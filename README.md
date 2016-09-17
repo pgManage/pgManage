@@ -6,7 +6,7 @@
 Different versions of libev may not work with every version of Postage. To avoid problems, the Postage compile process is set up to statically compile libev. This way we control what version you use. If you need a different version, start with the dependencies/update.sh file.
 
 #### LIBRESSL
-Postage uses the new TLS API found in LibreSSL. It can take some time to compile LibreSSL. If LibreSSL is already installed on your machine, then the compile process dynamically loads that one. This way you can avoid the wait. If not, it's compiled in statically.
+Postage uses the new TLS API found in LibreSSL. It can take some time to compile LibreSSL. If LibreSSL is already installed on your machine, then the compile process dynamically loads that one. This way you can avoid the wait. If not, it's compiled in statically. Please be patient. 
 
 #### LIBPQ
 In order for Postage to talk to PostgreSQL you need to have the libpq library installed.
@@ -14,18 +14,6 @@ In order for Postage to talk to PostgreSQL you need to have the libpq library in
 Mac OS X ships with a PostgreSQL install with no libpq header files. If you then install PostgreSQL but don't add it to your PATH (in .profile) then the Postage configure process will error saying that it found pg_config (but it will be the wrong one) and fail to find the libpq header files. To fix this situation, make sure you add the proper pgsql/bin folder in the beginning of your path.
 
 Usually, if you have psql then you'll have the libpq library files and be fine. Rarely, you may encounter issues by using the wrong version of libpq. In these cases, or in the case where you want to run postage on a computer that doesn't have libpq installed, you can consult the file INSTALL_LIBPQ for some OS specific advice on how to get libpq.
-
-If postage compiles and links but doesn't run (on linux):
-
-Add this line to `/etc/ld.so.conf`:
-
-    /usr/local/lib
-
-And then run (as root):
-
-    # ldconfig
-
-This will add /usr/local/lib to the default library path. Now try again.
 
 ####DOWNLOADING POSTAGE
 
@@ -110,15 +98,20 @@ Postage saves SQL scripts to the .postage folder. If you're removing Postage you
 
     rm -r ~/.postage/
 
-####UNINSTALLING POSTAGE (without original build directory)
+####UNINSTALLING POSTAGE
 
-If you lost your original build directory then download the correct version of Postage and run:
+If you still have your original build directory then:
 
     cd postage
     ./configure
     make uninstall
-    rm -r ~/.postage/
+    rm -r ~/.postage/  # to remove SQL script
+    
+If you don't have your original build directory check the following locations:
 
+    rm -r /usr/local/etc/postage        # you may wish to save your config files first
+    rm /usr/local/sbin/postage          # this removes the binary
+    rm /usr/local/man/man1/postage.1    # this removes the man page
 
 ####FEEDBACK AND BUG REPORTS
 
@@ -126,6 +119,6 @@ Please contact us with your feedback! Please report any issues you have for FREE
 
 ####Licensing
 
-If you like some or all of Postage's functionality and the current license won't suit your needs, alternative licensing is available for a small fee. Please call for details. 817-503-9545
+If you like some or all of Postage's functionality and the current license won't suit your needs, commercial licensing is available starting at $99. Please call Justin at Workflow Products, 817-503-9545 for details.
 
 Copyright 2016 Workflow Products LLC
