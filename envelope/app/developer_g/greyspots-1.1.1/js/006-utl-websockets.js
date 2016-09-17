@@ -822,7 +822,7 @@
                     if (!error) {
                         confirmCallback(data, error, transactionID, commitFunction, rollbackFunction);
                     } else {
-                        confirmCallback(errorData, error, transactionID, commitFunction, function () {}); //, rollbackFunction
+                        confirmCallback(errorData, error, transactionID, commitFunction, rollbackFunction);
                     }
                 });
                 
@@ -874,7 +874,7 @@
                     if (!error) {
                         confirmCallback(data, error, transactionID, commitFunction, rollbackFunction);
                     } else {
-                        confirmCallback(errorData, error, transactionID, commitFunction, function () {}); //, rollbackFunction
+                        confirmCallback(errorData, error, transactionID, commitFunction, rollbackFunction);
                     }
                 });
                 
@@ -924,7 +924,7 @@
                     if (!error) {
                         confirmCallback(data, error, transactionID, commitFunction, rollbackFunction);
                     } else {
-                        confirmCallback(errorData, error, transactionID, commitFunction, function () {}); //, rollbackFunction
+                        confirmCallback(errorData, error, transactionID, commitFunction, rollbackFunction);
                     }
                 });
                 
