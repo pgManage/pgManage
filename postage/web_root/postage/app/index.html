@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Postage</title>
+        
+        <script>
+            //jslint white:true multivar:true
+            var bolPropertyPanelOpen = false, arrNotification = [], bolCurl = false;
+            
+            window.addEventListener('DOMContentLoaded', function () {
+                'use strict';
+                var link1 = GS.stringToElement('<link href="resources/ws-tab-functions.css" type="text/css" rel="stylesheet" />'),
+                    link2 = GS.stringToElement('<link href="resources/ws-home.css" type="text/css" rel="stylesheet" />'),
+                    link3 = GS.stringToElement('<link href="resources/pg-9.2-tree-functions.css" type="text/css" rel="stylesheet" />'),
+                    link4 = GS.stringToElement('<link href="resources/pg-9.2-other.css" type="text/css" rel="stylesheet" />'),
+                    link5 = GS.stringToElement('<link href="resources/pg-9.2-autocomplete.css" type="text/css" rel="stylesheet" />');
+                
+                document.body.appendChild(link1);
+                document.body.appendChild(link2);
+                document.body.appendChild(link3);
+                document.body.appendChild(link4);
+                document.body.appendChild(link5);
+            });
+            
+            window.addEventListener('notification', function (event) {
+                'use strict';
+                var strBatch = event.message, arrBatch = strBatch.split('\n'), i, len
+                  , strMessage, strType, strChannel, strPID, strPayload, jsnMessage;
+                
+                // remove extra \n
+                arrBatch.pop();
+                
+                for (i = 0, len = arrBatch.length; i < len; i += 1) {
+                    strMessage = arrBatch[i];
+                    strType = strMessage.substring(0, strMessage.indexOf('\t'));
+                    strMessage = strMessage.substring(strMessage.indexOf('\t') + 1);
+                    
+                    if (strType !== 'WARNING') {
+                        strChannel = strMessage.substring(0, strMessage.indexOf('\t'));
+                        strMessage = strMessage.substring(strMessage.indexOf('\t') + 1);
+                        
+                        strPID = strMessage.substring(0, strMessage.indexOf('\t'));
+                        strMessage = strMessage.substring(strMessage.indexOf('\t') + 1);
+                    }
+                    
+                    strPayload = GS.decodeFromTabDelimited(strMessage);
+                    
+                    jsnMessage = {
+                        'strType': strType || '',
+                        'strMessage': strMessage || '',
+                        'strChannel': strChannel || '',
+                        'strPayload': strPayload || '',
+                        'strPID': strPID || '',
+                        'hasBeenRead': false
+                    };
+                    
+                    arrNotification.push(jsnMessage);
+                }
+                
+                document.getElementById('badge-notification-feed').removeAttribute('hidden');
+                document.getElementById('badge-notification-feed').textContent = (parseInt(document.getElementById('badge-notification-feed').textContent, 10) + arrBatch.length);
+                
+                GS.triggerEvent(window, 'notification-received', {'message': event.message, 'jsnMessage': jsnMessage});
+            });
+            
+            window.addEventListener('load', function () {
+                'use strict';
+                // load ace range constructor so that we can select text programatically
+                window.Range = require('ace/range').Range;
+                
+                // load ace snippet manager so that we can load our own snippets
+                window.snippetManager = require('ace/snippets').snippetManager;
+                
+                // load ace undo manager so that we can clear the undo stack of an ace
+                window.UndoManager = require('ace/undomanager').UndoManager;
+                
+                // open socket for queries
+                GS.envSocket = GS.openSocket('env');
+                
+                // load context info
+                loadContextData(function () {
+                    // time to get things started
+                    treeStart();
+                    startTabContainer();
+                    autocompleteStart();
+                    loadHeaderText();
+                    loadTabsFromServer();
+                    
+                    // load state from query string
+                    handleLoad();
+                    
+                    // put connection name in tab name
+                    document.title = 'Postage: ' + contextData.connectionName;
+                });
+                
+                //// if we're too small for the panel: close the panel
+                //if (window.innerWidth <= 768) {
+                //    hideLeftBar()
+                //}
+                
+                if (localStorage.greyspots_postage_tutorial === 'true') {
+                    // tutorial code should go here
+                    
+                    localStorage.greyspots_postage_tutorial = 'false';
+                }
+                
+                document.getElementById('right-bar').addEventListener('show', function () {
+                    bolPropertyPanelOpen = true;
+                });
+                
+                document.getElementById('right-bar').addEventListener('hide', function () {
+                    bolPropertyPanelOpen = false;
+                });
+                
+                // there is a font difference between chrome on mac and chrome on windows
+                //      this class should allow us to resolve the differences
+                if (navigator.userAgent.indexOf('Mac') > 0) {
+                    document.body.classList.add('mac');
+                } else {
+                    document.body.classList.add('pc');
+                }
+                
+                if (!evt.touchDevice) {
+                    startPanelResize(document.getElementById('left-bar'));
+                }
+                
+                // if a file didn't load: execute orderSixtySix()
+                if (!window.bolAutocompleteLogicLoaded
+                 || !window.bolAutocompleteQueriesLoaded
+                 || !window.autocompleteLoaded
+                 || !window.bolOtherLoaded
+                 || !window.bolProcessesLoaded
+                 || !window.bolQuerySelectionLoaded
+                 || !window.bolTreeFunctionsLoaded
+                 || !window.bolTreeQueriesLoaded
+                 || !window.bolGetFunctionsLoaded
+                 || !window.bolHomeLoaded
+                 || !window.bolTabFunctionsLoaded
+                 || !window.bolExplainLoaded
+                 || !window.bolD3Loaded) {
+                    orderSixtySix();
+                }
+            });
+            
+            function orderSixtySix() {
+                'use strict';
+                var styleElement = document.createElement('style')
+                  , dialogElement = document.createElement('div');
+                
+                styleElement.innerHTML =
+                    '#dialog-something-wrong { position:fixed; left:0; top:0; z-index:5000; width:100%; height:100%; background:#636579; color:#FFF;} ' +
+                    '.something-wrong-title  { text-align: center; padding-top: 3em; font-size: 25px; }' +
+                    '.something-wrong-content   { max-width: 500px; margin: 0 auto; }' +
+                    '.something-wrong-content a { color: #44FB96; }';
+                
+                dialogElement.setAttribute('id', 'dialog-something-wrong');
+                dialogElement.innerHTML =
+                    '<div class="something-wrong-title">' +
+                        'Something Went Wrong' +
+                    '</div>' +
+                    '<div class="something-wrong-content">' +
+                        'We apologize for the inconvenience, but not all of the files that postage needs successfully loaded. If possible, please open your console by right-clicking on this page and clicking the "Inspect Element" or "Inspect" choice. After doing so, please go to the "Console" tab and email a screenshot to <a href="mailto:michael@workflowproducts.com">me (Michael)</a>.' +
+                    '</div>';
+                
+                document.head.appendChild(styleElement);
+                document.body.appendChild(dialogElement);
+            }
+            
+            function showLeftBar() {
+                'use strict';
+                document.getElementById('panel').show('left-bar');
+                GS.pushQueryString('leftpanel=true');
+            }
+            function hideLeftBar() {
+                'use strict';
+                document.getElementById('panel').hide('left-bar');
+                GS.pushQueryString('leftpanel=false');
+            }
+            function qsLoadLeftPanel(strQueryString) {
+                var bolOpenPanel = GS.qryGetVal(strQueryString, 'leftpanel') !== 'false';
+                
+                if (bolOpenPanel) {
+                    document.getElementById('panel').show('left-bar');
+                } else {
+                    document.getElementById('panel').hide('left-bar');
+                }
+            }
+            
+            (function () {
+                var strViewCache;
+                
+                window.qsLoadScriptTab = function (strQueryString) {
+                    var strView = GS.qryGetVal(strQueryString, 'view'), arrParts, buttons, strScript, strName, strButtons
+                      , strTemplate, strOID, strSchema, strObjectName, strFinalName, arrElements, i, len, strCurrentTab
+                      , currentElement;
+                    
+                    if (strView && strView !== strViewCache) {
+                        strViewCache = strView;
+                        
+                        if (strView === 'home') {
+                            openHome();
+                            
+                        } else if (strView.indexOf('tab:') !== 0) {
+                            arrParts = strView.split(':');
+                            buttons = associatedButtons[arrParts[0]];
+                            
+                            strTemplate   = arrParts[0];
+                            strOID        = arrParts[1];
+                            strSchema     = arrParts[2];
+                            strObjectName = arrParts[3];
+                            
+                            // get tab name
+                            if (strSchema && strObjectName) {
+                                // "strObjectName" should already be quote_ident in the listQuery
+                                strFinalName = quote_ident(strSchema) + '.' + strObjectName;
+                            } else if (!strSchema) {
+                                strFinalName = quote_ident(strObjectName);
+                            } else {
+                                strFinalName = quote_ident(strSchema);
+                            }
+                            
+                            strScript = treePrepareQuery(scriptQuery[arrParts[0]], strOID, strFinalName, strFinalName);
+                            
+                            // get toolbar
+                            strButtons = '';
+                            if (buttons.indexOf('propertyButton') !== -1) {
+                                strButtons += propertyButton(strTemplate, strOID, strSchema, strObjectName);
+                            }
+                            if (buttons.indexOf('dependButton') !== -1) {
+                                strButtons += dependButton(strOID);
+                            }
+                            if (buttons.indexOf('statButton') !== -1) {
+                                strButtons += statButton(strTemplate, strOID, strSchema, strObjectName);
+                            }
+                            if (buttons.indexOf('dumpButton') !== -1) {
+                                strButtons += dumpButton(strOID, strFinalName);
+                            }
+                            if (buttons.indexOf('dataObjectButtons') !== -1) {
+                                strButtons += dataObjectButtons(strTemplate, strOID, strSchema, strObjectName);
+                            }
+                            
+                            getScript(strFinalName, strButtons, strScript);
+                            
+                        } else {
+                            arrElements = xtag.toArray(document.getElementsByClassName('tab-button'));
+                            strCurrentTab = strView.substring('tab:'.length);
+                            
+                            for (i = 0, len = arrElements.length; i < len; i += 1) {
+                                if (arrElements[i].filePath === strCurrentTab) {
+                                    currentElement = arrElements[i];
+                                    break;
+                                }
+                            }
+                            
+                            if (currentElement) {
+                                setFrame(currentElement, currentElement.relatedFrame, false);
+                            } else {
+                                addHomeQuery('', 'Couldn\'t Load Tab'
+                                           , 'SELECT E\'\n\n-- Couldn\'\'t Load Tab: The tab "' + strCurrentTab + '" is no longer open.\n\n\'', '');
+                                setHomeValue('Couldn\'t Load Tab', '\n\n-- Couldn\'t Load Tab: The tab "' + strCurrentTab + '" is no longer open.\n\n', '');
+                            }
+                        }
+                    } else {
+                        if (strView === 'home') {
+                            loadHome();
+                        }
+                    }
+                }
+            })();
+            
+            function handleLoad() {
+                'use strict';
+                var strQueryString = GS.getQueryString(), strView;
+                
+                qsLoadLeftPanel(strQueryString);
+                qsLoadShowHide(strQueryString);
+                
+                // handle preview script, if the querystring is not for home or tab
+                //      tab is handled by the tab listing function after load
+                strView = GS.qryGetVal(strQueryString, 'view');
+                if (strView !== 'home' && strView.indexOf('tab:') === -1) {
+                    qsLoadScriptTab(strQueryString);
+                }
+            }
+            
+            function handleReplacePop() {
+                'use strict';
+                var strQueryString = GS.getQueryString();
+                
+                qsLoadLeftPanel(strQueryString);
+                qsLoadScriptTab(strQueryString);
+                qsLoadShowHide(strQueryString);
+            }
+            
+            function handlePush() {
+                'use strict';
+                var strQueryString = GS.getQueryString();
+                
+                qsLoadScriptTab(strQueryString);
+                qsLoadShowHide(strQueryString);
+            }
+            
+            window.addEventListener('pushstate', function () { handlePush(); });
+            window.addEventListener('replacestate', function () { handleReplacePop(); });
+            window.addEventListener('popstate', function () { handleReplacePop(); });
+        </script>
+        <style>
+            #panel[right-bar="hide"] #postage-main-content {
+                border-right: 0 none;
+            }
+            
+            #grid-panel-buttons gs-button {
+                border-top: 0 none;
+                border-left: 0 none;
+                padding-top: 1.7em;
+                padding-bottom: 0.125em;
+            }
+            #grid-panel-buttons gs-button:after {
+                top: 0.1em;
+            }
+            #grid-panel-buttons gs-block:last-child gs-button {
+                border-right: 0 none;
+            }
+        </style>
+    </head>
+    <body>
+        <script id="initial-loader-script">
+            (function () {
+                var divElement = document.createElement('div');
+                
+                divElement.setAttribute('id','loading-screen');
+                divElement.innerHTML =
+                    '<div id="loading-icon">Loading Postage...</div>';
+                
+                document.body.appendChild(divElement);
+                
+                window.addEventListener('load', function () {
+                    document.body.removeChild(divElement);
+                    document.body.removeChild(document.getElementById('initial-loader-script'));
+                    document.body.removeChild(document.getElementById('initial-loader-style'));
+                });
+            })();
+        </script>
+        <style id="initial-loader-style">
+            #loading-screen { position:fixed; left:0; top:0; z-index:5000; width:100%; height:100%; background:#509469; color:#FFF; }
+            #loading-icon {
+                margin: 6em auto 0 auto;
+                text-align: center;
+                color: #FFF;
+                line-height: 1em;
+                font-size: 20px;
+                font-weight: 900;
+                font-family: Helvetica,Arial,sans-serif;
+            }
+        </style>
+        <gs-panel id="panel" dismissible>
+            <gs-page id="left-bar" style="width: 17em; min-width: 17em;">
+                <gs-header flex-horizontal>
+                    <div id="header-text-container" flex onclick="dialogConnData(this)"></div>
+                    <!--<gs-button class="header-button-text" id="header-text-container" onclick="dialogSwitchDatabase(this);" no-focus icon="angle-down" inline></gs-button>
+                    <span flex></span>-->
+                    <gs-button id="button-close-left" class="header-button" icononly no-focus
+                                icon="arrow-left" onclick="hideLeftBar();" title="Hide this panel"></gs-button>
+                </gs-header>
+                <gs-body id="left-panel-body" flex-vertical flex-fill>
+                    <gs-grid id="grid-panel-buttons">
+                        <gs-block>
+                            <gs-button onclick="dialogSwitchDatabase(this)" icontop icon="database"
+                                       title="Switch to a different database in this cluster" remove-all no-focus>Switch Database</gs-button>
+                        </gs-block>
+                        <gs-block>
+                            <gs-button onclick="dialogAddSchema(this)" title="Hide/Show SCHEMAs and other types of objects" remove-all icontop icon="eye" no-focus>Hide/Show</gs-button>
+                        </gs-block>
+                    </gs-grid>
+                    <div id="object-list-ace" class="childrenneedsclick" flex></div>
+                </gs-body>
+            </gs-page>
+            <gs-page id="postage-main-content" style="min-width: 17em;">
+                <gs-header flex-horizontal>
+                    <gs-button id="panel-open" class="header-button" icononly no-focus
+                                    icon="arrow-right" onclick="showLeftBar();" title="Show the left panel"></gs-button>
+                    <div flex></div>
+                    
+                    <gs-button class="header-button-text" onclick="menuUser(this);" no-focus icon="angle-down" inline title="Links related to the user.">User</gs-button>
+                    
+                    <gs-button class="header-button-text" onclick="menuTab(this);" no-focus icon="angle-down" inline title="Tools for handling Tabs.">Tab</gs-button>
+                    
+                    <gs-button class="header-button-text" onclick="menuTools(this);" no-focus icon="angle-down" inline title="Tools for Processes and Information.">Tools</gs-button>
+                    
+                    <gs-button id="button-history" class="header-button-text" onclick="dialogExecuteHistory();" no-focus
+                                    icon="book" inline title="Query history for this session">History</gs-button>
+                    
+                    <gs-button id="button-feed" class="header-button-text" onclick="dialogOpenFeed();" no-focus
+                                    icon="comments-o" inline title="Notification feed">Notify
+                        <span id="badge-notification-feed" hidden>0</span></gs-button>
+                    <span>&nbsp;</span>
+                    <gs-button class="header-button" id="button-property-panel" icononly no-focus icon="arrow-left"
+                                    onclick="showPropertyPanel()" title="Show the property panel" hidden></gs-button>
+                </gs-header>
+                <gs-body>
+                    <div id="tab-container" flex-vertical flex-fill></div>
+                </gs-body>
+            </gs-page>
+            <gs-page id="right-bar" style="width: 17em; min-width: 17em;" hidden>
+                <gs-header>
+                    <gs-button class="header-button" icononly no-focus icon="arrow-right" title="Hide this panel" onclick="hidePropertyPanel()"></gs-button>
+                </gs-header>
+                <gs-body padded></gs-body>
+            </gs-page>
+        </gs-panel>
+        
+        <script src="../js/greyspots.js" type="text/javascript"></script>
+        <link href="../css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <link href="../css/postage.css" type="text/css" rel="stylesheet" />
+        
+        <script src="resources/ace/ace.js" data-ace-base="resources/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="resources/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="resources/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="resources/ws-get-functions.js" type="text/javascript"></script>
+        <script src="resources/ws-tab-functions.js" type="text/javascript"></script>
+        <script src="resources/ws-home.js" type="text/javascript"></script>
+        
+        <script src="resources/pg-9.2-tree-functions.js" type="text/javascript"></script>
+        <script src="resources/pg-9.2-tree-queries.js" type="text/javascript"></script>
+        <script src="resources/pg-9.2-autocomplete.js" type="text/javascript"></script>
+        <script src="resources/pg-9.2-autocomplete-queries.js" type="text/javascript"></script>
+        <script src="resources/pg-9.2-autocomplete-logic.js" type="text/javascript"></script>
+        <script src="resources/pg-9.2-processes.js" type="text/javascript"></script>
+        <script src="resources/pg-9.2-other.js" type="text/javascript"></script>
+        <script src="resources/pg-9.2-query-selection.js" type="text/javascript"></script>
+        <script src="resources/pg-9.2-explain.js" type="text/javascript"></script>
+        <script src="../js/d3.js" type="text/javascript"></script>
+    </body>
+</html>

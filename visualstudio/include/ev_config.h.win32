@@ -1,0 +1,6 @@
+#pragma once
+
+#define EV_FEATURES 0x7f
+
+#define HAVE_SELECT 1
+#define HAVE_SYS_SELECT_H 1

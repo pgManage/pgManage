@@ -1,0 +1,291 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		ABDAFFD01D849B0800288D0D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ABDAFFCF1D849B0800288D0D /* AppDelegate.m */; };
+		ABDAFFD31D849B0800288D0D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ABDAFFD21D849B0800288D0D /* main.m */; };
+		ABDAFFD51D849B0800288D0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABDAFFD41D849B0800288D0D /* Assets.xcassets */; };
+		ABDAFFD81D849B0800288D0D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABDAFFD61D849B0800288D0D /* MainMenu.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		ABDAFFCB1D849B0800288D0D /* Postage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Postage.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABDAFFCE1D849B0800288D0D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		ABDAFFCF1D849B0800288D0D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		ABDAFFD21D849B0800288D0D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		ABDAFFD41D849B0800288D0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		ABDAFFD71D849B0800288D0D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		ABDAFFD91D849B0800288D0D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		ABDAFFC81D849B0800288D0D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		ABDAFFC21D849B0800288D0D = {
+			isa = PBXGroup;
+			children = (
+				ABDAFFCD1D849B0800288D0D /* Postage */,
+				ABDAFFCC1D849B0800288D0D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		ABDAFFCC1D849B0800288D0D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				ABDAFFCB1D849B0800288D0D /* Postage.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		ABDAFFCD1D849B0800288D0D /* Postage */ = {
+			isa = PBXGroup;
+			children = (
+				ABDAFFCE1D849B0800288D0D /* AppDelegate.h */,
+				ABDAFFCF1D849B0800288D0D /* AppDelegate.m */,
+				ABDAFFD41D849B0800288D0D /* Assets.xcassets */,
+				ABDAFFD61D849B0800288D0D /* MainMenu.xib */,
+				ABDAFFD91D849B0800288D0D /* Info.plist */,
+				ABDAFFD11D849B0800288D0D /* Supporting Files */,
+			);
+			path = Postage;
+			sourceTree = "<group>";
+		};
+		ABDAFFD11D849B0800288D0D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				ABDAFFD21D849B0800288D0D /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		ABDAFFCA1D849B0800288D0D /* Postage */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ABDAFFDC1D849B0800288D0D /* Build configuration list for PBXNativeTarget "Postage" */;
+			buildPhases = (
+				ABDAFFC71D849B0800288D0D /* Sources */,
+				ABDAFFC81D849B0800288D0D /* Frameworks */,
+				ABDAFFC91D849B0800288D0D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Postage;
+			productName = Postage;
+			productReference = ABDAFFCB1D849B0800288D0D /* Postage.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		ABDAFFC31D849B0800288D0D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0730;
+				ORGANIZATIONNAME = greyspots;
+				TargetAttributes = {
+					ABDAFFCA1D849B0800288D0D = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
+				};
+			};
+			buildConfigurationList = ABDAFFC61D849B0800288D0D /* Build configuration list for PBXProject "Postage" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = ABDAFFC21D849B0800288D0D;
+			productRefGroup = ABDAFFCC1D849B0800288D0D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				ABDAFFCA1D849B0800288D0D /* Postage */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		ABDAFFC91D849B0800288D0D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABDAFFD51D849B0800288D0D /* Assets.xcassets in Resources */,
+				ABDAFFD81D849B0800288D0D /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		ABDAFFC71D849B0800288D0D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABDAFFD31D849B0800288D0D /* main.m in Sources */,
+				ABDAFFD01D849B0800288D0D /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		ABDAFFD61D849B0800288D0D /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				ABDAFFD71D849B0800288D0D /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		ABDAFFDA1D849B0800288D0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		ABDAFFDB1D849B0800288D0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		ABDAFFDD1D849B0800288D0D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Postage/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.greyspots.Postage;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		ABDAFFDE1D849B0800288D0D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Postage/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.greyspots.Postage;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		ABDAFFC61D849B0800288D0D /* Build configuration list for PBXProject "Postage" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABDAFFDA1D849B0800288D0D /* Debug */,
+				ABDAFFDB1D849B0800288D0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ABDAFFDC1D849B0800288D0D /* Build configuration list for PBXNativeTarget "Postage" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABDAFFDD1D849B0800288D0D /* Debug */,
+				ABDAFFDE1D849B0800288D0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = ABDAFFC31D849B0800288D0D /* Project object */;
+}

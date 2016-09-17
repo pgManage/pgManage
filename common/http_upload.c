@@ -1,0 +1,288 @@
+#include "http_upload.h"
+
+void http_upload_step1(struct sock_ev_client *client) {
+	SDEBUG("http_upload_step1");
+
+	SDEFINE_VAR_ALL(str_temp, str_query, str_temp_connstring, str_canonical_start, str_full_path);
+	char *str_response = NULL;
+	struct sock_ev_client_upload *client_upload = NULL;
+#ifdef _WIN32
+	LPTSTR strErrorText = NULL;
+#endif
+
+	SFINISH_SALLOC(client_upload, sizeof(struct sock_ev_client_upload));
+	client_upload->parent = client;
+	client_upload->int_written = 0;
+#ifdef _WIN32
+	client_upload->h_file = INVALID_HANDLE_VALUE;
+#else
+	client_upload->int_fd = -1;
+#endif
+
+	// Get upload from request
+	client_upload->sun_current_upload = get_sun_upload(client->str_request, client->int_request_len);
+	SFINISH_CHECK(client_upload->sun_current_upload != NULL, "get_sun_upload failed");
+	SDEBUG("upload length: %i", client_upload->sun_current_upload->int_file_content_length);
+
+	client_upload->ptr_content = client_upload->sun_current_upload->str_file_content;
+	SDEBUG("upload contents: %s", client_upload->ptr_content);
+
+#ifdef ENVELOPE
+	SFINISH_CAT_CSTR(client_upload->str_file_name, client_upload->sun_current_upload->str_name);
+
+	client_upload->str_canonical_start = canonical_full_start(client_upload->str_file_name);
+	SFINISH_CHECK(client_upload->str_file_name != NULL, "canonical_full_start() failed, %s", client_upload->str_file_name);
+
+	str_temp = client_upload->str_file_name;
+	client_upload->str_file_name = canonical_strip_start(str_temp);
+	SFINISH_CHECK(client_upload->str_file_name != NULL, "canonical_strip_start() failed, %s", str_temp);
+
+	str_full_path = canonical(client_upload->str_canonical_start, client_upload->str_file_name, "valid_path");
+	SFINISH_CHECK(str_full_path != NULL, "invaild path: %s", client_upload->str_file_name);
+	SDEBUG("str_full_path: %s", str_full_path);
+
+	SDEBUG("str_temp: %s", str_temp);
+	SDEBUG("client_upload->str_canonical_start: %s", client_upload->str_canonical_start);
+	SDEBUG("client_upload->str_file_name: %s", client_upload->str_file_name);
+
+	SFINISH_CHECK(permissions_write_check(global_loop, client->conn, str_temp, client_upload, http_upload_step2),
+		"permissions_write_check() failed");
+	SFREE(str_temp);
+#else
+	SFINISH_CAT_CSTR(client_upload->str_canonical_start, str_global_sql_root);
+
+	// Find the file in the connection's sql folder
+	SFINISH_SALLOC(client_upload->str_file_name, 20);
+	if (client_upload->parent->str_conn != NULL) {
+		SFINISH_CAT_CSTR(str_temp_connstring, client_upload->parent->str_conn);
+	} else {
+#ifdef POSTAGE_INTERFACE_LIBPQ
+		SFINISH_CAT_CSTR(str_temp_connstring, get_connection_info(client_upload->parent->str_connname, NULL), " dbname=",
+			client_upload->parent->str_database);
+#else
+		SFINISH_CAT_CSTR(str_temp_connstring, get_connection_info(client_upload->parent->str_connname, NULL));
+#endif
+	}
+	SHA1((unsigned char *)str_temp_connstring, strlen(str_temp_connstring), (unsigned char *)client_upload->str_file_name);
+	str_temp = client_upload->str_file_name;
+	size_t int_len = 20;
+	client_upload->str_file_name = hexencode(str_temp, &int_len);
+	SFREE(str_temp);
+	SFINISH_CAT_APPEND(client_upload->str_file_name, "/", client->str_username, client_upload->sun_current_upload->str_name);
+
+	http_upload_step2(global_loop, client_upload, true);
+#endif
+
+	// check for permissions
+
+	bol_error_state = false;
+finish:
+	bol_error_state = false;
+	SFREE_ALL();
+	if (str_response != NULL) {
+		SDEBUG("str_response: %s", str_response);
+		char *_str_response = str_response;
+		char str_length[50];
+		ssize_t int_response_len = 0;
+		snprintf(str_length, 50, "%zu", strlen(_str_response));
+		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
+								"Server: " SUN_PROGRAM_LOWER_NAME ""
+								"Content-Length: ",
+			str_length, "\015\012\015\012", _str_response);
+		SFREE(_str_response);
+		if ((int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+			if (bol_tls) {
+				SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
+			} else {
+				SERROR_NORESPONSE("write() failed");
+			}
+		}
+		// Unlikely, but possible
+		if (client_upload != NULL) {
+			http_upload_free(client_upload);
+		}
+		// This prevents an infinite loop if CLIENT_CLOSE fails
+		SFREE(str_response);
+		ev_io_stop(global_loop, &client->io);
+		SFINISH_CLIENT_CLOSE(client);
+	}
+}
+
+bool http_upload_step2(EV_P, void *cb_data, bool bol_group) {
+	struct sock_ev_client_upload *client_upload = (struct sock_ev_client_upload *)cb_data;
+	struct sock_ev_client *client = client_upload->parent;
+	char *str_response = NULL;
+	SDEFINE_VAR_ALL(str_temp);
+#ifdef _WIN32
+	char *strErrorText = NULL;
+#endif
+
+	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
+
+	// Make sure the file doesn't already exist
+	str_temp = canonical(client_upload->str_canonical_start, client_upload->str_file_name, "read_file");
+	SFINISH_CHECK(str_temp == NULL, "File already exists.");
+	SFREE(str_global_error);
+
+	// Now open the file
+	str_temp = canonical(client_upload->str_canonical_start, client_upload->str_file_name, "write_file");
+	SFINISH_CHECK(str_temp != NULL, "Invalid path.");
+#ifdef _WIN32
+	SetLastError(0);
+	client_upload->h_file = CreateFileA(str_temp, GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (client_upload->h_file == INVALID_HANDLE_VALUE) {
+		int int_err = GetLastError();
+		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, int_err,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&strErrorText, 0, NULL);
+
+		if (strErrorText != NULL) {
+			SFINISH("CreateFile failed: 0x%X (%s)", int_err, strErrorText);
+		}
+	}
+#else
+	client_upload->int_fd = open(str_temp, O_TRUNC | O_WRONLY | O_CREAT, 0770);
+	SFINISH_CHECK(client_upload->int_fd > 0, "open() failed!");
+#endif
+
+	increment_idle(EV_A);
+	ev_check_init(&client_upload->check, http_upload_step3);
+	ev_check_start(EV_A, &client_upload->check);
+
+finish:
+#ifdef _WIN32
+	if (strErrorText != NULL) {
+		LocalFree(strErrorText);
+		strErrorText = NULL;
+	}
+#endif
+	bol_error_state = false;
+	if (client_upload != NULL) {
+		SFREE(client_upload->str_file_name);
+	}
+	SFREE_ALL();
+	if (str_response != NULL) {
+		SDEBUG("str_response: %s", str_response);
+		char *_str_response = str_response;
+		char str_length[50];
+		snprintf(str_length, 50, "%zu", strlen(_str_response));
+		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
+								"Server: " SUN_PROGRAM_LOWER_NAME ""
+								"Content-Length: ",
+			str_length, "\015\012\015\012", _str_response);
+		SFREE(_str_response);
+		ssize_t int_response_len = 0;
+		if ((int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+			if (bol_tls) {
+				SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
+			} else {
+				SERROR_NORESPONSE("write() failed");
+			}
+		}
+		// Unlikely, but possible
+		if (client_upload != NULL) {
+			http_upload_free(client_upload);
+		}
+		// This prevents an infinite loop if CLIENT_CLOSE fails
+		SFREE(str_response);
+		ev_io_stop(EV_A, &client->io);
+		SFINISH_CLIENT_CLOSE(client);
+	}
+	return true;
+}
+
+void http_upload_step3(EV_P, ev_check *w, int revents) {
+	if (revents != 0) {
+	} // get rid of unused parameter warning
+	struct sock_ev_client_upload *client_upload = (struct sock_ev_client_upload *)w;
+	struct sock_ev_client *client = client_upload->parent;
+	char *str_response = NULL;
+#ifdef _WIN32
+	LPTSTR strErrorText = NULL;
+#endif
+
+#ifdef _WIN32
+	DWORD int_temp = 0;
+	BOOL bol_result = WriteFile(client_upload->h_file, client_upload->ptr_content + client_upload->int_written,
+		(DWORD)(client_upload->sun_current_upload->int_file_content_length - client_upload->int_written), &int_temp, NULL);
+	if (bol_result == FALSE) {
+		int int_err = GetLastError();
+		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, int_err,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&strErrorText, 0, NULL);
+
+		if (strErrorText != NULL) {
+			SFINISH("WriteFile failed: 0x%X (%s)", int_err, strErrorText);
+		}
+	}
+#else
+	ssize_t int_temp = 0;
+	int_temp = write(client_upload->int_fd, client_upload->ptr_content + client_upload->int_written,
+		(size_t)((ssize_t)client_upload->sun_current_upload->int_file_content_length - client_upload->int_written));
+	SFINISH_CHECK(int_temp != -1, "write failed");
+#endif
+	client_upload->int_written += int_temp;
+
+	if (client_upload->int_written == (ssize_t)client_upload->sun_current_upload->int_file_content_length) {
+		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
+									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+									   "Content-Length: 17\015\012"
+									   "\015\012"
+									   "Upload Succeeded\012");
+		ssize_t int_response_len = 0;
+		if ((int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+			if (bol_tls) {
+				SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
+			} else {
+				SERROR_NORESPONSE("write() failed");
+			}
+		}
+		SFREE(str_response);
+
+		decrement_idle(EV_A);
+		ev_check_stop(EV_A, &client_upload->check);
+		http_upload_free(client_upload);
+		SFINISH_CLIENT_CLOSE(client);
+	}
+
+	bol_error_state = false;
+finish:
+	if (bol_error_state == true) {
+		bol_error_state = false;
+		char *_str_response = str_response;
+		char str_length[50];
+		snprintf(str_length, 50, "%zu", strlen(_str_response));
+		ssize_t int_response_len = 0;
+		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
+								"Server: " SUN_PROGRAM_LOWER_NAME ""
+								"Content-Length: ",
+			str_length, "\015\012\015\012", _str_response);
+		SFREE(_str_response);
+		if ((int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+			if (bol_tls) {
+				SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
+			} else {
+				SERROR_NORESPONSE("write() failed");
+			}
+		}
+		http_upload_free(client_upload);
+		SFREE(str_response);
+		SFINISH_CLIENT_CLOSE(client);
+	}
+}
+
+void http_upload_free(struct sock_ev_client_upload *to_free) {
+#ifdef _WIN32
+	if (to_free->h_file != INVALID_HANDLE_VALUE) {
+		CloseHandle(to_free->h_file);
+		to_free->h_file = INVALID_HANDLE_VALUE;
+	}
+#else
+	if (to_free->int_fd > -1) {
+		close(to_free->int_fd);
+		to_free->int_fd = -1;
+	}
+#endif
+	SFREE(to_free->str_canonical_start);
+	SFREE(to_free->str_file_name);
+	SFREE_SUN_UPLOAD(to_free->sun_current_upload);
+	SFREE(to_free);
+}

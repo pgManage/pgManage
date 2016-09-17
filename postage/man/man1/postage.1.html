@@ -1,0 +1,465 @@
+Content-type: text/html
+
+<HTML><HEAD><TITLE>Manpage of POSTAGE</TITLE>
+</HEAD><BODY>
+<H1>POSTAGE</H1>
+Section: Postage Manual (1)<BR>Updated: August 26, 2016<BR><A HREF="#index">Index</A>
+<A HREF="../index.html">Return to Main Contents</A><HR>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+<P>
+
+<I>postage</I>
+
+- PostgreSQL Administration for the web
+<A NAME="lbAC">&nbsp;</A>
+<H2>FULL PATH</H2>
+
+<P>
+
+postage is usually installed as
+<B>C:\Program Files\Workflow Products\Postage\bin\postage.exe</B>
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<P>
+
+<B>postage</B>
+
+<DL COMPACT><DT><DD>
+<BR>
+
+[-h | --help]
+<BR>
+
+[-v | --version]
+<BR>
+
+[-c &lt;config-file&gt; | --config-file=&lt;config-file&gt;]
+<BR>
+
+[-d &lt;connection-file&gt; | --connection-file=&lt;connection-file&gt;]
+<BR>
+
+[-s &lt;super-only&gt; | --super-only=&lt;super-only&gt;]
+<BR>
+
+[-g &lt;login-group&gt; | --login-group=&lt;login-group&gt;]
+<BR>
+
+[-r &lt;web-root&gt; | --web-root=&lt;web-root&gt;]
+<BR>
+
+[-a &lt;data-root&gt; | --data-root=&lt;data-root&gt;]
+<BR>
+
+[-p &lt;port&gt; | --port=&lt;port&gt;]
+<BR>
+
+[-j &lt;tls-cert&gt; | --tls-cert=&lt;tls-cert&gt;]
+<BR>
+
+[-k &lt;tls-key&gt; | --tls-key=&lt;tls-key&gt;]
+<BR>
+
+[-l &lt;log-level&gt; | --log-level=&lt;log-level&gt;]
+<BR>
+
+[-n &lt;allow_custom_connections&gt; | --allow-custom-connections=&lt;allow-custom-connections&gt;]
+<BR>
+
+[-t &lt;login-timeout&gt; | --login-timeout=&lt;login-timeout&gt;]
+</DL>
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<P>
+
+The
+<B>postage</B>
+
+utility is a tool to make managing your PostgreSQL database fast and easy. It provides web access and can be used on a tablet, or even on a phone.
+<P>
+
+All log output is pushed to stderr, if you are pushing that to a file, then you must handle rotating the file yourself or it will get large and slow
+<B>postage</B>
+
+down.
+<A NAME="lbAF">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<P>
+
+<B>-h</B>
+
+or
+<B>--help</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+Print usage and exit
+</DL>
+
+<P>
+
+<B>-v</B>
+
+or
+<B>--version</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+Print version information and exit
+</DL>
+
+<P>
+
+<B>-c</B>
+
+or
+<B>--config-file=</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+<B>String;</B>
+
+defaults to C:\Program Files\Workflow Products\Postage\config\postage.conf
+<BR>
+
+You can use this option to tell Postage where to look for the configuration file. A sample configuration file is provided in C:\Program Files\Workflow Products\Postage\config\.
+If there is no file specified Postage will look in the current directory for a config file. If no config file is found Postage will proceed with default values.
+</DL>
+
+<P>
+
+The following options can be specified on the command line or in the configuration file. In the event a value is specified on the command line and in the config file, Postage will always use the command line option. Note that if no option is specified then some options will be set to a default value.
+<P>
+
+<B>[command line short]</B>
+
+or
+<B>[command line long]</B>
+
+or
+<B>[config file]</B>
+
+<P>
+
+<B>-d</B>
+
+or
+<B>--connection-file=</B>
+
+or
+<B>connection_file=</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+<B>String;</B>
+
+defaults to @C:\Program Files\Workflow Products\Postage\config\postage-connections.conf
+<BR>
+
+If not specified, Postage looks in the same folder as the config file for a file named postage-connections.conf.
+If Postage can't find a connection file, it will error.
+</DL>
+
+<P>
+
+<B>-s</B>
+
+or
+<B>--super-only=</B>
+
+or
+<B>super_only=</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+<B>Boolean;</B>
+
+defaults to true
+<BR>
+
+This tells Postage whether or not to only allow super users to login. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through Postage. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser.
+</DL>
+
+<P>
+
+<B>-g</B>
+
+or
+<B>--login-group=</B>
+
+or
+<B>login_group=</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+<B>String;</B>
+
+no default
+<BR>
+
+This tells Postage to only allow users in a certain PostgreSQL group to login to Postage. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group.
+</DL>
+
+<P>
+
+<B>-r</B>
+
+or
+<B>--web-root=</B>
+
+or
+<B>web_root=</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+<B>String;</B>
+
+Defaults to @C:\Program Files\Workflow Products\Postage\config\web_root
+<BR>
+
+This tells Postage where the HTML files have been installed to.
+</DL>
+
+<P>
+
+<B>-a</B>
+
+or
+<B>--data-root=</B>
+
+or
+<B>data_root=</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+<B>String;</B>
+
+defaults to ~/.postage/
+<BR>
+
+This tells Postage where to put the SQL file history. All tabs are saved to this location so that if you get disconnected from Postage you don't lose your work.
+</DL>
+
+<P>
+
+<B>-p</B>
+
+or
+<B>--postage-port=</B>
+
+or
+<B>postage_port=</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+<B>Integer;</B>
+
+defaults to 8080
+<BR>
+
+This tells Postage what port to listen on for browser requests.
+</DL>
+
+<P>
+
+<B>-j</B>
+
+or
+<B>--tls-cert=</B>
+
+or
+<B>tls_cert=</B>
+
+<BR>
+
+<B>-k</B>
+
+or
+<B>--tls-key=</B>
+
+or
+<B>tls_key=</B>
+
+<DL COMPACT><DT><DD>
+<B>String;</B>
+
+no defaults
+<BR>
+
+These options tell Postage where the TLS Certificate and Key files reside. If you use these options then you'll only be able to access Postage through a secure TLS connection.
+<BR>
+
+These options are only necessary if you wish to connect directly to Postage using a secure TLS connection. As an alternative, you can set up Postage in a reverse proxy configuration. This allows your web server to terminate the secure connection and pass on the request to Postage. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution.
+</DL>
+
+<P>
+
+<B>-n</B>
+
+or
+<B>--allow-custom-connections=</B>
+
+or
+<B>allow_custom_connections=</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+<B>Boolean;</B>
+
+defaults to false
+<BR>
+
+This tells Postage whether or not to allow anyone to use a custom connection from the login screen.
+</DL>
+
+<P>
+
+<B>-l</B>
+
+or
+<B>--log-level=</B>
+
+or
+<B>log_level=</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+<B>String;</B>
+
+defaults to error
+<BR>
+
+This option regulates the frequency and verbosity of log messages. Possible values are error, warn, notice and info.
+</DL>
+
+<P>
+
+<B>-t</B>
+
+or
+<B>--login-timeout=</B>
+
+or
+<B>login-timeout=</B>
+
+<BR>
+
+<DL COMPACT><DT><DD>
+<B>Integer;</B>
+
+defaults to 30
+<BR>
+
+This option regulates the timeout after the last page is closed.
+</DL>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>SETTING UP A CONNECTION TO A POSTGRESQL SERVER</H2>
+
+<P>
+
+Postage requires at least one PostgreSQL server be listed in the postage-connections.conf file. This version of Postage doesn't allow you to specify a server from the command line. Enter only one PostgreSQL server per line.
+<P>
+
+<B>The format of a connection string is:</B>
+
+<DL COMPACT><DT><DD>
+[name of server] [tab character] [standard space delimited PostgreSQL connection string]
+</DL>
+
+<P>
+
+Detailed information about PostgreSQL connection strings is available at: <A HREF="http://www.postgresql.org/docs/current/static/libpq-connect.html">http://www.postgresql.org/docs/current/static/libpq-connect.html</A>
+<P>
+
+Note that you do not enter your user name or password in this file. That information will be entered on the login screen. If you put a username or password in this file, it will be removed by Postage before attempting to connect to a database.
+<P>
+<B>EXAMPLE CONNECTION STRINGS:</B>
+
+<DL COMPACT><DT><DD>
+nuc-server<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT>hostaddr=192.168.0.100 port=5432 dbname=postgres<BR>
+<BR>
+
+mini-server<TT>&nbsp;&nbsp;&nbsp;&nbsp;</TT>hostaddr=127.0.0.1 port=5432 dbname=postgres sslmode=require<BR>
+</DL>
+
+<P>
+<A NAME="lbAH">&nbsp;</A>
+<H2>EXAMPLES</H2>
+
+<P>
+
+Run Postage (short argument):
+<DL COMPACT><DT><DD>
+C:\Program Files\Workflow Products\Postage\bin\postage -c C:\Program Files\Workflow Products\Postage\config\postage.conf -d C:\Program Files\Workflow Products\Postage\config\postage-connections.conf
+</DL>
+
+<P>
+
+Run Envelope (long argument):
+<DL COMPACT><DT><DD>
+C:\Program Files\Workflow Products\Postage\bin\postage --config-file=C:\Program Files\Workflow Products\Postage\config\postage.conf --connection-file C:\Program Files\Workflow Products\Postage\config\postage-connections.conf
+</DL>
+
+<P>
+<A NAME="lbAI">&nbsp;</A>
+<H2>TROUBLESHOOTING</H2>
+
+Try accessing your database through psql. If you can, double check your connection string parameters. If you can't connect, you may have a firewall problem.
+<BR>
+
+If you add a connection string to your postage-connections.conf and it doesn't show in the login screen then you likely don't have a tab character after the server name and before your connection string. This often happens when you paste from or to a terminal window.
+<P>
+<A NAME="lbAJ">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+<P>
+
+Copyright (c) 2016 Workflow Products, LLC
+<BR>
+
+Created by Annunziato Tocci
+<BR>
+
+Report bugs to <A HREF="mailto:nunzio@wfprod.com">nunzio@wfprod.com</A>. Send us feedback! Current contact information can be found at workflowproducts.com.
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">FULL PATH</A><DD>
+<DT><A HREF="#lbAD">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAE">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAF">OPTIONS</A><DD>
+<DT><A HREF="#lbAG">SETTING UP A CONNECTION TO A POSTGRESQL SERVER</A><DD>
+<DT><A HREF="#lbAH">EXAMPLES</A><DD>
+<DT><A HREF="#lbAI">TROUBLESHOOTING</A><DD>
+<DT><A HREF="#lbAJ">AUTHOR</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 00:56:08 GMT, August 26, 2016
+</BODY>
+</HTML>

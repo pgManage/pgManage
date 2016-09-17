@@ -1,0 +1,579 @@
+
+
+div#header-text-container {
+    padding: 0 0.5em;
+}
+#header-text-container {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#menu-button-new-tab {
+    position: relative;
+}
+#menu-button-new-tab-plus {
+    position: absolute;
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    text-align: center;
+    font-size: 1em;
+    font-weight: 900;
+    line-height: 0.85em;
+    left: 0.9em;
+    top: 50%;
+    margin-top: -0.5em;
+}
+
+
+.panel-resizable {
+    position: relative;
+}
+
+/* ####################################################### */
+/* #################### PANEL RESIZE #################### */
+/* ####################################################### */
+
+.panel-resize-bar {
+    position: absolute;
+    top: 0;
+    right: -6px;
+    width: 10px;
+    height: 100%;
+    cursor: ew-resize;
+}
+
+/* ####################################################### */
+/* #################### CLEAN IFRAMES #################### */
+/* ####################################################### */
+
+.full-iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* ###################################################### */
+/* ################### HEADER BUTTONS ################### */
+/* ###################################################### */
+
+.header-button, .footer-button {
+    /*font-size: 0.7em;*/
+    
+    border: 0;
+    color: #FFF;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.8em;
+}
+
+.header-button-text {
+    /*font-size: 0.7em;*/
+    
+    border: 0;
+    color: #FFF;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.8em;
+    
+    padding-top: 0.5em;
+    /*padding-top: 0.7em; /*0.45em;*/
+    padding-left: 0.75em; /*0.25em;*/
+    padding-right: 0.75em; /*0.25em;*/
+    
+    /*text-decoration: underline;*/
+}
+
+.header-button-text[icon]:not([iconright]) {
+    padding-left: 2em !important;
+}
+.header-button-text[icon][iconright] {
+    padding-right: 2em !important;
+}
+
+.header-button-text[icon]:not([iconright]):after {
+    top: 50% !important;
+    margin-top: -0.6em;
+    left: 0.25em !important
+}
+.header-button-text[icon][iconright]:after {
+    top: 50% !important;
+    margin-top: -0.6em;
+    right: 0.25em !important
+}
+
+
+.results-header {
+    padding: 0 !important;
+    height: 2.422em;
+}
+.results-header .header-button-text {
+    padding-top: 0.7em;
+}
+
+.postage-menu-item-button {
+    border: 0 none;
+    
+    text-align: center;
+    padding: 0.75em !important;
+    border-bottom: 1px solid #ccc;
+    
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -ms-border-radius: 0;
+    -o-border-radius: 0;
+    border-radius: 0;
+}
+.postage-menu-item-button[icon] {
+    text-align: left;
+    padding-left: 2.25em !important;
+}
+.postage-menu-item-button[icon]:after {
+    top: 50% !important;
+    margin-top: -0.6em;
+    left: 0.4em !important
+}
+.postage-menu-item-button:last-child {
+    border-bottom: 0 none;
+}
+
+
+#button-open-tabs:after {
+    line-height: 1.4;
+}
+
+/* ###################################################### */
+/* ############### LEFT PANEL OPEN BUTTON ############### */
+/* ###################################################### */
+
+#panel:not([left-bar="hide"]) #panel-open {
+    display: none;
+}
+
+/* ##################################################### */
+/* ############## RIGHT PANEL OPEN BUTTON ############## */
+/* ##################################################### */
+
+#panel:not([right-bar="hide"]) #button-property-panel {
+    display: none;
+}
+
+/* ##################################################### */
+/* ################# STATISTICS TABLES ################# */
+/* ##################################################### */
+
+table.table-stats td,
+table.table-stats th {
+    border-right: 1px solid #CCC;
+    border-bottom: 1px solid #CCC;
+    white-space: pre-wrap;
+    word-break: break-word; /* break-word is fine, Ace's CSS validator might be behind */
+}
+table.table-stats {
+    border-left: 1px solid #CCC;
+    border-top: 1px solid #CCC;
+}
+
+table.table-stats th {
+    width: 14em;
+    text-align: right;
+}
+
+
+/* ##################################################### */
+/* ################### DEPEND TABLES ################### */
+/* ##################################################### */
+
+table.table-dep td,
+table.table-dep th {
+    border-right: 1px solid #CCC;
+    border-bottom: 1px solid #CCC;
+    white-space: pre-wrap;
+    word-break: break-word; /* break-word is fine, Ace's CSS validator might be behind */
+}
+table.table-dep {
+    width: 100%;
+    border-left: 1px solid #CCC;
+    border-top: 1px solid #CCC;
+}
+
+table.table-dep th {
+    text-align: center;
+}
+
+
+/* ##################################################### */
+/* ################## EXPLAIN BUTTONS ################## */
+/* ##################################################### */
+
+.ace-toolbar gs-button.button-explain {
+    text-indent: 0;
+    line-height: 1em;
+    padding: 0;
+    text-align: left;
+}
+
+.ace-toolbar gs-button.button-explain .explain-letter {
+    font-size: 2em;
+    line-height: 1.1em;
+}
+
+.ace-toolbar gs-button.button-explain:after {
+    position: absolute;
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    text-align: center;
+    font-size: 0.8em;
+    font-weight: 900;
+    line-height: 1em;
+    left: 80%;
+    top: 85%;
+}
+
+
+/* ##################################################### */
+/* #################### ACE BUTTONS #################### */
+/* ##################################################### */
+
+.ace-toolbar gs-button.button-ace-info {
+    position: relative;
+    line-height: 1em;
+    text-indent: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.ace-toolbar gs-button.button-ace-info .ace-suit {
+    display: inline-block;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    font-size: 3.2em;
+    line-height: 0.6em;
+}
+
+.ace-toolbar gs-button.button-ace-info .ace-letter {
+    display: inline-block;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    font-size: 1em;
+    line-height: 2em;
+    color: #FFF;
+}
+
+
+/* ##################################################### */
+/* ################### SIMPLE  TABLE ################### */
+/* ##################################################### */
+
+.simple-table {
+     border-left: 1px solid #ddd;
+}
+
+
+/* ##################################################### */
+/* ################### EXPLAIN NODES ################### */
+/* ##################################################### */
+
+.node-container {
+    padding-top: 1em;
+    padding-bottom: 1em;
+    font-size: 0.8em;
+}
+
+.node-layer {
+    text-align: left;
+    white-space: nowrap;
+    height: 5em;
+}
+
+.node-container.taller-nodes .node-layer {
+    height: 6.4em;
+}
+
+.node {
+    display: inline-block;
+    width: 16em;
+    height: 100%;
+    
+    text-align: left;
+    font-family: monospace;
+    white-space: normal;
+    word-break: break-all;
+    border: 1px solid #000000;
+    margin-left: 1em;
+    margin-right: 1em;
+    
+    border-radius: 0.2em;
+    background-color: #FFFFFF;
+    box-shadow: 0.1em 0.1em 0.3em 0.05em #CCCCCC;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.node.blank {
+    border: 0 none;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: 0 0 0 0 transparent;
+    color: transparent;
+}
+
+.node .node-content-container {
+    height: 100%;
+}
+
+.node .explain-context-container {
+    padding: 0.2em;
+    
+}
+
+.node .explain-speed-container {
+    white-space: nowrap;
+    border-left: 1px solid #CCCCCC;
+    padding: 0.2em;
+}
+
+.explain-speed-container .progressbar-outer {
+    border: 1px solid #CCCCCC;
+    height: 0.3em;
+    background-color: #F0F0F0;
+}
+.explain-speed-container .progressbar-inner {
+    height: 100%;
+    background-color: #0000FF;
+}
+
+.explain-speed-container .progressbar-outer.red .progressbar-inner {
+    background-color: #FF0000;
+}
+
+.explain-speed-container .progressbar-outer.blue .progressbar-inner {
+    background-color: #0000FF;
+}
+
+.explain-speed-container .progressbar-outer.green .progressbar-inner {
+    background-color: #00FF00;
+}
+
+.explain-speed-container .progressbar-outer.unknown {
+    background-color: #EFEFEF;
+}
+
+
+.line-layer {
+    white-space: nowrap;
+    height: 2em;
+}
+
+.line-layer .line {
+    position: relative;
+    width: 18em;
+    display: inline-block;
+    height: 2em;
+}
+
+.line-layer .up-down .line-arrow,
+.line-layer .up-right-down .line-arrow/*,
+.line-layer .down-left .line-arrow,
+.line-layer .right-down-left .line-arrow*/ {
+    display: block;
+    position: absolute;
+    content: '';
+    top: 0; /*bottom: 0;*/
+    left: 50%;
+	width: 0;
+	height: 0;
+	
+	border-bottom: 7px solid #000;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+    margin-left: -3px;
+}
+
+/* up and down */
+.line-layer .up-down .line-part-1 {
+    display: block;
+    position: absolute;
+    content: '';
+    top: 8%;
+    left: 50%;
+    width: 2px;
+    background-color: #000;
+    height: 92%; /* not 100% because we want to stay out of the way of the point of the arrow */
+}
+
+/* up, right and down */
+.line-layer .up-right-down .line-part-1 {
+    display: block;
+    position: absolute;
+    content: '';
+    top: 8%;
+    left: 50%;
+    width: 2px;
+    background-color: #000;
+    height: 92%; /* not 100% because we want to stay out of the way of the point of the arrow */
+}
+.line-layer .up-right-down .line-part-2 {
+    display: block;
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: 50%;
+    height: 2px;
+    background-color: #000;
+    width: 50%;
+}
+
+/* down and left */
+.line-layer .down-left .line-part-1 {
+    display: block;
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: 0;
+    width: 50%;
+    height: 2px;
+    background-color: #000;
+}
+.line-layer .down-left .line-part-2 {
+    display: block;
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 50%;
+    background-color: #000;
+}
+
+/* right and left */
+.line-layer .right-left .line-part-1 {
+    display: block;
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #000;
+}
+
+/* right, down and left */
+.line-layer .right-down-left .line-part-1 {
+    display: block;
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #000;
+}
+.line-layer .right-down-left .line-part-2 {
+    display: block;
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 42%; /* not 50% because we want to stay out of the way of the point of the arrow */
+    background-color: #000;
+}
+
+
+/* ##################################################### */
+/* ################ NOTIFICATION DIALOG ################ */
+/* ##################################################### */
+
+.button-channel-close {
+    border-left: 0 none;
+}
+
+#badge-notification-feed {
+    display: block;
+    position: absolute;
+    
+    left: -0.5em;
+    top: -0.2em;
+    
+    background-color: #FF0000;
+    text-indent: 0;
+    border-radius: 4px;
+    z-index: 1;
+    padding: 0.3em;
+    text-align: center;
+    height: 1em;
+    line-height: 1.1em;
+    color: #FFFFFF;
+}
+
+#notification-channel-insert,
+#notification-channel-list .channel {
+    padding: 0.25em;
+}
+
+#notification-channel-insert {
+    border-bottom: 1px solid #AAA;
+}
+
+#notification-channel-list .channel {
+    border-bottom: 1px solid #AAA;
+    padding: 0.25em;
+    cursor: pointer;
+}
+
+#notification-channel-list .channel-unread-number {
+    border: 2px solid #AAA;
+    border-radius: 50%;
+    margin-right: 0.25em;
+    min-width: 2em;
+    text-align: center;
+    padding: 0.25em;
+    box-sizing: border-box;
+}
+
+#notification-channel-list .channel-unread-number.unread {
+    border-color: #FF0000;
+}
+
+
+.notify-message .notify-message-inner {
+    display: inline-block;
+    /*width: 75%;*/
+    max-width: 400px;
+    border: 2px solid #AAA;
+    background-color: #f9f8f8;
+    margin-bottom: 0.25em;
+    padding: 0.25em;
+}
+
+.notify-message:not(.text-right) .notify-message-inner {
+    border-radius: 0 0.5em 0.5em 0.5em;
+}
+.notify-message.text-right .notify-message-inner {
+    border-radius: 0.5em 0 0.5em 0.5em;
+    background-color: #c8f9c6;
+}
+
+
+

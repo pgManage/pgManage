@@ -1,0 +1,139 @@
+
+
+/* ####################################################### */
+/* ####################### HEADERS ####################### */
+/* ####################################################### */
+
+gs-header { /*, gs-footer*/
+    padding: 0.2em !important;
+    color: #FFFFFF;
+    border-bottom: 2px solid #000000;
+    background: #006e00;
+    background: -moz-linear-gradient(top, #006e00 0%, #3c9640 100%);
+    background: -webkit-linear-gradient(top, #006e00 0%,#3c9640 100%);
+    background: linear-gradient(to bottom, #006e00 0%,#3c9640 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#006e00', endColorstr='#3c9640',GradientType=0 );
+}
+
+gs-header.executing {
+    background: #a27c00;
+    background: -moz-linear-gradient(top, #a27c00 0%, #facc00 100%);
+    background: -webkit-linear-gradient(top, #a27c00 0%,#facc00 100%);
+    background: linear-gradient(to bottom, #a27c00 0%,#facc00 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a27c00', endColorstr='#facc00',GradientType=0 );
+}
+
+gs-header.error {
+    background: #6e0400;
+    background: -moz-linear-gradient(top, #6e0400 0%, #934d46 100%);
+    background: -webkit-linear-gradient(top, #6e0400 0%,#934d46 100%);
+    background: linear-gradient(to bottom, #6e0400 0%,#934d46 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6e0400', endColorstr='#934d46',GradientType=0 );
+}
+
+/* ###################################################### */
+/* ####################### BODIES ####################### */
+/* ###################################################### */
+
+gs-body {
+    background: #ffffff;
+    background: -moz-linear-gradient(top, #ffffff 0%, #ffffff 22%, #ededed 100%);
+    background: -webkit-linear-gradient(top, #ffffff 0%,#ffffff 22%,#ededed 100%);
+    background: linear-gradient(to bottom, #ffffff 0%,#ffffff 22%,#ededed 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 );
+}
+
+/* ####################################################### */
+/* ####################### DIALOGS ####################### */
+/* ####################################################### */
+
+gs-dialog {
+    border: 2px solid #000;
+}
+
+gs-dialog.error gs-header {
+    color: #FFFFFF;
+    background: #6e0400;
+    background: -moz-linear-gradient(top, #6e0400 0%, #934d46 100%);
+    background: -webkit-linear-gradient(top, #6e0400 0%,#934d46 100%);
+    background: linear-gradient(to bottom, #6e0400 0%,#934d46 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6e0400', endColorstr='#934d46',GradientType=0 );
+}
+
+/* ####################################################### */
+/* ###################### DOC LINKS ###################### */
+/* ####################################################### */
+
+a.doc-link {
+    display: inline-block;
+    color: #7D7DDE;
+    letter-spacing: -0.5px;
+    font-style: italic;
+}
+
+a.doc-link:after {
+    content: ' \f08e'; /* external-link */
+    font-family: fontawesome;
+}
+
+/* ####################################################### */
+/* ####################### BUTTONS ####################### */
+/* ####################################################### */
+
+gs-button {
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/* ####################################################### */
+/* #################### FANCY BRACKETS #################### */
+/* ####################################################### */
+
+.style-bracket-container {
+    position: relative;
+    padding: 2em 1em;
+}
+
+.style-bracket-header {
+    position: absolute;
+    top: -0.5em;
+    left: 0;
+    width: 100%;
+    color: #CCC;
+    
+    text-align: center;
+    line-height: 1em;
+    font-size: 1.2em;
+    padding: 0;
+    margin: 0;
+}
+
+.style-bracket-left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 2em;
+    pointer-events: none;
+    z-index: 0;
+    
+    border-top: 2px solid #CCC;
+    border-left: 2px solid #CCC;
+    border-bottom: 2px solid #CCC;
+    border-radius: 4px 0px 0px 4px;
+}
+
+.style-bracket-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 2em;
+    pointer-events: none;
+    z-index: 0;
+    
+    border-top: 2px solid #CCC;
+    border-right: 2px solid #CCC;
+    border-bottom: 2px solid #CCC;
+    border-radius: 0px 4px 4px 0px;
+}

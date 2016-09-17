@@ -1,0 +1,6 @@
+#!/bin/sh
+
+( cd postage && ./configure )
+
+cp Makefile.in Makefile
+

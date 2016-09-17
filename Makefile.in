@@ -1,0 +1,26 @@
+all:
+	$(MAKE) -C postage all
+
+test-common:
+	$(MAKE) -C postage test-common
+
+test:
+	$(MAKE) -C postage test
+
+lldb:
+	$(MAKE) -C postage lldb
+
+gdb:
+	$(MAKE) -C postage gdb
+
+valgrind:
+	$(MAKE) -C postage valgrind
+
+install:
+	$(MAKE) -C postage install
+
+uninstall:
+	$(MAKE) -C postage uninstall
+
+clean:
+	$(MAKE) -C postage clean

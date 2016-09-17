@@ -1,0 +1,358 @@
+
+/* ###################################################### */
+/* ############### TAB BAR/FRAMES/BUTTONS ############### */
+/* ###################################################### */
+
+#tab-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#tab-bar-container {
+    box-shadow: 0 0 0.1em 0.1em #AAAAAA;
+}
+
+
+
+#tab-bar-container.home-mode {
+    border-bottom: 1px solid #AAAAAA;
+}
+
+
+#tab-bar-container.home-mode .tab-button {
+    border-bottom: 0 none;
+}
+
+
+
+#tab-bar-container.home-mode #button-home {
+    background-color: #FFFFFF;
+}
+
+.tab-bar-toolbar > gs-button {
+    /*height: 100%;*/
+    background-color: #EEEEEE;
+    
+    border-radius: 20%;
+    border: 1px solid #AAAAAA;
+    margin-left: 1px;
+    text-indent: 0;
+    line-height: 1em;
+    margin-top: 1px;
+}
+
+.tab-bar-toolbar.left {
+    border-right: 1px solid #AAAAAA;
+}
+.tab-bar-toolbar.right {
+    border-left: 1px solid #AAAAAA;
+}
+
+.tab-bar-toolbar > gs-button:last-child {
+    margin-right: 1px;
+}
+
+#button-home {
+    border-radius: 20%;
+    border: 1px solid #AAAAAA;
+    margin-left: 1px;
+    margin-top: 1px;
+}
+
+#button-new-tab-plus {
+    position: absolute;
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    text-align: center;
+    font-size: 1em;
+    font-weight: 900;
+    line-height: 0.85em;
+    left: 50%;
+    top: 50%;
+    margin-left: -0.4em;
+    margin-top: -0.45em;
+}
+
+
+
+#tab-bar {
+    position: relative;
+    background-color: #F1F1F1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    
+    height: 2em;
+}
+
+#tab-bar .tab-button {
+    position: relative;
+    display: inline-block;
+    border-right: 1px solid #AAAAAA;
+    background-color: #EEEEEE;
+    padding: 0.1em 0.5em;
+    height: 2em;
+    line-height: 1.8em;
+    /*float: left; <- this causes the buttons to wrap, which makes it seem like you have less tabs than you actually do */
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.tab-button:not(.current-tab) {
+    cursor: pointer;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+#tab-frames {
+    position: relative;
+}
+
+.tab-frame,
+.home-frame {
+    display: none;
+}
+
+#tab-bar .tab-button.current-tab,
+#button-list-container .current-tab {
+    background-color: #FFFFFF;
+}
+
+.home-frame.current-frame,
+.tab-frame.current-frame {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.tab-button .rename-control {
+    border: 0 none;
+    margin: 0;
+    padding: 0;
+    
+    background-color: transparent;
+    pointer-events: none;
+    
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -webkit-border-radius: inherit;
+    /* -moz-border-radius: none; */
+}
+
+.tab-button.current-tab .rename-control {
+    pointer-events: auto;
+}
+
+/* #### make sure that the typography is the same for the  #######
+####### tab button div and the rename control so that we   #######
+####### can accuratly get text width using GS.getTextWidth #### */
+
+.tab-button, .tab-button .rename-control {
+    font-size: 1em;
+    font-family: helvetica, sans-serif;
+    line-height: normal;
+}
+
+/* ######## desktop tab close buttons and tab buttons ######## */
+#tab-bar.not-touchscreen .tab-button {
+    padding-left: 0.5em;
+    padding-right: 1em;
+}
+
+#tab-bar.not-touchscreen .tab-button .delete-button {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    display: inline-block;
+    font-weight: 900;
+    line-height: 1em;
+    height: 1em;
+    width: 1em;/*width: 0.75em;*/
+    text-align: right;
+    cursor: pointer;
+    color: #AAAAAA;
+}
+
+#tab-bar.not-touchscreen .tab-button .delete-button:after {
+    content: '\2297';
+}
+
+
+body.pc #tab-bar.not-touchscreen .tab-button .delete-button {
+    line-height: 0.8em;
+    font-weight: normal;
+}
+
+body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
+    font-size: 0.8em;
+}
+
+#tab-bar.not-touchscreen .tab-button .delete-button:hover {
+    color: #000000;
+}
+
+/* ######## touch screen tab close buttons andtabbuttons ######## */
+#tab-bar.touchscreen .tab-button {
+    padding-right: 0;
+}
+
+#tab-bar.touchscreen .tab-button .delete-button {
+    display: inline-block;
+    font-weight: 900;
+    cursor: pointer;
+    color: #000000;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+#tab-bar.touchscreen .tab-button .delete-button:after {
+    content: 'X';
+}
+
+/* ####################################################### */
+/* ######################### ACE ######################### */
+/* ####################################################### */
+
+.script-window-container {
+    width: 100%;
+    height: 100%;
+}
+
+.ace-container-position-container {
+    position: relative;
+    z-index: 0; /* this makes it so that the "Executing Query..." loader doesn't go in front
+                        of a dialog (specifically the process manager dialog) */
+}
+
+.ace-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.ace-area {
+    height: 100%;
+}
+
+.ace-selected-element {
+    position: absolute;
+    background-color: #FDFFE0; /*#E0F6FF*/ /*#FBFFBE*/
+    z-index: 4;
+}
+
+.frame-indicator {
+    position: absolute;
+    
+    top: 0.2em;
+    left: 50%;
+    margin-left: -125px;
+    width: 250px;
+    text-align: center;
+    
+    z-index: 50;
+}
+
+.frame-indicator.indicator-error {
+    border: 2px dashed #000000;
+    background-color: #FF5555;
+    padding: 0.2em;
+    right: 1em;
+}
+
+.ace-toolbar {
+    position: absolute;
+    left: 1px;
+    top: 1px;
+    z-index: 10;
+}
+
+/* minimum width on number gutter */
+.tab-frame .ace-container .ace_gutter-layer,
+.home-frame .ace-container .ace_gutter-layer {
+    min-width: 4.2em; /*50px*/
+}
+
+/* move "x" annotation so that it's never under the ace-toolbar */
+.ace_gutter-cell.ace_error {
+    background-position: 87% center !important; /* 30px */
+    color: transparent !important;
+}
+
+
+/* ####################################################### */
+/* ############ ACE TAB TOGGLE COMMENT BUTTON ############ */
+/* ####################################################### */
+
+.button-toggle-comments {
+    width: 2.35em;
+    height: 2.35em;
+    padding: 0.1em 0em;
+    font-weight: 900;
+}
+.button-toggle-comments span {
+    font-size: 1.3em;
+}
+
+
+/* ###################################################### */
+/* ################# SQL RESULTS WINDOW ################# */
+/* ###################################################### */
+
+.sql-results-area-container {
+    position: relative;
+    background-color: #FFFFFF;
+    border-top: 2px solid #000000;
+}
+
+.sql-results-area-resize-handle {
+    /*position: absolute;
+    height: 0.5em;
+    left: 0;
+    top: -0.25em;
+    width: 100%;
+    z-index: 90;
+    background-color: #AAAAAA;*/
+    cursor: ns-resize;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.sql-results-area {
+    /*overflow: auto;
+    -webkit-overflow-scrolling: touch;*/
+    padding: 0 0.25em; /*padding: 0.25em;*/
+    /*border-top: 1px solid #CCCCCC;*/
+    white-space: pre-wrap;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.sql-results-area .result-table-scroll-container {
+    /*overflow: auto; <== this line makes each result table have it's own horizontal scrollbar, it was removed because you want to be able to scroll sideways using the scrollbar even it you're in the middle of a large result. */
+    width: 100%;
+}
+
+.sql-results-area table {
+    border-left: 1px solid #DDDDDD;
+}

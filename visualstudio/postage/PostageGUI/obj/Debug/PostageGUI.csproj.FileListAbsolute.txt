@@ -1,0 +1,14 @@
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\obj\Debug\MainWindow.g.cs
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\obj\Debug\App.g.cs
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\obj\Debug\PostageGUI_MarkupCompile.cache
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\obj\Debug\PostageGUI_MarkupCompile.lref
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\bin\Debug\PostageGUI.exe.config
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\bin\Debug\PostageGUI.exe
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\bin\Debug\PostageGUI.pdb
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\obj\Debug\MainWindow.baml
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\obj\Debug\PostageGUI.g.resources
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\obj\Debug\PostageGUI.Properties.Resources.resources
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\obj\Debug\PostageGUI.csproj.GenerateResource.Cache
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\obj\Debug\PostageGUI.exe
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\obj\Debug\PostageGUI.pdb
+C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\postage\PostageGUI\obj\Debug\PostageGUI.csprojResolveAssemblyReference.cache

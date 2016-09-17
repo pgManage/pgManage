@@ -1,0 +1,180 @@
+BINARY = envelope
+CONFIGS = -c config/envelope.conf -d config/envelope-connections.conf -t 300
+WEBROOTS = -r ./web_root/ -z ./role -y ./app
+INSTALL_DEPS = @prefix@/etc/envelope/ \
+@prefix@/etc/envelope/envelope.conf @prefix@/etc/envelope/envelope-connections.conf \
+@prefix@/etc/envelope/role/ \
+@prefix@/etc/envelope/app/all/file_manager_new/ \
+@prefix@/etc/envelope/app/developer_g/greyspots-1.1.1/ \
+@prefix@/etc/envelope/web_root/ \
+@prefix@/etc/envelope/app/all/file_manager/ \
+@prefix@/etc/envelope/app/all/index.html @INSTALL_DEPS@
+SOCK_DIR_PARAMETER = @sock_dir_parameter@
+MAKE = @make@
+
+VERSION = \"2.1.0RC3\"
+CC = cc
+CFLAGS = -O3 -g \
+	-fno-strict-aliasing
+LDFLAGS = @LDFLAGS@
+CPPFLAGS = @CPPFLAGS@ -DTRE_VERSION=\"0.8.0\" -DVERSION=$(VERSION) -D_GNU_SOURCE -DPOSTAGE_PREFIX=\"/usr/local\" -DPOSTAGE_INTERFACE_LIBPQ -DENVELOPE \
+		-I../db_framework_pq -I../ -I../common -I../dependencies/tre/include -I../dependencies/libev -I../dependencies/libressl/include
+BUILD_DEPS = @BUILD_DEPS@
+
+common_SOURCES = $(wildcard ../common/*.c) $(filter-out ../util/util_getopt.c, $(filter-out ../util/util_strptime.c, $(filter-out ../util/util_exec.c, $(wildcard ../util/*.c))))
+db_framework_pq_SOURCES = $(wildcard ../db_framework_pq/*.c)
+
+envelope_SOURCES = $(common_SOURCES) $(db_framework_pq_SOURCES) $(wildcard *.c)
+envelope_OBJECTS = $(envelope_SOURCES:.c=.o)
+
+#envelope_OBJECTS1 = $(envelope_SOURCES:.c=.o)
+#envelope_OBJECTS2 = $(patsubst ../common/%, obj/%, $(envelope_OBJECTS1))
+#envelope_OBJECTS3 = $(patsubst ../util/%, obj/%, $(envelope_OBJECTS2))
+#envelope_OBJECTS = $(patsubst ../db_framework_pq/%, obj/%, $(envelope_OBJECTS3))
+
+.PHONY: libressl libressl-install
+
+#### DEPENDENCIES
+libressl: ../dependencies/libressl/Makefile
+	$(MAKE) -C ../dependencies/libressl/
+
+libressl-install: ../dependencies/libressl/Makefile
+	$(MAKE) install -C ../dependencies/libressl/
+
+../dependencies/libressl/Makefile:
+	cd ../dependencies/libressl/; ./configure; cd ../../$(BINARY)
+
+ev.o:
+	$(CC) ../dependencies/libev/ev.c @libev_CPPFLAGS@ -c -o ev.o
+
+$(libtre_OBJECTS): %.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $< -c -o $@
+
+libtre_SOURCES = $(wildcard ../dependencies/tre/lib/*.c)
+libtre_OBJECTS = $(libtre_SOURCES:.c=.o)
+
+#### BUILDING
+all: $(BUILD_DEPS) $(envelope_OBJECTS) $(libtre_OBJECTS)
+	$(CC) $(envelope_OBJECTS) $(libtre_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
+	@echo
+	@echo "Compilation Successful"
+
+all-format:
+	cd ..; ./cleanup_format.sh; cd $(BINARY)
+	$(MAKE) all
+
+$(envelope_OBJECTS): %.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -Wall -Wextra -Wconversion $< -c -o $@
+
+#### CLEAN
+clean:
+	rm -f $(envelope_OBJECTS) $(BINARY) ev.o $(libtre_OBJECTS)
+	@echo
+	@echo "Clean Successful"
+
+#### INSTALL
+
+@prefix@/etc/envelope/:
+	mkdir -p @prefix@/etc/envelope/
+
+@prefix@/etc/envelope/app/all/file_manager_new/:
+	mkdir -p @prefix@/etc/envelope/app/all/file_manager_new/
+
+@prefix@/etc/envelope/app/all/file_manager/:
+	mkdir -p @prefix@/etc/envelope/app/all/file_manager/
+	cp -r ./app/all/file_manager/* @prefix@/etc/envelope/app/all/file_manager/
+
+@prefix@/etc/envelope/app/developer_g/greyspots-1.1.1/:
+	mkdir -p @prefix@/etc/envelope/app/developer_g/greyspots-1.1.1/
+	cp -r ./app/developer_g/greyspots-1.1.1/* @prefix@/etc/envelope/app/developer_g/greyspots-1.1.1/
+
+@prefix@/etc/envelope/web_root/:
+	mkdir -p @prefix@/etc/envelope/web_root
+	cp -r ./web_root/* @prefix@/etc/envelope/web_root/
+
+@prefix@/etc/envelope/app/all/index.html:
+	install ./app/all/index.in.html @prefix@/etc/envelope/app/all/index.html
+
+@prefix@/etc/envelope/role/:
+	mkdir -p @prefix@/etc/envelope/role/
+
+@prefix@/etc/$(BINARY)/$(BINARY).conf: @prefix@/etc/$(BINARY)/
+	install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf;
+
+@prefix@/etc/$(BINARY)/$(BINARY)-connections.conf: @prefix@/etc/$(BINARY)/
+	install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf;
+
+install: $(INSTALL_DEPS)
+	install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf.example
+	install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf.example
+	install $(BINARY) @prefix@/sbin/
+	install man/man1/envelope.1 @prefix@/@MANDIR@/man1/envelope.1
+	install ./app/all/index.in.html @prefix@/etc/envelope/app/all/index.in.html
+	cp -rf ./app/all/file_manager/* @prefix@/etc/envelope/app/all/file_manager_new/
+	@echo
+	@echo "Installation Successful"
+
+uninstall:
+	rm @prefix@/sbin/$(BINARY)
+	rm -f @prefix@/etc/$(BINARY)/*.example
+	@echo
+	@echo "Uninstall Successful"
+
+#### TESTING
+test-common:
+	-kill `cat postgres.pid`
+	-rm postgres.pid
+	-rm -rf data_test
+	initdb -D data_test -E UTF8 -U postgres
+	echo $(SOCK_DIR_PARAMETER)"='/tmp'" >> data_test/postgresql.conf
+	{ postgres -D data_test -p 5431 2> output.txt > output.txt & }; \
+	echo $$! > postgres.pid; \
+	sleep 3
+	psql -U postgres -h 127.0.0.1 -p 5431 postgres -1f test.sql
+	kill `cat postgres.pid`; rm postgres.pid; sleep 3
+	cp data_test/pg_hba.conf data_test/pg_hba.bak
+	sed -e '/trust/s/32            trust/32            md5/g' < data_test/pg_hba.bak > data_test/pg_hba.conf
+	echo "host    all             all             192.168.0.0/16            md5" >> data_test/pg_hba.conf
+	{ postgres -D data_test -i -p 5431 2> output.txt > output.txt & }; \
+	echo $$! > postgres.pid; \
+	sleep 3
+
+test: test-common
+	./$(BINARY) $(CONFIGS) $(WEBROOTS) -l info || \
+	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
+
+test-ssl: test-common
+	./$(BINARY) $(CONFIGS) $(WEBROOTS) -j ../ssl/self.crt -k ../ssl/self.key -l info || \
+	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
+
+gdb: test-common
+	echo -n "run" > temp_gdb_commands
+	gdb -x temp_gdb_commands --args ./$(BINARY) $(CONFIGS) $(WEBROOTS) -l info || \
+	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
+	rm temp_gdb_commands
+
+gdb-ssl: test-common
+	echo -n "run" > temp_gdb_commands
+	gdb -x temp_gdb_commands --args ./$(BINARY) $(CONFIGS) $(WEBROOTS) -j ../ssl/self.crt -k ../ssl/self.key -l info || \
+	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
+	rm temp_gdb_commands
+
+lldb: test-common
+	echo "run" > temp_lldb_commands
+	lldb -s temp_lldb_commands -- ./$(BINARY) $(CONFIGS) $(WEBROOTS) -l info || \
+	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
+	rm temp_lldb_commands
+
+lldb-ssl: test-common
+	echo "run" > temp_lldb_commands
+	lldb -s temp_lldb_commands -- ./$(BINARY) $(CONFIGS) $(WEBROOTS) -j ../ssl/self.crt -k ../ssl/self.key -l info || \
+	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
+	rm temp_lldb_commands
+
+valgrind: test-common
+	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) $(WEBROOTS) -l error || \
+	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
+
+valgrind-ssl: test-common
+	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) $(WEBROOTS) -j ../ssl/self.crt -k ../ssl/self.key -l error || \
+	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }

@@ -1,0 +1,273 @@
+.TH POSTAGE 1 "August 29, 2016" GREYSPOTS "Postage Manual"
+.SH NAME
+.P
+.I postage
+- PostgreSQL Administration for the web
+.SH FULL PATH
+.P
+This instance of postage was installed as
+.B @prefix@/sbin/postage
+(Usually
+.B /usr/local/sbin/postage
+)
+.SH SYNOPSIS
+.P
+.B postage
+.RS
+.br
+[-h | --help]
+.br
+[-v | --version]
+.br
+[-c <config-file> | --config-file=<config-file>]
+.br
+[-d <connection-file> | --connection-file=<connection-file>]
+.br
+[-s <super-only> | --super-only=<super-only>]
+.br
+[-g <login-group> | --login-group=<login-group>]
+.br
+[-r <web-root> | --web-root=<web-root>]
+.br
+[-a <data-root> | --data-root=<data-root>]
+.br
+[-p <port> | --port=<port>]
+.br
+[-j <tls-cert> | --tls-cert=<tls-cert>]
+.br
+[-k <tls-key> | --tls-key=<tls-key>]
+.br
+[-l <log-level> | --log-level=<log-level>]
+.br
+[-n <allow_custom_connections> | --allow-custom-connections=<allow-custom-connections>]
+.br
+[-t <login-timeout> | --login-timeout=<login-timeout>]
+.RE
+.SH DESCRIPTION
+.P
+The
+.B postage
+utility is a tool to make managing your PostgreSQL database fast and easy. It provides web access and can be used on a tablet, or even on a phone.
+.P
+All log output is pushed to stderr, if you are pushing that to a file, then you must handle rotating the file yourself or it will get large and slow
+.B postage
+down.
+.SH OPTIONS
+.P
+.B -h
+or
+.B --help
+.br
+.RS
+Print usage and exit
+.RE
+.P
+.B -v
+or
+.B --version
+.br
+.RS
+Print version information and exit
+.RE
+.P
+.B -c
+or
+.B --config-file=
+.br
+.RS
+.B String;
+defaults to @prefix@/etc/postage/postage.conf
+.br
+You can use this option to tell Postage where to look for the configuration file. A sample configuration file is provided in @prefix@/etc/postage.
+If there is no file specified Postage will look in the current directory for a config file. If no config file is found Postage will proceed with default values.
+.RE
+.P
+The following options can be specified on the command line or in the configuration file. In the event a value is specified on the command line and in the config file, Postage will always use the command line option. Note that if no option is specified then some options will be set to a default value.
+.P
+.B [command line short]
+or
+.B [command line long]
+or
+.B [config file]
+.P
+.B -d
+or
+.B --connection-file=
+or
+.B connection_file=
+.br
+.RS
+.B String;
+defaults to @prefix@/etc/postage/postage-connections.conf
+.br
+When you install Postage, the Makefile will generate a path to the sample postage-connections.conf file and put it in the sample config file. Use this option to tell Postage where your connection list is located.
+.br
+If not specified, Postage looks in the same folder as the config file for a file named postage-connections.conf.
+If Postage can't find a connection file, it will error.
+.RE
+.P
+.B -s
+or
+.B --super-only=
+or
+.B super_only=
+.br
+.RS
+.B Boolean;
+defaults to true
+.br
+This tells Postage whether or not to only allow super users to login. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through Postage. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser.
+.RE
+.P
+.B -g
+or
+.B --login-group=
+or
+.B login_group=
+.br
+.RS
+.B String;
+no default
+.br
+This tells Postage to only allow users in a certain PostgreSQL group to login to Postage. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group.
+.RE
+.P
+.B -r
+or
+.B --web-root=
+or
+.B web_root=
+.br
+.RS
+.B String;
+Defaults to @prefix@/etc/postage/web_root
+.br
+This tells Postage where the HTML files have been installed to.
+.RE
+.P
+.B -a
+or
+.B --data-root=
+or
+.B data_root=
+.br
+.RS
+.B String;
+defaults to ~/.postage/
+.br
+This tells Postage where to put the SQL file history. All tabs are saved to this location so that if you get disconnected from Postage you don't lose your work.
+.RE
+.P
+.B -p
+or
+.B --postage-port=
+or
+.B postage_port=
+.br
+.RS
+.B Integer;
+defaults to 8080
+.br
+This tells Postage what port to listen on for browser requests.
+.RE
+.P
+.B -j
+or
+.B --tls-cert=
+or
+.B tls_cert=
+.br
+.B -k
+or
+.B --tls-key=
+or
+.B tls_key=
+.RS
+.B String;
+no defaults
+.br
+These options tell Postage where the TLS Certificate and Key files reside. If you use these options then you'll only be able to access Postage through a secure TLS connection.
+.br
+These options are only necessary if you wish to connect directly to Postage using a secure TLS connection. As an alternative, you can set up Postage in a reverse proxy configuration. This allows your web server to terminate the secure connection and pass on the request to Postage. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution.
+.RE
+.P
+.B -n
+or
+.B --allow-custom-connections=
+or
+.B allow_custom_connections=
+.br
+.RS
+.B Boolean;
+defaults to false
+.br
+This tells Postage whether or not to allow anyone to use a custom connection from the login screen.
+.RE
+.P
+.B -l
+or
+.B --log-level=
+or
+.B log_level=
+.br
+.RS
+.B String;
+defaults to error
+.br
+This option regulates the frequency and verbosity of log messages. Possible values are none, error, warn, notice and info.
+.RE
+.P
+.B -t
+or
+.B --login-timeout=
+or
+.B login-timeout=
+.br
+.RS
+.B Integer;
+defaults to 1200
+.br
+This option regulates the timeout after the last page is closed.
+.RE
+.SH SETTING UP A CONNECTION TO A POSTGRESQL SERVER
+.P
+Postage requires at least one PostgreSQL server be listed in the postage-connections.conf file. This version of Postage doesn't allow you to specify a server from the command line. Enter only one PostgreSQL server per line.
+.P
+.B The format of a connection string is:
+.RS
+[server_name]: [standard PostgreSQL connection string]
+.RE
+.P
+Detailed information about PostgreSQL connection strings is available at: http://www.postgresql.org/docs/current/static/libpq-connect.html
+.P
+Note that you do not enter your user name or password in this file. That information will be entered on the login screen. If you put a username or password in this file, it will be removed by Postage before attempting to connect to a database.
+
+.B EXAMPLE CONNECTION STRINGS:
+.RS
+nuc-server: hostaddr=192.168.0.100 port=5432 dbname=postgres
+.br
+mini-server: hostaddr=127.0.0.1 port=5432 dbname=postgres sslmode=require
+.RE
+
+.SH EXAMPLES
+.P
+Run Postage (short argument):
+.RS
+@prefix@/sbin/postage -c @prefix@/etc/postage/postage.conf -d @prefix@/etc/postage/postage-connections.conf
+.RE
+.P
+Run Postage (long argument):
+.RS
+@prefix@/sbin/postage --config-file=@prefix@/etc/postage/postage.conf --connection-file @prefix@/etc/postage/postage-connections.conf
+.RE
+
+.SH TROUBLESHOOTING
+Try accessing your database through psql. If you can, double check your connection string parameters. If you can't connect, you may have a firewall problem.
+
+.SH AUTHOR
+.P
+Copyright (c) 2016 Workflow Products, LLC
+.br
+Created by Annunziato Tocci
+.br
+Report bugs to nunzio@wfprod.com. Send us feedback! Current contact information can be found at workflowproducts.com.
