@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Datasheet Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Datasheet</h1>
+        </gs-jumbo>
+        
+        <gs-container min-width="sml;med;lrg">
+            <h3 class="doc-header">Tag:</h3>
+            <pre><code>&lt;gs-datasheet&gt;&lt;/gs-datasheet&gt;</code></pre>
+            
+            <h3 class="doc-header">Description:</h3>
+            <p>This element is used for showing data in a spreadsheet. It also has the ability to SELECT, UPDATE and DELETE records.</p>
+            
+            <h1 class="doc-header">Examples:</h1>
+            
+                <div class="doc-example-description">
+                    <span class="h3">Skeleton Example:</span>
+                    <p>This is an example of a basic, stand-alone <code>gs-datasheet</code>.</p>
+                    <p>Note that the default behavior is for the user to have access to UPDATE and DELETE functionality. If your SRC is a view or function you'll need RULEs or TRIGGERS for UPDATE and DELETE or your users will get errors when they attempt to UPDATE or DELETE records.</p>
+                    <p>Other default behaviors include the refresh button. Row numbers are provided by datasheet when your template includes <code>{{! row_number }}</code>.</p>
+                    <p>The copy functionality allows you to select contiguous cells by clicking and dragging (or by selecting a cell, holding down shift and selecting another cell). You can select individual cells by holding down Command. You can drag across columns to select just a section of a table.</p>
+                    <p>The "<code>pk</code>" attribute defines the PRIMARY KEY column of the object.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="30">
+                        <gs-datasheet src="gsdoc.texample" pk="id">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name">
+                                                <gs-text mini column="first_name"></gs-text>
+                                            </td>
+                                            <td heading="Last Name">
+                                                <gs-text mini column="last_name"></gs-text>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>          
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>"cols"</code>:</span>
+                    <p>The <code>"cols"</code> attribute helps to limit the number of columns coming back from the database. This can reduce the amount of data that the server has to process and send to the WebSocket.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="32">
+                        <gs-datasheet src="gsdoc.texample" pk="id" cols="id,first_name,change_stamp">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name">
+                                                <gs-text mini column="first_name"></gs-text>
+                                            </td>
+                                            <td heading="Last Name">
+                                                <gs-text mini column="last_name"></gs-text>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>          
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">SQL Attributes:</span>
+                    <p>The <code>"where"</code>, <code>"ord"</code>, <code>"limit"</code> and <code>"offset"</code> attributes are used to configure which and how many records you want the datasheet to get.</p>
+                    
+                    <ul>
+                        <li>The <code>"where"</code> attribute takes any <code>WHERE</code> clause.</li>
+                        <li>The <code>"ord"</code> attribute takes any <code>ORDER BY</code> clause.</li>
+                        <li>The <code>"limit"</code> attribute takes an integer and <code>LIMIT</code>s the number of records that the datasheet asks for.</li>
+                        <li>The <code>"offset"</code> attribute takes an integer and <code>OFFSET</code>s the results.</li>
+                    </ul>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="32">
+                        <gs-datasheet src="gsdoc.texample" pk="id" where="first_name ~ 'a'" 
+                            ord="first_name" limit="20" offset="2">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name">
+                                                <gs-text mini column="first_name"></gs-text>
+                                            </td>
+                                            <td heading="Last Name">
+                                                <gs-text mini column="last_name"></gs-text>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>          
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Query String Example:</span>
+                    <p>The qs attribute causes the gs-datasheet to filter by the key and value of the query string. In this example, the qs attribute is set to listen to the query string key "first_name" and the query string is set to "first_name=Apple", so the gs-datasheet will only show items where the first_name is equal to 'Apple'.</p>
+                </div>
+                <gs-doc-example query-string="first_name=Apple">
+                    <template for="html" height="31">
+                        <gs-datasheet src="gsdoc.texample" pk="id" qs="first_name">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name">
+                                                <gs-text mini column="first_name"></gs-text>
+                                            </td>
+                                            <td heading="Last Name">
+                                                <gs-text mini column="last_name"></gs-text>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>          
+                    </template>
+                </gs-doc-example>
+                
+                <span class="h3">Insert Dialog Example:</span>
+                <p>This is an example of an envelope with an insert dialog.</p>
+                <gs-doc-example>
+                    <template for="html" height="41">
+                        <gs-datasheet src="gsdoc.texample">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name">
+                                                <gs-text mini column="first_name"></gs-text>
+                                            </td>
+                                            <td heading="Last Name">
+                                                <gs-text mini column="last_name"></gs-text>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                            <template for="insert">
+                                <label for="insert-first">First Name:</label>
+                                <gs-text id="insert-first" column="first_name"></gs-text>
+                                <label for="insert-last">Last Name:</label>
+                                <gs-text id="insert-last" column="last_name"></gs-text>
+                            </template>
+                        </gs-datasheet>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">HUD Button Removal:</span>
+                    <p>This is an example of an datasheet with the hud buttons removed. The no-hudrefresh attribute removes the refresh button. The no-huddelete attribute removes the delete button. Note that, once you remove all the buttons from the header the entire header disappears.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="24">
+                        <gs-datasheet src="gsdoc.tpeople" pk="id" no-hudrefresh no-huddelete>
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name"><gs-text mini column="first_name"></gs-text></td>
+                                            <td heading="Last Name"><gs-text mini column="last_name"></gs-text></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Add A Custom HUD Button:</span>
+                    <p>This is an example of an datasheet with some custom buttons in the HUD. Notice that the four buttons together are made to look that way with the "<code>remove-right</code>" and "<code>remove-left</code>" attributes.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="28">
+                        <gs-datasheet src="gsdoc.tpeople" pk="id">
+                            <template for="hud">
+                                <gs-button onclick="alert('custom')">Click Me</gs-button>
+                                
+                                <gs-button remove-right
+                                    icononly icon="bank"
+                                    onclick="alert('test-1');"></gs-button>
+                                <gs-button remove-right remove-left
+                                    icononly icon="question-circle"
+                                    onclick="alert('test-2');"></gs-button>
+                                <gs-button remove-right remove-left
+                                    icononly icon="bars"
+                                    onclick="alert('test-3');"></gs-button>
+                                <gs-button remove-left icononly
+                                    icon="calculator"
+                                    onclick="alert('test-4');"></gs-button>
+                            </template>
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name"><gs-text mini column="first_name"></gs-text></td>
+                                            <td heading="Last Name"><gs-text mini column="last_name"></gs-text></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "scroll-to-bottom":</span>
+                    <p>This is an example of an datasheet that has been set to scroll to the bottom on the first load. This is done by adding the "scroll-to-bottom" attribute.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="auto">
+                        <gs-datasheet src="gsdoc.tpeople" pk="id" scroll-to-bottom>
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name"><gs-text mini column="first_name"></gs-text></td>
+                                            <td heading="Last Name"><gs-text mini column="last_name"></gs-text></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Column Heading Removal:</span>
+                    <p>By omitting all of the heading attributes from the table template we've removed the column headings.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="23">
+                        <gs-datasheet src="gsdoc.tpeople" pk="id">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th>{{! row_number }}</th>
+                                            <td><gs-text mini column="first_name"></gs-text></td>
+                                            <td><gs-text mini column="last_name"></gs-text></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "reflow-at":</span>
+                    <p>In this example the datasheet has the "reflow-at" attribute. The "reflow-at" attribute is for telling the datasheet when to reflow the table. When a table is "reflowed" that means that each record is essentially turned to be vertical. To put a heading above each of the controls you must have the "heading" attribute set for each cell.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="23">
+                        <gs-datasheet src="gsdoc.tpeople" pk="id" reflow-at="400">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name"><gs-text mini column="first_name"></gs-text></td>
+                                            <td heading="Last Name"><gs-text mini column="last_name"></gs-text></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "expand-to-content":</span>
+                    <p>In this example the datasheet has the "expand-to-content" attribute. The "expand-to-content" attribute is for telling the datasheet to have it's height be determined by the height of it's content.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="23">
+                        <gs-datasheet src="gsdoc.tpeople" pk="id" expand-to-content>
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name"><gs-text mini column="first_name"></gs-text></td>
+                                            <td heading="Last Name"><gs-text mini column="last_name"></gs-text></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Header And Line Relationship Attributes:</span>
+                    <p>In this example we have a form with an datasheet inside that has the "column" and "child-column" attributes set, it also gets it's "value" attribute set by the form. Each of these three attributes are used to filter the datasheet based on a header record.<br /><br />
+                    
+                    The "column" Attribute:<br />
+                    This attribute is for getting the value from the form and it (in the absence of the "child-column" attribute) is used as the column name that the datasheet filters on.<br /><br />
+                    
+                    The "child-column" Attribute:<br />
+                    This attribute is the name of the column that you want to filter on and insert with. If this is not set it defaults to the value of the "column" attribute.<br /><br />
+                    
+                    The "value" Attribute:<br />
+                    This attribute works in conjunction with the "column" and "child-column" attributes to be the value that the datasheet filters for.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="35">
+                        <gs-form src="gsdoc.tpeople" where="id=2341">
+                            <template>
+                                <gs-datasheet src="gsdoc.tpeople_line" pk="id" column="id" child-column="people_id">
+                                    <template for="table">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <th heading="#">{{! row_number }}</th>
+                                                    <td heading="Name">
+                                                        <gs-text mini column="pet_name"></gs-text>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </template>
+                                </gs-datasheet>
+                            </template>
+                        </gs-form>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "refresh-on-querystring-values":</span>
+                    <p>The "refresh-on-querystring-values" attribute refreshes the datasheet when any of the columns in the attribute change in the query string. To put multiple columns in the attribute you would just put in a comma seperated list.</p>
+                </div>
+                <gs-doc-example query-string="first_name=Apple&unrelatedparameter=test">
+                    <template for="html" height="33">
+                        <gs-datasheet src="gsdoc.tpeople" pk="id" where="first_name = '{{! qs.first_name }}'" refresh-on-querystring-values="first_name">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name">
+                                                <gs-text mini column="first_name"></gs-text>
+                                            </td>
+                                            <td heading="Last Name">
+                                                <gs-text mini column="last_name"></gs-text>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "refresh-on-querystring-change":</span>
+                    <p>The "refresh-on-querystring-change" attribute refreshes the form element when anything changes in the query string.</p>
+                </div>
+                <gs-doc-example query-string="first_name=Apple&unrelatedparameter=test">
+                    <template for="html" height="32">
+                        <gs-datasheet src="gsdoc.tpeople" pk="id" where="first_name = '{{! qs.first_name }}'" refresh-on-querystring-change>
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name">
+                                                <gs-text mini column="first_name"></gs-text>
+                                            </td>
+                                            <td heading="Last Name">
+                                                <gs-text mini column="last_name"></gs-text>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Javascript Methods:</span>
+                    <p>These functions that can be run on individual datasheet elements:<br />
+                    <i>datasheet</i>.refresh() &lt;- This method refreshes the data inside the datasheet.<br />
+                    <i>datasheet</i>.refreshReflow() &lt;- This method recalculates to see if the datasheet should be reflowed or not. The effects of this method are only visible when for some reason the datasheet changed width to the point of needing to reflow or un-reflow but was not refreshed because the window "resize" event was not triggered.<br />
+                    <i>datasheet</i>.refreshFixedHeader() &lt;- This method refreshes the widths of the datasheet header. The effects of this method are only visible when for some reason the datasheet changed width but the headers were not refreshed because the window "resize" event was not triggered.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="37">
+                        <gs-button onclick="testData()">Refresh Data</gs-button>
+                        <gs-button onclick="testReflow()">Refresh Reflow</gs-button>
+                        <gs-button onclick="testHeader()">Refresh Header</gs-button>
+                        <br />
+                        <gs-datasheet id="test-elem" src="gsdoc.tpeople" pk="id" expand-to-content limit="12">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name">
+                                                <gs-text mini column="first_name"></gs-text>
+                                            </td>
+                                            <td heading="Last Name">
+                                                <gs-text mini column="last_name"></gs-text>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>
+                    </template>
+                    <template for="js" height="13">
+                        function testData() {
+                            document.getElementById('test-elem').refresh();
+                        }
+                        function testReflow() {
+                            document.getElementById('test-elem').refreshReflow();
+                        }
+                        function testHeader() {
+                            document.getElementById('test-elem').refreshFixedHeader();
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                
+                <div class="doc-example-description">
+                    <span class="h3">Getting The Current Selection:</span>
+                    <p>For this example you will have to open the Javascript console for your browser.<br /><br />
+                    
+                    There are three ways to get the selection of an datasheet:<br />
+                    <i>datasheet</i>.selectedCells; &lt;- This will return an array of cell elements that are selected.<br />
+                    <i>datasheet</i>.selectedRecords; &lt;- This will return an array of record elements that contain selected cells.<br />
+                    <i>datasheet</i>.selectedIds; &lt;- This will return an array of record IDs where the corresponding record element contains selected cells.<br /><br />
+                    
+                    There are three ways to set the selection of an datasheet:<br />
+                    <i>datasheet</i>.selectedCells = ...; &lt;- The format that this requires is an array of table cell elements that are inside the datasheet you are setting the selection of.<br />
+                    <i>datasheet</i>.selectedRecords = ...; &lt;- The format that this requires is an array of record elements that are inside the datasheet you are setting the selection of.<br />
+                    <i>datasheet</i>.selectedIds = ...; &lt;- The format that this requires is an array of record IDs that are inside the datasheet you are setting the selection of.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="50">
+                        <gs-button onclick="testGetCells()">Get Selected Cells</gs-button>
+                        <gs-button onclick="testGetRecords()">Get Selected Records</gs-button>
+                        <gs-button onclick="testGetIds()">Get Selected IDs</gs-button>
+                        <br />
+                        <gs-button onclick="testSetCells()">Set Selected Cells</gs-button>
+                        <gs-button onclick="testSetRecords()">Set Selected Records</gs-button>
+                        <gs-button onclick="testSetIds()">Set Selected IDs</gs-button>
+                        <br />
+                        <gs-datasheet id="test-elem" src="gsdoc.tpeople" pk="id" ord="id ASC" expand-to-content limit="5">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name">
+                                                <gs-text mini column="first_name"></gs-text>
+                                            </td>
+                                            <td heading="Last Name">
+                                                <gs-text mini column="last_name"></gs-text>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>
+                        <br />
+                        <div id="result"></div>
+                    </template>
+                    <template for="js" height="45">
+                        function testGetCells() {
+                            var element = document.getElementById('test-elem');
+                            
+                            console.log(element.selectedCells);
+                        }
+                        
+                        function testGetRecords() {
+                            var element = document.getElementById('test-elem');
+                            
+                            console.log(element.selectedRecords);
+                        }
+                        
+                        function testSetCells() {
+                            var element = document.getElementById('test-elem');
+                            
+                            element.selectedCells = [
+                                element.querySelectorAll('tr')[1].children[0]
+                            ];
+                        }
+                        
+                        function testSetRecords() {
+                            var element = document.getElementById('test-elem');
+                            
+                            element.selectedRecords = [
+                                element.querySelectorAll('tr')[1]
+                            ];
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Events:</span>
+                    <p>In this example we have an datasheet that logs every event that we have built in:<br />
+                    <b>after_selection</b>: This event is triggered when the cell selection of the datasheet changes.<br />
+                    <b>after_select</b>: This event is triggered when the element receives the data, if there is not error.<br />
+                    <b>after_update</b>: This event is triggered when the element receives confirmation that an update has gone through.<br />
+                    <b>after_delete</b>: This event is triggered when the element receives confirmation that a delete has gone through.<br />
+                    <b>after_insert</b>: This event is triggered when the element receives confirmation that an insert has gone through.<br />
+                    <b>insert_dialog_open</b>: This event is triggered when the insert dialog has been opened.
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="51">
+                        <gs-datasheet id="test-elem" src="gsdoc.tpeople" pk="id" ord="id ASC" expand-to-content limit="5">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <th heading="#">{{! row_number }}</th>
+                                            <td heading="First Name">
+                                                <gs-text mini column="first_name"></gs-text>
+                                            </td>
+                                            <td heading="Last Name">
+                                                <gs-text mini column="last_name"></gs-text>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                            <template for="insert">
+                                <label for="insert-first">First Name:</label>
+                                <gs-text id="insert-first" column="first_name"></gs-text>
+                                
+                                <label for="insert-last">Last Name:</label>
+                                <gs-text id="insert-last" column="last_name"></gs-text>
+                                
+                                <label for="insert-bday">Birth Day:</label>
+                                <gs-date id="insert-bday" column="birth_date" value="today"></gs-date>
+                            </template>
+                        </gs-datasheet>
+                        <br />
+                        <div id="event-log"></div>
+                    </template>
+                    <template for="js" height="64">
+                        function addToLog(strEventName, strExplain) {
+                            var element = document.getElementById('event-log');
+                            
+                            element.innerHTML =
+                                '<div>' +
+                                    '<b>' + strEventName + '</b> ' +
+                                    strExplain +
+                                '</div>' +
+                                element.innerHTML;
+                        }
+                        
+                        window.addEventListener('load', function () {
+                            var element = document.getElementById('test-elem');
+                            
+                            element.addEventListener('after_selection', function () {
+                                addToLog('after_selection',
+                                         'the selection has been changed.');
+                            });
+                            element.addEventListener('after_select', function () {
+                                addToLog('after_select',
+                                         'datasheet has gotten some data.');
+                            });
+                            element.addEventListener('after_update', function () {
+                                addToLog('after_update',
+                                         'datasheet has updated some data.');
+                            });
+                            element.addEventListener('after_delete', function () {
+                                addToLog('after_delete',
+                                         'datasheet has deleted some data.');
+                            });
+                            element.addEventListener('insert_dialog_open', function () {
+                                addToLog('insert_dialog_open',
+                                         'datasheet insert dialog has been opened.');
+                            });
+                            element.addEventListener('after_insert', function () {
+                                addToLog('after_insert',
+                                         'datasheet has inserted some data.');
+                            });
+                        });
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Datasheet, Sub-Datasheet Example:</span>
+                    <p>In this example we have an datasheet that has a sub-datasheet. Note: the offset attribute on the sub-datasheet is because all of these datasheets are looking at the same table, so the offset prevents any record from the table from being in two places at once.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="auto">
+                        <gs-datasheet src="gsdoc.tpeople" limit="3" pk="id" lock="change_stamp" ord="id ASC" cols="first_name,last_name">
+                            <template for="table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td heading="first_name">
+                                                <gs-text mini column="first_name"></gs-text>
+                                            </td>
+                                            <td heading="last_name">
+                                                <gs-text mini column="last_name"></gs-text>
+                                            </td>
+                                            <td>
+                                                <gs-datasheet src="gsdoc.tpeople" limit="3" pk="id" lock="change_stamp" ord="id ASC"
+                                                              offset="{{! row_number * 3}}" cols="first_name,last_name" expand-to-content>
+                                                    <template for="table">
+                                                        <table>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td heading="first_name">
+                                                                        <gs-text mini column="first_name"></gs-text>
+                                                                    </td>
+                                                                    <td heading="last_name">
+                                                                        <gs-text mini column="last_name"></gs-text>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </template>
+                                                </gs-datasheet>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-datasheet>
+                    </template>
+                </gs-doc-example>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

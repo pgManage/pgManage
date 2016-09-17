@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Dialog Button Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Dialog Button</h1>
+        </gs-jumbo>
+        
+        <gs-container min-width="sml;med;lrg">
+            <h3 class="doc-header">Tag:</h3>
+            <pre>&lt;gs-dialog-button template="..."&gt;&lt;/gs-dialog-button&gt;</pre>
+            
+            <h3 class="doc-header">Description:</h3>
+            <p>This element is used to open a dialog at the click of a button.</p>
+            
+            
+            
+            
+            
+            <h1 class="doc-header">Examples:</h1>
+            
+            <div class="doc-example-description">
+                <span class="h3">Inner Template Example:</span>
+                <p>This is an example of a <code>&lt;gs-dialog-button&gt;</code> that creates a dialog using an inner template. The template element must be an immediate child of the button for this to work. This is useful for a quick and simple dialog.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <gs-dialog-button>
+                        <template>
+                            <h5>Example Dialog</h5>
+                            <gs-button dialogclose>Done</gs-button>
+                        </template>
+                        Example Dialog
+                    </gs-dialog-button>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">"template" Attribute Example:</span>
+                <p>In this example we have a <code>&lt;gs-dialog-button&gt;</code> that opens a dialog by linking to an external <code>&lt;template&gt;</code> element. This is done by putting the <code>&lt;template&gt;</code>'s "<code>id</code>" in the <code>&lt;gs-dialog-button&gt;</code>'s "<code>template</code>" attribute. You would use this if you want to keep all of your templates together or if you want/have multiple elements/javascript functions using the template.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <template id="dialog-example">
+                        <h5>Example Dialog</h5>
+                        <gs-button dialogclose>Done</gs-button>
+                    </template>
+                    
+                    <gs-dialog-button template="dialog-example">
+                        Example Dialog
+                    </gs-dialog-button>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Event attributes Example:</span>
+                <p>
+                    There are four event attributes that you can run JavaScript in for this element.<br />
+                    <ol>
+                        <li>The "<code>before-open</code>" attribute runs before the dialog is added to the DOM. A variable can be used in this attribute is: "this", which is the button element that was clicked.</li>
+                        <li>The "<code>after-open</code>" attribute runs after the dialog has been added to the DOM. A variable can be used in this attribute is: "this", which is the dialog element that was created.</li>
+                        <li>The "<code>before-close</code>" attribute runs before the dialog is removed from the DOM. Variables in this attribute are "this" (which is the dialog element that is going to be closed) and "strAnswer" (which is the answer of the dialog).</li>
+                        <li>The "<code>after-close</code>" attribute runs after the dialog has been removed from the DOM. Variables in this attribute are "this" (which is the button element that was originally clicked) and "strAnswer" (which is the answer of the dialog).</li>
+                    </ol>
+                </p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <template id="dialog-example">
+                        <h5>Example Dialog</h5>
+                        <gs-button dialogclose>Done</gs-button>
+                    </template>
+                    
+                    <gs-dialog-button template="dialog-example"
+                            before-open="alert('before-open.');"
+                            after-open="alert('after-open.');"
+                            before-close="alert('before-close. Answer: ' + strAnswer);"
+                            after-close="alert('after-close. Answer: ' + strAnswer);">
+                        Example Dialog
+                    </gs-dialog-button>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">"target" Attribute Example:</span>
+                <p>You can open a dialog and attach it to a target element. This is done by putting a selector in the "<code>target</code>" attribute. This could be used for lists or tooltips.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <template id="dialog-example">
+                        <h5>Example Dialog</h5>
+                        <gs-button dialogclose>Done</gs-button>
+                    </template>
+                    
+                    <gs-dialog-button template="dialog-example"
+                                      target="#span">
+                        Open Example Dialog at the green element
+                    </gs-dialog-button>
+                    
+                    <gs-dialog-button template="dialog-example"
+                                      target>
+                        Open Example Dialog at the this button
+                    </gs-dialog-button>
+                    
+                    <br /><br /><br />
+                    
+                    <center>
+                        <span id="span" style="background: #0D0;">Target</span>
+                    </center>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">"direction" Attribute Example:</span>
+                <p>When you open a dialog and attach it to a target element you can specify a side to attach to. If the dialog doesn't have the room on the chosen side, then it wil try different sides. This is done by putting "left", "right", "up" or "down" in the "<code>direction</code>" attribute.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <template id="dialog-example" data-max-width="4.2em">
+                        <h5>Example</h5>
+                        <gs-button dialogclose>Done</gs-button>
+                    </template>
+                    
+                    <gs-dialog-button template="dialog-example"
+                                      target="#span"
+                                      direction="left">
+                        Open To The To The Left (left)
+                    </gs-dialog-button>
+                    
+                    <gs-dialog-button template="dialog-example"
+                                      target="#span"
+                                      direction="right">
+                        Open To The To The Right (right)
+                    </gs-dialog-button>
+                    
+                    <gs-dialog-button template="dialog-example"
+                                      target="#span"
+                                      direction="up">
+                        Open To The To The Top (up)
+                    </gs-dialog-button>
+                    
+                    <gs-dialog-button template="dialog-example"
+                                      target="#span"
+                                      direction="down">
+                        Open To The On The Bottom (down)
+                    </gs-dialog-button>
+                    
+                    <br /><br /><br />
+                    
+                    <center>
+                        <span id="span" style="background: #0D0;">Target</span>
+                    </center>
+                </template>
+            </gs-doc-example>
+            
+            
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

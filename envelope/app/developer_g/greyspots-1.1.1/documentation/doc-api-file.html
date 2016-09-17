@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>File API Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">File</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Commands:</h3>
+            <pre><code>FILE LIST
+FILE CREATE_FOLDER
+FILE CREATE_FILE
+FILE MOVE
+FILE DELETE
+FILE READ
+FILE WRITE</code></pre>
+            
+            <h3>Description:</h3>
+            <p>These commands handle file and folder viewing/editing/management.</p>
+            <h1>Examples:</h1>
+            
+            <div class="doc-example-description">
+                <span class="h3">Folder Listing Example:</span><br/>
+                <p>The <code>LIST</code> command lists the files and folders inside a particular folder. The results of this command is a <kbd>TAB</kbd> and <kbd>RETURN</kbd> delimited list with two columns, the first column is the file/folder name and the second column is whether that path is a file or folder.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <gs-button onclick="example()">List</gs-button>
+                    <br />
+                    <pre id="results"></pre>
+                </template>
+                <template for="js" height="29">
+                    window.addEventListener('load', function () {
+                        GS.envSocket = GS.openSocket('env');
+                    });
+                    
+                    function example() {
+                        var strMessage = 'FILE\tLIST\t' + '/web_root/';
+                        
+                        // clear results box
+                        document.getElementById('results').innerHTML = '';
+                        
+                        GS.requestFromSocket(
+                                GS.envSocket, strMessage,
+                                function (data, error, errorData) {
+                            if (!error) {
+                                document.getElementById('results').innerHTML += encodeHTML(data) + '<br /><hr />';
+                            } else {
+                                GS.webSocketErrorDialog(errorData);
+                            }
+                        });
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Folder Creation Example:</span><br/>
+                <p>The <code>CREATE_FOLDER</code> command creates a folder at a location that you specify. This command returns the Last Modified Stamp of the new folder. If the folder already exists, the command will error.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <label for="folder-name">Folder Name:</label>
+                    <gs-text id="folder-name" value="Test_Folder"></gs-text>
+                    <br />
+                    <gs-button onclick="example()">Create Folder</gs-button>
+                    <br />
+                    <pre id="results"></pre>
+                </template>
+                <template for="js" height="37">
+                    window.addEventListener('load', function () {
+                        GS.envSocket = GS.openSocket('env');
+                    });
+                    
+                    function example() {
+                        var strName = document.getElementById('folder-name').value;
+                        
+                        var strMessage =
+                                'FILE\tCREATE_FOLDER\t' +
+                                '/role/trusted_g/' + strName;
+                        
+                        // clear results box
+                        document.getElementById('results').innerHTML = '';
+                        
+                        GS.requestFromSocket(
+                                GS.envSocket, strMessage,
+                                function (data, error, errorData) {
+                            if (!error) {
+                                document.getElementById('results').innerHTML += encodeHTML(data) + '<br /><hr />';
+                            } else {
+                                GS.webSocketErrorDialog(errorData);
+                            }
+                        });
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">File Creation Example:</span><br/>
+                <p>The <code>CREATE_FILE</code> command creates a file at a location that you specify. This command returns the Last Modified Stamp of the new file. If the file already exists, the command will error.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <label for="file-name">File Name:</label>
+                    <gs-text id="file-name" value="Test_File"></gs-text>
+                    <br />
+                    <gs-button onclick="example()">Create File</gs-button>
+                    <br />
+                    <pre id="results"></pre>
+                </template>
+                <template for="js" height="37">
+                    window.addEventListener('load', function () {
+                        GS.envSocket = GS.openSocket('env');
+                    });
+                    
+                    function example() {
+                        var strName = document.getElementById('file-name').value;
+                        
+                        var strMessage =
+                                'FILE\tCREATE_FILE\t' +
+                                '/role/trusted_g/' + strName;
+                        
+                        // clear results box
+                        document.getElementById('results').innerHTML = '';
+                        
+                        GS.requestFromSocket(
+                                GS.envSocket, strMessage,
+                                function (data, error, errorData) {
+                            if (!error) {
+                                document.getElementById('results').innerHTML += encodeHTML(data) + '<br /><hr />';
+                            } else {
+                                GS.webSocketErrorDialog(errorData);
+                            }
+                        });
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">File Move Example:</span><br/>
+                <p>The <code>MOVE</code> command renames/moves a file/folder that you specify to a new path that you specify. This command returns the Last Modified Stamp of the moved file/folder.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <label for="file-from">From Name:</label>
+                    <gs-text id="file-from" value="Test_File"></gs-text>
+                    <br />
+                    <label for="file-to">To Name:</label>
+                    <gs-text id="file-to" value="Test_File_2"></gs-text>
+                    <br />
+                    <gs-button onclick="example()">Move File</gs-button>
+                    <br />
+                    <pre id="results"></pre>
+                </template>
+                <template for="js" height="38">
+                    window.addEventListener('load', function () {
+                        GS.envSocket = GS.openSocket('env');
+                    });
+                    
+                    function example() {
+                        var strFrom = document.getElementById('file-from').value;
+                        var strTo = document.getElementById('file-to').value;
+                        
+                        var strMessage =
+                                'FILE\tMOVE\t' +
+                                '/role/trusted_g/' + strFrom + '\t' +
+                                '/role/trusted_g/' + strTo;
+                        
+                        // clear results box
+                        document.getElementById('results').innerHTML = '';
+                        
+                        GS.requestFromSocket(
+                                GS.envSocket, strMessage,
+                                function (data, error, errorData) {
+                            if (!error) {
+                                document.getElementById('results').innerHTML += encodeHTML(data) + '<br /><hr />';
+                            } else {
+                                GS.webSocketErrorDialog(errorData);
+                            }
+                        });
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">File Delete Example:</span><br/>
+                <p>The <code>DELETE</code> command deletes a file/folder that you specify. This command returns "OK" if the delete was successful.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <label for="file-delete">From Name:</label>
+                    <gs-text id="file-delete" value="Test_File_2"></gs-text>
+                    <br />
+                    <gs-button onclick="example()">Delete</gs-button>
+                    <br />
+                    <pre id="results"></pre>
+                </template>
+                <template for="js" height="35">
+                    window.addEventListener('load', function () {
+                        GS.envSocket = GS.openSocket('env');
+                    });
+                    
+                    function example() {
+                        var strFile = document.getElementById('file-delete').value;
+                        
+                        var strMessage =
+                                'FILE\tDELETE\t' +
+                                '/role/trusted_g/' + strFile;
+                        
+                        // clear results box
+                        document.getElementById('results').innerHTML = '';
+                        
+                        GS.requestFromSocket(
+                                GS.envSocket, strMessage,
+                                function (data, error, errorData) {
+                            if (!error) {
+                                document.getElementById('results').innerHTML += encodeHTML(data) + '<br /><hr />';
+                            } else {
+                                GS.webSocketErrorDialog(errorData);
+                            }
+                        });
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">File Read Example:</span><br/>
+                <p>The <code>READ</code> command returns the Last Modified Stamp and the content of a file that you specify. The first line in the response is the change stamp and the rest after that is content.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <label for="file-read">File Name:</label>
+                    <gs-text id="file-read" value="/web_root/index.html"></gs-text>
+                    <br />
+                    <gs-button onclick="example()">Read</gs-button>
+                    <br />
+                    <pre id="results"></pre>
+                </template>
+                <template for="js" height="35">
+                    window.addEventListener('load', function () {
+                        GS.envSocket = GS.openSocket('env');
+                    });
+                    
+                    function example() {
+                        var strFile = document.getElementById('file-read').value;
+                        
+                        var strMessage =
+                                'FILE\tREAD\t' +
+                                strFile;
+                        
+                        // clear results box
+                        document.getElementById('results').innerHTML = '';
+                        
+                        GS.requestFromSocket(
+                                GS.envSocket, strMessage,
+                                function (data, error, errorData) {
+                            if (!error) {
+                                document.getElementById('results').innerHTML += encodeHTML(data) + '<br /><hr />';
+                            } else {
+                                GS.webSocketErrorDialog(errorData);
+                            }
+                        });
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Write Example:</span><br/>
+                <p>The <code>WRITE</code> command overwrites the content of a file with new content. This command requires the Last Modified Stamp and the new content of the file. This command returns the new Last Modified Stamp of the file.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <label for="file-write">File Name:</label>
+                    <gs-text id="file-write" value="/role/trusted_g/test.txt"></gs-text>
+                    <br />
+                    <gs-button onclick="example()">Write</gs-button>
+                    <br />
+                    <pre id="results"></pre>
+                </template>
+                <template for="js" height="58">
+                    function example() {
+                        var strFile = document.getElementById('file-write').value;
+                        
+                        var strMessage =
+                                'FILE\tREAD\t' +
+                                strFile;
+                        
+                        // clear results box
+                        document.getElementById('results').innerHTML = '';
+                        
+                        GS.requestFromSocket(GS.envSocket, strMessage, function (data, error, errorData) {
+                            if (!error) {
+                                if (data !== 'TRANSACTION COMPLETED') {
+                                    var lastModified = data.substring(0, data.indexOf('\n'));
+                                    
+                                    strMessage =
+                                            'FILE\tWRITE\t' +
+                                                strFile + '\t' +
+                                                GS.encodeForTabDelimited(lastModified) + '\n' +
+                                            'This is the new file content.';
+                                    
+                                    GS.requestFromSocket(GS.envSocket, strMessage, function (data, error, errorData) {
+                                        if (!error) {
+                                            document.getElementById('results').innerHTML += encodeHTML(data) + '<br /><hr />';
+                                        } else {
+                                            GS.webSocketErrorDialog(errorData);
+                                        }
+                                    });
+                                }
+                            } else {
+                                GS.webSocketErrorDialog(errorData);
+                            }
+                        });
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

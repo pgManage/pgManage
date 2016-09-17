@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Text Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Text</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3 class="doc-header">Tag:</h3>
+            <pre><code>&lt;gs-text&gt;&lt;/gs-text&gt;</code></pre>
+            
+            <h3>Description:</h3>
+            <p>
+                
+            </p>
+            
+            <h1 class="doc-header">Examples:</h1>
+            <div class="doc-section">
+                <div class="doc-example-description">
+                    <span class="h3">Skeleton Example:</span>
+                    <p>Without attributes the <code>&lt;gs-text&gt;</code> will have the following behaviors:</p>
+                    <ol>
+                        <li>Clicking on the control gives you a cursor.</li>
+                        <li>You can change the text by typing.</li>
+                    </ol>
+                </div>
+                <gs-doc-example>
+                    <template for="html">
+                        <label for="control_example">Test:</label>
+                        <gs-text id="control_example"></gs-text>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[onchange=""]</code>:</span>
+                    <p>To run javascript when the value changes, use the <code>[onchange=""]</code> attribute.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="5">
+                        <label for="control_default">Change Alert:</label>
+                        <gs-text id="control_default" onchange="alert('value changed')"></gs-text>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[value=""]</code>:</span>
+                    <p>To set the default value for the <code>&lt;gs-text&gt;</code>, use the <code>[value=""]</code> attribute.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <label for="control_default">Text No Value:</label>
+                        <gs-text id="control_default"></gs-text>
+                        <label for="control_value">Text With Value:</label>
+                        <gs-text id="control_value" value="05/05/05"></gs-text>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span>
+                    <p>The <code>[qs=""]</code> attribute can be used to sync the <code>&lt;gs-text&gt;</code> with the query string.</p>
+                </div>
+                <gs-doc-example query-string="test=05/05/05">
+                    <template for="html">
+                        <label for="control_qs">Text Query String:</label>
+                        <gs-text id="control_qs" qs="test"></gs-text>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[placeholder]</code>:</span>
+                    <p>The <code>[placeholder]</code> attribute can be used when you don't want to use a label to explain the purpose of the control to the user. (The label and the placeholder can be used together, that's just not what normally happens.)</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <label for="control_label">Label:</label>
+                        <gs-text id="control_label"></gs-text>
+                        <label for="control_placeholder_label">Placeholder And Label:</label>
+                        <gs-text placeholder="Placeholder And Label" id="control_placeholder_label"></gs-text>
+                        <gs-text placeholder="Placeholder" id="control_placeholder"></gs-text>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[mini]</code>:</span>
+                    <p>Sometimes you are limited on space. The <code>[mini]</code> attribute can be used to make the <code>&lt;gs-text&gt;</code> smaller.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="5">
+                        <label for="control_mini">Mini:</label>
+                        <gs-text id="control_mini" mini></gs-text>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[tabindex=""]</code>:</span>
+                    <p>With the <code>[tabindex=""]</code> attribute, you can control what order your controls are tabbed to.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="25">
+                        <label for="control_1">1:</label>
+                        <gs-text tabindex="1" id="control_1"></gs-text>
+                        <label for="control_3">3:</label>
+                        <gs-text tabindex="3" id="control_3"></gs-text>
+                        <label for="control_2">2:</label>
+                        <gs-text tabindex="2" id="control_2"></gs-text>
+                        <label for="control_4">4:</label>
+                        <gs-text tabindex="4" id="control_4"></gs-text>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[autocorrect=""]</code>/<code>[autocapitalize=""]</code>/<code>[autocomplete=""]</code> Attribute:</span>
+                    <p>If you don't want spelling to autocorrect, you can use the html5 <code>[autocorrect="off"]</code> attribute. See also html5 <code>[autocapitalize="off"]</code> and <code>[autocomplete="off"]</code>.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="20">
+                        <label for="control_nocorrect">No Autocorrect:</label>
+                        <gs-text autocorrect="off" id="control_nocorrect"></gs-text>
+                        <label for="control_nocapitalize">No Autocapitalize:</label>
+                        <gs-text autocapitalize="off" id="control_nocapitalize"></gs-text>
+                        <label for="control_nocomplete">No Autocomplete:</label>
+                        <gs-text autocomplete="off" id="control_nocomplete"></gs-text>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[disabled]</code>:</span>
+                    <p>With the <code>[disabled]</code> attribute, you can control whether or not you can use the control.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <label for="control_disabled">Disabled:</label>
+                        <gs-text disabled id="control_disabled"></gs-text>
+                        <label for="control_enabled">Not Disabled:</label>
+                        <gs-text id="control_enabled"></gs-text>
+                    </template>
+                </gs-doc-example>
+            </div>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

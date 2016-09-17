@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>URL State Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">URL State Functions</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+                <h3 class="doc-header">Functions:</h3>
+                <div class="doc-section doc-mono">
+                    <p>GS.pushState(&lt;STATE-OBJ&gt;, &lt;TITLE&gt;, &lt;URL&gt;);<br />
+                    GS.replaceState(&lt;STATE-OBJ&gt;, &lt;TITLE&gt;, &lt;URL&gt;);<br />
+                    GS.pushQueryString(&lt;OVERRIDING-QUERYSTRING&gt;);</p>
+                </div>
+                
+                <h3 class="doc-header">Description:</h3>
+                <div class="doc-section">
+                    <p>These functions are for modifiying the URL and query string without reloading the page. See also: <a href="doc-jslib-safe-uri-decode.html">Safe URI Decoding</a> and <a href="doc-jslib-query-string.html">Query String</a>.</p>
+                </div>
+                
+                <h1 class="doc-header">Examples:</h1>
+                <div class="doc-section">
+                    <div class="doc-example-description">
+                        <span class="h3">GS.pushState Example:</span><br />
+                        <p>This function's parameters are the same parameters as "history.pushState(...)". Documentation on "history.pushState": <a target="_blank" href="https://developer.mozilla.org/docs/Web/Guide/API/DOM/Manipulating_the_browser_history#The_pushState()_method">MDN</a>. What this function adds to "history.pushState" is an event gets triggered when this function is called so that elements and the javascript on the page can respond to the push.<br /><br /></p>
+                        
+                        <p>In this example when you click the "Test 1", "Test 2" or "Test 3" buttons it changes the path in the URL without refreshing the page. The new URL is put into the "result" div.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="12">
+                            <gs-button onclick="GS.pushState({}, '', 'test1.html')">Test 1</gs-button>
+                            <gs-button onclick="GS.pushState({}, '', 'test2.html')">Test 2</gs-button>
+                            <gs-button onclick="GS.pushState({}, '', 'test3.html')">Test 3</gs-button>
+                            <br />
+                            <div id="result"></div>
+                        </template>
+                        <template for="js" height="6">
+                            window.addEventListener('pushstate', function () {
+                                document.getElementById('result').textContent = window.location.pathname;
+                            });
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">GS.replaceState Example:</span><br />
+                        <p>This function's parameters are the same parameters as "history.replaceState(...)". Documentation on "history.replaceState": <a target="_blank" href="https://developer.mozilla.org/docs/Web/Guide/API/DOM/Manipulating_the_browser_history#The_replaceState()_method">MDN</a>. What this function adds to "history.replaceState" is an event gets triggered when this function is called so that elements and the javascript on the page can respond to the change.<br /><br />
+                        
+                        In this example when you click the "Test 1", "Test 2" or "Test 3" buttons it changes the path in the URL without refreshing the page. The new URL is put into the "result" div.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="12">
+                            <gs-button onclick="GS.replaceState({}, '', 'test1.html')">Test 1</gs-button>
+                            <gs-button onclick="GS.replaceState({}, '', 'test2.html')">Test 2</gs-button>
+                            <gs-button onclick="GS.replaceState({}, '', 'test3.html')">Test 3</gs-button>
+                            <br />
+                            <div id="result"></div>
+                        </template>
+                        <template for="js" height="6">
+                            window.addEventListener('replacestate', function () {
+                                document.getElementById('result').textContent = window.location.pathname;
+                            });
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">GS.pushQueryString Example:</span><br />
+                        <p>In this example when you click one of the "Test 1", "Test 2", "Test 3" or "Test 4" buttons the querystring in the URL is updated using the querystring passed to the GS.pushQueryString function. When the GS.pushQueryString function changes the querystring the user can use the back button to go back to a previous querystring (or no querystring for that matter) without reloading the page. Notice: when you set a column to empty in the querystring it is actually set to empty, it is not ignored.</p>
+                    </div>
+                    <gs-doc-example query-string="test=asdf">
+                        <template for="html" height="6">
+                            <gs-button onclick="testPushQS1()">Test 1</gs-button>
+                            <gs-button onclick="testPushQS2()">Test 2</gs-button>
+                            <gs-button onclick="testPushQS3()">Test 3</gs-button>
+                            <gs-button onclick="testPushQS4()">Test 4</gs-button>
+                        </template>
+                        <template for="js" height="22">
+                            function testPushQS1(strNewQueryString) {
+                                GS.pushQueryString('test=newtest');
+                            }
+                            
+                            function testPushQS2(strNewQueryString) {
+                                GS.pushQueryString('test=test&asdf=asdf');
+                            }
+                            
+                            function testPushQS3(strNewQueryString) {
+                                GS.pushQueryString('test=&asdf=');
+                            }
+                            
+                            function testPushQS4(strNewQueryString) {
+                                GS.pushQueryString('test=&asdf=asdf');
+                            }
+                        </template>
+                    </gs-doc-example>
+                </div>
+        </gs-container>
+    </body>
+</html>

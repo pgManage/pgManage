@@ -1,0 +1,44 @@
+
+gs-select {
+    position: relative;
+    display: block;
+    padding: 0.2em;
+    background-color: #FFFFFF;
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+    min-height: 1em;
+}
+
+gs-select > option {
+    display: none;
+}
+
+gs-select:after {
+    position: absolute;
+    
+    right: 0.6em;
+    top: 50%;
+    
+    margin-top: -0.35em;
+    
+    width: 0.8em;
+    height: 0.8em;
+    
+    line-height: 0.8em;
+    font-family: fontawesome;
+    content: '\f078';
+    
+    text-align: center;
+    
+    background-color: #FFFFFF;
+    pointer-events: none;
+}
+
+/* remove padding, border, border curve and box shadow */
+gs-select[mini] {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: 0 0 0 0;
+}

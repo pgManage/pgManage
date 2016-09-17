@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Envelope Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Envelope</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+        <h3 class="doc-header">Tag:</h3>
+        <p>&lt;gs-envelope&gt;</p>
+        
+        <h3 class="doc-header">Description:</h3>
+        <p>This element is used for showing data in a spreadsheet. It also has the ability to create, update and delete records.</p>
+        
+        <h1 class="doc-header">Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">Skeleton Example:</span>
+                <p>This is an example of a basic, stand-alone envelope.<br /> <br />
+                Note that the default behavior is for the user to have access to UPDATE and DELETE functionality. If your SRC is a view or function you'll need RULEs or TRIGGERS for UPDATE and DELETE or your users will get errors when they attempt to UPDATE or DELETE records. <br /><br />
+                Other default behaviors include limit, sorting and refresh. Row numbers are provided by envelope when your template includes the column="row_number" attribute. If you leave it out you still get a record selector column but there are no numbers. When you select records this column gets a triangle icon to indicate the record is selected.<br /><br />
+                The copy-to-clipboard functionality allows you to select contiguous records by holding down shift. You can select individual records by holding down Command. You can drag across columns to select just a section of a table. When you paste into a document the data will be tab delimited. Tab delimited data tends to paste into a spreadsheet with the columns preserved. Columns will not typically line up correctly in a plain text document. Users can paste into a spreadsheet and then copy and paste into a document to get a rich text table into a document.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="30">
+                    <gs-envelope src="gsdoc.texample">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>          
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Attribute "cols":</span>
+                <p>In this example we are limiting the columns we get back from the database by using the "cols" attribute. The "cols" attribute is a comma-seperated list of columns that you want from the database. You can see we did not include the "last_name" column so it is empty.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="32">
+                    <gs-envelope src="gsdoc.texample" cols="id,first_name,change_stamp">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>          
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">SQL Attributes:</span>
+                <p>The "where" attribute takes as an argument any valid SQL WHERE clause and the "ord" attribute takes any valid SQL order by clause. <br /><br /></p>
+                <p>Limit and offset need integers to work but they can also accept empty string in which case they are ignored.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="32">
+                    <gs-envelope src="gsdoc.texample" where="first_name ~ 'a'" 
+                        ord="first_name" limit="20" offset="2">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>          
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Query String Example:</span>
+                <p>The qs attribute causes the gs-envelope to filter by the key and value of the query string. In this example, the qs attribute is set to listen to the query string key "first_name" and the query string is set to "first_name=Apple", so the gs-envelope will only show items where the first_name is equal to 'Apple'.</p>
+            </div>
+            <gs-doc-example query-string="first_name=Apple">
+                <template for="html" height="31">
+                    <gs-envelope src="gsdoc.texample" qs="first_name">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>          
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Insert Dialog Example:</span>
+                <p>This is an example of an envelope with an insert dialog.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="41">
+                    <gs-envelope src="gsdoc.texample">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                        <template for="insert">
+                            <label for="text-insert-first_name">First Name:</label>
+                            <gs-text id="text-insert-first_name" column="first_name"></gs-text>
+                            <label for="text-insert-last_name">Last Name:</label>
+                            <gs-text id="text-insert-last_name" column="last_name"></gs-text>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">HUD Button Removal:</span>
+                <p>This is an example of an envelope with the hud buttons removed. The no-hudorderby attribute removes the order by button. The no-hudlimit attribute removes the limit button. The no-hudrefresh attribute removes the refresh button. The no-huddelete attribute removes the delete button. Note that, once you remove all the buttons from the header or footer, the entire header or footer colapses.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="24">
+                    <gs-envelope src="gsdoc.tpeople" no-hudorderby no-hudlimit no-hudrefresh no-huddelete>
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#"><gs-static column="row_number"></gs-static></th>
+                                        <td heading="First Name"><gs-text mini column="first_name"></gs-text></td>
+                                        <td heading="Last Name"><gs-text mini column="last_name"></gs-text></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Add A Custom HUD Button:</span>
+                <p>This is an example of an envelope with a custom button in the HUD.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="28">
+                    <gs-envelope src="gsdoc.tpeople">
+                        <template for="hud">
+                            <gs-button onclick="alert('custom button')" inline>Click Me</gs-button>
+                        </template>
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#"><gs-static column="row_number"></gs-static></th>
+                                        <td heading="First Name"><gs-text mini column="first_name"></gs-text></td>
+                                        <td heading="Last Name"><gs-text mini column="last_name"></gs-text></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Attribute "scroll-to-bottom":</span>
+                <p>This is an example of an envelope that has been set to scroll to the bottom on the first load. This is done by adding the "scroll-to-bottom" attribute.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <gs-envelope src="gsdoc.tpeople" scroll-to-bottom>
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#"><gs-static column="row_number"></gs-static></th>
+                                        <td heading="First Name"><gs-text mini column="first_name"></gs-text></td>
+                                        <td heading="Last Name"><gs-text mini column="last_name"></gs-text></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Column Heading Removal:</span>
+                <p>By omitting all of the heading attributes from the table template we've removed the column headings.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="23">
+                    <gs-envelope src="gsdoc.tpeople">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th><gs-static column="row_number"></gs-static></th>
+                                        <td><gs-text mini column="first_name"></gs-text></td>
+                                        <td><gs-text mini column="last_name"></gs-text></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Attribute "reflow-at":</span>
+                <p>In this example the envelope has the "reflow-at" attribute. The "reflow-at" attribute is for telling the envelope when to reflow the table. When a table is "reflowed" that means that each record is essentially turned to be vertical. To put a heading above each of the controls you must have the "heading" attribute set for each cell.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="23">
+                    <gs-envelope src="gsdoc.tpeople" reflow-at="400">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#"><gs-static column="row_number"></gs-static></th>
+                                        <td heading="First Name"><gs-text mini column="first_name"></gs-text></td>
+                                        <td heading="Last Name"><gs-text mini column="last_name"></gs-text></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Attribute "expand-to-content":</span>
+                <p>In this example the envelope has the "expand-to-content" attribute. The "expand-to-content" attribute is for telling the envelope have it's height be determined by the height of it's content.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="23">
+                    <gs-envelope src="gsdoc.tpeople" expand-to-content>
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#"><gs-static column="row_number"></gs-static></th>
+                                        <td heading="First Name"><gs-text mini column="first_name"></gs-text></td>
+                                        <td heading="Last Name"><gs-text mini column="last_name"></gs-text></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Attribute "primary-keys":</span>
+                <p>In this example the envelope has the "primary-keys" attribute. The "primary-keys" attribute is for telling the envelope what columns are supposed to be sent with every update for a where clause. The default primary keys are: "id,change_stamp".</p>
+                <br /><br />
+                <p>Note: if you inspect the record element of the envelope in this example and an envelope without "primary-keys" set: you can see that this envelope has the "data-id" attribute on every record and in the other you can see that each record has a "data-id" and a "data-change_stamp" attribute.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="23">
+                    <gs-envelope src="gsdoc.tpeople" primary-keys="id">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#"><gs-static column="row_number"></gs-static></th>
+                                        <td heading="First Name"><gs-text mini column="first_name"></gs-text></td>
+                                        <td heading="Last Name"><gs-text mini column="last_name"></gs-text></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Link Override Attributes:</span>
+                <p>In this example we have overridden the links that the envelope uses to call the database by setting the "action-select", "action-insert", "action-update" and the "action-delete" attributes to links of custom actions that return as the element expects. For the envelope to work the links that it calls have to at least return the same way as the Envelope API, an added bonus would be if it could also get it's parameters the same way. For a reference to how the default calls take parameters and return their data: see the <a href="doc-api-envelope.html" target="_blank">Envelope API Documentation</a>.</p>
+                <p>Note: This example will not update, insert, delete or select dynamic data, it's only to show how to connect postgres functions to the envelope element.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="27">
+                    <gs-envelope src="gsdoc.tpeople"
+                                 action-select="cluster/gsdoc.action_select"
+                                 action-insert="cluster/gsdoc.action_insert"
+                                 action-update="cluster/gsdoc.action_update"
+                                 action-delete="cluster/gsdoc.action_delete">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#"><gs-static column="row_number"></gs-static></th>
+                                        <td heading="Name"><gs-text mini column="name"></gs-text></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Header And Line Relationship Attributes:</span>
+                <p>In this example we have a form with an envelope inside that has the "column" and "child-column" attributes set, it also gets it's "value" attribute set by the form. Each of these three attributes are used to filter the envelope based on a header record and make it so that records that are inserted using the envelope are connected to the same header record.<br /><br />
+                
+                The "column" Attribute:<br />
+                This attribute is for getting the value from the form and it (in the absence of the "child-column" attribute) is used as the column name that the envelope filters on and inserts with.<br /><br />
+                
+                The "child-column" Attribute:<br />
+                This attribute is the name of the column that you want to filter on and insert with. If this is not set it defaults to the value of the "column" attribute.<br /><br />
+                
+                The "value" Attribute:<br />
+                This attribute works in conjunction with the "column" and "child-column" attributes to be the value that the envelope filters for and inserts using.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="41">
+                    <gs-form src="gsdoc.tpeople" where="id=2341">
+                        <template>
+                            <gs-envelope src="gsdoc.tpeople_line" column="id" child-column="people_id">
+                                <template for="table">
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <th heading="#">
+                                                    <gs-static column="row_number"></gs-static>
+                                                </th>
+                                                <td heading="Name">
+                                                    <gs-text mini column="pet_name"></gs-text>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </template>
+                                <template for="insert">
+                                    <label for="text-insert-pet_name">Name:</label>
+                                    <gs-text id="text-insert-pet_name" column="pet_name"></gs-text>
+                                    <label for="text-insert-birth_date">Birth Day:</label>
+                                    <gs-date id="text-insert-birth_date" column="birth_date" value="today"></gs-date>
+                                </template>
+                            </gs-envelope>
+                        </template>
+                    </gs-form>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Attribute "refresh-on-querystring-values":</span>
+                <p>The "refresh-on-querystring-values" attribute refreshes the envelope when any of the columns in the attribute change in the query string. To put multiple columns in the attribute you would just put in a comma seperated list.</p>
+            </div>
+            <gs-doc-example query-string="first_name=Apple&unrelatedparameter=test">
+                <template for="html" height="33">
+                    <gs-envelope src="gsdoc.tpeople" where="first_name = '{{! qs.first_name }}'" refresh-on-querystring-values="first_name">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Attribute "refresh-on-querystring-change":</span>
+                <p>The "refresh-on-querystring-change" attribute refreshes the form element when anything changes in the query string.</p>
+            </div>
+            <gs-doc-example query-string="first_name=Apple&unrelatedparameter=test">
+                <template for="html" height="32">
+                    <gs-envelope src="gsdoc.tpeople" where="first_name = '{{! qs.first_name }}'" refresh-on-querystring-change>
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Javascript Methods:</span>
+                <p>These functions that can be run on individual envelope elements:<br />
+                <i>ENVELOPE</i>.refresh() &lt;-- This method refreshes the data inside the envelope.<br />
+                <i>ENVELOPE</i>.refreshReflow() &lt;-- This method recalculates to see if the envelope should be reflowed or not. The effects of this method are only visible when for some reason the envelope changed width to the point of needing to reflow or un-reflow but was not refreshed because the window "resize" event was not triggered.<br />
+                <i>ENVELOPE</i>.refreshFixedHeader() &lt;-- This method refreshes the widths of the envelope header. The effects of this method are only visible when for some reason the envelope changed width but the headers were not refreshed because the window "resize" event was not triggered.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="37">
+                    <gs-button onclick="testData()">Refresh Data</gs-button>
+                    <gs-button onclick="testReflow()">Refresh Reflow</gs-button>
+                    <gs-button onclick="testHeader()">Refresh Header</gs-button>
+                    <br />
+                    <gs-envelope id="test-elem" src="gsdoc.tpeople" expand-to-content limit="12">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+                <template for="js" height="13">
+                    function testData() {
+                        document.getElementById('test-elem').refresh();
+                    }
+                    function testReflow() {
+                        document.getElementById('test-elem').refreshReflow();
+                    }
+                    function testHeader() {
+                        document.getElementById('test-elem').refreshFixedHeader();
+                    }
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Getting The Current Selection:</span>
+                <p>For this example you will have to open the Javascript console for your browser.<br /><br />
+                
+                There are three ways to get the selection of an envelope:<br />
+                <i>ENVELOPE</i>.selectedCells; &lt;-- This will return an array of cell elements that are selected.<br />
+                <i>ENVELOPE</i>.selectedRecords; &lt;-- This will return an array of record elements that contain selected cells.<br />
+                <i>ENVELOPE</i>.selectedIds; &lt;-- This will return an array of record IDs where the corresponding record element contains selected cells.<br /><br />
+                
+                There are three ways to set the selection of an envelope:<br />
+                <i>ENVELOPE</i>.selectedCells = ...; &lt;-- The format that this requires is an array of table cell elements that are inside the envelope you are setting the selection of.<br />
+                <i>ENVELOPE</i>.selectedRecords = ...; &lt;-- The format that this requires is an array of record elements that are inside the envelope you are setting the selection of.<br />
+                <i>ENVELOPE</i>.selectedIds = ...; &lt;-- The format that this requires is an array of record IDs that are inside the envelope you are setting the selection of.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="50">
+                    <gs-button onclick="testGetCells()">Get Selected Cells</gs-button>
+                    <gs-button onclick="testGetRecords()">Get Selected Records</gs-button>
+                    <gs-button onclick="testGetIds()">Get Selected IDs</gs-button>
+                    <br />
+                    <gs-button onclick="testSetCells()">Set Selected Cells</gs-button>
+                    <gs-button onclick="testSetRecords()">Set Selected Records</gs-button>
+                    <gs-button onclick="testSetIds()">Set Selected IDs</gs-button>
+                    <br />
+                    <gs-envelope id="test-elem" src="gsdoc.tpeople" ord="id ASC" expand-to-content limit="5">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                    <br />
+                    <div id="result"></div>
+                </template>
+                <template for="js" height="45">
+                    function testGetCells() {
+                        console.log(
+                            document.getElementById('test-elem').selectedCells);
+                    }
+                    function testGetRecords() {
+                        console.log(
+                            document.getElementById('test-elem').selectedRecords);
+                    }
+                    function testGetIds() {
+                        console.log(
+                            document.getElementById('test-elem').selectedIds);
+                    }
+                    
+                    function testSetCells() {
+                        document.getElementById('test-elem').selectedCells =
+                            [
+                                document.getElementById('test-elem')
+                                    .querySelectorAll('tr')[1].children[0]
+                            ];
+                    }
+                    function testSetRecords() {
+                        document.getElementById('test-elem').selectedRecords =
+                            [
+                                document.getElementById('test-elem')
+                                    .querySelectorAll('tr')[1]
+                            ];
+                    }
+                    function testSetIds() {
+                        document.getElementById('test-elem').selectedIds =
+                            [
+                                '2316', '2318', '2320'
+                            ];
+                    }
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Getting The Current Selection:</span>
+                <p>In this example we have an envelope that logs every event that we have built in:<br />
+                <b>after_selection</b>: This event is triggered when the cell selection of the envelope changes.<br />
+                <b>after_select</b>: This event is triggered when the element receives the data, if there is not error.<br />
+                <b>after_update</b>: This event is triggered when the element receives confirmation that an update has gone through.<br />
+                <b>after_delete</b>: This event is triggered when the element receives confirmation that a delete has gone through.<br />
+                <b>after_insert</b>: This event is triggered when the element receives confirmation that an insert has gone through.<br />
+                <b>insert_dialog_open</b>: This event is triggered when the insert dialog has been opened.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="51">
+                    <gs-envelope id="test-elem" src="gsdoc.tpeople" ord="id ASC" expand-to-content limit="5">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                        <template for="insert">
+                            <label for="text-insert-first_name">First Name:</label>
+                            <gs-text id="text-insert-first_name" column="first_name"></gs-text>
+                            
+                            <label for="text-insert-last_name">Last Name:</label>
+                            <gs-text id="text-insert-last_name" column="last_name"></gs-text>
+                            
+                            <label for="text-insert-birth_date">Birth Day:</label>
+                            <gs-date id="text-insert-birth_date" column="birth_date" value="today"></gs-date>
+                        </template>
+                    </gs-envelope>
+                    <br />
+                    <div id="event-log"></div>
+                </template>
+                <template for="js" height="64">
+                    function addToLog(strEventName, strExplain) {
+                        document.getElementById('event-log').innerHTML =
+                            '<div>' +
+                                '<b>' + strEventName + '</b> ' +
+                                strExplain +
+                            '</div>' +
+                            document.getElementById('event-log').innerHTML;
+                    }
+                    
+                    window.addEventListener('load', function () {
+                        document.getElementById('test-elem')
+                            .addEventListener('after_selection', function () {
+                            
+                            addToLog('after_selection',
+                                     'You\'ve changed the selection.');
+                        });
+                        document.getElementById('test-elem')
+                            .addEventListener('after_select', function () {
+                            
+                            addToLog('after_select',
+                                     'Envelope has gotten it\'s data.');
+                        });
+                        document.getElementById('test-elem')
+                            .addEventListener('after_update', function () {
+                            
+                            addToLog('after_update',
+                                     'Envelope has updated it\'s data.');
+                        });
+                        document.getElementById('test-elem')
+                            .addEventListener('after_delete', function () {
+                            
+                            addToLog('after_delete',
+                                     'Envelope has deleted some data.');
+                        });
+                        document.getElementById('test-elem')
+                            .addEventListener('after_insert', function () {
+                            
+                            addToLog('after_insert',
+                                     'Envelope has inserted some data.');
+                        });
+                        document.getElementById('test-elem')
+                            .addEventListener('insert_dialog_open', function () {
+                            
+                            addToLog('insert_dialog_open',
+                                     'Envelope insert dialog has been opened.');
+                        });
+                    });
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">Envelope, Sub-Envelope Example:</span>
+                <p>In this example we have an envelope that has a sub-envelope. Note: the offset attribute on the sub-envelope is because all of these envelopes are looking at the same table, so the offset prevents any record from the table from being in two places at once.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <gs-envelope src="gsdoc.tpeople" ord="id ASC" limit="3">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td>
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                        <td>
+                                            <gs-envelope src="gsdoc.tpeople" ord="id ASC" limit="3" offset="{{! row_number * 3}}" expand-to-content>
+                                                <template for="table">
+                                                    <table>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <gs-text mini column="first_name"></gs-text>
+                                                                </td>
+                                                                <td>
+                                                                    <gs-text mini column="last_name"></gs-text>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </template>
+                                            </gs-envelope>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

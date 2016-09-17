@@ -1,0 +1,27 @@
+
+gs-date input,
+gs-text input,
+gs-search input,
+gs-number input,
+gs-memo input,
+gs-combo input,
+gs-time input,
+gs-select select,
+gs-memo textarea {
+    width: 100%;
+    border: 0 none;
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
+    font-family: inherit;
+    
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    -webkit-border-radius: inherit;
+    /*-moz-border-radius: none;*/
+}
+
+gs-memo textarea {
+    display: block;
+}

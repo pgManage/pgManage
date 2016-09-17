@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Public API Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Public</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>URLs:</h3>
+            <pre><code>/cluster/[&lt;SCHEMA&gt;.]&lt;FUNCTION&gt;[?&lt;ARGS&gt;]</code></pre>
+            
+            <h3>Description:</h3>
+            <p>These links handle users with no cookie. If they do not work, you might need to enable No Cookie requests in the envelope.conf.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">Cluster No Cookie Actions:</span><br/>
+                <p>NC stands for No Cookie. Only functions that start with actionnc_ or acceptnc_ are allowed.</p>
+            </div>
+            
+            <div class="doc-example-description">
+                <span class="h3">Cluster Action No Cookie Example:</span><br/>
+                <p>Actionnc_ functions return json.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="5">
+                    <gs-button onclick="ajax_example()">Action</gs-button>
+                    <pre id="result"></pre>
+                </template>
+                <template for="js" height="20">
+                    function ajax_example() {
+                        GS.addLoader('loader', 'Ajax running...');
+                        GS.ajaxJSON('/cluster/gsdoc.actionnc_test', 'test=test'
+                            , function (data, error) {
+                            GS.removeLoader('loader');
+                            
+                            if (!error) {
+                                document.getElementById('result').textContent = JSON.stringify(data);
+                            } else {
+                                GS.ajaxErrorDialog(data);
+                            }
+                        });
+                    }
+                </template>
+                <template for="db" height="30">
+                    CREATE OR REPLACE FUNCTION gsdoc.actionnc_test(str_args text)
+                     RETURNS text AS
+                    $BODY$
+                    BEGIN
+                        --In public requests you can get the user-agent, ip address and host fields from the request. This is not possible on regular requests with a cookie. Since you don't know who logged in you can use these headers to determine who is who, but not as reliably as a cookie.
+                        RETURN
+                          '{"user_agent": "' || current_setting('envelope.request_user_agent') ||
+                          '", "ip": "' || current_setting('envelope.request_ip') ||
+                          '", "host": "' || current_setting('envelope.request_host') || '"}';
+                        --try all of these
+                        --RETURN '123';
+                        --RETURN array_to_json(ARRAY[[str_args]]::text[][]);
+                        --RETURN '"test"';
+                        --RETURN '{"test": "test", "test2": 123}';
+                    END; 
+                    
+                    $BODY$
+                    LANGUAGE plpgsql VOLATILE
+                    COST 100;
+                    ALTER FUNCTION gsdoc.actionnc_test(text) OWNER TO postgres;
+                    GRANT ALL ON FUNCTION gsdoc.actionnc_test(text) TO public_g;
+                    REVOKE ALL ON FUNCTION gsdoc.actionnc_test(text) FROM public;
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Cluster Accept No Cookie Example:</span><br/>
+                <p>Acceptnc functions return a full response.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="5">
+                    <gs-button onclick="ajax_example()">Accept</gs-button>
+                    <pre id="result"></pre>
+                </template>
+                <template for="js" height="20">
+                    function ajax_example() {
+                        GS.addLoader('loader', 'Ajax running...');
+                        GS.ajaxText(
+                                '/cluster/gsdoc.acceptnc_test'
+                              , 'test=test'
+                              , function (data, error) {
+                            GS.removeLoader('loader');
+                            
+                            if (!error) {
+                                document.getElementById('result').textContent = data;
+                            } else {
+                                GS.ajaxErrorDialog(data);
+                            }
+                        });
+                    }
+                </template>
+                <template for="db" height="25">
+                    CREATE OR REPLACE FUNCTION gsdoc.acceptnc_test(str_args text)
+                     RETURNS text AS
+                    $BODY$
+                    BEGIN
+                        RETURN E'HTTP/1.1 200 OK\r\n' ||
+                          E'Content-Type: text/csv\r\n\r\n' ||
+                          E'Header1, Header2, Header3\r\n' ||
+                          E'Data11, Data12, Data13\r\n' ||
+                          E'Data21, Data22, Data23\r\n' ||
+                          E'Data31, Data32, ' || str_args || '\r\n';
+                    END; 
+                    
+                    $BODY$
+                    LANGUAGE plpgsql VOLATILE
+                    COST 100;
+                    ALTER FUNCTION gsdoc.acceptnc_test(text) OWNER TO postgres;
+                    GRANT ALL ON FUNCTION gsdoc.acceptnc_test(text) TO public_g;
+                    REVOKE ALL ON FUNCTION gsdoc.acceptnc_test(text) FROM public;
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Cluster Accept Download No Cookie Example:</span><br/>
+                <p>When you want to download a file from the database, sometimes you will want a custom file name. Simply add the filename after the schema.function. That path will be sent to the function as path=/file.txt.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <form id="form_example" method="post" action="/cluster/gsdoc.acceptnc_test/file.txt">
+                        <input type="hidden" name="test" value="test"/>
+                    </form>
+                    <gs-button onclick="document.getElementById('form_example').submit();">Accept</gs-button>
+                </template>
+                <template for="db" height="25">
+                    CREATE OR REPLACE FUNCTION gsdoc.acceptnc_test(str_args text)
+                     RETURNS text AS
+                    $BODY$
+                    BEGIN
+                        RETURN E'HTTP/1.1 200 OK\r\n' ||
+                          E'Content-Type: text/csv\r\n\r\n' ||
+                          E'Header1, Header2, Header3\r\n' ||
+                          E'Data11, Data12, Data13\r\n' ||
+                          E'Data21, Data22, Data23\r\n' ||
+                          E'Data31, Data32, ' || str_args || '\r\n';
+                    END; 
+                    
+                    $BODY$
+                    LANGUAGE plpgsql VOLATILE
+                    COST 100;
+                    ALTER FUNCTION gsdoc.acceptnc_test(text) OWNER TO postgres;
+                    GRANT ALL ON FUNCTION gsdoc.acceptnc_test(text) TO normal_g;
+                    REVOKE ALL ON FUNCTION gsdoc.acceptnc_test(text) FROM public;
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <b>Envelope No Cookie Actions:</b><br/>
+                The No Cookie version of the envelope actions has the following imposed limitations:<br/>
+                &nbsp;&nbsp;&nbsp;&nbsp;1) The src= parameter is not allowed to have arbitrary sql.<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;2) The src= parameter must reference a view that starts with anc_ Example: schema.anc_view. Because the view must have this, you can easily see with views can be seen by No Cookie requests.<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;3) The cols= parameter is not allowed.<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;4) The where clause is not allowed to have paranthesis ().<br />
+                
+                actionnc_ is not required for the envelope actions.
+            </div>
+            
+            <div class="doc-example-description">
+                <span class="h3">Select No Cookie Example:</span><br/>
+                <p>The select ajax call gives you access to the <a href="http://www.postgresql.org/docs/9.2/static/sql-select.html">PostgreSQL SELECT</a> call. LIMIT, OFFSET, ORDER BY, WHERE should be self explanatory</p> to a PostgreSQL developer. 
+            </div>
+            <gs-doc-example>
+                <template for="html" height="15">
+                    <label for="limit">Limit:</label>
+                    <gs-number id="limit"></gs-number>
+                    <label for="offset">Offset:</label>
+                    <gs-number id="offset"></gs-number>
+                    <label for="order">Order By:</label>
+                    <gs-text id="order"></gs-text>
+                    <label for="where">Where:</label>
+                    <gs-text id="where"></gs-text>
+                    <gs-button onclick="ajax_example()">Select</gs-button>
+                    <pre id="result"></pre>
+                </template>
+                <template for="js" height="45">
+                    function ajax_example() {
+                        var where  = document.getElementById('where').value
+                          , order  = document.getElementById('order').value
+                          , limit  = document.getElementById('limit').value
+                          , offset = document.getElementById('offset').value;
+                        
+                        GS.addLoader('loader', 'Ajax running...');
+                        GS.ajaxJSON(
+                                '/env/action_select'
+                              , 'src=gsdoc.tenv_example' +
+                                '&limit=' + encodeURIComponent(limit || '') +
+                                '&offset=' + encodeURIComponent(offset || '') +
+                                '&order_by=' + encodeURIComponent(order || '') +
+                                '&where=' + encodeURIComponent(where || '')
+                              , function (data, error) {
+                            GS.removeLoader('loader');
+                            
+                            if (!error) {
+                                document.getElementById('result').textContent = JSON.stringify(data.dat);
+                            } else {
+                                GS.ajaxErrorDialog(data);
+                            }
+                        });
+                    }
+                </template>
+                <template for="db">
+                    CREATE OR REPLACE VIEW gsdoc.tenv_example AS
+                     SELECT id, first_name, last_name, change_stamp
+                     FROM gsdoc.rpeople;
+                    
+                    GRANT SELECT,UPDATE,INSERT,DELETE ON 
+                        TABLE gsdoc.tenv_example TO developer_g;
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Insert Example:</span><br/>
+                <p>The insert ajax call gives you access to the <a href="http://www.postgresql.org/docs/9.2/static/sql-insert.html">PostgreSQL INSERT</a> call. The data parameter must be a URI encoded query string of</p> columns=values. The ajax returns lastval(); unless you send a sequence name you want to run through currval(); <a href="http://www.postgresql.org/docs/9.2/static/functions-sequence.html">Sequence Manipulation</a>.
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <label for="seq">Sequence To Get The <code>currval</code> Of:</label>
+                    <gs-text id="seq"></gs-text>
+                    <label for="data">Data:</label>
+                    <gs-text id="data" value="first_name=test&last_name=test"></gs-text>
+                    <gs-button onclick="ajax_example()">Insert</gs-button>
+                    <pre id="result"></pre>
+                </template>
+                <template for="js" height="30">
+                    function ajax_example() {
+                        var seq = document.getElementById('seq').value
+                          , data = document.getElementById('data').value;
+                        
+                        GS.addLoader('loader', 'Ajax running...');
+                        GS.ajaxJSON(
+                                '/env/action_insert'
+                              , 'src=gsdoc.tenv_example' +
+                                '&currval=' + encodeURIComponent(seq || '') +
+                                '&data=' + encodeURIComponent(data || '')
+                              , function (data, error) {
+                            GS.removeLoader('loader');
+                            
+                            if (!error) {
+                                document.getElementById('result').textContent = JSON.stringify(data.dat);
+                            } else {
+                                GS.ajaxErrorDialog(data);
+                            }
+                        });
+                    }
+                </template>
+                <template for="db" height="15">
+                    CREATE OR REPLACE VIEW gsdoc.tenv_example AS
+                     SELECT id, first_name, last_name, change_stamp
+                     FROM gsdoc.rpeople;
+                    
+                    GRANT SELECT,UPDATE,INSERT,DELETE ON 
+                        TABLE gsdoc.tenv_example TO developer_g;
+                    
+                    CREATE OR REPLACE RULE tenv_example_insert AS
+                        ON INSERT TO gsdoc.tenv_example DO INSTEAD  
+                            INSERT INTO gsdoc.rpeople (first_name, last_name)
+                             VALUES (new.first_name, new.last_name);
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Update Example:</span><br/>
+                <p>The update ajax call gives you access to the <a href="http://www.postgresql.org/docs/9.2/static/sql-update.html">PostgreSQL UPDATE</a> call. The where= parameter is the where clause for the update.</p> (You don't want to change all the records at once to the same value... right?) The column is set to the value for all the records that match the where clause.
+            </div>
+            <gs-doc-example>
+                <template for="html" height="12">
+                    <label for="column">Column:</label>
+                    <gs-text id="column" value="first_name"></gs-text>
+                    <label for="value">Value:</label>
+                    <gs-text id="value" value="test"></gs-text>
+                    <label for="where">Where:</label>
+                    <gs-text id="where" value="id="></gs-text>
+                    <gs-button onclick="ajax_example()">Update</gs-button>
+                    <pre id="result"></pre>
+                </template>
+                <template for="js" height="32">
+                    function ajax_example() {
+                        var col  = document.getElementById('column').value
+                          , value  = document.getElementById('value').value
+                          , where  = document.getElementById('where').value;
+                        
+                        GS.addLoader('loader', 'Ajax running...');
+                        GS.ajaxJSON(
+                                '/env/action_update'
+                              , 'src=gsdoc.tenv_example' +
+                                '&column=' + encodeURIComponent(col || '') +
+                                '&value=' + encodeURIComponent(value || '') +
+                                '&where=' + encodeURIComponent(where || '')
+                              , function (data, error) {
+                            GS.removeLoader('loader');
+                            
+                            if (!error) {
+                                document.getElementById('result').textContent = JSON.stringify(data.dat);
+                            } else {
+                                GS.ajaxErrorDialog(data);
+                            }
+                        });
+                    }
+                </template>
+                <template for="db" height="20">
+                    CREATE OR REPLACE VIEW gsdoc.tenv_example AS
+                     SELECT id, first_name, last_name, change_stamp
+                     FROM gsdoc.rpeople;
+                    
+                    GRANT SELECT,UPDATE,INSERT,DELETE ON 
+                        TABLE gsdoc.tenv_example TO developer_g;
+                            
+                    CREATE OR REPLACE RULE tenv_example_update AS
+                        ON UPDATE TO gsdoc.tenv_example DO INSTEAD  
+                            UPDATE gsdoc.rpeople SET first_name = new.first_name, 
+                                last_name = new.last_name
+                             WHERE old.id = rpeople.id;
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Delete Example:</span><br/>
+                <p>The delete ajax call gives you access to the <a href="http://www.postgresql.org/docs/9.2/static/sql-delete.html">PostgreSQL DELETE</a> call. You simply send a comma seperated list of ids in the id=</p> parameter. (You can send just one.)
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <label for="id">ID:</label>
+                    <gs-text id="id"></gs-text>
+                    <gs-button onclick="ajax_example()">Delete</gs-button>
+                    <pre id="result"></pre>
+                </template>
+                <template for="js" height="25">
+                    function ajax_example() {
+                        var id = document.getElementById('id').value;
+                        
+                        GS.addLoader('loader', 'Ajax running...');
+                        GS.ajaxJSON(
+                                '/env/action_delete'
+                              , 'src=gsdoc.tenv_example' +
+                                '&id=' + encodeURIComponent(id || '')
+                              , function (data, error) {
+                            GS.removeLoader('loader');
+                            
+                            if (!error) {
+                                document.getElementById('result').textContent = JSON.stringify(data.dat);
+                            } else {
+                                GS.ajaxErrorDialog(data);
+                            }
+                        });
+                    }
+                </template>
+                <template for="db" height="15">
+                    CREATE OR REPLACE VIEW gsdoc.tenv_example AS
+                     SELECT id, first_name, last_name, change_stamp
+                     FROM gsdoc.rpeople;
+                    
+                    GRANT SELECT,UPDATE,INSERT,DELETE ON 
+                        TABLE gsdoc.tenv_example TO developer_g;
+                        
+                    CREATE OR REPLACE RULE tenv_example_delete AS
+                        ON DELETE TO gsdoc.tenv_example DO INSTEAD
+                            DELETE FROM gsdoc.rpeople WHERE old.id = rpeople.id;
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">File Upload:</span><br/>
+                <p>When you have a file on your desktop and you want to upload it, use a form instead of a ajax call. Forms allow file upload. Make sure you add the enctype="multipart/form-data" attribute or the</p> browser won't even send the file. In order for No Cookie Users to use the upload action, you need to do two things:
+                &nbsp;&nbsp;&nbsp;&nbsp;1) You must create a public_w group.<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;2) You must add public_user to the public_w group.<br />
+                Then No Cookie Users can use the upload action, but only to public_g.
+            </div>
+            <gs-doc-example>
+                <template for="html" height="15">
+                    <form id="form-file-upload" action="/env/action_upload" method="POST" enctype="multipart/form-data" target="upload_response">
+                        <label for="upload-file-content">File:</label>
+                        <input type="file" id="upload-file-content" name="file_content" />
+                        <br />
+                        <label for="upload-file-name">File Path:</label>
+                        <input id="upload-file-name" name="file_name" value="/public_g/test.txt" />
+                        <gs-button id="upload-submit" onclick="document.getElementById('form-file-upload').submit();">Submit</gs-button>
+                    </form>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">File Download:</span><br/>
+                <p>This request is meant for people with No Cookie to download files. The advantage of this link is that it saves the Ip Address of the downloader. This makes download counting easy.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="15">
+                    <a href="/env/action_download/all/gsdoc/test.txt" target="_blank">Click Here to Download</a>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Info Example:</span><br/>
+                <p>Returns Username, Groups, envelope version, cluster version, cluster port number and dbname.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="5">
+                    <gs-button onclick="ajax_example()">Info</gs-button>
+                    <pre id="result"></pre>
+                </template>
+                <template for="js" height="20">
+                    function ajax_example() {
+                        GS.addLoader('loader', 'Ajax running...');
+                        GS.ajaxJSON('/env/action_info', '', function (data, error) {
+                            GS.removeLoader('loader');
+                            
+                            if (!error) {
+                                document.getElementById('result').textContent = JSON.stringify(data.dat);
+                            } else {
+                                GS.ajaxErrorDialog(data);
+                            }
+                        });
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

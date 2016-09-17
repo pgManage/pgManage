@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Scrolling Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Scrolling</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Functions:</h3>
+            <pre><code>GS.scrollParent(&lt;ELEMENT&gt;);
+GS.scrollIntoView(&lt;ELEMENT&gt;);</code></pre>
+            
+            <h3>Description:</h3>
+            <p>These functions preform two useful tasks having to do with scrolling.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">GS.scrollParent Example:</span><br />
+                <p>This function finds an element's scrolling parent. The function loops through an element's parents until it finds a parent that has a scrollbar. When you click the "Find Scroll Parent" button the GS.scrollParent function will be run the the "target" div and it will loop through the target's parents to find it's scrolling parent. The function will first look at the light-red div and see it doesn't have a scrollbar then it will look at the green div and see that it does have a scrollbar and it'll return that element. When the green element is returned we'll put a CSS border on it for demonstration purposes.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="24">
+                    <gs-button onclick="testScrollParent()">Find Scroll Parent</gs-button>
+                    <br />
+                    <div bg-danger style="padding:1em;">
+                        <div bg-success style="padding:1em;overflow:auto;height:4em;">
+                            <div bg-primary>
+                                <div>test</div>
+                                <div>test</div>
+                                <div>test</div>
+                                <div id="target">target</div>
+                                <div>test</div>
+                                <div>test</div>
+                                <div>test</div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <template for="js" height="8">
+                    function testScrollParent() {
+                        var target = document.getElementById('target');
+                        
+                        GS.scrollParent(target).style.border = '1px solid #000';
+                    }
+                </template>
+            </gs-doc-example>
+            
+            
+            <div class="doc-example-description">
+                <span class="h3">GS.scrollIntoView Example:</span><br />
+                <p>This function will make an element be scrolled into view. When you click any of the "Scroll Target ... Into View" buttons the target numbered in the button will be scrolled to in the scrolling div. The function will attempt to center the chosen element in the view but when scrolling an element into view that is near one of the edges (as seen when scrolling targets 1 and 4 into view) you will see that it just goes to the limit.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="30">
+                    <gs-button onclick="testScrollIntoView('target-1')">
+                        Scroll Target 1 Into View</gs-button>
+                    <gs-button onclick="testScrollIntoView('target-2')">
+                        Scroll Target 2 Into View</gs-button>
+                    <gs-button onclick="testScrollIntoView('target-3')">
+                        Scroll Target 3 Into View</gs-button>
+                    <gs-button onclick="testScrollIntoView('target-4')">
+                        Scroll Target 4 Into View</gs-button>
+                    <br />
+                    <div bg-primary style="overflow:auto;height:6em;">
+                        <div>test</div>
+                        <div id="target-1">target 1</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div id="target-2">target 2</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div id="target-3">target 3</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div id="target-4">target 4</div>
+                        <div>test</div>
+                    </div>
+                </template>
+                <template for="js" height="5">
+                    function testScrollIntoView(strID) {
+                        GS.scrollIntoView(document.getElementById(strID));
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Time Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Dialog</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+                <h3 class="doc-header">Tag:</h3>
+                <div class="doc-section doc-mono">
+                    <p>&lt;gs-time&gt;&lt;/gs-time&gt;</p>
+                </div>
+                
+                <h3>Description:</h3>
+                    <p>The gs-time control is like the gs-text control, but it is specialized for times.</p>
+                
+                <h1>Examples:</h1>
+                <div class="doc-section">
+                    <div class="doc-example-description">
+                        <span class="h3">Skeleton Example:</span>
+                        <p>A basic gs-time element. Without attributes the gs-time control will have the following features/behaviors:</p>
+                        <ol>
+                            <li><p>) There is a button that activates the time picker.</p></li>
+                            <li><p>) If the time picker is in modal mode: the time picker can be dismissed by clicking the "Done" button. If the time picker is not in modal mode: clicking out of the time control will dissmiss the time picker.</p></li>
+                            <li><p>) You can also change the time manually.</p></li>
+                        </ol>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="28">
+                            <label for="time_example">Time Example:</label>
+                            <gs-time id="time_example"></gs-time>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Value Attribute Example:</span>
+                        <p>To set the value for the gs-time, use the "value" attribute.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="15">
+                            <label for="control_default">Time With No Value:</label>
+                            <gs-time id="control_default"></gs-time>
+                            <label for="control_value">Time With Value:</label>
+                            <gs-time id="control_value" value="15:30"></gs-time>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Query String Attribute Example:</span>
+                        <p>The "qs" attribute can be used to sync the gs-date with the query string.</p>
+                    </div>
+                    <gs-doc-example query-string="test=15:30">
+                        <template for="html" height="28">
+                            <label for="control_qs">Date Query String:</label>
+                            <gs-date id="control_qs" qs="test"></gs-date>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Placeholder Attribute Example:</span>
+                        <p>The "placeholder" attribute specifies some placeholder text for when the control is empty.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="28">
+                            <gs-time placeholder="Placeholder for when this control is empty"></gs-time>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Mini Attribute Example:</span>
+                        <p>Sometimes you are limited on space. The mini attribute is used to make the gs-time smaller.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="28">
+                            <label for="documentation-mini">Mini:</label>
+                            <gs-time id="documentation-mini" mini></gs-time>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">No Picker Attribute Example:</span>
+                        <p>If you want to remove the date picker button: add the "no-picker" attribute.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html">
+                            <label for="documentation-no-picker">No Picker:</label>
+                            <gs-time id="documentation-no-picker" no-picker></gs-time>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">No Now Button Attribute Example:</span>
+                        <p>If you want to remove the "Now" button from the picker: add the "no-now-button" attribute.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="28">
+                            <label for="documentation-no-now-button">No Now Button:</label>
+                            <gs-time id="documentation-no-now-button" no-now-button></gs-time>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Non-Empty Attribute Example:</span>
+                        <p>If you want to force the user to input a value: add the non-empty attribute. Note: if a default value is not provided then the control defaults to "12:00 PM".</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="28">
+                            <label for="documentation-non-empty">Non Empty:</label>
+                            <gs-time id="documentation-non-empty" non-empty></gs-time>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Display Format Attribute:</span>
+                        <p>The "format" attribute determines the display format of the control. This attribute can take two different values: "regular" and "military". "regular" is normal 12-hour time and "military" is 24-hour time.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="28">
+                            <label for="documentation-regular">Format: "regular" (Default)</label>
+                            <gs-time id="documentation-regular" format="regular" value="1:30 PM"></gs-time>
+                            <label for="documentation-military">Format: "military"</label>
+                            <gs-time id="documentation-military" format="military" value="1:30 PM"></gs-time>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Output Format Attribute Example:</span>
+                        <p>The "output-format" attribute determines the internal format of the control. This attribute can take two different values: "regular" and "military". "regular" is normal 12-hour time and "military" is 24-hour time. When getting the value of the control in javascript "output-format" is the format it will get.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="28">
+                            <label for="documentation-regular">Format: "regular" (Default)</label>
+                            <gs-time id="documentation-regular" output-format="regular" value="1:30 PM"></gs-time>
+                            <label for="documentation-military">Format: "military"</label>
+                            <gs-time id="documentation-military" output-format="military" value="1:30 PM"></gs-time>
+                            <gs-button onclick="showControlValues()">Show Internal Values</gs-button>
+                        </template>
+                        <template for="js" height="auto">
+                            function showControlValues() {
+                                alert('Control 1: "' + document.getElementById('documentation-regular').value + '"\n' +
+                                      'Control 2: "' + document.getElementById('documentation-military').value + '"');
+                            }
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Tabindex Attribute Example:</span>
+                        <p>With the "tabindex" attribute, you can control what order your controls are tabbed to.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="28">
+                            <label for="documentation-tabindex-1">1:</label>
+                            <gs-time id="documentation-tabindex-1" tabindex="1"></gs-time>
+                            <label for="documentation-tabindex-3">3:</label>
+                            <gs-time id="documentation-tabindex-3" tabindex="3"></gs-time>
+                            <label for="documentation-tabindex-2">2:</label>
+                            <gs-time id="documentation-tabindex-2" tabindex="2"></gs-time>
+                            <label for="documentation-tabindex-4">4:</label>
+                            <gs-time id="documentation-tabindex-4" tabindex="4"></gs-time>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Disabled Attribute Example:</span>
+                        <p>With the "disabled" attribute, you can control whether or not you can use the control.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="28">
+                            <label for="documentation-disabled">Disabled:</label>
+                            <gs-time disabled id="documentation-disabled"></gs-time>
+                            <label for="documentation-enabled">Not Disabled:</label>
+                            <gs-time id="documentation-enabled"></gs-time>
+                        </template>
+                    </gs-doc-example>
+                </div>
+        </gs-container>
+    </body>
+</html>

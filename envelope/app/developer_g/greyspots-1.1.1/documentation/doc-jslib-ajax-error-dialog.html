@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Ajax Error Dialog Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Dialog</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Function:</h3>
+            <pre><code>GS.ajaxErrorDialog(jsnError[, tryAgainCallback[, cancelCallback]]);</code></pre>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">Skeleton Example:</span>
+                <p>A basic error dialog. the will have the following behaviors:<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;1) It will show the user an error.<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;2) It will allow them to try again.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="5">
+                    <gs-button onclick="testError();">Error</gs-button>
+                </template>
+                <template for="js" height="20">
+                    function testError() {
+                        GS.ajaxJSON('/env/action_that_does_not_exist', '', function (data, error) {
+                            if (!error) {
+                                // Do stuff
+                            } else {
+                                GS.ajaxErrorDialog(data, function () {
+                                    testError();
+                                });
+                            }
+                        });
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">No Callback Example:</span>
+                <p>This will not allow the user to try again, because there is no callback passed to the function.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="5">
+                    <gs-button onclick="testError();">Error</gs-button>
+                </template>
+                <template for="js" height="15">
+                    function testError() {
+                        GS.ajaxJSON('/env/action_that_does_not_exist', '', function (data, error) {
+                            if (!error) {
+                                // Do stuff
+                            } else {
+                                GS.ajaxErrorDialog(data);
+                            }
+                        });
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

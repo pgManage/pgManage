@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Folder Element Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Folder Element</h1>
+        </gs-jumbo>
+            
+        <gs-container padded min-width="sml;med;lrg;">
+            <h3 class="doc-header">Tag:</h3>
+            <pre>&lt;gs-folder&gt;&lt;/gs-folder&gt;</pre>
+            
+            <h3 class="doc-header">Description:</h3>
+            <p>The <code>gs-folder</code> tag enables you to navigate folders, upload files, delete files, rename files and open the file editor for files.</p>
+            
+            <h1 class="doc-header">Examples:</h1>
+            <div class="doc-section">
+                <div class="doc-example-description">
+                    <span class="h3">Skeleton Example:</span>
+                    <p>A basic <code>gs-folder</code> element:</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="30">
+                        <gs-folder></gs-folder>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "<code>path</code>":</span>
+                    <p>The "<code>path</code>" attribute is for defining what directory the element should start in. Users cannot navigate to folders above the "<code>path</code>" setting (this is merely a front-end limitation, do not depend on this as a security measure).</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="30">
+                        <gs-folder path="/role/trusted_g/"></gs-folder>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "<code>horizontal</code>":</span>
+                    <p>The "<code>horizontal</code>" attribute is for putting the file list and the folder list side by side.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="30">
+                        <gs-folder horizontal></gs-folder>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "<code>no-folders</code>":</span>
+                    <p>The "<code>no-folders</code>" attribute is for hiding the folder list. This can be used to prevent the user from navigating anywhere other than the folder they start in (this is merely a front-end limitation, do not depend on this as a security measure).</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="30">
+                        <gs-folder no-folders></gs-folder>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "<code>no-files</code>":</span>
+                    <p>The "<code>no-files</code>" attribute is for hiding the file list.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="30">
+                        <gs-folder no-files></gs-folder>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "<code>mini</code>":</span>
+                    <p>The "<code>mini</code>" attribute removes the border around the element.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="30">
+                        <gs-folder mini></gs-folder>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "<code>qs</code>":</span>
+                    <p>The "<code>qs</code>" attribute makes the element listen for changes in the query string. If the column that element listens for is in the query string then it will refresh when the query string changes. <b>Note:</b> The "<code>path</code>" attribute is templated by doT.js and the "<code>qs</code>" variable is a JSON equivalent of the query string.</p>
+                </div>
+                <gs-doc-example query-string="example_id=3">
+                    <template for="html" height="30">
+                        <gs-folder
+                            path="/role/trusted_g/{{! qs.example_id ? 'doc_example_' + qs.example_id : '' }}/"
+                            qs="example_id"></gs-folder>
+                    </template>
+                </gs-doc-example>
+            </div>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

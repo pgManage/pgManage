@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Envelope API Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Envelope</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>URLs:</h3>
+            <pre><code>/env/action_select?src=[&lt;SCHEMA&gt;.]&lt;VIEW&gt
+/env/action_insert?src=[&lt;SCHEMA&gt;.]&lt;VIEW&gt;
+/env/action_update?src=[&lt;SCHEMA&gt;.]&lt;VIEW&gt;
+/env/action_delete?src=[&lt;SCHEMA&gt;.]&lt;VIEW&gt;</code></pre>
+    
+            <h3>Description:</h3>
+            <p>These links handle data viewing/editing.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-section">
+                <div class="doc-example-description">
+                    <span class="h3">Select Example:</span><br/>
+                    <p>The select ajax call gives you access to the <a href="http://www.postgresql.org/docs/9.2/static/sql-select.html">PostgreSQL SELECT</a> call. LIMIT, OFFSET, ORDER BY, WHERE should be self explanatory to a PostgreSQL developer. The cols= parameter is the column list you want. (Default to *)</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="20">
+                        <label for="limit">Limit:</label>
+                        <gs-number id="limit"></gs-number>
+                        <label for="offset">Offset:</label>
+                        <gs-number id="offset"></gs-number>
+                        <label for="order">Order By:</label>
+                        <gs-text id="order"></gs-text>
+                        <label for="where">Where:</label>
+                        <gs-text id="where"></gs-text>
+                        <label for="cols">Cols:</label>
+                        <gs-text id="cols"></gs-text>
+                        <gs-button onclick="ajax_example()">Select</gs-button>
+                        <pre id="result"></pre>
+                    </template>
+                    <template for="js" height="40">
+                        function ajax_example() {
+                            var limit = document.getElementById('limit').value
+                              , offset = document.getElementById('offset').value
+                              , order = document.getElementById('order').value
+                              , where = document.getElementById('where').value
+                              , cols = document.getElementById('cols').value;
+                            
+                            GS.addLoader('loader', 'Ajax running...');
+                            GS.ajaxJSON(
+                                    '/env/action_select'
+                                  , 'src=gsdoc.tenv_example' +
+                                    '&limit=' + encodeURIComponent(limit || '') +
+                                    '&offset=' + encodeURIComponent(offset || '') +
+                                    '&order_by=' + encodeURIComponent(order || '') +
+                                    '&where=' + encodeURIComponent(where || '') +
+                                    '&cols=' + encodeURIComponent(cols || '')
+                                  , function (data, error) {
+                                GS.removeLoader('loader');
+                                
+                                if (!error) {
+                                    document.getElementById('result').textContent = JSON.stringify(data.dat);
+                                } else {
+                                    GS.ajaxErrorDialog(data);
+                                }
+                            });
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Insert Example:</span><br/>
+                    <p>The insert ajax call gives you access to the <a href="http://www.postgresql.org/docs/9.2/static/sql-insert.html">PostgreSQL INSERT</a> call. The data parameter must be a URI encoded query string of columns=values. The ajax returns lastval(); unless you send a sequence name you want to run through currval(); <a href="http://www.postgresql.org/docs/9.2/static/functions-sequence.html">Sequence Manipulation</a>.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="12">
+                        <label for="seq">Sequence To Get The <code>currval</code> Of:</label>
+                        <gs-text id="seq"></gs-text>
+                        <label for="data">Data:</label>
+                        <gs-text id="data" value="first_name=test&last_name=test"></gs-text>
+                        <gs-button onclick="ajax_example()">Insert</gs-button>
+                        <pre id="result"></pre>
+                    </template>
+                    <template for="js" height="30">
+                        function ajax_example() {
+                            var seq = document.getElementById('seq').value
+                              , data = document.getElementById('data').value;
+                            
+                            GS.addLoader('loader', 'Ajax running...');
+                            GS.ajaxJSON(
+                                    '/env/action_insert'
+                                  , 'src=gsdoc.tenv_example' +
+                                    '&currval=' + encodeURIComponent(seq || '') +
+                                    '&data=' + encodeURIComponent(data || '')
+                                  , function (data, error) {
+                                GS.removeLoader('loader');
+                                
+                                if (!error) {
+                                    document.getElementById('result').textContent = JSON.stringify(data.dat);
+                                } else {
+                                    GS.ajaxErrorDialog(data);
+                                }
+                            });
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Update Example:</span><br/>
+                    <p>The update ajax call gives you access to the <a href="http://www.postgresql.org/docs/9.2/static/sql-update.html">PostgreSQL UPDATE</a> call. The where= parameter is the where clause for the update. (You don't want to change all the records at once to the same value... right?) The column is set to the value for all the records that match the where clause.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <label for="column">Column:</label>
+                        <gs-text id="column" value="first_name"></gs-text>
+                        <label for="value">Value:</label>
+                        <gs-text id="value" value="test"></gs-text>
+                        <label for="where">Where:</label>
+                        <gs-text id="where" value="id="></gs-text>
+                        <gs-button onclick="ajax_example()">Update</gs-button>
+                        <pre id="result"></pre>
+                    </template>
+                    <template for="js" height="30">
+                        function ajax_example() {
+                            var column = document.getElementById('column').value
+                              , value = document.getElementById('value').value
+                              , where = document.getElementById('where').value;
+                            
+                            GS.addLoader('loader', 'Ajax running...');
+                            GS.ajaxJSON(
+                                    '/env/action_update'
+                                  , 'src=gsdoc.tenv_example' +
+                                    '&column=' + encodeURIComponent(column) +
+                                    '&value=' + encodeURIComponent(value) +
+                                    '&where=' + encodeURIComponent(where)
+                                  , function (data, error) {
+                                GS.removeLoader('loader');
+                                
+                                if (!error) {
+                                    document.getElementById('result').textContent = JSON.stringify(data.dat);
+                                } else {
+                                    GS.ajaxErrorDialog(data);
+                                }
+                            });
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Delete Example:</span><br/>
+                    <p>The delete ajax call gives you access to the <a href="http://www.postgresql.org/docs/9.2/static/sql-delete.html">PostgreSQL DELETE</a> call. You simply send a comma seperated list of ids in the id= parameter. (You can send just one.)</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html">
+                        <label for="id">ID:</label>
+                        <gs-text id="id"></gs-text>
+                        <gs-button onclick="ajax_example()">Delete</gs-button>
+                        <pre id="result"></pre>
+                    </template>
+                    <template for="js" height="25">
+                        function ajax_example() {
+                            var id = document.getElementById('id').value;
+                            
+                            GS.addLoader('loader', 'Ajax running...');
+                            GS.ajaxJSON(
+                                    '/env/action_delete'
+                                  , 'src=gsdoc.tenv_example' +
+                                    '&id=' + encodeURIComponent(id || '')
+                                  , function (data, error) {
+                                GS.removeLoader('loader');
+                                
+                                if (!error) {
+                                    document.getElementById('result').textContent = JSON.stringify(data.dat);
+                                } else {
+                                    GS.ajaxErrorDialog(data);
+                                }
+                            });
+                        }
+                    </template>
+                </gs-doc-example>
+            </div>
+        </gs-container>
+    </body>
+</html>

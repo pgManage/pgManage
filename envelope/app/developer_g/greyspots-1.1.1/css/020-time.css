@@ -1,0 +1,289 @@
+gs-time {
+    position: relative;
+    display: block;
+    
+    padding: 0.2em 2.2em 0.2em 0.2em;
+    min-height: 1em;
+    background-color: #FFFFFF;
+    
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+}
+
+gs-time .time-picker-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    
+    width: 2em;
+    height: 100%;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+gs-time .time-picker-button:after {
+    font-size: 1em;
+}
+
+
+/* ###################################################################################### */
+/* ################################ ATTRIBUTE: "no-picker" ############################## */
+/* ###################################################################################### */
+
+gs-time[no-picker] {
+    padding: 0.2em;
+}
+
+
+/* ###################################################################################### */
+/* ################################ ATTRIBUTE:  "disabled" ############################## */
+/* ###################################################################################### */
+
+gs-time[disabled],
+gs-time[disabled] .control {
+    background-color: #D5D5D5;
+}
+
+gs-time[disabled]:not([mini]) {
+    min-height: 1.358em;
+}
+
+
+/* ###################################################################################### */
+/* ################################## ATTRIBUTE:  "mini" ################################ */
+/* ###################################################################################### */
+
+gs-time[mini] {
+    padding: 0 1.5em 0 0;
+    
+    border: 0;
+    border-radius: 0;
+    box-shadow: 0 0 0 0 #FFFFFF;
+}
+
+gs-time[no-picker][mini] {
+    padding: 0;
+}
+
+gs-time[mini] .time-picker-button {
+    width: 1.5em;
+    min-height: 0.8em;
+}
+
+gs-time[mini] .time-picker-button:after {
+    font-size: 0.8em;
+}
+
+
+/* ###################################################################################### */
+/* ####################################### DROPDOWN ##################################### */
+/* ###################################################################################### */
+
+.gs-time-time-picker-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 110;
+}
+
+html.no-scroll-except-for-dialog > body > div.gs-time-time-picker-container,
+html.no-scroll-except-for-dialog > body > div.gs-time-time-picker-container * {
+    overflow: visible !important
+}
+
+.gs-time-time-picker-container .gs-time-time-picker-overlay {
+    position: absolute;
+    
+    top: 0;
+    left: 0;
+    
+    background-color: #000000;
+    opacity: 0.4;
+}
+
+.gs-time-time-picker-container .gs-time-time-picker {
+    position: absolute;
+    
+    padding: 0.25em;
+    
+    background-color: #F5F5F5;
+    
+    border: 1px solid #000000;
+}
+
+
+/* ##################################################################################### */
+/* ######################################## MODAL ###################################### */
+/* ##################################################################################### */
+
+.gs-time-time-picker-container.modal {
+    width: 100%;
+    height: 100%;
+}
+
+.gs-time-time-picker-container.modal .gs-time-time-picker-overlay {
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.gs-time-time-picker-container.modal .gs-time-time-picker {
+    position: relative;
+    margin: 0 auto;
+    width: 94%;
+}
+
+
+/* ##################################################################################### */
+/* ######################################## CLOCK ###################################### */
+/* ##################################################################################### */
+
+.gs-time-time-picker-container .time-inner-container {
+    position: relative;
+}
+
+.gs-time-time-picker-container .time-modal-control-container {
+    margin-bottom: 0.25em;
+}
+
+.gs-time-time-picker-container:not(.modal) .time-modal-control-container {
+    display: none;
+}
+
+.gs-time-time-picker-container .gs-time-clock-container {
+    font-family: menlo, monospace;
+    
+    font-size: 16px;
+    width: 15em;
+    height: 15em;
+    margin: 0 auto;
+    padding: 0.7em;
+    border-radius: 50%;
+    box-shadow: 0 0 0.01em 0.09em #999999;
+    
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f5f6f6+60,9ad392+61,366d36+66,9ad392+70,f5f6f6+71&1+0,1+71,0+72,0+72 */
+background: -moz-radial-gradient(center, ellipse cover, rgba(245,246,246,1) 0%, rgba(245,246,246,1) 60%, rgba(154,211,146,1) 61%, rgba(54,109,54,1) 66%, rgba(154,211,146,1) 70%, rgba(245,246,246,1) 71%, rgba(245,246,246,0) 72%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(245,246,246,1)), color-stop(60%,rgba(245,246,246,1)), color-stop(61%,rgba(154,211,146,1)), color-stop(66%,rgba(54,109,54,1)), color-stop(70%,rgba(154,211,146,1)), color-stop(71%,rgba(245,246,246,1)), color-stop(72%,rgba(245,246,246,0))); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover, rgba(245,246,246,1) 0%,rgba(245,246,246,1) 60%,rgba(154,211,146,1) 61%,rgba(54,109,54,1) 66%,rgba(154,211,146,1) 70%,rgba(245,246,246,1) 71%,rgba(245,246,246,0) 72%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover, rgba(245,246,246,1) 0%,rgba(245,246,246,1) 60%,rgba(154,211,146,1) 61%,rgba(54,109,54,1) 66%,rgba(154,211,146,1) 70%,rgba(245,246,246,1) 71%,rgba(245,246,246,0) 72%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover, rgba(245,246,246,1) 0%,rgba(245,246,246,1) 60%,rgba(154,211,146,1) 61%,rgba(54,109,54,1) 66%,rgba(154,211,146,1) 70%,rgba(245,246,246,1) 71%,rgba(245,246,246,0) 72%); /* IE10+ */
+background: radial-gradient(ellipse at center, rgba(245,246,246,1) 0%,rgba(245,246,246,1) 60%,rgba(154,211,146,1) 61%,rgba(54,109,54,1) 66%,rgba(154,211,146,1) 70%,rgba(245,246,246,1) 71%,rgba(245,246,246,0) 72%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f6f6', endColorstr='#00f5f6f6',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+.gs-time-time-picker-container .gs-time-bezel {
+    position: relative;
+    
+    width: 100%;
+    height: 100%;
+    
+    box-shadow: 0 0 0.09em 0.15em #CCCCCC inset;
+    border-radius: 50%;
+    
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f3f3f3+0,dadada+42,dadada+100 */
+background: rgb(243,243,243); /* Old browsers */
+background: -moz-radial-gradient(center, ellipse cover, rgba(243,243,243,1) 0%, rgba(218,218,218,1) 42%, rgba(218,218,218,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(243,243,243,1)), color-stop(42%,rgba(218,218,218,1)), color-stop(100%,rgba(218,218,218,1))); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover, rgba(243,243,243,1) 0%,rgba(218,218,218,1) 42%,rgba(218,218,218,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover, rgba(243,243,243,1) 0%,rgba(218,218,218,1) 42%,rgba(218,218,218,1) 100%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover, rgba(243,243,243,1) 0%,rgba(218,218,218,1) 42%,rgba(218,218,218,1) 100%); /* IE10+ */
+background: radial-gradient(ellipse at center, rgba(243,243,243,1) 0%,rgba(218,218,218,1) 42%,rgba(218,218,218,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3f3f3', endColorstr='#dadada',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.gs-time-time-picker-container .clock-face-layer {
+    position: absolute;
+    border-radius: 50%;
+    color: #006E00;
+}
+
+.gs-time-time-picker-container .clock-face-layer.layer-1 {
+    line-height: 1.5em;
+    top: 4%;
+    left: 4%;
+    width: 92%;
+    height: 92%;
+}
+
+.gs-time-time-picker-container .clock-face-layer.layer-2 {
+    line-height: 1.2em;
+    top: 18%;
+    left: 18%;
+    width: 64%;
+    height: 64%;
+}
+
+.gs-time-time-picker-container .clock-line {
+    position: absolute;
+    /*height: 1em;*/
+    width: 100%;
+    text-align: center;
+    height: 0;
+    /*margin-top: -1em;*/
+}
+
+.gs-time-time-picker-container .clock-split {
+    /*display: inline-block;*/
+    position: absolute;
+    top: 0;
+    text-align: center;
+    height: 0;
+}
+
+.gs-time-time-picker-container .clock-center {
+    position: absolute;
+    font-size: 1.8em;
+    left: 50%;
+    top: 50%;
+    width: 4em;
+    margin-left: -2em;
+    margin-top: -0.5em;
+    text-align: center;
+    height: 0;
+}
+
+.gs-time-time-picker-container .clock-button {
+    display: inline-block;
+}
+
+.gs-time-time-picker-container .clock-button.selected .content,
+.gs-time-time-picker-container .clock-period-switch.selected .content {
+    background-color: #FFDD66;
+    color: #000000;
+    border-radius: 19%;
+}
+
+.gs-time-time-picker-container .clock-period-switch {
+    display: inline-block;
+    padding: 0 0.25em;
+    font-size: 0.8em;
+    line-height: 1.4em;
+}
+
+.gs-time-time-picker-container .clock-face-layer.layer-1 .clock-button {
+    font-size: 1.6em;
+}
+
+.gs-time-time-picker-container .clock-face-layer.layer-2 .clock-button {
+    font-size: 1.2em;
+}
+
+.gs-time-time-picker-container .time-top-toolbar {
+    width: 100%;
+    height: 0;
+}
+
+.gs-time-time-picker-container .time-bottom-toolbar {
+    margin-top: 0.4em;
+}

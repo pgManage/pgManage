@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title class="title">Home</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script>
+            //jslint white:true multivar:true for:true
+            window.addEventListener('load', function () {
+                'use strict';
+                GS.ajaxJSON('/env/action_info', '', function (data, error) {
+                    window.userData = data.dat;
+                    GS.triggerEvent(window, 'user-data-loaded');
+                });
+                
+                // if we're at an old envelope: remove the ?socket=true
+                if (window.location.pathname.indexOf('/v1') === 0) {
+                    document.getElementById('button-file-manager').setAttribute('href', '../all/file_manager/file_manager.html');
+                    document.getElementById('button-logout-user').setAttribute('href', '/env/auth?action=logout');
+                }
+            });
+            
+            window.addEventListener('user-data-loaded', function () {
+                'use strict';
+                var arrElements, i, len;
+                
+                document.getElementById('user-name-label').textContent = userData.username;
+                
+                arrElements = document.querySelectorAll('*[data-group], *[data-user]');
+                
+                for (i = 0, len = arrElements.length; i < len; i += 1) {
+                    // remove links that have a group attached that is not in your group list (data.groups)
+                    if (arrElements[i].hasAttribute('data-group')) {
+                        if (userData.groups.indexOf(arrElements[i].getAttribute('data-group')) !== -1) {
+                            arrElements[i].removeAttribute('data-group');
+                        }
+                        
+                    // remove links that have a user attached that is not your username (data.session_user)
+                    } else {
+                        if (arrElements[i].getAttribute('data-user') === userData.username) {
+                            arrElements[i].removeAttribute('data-user');
+                        }
+                    }
+                }
+                
+                arrElements = document.querySelectorAll('.group-container:not([hidden])');
+                
+                for (i = 0, len = arrElements.length; i < len; i += 1) {
+                    if (i % 2 !== 0) {
+                        arrElements[i].classList.add('grey');
+                    }
+                }
+            });
+            
+            function buttonJSCompile() {
+                GS.addLoader('compile', 'Compiling JS...');
+                GS.ajaxJSON('/env/postage.action_jsmin', '', function (data, error) {
+                    if (!error) {
+                        GS.removeLoader('compile');
+                    } else {
+                        GS.ajaxErrorDialog(data);
+                    }
+                });
+            }
+            
+            function buttonAbandon() {
+                'use strict';
+                GS.msgbox('Are you sure...', 'Are you sure you want to do this?', ['No', 'Yes'], function (strAnswer) {
+                    if (strAnswer === 'Yes') {
+                        GS.addLoader('abandon', 'Abandoning...');
+                        GS.ajaxJSON('/env/postage.action_git_abandon', '', function (data, error) {
+                            GS.removeLoader('abandon');
+                            if (!error) {
+                                GS.msgbox('Abandon Results', '<pre>' + data.dat + '</pre>', ['Ok']);
+                            } else {
+                                GS.ajaxErrorDialog(data);
+                            }
+                        });
+                    }
+                });
+            }
+            
+            function buttonStatus() {
+                GS.addLoader('status', 'Getting status...');
+                GS.ajaxJSON('/env/postage.action_git_status', '', function (data, error) {
+                    if (!error) {
+                        GS.removeLoader('status');
+                        GS.msgbox('Status Results', '<pre>' + data.dat + '</pre>', ['Ok']);
+                    } else {
+                        GS.ajaxErrorDialog(data);
+                    }
+                });
+            }
+            
+            function buttonCommit() {
+                GS.msgbox('Enter Commit Message', ml(function () {/*
+                    <label for="input-commit">Commit Message:</label>
+                    <gs-memo id="input-commit"></gs-memo>
+                */}), ['No', 'Yes'], function (strAnswer) {
+                    if (strAnswer === 'Yes') {
+                        GS.addLoader('commit', 'Committing...');
+                        GS.ajaxJSON(
+                            '/env/postage.action_git_commit',
+                            encodeURIComponent(document.getElementById('input-commit').value),
+                            function (data, error) {
+                                GS.removeLoader('commit');
+                                if (!error) {
+                                    GS.msgbox('Commit Results', '<pre>' + data.dat + '</pre>', ['Ok']);
+                                } else {
+                                    GS.ajaxErrorDialog(data);
+                                }
+                            });
+                    }
+                });
+            }
+            
+            function buttonPull() {
+                GS.addLoader('pull', 'Pulling...');
+                GS.ajaxJSON('/env/postage.action_git_pull', '', function (data, error) {
+                    GS.removeLoader('pull');
+                    if (!error) {
+                        GS.msgbox('Pull Results', '<pre>' + data.dat + '</pre>', ['Ok']);
+                    } else {
+                        GS.ajaxErrorDialog(data);
+                    }
+                });
+            }
+            
+            function buttonPush() {
+                GS.addLoader('push', 'Pushing...');
+                GS.ajaxJSON('/env/postage.action_git_push', '', function (data, error) {
+                    GS.removeLoader('push');
+                    if (!error) {
+                        GS.msgbox('Push Results', '<pre>' + data.dat + '</pre>', ['Ok']);
+                    } else {
+                        GS.ajaxErrorDialog(data);
+                    }
+                });
+            }
+        </script>
+        
+        <style>
+            .group-container {
+                padding: 1em;
+                border: 1px solid #AAAAAA;
+                -webkit-border-radius: 0.5em;
+                -moz-border-radius: 0.5em;
+                -ms-border-radius: 0.5em;
+                -o-border-radius: 0.5em;
+                border-radius: 0.5em;
+            }
+            .group-container > h4 {
+                padding: 0;
+                margin: 0;
+            }
+            .group-container > span.space {
+                display: block;
+                height: 1em;
+            }
+            .group-container.grey {
+                background-color: #EEE;
+            }
+            
+            [data-group], [data-user] {
+                display: none;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <gs-page>
+            <gs-header>
+                <div flex-horizontal>
+                    <h3 class="title" flex>Home</h3>
+                    <gs-button id="button-logout-user" href="/env/auth/?action=logout" title="Sign out" icononly icon="sign-out" iconrotatedown target="_self"></gs-button>
+                </div>
+            </gs-header>
+            <gs-body padded>
+                <!--<div flex-horizontal>
+                    <gs-combo id="combo-session-user" limit-to-list src="(SELECT 2 AS sort, pg_roles.oid::integer AS oid, rolname::text AS user_name     FROM pg_roles    WHERE rolcanlogin = 't' AND rolsuper = 'f' UNION    SELECT 1 AS sort, 0 AS oid, 'Production'::text AS user_name ORDER BY sort ASC, user_name ASC) ema" hidden flex>
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr value="{{! row.oid }}">
+                                        <td>{{! row.user_name }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-combo>
+                </div>
+                <br />-->
+                <div id="user-app-list-container">
+                    
+                    <gs-button target="_blank" data-user="joseph@wfprod.com" href="../wiki_g/index.html?page_id=63243"><b>MENU</b></gs-button>
+                    
+                    <div class="group-container" data-group="ttu_g">
+                        <h4><i>Texas Tech University</i></h4>
+                        <span class="space"></span>
+                        
+                        <gs-grid widths="1,1,1" reflow-at="500px" gutter>
+                            <gs-block>
+                                <gs-button target="_blank" jumbo data-group="ttu_g" href="../ttu_g/collection_list.html">Collection Events</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button target="_blank" jumbo data-group="ttu_g" href="../ttu_g/quick_entry.html">Quick Entry</gs-button>
+                            </gs-block>
+                        </gs-grid>
+                    </div>
+                    <br data-group="ttu_g" />
+                    
+                    <div class="group-container" data-group="place_g">
+                        <h4><i>Place To Be Demo</i></h4>
+                        <span class="space"></span>
+                        
+                        <gs-grid widths="1,1,1" reflow-at="500px" gutter>
+                            <gs-block>
+                                <gs-button target="_blank" jumbo data-group="place_g" href="../place_g/import.html">Employee View</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button target="_blank" jumbo data-group="place_g" href="../place_g/contractor.html?contractor=Paris">Contractor: Paris</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button target="_blank" jumbo data-group="place_g" href="../place_g/contractor.html?contractor=Steven">Contractor: Steven</gs-button>
+                            </gs-block>
+                        </gs-grid>
+                    </div>
+                    <br data-group="place_g" />
+                    
+                    <div class="group-container" data-group="hbst_manager_g">
+                        <h4><i>HBST Managers</i></h4>
+                        <span class="space"></span>
+                        
+                        <gs-grid widths="1,1,1" reflow-at="795px" gutter>
+                            <gs-block>
+                                <gs-button target="_blank" data-group="hbst_manager_g" jumbo href="../hbst_manager_g/schedule_availability.html">HBST Admin View</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button target="_blank" data-group="hbst_manager_g" jumbo href="../hbst_manager_g/applicants.html">HBST Applicants and Contractors</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button target="_blank" data-group="hbst_manager_g" jumbo href="../hbst_manager_g/invite.html">HBST Invite Applicant</gs-button>
+                            </gs-block>
+                        </gs-grid>
+                    </div>
+                    <br data-group="hbst_manager_g" />
+                    
+                    <div class="group-container" data-group="hbst_onboard_g">
+                        <h4><i>HBST</i></h4>
+                        <span class="space"></span>
+                        
+                        <gs-button target="_blank" data-group="hbst_onboard_g" jumbo href="../hbst_onboard_g/index.html">HBST Onboarding</gs-button>
+                    </div>
+                    <br data-group="hbst_onboard_g" />
+                    
+                    <!--
+                    <gs-button target="_blank" data-group="bee_g" href="../bee_g/create.html">New Event</gs-button>
+                    <gs-button target="_blank" data-group="bee_g" href="../bee_g/review.html">Review Event</gs-button>
+                    <gs-button target="_blank" data-group="scs_richard_broadhead_demo_g" href="../scs_richard_broadhead_demo_g/index.html">SCS Richard Broadhead Demo</gs-button>
+                    
+                    <gs-button target="_blank" data-group="blog_g" href="../blog_g/index.html">Blog Edit</gs-button>
+                    -->
+
+                    <gs-grid widths="1,1" reflow-at="500px" gutter>
+                        <gs-block>
+                            <gs-button jumbo target="_blank" data-group="adr_g" href="../adr_g/index.html">Address Book</gs-button>
+                            <gs-button jumbo target="_blank" data-group="days_g" href="../days_g/ages.html">Ages</gs-button>
+                            <gs-button jumbo target="_blank" data-user="jen@tocci.org" href="../all/backups.html">Backup Status</gs-button>
+                            <gs-button jumbo target="_blank" data-group="cal2_g" href="../cal2_g/calendar.html">Calendar</gs-button>
+                            <gs-button jumbo target="_blank" data-group="days_g" href="../days_g/index.html">Countdown</gs-button>
+                            <gs-form src="post.rptdownload_new">
+                                <template>
+                                    <gs-button jumbo target="_blank" data-group="tocci_g" href="../all/downloadcount.html">
+                                        <gs-static inline column="day_new_users"></gs-static>/<gs-static inline column="today_users"></gs-static>Download Count
+                                    </gs-button>
+                                </template>
+                            </gs-form>
+                        </gs-block>
+                        <gs-block>
+                            <gs-button jumbo target="_blank" data-group="a8g_g" href="../a8g_g/index.html">EasyBooks</gs-button>
+                            <gs-button jumbo target="_blank" data-group="school_g" href="../school_g/index.html">Learning App</gs-button>
+                            <gs-button jumbo target="_blank" data-group="school_g" href="../school_g/math.html">Learning Latin Math</gs-button>
+                            <gs-button jumbo target="_blank" data-group="lph_g" href="../lph_g/lph.html">LPH</gs-button>
+                            <gs-button jumbo target="_blank" data-group="meal_g" href="../meal_g/calendar.html">Meals 3.0</gs-button>
+                            <gs-button jumbo target="_blank" data-group="trkng_g" href="../trkng_g/index.html">Packages</gs-button>
+                            <gs-button jumbo target="_blank" data-group="shop_g" href="../shop_g/index.html">TEMP</gs-button>
+                            <gs-button jumbo target="_blank" data-group="wtkv2_g" href="../wtkv2_g/index.html">Timekeeping</gs-button>
+                            <gs-button jumbo target="_blank" data-group="days_g" href="../days_g/toccical.html">TocciCal</gs-button>
+                            <gs-button jumbo target="_blank" data-group="days_g" href="../todo_g/todo.html">Todo</gs-button>
+                            <gs-button jumbo target="_blank" data-group="trn_g" href="../trn_g/index.html">Turns</gs-button>
+                            <gs-button jumbo target="_blank" data-group="wiki_g" href="../wiki_g/index.html">Wiki</gs-button>
+                        </gs-block>
+                    </gs-grid>
+                    
+                    <br data-group="developer_g" />
+                    <div class="group-container" data-group="developer_g">
+                        <h4><i>Developer</i></h4>
+                        <span class="space"></span>
+                        
+                        <gs-grid widths="1,1,1" reflow-at="500px" gutter>
+                            <gs-block>
+                                <gs-button target="_blank" data-group="developer_g" href="../developer_g/greyspots-1.1.1/documentation/index.html" jumbo>Documentation</gs-button>
+                                <br />
+                            </gs-block>
+                            <gs-block>
+                                <gs-button id="button-file-manager" target="_blank" data-group="developer_g" href="../all/file_manager/file_manager.html?socket=true" jumbo>File Manager</gs-button>
+                                <br />
+                            </gs-block>
+                            <gs-block>
+                                <gs-button target="_blank" data-group="pdf_g" href="../pdf_g/pdf_list.html" jumbo>PDF Design</gs-button>
+                                <br />
+                            </gs-block>
+                        </gs-grid>
+                        
+                        <gs-button jumbo onclick="buttonJSCompile()"><b>Compile JS</b></gs-button>
+                        <br />
+                        
+                        <gs-grid widths="1,1,1,1,1" reflow-at="500px" gutter>
+                            <gs-block>
+                                <gs-button jumbo onclick="buttonAbandon()" bg-danger txt-danger><b>Abandon</b></gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button jumbo onclick="buttonStatus()"><b>Status</b></gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button jumbo onclick="buttonCommit()"><b>Commit</b></gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button jumbo onclick="buttonPull()"><b>Pull</b></gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button jumbo onclick="buttonPush()"><b>Push</b></gs-button>
+                            </gs-block>
+                        </gs-grid>
+                    </div>
+                    
+                    <br data-group="sls_g" />
+                    <div class="group-container" data-group="sls_g">
+                        <h4><i>CRM</i></h4>
+                        <span class="space"></span>
+                        <gs-grid widths="1,1" reflow-at="500px" gutter>
+                            <gs-block>
+                                <gs-button target="_blank" data-group="sls_g" href="../sls_g/account_search.html" jumbo>CRM Account Search</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button target="_blank" data-group="sls_g" href="../sls_g/activity.html" jumbo>CRM Activity</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button target="_blank" data-group="sls_g" href="../sls_g/calendar.html" jumbo>CRM Calendar</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button target="_blank" data-group="sls_g" href="../sls_g/multi-view.html" show-on-desktop jumbo>CRM Multi-View</gs-button>
+                            </gs-block>
+                        </gs-grid>
+                    </div>
+                </div>
+                <br />
+                <center id="user-name-label"></center>
+                <br />
+            </gs-body>
+        </gs-page>
+    </body>
+</html>

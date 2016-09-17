@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Element Position Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Element Position</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Functions:</h3>
+            <pre><code>GS.getElementOffset(&lt;ELEMENT&gt;);
+GS.getElementPositionData(&lt;ELEMENT&gt;);</code></pre>
+            
+            <h3>Description:</h3>
+            <p>These functions are for getting data about the position of an HTML element.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">GS.getElementOffset Example:</span><br />
+                <p>This function is for getting the left and top of an element relative to the viewport. This function is useful for example for positioning a dropdown box near an element.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="29">
+                    <gs-button onclick="testGetOffset('elem-1')">
+                        Get Element 1 Offset</gs-button>
+                    <gs-button onclick="testGetOffset('elem-2')">
+                        Get Element 2 Offset</gs-button>
+                    <gs-button onclick="testGetOffset('elem-3')">
+                        Get Element 3 Offset</gs-button>
+                    <br />
+                    <div bg-success style="position:relative; height:7em; width:10em; margin:0 auto;">
+                        <div id="elem-1" bg-primary style="position:absolute; left:1em; top:1em; width:2em; height:2em;">1</div>
+                        <div id="elem-2" bg-primary style="position:absolute; left:1em; top:4em; width:2em; height:2em;">2</div>
+                        <div id="elem-3" bg-primary style="position:absolute; left:7em; top:4em; width:2em; height:2em;">3</div>
+                    </div>
+                    <br />
+                    <div id="result"></div>
+                </template>
+                <template for="js" height="12">
+                    function testGetOffset(strID) {
+                        var jsnOffset = GS.getElementOffset(document.getElementById(strID));
+                        
+                        document.getElementById('result').textContent =
+                            'Left: ' + jsnOffset.left + 'px ' +
+                            'Top: ' + jsnOffset.top + 'px';
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">GS.getElementPositionData Example:</span><br />
+                <p>This function is for getting:<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Element Width<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Element Height<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Element Top (relative to the viewport)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Element Left (relative to the viewport)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Element Bottom (relative to the viewport)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Element Right (relative to the viewport)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Room Above (relative to the viewport)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Room Below (relative to the viewport)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Room To The Left (relative to the viewport)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;Room To The Right (relative to the viewport)</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="33">
+                    <gs-button onclick="testGetPositionData('elem-1')">
+                        Get Element 1 Position Data</gs-button>
+                    <gs-button onclick="testGetPositionData('elem-2')">
+                        Get Element 2 Position Data</gs-button>
+                    <gs-button onclick="testGetPositionData('elem-3')">
+                        Get Element 3 Position Data</gs-button>
+                    <gs-button onclick="testGetPositionData('elem-4')">
+                        Get Element 4 Position Data</gs-button>
+                    <br>
+                    <div bg-success style="position:relative; height:7em; width:10em; margin:0 auto;">
+                        <div id="elem-1" bg-primary style="position:absolute; left:1em; top:1em; width:5em; height:1em;">1</div>
+                        <div id="elem-2" bg-primary style="position:absolute; left:7em; top:1em; width:2em; height:1em;">2</div>
+                        <div id="elem-3" bg-primary style="position:absolute; left:1em; top:3em; width:3em; height:3em;">3</div>
+                        <div id="elem-4" bg-primary style="position:absolute; left:5em; top:3em; width:4em; height:3em;">4</div>
+                    </div>
+                    <br />
+                    <div id="result"></div>
+                </template>
+                <template for="js" height="22">
+                    function testGetPositionData(strID) {
+                        var jsnOffset = GS.getElementPositionData(document.getElementById(strID));
+                        
+                        document.getElementById('result').innerHTML =
+                            'Width: ' + jsnOffset.intElementWidth + 'px<br />' +
+                            'Height: ' + jsnOffset.intElementHeight + 'px<br />' +
+                            'Top: ' + jsnOffset.intElementTop + 'px<br />' +
+                            'Left: ' + jsnOffset.intElementLeft + 'px<br />' +
+                            'Bottom: ' + jsnOffset.intElementBottom + 'px<br />' +
+                            'Right: ' + jsnOffset.intElementRight + 'px<br />' +
+                            'Room Above: ' + jsnOffset.intRoomAbove + 'px<br />' +
+                            'Room Below: ' + jsnOffset.intRoomBelow + 'px<br />' +
+                            'Room Left: ' + jsnOffset.intRoomLeft + 'px<br />' +
+                            'Room Right: ' + jsnOffset.intRoomRight + 'px';
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

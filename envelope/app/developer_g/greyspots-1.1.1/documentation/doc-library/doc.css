@@ -1,0 +1,214 @@
+/* ########################################################################### */
+/* ####################### GENERAL DOCUMENTATION LOOKS ####################### */
+/* ########################################################################### */
+/*
+gs-body[padded] {
+    padding: 0.5em;
+}
+
+.doc-mono {
+    font-family: menlo, monospace;
+}
+
+.doc-small-header {
+    font-size: 0.6em;
+}
+
+.doc-section {
+    margin-bottom: 1.2em;
+    padding-left: 0.4em;
+}
+
+.doc-header {
+    display: block;
+    margin-bottom: 0.2em;
+}
+
+.doc-table {
+    border: 1px solid #13AB13;
+}
+
+.doc-example-description {
+    margin-top: 0.5em;
+    padding: 0.5em;
+    border: 1px solid #13AB13;
+}
+*/
+
+/* ############################################################################ */
+/* ######################## DOCUMENTATION TABLE REFLOW ######################## */
+/* ############################################################################ */
+/*
+@media only screen and (min-width: 768px) {
+    table.doc-table tr th:first-child {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    table.doc-table tbody th,
+    table.doc-table tbody td {
+        width: 100% !important;
+        float: left;
+        clear: left;
+        
+        min-width: 0 !important;
+        
+        border: 1px solid #168216;
+        
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        -o-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+    
+    table.doc-table thead {
+        display: none;
+    }
+    
+    table.doc-table tbody th,
+    table.doc-table tbody td {
+        height: auto;
+        padding: 0.3em;
+    }
+    
+    table.doc-table tbody tr th:first-child {
+        background-color: #EAEAEA;
+    }
+    
+    table.doc-table tbody tr th:first-child,
+    table.doc-table tbody tr:not(:last-child) th:last-child,
+    table.doc-table tbody tr:not(:last-child) td:last-child {
+        border-bottom: 3px solid #000000;
+    }
+    
+    table.doc-table th:not(:first-child):before,
+    table.doc-table td:before {
+        display: block;
+        
+        margin: 0.3em;
+        
+        text-align: center;
+        font-weight: 900;
+        
+        content: attr(heading);
+        
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        -o-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+}
+*/
+
+/* ########################################################################### */
+/* ###################### DOCUMENTATION EXAMPLE ELEMENT ###################### */
+/* ########################################################################### */
+
+.doc-example-description {
+    margin-top: 0.5em;
+    padding: 0.5em;
+    border: 1px solid #000000;
+}
+
+gs-doc-example {
+    display: block;
+    border-right: 1px solid #000000;
+    border-left: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+}
+
+gs-doc-example .example-parent {
+    position: relative;
+}
+
+gs-doc-example .example-html-ace,
+gs-doc-example .example-js-ace,
+gs-doc-example .example-db-ace {
+    width: 50%;
+    height: auto;
+    border-right: 1px solid #000000;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+gs-doc-example .example-display-container {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 50%;
+    height: 100%;
+}
+
+@media only screen and (max-width: 768px) {
+    gs-doc-example .example-html-ace,
+    gs-doc-example .example-js-ace,
+    gs-doc-example .example-db-ace {
+        width: auto;
+    }
+    
+    gs-doc-example .example-display-container {
+        position: static;
+        left: auto;
+        top: auto;
+        width: auto;
+        border-top: 1px solid #000000;
+    }
+}
+
+gs-doc-example .query-string-container {
+    border-bottom: 1px solid #000000;
+}
+
+gs-doc-example .example-display-refresh-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    opacity: 0.2;
+}
+
+gs-doc-example .example-display-refresh-button {
+    position: absolute;
+    left: 2%;
+    top: 2%;
+    width: 96%;
+}
+
+.example-db-ace-status-flag.running {
+    position: relative;
+    overflow: visible;
+    z-index: 10;
+}
+.example-db-ace-status-flag.running:after {
+    content: 'Running...';
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    opacity: 0.5;
+}
+
+gs-doc-example .example-js-ace.ace_editor,
+gs-doc-example .example-db-ace.ace_editor {
+    border-top: 1px solid #000000;
+}
+
+gs-doc-example .example-display {
+    width: 100%;
+    height: 100%;
+    border: 0 none;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}

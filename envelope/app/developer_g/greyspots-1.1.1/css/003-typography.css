@@ -1,0 +1,468 @@
+/* Default Text */
+body {
+    font-family: Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857;
+    color: #333;
+}
+
+/* Headings */
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+    color: inherit;
+}
+
+.h1, .h2, .h3, h1, h2, h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/*
+h1 {
+    margin: 0.67em 0px;
+    font-size: 2em;
+}
+*/
+
+.h1, h1 {
+    font-size: 36px;
+}
+
+.h2, h2 {
+    font-size: 30px;
+}
+
+.h3, h3 {
+    font-size: 24px;
+}
+
+.h4, .h5, .h6, h4, h5, h6 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.h4, h4 {
+    font-size: 18px;
+}
+
+.h5, h5 {
+    font-size: 14px;
+}
+
+.h6, h6 {
+    font-size: 12px;
+}
+
+/* Seconday Text for Headings */
+.h1 .small, .h1 small, .h2 .small, .h2 small, .h3 .small, .h3 small, h1 .small, h1 small, h2 .small, h2 small, h3 .small, h3 small {
+    font-size: 65%;
+}
+.h1 .small, .h1 small, .h2 .small, .h2 small, .h3 .small, .h3 small, .h4 .small, .h4 small, .h5 .small, .h5 small, .h6 .small, .h6 small, h1 .small, h1 small, h2 .small, h2 small, h3 .small, h3 small, h4 .small, h4 small, h5 .small, h5 small, h6 .small, h6 small {
+    font-weight: 400;
+    line-height: 1;
+    color: #777;
+}
+
+/* Small Text */
+.small, small {
+    font-size: 85%;
+}
+small {
+    font-size: 80%;
+}
+
+/* Paragraphs */
+p {
+    margin: 0px 0px 10px;
+}
+
+/* Lead Body, makes a Paragrah Stand Out */
+.lead {
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.4;
+}
+
+@media (min-width:768px){
+	.lead{
+		font-size:21px
+	}
+}
+
+/* Mark Text */
+.mark, mark {
+    padding: 0.2em;
+    background-color: #FCF8E3;
+}
+mark {
+    color: #000;
+    background: #FF0 none repeat scroll 0% 0%;
+}
+
+/* Deleted Text, Strike-Through Text, Inserted Text any Underlined Text does not require and special css */
+/*
+del, s, ins, u {}
+*/
+
+/* Bold Text */
+b, strong {
+    font-weight: 700;
+}
+
+/* Emphasized Text and Italic Text does not require any special css */
+/*
+em, i {}
+*/
+
+/* Superscript and Subscript */
+sub,sup{
+	position:relative;
+	font-size:75%;
+	line-height:0;
+	vertical-align:baseline
+}
+
+sup{
+	top:-.5em
+}
+
+sub{
+	bottom:-.25em
+}
+
+/* Horizontal Rule does not require any special css */
+/*
+hr {}
+*/
+
+/* Text Alignment */
+.text-left{
+	text-align:left
+}
+
+.text-right{
+	text-align:right
+}
+
+.text-center{
+	text-align:center
+}
+
+.text-justify{
+	text-align:justify
+}
+
+.text-nowrap{
+	white-space:nowrap
+}
+
+/* Text Transformation */
+.text-lowercase{
+	text-transform:lowercase
+}
+
+.text-uppercase{
+	text-transform:uppercase
+}
+
+.text-capitalize{
+	text-transform:capitalize
+}
+
+/* Text Colors */
+[txt-muted]{
+	color:#777
+}
+
+[txt-primary]{
+	color:#337ab7
+}
+
+a[txt-primary]:focus,a[txt-primary]:hover{
+	color:#286090
+}
+
+[txt-success]{
+	color:#3c763d
+}
+
+a[txt-success]:focus,a[txt-success]:hover{
+	color:#2b542c
+}
+
+[txt-info]{
+	color:#31708f
+}
+
+a[txt-info]:focus,a[txt-info]:hover{
+	color:#245269
+}
+
+[txt-warning]{
+	color:#8a6d3b
+}
+
+a[txt-warning]:focus,a[txt-warning]:hover{
+	color:#66512c
+}
+
+[txt-danger]{
+	color:#a94442
+}
+
+a[txt-danger]:focus,a[txt-danger]:hover{
+	color:#843534
+}
+
+/* Background Colors */
+[bg-primary]{
+	color:#fff;
+	background-color:#337ab7
+}
+
+a[bg-primary]:focus,a[bg-primary]:hover{
+	background-color:#286090
+}
+
+[bg-success]{
+	background-color:#dff0d8
+}
+
+a[bg-success]:focus,a[bg-success]:hover{
+	background-color:#c1e2b3
+}
+
+[bg-info]{
+	background-color:#d9edf7
+}
+
+a[bg-info]:focus,a[bg-info]:hover{
+	background-color:#afd9ee
+}
+
+[bg-warning]{
+	background-color:#fcf8e3
+}
+
+a[bg-warning]:focus,a[bg-warning]:hover{
+	background-color:#f7ecb5
+}
+
+[bg-danger]{
+	background-color:#f2dede
+}
+
+a[bg-danger]:focus,a[bg-danger]:hover{
+	background-color:#e4b9b9
+}
+
+/* Abbreviations */
+abbr[title]{
+	border-bottom:1px dotted
+}
+
+@media print{
+    abbr[title]:after{
+		content:" (" attr(title) ")"
+	}
+}
+
+abbr[data-original-title],abbr[title]{
+	cursor:help;
+	border-bottom:1px dotted #777
+}
+
+.initialism{
+	font-size:90%;
+	text-transform:uppercase
+}
+
+/* Address */
+address{
+	margin-bottom:20px;
+	font-style:normal;
+	line-height:1.42857143
+}
+
+/* Blockquote */
+blockquote{
+	padding:10px 20px;
+	margin:0 0 20px;
+	font-size:17.5px;
+	border-left:5px solid #eee
+}
+
+blockquote ol:last-child,blockquote p:last-child,blockquote ul:last-child{
+	margin-bottom:0
+}
+
+blockquote .small,blockquote footer,blockquote small{
+	display:block;
+	font-size:80%;
+	line-height:1.42857143;
+	color:#777
+}
+
+blockquote .small:before,blockquote footer:before,blockquote small:before{
+	content:'\2014 \00A0'
+}
+
+.blockquote-reverse,blockquote.pull-right{
+	padding-right:15px;
+	padding-left:0;
+	text-align:right;
+	border-right:5px solid #eee;
+	border-left:0
+}
+
+.blockquote-reverse .small:before,.blockquote-reverse footer:before,.blockquote-reverse small:before,blockquote.pull-right .small:before,blockquote.pull-right footer:before,blockquote.pull-right small:before{
+	content:''
+}
+
+.blockquote-reverse .small:after,.blockquote-reverse footer:after,.blockquote-reverse small:after,blockquote.pull-right .small:after,blockquote.pull-right footer:after,blockquote.pull-right small:after{
+	content:'\00A0 \2014'
+}
+
+@media print{
+    blockquote,pre{
+		border:1px solid #999;
+		page-break-inside:avoid
+	}
+}
+
+/* Lists */
+ol,ul{
+	margin-top:0;
+	margin-bottom:10px
+}
+
+ol ol,ol ul,ul ol,ul ul{
+	margin-bottom:0
+}
+
+.list-unstyled{
+	padding-left:0;
+	list-style:none
+}
+
+.list-inline{
+	padding-left:0;
+	margin-left:-5px;
+	list-style:none
+}
+
+.list-inline>li{
+	display:inline-block;
+	padding-right:5px;
+	padding-left:5px
+}
+
+/* Description Lists */
+dl{
+	margin-top:0;
+	margin-bottom:20px
+}
+
+dd,dt{
+	line-height:1.42857143
+}
+
+dt{
+	font-weight:700
+}
+
+dd{
+	margin-left:0
+}
+
+@media (min-width:768px){
+	.dl-horizontal dt{
+		float:left;
+		width:160px;
+		overflow:hidden;
+		clear:left;
+		text-align:right;
+		text-overflow:ellipsis;
+		white-space:nowrap
+	}
+
+	.dl-horizontal dd{
+		margin-left:180px
+	}
+
+}
+
+/* Code */
+code,kbd,pre,samp{
+	font-family:monospace,monospace;
+	font-size:1em
+}
+
+code,kbd,pre,samp{
+	font-family:Menlo,Monaco,Consolas,"Courier New",monospace
+}
+
+code{
+	padding:2px 4px;
+	font-size:90%;
+	color:#c7254e;
+	background-color:#f9f2f4;
+	border-radius:4px
+}
+
+kbd{
+	padding:2px 4px;
+	font-size:90%;
+	color:#fff;
+	background-color:#333;
+	border-radius:3px;
+	-webkit-box-shadow:inset 0 -1px 0 rgba(0,0,0,.25);
+	box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)
+}
+
+kbd kbd{
+	padding:0;
+	font-size:100%;
+	font-weight:700;
+	-webkit-box-shadow:none;
+	box-shadow:none
+}
+
+pre{
+	display:block;
+	padding:9.5px;
+	margin:0 0 10px;
+	font-size:13px;
+	line-height:1.42857143;
+	color:#333;
+	background-color:#f5f5f5;
+	border:1px solid #ccc;
+	border-radius:4px;
+	
+	white-space: pre-wrap;
+	word-break: break-all;
+	word-break: break-word;
+	word-wrap: break-word;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-o-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+pre code{
+	padding:0;
+	font-size:inherit;
+	color:inherit;
+	white-space:pre-wrap;
+	background-color:transparent;
+	border-radius:0
+}
+
+.pre-scrollable{
+	max-height:340px;
+	overflow-y:scroll
+}

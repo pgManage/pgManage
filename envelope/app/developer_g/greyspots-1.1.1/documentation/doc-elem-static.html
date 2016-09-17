@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Static Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Static</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3 class="doc-header">Tag:</h3>
+            <pre><code>&lt;gs-static&gt;&lt;/gs-static&gt;</code></pre>
+            
+            <h3 class="doc-header">Description:</h3>
+            <div class="doc-section">
+                <p>The <code>&lt;gs-static&gt;</code> allows you to view data from a <code>&lt;gs-form&gt;</code> without the ability to change that data.</p>
+            </div>
+            
+            <h1 class="doc-header">Examples:</h1>
+            <div class="doc-section">
+                <div class="doc-example-description">
+                    <span class="h3">Skeleton Example:</span>
+                    <p>A basic <code>&lt;gs-static&gt;</code> control will have the following behaviors:</p>
+                    <ol>
+                        <li>The <code>[value=""]</code> attribute will set the text of the control.</li>
+                        <li>The control cannot be focused.</li>
+                        <li>The text can be selected so that it can be copied.</li>
+                    </ol>
+                </div>
+                <gs-doc-example>
+                    <template for="html">
+                        <gs-static value="Test"></gs-static>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[column]</code>:</span>
+                    <p>When you have a <code>gs-static</code> inside a data element and you want to use it to display cell data you use the <code>column</code> attribute.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="14">
+                        <gs-form src="gsdoc.tpeople" where="id=2341">
+                            <template>
+                                <b>First Name:</b>
+                                <gs-static column="first_name"></gs-static>
+                                <b>Last Name:</b>
+                                <gs-static column="last_name"></gs-static>
+                            </template>
+                        </gs-form>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[pre]</code>:</span>
+                    <p>Use the <code>[pre]</code> attribute to format the text. Note that a <code>\n</code> in the <code>[value=""]</code> attribute will show as <code>\n</code>, but a newline in the attribute text will show properly.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html">
+                        <gs-static value="Testing 1 Test 2 test 3"></gs-static>
+                        <gs-static pre value="Testing 1 Tes\nt 2 t
+                        est 3"></gs-static>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span>
+                    <p>The <code>[qs=""]</code> attribute can be used to sync the <code>&lt;gs-static&gt;</code> with the query string.</p>
+                </div>
+                <gs-doc-example query-string="test=test">
+                    <template for="html" height="15">
+                        <gs-static qs="test"></gs-static>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[inline]</code>:</span>
+                    <p>Sometimes you are limited on space. The <code>[inline]</code> attribute can be used to make the <code>&lt;gs-static&gt;</code> smaller width-wise.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html">
+                        Inline: <gs-static inline value="Test"></gs-static>
+                        <br/>
+                        Not Inline: <gs-static value="Test"></gs-static>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[mini]</code>:</span>
+                    <p>Sometimes you are limited on space. The <code>[mini]</code> attribute can be used to make the <code>&lt;gs-static&gt;</code> smaller height-wise.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html">
+                        <label for="control_mini">Mini:</label>
+                        <gs-static id="control_mini" mini value="Test"></gs-static>
+                    </template>
+                </gs-doc-example>
+            </div>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

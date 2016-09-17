@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Clone Element Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Dialog</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Function:</h3>
+            <pre><code>GS.cloneElement(&lt;ELEMENT&gt;[, &lt;DOCUMENT&gt;]);</code></pre>
+            
+            <h3>Description:</h3>
+            <p>The GS.cloneElement function is used for cloning an element. This function also works around an issue on iOS where template elements have cloning issues.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">GS.cloneElement Example:</span><br />
+                <p>In this example when you click a "Clone" button a copy of the button you clicked is appended to the end of the document.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="10">
+                    <gs-button onclick="testClone(this)">Clone</gs-button>
+                </template>
+                <template for="js" height="10">
+                    function testClone(button) {
+                        document.body.appendChild(GS.cloneElement(button));
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">GS.cloneElement Custom Document Example:</span><br />
+                <p>When you click the "Custom Document" button a copy of the button will be created in the iframe element's document. There is no visual component to this example. This example is only so that you can see how to use it and what it's for.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="10">
+                    <gs-button onclick="testCustomDocument(this)">Custom Document</gs-button>
+                    
+                    <iframe id="test-iframe" hidden></iframe>
+                </template>
+                <template for="js" height="10">
+                    function testCustomDocument(button) {
+                        var clone = GS.cloneElement(button, document.getElementById('test-iframe').contentDocument);
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

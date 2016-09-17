@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Make Table Selectable Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Make Table Selectable</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Function:</h3>
+            <pre><code>GS.makeTableSelectable(&lt;TABLE-ELEMENT&gt;, &lt;SINGLE-RECORD-MODE&gt;);</code></pre>
+            
+            <h3>Description:</h3>
+            <p>This function makes an HTML table selectable on a cell or record basis and when copying from the table the user gets a tab seperated value list (TSV) that is able to be pasted into Apple Numbers or Microsoft Excel.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">Skeleton Example:</span><br />
+                <p>In this example we have a table that has been made selectable by the GS.makeTableSelectable function. When you are on a touch device: the selection will be limited to single record mode. To test copy and paste you select some data in the table, use your default copy command and you can paste it into the gs-memo below the table.</p><!-- Here is a list of behaviours:<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;1) When your selection is in the first column of the &lt;thead&gt; and each record has a &lt;th&gt; as it's first cell: the whole table will be selected.<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;2) When your selection is in a column of the &lt;thead&gt;: the whole column will be selected.<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;3) When your selection is in the first column of a &lt;tr&gt; and the first cell of each record is a &lt;th&gt;: the whole record will be selected.<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;4) If your selection starts and ends in the same cell: the whole record will be selected.<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;5)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;6)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;7)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;8)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;9)-->
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <table id="table">
+                        <thead>
+                            <tr>
+                                <th>#</th><th>Name</th><th>Age</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>1</th><td>Blueberries</td><td>66</td>
+                            </tr>
+                            <tr>
+                                <th>2</th><td>Rasberries</td><td>12</td>
+                            </tr>
+                            <tr>
+                                <th>3</th><td>Strawberry</td><td>38</td>
+                            </tr>
+                            <tr>
+                                <th>4</th><td>Apple</td><td>1</td>
+                            </tr>
+                            <tr>
+                                <th>5</th><td>Fig</td><td>33</td>
+                            </tr>
+                            <tr>
+                                <th>6</th><td>Mango</td><td>61</td>
+                            </tr>
+                            <tr>
+                                <th>7</th><td>Banana</td><td>21</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br />
+                    <gs-memo rows="8" no-resize-handle></gs-memo>
+                </template>
+                <template for="js" height="auto">
+                    window.addEventListener('load', function () {
+                        GS.makeTableSelectable(document.getElementById('table'));
+                    });
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Single Record Mode Example:</span><br />
+                <p>In this example we have a table that has been made selectable by the GS.makeTableSelectable function. This table has been set to single record selection mode by sending true as the second parameter to GS.makeTableSelectable.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <table id="table">
+                        <thead>
+                            <tr>
+                                <th>#</th><th>Name</th><th>Age</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>1</th><td>Blueberries</td><td>66</td>
+                            </tr>
+                            <tr>
+                                <th>2</th><td>Rasberries</td><td>12</td>
+                            </tr>
+                            <tr>
+                                <th>3</th><td>Strawberry</td><td>38</td>
+                            </tr>
+                            <tr>
+                                <th>4</th><td>Apple</td><td>1</td>
+                            </tr>
+                            <tr>
+                                <th>5</th><td>Fig</td><td>33</td>
+                            </tr>
+                            <tr>
+                                <th>6</th><td>Mango</td><td>61</td>
+                            </tr>
+                            <tr>
+                                <th>7</th><td>Banana</td><td>21</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </template>
+                <template for="js" height="auto">
+                    window.addEventListener('load', function () {
+                        GS.makeTableSelectable(document.getElementById('table'), true);
+                    });
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Copy Settings:</span><br />
+                <p>You can alter how the text copy works using a set of attributes.</p>
+                <ul>
+                    <li><b>"quote-type"</b> this controls what values are quoted. There are three possible values for this attribute: "all", "none", "strings". "all" means put quotes around every value. "none" means put quotes around nothing value. "strings" means put quotes around everything that isn't a number.</li>
+                    <li><b>"quote-char"</b> this sets the character used to quote a value.</li>
+                    <li><b>"field-delimiter"</b> this sets the character used to seperate fields.</li>
+                    <li><b>"null-values"</b> this sets the what string is used instead when the value of a cell is "NULL" or "\N".</li>
+                    <li><b>"column-names"</b> this is a true/false attribute. "true" means that when you copy you'll always get the column headings.</li>
+                    <li><b>"row-delimiter"</b> this sets the character used to seperate records.</li>
+                </ul>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <table id="table"
+                            quote-type="all"
+                            quote-char="'"
+                            field-delimiter=","
+                            null-values="HELLO"
+                            column-names="true">
+                        <thead>
+                            <tr>
+                                <th>#</th><th>Name</th><th>Age</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>1</th><td>Blueberries</td><td>66</td>
+                            </tr>
+                            <tr>
+                                <th>2</th><td>Rasberries</td><td>12</td>
+                            </tr>
+                            <tr>
+                                <th>3</th><td>Strawberry</td><td>38</td>
+                            </tr>
+                            <tr>
+                                <th>4</th><td>Apple</td><td>1</td>
+                            </tr>
+                            <tr>
+                                <th>5</th><td>NULL</td><td>33</td>
+                            </tr>
+                            <tr>
+                                <th>6</th><td>Mango</td><td>61</td>
+                            </tr>
+                            <tr>
+                                <th>7</th><td>Banana</td><td>21</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <gs-memo rows="8" no-resize-handle></gs-memo>
+                </template>
+                <template for="js" height="auto">
+                    window.addEventListener('load', function () {
+                        GS.makeTableSelectable(document.getElementById('table'));
+                    });
+                </template>
+            </gs-doc-example>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

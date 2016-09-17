@@ -1,0 +1,26 @@
+gs-checkbox:not([mini]):not(:focus) {
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+}
+
+/* ##################################################################################### */
+/* ############################## UNCHECKED / CHECKED STATE ############################ */
+/* ##################################################################################### */
+
+gs-checkbox:before {
+    font-family: fontawesome;
+    font-size: 1.1em;
+    content: '\f096'; /* fa-square-o */
+}
+
+gs-checkbox[value="true"]:before,
+gs-checkbox[value="-1"]:before {
+    content: '\f046'; /* fa-check-square */
+    letter-spacing: -0.143em;
+}
+
+gs-checkbox[value="null"]:before,
+gs-checkbox[value="n"]:before,
+gs-checkbox[value="N"]:before {
+    content: '\f0c8'; /* fa-square */
+    color: #AAAAAA;
+}

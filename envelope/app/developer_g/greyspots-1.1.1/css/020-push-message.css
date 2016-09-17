@@ -1,0 +1,32 @@
+
+
+gs-pushmessage-container {
+    display: block;
+    position: absolute;
+    
+    width: 100%;
+    height: 0;
+    top: 0;
+    
+    z-index: 6;
+    
+    overflow: visible;
+}
+
+gs-pushmessage {
+    display: block;
+    
+    padding: 0.25em;
+    margin: 1em 1em 0 1em;
+    
+    border: 2px solid #AAAAAA;
+    border-radius: 0.5em;
+    
+    box-shadow: 0 0 0.2em 0.1em #AAAAAA;
+    
+    /* Fallback for web browsers that doesn't support RGBa
+        (got the original version of this from: http://robertnyman.com/2010/01/11/css-background-transparency-without-affecting-child-elements-through-rgba-and-filters/) */
+    background: #EAEAEA;
+    /* background with opacity */
+    background: rgba(244, 244, 244, 0.8);
+}

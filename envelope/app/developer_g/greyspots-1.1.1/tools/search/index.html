@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Grep Search</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script>
+            /*global console, doT, window, encodeHTML, evt*/
+            /*jslint white:true*/
+            var strCurrentFolder, strLastSearch, latestSearchAjax;
+            
+            function search(strFolder) {
+                'use strict';
+                var i, len, arrFolders = ['dev', 'web_root', 'sql', 'role'], buttonDev, buttonWebRoot, buttonSQL, buttonRole, strPattern, bolCaseSensitive, bolRegexp, strQueryString = GS.getQueryString(),
+                    functionMatchNumber = function (folderNumber) {
+                        document.getElementById(arrFolders[folderNumber] + '-matches').textContent = '(LOADING)';
+                        GS.ajaxJSON(arrFolders[folderNumber] === 'role' ? '/env/action_file' : '/v1/postage/action_file',
+                                                        'action=grep&folder=' + arrFolders[folderNumber] + '&path=' +
+                                                        '&pattern=' + encodeURIComponent(document.getElementById('input-search').value) +
+                                                        '&regexp=' + document.getElementById('checkbox-regex').value +
+                                                        '&case_sensitive=' + document.getElementById('checkbox-case').value,
+                                                        function (data, error) {
+                            var arrLines;
+                            
+                            if (!error) {
+                                arrLines = data.dat.split('\n');
+                                console.log(arrFolders[folderNumber], arrLines.length);
+                                document.getElementById(arrFolders[folderNumber] + '-matches').textContent = '(' + (arrLines.length - 1) + ')';
+                            } else {
+                                document.getElementById(arrFolders[folderNumber] + '-matches').textContent = '(ERROR)';
+                            }
+                        });
+                    };
+                
+                
+                
+                buttonDev     = document.getElementById('button-dev');
+                buttonWebRoot = document.getElementById('button-web_root');
+                buttonSQL     = document.getElementById('button-sql');
+                buttonRole    = document.getElementById('button-role');
+                strPattern       = document.getElementById('input-search').value;
+                bolCaseSensitive = document.getElementById('checkbox-case').value === 'true';
+                bolRegexp        = document.getElementById('checkbox-regex').value === 'true';
+                
+                buttonDev    .setAttribute('href', 'index.html?folder=dev&pattern=' + strPattern + '&case=' + bolCaseSensitive + '&regexp=' + bolRegexp);
+                buttonWebRoot.setAttribute('href', 'index.html?folder=web_root&pattern=' + strPattern + '&case=' + bolCaseSensitive + '&regexp=' + bolRegexp);
+                buttonSQL    .setAttribute('href', 'index.html?folder=sql&pattern=' + strPattern + '&case=' + bolCaseSensitive + '&regexp=' + bolRegexp);
+                buttonRole   .setAttribute('href', 'index.html?folder=role&pattern=' + strPattern + '&case=' + bolCaseSensitive + '&regexp=' + bolRegexp);
+                
+                strLastSearch = document.getElementById('input-search').value;
+                
+                if (document.getElementById('input-search').value) {
+                    for (i = 0, len = arrFolders.length; i < len; i += 1) {
+                        if (arrFolders[i] !== strFolder) {
+                            functionMatchNumber(i);
+                        }
+                    }
+                    
+                    GS.addLoader(document.getElementById('results-container'), 'Searching...');
+                    
+                    GS.ajaxJSON(strFolder === 'role' ? '/env/action_file' : '/v1/postage/action_file',
+                                                    'action=grep' +
+                                                    '&folder=' + strFolder +
+                                                    '&path=' +
+                                                    '&pattern=' + encodeURIComponent(document.getElementById('input-search').value) +
+                                                    '&regexp=' + document.getElementById('checkbox-regex').value +
+                                                    '&case_sensitive=' + document.getElementById('checkbox-case').value, function (data, error) {
+                        var strPattern       = document.getElementById('input-search').value,
+                            bolCaseSensitive = document.getElementById('checkbox-case').value === 'true',
+                            bolRegexp        = document.getElementById('checkbox-regex').value === 'true',
+                            html = '', i, len, arrLines, arrPaths = [], arrMatches = [],
+                            arrCurrentHref, arrCurrentLine, strCurrentPath, strCurrentLineNumber, strCurrentMatchLine;
+                        
+                        GS.removeLoader(document.getElementById('results-container'));
+                        
+                        GS.pushQueryString('pattern=' + encodeURIComponent(strPattern) +
+                                          '&case=' + encodeURIComponent(bolCaseSensitive) +
+                                          '&regexp=' + encodeURIComponent(bolRegexp));
+                        
+                        if (!error) {
+                            //html = encodeHTML(data).replace(/\n/g, '<br />');
+    
+                            if (typeof data.dat === 'object') {
+                                html = '';
+                            } else {
+                                arrLines = data.dat.split('\n');
+                                
+                                for (i = 0, len = arrLines.length; i < len; i += 1) {
+                                    if (arrLines[i].length > 0) {
+                                        arrCurrentLine = arrLines[i].split(':');
+                                        
+                                        strCurrentPath = arrCurrentLine.shift();
+                                        strCurrentLineNumber = arrCurrentLine.shift();
+                                        strCurrentMatchLine = arrCurrentLine.join(':');
+                                        
+                                        strCurrentPath = strCurrentPath.substring(strCurrentPath.indexOf('/') + 1);
+                                        
+                                        if (arrPaths.indexOf(strCurrentPath) === -1) {
+                                            arrPaths.push(strCurrentPath);
+                                            arrMatches.push('');
+                                        }
+                                        arrMatches[arrPaths.indexOf(strCurrentPath)] += '<b>line ' +
+                                            GS.rightPad(strCurrentLineNumber + ':', ' ', 5) +
+                                            '</b> ' + encodeHTML(strCurrentMatchLine.trim().substring(0, 2000)) + '<br/>';
+                                    }
+                                }
+                                
+                                for (i = 0, len = arrPaths.length; i < len; i += 1) {
+                                    if (strFolder === 'sql') {
+                                        arrCurrentHref = '/v1/dev/developer_g/greyspots-' + GS.version() + '/tools/postage/index.html?file=' + encodeURIComponent(arrPaths[i]) +
+                                            '&folder=' + strFolder +
+                                            '&pattern=' + encodeURIComponent(strPattern) +
+                                            '&case=' + encodeURIComponent(bolCaseSensitive) +
+                                            '&regexp=' + encodeURIComponent(bolRegexp);
+                                    } else {
+                                        arrCurrentHref = '/v1/dev/developer_g/greyspots-' + GS.version() + '/tools/file_manager/file_edit.html?link=' + encodeURIComponent(arrPaths[i]) +
+                                            '&folder=' + strFolder +
+                                            '&pattern=' + encodeURIComponent(strPattern) +
+                                            '&case=' + encodeURIComponent(bolCaseSensitive) +
+                                            '&regexp=' + encodeURIComponent(bolRegexp);
+                                    }
+                                    
+                                    html += '<div class="search-result">&nbsp;<a href="' + arrCurrentHref + '" target="_blank">' +
+                                        encodeHTML(arrPaths[i]) + '</a><br /><br /><pre>' + arrMatches[i] + '</pre>' +
+                                        '</div><br/>';
+                                }
+                            }
+                            
+                            //console.log(strFolder, arrLines.length);
+                            if (html) {
+                                document.getElementById(strFolder + '-matches').textContent = '(' + (arrLines.length -1) + ')';
+                            } else {
+                                document.getElementById(strFolder + '-matches').textContent = '(0)';
+                            }
+                            
+                            document.getElementById('results-container').innerHTML = (html || '<center>No Matches</center>');
+                            
+                            document.getElementById('button-dev').href          = 'index.html?' + GS.qrySetVal(strQueryString, 'folder=dev');
+                            document.getElementById('button-web_root').href     = 'index.html?' + GS.qrySetVal(strQueryString, 'folder=web_root');
+                            document.getElementById('button-sql').href          = 'index.html?' + GS.qrySetVal(strQueryString, 'folder=sql');
+                            document.getElementById('button-role').href         = 'index.html?' + GS.qrySetVal(strQueryString, 'folder=role');
+                            
+                        } else {
+                            //console.log(strFolder);
+                            GS.ajaxErrorDialog(data, function() {
+                                search(strFolder);
+                            });
+                        }
+                    });
+                }
+            }
+
+            function handleFolder(strFolder) {
+                var arrResults = xtag.query(document, '.search_result_scroll_container'),
+                    arrFolders = ['dev', 'web_root', 'sql', 'role'], i, len;
+                
+                GS.pushQueryString('folder=' + strFolder);
+                
+                for (i = 0, len = arrFolders.length; i < len; i += 1) {
+                    document.getElementById('button-' + arrFolders[i]).value = (arrFolders[i] === strFolder);
+                }
+                
+                strCurrentFolder = strFolder;
+            }
+
+            window.addEventListener('DOMContentLoaded', function (event) {
+                var i, len, strQueryString = GS.getQueryString(), strFolder;
+                
+                if (strQueryString) {
+                    if (GS.qryGetVal(strQueryString, 'pattern')) {
+                        document.getElementById('input-search').value = GS.qryGetVal(strQueryString, 'pattern');
+                    }
+                    if (GS.qryGetVal(strQueryString, 'case')) {
+                        document.getElementById('checkbox-case').value = GS.qryGetVal(strQueryString, 'case');
+                    }
+                    if (GS.qryGetVal(strQueryString, 'regexp')) {
+                        document.getElementById('checkbox-regex').value = GS.qryGetVal(strQueryString, 'regexp');
+                    }
+                    
+                    if (GS.qryGetVal(strQueryString, 'folder')) {
+                        strFolder = GS.qryGetVal(strQueryString, 'folder');
+                    }
+                    
+                    if (document.getElementById('input-search').value && strFolder) {
+                        search(strFolder);
+                    }
+                }
+                
+                document.getElementById('button-' + (strFolder || 'dev')).setAttribute('selected', '');
+                handleFolder(strFolder || 'dev');
+                
+                document.getElementById('input-search').addEventListener('change', function (event) {
+                    if (document.getElementById('input-search').value) {
+                        search(strCurrentFolder);
+                    }
+                });
+                
+                document.getElementById('input-search').addEventListener('keydown', function (event) {
+                    var intKeyCode = event.which || event.keyCode,
+                        strSearchInputValue = document.getElementById('input-search').value;
+                    
+                    if (intKeyCode === 13 && strSearchInputValue && strSearchInputValue === strLastSearch) {
+                        search(strCurrentFolder);
+                    }
+                });
+                
+                document.getElementById('input-search').focus();
+                
+                document.getElementById('checkbox-case').addEventListener('change', function (event) {
+                    if (document.getElementById('input-search').value) {
+                        search(strCurrentFolder);
+                    }
+                });
+                document.getElementById('checkbox-regex').addEventListener('change', function (event) {
+                    if (document.getElementById('input-search').value) {
+                        search(strCurrentFolder);
+                    }
+                });
+            });
+        </script>
+        <style>
+            #results-container {
+                height: 100%;
+                
+                overflow: auto;
+                
+                padding-top: 1em;
+                padding-bottom: 1em;
+                padding-right: 1em;
+                
+                word-break: break-all;
+                
+                box-sizing: border-box;
+                -o-box-sizing: border-box;
+                -ms-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+            }
+            .search-result pre {
+                width: 100%;
+                max-height: 200px;
+                
+                overflow-y: scroll;
+                
+                margin-left: 0.5em;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                
+                border: 1px solid #AAAAAA;
+                
+                text-align: left;
+                white-space: nowrap;
+                overflow-x: hidden;
+                text-overflow: ellipsis;
+            }
+        </style>
+    </head>
+    <body class="blue">
+        <gs-page>
+            <gs-header>
+                <center><h3>Grep Search</h3></center>
+                <label for="input-search">Search Text</label>
+                <gs-text id="input-search" placeholder="Search terms here..."></gs-text>
+                <br />
+                <gs-grid>
+                    <gs-block>
+                        <label for="checkbox-case">Match&nbsp;Case</label>
+                        <gs-checkbox id="checkbox-case"></gs-checkbox>
+                    </gs-block>
+                    <gs-block>
+                        <label for="checkbox-regex">RegExp</label>
+                        <gs-checkbox id="checkbox-regex"></gs-checkbox>
+                    </gs-block>
+                </gs-grid>
+                <br />
+                <gs-grid>
+                    <gs-block>
+                        <gs-button href="index.html?folder=dev" id="button-dev" remove-right target="_self">Apps<span id="dev-matches"></span></gs-button>
+                    </gs-block>
+                    <gs-block>
+                        <gs-button href="index.html?folder=web_root" id="button-web_root" remove-all target="_self">Public<span id="web_root-matches"></span></gs-button>
+                    </gs-block>
+                    <gs-block>
+                        <gs-button href="index.html?folder=sql" id="button-sql" remove-all target="_self">SQL<span id="sql-matches"></span></gs-button>
+                    </gs-block>
+                    <gs-block>
+                        <gs-button href="index.html?folder=role" id="button-role" remove-left target="_self">Role<span id="role-matches"></span></gs-button>
+                    </gs-block>
+                </gs-grid>
+            </gs-header>
+            <gs-body id="results-container"></gs-body>
+        </gs-page>
+    </body>
+</html>

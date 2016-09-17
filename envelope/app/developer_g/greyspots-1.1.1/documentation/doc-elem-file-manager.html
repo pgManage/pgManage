@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>File Manager Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">File Manager</h1>
+        </gs-jumbo>
+            
+        <gs-container padded min-width="sml;med;lrg;">
+            <h3 class="doc-header">Tag:</h3>
+            <pre>&lt;gs-file-manager path="..." folder="..."&gt;&lt;/gs-file-manager&gt;</pre>
+            
+            <h3 class="doc-header">Description:</h3>
+            <p>The file manager tag enables you to upload files, delete files, rename files and open the file editor for files. The file manager element requires two attributes: "path" and "folder". The "path" attribute is for defining what directory the element should edit. The "folder" attribute is for defining which folder the directory is in, valid values are: "role" (this is for user files), "dev" (this is for application files and developer files) and "web_root" (this is for public files, which are only developer editable).</p>
+            
+            <h1 class="doc-header">Examples:</h1>
+            <div class="doc-section">
+                <div class="doc-example-description">
+                    <span class="h3">Skeleton Example:</span>
+                    <p>A basic gs-file-manager element. This element will have the following behaviors:</p>
+                    <ol>
+                        <li>The element will load files from the "role" folder in the "/trusted_g/doc_example_1/" directory.</li>
+                        <li>When there are no files: instead of displaying a file list it will say "No Files".</li>
+                        <li>You will be able to upload a file by clicking the "New File" button.</li>
+                        <li>You will be able to delete a file by clicking the "X" button on one of the files in the file list.</li>
+                        <li>You will be able to rename a file or open the file editor by clicking the pencil icon button on one of the files in the file list.</li>
+                    </ol>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="20">
+                        <gs-file-manager path="/trusted_g/doc_example_1/" folder="role"></gs-file-manager>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "mini":</span>
+                    <p>The "mini" attribute removes the black border around the element.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="20">
+                        <gs-file-manager path="/trusted_g/doc_example_2/" folder="role" mini></gs-file-manager>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "qs":</span>
+                    <p>The "qs" attribute makes the element listen for changes in the query string. If the column that element listens for is in the query string then it will refresh when the query string changes. <b>Note:</b> The "path" attribute is templated by doT.js and the "qs" variable is a JSON equivalent of the query string.</p>
+                </div>
+                <gs-doc-example query-string="example_id=3">
+                    <template for="html" height="20">
+                        <gs-file-manager path="/trusted_g/doc_example_{{! qs.example_id }}/" folder="role" qs="example_id"></gs-file-manager>
+                    </template>
+                </gs-doc-example>
+            </div>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

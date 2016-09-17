@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Animate Style Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Dialog</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Function:</h3>
+            <pre><code>GS.animateStyle(&lt;ELEMENT&gt;, &lt;CSS-PROPERTY&gt;, &lt;PROPERTY-START-VALUE&gt;, &lt;PROPERTY-END-VALUE&gt;, &lt;CALLBACK&gt;, &lt;DURATION&gt;, &lt;NUMBER-OF-FRAMES&gt;);</code></pre>
+            
+            <h1 class="doc-header">Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">GS.animateStyle Example:</span><br />
+                <p>In this example we use GS.animateStyle to move a div to the left and the right. This function can be used to change more than CSS "left". A few examples of other things you can change are: "top", "right", "bottom", "width", "height" and "opacity".</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="13">
+                    <gs-button id="right-animate-button" onclick="testRightAnimate()">Animate Right</gs-button>
+                    <gs-button id="left-animate-button" onclick="testLeftAnimate()">Animate Left</gs-button>
+                    <br />
+                    <div bg-success style="position:relative;height:9em;">
+                        <div id="target" bg-primary style="position:absolute; height:9em; width:10%;"></div>
+                    </div>
+                </template>
+                <template for="js" height="30">
+                    function testRightAnimate() {
+                        disable();
+                        
+                        GS.animateStyle(document.getElementById('target'),
+                                        'left', '0%', '90%', function () {
+                            enable();
+                        }, 500, 25);
+                    }
+                    
+                    function testLeftAnimate() {
+                        disable();
+                        
+                        GS.animateStyle(document.getElementById('target'),
+                                        'left', '90%', '0%', function () {
+                            enable();
+                        }, 500, 25);
+                    }
+                    
+                    function disable() {
+                        document.getElementById('right-animate-button').setAttribute('disabled', '');
+                        document.getElementById('left-animate-button').setAttribute('disabled', '');
+                    }
+                    
+                    function enable() {
+                        document.getElementById('right-animate-button').removeAttribute('disabled');
+                        document.getElementById('left-animate-button').removeAttribute('disabled');
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

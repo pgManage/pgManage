@@ -1,0 +1,118 @@
+
+/* default styles */
+gs-form {
+    position: relative;
+    
+    /* make the form display like a div */
+    display: block;
+    
+    /* make scrolling work */
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    /* prevent text selection (this wont affect inputs and such) */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    
+    /* make widths and heights go from border to border not from content edge to content edge */
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+
+gs-form.error {
+    /* this is to make the error text not go up against the edge of the element */
+    padding: 1em;
+    
+    /* make slighty transparent */
+    opacity: 0.8;
+    
+    /* border */
+    /*border: 2px dashed #FF0000;
+    border: 2px dashed #FF4949;*/
+    border: 2px solid #000000;
+    
+    /* darker background color than default */
+    background-color: #E5E5E5;
+}
+
+gs-form.error:before {
+    display: inline-block;
+    
+    width: 1em;
+    height: 1em;
+    
+    background-color: #FF0000;
+    color: #FFFF00;
+    
+    margin-right: 0.5em;
+    padding: 1px;
+    
+    border-radius: 50%;
+    
+    text-align: center;
+    font-family: fontawesome;
+    content: '\f06a';
+}
+
+
+gs-form > .message {
+    display: inline-block;
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    
+    background-color: #FFFFFF;
+    border: 2px solid #AAAAAA;
+    opacity: 0.5;
+    z-index: 20;
+    pointer-events: none;
+}
+/*      this code was commented out because for some reason when the :before CSS was applied
+            it was causing an issue on firefox where the undo history was being cleared
+gs-form.saving {
+    position: relative;
+}
+
+gs-form.saving:before {
+    display: inline-block;
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    
+    content: 'Saving...';
+    
+    background-color: #FFFFFF;
+    border: 2px solid #AAAAAA;
+    opacity: 0.5;
+    z-index: 20;
+    pointer-events: none;
+}
+
+gs-form.waiting {
+    position: relative;
+}
+
+gs-form.waiting:before {
+    display: inline-block;
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    
+    white-space: pre-wrap;
+    content: 'Waiting\00000ato save...';
+    
+    background-color: #FFFFFF;
+    border: 2px solid #AAAAAA;
+    opacity: 0.5;
+    z-index: 20;
+    pointer-events: none;
+}*/

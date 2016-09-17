@@ -1,0 +1,26 @@
+gs-file-manager {
+    display: block;
+    border: 2px solid #000000;
+}
+
+gs-file-manager[mini] {
+    border: 0 none;
+}
+
+gs-file-manager > .root {
+    height: 100%;
+}
+
+gs-file-manager > .root > .file-manager-list {
+    min-height: 1.6em;
+    
+    overflow: auto;
+}
+
+gs-file-manager > .root > .file-manager-list .goto-file {
+    text-align: left;
+}
+
+gs-file-manager > .root > .file-manager-upload {
+    margin-top: 0.2em;
+}

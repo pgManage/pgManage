@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>keyCode Utility Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">keyCode Utilities</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Functions:</h3>
+            <pre><code>GS.keyCode(&lt;STRING-TO-GET-KEYCODE-FROM&gt;);
+GS.charFromKeyCode(&lt;EVENT&gt;);</code></pre>
+            
+            <h3>Description:</h3>
+            <p>
+                GS.keyCode is used so that you don't have to find out a keyCode in Javascript.<br />
+                GS.charFromKeyCode is the reverse.
+            </p>
+            
+            <b class="doc-header">Examples:</b>
+            <div class="doc-example-description">
+                <span class="h3">GS.keyCode Skeleton Example:</span><br />
+                <p>When you click the button the text of the first text control will be run through the GS.keyCode function and put in the second text control. Special values for the GS.keyCode function are: 'backspace', 'tab', 'enter', 'return', 'newline', 'shift', 'ctrl', 'alt', 'pause/break', 'caps lock', 'escape', 'space', 'page up', 'page down', 'end', 'home', 'left arrow', 'up arrow', 'right arrow', 'down arrow', 'insert', 'delete', 'left window key', 'right window key', 'select key', 'numpad 0', 'numpad 1', 'numpad 2', 'numpad 3', 'numpad 4', 'numpad 5', 'numpad 6', 'numpad 7', 'numpad 8', 'numpad 9', 'multiply', 'add', 'subtract', 'decimal point', 'divide', 'num lock', 'scroll lock', 'semi-colon', 'equal sign', 'comma', 'dash', 'period', 'forward slash', 'grave accent', 'open bracket', 'back slash', 'close bracket' and 'single quote'.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <gs-text id="text-string-to-translate" value="A"></gs-text>
+                    <gs-button onclick="testKeyCode()">Get Key Code</gs-button>
+                    <gs-text id="text-keycode"></gs-text>
+                </template>
+                <template for="js">
+                    function testKeyCode() {
+                        document.getElementById('text-keycode').value =
+                            GS.keyCode(document.getElementById('text-string-to-translate').value)
+                    }
+                </template>
+            </gs-doc-example>
+            <div class="doc-example-description">
+                <span class="h3">GS.charFromKeyCode Skeleton Example:</span><br />
+                <p>When you press a key in the first input, the second input will show you what key you pressed.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <gs-text id="text-input" onkeypress="charFromKeyCode()"></gs-text>
+                    <gs-text id="text-result"></gs-text>
+                </template>
+                <template for="js">
+                    function charFromKeyCode(event) {
+                        document.getElementById('text-result').value = GS.charFromKeyCode(event);
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

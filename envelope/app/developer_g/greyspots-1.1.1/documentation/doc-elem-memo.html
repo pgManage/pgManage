@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Memo Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Memo</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+                <h3 class="doc-header">Tag:</h3>
+                <pre><code>&lt;gs-memo&gt;&lt;/gs-memo&gt;</code></pre>
+                
+                <h3 class="doc-header">Description:</h3>
+                <div class="doc-section">
+                    <p>The purpose of a <code>&lt;gs-memo&gt;</code> control is to hold large amounts of text from the user.</p>
+                </div>
+                
+                <h1 class="doc-header">Examples:</h1>
+                <div class="doc-section">
+                    <div class="doc-example-description">
+                        <span class="h3">Skeleton Example:</span>
+                        <p>A basic <code>&lt;gs-memo&gt;</code> element. Without attributes the <code>&lt;gs-memo&gt;</code> control will have the following behaviors:</p>
+                        <ol>
+                            <li>You can resize the <code>&lt;gs-memo&gt;</code>.</li>
+                            <li>A scrollbar will appear when the text is longer then the <code>&lt;gs-memo&gt;</code>.</li>
+                        </ol>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html">
+                            <label for="con_example">Memo Example:</label>
+                            <gs-memo id="memo_example"></gs-memo>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[onchange=""]</code>:</span>
+                        <p>To run javascript when the value changes, use the <code>[onchange=""]</code> attribute.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="10">
+                            <label for="control_default">Change Alert:</label>
+                            <gs-memo id="control_default" onchange="alert('value changed')"></gs-memo>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[value=""]</code>:</span>
+                        <p>To set the default value for the <code>&lt;gs-memo&gt;</code>, use the <code>[value=""]</code> attribute.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="20">
+                            <label for="memo_default">Memo No Value:</label>
+                            <gs-memo id="memo_default"></gs-memo>
+                            <label for="memo_value">Memo With Value:</label>
+                            <gs-memo id="memo_value" value="testing"></gs-memo>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[qs=""]</code>:</span>
+                        <p>The <code>[qs=""]</code> attribute can be used to sync the <code>&lt;gs-memo&gt;</code> with the query string.</p>
+                    </div>
+                    <gs-doc-example query-string="test=testing321">
+                        <template for="html" height="15">
+                            <label for="memo_qs">Memo Query String:</label>
+                            <gs-memo id="memo_qs" qs="test"></gs-memo>
+                        </template>
+                    </gs-doc-example>
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[placeholder=""]</code>:</span>
+                        <p>The <code>[placeholder=""]</code> attribute can be used when you don't want to use a label to explain the purpose of the control to the user. (The label and the placeholder can be used together, that's just not what normally happens.)</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="25">
+                            <label for="memo_label">Label:</label>
+                            <gs-memo id="memo_label"></gs-memo>
+                            <label for="memo_placeholder_label">Placeholder And Label:</label>
+                            <gs-memo placeholder="Placeholder And Label" id="memo_placeholder_label"></gs-memo>
+                            <gs-memo placeholder="Placeholder" id="memo_placeholder"></gs-memo>
+                        </template>
+                    </gs-doc-example>
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[autoresize]</code>:</span>
+                        <p>Rather then manually resizing the <code>&lt;gs-memo&gt;</code> when the text gets too large, it can automatically resize itself when you use the <code>[autoresize]</code> attribute.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html">
+                            <label for="memo_auto">Autoresize:</label>
+                            <gs-memo autoresize id="memo_auto"></gs-memo>
+                        </template>
+                    </gs-doc-example>
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[no-resize-handle]</code>:</span>
+                        <p>When you use the <code>[no-resize-handle]</code> attribute, you can no longer resize the memo. When you use both the <code>[autoresize]</code> attribute, you typically also want <code>[no-resize-handle]</code>.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="20">
+                            <label for="memo_noresize">No Resize Handle:</label>
+                            <gs-memo no-resize-handle id="memo_noresize"></gs-memo>
+                            <label for="memo_auto">Auto:</label>
+                            <gs-memo autoresize no-resize-handle id="memo_auto"></gs-memo>
+                        </template>
+                    </gs-doc-example>
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[mini]</code>:</span>
+                        <p>Sometimes you are limited on space. The <code>[mini]</code> attribute can be used to make the <code>&lt;gs-memo&gt;</code> smaller.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html">
+                            <label for="memo_mini">Mini:</label>
+                            <gs-memo id="memo_mini" mini></gs-memo>
+                        </template>
+                    </gs-doc-example>
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[tabindex=""]</code>:</span>
+                        <p>With the <code>[tabindex=""]</code> attribute, you can control what order your controls are tabbed to.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="35">
+                            <label for="memo_1">1:</label>
+                            <gs-memo tabindex="1" id="memo_1"></gs-memo>
+                            <label for="memo_3">3:</label>
+                            <gs-memo tabindex="3" id="memo_3"></gs-memo>
+                            <label for="memo_2">2:</label>
+                            <gs-memo tabindex="2" id="memo_2"></gs-memo>
+                            <label for="memo_4">4:</label>
+                            <gs-memo tabindex="4" id="memo_4"></gs-memo>
+                        </template>
+                    </gs-doc-example>
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[disabled]</code>:</span>
+                        <p>With the <code>[disabled]</code> attribute, you can control whether or not you can use the control.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="20">
+                            <label for="date_disabled">Disabled:</label>
+                            <gs-memo disabled id="date_disabled"></gs-memo>
+                            <label for="date_enabled">Not Disabled:</label>
+                            <gs-memo id="date_enabled"></gs-memo>
+                        </template>
+                    </gs-doc-example>
+                </div>
+        </gs-container>
+    </body>
+</html>

@@ -1,0 +1,121 @@
+html.no-scroll-except-for-dialog,
+html.no-scroll-except-for-dialog > body,
+html.no-scroll-except-for-dialog > body > *:not(gs-dialog),
+html.no-scroll-except-for-dialog > body > *:not(gs-dialog) * {
+    overflow: hidden !important;
+}
+
+/* ################################################################## */
+/* ######################## DIALOG CONTAINER ######################## */
+/* ################################################################## */
+
+gs-dialog {
+    display: block;
+    
+    /*position: fixed;
+    left: 50%;
+    top: 8%;
+    
+    width: 70%;
+    height: 70%;*/
+    
+    /*position: relative;
+    margin: 0 auto;*/
+    
+    position: fixed;
+    top: 1%;
+    
+    border-radius: 0.25em;
+    
+    box-shadow: 0 0 0.5em 0.1em #C5C5C5;
+    
+    z-index: 100;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    
+    background-color: #F0F0F0;
+}
+
+
+/* ################################################################### */
+/* ###################### DIALOG PAGE CONTAINER ###################### */
+/* ################################################################### */
+/*
+gs-dialog > gs-page {
+    position: absolute;
+}
+*/
+
+/* ################################################################### */
+/* ########################## DIALOG THEMES ########################## */
+/* ################################################################### */
+
+/* ########################## */
+/* ## DEFAULT AND  REGULAR ## */
+/* ########################## */
+gs-dialog gs-header,
+gs-dialog.regular gs-header {
+    background-color: #F5F5F5;
+}
+
+gs-dialog gs-body,
+gs-dialog.regular gs-body {
+    background-color: #EEEEEE;
+}
+
+gs-dialog gs-footer,
+gs-dialog.regular gs-footer {
+    background-color: #F5F5F5;
+}
+
+/* ########################## */
+/* ########## INFO ########## */
+/* ########################## */
+gs-dialog.info gs-header {
+    background-color: #86C9F2;
+}
+
+gs-dialog.info gs-footer  {
+    background-color: #86C9F2;
+}
+
+/* ######################### */
+/* ######### ERROR ######### */
+/* ######################### */
+gs-dialog.error gs-header {
+    /*
+    background-color: #FF4949;
+    font-weight: 900;
+    color: #FFFFFF;
+    */
+	color:#a94442
+}
+/*
+gs-dialog.error gs-footer  {
+    background-color: #FF4949;
+}
+*/
+/* ################################################################## */
+/* ######################### DIALOG OVERLAY ######################### */
+/* ################################################################## */
+
+gs-dialog-overlay {
+    display: block;
+    
+    position: fixed;
+    left: 0;
+    top: 0;
+    
+    width: 100%;
+    height: 100%;
+    
+    background-color: #000000;
+    opacity: 0.4;
+    
+    z-index: 100;
+}
+

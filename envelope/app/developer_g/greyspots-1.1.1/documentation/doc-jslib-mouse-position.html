@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Mouse Position Normalizer Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Mouse Position Normalizer</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Function:</h3>
+            <pre><code>GS.mousePosition(&lt;EVENT-OBJECT&gt;);</code></pre>
+            
+            <h3>Description:</h3>
+            <div class="doc-section">
+                This function makes getting the mouse position work the same on touch and non-touch devices.
+            </div>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">Skeleton Example:</span><br />
+                <p>In this example we are updating the "mouse-position" div whenever a mousemove event is caught. We are also preventing default and stopping propagation on mousedown so that touch devices don't scroll in this example.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="2">
+                    <div id="mouse-position"></div>
+                </template>
+                <template for="js" height="16">
+                    window.addEventListener(evt.mousemove, function (event) {
+                        var jsnMousePos = GS.mousePosition(event);
+                        
+                        document.getElementById('mouse-position').innerHTML =
+                            'X: '     + jsnMousePos.x + '<br />' +
+                            'Y: '     + jsnMousePos.y + '<br />' +
+                            'Top: '   + jsnMousePos.top + '<br />' +
+                            'Left: '  + jsnMousePos.left + '<br />' +
+                            'Bottom: '+ jsnMousePos.bottom + '<br />' +
+                            'Right: ' + jsnMousePos.right;
+                    });
+                    window.addEventListener(evt.mousedown, function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    });
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

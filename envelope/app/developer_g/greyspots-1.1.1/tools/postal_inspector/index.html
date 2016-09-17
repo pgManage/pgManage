@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Postal Inspector</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script>
+            var currentID;
+            
+            function dialogUsersInGroup(intID) {
+                currentID = intID;
+                
+                GS.openDialog('users-in-group');
+            }
+            
+            function dialogViewsInGroup(intID) {
+                currentID = intID;
+                
+                GS.openDialog('views-in-group');
+            }
+            
+            function dialogFunctionsInGroup(intID) {
+                currentID = intID;
+                
+                GS.openDialog('functions-in-group');
+            }
+            
+            function dialogGroupsOnFunction(intID) {
+                currentID = intID;
+                
+                GS.openDialog('groups-on-function');
+            }
+            
+            function dialogGroupsOnUser(intID) {
+                currentID = intID;
+                
+                GS.openDialog('groups-on-user');
+            }
+            
+            function dialogGroupsOnView(intID) {
+                currentID = intID;
+                
+                GS.openDialog('groups-on-user');
+            }
+        </script>
+    </head>
+    <body>
+        <template id="users-in-group" data-mode="constrained">
+            <gs-page>
+                <gs-header><center><h3>Users In Group</h3></center></gs-header>
+                <gs-body>
+                    <gs-envelope where="roleid={{! currentID }}" src="(SELECT%20row_number()%20OVER%20(ORDER%20BY%20rolname)%20as%20id%2C%20rolname%2C%20has_group%2C%20roleid%0AFROM%20(SELECT%20rolname%2C%20min(has_group)%20as%20has_group%2C%20roleid%0A%20%20%20%20%20%20%20%20FROM%20(SELECT%20pg_roles.rolname%2C%200%20as%20has_group%2C%20roleid%0A%20%20%20%20%20%20%20%20%20%20%20%20FROM%20pg_auth_members%2Cpg_roles%20%0A%20%20WHERE%20rolcanlogin%0A%20%20%20%20%20%20%20%20%20%20%20%20UNION%0A%20%20%20%20%20%20%20%20%20%20%20%20SELECT%20pg_roles.rolname%2C%20-1%2C%20roleid%0A%20%20%20%20%20%20%20%20%20%20%20%20FROM%20pg_auth_members%20%0A%20%20%20%20%20%20%20%20%20%20%20%20LEFT%20JOIN%20pg_roles%20ON%20pg_roles.oid%20%3D%20pg_auth_members.member%0A%20%20WHERE%20rolcanlogin)%20em%09%09%20%20%20%0A%20%20%20%20%20%20%20%20GROUP%20BY%20rolname%2C%20roleid)%20ok%0AORDER%20BY%20rolname)%20ema" no-hudorderby no-hudlimit no-huddelete no-hudrefresh>
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td heading="Role Name">{{! row.rolname }}</td>
+                                        <td heading="Has Group">{{= (String(row.has_group) === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </gs-body>
+                <gs-footer>
+                    <gs-button dialogclose>Done</gs-button>
+                </gs-footer>
+            </gs-page>
+        </template>
+        
+        <template id="views-in-group" data-mode="constrained" data-max-width="1000px">
+            <gs-page>
+                <gs-header><center><h3>Views In Group</h3></center></gs-header>
+                <gs-body>
+                    <gs-envelope src="(SELECT pg_class.oid as id, pg_namespace.nspname || '.' || pg_class.relname as relname, has_table_privilege( pg_roles.oid, pg_class.oid, 'select') as has_select, has_table_privilege( pg_roles.oid, pg_class.oid, 'update') as has_update, has_table_privilege( pg_roles.oid, pg_class.oid, 'insert') as has_insert, has_table_privilege( pg_roles.oid, pg_class.oid, 'delete') as has_delete, has_table_privilege( pg_roles.oid, pg_class.oid, 'trigger') as has_trigger, has_table_privilege( pg_roles.oid, pg_class.oid, 'references') as has_references, has_table_privilege( pg_roles.oid, pg_class.oid, 'truncate') as has_truncate FROM pg_roles, pg_class LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace WHERE pg_class.relkind = 'v' {{! String(currentID) !== '0' ? ' AND pg_roles.oid=' + currentID : '' }}) ema" ord="relname ASC" no-hudorderby no-hudlimit no-huddelete no-hudrefresh action-select="postage/action_select">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td heading="View Name">{{! row.relname }}</td>
+                                        <td heading="Select">{{= (row.has_select === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Insert">{{= (row.has_insert === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Update">{{= (row.has_update === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Delete">{{= (row.has_delete === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Trig">{{= (row.has_trigger === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Refs">{{= (row.has_references === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Trunc">{{= (row.has_truncate === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </gs-body>
+                <gs-footer>
+                    <gs-button dialogclose>Done</gs-button>
+                </gs-footer>
+            </gs-page>
+        </template>
+        
+        <template id="functions-in-group" data-mode="constrained">
+            <gs-page>
+                <gs-header><center><h3>Functions In Group</h3></center></gs-header>
+                <gs-body>
+                    <gs-envelope src="(SELECT%20oid%20AS%20id%2C%20func_name%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20(CASE%20WHEN%20has_function_privilege({{! currentID }}%3A%3Aoid%2C%20func_name%2C%20'EXECUTE')%20%20THEN%20'-1'%20ELSE%20'0'%20END)%20AS%20has_execute%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20FROM%20(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20SELECT%20pg_proc.oid%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20pg_namespace.nspname%20%7C%7C%20'.'%20%7C%7C%20pg_proc.proname%20%7C%7C%20'('%20%7C%7C%20COALESCE(oidvectortypes(proargtypes)%2C%20'')%20%7C%7C%20')'%20as%20func_name%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20FROM%20pg_proc%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20LEFT%20JOIN%20pg_type%20ON%20pg_type.oid%20%3D%20pg_proc.prorettype%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20LEFT%20JOIN%20pg_namespace%20ON%20pg_namespace.oid%20%3D%20pg_proc.pronamespace%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20WHERE%20pg_namespace.nspname%20!%3D%20'pg_catalog'%20AND%20pg_proc.proisagg%20%3D%20FALSE%20AND%20typname%20%3C%3E%20'trigger'%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20AND%20NOT%20has_function_privilege('public'%2C%20pg_proc.oid%2C%20'EXECUTE')%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20ORDER%20BY%202)%20em)%20ema" no-hudorderby no-hudlimit no-huddelete no-hudrefresh action-select="postage/action_select">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td heading="Function Name">{{! row.func_name }}</td>
+                                        <td heading="Has EXECUTE">{{= (String(row.has_execute) === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </gs-body>
+                <gs-footer>
+                    <gs-button dialogclose>Done</gs-button>
+                </gs-footer>
+            </gs-page>
+        </template>
+        
+        <template id="groups-on-function" data-mode="constrained">
+            <gs-page>
+                <gs-header><center><h3>Groups On Function</h3></center></gs-header>
+                <gs-body>
+                    <gs-envelope src="(SELECT%20*%20FROM%20(%0ASELECT%20rank()%20OVER%20(ORDER%20BY%20rolname)%20AS%20id%2C%20oid%2C%20rolname%2C%20min(has_execute)%20as%20has_execute%2C%20foid%0AFROM%20(SELECT%20oid%2C%20rolname%2C%200%20as%20has_execute%2C%20foid%20FROM%20pg_roles%2C%20(SELECT%20oid%20as%20foid%20FROM%20pg_proc)%20foidlist%20WHERE%20NOT%20pg_roles.rolcanlogin%20UNION%20%0A%20%20%20%20SELECT%20pg_roles.oid%2C%20pg_roles.rolname%2C%20CASE%20WHEN%20procacl.has_execute%20THEN%20-1%20ELSE%200%20END%20as%20has_execute%2C%20procacl.oid%20as%20foid%0A%20%20%20%20FROM%20(SELECT%20DISTINCT%20oid%2C%20CASE%20WHEN%20acl%3A%3Atext%20~%20'%5E%3D'%3A%3Atext%20THEN%20'public'%20%0A%20%20%20%20%09%20%20%20%20%20%20%20ELSE%20substr(acl%3A%3Atext%2C%200%2C%20position('%3D'%20in%20acl%3A%3Atext))%20END%20as%20rolname%2C%0A%20%20%20%20%09%20%20%20%20%20%20substr(acl%3A%3Atext%2C%20position('%3D'%20in%20acl%3A%3Atext)%2B1%2C%20position('%2F'%20in%20acl%3A%3Atext)-position('%3D'%20in%20acl%3A%3Atext)-1)%20~%20'X'%20as%20has_execute%0A%20%20%20%20%09%20%20%20%20%20%20%0A%20%20%20%20%20%20%20%20%20%20FROM%20(SELECT%20unnest(proacl)%20as%20acl%2C%20oid%20FROM%20pg_proc)%20proc%20)%20procacl%0A%20%20%20%20LEFT%20JOIN%20pg_roles%20ON%20procacl.rolname%20%3D%20pg_roles.rolname%0A%20%20%20%20WHERE%20NOT%20pg_roles.rolcanlogin)%20em%0AGROUP%20BY%20oid%2C%20rolname%2C%20foid%20)%20ok%0AORDER%20BY%20rolname)%20ema" where="foid={{! currentID }}" no-hudorderby no-hudlimit no-huddelete no-hudrefresh action-select="postage/action_select">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td heading="Group Name">{{! row.rolname }}</td>
+                                        <td heading="Has Execute">{{= (String(row.has_execute) === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </gs-body>
+                <gs-footer>
+                    <gs-button dialogclose>Done</gs-button>
+                </gs-footer>
+            </gs-page>
+        </template>
+        
+        <template id="groups-on-user" data-mode="constrained">
+            <gs-page>
+                <gs-header><center><h3>Groups On User</h3></center></gs-header>
+                <gs-body>
+                    <gs-envelope src="(SELECT%20oid%20AS%20id%2C%20rolname%2C%20(CASE%20WHEN%20member%20IS%20NULL%20THEN%20'0'%20ELSE%20'-1'%20END)%20AS%20has_grp%0A%20%20FROM%20(SELECT%20grp.oid%2C%20grp.rolname%2C%20pgam.member%0A%09%09%20%20FROM%20(SELECT%20oid%2C%20rolname%0A%09%09%20%20%20%20%20%20%20%20%20%20FROM%20pg_roles%0A%09%09%20%20%20%20%20%20%20%20%20%20WHERE%20NOT%20pg_roles.rolcanlogin)%20grp%0A%20%20LEFT%20JOIN%20(SELECT%20roleid%2C%20member%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20FROM%20pg_auth_members%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20WHERE%20member%20%3D%20{{! currentID }})%20pgam%20ON%20grp.oid%20%3D%20pgam.roleid%0A%20%20ORDER%20BY%20grp.rolname%20ASC)%20em)%20ema" no-hudorderby no-hudlimit no-huddelete no-hudrefresh action-select="postage/action_select">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td heading="Group Name">{{! row.rolname }}</td>
+                                        <td heading="Has Group">{{= (String(row.has_grp) === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </gs-body>
+                <gs-footer>
+                    <gs-button dialogclose>Done</gs-button>
+                </gs-footer>
+            </gs-page>
+        </template>
+        
+        <template id="groups-on-user" data-mode="constrained" data-max-width="1000px">
+            <gs-page>
+                <gs-header><center><h3>Groups On User</h3></center></gs-header>
+                <gs-body>
+                    <gs-envelope src="(SELECT%20oid%20AS%20id%2C%20rolname%2C%20has_select%2C%20has_update%2C%20has_insert%2C%20has_delete%2C%20has_trigger%2C%20has_references%2C%20has_truncate%0A%09%20FROM%20(SELECT%20grp.*%2C%20view_grps.has_select%2C%20view_grps.has_update%2C%20view_grps.has_insert%2C%20view_grps.has_delete%2C%0A%09%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20view_grps.has_trigger%2C%20view_grps.has_references%2C%20view_grps.has_truncate%0A%09%20FROM%20(SELECT%20oid%2C%20rolname%20FROM%20pg_roles%20WHERE%20NOT%20pg_roles.rolcanlogin)%20grp%0A%09%20LEFT%20JOIN%20(SELECT%20CASE%20WHEN%20acl%3A%3Atext%20~%20'%5E%3D'%3A%3Atext%20THEN%20'public'%20ELSE%20substr(acl%3A%3Atext%2C%200%2C%20position('%3D'%20in%20acl%3A%3Atext))%20END%20as%20rolname%2C%0A%09%20%09substr(acl%3A%3Atext%2C%20position('%3D'%20in%20acl%3A%3Atext)%20%2B%201%2C%20position('%2F'%20in%20acl%3A%3Atext)%20-%20position('%3D'%20in%20acl%3A%3Atext)-1)%20~%20'r'%20as%20has_select%2C%0A%09%20%09substr(acl%3A%3Atext%2C%20position('%3D'%20in%20acl%3A%3Atext)%20%2B%201%2C%20position('%2F'%20in%20acl%3A%3Atext)%20-%20position('%3D'%20in%20acl%3A%3Atext)-1)%20~%20'w'%20as%20has_update%2C%0A%09%20%09substr(acl%3A%3Atext%2C%20position('%3D'%20in%20acl%3A%3Atext)%20%2B%201%2C%20position('%2F'%20in%20acl%3A%3Atext)%20-%20position('%3D'%20in%20acl%3A%3Atext)-1)%20~%20'a'%20as%20has_insert%2C%0A%09%20%09substr(acl%3A%3Atext%2C%20position('%3D'%20in%20acl%3A%3Atext)%20%2B%201%2C%20position('%2F'%20in%20acl%3A%3Atext)%20-%20position('%3D'%20in%20acl%3A%3Atext)-1)%20~%20'd'%20as%20has_delete%2C%0A%09%20%09substr(acl%3A%3Atext%2C%20position('%3D'%20in%20acl%3A%3Atext)%20%2B%201%2C%20position('%2F'%20in%20acl%3A%3Atext)%20-%20position('%3D'%20in%20acl%3A%3Atext)-1)%20~%20't'%20as%20has_trigger%2C%0A%09%20%09substr(acl%3A%3Atext%2C%20position('%3D'%20in%20acl%3A%3Atext)%20%2B%201%2C%20position('%2F'%20in%20acl%3A%3Atext)%20-%20position('%3D'%20in%20acl%3A%3Atext)-1)%20~%20'x'%20as%20has_references%2C%0A%09%20%09substr(acl%3A%3Atext%2C%20position('%3D'%20in%20acl%3A%3Atext)%20%2B%201%2C%20position('%2F'%20in%20acl%3A%3Atext)%20-%20position('%3D'%20in%20acl%3A%3Atext)-1)%20~%20'D'%20as%20has_truncate%0A%09%09FROM%20(SELECT%20unnest(relacl)%20as%20acl%0A%09%09%09%20%20FROM%20pg_class%0A%09%20%20%20%20%20%20%20%20%20%20WHERE%20pg_class.oid%20%3D%20{{! currentID }})%20pgc)%20view_grps%20ON%20grp.rolname%20%3D%20view_grps.rolname%0A%20%20%20%20%20%20%20%20ORDER%20BY%20grp.rolname)%20em)%20ema" no-hudorderby no-hudlimit no-huddelete no-hudrefresh action-select="postage/action_select">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td heading="Group Name">{{! row.rolname }}</td>
+                                        <td heading="Select">{{= (row.has_select === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Insert">{{= (row.has_insert === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Update">{{= (row.has_update === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Delete">{{= (row.has_delete === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Trig">{{= (row.has_trigger === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Refs">{{= (row.has_references === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                        <td heading="Trunc">{{= (row.has_truncate === 't' ? '<b>YES</b>' : 'NO') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </gs-body>
+                <gs-footer>
+                    <gs-button dialogclose>Done</gs-button>
+                </gs-footer>
+            </gs-page>
+        </template>
+        
+        <gs-panel id="panel">
+            <gs-page id="left-bar" style="width: 17em;">
+                <gs-body padded>
+                    Inspect:
+                    <gs-optionbox onchange="GS.pushQueryString('panel.left-bar=hide&page=' + this.value);">
+                        <gs-option value="groups">Groups</gs-option>
+                        <gs-option value="non-public-functions">Non-Public Functions</gs-option>
+                        <gs-option value="public-functions">Public Functions</gs-option>
+                        <gs-option value="users">Users</gs-option>
+                        <gs-option value="views">Views</gs-option>
+                    </gs-optionbox>
+                </gs-body>
+            </gs-page>
+            <gs-switch value="{{! qs.page || 'groups' }}" refresh-on-querystring-values="page">
+                <template for="groups">
+                    <gs-page>
+                        <gs-header flex-horizontal>
+                            <gs-button onclick="GS.pushQueryString('panel.left-bar=show')" icononly icon="arrow-right" hide-on-desktop></gs-button>
+                            <h3 flex>Group Inspector</h3>
+                        </gs-header>
+                        <gs-body>
+                            <gs-envelope id="group-perms" src="(SELECT%20pg_roles.oid%20as%20id%2C%20pg_roles.rolname%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20CASE%20WHEN%20sum(%20CASE%20WHEN%20has_table_privilege('public'%3A%3Aname%2C%20view_list.oid%2C%20'SELECT'%3A%3Atext)%20%0A%09%09%09%09%09%20AND%20view_list.relacl%20~%20pg_roles.rolname%3A%3Atext%20THEN%201%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20ELSE%200%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20END)%20%3E%200%20%0A%20%20%20%20%20%20%20%20%20%20%20%20THEN%20sum(%20CASE%20WHEN%20has_table_privilege('public'%3A%3Aname%2C%20view_list.oid%2C%20'SELECT'%3A%3Atext)%20AND%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20view_list.relacl%20~%20pg_roles.rolname%3A%3Atext%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20THEN%201%20ELSE%200%20END)%3A%3Atext%20%7C%7C%20'%20Views%20with%20'%20%7C%7C%20pg_roles.rolname%20%7C%7C%20'%20and%20Public'%20%0A%20%20%20%20%20%20%20%20%20%20%20%20ELSE%20'ok'%20END%20AS%20public_warn%20%0A%20%20FROM%20pg_roles%2C%20%0A%20%20%20%20%20%20%20(SELECT%20pg_class.oid%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20(pg_namespace.nspname%3A%3Atext%20%7C%7C%20'.'%3A%3Atext)%20%7C%7C%20pg_class.relname%3A%3Atext%20AS%20nspname%2C%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20pg_class.relacl%3A%3Atext%20AS%20relacl%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20FROM%20pg_class%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20LEFT%20JOIN%20pg_namespace%20ON%20pg_namespace.oid%20%3D%20pg_class.relnamespace%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20WHERE%20(pg_namespace.nspname%20%3C%3E%20ALL%20(ARRAY%5B'pg_toast'%3A%3Aname%2C%20'pg_catalog'%3A%3Aname%2C%20'information_schema'%3A%3Aname%5D))%20%0A%09%09%09%20%20%20AND%20pg_class.relkind%20%3D%20'v'%3A%3A%22char%22)%20view_list%20%0A%20WHERE%20NOT%20rolcanlogin%20%0A%20%20%20%20%20%20%20%20%20%20GROUP%20BY%20pg_roles.oid%2C%20pg_roles.rolname%20%0AUNION%20ALL%20%0ASELECT%200%20AS%20oid%2C%20'public'%3A%3Aname%2C%20''%3A%3Atext%20%20%0AORDER%20BY%202)%20ema" no-hudorderby no-hudlimit no-huddelete action-select="postage/action_select">
+                                <template for="table">
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td heading="Role Name">{{! row.rolname }}</td>
+                                                <td heading="Views w/Public">{{! row.public_warn }}</td>
+                                                <td><gs-button mini onclick="dialogUsersInGroup({{! row.id }})">Users</gs-button></td>
+                                                <td><gs-button mini onclick="dialogViewsInGroup({{! row.id }})">Views</gs-button></td>
+                                                <td><gs-button mini onclick="dialogFunctionsInGroup({{! row.id }})">Functions</gs-button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </template>
+                            </gs-envelope>
+                        </gs-body>
+                    </gs-page>
+                </template>
+                <template for="non-public-functions">
+                    <gs-page>
+                        <gs-header flex-horizontal>
+                            <gs-button onclick="GS.pushQueryString('panel.left-bar=show')" icononly icon="arrow-right" hide-on-desktop></gs-button>
+                            <h3 flex>Non-Public Functions</h3>
+                        </gs-header>
+                        <gs-body>
+                            <gs-envelope src="(SELECT%20pg_proc.oid%20as%20id%2C%0A%20%20%20%20((((pg_namespace.nspname%3A%3Atext%20%7C%7C%20'.'%3A%3Atext)%20%7C%7C%20pg_proc.proname%3A%3Atext)%20%7C%7C%20'('%3A%3Atext)%20%7C%7C%20%0A%09%09oidvectortypes(pg_proc.proargtypes))%20%7C%7C%20')'%3A%3Atext%20AS%20name%2C%20%0A%20%20%20%20CASE%20WHEN%20pg_proc.prosecdef%20THEN%20'-1'%20ELSE%20'0'%20END%20AS%20chk_secdef%0A%20%20%20FROM%20pg_proc%20%0A%20%20%20LEFT%20JOIN%20pg_type%20ON%20pg_type.oid%20%3D%20pg_proc.prorettype%20%0A%20%20%20LEFT%20JOIN%20pg_namespace%20ON%20pg_namespace.oid%20%3D%20pg_proc.pronamespace%20%0A%20%20WHERE%20pg_namespace.nspname%20%3C%3E%20'pg_catalog'%3A%3Aname%20AND%20pg_proc.proisagg%20%3D%20false%20%0A%20%20%20%20AND%20pg_type.typname%20%3C%3E%20'trigger'%3A%3Aname%20%0A%09AND%20NOT%20has_function_privilege('public'%3A%3Aname%2C%20pg_proc.oid%2C%20'EXECUTE'%3A%3Atext)%20%0A%20%20ORDER%20BY%20prosecdef%20DESC%2C%20((((pg_namespace.nspname%3A%3Atext%20%7C%7C%20'.'%3A%3Atext)%20%7C%7C%20pg_proc.proname%3A%3Atext)%20%7C%7C%20%0A%20%20%20%20%20%20%20%20%20%20%20'('%3A%3Atext)%20%7C%7C%20oidvectortypes(pg_proc.proargtypes))%20%7C%7C%20')'%3A%3Atext)%20ema" no-huddelete no-hudlimit no-hudorderby action-select="postage/action_select">
+                                <template for="table">
+                                    <table>
+                                        <tbody>
+                                            <tr data-chk_secdef="{{! row.chk_secdef }}">
+                                                <td heading="Function Name">{{! row.name }}</td>
+                                                <td heading="SecDef">{{= (row.chk_secdef === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                                <td><gs-button mini onclick="dialogGroupsOnFunction({{! row.id }})">Groups</gs-button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </template>
+                            </gs-envelope>
+                        </gs-body>
+                    </gs-page>
+                </template>
+                <template for="public-functions">
+                    <gs-page>
+                        <gs-header flex-horizontal>
+                            <gs-button onclick="GS.pushQueryString('panel.left-bar=show')" icononly icon="arrow-right" hide-on-desktop></gs-button>
+                            <h3 flex>Public Functions</h3>
+                        </gs-header>
+                        <gs-body>
+                            <gs-envelope src="(SELECT%20pg_proc.oid%20as%20id%2C%20%0A%20%20%20%20((((pg_namespace.nspname%3A%3Atext%20%7C%7C%20'.'%3A%3Atext)%20%7C%7C%20pg_proc.proname%3A%3Atext)%20%7C%7C%20'('%3A%3Atext)%20%7C%7C%20%0A%09%20%20%20%20oidvectortypes(pg_proc.proargtypes))%20%7C%7C%20')'%3A%3Atext%20AS%20name%2C%0A%20%20%20%20CASE%20WHEN%20pg_proc.prosecdef%20THEN%20'-1'%20ELSE%20'0'%20END%20AS%20chk_secdef%0A%20%20%20FROM%20pg_proc%20%0A%20%20%20LEFT%20JOIN%20pg_type%20ON%20pg_type.oid%20%3D%20pg_proc.prorettype%20%0A%20%20%20LEFT%20JOIN%20pg_namespace%20ON%20pg_namespace.oid%20%3D%20pg_proc.pronamespace%20%0A%20%20WHERE%20pg_namespace.nspname%20!~%20'pg_catalog%7Cinformation_schema'%3A%3Atext%20AND%20pg_proc.proisagg%20%3D%20false%20%0A%20%20%20%20AND%20pg_type.typname%20%3C%3E%20'trigger'%3A%3Aname%20%0A%09AND%20has_function_privilege('public'%3A%3Aname%2C%20pg_proc.oid%2C%20'EXECUTE'%3A%3Atext)%20%0A%20%20ORDER%20BY%20prosecdef%20DESC%2C%20((((pg_namespace.nspname%3A%3Atext%20%7C%7C%20'.'%3A%3Atext)%20%7C%7C%20pg_proc.proname%3A%3Atext)%20%7C%7C%20%0A%20%20%20%20%20%20%20%20%20%20%20'('%3A%3Atext)%20%7C%7C%20oidvectortypes(pg_proc.proargtypes))%20%7C%7C%20')'%3A%3Atext)%20ema" no-hudorderby no-hudlimit no-huddelete action-select="postage/action_select">
+                                <template for="table">
+                                    <table>
+                                        <tbody>
+                                            <tr data-chk_secdef="{{! row.chk_secdef }}">
+                                                <td heading="Function Name">{{! row.name }}</td>
+                                                <td heading="SecDef">{{= (row.chk_secdef === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                                <td><gs-button mini onclick="dialogGroupsOnFunction({{! row.id }})">Groups</gs-button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </template>
+                            </gs-envelope>
+                        </gs-body>
+                    </gs-page>
+                </template>
+                <template for="users">
+                    <gs-page>
+                        <gs-header flex-horizontal>
+                            <gs-button onclick="GS.pushQueryString('panel.left-bar=show')" icononly icon="arrow-right" hide-on-desktop></gs-button>
+                            <h3 flex>Users</h3>
+                        </gs-header>
+                        <gs-body>
+                            <gs-envelope src="(SELECT%20pg_roles.oid%20AS%20id%2C%20pg_roles.rolname%0A%20%20%20FROM%20pg_roles%0A%20%20WHERE%20pg_roles.rolcanlogin%0A%20%20ORDER%20BY%20pg_roles.rolname)%20ema" no-hudorderby no-hudlimit no-huddelete action-select="postage/action_select">
+                                <template for="table">
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td heading="Role Name">{{! row.rolname }}</td>
+                                                <td><gs-button mini onclick="dialogGroupsOnUser({{! row.id }})">Groups</gs-button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </template>
+                            </gs-envelope>
+                        </gs-body>
+                    </gs-page>
+                </template>
+                <template for="views">
+                    <gs-page>
+                        <gs-header flex-horizontal>
+                            <gs-button onclick="GS.pushQueryString('panel.left-bar=show')" icononly icon="arrow-right" hide-on-desktop></gs-button>
+                            <h3 flex>Views</h3>
+                        </gs-header>
+                        <gs-body>
+                            <gs-envelope src="(SELECT%20pg_class.oid%20AS%20id%2C%20%0A%20%20%20%20(pg_namespace.nspname%3A%3Atext%20%7C%7C%20'.'%3A%3Atext)%20%7C%7C%20pg_class.relname%3A%3Atext%20AS%20viewname%2C%20%0A%20%20%20%20%20%20%20%20CASE%0A%20%20%20%20%20%20%20%20%20%20%20%20WHEN%20has_table_privilege('public'%3A%3Aname%2C%20(pg_namespace.nspname%3A%3Atext%20%7C%7C%20%0A%09%09%09%20%20%20%20%20'.'%3A%3Atext)%20%7C%7C%20pg_class.relname%3A%3Atext%2C%20'SELECT'%3A%3Atext)%20THEN%20'-1'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20%20%20%20%20ELSE%20'0'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20END%20AS%20public_select%2C%20%0A%20%20%20%20%20%20%20%20CASE%20%0A%20%20%20%20%20%20%20%20%20%20%20%20WHEN%20has_table_privilege('public'%3A%3Aname%2C%20(pg_namespace.nspname%3A%3Atext%20%7C%7C%20%0A%09%09%09%20%20%20%20%20'.'%3A%3Atext)%20%7C%7C%20pg_class.relname%3A%3Atext%2C%20'INSERT'%3A%3Atext)%20THEN%20'-1'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20%20%20%20%20ELSE%20'0'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20END%20AS%20public_insert%2C%20%0A%20%20%20%20%20%20%20%20CASE%20%0A%20%20%20%20%20%20%20%20%20%20%20%20WHEN%20has_table_privilege('public'%3A%3Aname%2C%20(pg_namespace.nspname%3A%3Atext%20%7C%7C%20%0A%09%09%09%20%20%20%20%20'.'%3A%3Atext)%20%7C%7C%20pg_class.relname%3A%3Atext%2C%20'UPDATE'%3A%3Atext)%20THEN%20'-1'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20%20%20%20%20ELSE%20'0'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20END%20AS%20public_update%2C%20%0A%20%20%20%20%20%20%20%20CASE%20%0A%20%20%20%20%20%20%20%20%20%20%20%20WHEN%20has_table_privilege('public'%3A%3Aname%2C%20(pg_namespace.nspname%3A%3Atext%20%7C%7C%20%0A%09%09%09%20%20%20%20%20'.'%3A%3Atext)%20%7C%7C%20pg_class.relname%3A%3Atext%2C%20'DELETE'%3A%3Atext)%20THEN%20'-1'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20%20%20%20%20ELSE%20'0'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20END%20AS%20public_delete%2C%20%0A%20%20%20%20%20%20%20%20CASE%20%0A%20%20%20%20%20%20%20%20%20%20%20%20WHEN%20has_table_privilege('public'%3A%3Aname%2C%20(pg_namespace.nspname%3A%3Atext%20%7C%7C%20%0A%09%09%09%20%20%20%20%20'.'%3A%3Atext)%20%7C%7C%20pg_class.relname%3A%3Atext%2C%20'TRIGGER'%3A%3Atext)%20THEN%20'-1'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20%20%20%20%20ELSE%20'0'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20END%20AS%20public_trigger%2C%20%0A%20%20%20%20%20%20%20%20CASE%20%0A%20%20%20%20%20%20%20%20%20%20%20%20WHEN%20has_table_privilege('public'%3A%3Aname%2C%20(pg_namespace.nspname%3A%3Atext%20%7C%7C%20%0A%09%09%09%20%20%20%20%20'.'%3A%3Atext)%20%7C%7C%20pg_class.relname%3A%3Atext%2C%20'REFERENCES'%3A%3Atext)%20THEN%20'-1'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20%20%20%20%20ELSE%20'0'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20END%20AS%20public_references%2C%20%0A%20%20%20%20%20%20%20%20CASE%20%0A%20%20%20%20%20%20%20%20%20%20%20%20WHEN%20has_table_privilege('public'%3A%3Aname%2C%20(pg_namespace.nspname%3A%3Atext%20%7C%7C%20%0A%09%09%09%20%20%20%20%20'.'%3A%3Atext)%20%7C%7C%20pg_class.relname%3A%3Atext%2C%20'TRUNCATE'%3A%3Atext)%20THEN%20'-1'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20%20%20%20%20ELSE%20'0'%3A%3Atext%20%0A%20%20%20%20%20%20%20%20END%20AS%20public_truncate%0A%20%20%20FROM%20pg_class%20%0A%20%20%20LEFT%20JOIN%20pg_namespace%20ON%20pg_namespace.oid%20%3D%20pg_class.relnamespace%20%0A%20%20WHERE%20(pg_namespace.nspname%20%3C%3E%20ALL%20(ARRAY%5B'pg_toast'%3A%3Aname%2C%20'pg_catalog'%3A%3Aname%2C%20'information_schema'%3A%3Aname%5D))%20%0A%20%20%20%20AND%20pg_class.relkind%20%3D%20'v'%3A%3A%22char%22%20AND%20pg_class.relpersistence%20!%3D%20't'%3A%3A%22char%22%20%0A%20%20ORDER%20BY%20(pg_namespace.nspname%3A%3Atext%20%7C%7C%20'.'%3A%3Atext)%20%7C%7C%20pg_class.relname%3A%3Atext)%20ema" no-hudorderby no-hudlimit no-huddelete action-select="postage/action_select">
+                                <template for="table">
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td heading="View Name">{{! row.viewname }}</td>
+                                                <td heading="Public Select">{{= (row.public_select === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                                <td heading="Public Insert">{{= (row.public_insert === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                                <td heading="Public Update">{{= (row.public_update === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                                <td heading="Public Delete">{{= (row.public_delete === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                                <td heading="Public Trigger">{{= (row.public_trigger === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                                <td heading="Public Reference">{{= (row.public_references === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                                <td heading="Public Truncate">{{= (row.public_truncate === '-1' ? '<b>YES</b>' : 'NO') }}</td>
+                                                <td><gs-button mini onclick="dialogGroupsOnView({{= row.id }})">Groups</gs-button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </template>
+                            </gs-envelope>
+                        </gs-body>
+                    </gs-page>
+                </template>
+            </gs-switch>
+        </gs-panel>
+    </body>
+</html>

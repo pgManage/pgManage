@@ -1,0 +1,45 @@
+/*
+    
+    ################# THEMING #################
+    
+    we have two themes:
+        the production (green) theme (default) and
+        the developer (blue) theme
+    
+    here are the colors:
+        green
+            light background color: #E9F1E9
+            border color and text color: #168216
+        blue
+            light background color: #E9EFF7
+            border color and text color: #3B99BE
+    
+    The coding practice for theming is this:
+        you write your CSS assuming the green theme and then after every block
+            that describes a green background or text color or border you add
+            a blue color override. See the example below (content between double asterisks "**" are notes
+            for aiding your understanding, not part of the example):
+    
+    START OF EXAMPLE
+        gs-whatever {
+            display: block;
+            
+            width: 100%;
+            height: 100%;
+            
+            border: 2px solid #168216; ** NOTICE THIS GREEN BORDER **
+            
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            -o-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        
+        gs-whatever.blue, ** NOTICE THE TWO SELECTORS, ONE FOR WHEN THE ELEMENT ITSELF HAS THE BLUE CLASS AND ONE FOR WHEN THE ELEMENT IS INSIDE AN ELEMENT WITH THE BLUE CLASS **
+        .blue gs-whatever {
+            border-color: #3B99BE; ** OVERRIDES "border-color", NOT "border" SO THAT IF WE CHANGED THE ABOVE "2px" OR "solid" WE DONT HAVE TO MAKE THE SAME CHANGES HERE **
+        }
+    END OF EXAMPLE
+    
+*/

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Is Element Focusable Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Is Element Focusable</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Function:</h3>
+            <pre><code>GS.isElementFocusable(&lt;ELEMENT&gt;);</code></pre>
+            
+            <h3>Description:</h3>
+            <p>This function is for finding out if an element is focusable.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">GS.isElementFocusable Example:</span><br />
+                <p>In this example when you click the "Check Focusable" button we check three elements to see if they are focusable. The first element is focusable so GS.isElementFocusable will return "true". The second element is not focusable so the function will return "false". The third element is the same HTML tag as the second but it has been made focusable with the "tabindex" attribute so the function will return "true".</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="16">
+                    <gs-button onclick="testFocusable()">Check Focusable</gs-button>
+                    <br />
+                    
+                    Element 1: <span id="result-1"></span><br />
+                    Element 2: <span id="result-2"></span><br />
+                    Element 3: <span id="result-3"></span><br /><br />
+                    
+                    <gs-text id="element-1" value="Focusable"></gs-text>
+                    <div id="element-2">Not Focusable</div>
+                    <div id="element-3" tabindex="0">Focusable</div>
+                </template>
+                <template for="js" height="18">
+                    function testFocusable() {
+                        document.getElementById('result-1').textContent =
+                            GS.isElementFocusable(document.getElementById('element-1'));
+                            
+                        document.getElementById('result-2').textContent =
+                            GS.isElementFocusable(document.getElementById('element-2'));
+                            
+                        document.getElementById('result-3').textContent =
+                            GS.isElementFocusable(document.getElementById('element-3'));
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

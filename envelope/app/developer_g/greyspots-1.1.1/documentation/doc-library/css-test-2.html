@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>CSS test 2</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc.js" type="text/javascript"></script>
+        <link href="doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-page>
+            <gs-header><center><h3>CSS test 2</h3></center></gs-header>
+            <gs-body padded>
+                <div class="doc-example-description"><b>Test 1</b></div>
+                <gs-doc-example>
+                    <template for="html" height="auto">
+                        <!-- test1 -->
+                        <!-- test2 -->
+                        <!-- test3 -->
+                        <!-- test4 -->
+                        <!-- test5 -->
+                    </template>
+                    <template for="js" height="auto">
+                        // test1
+                        // test2
+                        // test3
+                        // test4
+                    </template>
+                    <template for="db" height="auto">
+                        -- test1
+                        -- test2
+                        -- test3
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description"><b>Test 2</b></div>
+                <gs-doc-example query-string="test=test">
+                    <template for="html" height="auto">
+                        <!-- test1 -->
+                        <!-- test2 -->
+                        <!-- test3 -->
+                    </template>
+                    <template for="js" height="auto">
+                        // test1
+                        // test2
+                        // test3
+                        // test4
+                    </template>
+                    <template for="db" height="auto">
+                        -- test1
+                        -- test2
+                        -- test3
+                        -- test4
+                        -- test5
+                    </template>
+                </gs-doc-example>
+            </gs-body>
+        </gs-page>
+    </body>
+</html>

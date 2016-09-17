@@ -1,0 +1,94 @@
+gs-optionbox {
+    display: block;
+    border: 2px solid #AAAAAA;
+    /*
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    */
+}
+
+gs-optionbox[mini] {
+    border: 0 none;
+}
+
+gs-optionbox:not([no-target]) gs-option {
+    text-align: left;
+}
+
+gs-optionbox:not([no-target]) gs-option:after {
+    /* fa-circle-o */
+    content: '\f10c';
+}
+
+gs-optionbox:not([no-target]) gs-option[selected]:after {
+    /* fa-dot-circle-o */
+    content: '\f192';
+}
+
+/*
+gs-optionbox:focus {
+    outline-offset: -4px;
+}
+
+
+gs-option {
+    position: relative;
+    display: block;
+    border: 1px solid #AAAAAA;
+}
+
+gs-option:nth-of-type(odd) {
+  background-color: #f9f9f9;
+}*/
+/*
+gs-option:nth-child(even) {
+    background-color: #E9F1E9;
+}
+*/
+/*gs-option:before {
+    display: inline-block;
+    
+    border-right: 2px solid #CCCCCC;
+    
+    margin-right: 0.25em;
+    margin-top: 0.125em;
+    margin-bottom: 0.125em;
+    
+    padding: 0 0.25em;
+    
+    
+    / fa-circle-o /
+    font-family: fontawesome;
+    content: '\f10c';
+}
+
+gs-option[selected]:before {
+    / fa-dot-circle-o /
+    content: '\f192';
+}
+
+gs-option[tempselect]:after {
+    position: absolute;
+    right: 0.25em;
+    top: 50%;
+    margin-top: -0.5em;
+    
+    height: 1em;
+    
+    / fa-chevron-left /
+    font-family: fontawesome;
+    content: '\f053';
+}*/

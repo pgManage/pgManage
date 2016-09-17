@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Number Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Number</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3 class="doc-header">Tag:</h3>
+            <pre><code>&lt;gs-number&gt;&lt;/gs-number&gt;</code></pre>
+            
+            <h3 class="doc-header">Description:</h3>
+            <div class="doc-section">
+                <p>The purpose of a <code>&lt;gs-number&gt;</code> control to take hold a number from the user. This control is based off of the <code>&lt;gs-text&gt;</code>.</p>
+            </div>
+            
+            <h1 class="doc-header">Examples:</h1>
+            <div class="doc-section">
+                <div class="doc-example-description">
+                    <span class="h3">Skeleton Example:</span>
+                        <p>A basic <code>&lt;gs-number&gt;</code> element. Without attributes the <code>&lt;gs-number&gt;</code> control will have the following behaviors:</p>
+                    <ol>
+                        <li>You can change the number manually.</li>
+                        <li>Without attributes it's kinda boring.</li>
+                    </ol>    
+                </div>
+                <gs-doc-example>
+                    <template for="html">
+                        <label for="number_example">Number Example:</label>
+                        <gs-number id="number_example"></gs-number>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[onchange=""]</code>:</span>
+                    <p>To run javascript when the value changes, use the <code>[onchange=""]</code> attribute.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <label for="control_default">Change Alert:</label>
+                        <gs-number id="control_default" onchange="alert('value changed')"></gs-number>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[value=""]</code>:</span>
+                    <p>To set the default value for the <code>&lt;gs-number&gt;</code>, use the <code>[value=""]</code> attribute.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <label for="number_default">Number No Value:</label>
+                        <gs-number id="number_default"></gs-number>
+                        <label for="number_value">Number With Value:</label>
+                        <gs-number id="number_value" value="12345"></gs-number>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span>
+                    <p>The <code>[qs=""]</code> attribute can be used to sync the <code>&lt;gs-number&gt;</code> with the query string.</p>
+                </div>
+                <gs-doc-example query-string="test=12345">
+                    <template for="html" height="15">
+                        <label for="number_qs">Number Query String:</label>
+                        <gs-number id="number_qs" qs="test"></gs-number>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[placeholder=""]</code>:</span>
+                    <p>The <code>[placeholder=""]</code> attribute can be used when you don't want to use a label to explain the purpose of the control to the user. (The label and the placeholder can be used together, that's just not what normally happens.)</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <label for="number_label">Label:</label>
+                        <gs-number id="number_label"></gs-number>
+                        <label for="number_placeholder_label">Placeholder And Label:</label>
+                        <gs-number placeholder="Placeholder And Label" id="number_placeholder_label"></gs-number>
+                        <gs-number placeholder="Placeholder" id="number_placeholder"></gs-number>
+                    </template>
+                </gs-doc-example>
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[mini]</code>:</span>
+                    <p>Sometimes you are limited on space. The <code>[mini]</code> attribute can be used to make the <code>&lt;gs-number&gt;</code> smaller.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="5">
+                        <label for="number_mini">Mini:</label>
+                        <gs-number id="number_mini" mini></gs-number>
+                    </template>
+                </gs-doc-example>
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[tabindex=""]</code>:</span>
+                    <p>With the <code>[tabindex=""]</code> attribute, you can control what order your controls are tabbed to.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="25">
+                        <label for="number_1">1:</label>
+                        <gs-number tabindex="1" id="number_1"></gs-number>
+                        <label for="number_3">3:</label>
+                        <gs-number tabindex="3" id="number_3"></gs-number>
+                        <label for="number_2">2:</label>
+                        <gs-number tabindex="2" id="number_2"></gs-number>
+                        <label for="number_4">4:</label>
+                        <gs-number tabindex="4" id="number_4"></gs-number>
+                    </template>
+                </gs-doc-example>
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[disabled]</code>:</span>
+                    <p>With the <code>[disabled]</code> attribute, you can control whether or not you can use the control.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <label for="number_disabled">Disabled:</label>
+                        <gs-number disabled id="number_disabled"></gs-number>
+                        <label for="number_enabled">Not Disabled:</label>
+                        <gs-number id="number_enabled"></gs-number>
+                    </template>
+                </gs-doc-example>
+            </div>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

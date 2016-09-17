@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Text Height Calculation Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Text Height Calculation</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Function:</h3>
+            <pre><code>GS.getTextHeight([&lt;SCOPE&gt;[, &lt;USE-NORMAL-LINE-HEIGHT&gt;]]);</code></pre>
+            
+            <h3>Description:</h3>
+            <p>The GS.getTextHeight function is for getting the height of text either in the body or in an element of your choice.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">Skeleton Example:</span><br />
+                <p>In this example we are getting the text height of the body element and putting it into the "result" div so that you can see.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="5">
+                    <gs-button onclick="calculateTextHeight()">Calculate Text Height</gs-button>
+                    <div id="result"></div>
+                </template>
+                <template for="js" height="7">
+                    function calculateTextHeight() {
+                        document.getElementById('result').textContent =
+                          GS.getTextHeight() + 'px';
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Specific Element Example:</span><br />
+                <p>In this example we are getting the text height of specific elements instead of the body. Some of these different elements have their font-size set which changes the text</p> height.
+            </div>
+            <gs-doc-example>
+                <template for="html" height="23">
+                    <gs-button onclick="calculateTextHeights()">Calculate Text Heights</gs-button>
+                    <br />
+                    <div id="target-1" bg-primary>
+                        Normal Text
+                    </div>
+                    <br />
+                    <div id="target-2" bg-success style="font-size:0.8em;">
+                        Smaller Text
+                    </div>
+                    <br />
+                    <div id="target-3" bg-danger style="font-size:1.2em;">
+                        Bigger Text
+                    </div>
+                </template>
+                <template for="js" height="18">
+                    function calculateTextHeights() {
+                        document.getElementById('target-1').textContent =
+                          GS.getTextHeight(document.getElementById('target-1')) + 'px';
+                        
+                        document.getElementById('target-2').textContent =
+                          GS.getTextHeight(document.getElementById('target-2')) + 'px';
+                        
+                        document.getElementById('target-3').textContent =
+                          GS.getTextHeight(document.getElementById('target-3')) + 'px';
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">CSS line-height Example:</span><br />
+                <p>In this example we have an element with a custom CSS line-height set that we want to get the line height of. In order for the GS.getTextHeight function to do this we have to tell it to respect line-height by sending true as the second parameter. If you remove the second parameter we get the height of the text instead of the height if the line.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="23">
+                    <gs-button onclick="calculateTextHeights()">Calculate Text Heights</gs-button>
+                    <br />
+                    <div id="target" bg-primary style="line-height:1.8em;">
+                        Text
+                    </div>
+                </template>
+                <template for="js" height="18">
+                    function calculateTextHeights() {
+                        document.getElementById('target').textContent =
+                          GS.getTextHeight(document.getElementById('target'), true) + 'px';
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

@@ -1,0 +1,106 @@
+
+
+gs-tutorial-popup {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    
+    border-radius: 0.25em;
+    /*box-shadow: 0 0 0.5em 0.1em #C5C5C5;*/
+    
+    padding: 0.25em;
+    z-index: 100;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    
+    background-color: #FFFFFF;
+}
+
+gs-tutorial-popup > .connection-arrow {
+    position: absolute;
+	width: 0;
+	height: 0;
+	border: 10px solid transparent;
+}
+
+gs-tutorial-popup.up > .connection-arrow {
+	border-bottom-width: 0;
+	border-top-color: #FFFFFF;
+	bottom: -10px;
+    
+    left: 50%;
+    margin-left: -10px;
+}
+
+gs-tutorial-popup.down > .connection-arrow {
+	border-top-width: 0;
+	border-bottom-color: #FFFFFF;
+    top: -10px;
+	
+    left: 50%;
+    margin-left: -10px;
+}
+
+gs-tutorial-popup.extreme-left > .connection-arrow {
+	border-left-width: 0;
+    margin-left: 0;
+}
+gs-tutorial-popup.extreme-right > .connection-arrow {
+	border-right-width: 0;
+}
+
+gs-tutorial-popup.right > .connection-arrow {
+	border-left-width: 0;
+	border-right-color: #FFFFFF;
+    left: -10px;
+    
+    top: 50%;
+    margin-top: -10px;
+}
+
+gs-tutorial-popup.left > .connection-arrow {
+	border-right-width: 0;
+	border-left-color: #FFFFFF;
+    right: -10px;
+    
+    top: 50%;
+    margin-top: -10px;
+}
+
+gs-tutorial-popup.extreme-up > .connection-arrow {
+	border-top-width: 0;
+    margin-top: 0;
+}
+gs-tutorial-popup.extreme-down > .connection-arrow {
+	border-bottom-width: 0;
+}
+
+gs-tutorial-popup > .popup-control-bar {
+    
+}
+gs-tutorial-popup > .popup-control-bar gs-button {
+	float: right;
+}
+
+
+
+gs-tutorial-overlay {
+    display: block;
+    
+    position: fixed;
+    left: 0;
+    top: 0;
+    
+    width: 100%;
+    height: 100%;
+    
+    background-color: #000000;
+    opacity: 0.1;
+    
+    z-index: 100;
+}

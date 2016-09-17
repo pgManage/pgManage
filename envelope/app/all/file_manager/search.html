@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>File Search</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script>
+            /*global window, encodeHTML*/
+            /*jslint white:true*/
+            var bolWebSockets;
+            
+            function parseResults(results, bolClear) {
+                "use strict";
+                var i;
+                var len;
+                var strHTML = '';
+                var arrLines;
+                var arrPaths = [];
+                var arrMatches = [];
+                var arrCurrentHref;
+                var arrCurrentLine;
+                var strCurrentPath;
+                var strCurrentLineNumber;
+                var strCurrentMatchLine;
+
+                var scrollContainer = document.getElementById('results-scroll-container');
+                var bolScrollToEnd = (scrollContainer.scrollHeight === scrollContainer.scrollTop + scrollContainer.offsetHeight);
+
+                var strPattern = document.getElementById('input-search').value;
+                var bolCaseSensitive = document.getElementById('checkbox-case').value === 'true';
+                var bolRegexp = document.getElementById('checkbox-regex').value === 'true';
+                var strDirectory;
+
+                if (document.getElementById('combo-directory')) {
+                    strDirectory = '/' + GS.trim(document.getElementById('combo-directory').value, '/');
+                } else {
+                    strDirectory = '/';
+                }
+
+                arrLines = results.split('\n');
+
+                // remove empty lines
+                for (i = 0, len = arrLines.length; i < len; i += 1) {
+                    if (!arrLines[i].trim()) {
+                        arrLines.splice(i, 1);
+                        i -= 1;
+                        len -= 1;
+                    }
+                }
+
+                for (i = 0, len = arrLines.length; i < len; i += 1) {
+                    if (arrLines[i].length > 0) {
+                        arrCurrentLine = arrLines[i].split(':');
+
+                        strCurrentPath = arrCurrentLine.shift();
+                        strCurrentLineNumber = arrCurrentLine.shift();
+                        strCurrentMatchLine = arrCurrentLine.join(':');
+
+                        if (arrPaths.indexOf(strCurrentPath) === -1) {
+                            arrPaths.push(strCurrentPath);
+                            arrMatches.push('');
+                        }
+                        arrMatches[arrPaths.indexOf(strCurrentPath)] += '<b>line ' +
+                            GS.rightPad(strCurrentLineNumber + ':', ' ', 5) +
+                            '</b> ' + encodeHTML(strCurrentMatchLine.trim().substring(0, 2000)) + '<br/>';
+                    }
+                }
+
+                for (i = 0, len = arrPaths.length; i < len; i += 1) {
+                    arrCurrentHref = 'file_edit.html?link=' + encodeURIComponent(strDirectory + arrPaths[i]) +
+                        '&pattern=' + encodeURIComponent(strPattern) +
+                        '&case=' + encodeURIComponent(bolCaseSensitive) +
+                        '&regexp=' + encodeURIComponent(bolRegexp);
+
+                    if (bolWebSockets) {
+                        arrCurrentHref += '&socket=true';
+                    }
+
+                    strHTML += '<div class="search-result">&nbsp;<a href="' + arrCurrentHref + '" target="_blank">' +
+                        encodeHTML(arrPaths[i]) + '</a><br /><br /><pre>' + arrMatches[i] + '</pre>' +
+                        '</div><br/>';
+                }
+                
+                if (bolClear === true) {
+                    if (strHTML) {
+                        document.getElementById('matches').textContent = arrLines.length + ' Matches';
+                    } else {
+                        document.getElementById('matches').textContent = '0 Matches';
+                    }
+    
+                    document.getElementById('results-container').innerHTML = (strHTML || '<center>No Matches</center>');
+                } else {
+                    var intMatches = parseInt(document.getElementById('matches').textContent || '0', 10) || 0;
+
+                    document.getElementById('matches').textContent = (intMatches + arrLines.length) + ' Matches';
+    
+                    document.getElementById('results-container').innerHTML += (strHTML || '<center>No Matches</center>');
+                }
+                
+                if (bolScrollToEnd) {
+                    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+                }
+            }
+            
+            function addLoaderElements() {
+                GS.addLoader(document.getElementById('search-header'), 'Searching...');
+                document.getElementById('list-loader').textContent = 'Loading...';
+            }
+            
+            function removeLoaderElements() {
+                GS.removeLoader(document.getElementById('search-header'));
+                document.getElementById('list-loader').textContent = '';
+            }
+            
+            function search() {
+                'use strict';
+                var strQueryString = GS.getQueryString();
+                var strPattern = document.getElementById('input-search').value;
+                var bolCaseSensitive = document.getElementById('checkbox-case').value === 'true';
+                var bolRegexp = document.getElementById('checkbox-regex').value === 'true';
+                
+                // if there is a value in the search input
+                if (document.getElementById('input-search').value) {
+                    if (bolWebSockets) {
+                        var bolRecursive = document.getElementById('checkbox-recursive').value === 'true';
+                        var arrAttributes = [];
+                        
+                        var strFolder = '/';
+                        
+                        if (document.getElementById('combo-directory')) {
+                            strFolder = '/' + GS.trim(document.getElementById('combo-directory').value, '/') + '/';
+                        }
+
+                        if (strFolder === '//') {
+                            strFolder = '/';
+                        }
+
+                        if (!bolCaseSensitive) {
+                            arrAttributes.push('INSENSITIVE');
+                        }
+                        if (bolRegexp) {
+                            arrAttributes.push('REGEX');
+                        }
+                        if (bolRecursive) {
+                            arrAttributes.push('RECURSIVE');
+                        }
+
+                        var strResults = '';
+                        var strPrevLink = '';
+                        addLoaderElements();
+                        GS.requestFromSocket(
+                            GS.envSocket,
+
+                            'FILE\tSEARCH\t' +
+                                GS.encodeForTabDelimited(strFolder) + '\t' +
+                                GS.encodeForTabDelimited(strPattern) + '\n' +
+                            arrAttributes.join('\t') + '\n',
+
+                            function (data, error, errorData) {
+                                var strCurrLink;
+
+                                if (!error) {
+                                    if (data !== 'TRANSACTION COMPLETED') {
+                                        strCurrLink = data.split(':')[0];
+
+                                        if (strPrevLink === '') {
+                                            strPrevLink = strCurrLink;
+                                            document.getElementById('matches').textContent = '';
+                                            document.getElementById('results-container').innerHTML = '';
+                                        }
+                                        
+                                        if (strCurrLink !== strPrevLink) {
+                                            parseResults(strResults, false);
+                                            strPrevLink = strCurrLink;
+                                            strResults = '';
+                                        }
+                                        
+                                        strResults += (strResults ? '\n' : '') + data.trim();
+                                    } else {
+                                        if (strPrevLink === '') {
+                                            document.getElementById('matches').textContent = '';
+                                            document.getElementById('results-container').innerHTML = '';
+                                        }
+                                        
+                                        parseResults(strResults, false);
+                                        removeLoaderElements();
+                                    }
+                                    
+                                    //if (data === 'TRANSACTION COMPLETED') {
+                                    //    parseResults(strResults, true);
+                                    //    
+                                    //} else {
+                                    //    strResults += (strResults ? '\n' : '') + data;
+                                    //}
+                                } else {
+                                    removeLoaderElements();
+                                    GS.webSocketErrorDialog(errorData);
+                                }
+                            }
+                        );
+                        
+                    } else {
+                        GS.addLoader(document.getElementById('results-container'), 'Searching...');
+                        GS.ajaxJSON('/env/action_file',
+                                    'action=grep' +
+                                    '&path=' +
+                                    '&pattern=' + encodeURIComponent(strPattern) +
+                                    '&regexp=' + bolCaseSensitive +
+                                    '&case_sensitive=' + bolCaseSensitive, function (data, error) {
+                            GS.removeLoader(document.getElementById('results-container'));
+                
+                            if (!error) {
+                                parseResults(data.dat.trim(), true);
+                            } else {
+                                GS.ajaxErrorDialog(data, search);
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // save settings to querystring
+            function updateQueryString() {
+                'use strict';
+                var strPattern = document.getElementById('input-search').value;
+                var bolRecursive = document.getElementById('checkbox-recursive').value === 'true';
+                var bolCaseSensitive = document.getElementById('checkbox-case').value === 'true';
+                var bolRegexp = document.getElementById('checkbox-regex').value === 'true';
+                var strFolder;
+                
+                if (document.getElementById('combo-directory')) {
+                    strFolder = document.getElementById('combo-directory').value;
+                }
+                
+                GS.pushQueryString('pattern=' + encodeURIComponent(strPattern) +
+                                  '&recursive=' + encodeURIComponent(bolRecursive) +
+                                  '&case=' + encodeURIComponent(bolCaseSensitive) +
+                                  '&regexp=' + encodeURIComponent(bolRegexp) +
+                                  '&folder=' + encodeURIComponent(strFolder));
+                }
+                
+                window.addEventListener('DOMContentLoaded', function (event) {
+                var strQueryString = GS.getQueryString();
+                
+                // if querystring: get variables, update controls to reflect querystring and search if there is a search string
+                if (strQueryString) {
+                    bolWebSockets = (GS.qryGetVal(strQueryString, 'socket') === 'true');
+                
+                    if (GS.qryGetVal(strQueryString, 'pattern')) {
+                        document.getElementById('input-search').value = GS.qryGetVal(strQueryString, 'pattern');
+                    }
+                    if (GS.qryGetVal(strQueryString, 'folder')) {
+                        document.getElementById('combo-directory').value = GS.qryGetVal(strQueryString, 'folder');
+                    }
+                    if (GS.qryGetVal(strQueryString, 'recursive')) {
+                        document.getElementById('checkbox-recursive').value = GS.qryGetVal(strQueryString, 'recursive');
+                    }
+                    if (GS.qryGetVal(strQueryString, 'case')) {
+                        document.getElementById('checkbox-case').value = GS.qryGetVal(strQueryString, 'case');
+                    }
+                    if (GS.qryGetVal(strQueryString, 'regexp')) {
+                        document.getElementById('checkbox-regex').value = GS.qryGetVal(strQueryString, 'regexp');
+                    }
+                
+                    search();
+                }
+                
+                // bind save settings to querystring on control change
+                document.getElementById('checkbox-case').addEventListener('change', function (event) {
+                    updateQueryString();
+                });
+                document.getElementById('checkbox-regex').addEventListener('change', function (event) {
+                    updateQueryString();
+                });
+                document.getElementById('checkbox-recursive').addEventListener('change', function (event) {
+                    updateQueryString();
+                });
+                if (document.getElementById('combo-directory')) {
+                    document.getElementById('combo-directory').addEventListener('change', function (event) {
+                        updateQueryString();
+                    });
+                }
+                document.getElementById('input-search').addEventListener('change', function (event) {
+                    updateQueryString();
+                });
+                
+                // bind search on search button click and bind search on input return
+                document.getElementById('button-search').addEventListener('click', function (event) {
+                    search();
+                });
+                document.getElementById('input-search').addEventListener('keydown', function (event) {
+                    if ((event.which || event.keyCode) === 13) {
+                        search();
+                    }
+                });
+                
+                // focus search input
+                document.getElementById('input-search').focus();
+                
+                // if websockets: add websockets attribute to grid for css purposes
+                if (bolWebSockets) {
+                    document.getElementById('grid-control').setAttribute('websockets', '');
+                
+                // else remove folder control
+                } else {
+                    document.getElementById('checkbox-recursive').setAttribute('hidden', '');
+                    document.getElementById('grid-control').setAttribute('widths', '1');
+                    document.getElementById('combo-directory-container').parentNode.removeChild(
+                        document.getElementById('combo-directory-container')
+                    );
+                }
+                
+                // allow grid to begin function
+                document.getElementById('grid-control').removeAttribute('suspend-inserted');
+            });
+        </script>
+        <style>
+            #results-container {
+                padding-top: 1em;
+                /*padding-bottom: 1em;*/
+                padding-right: 0.5em;
+                
+                word-break: break-all;
+            }
+            
+            .search-result pre {
+                /*width: 100%; <- caused the pre to grow slightly too much, even though it has box-sizing set to border-box */
+                max-height: 200px;
+                
+                overflow-y: scroll;
+                
+                margin-left: 0.5em;
+                margin-top: 0;
+                margin-bottom: 0;
+                
+                border: 1px solid #AAAAAA;
+                
+                text-align: left;
+                white-space: nowrap;
+                overflow-x: hidden;
+                text-overflow: ellipsis;
+                
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -ms-box-sizing: border-box;
+                -o-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+            
+            #button-search, #checkbox-recursive, #checkbox-case, #checkbox-regex, #combo-directory, #input-search {
+                margin-top: 0.25em;
+            }
+            #button-search {
+                padding: 0.42857143em 0.25em;
+            }
+            #checkbox-recursive, #checkbox-case, #checkbox-regex {
+                padding: 0.3575em 0.25em;
+            }
+            #checkbox-case {
+                border-left: 0 none;
+            }
+            #checkbox-regex {
+                border-left: 0 none;
+            }
+            
+            #grid-control[websockets] gs-block:first-child {
+                padding-right: 0.125em;
+            }
+            
+            #grid-control[websockets] gs-block:last-child {
+                padding-left: 0.125em;
+            }
+        </style>
+    </head>
+    <body class="blue">
+        <gs-page>
+            <gs-header id="search-header">
+                <center><h3>File Search</h3></center>
+                <gs-grid id="grid-control" widths="3,1" reflow-at="500px" suspend-inserted>
+                    <gs-block>
+                        <gs-text id="input-search" placeholder="Search terms here..." title="Text to search for."></gs-text>
+                    </gs-block>
+                    <gs-block id="combo-directory-container">
+                        <gs-combo id="combo-directory" value="/app" title="Path to search under.">
+                            <template>
+                                <table>
+                                    <tbody>
+                                        <tr value="/role">
+                                            <td>/role</td>
+                                            <td>Role</td>
+                                        </tr>
+                                        <tr value="/web_root">
+                                            <td>/web_root</td>
+                                            <td>Webroot</td>
+                                        </tr>
+                                        <tr value="/app">
+                                            <td>/app</td>
+                                            <td>Apps</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-combo>
+                    </gs-block>
+                </gs-grid>
+                
+                <div flex-horizontal>
+                    <gs-button id="button-search">Search</gs-button>
+                    <span flex>&nbsp;</span>
+                    <gs-checkbox id="checkbox-recursive" value="true" inline remove-right>&nbsp;Full Depth</gs-checkbox>
+                    <gs-checkbox id="checkbox-case" inline remove-all>&nbsp;Match&nbsp;Case</gs-checkbox>
+                    <gs-checkbox id="checkbox-regex" inline remove-left>&nbsp;RegEx</gs-checkbox>
+                </div>
+				<center><i><b id="matches"></b></i></center>
+            </gs-header>
+            <gs-body id="results-scroll-container">
+                <div id="results-container"></div>
+                <center><i><b id="list-loader"></b></i></center>
+            </gs-body>
+        </gs-page>
+    </body>
+</html>

@@ -1,0 +1,90 @@
+
+gs-memo {
+    display: block;
+    padding: 0.2em;
+    background-color: #FFFFFF;
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+    min-height: 1.4em;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* ###################################################################################### */
+/* #################################### NORESIZE STATE ################################## */
+/* ###################################################################################### */
+
+gs-memo .control-understudy {
+    overflow: auto;
+    white-space: pre-wrap;
+    -webkit-overflow-scrolling: touch;
+}
+
+gs-memo .control-understudy.placeholder {
+    color: #AAAAAA;
+}
+
+
+/* ###################################################################################### */
+/* #################################### NORESIZE STATE ################################## */
+/* ###################################################################################### */
+
+gs-memo[noresize] textarea.control, /* <===== backwards compatibility (use no-resize-handle) */
+gs-memo[no-resize-handle] textarea.control {
+    resize: none;
+}
+
+
+/* ###################################################################################### */
+/* ###################################### MINI STATE #################################### */
+/* ###################################################################################### */
+
+gs-memo[mini] {
+    padding: 0;
+    border: 0;
+    box-shadow: 0 0 0 0 #FFFFFF;
+    border-radius: 0;
+}
+
+
+/* ###################################################################################### */
+/* ######################################## FLEXED ###################################### */
+/* ###################################################################################### */
+
+[flex-vertical] > gs-memo[flex] {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    
+    flex-direction: column;
+    -ms-flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+[flex-vertical] > gs-memo[flex] .control {
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    width: 100%;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    
+    resize: none;
+}
+
+
+/* ###################################################################################### */
+/* #################################### DISABLED STATE ################################## */
+/* ###################################################################################### */
+
+gs-memo[disabled],
+gs-memo[disabled] .control {
+    background-color: #D5D5D5;
+}

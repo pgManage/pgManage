@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Font Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Font</h1>
+        </gs-jumbo>
+            
+        <gs-container padded>
+                <h3 class="doc-header">Tag:</h3>
+                <pre>&lt;gs-font&gt;&lt;/gs-font&gt;</pre>
+                
+                <h3 class="doc-header">Description:</h3>
+                <p>The font tag allows you to change the font size of text based on window size or media query.</p>
+                
+                <h1 class="doc-header">Examples:</h1>
+                <div class="doc-section">
+                    <div class="doc-example-description">
+                        <span class="h3">Skeleton Example:</span>
+                        <p>A basic gs-font element. This font element will have the following behaviors:<br />
+                        <ol>
+                            <li>When the window is above 0 width the font-size will be set to 10px</li>
+                            <li>When the window is above or equal to 500px width the font-size will be set to 20px</li>
+                        </ol></p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html">
+                            <gs-font min-width="all {10px}; 500px {20px};">
+                                Some demo text
+                            </gs-font>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute "min-width":</span>
+                        <p>This "min-width" attribute enables you to change the font size depending the minimum width of the screen. The "min-width" attribute takes a list of expressions seperated by semi-colons. The format of an expression is "&lt;WINDOW-WIDTH&gt; {&lt;FONT-SIZE&gt;};". Precedence for the font-sizes is determined by order, so the last expression is more important that the first.</p>
+                        
+                        There are several shortcuts for some pre-set sizes:
+                        <ol>
+                            <li>All instances of "all" are replaced with "0px"</li>
+                            <li>All instances of "small" or "sml" are replaced with "768px"</li>
+                            <li>All instances of "medium" or "med" are replaced with "992px"</li>
+                            <li>All instances of "large" or "lrg" are replaced with "1200px"</li>
+                        </ol>
+                        
+                        In this example the gs-font element will change the font-size at 4 widths.<br />
+                    </div>
+                    <gs-doc-example>
+                        <template for="html">
+                            <gs-font min-width="all {2em}; 300px {3em}; 600px {4em}; 900px {5em};">
+                                Some demo text
+                            </gs-font>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute "media":</span>
+                        <p>The "media" attribute enables you to change the font size depending <a href="https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries">CSS Media Queries</a>. The "media" attribute takes a list of expressions seperated by semi-colons. The format of an expression is "&lt;MEDIA-SELECTOR&gt; {&lt;FONT-SIZE&gt;};". Precedence for the font-sizes is determined by order, so the last expression is more important that the first.</p>
+                        
+                        There are several shortcuts for some pre-set sizes:
+                        <ol>
+                            <li>All instances of "small" or "sml" are replaced with "768px"</li>
+                            <li>All instances of "medium" or "med" are replaced with "992px"</li>
+                            <li>All instances of "large" or "lrg" are replaced with "1200px"</li>
+                        </ol>
+                        
+                        In this example the gs-font element will change the font-size at 4 media conditions.<br />
+                    </div>
+                    <gs-doc-example>
+                        <template for="html">
+                            <gs-font media="all {10px}; screen and (min-width: 500px) {15px}; screen and (min-width: small) {20px}; print {25px};">
+                                Some demo text
+                            </gs-font>
+                        </template>
+                    </gs-doc-example>
+                </div>
+        </gs-container>
+    </body>
+</html>

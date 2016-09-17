@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>WebSocket Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">WebSocket Functions</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3 class="doc-header">Functions:</h3>
+            <pre><code><b>GS.openSocket</b>(strLink, relinkSessionID, relinkSessionNotifications);
+<b>GS.closeSocket</b>(socket);
+
+<b>GS.encodeForTabDelimited</b>(strValue);
+<b>GS.decodeFromTabDelimited</b>(strValue);
+
+<b>GS.requestFromSocket</b>(
+    socket, strMessage, callback
+);
+<b>GS.requestSelectFromSocket</b>(
+    socket, strSchema, strObject, strReturnCols,
+    strWhere, strOrd, strLimit, strOffset,
+    finalCallback
+);
+<b>GS.requestCachingSelect</b>(
+    socket, strSchema, strObject, strColumns,
+    strWhere, strOrd, strLimit, strOffset,
+    callback, bolClearCache
+);
+<b>GS.requestInsertFromSocket</b>(
+    socket, strSchema, strObject, strReturnCols,
+    strPkCols, strSeqCols, insertData,
+    beginCallback, confirmCallback, finalCallback
+);
+<b>GS.requestUpdateFromSocket</b>(
+    socket, strSchema, strObject, strReturnCols,
+    strHashCols, updateData,
+    beginCallback, confirmCallback, finalCallback
+);
+<b>GS.requestDeleteFromSocket</b>(
+    socket, strSchema, strObject, strHashCols,
+    deleteData,
+    beginCallback, confirmCallback, finalCallback
+);
+
+<b>GS.webSocketErrorDialog</b>(
+    jsnError, tryAgainCallback, cancelCallback
+);</code></pre>
+            
+            <h3 class="doc-header">Description:</h3>
+            <div class="doc-section">
+                <p>These functions are for opening, using, closing and the ancillary operations of the Envelope WebSocket API.</p>
+            </div>
+            
+            <h1 class="doc-header">Examples:</h1>
+            <div class="doc-section">
+                <div class="doc-example-description">
+                    <span class="h3"><code>GS.openSocket</code> Example:</span><br />
+                    <p>The "<code>GS.openSocket</code>" function opens a WebSocket to the Envelope Engine. There is no "onopen" event because when you send messages to the socket using the other functions those messages automatically wait until the connection is established before being sent off.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="8">
+                        
+                    </template>
+                    <template for="js" height="8">
+                        window.addEventListener('load', function () {
+                            GS.envSocket = GS.openSocket('env');
+                        });
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3"><code>GS.closeSocket</code> Example:</span><br />
+                    <p>The "<code>GS.closeSocket</code>" function closes a WebSocket.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="8">
+                        
+                    </template>
+                    <template for="js" height="8">
+                        window.addEventListener('load', function () {
+                            GS.envSocket = GS.openSocket('env');
+                            GS.closeSocket(GS.envSocket);
+                        });
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Encode and Decode Example:</span><br />
+                    <p>The Envelope Engine transmits data in a tabular format delimiting cells with <kbd>TAB</kbd> characters and records with <kbd>RETURN</kbd> characters. The "<code>GS.encodeForTabDelimited</code>" and "<code>GS.decodeFromTabDelimited</code>" functions are for encoding and decoding cell values for transmission. Using these functions prevents a <kbd>TAB</kbd> (<code>\t</code>), <kbd>RETURN</kbd> (<code>\r</code> and/or <code>\n</code>) or <kbd>BACKSLASH</kbd> (<code>\</code>) character inside a cell from being misinterpreted as a delimiter. These functions also turn <kbd>NULL</kbd> (<code>\N</code>) characters into the string "NULL" and back the other way.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="8">
+                        <gs-button onclick="encode()">Encode</gs-button>
+                        <gs-button onclick="decode()">Decode</gs-button>
+                        <br />
+                        <gs-memo id="result" value="test
+                        test"></gs-memo>
+                    </template>
+                    <template for="js" height="15">
+                        function encode() {
+                            var result = document.getElementById('result');
+                            
+                            result.value = GS.encodeForTabDelimited(result.value);
+                        }
+                        function decode() {
+                            var result = document.getElementById('result');
+                            
+                            result.value = GS.decodeFromTabDelimited(result.value);
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3"><code>GS.requestFromSocket</code> Example:</span><br />
+                    <p>The "<code>GS.requestFromSocket</code>" function is for making a request from a websocket.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="8">
+                        <gs-button onclick="makeCall()">Make A Socket Request</gs-button>
+                        <pre id="results"></pre>
+                    </template>
+                    <template for="js" height="30">
+                        window.addEventListener('load', function () {
+                            GS.envSocket = GS.openSocket('env');
+                        });
+                        
+                        function makeCall() {
+                            var strMessage =
+                                    'FILE\tSEARCH\t/web_root/\tlogin\n' +
+                                    'INSENSITIVE\n'
+                            
+                            GS.requestFromSocket(
+                                    GS.envSocket, strMessage,
+                                    function (data, error, errorData) {
+                                if (!error) {
+                                    document.getElementById('results').innerHTML += '<br /><hr />' + encodeHTML(data);
+                                } else {
+                                    GS.webSocketErrorDialog(errorData);
+                                }
+                            });
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3"><code>GS.requestSelectFromSocket</code> Example:</span><br />
+                    <p>The "<code>GS.requestSelectFromSocket</code>" function is for getting data from the database via the Envelope Engine's "SELECT" API. This function calls it's callback once for each record data or "<code>TRANSACTION COMPLETED</code>" WebSocket frame.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="8">
+                        <gs-button onclick="selectData()">Perform a SELECT API call</gs-button>
+                    </template>
+                    <template for="js" height="30">
+                        window.addEventListener('load', function () {
+                            GS.envSocket = GS.openSocket('env');
+                        });
+                        
+                        function selectData() {
+                            var strSchema = 'gsdoc'
+                              , strObject = 'tenv_example'
+                              , strColumns = '*'
+                              , strWhere = 'id > 5'
+                              , strOrd = 'first_name ASC'
+                              , strLimit = '200'
+                              , strOffset = '5';
+                            
+                            GS.requestSelectFromSocket(
+                                    GS.envSocket
+                                  , strSchema
+                                  , strObject
+                                  , strColumns
+                                  , strWhere
+                                  , strOrd
+                                  , strLimit
+                                  , strOffset
+                                  , function (data, error) {
+                                
+                                // typical command structure for handling results:
+                                
+                                if (!error) {
+                                    //properties of "data":
+                                    //  an array of column names:
+                                    //    data.arrColumnNames
+                                    //  an array of column types:
+                                    //    data.arrColumnTypes
+                                    //  an array of pre-decoded column names:
+                                    //    data.arrDecodedColumnNames
+                                    //  an array of pre-decoded column types:
+                                    //    data.arrDecodedColumnTypes
+                                    //  what number callback this is:
+                                    //    data.intCallback
+                                    //  records OR 'TRANSACTION COMPLETED':
+                                    //    data.strMessage
+                                    
+                                    console.log(data);
+                                    
+                                    if (data.strMessage !== 'TRANSACTION COMPLETED') {
+                                        // parse and use the data
+                                    } else {
+                                        // last callback
+                                    }
+                                } else {
+                                    GS.webSocketErrorDialog(data);
+                                }
+                            });
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3"><code>GS.requestCachingSelect</code> Example:</span><br />
+                    <p>The "<code>GS.requestCachingSelect</code>" function is for getting data from the database via the Envelope Engine's "SELECT" API. But, the results cache so that you can consolidate multiple SELECTs that are exactly the same. This is useful if you going to repeat a select call but don't want to bog down the web page with many identical select calls.</p>
+                    
+                    <p>The "<code>GS.requestCachingSelect</code>" function can be told to clear it's cache, if the "<code>bolClearCache</code>" parameter is set to <code>true</code> then the cache will be cleared for that particular query.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="8">
+                        <gs-button onclick="selectData(false)">Perform a SELECT API call</gs-button>
+                        <gs-button onclick="selectData(true)">Perform a SELECT API call and clear the cache</gs-button>
+                    </template>
+                    <template for="js" height="30">
+                        window.addEventListener('load', function () {
+                            GS.envSocket = GS.openSocket('env');
+                        });
+                        
+                        function selectData(bolClearCache) {
+                            var strSchema = 'gsdoc'
+                              , strObject = 'tenv_example'
+                              , strColumns = '*'
+                              , strWhere = 'id > 5'
+                              , strOrd = 'first_name ASC'
+                              , strLimit = '200'
+                              , strOffset = '5';
+                            
+                            GS.requestCachingSelect(
+                                    GS.envSocket
+                                  , strSchema
+                                  , strObject
+                                  , strColumns
+                                  , strWhere
+                                  , strOrd
+                                  , strLimit
+                                  , strOffset
+                                  , function (data, error) {
+                                
+                                // typical command structure for handling results:
+                                
+                                if (!error) {
+                                    //properties of "data":
+                                    //  an array of column names:
+                                    //    data.arrColumnNames
+                                    //  an array of column types:
+                                    //    data.arrColumnTypes
+                                    //  an array of pre-decoded column names:
+                                    //    data.arrDecodedColumnNames
+                                    //  an array of pre-decoded column types:
+                                    //    data.arrDecodedColumnTypes
+                                    //  what number callback this is:
+                                    //    data.intCallback
+                                    //  records OR 'TRANSACTION COMPLETED':
+                                    //    data.strMessage
+                                    
+                                    console.log(data);
+                                    
+                                    if (data.strMessage !== 'TRANSACTION COMPLETED') {
+                                        // parse and use the data
+                                    } else {
+                                        // last callback
+                                    }
+                                } else {
+                                    GS.webSocketErrorDialog(data);
+                                }
+                            }, bolClearCache);
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3"><code>GS.requestInsertFromSocket</code> Example:</span><br />
+                    <p>The "<code>GS.requestInsertFromSocket</code>" function is for inserting records into a database object.</p>
+                    
+                    <p>The function has three steps:</p>
+                    <ol>
+                        <li><code>BEGIN</code> a transaction</li>
+                        <li>send your <code>INSERT</code>s</li>
+                        <li>Return after <code>COMMIT</code>/<code>ROLLBACK</code></li>
+                    </ol>
+                    <p>Each step has it's own callback:</p>
+                    <ol>
+                        <li>The <code>BEGIN</code> callback allows you to handle an error at the <code>BEGIN</code> step.</li>
+                        <li>The <code>INSERT</code> callback allows you to:
+                            <ul>
+                                <li>Handle an error at the <code>INSERT</code> step</li>
+                                <li>Show the user what the actual records will look like before <code>COMMIT</code>ing</li>
+                                <li>Decide to <code>COMMIT</code> or <code>ROLLBACK</code> the transaction</li>
+                            </ul>
+                        </li>
+                        <li>The <code>COMMIT</code>/<code>ROLLBACK</code> callback allows you to handle the success or error of the <code>COMMIT</code> or <code>ROLLBACK</code>.</li>
+                    </ol>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="8">
+                        <gs-button onclick="insertData()">Perform an INSERT API call</gs-button>
+                    </template>
+                    <template for="js" height="30">
+                        window.addEventListener('load', function () {
+                            GS.envSocket = GS.openSocket('env');
+                        });
+                        
+                        function insertData() {
+                            var strSchema = 'gsdoc'
+                              , strObject = 'tenv_example'
+                              , strReturnCols = 'first_name\tlast_name'
+                              , strPkCols = 'id'
+                              , strSeqCols = 'gsdoc.global_seq'
+                              , insertData =
+                                    'first_name\tlast_name\n'
+                                  + 'dave\tapricot\n'
+                                  + 'jackbe\tnimble';
+                            
+                            // "strPkCols" and "strSeqCols" contain a TAB-delimited list of the PRIMARY KEY columns and the associated SEQUENCEs these primary keys will be part of what is returned to the INSERT callback.
+                            
+                            // "insertData" contains a RETURN-delimited list of TAB-delimited records, the first record contains the column names and the subsequent records are what is inserted into the object.
+                            
+                            GS.requestInsertFromSocket(
+                                GS.envSocket
+                              , strSchema, strObject, strReturnCols
+                              , strPkCols, strSeqCols, insertData
+                              , function (data, error) {
+                                    // callback after transaction BEGIN
+                                    
+                                    if (error) {
+                                        // handle a BEGIN error
+                                    }
+                                }
+                              , function (data, error, transactionID, commitFunction, rollbackFunction) {
+                                    // callback after INSERT but before COMMIT or ROLLBACK
+                                    
+                                    // "data" will contain a batch of records or a "TRANSACTION COMPLETED" message. The records are a RETURN-delimited list of TAB-delimited records. These records contain the actual values the database will have if the records are COMMITed. "data" does not have a list of columns inside it. After the last batch of records is sent "data" will contain the string "TRANSACTION COMPLETED".
+                                    
+                                    // The commitFunction and rollbackFunction are callbacks that you can run to COMMIT or ROLLBACK this transaction. This gives you the opportunity to (if you want) ask the user if they're sure. Make sure to run one of them after the last message from the server.
+                                    
+                                    if (!error) {
+                                        if (data !== 'TRANSACTION COMPLETED') {
+                                            // handle returned records
+                                            
+                                        } else {
+                                            // last callback (commit or rollback here)
+                                            
+                                            if (confirm('Are you sure?')) {
+                                                commitFunction();
+                                            } else {
+                                                rollbackFunction();
+                                            }
+                                        }
+                                        
+                                    } else {
+                                        // TRANSACTION failed, ROLLBACK
+                                        rollbackFunction();
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                              , function (strAnswer, data, error) {
+                                    // callback after COMMIT or ROLLBACK
+                                    
+                                    if (!error) {
+                                        if (strAnswer === 'COMMIT') {
+                                            // SUCCESSFUL COMMIT
+                                        } else if (strAnswer === 'ROLLBACK') {
+                                            // SUCCESSFUL ROLLBACK
+                                        }
+                                    } else {
+                                        if (strAnswer === 'COMMIT') {
+                                            // COMMIT ERROR
+                                        } else if (strAnswer === 'ROLLBACK') {
+                                            // ROLLBACK ERROR
+                                        }
+                                        
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                            );
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3"><code>GS.requestUpdateFromSocket</code> Example:</span><br />
+                    <p>The "<code>GS.requestUpdateFromSocket</code>" function is for updating records in a database object.</p>
+                    
+                    <p>The function has three steps:</p>
+                    <ol>
+                        <li><code>BEGIN</code> a transaction</li>
+                        <li>send your <code>UPDATE</code>s</li>
+                        <li>Return after <code>COMMIT</code>/<code>ROLLBACK</code></li>
+                    </ol>
+                    <p>Each step has it's own callback:</p>
+                    <ol>
+                        <li>The <code>BEGIN</code> callback allows you to handle an error at the <code>BEGIN</code> step.</li>
+                        <li>The <code>UPDATE</code> callback allows you to:
+                            <ul>
+                                <li>Handle an error at the <code>UPDATE</code> step</li>
+                                <li>Show the user what the data will look like before <code>COMMIT</code>ing</li>
+                                <li>Decide to <code>COMMIT</code> or <code>ROLLBACK</code> the transaction</li>
+                            </ul>
+                        </li>
+                        <li>The <code>COMMIT</code>/<code>ROLLBACK</code> callback allows you to handle the success or error of the <code>COMMIT</code> or <code>ROLLBACK</code>.</li>
+                    </ol>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="8">
+                        <gs-button onclick="updateData()">Perform an UPDATE API call</gs-button>
+                    </template>
+                    <template for="js" height="30">
+                        window.addEventListener('load', function () {
+                            GS.envSocket = GS.openSocket('env');
+                        });
+                        
+                        function updateData() {
+                            var strSchema = 'gsdoc'
+                              , strObject = 'tenv_example'
+                              , strReturnCols = '*'
+                              , strHashCols
+                              , recordOneHash
+                              , recordTwoHash
+                              , updateData;
+                            
+                            // These hashes can be multiple columns
+                            //     The values in the hash are TAB-delimited and they are not encoded with "GS.encodeForTabDelimited".
+                            //     If the value of the column is "NULL" then use an empty string in that column's place.
+                            recordOneHash = CryptoJS.MD5('2015-02-25 05:23:50-05').toString();
+                            recordTwoHash = CryptoJS.MD5('2016-03-00 08:01:33-05').toString();
+                            
+                            // "strHashCols" contain a TAB-delimited list of the columns that were used to generate the hash column.
+                            strHashCols = 'change_stamp';
+                            
+                            // "updateData" contains a RETURN-delimited list of TAB-delimited records.
+                            // The first record contains the column purposes:
+                            //     "pk" means that this column is a PRIMARY KEY column and that Envelope can use this column as the unique identifier for the record.
+                            //     "hash" means that this column is a hash of columns that is compared to the hash of the same columns in the database record to see if the record has changed since you last got it.
+                            //     "set" means that this column will be used to update the record.
+                            // The second record contains the column names. Note: the name of the hash column doesn't matter, it can be anything.
+                            // The subsequent records are the updated records data.
+                            updateData =
+                                'pk\thash\tset\tset\n'
+                              + 'id\thash\tfirst_name\tlast_name\n'
+                              + '123\t' + recordOneHash + '\tapple\tbran\n'
+                              + '124\t' + recordTwoHash + '\traisin\tbran'
+                            
+                            GS.requestUpdateFromSocket(
+                                GS.envSocket
+                              , strSchema, strObject, strReturnCols
+                              , strHashCols, updateData
+                              , function (data, error) {
+                                    // callback after transaction BEGIN
+                                    
+                                    if (error) {
+                                        // handle a BEGIN error
+                                    }
+                                }
+                              , function (data, error, transactionID, commitFunction, rollbackFunction) {
+                                    // callback after INSERT but before COMMIT or ROLLBACK
+                                    
+                                    // "data" will contain a batch of records or a "TRANSACTION COMPLETED" message. The records are a RETURN-delimited list of TAB-delimited records. These records contain the actual values the database will have if the records are COMMITed. "data" does not have a list of columns inside it. After the last batch of records is sent "data" will contain the string "TRANSACTION COMPLETED".
+                                    
+                                    // The commitFunction and rollbackFunction are callbacks that you can run to COMMIT or ROLLBACK this transaction. This gives you the opportunity to (if you want) ask the user if they're sure. Make sure to run one of them after the last message from the server.
+                                    
+                                    if (!error) {
+                                        if (data !== 'TRANSACTION COMPLETED') {
+                                            // handle returned records
+                                            
+                                        } else {
+                                            // last callback (commit or rollback here)
+                                            
+                                            if (confirm('Are you sure?')) {
+                                                commitFunction();
+                                            } else {
+                                                rollbackFunction();
+                                            }
+                                        }
+                                        
+                                    } else {
+                                        // TRANSACTION failed, ROLLBACK
+                                        rollbackFunction();
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                              , function (strAnswer, data, error) {
+                                    // callback after COMMIT or ROLLBACK
+                                    
+                                    if (!error) {
+                                        if (strAnswer === 'COMMIT') {
+                                            // SUCCESSFUL COMMIT
+                                        } else if (strAnswer === 'ROLLBACK') {
+                                            // SUCCESSFUL ROLLBACK
+                                        }
+                                    } else {
+                                        if (strAnswer === 'COMMIT') {
+                                            // COMMIT ERROR
+                                        } else if (strAnswer === 'ROLLBACK') {
+                                            // ROLLBACK ERROR
+                                        }
+                                        
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                            );
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3"><code>GS.requestDeleteFromSocket</code> Example:</span><br />
+                    <p>The "<code>GS.requestDeleteFromSocket</code>" function is for updating records in a database object.</p>
+                    
+                    <p>The function has three steps:</p>
+                    <ol>
+                        <li><code>BEGIN</code> a transaction</li>
+                        <li>send your <code>DELETE</code>s</li>
+                        <li>Return after <code>COMMIT</code>/<code>ROLLBACK</code></li>
+                    </ol>
+                    <p>Each step has it's own callback:</p>
+                    <ol>
+                        <li>The <code>BEGIN</code> callback allows you to handle an error at the <code>BEGIN</code> step.</li>
+                        <li>The <code>DELETE</code> callback allows you to:
+                            <ul>
+                                <li>Handle an error at the <code>DELETE</code> step</li>
+                                <li>Show the user what the data will look like before <code>COMMIT</code>ing</li>
+                                <li>Decide to <code>COMMIT</code> or <code>ROLLBACK</code> the transaction</li>
+                            </ul>
+                        </li>
+                        <li>The <code>COMMIT</code>/<code>ROLLBACK</code> callback allows you to handle the success or error of the <code>COMMIT</code> or <code>ROLLBACK</code>.</li>
+                    </ol>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="8">
+                        <gs-button onclick="deleteData()">Perform an DELETE API call</gs-button>
+                    </template>
+                    <template for="js" height="30">
+                        window.addEventListener('load', function () {
+                            GS.envSocket = GS.openSocket('env');
+                        });
+                        
+                        function deleteData() {
+                            var strSchema = 'gsdoc'
+                              , strObject = 'tenv_example'
+                              , strHashCols
+                              , recordOneHash
+                              , recordTwoHash
+                              , deleteData;
+                            
+                            // These hashes can be multiple columns
+                            //     The values in the hash are TAB-delimited and they are not encoded with "GS.encodeForTabDelimited".
+                            //     If the value of the column is "NULL" then use an empty string in that column's place.
+                            recordOneHash = CryptoJS.MD5('2015-02-25 05:23:50-05\tASDF').toString();
+                            recordTwoHash = CryptoJS.MD5('2016-03-00 08:01:33-05\t').toString();
+                            
+                            // "strHashCols" contain a TAB-delimited list of the columns that were used to generate the hash column.
+                            strHashCols = 'change_stamp\tothercolumn';
+                            
+                            // "updateData" contains a RETURN-delimited list of TAB-delimited records.
+                            // The first record contains the column purposes:
+                            //     "pk" means that this column is a PRIMARY KEY column and that Envelope can use this column as the unique identifier for the record.
+                            //     "hash" means that this column is a hash of columns that is compared to the hash of the same columns in the database record to see if the record has changed since you last got it.
+                            // The second record contains the column names. Note: the name of the hash column doesn't matter, it can be anything.
+                            // The subsequent records are the records to be deleted.
+                            deleteData =
+                                'pk\thash\n'
+                              + 'id\thash\n'
+                              + '123\t' + recordOneHash + '\n'
+                              + '124\t' + recordTwoHash;
+                            
+                            GS.requestUpdateFromSocket(
+                                GS.envSocket
+                              , strSchema, strObject
+                              , strHashCols, deleteData
+                              , function (data, error) {
+                                    // callback after transaction BEGIN
+                                    
+                                    if (error) {
+                                        // handle a BEGIN error
+                                    }
+                                }
+                              , function (data, error, transactionID, commitFunction, rollbackFunction) {
+                                    // callback after INSERT but before COMMIT or ROLLBACK
+                                    
+                                    // "data" will contain BLANK or a "TRANSACTION COMPLETED" message. BLANK. After the last batch of records is sent "data" will contain the string "TRANSACTION COMPLETED".
+                                    
+                                    // The commitFunction and rollbackFunction are callbacks that you can run to COMMIT or ROLLBACK this transaction. This gives you the opportunity to (if you want) ask the user if they're sure. Make sure to run one of them after the last message from the server.
+                                    
+                                    if (!error) {
+                                        if (data !== 'TRANSACTION COMPLETED') {
+                                            // handle returned data
+                                            
+                                        } else {
+                                            // last callback (commit or rollback here)
+                                            
+                                            if (confirm('Are you sure?')) {
+                                                commitFunction();
+                                            } else {
+                                                rollbackFunction();
+                                            }
+                                        }
+                                        
+                                    } else {
+                                        // TRANSACTION failed, ROLLBACK
+                                        rollbackFunction();
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                              , function (strAnswer, data, error) {
+                                    // callback after COMMIT or ROLLBACK
+                                    
+                                    if (!error) {
+                                        if (strAnswer === 'COMMIT') {
+                                            // SUCCESSFUL COMMIT
+                                        } else if (strAnswer === 'ROLLBACK') {
+                                            // SUCCESSFUL ROLLBACK
+                                        }
+                                    } else {
+                                        if (strAnswer === 'COMMIT') {
+                                            // COMMIT ERROR
+                                        } else if (strAnswer === 'ROLLBACK') {
+                                            // ROLLBACK ERROR
+                                        }
+                                        
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                            );
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3"><code>GS.webSocketErrorDialog</code> Example:</span><br />
+                    <p>The "<code>GS.webSocketErrorDialog</code>" function is for opening a dialog when there is an error during a WebSocket call.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="16">
+                        <gs-button onclick="errorCall()">
+                            Perform an API call
+                            <br />that results in an error
+                            <br />(and pops up the default error dialog)
+                        </gs-button>
+                        <gs-button onclick="errorCallTryAgain()">
+                            Perform an API call
+                            <br />that results in an error
+                            <br />(and pops up the error dialog with the option to try again)
+                        </gs-button>
+                    </template>
+                    <template for="js" height="30">
+                        window.addEventListener('load', function () {
+                            GS.envSocket = GS.openSocket('env');
+                        });
+                        
+                        function errorCall() {
+                            GS.requestSelectFromSocket(
+                                    GS.envSocket
+                                  , 'gsdoc'
+                                  , 'object_that_doesnt_exist'
+                                  , '*', '', '', '200', '0'
+                                  , function (data, error) {
+                                
+                                if (!error) {
+                                    
+                                } else {
+                                    GS.webSocketErrorDialog(data);
+                                }
+                            });
+                        }
+                        
+                        function errorCallTryAgain() {
+                            GS.requestSelectFromSocket(
+                                    GS.envSocket
+                                  , 'gsdoc'
+                                  , 'object_that_doesnt_exist'
+                                  , '*', '', '', '200', '0'
+                                  , function (data, error) {
+                                
+                                if (!error) {
+                                    
+                                } else {
+                                    GS.webSocketErrorDialog(
+                                        data
+                                      , function () {
+                                            // "Try Again" callback
+                                            errorCallTryAgain();
+                                        }
+                                      , function () {
+                                            // "Cancel" callback
+                                            alert('canceled');
+                                        }
+                                    );
+                                }
+                            });
+                        }
+                    </template>
+                </gs-doc-example>
+            </div>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title id="display-file-name"></title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script>
+            /*global $, WFP, jQuery, console, doT, window, encodeHTML, evt, setTimeout, clearTimeout*/
+            /*jslint white:true*/
+            var strCurrentPageLink, bolCurrentlySaving = false, bolSaveWaiting = false, lastModified, intCurrentFind = 0,
+                arrLineNumbers, editor, bolAutoSave = true, bolBlameMode = false, currentSaveAjax, strActionLink = '/env',
+                intTimerID, testingWindow, currentElementData, jsnTagData = {}, openSelectionMarker, closeSelectionMarker,
+                bolWebSocket, strParsingMode;
+                //consoleCustom = []
+            
+            function test() {
+                var testingLink = strCurrentPageLink;
+                
+                if (testingLink[0] === '/') {
+                    testingLink = testingLink.substring(1);
+                }
+                
+                if (!testingWindow || (testingWindow && testingWindow.closed === true)) {
+                    if (testingLink.indexOf('app/') == 0) {
+                        testingWindow = window.open('/env/' + testingLink);
+                        
+                    } else if (testingLink.indexOf('role/') == 0) {
+                        testingWindow = window.open('/env/' + testingLink);
+                        
+                    } else {
+                        testingWindow = window.open(window.location.protocol + '//' + window.location.hostname + testingLink.substring('web_root'.length));
+                    }
+                } else {
+                    testingWindow.location.reload(true);
+                }
+                testingWindow.focus();
+            }
+            
+            function designRegisterElement(strTagName, strDocLink) {
+                //console.log(strTagName, strDocLink);
+                
+                jsnTagData[strTagName.toUpperCase()] = {
+                    'documentation': strDocLink
+                };
+            }
+            
+            //
+            function selectorTitleForElement(element) {
+                var i, len, strSelector;
+                
+                // if there is an ID attribute
+                if (element.getAttribute('id')) {
+                    return '#' + element.getAttribute('id');
+                }
+                
+                // first class that
+                //      is not equal to "selected" and
+                //      is not equal to "designMode" and
+                //      is not equal to "design-mark" and
+                //      is not equal to "template-container"
+                if (element.classList.length > 0) {
+                    for (i = 0, len = element.classList.length; i < len; i += 1) {
+                        if (element.classList[i] !== 'selected' &&
+                            element.classList[i] !== 'designMode' &&
+                            element.classList[i] !== 'design-mark' &&
+                            element.classList[i] !== 'template-container') {
+                            
+                            return '.' + element.classList[i];
+                        }
+                    }
+                } 
+                
+                // first attribute that
+                //      is not class and
+                //      is not style and 
+                //      is not id and
+                //      is (when combined with the tagname) less than 25 chars long (including square braces)
+                if (element.attributes.length > 0) {
+                    for (i = 0, len = element.attributes.length; i < len; i += 1) {
+                        if (element.attributes[i].value) {
+                            strSelector = '[' + element.attributes[i].nodeName + '="' + element.attributes[i].value + '"]';
+                        } else {
+                            strSelector = '[' + element.attributes[i].nodeName + ']';
+                        }
+                        
+                        if (element.attributes[i].nodeName !== 'class' &&
+                            element.attributes[i].nodeName !== 'style' &&
+                            element.attributes[i].nodeName !== 'id' &&
+                            (element.nodeName + strSelector).length < 25) {
+                            return strSelector;
+                        }
+                    }
+                } 
+                
+                return '';
+            }
+            
+            //function renameFile() {
+            //    GS.openDialog('dialog-rename', function () {
+            //        document.getElementById('input-new-file-name').value = strCurrentPageLink;
+            //    }, function (event, strAnswer) {
+            //        if (strAnswer === 'Ok') {
+            //            var newName = document.getElementById('input-new-file-name').value;
+            //            
+            //            GS.addLoader('file-rename', 'Updating...');
+            //            // need to make sure that the files/folders are renamed in order
+            //            GS.ajaxJSON(strActionLink + '/action_file', 'action=mv_file' +
+            //                                                '&paths_from=' + encodeURIComponent('["' + strCurrentPageLink + '"]') +
+            //                                                '&paths_to=' + encodeURIComponent('["' + newName + '"]'),
+            //                                                function(data, error) {
+            //                if (!error) {
+            //                    strCurrentPageLink = newName;
+            //                    GS.ajaxJSON(strActionLink + '/action_file', 'action=read' +
+            //                                                                '&path=' + encodeURIComponent(strCurrentPageLink),
+            //                                                                function (data, error) {
+            //                        if (!error) {
+            //                            lastModified = data.dat.date;
+            //                            GS.removeLoader('file-rename');
+            //                            
+            //                            if (window.opener && window.opener.listCurrentDirectory) {
+            //                                window.opener.listCurrentDirectory(false);
+            //                            }
+            //                            document.getElementById('display-file-name').textContent = 'Editing: ' + strCurrentPageLink.substring(strCurrentPageLink.lastIndexOf('/') + 1);
+            //                            GS.pushQueryString('link=' + encodeURIComponent(strCurrentPageLink));
+            //                            document.getElementById('display-full-link').innerHTML = strCurrentPageLink;
+            //                        } else {
+            //                            GS.ajaxErrorDialog(data);
+            //                        }
+            //                    });
+            //                    
+            //                } else {
+            //                    GS.ajaxErrorDialog(data);
+            //                }
+            //            });
+            //        }
+            //    });
+            //}
+            
+            //function deleteFile() {
+            //    GS.openDialog('dialog-delete', function () {
+            //        document.getElementById('delete-file-path').textContent = strCurrentPageLink;
+            //    }, function (event, strAnswer) {
+            //        if (strAnswer === 'Ok') {
+            //            GS.addLoader('file-delete', 'Deleting...');
+            //            // need to make sure that the files/folders are renamed in order
+            //            GS.ajaxJSON(strActionLink + '/action_file', 'action=rm' +
+            //                                                        '&paths=' + encodeURIComponent('["'+strCurrentPageLink+'"]'),
+            //                                                        function (data, error) {
+            //                GS.removeLoader('file-delete');
+            //                
+            //                if (!error) {
+            //                    if (window.opener && window.opener.listCurrentDirectory) {
+            //                        window.opener.listCurrentDirectory(false);
+            //                    }
+            //                    window.close();
+            //                } else {
+            //                    GS.ajaxErrorDialog(data);
+            //                }
+            //            });
+            //        }
+            //    });
+            //}
+            
+            function registerDesignSnippet(strName, strTabTrigger, strSnippet) {
+                snippetManager.register([{'name': strName, 'tabTrigger': strTabTrigger, 'content':  strSnippet}]);
+            }
+            
+            function currentElementFromCursor() {
+                var editorSelection = editor.getSelection(), editorSelectionRange = editor.getSelectionRange(),
+                    strValue = editor.getValue(), arrLines = strValue.split('\n'), strCodeUntilStart, arrCodeUntilStart,
+                    intCurrentRow = editorSelectionRange.end.row, intCurrentColumn = editorSelectionRange.end.column,
+                    intOpenTagStart, intOpenTagEnd, intCloseTagStart, intCloseTagEnd, strTagText, intStart, i, len, ret,
+                    rowStart, columnStart, rowEnd, columnEnd, intCount, strTag, bolFound, bolSingleton, intNeedle;
+                
+                if (editorSelection.inMultiSelectMode !== true && editorSelectionRange.start.row === editorSelectionRange.end.row) {
+                    //console.log(intCurrentRow, intCurrentColumn);
+                    
+                    // turn row and column into a start character number
+                    intStart = intCurrentColumn;
+                    
+                    for (i = 0, len = intCurrentRow; i < len; i += 1) {
+                        intStart += arrLines[i].length + 1;
+                    }
+                    
+                    
+                    /*
+                    if we find a </tag first then
+                    	var bol_found = false
+                    	str_tag = '</found tag>';  -- this is the first tag we found and the only one we care about. only count this tag
+                    	int_count = 0;
+                    	while (not found and not at beginning)
+                    		if we find a </tag> then
+                    			int_count = int_count + 1;
+                    		end if
+                    		if we find a <tag and int_count != 0 then
+                    			int_count = int_count - 1;
+                    		elseif we find a <tag> and int_count === 0 then
+                    			bol_found = true;
+                    		end if
+                    		go back some more
+                    	end while
+                    	if at beginning then blank out property window (bad tag)
+                    
+                    end if*/
+                    
+                    
+                    // go backwards from cursor
+                    for (i = intStart; i > -1; i -= 1) {
+                        // if an open tag is found first
+                        if (strValue[i] === '<' && strValue[i + 1].match(/[a-z]/gim)) {
+                            intOpenTagStart = i;
+                            
+                            // go forwards from intOpenTagStart until a ">" is found
+                            for (i = intOpenTagStart, len = strValue.length; i < len; i += 1) {
+                                if ((strValue[i] === ' ' || strValue[i] === '>') && !strTag) {
+                                    strTag = strValue.substring(intOpenTagStart + 1, i);
+                                    //console.log(strTag);
+                                }
+                                
+                                if (strValue[i] === '>') {
+                                    intOpenTagEnd = i + 1;
+                                    
+                                    bolSingleton = (strValue[i - 1] === '/');
+                                    
+                                    break;
+                                }
+                            }
+                            
+                            // if this is not a singleton: find the end tag
+                            //console.log(bolSingleton);
+                            if (!bolSingleton) {
+                                intNeedle = intOpenTagEnd - 1;
+                                bolFound = false;
+                                intCount = 0;
+                                len = strValue.length;
+                                
+                                while (bolFound === false && intNeedle < len) {
+                                    //console.log(intCount,
+                                    //            strValue.substring(intNeedle, intNeedle + ('</' + strTag + '>').length),
+                                    //            strValue.substring(intNeedle, intNeedle + ('<' + strTag).length));
+                                    if (strValue.substring(intNeedle, intNeedle + ('<' + strTag).length) === '<' + strTag
+                                          && (/[\s|\>]/).test(strValue[intNeedle + ('<' + strTag).length])) {
+                                        intCount += 1;
+                                    }
+                                    if (strValue.substring(intNeedle, intNeedle + ('</' + strTag + '>').length) === '</' + strTag + '>' && intCount !== 0) {
+                                        intCount -= 1;
+                                    } else if (strValue.substring(intNeedle, intNeedle + ('</' + strTag + '>').length) === '</' + strTag + '>' && intCount === 0) {
+                                        intCloseTagStart = intNeedle;
+                                        bolFound = true;
+                                    }
+                                    
+                                    intNeedle += 1;
+                                }
+                                
+                                //console.log(intCloseTagStart);
+                                if (intCloseTagStart) {
+                                    // go forwards from intCloseTagStart until a ">" is found
+                                    for (i = intCloseTagStart, len = strValue.length; i < len; i += 1) {
+                                        if (strValue[i] === '>') {
+                                            intCloseTagEnd = i + 1;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            break;
+                            
+                        // else if an end tag is found first
+                        } else if (strValue[i] === '<' && strValue[i + 1] === '/') {
+                            // loop backwards until we find the open tag
+                            intCloseTagStart = i;
+                            bolFound = false;
+                            intCount = 0;
+                            
+                            // go forwards from intCloseTagStart until a ">" is found
+                            for (i = intCloseTagStart, len = strValue.length; i < len; i += 1) {
+                                if (strValue[i] === '>') {
+                                    intCloseTagEnd = i + 1;
+                                    break;
+                                }
+                            }
+                            
+                            strTag = strValue.substring(intCloseTagStart + 2, intCloseTagEnd - 1);
+                            intNeedle = intCloseTagStart - 1;
+                            //console.log(strTag);
+                            
+                            while (bolFound === false && intNeedle > 0) {
+                                //console.log(intCount,
+                                //            strValue.substring(intNeedle, intNeedle + ('</' + strTag + '>').length),
+                                //            strValue.substring(intNeedle, intNeedle + ('<' + strTag).length));
+                                
+                                if (strValue.substring(intNeedle, intNeedle + ('</' + strTag + '>').length) === '</' + strTag + '>') {
+                                    intCount += 1;
+                                }
+                                if (strValue.substring(intNeedle, intNeedle + ('<' + strTag).length) === '<' + strTag && intCount !== 0) {
+                                    intCount -= 1;
+                                } else if (strValue.substring(intNeedle, intNeedle + ('<' + strTag).length) === '<' + strTag && intCount === 0
+                                            && (/[\s|\>]/).test(strValue[intNeedle + ('<' + strTag).length])) {
+                                    intOpenTagStart = intNeedle;
+                                    bolFound = true;
+                                }
+                                
+                                intNeedle -= 1;
+                            }
+                            
+                            break;
+                        }
+                    }
+                    
+                    if (intOpenTagStart && !intOpenTagEnd) {
+                        // go forwards from intOpenTagStart until a ">" is found
+                        for (i = intOpenTagStart, len = strValue.length; i < len; i += 1) {
+                            if (strValue[i] === '>') {
+                                intOpenTagEnd = i + 1;
+                                
+                                bolSingleton = (strValue[i - 1] === '/');
+                                
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (intOpenTagStart !== undefined && intOpenTagEnd !== undefined) {
+                        strTagText = strValue.substring(intOpenTagStart, intOpenTagEnd);
+                        
+                        ret = {
+                            'start': intOpenTagStart,
+                            'length': strTagText.length,
+                            'text': strTagText,
+                            'linenumber': strValue.substring(0, intOpenTagStart).split('\n').length
+                        };
+                        
+                        //console.log(intCloseTagStart, intCloseTagEnd);
+                        if (intCloseTagStart !== undefined && intCloseTagEnd !== undefined) {
+                            ret.closestart = intCloseTagStart;
+                            ret.closelength = intCloseTagEnd - intCloseTagStart;
+                        }
+                    }
+                    
+                    /*
+                    
+                    //console.log(intOpenTagStart, intOpenTagEnd, strValue.substring(intOpenTagStart, intOpenTagEnd));
+                    
+                    // go to the first " " or ">" that will get you the tag then
+                    // go until the end of the tag to get all of the attributes
+                    */
+                }
+                
+                //console.log(ret);
+                // remove and old yellow highlights
+                if (openSelectionMarker) {
+                    editor.getSession().removeMarker(openSelectionMarker);
+                    openSelectionMarker = null;
+                }
+                if (closeSelectionMarker) {
+                    editor.getSession().removeMarker(closeSelectionMarker);
+                    closeSelectionMarker = null;
+                }
+                
+                // highlight matches
+                if (ret) {
+                    strCodeUntilStart = strValue.substring(0, ret.start);
+                    arrCodeUntilStart = strCodeUntilStart.split('\n');
+                    
+                    rowStart = arrCodeUntilStart.length - 1;
+                    columnStart = arrCodeUntilStart[rowStart].length;
+                    rowEnd = rowStart + strValue.substring(ret.start, ret.start + ret.length).split('\n').length - 1;
+                    columnEnd = columnStart + ret.length;
+                    
+                    openSelectionMarker = editor.getSession().addMarker(new Range(rowStart, columnStart, rowEnd, columnEnd),
+                                                                    'ace-selected-element', 'background');
+                    
+                    if (ret.closestart && ret.closelength) {
+                        strCodeUntilStart = strValue.substring(0, ret.closestart);
+                        arrCodeUntilStart = strCodeUntilStart.split('\n');
+                        
+                        rowStart = arrCodeUntilStart.length - 1;
+                        columnStart = arrCodeUntilStart[rowStart].length;
+                        rowEnd = rowStart + strValue.substring(ret.closestart, ret.closestart + ret.closelength).split('\n').length - 1;
+                        columnEnd = columnStart + ret.closelength;
+                        
+                        closeSelectionMarker = editor.getSession().addMarker(new Range(rowStart, columnStart, rowEnd, columnEnd),
+                                                                                'ace-selected-element-close', 'background');
+                    }
+                }
+                
+                return ret;
+            }
+            
+            
+            function replaceCurrentTag(replacementElement, currentElement) {
+                var editorSelectionRange = editor.getSelectionRange(),
+                    strCurrentText = editor.getValue(),
+                    replacementElementHTML = decodeHTML(replacementElement.outerHTML);
+                
+                //console.log(replacementElement, currentElement);
+                replacementElementHTML = replacementElementHTML.replace(/=""/gim, '');
+                
+                if (currentElement) {
+                    strCurrentText = strCurrentText.substring(0, currentElement.start) +
+                                     replacementElementHTML.substring(0, replacementElementHTML.indexOf('>') + 1) +
+                                     strCurrentText.substring(currentElement.start + currentElement.length);
+                }
+                
+                editor.setValue(strCurrentText);
+                editor.selection.setSelectionRange(
+                        new Range(editorSelectionRange.start.row, editorSelectionRange.start.column, editorSelectionRange.end.row, editorSelectionRange.end.column));
+                currentElementData = currentElementFromCursor();
+                
+                if (bolAutoSave) {
+                    clearTimeout(intTimerID);
+                    intTimerID = setTimeout(function() {
+                        saveFile();
+                        intTimerID = null;
+                    }, 300);
+                }
+            }
+            
+            function loadFile() {
+                if (bolWebSocket) {
+                    GS.addLoader('file-load', 'Loading File...');
+                    GS.requestFromSocket(GS.envSocket
+                                       , 'FILE\tREAD\t' + GS.encodeForTabDelimited(strCurrentPageLink)
+                                       , function (data, error, errorData) {
+                        var index, selectionChangeHandler;
+                        
+                        if (!error) {
+                            if (data !== 'TRANSACTION COMPLETED') {
+                                index = data.indexOf('\n');
+                                lastModified = data.substring(0, index);
+                                data = data.substring(index + 1);
+                                
+                                makeEditor(data);
+                                
+                                // hide panel if on a phone
+                                if (evt.deviceType === 'phone' || evt.deviceType === 'tablet' || window.innerWidth <= 600) {
+                                    GS.triggerEvent(document.getElementById('button-panel-close'), 'click');
+                                }
+                                
+                                search();
+                            } else {
+                                GS.removeLoader('file-load');
+                            }
+                            
+                        } else {
+                            GS.removeLoader('file-load');
+                            GS.webSocketErrorDialog(errorData);
+                        }
+                    });
+                    
+                } else {
+                    GS.addLoader('file-load', 'Loading File...');
+                    GS.ajaxJSON(strActionLink + '/action_file'
+                              , 'action=read&path=' + encodeURIComponent(strCurrentPageLink)
+                              , function (data, error) {
+                        GS.removeLoader('file-load');
+                        
+                        if (!error) {
+                            lastModified = data.dat.date;
+                            
+                            makeEditor(data.dat.content);
+                            
+                            // hide panel if on a phone
+                            if (evt.deviceType === 'phone' || evt.deviceType === 'tablet' || window.innerWidth <= 600) {
+                                GS.triggerEvent(document.getElementById('button-panel-close'), 'click');
+                            }
+                            
+                            //
+                            search();
+                        } else {
+                            document.getElementById('area').innerHTML = '<br />' +
+                                                                        '<center>This file does not exist. Would you like to create it?</center>' +
+                                                                        '<br />' +
+                                                                        '<gs-button onclick="createFile()">Create The File</gs-button>';
+                            
+                            document.getElementById('button-create-file').addEventListener('click', function () {
+                                createFile();
+                            });
+                        }
+                    });
+                }
+            }
+            
+            function makeEditor(strContent) {
+                editor = ace.edit('area');
+                
+                editor.setTheme('ace/theme/eclipse');
+                editor.getSession().setMode('ace/mode/' + strParsingMode);
+                editor.setShowPrintMargin(false);
+                editor.setDisplayIndentGuides(true);
+                editor.setShowFoldWidgets(false);
+                editor.session.setUseWrapMode('free');
+                editor.setBehavioursEnabled(false);
+                editor.$blockScrolling = Infinity; // <== blocks a warning
+                
+                editor.setOptions({
+                    'enableBasicAutocompletion': true,
+                    'enableSnippets'           : true,
+                    'enableLiveAutocompletion' : true
+                });
+                
+                editor.setValue(strContent);
+                
+                // reset undo stack so that we can't undo to empty
+                setTimeout(function () {
+                    editor.getSession().getUndoManager().reset();
+                }, 1);
+                
+                if (evt.touchDevice) {
+                    editor.setOptions({
+                        maxLines: Infinity
+                    });
+                    document.getElementById('area').classList.add('childrenneedsclick');
+                    //// on touch device add a letter to the textarea so that multiple delete works
+                    //editor.renderer.textarea.value = 'a';
+                    
+                } else {
+                    document.getElementById('area').style.height = '100%';
+                }
+                
+                editor.resize(true);
+                editor.focus();
+                editor.selection.setSelectionRange(new Range(0, 0, 0, 0));
+                
+                document.addEventListener('keydown', function (event) {
+                    var intKeyCode = event.which || event.keyCode;
+                    
+                    if (intKeyCode === 83 && event.metaKey) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        clearTimeout(intTimerID);
+                        intTimerID = null;
+                        saveFile(true);
+                    }
+                });
+                
+                
+                // bind text change saving
+                editor.addEventListener('change', function (event) {
+                    if (bolAutoSave) {
+                        clearTimeout(intTimerID);
+                        intTimerID = setTimeout(function() {
+                            saveFile();
+                            intTimerID = null;
+                        }, 300);
+                    }
+                });
+                
+                // bind click on the save indicator to trigger a save
+                //      this is so that when there is an error you can click the indicator
+                document.getElementById('ace-indicator').addEventListener('click', function () {
+                    saveFile(true);
+                });
+                
+                // selection change handler
+                selectionChangeHandler = function (event) {
+                    var currentElement = currentElementFromCursor();
+                    
+                    if (currentElement) {
+                        // turn tag html into element
+                        selectedElement = GS.stringToElement(currentElement.text, document.getElementById('sandbox').contentWindow.document);
+                        
+                        // run property function on tag
+                        if (selectedElement) {
+                            propertyList(selectedElement, currentElement);
+                        } else {
+                            clearPropertyList();
+                        }
+                    } else {
+                        clearPropertyList();
+                    }
+                };
+                
+                document.getElementById('area').addEventListener(evt.mouseup, selectionChangeHandler);
+                document.getElementById('area').addEventListener('keyup', selectionChangeHandler);
+                
+                // trigger design code from the custom elements
+                GS.triggerEvent(window, 'design-register-element');
+                
+                // panel close/open buttons
+                document.getElementById('button-panel-open').addEventListener('click', function () {
+                    document.getElementById('property-panel').removeAttribute('hidden');
+                    document.getElementById('button-panel-open').setAttribute('hidden', '');
+                    editor.resize();
+                });
+                document.getElementById('button-panel-close').addEventListener('click', function () {
+                    document.getElementById('property-panel').setAttribute('hidden', '');
+                    document.getElementById('button-panel-open').removeAttribute('hidden');
+                    editor.resize();
+                });
+            }
+            
+            function createFile() {
+                GS.addLoader('file-create', 'Creating File...');
+                GS.ajaxJSON(strActionLink + '/action_file', 'action=write' +
+                                                                    '&path=' + encodeURIComponent(strCurrentPageLink) +
+                                                                    '&content=', function(data, error) {
+                    if (!error) {
+                        window.location.reload();
+                    } else {
+                        GS.removeLoader('file-create');
+                        GS.ajaxErrorDialog(data, function() {
+                            createFile();
+                        });
+                    }
+                });
+            }
+            
+            function search() {
+                'use strict';
+                var aceContainer = document.getElementById('area'), regexToggle, caseSensitiveToggle,
+                    jsnArgs = GS.qryToJSON(GS.getQueryString());
+
+                if (jsnArgs.pattern) {
+                    editor.find(jsnArgs.pattern);
+                    editor.execCommand('find');
+                    
+                    regexToggle = xtag.query(aceContainer, '.ace_search .ace_button[action="toggleRegexpMode"]')[0];
+                    caseSensitiveToggle = xtag.query(aceContainer, '.ace_search .ace_button[action="toggleCaseSensitive"]')[0];
+                    
+                    if (jsnArgs.regexp === 'true' && !regexToggle.classList.contains('checked')) {
+                        GS.triggerEvent(regexToggle, 'click');
+                        
+                    } else if (jsnArgs.regexp !== 'true' && regexToggle.classList.contains('checked')) {
+                        GS.triggerEvent(regexToggle, 'click');
+                    }
+                    
+                    if (jsnArgs.case === 'true' && !caseSensitiveToggle.classList.contains('checked')) {
+                        GS.triggerEvent(caseSensitiveToggle, 'click');
+                        
+                    } else if (jsnArgs.case !== 'true' && caseSensitiveToggle.classList.contains('checked')) {
+                        GS.triggerEvent(caseSensitiveToggle, 'click');
+                    }
+                }
+            }
+            
+            function saveFile(bolLoader) {
+                'use strict';
+                var aceIndicator = document.getElementById('ace-indicator');
+                
+                if (bolCurrentlySaving === false) {
+                    bolCurrentlySaving = true;
+                    
+                    if (bolLoader) {
+                        GS.addLoader('file-save', 'Saving...');
+                    }
+                    
+                    aceIndicator.removeAttribute('hidden');
+                    aceIndicator.textContent = 'Saving...';
+                    aceIndicator.classList.remove('indicator-error');
+                    
+                    if (bolWebSocket) {
+                        webSocketFileSave(bolLoader);
+                    } else {
+                        ajaxFileSave(bolLoader);
+                    }
+                } else {
+                    bolSaveWaiting = true;
+                }
+            }
+            
+            function ajaxFileSave(bolLoader) {
+                var aceIndicator = document.getElementById('ace-indicator');
+                
+                currentSaveAjax = GS.ajaxJSON(strActionLink + '/action_file'
+                                            , 'action=write' +
+                                              '&path=' + encodeURIComponent(strCurrentPageLink) +
+                                              '&change_stamp=' + encodeURIComponent(lastModified) +
+                                              '&content=' + encodeURIComponent(editor.getValue())
+                                            , function(data, error) {
+                    aceIndicator.setAttribute('hidden', '');
+                    if (bolLoader) {
+                        GS.removeLoader('file-save');
+                    }
+                    
+                    if (!error) {
+                        //consoleCustom.push({
+                        //    'ajax returned': (new Date()).toUTCString(),
+                        //    'send': lastModified,
+                        //    'returned': data.dat
+                        //});
+                        
+                        lastModified = data.dat;
+                        
+                        if (!bolAutoSave) {
+                            bolAutoSave = true;
+                            GS.pushMessage('Auto-saving has been turned on.', 1000);
+                        }
+
+                        bolCurrentlySaving = false;
+                        if (bolSaveWaiting) {
+                            bolSaveWaiting = false;
+                            saveFile();
+                        } else {
+                            if (!testingWindow || (testingWindow && testingWindow.closed === true)) {
+                                //there is no window, and they haven't indicated they want one
+                            } else {
+                                //there is one, so reload it
+                                testingWindow.location.reload(true);
+                            }
+                        }
+                    } else {
+                        bolSaveWaiting = false;
+                        bolCurrentlySaving = false;
+                        bolAutoSave = false;
+                        aceIndicator.removeAttribute('hidden');
+                        aceIndicator.innerHTML = 'CHANGES ARE NOT SAVED<br />CLICK HERE TO TRY AGAIN';
+                        aceIndicator.classList.add('indicator-error');
+                        
+                        data.error_hint = 'Auto-saving has been turned off.\n' +
+                                          'Please save a copy of this code locally so that you do not lose your changes.\n\n' +
+                                          'Click "Cancel" to continue editing. Click "Try Again" to attempt another save.';
+                        
+                        GS.ajaxErrorDialog(data, function() {
+                            saveFile(true);
+                        });
+                    }
+                });
+            }
+            
+            function webSocketFileSave(bolLoader) {
+                var aceIndicator = document.getElementById('ace-indicator');
+                GS.requestFromSocket(GS.envSocket
+                                   , 'FILE\tWRITE\t' +
+                                        GS.encodeForTabDelimited(strCurrentPageLink) + '\t' +
+                                        GS.encodeForTabDelimited(lastModified) + '\n' +
+                                        editor.getValue()
+                                   , function (data, error, errorData) {
+                    aceIndicator.setAttribute('hidden', '');
+                    if (bolLoader) {
+                        GS.removeLoader('file-save');
+                    }
+                    
+                    if (!error) {
+                        if (data !== 'TRANSACTION COMPLETED') {
+                            //consoleCustom.push({
+                            //    'ajax returned': (new Date()).toUTCString(),
+                            //    'send': lastModified,
+                            //    'returned': data.dat
+                            //});
+                            
+                            lastModified = data.trim();
+                            
+                            if (!bolAutoSave) {
+                                bolAutoSave = true;
+                                GS.pushMessage('Auto-saving has been turned on.', 1000);
+                            }
+
+                            bolCurrentlySaving = false;
+                            if (bolSaveWaiting) {
+                                bolSaveWaiting = false;
+                                saveFile();
+                            } else {
+                                if (!testingWindow || (testingWindow && testingWindow.closed === true)) {
+                                    //there is no window, and they haven't indicated they want one
+                                } else {
+                                    //there is one, so reload it
+                                    testingWindow.location.reload(true);
+                                }
+                            }
+                        }
+                    } else {
+                        bolSaveWaiting = false;
+                        bolCurrentlySaving = false;
+                        bolAutoSave = false;
+                        aceIndicator.removeAttribute('hidden');
+                        aceIndicator.innerHTML = 'CHANGES ARE NOT SAVED<br />CLICK HERE TO TRY AGAIN';
+                        aceIndicator.classList.add('indicator-error');
+                        
+                        errorData.error_hint = 'Auto-saving has been turned off.\n' +
+                                          'Please save a copy of this code locally so that you do not lose your changes.\n\n' +
+                                          'Click "Cancel" to continue editing. Click "Try Again" to attempt another save.';
+                        
+                        GS.ajaxErrorDialog(errorData, function() {
+                            saveFile(true);
+                        });
+                    }
+                });
+            }
+            
+            window.addEventListener('load', function () { // DOMContentLoaded
+                var jsnArgs = GS.qryToJSON(GS.getQueryString()), strFileExtension;
+                
+                //window.Find = require('ace/find').Find;
+                window.Range = require('ace/range').Range;
+                window.snippetManager = require('ace/snippets').snippetManager;
+                
+                strCurrentPageLink = jsnArgs.link;
+                
+                bolWebSocket = (jsnArgs.socket === "true");
+                
+                
+                if (strCurrentPageLink) {
+                    document.getElementById('display-file-name').textContent = 
+                                    'Editing: ' + strCurrentPageLink.substring(strCurrentPageLink.lastIndexOf('/') + 1);
+                    
+                    document.getElementById('display-full-link').innerHTML = strCurrentPageLink;
+                    
+                    // calculate ace editor parsing mode
+                    strFileExtension = strCurrentPageLink.substring(strCurrentPageLink.lastIndexOf('.') + 1);
+                    
+                    if (strFileExtension === 'html') {
+                        strParsingMode = 'html';
+                    } else if (strFileExtension === 'css') {
+                        strParsingMode = 'css';
+                    } else if (strFileExtension === 'js') {
+                        strParsingMode = 'javascript';
+                    } else if (strFileExtension === 'sql' || strFileExtension === 'once' || strFileExtension === 'drop' || strFileExtension === 'replace') {
+                        strParsingMode = 'sql';
+                    } else {
+                        strParsingMode = 'text';
+                    }
+                    
+                    // load file
+                    loadFile();
+                } else {
+                    document.getElementById('area').innerHTML = '<center><br /><b>No file link provided.</b></center>';
+                }
+                
+                // test button and F5
+                if (document.getElementById('button-test')) {
+                    document.getElementById('button-test').addEventListener('click', test);
+                    window.addEventListener('keydown', function (event) {
+                        var intKeyCode = event.which || event.keyCode;
+                        
+                        //console.log(intKeyCode);
+						//116 = F5
+                        if (intKeyCode === 116) {
+                            test();
+                        }
+                    });
+                }
+                
+                //document.getElementById('button-rename').addEventListener('click', function () {
+                //    renameFile();
+                //});
+                
+                //document.getElementById('button-delete').addEventListener('click', function () {
+                //    deleteFile();
+                //});
+            });
+            
+            function scriptComment() {
+                "use strict";
+                editor.toggleCommentLines();
+                editor.focus();
+            }
+            function scriptIndent() {
+                "use strict";
+                editor.blockIndent();
+                editor.focus();
+            }
+            function scriptOutdent() {
+                "use strict";
+                editor.blockOutdent();
+                editor.focus();
+            }
+            
+            GS.addBeforeUnloadEvent(function () {
+                // remove testing window
+                if (testingWindow && testingWindow.closed === false) {
+                    testingWindow.close();
+                }
+                
+                if (bolWebSocket) {
+                    if ((intTimerID !== undefined && intTimerID !== null) || bolCurrentlySaving || !bolAutoSave) {
+                        return 'You have unsaved changes.';
+                    }
+                } else {
+                    if (bolCurrentlySaving) {
+                        currentSaveAjax.abort();
+                        bolSaveWaiting = false;
+                        bolCurrentlySaving = false;
+                        saveFile();
+                        
+                    } else if (!bolAutoSave) {
+                        return 'You have unsaved changes.';
+                    }
+                }
+            });
+        </script>
+        
+        <script src="design_standard_elements.js" type="text/javascript"></script>
+        <script src="design_property.js" type="text/javascript"></script>
+        
+        <style>
+            #editor-container { height: 100%; }
+            #container { position: relative; }
+            #area { height: 100%; }
+            
+            #ace-indicator {
+                position: absolute;
+                top: 0.2em;
+                left: 50%;
+                margin-left: -125px;
+                width: 250px;
+                text-align: center;
+                
+                z-index: 50;
+            }
+            #ace-indicator.indicator-error {
+                border: 2px dashed #000000;
+                background-color: #FF5555;
+                padding: 0.2em;
+                right: 1em;
+            }
+        
+            #property-panel {
+                background-color: #F5F5F5;
+                position: relative;
+                
+                border-left: 1px solid #3B99BE;
+                box-shadow: 0 0 0.2em 0 #999999;
+                width: 20em;
+                
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -ms-box-sizing: border-box;
+                -o-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+            
+            /* when the page gets too small widthwise: make side box position absolute */
+            @media (max-width: 768px) {
+                #property-panel {
+                    position: absolute;
+                    height: 100%;
+                    width: 100%;
+                    right: 0;
+                    top: 0;
+                    border-left: 0 none;
+                    z-index: 5;
+                }
+            }
+            
+            #property-panel-padding {
+                padding: 0.5em;
+                
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -ms-box-sizing: border-box;
+                -o-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+            
+            #global-property-section,
+            #element-property-section,
+            #siblings-and-children-section {
+                padding: 0 0.2em 0.25em 0.2em;
+            }
+            
+            #property-panel .section-heading {
+                margin: 0.3em 0;
+                padding: 0.2em 0.1em;
+                border-bottom: 2px solid #A3A3A3;
+            }
+            
+            #property-panel .section-heading h5 {
+                margin: 0;
+                padding: 0;
+            }
+            
+            #property-panel-scroll-container {
+                overflow: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            
+            
+            #global-property-section > table,
+            #element-property-section > table {
+                border: 2px solid #CCCCCC;
+            }
+            
+            #global-property-section > table tr th:first-child,
+            #element-property-section > table tr th:first-child {
+                font-size: 0.8em;
+                line-height: 0.9;
+            }
+            
+            #global-property-section > table tr td:last-child,
+            #element-property-section > table tr td:last-child {
+                border-left-width: 2px;
+            }
+            
+            .blue #global-property-section > table > tbody > tr > td *,
+            .blue #global-property-section > table > tbody > tr > th *,
+            .blue #element-property-section > table > tbody > tr > td *,
+            .blue #element-property-section > table > tbody > tr > th * {
+                background-color: transparent;
+            }
+            
+            #button-panel-close {
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 1;
+            }
+            
+            #element-property-title .tag-name {
+                color: #0000FF;
+            }
+            #element-property-title .tag-selector {
+                color: #CB7119;
+            }
+            #element-property-title .line-number {
+                font-size: 0.8em;
+            }
+            
+            .ace-selected-element {
+                position: absolute;
+                background-color: #FBFFBE;
+                z-index: 4;
+            }
+            
+            .ace-selected-element-close {
+                position: absolute;
+                background-color: #FBFFBE;
+                opacity: 0.5;
+                z-index: 4;
+            }
+            
+            #display-full-link {
+                word-break: break-all;
+            }
+        </style>
+    </head>
+    <body class="blue">
+        <!--<template id="dialog-rename">
+            <gs-page>
+                <gs-header><center><h3>Rename</h3></center></gs-header>
+                <gs-body padded>
+                    <gs-text id="input-new-file-name"></gs-text>
+                </gs-body>
+                <gs-footer>
+                    <gs-grid>
+                        <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
+                        <gs-block><gs-button dialogclose listen-for-return bg-primary>Ok</gs-button></gs-block>
+                    </gs-grid>
+                </gs-footer>
+            </gs-page>
+        </template>
+        
+        <template id="dialog-delete">
+            <gs-page>
+                <gs-header><center><h3>Delete</h3></center></gs-header>
+                <gs-body padded>
+                    Are you sure you want to delete the file: "<span id="delete-file-path"></span>"?
+                </gs-body>
+                <gs-footer>
+                    <gs-grid>
+                        <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
+                        <gs-block><gs-button dialogclose listen-for-return bg-danger>Ok</gs-button></gs-block>
+                    </gs-grid>
+                </gs-footer>
+            </gs-page>
+        </template>-->
+        
+        <template id="dialog-commit" data-max-width="2000px" data-max-height="2000px">
+            <gs-page>
+                <gs-header><center><h3>Commit: <span id="dialog-header-commit"></span></h3></center></gs-header>
+                <gs-body padded>
+                    <pre id="dialog-body-text" class="selectable" style="font-size: 0.8em"></pre>
+                </gs-body>
+                <gs-footer>
+                    <gs-button dialogclose>Done</gs-button>
+                </gs-footer>
+            </gs-page>
+        </template>
+        
+        <iframe id="sandbox" hidden></iframe>
+        <div id="editor-container" flex-horizontal flex-fill>
+            <gs-page flex>
+                <gs-header id="editor-header" style="padding: 0;">
+                    <div flex-horizontal style="padding: 0.25em;">
+                        <b id="display-full-link" flex></b>
+                        <div>
+                            <!--
+                                <gs-button id="button-rename" no-focus inline>Rename</gs-button>
+                                <gs-button id="button-delete" no-focus inline>Delete</gs-button>
+                            -->
+                            <gs-button id="button-test" no-focus inline>Test</gs-button>
+                            <gs-button id="button-panel-open" no-focus icononly icon="chevron-left" hidden inline>&nbsp;</gs-button>
+                        </div>
+                    </div>
+                    
+                    <template id="ribbon-category-layout">
+                        <gs-group title="These are elements used for responsive design based on media and page dimensions." name="Responsive Design">
+                            <gs-button data-ref="0" inline>Container</gs-button>
+                            <gs-button data-ref="2" inline>Font size adjuster</gs-button>
+                            <gs-button data-ref="3" inline>Grid</gs-button>
+                            <gs-button data-ref="4" inline>Image</gs-button>
+                            <gs-button data-ref="6" inline>Panel</gs-button>
+                        </gs-group>
+                        
+                        <gs-group title="These are general use elements for holding content." name="Content Holders">
+                            <gs-button data-ref="1" inline>Jumbo</gs-button>
+                            <gs-button data-ref="5" inline>Page</gs-button>
+                            <gs-button data-ref="7" inline>Switch</gs-button>
+                        </gs-group>
+                    </template>
+                    <template id="ribbon-category-control">
+                        <gs-group title="These are button elements." name="Button">
+                            <gs-button data-ref="8" inline>Button</gs-button>
+                            <gs-button data-ref="9" inline>E-Mail</gs-button>
+                            <gs-button data-ref="10" inline>Facetime</gs-button>
+                            <gs-button data-ref="11" inline>Map</gs-button>
+                            <gs-button data-ref="12" inline>Phone</gs-button>
+                            <div class="spacer"></div>
+                            <gs-button data-ref="13" inline>Skype</gs-button>
+                            <gs-button data-ref="14" inline>Package Tracking</gs-button>
+                            <gs-button data-ref="16" inline>Dialog</gs-button>
+                        </gs-group>
+                        
+                        <gs-group title="These are Field-based elements." name="Field">
+                            <gs-button data-ref="18" inline>Combo</gs-button>
+                            <gs-button data-ref="19" inline>Date</gs-button>
+                            <gs-button data-ref="21" inline>Memo</gs-button>
+                            <div class="spacer"></div>
+                            <gs-button data-ref="22" inline>Number</gs-button>
+                            <gs-button data-ref="24" inline>Search</gs-button>
+                            <gs-button data-ref="27" inline>Text</gs-button>
+                        </gs-group>
+                        
+                        <gs-group title="These are List-based elements." name="List">
+                            <gs-button data-ref="20" inline>Listbox</gs-button>
+                            <gs-button data-ref="23" inline>Optionbox</gs-button>
+                            <div class="spacer"></div>
+                            <gs-button data-ref="25" inline>Select</gs-button>
+                            <gs-button data-ref="28" inline>Folder Manager</gs-button>
+                        </gs-group>
+                        
+                        <gs-group title="These are Toggle-based elements." name="Toggle">
+                            <gs-button data-ref="15" inline>Toggle</gs-button>
+                            <div class="spacer"></div>
+                            <gs-button data-ref="17" inline>Checkbox</gs-button>
+                        </gs-group>
+                    </template>
+                    <template id="ribbon-category-data">
+                        <gs-group title="These are elements can display as well as alter data." name="Data Display &amp; Alteration">
+                            <gs-button data-ref="49" inline>Datasheet</gs-button>
+                            <gs-button data-ref="30" inline>Envelope</gs-button>
+                            <gs-button data-ref="31" inline>Form</gs-button>
+                        </gs-group>
+                        <gs-group title="These are elements can display as well as alter data." name="Data Alteration Only">
+                            <gs-button data-ref="29" inline>Delete button</gs-button>
+                            <gs-button data-ref="32" inline>Insert</gs-button>
+                        </gs-group>
+                    </template>
+                    <template id="ribbon-category-templating">
+                        <gs-group title="These are statements for inserting data into the template." name="Value Insertion">
+                            <gs-button data-ref="35" inline>Envelope column</gs-button>
+                            <gs-button data-ref="36" inline>Querystring column</gs-button>
+                            <gs-button data-ref="37" inline>HTML Safe Value</gs-button>
+                            <gs-button data-ref="38" inline>HTML Unsafe value</gs-button>
+                        </gs-group>
+                        <gs-group title="These are statements for inserting data into the template." name="Control Structures">
+                            <gs-button data-ref="33" inline>Array Loop</gs-button>
+                            <gs-button data-ref="34" inline>If</gs-button>
+                            <gs-button data-ref="39" inline>Javascript Command</gs-button>
+                        </gs-group>
+                    </template>
+                    <template id="ribbon-category-misc">
+                        <gs-group title="These snippets are for Javascript." name="Javascript">
+                            <gs-button data-ref="40" inline>Document Start</gs-button>
+                            <gs-button data-ref="41" inline>Window Load</gs-button><br />
+                            <gs-button data-ref="45" inline>Loader/Spinner</gs-button>
+                        </gs-group>
+                        <gs-group title="These snippets are for HTML." name="HTML">
+                            <gs-button data-ref="43" inline>Template</gs-button>
+                            <gs-button data-ref="44" inline>Table</gs-button>
+                            <gs-button data-ref="48" inline>HTML Comment</gs-button><br />
+                            <gs-button data-ref="52" inline>JS Script Tag</gs-button>
+                            <gs-button data-ref="53" inline>CSS Style Tag</gs-button>
+                        </gs-group>
+                        <gs-group title="These snippets are for CSS." name="CSS">
+                            <gs-button data-ref="50" inline>Smooth Iphone Scrolling</gs-button><br />
+                            <gs-button data-ref="51" inline>Background Color</gs-button>
+                        </gs-group>
+                        
+                        <!--<gs-button data-ref="42">New Element</gs-button>-->
+                        <!--<gs-button data-ref="46">WebSocket Action</gs-button>-->
+                        <!--<gs-button data-ref="47">AJAX Action</gs-button>-->
+                    </template>
+                    <script>
+                        var arrRibbonChoices = [
+                            //0: Container
+                            '\n<gs-container min-width="sml;med;lrg;" padded>\n    \n</gs-container>'
+                            //1: Jumbo
+                          , '\n<gs-jumbo>\n    \n</jumbo>'
+                            //2: Font Size
+                          , '\n<gs-font min-width="">\n    \n</gs-font>'
+                            //3: Grid
+                          , '\n<gs-grid widths="">\n    <gs-block></gs-block>\n</gs-grid>'
+                            //4: Image
+                          , '\n<gs-img src=""></gs-img>'
+                            //5: Page
+                          , ml(function () {/*
+<gs-page>
+    <gs-header>
+        <center><h3></h3></center>
+    </gs-header>
+    <gs-body>
+    
+    </gs-body>
+    <gs-footer></gs-footer>
+</gs-page>*/})
+                            //6: Panel
+                          , ml(function () {/*
+<gs-panel id="panel">
+    <gs-page id="left-bar" style="width: 17em;">
+        
+    </gs-page>
+    <gs-page>
+        
+    </gs-page>
+</gs-panel>*/})
+                            //7: Switch
+                          , ml(function () {/*
+<gs-switch>
+    <template for="none"></template>
+    <template for="detail"></template>
+</gs-switch>*/})
+
+                            //8: Button
+                          , '\n<gs-button></gs-button>'
+                            //9: E-Mail Button
+                          , '\n<gs-email-button></gs-email-button>'
+                            //10: Facetime Button
+                          , '\n<gs-facetime-button></gs-facetime-button>'
+                            //11: Map Button
+                          , '\n<gs-map-button></gs-map-button>'
+                            //12: Phone Button
+                          , '\n<gs-phone-button></gs-phone-button>'
+                            //13: Skype Button
+                          , '\n<gs-skype-button></gs-skype-button>'
+                            //14: Delivery Button
+                          , '\n<gs-tracking-button></gs-tracking-button>'
+                            //15: Toggle Button
+                          , '\n<gs-toggle></gs-toggle>'
+                            //16: Dialog Button
+                          , '\n<gs-dialog-button></gs-dialog-button>'
+                            //17: Checkbox
+                          , '\n<gs-checkbox value="0"></gs-checkbox>'
+                            //18: Combobox
+                          , '\n<gs-combo src=""></gs-combo>'
+                            //19: Date
+                          , '\n<gs-date></gs-date>'
+                            //20: Listbox
+                          , '\n<gs-listbox src=""></gs-listbox>'
+                            //21: Memo
+                          , '\n<gs-memo></gs-memo>'
+                            //22: Number
+                          , '\n<gs-number></gs-number>'
+                            //23: Optionbox
+                          , '\n<gs-optionbox>\n    <gs-option value=""></gs-option>\n</gs-optionbox>'
+                            //24: Search
+                          , '\n<gs-search id=""></gs-search>'
+                            //25: Select
+                          , '\n<gs-select>\n    <option></option>\n</gs-select>'
+                            //26: Static
+                          , '\n<gs-static></gs-static>'
+                            //27: Text
+                          , '\n<gs-text></gs-text>'
+                            //28: Folder Manager
+                          , '\n<gs-file-manager path="/" folder="role"></gs-file-manager>'
+                            //29: Delete Button
+                          , '\n<gs-delete-button src=""></gs-delete-button>'
+                            //30: Envelope
+                          , ml(function () {/*
+<gs-envelope src="test.tpeople">
+    <template for="hud"></template>
+    <template for="table">
+        <table>
+            <tbody>
+                <tr>
+                    <th heading="#">{{! row_number }}</th>
+                    <td heading=""></td>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+    <template for="insert"></template>
+</gs-envelope>*/})
+
+                            //31: Form
+                          , ml(function () {/*
+<gs-form src="test.tpeople">
+    <template>
+        
+    </template>
+</gs-form>*/})
+
+                            //32: Insert
+                          , '\n<gs-insert src="test.tpeople"></gs-insert>'
+                            //33: Array Loop
+                          , ml(function () {/*
+{{~jo.ARRAY :value:index}}
+    {{! value}}
+    {{! index}}
+{{~}}*/})
+                            //34: If
+                          , ml(function () {/*
+{{? condition1 }}
+    this is an if
+{{?? condition2 }}
+    this is an else if
+{{??}}
+    this is an else
+{{?}}*/})
+                            //35: Envelope Column
+                          , '{{! row.COLUMN }}'
+                            //36: Querystring column
+                          , '{{! qs.COLUMN }}'
+                            //37: HTML Safe Value
+                          , '{{! \'HTML Encoded Value (HTML Safe)\' }}'
+                            //38: HTML Unsafe value
+                          , '{{= \'Value (UNSAFE AGAINST HTML INJECTION)\' }}'
+                            //39: Javascript Command
+                          , '{{ Javascript Here }}'
+                            //40: Document Start
+                          , ml(function () {/*
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>New Page</title>
+        
+        <ASDF src="/js/greyspots.js" type="text/javascript"></ASDF>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        
+    </body>
+</html>*/}).replace(/ASDF/gi, 'script')
+
+                            //41: Window Load
+                          , ml(function () {/*
+window.addEventListener('load', function () {
+    'use strict';
+    
+});*/})
+
+                            //42: New Element
+                          , '\n'
+                            //43: Template
+                          , '\n<template>\n    \n</template>'
+                            //44: Table
+                          , ml(function () {/*
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>*/})
+
+                            //45: Loader
+                          , '\nGS.addLoader(\'loader-class-or-target\', \'Loader Message...\')' +
+                            '\nGS.removeLoader(\'loader-class-or-target\')'
+                            
+                            //46: WebSocket Action Call
+                          , '\n'
+                            //47: AJAX Action Call
+                          , '\n'
+                            //48: HTML Comment
+                          , '\n<!--\n    \n-->'
+                            //49: Datasheet
+                          , ml(function () {/*
+<gs-datasheet src="test.tpeople">
+    <template for="hud"></template>
+    <template for="table">
+        <table>
+            <tbody>
+                <tr>
+                    <th heading="#">{{! row_number }}</th>
+                    <td heading=""></td>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+    <template for="insert"></template>
+</gs-datasheet>*/})
+
+                            //50: Smooth Iphone Scrolling
+                          , '\n-webkit-overflow-scrolling: touch;'
+                            //51: Background Color
+                          , '\nbackground-color: #000000;'
+                          
+                            //52: JS Script Tag
+                          , '\n<' + 'scri' + 'pt' + '>\n    \n<' + '/scri' + 'pt>'
+                            //53: CSS Style Tag
+                          , '\n<style>\n    \n</style>'
+                        ];
+                        
+                        // insert ribbon snippet using "strRef" as the array index
+                        function insertRibbonSnippet(strRef) {
+                            var strSnippet      = arrRibbonChoices[parseInt(strRef, 10)]
+                              , cursor          = editor.getCursorPosition()
+                              , strLine         = editor.session.getLine(cursor.row)
+                              , strIndentString = strLine.match(/^\s*/)[0];
+                            
+                            // we dont want a snippet adding an extra line if we can avoid it so:
+                            //      if the snippet wants to be on it's own line (which is true if the first character is a \n)
+                            //      and if the line we are currently on is only whitespace:
+                            //          trim off first \n
+                            if (strSnippet[0] === '\n' && (/^\s*$/gi).test(strLine)) {
+                                strSnippet = strSnippet.substring(1);
+                            }
+                            
+                            // add snippet text to editor
+                            editor.insert(strSnippet.replace(/\n/g, '\n' + strIndentString));
+                            
+                            // if we are not on a touch device: focus into editor
+                            if (!evt.touchDevice) {
+                                editor.focus();
+                            }
+                        }
+                        
+                        // if the ribbon is hidden, we call this function to open a dialog with the ribbon content
+                        function ribbonPopupOpen(target) {
+                            var templateElement = document.createElement('template');
+                            
+                            templateElement.setAttribute('data-overlay-close', 'true');
+                            templateElement.setAttribute('data-max-width', '300px');
+                            templateElement.innerHTML =
+                                '<gs-page>' +
+                                    '<gs-body padded id="ribbon-dialog-content">' +
+                                        document.getElementById('ribbon-content').innerHTML +
+                                    '</gs-body>' +
+                                '</gs-page>';
+                            
+                            GS.openDialogToElement(target, templateElement, 'down', function () {
+                                var dialog = this;
+                                
+                                // v-- this code didn't account for drag start closing the dialog, the code below solves that
+                                //// we need the click of the ribbon choice buttons to close the dialog,
+                                ////      so we'll add "dialogclose" to all of them
+                                //var arrElements = xtag.query(dialog, '[data-ref]'), i, len;
+                                //
+                                //for (i = 0, len = arrElements.length; i < len; i += 1) {
+                                //    arrElements[i].setAttribute('dialogclose', '');
+                                //}
+                                
+                                // when the "ribbon-click" or "ribbon-drag-start" events are emitted: close the dialog
+                                document.getElementById('ribbon-dialog-content').addEventListener('ribbon-click', function () {
+                                    GS.closeDialog(dialog, 'Ok');
+                                });
+                                document.getElementById('ribbon-dialog-content').addEventListener('ribbon-drag-start', function () {
+                                    GS.closeDialog(dialog, 'Ok');
+                                });
+                                
+                                // because there is a lot to bind for the ribbon choices (and we bind the ribbon buttons
+                                //      in multiple places), we call this function to do the dirty work
+                                bindRibbonChoices('ribbon-dialog-content', 'vertical');
+                            });
+                        }
+                        
+                        // there are multiple things a ribbon choice needs to have bound to it:
+                        //      click: just insert the correct snippet at the cursor
+                        //      mousedown: prepare for drag
+                        //      mousemove: once we move 3px out of start: ghost and drag cursor
+                        function bindRibbonChoices(strContainerID, scrollDirection) {
+                            var container = document.getElementById(strContainerID)
+                              , dragStartFunction, dragMoveFunction, dragEndFunction;
+                            
+                            var ghost, ghostXOffset, ghostYOffset
+                              , intStartLeft, intStartTop, intCurrentLeft, intCurrentTop
+                              , dragStarted, mousedownEvent, startScrollLeft, startScrollTop;
+                            
+                            dragStartFunction = function (event) {
+                                if (event.target.hasAttribute('data-ref')) {
+                                    var jsnMousePos = GS.mousePosition(event)
+                                      , ghostPos = GS.getElementPositionData(event.target);
+                                    
+                                    mousedownEvent = event;
+                                    dragStarted = false;
+                                    intStartLeft = jsnMousePos.left;
+                                    intStartTop = jsnMousePos.top;
+                                    startScrollLeft = container.scrollLeft;
+                                    startScrollTop = container.scrollTop;
+                                    
+                                    ghost = event.target.cloneNode(true);
+                                    
+                                    ghost.style.minHeight = '0px';
+                                    ghost.style.padding = '0.25em';
+                                    ghost.style.position = 'absolute';
+                                    ghost.style.zIndex = '9001'; // IT'S OVER NINE THOUSAND!!!
+                                    ghost.style.opacity = '0.5';
+                                    ghost.style.width = event.target.offsetWidth + 'px';
+                                    ghost.style.height = event.target.offsetHeight + 'px';
+                                    
+                                    ghostXOffset = intStartLeft - ghostPos.intElementLeft;
+                                    ghostYOffset = intStartTop - ghostPos.intElementTop;
+                                    
+                                    document.body.addEventListener(evt.mousemove, dragMoveFunction);
+                                    document.body.addEventListener(evt.mouseup, dragEndFunction);
+                                }
+                            };
+                            
+                            // because on a phone, you might want to scroll: in the direction of the scrolling we make it so that
+                            //      you can't trigger the ghost in the scroll direction (by making the threshold so high that you
+                            //      can't really expect to cross over it)
+                            var leftPlay = (evt.touchDevice && scrollDirection === 'horizontal' ? 9999999999 : 3)
+                              , topPlay = (evt.touchDevice && scrollDirection === 'vertical' ? 9999999999 : 3);
+                            dragMoveFunction = function (event) {
+                                var jsnMousePos;
+                                
+                                if (event.which === 0 && !evt.touchDevice) {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    dragEndFunction();
+                                    
+                                } else {
+                                    jsnMousePos = GS.mousePosition(event);
+                                    intCurrentLeft = jsnMousePos.left;
+                                    intCurrentTop = jsnMousePos.top;
+                                    
+                                    if (dragStarted === false &&
+                                        (
+                                            (scrollDirection === 'horizontal' && container.scrollLeft === startScrollLeft) ||
+                                            (scrollDirection === 'vertical' && container.scrollTop === startScrollTop)
+                                        ) &&
+                                        (
+                                            Math.abs(intCurrentLeft - intStartLeft) > leftPlay
+                                         || Math.abs(intCurrentTop - intStartTop) > topPlay
+                                        )) {
+                                        dragStarted = true;
+                                        
+                                        // if ghost is not appended yet: append to body
+                                        if (!ghost.parentNode || ghost.parentNode.nodeName !== 'BODY') {
+                                            document.body.appendChild(ghost);
+                                        }
+                                        
+                                        GS.triggerEvent(container, 'ribbon-drag-start');
+                                    }
+                                    
+                                    if (dragStarted) {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                        
+                                        // style ghost
+                                        ghost.style.left = (intCurrentLeft - ghostXOffset) + 'px';
+                                        ghost.style.top = (intCurrentTop - ghostYOffset) + 'px';
+                                        
+                                        // move ace cursor
+                                        editor.selection.moveToPosition(editor.renderer.screenToTextCoordinates(intCurrentLeft, intCurrentTop));
+                                    }
+                                }
+                            };
+                            
+                            dragEndFunction = function (event) {
+                                var editorPos = GS.getElementPositionData(document.getElementById('container'));
+                                
+                                // remove ghost
+                                if (ghost.parentNode && ghost.parentNode.nodeName === 'BODY') {
+                                    ghost.parentNode.removeChild(ghost);
+                                }
+                                
+                                // unbind mousemove and mouseup
+                                document.body.removeEventListener(evt.mousemove, dragMoveFunction);
+                                document.body.removeEventListener(evt.mouseup, dragEndFunction);
+                                
+                                // insert text to location (if the location is in the editor)
+                                if (
+                                        dragStarted &&
+                                        // if mouse pos (x and y) is greater than the top left of the editor (x and y)
+                                        intCurrentLeft > editorPos.intElementLeft &&
+                                        intCurrentTop > editorPos.intElementTop &&
+                                        // and if mouse pos (x and y) is less than the bottom right of the editor (x and y)
+                                        intCurrentLeft < (editorPos.intElementLeft + editorPos.intElementWidth) &&
+                                        intCurrentTop < (editorPos.intElementTop + editorPos.intElementHeight)
+                                    ) {
+                                    insertRibbonSnippet(ghost.getAttribute('data-ref'));
+                                }
+                            };
+                            
+                            container.addEventListener(evt.mousedown, dragStartFunction);
+                            
+                            // ribbon button click:
+                            //      because it's easier: I'll event delegate for ribbon button click instead of binding every button
+                            container.addEventListener('click', function (event) {
+                                if (event.target.getAttribute('data-ref')) {
+                                    insertRibbonSnippet(event.target.getAttribute('data-ref'));
+                                    GS.triggerEvent(event.target, 'ribbon-click');
+                                }
+                            });
+                        }
+                        
+                        // use the querystring to alter the ribbon state
+                        function ribbonQSHandler() {
+                            var strQueryString = GS.getQueryString()
+                              , strCategory = GS.qryGetVal(strQueryString, 'ribbon')
+                              , strHidden = GS.qryGetVal(strQueryString, 'ribbon-hidden')
+                              , arrElements;
+                            
+                            // hide/show the ribbon and change the ribbon toggle button icon
+                            //      depending on the "ribbon-hidden" in the querystring
+                            if (strHidden === 'true') {
+                                document.getElementById('ribbon-container').classList.add('ribbon-hidden');
+                                document.getElementById('ribbon-minimize').setAttribute('icon', 'chevron-down');
+                            } else {
+                                document.getElementById('ribbon-container').classList.remove('ribbon-hidden');
+                                document.getElementById('ribbon-minimize').setAttribute('icon', 'chevron-up');
+                            }
+                            
+                            // set the ribbon content to the content of the ribbon category's template
+                            //      we want to fill the ribbon even if it's hidden so that "ribbonPopupOpen"
+                            //      can copy from it to fill it's dialog and so that when we show the ribbon
+                            //      we dont have to fill it then
+                            document.getElementById('ribbon-content').innerHTML =
+                                    document.getElementById('ribbon-category-' + strCategory).innerHTML;
+                            
+                            // move "ribbon-selected" class
+                            arrElements = xtag.query(document.getElementById('ribbon-control'), '.ribbon-selected');
+                            if (arrElements.length > 0) {
+                                arrElements[0].classList.remove('ribbon-selected');
+                            }
+                            arrElements = xtag.query(document.getElementById('ribbon-control'), '[data-template="' + strCategory + '"]');
+                            if (arrElements.length > 0) {
+                                arrElements[0].classList.add('ribbon-selected');
+                            }
+                            
+                            // we want the gs-body to sync with any changes to the header height because of the ribbon
+                            GS.triggerEvent(window, 'resize');
+                            
+                            // we want to remember your choice of showing or hiding the ribbon
+                            GS.setCookie('file-editor-ribbon-hidden', strHidden, 999999);
+                        }
+                        
+                        window.addEventListener('load', function () {
+                            var strQueryString = GS.getQueryString();
+                            
+                            // bind ribbon toggle
+                            document.getElementById('ribbon-minimize').addEventListener('click', function () {
+                                if (this.getAttribute('icon') === 'chevron-up') {
+                                    GS.pushQueryString('ribbon-hidden=true');
+                                } else {
+                                    GS.pushQueryString('ribbon-hidden=false');
+                                }
+                            });
+                            
+                            // default ribbon choice and hidden state
+                            if (!GS.qryGetVal(strQueryString, 'ribbon')) {
+                                GS.pushQueryString('ribbon=layout');
+                            }
+                            if (!GS.qryGetVal(strQueryString, 'ribbon-hidden') && GS.getCookie('file-editor-ribbon-hidden')) {
+                                GS.pushQueryString('ribbon-hidden=' + GS.getCookie('file-editor-ribbon-hidden'));
+                            }
+                            
+                            // event delegate for ribbon options
+                            document.getElementById('ribbon-control').addEventListener('click', function () {
+                                var target = event.target;
+                                
+                                // if target has a "data-template" attribute: push state
+                                if (target.hasAttribute('data-template')) {
+                                    // push state (causes the ribbon to be filled correctly even if the ribbon is hidden)
+                                    GS.pushQueryString('ribbon=' + target.getAttribute('data-template'));
+                                    
+                                    // if the ribbon is hidden: popup mode
+                                    if (document.getElementById('ribbon-minimize').getAttribute('icon') === 'chevron-down') {
+                                        ribbonPopupOpen(target);
+                                    }
+                                }
+                            });
+                            
+                            // because there is a lot to bind for the ribbon choices (and we bind the ribbon buttons
+                            //      in multiple places), we call this function to do the dirty work
+                            bindRibbonChoices('ribbon-content', 'horizontal');
+                            
+                            // we want to refresh the state when the querystring changes, so we bind to the querystring events
+                            ribbonQSHandler();
+                            window.addEventListener('pushstate',    function () { ribbonQSHandler(); });
+                            window.addEventListener('replacestate', function () { ribbonQSHandler(); });
+                            window.addEventListener('popstate',     function () { ribbonQSHandler(); });
+                        });
+                    </script>
+                    <style>
+                        /* override */
+                        #editor-header {
+                            border: 0 none;
+                        }
+                        
+                        /* make tab bar buttons flow together */
+                        /* ribbon-control button single border in between */
+                        #ribbon-control gs-button {
+                            display: inline-block;
+                            border: 0 none;
+                            border-bottom: 1px solid #AAA;
+                            border-top: 1px solid #AAA;
+                            padding: 0.25em 0.5em 0.25em 0.5em;
+                            min-height: 0;
+                            min-width: 2.5em;
+                            
+                            font-size: 1em;
+                        }
+                        
+                        gs-button#ribbon-minimize {
+                            color: #3b99be;
+                            background-color: #e9eff7;
+                        }
+                        
+                        /* borders in between the control buttons */
+                        #ribbon-control .ribbon-tab-divider {
+                            border-left: 1px solid #AAA;
+                        }
+                        
+                        /* borders bottom border in the tab bar where there isn't a button */
+                        #ribbon-control .ribbon-tab-bar-border {
+                            border-bottom: 1px solid #AAA;
+                            min-width: 0.25em; /*this allows us to use these elements as a 0.25em padding*/
+                        }
+                        
+                        /* make ribbon-content buttons flow together */
+                        /*#ribbon-content gs-button {
+                            display: inline-block;
+                        }*/
+                        
+                        /* make ribbon content dimensions, padding and scroll policy */
+                        #ribbon-content {
+                            padding: 0.25em 0.25em 0 0.25em;
+                            /*max-height: 5em;*/
+                            white-space: nowrap;
+                            overflow: auto;
+                            -webkit-overflow-scrolling: touch;
+                            border-bottom: 1px solid #AAA;
+                            -webkit-box-sizing: border-box;
+                            -moz-box-sizing: border-box;
+                            -ms-box-sizing: border-box;
+                            -o-box-sizing: border-box;
+                            box-sizing: border-box;
+                        }
+                        
+                        #ribbon-content .spacer {
+                            height: 0.25em;
+                        }
+                        
+                        #ribbon-dialog-content .spacer {
+                            display: none;
+                        }
+                        
+                        #ribbon-content gs-group {
+                            display: inline-block;
+                        }
+                        
+                        #ribbon-dialog-content gs-group:not(:last-child) {
+                            display: block;
+                            margin-bottom: 1em;
+                        }
+                        
+                        /* not hidden state */
+                        
+                        /* ribbon category non-select color */
+                        #ribbon-container:not(.ribbon-hidden) #ribbon-control gs-button[data-template] {
+                            background-color: #ececec;
+                            color: #777;
+                        }
+                        
+                        /* ribbon category select color */
+                        #ribbon-container:not(.ribbon-hidden) #ribbon-control gs-button.ribbon-selected[data-template] {
+                            background-color: #ffffff;
+                            border-bottom-color: #ffffff;
+                            color: #000;
+                        }
+                        
+                        /* hidden state */
+                        
+                        /* hide ribbon content */
+                        #ribbon-container.ribbon-hidden #ribbon-content {
+                            display: none;
+                        }
+                        
+                        /* override ribbon selected so that nothing looks selected */
+                        #ribbon-container.ribbon-hidden .ribbon-selected {
+                            background-color: #e9eff7;
+                            border-bottom-color: #AAA;
+                        }
+                        
+                        /* comment button */
+                        #comment-button:after {
+                            content: '//';
+                        }
+                    </style>
+                    <div id="ribbon-container" prevent-text-selection>
+                        <div flex-horizontal id="ribbon-control" flex-fill>
+                            <span class="ribbon-tab-bar-border"></span>
+                            <span class="ribbon-tab-divider"></span>
+                            <gs-button no-focus remove-all data-template="layout">Layout</gs-button>
+                            <span class="ribbon-tab-divider"></span>
+                            <gs-button no-focus remove-all data-template="control">Control</gs-button>
+                            <span class="ribbon-tab-divider"></span>
+                            <gs-button no-focus remove-all data-template="data">Data</gs-button>
+                            <span class="ribbon-tab-divider"></span>
+                            <gs-button no-focus remove-all data-template="templating">doT.js</gs-button>
+                            <span class="ribbon-tab-divider"></span>
+                            <gs-button no-focus remove-all data-template="misc">Misc</gs-button>
+                            <span class="ribbon-tab-divider"></span>
+                            <span class="ribbon-tab-bar-border" flex></span>
+                            
+                            <span class="ribbon-tab-divider" show-on-desktop></span>
+                            <gs-button no-focus remove-all icononly icon id="comment-button" onclick="scriptComment();" show-on-desktop></gs-button>
+                            <span class="ribbon-tab-divider" show-on-desktop></span>
+                            <gs-button no-focus remove-all icononly icon="indent" onclick="scriptIndent();" show-on-desktop></gs-button>
+                            <span class="ribbon-tab-divider" show-on-desktop></span>
+                            <gs-button no-focus remove-all icononly icon="outdent" onclick="scriptOutdent();" show-on-desktop></gs-button>
+                            <span class="ribbon-tab-divider" show-on-desktop></span>
+                            
+                            <span class="ribbon-tab-bar-border" show-on-desktop>&nbsp;</span>
+                            <span class="ribbon-tab-divider"></span>
+                            <gs-button id="ribbon-minimize" no-focus remove-all icononly icon="chevron-up">&nbsp;</gs-button>
+                            <span class="ribbon-tab-divider"></span>
+                            <span class="ribbon-tab-bar-border"></span>
+                        </div>
+                        <div id="ribbon-content"></div>
+                    </div>
+                </gs-header>
+                <gs-body id="container">
+                    <div id="ace-indicator"></div>
+                    <div id="area"></div>
+                </gs-body>
+            </gs-page>
+            <div id="property-panel" flex-vertical flex-fill>
+                <gs-button id="button-panel-close" icononly icon="chevron-right" no-focus></gs-button>
+                <div id="property-panel-padding" flex-vertical flex-fill flex disabled>
+                    <div id="property-panel-scroll-container" flex>
+                        <center class="section-heading">
+                            <h5 id="element-property-title"></h5>
+                            <gs-button id="element-documentation-link" hidden>Documentation</gs-button>
+                        </center>
+                        <div id="global-property-section"></div>
+                        
+                        <center class="section-heading"><h5>Element Properties</h5></center>
+                        <div id="element-property-section"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

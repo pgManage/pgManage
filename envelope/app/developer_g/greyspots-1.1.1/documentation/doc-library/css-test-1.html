@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>CSS test</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script>
+            function windowSizeHandler() {
+                if (window.innerWidth <= 768 && !document.getElementById('child-3').style.height) {
+                    document.getElementById('child-3').style.height =
+                        (document.getElementById('child-1').offsetHeight + document.getElementById('child-2').offsetHeight) + 'px';
+                    
+                } else if (window.innerWidth > 768 && document.getElementById('child-3').style.height) {
+                    document.getElementById('child-3').style.height = '';
+                }
+            }
+            
+            function addToChild(strChildNumber) {
+                document.getElementById('child-' + strChildNumber).innerHTML += '<div>test</div>';
+                windowSizeHandler();
+            }
+            
+            function takeFromChild(strChildNumber) {
+                document.getElementById('child-' + strChildNumber).removeChild(
+                    document.getElementById('child-' + strChildNumber).children[
+                        document.getElementById('child-' + strChildNumber).children.length - 1]);
+                windowSizeHandler();
+            }
+            
+            window.addEventListener('resize', windowSizeHandler);
+            window.addEventListener('load', windowSizeHandler);
+        </script>
+        
+        <style>
+            #parent {
+                position: relative;
+                background-color: #FF0000; /* red */
+            }
+            
+            #child-1 {
+                width: 50%;
+                height: auto;
+                background-color: #00FF00; /* green */
+            }
+            
+            #child-2 {
+                width: 50%;
+                height: auto;
+                background-color: #00FFFF; /* cyan*/
+            }
+            
+            #child-3 {
+                position: absolute;
+                left: 50%;
+                top: 0;
+                width: 50%;
+                height: 100%;
+                background-color: #0000FF; /* blue */
+            }
+            
+            #child-4 {
+                background-color: #FFFF00; /* yellow */
+            }
+            
+            /* reflow CSS */
+            @media only screen and (max-width: 768px) {
+                #child-1,
+                #child-2 {
+                    width: auto;
+                }
+                
+                #child-3 {
+                    position: static;
+                    left: auto;
+                    top: auto;
+                    width: auto;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <gs-page>
+            <gs-header>
+                <h3>CSS test</h3>
+                <gs-button onclick="addToChild('1')">Green Element Taller</gs-button>
+                <gs-button onclick="takeFromChild('1')">Green Element Shorter</gs-button>
+                <br />
+                <gs-button onclick="addToChild('2')">Cyan Element Taller</gs-button>
+                <gs-button onclick="takeFromChild('2')">Cyan Element Shorter</gs-button>
+            </gs-header>
+            <gs-body padded>
+                <div id="parent">
+                    <div id="child-1">
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                    </div>
+                    <div id="child-2">
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                        <div>test</div>
+                    </div>
+                    <br />
+                    <div id="child-3" flex-vertical flex-fill>
+                        <gs-text></gs-text>
+                        <br />
+                        <div id="child-4" flex></div>
+                    </div>
+                </div>
+            </gs-body>
+        </gs-page>
+    </body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Lorem Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Lorem</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Function:</h3>
+            <pre><code>GS.lorem();</code></pre>
+            
+            <h3>Description:</h3>
+            <p>This function just returns "Lorem Ipsum" text.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">Skeleton Example:</span><br />
+                <p>When you click the "Lorem" button it will fill the "result" div with the lorem text returned by GS.lorem().</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="10">
+                    <gs-button onclick="testLorem()">Lorem</gs-button>
+                    <div id="result"></div>
+                </template>
+                <template for="js" height="10">
+                    function testLorem() {
+                        document.getElementById('result').textContent = GS.lorem();
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

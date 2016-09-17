@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>script.so Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Script.so</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+                <h3 class="doc-header">Library:</h3>
+                <div class="doc-section doc-mono">
+                    script.so
+                </div>
+                
+                <h3 class="doc-header">Description:</h3>
+                <div class="doc-section">
+                    This library will allow you to run bash and perl scripts from postgres. You must create the scripts in your data directory, they must be in /<i>path</i>/<i>to</i>/data/scripts, and they must be owned by root, permissions 750.
+                    We use the secure coding specification from:
+                    <a href="https://www.securecoding.cert.org/confluence/display/seccode/SEI+CERT+Coding+Standards">https://www.securecoding.cert.org</a>
+                </div>
+                
+                <h3 class="doc-header">Parameters:</h3>
+                <div class="doc-section">
+                    <table class="doc-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Input</th>
+                                <th class="doc-small-header">Optional</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Stdin</td>
+                                <td>Any</td>
+                                <td>Yes</td>
+                                <td>Usually a file, can be whatever the script can accept.</td>
+                            </tr>
+                            <tr>
+                                <td>Arguments</td>
+                                <td>URI Encoded Arguements</td>
+                                <td>Yes</td>
+                                <td>The arguments are converted from uri to -- command line arguments.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h1 class="doc-header">Examples:</h1>
+                <div class="doc-section">
+                    <Span class="h3">How to create a postgres functions that runs /<i>path</i>/<i>to</i>/data/scripts/action_test.plx</span>
+                    <pre>-- DROP FUNCTION postage.action_test(text, text);
+
+CREATE OR REPLACE FUNCTION postage.action_test(text, text)
+  RETURNS text AS
+    '$libdir/script.so', 'action_script_perl'
+  LANGUAGE c VOLATILE STRICT
+  COST 1;
+
+ALTER FUNCTION postage.action_test(text, text) OWNER TO postgres;
+REVOKE ALL ON FUNCTION postage.action_test(text, text) FROM public;;
+
+--SELECT postage.action_test(text, text);</pre>
+                            <span class="h3">How to use stdin on action_test.plx</span>
+                            <pre>SELECT postage.action_test('The input to the script', '');</pre>
+                            <span class="h3">What runs in command line:</span>
+                            <pre>action_test.plx &lt;EOF
+The input to the script
+EOF</pre>
+                            <span class="h3">How to use arguments on action_test.plx</span>
+                            <pre>SELECT postage.action_test('', 'arg1=value1&amp;arg2=value2');</pre>
+                            <span class="h3">What runs in command line:</span>
+                            <pre>action_test.plx --arg1=value1 --arg2=value2</pre>
+                            <span class="h3">How to use both stdin and arguments on action_test.plx</span>
+                            <pre>SELECT postage.action_test('The input to the script', 'arg1=value1&amp;arg2=value2');</pre>
+                            <span class="h3">What runs in command line:</span>
+                            <pre>action_test.plx --arg1=value1 --arg2=value2 &lt;EOF
+The input to the script
+EOF</pre>
+                </div>
+        </gs-container>
+    </body>
+</html>

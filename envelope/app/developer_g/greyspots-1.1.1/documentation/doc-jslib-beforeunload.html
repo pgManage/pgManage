@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Add Before Unload Event Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h2 class="text-center">Add Before Unload Event</h2>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Function:</h3>
+            <pre><code>GS.addBeforeUnloadEvent(function () {...});</code></pre>
+            
+            <h3>Description:</h3>
+            <p>Javascript has a feature which allows the developer to run code before the page unloads, this is used primarily as a means of opening up a popup asking to confirm if you want to close the page. This feature is accessed using the <a href="https://developer.mozilla.org/docs/Web/API/WindowEventHandlers/onbeforeunload">window.onbeforeunload</a> property. However there is a limitation of this property: you cannot run two independent functions using the same property.</p>
+            
+            <p>This function was created to allow multiple "onbeforeunload" functions to run. Just call the function and send your function that you want to bind and it'll add it to the stack.</p>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

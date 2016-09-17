@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Pixel and EM conversion Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Dialog</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Pixel and EM conversion:</h3>
+            <pre><code>GS.pxToEm(&lt;ELEMENT&gt;, &lt;PIXELS-TO-CONVERT&gt;);
+GS.emToPx(&lt;ELEMENT&gt;, &lt;EMS-TO-CONVERT&gt;);</code></pre>
+            
+            <h3>Description:</h3>
+            <p>These functions are for converting from pixels to ems and also ems to pixels. The reason for the &lt;ELEMENT&gt; parameter is that ems are relative to the font-size of parent elements (if you had an element with a font-size of 18 pixels then "1em" would be 18 pixels, "0.5em" would be equal to 9 pixels, "1.5em" would be equal to 27 pixels etc...) so to convert using a specific elements you just change what element you put in the &lt;ELEMENT&gt; parameter.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">GS.pxToEm Example:</span><br />
+                <p>In this example when you click the "Convert To Ems" button the number in the "number-of-px" control will be converted into pixels using the &lt;body&gt; element's font-size.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="9">
+                    <gs-number id="number-of-px" value="18"></gs-number>
+                    <br />
+                    <gs-button onclick="testPxConversion()">Convert To Ems</gs-button>
+                    <br />
+                    <div id="result"></div>
+                </template>
+                <template for="js" height="12">
+                    function testPxConversion() {
+                        document.getElementById('result').textContent =
+                            GS.pxToEm(
+                                document.body,
+                                document.getElementById('number-of-px').value
+                            ) +
+                            'em';
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">GS.emToPx Example:</span><br />
+                <p>In this example when you click the "Convert To Pixels" button the number in the "number-of-em" control will be converted into pixels using the &lt;body&gt; element's font-size.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="9">
+                    <gs-number id="number-of-em" value="1"></gs-number>
+                    <br />
+                    <gs-button onclick="testEmConversion()">Convert To Pixels</gs-button>
+                    <br />
+                    <div id="result"></div>
+                </template>
+                <template for="js" height="12">
+                    function testEmConversion() {
+                        document.getElementById('result').textContent =
+                            GS.emToPx(
+                                document.body,
+                                document.getElementById('number-of-em').value
+                            ) +
+                            'px';
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

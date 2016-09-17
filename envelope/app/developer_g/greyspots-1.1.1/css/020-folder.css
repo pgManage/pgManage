@@ -1,0 +1,172 @@
+/* defaults */
+gs-folder {
+    display: block;
+    border: 1px solid #006E00;
+    padding: 0.5em;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    
+    -webkit-border-radius: 0.25em;
+    -moz-border-radius: 0.25em;
+    -ms-border-radius: 0.25em;
+    -o-border-radius: 0.25em;
+    border-radius: 0.25em;
+}
+
+/* mini */
+gs-folder[mini] {
+    border: 0 none;
+    padding: 0;
+}
+
+
+gs-folder > .root .path-title {
+    text-align: center;
+    color: #BBB;
+    padding-bottom: 0.25em;
+}
+
+/* ###############################################################
+############################## ROOT ##############################
+############################################################### */
+
+/* defaults */
+gs-folder > .root,
+gs-folder > .root > .list-container {
+    height: 100%;
+}
+
+gs-folder:not([horizontal]) > .root > .list-container {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    
+    flex-direction: column;
+    -ms-flex-direction: column;
+    -webkit-flex-direction: column;
+}
+
+/* horizontal */
+gs-folder[horizontal] > .root > .list-container {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    
+    flex-direction: row;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+}
+
+/* ##############################################################
+####################### LIST LINE BORDERS #######################
+############################################################## */
+
+gs-folder > .root .folder-line:not(:last-child) > gs-button,
+gs-folder > .root .file-line:not(:last-child) > gs-button {
+    border-bottom: 0 none;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+gs-folder > .root .folder-line:not(:first-child) > gs-button,
+gs-folder > .root .file-line:not(:first-child) > gs-button {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+}
+
+gs-folder > .root .open-folder,
+gs-folder > .root .open-file {
+    border-left: 0 none;
+}
+
+gs-folder > .root .open-folder,
+gs-folder > .root .open-file {
+    text-align: left;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* ##############################################################
+###################### LIST HEADER BUTTONS ######################
+############################################################## */
+
+/* defaults */
+gs-folder > .root .folder-list-header gs-button,
+gs-folder > .root .file-list-header gs-button {
+    border: 1px solid #006E00;
+}
+gs-folder > .root .folder-list-header gs-button[remove-bottom],
+gs-folder > .root .file-list-header gs-button[remove-bottom] {
+    border-bottom: 0 none;
+}
+gs-folder > .root .folder-list-header gs-button[remove-right],
+gs-folder > .root .file-list-header gs-button[remove-right] {
+    border-right: 0 none;
+}
+gs-folder > .root .folder-list-header gs-button[remove-left],
+gs-folder > .root .file-list-header gs-button[remove-left] {
+    border-left: 0 none;
+}
+
+/* mini */
+/*gs-folder[mini] > .root .folder-list-header gs-button,
+gs-folder[mini] > .root .file-list-header gs-button {
+    border: 0 none;
+}*/
+
+/* ###############################################################
+######################### LIST CONTAINER #########################
+############################################################### */
+
+gs-folder[no-folders] > .root .folder-list-container,
+gs-folder[no-files] > .root .file-list-container {
+    display:none;
+}
+
+gs-folder:not([no-files]):not([horizontal]) > .root .folder-list-container {
+    margin-bottom: 0.5em;
+}
+
+gs-folder[horizontal]:not([no-files]) > .root .folder-list-container {
+    margin-right: 0.5em;
+}
+
+/* ###############################################################
+############################ LIST DIV ############################
+############################################################### */
+
+/* defaults */
+gs-folder > .root .folder-list,
+gs-folder > .root .file-list {
+    padding: 0.5em;
+    border: 1px solid #006E00;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    
+    -webkit-border-radius: 0.25em 0 0.25em 0.25em;
+    -moz-border-radius: 0.25em 0 0.25em 0.25em;
+    -ms-border-radius: 0.25em 0 0.25em 0.25em;
+    -o-border-radius: 0.25em 0 0.25em 0.25em;
+    border-radius: 0.25em 0 0.25em 0.25em;
+}
+
+/* mini */
+/*gs-folder[mini] > .root .folder-list,
+gs-folder[mini] > .root .file-list {
+    border: 0 none;
+    padding: 0;
+}*/

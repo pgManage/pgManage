@@ -1,0 +1,141 @@
+/* ################################################################ */
+/* ############################ PANEL ############################# */
+/* ################################################################ */
+
+gs-panel {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /*background-color: #F0F0F0;*/
+    /*width: 17em;*/
+    /*z-index: 50;*/
+    
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    
+    flex-direction: row;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+
+/* ################################################################ */
+/* ###################### IMMEDIATE CHILDREN ###################### */
+/* ################################################################ */
+
+gs-panel > [flex],
+gs-panel > [panel-set-width] {
+    border-right: 2px solid #000000;
+}
+
+.blue gs-panel > [flex],
+gs-panel.blue > [flex],
+.blue gs-panel > [panel-set-width],
+gs-panel.blue > [panel-set-width] {
+    border-color: #3B99BE;
+}
+
+/*gs-panel > [panel-flex]:last-child,
+gs-panel > [panel-set-width]:last-child*/
+gs-panel > *:last-child {
+    border-right: 0 none;
+}
+
+/* ################################################################ */
+/* ###################### IMMEDIATE CHILDREN ###################### */
+/* ################################################################ */
+
+gs-panel > *[panel-set-width] {
+    
+}
+
+@media (max-width: 768px) {
+    gs-panel > *[panel-set-width] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        
+        background-color: #F0F0F0;
+        border-right: 1px solid #000000;
+        min-width: 13em;
+        max-width: 14em;
+        
+        z-index: 50;
+    }
+    gs-panel > *[panel-set-width]:last-child {
+        position: absolute;
+        left: auto;
+        right: 0;
+        top: 0;
+        
+        background-color: #F0F0F0;
+        border-left: 1px solid #000000;
+        min-width: 13em;
+        max-width: 14em;
+        
+        z-index: 50;
+    }
+    
+    .blue gs-panel > *[panel-set-width]:first-child,
+    gs-panel.blue > *[panel-set-width]:first-child,
+    .blue gs-panel > *[panel-set-width]:last-child,
+    gs-panel.blue > *[panel-set-width]:last-child {
+        border-color: #3B99BE;
+    }
+}
+
+/* ################################################################# */
+/* ################## OVERLAY PANEL PAGE BLOCKER ################### */
+/* ################################################################# */
+
+.gs-panel-page-blocker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    z-index: 50;
+    background-color: #555555;
+    opacity: 0.4;
+}
+
+
+/* show panel page blocker when the page gets too small */
+@media (max-width: 768px) {
+    .gs-panel-page-blocker {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+
+/* ################################################################# */
+/* ########################## PANEL HIDE ########################### */
+/* ################################################################# */
+
+
+
+/* panel[dissmissable-on-desktop] > [panel-hide]: hide */
+/* @media (max-width: 768px) panel > [panel-hide]: hide */
+
+gs-panel[dismissible] > [panel-hide] {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    gs-panel > [panel-hide] {
+        display: none;
+    }
+}
+
+

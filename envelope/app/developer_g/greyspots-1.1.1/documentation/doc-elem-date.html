@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Date Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Date</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Tag:</h3>
+            <pre><code>&lt;gs-date&gt;&lt;/gs-date&gt;</code></pre>
+            
+            <h3>Description:</h3>
+            <div>
+                <p>The <code>&lt;gs-date&gt;</code> control is like the <code>&lt;gs-text&gt;</code> control, but it is specialized for dates.</p>
+                <p>When working with dates on a website we heavily prefer slash delimited dates because a dash delimited date (in some cases) will text wrap, and you want everything to be consistent so please use slash delimited dates.</p>
+            </div>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">Skeleton Example:</span>
+               <p>A basic <code>&lt;gs-date&gt;</code> element. Without attributes the gs-date control will have the following behaviors:</p>
+               <ol>
+                    <li>There is a button that activates the date picker.</li>
+                    <li>After choosing a date using the date picker, the date picker disappears and the data changes in the control.</li>
+                    <li>You can also change the date manually.</li>
+                    <li>
+                        When the value is a date that is slash or dash delimited:
+                        <ol>
+                            <li>Clicking into the date will select the closest part of the date.</li>
+                            <li>Arrowing up or down will increase the value of the date depending on the part you have selected.</li>
+                            <li>Arrowing left or right will select the next or previous part.</li>
+                            <li>Pressing or "/" or "-" will select the next part.</li>
+                            <li>Pressing any number will overwrite the number of the part you have selected.</li>
+                        </ol>
+                    </li>
+                </ol>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="20">
+                    <label for="date_example">Date Example:</label>
+                    <gs-date id="date_example"></gs-date>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Attribute <code>[onchange=""]</code>:</span>
+                <p>To run javascript when the value changes, use the <code>[onchange=""]</code> attribute.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="15">
+                    <label for="control_default">Change Alert:</label>
+                    <gs-date id="control_default" onchange="alert('value changed')"></gs-date>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Attribute <code>[value=""]</code>:</span>
+                <p>To set the value for the <code>&lt;gs-date&gt;</code>, use the <code>[value=""]</code> attribute.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="5">
+                    <gs-date value="05/05/05"></gs-date>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Attribute <code>[qs=""]</code>:</span>
+                <p>The <code>[qs=""]</code> attribute can be used to sync the <code>&lt;gs-date&gt;</code> with the query string.</p>
+            </div>
+            <gs-doc-example query-string="test=05/05/05">
+                <template for="html" height="15">
+                    <label for="control_qs">Date Query String:</label>
+                    <gs-date id="control_qs" qs="test"></gs-date>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Attribute <code>[placeholder=""]</code>:</span>
+                <p>The <code>[placeholder=""]</code> attribute can be used when you don't want to use a label to explain the purpose of the control to the user. (The label and the placeholder can be used together, that's just not what normally happens.)</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="15">
+                    <label for="control_label">Label:</label>
+                    <gs-date id="control_label"></gs-date>
+                    <label for="control_placeholder_label">Placeholder And Label:</label>
+                    <gs-date placeholder="Placeholder And Label" id="control_placeholder_label"></gs-date>
+                    <gs-date placeholder="Placeholder" id="control_placeholder"></gs-date>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Attribute <code>[mini]</code>:</span>
+                <p>Sometimes you are limited on space. The <code>[mini]</code> attribute can be used to make the <code>&lt;gs-date&gt;</code> smaller.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <label for="control_mini">Mini:</label>
+                    <gs-date id="control_mini" mini></gs-date>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Attribute <code>[no-picker]</code>:</span>
+                <p>If you want to remove the date picker button, simply add the <code>[no-picker]</code> attribute.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html">
+                    <label for="date_mini">No Picker:</label>
+                    <gs-date no-picker id="date_mini"></gs-date>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Attribute <code>[tabindex=""]</code>:</span>
+                <p>With the <code>[tabindex=""]</code> attribute, you can control what order your controls are tabbed to.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="25">
+                    <label for="control_1">1:</label>
+                    <gs-date tabindex="1" id="control_1"></gs-date>
+                    <label for="control_3">3:</label>
+                    <gs-date tabindex="3" id="control_3"></gs-date>
+                    <label for="control_2">2:</label>
+                    <gs-date tabindex="2" id="control_2"></gs-date>
+                    <label for="control_4">4:</label>
+                    <gs-date tabindex="4" id="control_4"></gs-date>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Attribute <code>[disabled]</code>:</span>
+                <p>With the <code>[disabled]</code> attribute, you can control whether or not you can use the control.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="15">
+                    <label for="control_disabled">Disabled:</label>
+                    <gs-date disabled id="control_disabled"></gs-date>
+                    <label for="control_enabled">Not Disabled:</label>
+                    <gs-date id="control_enabled"></gs-date>
+                </template>
+            </gs-doc-example>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

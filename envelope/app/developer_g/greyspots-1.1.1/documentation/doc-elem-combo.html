@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Combo Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+         <gs-jumbo>
+            <h1 class="text-center">Combo</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Tag:</h3>
+            <div class="doc-section doc-mono">
+                <pre><code>&lt;gs-combo&gt;&lt;/gs-combo&gt;</code></pre>
+            </div>
+            
+            <h3>Description:</h3>
+            <div class="doc-section">
+                <p>A <code>&lt;gs-combo&gt;</code> is a combination of a textbox and a selectbox. A <code>&lt;gs-combo&gt;</code> fills the need of being able to add custom values into the control.</p>
+            </div>
+            
+            <h3 class="doc-header">Examples:</h3>
+            <div class="doc-section">
+                <div class="doc-example-description">
+                    <span class="h3">Skeleton Example:</span>
+                    <p>A basic <code>&lt;gs-combo&gt;</code> element with list loaded from a Postgres view using the <code>[src=""]</code> attribute. The <code>[src=""]</code> attribute can contain a view name or a table name. When you select a record out of the dropdown the text from the first column will populate the textbox</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[onchange=""]</code>:</span>
+                    <p>To run javascript when the value changes, use the <code>[onchange=""]</code> attribute.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" onchange="alert('value changed to: ' + this.value)"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[cols=""]</code>:</span><br />
+                    <p>The <code>[cols=""]</code> attribute is for removing columns from the data that the combobox gets from the database.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" cols="id,name"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[value=""]</code>:</span><br />
+                    <p>The <code>[value=""]</code> attribute is for setting the value of the combobox.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" value="2341"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[hide=""]</code>:</span><br />
+                    <p>The <code>[hide=""]</code> attribute is for hiding columns that you don't want the user to see but still want access to. The primary use of this attribute is to hide the ID column in such a way that it can be used to get and set the combobox but the user never sees it.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" hide="id"></gs-combo>
+                        <br />
+                        <gs-combo src="gsdoc.tpeople_list" hide="id" value="2341"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[initialize=""]</code>:</span><br />
+                    <p>The <code>[initialize=""]</code> attribute is for loading a version of the view or table with less columns in it to speed up the inital value lookup.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" initialize="gsdoc.tpeople_list_inital" value="2341"></gs-combo>
+                        <br />
+                        <gs-combo src="gsdoc.tpeople_list" initialize="gsdoc.tpeople_list_inital" value="2341" hide="id"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[where=""]</code>:</span><br />
+                    <p>The <code>[where=""]</code> attribute is for sending a postgres <code>WHERE</code> with the view or table in the <code>[src=""]</code> or <code>[initialize=""]</code> attributes.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" where="id > 2339 AND id < 2346"></gs-combo>
+                        <br />
+                        <gs-combo src="gsdoc.tpeople_list" where="id > 2339 AND id < 2346" hide="id"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[ord=""]</code>:</span><br />
+                    <p>The <code>[ord=""]</code> attribute is for sending a postgres <code>ORDER BY</code> with the view or table in the <code>[src=""]</code> or <code>[initialize=""]</code> attributes.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" ord="name ASC"></gs-combo>
+                        <br />
+                        <gs-combo src="gsdoc.tpeople_list" ord="name ASC" hide="id"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[limit=""]</code>:</span><br />
+                    <p>The <code>[limit=""]</code> attribute is for sending a postgres <code>LIMIT</code> with the view or table in the <code>[src=""]</code> or <code>[initialize=""]</code> attributes.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" limit="10"></gs-combo>
+                        <br />
+                        <gs-combo src="gsdoc.tpeople_list" limit="10" hide="id"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[offset=""]</code>:</span><br />
+                    <p>The <code>[offset=""]</code> attribute is for sending a postgres <code>OFFSET</code> with the view or table in the <code>[src=""]</code> or <code>[initialize=""]</code> attributes. The <code>[ord=""]</code> attribute is for making the data in the combobox clearer and the <code>[limit=""]</code> attribute is so that the offset has an effect.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" ord="name ASC" limit="10"></gs-combo>
+                        <gs-combo src="gsdoc.tpeople_list" ord="name ASC" limit="10" offset="5"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span><br />
+                    <p>The name <code>[qs=""]</code> stands for "querystring". The querystring is the part in the URL after the "?". This <code>&lt;gs-combo&gt;</code> will get its initial values from the querystring.</p>
+                </div>
+                <gs-doc-example query-string="test=2341">
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" qs="test"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[limit-to-list]</code>:</span><br />
+                    <p>The attribute <code>[limit-to-list]</code> forces the user to choose a value that is in the list.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" limit-to-list></gs-combo>
+                        <br />
+                        <gs-combo src="gsdoc.tpeople_list" limit-to-list hide="id"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[mini]</code>:</span><br />
+                    <p>A <code>&lt;gs-combo&gt;</code> with the attribute <code>[mini]</code> will have less padding and no borders.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" mini></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[disabled]</code>:</span><br />
+                    <p>A <code>&lt;gs-combo&gt;</code> with the attribute <code>[disabled]</code> will not be able to be changed by the user.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" disabled></gs-combo>
+                        <br />
+                        <gs-combo src="gsdoc.tpeople_list" disabled value="2341" hide="id"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Refresh On Query String Column Change:</span><br />
+                    <p>If you want to refresh on changes to a list of columns you can put a comma seperated list of columns in the <code>[refresh-on-querystring-values]</code> attribute. That could look something like <code>[refresh-on-querystring-values="parent_id,id"]</code>.</p>
+                </div>
+                <gs-doc-example query-string="id=2341&parent_id=test&asdf=changing_this_wont_refresh_the_combo">
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" qs="id" refresh-on-querystring-values="parent_id,id"></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Refresh On Query String Change:</span><br />
+                    <p>To make the <code>&lt;gs-combo&gt;</code> refresh when anything in the query string is updated, you add the attribute <code>[refresh-on-querystring-change]</code>.</p>
+                </div>
+                <gs-doc-example query-string="test=2341&asdf=changing_this_will_refresh_the_combo">
+                    <template for="html" height="15">
+                        <gs-combo src="gsdoc.tpeople_list" qs="test" refresh-on-querystring-change></gs-combo>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[tabindex]</code>:</span>
+                    <p>With the <code>[tabindex]</code> attribute, you can control what order your controls are tabbed to.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="25">
+                        <label for="control_1">1:</label>
+                        <gs-text tabindex="1" id="control_1"></gs-text>
+                        <label for="control_3">3:</label>
+                        <gs-combo tabindex="3" id="control_3"></gs-combo>
+                        <label for="control_2">2:</label>
+                        <gs-text tabindex="2" id="control_2"></gs-text>
+                        <label for="control_4">4:</label>
+                        <gs-text tabindex="4" id="control_4"></gs-text>
+                    </template>
+                </gs-doc-example>
+            </div>
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

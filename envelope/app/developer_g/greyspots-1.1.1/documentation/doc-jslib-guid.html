@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>GUID Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">GUID</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Function:</h3>
+            <pre><code>GS.GUID();</code></pre>
+            
+            <h3>Description:</h3>
+            <p>This function returns a randomly generated GUID. GUID stands for "<b>G</b>lobally <b>U</b>nique <b>ID</b>entifier" what this means is that the function will return a string of random letters and numbers that will most likely never be repeated on a webpage twice ever.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">GS.GUID Example:</span><br />
+                <p>In this example when you click the "Test GUID" button a randomly generated GUID will be put into the "result" div.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="5">
+                    <gs-button onclick="testGUID()">Test GUID</gs-button>
+                    <br />
+                    <div id="result"></div>
+                </template>
+                <template for="js" height="6">
+                    function testGUID() {
+                        document.getElementById('result').textContent =
+                            GS.GUID();
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

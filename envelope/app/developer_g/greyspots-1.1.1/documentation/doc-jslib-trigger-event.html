@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Trigger Event Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Trigger Event Function</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+                <h3 class="doc-header">Function:</h3>
+                <div class="doc-section doc-mono">
+                    <p>GS.triggerEvent(&lt;ELEMENT&gt;, &lt;EVENT-NAME&gt;, &lt;CONFIGURATION&gt;)</p>
+                </div>
+                
+                <h3 class="doc-header">Description:</h3>
+                <div class="doc-section">
+                    <p>This function used is for triggering events via javascript. The events can either be standard events (Like: "click", "keydown", "mouseover", "load" etc...) or custom events. Custom events are just events with your own custom name.</p>
+                </div>
+                
+                <h1 class="doc-header">Examples:</h1>
+                <div class="doc-section">
+                    <div class="doc-example-description">
+                        <span class="h3">Skeleton Example:</span><br />
+                        <p>In this example we will have a button that will either recieve a click from the mouse or recieve a click from javascript.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="auto">
+                            <gs-button id="target" onclick="alert('test')">Target</gs-button>
+                            <br />
+                            <gs-button onclick="GS.triggerEvent(document.getElementById('target'), 'click')">Trigger Artificial Click</gs-button>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Configuration Example:</span><br />
+                        <p>In this example we will set properties on a custom event. These properties are accessed the same way as the standard <i>EVENT</i>.target property. The use of this is to pass data to event listeners using an already established standard: using the <i>EVENT</i> object.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="7">
+                            <gs-button onclick="testTrigger();">Trigger Customized Event</gs-button>
+                            <br />
+                            <div id="target">Target</div>
+                        </template>
+                        <template for="js" height="21">
+                            window.addEventListener('load', function () {
+                                document.getElementById('target').addEventListener('custom-event', function (event) {
+                                    alert(event.customProperty1 + '|' + event.customProperty2);
+                                });
+                            });
+                            
+                            function testTrigger() {
+                                GS.triggerEvent(document.getElementById('target'), 'custom-event', {
+                                    'customProperty1': 'This is a custom property',
+                                    'customProperty2': 123456789
+                                });
+                            }
+                        </template>
+                    </gs-doc-example>
+                </div>
+        </gs-container>
+    </body>
+</html>

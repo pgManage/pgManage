@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>String To Element Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">String To Element</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Functions:</h3>
+            <pre><code>GS.stringToElement(&lt;HTML-STRING&gt;, &lt;OPTIONAL-DOCUMENT&gt;);</code></pre>
+            
+            <h3>Description:</h3>
+            <p>The GS.stringToElement function is for creating an HTML element based on the element's string representation.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">GS.stringToElement Example:</span><br />
+                <p>In this example when you click the "Create/Append Element" button an element will be generated from a string and appended to the "target" div. Note: If you try to do two elements next to each other at the top level then you will only get the first element, however put several elements inside the first element then those will come through.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="5">
+                    <gs-button onclick="testCreate()">Create/Append Element</gs-button>
+                    <div id="target"></div>
+                </template>
+                <template for="js" height="10">
+                    function testCreate() {
+                        document.getElementById('target').appendChild(
+                            GS.stringToElement('<div bg-primary>test <b>test</b></div>')
+                        );
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">GS.stringToElement Document Example:</span><br />
+                <p>
+                    In this example we have created an element that opens an alert when it is recognized by the document.<br /><br />
+                    
+                    When you click the "This Document" button you are creating the element in the scope of the current document. Meaning that the element will be recognized and open an alert, because it is registered in this document.<br /><br />
+                    
+                    When you click the "Custom Document" button you are creating the element in the scope of the iframe which doesn't have the gs-test element registered in it. Meaning that the gs-test element will not be recognized and it wont alert.
+                </p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="9">
+                    <gs-button onclick="testThisDocument()">This Document</gs-button>
+                    <gs-button onclick="testCustomDocument()">Custom Document</gs-button>
+                    
+                    <iframe id="test-iframe"></iframe>
+                </template>
+                <template for="js" height="auto">
+                    xtag.register('gs-test', {
+                        lifecycle: {
+                            created: function () {
+                                alert('A gs-test element has been recognized');
+                            }
+                        }
+                    });
+                    
+                    function testThisDocument() {
+                        GS.stringToElement('<gs-test></gs-test>');
+                    }
+                    function testCustomDocument() {
+                        GS.stringToElement('<gs-test></gs-test>', document.getElementById('test-iframe').contentDocument);
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>JS Dotty</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script>
+            function jsdotty() {
+                var strInput = document.getElementById('memo-input').value
+                  , strResult = '';
+                
+                //strResult = strInput;
+                
+                
+                var strCurrent = strInput, intPositionOfDot, strState;
+                do {
+                    intPositionOfDot = strCurrent.indexOf('.');
+                    strResult = strResult + strCurrent.substring(0, intPositionOfDot);
+                    strCurrent = strCurrent.substring(intPositionOfDot);
+                    
+                    
+                    //if last char was a newline
+                    if (strResult.substring(intPositionOfDot - 1) === '\n') {
+                        strCurrent.search(/[a-zA-Z][a-zA-Z0-9]/);
+                        strResult = strResult + '<' + strCurrent + '>';
+                    } else {
+                    }
+                } while (strCurrent.length > 0);
+                
+                
+                /*
+                var chrCurrent = '', chrLast = '', i, len, chrState = '';
+                for (i = 0, len = strInput.length;i < strInput.length;i++) {
+                    chrLast = chrCurrent;
+                    chrCurrent = strInput.substring(i, i + 1);
+                    if (chrState === 'f') {
+                        
+                    } else if (chrLast === '\n' && chrCurrent === '.') {
+                        chrState = 'f';
+                    } else {
+                        strResult = strResult + chrCurrent;
+                    }
+                }
+                */
+                
+                document.getElementById('memo-output').value = strResult;
+                document.getElementById('div-output').innerHTML = strResult;
+            }
+        </script>
+    </head>
+    <body>
+        <gs-page>
+            <gs-header>
+                <h3>JSDotty</h3>
+            </gs-header>
+            <gs-body padded>
+                <label for="memo-input">Input:</label>
+                <gs-memo id="memo-input" rows="6"></gs-memo><br />
+                
+                <gs-button onclick="jsdotty();">Run JSDotty</gs-button><br />
+                <label for="memo-output">Output:</label>
+                <gs-memo id="memo-output" rows="6"></gs-memo><br />
+                <div id="div-output"></div>
+            </gs-body>
+        </gs-page>
+    </body>
+</html>

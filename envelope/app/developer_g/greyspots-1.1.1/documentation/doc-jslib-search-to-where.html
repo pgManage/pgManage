@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Where Clause Generation Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Where Clause Generation</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3>Function:</h3>
+            <pre><code>GS.searchToWhere(&lt;COLUMNS&gt;,&lt;SEARCH-TERMS&gt;);</code></pre>
+            
+            <h3>Description:</h3>
+            <p>The GS.searchToWhere function is for generating a Postgres WHERE clause using a list of columns and search terms.</p>
+            
+            <h1>Examples:</h1>
+            <div class="doc-example-description">
+                <span class="h3">Skeleton Example:</span><br />
+                <p>When you click the button the text of the first text control will be used as the column list and the text of the second text control will be used for the search terms and the result of the GS.searchToWhere function will be put in the memo control. Notice that you can have multiple search columns just by sending in a comma seperated list. If you send no search terms the function will return "TRUE" so that if this where clause is embedded inside another where clause than the where clause will not break because of an empty space.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="8">
+                    <gs-text id="text-columns" value="search_text,search_title"></gs-text>
+                    <gs-text id="text-term" value="test search term"></gs-text>
+                    <gs-button onclick="testWhere()">Generate WHERE</gs-button>
+                    <gs-memo id="text-where"></gs-memo>
+                </template>
+                <template for="js" height="11">
+                    function testWhere() {
+                        document.getElementById('text-where').value =
+                            GS.searchToWhere(document.getElementById('text-columns').value,
+                                             document.getElementById('text-term').value);
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>

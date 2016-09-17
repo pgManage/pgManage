@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Delete Record Button Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>    
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Delete Record Button</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <h3 class="doc-header">Record Element:</h3>
+            <div class="doc-section doc-mono">
+                <p>&lt;gs-delete-button&gt;&lt;/gs-delete-button&gt;</p>
+            </div>
+            
+            <h3 class="doc-header">Description:</h3>
+            <div class="doc-section">
+                <p>On receiving the click event, this button deletes a record from a table. 
+                On the click event, this button will run an action_delete. An action_delete is part of the Envelope API. It converts the browser request into a SQL DELETE query and executes it, thereby dropping a record or records. Default functionality includes a popup for confirming you wish to delete the record as well as an error popup if the delete fails to occur.</p>
+                <p>The gs-delete-button is both click and tap aware and works as expected across desktop and mobile browsers. Note that href, target, and dialogclose attributes won't work for gs-delete-button but other button attributes should work as expected.</p>
+            </div>
+            
+            <h1 class="doc-header">Examples:</h1>
+            <div class="doc-section">
+                <div class="doc-example-description">
+                    <span class="h3">Table/View Example:</span>
+                    <p>We've set the "src" attribute to a view but we could have set it to a table. The user must have delete permission on the table or view for this to work.</p>
+                    <p>Start by clicking the delete button. The record with an "id" column value of "1234" does not exist so this will fail. Next, click the "Add record" button and then the delete button will be updated with a valid record ID. Now you can click the delete button and it will succeed in deleting the record you just created. </p>
+                </div>
+                <gs-doc-example>
+                    <template for="html">
+                        <gs-button onclick="insertPerson();">Add record to delete</gs-button>
+                        <gs-delete-button id="example" src="gsdoc.tpeople" column="id" value="1234">Delete record ID#1234</gs-delete-button>
+                    </template>
+                    <template for="js" height="20">
+                        function insertPerson() { /* Add record button */
+                            GS.ajaxJSON('/env/action_insert'
+                                , 'view=gsdoc.tpeople&data=' 
+                                    + encodeURIComponent('first_name=John&last_name=Smith')
+                                , function (data, error) {
+                                    document.getElementById('example').setAttribute('value'
+                                        , data.dat.lastval);
+                                    document.getElementById('example').innerHTML 
+                                        = 'Delete record ID#' + data.dat.lastval;
+                                    GS.pushMessage('ID#' 
+                                        + data.dat.lastval + ' Inserted.', 1500);
+                                }
+                            );
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "key":</span>
+                    <p>In this example we have a delete button with the "key" attribute set. The "key" attribute is for defining a hot-key for a button. Note: you have to click into the example for it to work.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="auto">
+                        <gs-button onclick="insertPerson();">Add record to delete</gs-button>
+                        <gs-delete-button id="example" src="gsdoc.tpeople" column="id" value="1234" key="a">Delete record ID#1234 (CMD-a or CTRL-a)</gs-delete-button>
+                    </template>
+                    <template for="js" height="auto">
+                        function insertPerson() { /* Add record button */
+                            GS.ajaxJSON('/env/action_insert'
+                                , 'view=gsdoc.tpeople&data=' 
+                                    + encodeURIComponent('first_name=John&last_name=Smith')
+                                , function (data, error) {
+                                    document.getElementById('example').setAttribute('value'
+                                        , data.dat.lastval);
+                                    document.getElementById('example').innerHTML 
+                                        = 'Delete record ID#' + data.dat.lastval;
+                                    GS.pushMessage('ID#' 
+                                        + data.dat.lastval + ' Inserted.', 1500);
+                                }
+                            );
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "no-modifier-key":</span>
+                    <p>In this example we have a button with the "key" and "no-modifier-key" attributes set. The "no-modifier-key" attribute means that you can't use CMD or CTRL to activate the hot-key. Note: you have to click into the example for it to work.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="auto">
+                        <gs-button onclick="insertPerson();">Add record to delete</gs-button>
+                        <gs-delete-button id="example" src="gsdoc.tpeople" column="id" value="1234" key="a" no-modifier-key>Delete record ID#1234 (a)</gs-delete-button>
+                    </template>
+                    <template for="js" height="auto">
+                        function insertPerson() { /* Add record button */
+                            GS.ajaxJSON('/env/action_insert'
+                                , 'view=gsdoc.tpeople&data=' 
+                                    + encodeURIComponent('first_name=John&last_name=Smith')
+                                , function (data, error) {
+                                    document.getElementById('example').setAttribute('value'
+                                        , data.dat.lastval);
+                                    document.getElementById('example').innerHTML 
+                                        = 'Delete record ID#' + data.dat.lastval;
+                                    GS.pushMessage('ID#' 
+                                        + data.dat.lastval + ' Inserted.', 1500);
+                                }
+                            );
+                        }
+                    </template>
+                </gs-doc-example>
+
+                <div class="doc-example-description">
+                    <span class="h3">Query String Example:</span>
+                    <p>In this example we've set the qs attribute instead of the column attribute.</p>
+                </div> 
+                <gs-doc-example query-string="id=1234">
+                    <template for="html" height="5">
+                        <gs-button onclick="insertPerson();">Add record to delete and put it's ID in the querystring</gs-button>
+                        <gs-delete-button id="example" src="gsdoc.tpeople" qs="id">Delete record ID in Query String</gs-delete-button>
+                    </template>
+                    <template for="js" height="15">
+                        function insertPerson() { /* Add record button */
+                            GS.ajaxJSON('/env/action_insert'
+                                , 'view=gsdoc.tpeople&data=' 
+                                    + encodeURIComponent('first_name=John&last_name=Smith')
+                                , function (data, error) {
+                                    GS.pushQueryString('id=' + data.dat.lastval);
+                                    GS.pushMessage('ID#' 
+                                        + data.dat.lastval + ' Inserted.', 1500);
+                                }
+                            );
+                        }
+                    </template>
+                </gs-doc-example>
+            </div> 
+        </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </body>
+</html>

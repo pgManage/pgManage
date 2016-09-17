@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <title>Duplicate Safe Ajax Documentation</title>
+        
+        <script src="/js/greyspots.js" type="text/javascript"></script>
+        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <script src="/js/ace/ace.js" data-ace-base="/js/ace/" type="text/javascript" charset="utf-8"></script>
+        <script src="/js/ace/ext-language_tools.js" type="text/javascript"></script>
+        <script src="/js/ace/ext-searchbox.js" type="text/javascript"></script>
+        
+        <script src="doc-library/doc.js" type="text/javascript"></script>
+        <link href="doc-library/doc.css" type="text/css" rel="stylesheet" />
+    </head>
+    <body>
+        <gs-jumbo>
+            <h1 class="text-center">Duplicate Safe Ajax</h1>
+        </gs-jumbo>
+            
+        <gs-container min-width="sml;med;lrg">
+            <b class="doc-header">Function:</b>
+            <pre><code>GS.dataFetch('...');</code></pre>
+            
+            <h3>Description:</h3>
+            <p>The GS.dataFetch function is for making duplicate ajax calls use the same ajax call. Essentially the data is cached after the first request unless it is cleared. The main use of this function is when you have a combobox in a table and each combobox will have the same data so instead of one ajax call for each combobox all of the comboboxes use the same ajax call.</p>
+            
+            <h3>Examples:</h3>
+            <div class="doc-example-description">
+                <span class="h3">Skeleton Example:</span><br />
+                <p>In this example we have minimal usage of GS.dataFetch. When you click the "Run Ajax" the first time it will make a call to the database and you'll notice a loader pop up. Subsequent clicks to the button will be instantaneous because it will be getting that data from a variable on the page instead of from the database.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="4">
+                    <gs-button onclick="testAjax()">Get Data</gs-button>
+                    <div id="result"></div>
+                </template>
+                <template for="js" height="63">
+                    function testAjax() {
+                        var strLink = '/env/gsdoc.action_ajax_test?test', data, dataFunction;
+                        
+                        // retrieve data (if this is the first call then
+                        //                  this is where the ajax is initiated)
+                        data = GS.dataFetch(strLink);
+                        
+                        // if the data has already been fetched
+                        if (data) {
+                            // pass data to handleResult function
+                            handleResult(data.response, data.error);
+                            
+                        // else the data hasn't already been fetched
+                        } else {
+                            // put a loader on the screen
+                            GS.addLoader('datafetch-test', 'Loading...');
+                            
+                            // create a function to bind to an event once
+                            dataFunction = function (event) {
+                                // unbind this function (so that it only runs once)
+                                document.removeEventListener('dataready_' + encodeURIComponent(strLink), dataFunction);
+                                
+                                // remove loader
+                                GS.removeLoader('datafetch-test');
+                                
+                                // pass data to handleResult function
+                                handleResult(event.detail.response,
+                                             event.detail.error);
+                            };
+                            
+                            // bind function to listen for when the data is finally retrieved
+                            document.addEventListener('dataready_' + encodeURIComponent(strLink), dataFunction);
+                        }
+                    }
+                    
+                    // put a string representation of the
+                    //      return value in the "result" div
+                    function handleResult(data, error) {
+                        document.getElementById('result').textContent = JSON.stringify(data);
+                    }
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Clear Example:</span><br />
+                <p>In this example we have two buttons: one to make the call and cache the rest and one to clear the cache and to make the call.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="7">
+                    <gs-button onclick="testAjax()">Get Data, Cache</gs-button>
+                    <gs-button onclick="testAjax(true)">Clear Cache, Get Data</gs-button>
+                    <div id="result"></div>
+                </template>
+                <template for="js" height="64">
+                    function testAjax(bolClearCache) {
+                        var strLink = '/env/gsdoc.action_ajax_test?test', data, dataFunction;
+                        
+                        // retrieve data (if this is the first call or
+                        //                  if bolClearCache is true then
+                        //                  this is where the ajax is initiated)
+                        data = GS.dataFetch(strLink, bolClearCache);
+                        
+                        // if the data has already been fetched
+                        if (data) {
+                            // pass data to handleResult function
+                            handleResult(data.response, data.error);
+                            
+                        // else the data hasn't already been fetched
+                        } else {
+                            // put a loader on the screen
+                            GS.addLoader('datafetch-test', 'Loading...');
+                            
+                            // create a function to bind to an event once
+                            dataFunction = function (event) {
+                                // unbind this function (so that it only runs once)
+                                document.removeEventListener('dataready_' + encodeURIComponent(strLink), dataFunction);
+                                
+                                // remove loader
+                                GS.removeLoader('datafetch-test');
+                                
+                                // pass data to handleResult function
+                                handleResult(event.detail.response,
+                                             event.detail.error);
+                            };
+                            
+                            // bind function to listen for when the data is finally retrieved
+                            document.addEventListener('dataready_' + encodeURIComponent(strLink), dataFunction);
+                        }
+                    }
+                    
+                    // put a string representation of the
+                    //      return value in the "result" div
+                    function handleResult(data, error) {
+                        document.getElementById('result').textContent = JSON.stringify(data);
+                    }
+                </template>
+            </gs-doc-example>
+        </gs-container>
+    </body>
+</html>
