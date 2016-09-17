@@ -137,6 +137,7 @@ README.md
 /visualstudio/postage/Debug
 /visualstudio/postage/x64
 /visualstudio/postage/bin
+/RELEASE_NOTES.txt
 /dependencies/libressl/apps/nc/netcat.c.orig
 /dependencies/libressl/autom4te.cache/output.0
 /dependencies/libressl/autom4te.cache/output.1
