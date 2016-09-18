@@ -1,31 +1,22 @@
 # Postage - A fast replacement for PGAdmin
 
+## About
+Postage is built on Envelope technology. Postage and Envelope are products of Workflow Products, LLC. 
+
+## Developer Notes
+If you're interested in developing, patching or in any way contributing to Postage then you should probably also read the [README_DEV](https://github.com/workflowproducts/postage/blob/master/README_DEV.md) file.
+
 ## Dependencies
 
-#### LIBEV
-Different versions of libev may not work with every version of Postage. To avoid problems, the Postage compile process is set up to statically compile libev. This way we control what version you use. If you need a different version, start with the dependencies/update.sh file.
+#### LIBPQ
+In order for Postage to talk to PostgreSQL you need to have the libpq library installed. If you don't have LibPQ or the Postage compile process can't find it, please consult the file INSTALL_LIBPQ for some OS-specific advice on how to get libpq.
 
 #### LIBRESSL
 Postage uses the new TLS API found in LibreSSL. It can take some time to compile LibreSSL. If LibreSSL is already installed on your machine, then the compile process dynamically loads that one. This way you can avoid the wait. If not, it's compiled in statically. Please be patient. 
 
-#### LIBPQ
-In order for Postage to talk to PostgreSQL you need to have the libpq library installed.
-
-Mac OS X ships with a PostgreSQL install with no libpq header files. If you then install PostgreSQL but don't add it to your PATH (in .profile) then the Postage configure process will error saying that it found pg_config (but it will be the wrong one) and fail to find the libpq header files. To fix this situation, make sure you add the proper pgsql/bin folder in the beginning of your path.
-
-Usually, if you have psql then you'll have the libpq library files and be fine. Rarely, you may encounter issues by using the wrong version of libpq. In these cases, or in the case where you want to run postage on a computer that doesn't have libpq installed, you can consult the file INSTALL_LIBPQ for some OS specific advice on how to get libpq.
-
 ####DOWNLOADING POSTAGE
 
-If you prefer wget:
-
-    wget https://www.workflowproducts.com/downloads/postage-stable.zip
-    unzip postage-stable.zip
-
-OR if you prefer curl:
-
-    curl -L https://www.workflowproducts.com/downloads/postage-stable.zip > postage-stable.zip
-    unzip postage-stable.zip
+https://github.com/workflowproducts/postage/releases
 
 ####INSTALLING POSTAGE
 
@@ -88,16 +79,6 @@ Postage will push a message like:
 
 Once you see that message that means Postage is running, open your web browser to the link shown.
 
-####UNINSTALLING POSTAGE (from original build directory)
-
-If you install Postage and then decide you want to uninstall it then you need to have done a `./configure` with the same version of Postage. If you still have your original build directory around then you can just cd into it and run:
-
-    make uninstall
-
-Postage saves SQL scripts to the .postage folder. If you're removing Postage you may want to remove the .postage directory.
-
-    rm -r ~/.postage/
-
 ####UNINSTALLING POSTAGE
 
 If you still have your original build directory then:
@@ -105,8 +86,11 @@ If you still have your original build directory then:
     cd postage
     ./configure
     make uninstall
-    rm -r ~/.postage/  # to remove SQL script
     
+Postage saves SQL scripts that you create in Postage to the .postage folder. If you're removing Postage you may want to remove the .postage directory.
+
+    rm -r ~/.postage/
+
 If you don't have your original build directory check the following locations:
 
     rm -r /usr/local/etc/postage        # you may wish to save your config files first
@@ -115,7 +99,7 @@ If you don't have your original build directory check the following locations:
 
 ####FEEDBACK AND BUG REPORTS
 
-Please contact us with your feedback! Please report any issues you have for FREE support. More information is available at the project home page: https://www.workflowproducts.com/postage.html
+Please contact us with your feedback! Github issues and pull requests are welcome. Please report any issues you have for FREE support. More information is available at the project home page: https://www.workflowproducts.com/postage.html
 
 ####Licensing
 
