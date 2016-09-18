@@ -48,4 +48,9 @@ Note that valgrind is going to detect a lot if uninitialized reads/jumps from li
 
 Using GDB and Valgrind at the same time (Yikes!), I found some related information here: http://tromey.com/blog/?p=731
 
+## Dependencies
+
+#### LIBEV
+Different versions of libev may not work with every version of Postage. To avoid problems, the Postage compile process is set up to statically compile libev. This way we control what version you use. If you need a different version, start with the dependencies/update.sh file.
+
 Copyright 2016 Workflow Products LLC
