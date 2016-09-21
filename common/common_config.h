@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include "db_framework.h"
 #ifdef _WIN32
 #include "util/util_getopt.h"
 #include <windows.h>

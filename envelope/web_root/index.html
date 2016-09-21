@@ -77,16 +77,14 @@
 
                 // bind keydown for the "normal-pword" field
                 document.getElementById('normal-pword').addEventListener('keydown', function (event) {
-                    if (event.keyCode === 13 && document.getElementById('normal-uname').value && document.getElementById('normal-pword').value) {
+                    if (event.keyCode === 13) {
                         login();
                     }
                 });
 
                 // bind click for the "button-login" button
                 document.getElementById('button-login').addEventListener('click', function () {
-                    if (document.getElementById('normal-uname').value && document.getElementById('normal-pword').value) {
-                        login();
-                    }
+                       login();
                 });
 
                 // GS.ajaxJSON((location.pathname.indexOf('/v1/') === 0 ? '/v1/cluster' : '/env') + '/postage.actionnc_roles', '', function (data, error) {

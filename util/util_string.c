@@ -2,23 +2,40 @@
 
 bool check_to_escape(char *str_input, bool bol_as_ident) {
 	char *ptr_input = str_input;
-	char *ptr_end_input = str_input + strlen(str_input);
+	char *ptr_end_input = (str_input + strlen(str_input)) - 1;
+	size_t int_num_quotes = 0;
 	while (isspace(*ptr_input)) {
 		ptr_input++;
 	}
 	while (isspace(*ptr_end_input)) {
 		ptr_end_input--;
 	}
-	if (*ptr_input == 'E' && !bol_as_ident) {
+	if (!bol_as_ident && *ptr_input == 'E') {
 		ptr_input++;
 	}
-	if (!bol_as_ident && *ptr_input == '\'' && *ptr_end_input == '\'') {
-		return false;
+
+	if (!bol_as_ident && (*ptr_input != '\'' || *ptr_end_input != '\'')) {
+		return true;
 	}
-	if (bol_as_ident && *ptr_input == '"' && *ptr_end_input == '"') {
-		return false;
+	if (bol_as_ident && (*ptr_input != '"' || *ptr_end_input != '"')) {
+		return true;
 	}
-	return true;
+	ptr_input++;
+
+	while (ptr_input < ptr_end_input) {
+		if (( bol_as_ident && *ptr_input != '"'  && int_num_quotes > 0 && (int_num_quotes % 2) == 0) ||
+			(!bol_as_ident && *ptr_input != '\'' && int_num_quotes > 0 && (int_num_quotes % 2) == 0)) {
+			return true;
+		} else if ( ( bol_as_ident && *ptr_input == '"' ) ||
+					(!bol_as_ident && *ptr_input == '\'')) {
+			int_num_quotes += 1;
+		} else {
+			int_num_quotes = 0;
+		}
+		ptr_input++;
+	}
+
+	return (int_num_quotes % 2) != 0;
 }
 
 char *escape_value(char *str_input) {

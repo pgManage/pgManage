@@ -68,7 +68,7 @@ typedef struct {
 DB_conn *DB_connect(EV_P, void *cb_data, char *str_connstring, char *str_user, size_t int_user_length, char *str_password,
 	size_t int_password_length, char *str_context_data, connect_cb_t connect_cb);
 
-typedef enum { DB_DRIVER_POSTGRES = 1 } DB_driver;
+typedef enum { DB_DRIVER_POSTGRES = 1, DB_DRIVER_SQL_SERVER = 2, DB_DRIVER_MSACCESS = 3 } DB_driver;
 #define DB_connection_driver(conn) DB_DRIVER_POSTGRES
 
 typedef enum {

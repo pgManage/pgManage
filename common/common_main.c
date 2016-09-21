@@ -265,7 +265,6 @@ int main(int argc, char *const *argv) {
 		goto error;
 	}
 	SINFO("Configuration finished");
-	SINFO("POSTAGE_PREFIX: %s", POSTAGE_PREFIX);
 
 	global_loop = ev_default_loop(0);
 	SERROR_CHECK(global_loop != NULL, "ev_default_loop failed!");

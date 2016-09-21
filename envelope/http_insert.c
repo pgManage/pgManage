@@ -117,8 +117,11 @@ void http_insert_step1(struct sock_ev_client *client) {
 
 	if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
 		SFINISH_CHECK(DB_exec(global_loop, client->conn, client, "BEGIN;", http_insert_step2), "DB_exec failed");
-	} else {
+	} else if (DB_connection_driver(client->conn) == DB_DRIVER_SQL_SERVER) {
 		SFINISH_CHECK(DB_exec(global_loop, client->conn, client, "BEGIN TRANSACTION;", http_insert_step2), "DB_exec failed");
+	} else {
+		SFINISH_CHECK(DB_get_column_types_for_query(global_loop, client->conn, client_insert->str_sql, client, http_insert_step3),
+			"DB_get_column_types_for_query failed");
 	}
 
 	// SFINISH("Only WHERE, ORDER BY, LIMIT and OFFSET are allowed in the SELECT request");
@@ -243,9 +246,11 @@ bool http_insert_step3(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_CHECK(str_temp != NULL, "DB_escape_literal failed");
 		if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
 			SFINISH_CAT_APPEND(client_insert->str_sql, str_temp, "::", DArray_get(client_insert->darr_column_types, i));
-		} else {
+		} else if (DB_connection_driver(client->conn) == DB_DRIVER_SQL_SERVER) {
 			SFINISH_CAT_APPEND(
 				client_insert->str_sql, "CAST(", str_temp, " AS ", DArray_get(client_insert->darr_column_types, i), ")");
+		} else {
+			SFINISH_CAT_APPEND( client_insert->str_sql, str_temp);
 		}
 		SFREE(str_temp);
 		if (i < (int_len - 1)) {
@@ -323,20 +328,28 @@ bool http_insert_step4(EV_P, void *cb_data, DB_result *res) {
 		} else {
 			SFINISH_CAT_CSTR(client_insert->str_sql, "SELECT lastval();");
 		}
-	} else {
+
+		SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_insert->str_sql, http_insert_step5), "DB_exec failed");
+	} else if (DB_connection_driver(client->conn) == DB_DRIVER_SQL_SERVER) {
 		if (client_insert->str_sequence_name != NULL && strlen(client_insert->str_sequence_name) > 0) {
 			SFINISH_CAT_CSTR(client_insert->str_sql,
-				"SELECT CAST(current_value AS nvarchar(MAX)) FROM sys.sequences WHERE [name] = ",
-				client_insert->str_sequence_name);
+				"SELECT IDENT_CURRENT(",
+				client_insert->str_sequence_name, ")");
 		} else {
 			SFINISH_CAT_CSTR(client_insert->str_sql, "SELECT CAST(SCOPE_IDENTITY() AS nvarchar(MAX));");
 		}
+
+		SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_insert->str_sql, http_insert_step5), "DB_exec failed");
+	} else {
+		SFINISH_CAT_CSTR(client_insert->str_sql,
+			" SELECT Cstr(id) As id2 ",
+			"  FROM (SELECT TOP 1 @@IDENTITY AS id",
+			"         FROM ", client_insert->str_real_table_name,
+			"  ) em");
+		SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_insert->str_sql, http_insert_step6), "DB_exec failed");
 	}
 
 	DB_free_result(res);
-
-	// Use the sql we generated earlier to send all the data to the socket
-	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_insert->str_sql, http_insert_step5), "DB_exec failed");
 
 	SDEBUG("client_insert->str_sql: %s", client_insert->str_sql);
 
@@ -353,7 +366,7 @@ finish:
 
 		_str_response = str_response;
 		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
 			_str_response);
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client->conn, res);
@@ -459,7 +472,22 @@ bool http_insert_step6(EV_P, void *cb_data, DB_result *res) {
 	SDEFINE_VAR_ALL(str_temp);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
-	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
+	if (DB_connection_driver(client->conn) == DB_DRIVER_MSACCESS) {
+		SFINISH_CHECK(res->status == DB_RES_TUPLES_OK, "DB_exec failed");
+
+		SFINISH_CHECK(DB_fetch_row(res) == DB_FETCH_OK, "DB_fetch_row failed");
+
+		arr_row_values = DB_get_row_values(res);
+		SFINISH_CHECK(arr_row_values != NULL, "DB_get_row_values failed");
+
+		SFINISH_CAT_CSTR(client_insert->str_result, DArray_get(arr_row_values, 0));
+		DArray_clear_destroy(arr_row_values);
+		arr_row_values = NULL;
+
+		SFINISH_CHECK(DB_fetch_row(res) == DB_FETCH_END, "DB_fetch_row failed");
+	} else {
+		SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
+	}
 
 	SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
 								   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"

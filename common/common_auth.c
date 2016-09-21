@@ -65,10 +65,9 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	// Find another client from the same place/cookie
 	LIST_FOREACH(client->server->list_client, first, next, node) {
 		struct sock_ev_client *other_client = node->value;
-		SDEBUG("other_client                     = %p", other_client);
-		SDEBUG("other_client->node               = %p", other_client->node);
-		SDEBUG("client->node                     = %p", client->node);
-		SDEBUG("other_client->cnxn               = %p", other_client->cnxn);
+		SDEBUG("other_client                        = %p", other_client);
+		SDEBUG("other_client->node                  = %p", other_client->node);
+		SDEBUG("client->node                        = %p", client->node);
 		SDEBUG("other_client->int_last_activity_i   = %d", other_client->int_last_activity_i);
 		SDEBUG("client->int_last_activity_i         = %d", client->int_last_activity_i);
 		if (other_client != NULL && client->node != other_client->node &&
@@ -78,10 +77,10 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		}
 	}
 
-	SDEBUG("List_count(client->server->list_client) = %d", List_count(client->server->list_client));
+	SDEBUG("List_count(client->server->list_client)   = %d", List_count(client->server->list_client));
 	SDEBUG("client->server->arr_client_last_activity  = %p", client->server->arr_client_last_activity);
 	SDEBUG("client->int_last_activity_i               = %d", client->int_last_activity_i);
-	SDEBUG("other_client_node                      = %p", other_client_node);
+	SDEBUG("other_client_node                         = %p", other_client_node);
 
 	// Grab the last close time if we have it
 	struct sock_ev_client_last_activity *client_last_activity = NULL;
@@ -89,10 +88,9 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		client_last_activity = (struct sock_ev_client_last_activity *)DArray_get(
 			client->server->arr_client_last_activity, (size_t)client->int_last_activity_i);
 
-		SDEBUG(" ev_now(EV_A)                                      : %f", ev_now(EV_A));
-		SDEBUG("                client_last_activity->last_activity_time : %f", client_last_activity->last_activity_time);
-		SDEBUG("(ev_now(EV_A) - client_last_activity->last_activity_time): %f",
-			(ev_now(EV_A) - client_last_activity->last_activity_time));
+		SDEBUG(" ev_now(global_loop)                                            : %f", ev_now(global_loop));
+		SDEBUG("                       client_last_activity->last_activity_time : %f", client_last_activity->last_activity_time);
+		SDEBUG("(ev_now(global_loop) - client_last_activity->last_activity_time): %f", (ev_now(global_loop) - client_last_activity->last_activity_time));
 	}
 	// Grab the other client if we have it
 	struct sock_ev_client *other_client = NULL;

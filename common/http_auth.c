@@ -45,14 +45,26 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 	if (strncmp(client_auth->str_action, "login", 6) == 0) {
 		SNOTICE("REQUEST TYPE: " SUN_PROGRAM_LOWER_NAME " LOGIN");
 		client_auth->str_user = getpar(str_form_data, "username", int_query_length, &client_auth->int_user_length);
+#ifdef ENVELOPE_ODBC
+		if (strncmp(str_global_mode, "msaccess", 9) != 0) {
+			SFINISH_CHECK(client_auth->str_user != NULL && client_auth->int_user_length > 0, "no username");
+		}
+#else
 		SFINISH_CHECK(client_auth->str_user != NULL && client_auth->int_user_length > 0, "no username");
+#endif
 		bstr_tolower(client_auth->str_user, client_auth->int_user_length);
 		SFINISH_CHECK(client_auth->str_user != NULL, "str_tolower(client_auth->str_user) failed");
 
 		SNOTICE("REQUEST USERNAME: %s", client_auth->str_user);
 
 		client_auth->str_password = getpar(str_form_data, "password", int_query_length, &client_auth->int_password_length);
+#ifdef ENVELOPE_ODBC
+		if (strncmp(str_global_mode, "msaccess", 9) != 0) {
+			SFINISH_CHECK(client_auth->str_password != NULL && client_auth->int_password_length > 0, "no password");
+		}
+#else
 		SFINISH_CHECK(client_auth->str_password != NULL && client_auth->int_password_length > 0, "no password");
+#endif
 
 		SFINISH_CHECK(bstrstr(client_auth->str_user, client_auth->int_user_length, ";", 1) == NULL, "no semi-colons allowed");
 		SFINISH_CHECK(
@@ -557,7 +569,7 @@ finish:
 
 void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 	struct sock_ev_client_auth *client_auth = cb_data;
-	SDEFINE_VAR_ALL(str_group_literal, str_sql, str_expires, str_temp, str_user_literal);
+	SDEFINE_VAR_ALL(str_group_literal, str_sql, str_expires, str_temp, str_user_literal, str_int_len);
 	char *str_response = NULL;
 	SDEBUG("http_auth_login_step2");
 	SDEBUG("client_auth: %p", client_auth);
@@ -589,13 +601,49 @@ void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 							  "LEFT JOIN pg_roles on pg_roles.oid = pg_auth_members.roleid "
 							  "WHERE pg_user.usename = ",
 			str_user_literal, " AND pg_roles.rolname = ", str_group_literal, ";");
-	} else {
+	} else if (DB_connection_driver(client_auth->parent->conn) == DB_DRIVER_SQL_SERVER) {
 		SFINISH_CAT_CSTR(str_sql, "SELECT CASE WHEN IS_SRVROLEMEMBER('sysadmin') = 1 THEN 'TRUE' ELSE 'FALSE' END"
-								  " UNION ALL SELECT CASE WHEN IS_MEMBER(",
+			" UNION ALL SELECT CASE WHEN IS_MEMBER(",
 			str_group_literal, ") = 1 THEN 'TRUE' ELSE 'FALSE' END;");
+	} else {
+		SFINISH_CAT_CSTR(str_int_len, "48");
+		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
+			"Set-Cookie: envelope=", client_auth->str_cookie_encrypted, "; path=/; expires=", str_expires,
+			(bol_tls ? "; secure" : ""), "; HttpOnly;\015\012", "Set-Cookie: DB=", (DB_connection_driver(client_auth->parent->conn) == DB_DRIVER_POSTGRES ? "PG" : "SS"), "; path=/;\015\012Content-Length: ", str_int_len, "\015\012\015\012",
+			"{\"stat\": true, \"dat\": \"/env/app/all/index.html\"}");
+
+		struct sock_ev_client *client = client_auth->parent;
+		size_t int_i, int_len;
+		client->int_last_activity_i = -1;
+		struct sock_ev_client_last_activity *client_last_activity;
+		for (int_i = 0, int_len = DArray_end(client->server->arr_client_last_activity); int_i < int_len; int_i += 1) {
+			client_last_activity =
+				(struct sock_ev_client_last_activity *)DArray_get(client->server->arr_client_last_activity, int_i);
+			if (client_last_activity != NULL &&
+				strncmp(client_last_activity->str_client_ip, client->str_client_ip, INET_ADDRSTRLEN) == 0 &&
+				strncmp(client_last_activity->str_cookie, client_auth->str_cookie_encrypted,
+					strlen(client_auth->str_cookie_encrypted)) == 0) {
+				client->int_last_activity_i = (ssize_t)int_i;
+				break;
+			}
+		}
+		if (client->int_last_activity_i == -1) {
+			SFINISH_SALLOC(client_last_activity, sizeof(struct sock_ev_client_last_activity));
+			memcpy(client_last_activity->str_client_ip, client_auth->parent->str_client_ip, INET_ADDRSTRLEN);
+			SFINISH_CAT_CSTR(client_last_activity->str_cookie, client_auth->str_cookie_encrypted);
+			client_last_activity->last_activity_time = ev_now(EV_A);
+			client_auth->parent->int_last_activity_i =
+				(ssize_t)DArray_push(client_auth->parent->server->arr_client_last_activity, client_last_activity);
+		}
+
+		SFREE(str_user_literal);
+		SFREE(str_group_literal);
+
+		bol_error_state = false;
+		goto finish;
 	}
 	SFREE(str_user_literal);
-	str_user_literal = NULL;
 	SFREE(str_group_literal);
 
 	struct sock_ev_client_request *client_request =
@@ -608,17 +656,19 @@ void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 	bol_error_state = false;
 finish:
 	SFREE(conn->str_response);
+	ssize_t int_len = 0;
 	if (bol_error_state == true) {
 		SDEBUG("str_response: %s", str_response);
 		char *_str_response = str_response;
 		char str_length[50];
-		ssize_t int_len = 0;
 		snprintf(str_length, 50, "%zu", strlen(_str_response));
 		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
 								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 								"Content-Length: ",
 			str_length, "\015\012\015\012", _str_response);
 		SFREE(_str_response);
+	}
+	if (str_response != NULL) {
 		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, strlen(str_response))) < 0) {
 			SFREE(str_response);
 			if (bol_tls) {
@@ -670,7 +720,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 #ifdef ENVELOPE
 #else
 	if (bol_global_super_only == true && strncmp(str_rolsuper, "FALSE", 5) == 0) {
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
+		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 403 Forbidden\015\012"
 									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
 			"Content-Length: 71\015\012\015\012", "{\"stat\": false, \"dat\": "
 												  "\"You must login as a super "
@@ -682,7 +732,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		snprintf(str_content_length, 255, "%zu", int_content_length);
 		str_content_length[255] = 0;
 
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
+		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 403 Forbidden\015\012"
 									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 									   "Content-Length: ",
 			str_content_length, "\015\012\015\012"
@@ -826,6 +876,23 @@ finish:
 	SFREE_ALL();
 
 	ssize_t int_len = 0;
+
+	if (bol_error_state == true) {
+		SDEBUG("str_response: %s", str_response);
+		char *_str_response = str_response;
+		char str_length[50];
+		snprintf(str_length, 50, "%zu", strlen(_str_response));
+		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ",
+			str_length, "\015\012\015\012", _str_response);
+		SFREE(_str_response);
+		if (client_request->parent->conn->str_response != NULL && client_request->parent->conn->str_response[0] != 0) {
+			SFINISH_CAT_APPEND(str_response, ":\n", client_request->parent->conn->str_response);
+		}
+		SFREE(client_request->parent->conn->str_response);
+	}
+
 	if ((int_len = CLIENT_WRITE(client_request->parent, str_response, strlen(str_response))) < 0) {
 		if (bol_tls) {
 			SFINISH_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");

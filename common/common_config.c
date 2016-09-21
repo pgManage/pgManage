@@ -74,6 +74,11 @@ static int handler(void *str_user, const char *str_section, const char *str_name
 		SFREE(str_global_role_path);
 		SERROR_CAT_CSTR(str_global_role_path, str_value);
 #endif
+	} else if (SMATCH("", "mode")) {
+#ifdef ENVELOPE_ODBC
+		SFREE(str_global_mode);
+		SERROR_CAT_CSTR(str_global_mode, str_value);
+#endif
 
 	} else if (SMATCH("", "web_root")) {
 		SFREE(str_global_web_root);
@@ -378,6 +383,10 @@ bool parse_options(int argc, char *const *argv) {
 	//		 abort();
 	// }
 	SERROR_CAT_CSTR(str_global_log_level, "error");
+
+#ifdef ENVELOPE_ODBC
+	SERROR_CAT_CSTR(str_global_mode, "");
+#endif
 
 	int ch;
 #ifdef _WIN32
