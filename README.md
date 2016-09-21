@@ -1,43 +1,22 @@
 # Postage - A fast replacement for PGAdmin
 
+## About
+Postage is built on Envelope technology. Postage and Envelope are products of Workflow Products, LLC. 
+
+## Developer Notes
+If you're interested in developing, patching or in any way contributing to Postage then you should probably also read the [README_DEV](https://github.com/workflowproducts/postage/blob/master/README_DEV.md) file.
+
 ## Dependencies
 
-#### LIBEV
-Different versions of libev may not work with every version of Postage. To avoid problems, the Postage compile process is set up to statically compile libev. This way we control what version you use. If you need a different version, start with the dependencies/update.sh file.
+#### LIBPQ
+In order for Postage to talk to PostgreSQL you need to have the libpq library installed. If you don't have LibPQ or the Postage compile process can't find it, please consult the file INSTALL_LIBPQ for some OS-specific advice on how to get libpq.
 
 #### LIBRESSL
-Postage uses the new TLS API found in LibreSSL. It can take some time to compile LibreSSL. If LibreSSL is already installed on your machine, then the compile process dynamically loads that one. This way you can avoid the wait. If not, it's compiled in statically.
-
-#### LIBPQ
-In order for Postage to talk to PostgreSQL you need to have the libpq library installed.
-
-Mac OS X ships with a PostgreSQL install with no libpq header files. If you then install PostgreSQL but don't add it to your PATH (in .profile) then the Postage configure process will error saying that it found pg_config (but it will be the wrong one) and fail to find the libpq header files. To fix this situation, make sure you add the proper pgsql/bin folder in the beginning of your path.
-
-Usually, if you have psql then you'll have the libpq library files and be fine. Rarely, you may encounter issues by using the wrong version of libpq. In these cases, or in the case where you want to run postage on a computer that doesn't have libpq installed, you can consult the file INSTALL_LIBPQ for some OS specific advice on how to get libpq.
-
-If postage compiles and links but doesn't run (on linux):
-
-Add this line to `/etc/ld.so.conf`:
-
-    /usr/local/lib
-
-And then run (as root):
-
-    # ldconfig
-
-This will add /usr/local/lib to the default library path. Now try again.
+Postage uses the new TLS API found in LibreSSL. It can take some time to compile LibreSSL. If LibreSSL is already installed on your machine, then the compile process dynamically loads that one. This way you can avoid the wait. If not, it's compiled in statically. Please be patient. 
 
 ####DOWNLOADING POSTAGE
 
-If you prefer wget:
-
-    wget https://www.workflowproducts.com/downloads/postage-stable.zip
-    unzip postage-stable.zip
-
-OR if you prefer curl:
-
-    curl -L https://www.workflowproducts.com/downloads/postage-stable.zip > postage-stable.zip
-    unzip postage-stable.zip
+https://github.com/workflowproducts/postage/releases
 
 ####INSTALLING POSTAGE
 
@@ -100,32 +79,50 @@ Postage will push a message like:
 
 Once you see that message that means Postage is running, open your web browser to the link shown.
 
-####UNINSTALLING POSTAGE (from original build directory)
+####UNINSTALLING POSTAGE
 
-If you install Postage and then decide you want to uninstall it then you need to have done a `./configure` with the same version of Postage. If you still have your original build directory around then you can just cd into it and run:
-
-    make uninstall
-
-Postage saves SQL scripts to the .postage folder. If you're removing Postage you may want to remove the .postage directory.
-
-    rm -r ~/.postage/
-
-####UNINSTALLING POSTAGE (without original build directory)
-
-If you lost your original build directory then download the correct version of Postage and run:
+If you still have your original build directory then:
 
     cd postage
     ./configure
     make uninstall
+    
+Postage saves SQL scripts that you create in Postage to the .postage folder. If you're removing Postage you may want to remove the .postage directory.
+
     rm -r ~/.postage/
 
+If you don't have your original build directory check the following locations:
+
+    rm -r /usr/local/etc/postage        # you may wish to save your config files first
+    rm /usr/local/sbin/postage          # this removes the binary
+    rm /usr/local/man/man1/postage.1    # this removes the man page
 
 ####FEEDBACK AND BUG REPORTS
 
-Please contact us with your feedback! Please report any issues you have for FREE support. More information is available at the project home page: https://www.workflowproducts.com/postage.html
+Please contact us with your feedback! Github issues and pull requests are welcome. Please report any issues you have for FREE support. More information is available at the project home page: https://www.workflowproducts.com/postage.html
 
 ####Licensing
 
-If you like some or all of Postage's functionality and the current license won't suit your needs, alternative licensing is available for a small fee. Please call for details. 817-503-9545
+If you like some or all of Postage's functionality and the current license won't suit your needs, commercial licensing is available starting at $99. Please call Justin at Workflow Products, 817-503-9545 for details.
+
+## Why?
+
+It's a sad story really. We had an in-house version for six or seven years. Then we decided it would be a good idea to polish it up and open source it. If it became popular it could be good for us. We invested an embarrassing amount of work into it. 
+
+It was available for some months on Github and there was no activity from outside developers or users. We did get a few stars but just one one-line patch. We were ok with that though because we figured at some point the number of users would increase. Everyone we showed it to at the DFW and Austin PUGs were very impressed and enthusiastic.
+
+Then E*********DB committed several people to PGAdmin4. We realized that Postage was unlikely to be popular if PGAdmin4 gets to a place where it is 'good enough'. So we left Github to save developer overhead. 
+
+Then someone expressed interest in Postage. We figured out a way to keep the developer overhead low and got back onto Github. So now we're back.
+
+At this point Postage is Workflow Products' flagship. We're content that Postage play the role of showing off the rich, desktop-like functionality possible with Envelope, the platform we wrote for our business applications. It would have been nice for it to become popular some day but that isn't going to happen. Fortunately for us we don't need it to be popular. We use it every day. If you do give Postage a try then you have our gratitude. Let us know what you think and we'll make it better.
+
+## Roadmap
+
+We're more than a little annoyed at our competitor. As a consequence, we aren't going to give any advance notice of features in development. However, if you are wondering about our commitment to Postage then wonder no longer. 
+
+Workflow Products has committed an embarrassing amount of resources to Postage over the years. The current average for 2016 is two full time people. Current priority is debugging install on various platforms. Next we'll be setting up various packages to make installation even easier. Then we'll move back into feature expansion. We have identified four major features we want to bring to Postage over the next six to eight months.
+
+Workflow Products itself is healthier than it's ever been. We're celebrating our tenth year in November 2016. We're now at five full time employees and we expect to be around in another ten years. If you have any further questions please contact us directly at 817-503-9545.
 
 Copyright 2016 Workflow Products LLC
