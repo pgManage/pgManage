@@ -51,6 +51,6 @@ Using GDB and Valgrind at the same time (Yikes!), I found some related informati
 ## Dependencies
 
 #### LIBEV
-Different versions of libev may not work with every version of Postage. To avoid problems, the Postage compile process is set up to statically compile libev. This way we control what version you use. If you need a different version, start with the dependencies/update.sh file.
+Different versions of libev may not work with every version of Postage. To avoid problems, the Postage compile process is set up to statically compile libev. This way we control what version you use.
 
 Copyright 2016 Workflow Products LLC
