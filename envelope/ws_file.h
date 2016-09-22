@@ -33,6 +33,7 @@ struct sock_ev_client_file {
 	char *str_canonical_start_to;
 	char *str_path_to;
 	time_t int_change_stamp;
+	char *str_change_stamp;
 	char *ptr_content;
 	char *str_content;
 	char *str_search;

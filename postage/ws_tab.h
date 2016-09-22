@@ -16,6 +16,7 @@ struct sock_ev_client_tab {
 	time_t int_change_stamp;
 	char *ptr_content;
 	char *str_content;
+	char *str_change_stamp;
 #ifdef _WIN32
 	HANDLE h_file;
 #else

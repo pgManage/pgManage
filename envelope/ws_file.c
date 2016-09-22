@@ -132,23 +132,22 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 		client_file->str_input_path = unescape_value(str_query);
 		SFINISH_CHECK(client_file->str_input_path != NULL, "unescape_value failed");
 
-		str_change_stamp = unescape_value(ptr_change_stamp);
-		SFINISH_CHECK(str_change_stamp != NULL, "unescape_value failed");
+		client_file->str_change_stamp = unescape_value(ptr_change_stamp);
+		SFINISH_CHECK(client_file->str_change_stamp != NULL, "unescape_value failed");
 
-		if (strcmp(str_change_stamp, "0") == 0) {
+		if (strcmp(client_file->str_change_stamp, "0") == 0) {
 			client_file->int_change_stamp = 0;
 		} else {
 			struct tm tm_change_stamp;
 			memset(&tm_change_stamp, 0, sizeof(struct tm));
-			SDEBUG("str_change_stamp: %s", str_change_stamp);
+			SDEBUG("client_file->str_change_stamp: %s", client_file->str_change_stamp);
 			SDEBUG("str_date_format : %s", str_date_format);
-			SFINISH_CHECK(strptime(str_change_stamp, str_date_format, &tm_change_stamp) != NULL, "strptime() failed");
+			SFINISH_CHECK(strptime(client_file->str_change_stamp, str_date_format, &tm_change_stamp) != NULL, "strptime() failed");
 			tm_change_stamp.tm_isdst = -1;
 
 			client_file->int_change_stamp = mktime(&tm_change_stamp);
 			SFINISH_CHECK(client_file->int_change_stamp != -1, "mktime() failed");
 		}
-		SFREE(str_change_stamp);
 
 		client_file->str_canonical_start = canonical_full_start(client_file->str_input_path);
 		SFINISH_CHECK(client_file->str_canonical_start != NULL, "Invalid Path");
@@ -541,10 +540,12 @@ finish:
 bool ws_file_read_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
 	char *str_response = NULL;
+	time_t int_change_stamp;
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
-	struct stat *statdata = NULL;
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
+#else
+	struct stat *statdata = NULL;
 #endif
 
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
@@ -562,15 +563,40 @@ bool ws_file_read_step2(EV_P, void *cb_data, bool bol_group) {
 			SFINISH("CreateFile failed: 0x%X (%s)", int_err, strErrorText);
 		}
 	}
+
+	FILETIME ft_last_write_time;
+	SFINISH_CHECK(GetFileTime(client_file->h_file, NULL, NULL, &ft_last_write_time) != 0, "GetFileTime failed");
+	SYSTEMTIME st_last_write_time;
+	SFINISH_CHECK(FileTimeToSystemTime(&ft_last_write_time, &st_last_write_time) != 0, "FileTimeToSystemTime failed");
+
+	SFINISH_SALLOC(client_file->str_change_stamp, 101);
+	SFINISH_CHECK(
+		snprintf(client_file->str_change_stamp, 100, "%d-%d-%d %d:%d:%d.%d",
+			st_last_write_time.wYear,
+			st_last_write_time.wMonth,
+			st_last_write_time.wDay,
+			st_last_write_time.wHour,
+			st_last_write_time.wMinute,
+			st_last_write_time.wSecond,
+			st_last_write_time.wMilliseconds
+		) > 0,
+		"snprintf() failed"
+	);
+	client_file->str_change_stamp[100] = 0;
 #else
 	client_file->int_fd = open(client_file->str_path, O_RDONLY | O_NONBLOCK);
 	SFINISH_CHECK(client_file->int_fd != -1, "open failed!");
-#endif
 
 	SFINISH_SALLOC(statdata, sizeof(struct stat));
 	stat(client_file->str_path, statdata);
 
-	client_file->int_change_stamp = statdata->st_mtime;
+	int_change_stamp = statdata->st_mtime;
+	struct tm *tm_change_stamp = localtime(&(int_change_stamp));
+	SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
+	SFINISH_SALLOC(client_file->str_change_stamp, 101);
+	SFINISH_CHECK(strftime(client_file->str_change_stamp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+	client_file->str_change_stamp[100] = 0;
+#endif
 
 #ifdef _WIN32
 	client_file->int_length = GetFileSize(client_file->h_file, NULL);
@@ -594,8 +620,9 @@ finish:
 		LocalFree(strErrorText);
 		strErrorText = NULL;
 	}
-#endif
+#else
 	SFREE(statdata);
+#endif
 	if (bol_error_state) {
 		bol_error_state = false;
 		client_request->int_response_id = (ssize_t)DArray_end(client_request->arr_response) + 1;
@@ -704,18 +731,13 @@ finish:
 void ws_file_read_step4(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
-	char str_change_stamp[101] = {0};
-	struct tm *tm_change_stamp = localtime(&(client_file->int_change_stamp));
-	SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
-	SFINISH_CHECK(strftime(str_change_stamp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
-	str_change_stamp[100] = 0;
 
 	client_request->int_response_id += 1;
 	char str_temp[101] = {0};
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
 																				   "responsenumber = ",
-		str_temp, "\012", str_change_stamp, "\012", client_file->str_content);
+		str_temp, "\012", client_file->str_change_stamp, "\012", client_file->str_content);
 	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 	DArray_push(client_request->arr_response, str_response);
 
@@ -782,15 +804,57 @@ finish:
 bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
 	char *str_response = NULL;
-	struct stat statbuf;
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 	int int_status = 0;
+	char *str_change_stamp = NULL;
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
 #endif
 
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
 
+#ifdef _WIN32
+	SetLastError(0);
+	client_file->h_file =
+		CreateFileA(client_file->str_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (client_file->h_file == INVALID_HANDLE_VALUE) {
+		int int_err = GetLastError();
+		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, int_err,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&strErrorText, 0, NULL);
+
+		if (strErrorText != NULL) {
+			SFINISH("CreateFile failed: 0x%X (%s)", int_err, strErrorText);
+		}
+	}
+
+	FILETIME ft_last_write_time;
+	SFINISH_CHECK(GetFileTime(client_file->h_file, NULL, NULL, &ft_last_write_time) != 0, "GetFileTime failed");
+
+	SYSTEMTIME st_last_write_time;
+	SFINISH_CHECK(FileTimeToSystemTime(&ft_last_write_time, &st_last_write_time) != 0, "FileTimeToSystemTime failed");
+
+	SFINISH_SALLOC(str_change_stamp, 101);
+	SFINISH_CHECK(
+		snprintf(str_change_stamp, 100, "%d-%d-%d %d:%d:%d.%d",
+			st_last_write_time.wYear,
+			st_last_write_time.wMonth,
+			st_last_write_time.wDay,
+			st_last_write_time.wHour,
+			st_last_write_time.wMinute,
+			st_last_write_time.wSecond,
+			st_last_write_time.wMilliseconds
+		) > 0,
+		"snprintf() failed"
+	);
+	str_change_stamp[100] = 0;
+
+	SDEBUG("client_file->str_change_stamp: %s", client_file->str_change_stamp);
+	SDEBUG("str_change_stamp             : %s", str_change_stamp);
+	if (strncmp(client_file->str_change_stamp, str_change_stamp, strlen(str_change_stamp)) != 0) {
+		SFINISH("Someone updated this file before you.");
+	}
+#else
+	struct stat statbuf;
 	int_status = stat(client_file->str_path, &statbuf);
 
 	if (int_status == 0 && client_file->file_type == POSTAGE_FILE_CREATE_FILE) {
@@ -800,8 +864,10 @@ bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 	if (int_status == 0 && client_file->int_change_stamp < statbuf.st_mtime) {
 		SFINISH("Someone updated this file before you.");
 	}
+#endif
 
 #ifdef _WIN32
+	CloseHandle(client_file->h_file);
 	SetLastError(0);
 	client_file->h_file = CreateFileA(client_file->str_path, GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (client_file->h_file == INVALID_HANDLE_VALUE) {
@@ -841,6 +907,7 @@ finish:
 		strErrorText = NULL;
 	}
 #endif
+	SFREE(str_change_stamp);
 	if (bol_error_state) {
 		bol_error_state = false;
 		client_request->int_response_id = (ssize_t)DArray_end(client_request->arr_response) + 1;
@@ -950,24 +1017,65 @@ finish:
 void ws_file_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
-
-	struct stat statbuf;
-	stat(client_file->str_path, &statbuf);
+#ifdef _WIN32
+	LPSTR strErrorText = NULL;
+#endif
 
 	SFINISH_SALLOC(str_response, 101);
+#ifdef _WIN32
+	CloseHandle(client_file->h_file);
+	SetLastError(0);
+	client_file->h_file =
+		CreateFileA(client_file->str_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (client_file->h_file == INVALID_HANDLE_VALUE) {
+		int int_err = GetLastError();
+		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, int_err,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&strErrorText, 0, NULL);
+
+		if (strErrorText != NULL) {
+			SFINISH("CreateFile failed: 0x%X (%s)", int_err, strErrorText);
+		}
+	}
+
+	FILETIME ft_last_write_time;
+	SFINISH_CHECK(GetFileTime(client_file->h_file, NULL, NULL, &ft_last_write_time) != 0, "GetFileTime failed");
+
+	SYSTEMTIME st_last_write_time;
+	SFINISH_CHECK(FileTimeToSystemTime(&ft_last_write_time, &st_last_write_time) != 0, "FileTimeToSystemTime failed");
+
+	SFINISH_CHECK(
+		snprintf(str_response, 100, "%d-%d-%d %d:%d:%d.%d",
+			st_last_write_time.wYear,
+			st_last_write_time.wMonth,
+			st_last_write_time.wDay,
+			st_last_write_time.wHour,
+			st_last_write_time.wMinute,
+			st_last_write_time.wSecond,
+			st_last_write_time.wMilliseconds
+		) > 0,
+		"snprintf() failed"
+	);
+#else
+	struct stat statbuf;
+	stat(client_file->str_path, &statbuf);
 	struct tm tm_change_stamp_result;
 	struct tm *tm_change_stamp = &tm_change_stamp_result;
-#ifdef _WIN32
-	localtime_s(tm_change_stamp, &(statbuf.st_mtime));
-#else
+
 	tm_change_stamp = localtime_r(&(statbuf.st_mtime), tm_change_stamp);
-#endif
+
 	SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
 	SFINISH_CHECK(strftime(str_response, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+#endif
 	str_response[100] = 0;
 
 	bol_error_state = false;
 finish:
+#ifdef _WIN32
+	if (strErrorText != NULL) {
+		LocalFree(strErrorText);
+		strErrorText = NULL;
+	}
+#endif
 
 	if (bol_error_state) {
 		bol_error_state = false;
@@ -1997,6 +2105,7 @@ void ws_file_free(struct sock_ev_client_file *to_free) {
 	SFREE(to_free->str_canonical_start_to);
 	SFREE(to_free->str_path_to);
 	SFREE(to_free->str_content);
+	SFREE(to_free->str_change_stamp);
 	size_t int_i, int_len;
 #ifdef _WIN32
 	if (to_free->h_file != INVALID_HANDLE_VALUE) {

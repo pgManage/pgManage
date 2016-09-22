@@ -1,16 +1,8 @@
-﻿  common_main.c
-c:\users\nunzio tocci\desktop\repos\postage\common\../dependencies/libev/ev.c(205): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition
-  c:\users\nunzio tocci\desktop\repos\postage\common\../dependencies/libev/ev.c(205): note: command-line arguments:  see previous definition of 'WIN32_LEAN_AND_MEAN'
-c:\users\nunzio tocci\desktop\repos\postage\common\../dependencies/libev/ev.c(969): warning C4244: 'function': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-c:\users\nunzio tocci\desktop\repos\postage\common\../dependencies/libev/ev.c(1017): warning C4244: 'function': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-c:\users\nunzio tocci\desktop\repos\postage\common\../dependencies/libev/ev.c(1063): warning C4244: 'function': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-c:\users\nunzio tocci\desktop\repos\postage\common\../dependencies/libev/ev.c(2091): warning C4101: 'arg': unreferenced local variable
-c:\users\nunzio tocci\desktop\repos\postage\common\../dependencies/libev/ev.c(2476): warning C4133: '=': incompatible types - from 'WSABUF *' to 'CHAR *'
-c:\users\nunzio tocci\desktop\repos\postage\dependencies\libev\ev_select.c(200): warning C4244: 'initializing': conversion from 'ev_tstamp' to 'unsigned long', possible loss of data
+﻿  ws_tab.c
   Generating code
-  1 of 407 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+  4 of 406 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    9 functions had inline decision re-evaluated but remain unchanged
+    4 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   postage.vcxproj -> C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\Release\postage.exe
   postage.vcxproj -> C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)
