@@ -1,8 +1,2 @@
 ﻿  ws_tab.c
-  Generating code
-  4 of 406 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    4 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  postage.vcxproj -> C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\Release\postage.exe
-  postage.vcxproj -> C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)
+LINK : fatal error LNK1104: cannot open file 'C:\Users\Nunzio Tocci\Desktop\Repos\postage\visualstudio\Release\postage.exe'
