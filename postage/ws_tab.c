@@ -411,7 +411,7 @@ void ws_tab_read_step2(EV_P, struct sock_ev_client_request *client_request) {
 #ifdef st_mtime
 	SFINISH_SALLOC(str_nanoseconds, 101);
 #ifdef __APPLE__
-	SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%d", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
+	SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
 #else
 	SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtim.tv_nsec) > 0, "snprintf() failed");
 #endif
@@ -682,7 +682,7 @@ void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 #ifdef st_mtime
 		SFINISH_SALLOC(str_nanoseconds, 101);
 #ifdef __APPLE__
-		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%d", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
+		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
 #else
 		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtim.tv_nsec) > 0, "snprintf() failed");
 #endif
@@ -901,7 +901,7 @@ void ws_tab_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 #ifdef st_mtime
 		SFINISH_SALLOC(str_nanoseconds, 101);
 #ifdef __APPLE__
-		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%d", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
+		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
 #else
 		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtim.tv_nsec) > 0, "snprintf() failed");
 #endif
