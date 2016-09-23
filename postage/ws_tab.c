@@ -120,19 +120,6 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 		client_tab->str_change_stamp = unescape_value(ptr_change_stamp);
 		SFINISH_CHECK(client_tab->str_change_stamp != NULL, "unescape_value failed");
 
-		if (strcmp(client_tab->str_change_stamp, "0") == 0) {
-			client_tab->int_change_stamp = 0;
-		} else {
-			struct tm tm_change_stamp;
-			SDEBUG("client_tab->str_change_stamp: %s", client_tab->str_change_stamp);
-			SDEBUG("str_date_format : %s", str_date_format);
-			SFINISH_CHECK(strptime(client_tab->str_change_stamp, str_date_format, &tm_change_stamp) != NULL, "strptime() failed");
-			tm_change_stamp.tm_isdst = -1;
-
-			client_tab->int_change_stamp = mktime(&tm_change_stamp);
-			SFINISH_CHECK(client_tab->int_change_stamp != -1, "mktime() failed");
-		}
-
 		str_path_temp = client_tab->str_path;
 		client_tab->str_path = canonical(str_local_path_root, str_path_temp, "write_file");
 		SFINISH_CHECK(client_tab->str_path != NULL, "Failed to get canonical path: >%s|%s<", str_local_path_root, str_path_temp);
@@ -361,9 +348,11 @@ finish:
 void ws_tab_read_step2(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
 	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
-	struct stat *statdata = NULL;
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
+#else
+	struct stat *statdata = NULL;
+	char *str_nanoseconds = NULL;
 #endif
 
 #ifdef _WIN32
@@ -379,6 +368,26 @@ void ws_tab_read_step2(EV_P, struct sock_ev_client_request *client_request) {
 			SFINISH("CreateFile failed: 0x%X (%s)", int_err, strErrorText);
 		}
 	}
+
+	SFINISH_SALLOC(client_tab->str_change_stamp, 101);
+	FILETIME ft_last_write_time;
+	SFINISH_CHECK(GetFileTime(client_tab->h_file, NULL, NULL, &ft_last_write_time) != 0, "GetFileTime failed");
+	SYSTEMTIME st_last_write_time;
+	SFINISH_CHECK(FileTimeToSystemTime(&ft_last_write_time, &st_last_write_time) != 0, "FileTimeToSystemTime failed");
+
+	SFINISH_CHECK(
+		snprintf(client_tab->str_change_stamp, 100, "%d-%d-%d %d:%d:%d.%d",
+			st_last_write_time.wYear,
+			st_last_write_time.wMonth,
+			st_last_write_time.wDay,
+			st_last_write_time.wHour,
+			st_last_write_time.wMinute,
+			st_last_write_time.wSecond,
+			st_last_write_time.wMilliseconds
+		) > 0,
+		"snprintf() failed"
+	);
+	client_tab->str_change_stamp[100] = 0;
 #else
 	client_tab->int_fd = open(client_tab->str_path, O_RDONLY | O_NONBLOCK);
 	SFINISH_CHECK(client_tab->int_fd != -1, "open failed!");
@@ -394,7 +403,22 @@ void ws_tab_read_step2(EV_P, struct sock_ev_client_request *client_request) {
 	SFINISH_SALLOC(statdata, sizeof(struct stat));
 	stat(client_tab->str_path, statdata);
 
-	client_tab->int_change_stamp = statdata->st_mtime;
+	SFINISH_SALLOC(client_tab->str_change_stamp, 101);
+	struct tm *tm_change_stamp = localtime(&(statdata->st_mtime));
+	SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
+	SFINISH_CHECK(strftime(client_tab->str_change_stamp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+	client_tab->str_change_stamp[100] = 0;
+#ifdef st_mtime
+	SFINISH_SALLOC(str_nanoseconds, 101);
+#ifdef __APPLE__
+	SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%d", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
+#else
+	SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtim.tv_nsec) > 0, "snprintf() failed");
+#endif
+	str_nanoseconds[100] = 0;
+
+	SFINISH_CAT_APPEND(client_tab->str_change_stamp, ".", str_nanoseconds);
+#endif
 #endif
 
 	SFINISH_SALLOC(client_tab->str_content, (size_t)client_tab->int_length + 1);
@@ -411,8 +435,10 @@ finish:
 		LocalFree(strErrorText);
 		strErrorText = NULL;
 	}
-#endif
+#else
+	SFREE(str_nanoseconds);
 	SFREE(statdata);
+#endif
 	if (bol_error_state) {
 		bol_error_state = false;
 		client_request->int_response_id = (ssize_t)DArray_end(client_request->arr_response) + 1;
@@ -520,41 +546,13 @@ finish:
 void ws_tab_read_step4(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
 	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
-	char str_change_stamp[101] = {0};
-#ifdef _WIN32
-	FILETIME ft_last_write_time;
-	SFINISH_CHECK(GetFileTime(client_tab->h_file, NULL, NULL, &ft_last_write_time) != 0, "GetFileTime failed");
-	SYSTEMTIME st_last_write_time;
-	SFINISH_CHECK(FileTimeToSystemTime(&ft_last_write_time, &st_last_write_time) != 0, "FileTimeToSystemTime failed");
-
-	SFINISH_CHECK(
-		snprintf(str_change_stamp, 100, "%d-%d-%d %d:%d:%d.%d",
-			st_last_write_time.wYear,
-			st_last_write_time.wMonth,
-			st_last_write_time.wDay,
-			st_last_write_time.wHour,
-			st_last_write_time.wMinute,
-			st_last_write_time.wSecond,
-			st_last_write_time.wMilliseconds
-		) > 0,
-		"snprintf() failed"
-	);
-
-	CloseHandle(client_tab->h_file);
-	client_tab->h_file = INVALID_HANDLE_VALUE;
-#else
-	struct tm *tm_change_stamp = localtime(&(client_tab->int_change_stamp));
-	SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
-	SFINISH_CHECK(strftime(str_change_stamp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
-#endif
-	str_change_stamp[100] = 0;
 
 	client_request->int_response_id += 1;
 	char str_temp[101] = {0};
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
 																				   "responsenumber = ",
-		str_temp, "\012", str_change_stamp, "\012", client_tab->str_content);
+		str_temp, "\012", client_tab->str_change_stamp, "\012", client_tab->str_content);
 	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 	DArray_push(client_request->arr_response, str_response);
 
@@ -624,6 +622,9 @@ void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
+#else
+	struct stat *statdata = NULL;
+	char *str_nanoseconds = NULL;
 #endif
 	char *str_change_stamp = NULL;
 
@@ -671,9 +672,28 @@ void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 		CloseHandle(client_tab->h_file);
 	}
 #else
-	struct stat statbuf;
-	if (stat(client_tab->str_path, &statbuf) == 0 && client_tab->int_change_stamp < statbuf.st_mtime) {
-		SFINISH("Someone updated this file before you.");
+	SFINISH_SALLOC(statdata, sizeof(struct stat));
+	if (stat(client_tab->str_path, statdata) == 0) {
+		SFINISH_SALLOC(str_change_stamp, 101);
+		struct tm *tm_change_stamp = localtime(&(statdata->st_mtime));
+		SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
+		SFINISH_CHECK(strftime(str_change_stamp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+		str_change_stamp[100] = 0;
+#ifdef st_mtime
+		SFINISH_SALLOC(str_nanoseconds, 101);
+#ifdef __APPLE__
+		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%d", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
+#else
+		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtim.tv_nsec) > 0, "snprintf() failed");
+#endif
+		str_nanoseconds[100] = 0;
+
+		SFINISH_CAT_APPEND(str_change_stamp, ".", str_nanoseconds);
+#endif
+
+		if (strncmp(client_tab->str_change_stamp, str_change_stamp, strlen(str_change_stamp)) != 0) {
+			SFINISH("Someone updated this file before you.");
+		}
 	}
 #endif
 
@@ -716,6 +736,9 @@ finish:
 		LocalFree(strErrorText);
 		strErrorText = NULL;
 	}
+#else
+	SFREE(statdata);
+	SFREE(str_nanoseconds);
 #endif
 	SFREE(str_change_stamp);
 	if (bol_error_state) {
@@ -828,6 +851,9 @@ void ws_tab_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
+#else
+	struct stat *statdata = NULL;
+	char *str_nanoseconds = NULL;
 #endif
 
 	SFINISH_SALLOC(str_response, 101);
@@ -864,19 +890,29 @@ void ws_tab_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 		) > 0,
 		"snprintf() failed"
 	);
+		str_response[100] = 0;
 #else
-	struct stat statbuf;
-	stat(client_tab->str_path, &statbuf);
-
-	struct tm tm_change_stamp_result;
-	struct tm *tm_change_stamp = &tm_change_stamp_result;
-
-	tm_change_stamp = localtime_r(&(statbuf.st_mtime), tm_change_stamp);
-
-	SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
-	SFINISH_CHECK(strftime(str_response, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+	SFINISH_SALLOC(statdata, sizeof(struct stat));
+	if (stat(client_tab->str_path, statdata) == 0) {
+		struct tm *tm_change_stamp = localtime(&(statdata->st_mtime));
+		SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
+		SFINISH_CHECK(strftime(str_response, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+		str_response[100] = 0;
+#ifdef st_mtime
+		SFINISH_SALLOC(str_nanoseconds, 101);
+#ifdef __APPLE__
+		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%d", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
+#else
+		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtim.tv_nsec) > 0, "snprintf() failed");
 #endif
-	str_response[100] = 0;
+		str_nanoseconds[100] = 0;
+
+		SFINISH_CAT_APPEND(str_response, ".", str_nanoseconds);
+#endif
+	} else {
+		SFINISH("stat failed");
+	}
+#endif
 
 	bol_error_state = false;
 finish:
@@ -885,6 +921,9 @@ finish:
 		LocalFree(strErrorText);
 		strErrorText = NULL;
 	}
+#else
+	SFREE(statdata);
+	SFREE(str_nanoseconds);
 #endif
 
 	if (bol_error_state) {

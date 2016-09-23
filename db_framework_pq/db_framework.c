@@ -877,7 +877,7 @@ finish:
 	SFREE(str_response);
 }
 
-void db_conn_cb_context_data(EV_P, void *cb_data, DB_result *res) {
+bool db_conn_cb_context_data(EV_P, void *cb_data, DB_result *res) {
 	char *str_response = NULL;
 	DB_poll *conn_poll = cb_data;
 	DB_conn *conn = conn_poll->conn;
@@ -900,6 +900,7 @@ finish:
 		SFREE(conn_poll);
 	}
 	DB_free_result(res);
+	return true;
 }
 
 static void db_cnxn_cb(EV_P, ev_io *w, int revents) {

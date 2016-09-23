@@ -135,20 +135,6 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 		client_file->str_change_stamp = unescape_value(ptr_change_stamp);
 		SFINISH_CHECK(client_file->str_change_stamp != NULL, "unescape_value failed");
 
-		if (strcmp(client_file->str_change_stamp, "0") == 0) {
-			client_file->int_change_stamp = 0;
-		} else {
-			struct tm tm_change_stamp;
-			memset(&tm_change_stamp, 0, sizeof(struct tm));
-			SDEBUG("client_file->str_change_stamp: %s", client_file->str_change_stamp);
-			SDEBUG("str_date_format : %s", str_date_format);
-			SFINISH_CHECK(strptime(client_file->str_change_stamp, str_date_format, &tm_change_stamp) != NULL, "strptime() failed");
-			tm_change_stamp.tm_isdst = -1;
-
-			client_file->int_change_stamp = mktime(&tm_change_stamp);
-			SFINISH_CHECK(client_file->int_change_stamp != -1, "mktime() failed");
-		}
-
 		client_file->str_canonical_start = canonical_full_start(client_file->str_input_path);
 		SFINISH_CHECK(client_file->str_canonical_start != NULL, "Invalid Path");
 		client_file->str_partial_path = canonical_strip_start(client_file->str_input_path);
@@ -540,12 +526,12 @@ finish:
 bool ws_file_read_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
 	char *str_response = NULL;
-	time_t int_change_stamp;
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
 #else
 	struct stat *statdata = NULL;
+		char *str_nanoseconds = NULL;
 #endif
 
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
@@ -586,16 +572,6 @@ bool ws_file_read_step2(EV_P, void *cb_data, bool bol_group) {
 #else
 	client_file->int_fd = open(client_file->str_path, O_RDONLY | O_NONBLOCK);
 	SFINISH_CHECK(client_file->int_fd != -1, "open failed!");
-
-	SFINISH_SALLOC(statdata, sizeof(struct stat));
-	stat(client_file->str_path, statdata);
-
-	int_change_stamp = statdata->st_mtime;
-	struct tm *tm_change_stamp = localtime(&(int_change_stamp));
-	SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
-	SFINISH_SALLOC(client_file->str_change_stamp, 101);
-	SFINISH_CHECK(strftime(client_file->str_change_stamp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
-	client_file->str_change_stamp[100] = 0;
 #endif
 
 #ifdef _WIN32
@@ -604,6 +580,26 @@ bool ws_file_read_step2(EV_P, void *cb_data, bool bol_group) {
 	client_file->int_length = lseek(client_file->int_fd, 0, SEEK_END);
 	SFINISH_CHECK(client_file->int_length != -1, "lseek(0, SEEK_END) failed");
 	SFINISH_CHECK(lseek(client_file->int_fd, 0, SEEK_SET) != -1, "lseek(0, SEEK_SET) failed");
+
+	SFINISH_SALLOC(statdata, sizeof(struct stat));
+	stat(client_file->str_path, statdata);
+
+	SFINISH_SALLOC(client_file->str_change_stamp, 101);
+	struct tm *tm_change_stamp = localtime(&(statdata->st_mtime));
+	SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
+	SFINISH_CHECK(strftime(client_file->str_change_stamp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+	client_file->str_change_stamp[100] = 0;
+#ifdef st_mtime
+	SFINISH_SALLOC(str_nanoseconds, 101);
+#ifdef __APPLE__
+	SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%d", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
+#else
+	SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtim.tv_nsec) > 0, "snprintf() failed");
+#endif
+	str_nanoseconds[100] = 0;
+
+	SFINISH_CAT_APPEND(client_file->str_change_stamp, ".", str_nanoseconds);
+#endif
 #endif
 
 	SFINISH_SALLOC(client_file->str_content, (size_t)client_file->int_length + 1);
@@ -621,6 +617,7 @@ finish:
 		strErrorText = NULL;
 	}
 #else
+	SFREE(str_nanoseconds);
 	SFREE(statdata);
 #endif
 	if (bol_error_state) {
@@ -805,10 +802,12 @@ bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
 	char *str_response = NULL;
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
-	int int_status = 0;
 	char *str_change_stamp = NULL;
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
+#else
+	struct stat *statdata = NULL;
+	char *str_nanoseconds = NULL;
 #endif
 
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
@@ -857,15 +856,28 @@ bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 		CloseHandle(client_file->h_file);
 	}
 #else
-	struct stat statbuf;
-	int_status = stat(client_file->str_path, &statbuf);
+	SFINISH_SALLOC(statdata, sizeof(struct stat));
+	if (stat(client_file->str_path, statdata) == 0) {
+		SFINISH_SALLOC(str_change_stamp, 101);
+		struct tm *tm_change_stamp = localtime(&(statdata->st_mtime));
+		SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
+		SFINISH_CHECK(strftime(str_change_stamp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+		str_change_stamp[100] = 0;
+#ifdef st_mtime
+		SFINISH_SALLOC(str_nanoseconds, 101);
+#ifdef __APPLE__
+		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%d", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
+#else
+		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtim.tv_nsec) > 0, "snprintf() failed");
+#endif
+		str_nanoseconds[100] = 0;
 
-	if (int_status == 0 && client_file->file_type == POSTAGE_FILE_CREATE_FILE) {
-		SFINISH("File already exists.");
-	}
+		SFINISH_CAT_APPEND(str_change_stamp, ".", str_nanoseconds);
+#endif
 
-	if (int_status == 0 && client_file->int_change_stamp < statbuf.st_mtime) {
-		SFINISH("Someone updated this file before you.");
+		if (strncmp(client_file->str_change_stamp, str_change_stamp, strlen(str_change_stamp)) != 0) {
+			SFINISH("Someone updated this file before you.");
+		}
 	}
 #endif
 
@@ -908,6 +920,9 @@ finish:
 		LocalFree(strErrorText);
 		strErrorText = NULL;
 	}
+#else
+	SFREE(statdata);
+	SFREE(str_nanoseconds);
 #endif
 	SFREE(str_change_stamp);
 	if (bol_error_state) {
@@ -1021,6 +1036,9 @@ void ws_file_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
+#else
+	struct stat *statdata = NULL;
+	char *str_nanoseconds = NULL;
 #endif
 
 	SFINISH_SALLOC(str_response, 101);
@@ -1057,18 +1075,29 @@ void ws_file_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 		) > 0,
 		"snprintf() failed"
 	);
+		str_response[100] = 0;
 #else
-	struct stat statbuf;
-	stat(client_file->str_path, &statbuf);
-	struct tm tm_change_stamp_result;
-	struct tm *tm_change_stamp = &tm_change_stamp_result;
-
-	tm_change_stamp = localtime_r(&(statbuf.st_mtime), tm_change_stamp);
-
-	SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
-	SFINISH_CHECK(strftime(str_response, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+	SFINISH_SALLOC(statdata, sizeof(struct stat));
+	if (stat(client_file->str_path, statdata) == 0) {
+		struct tm *tm_change_stamp = localtime(&(statdata->st_mtime));
+		SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
+		SFINISH_CHECK(strftime(str_response, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+		str_response[100] = 0;
+#ifdef st_mtime
+		SFINISH_SALLOC(str_nanoseconds, 101);
+#ifdef __APPLE__
+		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%d", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
+#else
+		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtim.tv_nsec) > 0, "snprintf() failed");
 #endif
-	str_response[100] = 0;
+		str_nanoseconds[100] = 0;
+
+		SFINISH_CAT_APPEND(str_response, ".", str_nanoseconds);
+#endif
+	} else {
+		SFINISH("stat failed");
+	}
+#endif
 
 	bol_error_state = false;
 finish:
@@ -1077,6 +1106,9 @@ finish:
 		LocalFree(strErrorText);
 		strErrorText = NULL;
 	}
+#else
+	SFREE(statdata);
+	SFREE(str_nanoseconds);
 #endif
 
 	if (bol_error_state) {
