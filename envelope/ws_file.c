@@ -813,7 +813,7 @@ bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
 
 #ifdef _WIN32
-	if (strncmp(str_change_stamp, "0", 2) != 0) {
+	if (strncmp(client_file->str_change_stamp, "0", 2) != 0) {
 		SetLastError(0);
 		client_file->h_file =
 			CreateFileA(client_file->str_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);

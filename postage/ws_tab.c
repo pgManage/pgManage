@@ -629,7 +629,7 @@ void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_change_stamp = NULL;
 
 #ifdef _WIN32
-	if (strncmp(str_change_stamp, "0", 2) != 0) {
+	if (strncmp(client_tab->str_change_stamp, "0", 2) != 0) {
 		SetLastError(0);
 		client_tab->h_file =
 			CreateFileA(client_tab->str_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
