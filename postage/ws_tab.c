@@ -673,7 +673,7 @@ void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 	}
 #else
 	SFINISH_SALLOC(statdata, sizeof(struct stat));
-	if (stat(client_tab->str_path, statdata) == 0) {
+	if (strncmp(client_tab->str_change_stamp, "0", 2) != 0 && stat(client_tab->str_path, statdata) == 0) {
 		SFINISH_SALLOC(str_change_stamp, 101);
 		struct tm *tm_change_stamp = localtime(&(statdata->st_mtime));
 		SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
