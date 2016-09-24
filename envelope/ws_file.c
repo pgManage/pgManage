@@ -862,27 +862,32 @@ bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 	}
 #else
 	SFINISH_SALLOC(statdata, sizeof(struct stat));
-	if (stat(client_file->str_path, statdata) == 0) {
-		SFINISH_SALLOC(str_change_stamp, 101);
-		struct tm *tm_change_stamp = localtime(&(statdata->st_mtime));
-		SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
-		SFINISH_CHECK(strftime(str_change_stamp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
-		str_change_stamp[100] = 0;
+	int int_status = stat(client_file->str_path, statdata);
+	if (client_file->file_type == POSTAGE_FILE_WRITE) {
+		if (int_status == 0 && client_file->str_change_stamp != NULL && strncmp(client_file->str_change_stamp, "0", 2) != 0) {
+			SFINISH_SALLOC(str_change_stamp, 101);
+			struct tm *tm_change_stamp = localtime(&(statdata->st_mtime));
+			SFINISH_CHECK(tm_change_stamp != NULL, "localtime() failed");
+			SFINISH_CHECK(strftime(str_change_stamp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+			str_change_stamp[100] = 0;
 #ifdef st_mtime
-		SFINISH_SALLOC(str_nanoseconds, 101);
+			SFINISH_SALLOC(str_nanoseconds, 101);
 #ifdef __APPLE__
-		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
+			SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtimespec.tv_nsec) > 0, "snprintf() failed");
 #else
-		SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtim.tv_nsec) > 0, "snprintf() failed");
+			SFINISH_CHECK(snprintf(str_nanoseconds, 100, "%ld", statdata->st_mtim.tv_nsec) > 0, "snprintf() failed");
 #endif
-		str_nanoseconds[100] = 0;
+			str_nanoseconds[100] = 0;
 
-		SFINISH_CAT_APPEND(str_change_stamp, ".", str_nanoseconds);
+			SFINISH_CAT_APPEND(str_change_stamp, ".", str_nanoseconds);
 #endif
 
-		if (strncmp(client_file->str_change_stamp, str_change_stamp, strlen(str_change_stamp)) != 0) {
-			SFINISH("Someone updated this file before you.");
+			if (strncmp(client_file->str_change_stamp, str_change_stamp, strlen(str_change_stamp)) != 0) {
+				SFINISH("Someone updated this file before you.");
+			}
 		}
+	} else if (client_file->file_type == POSTAGE_FILE_CREATE_FILE) {
+		SFINISH_CHECK(int_status != 0, "File already exists.");
 	}
 #endif
 

@@ -240,18 +240,12 @@
 				Global.tests = [
 			['File Read Fail 1', 'ajax', 404, '/test2.txt', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
-			['File Read Fail 2', 'ajax', 200, '/env/66/index.html', '',
-				ml(function () {/*<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
-<head><script>window.open('/index.html?connection=localhost:5431&redirect=/env/66/index.html', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })],
-			['File Read Fail 3', 'ajax', 200, '/env/AAA/index.html', '',
-				ml(function () {/*<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
-<head><script>window.open('/index.html?connection=localhost:5431&redirect=/env/AAA/index.html', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })],
-			['File Read Fail 4', 'ajax', 200, '/env/66AAA/index.html', '',
-				ml(function () {/*<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
-<head><script>window.open('/index.html?connection=localhost:5431&redirect=/env/66AAA/index.html', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })],
+			['File Read Fail 2', 'ajax', 404, '/test2.txt', '',
+				ml(function () {/*"The file you are requesting is not here."*/ })],
+			['File Read Fail 3', 'ajax', 404, '/test2.txt', '',
+				ml(function () {/*"The file you are requesting is not here."*/ })],
+			['File Read Fail 4', 'ajax', 404, '/test2.txt', '',
+				ml(function () {/*"The file you are requesting is not here."*/ })],
 			['File Read', 'ajax', 200, '/test.txt', '',
 				ml(function () {/*πππøˆ¨¥†ƒ©√˙∫˚∆¨¥†ƒç©˙∆√˙˚∫∆¨¥ˆ†∂®†®∂¥†®´∑œ£™¢∞§¶•ª¶¥†¶•∞§¢´£¢™§¶§¢•∞‡ﬁ‡´ﬁﬂ‹›Œ„´‰ÁˇÎ¨ÁÏÓ˝ÔÏÇÓ˛˝ÏÎÍ¸‰´ˇÁˇ¨ÁÏˆ˝ØÓ¨ÒÁ¨ˆÁØ‡°ˇ°‰ﬂﬁ´›ﬁ‹€ﬁ„‹†´®ß©≈˙ƒ∆˙©∆˚˚136789864512321
 */ })],
@@ -443,7 +437,7 @@ File already exists.*/})],
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE LIST', 'websocket', '', 'FILE\tLIST\t/app/',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
-			['APP FILE WRITE 1', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt\t' + test_change_stamp + '\nTESTING\n',
+			['APP FILE WRITE 1', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt\t0\nTESTING\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE READ TO PREPARE', 'websocket', '', 'FILE\tREAD\t/app/all/test.txt\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
@@ -460,38 +454,39 @@ File already exists.*/})],
 			['APP FILE READ TO PREPARE', 'websocket', '', 'FILE\tREAD\t/app/all/test.txt\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE WRITE FAIL 2', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\t{{CHANGESTAMP}}\nThis is a test1\n',
-				["../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|all/test.txtπ<"]],
+				[
+					"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|all/test.txtπ<"
+				]
+			],
 			['APP FILE WRITE FAIL 3', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt\t',
-				["strptime() failed"]],
+				["Someone updated this file before you."]],
 			['APP FILE WRITE FAIL 4', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt',
 				["Invalid Request"]],
 			['APP FILE WRITE FAIL 5', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\tCHANGESTAMP\nThis is a test1\n',
-				["strptime() failed"]],
+				["../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|all/test.txtπ<"]],
 			['APP FILE WRITE FAIL 6', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\t\'2016-8-8 11:15:46\'\nThis is a test1\n',
-				["strptime() failed"]],
-			['APP FILE WRITE FAIL 7', 'websocket', '', 'FILE\tWRITE\t/app/all/test1.txt\t10000000000000\nThis is a test\n',
-				['strptime() failed', 'TRANSACTION COMPLETED']],
+				["../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|all/test.txtπ<"]],
+			['APP FILE WRITE 4', 'websocket', '', 'FILE\tWRITE\t/app/all/test1.txt\t10000000000000\nThis is a test\n',
+				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE WRITE FAIL 8', 'websocket', '', 'FILE\tWRITE\t/app/all/test1.txt 10000000000000\nThis is a test\n',
 				["Invalid Request","TRANSACTION COMPLETED"]],
-			['APP FILE WRITE 4', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test.txt\t' + test_change_stamp + '\nThis is a test\n',
+			['APP FILE WRITE 5', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test.txt\t' + test_change_stamp + '\nThis is a test\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
-			['APP FILE WRITE 5', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test2/test.txt\t' + test_change_stamp + '\nThis is a test\n',
+			['APP FILE WRITE 6', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test2/test.txt\t' + test_change_stamp + '\nThis is a test\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
-			['APP FILE WRITE 6', 'websocket', '', 'FILE\tWRITE\t/app/all/test3/test.txt\t' + test_change_stamp + '\nThis is a test\n',
+			['APP FILE WRITE 7', 'websocket', '', 'FILE\tWRITE\t/app/all/test3/test.txt\t' + test_change_stamp + '\nThis is a test\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
-			['APP FILE WRITE 7', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test2/test2.txt\t' + test_change_stamp + '\nThis is a test\n',
+			['APP FILE WRITE 8', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test2/test2.txt\t' + test_change_stamp + '\nThis is a test\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE READ PREPARE (WRITE 1)', 'websocket', '', 'FILE\tWRITE\t' +
-				GS.encodeForTabDelimited('/app/trusted_g/test.txt') + '\t' +
-				GS.encodeForTabDelimited(test_change_stamp) + '\n' +
+				GS.encodeForTabDelimited('/app/trusted_g/test.txt') + '\t0\n' +
 				'This is a test of the search. (test line #1)' + '\n' +
 				'This is a test of the bran muffin. (test line #2)' + '\n' +
 				'This is a test of the tv. (test line #3)' + '\n' +
 				'This is a test of the envelope. (test line #4)',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE READ PREPARE (WRITE 2)', 'websocket', '', 'FILE\tWRITE\t' +
-				GS.encodeForTabDelimited('/app/trusted_g/test2.txt') + '\t' +
-				GS.encodeForTabDelimited(test_change_stamp) + '\n' +
+				GS.encodeForTabDelimited('/app/trusted_g/test2.txt') + '\t0\n' +
 				'This is a test of the search. (test line #1)' + '\n' +
 				'This is a test of the bran muffin. (test line #2)' + '\n' +
 				'This is a test of the tv. (test line #3)' + '\n' +
@@ -502,7 +497,7 @@ File already exists.*/})],
 			['APP FILE READ FAIL 2', 'websocket', '', 'FILE\tREAD\t/ap/all/test.txt',
 				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
 			['APP FILE READ FAIL 3', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited('/role/trusted_g/test.txt > /role/trusted_g/test2.txt'),
-				["../util/util_canonical.c:canonical: trusted_g/test.txt > /role/trusted_g/test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/test.txt > /role/trusted_g/test2.txt<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/test.txt > /role/trusted_g/test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/role|trusted_g/test.txt > /role/trusted_g/test2.txt<","TRANSACTION COMPLETED"]],
 			['APP FILE READ FAIL 4', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited(''),
 				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
 			['APP FILE READ FAIL 5', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited('../'),
@@ -556,19 +551,19 @@ File already exists.*/})],
 			['APP FILE CREATE_FOLDER FAIL 1', 'websocket', '', 'FILE\tCREATE_FOLDER\t/test/\n',
 				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 2', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/app/trusted_g/test-test--test-test') + '\n',
-				["../util/util_canonical.c:canonical: trusted_g/test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trusted_g/test-test--test-test<"]],
+				["../util/util_canonical.c:canonical: trusted_g/test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|trusted_g/test-test--test-test<"]],
 			['APP FILE CREATE_FOLDER FAIL 3', 'websocket', '', 'FILE\tCREATE_FOLDER',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 4', 'websocket', '', 'FILE\tCREATE_PI',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 5', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/app/trusted_g///////') + '\n',
-				["../util/util_canonical.c:canonical: trusted_g/////// is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trusted_g///////<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/////// is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|trusted_g///////<","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 6', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/role/trusted_g/ > /opt/test') + '\n',
-				["../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/ > /opt/test<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/role|trusted_g/ > /opt/test<","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 7', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/role/trusted_g/ > /opt/test'),
-				["../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/ > /opt/test<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/role|trusted_g/ > /opt/test<","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 8', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/role/trusted_g/π'),
-				["../util/util_canonical.c:canonical: trusted_g/π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/π<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/role|trusted_g/π<","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER', 'websocket', '', 'FILE\tCREATE_FOLDER\t/app/all/test3/test4/',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 
@@ -597,7 +592,7 @@ File already exists.*/})],
 				["File already exists."]],
 			['APP FILE CREATE_FILE FAIL 9', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/test.π'),
-				["../util/util_canonical.c:canonical: trusted_g/test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trusted_g/test.π<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|trusted_g/test.π<","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FILE', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/all/test3.txt'),
 				['ANYTHING', 'TRANSACTION COMPLETED']],
@@ -626,17 +621,17 @@ File already exists.*/})],
 				['OK', 'TRANSACTION COMPLETED']],
 			['APP FILE DELETE 6', 'websocket', '', 'FILE\tDELETE\t/app/all/test3.txt',
 				['OK', 'TRANSACTION COMPLETED']],
+			['APP FILE DELETE 7', 'websocket', '', 'FILE\tDELETE\t/app/all/test1.txt',
+				['OK', 'TRANSACTION COMPLETED']],
 			['APP FILE SEARCH PREPARE (WRITE 1)', 'websocket', '', 'FILE\tWRITE\t' +
-				GS.encodeForTabDelimited('/app/trusted_g/test.txt') + '\t' +
-				GS.encodeForTabDelimited(test_change_stamp) + '\n' +
+				GS.encodeForTabDelimited('/app/trusted_g/test.txt') + '\t0\n' +
 				'This is a test of the search. (test line #1)' + '\n' +
 				'This is a test of the bran muffin. (test line #2)' + '\n' +
 				'This is a test of the tv. (test line #3)' + '\n' +
 				'This is a test of the envelope. (test line #4)',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE SEARCH PREPARE (WRITE 2)', 'websocket', '', 'FILE\tWRITE\t' +
-				GS.encodeForTabDelimited('/app/trusted_g/test/test.txt') + '\t' +
-				GS.encodeForTabDelimited(test_change_stamp) + '\n' +
+				GS.encodeForTabDelimited('/app/trusted_g/test/test.txt') + '\t0\n' +
 				'This is a test of the search. (test line #1)' + '\n' +
 				'This is a test of the bran muffin. (test line #2)' + '\n' +
 				'This is a test of the tv. (test line #3)' + '\n' +
@@ -645,7 +640,7 @@ File already exists.*/})],
 			['APP FILE SEARCH FAIL 1', 'websocket', '', 'FILE\tSEARCH\t/ap/\tgs-page > gs-header,\nRECURSIVE\n',
 				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"]],
 			['APP FILE SEARCH FAIL 2', 'websocket', '', 'FILE\tSEARCH\t/app/nonexisitant/\tgs-page > gs-header,\nRECURSIVE\n',
-				["../util/util_canonical.c:canonical: read_dir: /Users/joseph/Repos/postage/envelope/app/|nonexisitant/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|nonexisitant/<"]
+				["../util/util_canonical.c:canonical: read_dir: /home/super/Repos/github/postage/envelope/app/|nonexisitant/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|nonexisitant/<"]
 			],
 			['APP FILE SEARCH FAIL 3', 'websocket', '', 'FILE\tSEARCH\t/app/\tThis is a test of the [search|bran|envelope,\nREGEX\n',
 				["regcomp failed: 7 (Missing ']')"]],
@@ -653,7 +648,7 @@ File already exists.*/})],
 				GS.encodeForTabDelimited('/app/trust_g/') + '\t' +
 				GS.encodeForTabDelimited('This....a test of the search') + '\n' +
 				'INSENSITIVE\tREGEX' + '\n',
-				["../util/util_canonical.c:canonical: read_dir: /Users/joseph/Repos/postage/envelope/app/|trust_g/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trust_g/<"]],
+				["../util/util_canonical.c:canonical: read_dir: /home/super/Repos/github/postage/envelope/app/|trust_g/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|trust_g/<"]],
 			['APP FILE SEARCH FAIL 5', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('../../') + '\t' +
 				GS.encodeForTabDelimited('This is a test of the search') + '\n' +
@@ -750,9 +745,9 @@ File already exists.*/})],
 
 			['ACCEPT FAIL', 'ajax', 500, '/env/public.accept_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.accept_testing1(unknown) does not exist\\nLINE 1: SELECT public.accept_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
 			['ACCEPT', 'ajax', 200, '/env/public.accept_testing', 'testingnitset', 'testingnitset'],
-			['ACTION FAIL', 'ajax', 500, '/env/public.action_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.action_testing1(unknown) does not exist\\nLINE 1: SELECT public.action_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTION FAIL', 'ajax', 500, '/env/public.action_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.action_testing1(unknown) does not exist\\nLINE 1: SELECT public.action_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
 			['ACTION', 'ajax', 200, '/env/public.action_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
-			['action_info', 'ajax', 200, '/env/action_info', '', ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8080, "database_version": "PostgreSQL 9.2.4 on x86_64-apple-darwin11.4.2, compiled by i686-apple-darwin11-llvm-gcc-4.2 (GCC) 4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2336.9.00), 64-bit","envelope": "2.0.1"}}*/ })],
+			['action_info', 'ajax', 200, '/env/action_info', '', ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.4 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 6.1.1 20160621 (Red Hat 6.1.1-3), 64-bit","envelope": "2.1.0RC3"}}*/ })],
 			['ACTION FAIL 1', 'websocket', '', ml(function () {/*ACTION	public	action_testing1	testingnitset
 */}),
 			["FATAL\nerror_text\tERROR:  function public.action_testing1(unknown) does not exist\\nLINE 1: COPY (SELECT \"public\".\"action_testing1\"('testingnitset')) TO...\\n                     ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t14\n"]],
@@ -840,7 +835,7 @@ id	test_name
 2	Alice
 3	Eve
 */}),
-				["DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot insert into view \"ttesting_view\"\\nHINT:  You need an unconditional ON INSERT DO INSTEAD rule or an INSTEAD OF INSERT trigger.\\n\nerror_detail\t\nerror_hint\tYou need an unconditional ON INSERT DO INSTEAD rule or an INSTEAD OF INSERT trigger.\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
+				["DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot insert into view \"ttesting_view\"\\nDETAIL:  Views that do not select from a single table or view are not automatically updatable.\\nHINT:  To enable inserting into the view, provide an INSTEAD OF INSERT trigger or an unconditional ON INSERT DO INSTEAD rule.\\n\nerror_detail\tViews that do not select from a single table or view are not automatically updatable.\nerror_hint\tTo enable inserting into the view, provide an INSTEAD OF INSERT trigger or an unconditional ON INSERT DO INSTEAD rule.\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -925,18 +920,18 @@ OFFSET
 				ml(function () {/*{"stat": true, "dat": {"arr_column": ["generate_series"], "dat": [[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13],[14],[15],[16],[17],[18],[19],[20]], "row_count": 20}}*/})],
 			['Select 6', 'ajax', 200, '/env/action_select', 'src=generate_series(1,16300)',
 				ml(function () {/*{"stat": true, "dat": {"arr_column": ["generate_series"], "dat": [*/}) + '[' + makeArray(16300, function (i) { return i + 1;}).join('],[') + ']' + ml(function () {/*], "row_count": 16300}}*/})],
-			['Insert Fail 1', 'ajax', 500, '/env/action_insert', 'src=rtesting_table1',
-				ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t18\n"*/})],
-			['Insert Fail 2', 'ajax', 500, '/env/action_insert', 'view=rtesting_table1',
-				ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t18\n"*/})],
-            ['Insert Fail 3', 'ajax', 500, '/env/action_insert', 'src=rtesting_table&data=',
+			['Insert Fail 1', 'ajax', 500, '/env/action_insert', 'src=rtesting_table1&data=id%3D1',
+				ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t19\n"*/})],
+			['Insert Fail 2', 'ajax', 500, '/env/action_insert', 'view=rtesting_table1&data=id%3D1',
+				ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t19\n"*/})],
+            ['Insert Fail 3', 'ajax', 500, '/env/action_insert', 'src=rtesting_table',
                 ml(function () {/*"FATAL\nNo insert data"*/ })],
 			['Insert 1', 'ajax', 200, '/env/action_insert', 'src=rtesting_table&data=' + encodeURIComponent('test_name=test&test_name2=test'),
 				ml(function () {/*{"stat": true, "dat": {"lastval": 5}}*/})],
 			['Insert 2', 'ajax', 200, '/env/action_insert', 'view=rtesting_table&data=' + encodeURIComponent('test_name=test&test_name2=test'),
 				ml(function () {/*{"stat": true, "dat": {"lastval": 6}}*/})],
 			['Update Fail', 'ajax', 500, '/env/action_update', 'src=rtesting_table&column=first_name&value=Test&where=' + encodeURIComponent('id=5'),
-				ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  column \"first_name\" does not exist\\nLINE 1: SELECT \"first_name\", \"id\", * FROM rtesting_table\\n               ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/})],
+				ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  column \"first_name\" does not exist\\nLINE 1: SELECT \"first_name\", \"id\", * FROM rtesting_table\\n               ^\\nHINT:  Perhaps you meant to reference the column \"rtesting_table.test_name\".\\n\nerror_detail\t\nerror_hint\tPerhaps you meant to reference the column \"rtesting_table.test_name\".\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/})],
 			['Update 1', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=Test&where=' + encodeURIComponent('id=5'),
 				ml(function () {/*{"stat": true, "dat": ["5","Test","test","2016-07-12 05:13:00"]}*/})],
 			['Update 2', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=NULL&where=' + encodeURIComponent('id=5&change_stamp=2016-07-12%2005:13:00'),
@@ -961,7 +956,7 @@ id	test_name
 2	Bobby
 3	Alicia
 */}),
-				["FATAL\nerror_text\tERROR:  column rtesting_table.tes_name does not exist\\nLINE 1: COPY (SELECT \"rtesting_table\".\"id\", \"rtesting_table\".\"tes_na...\\n                                            ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t37\n"]],
+				["FATAL\nerror_text\tERROR:  column rtesting_table.tes_name does not exist\\nLINE 1: COPY (SELECT \"rtesting_table\".\"id\", \"rtesting_table\".\"tes_na...\\n                                            ^\\nHINT:  Perhaps you meant to reference the column \"rtesting_table.test_name\".\\n\nerror_detail\t\nerror_hint\tPerhaps you meant to reference the column \"rtesting_table.test_name\".\nerror_query\t\nerror_context\t\nerror_position\t37\n"]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -975,7 +970,7 @@ id	test_name
 3	Alicia
 */}),
 				[
-					["DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot update view \"ttesting_view\"\\nHINT:  You need an unconditional ON UPDATE DO INSTEAD rule or an INSTEAD OF UPDATE trigger.\\n\nerror_detail\t\nerror_hint\tYou need an unconditional ON UPDATE DO INSTEAD rule or an INSTEAD OF UPDATE trigger.\nerror_query\t\nerror_context\t\nerror_position\t\n"]
+					["DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot update view \"ttesting_view\"\\nDETAIL:  Views that do not select from a single table or view are not automatically updatable.\\nHINT:  To enable updating the view, provide an INSTEAD OF UPDATE trigger or an unconditional ON UPDATE DO INSTEAD rule.\\n\nerror_detail\tViews that do not select from a single table or view are not automatically updatable.\nerror_hint\tTo enable updating the view, provide an INSTEAD OF UPDATE trigger or an unconditional ON UPDATE DO INSTEAD rule.\nerror_query\t\nerror_context\t\nerror_position\t\n"]
 				]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
@@ -1028,7 +1023,7 @@ id
 4
 */}),
 				[
-					["DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot delete from view \"ttesting_view\"\\nHINT:  You need an unconditional ON DELETE DO INSTEAD rule or an INSTEAD OF DELETE trigger.\\n\nerror_detail\t\nerror_hint\tYou need an unconditional ON DELETE DO INSTEAD rule or an INSTEAD OF DELETE trigger.\nerror_query\t\nerror_context\t\nerror_position\t\n"]
+					["DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot delete from view \"ttesting_view\"\\nDETAIL:  Views that do not select from a single table or view are not automatically updatable.\\nHINT:  To enable deleting from the view, provide an INSTEAD OF DELETE trigger or an unconditional ON DELETE DO INSTEAD rule.\\n\nerror_detail\tViews that do not select from a single table or view are not automatically updatable.\nerror_hint\tTo enable deleting from the view, provide an INSTEAD OF DELETE trigger or an unconditional ON DELETE DO INSTEAD rule.\nerror_query\t\nerror_context\t\nerror_position\t\n"]
 				]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*COMMIT*/ }),
 				['OK']],
