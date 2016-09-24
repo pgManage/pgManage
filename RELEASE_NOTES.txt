@@ -1,6 +1,15 @@
+Changes since 2.1.0RC4:
+
+Usability: make postage use full precision for file changestamps
+Security: fix check_to_escape to check the middle of the string for quotes
+
 Changes since 2.1.0RC3:
 
 Reliability: Make .html files not cache
 Usability: postage download script
 Usability: postage splash page link in drop down tab
+Usability: envelope gs-folder design
+Usability: file manager cmd-z clears page
+Usability: fixed ace search dialog buttons
+Usability: fix listing permission checks
 Usability: error when someone tries to connect with https when you are listening on http
