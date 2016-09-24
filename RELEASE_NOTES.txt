@@ -1,6 +1,6 @@
 Changes since 2.1.0RC4:
 
-Usability: make postage use full precision for file changestamps
+Usability: make postage/envelope use full precision for file changestamps
 Security: fix check_to_escape to check the middle of the string for quotes
 
 Changes since 2.1.0RC3:
