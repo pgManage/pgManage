@@ -208,16 +208,12 @@
 		Local.tests = [
 			['File Read Fail 1', 'ajax', 404, '/test2.txt', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
-			['File Read Fail 2', 'ajax', 200, '/postage/66/index.html', '',
-				ml(function () {/*<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
-<head><script>window.open('/postage/index.html', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })],
+			['File Read Fail 2', 'ajax', 440, '/postage/66/index.html', '',
+				ml(function () {/*"You need to login.\n"*/ })],
 			['File Read Fail 3', 'ajax', 404, '/postage/AAA/index.html', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
-			['File Read Fail 4', 'ajax', 200, '/postage/66AAA/index.html', '',
-				ml(function () {/*<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
-<head><script>window.open('/postage/index.html', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })],
+			['File Read Fail 4', 'ajax', 440, '/postage/66AAA/index.html', '',
+				ml(function () {/*"You need to login.\n"*/ })],
 			['File Read 1', 'ajax', 200, '/test.txt', '',
 				ml(function () {/*TESTING*/ })],
 			//Custom GS.ajaxText looks for /test.txt?if_modified_since=true
@@ -225,7 +221,7 @@
 			['File Read If-Modified-Since', 'ajax', 304, '/test.txt?if_modified_since=true', '', ''],
 			['List Connections', 'ajax', 200, '/postage/auth', 'action=list',
 				ml(function () {/*test
-localhost:5432
+localhost@5432
 ip example
 host example*/})],
 			['Login Fail 1', 'ajax', 500, '/postage/auth', 'action=login&connname=doesntexist&username=postgres&password=password',
@@ -322,10 +318,8 @@ host example*/})],
 				}],
 			['File Read Fail 6', 'ajax', 404, '/postage/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/index.html', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
-			['File Read Fail 7', 'ajax', 200, '/postage/00/index.html', '',
-				ml(function () {/*<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
-<head><script>window.open('/postage/index.html?connection=test&redirect=/postage/00/index.html', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })],
+			['File Read Fail 7', 'ajax', 440, '/postage/00/index.html', '',
+				ml(function () {/*"You need to login.\n"*/ })],
 			['File Read Fail 8', 'ajax', 404, '/postage/postage/0/index.html', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
 			['File Read Fail 9', 'ajax', 500, '/postage/0/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/index.html', '',
@@ -384,8 +378,6 @@ host example*/})],
 */})],
 			['Upload Fail 2', 'upload', 500, '/postage/0/upload', '/open/test' + test_random + '.sql',
 				ml(function () {/*FATAL
-../util/util_canonical.c:canonical: read_file: /Users/joseph/.postage/sql/|ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres/open/test*/}) + test_random + ml(function () {/*.sql is a bad path. Path does not exist.
-
 File already exists.*/})],
 			['Download Fail', 'ajax', 404, '/postage/0/download/test' + test_random + '.sql', '',
 				ml(function () {/*"The file you are requesting is not here."*/})],
@@ -431,9 +423,9 @@ test
 			['TAB LIST FAIL 2', 'websocket', '', 'TAB\tLIST\t/ipen/',
 			[
 				[
-					"../util/util_canonical.c:canonical: read_dir: /home/super/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres/|ipen/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/<",
-					"../util/util_canonical.c:canonical: read_dir: /Users/joseph/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres/|ipen/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/<",
-					"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff4bffffff31ffff45ffff69ff653d0f4440ff2b\\postgres\\|ipen\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff4bffffff31ffff45ffff69ff653d0f4440ff2b\\postgres|/ipen/<"
+					"../util/util_canonical.c:canonical: read_dir: /home/super/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres/|ipen/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres|/ipen/<",
+					"../util/util_canonical.c:canonical: read_dir: /Users/joseph/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres/|ipen/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres|/ipen/<",
+					"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres\\|ipen\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres|/ipen/<"
 				],
 				"TRANSACTION COMPLETED"
 			]],
@@ -442,26 +434,26 @@ test
 			['TAB READ FAIL', 'websocket', '', 'TAB\tREAD\t/ipen/test' + test_random + '.sql',
 			[
 				[
-					"../util/util_canonical.c:canonical: read_file: /home/super/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/test" + test_random + ".sql<",
-					"../util/util_canonical.c:canonical: read_file: /Users/joseph/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/test" + test_random + ".sql<",
-					"..\\..\\util\\util_canonical.c:canonical: read_file: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff4bffffff31ffff45ffff69ff653d0f4440ff2b\\postgres\\|ipen\\test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff4bffffff31ffff45ffff69ff653d0f4440ff2b\\postgres|/ipen/test" + test_random + ".sql<"
+					"../util/util_canonical.c:canonical: read_file: /home/super/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/test" + test_random + ".sql<",
+					"../util/util_canonical.c:canonical: read_file: /Users/joseph/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/test" + test_random + ".sql<",
+					"..\\..\\util\\util_canonical.c:canonical: read_file: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres\\|ipen\\test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres|/ipen/test" + test_random + ".sql<"
 				],
 				"TRANSACTION COMPLETED"
 			]],
 			['TAB READ', 'websocket', '', 'TAB\tREAD\t/open/test' + test_random + '.sql',
 			['ANYTHING', 'TRANSACTION COMPLETED']],
 			['TAB WRITE FAIL 1', 'websocket', '', 'TAB\tWRITE\t/open/test' + test_random + '.sql\t10000000000000\nThis is a test\n',
-			['strptime() failed', 'TRANSACTION COMPLETED']],
+			["Someone updated this file before you."]],
 			['TAB WRITE FAIL 2', 'websocket', '', 'TAB\tWRITE\t/open/test' + test_random + '.sql 10000000000000\nThis is a test\n',
 			['strstr failed', 'TRANSACTION COMPLETED']],
-			['TAB WRITE', 'websocket', '', 'TAB\tWRITE\t/open/test' + test_random + '.sql\t' + test_change_stamp + '\nThis is a test\n',
+			['TAB WRITE', 'websocket', '', 'TAB\tWRITE\t/open/test' + test_random + '.sql\t0\nThis is a test\n',
 			['ANYTHING', 'TRANSACTION COMPLETED']],
 			['TAB MOVE FAIL 1', 'websocket', '', 'TAB\tMOVE\t/ipen/test' + test_random + '.sql\t/closed/test' + test_random + '.sql\n',
 			[
 				[
 					"../util/util_canonical.c:canonical: read_file: /home/super/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/test" + test_random + ".sql<",
 					"../util/util_canonical.c:canonical: read_file: /Users/joseph/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/test" + test_random + ".sql<",
-					"..\\..\\util\\util_canonical.c:canonical: read_file: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff4bffffff31ffff45ffff69ff653d0f4440ff2b\\postgres\\|ipen\\test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff4bffffff31ffff45ffff69ff653d0f4440ff2b\\postgres|/ipen/test" + test_random + ".sql<"
+					"..\\..\\util\\util_canonical.c:canonical: read_file: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres\\|ipen\\test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres|/ipen/test" + test_random + ".sql<"
 				],
 				"TRANSACTION COMPLETED"
 			]],
@@ -772,28 +764,28 @@ RETURN	id	test_name
 ORDER BY
 id DESC
 */}),
-			['id\ttest_name\ninteger\tcharacter varying(150)\n', '', 'TRANSACTION COMPLETED']],
+			['id\ttest_name\ninteger\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
 			['SELECT 2', 'websocket', '', ml(function () {/*SELECT	rtesting_table
 RETURN	id	test_name
 */}),
-			['id\ttest_name\ninteger\tcharacter varying(150)\n', '', 'TRANSACTION COMPLETED']],
+			['id\ttest_name\ninteger\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
 			['SELECT 3', 'websocket', '', ml(function () {/*SELECT	rtesting_table
 RETURN	id	test_name
 
 */}),
-			['id\ttest_name\ninteger\tcharacter varying(150)\n', '', 'TRANSACTION COMPLETED']],
+			['id\ttest_name\ninteger\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
 			['SELECT 4', 'websocket', '', ml(function () {/*SELECT	rtesting_table
 RETURN	id	test_name
 
 
 */}),
-			['id\ttest_name\ninteger\tcharacter varying(150)\n', '', 'TRANSACTION COMPLETED']],
+			['id\ttest_name\ninteger\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
 			['SELECT 5', 'websocket', '', new Blob([ml(function () {/*SELECT	rtesting_table
 RETURN	id	test_name
 
 
 */})], {type: 'application/x-binary'}),
-			['id\ttest_name\ninteger\tcharacter varying(150)\n', '', 'TRANSACTION COMPLETED']],
+			['id\ttest_name\ninteger\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
             
             
 			[
@@ -807,7 +799,6 @@ RETURN	id	test@test
 */}),
 			    [
                     'id\ttest@test\ninteger\tcharacter varying(150)\n',
-                    '',
                     'TRANSACTION COMPLETED'
                 ]
             ],
@@ -824,7 +815,6 @@ RETURN	id	select
 */}),
 			    [
                     'id\tselect\ninteger\tcharacter varying(150)\n',
-                    '',
                     'TRANSACTION COMPLETED'
                 ]
             ],

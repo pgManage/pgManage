@@ -537,6 +537,9 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 	DB_readable_poll *readable_poll = NULL;
 	SDEFINE_VAR_ALL(str_folder, str_folder_write, str_folder_literal, str_folder_write_literal, str_sql);
 
+	SERROR_CHECK(cb_data != NULL, "cb_data == NULL");
+	SERROR_CHECK(readable_cb != NULL, "readable_cb == NULL");
+
 	char *ptr_path = str_path;
 	while (*ptr_path == '/') {
 		ptr_path++;
@@ -631,6 +634,9 @@ static bool ddl_readable_done(EV_P, void *cb_data, DB_result *res) {
 	DArray *arr_row_lengths = NULL;
 	bool bol_return = true;
 	bool bol_result = 0;
+
+	SERROR_CHECK(res != NULL, "Query failed: res == NULL");
+	SERROR_CHECK(res->status == DB_RES_TUPLES_OK, "Query failed: res->status = %d", res->status);
 
 	SERROR_CHECK(DB_fetch_row(res) == DB_FETCH_OK, "DB_fetch_row failed: %s", DB_get_diagnostic(res->conn, res));
 	arr_row_values = DB_get_row_values(res);

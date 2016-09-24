@@ -813,47 +813,52 @@ bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
 
 #ifdef _WIN32
-	if (strncmp(client_file->str_change_stamp, "0", 2) != 0) {
+	if (client_file->file_type == POSTAGE_FILE_WRITE) {
 		SetLastError(0);
 		client_file->h_file =
 			CreateFileA(client_file->str_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (client_file->h_file == INVALID_HANDLE_VALUE) {
 			int int_err = GetLastError();
-			FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, int_err,
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&strErrorText, 0, NULL);
+			if (int_err != 2) {
+				FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, int_err,
+					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&strErrorText, 0, NULL);
 
-			if (strErrorText != NULL) {
-				SFINISH("CreateFile failed: 0x%X (%s)", int_err, strErrorText);
+				if (strErrorText != NULL) {
+					SFINISH("CreateFile failed: 0x%X (%s)", int_err, strErrorText);
+				}
 			}
 		}
+		if (client_file->h_file != INVALID_HANDLE_VALUE && client_file->str_change_stamp != NULL && strncmp(client_file->str_change_stamp, "0", 2) != 0) {
+			FILETIME ft_last_write_time;
+			SFINISH_CHECK(GetFileTime(client_file->h_file, NULL, NULL, &ft_last_write_time) != 0, "GetFileTime failed");
 
-		FILETIME ft_last_write_time;
-		SFINISH_CHECK(GetFileTime(client_file->h_file, NULL, NULL, &ft_last_write_time) != 0, "GetFileTime failed");
+			SYSTEMTIME st_last_write_time;
+			SFINISH_CHECK(FileTimeToSystemTime(&ft_last_write_time, &st_last_write_time) != 0, "FileTimeToSystemTime failed");
 
-		SYSTEMTIME st_last_write_time;
-		SFINISH_CHECK(FileTimeToSystemTime(&ft_last_write_time, &st_last_write_time) != 0, "FileTimeToSystemTime failed");
+			SFINISH_SALLOC(str_change_stamp, 101);
+			SFINISH_CHECK(
+				snprintf(str_change_stamp, 100, "%d-%d-%d %d:%d:%d.%d",
+					st_last_write_time.wYear,
+					st_last_write_time.wMonth,
+					st_last_write_time.wDay,
+					st_last_write_time.wHour,
+					st_last_write_time.wMinute,
+					st_last_write_time.wSecond,
+					st_last_write_time.wMilliseconds
+				) > 0,
+				"snprintf() failed"
+			);
+			str_change_stamp[100] = 0;
 
-		SFINISH_SALLOC(str_change_stamp, 101);
-		SFINISH_CHECK(
-			snprintf(str_change_stamp, 100, "%d-%d-%d %d:%d:%d.%d",
-				st_last_write_time.wYear,
-				st_last_write_time.wMonth,
-				st_last_write_time.wDay,
-				st_last_write_time.wHour,
-				st_last_write_time.wMinute,
-				st_last_write_time.wSecond,
-				st_last_write_time.wMilliseconds
-			) > 0,
-			"snprintf() failed"
-		);
-		str_change_stamp[100] = 0;
-
-		SDEBUG("client_file->str_change_stamp: %s", client_file->str_change_stamp);
-		SDEBUG("str_change_stamp             : %s", str_change_stamp);
-		if (strncmp(client_file->str_change_stamp, str_change_stamp, strlen(str_change_stamp)) != 0) {
-			SFINISH("Someone updated this file before you.");
+			SDEBUG("client_file->str_change_stamp: %s", client_file->str_change_stamp);
+			SDEBUG("str_change_stamp             : %s", str_change_stamp);
+			if (strncmp(client_file->str_change_stamp, str_change_stamp, strlen(str_change_stamp)) != 0) {
+				SFINISH("Someone updated this file before you.");
+			}
 		}
-		CloseHandle(client_file->h_file);
+		if (client_file->h_file != INVALID_HANDLE_VALUE) {
+			CloseHandle(client_file->h_file);
+		}
 	}
 #else
 	SFINISH_SALLOC(statdata, sizeof(struct stat));
@@ -886,7 +891,7 @@ bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 	client_file->h_file = CreateFileA(client_file->str_path, GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (client_file->h_file == INVALID_HANDLE_VALUE) {
 		int int_err = GetLastError();
-		if (int_err == 0x50) {
+		if (int_err == 0x50 && client_file->file_type == POSTAGE_FILE_WRITE) {
 			// CreateFileA return "File exists" if you give it CREATE_NEW and it finds
 			// the file already there
 			// In this case, we need to truncate the existing file

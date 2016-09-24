@@ -292,8 +292,8 @@
 				ml(function () {/*"FATAL\n[28000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Login failed for user 'π'.(18456)\n"*/ })],
 			['Login Fail 22', 'ajax', 500, '/env/auth', 'action=login&connection=' + encodeURIComponent('π\'π') + '&username=' + encodeURIComponent('π') + '&password=' + encodeURIComponent('π'),
 				ml(function () {/*"FATAL\n[28000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Login failed for user 'π'.(18456)\n"*/ })],
-			['Login Fail 23', 'ajax', 440, '/env/authasdf', '',
-				ml(function () {/*"You need to login.\n"*/ })],
+			['Login Fail 23', 'ajax', 404, '/env/authasdf', '',
+				ml(function () {/*"The file you are requesting is not here."*/ })],
 			['Login Fail 24', 'ajax', 500, '/env/auth', 'test=test&a@&#=te=st',
 				ml(function () {/*"Not a valid action."*/ })],
 			['Logout before login *', 'ajax spam', 200, '/env/auth', 'action=logout', ''],
@@ -345,9 +345,8 @@
 			['Change Password', 'ajax', 200, '/env/auth', 'action=change_pw&password_old=test1&password_new=456456',
 				ml(function () {/*{"stat": true, "dat": "OK"}*/ })],
 			
-			['action_info', 'ajax', 200, '/env/action_info', '', ml(function () {/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8080, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0RC3"}}*/})],
-			['action_info *', 'ajax spam', 200, '/env/action_info', '', ml(function (){/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8080, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0RC3"}}*/})],
-
+			['action_info', 'ajax', 200, '/env/action_info', '', ml(function () {/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8888, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0RC4"}}*/})],
+			['action_info *', 'ajax spam', 200, '/env/action_info', '', ml(function (){/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8888, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0RC4"}}*/})],
 			['WEBSOCKET OPEN W/INFO ACTION', 'websocket start', '', '', '']
 		];
 		console.log('test4');
@@ -407,7 +406,7 @@ File already exists.*/})],
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE LIST', 'websocket', '', 'FILE\tLIST\t/app/',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
-			['APP FILE WRITE 1', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt\t' + test_change_stamp + '\nTESTING\n',
+			['APP FILE WRITE 1', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt\t0\nTESTING\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE READ TO PREPARE', 'websocket', '', 'FILE\tREAD\t/app/all/test.txt\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
@@ -424,38 +423,36 @@ File already exists.*/})],
 			['APP FILE READ TO PREPARE', 'websocket', '', 'FILE\tREAD\t/app/all/test.txt\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE WRITE FAIL 2', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\t{{CHANGESTAMP}}\nThis is a test1\n',
-				["..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\old-postage\\envelope\\app|all/test.txtπ<"]],
+				["..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\app|all/test.txtπ<"]],
 			['APP FILE WRITE FAIL 3', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt\t',
-				["mktime() failed"]],
+				["Someone updated this file before you."]],
 			['APP FILE WRITE FAIL 4', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt',
 				["Invalid Request"]],
 			['APP FILE WRITE FAIL 5', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\tCHANGESTAMP\nThis is a test1\n',
-				["strptime() failed"]],
+				["..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\app|all/test.txtπ<"]],
 			['APP FILE WRITE FAIL 6', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\t\'2016-8-8 11:15:46\'\nThis is a test1\n',
-				["strptime() failed"]],
-			['APP FILE WRITE FAIL 7', 'websocket', '', 'FILE\tWRITE\t/app/all/test1.txt\t10000000000000\nThis is a test\n',
-				['strptime() failed', 'TRANSACTION COMPLETED']],
-			['APP FILE WRITE FAIL 8', 'websocket', '', 'FILE\tWRITE\t/app/all/test1.txt 10000000000000\nThis is a test\n',
+				["..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\app|all/test.txtπ<"]],
+			['APP FILE WRITE 4', 'websocket', '', 'FILE\tWRITE\t/app/all/test1.txt\t10000000000000\nThis is a test\n',
+				['ANYTHING', 'TRANSACTION COMPLETED']],
+			['APP FILE WRITE FAIL 7', 'websocket', '', 'FILE\tWRITE\t/app/all/test1.txt 10000000000000\nThis is a test\n',
 				["Invalid Request","TRANSACTION COMPLETED"]],
-			['APP FILE WRITE 4', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test.txt\t' + test_change_stamp + '\nThis is a test\n',
+			['APP FILE WRITE 5', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test.txt\t0\nThis is a test\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
-			['APP FILE WRITE 5', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test2/test.txt\t' + test_change_stamp + '\nThis is a test\n',
+			['APP FILE WRITE 6', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test2/test.txt\t0\nThis is a test\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
-			['APP FILE WRITE 6', 'websocket', '', 'FILE\tWRITE\t/app/all/test3/test.txt\t' + test_change_stamp + '\nThis is a test\n',
+			['APP FILE WRITE 7', 'websocket', '', 'FILE\tWRITE\t/app/all/test3/test.txt\t0\nThis is a test\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
-			['APP FILE WRITE 7', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test2/test2.txt\t' + test_change_stamp + '\nThis is a test\n',
+			['APP FILE WRITE 8', 'websocket', '', 'FILE\tWRITE\t/app/all/test/test2/test2.txt\t0\nThis is a test\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE READ PREPARE (WRITE 1)', 'websocket', '', 'FILE\tWRITE\t' +
-				GS.encodeForTabDelimited('/app/trusted_g/test.txt') + '\t' +
-				GS.encodeForTabDelimited(test_change_stamp) + '\n' +
+				GS.encodeForTabDelimited('/app/trusted_g/test.txt') + '\t0\n' +
 				'This is a test of the search. (test line #1)' + '\n' +
 				'This is a test of the bran muffin. (test line #2)' + '\n' +
 				'This is a test of the tv. (test line #3)' + '\n' +
 				'This is a test of the envelope. (test line #4)',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE READ PREPARE (WRITE 2)', 'websocket', '', 'FILE\tWRITE\t' +
-				GS.encodeForTabDelimited('/app/trusted_g/test2.txt') + '\t' +
-				GS.encodeForTabDelimited(test_change_stamp) + '\n' +
+				GS.encodeForTabDelimited('/app/trusted_g/test2.txt') + '\t0\n' +
 				'This is a test of the search. (test line #1)' + '\n' +
 				'This is a test of the bran muffin. (test line #2)' + '\n' +
 				'This is a test of the tv. (test line #3)' + '\n' +
@@ -466,7 +463,7 @@ File already exists.*/})],
 			['APP FILE READ FAIL 2', 'websocket', '', 'FILE\tREAD\t/ap/all/test.txt',
 				["..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path", "TRANSACTION COMPLETED"]],
 			['APP FILE READ FAIL 3', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited('/role/trusted_g/test.txt > /role/trusted_g/test2.txt'),
-				["..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.txt > \\role\\trusted_g\\test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\old-postage\\envelope\\role|trusted_g/test.txt > /role/trusted_g/test2.txt<", "TRANSACTION COMPLETED"]],
+				["..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.txt > \\role\\trusted_g\\test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\role|trusted_g/test.txt > /role/trusted_g/test2.txt<", "TRANSACTION COMPLETED"]],
 			['APP FILE READ FAIL 4', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited(''),
 				["..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path", "TRANSACTION COMPLETED"]],
 			['APP FILE READ FAIL 5', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited('../'),
@@ -520,15 +517,15 @@ File already exists.*/})],
 			['APP FILE CREATE_FOLDER FAIL 1', 'websocket', '', 'FILE\tCREATE_FOLDER\t/test/\n',
 				["..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path", "TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 2', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/app/trusted_g/test-test--test-test') + '\n',
-				["..\\..\\util\\util_canonical.c:canonical: trusted_g\\test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\old-postage\\envelope\\app|trusted_g/test-test--test-test<"]],
+				["..\\..\\util\\util_canonical.c:canonical: trusted_g\\test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\app|trusted_g/test-test--test-test<"]],
 			['APP FILE CREATE_FOLDER FAIL 3', 'websocket', '', 'FILE\tCREATE_FOLDER',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 4', 'websocket', '', 'FILE\tCREATE_PI',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 5', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/app/trusted_g///////') + '\n',
-				["..\\..\\util\\util_canonical.c:canonical: trusted_g\\\\\\\\\\\\\\ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\old-postage\\envelope\\app|trusted_g///////<", "TRANSACTION COMPLETED"]],
+				["..\\..\\util\\util_canonical.c:canonical: trusted_g\\\\\\\\\\\\\\ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\app|trusted_g///////<", "TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 6', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/app/trusted_g/π'),
-				["..\\..\\util\\util_canonical.c:canonical: trusted_g\\π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\old-postage\\envelope\\app|trusted_g/π<", "TRANSACTION COMPLETED"]],
+				["..\\..\\util\\util_canonical.c:canonical: trusted_g\\π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\app|trusted_g/π<", "TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER', 'websocket', '', 'FILE\tCREATE_FOLDER\t/app/all/test3/test4/',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 
@@ -551,13 +548,13 @@ File already exists.*/})],
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE CREATE_FILE FAIL 7', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/test.txt') + '\n',
-				["File already exists."]],
+				["CreateFile failed: 0x50 (The file exists.\r\n)"]],
 			['APP FILE CREATE_FILE FAIL 8', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/test.txt'),
-				["File already exists."]],
+				["CreateFile failed: 0x50 (The file exists.\r\n)"]],
 			['APP FILE CREATE_FILE FAIL 9', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/test.π'),
-				["..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\old-postage\\envelope\\app|trusted_g/test.π<", "TRANSACTION COMPLETED"]],
+				["..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\app|trusted_g/test.π<", "TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FILE', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/all/test3.txt'),
 				['ANYTHING', 'TRANSACTION COMPLETED']],
@@ -586,17 +583,17 @@ File already exists.*/})],
 				['OK', 'TRANSACTION COMPLETED']],
 			['APP FILE DELETE 6', 'websocket', '', 'FILE\tDELETE\t/app/all/test3.txt',
 				['OK', 'TRANSACTION COMPLETED']],
+			['APP FILE DELETE 7', 'websocket', '', 'FILE\tDELETE\t/app/all/test1.txt',
+				['OK', 'TRANSACTION COMPLETED']],
 			['APP FILE SEARCH PREPARE (WRITE 1)', 'websocket', '', 'FILE\tWRITE\t' +
-				GS.encodeForTabDelimited('/app/trusted_g/test.txt') + '\t' +
-				GS.encodeForTabDelimited(test_change_stamp) + '\n' +
+				GS.encodeForTabDelimited('/app/trusted_g/test.txt') + '\t0\n' +
 				'This is a test of the search. (test line #1)' + '\n' +
 				'This is a test of the bran muffin. (test line #2)' + '\n' +
 				'This is a test of the tv. (test line #3)' + '\n' +
 				'This is a test of the envelope. (test line #4)',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE SEARCH PREPARE (WRITE 2)', 'websocket', '', 'FILE\tWRITE\t' +
-				GS.encodeForTabDelimited('/app/trusted_g/test/test.txt') + '\t' +
-				GS.encodeForTabDelimited(test_change_stamp) + '\n' +
+				GS.encodeForTabDelimited('/app/trusted_g/test/test.txt') + '\t0\n' +
 				'This is a test of the search. (test line #1)' + '\n' +
 				'This is a test of the bran muffin. (test line #2)' + '\n' +
 				'This is a test of the tv. (test line #3)' + '\n' +
@@ -605,7 +602,7 @@ File already exists.*/})],
 			['APP FILE SEARCH FAIL 1', 'websocket', '', 'FILE\tSEARCH\t/ap/\tgs-page > gs-header,\nRECURSIVE\n',
 				["..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"]],
 			['APP FILE SEARCH FAIL 2', 'websocket', '', 'FILE\tSEARCH\t/app/nonexisitant/\tgs-page > gs-header,\nRECURSIVE\n',
-				["..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Desktop\\Repos\\old-postage\\envelope\\app\\|nonexisitant\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\old-postage\\envelope\\app|nonexisitant/<"]
+				["..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\app\\|nonexisitant\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\app|nonexisitant/<"]
 			],
 			// could not get regex to fail, will put this back after we move to tre on windows
 			//['APP FILE SEARCH FAIL 3', 'websocket', '', 'FILE\tSEARCH\t/app/\tThis is a test of the [search|bran|envelope,\nREGEX\n',
@@ -614,7 +611,7 @@ File already exists.*/})],
 				GS.encodeForTabDelimited('/app/trust_g/') + '\t' +
 				GS.encodeForTabDelimited('This....a test of the search') + '\n' +
 				'INSENSITIVE\tREGEX' + '\n',
-				["..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Desktop\\Repos\\old-postage\\envelope\\app\\|trust_g\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\old-postage\\envelope\\app|trust_g/<"]],
+				["..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\app\\|trust_g\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Desktop\\Repos\\postage\\envelope\\app|trust_g/<"]],
 			['APP FILE SEARCH FAIL 5', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('../../') + '\t' +
 				GS.encodeForTabDelimited('This is a test of the search') + '\n' +
@@ -721,13 +718,13 @@ File already exists.*/})],
 		Global.tests.push.apply(Global.tests, [
 			['RAW FAIL', 'websocket', '', ml(function () {/*RAW*/}),
 				["Invalid Request Type \"RAW\"\n"]],
-			['Accept FAIL', 'ajax', 500, '/env/dbo.accept_testing1', 'testingnitset', ml(function () {/*"FATAL\n..\\..\\db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Could not find stored procedure 'dbo.accept_testing1'.(2812)\n"*/ })],
+			['Accept FAIL', 'ajax', 500, '/env/dbo.accept_testing1', 'testingnitset', ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Could not find stored procedure 'dbo.accept_testing1'.(2812)\n"*/ })],
 			['Accept', 'ajax', 200, '/env/dbo.accept_testing', 'testingnitset', 'testingnitset'],
-			['Action FAIL', 'ajax', 500, '/env/dbo.action_testing1', 'testingnitset', ml(function () {/*"FATAL\n..\\..\\db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed, res->status == 5:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Could not find stored procedure 'dbo.action_testing1'.(2812)\n"*/ })],
+			['Action FAIL', 'ajax', 500, '/env/dbo.action_testing1', 'testingnitset', ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed, res->status == 5:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Could not find stored procedure 'dbo.action_testing1'.(2812)\n"*/ })],
 			['Action 1', 'ajax', 200, '/env/dbo.action_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
 			['Action 2', 'ajax', 200, '/env/dbo.action_testing_nvarchar', 'testingnitset', '{"stat":true, "dat": "utf-8: ↑ utf-16: § §"}'],
 			['Action 3', 'ajax', 200, '/env/dbo.action_testing_nvarchar2', 'action=scan&bc=123217&drawtocentrifuge=00%3A02&processtime=00%3A54&centrifugetominus80=00%3A52&amount=1500', '{"stat":true, "dat": "freezerid=10013&shelf=1&rack=5&box=5&row=F&column=1"}'],
-			['Action 4', 'ajax', 200, '/env/dbo.action_testing_context_data', 'testingnitset', '{"stat":true, "dat": "request_ip_address=127.0.0.1&request_host=127.0.0.1%3A8080"}'],
+			['Action 4', 'ajax', 200, '/env/dbo.action_testing_context_data', 'testingnitset', '{"stat":true, "dat": "request_ip_address=127.0.0.1&request_host=127.0.0.1%3A8888"}'],
 			['Action 5', 'ajax', 200, '/env/dbo.action_testing_large_return', '', ml(function () {/*{"stat":true, "dat": [*/ }) + '[' + makeArray(16300, function (i) { return i + 1; }).join('], [') + ']' + ml(function () {/*]}*/ })],
 			['Action 6', 'ajax', 200, '/env/dbo.action_truncate_testing_tables', '', '"FATAL\nDB_exec failed, res->status == 2:\n"'],
 			['ACTION FAIL 1', 'websocket', '', ml(function () {/*ACTION	dbo	action_testing1	testingnitset
@@ -783,7 +780,7 @@ RETURN	id	test_name	test_full
 ORDER BY
 id DESC
 */}),
-				["..\\..\\db_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'test_full'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"]],
+				["db_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'test_full'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"]],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table
@@ -807,7 +804,7 @@ Bob	Robert
 Alice	Alicia
 Eve	Adam
 */}),
-				["..\\..\\db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[23000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Cannot insert explicit value for identity column in table '#temp_insert_2' when IDENTITY_INSERT is set to OFF.(544)\n"]],
+				["db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[23000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Cannot insert explicit value for identity column in table '#temp_insert_2' when IDENTITY_INSERT is set to OFF.(544)\n"]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -822,7 +819,7 @@ Bob	Robert
 Alice	Alicia
 Eve	Adam
 */}),
-				["..\\..\\db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Cannot update the view or function 'ttesting_view' because it contains aggregates, or a DISTINCT or GROUP BY clause, or PIVOT or UNPIVOT operator.(4403)\n"]],
+				["db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Cannot update the view or function 'ttesting_view' because it contains aggregates, or a DISTINCT or GROUP BY clause, or PIVOT or UNPIVOT operator.(4403)\n"]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -904,9 +901,9 @@ OFFSET
 			['COMMIT', 'websocket', '', ml(function () {/*COMMIT*/ }),
 				['OK']],
             ['Select Fail 1', 'ajax', 500, '/env/action_select', 'src=rtesting_table2',
-                ml(function () {/*"FATAL\n..\\..\\db_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Select Fail 2', 'ajax', 500, '/env/action_select', 'view=rtesting_table2',
-                ml(function () {/*"FATAL\n..\\..\\db_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Select 1', 'ajax', 200, '/env/action_select', 'src=rtesting_table&limit=1&order_by=id%20ASC&cols=id,test_name,test_name2,change_stamp,testint',
                 ml(function () {/*{"stat": true, "dat": {"arr_column": ["id","test_name","test_name2","change_stamp","testint"], "dat": [[2,"Bob","","Jun 15 2016  1:17PM",0]], "row_count": 4}}*/ })],
 
@@ -923,19 +920,19 @@ OFFSET
             ['Insert Fail 1', 'ajax', 500, '/env/action_insert', 'src=rtesting_table2&data=test',
                 ml(function () {/*"FATAL\nBadly formed data string. Should be URI encoded 'key=value&key=value'."*/ })],
             ['Insert Fail 2', 'ajax', 500, '/env/action_insert', 'src=rtesting_table2&data=test%3Dtest',
-                ml(function () {/*"FATAL\n..\\..\\db_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Insert Fail 3', 'ajax', 500, '/env/action_insert', 'view=rtesting_table2&data=test%3Dtest',
-                ml(function () {/*"FATAL\n..\\..\\db_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Insert Fail 4', 'ajax', 500, '/env/action_insert', 'src=rtesting_table&data=',
 				ml(function () {/*"FATAL\nNo insert data"*/ })],
             ['Insert Fail 5', 'ajax', 500, '/env/action_insert', 'view=ttesting_view2&data=' + encodeURIComponent('test_name_1=test&test_name2_1=test&test_name_2=test&test_name2_2=test'),
-                ml(function () {/*"FATAL\n..\\..\\db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]View or function 'ttesting_view2' is not updatable because the modification affects multiple base tables.(4405)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]View or function 'ttesting_view2' is not updatable because the modification affects multiple base tables.(4405)\n"*/ })],
             ['Insert 1', 'ajax', 200, '/env/action_insert', 'src=rtesting_table&data=' + encodeURIComponent('test_name=test&test_name2=test'),
                 ml(function () {/*{"stat": true, "dat": {"lastval": 6}}*/ })],
             ['Insert 2', 'ajax', 200, '/env/action_insert', 'view=rtesting_table&data=' + encodeURIComponent('test_name=test&test_name2=test'),
                 ml(function () {/*{"stat": true, "dat": {"lastval": 7}}*/ })],
             ['Update Fail', 'ajax', 500, '/env/action_update', 'src=rtesting_table&column=first_name&value=Test&where=' + encodeURIComponent('id=6'),
-                ml(function () {/*"FATAL\n..\\..\\db_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'first_name'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'first_name'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Update 1', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=Test&where=' + encodeURIComponent('id=6'),
                 ml(function () {/*{"stat": true, "dat": ["6","Test","test","Jun 15 2016  1:17PM","0"]}*/ })],
             ['Update 2', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=NULL&where=' + encodeURIComponent('id=6&change_stamp=' + encodeURIComponent('Jun 15 2016  1:17PM')),
@@ -947,9 +944,9 @@ OFFSET
             ['Update 5', 'ajax', 200, '/env/action_update', 'src=ttesting_view2&column=test_name_2&value=testest&where=' + encodeURIComponent('id_2=6&change_stamp_2=' + encodeURIComponent('Jun 15 2016  1:17PM')),
                 ml(function () {/*{"stat": true, "dat": [null,null,null,null,null,"6","testest","test","0","Jun 15 2016  1:17PM"]}*/ })],
             ['Delete Fail 1', 'ajax', 500, '/env/action_delete', 'src=rtesting_table2&id=5',
-                ml(function () {/*"FATAL\n..\\..\\db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n"*/ })],
             ['Delete Fail 2', 'ajax', 500, '/env/action_delete', 'src=ttesting_view2&id=8',
-                ml(function () {/*"FATAL\n..\\..\\db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'id'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]View or function 'ttesting_view2' is not updatable because the modification affects multiple base tables.(4405)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'id'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]View or function 'ttesting_view2' is not updatable because the modification affects multiple base tables.(4405)\n"*/ })],
             ['Delete 1', 'ajax', 200, '/env/action_delete', 'src=rtesting_table&id=6',
                 ml(function () {/*{"stat": true, "dat": ""}*/ })],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -975,7 +972,7 @@ id	test_name
 2	Bobby
 3	Alicia
 */}),
-				["..\\..\\db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Cannot update the view or function 'ttesting_view' because it contains aggregates, or a DISTINCT or GROUP BY clause, or PIVOT or UNPIVOT operator.(4403)\n"]],
+				["db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Cannot update the view or function 'ttesting_view' because it contains aggregates, or a DISTINCT or GROUP BY clause, or PIVOT or UNPIVOT operator.(4403)\n"]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -1032,7 +1029,7 @@ id
 3
 4
 */}),
-				["..\\..\\db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Cannot update the view or function 'ttesting_view' because it contains aggregates, or a DISTINCT or GROUP BY clause, or PIVOT or UNPIVOT operator.(4403)\n"]],
+				["db_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Cannot update the view or function 'ttesting_view' because it contains aggregates, or a DISTINCT or GROUP BY clause, or PIVOT or UNPIVOT operator.(4403)\n"]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*COMMIT*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
