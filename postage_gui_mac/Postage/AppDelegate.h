@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#include "util_ini.h"
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
@@ -18,7 +19,7 @@
 - (void)openConnection:(NSMenuItem *)sender;
 - (void)about:(NSObject *)sender;
 - (void)configFolder:(NSObject *)sender;
+- (void)man:(NSObject *)sender;
 - (void)quit:(NSObject *)sender;
 
 @end
-

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB6A67381D99D08100E6FA4D /* util_ini.c in Sources */ = {isa = PBXBuildFile; fileRef = AB6A67361D99D08100E6FA4D /* util_ini.c */; };
 		ABDAFFD01D849B0800288D0D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ABDAFFCF1D849B0800288D0D /* AppDelegate.m */; };
 		ABDAFFD31D849B0800288D0D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ABDAFFD21D849B0800288D0D /* main.m */; };
 		ABDAFFD51D849B0800288D0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ABDAFFD41D849B0800288D0D /* Assets.xcassets */; };
@@ -14,6 +15,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AB6A67361D99D08100E6FA4D /* util_ini.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = util_ini.c; sourceTree = "<group>"; };
+		AB6A67371D99D08100E6FA4D /* util_ini.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util_ini.h; sourceTree = "<group>"; };
 		ABDAFFCB1D849B0800288D0D /* Postage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Postage.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABDAFFCE1D849B0800288D0D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		ABDAFFCF1D849B0800288D0D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -55,6 +58,8 @@
 			children = (
 				ABDAFFCE1D849B0800288D0D /* AppDelegate.h */,
 				ABDAFFCF1D849B0800288D0D /* AppDelegate.m */,
+				AB6A67361D99D08100E6FA4D /* util_ini.c */,
+				AB6A67371D99D08100E6FA4D /* util_ini.h */,
 				ABDAFFD41D849B0800288D0D /* Assets.xcassets */,
 				ABDAFFD61D849B0800288D0D /* MainMenu.xib */,
 				ABDAFFD91D849B0800288D0D /* Info.plist */,
@@ -142,6 +147,7 @@
 			files = (
 				ABDAFFD31D849B0800288D0D /* main.m in Sources */,
 				ABDAFFD01D849B0800288D0D /* AppDelegate.m in Sources */,
+				AB6A67381D99D08100E6FA4D /* util_ini.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
