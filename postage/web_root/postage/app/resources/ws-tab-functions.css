@@ -356,3 +356,47 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
 .sql-results-area table {
     border-left: 1px solid #DDDDDD;
 }
+
+
+/* ###################################################### */
+/* ################ EDITOR WARNING POPUP ################ */
+/* ###################################################### */
+
+.editor-warning {
+    position: absolute;
+    right: 0.25em;
+    top: 0.25em;
+    padding: 0.25em;
+    z-index: 10000000;
+    background: #ff8e8e;
+    border: 3px dashed #000000;
+    text-align: center;
+    cursor: pointer;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+@-webkit-keyframes error-pulsate {
+    0% { background: #ff8e8e; }
+    50% { background: #ff7272; }
+    100% { background: #ff8e8e; }
+}
+
+@keyframes error-pulsate {
+    0% { background: #ff8e8e; }
+    50% { background: #ff7272; }
+    100% { background: #ff8e8e; }
+}
+
+.editor-warning {
+    -webkit-animation: error-pulsate 1100ms linear infinite;
+    -moz-animation: error-pulsate 1100ms linear infinite;
+    animation: error-pulsate 1100ms linear infinite;
+}
+

@@ -438,7 +438,9 @@ function autocompletePopupWake(editor) {
     autocompleteGlobals.popupAsleep = false;
     
     // unbind keydown
-    editor.keyListenerElementSleep.removeEventListener('keydown', editor.keyListenerFunctionSleep);
+    if (editor.keyListenerElementSleep) {
+        editor.keyListenerElementSleep.removeEventListener('keydown', editor.keyListenerFunctionSleep);
+    }
     
     // bind the popup
     autocompleteBind(editor);
@@ -551,7 +553,11 @@ function autocompleteUnbind(editor) {
     editor.commands.removeCommand('hideautocomplete');
     editor.commands.removeCommand('autocomplete');
     autocompleteGlobals.popupElement.removeEventListener('change', autocompleteGlobals.popupElement.clickFunction);
-    editor.keyListenerElement.removeEventListener('keydown', editor.keyListenerFunction);
+
+    if (editor.keyListenerElement) {
+        editor.keyListenerElement.removeEventListener('keydown', editor.keyListenerFunction);
+    }
+
     editor.container.removeEventListener('mousedown', editor.mousedownFunction);
     editor.container.removeEventListener('focusout', editor.focusoutFunction);
     autocompleteGlobals.popupAce.focusElement.removeEventListener('focus', autocompleteGlobals.popupAce.focusFunction);

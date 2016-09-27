@@ -187,14 +187,20 @@ function menuTools(target) {
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft onclick="dialogDatabaseInfo()" icon="plug">Connection Info</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
-                            no-focus iconleft onclick="dialogAbout()" icon="info">About Postage</gs-button>
+                            no-focus iconleft onclick="dialogSplash()" icon="info">About Postage</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft onclick="GS.showShimmed()" icon="heartbeat">Browser Support</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft onclick="window.location.reload(true);" icon="refresh">Clear Cache</gs-button>
+                <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft target="_blank"
+                            href="https://github.com/workflowproducts/postage/" icon="github">Postage On Github</gs-button>
+                <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft target="_blank"
+                            href="https://github.com/workflowproducts/postage/issues" icon="bug">Report An Issue</gs-button>
             </gs-body>
         </gs-page>
     */});
+    
+    // dialogAbout()
 
     GS.openDialogToElement(target, templateElement, 'down');
 }
@@ -230,6 +236,23 @@ function menuTab(target) {
     GS.openDialogToElement(target, templateElement, 'down');
 }
 
+
+function dialogSplash() {
+    'use strict';
+    var templateElement = document.createElement('template'), afterOpen, beforeClose;
+    
+    templateElement.setAttribute('data-mode', 'constrained');
+    templateElement.setAttribute('data-overlay-close', 'true');
+    templateElement.innerHTML = ml(function () {/*
+        <gs-page>
+            <gs-body>
+                <iframe class="full-iframe" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}"></iframe>
+            </gs-body>
+        </gs-page>
+    */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion);
+    
+    GS.openDialog(templateElement);
+}
 
 
 // open a dialog allowing you to change databases

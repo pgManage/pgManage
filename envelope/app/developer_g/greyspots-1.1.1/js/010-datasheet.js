@@ -191,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 && arrSelectRecords[0].children[0].hasAttribute('selected')
                 && !element.deleteButton.hasAttribute('disabled')) {
             
+            // generate the information to send to the websocket
             arrPk = (element.getAttribute('pk') || '').split(/[\s]*,[\s]*/);
             arrLock = (element.getAttribute('lock') || '').split(/[\s]*,[\s]*/);
             
@@ -223,6 +224,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 for (col_i = 0, col_len = arrLock.length; col_i < col_len; col_i += 1) {
                     strRecordToHash += (strRecordToHash ? '\t' : '');
                     strTemp = deleteRecordData[element.internalData.arrColumnNames.indexOf(arrLock[col_i])];
+                    
+                    // I believe that this needs to use the null-string instead of 'NULL'
                     strRecordToHash += (strTemp === 'NULL' ? '' : strTemp);
                 }
                 
@@ -294,21 +297,31 @@ document.addEventListener('DOMContentLoaded', function () {
                         GS.webSocketErrorDialog(data);
                     }
                 }
+                // final result callback, because we need to handle the commit/rollback response
                 , function (strAnswer, data, error) {
                     var arrElements, i, len;
                     GS.removeLoader(element);
                     
                     if (!error) {
                         if (strAnswer === 'COMMIT') {
+                            // remove amber records, because the amber records have now been deleted
                             removeRecords(element, 'bg-amber');
+                            
+                            // clear internal variables for selection now that the selected records have been deleted,
+                            //      because if you try to shift-select to extend the selection and the origin cell has
+                            //      been deleted this may cause an error
                             clearSelection(element);
+                            
+                            // trigger after_delete so that developers can react to a successful delete
                             GS.triggerEvent(element, 'after_delete');
                             
                         } else {
+                            // clear bg-amber class and don't add a green fade
                             clearRecordColor(element, 'bg-amber', false);
                         }
                         
-                        // fix record selector numbers
+                        // update record selector numbers to reflect current record numbers
+                        //      because after you delete records there may be a gap in the numbers and that is not acceptable
                         arrElements = xtag.query(element, 'tbody > tr');
                         
                         for (i = 0, len = arrElements.length; i < len; i += 1) {
@@ -317,8 +330,13 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         }
                         
+                    // if an error occurred
                     } else {
+                        // get new data, because after an error we don't know the current state
+                        //      of the data so a re-fetch will help mitigate inaccurate data errors
                         getData(element);
+                        
+                        // open an error dialog so that the user knows there was an error
                         GS.webSocketErrorDialog(data);
                     }
                 }
@@ -329,7 +347,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function insertDialog(element) {
         var templateElement = document.createElement('template'), strAddin;
         
-        // if there is a column attribute on this element: append child column (or column) and the value to the insert string
+        // if there is a column attribute on this element: append child column (or column) and
+        //      the value to the insert string so that we can have parent-child relationships
         if (element.getAttribute('column') || element.getAttribute('qs')) {
             strAddin =  (
                             element.getAttribute('child-column')

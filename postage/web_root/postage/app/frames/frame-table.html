@@ -154,58 +154,102 @@
                 // build query for getting all of the lists of objects
                 strQuery = '';
                 
-                strQuery += '\n\nSELECT *, \'operator\' AS objType, 1 AS srt FROM (' + listQuery.operators.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') + ') em';
-                strQuery += '\n\nUNION ALL ' +
-                            'SELECT *, \'aggregate\' AS objType, 2 AS srt FROM (' + listQuery.aggregates.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') + ') em';
-                strQuery += '\n\nUNION ALL ' +
-                            'SELECT *, \'function\' AS objType, 3 AS srt FROM (' + listQuery.functions.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') + ') em';
-                strQuery += '\n\nUNION ALL ' +
-                            'SELECT *, \'function\' AS objType, 4 AS srt FROM (' + listQuery.triggers.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') + ') em';
-                strQuery += '\n\nUNION ALL ' +
-                            'SELECT *, \'view\' AS objType, 5 AS srt FROM (' + listQuery.views.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') + ') em';
-                strQuery += '\n\nUNION ALL ' +
-                            'SELECT *, \'trigger\' AS objType, 6 AS srt FROM (' + ml(function() {/*
-                                      SELECT pg_trigger.oid, quote_ident(tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname), nspname
-                                        FROM pg_class 
-                                        JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
-                                        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-                                       WHERE pg_namespace.oid = {{INTOID}} AND pg_trigger.oid IS NOT NULL AND pg_class.relkind = 'r';
-                                */}).replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') + ') em';
-                strQuery += '\n\nUNION ALL SELECT *, \'rule\'       AS objType, 7 AS srt FROM (' + ml(function() {/*
-                                      SELECT pg_rewrite.oid, quote_ident(rulename) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname), nspname
-                                        FROM pg_class
-                                   LEFT JOIN pg_rewrite ON pg_rewrite.ev_class = pg_class.oid
-                                   LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-                                       WHERE pg_namespace.oid = {{INTOID}} AND pg_rewrite.oid IS NOT NULL AND pg_class.relkind = 'r';
-                                */}).replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') + ') em';
-                strQuery += '\n\nORDER BY srt, 1';
+                strQuery +=
+                    '\n\n' +
+                    // operators are included because of functions
+                    'SELECT oid, name, schema_name, \'operator\' AS objType, 1 AS srt FROM (' +
+                        listQuery.operators.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                    ') em' +
+                    '\n\n' +
+                    'UNION ALL ' +
+                    // aggregates are included because of functions
+                    'SELECT oid, name, schema_name, \'aggregate\' AS objType, 2 AS srt FROM (' +
+                        listQuery.aggregates.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                    ') em' +
+                    '\n\n' +
+                    'UNION ALL ' +
+                    // functions are included so that the user can do a find and replace on a table name or a column name
+                    'SELECT oid, name, schema_name, \'function\' AS objType, 3 AS srt FROM (' +
+                        listQuery.functions.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                    ') em' +
+                    '\n\n' +
+                    'UNION ALL ' +
+                    'SELECT oid, name, schema_name, \'function\' AS objType, 4 AS srt FROM (' +
+                        listQuery.triggers.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                    ') em' +
+                    '\n\n' +
+                    'UNION ALL ' +
+                    'SELECT oid, name, schema_name, \'view\' AS objType, 5 AS srt FROM (' +
+                        listQuery.views.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                    ') em' +
+                    '\n\n' +
+                    'UNION ALL ' +
+                    'SELECT oid, name, schema_name, \'trigger\' AS objType, 6 AS srt FROM (' +
+                            ml(function() {/*
+                                  SELECT pg_trigger.oid,
+                                         quote_ident(tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) AS name,
+                                         nspname AS schema_name
+                                    FROM pg_class 
+                                    JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                                    JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                                   WHERE pg_namespace.oid = {{INTOID}}
+                                     AND pg_trigger.oid IS NOT NULL
+                                     AND pg_trigger.tgisinternal != TRUE
+                                     AND pg_class.relkind = 'r';
+                            */}).replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                    ') em' +
+                    '\n\n' +
+                    'UNION ALL ' +
+                    'SELECT oid, name, schema_name, \'rule\' AS objType, 7 AS srt FROM (' +
+                            ml(function() {/*
+                                  SELECT pg_rewrite.oid,
+                                         quote_ident(rulename) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) AS name,
+                                         nspname AS schema_name
+                                    FROM pg_class
+                               LEFT JOIN pg_rewrite ON pg_rewrite.ev_class = pg_class.oid
+                               LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                                   WHERE pg_namespace.oid = {{INTOID}} AND pg_rewrite.oid IS NOT NULL AND pg_class.relkind = 'r';
+                            */}).replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                    ') em' +
+                    '\n\n' +
+                    'ORDER BY srt, 1';
                 
                 // function to handle the query results
                 handleListResults = function (arrResult) {
                     var strDumpQuery = '', strQuery, i, len, tempFunction, handleScriptResults, arrRow;
                     
                     for (i = arrResult.length - 1; i >= 0; i -= 1) {
-                        strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase() + ' ' +
-                            (arrResult[i][3].toUpperCase() === 'TRIGGER' || arrResult[i][3].toUpperCase() === 'RULE' ? '' : strSchemaName + '.') + arrResult[i][1] + ';\n';
+                        strDumpQuery +=
+                            'DROP ' + arrResult[i][3].toUpperCase() + ' ' +
+                                (
+                                    arrResult[i][3].toUpperCase() === 'TRIGGER' ||
+                                    arrResult[i][3].toUpperCase() === 'RULE'
+                                        ? ''
+                                        : strSchemaName + '.'
+                                ) + arrResult[i][1] + ';\n';
                     }
                     
-                    strDumpQuery += '\nALTER TABLE ' + strSchemaName + '.' + strTableName + ' RENAME TO ' + strTableName + strTableSuffix + ';\n';
+                    strDumpQuery += '\nALTER TABLE ' +
+                                        strSchemaName + '.' + strTableName +
+                                        ' RENAME TO ' + strTableName + strTableSuffix + ';\n';
                     
                     arrConstraint = strConstraints.split('\n');
                     //console.log(strConstraints, arrConstraint);
                     
-                    // the - q is because there is an empty string at the end of the array
-                    for (i = 0, len = arrConstraint.length - 1; i < len; i += 1) {
-                        var intEndConstraintName = arrConstraint[i].indexOf(' ');
-                        intEndConstraintName = intEndConstraintName + arrConstraint[i].substring(intEndConstraintName + 1).indexOf(' ') + 1;
-                        strDumpQuery += '\nALTER TABLE ';
-                        strDumpQuery += strSchemaName;
-                        strDumpQuery += '.';
-                        strDumpQuery += strTableName;
-                        strDumpQuery += strTableSuffix;
-                        strDumpQuery += ' DROP ';
-                        strDumpQuery += arrConstraint[i].substring(1, intEndConstraintName);
-                        strDumpQuery += ';';
+                    var intEndConstraintName;
+                    for (i = 0, len = arrConstraint.length; i < len; i += 1) {
+                        if (arrConstraint[i].trim()) {
+                            intEndConstraintName = arrConstraint[i].indexOf(' ');
+                            intEndConstraintName = intEndConstraintName + arrConstraint[i].substring(intEndConstraintName + 1).indexOf(' ') + 1;
+                            strDumpQuery += '\nALTER TABLE ';
+                            strDumpQuery += strSchemaName;
+                            strDumpQuery += '.';
+                            strDumpQuery += strTableName;
+                            strDumpQuery += strTableSuffix;
+                            strDumpQuery += ' DROP ';
+                            strDumpQuery += arrConstraint[i].substring(1, intEndConstraintName);
+                            strDumpQuery += ';';
+                        }
                     }
                     
                     strDumpQuery += '\n\nCREATE TABLE ';
@@ -291,18 +335,31 @@
                     strQuery = '';
                     var j = 0, len1 = arrResult.length;
                     for (i = 0, len = arrResult.length; i < len; i += 1) {
-                        //strQuery += '\n\n' + (  scriptQuery[arrResult[i][3].toLowerCase()] ||
-                        //                        scriptQuery[arrResult[i][3].toLowerCase() + 'Sql']
-                        //                     ).replace(/\{\{INTOID\}\}/gim, arrResult[i][0]);
                         
-                        strQuery += '\n\n' + (scriptQuery[arrResult[i][3].toLowerCase()] || scriptQuery[arrResult[i][3].toLowerCase() + 'Sql'])
-                                                    .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
-                                                    .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + quote_ident(arrResult[i][1]));
+                        //console.log('arrResult ' + i + ':', arrResult[i]);
+                        //console.log('object' + GS.strToTitle(arrResult[i][3]));
+                        //console.log('arrResult 0:', arrResult[i][0]);
+                        //console.log('arrResult 1:', arrResult[i][1]);
+                        //console.log('arrResult 2:', arrResult[i][2]);
+                        //console.log('arrResult 3:', arrResult[i][3]);
+                        //console.log(scriptQuery['object' + GS.strToTitle(arrResult[i][3])]);
+                        
+                        strQuery += '\n\n' +
+                            (
+                                //scriptQuery[arrResult[i][3].toLowerCase()] ||
+                                //scriptQuery[arrResult[i][3].toLowerCase() + 'Sql']
+                                scriptQuery['object' + GS.strToTitle(arrResult[i][3])]
+                            )
+                                .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
+                                .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + quote_ident(arrResult[i][1]));
                     }
                     
                     handleScriptResults = function (arrResult) {
                         var i, len;
                         arrResult.splice(0, 1);
+                        
+                        //console.log(arrResult);
+                        //console.log(j, len1);
                         
                         for (i = 0, len = arrResult.length; i < len; i += 1) {
                             strDumpQuery += arrResult[i][0] + '\n\n'; //GS.decodeFromTabDelimited(arrResult[i][0]) + '\n\n';

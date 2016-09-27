@@ -13,211 +13,217 @@
         <link href="/postage/css/postage.css" rel="stylesheet" type="text/css" />
         
         <script>
-            var bolCurl = false, bolTutorial = false;
-            
-            function appendError(data) {
-                var errorContainer = document.getElementById('container-error');
-                
-                data = data.original_response.substring(data.original_response.indexOf('\n') + 1);
-                
-                if (errorContainer.textContent) {
-                    errorContainer.appendChild(document.createElement('br'));
-                }
-                
-                errorContainer.appendChild(document.createTextNode(data));
-            }
-            
-            function login() {
-                'use strict';
-                var strQueryString = GS.getQueryString(), strConnName = document.getElementById('option-connection').value;
-                
-                document.getElementById('container-error').textContent = '';
-                
-                GS.addLoader('login', 'Logging In...');
-                GS.ajaxJSON('/postage/auth',
-                            'action=login' +
-                               '&connname=' + encodeURIComponent(strConnName) +
-                               (strConnName === 'custom' ? '&conn=' + encodeURIComponent(document.getElementById('text-custom').value) : '') +
-                               '&username=' + encodeURIComponent(document.getElementById('text-username').value) +
-                               '&password=' + encodeURIComponent(document.getElementById('text-password').value),
-                            function (data, error) {
-                    var strRedirect, arrRedirect, i, len, bolFollow;
-                    GS.removeLoader('login');
-                    
-                    if (!error) {
-                        localStorage.greyspots_postage_tutorial = bolTutorial;
-                        localStorage['greyspots_postage_' + strConnName] = document.getElementById('text-username').value;
-                        //localStorage.greyspots_postage_username = document.getElementById('text-username').value;
-                        
-                        strRedirect = GS.qryGetVal(strQueryString, 'redirect');
-                        
-                        if (strRedirect) {
-                            // we don't want to redirect with a connection index in the url
-                            arrRedirect = strRedirect.split('/');
-                            
-                            // search for connection index
-                            for (i = (arrRedirect.length - 1), bolFollow = true; i > -1; i -= 1) {
-                                if (!isNaN(parseInt(arrRedirect[i], 10))) {
-                                    bolFollow = false;
-                                    break;
-                                }
-                            }
-                            
-                            if (bolFollow) {
-                                window.location = strRedirect;
-                            } else {
-                                window.location = data.dat;
-                            }
-                        } else {
-                            window.location = data.dat;// + '?cache=no';
-                        }
-                        
-                    } else {
-                        appendError(data);
-                        document.getElementById('text-password').value = '';
+var bolCurl = false;
+var bolTutorial = false;
+
+function appendError(data) {
+    var errorContainer = document.getElementById('container-error');
+
+    data = data.original_response.substring(data.original_response.indexOf('\n') + 1);
+
+    if (errorContainer.textContent) {
+        errorContainer.appendChild(document.createElement('br'));
+    }
+
+    errorContainer.appendChild(document.createTextNode(data));
+}
+
+function login() {
+    'use strict';
+    var strQueryString = GS.getQueryString();
+    var strConnName = document.getElementById('option-connection').value;
+    var strCustomConn;
+
+    document.getElementById('container-error').textContent = '';
+
+    if (strConnName === 'custom') {
+        strCustomConn = 'host=' + document.getElementById('text-custom-host').value +
+                        ' port=' + document.getElementById('text-custom-port').value +
+                        ' dbname=' + document.getElementById('text-custom-db').value +
+                        ' sslmode=' + document.getElementById('text-custom-ssl').value;
+
+        strCustomConn = '&conn=' + encodeURIComponent(strCustomConn);
+    } else {
+        strCustomConn = '';
+    }
+
+    GS.addLoader('login', 'Logging In...');
+    GS.ajaxJSON('/postage/auth',
+                'action=login' + strCustomConn +
+                   '&connname=' + encodeURIComponent(strConnName) +
+                   '&username=' + encodeURIComponent(document.getElementById('text-username').value) +
+                   '&password=' + encodeURIComponent(document.getElementById('text-password').value),
+                function (data, error) {
+        var strRedirect, arrRedirect, i, len, bolFollow;
+        GS.removeLoader('login');
+
+        if (!error) {
+            localStorage.greyspots_postage_tutorial = bolTutorial;
+            localStorage['greyspots_postage_' + strConnName] = document.getElementById('text-username').value;
+            //localStorage.greyspots_postage_username = document.getElementById('text-username').value;
+
+            strRedirect = GS.qryGetVal(strQueryString, 'redirect');
+
+            if (strRedirect) {
+                // we don't want to redirect with a connection index in the url
+                arrRedirect = strRedirect.split('/');
+
+                // search for connection index
+                for (i = (arrRedirect.length - 1), bolFollow = true; i > -1; i -= 1) {
+                    if (!isNaN(parseInt(arrRedirect[i], 10))) {
+                        bolFollow = false;
+                        break;
                     }
-                });
+                }
+
+                if (bolFollow) {
+                    window.location = strRedirect;
+                } else {
+                    window.location = data.dat;
+                }
+            } else {
+                window.location = data.dat;// + '?cache=no';
             }
-            
-            function appendConnection(connName, strButtons) {
-                'use strict';
-                var optionControl = document.getElementById('option-connection')
-                  , optionElement = document.createElement('gs-option'), strHTML, i, len;
-                
-                optionElement.setAttribute('value', connName);
-                optionElement.textContent = connName;
+        } else {
+            appendError(data);
+            document.getElementById('text-password').value = '';
+        }
+    });
+}
+
+function appendConnection(connName, strButtons) {
+    'use strict';
+    var optionControl = document.getElementById('option-connection');
+    var optionElement = document.createElement('gs-option');
+
+    optionElement.setAttribute('value', connName);
+    optionElement.textContent = connName;
+    optionControl.appendChild(optionElement);
+
+    if (!optionControl.value) {
+        optionControl.value = connName;
+    }
+}
+
+function getConnections() {
+    'use strict';
+    var strQueryString = GS.getQueryString(), strConnName = GS.qryGetVal(strQueryString, 'connection');
+
+    document.getElementById('option-connection').innerHTML = '';
+
+    // get connection list
+    GS.ajaxText('/postage/auth', 'action=list', function (data, error) {
+        var arrConnections, i, len;
+        if (!error) {
+            arrConnections = data.split('\n');
+            for (i = 0, len = arrConnections.length; i < len; i += 1) {
+                appendConnection(arrConnections[i]);
+            }
+
+            try {
+                document.getElementById('option-connection').value = strConnName || arrConnections[0] || '';
+            } catch (e) {}
+            getUserName();
+        } else {
+            appendError(data);
+        }
+    });
+
+    // find out if we can dynamically add connection strings
+    GS.ajaxText('/postage/auth', 'action=canadd', function (data, error) {
+        if (!error) {
+            if (data.trim() === 'true') {
+                var optionControl = document.getElementById('option-connection');
+                var optionElement = document.createElement('gs-option');
+
+                optionElement.setAttribute('value', 'custom');
+                optionElement.setAttribute('no-focus', '');
+                optionElement.innerHTML = ml(function () {/*
+                    <gs-grid min-width="all {reflow}; 400px {1,1}; 640px {4,2,4,4}">
+                        <gs-block flex-horizontal>
+                            <b>Host:&nbsp;</b>
+                            <gs-text id="text-custom-host" placeholder="host" flex></gs-text>
+                        </gs-block>
+                        <gs-block flex-horizontal>
+                            <b>&nbsp;Port:&nbsp;</b>
+                            <gs-text id="text-custom-port" placeholder="port" flex></gs-text>
+                        </gs-block>
+                        <gs-block flex-horizontal>
+                            <b>&nbsp;DB Name:&nbsp;</b>
+                            <gs-text id="text-custom-db" placeholder="dbname" flex></gs-text>
+                        </gs-block>
+                        <gs-block flex-horizontal>
+                            <b>&nbsp;SSL Mode:&nbsp;</b>
+                            <gs-select id="text-custom-ssl" placeholder="sslmode" value="prefer" flex>
+                                <option value="disable">Disable</option>
+                                <option value="allow">Allow</option>
+                                <option value="prefer">Prefer</option>
+                                <option value="require">Require</option>
+                                <option value="verify-ca">Verify Authority</option>
+                                <option value="verify-full">Verify Full</option>
+                            </gs-select>
+                        </gs-block>
+                    </gs-grid>
+                */});
+
                 optionControl.appendChild(optionElement);
-                
-                if (!optionControl.value) {
-                    optionControl.value = connName;
-                }
             }
-            
-            function getConnections() {
-                'use strict';
-                var strQueryString = GS.getQueryString(), strConnName = GS.qryGetVal(strQueryString, 'connection');
-                document.getElementById('option-connection').innerHTML = '';
-                
-                // get connection list
-                GS.ajaxText('/postage/auth', 'action=list', function (data, error) {
-                    var arrConnections, i, len;
-                    if (!error) {
-                        arrConnections = data.split('\n');
-                        for (i = 0, len = arrConnections.length; i < len; i += 1) {
-                            appendConnection(arrConnections[i]);
-                        }
-                        
-                        try {
-                            document.getElementById('option-connection').value = strConnName || arrConnections[0] || '';
-                        } catch (e) {}
-                        getUserName();
-                        
-                    } else {
-                        appendError(data);
-                    }
-                });
-                
-                // find out if we can dynamically add connection strings
-                GS.ajaxText('/postage/auth', 'action=canadd', function (data, error) {
-                    var arrConnections, i, len;
-                    if (!error) {
-                        if (data.trim() === 'true') {
-                            //arrConnections = getCookieConnections();
-                            //
-                            //for (i = 0, len = arrConnections.length; i < len; i += 1) {
-                            //    appendConnection(arrConnections[i].connname,
-                            //                     '<gs-button onclick="editConnection(\'' + arrConnections[i].cookiename + '\')"></gs-button>');
-                            //}
-                            
-                            var optionControl = document.getElementById('option-connection')
-                              , optionElement = document.createElement('gs-option'), strHTML, i, len;
-                            
-                            optionElement.setAttribute('value', 'custom');
-                            optionElement.innerHTML = ml(function () {/*
-                                                        <div flex-horizontal>
-                                                            <span>custom</span>
-                                                            <span>&nbsp;</span>
-                                                            <gs-text id="text-custom" value="host= port= dbname= sslmode=prefer" flex></gs-text>
-                                                        </div>
-                                                    */});
-                            optionControl.appendChild(optionElement);
-                        }
-                        
-                    } else {
-                        appendError(data);
-                    }
-                });
-            }
-            
-            function getUserName() {
-                'use strict';
-                var strConnName = document.getElementById('option-connection').value;
-                
-                document.getElementById('text-username').value = (localStorage['greyspots_postage_' + strConnName] || '');
-                
-                if (!evt.touchDevice) {
-                    if (document.getElementById('text-username').value) {
-                        document.getElementById('text-password').focus();
-                    } else {
-                        document.getElementById('text-username').focus();
-                    }
-                }
-            }
-            
-            
-            
-            window.addEventListener('load', function () {
-                var strQueryString = GS.getQueryString(); //, strUnameCookie = GS.getCookie('greyspots_postage_username');
-                
-                //// if there is a username cookie: set the username input value
-                //if (strUnameCookie) {
-                //    document.getElementById('text-username').value = decodeURIComponent(strUnameCookie);
-                //    
-                //// else: place an indicator that the user should get the tutorial after logging in
-                //} else {
-                //    document.getElementById('text-username').value = 'postgres';
-                //    bolTutorial = true;
-                //}
-                
-                //// if we are not on a touch device: put the focus into the first empty control out of "text-username" and "text-password"
-                //if (!evt.touchDevice) {
-                //    //if (strUnameCookie) {
-                //    document.getElementById('text-password').focus();
-                //    //} else {
-                //    //    document.getElementById('text-username').focus();
-                //    //}
-                //}
-                
-                // fill the error element with any error text from the query string (coalesce to empty string)
-                document.getElementById('container-error').textContent = GS.qryGetVal(strQueryString, 'error') || '';
-                
-                // bind keydown for the "text-username" field
-                document.getElementById('text-username').addEventListener('keydown', function (event) {
-                    if (event.keyCode === 13 && document.getElementById('text-username').value) {
-                        login();
-                    }
-                });
-                
-                // bind keydown for the "text-password" field
-                document.getElementById('text-password').addEventListener('keydown', function (event) {
-                    if (event.keyCode === 13 && document.getElementById('text-username').value) {
-                        login();
-                    }
-                });
-                
-                // bind click for the "button-login" button
-                document.getElementById('button-login').addEventListener('click', function () {
-                    if (document.getElementById('text-username').value) {
-                        login();
-                    }
-                });
-                
-                // when the connection optionbox is changed: try to get a username from the cookie
-                document.getElementById('option-connection').addEventListener('change', getUserName);
-                
-                // get connection list
-                getConnections();
-            });
+        } else {
+            appendError(data);
+        }
+    });
+}
+
+// we want the remembered user name to be remembered by connection name
+//      this function puts the current selected connection's associated username into the username field
+function getUserName() {
+    'use strict';
+    var strConnName = document.getElementById('option-connection').value;
+
+    document.getElementById('text-username').value = (localStorage['greyspots_postage_' + strConnName] || '');
+
+    if (!evt.touchDevice && strConnName !== 'custom') {
+        if (document.getElementById('text-username').value) {
+            document.getElementById('text-password').focus();
+        } else {
+            document.getElementById('text-username').focus();
+        }
+    }
+}
+
+window.addEventListener('load', function () {
+    var strQueryString = GS.getQueryString(); //, strUnameCookie = GS.getCookie('greyspots_postage_username');
+
+    // fill the error element with any error text from the query string (coalesce to empty string)
+    document.getElementById('container-error').textContent = GS.qryGetVal(strQueryString, 'error') || '';
+
+    // bind keydown for the "text-username" field
+    document.getElementById('text-username').addEventListener('keydown', function (event) {
+        if (event.keyCode === 13 && document.getElementById('text-username').value) {
+            login();
+        }
+    });
+
+    // bind keydown for the "text-password" field
+    document.getElementById('text-password').addEventListener('keydown', function (event) {
+        if (event.keyCode === 13 && document.getElementById('text-username').value) {
+            login();
+        }
+    });
+
+    // bind click for the "button-login" button
+    document.getElementById('button-login').addEventListener('click', function () {
+        if (document.getElementById('text-username').value) {
+            login();
+        }
+    });
+
+    // when the connection optionbox is changed: try to get a username from the cookie
+    document.getElementById('option-connection').addEventListener('change', getUserName);
+
+    // get connection list
+    getConnections();
+});
         </script>
         <style>
             #option-connection gs-option:not(:last-child) {
@@ -316,4 +322,4 @@
             </gs-body>
         </gs-page>
     </body>
-</html>
+</html

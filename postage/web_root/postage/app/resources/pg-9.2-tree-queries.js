@@ -423,8 +423,10 @@ listQuery.objectConversion = listQuery.conversions = ml(function () {/*
 
 listQuery.objectOperator = listQuery.operators = ml(function () {/*
       SELECT pg_operator.oid,
-             quote_ident(pg_operator.oprname) ||
-                    ' (' || format_type(pg_operator.oprleft, NULL) || ', ' || format_type(pg_operator.oprright, NULL) || ')' AS name, 
+             pg_operator.oprname || ' (' ||
+                    format_type(pg_operator.oprleft, NULL) || ', ' ||
+                    format_type(pg_operator.oprright, NULL) ||
+                ')' AS name, 
              pg_namespace.nspname AS schema_name, 'OP' AS bullet
         FROM pg_operator
    LEFT JOIN pg_namespace ON pg_namespace.oid = pg_operator.oprnamespace
@@ -683,8 +685,59 @@ scriptQuery.objectAggregate = ml(function () {/*
     */});
 
 
+scriptQuery.objectTrigger = ml(function () {/*
+    SELECT 
+            -- DROP statement
+            (
+                SELECT  '-- Trigger: ' ||
+                                quote_ident(pg_trigger.tgname) || ' ON ' ||
+                                quote_ident(pg_namespace.nspname) || '.' ||
+                                quote_ident(pg_class.relname) || E';\n' || 
+                        '-- DROP TRIGGER ' ||
+                                quote_ident(pg_trigger.tgname) || ' ON ' ||
+                                quote_ident(pg_namespace.nspname) || '.' ||
+                                quote_ident(pg_class.relname) || E';\n'
+                  FROM pg_trigger
+                  JOIN pg_class ON pg_class.oid = pg_trigger.tgrelid
+                  JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                 WHERE (
+                            pg_trigger.oid = {{INTOID}}
+                         OR pg_namespace.nspname || '.' || pg_trigger.tgname = '{{STRNAME}}'
+                       )
+                   AND pg_trigger.tgisinternal != TRUE
+            )
+            
+            -- CREATE STATEMENT
+            || (
+                SELECT regexp_replace(
+                            regexp_replace(
+                                regexp_replace(
+                                    regexp_replace(
+                                        pg_get_triggerdef(pg_trigger.oid, true),
+                                        ' BEFORE ', E'\n   BEFORE '
+                                    ),
+                                    ' ON ', E'\n   ON '
+                                ),
+                                ' FOR ', E'\n   FOR '
+                            ),
+                            ' EXECUTE ', E'\n   EXECUTE '
+                        ) || E';\n\n'
+                  FROM pg_trigger
+                  JOIN pg_class ON pg_class.oid = pg_trigger.tgrelid
+                  JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                 WHERE (
+                            pg_trigger.oid = {{INTOID}}
+                         OR pg_namespace.nspname || '.' || pg_trigger.tgname = '{{STRNAME}}'
+                       )
+                   AND pg_trigger.tgisinternal != TRUE
+            );
+    */});
+
+
+
+
 associatedButtons.objectFunction = ['propertyButton', 'dependButton', 'statButton'];
-scriptQuery.objectFunction = ml(function () {/*
+scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () {/*
     -- DROP statement
     SELECT (SELECT  '-- DROP FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' || E';\n\n'
     FROM pg_proc
@@ -774,7 +827,7 @@ scriptQuery.objectFunction = ml(function () {/*
     -- COMMENT
     || (SELECT CASE WHEN description IS NOT NULL THEN E'\n\nCOMMENT ON FUNCTION ' 
     	|| quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' 
-    	|| $$ IS '$$ || description || $$;'$$ ELSE '' END 
+    	|| $$ IS '$$ || description || $$';$$ ELSE '' END 
     	FROM pg_proc 
     	LEFT JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
     	LEFT JOIN pg_description ON pg_proc.oid=pg_description.objoid

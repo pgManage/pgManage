@@ -13,13 +13,13 @@ function encodeTabNameForFileName(strName) {
                 (strName[i] >= 'a' && strName[i] <= 'z') ||
                 (strName[i] >= 'A' && strName[i] <= 'Z') ||
                 (strName[i] >= '0' && strName[i] <= '9') ||
-                strName[i] == '%' ||
+                //strName[i] == '%' ||
                 strName[i] == '&' ||
                 strName[i] == '+' ||
                 strName[i] == ',' ||
                 strName[i] == '.' ||
                 //strName[i] == ':' ||
-                strName[i] == '=' ||
+                //strName[i] == '=' ||
                 strName[i] == '_' ||
                 //strName[i] == '/' ||
                 //strName[i] == ' ' ||
@@ -761,6 +761,13 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                         //GS.pushQueryString('current-tab=' + encodeURIComponent(tabElement.filePath));
                         GS.pushQueryString('view=tab:' + encodeURIComponent(tabElement.filePath));
                         tabElement.innerRenameControl.oldValue = tabElement.innerRenameControl.value;
+                        
+                        // update href of download script button (we want to use an anchor for that button because it's native)
+                        tabElement.relatedDownloadButton.setAttribute(
+                            'href',
+                            '/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/')
+                        );
+                        
                     }
                     
                 } else {
@@ -1006,7 +1013,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                                     'title="Indent the selected text [TAB]" remove-all></gs-button>' +
                         '<gs-button icononly icon="outdent" onclick="outdentScript()" ' +
                                     'title="Outdent the selected text [SHIFT][TAB]" remove-all></gs-button>' +
-                        '<gs-button icononly icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
+                        '<gs-button icononly id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
                                     'title="Download as a file" remove-all></gs-button>' +
                         '<gs-button icononly class="button-explain" icon="play-circle-o" onclick="explain()" ' +
                                     'title="Query explanation. This does not run the query." remove-all><span class="explain-letter">E</span></gs-button>' +
@@ -1079,6 +1086,8 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         tabElement.relatedClearButton = document.getElementById('sql-results-clear-' + intTabNumber);
         tabElement.relatedCopyOptionsButton = document.getElementById('sql-results-copy-options-' + intTabNumber);
         tabElement.relatedStopLoadingButton = document.getElementById('sql-results-stop-loading-' + intTabNumber);
+        
+        tabElement.relatedDownloadButton = document.getElementById('button-tab-' + intTabNumber + '-download');
         
         //editor.getSession().selection.on('changeCursor', function(event) {
         //    console.log(event);
@@ -1447,7 +1456,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         
         if (!bolLoadedFromServer) {
             GS.addLoader(tabElement.relatedFrame, 'Saving...');
-            saveFile(tabElement.filePath, tabElement.changeStamp, jsnParameters.oid, function () {
+            saveFile(tabElement, tabElement.filePath, tabElement.changeStamp, jsnParameters.oid, function () {
                 GS.removeLoader(tabElement.relatedFrame);
             });
         }
@@ -1459,7 +1468,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         
         if (!bolLoadedFromServer) {
             GS.addLoader(tabElement.relatedFrame, 'Saving...');
-            saveFile(tabElement.filePath, tabElement.changeStamp, jsnParameters.queryString, function () {
+            saveFile(tabElement, tabElement.filePath, tabElement.changeStamp, jsnParameters.queryString, function () {
                 GS.removeLoader(tabElement.relatedFrame);
             });
         }
@@ -1529,7 +1538,7 @@ function saveScript(tabElement, bolLoader) {
         tabElement.saveWaiting = false;
         tabElement.indicatorElement.textContent = 'Saving...';
         
-        saveFile(tabElement.filePath, tabElement.changeStamp, tabElement.relatedEditor.getValue(), function (changeStamp) {
+        saveFile(tabElement, tabElement.filePath, tabElement.changeStamp, tabElement.relatedEditor.getValue(), function (changeStamp) {
             if (tabElement.removeLoader === true) {
                 tabElement.removeLoader = null;
                 GS.removeLoader(tabElement.relatedFrame);
@@ -1556,19 +1565,40 @@ function saveScript(tabElement, bolLoader) {
     }
 }
 
-function saveFile(strPath, changeStamp, strContent, callbackSuccess, callbackFail) {
+function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess, callbackFail) {
     'use strict';
+    var arrElements = xtag.queryChildren(tabElement.relatedEditor.container.parentNode, '.editor-warning');
+    
+    arrElements.forEach(function (element) {
+        element.parentNode.removeChild(element);
+    });
+    
+    tabElement.saveState = 'saving';
     
     GS.requestFromSocket(GS.envSocket, 'TAB\tWRITE\t' + GS.encodeForTabDelimited(strPath) + '\t' +
                                             changeStamp + '\n' + strContent, function (data, error, errorData) {
         //console.log(data, error, errorData);
         
         if (!error) {
+            tabElement.saveState = 'saved';
             if (data !== 'TRANSACTION COMPLETED') {
                 callbackSuccess(data);
             }
             
         } else {
+            var warningElement = document.createElement('div');
+            
+            warningElement.classList.add('editor-warning');
+            warningElement.innerHTML = 'CHANGES ARE NOT SAVED<br />CLICK HERE TO TRY AGAIN';
+            
+            tabElement.relatedEditor.container.parentNode.appendChild(warningElement);
+            
+            warningElement.addEventListener('click', function () {
+                saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess, callbackFail);
+            });
+            
+            tabElement.saveState = 'error';
+            
             if (callbackFail) {
                 callbackFail(errorData);
             } else {

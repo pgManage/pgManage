@@ -1169,7 +1169,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strRightPad = stringRepeat('\t', (element.internalData.arrColumnNames.length - ((arrSetColumns[0].cellIndex - 1) + arrSetColumns.length)));
                 
                 for (i = 0, len = arrPasteRecords.length, strInsertData = '', strLocalData = ''; i < len; i += 1) {
-                    for (col_i = 0, col_len = arrSetColumns.length, strRecord = ''; col_i < col_len; col_i += 1) {
+                    for (col_i = 0, col_len = Math.min(arrSetColumns.length, arrPasteRecords[0].children.length), strRecord = ''; col_i < col_len; col_i += 1) {
                         cell = arrPasteRecords[i].children[col_i];
                         strRecord += (strRecord ? '\t' : '') + GS.encodeForTabDelimited(cell.innerText || cell.textContent);
                     }

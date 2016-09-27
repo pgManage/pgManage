@@ -54,6 +54,11 @@ gs-datagrid table {
 gs-datagrid .floating-button-container {
     display: inline-block;
     position: fixed;
+    opacity: 0.2;
+}
+
+gs-datagrid .floating-button-container:hover {
+    opacity: 1;
 }
 
 gs-datagrid .hud-container .refresh-button {

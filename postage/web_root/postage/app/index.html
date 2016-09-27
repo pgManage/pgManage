@@ -129,7 +129,34 @@
                     startPanelResize(document.getElementById('left-bar'));
                 }
                 
-                // if a file didn't load: execute orderSixtySix()
+                // on before unload, make sure no tabs have unsaved changes: popup if there is unsaved changes
+                GS.addBeforeUnloadEvent(function () {
+                    var strMessage = '';
+                    var strName;
+                    var arrElements = xtag.queryChildren(document.getElementById('tab-bar'), '.tab-button');
+                    
+                    arrElements.forEach(function (tab) {
+                        strName = decodeFileNameForTabName(
+                            tab.filePath.substring(
+                                tab.filePath.lastIndexOf('/') + 1,
+                                tab.filePath.lastIndexOf('.')
+                            )
+                        );
+                        
+                        if (tab.saveState === 'saving') {
+                            strMessage += '\n  "' + strName + '" Is still attempting to save.';
+                            
+                        } else if (tab.saveState === 'error') {
+                            strMessage += '\n  "' + strName + '" Has unsaved changes.';
+                        }
+                    });
+                    
+                    if (strMessage !== '') {
+                        return 'You have unsaved changes!' + strMessage;
+                    }
+                });
+                
+                // if a file didn't load: popup an error (execute orderSixtySix)
                 if (!window.bolAutocompleteLogicLoaded
                  || !window.bolAutocompleteQueriesLoaded
                  || !window.autocompleteLoaded
@@ -204,6 +231,9 @@
                         
                         if (strView === 'home') {
                             openHome();
+                            
+                        } else if (strView === 'splash') {
+                            openSplash();
                             
                         } else if (strView.indexOf('tab:') !== 0) {
                             arrParts = strView.split(':');
@@ -283,7 +313,7 @@
                 // handle preview script, if the querystring is not for home or tab
                 //      tab is handled by the tab listing function after load
                 strView = GS.qryGetVal(strQueryString, 'view');
-                if (strView !== 'home' && strView.indexOf('tab:') === -1) {
+                if (strView !== 'home' && strView !== 'splash' && strView.indexOf('tab:') === -1) {
                     qsLoadScriptTab(strQueryString);
                 }
             }
