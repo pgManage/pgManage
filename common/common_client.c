@@ -14,8 +14,15 @@
 void notice_processor(void *arg, const char *str_notice) {
 	struct sock_ev_client *client = (struct sock_ev_client *)arg;
 	char *str_temp = NULL;
-	char *ptr_actual_message = strstr(str_notice, ": ") + 2;
-	*(ptr_actual_message - 2) = 0;
+	SDEBUG("%s", str_notice);
+	char *ptr_actual_message = strstr(str_notice, ": ");
+	if (ptr_actual_message == NULL) {
+		ptr_actual_message = str_notice;
+		str_notice = "NOTICE";
+	} else {
+		ptr_actual_message += 2;
+		*(ptr_actual_message - 2) = 0;
+	}
 	str_temp = escape_value(ptr_actual_message);
 	SDEBUG("%s\t%s", str_notice, str_temp);
 	if (client->str_notice != NULL) {
@@ -56,6 +63,7 @@ void _send_notices(struct sock_ev_client *client) {
 			DArray_push(client->cur_request->arr_response, str_response);
 		}
 		str_response = NULL;
+		SDEBUG("notices sent");
 	}
 
 	if (pg_notify_current != NULL) {
@@ -556,17 +564,6 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					if (set_cnxn(client, client->str_request, NULL) == NULL) {
 						ev_io_stop(EV_A, &client->io);
 						SERROR_CLIENT_CLOSE(client);
-					} else {
-#ifdef POSTAGE_INTERFACE_LIBPQ
-						PQsetNoticeProcessor(client->cnxn, notice_processor, client);
-						SERROR_SALLOC(client->notify_watcher, sizeof(struct sock_ev_client_notify_watcher));
-						// SERROR_SET_CLIENT_PQ_SOCKET(client);
-						// ev_io_init(&client->notify_watcher->io, client_notify_cb,
-						// GET_CLIENT_PQ_SOCKET(client), EV_READ);
-						// ev_io_start(EV_A, &client->notify_watcher->io);
-						client->notify_watcher->parent = client;
-						client->bol_connected = true;
-#endif
 					}
 				}
 
@@ -745,9 +742,9 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 		WS_freeFrame(frame);
 
 	} else if (frame->int_opcode == 0x09) {
-		SINFO("Got  ping frame", client);
+		SDEBUG("Got  ping frame", client);
 		SERROR_CHECK(WS_sendFrame(EV_A, client, true, 0x0A, frame->str_message, frame->int_length), "Failed to send message");
-		SINFO("Sent pong frame", client);
+		SDEBUG("Sent pong frame", client);
 		WS_freeFrame(frame);
 
 	} else if (frame->bol_fin == true && (frame->int_opcode == 0x02 || frame->int_opcode == 0x01 || frame->int_opcode == 0x00)) {
@@ -1231,6 +1228,7 @@ void cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 	client->bol_connected = true;
 
 #ifdef POSTAGE_INTERFACE_LIBPQ
+	PQsetNoticeProcessor(client->cnxn, notice_processor, client);
 	SERROR_SALLOC(client->notify_watcher, sizeof(struct sock_ev_client_notify_watcher));
 	ev_io_init(&client->notify_watcher->io, client_notify_cb, GET_CLIENT_PQ_SOCKET(client), EV_READ);
 	ev_io_start(EV_A, &client->notify_watcher->io);
@@ -1646,7 +1644,7 @@ void client_close_immediate(struct sock_ev_client *client) {
 			ev_io_stop(global_loop, &client->notify_watcher->io);
 			SFREE(client->notify_watcher);
 		}
-		SINFO("DB_conn %p closing", client->conn);
+		SDEBUG("DB_conn %p closing", client->conn);
 		DB_finish(client->conn);
 	}
 
