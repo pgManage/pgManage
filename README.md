@@ -3,6 +3,8 @@
 ## About
 Postage is built on Envelope technology. Postage and Envelope are products of Workflow Products, LLC. 
 
+Since postage runs in a browser it will use the UTF8 encoding. Therefore we don't recommend you use postage with a non-UTF8 database.
+
 ## Developer Notes
 If you're interested in developing, patching or in any way contributing to Postage then you should probably also read the [README_DEV](https://github.com/workflowproducts/postage/blob/master/README_DEV.md) file.
 
