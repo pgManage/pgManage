@@ -10,7 +10,7 @@ struct custom_check_callback {
 };
 
 char *ws_tab_step1(struct sock_ev_client_request *client_request) {
-	SDEFINE_VAR_ALL(str_path_temp, str_connstring, str_local_path_root, str_temp_connstring, str_change_stamp, str_query);
+	SDEFINE_VAR_ALL(str_path_temp, str_local_path_root, str_change_stamp, str_query);
 	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
 	char *str_response = NULL;
 	char *str_temp = NULL;
@@ -39,27 +39,9 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 	ptr_query += 1;
 	*(ptr_query - 1) = 0;
 
-	if (client_request->parent->str_conn != NULL) {
-		SFINISH_CAT_CSTR(str_temp_connstring, client_request->parent->str_conn);
-	} else {
-#ifdef POSTAGE_INTERFACE_LIBPQ
-		SFINISH_CAT_CSTR(str_temp_connstring, get_connection_info(client_request->parent->str_connname, NULL), " dbname=",
-			client_request->parent->str_database);
-#else
-		SFINISH_CAT_CSTR(str_temp_connstring, get_connection_info(client_request->parent->str_connname, NULL));
-#endif
-	}
-
-	SFINISH_SALLOC(str_connstring, 20);
-	SHA1((unsigned char *)str_temp_connstring, strlen(str_temp_connstring), (unsigned char *)str_connstring);
-	str_temp = str_connstring;
-	size_t int_len = 20;
-	str_connstring = hexencode(str_temp, &int_len);
-	SFREE(str_temp);
-
 	// canonical username
-	str_path_temp = canonical(str_global_sql_root, str_connstring, "read_dir");
-	SFINISH_CHECK(str_path_temp != NULL, "Failed to get canonical path: >%s|%s<", str_global_sql_root, str_connstring);
+	str_path_temp = canonical(str_global_sql_root, client_request->parent->str_connname_folder, "read_dir");
+	SFINISH_CHECK(str_path_temp != NULL, "Failed to get canonical path: >%s|%s<", str_global_sql_root, client_request->parent->str_connname_folder);
 
 	str_local_path_root = canonical(str_path_temp, client_request->parent->str_username, "read_dir");
 	SFREE(str_path_temp);

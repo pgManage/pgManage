@@ -13,7 +13,7 @@ void http_file_step1(struct sock_ev_client *client) {
 
 	struct sock_ev_client_copy_check *client_copy_check = NULL;
 	struct sock_ev_client_http_file *client_http_file = NULL;
-	SDEFINE_VAR_ALL(str_temp_connstring, str_connstring, str_temp, str_temp1, str_uri_temp, str_canonical_start);
+	SDEFINE_VAR_ALL(str_temp, str_temp1, str_uri_temp, str_canonical_start);
 
 	SFINISH_SALLOC(client_http_file, sizeof(struct sock_ev_client_http_file));
 	client_http_file->parent = client;
@@ -57,26 +57,8 @@ void http_file_step1(struct sock_ev_client *client) {
 	}
 
 	if (strncmp(client_http_file->str_uri, "/postage/app/download", 21) == 0) {
-		if (client_http_file->parent->str_conn != NULL) {
-			SFINISH_CAT_CSTR(str_temp_connstring, client_http_file->parent->str_conn);
-		} else {
-#ifdef POSTAGE_INTERFACE_LIBPQ
-			SFINISH_CAT_CSTR(str_temp_connstring, get_connection_info(client_http_file->parent->str_connname, NULL), " dbname=",
-				client_http_file->parent->str_database);
-#else
-			SFINISH_CAT_CSTR(str_temp_connstring, get_connection_info(client_http_file->parent->str_connname, NULL));
-#endif
-		}
-
-		SFINISH_SALLOC(str_connstring, 20);
-		SHA1((unsigned char *)str_temp_connstring, strlen(str_temp_connstring), (unsigned char *)str_connstring);
-		str_temp = str_connstring;
-		size_t int_len1 = 20;
-		str_connstring = hexencode(str_temp, &int_len1);
-		SFREE(str_temp);
-
-		int_len1 = strlen(client_http_file->str_uri) - 9;
-		SFINISH_CAT_CSTR(client_http_file->str_uri_part, str_connstring, "/", client->str_username,
+		size_t int_len1 = strlen(client_http_file->str_uri) - 9;
+		SFINISH_CAT_CSTR(client_http_file->str_uri_part, client->str_connname_folder, "/", client->str_username,
 			client_http_file->str_uri + strlen("/postage/app/download"));
 		int_len1 = 0;
 		SFREE(client_http_file->str_uri);

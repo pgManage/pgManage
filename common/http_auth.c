@@ -791,40 +791,42 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 #ifdef ENVELOPE
 #else
 		if (client_request->parent->str_conn != NULL) {
-			SFINISH_CAT_CSTR(str_temp_connstring, client_request->parent->str_conn);
 			client_auth->int_connection_index = (int_global_custom_connection_number += 1);
-		} else {
-			SFINISH_CAT_CSTR(str_temp_connstring,
-				get_connection_info(client_auth->str_connname, &client_auth->int_connection_index), " dbname=",
-				client_auth->str_database);
 		}
-		SFREE(client_auth->str_int_connection_index);
-		SFINISH_SALLOC(client_auth->str_int_connection_index, 20);
-		snprintf(client_auth->str_int_connection_index, 20, "%zu", client_auth->int_connection_index);
 
-		SFINISH_SALLOC(str_connstring, 20);
-		SHA1((unsigned char *)str_temp_connstring, strlen(str_temp_connstring), (unsigned char *)str_connstring);
-		char *str_temp = str_connstring;
-		int_len = 20;
-		str_connstring = hexencode(str_temp, &int_len);
-		SFREE(str_temp);
+		SFINISH_CAT_CSTR(client_request->parent->str_connname_folder, client_auth->str_connname);
+		if (client_auth->str_database != NULL) {
+			SFINISH_CAT_APPEND(client_request->parent->str_connname_folder, "_", client_auth->str_database);
+		}
+		if (client_request->parent->str_conn != NULL) {
+			SFINISH_CAT_APPEND(client_request->parent->str_connname_folder, "_", client_request->parent->str_conn);
+		}
+		int_i = 0;
+		int_len = strlen(client_request->parent->str_connname_folder);
+		while (int_i < int_len) {
+			if (!isalnum(client_request->parent->str_connname_folder[int_i])) {
+				client_request->parent->str_connname_folder[int_i] = '_';
+			}
+
+			int_i++;
+		}
 
 		str_temp1 = client_auth->str_user;
 		SFINISH_CHECK((client_auth->str_user = cstr_to_uri(str_temp1)) != NULL, "cstr_to_uri failed");
 		SFREE(str_temp1);
 
-		SFINISH_CAT_CSTR(str_user, str_connstring, "/", client_auth->str_user);
-		SFINISH_CAT_CSTR(str_open, str_connstring, "/", client_auth->str_user, "/open");
-		SFINISH_CAT_CSTR(str_closed, str_connstring, "/", client_auth->str_user, "/closed");
+		SFINISH_CAT_CSTR(str_user, client_request->parent->str_connname_folder, "/", client_auth->str_user);
+		SFINISH_CAT_CSTR(str_open, client_request->parent->str_connname_folder, "/", client_auth->str_user, "/open");
+		SFINISH_CAT_CSTR(str_closed, client_request->parent->str_connname_folder, "/", client_auth->str_user, "/closed");
 
 		// connection folder
-		str_temp = canonical(str_global_sql_root, str_connstring, "read_dir");
+		char *str_temp = canonical(str_global_sql_root, client_request->parent->str_connname_folder, "read_dir");
 		if (str_temp == NULL) {
-			str_temp = canonical(str_global_sql_root, str_connstring, "create_dir");
+			str_temp = canonical(str_global_sql_root, client_request->parent->str_connname_folder, "create_dir");
 			SFINISH_CHECK(str_temp != NULL, "Could not create directory >%s/%s<", str_global_sql_root, str_connstring);
 		}
 		SFREE(str_temp);
-		str_temp = canonical(str_global_sql_root, str_connstring, "read_dir");
+		str_temp = canonical(str_global_sql_root, client_request->parent->str_connname_folder, "read_dir");
 		SFINISH_ERROR_CHECK(str_temp != NULL, "Could not create directory >%s/%s<", str_global_sql_root, str_connstring);
 		SFREE(str_temp);
 
@@ -1105,7 +1107,7 @@ finish:
 
 void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 	struct sock_ev_client_auth *client_auth = cb_data;
-	SDEFINE_VAR_ALL(str_expires, str_temp1, str_user, str_open, str_closed, str_connstring, str_temp_connstring);
+	SDEFINE_VAR_ALL(str_expires, str_temp1, str_user, str_open, str_closed);
 	char *str_response = NULL;
 
 	SFINISH_CHECK(conn->int_status == 1, "%s", conn->str_response);
@@ -1163,34 +1165,41 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 			(ssize_t)DArray_push(client_auth->parent->server->arr_client_last_activity, client_last_activity);
 		SDEBUG("New cookie is %s", client_last_activity->str_cookie);
 	}
-	SFINISH_CAT_CSTR(str_temp_connstring, client_auth->str_conn);
 
-	SFINISH_SALLOC(str_connstring, 20);
-	SHA1((unsigned char *)str_temp_connstring, strlen(str_temp_connstring), (unsigned char *)str_connstring);
-	char *str_temp = str_connstring;
-	int_len = 20;
-	str_connstring = hexencode(str_temp, &int_len);
-	SFREE(str_temp);
+	SFINISH_CAT_CSTR(client_auth->parent->str_connname_folder, client_auth->str_connname);
+	SFINISH_CAT_APPEND(client_auth->parent->str_connname_folder, "_", client_auth->str_database);
+	if (client_auth->str_conn != NULL) {
+		SFINISH_CAT_APPEND(client_auth->parent->str_connname_folder, "_", client_auth->str_conn);
+	}
+	int_i = 0;
+	int_len = strlen(client_auth->parent->str_connname_folder);
+	while (int_i < int_len) {
+		if (!isalnum(client_auth->parent->str_connname_folder[int_i])) {
+			client_auth->parent->str_connname_folder[int_i] = '_';
+		}
+
+		int_i++;
+	}
 
 	str_temp1 = client_auth->str_user;
 	SFINISH_CHECK((client_auth->str_user = cstr_to_uri(str_temp1)) != NULL, "cstr_to_uri failed");
 	SFREE(str_temp1);
 
-	SFINISH_CAT_CSTR(str_user, str_connstring, "/", client_auth->str_user);
-	SFINISH_CAT_CSTR(str_open, str_connstring, "/", client_auth->str_user, "/open");
-	SFINISH_CAT_CSTR(str_closed, str_connstring, "/", client_auth->str_user, "/closed");
+	SFINISH_CAT_CSTR(str_user, client_auth->parent->str_connname_folder, "/", client_auth->str_user);
+	SFINISH_CAT_CSTR(str_open, client_auth->parent->str_connname_folder, "/", client_auth->str_user, "/open");
+	SFINISH_CAT_CSTR(str_closed, client_auth->parent->str_connname_folder, "/", client_auth->str_user, "/closed");
 
 #ifdef ENVELOPE
 #else
 	// connection folder
-	str_temp = canonical(str_global_sql_root, str_connstring, "read_dir");
+	char *str_temp = canonical(str_global_sql_root, client_auth->parent->str_connname_folder, "read_dir");
 	if (str_temp == NULL) {
-		str_temp = canonical(str_global_sql_root, str_connstring, "create_dir");
-		SFINISH_CHECK(str_temp != NULL, "Could not create directory %s", str_connstring);
+		str_temp = canonical(str_global_sql_root, client_auth->parent->str_connname_folder, "create_dir");
+		SFINISH_CHECK(str_temp != NULL, "Could not create directory %s", client_auth->parent->str_connname_folder);
 	}
 	SFREE(str_temp);
-	str_temp = canonical(str_global_sql_root, str_connstring, "read_dir");
-	SFINISH_ERROR_CHECK(str_temp != NULL, "Could not create directory >%s/%s<", str_global_sql_root, str_connstring);
+	str_temp = canonical(str_global_sql_root, client_auth->parent->str_connname_folder, "read_dir");
+	SFINISH_ERROR_CHECK(str_temp != NULL, "Could not create directory >%s/%s<", str_global_sql_root, client_auth->parent->str_connname_folder);
 	SFREE(str_temp);
 
 	// connection/user folder

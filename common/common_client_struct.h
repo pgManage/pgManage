@@ -104,6 +104,7 @@ struct sock_ev_client {
 	char *str_username;
 	char *str_database;
 	char *str_connname;
+	char *str_connname_folder;
 	char *str_conn;
 	char *str_cookie;
 	char *str_cookie_name;

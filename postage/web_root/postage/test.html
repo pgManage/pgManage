@@ -423,9 +423,9 @@ test
 			['TAB LIST FAIL 2', 'websocket', '', 'TAB\tLIST\t/ipen/',
 			[
 				[
-					"../util/util_canonical.c:canonical: read_dir: /home/super/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres/|ipen/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres|/ipen/<",
-					"../util/util_canonical.c:canonical: read_dir: /Users/joseph/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres/|ipen/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres|/ipen/<",
-					"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres\\|ipen\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres|/ipen/<"
+					"../util/util_canonical.c:canonical: read_dir: /home/super/.postage/sql/test_postgres/postgres/|ipen/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/.postage/sql/test_postgres/postgres|/ipen/<",
+					"../util/util_canonical.c:canonical: read_dir: /Users/joseph/.postage/sql/test_postgres/postgres/|ipen/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/.postage/sql/test_postgres/postgres|/ipen/<",
+					"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\test_postgres\\postgres\\|ipen\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\test_postgres\\postgres|/ipen/<"
 				],
 				"TRANSACTION COMPLETED"
 			]],
@@ -434,9 +434,9 @@ test
 			['TAB READ FAIL', 'websocket', '', 'TAB\tREAD\t/ipen/test' + test_random + '.sql',
 			[
 				[
-					"../util/util_canonical.c:canonical: read_file: /home/super/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/test" + test_random + ".sql<",
-					"../util/util_canonical.c:canonical: read_file: /Users/joseph/.postage/sql/ff75ffffffff6f5b256d4fffffff6cff61070e53/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/test" + test_random + ".sql<",
-					"..\\..\\util\\util_canonical.c:canonical: read_file: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres\\|ipen\\test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres|/ipen/test" + test_random + ".sql<"
+					"../util/util_canonical.c:canonical: read_file: /home/super/.postage/sql/test_postgres/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/.postage/sql/test_postgres/postgres|/ipen/test" + test_random + ".sql<",
+					"../util/util_canonical.c:canonical: read_file: /Users/joseph/.postage/sql/test_postgres/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/.postage/sql/test_postgres/postgres|/ipen/test" + test_random + ".sql<",
+					"..\\..\\util\\util_canonical.c:canonical: read_file: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\test_postgres\\postgres\\|ipen\\test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\test_postgres\\postgres|/ipen/test" + test_random + ".sql<"
 				],
 				"TRANSACTION COMPLETED"
 			]],
@@ -451,9 +451,9 @@ test
 			['TAB MOVE FAIL 1', 'websocket', '', 'TAB\tMOVE\t/ipen/test' + test_random + '.sql\t/closed/test' + test_random + '.sql\n',
 			[
 				[
-					"../util/util_canonical.c:canonical: read_file: /home/super/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/test" + test_random + ".sql<",
-					"../util/util_canonical.c:canonical: read_file: /Users/joseph/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/.postage/sql/ff4bffffff31ffff45ffff69ff653d0f4440ff2b/postgres|/ipen/test" + test_random + ".sql<",
-					"..\\..\\util\\util_canonical.c:canonical: read_file: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres\\|ipen\\test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\ff75ffffffff6f5b256d4fffffff6cff61070e53\\postgres|/ipen/test" + test_random + ".sql<"
+					"../util/util_canonical.c:canonical: read_file: /home/super/.postage/sql/test_postgres/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/.postage/sql/test_postgres/postgres|/ipen/test" + test_random + ".sql<",
+					"../util/util_canonical.c:canonical: read_file: /Users/joseph/.postage/sql/test_postgres/postgres/|ipen/test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/.postage/sql/test_postgres/postgres|/ipen/test" + test_random + ".sql<",
+					"..\\..\\util\\util_canonical.c:canonical: read_file: \\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\test_postgres\\postgres\\|ipen\\test" + test_random + ".sql is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\AppData\\Roaming\\postage\\sql\\test_postgres\\postgres|/ipen/test" + test_random + ".sql<"
 				],
 				"TRANSACTION COMPLETED"
 			]],
@@ -473,7 +473,13 @@ SELECT pg_sleep(5);
 			['RAW FAIL 1', 'websocket', '', ml(function () {/*RAW
 å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥
 */}),
-			["QUERY\tå´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n","START","END","Query failed: ERROR:  syntax error at or near \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\"\nLINE 1: å´†"]],
+			[
+				"QUERY\tå´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n",
+				"START",
+				"NOTICE\t identifier \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\" will be truncated to \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®\"\\n",
+				"END",
+				"Query failed: ERROR:  syntax error at or near \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\"\nLINE 1: å´†"
+			]],
 			['RAW FAIL 2', 'websocket', '', ml(function () {/*RAW*/}),
 			["Invalid RAW request"]],
 			['RAW', 'websocket', '', ml(function () {/*RAW

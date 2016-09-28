@@ -141,6 +141,21 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 
 	if (client->str_connname == NULL) {
 		SFINISH_CAT_CSTR(client->str_connname, str_connname);
+		SFINISH_CAT_CSTR(client->str_connname_folder, str_connname);
+		if (str_database != NULL) {
+			SFINISH_CAT_APPEND(client->str_connname_folder, "_", str_database);
+		}
+		if (str_conn != NULL) {
+			SFINISH_CAT_APPEND(client->str_connname_folder, "_", str_conn);
+		}
+		size_t int_i = 0, int_len = strlen(client->str_connname_folder);
+		while (int_i < int_len) {
+			if (!isalnum(client->str_connname_folder[int_i])) {
+				client->str_connname_folder[int_i] = '_';
+			}
+
+			int_i++;
+		}
 	}
 	if (client->str_username == NULL) {
 		SFINISH_CAT_CSTR(client->str_username, str_username);

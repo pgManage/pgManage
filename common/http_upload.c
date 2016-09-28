@@ -3,7 +3,7 @@
 void http_upload_step1(struct sock_ev_client *client) {
 	SDEBUG("http_upload_step1");
 
-	SDEFINE_VAR_ALL(str_temp, str_query, str_temp_connstring, str_canonical_start, str_full_path);
+	SDEFINE_VAR_ALL(str_temp, str_query, str_canonical_start, str_full_path);
 	char *str_response = NULL;
 	struct sock_ev_client_upload *client_upload = NULL;
 #ifdef _WIN32
@@ -50,25 +50,7 @@ void http_upload_step1(struct sock_ev_client *client) {
 	SFREE(str_temp);
 #else
 	SFINISH_CAT_CSTR(client_upload->str_canonical_start, str_global_sql_root);
-
-	// Find the file in the connection's sql folder
-	SFINISH_SALLOC(client_upload->str_file_name, 20);
-	if (client_upload->parent->str_conn != NULL) {
-		SFINISH_CAT_CSTR(str_temp_connstring, client_upload->parent->str_conn);
-	} else {
-#ifdef POSTAGE_INTERFACE_LIBPQ
-		SFINISH_CAT_CSTR(str_temp_connstring, get_connection_info(client_upload->parent->str_connname, NULL), " dbname=",
-			client_upload->parent->str_database);
-#else
-		SFINISH_CAT_CSTR(str_temp_connstring, get_connection_info(client_upload->parent->str_connname, NULL));
-#endif
-	}
-	SHA1((unsigned char *)str_temp_connstring, strlen(str_temp_connstring), (unsigned char *)client_upload->str_file_name);
-	str_temp = client_upload->str_file_name;
-	size_t int_len = 20;
-	client_upload->str_file_name = hexencode(str_temp, &int_len);
-	SFREE(str_temp);
-	SFINISH_CAT_APPEND(client_upload->str_file_name, "/", client->str_username, client_upload->sun_current_upload->str_name);
+	SFINISH_CAT_CSTR(client_upload->str_file_name, client->str_connname_folder, "/", client->str_username, client_upload->sun_current_upload->str_name);
 
 	http_upload_step2(global_loop, client_upload, true);
 #endif
