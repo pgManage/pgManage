@@ -3,10 +3,9 @@
 ## About
 Postage is built on Envelope technology. Postage and Envelope are products of Workflow Products, LLC. 
 
-Since postage runs in a browser it will use the UTF8 encoding. Therefore we don't recommend you use postage with a non-UTF8 database.
+Since postage runs in a browser we don't recommend you use postage with a non-UTF8 PostgreSQL database.
 
-## Developer Notes
-If you're interested in developing, patching or in any way contributing to Postage then you should probably also read the [README_DEV](https://github.com/workflowproducts/postage/blob/master/README_DEV.md) file.
+Currently we release once a week. To download Postage for install purposes, please go to ["Releases"](https://github.com/workflowproducts/postage/releases)
 
 ## Dependencies
 
@@ -109,7 +108,7 @@ If you like some or all of Postage's functionality and the current license won't
 
 ## Why?
 
-It's a sad story really. We had an in-house version for six or seven years. Then we decided it would be a good idea to polish it up and open source it. If it became popular it could be good for us. We invested an embarrassing amount of work into it. 
+It's a sad story really. We had an in-house version for six or seven years. Then we decided it would be a good idea to polish it up and open source it. If it became popular it could be good for us. We then proceeded to invest an embarrassing amount of work into it. 
 
 It was available for some months on Github and there was no activity from outside developers or users. We did get a few stars but just one one-line patch. We were ok with that though because we figured at some point the number of users would increase. Everyone we showed it to at the DFW and Austin PUGs were very impressed and enthusiastic.
 
@@ -121,10 +120,21 @@ At this point Postage is Workflow Products' flagship. We're content that Postage
 
 ## Roadmap
 
-We're more than a little annoyed at our competitor. As a consequence, we aren't going to give any advance notice of features in development. However, if you are wondering about our commitment to Postage then wonder no longer. 
+We aren't able to give any advance notice of features in development. However, if you are wondering about our commitment to Postage then wonder no longer. 
 
 Workflow Products has committed an embarrassing amount of resources to Postage over the years. The current average for 2016 is two full time people. Current priority is debugging install on various platforms. Next we'll be setting up various packages to make installation even easier. Then we'll move back into feature expansion. We have identified four major features we want to bring to Postage over the next six to eight months.
 
 Workflow Products itself is healthier than it's ever been. We're celebrating our tenth year in November 2016. We're now at five full time employees and we expect to be around in another ten years. If you have any further questions please contact us directly at 817-503-9545.
+
+## Contributing
+
+If you would like to contribute to Postage, first submit an issue. Please include how you plan to solve the issue. Then work on the patch. This way we get a moment to give feedback before you invest your time. 
+
+Anyone presenting a quality patch that asks for commit privileges will likely receive them! Please leave the releases to Nunzio though. He has an extensive testing process. 
+
+We're not against forking. We just want people communicating. It would be preferable if everyone did that before putting forth effort. If we all use the Github issue tracker then there will be a minimum of wasted effort. 
+
+You should probably also read the [README_DEV](https://github.com/workflowproducts/postage/blob/master/README_DEV.md) file.
+
 
 Copyright 2016 Workflow Products LLC
