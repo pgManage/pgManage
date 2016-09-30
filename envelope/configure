@@ -175,14 +175,16 @@ elif test $libressl = "install"; then
 	INSTALL_DEPS="$INSTALL_DEPS libressl-install"
         printf "resetting modify times for libressl..."
         DATE=$(date)
-        find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
+        printf "resetting modify times for libressl..."
+        DATE=$(date)
+        find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
         echo "done"
 else
 	LDFLAGS="$LDFLAGS ..\\/dependencies\\/libressl\\/tls\\/.libs\\/libtls.a ..\\/dependencies\\/libressl\\/ssl\\/.libs\\/libssl.a ..\\/dependencies\\/libressl\\/crypto\\/.libs\\/libcrypto.a"
 	BUILD_DEPS="$BUILD_DEPS libressl"
         printf "resetting modify times for libressl..."
         DATE=$(date)
-        find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
+        find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
         echo "done"
 fi
 
