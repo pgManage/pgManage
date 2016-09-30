@@ -1,0 +1,17 @@
+#!/bin/sh
+
+CUR_FUNCTION=$1
+printf "checking for $CUR_FUNCTION""..."
+echo "extern int $CUR_FUNCTION(int);" > test.c
+echo "int main(int argc) {" >> test.c
+echo "    return $CUR_FUNCTION(argc);" >> test.c
+echo "}" >> test.c
+cc -o test.o test.c $2 > /dev/null 2> /dev/null
+if test $? = 0; then
+	HAVE_FUNCTION=1
+	echo "yes"
+else
+	HAVE_FUNCTION=0
+	echo "no"
+fi
+rm -f test.c test.o

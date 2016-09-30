@@ -1,0 +1,14 @@
+#!/bin/sh
+
+CUR_HEADER=$1
+printf "checking for $CUR_HEADER""..."
+echo "#include <$CUR_HEADER>" > test.c
+cc -c -o test.o test.c > /dev/null 2> /dev/null
+if test $? = 0; then
+	HAVE_HEADER=1
+	echo "yes"
+else
+	HAVE_HEADER=0
+	echo "no"
+fi
+rm -f test.c test.o

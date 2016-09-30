@@ -1,25 +1,4 @@
-#!/bin/bash
-
-function libressl_warn {
-	echo
-	if test $(uname -s) = "Darwin"; then
-		echo "\x1b[95m"
-	else
-		echo -e "\x1b[95m"
-	fi
-	echo "   ******************************************************************************"
-	echo "                                   PLEASE READ:"
-	echo "   It looks like we will have to compile LibreSSL when you do \`make\`."
-	echo "   If you would like to install it yourself, please do so, then re-run configure."
-	echo "   LibreSSL takes 10-20 minutes to compile, depending on your computer."
-	echo
-	echo "   ******************************************************************************"
-	if test $(uname -s) = "Darwin"; then
-		echo "\x1b[0m"
-	else
-		echo -e "\x1b[0m"
-	fi
-}
+#!/bin/sh
 
 printf "checking for pg_config..."
 pg_config > /dev/null
@@ -98,56 +77,6 @@ CPPFLAGS="$CPPFLAGS -I$(pg_config --includedir | sed -e 's/\//\\\//g')"
 
 BUILD_DEPS=""
 
-function check_header {
-	CUR_HEADER=$1
-	printf "checking for $CUR_HEADER""..."
-	echo "#include <$CUR_HEADER>" > test.c
-	cc -c -o test.o test.c > /dev/null 2> /dev/null
-	if test $? = 0; then
-		HAVE_HEADER=1
-		echo "yes"
-	else
-		HAVE_HEADER=0
-		echo "no"
-	fi
-	rm -f test.c test.o
-}
-
-function check_function {
-	CUR_FUNCTION=$1
-	printf "checking for $CUR_FUNCTION""..."
-	echo "extern int $CUR_FUNCTION(int);" > test.c
-	echo "int main(int argc) {" >> test.c
-	echo "    return $CUR_FUNCTION(argc);" >> test.c
-	echo "}" >> test.c
-	cc -o test.o test.c $2 > /dev/null 2> /dev/null
-	if test $? = 0; then
-		HAVE_FUNCTION=1
-		echo "yes"
-	else
-		HAVE_FUNCTION=0
-		echo "no"
-	fi
-	rm -f test.c test.o
-}
-
-function check_library {
-	CUR_LIBRARY=$1
-	printf "checking for -l$CUR_LIBRARY""..."
-	echo "int main(int argc) {" > test.c
-	echo "    return 0;" >> test.c
-	echo "}" >> test.c
-	cc -o test.o test.c -l$CUR_LIBRARY > /dev/null 2> /dev/null
-	if test $? = 0; then
-		HAVE_LIBRARY=1
-		echo "yes"
-	else
-		HAVE_LIBRARY=0
-		echo "no"
-	fi
-	rm -f test.c test.o
-}
-
 #### CHECK LIBRESSL VERSION
 ## if we have libressl, we need to check for 2.3.2 or newer (the api changed slightly)
 if test $libressl = "yes"; then
@@ -198,17 +127,17 @@ else
 	BUILD_DEPS="$BUILD_DEPS ev.o"
 	CHECK_HEADERS="sys/inotify.h sys/epoll.h sys/event.h port.h poll.h sys/select.h sys/eventfd.h sys/signalfd.h"
 	for HEADER in $CHECK_HEADERS; do
-		check_header "$HEADER"
+		. scripts/check_header "$HEADER"
 		HEADER_VAR_NAME="HAVE_"$(echo "$HEADER" | tr '[a-z]' '[A-Z]' | tr '.' '_' | tr '/' '_')
 		libev_CPPFLAGS="$libev_CPPFLAGS -D$HEADER_VAR_NAME""=$HAVE_HEADER"
 	done
 	CHECK_FUNCTIONS="inotify_init epoll_ctl kqueue port_create poll select eventfd signalfd"
 	for FUNCTION in $CHECK_FUNCTIONS; do
-		check_function "$FUNCTION"
+		. scripts/check_function "$FUNCTION"
 		CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
 		libev_CPPFLAGS="$libev_CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
 	done
-	check_function "clock_gettime"
+	. scripts/check_function "clock_gettime"
 	HAVE_SYSCALL_FUNCTION=0
 	if test $HAVE_FUNCTION = 1; then
 		if test $(uname -s) = "Linux"; then
@@ -233,10 +162,10 @@ else
 			else
 				echo "no"
 			    if test -z "$LIBEV_M4_AVOID_LIBRT"; then
-					check_library "rt"
+					. scripts/check_library "rt"
 					if test $HAVE_LIBRARY = 1; then
 						LDFLAGS="$LDFLAGS -lrt"
-						check_function "clock_gettime"
+						. scripts/check_function "clock_gettime"
 						USE_LRT="yes"
 					fi
 				fi
@@ -245,27 +174,27 @@ else
 		fi
 	fi
 	libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_CLOCK_GETTIME""=$HAVE_FUNCTION"
-	check_function "nanosleep"
+	. scripts/check_function "nanosleep"
 	if test -z "$LIBEV_M4_AVOID_LIBRT" && test $USE_LRT = "no"; then
-		check_library "rt"
+		. scripts/check_library "rt"
 		if test $HAVE_LIBRARY = 1; then
 			LDFLAGS="$LDFLAGS -lrt"
-			check_function "nanosleep"
+			. scripts/check_function "nanosleep"
 			libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_NANOSLEEP""=$HAVE_FUNCTION"
 		fi
 	fi
 	if test -z "$LIBEV_M4_AVOID_LIBM"; then
-		check_library "m"
+		. scripts/check_library "m"
 		if test $HAVE_LIBRARY = 1; then
 			LDFLAGS="$LDFLAGS -lm"
-			check_function "floor" "-lm"
+			. scripts/check_function "floor" "-lm"
 			libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_FLOOR""=$HAVE_FUNCTION"
 		else
-			check_function "floor"
+			. scripts/check_function "floor"
 			libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_FLOOR""=$HAVE_FUNCTION"
 		fi
 	else
-		check_function "floor"
+		. scripts/check_function "floor"
 		libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_FLOOR""=$HAVE_FUNCTION"
 	fi
 fi
@@ -273,13 +202,11 @@ fi
 #### ADD LIBTRE FLAGS
 ## we always use the one we ship (0.8.0)
 if test $libtre = "no"; then
-	LDFLAGS="$LDFLAGS tre.o"
-	BUILD_DEPS="$BUILD_DEPS tre.o"
-	libtre_CPPFLAGS=""
+	CPPFLAGS="$CPPFLAGS -DTRE_APPROX=0 -DTRE_REGEX_T_FIELD=value"
 
-	check_function "isascii"
+	. scripts/check_function "isascii"
 	libtre_CPPFLAGS="$libtre_CPPFLAGS -DHAVE_ISASCII""=$HAVE_FUNCTION"
-	check_function "isblank"
+	. scripts/check_function "isblank"
 	libtre_CPPFLAGS="$libtre_CPPFLAGS -DHAVE_ISABLANK""=$HAVE_FUNCTION"
 fi
 
@@ -331,5 +258,5 @@ echo "   #                                                             #"
 echo "   ###############################################################"
 
 if test $libressl != "yes"; then
-	libressl_warn
+	. scripts/libressl_warn
 fi
