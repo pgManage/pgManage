@@ -1304,6 +1304,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.anchorElement.setAttribute('onclick', element.getAttribute('onclick'));
             }
             
+            if (element.hasAttribute('download')) {
+                element.anchorElement.setAttribute('download', element.getAttribute('download'));
+            }
+            
             element.appendChild(element.anchorElement);
             
         } else if (element.anchorElement) {
@@ -1457,7 +1461,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else if (strAttrName === 'disabled') {
                         this.classList.remove('down');
                         
-                    } else if (strAttrName === 'href' || strAttrName === 'target' || strAttrName === 'onclick') {
+                    } else if (strAttrName === 'href' || strAttrName === 'target' || strAttrName === 'onclick' || strAttrName === 'download') {
                         refreshAnchor(this);
                     }
                 }

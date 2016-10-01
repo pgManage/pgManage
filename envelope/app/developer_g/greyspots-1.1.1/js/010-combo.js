@@ -1087,14 +1087,76 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         
         // bind change event to control
+        console.log('change bound');
         element.control.addEventListener('change', function (event) {
             event.preventDefault();
             event.stopPropagation();
             
+            console.log('change detected');
             if (!element.ignoreChange) {
                 selectRecordFromValue(element, this.value, true);
             }
             element.ignoreChange = false;
+        });
+        
+        
+        //  on safari the change event doesn't occur if you click out while the autocomplete has
+        //      completed the value (because the user technically didn't change after the javascript changed the value)
+        //  to solve this the code below will mimic a change event if one does not occur at the right time
+        
+        // there are two ways that user's cause change events:
+        //      1) after making a change to the value: taking the focus out of the field
+        //      2) after making a change to the value: hitting return
+        
+        // this code counts on the fact that a browser will always emit a change event before a 'blur' or 'keyup'
+        // the execution is as follows
+        
+        // this is the basic plan:
+        //  change:
+        //          // changeOccured tells the event code to not do anything because a change event did fire
+        //          element.changeOccured to true
+        //  focus:
+        //          // element.lastValue allows us to compare the value to the old value, and if there's a difference: we need a change event
+        //          set element.lastValue to current value of the control 
+        //  blur:
+        //          if element.changeOccured === true:
+        //              set element.changeOccured = false
+        //          else:
+        //              if control.value !== lastValue: // if the value has been changed
+        //                  trigger artificial change event on control
+        //  keyup (on return key):
+        //          if element.changeOccured === true:
+        //              set element.changeOccured = false
+        //          else:
+        //              if control.value !== lastValue: // if the value has been changed
+        //                  trigger artificial change event on control
+        
+        
+        element.control.addEventListener('change', function (event) {
+            element.changeOccured = true;
+        });
+        
+        element.control.addEventListener('focus', function (event) {
+            element.lastValue = element.control.value;
+        });
+        
+        element.control.addEventListener('blur', function (event) {
+            if (element.changeOccured === true) {
+                element.changeOccured = false;
+            } else if (element.control.value !== element.lastValue) {
+                GS.triggerEvent(element.control, 'change');
+            }
+        });
+        
+        element.control.addEventListener('keyup', function (event) {
+            // if the key was return
+            if ((event.keyCode || event.which) === 13) {
+                if (element.changeOccured === true) {
+                    element.changeOccured = false;
+                } else if (element.control.value !== element.lastValue) {
+                    GS.triggerEvent(element.control, 'change');
+                }
+            }
         });
     }
     

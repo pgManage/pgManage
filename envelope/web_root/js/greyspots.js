@@ -8978,7 +8978,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         
         //console.log(strMessage);
         
-        GS.requestFromSocket(GS.envSocket, strMessage, function (data, error, errorData) {
+        GS.requestFromSocket(socket, strMessage, function (data, error, errorData) {
             var arrLines, i, len;
             if (!error) {
                 if (intResponse === 0) {
@@ -11775,6 +11775,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.anchorElement.setAttribute('onclick', element.getAttribute('onclick'));
             }
             
+            if (element.hasAttribute('download')) {
+                element.anchorElement.setAttribute('download', element.getAttribute('download'));
+            }
+            
             element.appendChild(element.anchorElement);
             
         } else if (element.anchorElement) {
@@ -11928,7 +11932,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else if (strAttrName === 'disabled') {
                         this.classList.remove('down');
                         
-                    } else if (strAttrName === 'href' || strAttrName === 'target' || strAttrName === 'onclick') {
+                    } else if (strAttrName === 'href' || strAttrName === 'target' || strAttrName === 'onclick' || strAttrName === 'download') {
                         refreshAnchor(this);
                     }
                 }
@@ -13455,14 +13459,76 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         
         // bind change event to control
+        console.log('change bound');
         element.control.addEventListener('change', function (event) {
             event.preventDefault();
             event.stopPropagation();
             
+            console.log('change detected');
             if (!element.ignoreChange) {
                 selectRecordFromValue(element, this.value, true);
             }
             element.ignoreChange = false;
+        });
+        
+        
+        //  on safari the change event doesn't occur if you click out while the autocomplete has
+        //      completed the value (because the user technically didn't change after the javascript changed the value)
+        //  to solve this the code below will mimic a change event if one does not occur at the right time
+        
+        // there are two ways that user's cause change events:
+        //      1) after making a change to the value: taking the focus out of the field
+        //      2) after making a change to the value: hitting return
+        
+        // this code counts on the fact that a browser will always emit a change event before a 'blur' or 'keyup'
+        // the execution is as follows
+        
+        // this is the basic plan:
+        //  change:
+        //          // changeOccured tells the event code to not do anything because a change event did fire
+        //          element.changeOccured to true
+        //  focus:
+        //          // element.lastValue allows us to compare the value to the old value, and if there's a difference: we need a change event
+        //          set element.lastValue to current value of the control 
+        //  blur:
+        //          if element.changeOccured === true:
+        //              set element.changeOccured = false
+        //          else:
+        //              if control.value !== lastValue: // if the value has been changed
+        //                  trigger artificial change event on control
+        //  keyup (on return key):
+        //          if element.changeOccured === true:
+        //              set element.changeOccured = false
+        //          else:
+        //              if control.value !== lastValue: // if the value has been changed
+        //                  trigger artificial change event on control
+        
+        
+        element.control.addEventListener('change', function (event) {
+            element.changeOccured = true;
+        });
+        
+        element.control.addEventListener('focus', function (event) {
+            element.lastValue = element.control.value;
+        });
+        
+        element.control.addEventListener('blur', function (event) {
+            if (element.changeOccured === true) {
+                element.changeOccured = false;
+            } else if (element.control.value !== element.lastValue) {
+                GS.triggerEvent(element.control, 'change');
+            }
+        });
+        
+        element.control.addEventListener('keyup', function (event) {
+            // if the key was return
+            if ((event.keyCode || event.which) === 13) {
+                if (element.changeOccured === true) {
+                    element.changeOccured = false;
+                } else if (element.control.value !== element.lastValue) {
+                    GS.triggerEvent(element.control, 'change');
+                }
+            }
         });
     }
     
@@ -14196,6 +14262,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 && arrSelectRecords[0].children[0].hasAttribute('selected')
                 && !element.deleteButton.hasAttribute('disabled')) {
             
+            // generate the information to send to the websocket
             arrPk = (element.getAttribute('pk') || '').split(/[\s]*,[\s]*/);
             arrLock = (element.getAttribute('lock') || '').split(/[\s]*,[\s]*/);
             
@@ -14228,6 +14295,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 for (col_i = 0, col_len = arrLock.length; col_i < col_len; col_i += 1) {
                     strRecordToHash += (strRecordToHash ? '\t' : '');
                     strTemp = deleteRecordData[element.internalData.arrColumnNames.indexOf(arrLock[col_i])];
+                    
+                    // I believe that this needs to use the null-string instead of 'NULL'
                     strRecordToHash += (strTemp === 'NULL' ? '' : strTemp);
                 }
                 
@@ -14240,7 +14309,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // create delete transaction
             GS.addLoader(element, 'Creating Delete Transaction...');
             GS.requestDeleteFromSocket(
-                GS.envSocket, strSchema, strObject, strHashColumns, strDeleteData
+                getSocket(element), strSchema, strObject, strHashColumns, strDeleteData
                 , function (data, error, transactionID) {
                     if (error) {
                         getData(element);
@@ -14299,21 +14368,31 @@ document.addEventListener('DOMContentLoaded', function () {
                         GS.webSocketErrorDialog(data);
                     }
                 }
+                // final result callback, because we need to handle the commit/rollback response
                 , function (strAnswer, data, error) {
                     var arrElements, i, len;
                     GS.removeLoader(element);
                     
                     if (!error) {
                         if (strAnswer === 'COMMIT') {
+                            // remove amber records, because the amber records have now been deleted
                             removeRecords(element, 'bg-amber');
+                            
+                            // clear internal variables for selection now that the selected records have been deleted,
+                            //      because if you try to shift-select to extend the selection and the origin cell has
+                            //      been deleted this may cause an error
                             clearSelection(element);
+                            
+                            // trigger after_delete so that developers can react to a successful delete
                             GS.triggerEvent(element, 'after_delete');
                             
                         } else {
+                            // clear bg-amber class and don't add a green fade
                             clearRecordColor(element, 'bg-amber', false);
                         }
                         
-                        // fix record selector numbers
+                        // update record selector numbers to reflect current record numbers
+                        //      because after you delete records there may be a gap in the numbers and that is not acceptable
                         arrElements = xtag.query(element, 'tbody > tr');
                         
                         for (i = 0, len = arrElements.length; i < len; i += 1) {
@@ -14322,8 +14401,13 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         }
                         
+                    // if an error occurred
                     } else {
+                        // get new data, because after an error we don't know the current state
+                        //      of the data so a re-fetch will help mitigate inaccurate data errors
                         getData(element);
+                        
+                        // open an error dialog so that the user knows there was an error
                         GS.webSocketErrorDialog(data);
                     }
                 }
@@ -14334,7 +14418,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function insertDialog(element) {
         var templateElement = document.createElement('template'), strAddin;
         
-        // if there is a column attribute on this element: append child column (or column) and the value to the insert string
+        // if there is a column attribute on this element: append child column (or column) and
+        //      the value to the insert string so that we can have parent-child relationships
         if (element.getAttribute('column') || element.getAttribute('qs')) {
             strAddin =  (
                             element.getAttribute('child-column')
@@ -14775,6 +14860,13 @@ document.addEventListener('DOMContentLoaded', function () {
         return result + pattern;
     }
     
+    function getSocket(element) {
+        if (element.getAttribute('socket')) {
+            return GS[element.getAttribute('socket')];
+        }
+        return GS.envSocket;
+    }
+    
     function getData(element, refocusSelector, refocusSelection, bolFirstLoad) {
         var strSchema = GS.templateWithQuerystring(element.getAttribute('schema') || '')
           , strObject = GS.templateWithQuerystring(element.getAttribute('object') || '')
@@ -14816,7 +14908,8 @@ document.addEventListener('DOMContentLoaded', function () {
         
         GS.addLoader(element, 'Loading...');
         GS.requestSelectFromSocket(
-                        GS.envSocket, strSchema, strObject, strReturn, strWhere, strOrd, strLimit, strOffset
+                        getSocket(element), strSchema, strObject, strReturn
+                      , strWhere, strOrd, strLimit, strOffset
           , function (data, error) {
                 var refocusElement;
                 
@@ -15207,7 +15300,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         GS.addLoader(element, 'Creating Insert Transaction...');
         GS.requestInsertFromSocket(
-            GS.envSocket, strSchema, strObject, getReturn(element), strPk, strSeq, strInsertData
+            getSocket(element), strSchema, strObject, getReturn(element), strPk, strSeq, strInsertData
             , function (data, error) {
                 if (error) {
                     removeRecords(element, 'bg-red');
@@ -15350,7 +15443,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // create transaction
         GS.addLoader(element, 'Creating Update Transaction...');
         GS.requestUpdateFromSocket(
-            GS.envSocket, strSchema, strObject, getReturn(element), strHashColumns, strUpdateData
+            getSocket(element), strSchema, strObject, getReturn(element), strHashColumns, strUpdateData
             , function (data, error, transactionID) {
                 if (error) {
                     getData(element);
@@ -16326,7 +16419,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         // create update transaction
                         GS.addLoader(element, 'Creating Update Transaction...');
                         GS.requestUpdateFromSocket(
-                            GS.envSocket, strSchema, strObject, getReturn(element), strHashColumns, strUpdateData,
+                            getSocket(element), strSchema, strObject, getReturn(element), strHashColumns, strUpdateData,
                             function (data, error, transactionID) {
                                 if (error) {
                                     getData(element);

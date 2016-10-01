@@ -723,7 +723,7 @@
         
         //console.log(strMessage);
         
-        GS.requestFromSocket(GS.envSocket, strMessage, function (data, error, errorData) {
+        GS.requestFromSocket(socket, strMessage, function (data, error, errorData) {
             var arrLines, i, len;
             if (!error) {
                 if (intResponse === 0) {

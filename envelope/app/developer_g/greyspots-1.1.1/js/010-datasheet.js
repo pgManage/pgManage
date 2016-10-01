@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // create delete transaction
             GS.addLoader(element, 'Creating Delete Transaction...');
             GS.requestDeleteFromSocket(
-                GS.envSocket, strSchema, strObject, strHashColumns, strDeleteData
+                getSocket(element), strSchema, strObject, strHashColumns, strDeleteData
                 , function (data, error, transactionID) {
                     if (error) {
                         getData(element);
@@ -789,6 +789,13 @@ document.addEventListener('DOMContentLoaded', function () {
         return result + pattern;
     }
     
+    function getSocket(element) {
+        if (element.getAttribute('socket')) {
+            return GS[element.getAttribute('socket')];
+        }
+        return GS.envSocket;
+    }
+    
     function getData(element, refocusSelector, refocusSelection, bolFirstLoad) {
         var strSchema = GS.templateWithQuerystring(element.getAttribute('schema') || '')
           , strObject = GS.templateWithQuerystring(element.getAttribute('object') || '')
@@ -830,7 +837,8 @@ document.addEventListener('DOMContentLoaded', function () {
         
         GS.addLoader(element, 'Loading...');
         GS.requestSelectFromSocket(
-                        GS.envSocket, strSchema, strObject, strReturn, strWhere, strOrd, strLimit, strOffset
+                        getSocket(element), strSchema, strObject, strReturn
+                      , strWhere, strOrd, strLimit, strOffset
           , function (data, error) {
                 var refocusElement;
                 
@@ -1221,7 +1229,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         GS.addLoader(element, 'Creating Insert Transaction...');
         GS.requestInsertFromSocket(
-            GS.envSocket, strSchema, strObject, getReturn(element), strPk, strSeq, strInsertData
+            getSocket(element), strSchema, strObject, getReturn(element), strPk, strSeq, strInsertData
             , function (data, error) {
                 if (error) {
                     removeRecords(element, 'bg-red');
@@ -1364,7 +1372,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // create transaction
         GS.addLoader(element, 'Creating Update Transaction...');
         GS.requestUpdateFromSocket(
-            GS.envSocket, strSchema, strObject, getReturn(element), strHashColumns, strUpdateData
+            getSocket(element), strSchema, strObject, getReturn(element), strHashColumns, strUpdateData
             , function (data, error, transactionID) {
                 if (error) {
                     getData(element);
@@ -2340,7 +2348,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         // create update transaction
                         GS.addLoader(element, 'Creating Update Transaction...');
                         GS.requestUpdateFromSocket(
-                            GS.envSocket, strSchema, strObject, getReturn(element), strHashColumns, strUpdateData,
+                            getSocket(element), strSchema, strObject, getReturn(element), strHashColumns, strUpdateData,
                             function (data, error, transactionID) {
                                 if (error) {
                                     getData(element);

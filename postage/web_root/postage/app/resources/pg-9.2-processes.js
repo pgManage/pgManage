@@ -1,6 +1,6 @@
 //jslint white:true
 var bolProcessesLoaded = true;
-
+/*
 function refreshProcessList() {
     'use strict';
     var strQuery;
@@ -14,9 +14,10 @@ function refreshProcessList() {
                     + ', to_char(query_start, \'FMHH:MI:SSpm\') AS "Started Time"'
                     + ', client_addr AS "Client Address"'
                     + ', client_port AS "Client Port"'
-                    + ', query AS "Query"\n' +
-                 'FROM pg_stat_activity\n' +
-                'WHERE state = \'active\';';
+                    + ', query AS "Query"\n'
+                    + ', state AS "State"\n'
+                    + ', application_name AS "Application"\n'
+               + 'FROM pg_stat_activity;';
     
     GS.requestRawFromSocket(GS.postageProcessDialogSocket, strQuery, function (data, error) {
         var arrRecords, arrCells, arrTypes, rec_i, rec_len, col_i, col_len, strHTML, tbodyElement, trElement, arrElements, strCurrentQuery, editor;
@@ -67,6 +68,7 @@ function refreshProcessList() {
                                                 '<b>User:</b> ' + encodeHTML(GS.decodeFromTabDelimited(arrCells[1])) + '<br />' +
                                                 '<b>PID:</b> ' + encodeHTML(GS.decodeFromTabDelimited(arrCells[2])) + '<br />' +
                                                 '<b>Waiting:</b> ' + encodeHTML(GS.decodeFromTabDelimited(arrCells[3])) + '<br />' +
+                                                '<b>State:</b> ' + encodeHTML(GS.decodeFromTabDelimited(arrCells[9])) + '<br />' +
                                             '</div><br />' +
                                         '</gs-block>' +
                                         '<gs-block>' +
@@ -75,6 +77,7 @@ function refreshProcessList() {
                                                 '<b>Started Time:</b> ' + encodeHTML(GS.decodeFromTabDelimited(arrCells[5])) + '<br />' +
                                                 '<b>Client Address:</b> ' + encodeHTML(GS.decodeFromTabDelimited(arrCells[6])) + '<br />' +
                                                 '<b>Client Port:</b> ' + encodeHTML(GS.decodeFromTabDelimited(arrCells[7])) + '<br />' +
+                                                '<b>Application:</b> ' + encodeHTML(GS.decodeFromTabDelimited(arrCells[10])) + '<br />' +
                                             '</div><br />' +
                                         '</gs-block>' +
                                     '</gs-grid>' +
@@ -97,7 +100,7 @@ function refreshProcessList() {
                             trElement = document.createElement('tr');
                             
                             if (rec_i < (rec_len - 1)) {
-                                trElement.style.borderBottom = '2px solid #000';
+                                trElement.style.borderBottom = '4px solid #000';
                             }
                             
                             trElement.innerHTML = strHTML;
@@ -143,6 +146,7 @@ function refreshProcessList() {
     });
 }
 
+
 function dialogProcesses() {
     'use strict';
     var templateElement = document.createElement('template');
@@ -154,7 +158,7 @@ function dialogProcesses() {
     
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.setAttribute('data-max-width', '1200px');
-    templateElement.innerHTML = ml(function () {/*
+    templateElement.innerHTML = ml(function () {/a;ldkjf;laksdjf;lksdjf;lskdjf;lakdsjf;lakdsfj*
         <gs-page>
             <gs-header><center><h3>Process Manager</h3></center></gs-header>
             <gs-body id="process-table-container">
@@ -163,11 +167,134 @@ function dialogProcesses() {
             </gs-body>
             <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
         </gs-page>
-    */});
+    *a;lskdjfl;kasdjf;lksdjf;laksdjf;lkasdjf;lkasdjf;lksjdf/});
     
     GS.openDialog(templateElement, function () {
         refreshProcessList();
     });
+}
+
+
+*/
+
+function dialogShowProcessQuery(target, intRowIndex) {
+    "use strict";
+    var templateElement = document.createElement('template');
+    var internalData;
+    var intColumnIndex;
+    var strQuery;
+    
+    internalData = document.getElementById('datasheet-processes').internalData;
+    intColumnIndex = internalData.arrColumnNames.indexOf('query');
+    strQuery = internalData.arrRecords[intRowIndex][intColumnIndex];
+    
+    templateElement.setAttribute('data-overlay-close', 'true');
+    templateElement.setAttribute('data-max-width', '1200px');
+    templateElement.setAttribute('data-mode', 'constrained');
+    templateElement.innerHTML = ml(function () {/*
+        <gs-page>
+            <gs-body padded>
+                <pre>{{STRQUERY}}</pre>
+            </gs-body>
+        </gs-page>
+    */}).replace(/\{\{STRQUERY\}\}/gi, strQuery);
+    
+    GS.openDialogToElement(target, templateElement, 'down');
+}
+
+function dialogProcesses() {
+    "use strict";
+    var templateElement = document.createElement('template');
+    
+    // define a seperate socket for the processes dialog if it hasn't been defined already
+    if (!GS.postageProcessDialogSocket) {
+        GS.postageProcessDialogSocket = GS.openSocket('env');
+    }
+    
+    templateElement.setAttribute('data-overlay-close', 'true');
+    templateElement.setAttribute('data-max-width', '1200px');
+    templateElement.setAttribute('data-mode', 'constrained');
+    templateElement.innerHTML = ml(function () {/*
+        <gs-page>
+            <gs-header><center><h3>Process Manager</h3></center></gs-header>
+            <gs-body padded>
+                <gs-datasheet id="datasheet-processes" src="pg_catalog.pg_stat_activity" pk="pid" lock="pid" socket="postageProcessDialogSocket">
+                    <template for="table">
+                        <table>
+                            <thead>
+                                <th>#</th>
+                                <th style="width: 8em;">Database</th>
+                                <th style="width: 10em;"></th>
+                                <th style="width: 6em;">Process ID</th>
+                                <th style="width: 12em;">Username</th>
+                                <th style="width: 5em;">Waiting?</th>
+                                <th style="width: 4em;">State</th>
+                                <th style="width: 25em;">Query</th>
+                                <th style="width: 12em;">Application Name</th>
+                                <th style="width: 9em;">Client Address</th>
+                                <th style="width: 12em;">Client Host</th>
+                                <th style="width: 6em;">Client Port</th>
+                                <th style="width: 16em;">Backend Start</th>
+                                <th style="width: 16em;">Transaction Start</th>
+                                <th style="width: 16em;">Query Start</th>
+                                <th style="width: 16em;">Last State Change</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th heading="#">{{! row_number }}</th>
+                                    <th heading="">
+                                        <gs-button onclick="stopProcess({{! row.pid }})" bg-danger>Kill Process</gs-button>
+                                    </th>
+                                    <td heading="Database"><label>{{! row.datname }}</label></td>
+                                    <td heading="Proccess ID"><label>{{! row.pid }}</label></td>
+                                    <td heading="Username"><label>{{! row.usename }}</label></td>
+                                    <td heading="Waiting?"><label>{{! row.waiting === 'f' ? 'No' : 'Yes' }}</label></td>
+                                    <td heading="State">
+                                        {{? row.state === 'active' }}
+                                            <label title="active: The backend is executing a query.">{{! row.state }}</label>
+                                            
+                                        {{?? row.state === 'idle' }}
+                                            <label title="idle: The backend is waiting for a new client command.">{{! row.state }}</label>
+                                            
+                                        {{?? row.state === 'idle in transaction' }}
+                                            <label title="idle in transaction: The backend is in a transaction, but is not currently executing a query.">{{! row.state }}</label>
+                                            
+                                        {{?? row.state === 'idle in transaction (aborted)' }}
+                                            <label title="idle in transaction (aborted): This state is similar to idle in transaction, except one of the statements in the transaction caused an error.">{{! row.state }}</label>
+                                            
+                                        {{?? row.state === 'fastpath function call' }}
+                                            <label title="fastpath function call: The backend is executing a fast-path function.">{{! row.state }}</label>
+                                            
+                                        {{?? row.state === 'disabled' }}
+                                            <label title="disabled: This state is reported if track_activities is disabled in this backend.">{{! row.state }}</label>
+                                        {{?}}
+                                    </td>
+                                    <td heading="Query">
+                                        <gs-button onclick="dialogShowProcessQuery(this, {{! row_number - 1 }})"
+                                                    style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                                                    title="Show Query..." bg-primary>
+                                            {{! row.query }}
+                                        </gs-button>
+                                    </td>
+                                    <td heading="Application Name"><label>{{! row.application_name }}</label></td>
+                                    <td heading="Client Address"><label>{{! row.client_addr }}</label></td>
+                                    <td heading="Client Host"><label>{{! row.client_hostname }}</label></td>
+                                    <td heading="Client Port"><label>{{! row.client_port }}</label></td>
+                                    <td heading="Backend Start"><label>{{! row.backend_start }}</label></td>
+                                    <td heading="Transaction Start"><label>{{! row.xact_start }}</label></td>
+                                    <td heading="Query Start"><label>{{! row.query_start }}</label></td>
+                                    <td heading="Last State Change"><label>{{! row.state_change }}</label></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </template>
+                </gs-datasheet>
+            </gs-body>
+            <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
+        </gs-page>
+    */});
+    
+    GS.openDialog(templateElement);
 }
 
 function stopProcess(intPID) {
@@ -176,7 +303,7 @@ function stopProcess(intPID) {
             GS.addLoader(document.getElementById('process-table-container'), 'Cancelling Process...');
             GS.requestFromSocket(GS.postageProcessDialogSocket, 'RAW\nSELECT pg_cancel_backend(' + intPID + ');', function (response, error) {
                 if (!error) {
-                    refreshProcessList();
+                    document.getElementById('datasheet-processes').refresh();
                     
                     if (response === 'TRANSACTION COMPLETED') {
                         GS.removeLoader(document.getElementById('process-table-container'));
@@ -189,3 +316,10 @@ function stopProcess(intPID) {
         }
     });
 }
+
+
+
+
+
+
+

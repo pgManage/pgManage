@@ -2470,7 +2470,9 @@ function exportCSV() {
                                         arrRequestHeaders.join('\t') + '\n' + arrRequestValues.join('\t');
                     
                     window.open('/postage/' + contextData.connectionID + '/export?' + encodeURIComponent(strRequestString));
-                    GS.closeDialog(dialog, 'Ok');
+                    
+                    // don't close the dialog!! what if the export has an error or needs to be tweaked??
+                    //GS.closeDialog(dialog, 'Ok');
                 });
             });
             

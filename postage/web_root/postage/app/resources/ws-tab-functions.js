@@ -1004,25 +1004,25 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                     '<div class="ace-container">' +
                     '    <div id="sql-ace-area-' + intTabNumber + '" class="ace-area"></div>' +
                     '</div>' +
-                    '<div class="ace-toolbar">' +
+                    '<div class="ace-toolbar" id="sql-ace-toolbar-' + intTabNumber + '">' +
                         '<gs-button icononly icon="play" onclick="executeScript()" ' +
-                                    'title="Execute Script [F5]" remove-bottom></gs-button>' +
+                                    'title="Execute Script [F5]" remove-bottom no-focus></gs-button>' +
                         '<gs-button class="button-toggle-comments" onclick="toggleCommentScript()" ' +
-                                    'title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all><span>--</span></gs-button>' +
+                                    'title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span></gs-button>' +
                         '<gs-button icononly icon="indent" onclick="indentScript()" ' +
-                                    'title="Indent the selected text [TAB]" remove-all></gs-button>' +
+                                    'title="Indent the selected text [TAB]" remove-all no-focus></gs-button>' +
                         '<gs-button icononly icon="outdent" onclick="outdentScript()" ' +
-                                    'title="Outdent the selected text [SHIFT][TAB]" remove-all></gs-button>' +
+                                    'title="Outdent the selected text [SHIFT][TAB]" remove-all no-focus></gs-button>' +
                         '<gs-button icononly id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
-                                    'title="Download as a file" remove-all></gs-button>' +
+                                    'title="Download as a file" remove-all no-focus></gs-button>' +
                         '<gs-button icononly class="button-explain" icon="play-circle-o" onclick="explain()" ' +
-                                    'title="Query explanation. This does not run the query." remove-all><span class="explain-letter">E</span></gs-button>' +
+                                    'title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter">E</span></gs-button>' +
                         '<gs-button icononly class="button-explain" icon="play" onclick="explain(true)" ' +
-                                    'title="Query explanation. Note that the query will run, meaning that you\'ll get run times." remove-top><span class="explain-letter">E</span></gs-button>' +
+                                    'title="Query explanation. Note that the query will run, meaning that you\'ll get run times." remove-top><span class="explain-letter" no-focus>E</span></gs-button>' +
                         '<gs-button icononly class="button-csv" icon="file-text" onclick="exportCSV()" ' +
-                                    'title="Download a single query\'s results as a file" remove-all></gs-button>' +
+                                    'title="Download a single query\'s results as a file" remove-all no-focus></gs-button>' +
                         '<gs-button icononly class="button-ace-info" onclick="dialogAceInfo()" ' +
-                                    'title="Information and tips about the Editor" remove-top>' +
+                                    'title="Information and tips about the Editor" remove-top no-focus>' +
                             '<span class="ace-suit">&#9824;</span>' + //&#9830;
                             '<span class="ace-letter">A</span>' +
                         '</gs-button>' +
@@ -1048,13 +1048,13 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                                 '<span id="sql-results-tally-' + intTabNumber + '"></span>' +
                             '</b>' +
                             '<gs-button id="sql-results-stop-' + intTabNumber + '" hidden no-focus' +
-                                      ' class="header-button-text" icon="stop">Stop Execution</gs-button>' +
+                                      ' class="header-button-text" icon="stop" no-focus>Stop Execution</gs-button>' +
                             '<gs-button id="sql-results-stop-loading-' + intTabNumber + '" hidden no-focus' +
-                                      ' class="header-button-text" icon="hand-stop-o">Stop Loading</gs-button>' +
+                                      ' class="header-button-text" icon="hand-stop-o" no-focus>Stop Loading</gs-button>' +
                             '<gs-button id="sql-results-copy-options-' + intTabNumber + '" hidden no-focus' +
-                                      ' class="header-button-text" icon="clipboard">Clip Options</gs-button>' +
+                                      ' class="header-button-text" icon="clipboard" no-focus>Clip Options</gs-button>' +
                             '<gs-button id="sql-results-clear-' + intTabNumber + '" no-focus' +
-                                      ' class="header-button-text" icon="trash-o">Clear</gs-button>' +
+                                      ' class="header-button-text" icon="trash-o" no-focus>Clear</gs-button>' +
                         '</gs-header>' +
                         '<gs-body id="sql-results-area-' + intTabNumber + '" class="sql-results-area"></gs-body>' +
                     '</gs-page>' +
@@ -1088,6 +1088,13 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         tabElement.relatedStopLoadingButton = document.getElementById('sql-results-stop-loading-' + intTabNumber);
         
         tabElement.relatedDownloadButton = document.getElementById('button-tab-' + intTabNumber + '-download');
+        
+        
+        tabElement.relatedEditorToolbar = document.getElementById('sql-ace-toolbar-' + intTabNumber);
+        tabElement.relatedEditorToolbar.addEventListener('click', function () {
+            tabElement.relatedEditor.focus();
+        });
+        
         
         //editor.getSession().selection.on('changeCursor', function(event) {
         //    console.log(event);
@@ -1567,11 +1574,16 @@ function saveScript(tabElement, bolLoader) {
 
 function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess, callbackFail) {
     'use strict';
-    var arrElements = xtag.queryChildren(tabElement.relatedEditor.container.parentNode, '.editor-warning');
     
-    arrElements.forEach(function (element) {
-        element.parentNode.removeChild(element);
-    });
+    // saveFile is called on datasheet, editor and table designer tabs.
+    //      this warning popup code is now only used on an editor tab
+    if (tabElement.relatedEditor) {
+        var arrElements = xtag.queryChildren(tabElement.relatedEditor.container.parentNode, '.editor-warning');
+        
+        arrElements.forEach(function (element) {
+            element.parentNode.removeChild(element);
+        });
+    }
     
     tabElement.saveState = 'saving';
     
@@ -1586,16 +1598,20 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
             }
             
         } else {
-            var warningElement = document.createElement('div');
-            
-            warningElement.classList.add('editor-warning');
-            warningElement.innerHTML = 'CHANGES ARE NOT SAVED<br />CLICK HERE TO TRY AGAIN';
-            
-            tabElement.relatedEditor.container.parentNode.appendChild(warningElement);
-            
-            warningElement.addEventListener('click', function () {
-                saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess, callbackFail);
-            });
+            // saveFile is called on datasheet, editor and table designer tabs.
+            //      this warning popup code is now only used on an editor tab
+            if (tabElement.relatedEditor) {
+                var warningElement = document.createElement('div');
+                
+                warningElement.classList.add('editor-warning');
+                warningElement.innerHTML = 'CHANGES ARE NOT SAVED<br />CLICK HERE TO TRY AGAIN';
+                
+                tabElement.relatedEditor.container.parentNode.appendChild(warningElement);
+                
+                warningElement.addEventListener('click', function () {
+                    saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess, callbackFail);
+                });
+            }
             
             tabElement.saveState = 'error';
             
