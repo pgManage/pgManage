@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CUR_HEADER=$1
+CUR_HEADER=$HEADER
 printf "checking for $CUR_HEADER""..."
 echo "#include <$CUR_HEADER>" > test.c
 cc -c -o test.o test.c > /dev/null 2> /dev/null

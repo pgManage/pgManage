@@ -167,6 +167,7 @@ else
 					. scripts/check_library
 					if test $HAVE_LIBRARY = 1; then
 						LDFLAGS="$LDFLAGS -lrt"
+						CHECK_CFLAGS="-lrt"
 						FUNCTION="clock_gettime"
 						. scripts/check_function "clock_gettime"
 						USE_LRT="yes"
@@ -200,11 +201,12 @@ else
 			libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_FLOOR""=$HAVE_FUNCTION"
 		else
 			FUNCTION="floor"
-			. scripts/check_function "floor"
+			. scripts/check_function
 			libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_FLOOR""=$HAVE_FUNCTION"
 		fi
 	else
-		. scripts/check_function "floor"
+		FUNCTION="floor"
+		. scripts/check_function
 		libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_FLOOR""=$HAVE_FUNCTION"
 	fi
 fi

@@ -3,6 +3,8 @@
 echo
 if test $(uname -s) = "Darwin"; then
 	echo "\x1b[95m"
+elif test $(uname -a | grep Ubuntu | wc -l) = "1"; then
+	/bin/echo -e "\x1b[95m"
 else
 	echo -e "\x1b[95m"
 fi
@@ -15,6 +17,8 @@ echo
 echo "   ******************************************************************************"
 if test $(uname -s) = "Darwin"; then
 	echo "\x1b[0m"
+elif test $(uname -a | grep Ubuntu | wc -l) = "1"; then
+	/bin/echo -e "\x1b[0m"
 else
 	echo -e "\x1b[0m"
 fi
