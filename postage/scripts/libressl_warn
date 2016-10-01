@@ -1,7 +1,13 @@
 #!/bin/sh
 
 echo
-printf "\x1b[95m\n"
+if test $(uname -s) = "Darwin"; then
+	echo "\x1b[95m"
+elif test $(uname -a | grep Ubuntu | wc -l) = "1"; then
+	/bin/echo -e "\x1b[95m"
+else
+	echo -e "\x1b[95m"
+fi
 echo "   ******************************************************************************"
 echo "                                   PLEASE READ:"
 echo "   It looks like we will have to compile LibreSSL when you do \`make\`."
@@ -9,4 +15,10 @@ echo "   If you would like to install it yourself, please do so, then re-run con
 echo "   LibreSSL takes 10-20 minutes to compile, depending on your computer."
 echo
 echo "   ******************************************************************************"
-printf "\x1b[0m\n"
+if test $(uname -s) = "Darwin"; then
+	echo "\x1b[0m"
+elif test $(uname -a | grep Ubuntu | wc -l) = "1"; then
+	/bin/echo -e "\x1b[0m"
+else
+	echo -e "\x1b[0m"
+fi
