@@ -1,3 +1,14 @@
+Changes since 2.1.0RC5:
+Usability: remove old man page that was confusing
+Usability: fix makefiles to use the VERSION file
+Usability: fix man pages to say --postage-port and --envelope-port
+Usability: make postage process manager show all processes (not just active ones)
+Usability: make configure script bash functions external scripts so that dash works on ubuntu
+Usability: make configure scripts reset timestamps for libressl files so that if you clone it doesn't try to run aclocal
+Usability: make tab folder names easier to navigate
+Usability: rewrite mac gui
+Usability: fix notice code to actually detect notices
+
 Changes since 2.1.0RC4:
 
 Usability: make postage/envelope use full precision for file changestamps
