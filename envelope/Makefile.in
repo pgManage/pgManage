@@ -12,7 +12,7 @@ INSTALL_DEPS = @prefix@/etc/envelope/ \
 SOCK_DIR_PARAMETER = @sock_dir_parameter@
 MAKE = @make@
 
-VERSION = \"2.1.0RC3\"
+VERSION = \"$(shell cat ../VERSION)\"
 CC = cc
 CFLAGS = -O3 -g \
 	-fno-strict-aliasing
