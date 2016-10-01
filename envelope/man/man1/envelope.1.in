@@ -29,7 +29,7 @@ This instance of envelope was installed as
 .br
 [-r <web-root> | --web-root=<web-root>]
 .br
-[-p <port> | --port=<port>]
+[-p <port> | --envelope-port=<port>]
 .br
 [-j <tls-cert> | --tls-cert=<tls-cert>]
 .br

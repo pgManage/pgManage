@@ -36,9 +36,6 @@ envelope/web_root
 /postage/postgres.pid
 /postage/output.txt
 
-postage.1
-envelope.1
-
 Makefile
 *.opendb
 *.exe

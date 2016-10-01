@@ -31,7 +31,7 @@ This instance of postage was installed as
 .br
 [-a <data-root> | --data-root=<data-root>]
 .br
-[-p <port> | --port=<port>]
+[-p <port> | --postage-port=<port>]
 .br
 [-j <tls-cert> | --tls-cert=<tls-cert>]
 .br
