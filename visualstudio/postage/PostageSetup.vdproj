@@ -45,12 +45,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_04F7EB74CB264834B0376DE52A2036E2"
-        "OwnerKey" = "8:_794BFC51EE824CC4859F06335C6E9986"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_0584D75B31E3463D83CA1C104D0A489F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -275,12 +269,6 @@
         {
         "MsmKey" = "8:_1AB9B6F92B4C45149332C2683AB10337"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_1B8E7A1E8BFDE4FC1765090E41DF5EDC"
-        "OwnerKey" = "8:_794BFC51EE824CC4859F06335C6E9986"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -3385,26 +3373,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1B8E7A1E8BFDE4FC1765090E41DF5EDC"
-            {
-            "SourcePath" = "8:LIBPQ.dll"
-            "TargetName" = "8:LIBPQ.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_81977F324C1A42F79139FF39CA383B45"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1C898B03FCC3419596677ADDCB89E4C9"
@@ -10758,15 +10726,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Postage"
-        "ProductCode" = "8:{D392D1C7-1617-46E7-B38A-D0122652C1CC}"
-        "PackageCode" = "8:{4DC15B6C-583E-4C96-B2D3-E6AC2D11BF6B}"
+        "ProductCode" = "8:{D24BDB57-4513-4064-8987-DAFE7B94E3DD}"
+        "PackageCode" = "8:{C5779F9C-819A-4C98-B135-3FD3B165CB34}"
         "UpgradeCode" = "8:{B33D536F-7F9C-46E1-9536-47073F853334}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:2.1.05"
+        "ProductVersion" = "8:2.1.06"
         "Manufacturer" = "8:Workflow Products"
         "ARPHELPTELEPHONE" = "8:817 503-9545"
         "ARPHELPLINK" = "8:https://www.workflowproducts.com"

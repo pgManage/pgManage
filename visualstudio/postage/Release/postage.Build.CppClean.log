@@ -10,7 +10,6 @@ c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\http_ma
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\http_file.obj
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\http_export.obj
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\http_ev.obj
-c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\http_auth.obj
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\common_websocket.obj
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\common_util_sql.obj
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\common_server.obj
@@ -38,6 +37,7 @@ c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\util_ae
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\ws_tab.obj
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\ws_raw.obj
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\postage_callback.obj
+c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\http_auth.obj
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\postage\release\vc140.pdb
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\release\postage.exe
 c:\users\nunzio tocci\desktop\repos\postage\visualstudio\release\postage.ipdb
