@@ -194,7 +194,7 @@ else
 			echo "    return 0;" >> test.c
 			echo "}" >> test.c
 			cc -o test.o test.c > /dev/null 2> /dev/null
-			./test.o
+			./test.o > /dev/null 2> /dev/null
 			if test $? = 0; then
 				HAVE_FUNCTION=1
 				echo "yes"
