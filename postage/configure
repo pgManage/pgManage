@@ -187,6 +187,7 @@ else
 			rm -f test.c test.o
 		elif test $(uname -s) = "Darwin"; then
 			printf "checking for clock_gettime at runtime""..."
+			echo "#include <time.h>" > test.c
 			echo "int main(int argc) {" >> test.c
 			echo "    struct timespec test = {0};" >> test.c
 			echo "    clock_gettime(CLOCK_REALTIME, &test);" >> test.c
