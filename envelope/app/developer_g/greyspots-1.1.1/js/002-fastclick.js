@@ -842,9 +842,10 @@
 	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = FastClick.attach;
 		module.exports.FastClick = FastClick;
-	} else {
-		window.FastClick = FastClick;
-	}
+	}// else {
+	
+	window.FastClick = FastClick;
+	//}
 }());
 
 
