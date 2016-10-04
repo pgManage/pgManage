@@ -103,15 +103,26 @@ elif test $libressl = "install"; then
 	BUILD_DEPS="$BUILD_DEPS libressl"
 	INSTALL_DEPS="$INSTALL_DEPS libressl-install"
 	printf "resetting modify times for libressl..."
-	DATE=$(date)
-	find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
+	if test $(uname -s) = "Darwin"; then
+		DATE=$(date +%Y%m%d%H%M.%S)
+		find ../dependencies/libressl/ -name "*.in" | xargs touch -t "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -t "$DATE" && touch -t "$DATE" ../dependencies/libressl/configure
+	else
+		DATE=$(date)
+		find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
+	fi
 	echo "done"
 else
 	LDFLAGS="$LDFLAGS ..\\/dependencies\\/libressl\\/tls\\/.libs\\/libtls.a ..\\/dependencies\\/libressl\\/ssl\\/.libs\\/libssl.a ..\\/dependencies\\/libressl\\/crypto\\/.libs\\/libcrypto.a"
 	BUILD_DEPS="$BUILD_DEPS libressl"
 	printf "resetting modify times for libressl..."
 	DATE=$(date)
-	find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
+	if test $(uname -s) = "Darwin"; then
+		DATE=$(date +%Y%m%d%H%M.%S)
+		find ../dependencies/libressl/ -name "*.in" | xargs touch -t "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -t "$DATE" && touch -t "$DATE" ../dependencies/libressl/configure
+	else
+		DATE=$(date)
+		find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
+	fi
 	echo "done"
 fi
 
@@ -172,6 +183,29 @@ else
 						USE_LRT="yes"
 					fi
 				fi
+			fi
+			rm -f test.c test.o
+		elif test $(uname -s) = "Darwin"; then
+			printf "checking for clock_gettime at runtime""..."
+			echo "#include <time.h>" > test.c
+			echo "int main(int argc) {" >> test.c
+			echo "    struct timespec test = {0};" >> test.c
+			echo "    clock_gettime(CLOCK_REALTIME, &test);" >> test.c
+			echo "    return 0;" >> test.c
+			echo "}" >> test.c
+			cc -o test.o test.c > /dev/null 2> /dev/null
+			./test.o > /dev/null 2> /dev/null
+			if test $? = 0; then
+				HAVE_FUNCTION=1
+				echo "yes"
+			else
+				HAVE_FUNCTION=0
+				echo "no"
+				echo "WARNING: It seems that the linker reports clock_gettime is present, but at runtime it isn't."
+				echo "It is possible to encounter this on OS X 10.11 (El Capitan) if you have the macOS 10.12 (Sierra) SDK installed."
+				echo "This is an unsupported configuration and you should wither upgrade to 10.12, or downgrade your SDK."
+				echo "Press [ENTER] to continue anyway."
+				read
 			fi
 			rm -f test.c test.o
 		fi
