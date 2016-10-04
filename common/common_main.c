@@ -325,6 +325,7 @@ int main(int argc, char *const *argv) {
 	int bol_reuseaddr = 1;
 	SERROR_CHECK(setsockopt((int)int_sock, SOL_SOCKET, SO_REUSEADDR, &bol_reuseaddr, sizeof(int)) != -1, "setsockopt failed");
 
+	((struct sockaddr_in *)(res->ai_addr))->sin_addr.s_addr = htonl(bol_global_local_only ? INADDR_LOOPBACK : INADDR_ANY);
 	// Bind socket
 	SERROR_CHECK(bind(int_sock, res->ai_addr, (socklen_t)res->ai_addrlen) != -1, "bind failed");
 

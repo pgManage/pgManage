@@ -1,5 +1,8 @@
+const os = require('os');
 const path = require('path');
 const electron = require('electron');
+const fs = require('fs');
+const hidefile = require('hidefile');
 const ipcMain = electron.ipcMain;
 // Module to control application life.
 const app = electron.app;
@@ -11,12 +14,25 @@ const int_postage_port = parseInt(Math.random().toString().substring(2)) % (6553
 const child_process = require('child_process');
 var proc = null;
 
+try {
+	fs.statSync(os.homedir() + '/.postage/');
+	fs.statSync(os.homedir() + '/.postage/postage.conf');
+	fs.statSync(os.homedir() + '/.postage/postage-connections.conf');
+} catch (e) {
+	fs.mkdirSync(os.homedir() + '/.postage/');
+	hidefile.hideSync(os.homedir() + '/.postage/');
+
+	console.log('copying config');
+	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync('postage/config/postage.conf', 'utf8'), 'utf8');
+	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync('postage/config/postage-connections.conf', 'utf8'), 'utf8');
+}
+
 function spawnPostage() {
 	proc = child_process.spawn(
 		'postage/postage' + (process.platform == 'win32' ? '.exe' : ''),
 		[
-			'-c', __dirname + path.normalize('/postage/config/postage.conf'),
-			'-d', __dirname + path.normalize('/postage/config/postage-connections.conf'),
+			'-c', path.normalize(os.homedir() + '/.postage/postage.conf'),
+			'-d', path.normalize(os.homedir() + '/.postage/postage-connections.conf'),
 			'-r', __dirname + path.normalize('/postage/web_root'),
 			'-x', 't',
 			'-p', int_postage_port

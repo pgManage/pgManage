@@ -34,6 +34,7 @@ extern char *str_global_data_root;
 extern char *str_global_tls_cert;
 extern char *str_global_tls_key;
 extern char *str_global_port;
+extern bool bol_global_local_only;
 extern bool bol_global_super_only;
 extern bool bol_global_allow_custom_connections;
 

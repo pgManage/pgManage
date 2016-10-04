@@ -8,6 +8,7 @@ char *str_global_data_root = NULL;
 char *str_global_tls_cert = NULL;
 char *str_global_tls_key = NULL;
 char *str_global_port = NULL;
+bool bol_global_local_only = false;
 bool bol_global_super_only = true;
 bool bol_global_allow_custom_connections = false;
 size_t int_global_login_timeout = 1200;
@@ -43,6 +44,7 @@ char *POSTAGE_PREFIX = NULL;
 // str_global_port						postage_port OR envelope_port	p							postage-port OR envelope-port
 // str_global_tls_cert					tls_cert						j							tls-cert
 // str_global_tls_key					tls_key							k							tls-key
+// bol_global_local_only				NULL							x							local-only
 // bol_global_super_only				super_only						s							super-only
 // bol_global_allow_custom_connections	allow_custom_connections		n							allow-custom-connections
 // int_global_login_timeout	 			login_timeout					t							login-timeout
@@ -426,34 +428,35 @@ bool parse_options(int argc, char *const *argv) {
 	// options descriptor
 	// clang-format off
 	static struct option longopts[20] = {
-			{"help",							no_argument,			NULL,	'h'},
-			{"version",							no_argument,			NULL,	'v'},
-			{"config-file",						required_argument,		NULL,	'c'},
-			{"connection-file",					required_argument,		NULL,	'd'},
-			{"login-group",						required_argument,		NULL,	'g'},
+		{"help",							no_argument,			NULL,	'h'},
+		{"version",							no_argument,			NULL,	'v'},
+		{"config-file",						required_argument,		NULL,	'c'},
+		{"connection-file",					required_argument,		NULL,	'd'},
+		{"login-group",						required_argument,		NULL,	'g'},
 #ifdef ENVELOPE
-			{"app-path",						required_argument,		NULL,	'y'},
-			{"role-path",						required_argument,		NULL,	'z'},
+		{"app-path",						required_argument,		NULL,	'y'},
+		{"role-path",						required_argument,		NULL,	'z'},
 #else
-			{"allow-custom-connections",		required_argument,		NULL,	'n'},
+		{"allow-custom-connections",		required_argument,		NULL,	'n'},
+		{"local-only",						required_argument,		NULL,	'x'},
 #endif
-			{"web-root",						required_argument,		NULL,	'r'},
-			{"data-root",						required_argument,		NULL,	'a'},
-			{""SUN_PROGRAM_LOWER_NAME"-port",	required_argument,		NULL,	'p'},
-			{"tls-cert",						required_argument,		NULL,	'j'},
-			{"tls-key",							required_argument,		NULL,	'k'},
-			{"super-only",						required_argument,		NULL,	's'},
-			{"login-timeout",					required_argument,		NULL,	't'},
-			{"log-level",						required_argument,		NULL,	'l'},
-			{"log-file",						required_argument,		NULL,	'o'},
-			{NULL,								0,						NULL,	0}
+		{"web-root",						required_argument,		NULL,	'r'},
+		{"data-root",						required_argument,		NULL,	'a'},
+		{""SUN_PROGRAM_LOWER_NAME"-port",	required_argument,		NULL,	'p'},
+		{"tls-cert",						required_argument,		NULL,	'j'},
+		{"tls-key",							required_argument,		NULL,	'k'},
+		{"super-only",						required_argument,		NULL,	's'},
+		{"login-timeout",					required_argument,		NULL,	't'},
+		{"log-level",						required_argument,		NULL,	'l'},
+		{"log-file",						required_argument,		NULL,	'o'},
+		{NULL,								0,						NULL,	0}
 	};
 // clang-format on
 
 #ifdef ENVELOPE
 	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #else
-	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #endif
 		if (ch == '?') {
 			// getopt_long prints an error in this case
@@ -480,7 +483,7 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef ENVELOPE
 	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #else
-	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #endif
 		if (ch == '?') {
 			// getopt_long prints an error in this case
@@ -510,8 +513,11 @@ bool parse_options(int argc, char *const *argv) {
 #else
 		} else if (ch == 'n') {
 			bol_global_allow_custom_connections = *optarg == 'T' || *optarg == 't';
-#endif
 
+		} else if (ch == 'x') {
+			bol_global_local_only = *optarg == 'T' || *optarg == 't';
+
+#endif
 		} else if (ch == 'r') {
 			SFREE(str_global_web_root);
 			SERROR_CAT_CSTR(str_global_web_root, optarg);

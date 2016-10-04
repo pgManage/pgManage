@@ -21,6 +21,9 @@
     "url": "https://github.com/workflowproducts/postage/issues"
   },
   "homepage": "https://github.com/workflowproducts/postage/master/README.md",
+  "dependencies": {
+    "hidefile": "^1.1.0"
+  },
   "devDependencies": {
     "electron": "^1.4.2"
   }
