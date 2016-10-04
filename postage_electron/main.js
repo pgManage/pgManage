@@ -1,49 +1,73 @@
 const path = require('path');
 const electron = require('electron');
+const ipcMain = electron.ipcMain;
 // Module to control application life.
 const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
+const int_postage_port = parseInt(Math.random().toString().substring(2)) % (65535 - 1024) + 1024;
+
 const child_process = require('child_process');
-var proc = child_process.spawn(
-	'postage/postage.exe',
-	[
-		'-c', __dirname + path.normalize('/postage/config/postage.conf'),
-		'-d', __dirname + path.normalize('/postage/config/postage-connections.conf'),
-		'-r', __dirname + path.normalize('/postage/web_root')
-	], {
-		detached: true
+var proc = null;
+
+function spawnPostage() {
+	proc = child_process.spawn(
+		'postage/postage' + (process.platform == 'win32' ? '.exe' : ''),
+		[
+			'-c', __dirname + path.normalize('/postage/config/postage.conf'),
+			'-d', __dirname + path.normalize('/postage/config/postage-connections.conf'),
+			'-r', __dirname + path.normalize('/postage/web_root'),
+			'-x', 't',
+			'-p', int_postage_port
+		], {
+			detached: true
+		}
+	);
+
+	proc.stdout.on('data', function (data) {
+		console.log('got data:\n' + data);
+	});
+	proc.stderr.on('data', function (data) {
+		console.log('got data:\n' + data);
+	});
+	proc.on('close', function (code) {
+		console.log(proc.pid + ' closed with code ' + code);
+	});
+}
+spawnPostage();
+
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+let mainWindow = null;
+let configWindow = null;
+
+ipcMain.on('postage', function (event, arg) {
+	if (arg === 'restart') {
+		proc.kill();
+		spawnPostage();
+		mainWindow.webContents.executeJavaScript('window.location.reload();');
+	} else if (arg === 'edit_config') {
+		configWindow = new BrowserWindow({ width: 1024, height: 768 });
+		configWindow.loadURL('file://' + __dirname + '/postage/web_root/postage/app/config.html',  { 'extraHeaders': 'pragma: no-cache\n' });
+		configWindow.setMenu(null);
 	}
-);
-proc.stdout.on('data', function (data) {
-	console.log('got data:\n' + data);
-});
-proc.stderr.on('data', function (data) {
-	console.log('got data:\n' + data);
-});
-proc.on('close', function (code) {
-	console.log(proc.pid + ' closed with code ' + code);
-});
+
+})
 
 app.on('quit', function () {
 	console.log('quitting');
 	proc.kill();
 });
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
-
 function createWindow() {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({ width: 1024, height: 768 });
 
 	// Open the DevTools.
-	//mainWindow.webContents.openDevTools();
+	mainWindow.webContents.openDevTools();
 
-	// and load the index.html of the app.
-	mainWindow.loadURL('http://127.0.0.1:8080/postage/index.html', { 'extraHeaders': 'pragma: no-cache\n' });
+	mainWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/index.html',  { 'extraHeaders': 'pragma: no-cache\n' });
 
 	mainWindow.setMenu(null);
 
@@ -52,7 +76,7 @@ function createWindow() {
 		// Dereference the window object, usually you would store windows
 		// in an array if your app supports multi windows, this is the time
 		// when you should delete the corresponding element.
-		mainWindow = null
+		mainWindow = null;
 	});
 }
 
