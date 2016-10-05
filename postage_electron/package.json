@@ -8,6 +8,9 @@
 		"mac": {
 			"category": "public.app-category.developer-tools"
 		},
+		"win": {
+			"target": "nsis"
+		},
 		"dmg": {
 			"title": "Postage",
 			"icon": "",
