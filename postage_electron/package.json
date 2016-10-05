@@ -1,5 +1,5 @@
 {
-  "name": "postage",
+  "name": "Postage",
   "version": "1.0.0",
   "description": "A fast replacement for PGAdmin",
   "main": "main.js",
