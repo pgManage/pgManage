@@ -7,7 +7,7 @@
 		"asar": false,
 		"mac": {
 			"category": "public.app-category.developer-tools"
-		}
+		},
 		"dmg": {
 			"title": "Postage",
 			"icon": "",
