@@ -23,17 +23,17 @@ try {
 	hidefile.hideSync(os.homedir() + '/.postage/');
 
 	console.log('copying config');
-	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync('postage/config/postage.conf', 'utf8'), 'utf8');
-	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync('postage/config/postage-connections.conf', 'utf8'), 'utf8');
+	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync(app.getAppPath() + '/postage/config/postage.conf', 'utf8'), 'utf8');
+	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync(app.getAppPath() + '/postage/config/postage-connections.conf', 'utf8'), 'utf8');
 }
 
 function spawnPostage() {
 	proc = child_process.spawn(
-		'postage/postage' + (process.platform == 'win32' ? '.exe' : ''),
+		path.normalize(app.getAppPath() + '/postage/postage' + (process.platform == 'win32' ? '.exe' : '')),
 		[
 			'-c', path.normalize(os.homedir() + '/.postage/postage.conf'),
 			'-d', path.normalize(os.homedir() + '/.postage/postage-connections.conf'),
-			'-r', __dirname + path.normalize('/postage/web_root'),
+			'-r', app.getAppPath() + path.normalize('/postage/web_root'),
 			'-x', 't',
 			'-p', int_postage_port
 		], {
@@ -65,7 +65,7 @@ ipcMain.on('postage', function (event, arg) {
 		mainWindow.webContents.executeJavaScript('window.location.reload();');
 	} else if (arg === 'edit_config') {
 		configWindow = new BrowserWindow({ width: 1024, height: 768 });
-		configWindow.loadURL('file://' + __dirname + '/postage/web_root/postage/app/config.html',  { 'extraHeaders': 'pragma: no-cache\n' });
+		configWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html',  { 'extraHeaders': 'pragma: no-cache\n' });
 		configWindow.setMenu(null);
 	}
 
