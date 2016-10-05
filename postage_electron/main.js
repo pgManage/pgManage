@@ -81,7 +81,7 @@ function createWindow() {
 	mainWindow = new BrowserWindow({ width: 1024, height: 768 });
 
 	// Open the DevTools.
-	mainWindow.webContents.openDevTools();
+	//mainWindow.webContents.openDevTools();
 
 	mainWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/index.html',  { 'extraHeaders': 'pragma: no-cache\n' });
 
