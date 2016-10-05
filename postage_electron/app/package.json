@@ -1,0 +1,12 @@
+{
+	"author": "Workflow Products, L.L.C.",
+	"dependencies": {
+		"hidefile": "^1.1.0",
+		"fs-extra": "^0.30.0"
+	},
+	"description": "A fast replacement for PGAdmin",
+	"license": "Apache-2.0",
+	"main": "main.js",
+	"name": "Postage",
+	"version": "1.0.0"
+}

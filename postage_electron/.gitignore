@@ -1,3 +1,4 @@
-/node_modules
-/postage
+node_modules
+app/postage
 /Postage-*
+/dist

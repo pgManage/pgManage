@@ -1,8 +1,8 @@
-del /S /Q postage
-mkdir postage
-mkdir postage\web_root
-mkdir postage\config
-xcopy ..\visualstudio\Release\postage.exe postage\
-xcopy ..\visualstudio\lib\x86\* postage\
-xcopy ..\postage\web_root postage\web_root /E
-xcopy ..\postage\config postage\config /E
+del /S /Q app\postage
+mkdir app\postage
+mkdir app\postage\web_root
+mkdir app\postage\config
+xcopy ..\visualstudio\Release\postage.exe app\postage\
+xcopy ..\visualstudio\lib\x86\* app\postage\
+xcopy ..\postage\web_root app\postage\web_root /E
+xcopy ..\postage\config app\postage\config /E

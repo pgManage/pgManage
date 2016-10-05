@@ -1,32 +1,31 @@
 {
-  "name": "Postage",
-  "version": "1.0.0",
-  "description": "A fast replacement for PGAdmin",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/workflowproducts/postage.git"
-  },
-  "keywords": [
-    "Electron",
-    "Postage",
-    "PostgreSQL"
-  ],
-  "author": "Workflow Products, L.L.C.",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/workflowproducts/postage/issues"
-  },
-  "homepage": "https://github.com/workflowproducts/postage/master/README.md",
-  "dependencies": {
-    "hidefile": "^1.1.0",
-	"fs-extra": "^0.30.0"
-  },
-  "devDependencies": {
-    "electron": "^1.4.2",
-    "electron-packager": "^8.1.0"
-  }
+	"bugs": {
+		"url": "https://github.com/workflowproducts/postage/issues"
+	},
+	"build": {
+		"appId": "your.id",
+		"asar": false,
+		"mac": {
+			"category": "public.app-category.developer-tools"
+		}
+	},
+	"devDependencies": {
+		"electron": "^1.4.2",
+		"electron-builder": "^7.10.2"
+	},
+	"homepage": "https://github.com/workflowproducts/postage/master/README.md",
+	"keywords": [
+		"Postage",
+		"Electron",
+		"PostgreSQL"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/workflowproducts/postage.git"
+	},
+	"scripts": {
+		"start": "electron .",
+		"pack": "build --dir",
+		"dist": "build"
+	}
 }
