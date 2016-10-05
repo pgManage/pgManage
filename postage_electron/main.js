@@ -1,7 +1,7 @@
 const os = require('os');
 const path = require('path');
 const electron = require('electron');
-const fs = require('fs');
+const fs = require('fs-extra');
 const hidefile = require('hidefile');
 const ipcMain = electron.ipcMain;
 // Module to control application life.
@@ -19,7 +19,7 @@ try {
 	fs.statSync(os.homedir() + '/.postage/postage.conf');
 	fs.statSync(os.homedir() + '/.postage/postage-connections.conf');
 } catch (e) {
-	fs.mkdirSync(os.homedir() + '/.postage/');
+	fs.mkdirsSync(os.homedir() + '/.postage/');
 	hidefile.hideSync(os.homedir() + '/.postage/');
 
 	console.log('copying config');

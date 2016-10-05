@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/workflowproducts/postage/master/README.md",
   "dependencies": {
-    "hidefile": "^1.1.0"
+    "hidefile": "^1.1.0",
+	"fs-extra": "^0.30.0"
   },
   "devDependencies": {
     "electron": "^1.4.2",
