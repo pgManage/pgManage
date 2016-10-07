@@ -1,7 +1,4 @@
 {
-	"bugs": {
-		"url": "https://github.com/workflowproducts/postage/issues"
-	},
 	"build": {
 		"appId": "your.id",
 		"asar": false,
@@ -10,6 +7,12 @@
 		},
 		"win": {
 			"target": "nsis"
+		},
+		"linux": {
+			"target": [
+				"deb",
+				"rpm"
+			]
 		},
 		"dmg": {
 			"title": "Postage",
@@ -35,7 +38,7 @@
 		"url": "git+https://github.com/workflowproducts/postage.git"
 	},
 	"scripts": {
-		"start": "electron .",
+		"start": "electron app",
 		"pack": "build --dir",
 		"dist": "build"
 	}

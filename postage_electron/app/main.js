@@ -3,6 +3,7 @@ const path = require('path');
 const electron = require('electron');
 const fs = require('fs-extra');
 const hidefile = require('hidefile');
+const windowStateKeeper = require('electron-window-state');
 const ipcMain = electron.ipcMain;
 // Module to control application life.
 const app = electron.app;
@@ -57,6 +58,8 @@ spawnPostage();
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
 let configWindow = null;
+let mainWindowState = null;
+let configWindowState = null;
 
 ipcMain.on('postage', function (event, arg) {
 	if (arg === 'restart') {
@@ -64,7 +67,13 @@ ipcMain.on('postage', function (event, arg) {
 		spawnPostage();
 		mainWindow.webContents.executeJavaScript('window.location.reload();');
 	} else if (arg === 'edit_config') {
-		configWindow = new BrowserWindow({ width: 1024, height: 768 });
+		configWindow = new BrowserWindow({
+			'x': configWindowState.x,
+			'y': configWindowState.y,
+			'width': configWindowState.width,
+			'height': configWindowState.height
+		});
+		configWindowState.manage(configWindow);
 		configWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html',  { 'extraHeaders': 'pragma: no-cache\n' });
 		configWindow.setMenu(null);
 	}
@@ -77,11 +86,31 @@ app.on('quit', function () {
 });
 
 function createWindow() {
+	mainWindowState = windowStateKeeper({
+		defaultWidth: 1024,
+		defaultHeight: 768,
+		path: os.homedir() + '/.postage/',
+		file: 'main-window-state.json'
+	});
+
+	configWindowState = windowStateKeeper({
+		defaultWidth: 1024,
+		defaultHeight: 768,
+		path: os.homedir() + '/.postage/',
+		file: 'config-window-state.json'
+	});
+
 	// Create the browser window.
-	mainWindow = new BrowserWindow({ width: 1024, height: 768 });
+	mainWindow = new BrowserWindow({
+		'x': mainWindowState.x,
+		'y': mainWindowState.y,
+		'width': mainWindowState.width,
+		'height': mainWindowState.height
+	});
+	mainWindowState.manage(mainWindow);
 
 	// Open the DevTools.
-	//mainWindow.webContents.openDevTools();
+	mainWindow.webContents.openDevTools();
 
 	mainWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/index.html',  { 'extraHeaders': 'pragma: no-cache\n' });
 

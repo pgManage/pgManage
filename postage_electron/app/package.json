@@ -1,10 +1,20 @@
 {
-	"author": "Workflow Products, L.L.C.",
+	"author": {
+		"name" : "Annunziato Tocci",
+		"email" : "nunzio@workflowproducts.com",
+		"url" : "http://tocci.xyz/"
+	},
+	"bugs": {
+		"url": "https://github.com/workflowproducts/postage/issues",
+		"email": "nunzio@workflowproducts.com"
+	},
 	"dependencies": {
 		"hidefile": "^1.1.0",
-		"fs-extra": "^0.30.0"
+		"fs-extra": "^0.30.0",
+		"electron-window-state": "^3.0.4"
 	},
 	"description": "A fast replacement for PGAdmin",
+	"email": "nunzio@workflowproducts.com",
 	"license": "Apache-2.0",
 	"main": "main.js",
 	"name": "Postage",
