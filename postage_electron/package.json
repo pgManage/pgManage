@@ -40,6 +40,7 @@
 	"scripts": {
 		"start": "electron app",
 		"pack": "build --dir",
-		"dist": "build"
+		"dist": "build",
+		"dist-win": "build --arch all"
 	}
 }
