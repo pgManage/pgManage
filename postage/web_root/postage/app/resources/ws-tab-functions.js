@@ -833,10 +833,8 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 
                         // update href of download script button (we want to use an anchor for that button because it's native)
 						if (window.process && window.process.type === 'renderer') {
-	                        tabElement.relatedDownloadButton.setAttribute(
-	                            'onclick',
-	                            'saveScriptAsFile(\'' + tabElement.filePath + '\')'
-	                        );
+							tabElement.relatedDownloadButton.setAttribute('data-filename', tabElement.filePath);
+							tabElement.relatedDownloadButton2.setAttribute('data-filename', tabElement.filePath);
 						} else {
 	                        tabElement.relatedDownloadButton.setAttribute(
 	                            'href',
@@ -1091,8 +1089,13 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                                     'title="Outdent the selected text [SHIFT][TAB]" remove-all no-focus></gs-button>' +
                         (
 							window.process && window.process.type === 'renderer' ?
-							'<gs-button icononly id="button-tab-' + intTabNumber + '-save" icon="save" onclick="saveScriptAsFile(\'' + tabElement.filePath + '\')" ' +
-                                    'title="Save" remove-all no-focus></gs-button>'
+							'<gs-button icononly id="button-tab-' + intTabNumber + '-save" icon="save" data-filename="' + tabElement.filePath + '" ' +
+                                    'title="Save" remove-all no-focus></gs-button>' +
+							'<gs-button icononly id="button-tab-' + intTabNumber + '-save-as" class="button-save-as" data-filename="' + tabElement.filePath + '" ' +
+                                    'title="Save As..." remove-all no-focus>' +
+                            '<span class="save-as-floppy">&#xf0c7;</span>' + //&#9830;
+                            '<span class="save-as-pencil">&#xf040;</span>' +
+                        '</gs-button>'
 							:
 							'<gs-button icononly id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
                                     'title="Download as a file" remove-all no-focus></gs-button>'
@@ -1169,8 +1172,24 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         tabElement.relatedCopyOptionsButton = document.getElementById('sql-results-copy-options-' + intTabNumber);
         tabElement.relatedStopLoadingButton = document.getElementById('sql-results-stop-loading-' + intTabNumber);
 
-        tabElement.relatedDownloadButton = document.getElementById('button-tab-' + intTabNumber + '-download') || document.getElementById('button-tab-' + intTabNumber + '-save');
+		if (window.process && window.process.type === 'renderer') {
+			tabElement.relatedDownloadButton = document.getElementById('button-tab-' + intTabNumber + '-save');
+			tabElement.relatedDownloadButton2 = document.getElementById('button-tab-' + intTabNumber + '-save-as');
 
+			tabElement.relatedDownloadButton.addEventListener('click', function (event) {
+				console.log(event, event.which);
+				var strFileName = this.getAttribute('data-filename');
+				saveScriptAsFile(strFileName);
+			});
+
+			tabElement.relatedDownloadButton2.addEventListener('click', function (event) {
+				console.log(event, event.which);
+				var strFileName = this.getAttribute('data-filename');
+				saveScriptAsFile(strFileName, true);
+			});
+		} else {
+			tabElement.relatedDownloadButton = document.getElementById('button-tab-' + intTabNumber + '-download');
+		}
 
         tabElement.relatedEditorToolbar = document.getElementById('sql-ace-toolbar-' + intTabNumber);
         tabElement.relatedEditorToolbar.addEventListener('click', function () {
@@ -1613,14 +1632,14 @@ function closeFile(tabElement, callBack) {
     });
 }
 
-function saveScriptAsFile(strFileName) {
+function saveScriptAsFile(strFileName, forceSaveAs) {
 	// We are inside electron here
 	var fs = require('fs');
 	var os = require('os');
 	var path = require('path');
 	var electron = require('electron').remote;
 	var dialog = electron.dialog;
-	
+
 	var i = 0, j = 0;
     GS.requestFromSocket(GS.envSocket,
                          'TAB\tREAD\t' + GS.encodeForTabDelimited(strFileName), function (data, error, errorData) {
@@ -1631,7 +1650,7 @@ function saveScriptAsFile(strFileName) {
 			                         'TAB\tREAD\t' + GS.encodeForTabDelimited(strFileName + encodeTabNameForFileName('~')), function (data, error, errorData) {
 					var strNewFileName = '';
 		            if (j === 0) {
-				        if (!error) {
+				        if (!error && !forceSaveAs) {
 							var newLineIndex = data.indexOf('\n');
 							strNewFileName = data.substring(newLineIndex + 1);
 				        } else {
@@ -1651,6 +1670,7 @@ function saveScriptAsFile(strFileName) {
 								properties: ['openFile']
 							});
 						}
+						console.log(strNewFileName, forceSaveAs);
 						if (strNewFileName !== undefined) {
 							function save() {
 								GS.addLoader('saving', 'Saving...');
