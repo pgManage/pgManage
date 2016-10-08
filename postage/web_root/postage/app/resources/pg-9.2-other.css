@@ -66,7 +66,7 @@ div#header-text-container {
 
 .header-button, .footer-button {
     /*font-size: 0.7em;*/
-    
+
     border: 0;
     color: #FFF;
     background: transparent;
@@ -77,19 +77,19 @@ div#header-text-container {
 
 .header-button-text {
     /*font-size: 0.7em;*/
-    
+
     border: 0;
     color: #FFF;
     background: transparent;
     padding: 0;
     margin: 0;
     font-size: 0.8em;
-    
+
     padding-top: 0.5em;
     /*padding-top: 0.7em; /*0.45em;*/
     padding-left: 0.75em; /*0.25em;*/
     padding-right: 0.75em; /*0.25em;*/
-    
+
     /*text-decoration: underline;*/
 }
 
@@ -122,11 +122,11 @@ div#header-text-container {
 
 .postage-menu-item-button {
     border: 0 none;
-    
+
     text-align: center;
     padding: 0.75em !important;
     border-bottom: 1px solid #ccc;
-    
+
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
     -ms-border-radius: 0;
@@ -208,6 +208,53 @@ table.table-dep {
 
 table.table-dep th {
     text-align: center;
+}
+
+
+/* ##################################################### */
+/* ################### SAVE AS BUTTON ################## */
+/* ##################################################### */
+
+.ace-toolbar gs-button.button-save-as {
+    position: relative;
+    line-height: 1em;
+    text-indent: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.ace-toolbar gs-button.button-save-as .save-as-floppy {
+    font-family: fontawesome;
+    display: inline-block;
+	top: 40%;
+	left: 40%;
+	margin-top: -0.57em;
+	margin-left: -0.56em;
+	position: absolute;
+    display: block;
+    width: 1.12em;
+    height: 1.12em;
+    text-align: center;
+    text-indent: 0;
+    line-height: 1.25;
+    font-size: 1.4em;
+}
+
+.ace-toolbar gs-button.button-save-as .save-as-pencil {
+    font-family: fontawesome;
+    display: inline-block;
+	bottom: 0;
+	right: 0;
+	margin-top: -0.57em;
+	margin-left: -0.56em;
+	position: absolute;
+    display: block;
+    width: 1.12em;
+    height: 1.12em;
+    text-align: center;
+    text-indent: 0;
+    line-height: 1.25;
+    font-size: 1.4em;
 }
 
 
@@ -310,7 +357,7 @@ table.table-dep th {
     display: inline-block;
     width: 16em;
     height: 100%;
-    
+
     text-align: left;
     font-family: monospace;
     white-space: normal;
@@ -318,11 +365,11 @@ table.table-dep th {
     border: 1px solid #000000;
     margin-left: 1em;
     margin-right: 1em;
-    
+
     border-radius: 0.2em;
     background-color: #FFFFFF;
     box-shadow: 0.1em 0.1em 0.3em 0.05em #CCCCCC;
-    
+
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
@@ -344,7 +391,7 @@ table.table-dep th {
 
 .node .explain-context-container {
     padding: 0.2em;
-    
+
 }
 
 .node .explain-speed-container {
@@ -403,7 +450,7 @@ table.table-dep th {
     left: 50%;
 	width: 0;
 	height: 0;
-	
+
 	border-bottom: 7px solid #000;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
@@ -512,10 +559,10 @@ table.table-dep th {
 #badge-notification-feed {
     display: block;
     position: absolute;
-    
+
     left: -0.5em;
     top: -0.2em;
-    
+
     background-color: #FF0000;
     text-indent: 0;
     border-radius: 4px;
@@ -574,6 +621,3 @@ table.table-dep th {
     border-radius: 0.5em 0 0.5em 0.5em;
     background-color: #c8f9c6;
 }
-
-
-

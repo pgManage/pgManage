@@ -3,6 +3,7 @@ const path = require('path');
 const electron = require('electron');
 const fs = require('fs-extra');
 const hidefile = require('hidefile');
+const windowStateKeeper = require('electron-window-state');
 const ipcMain = electron.ipcMain;
 // Module to control application life.
 const app = electron.app;
@@ -57,6 +58,8 @@ spawnPostage();
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
 let configWindow = null;
+let mainWindowState = null;
+let configWindowState = null;
 
 ipcMain.on('postage', function (event, arg) {
 	if (arg === 'restart') {
@@ -64,7 +67,13 @@ ipcMain.on('postage', function (event, arg) {
 		spawnPostage();
 		mainWindow.webContents.executeJavaScript('window.location.reload();');
 	} else if (arg === 'edit_config') {
-		configWindow = new BrowserWindow({ width: 1024, height: 768 });
+		configWindow = new BrowserWindow({
+			'x': configWindowState.x,
+			'y': configWindowState.y,
+			'width': configWindowState.width,
+			'height': configWindowState.height
+		});
+		configWindowState.manage(configWindow);
 		configWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html',  { 'extraHeaders': 'pragma: no-cache\n' });
 		configWindow.setMenu(null);
 	}
@@ -76,16 +85,180 @@ app.on('quit', function () {
 	proc.kill();
 });
 
-function createWindow() {
-	// Create the browser window.
-	mainWindow = new BrowserWindow({ width: 1024, height: 768 });
+function setMenu() {
+	const Menu = electron.Menu;
+	const template = [
+		{
+			label: 'File',
+			submenu: [
+				{
+					role: 'quit'
+				}
+			]
+		}, {
+			label: 'Edit',
+			submenu: [
+				{
+					role: 'undo'
+				}, {
+					role: 'redo'
+				}, {
+					type: 'separator'
+				}, {
+					role: 'cut'
+				}, {
+					role: 'copy'
+				}, {
+					role: 'paste'
+				}, {
+					role: 'pasteandmatchstyle'
+				}, {
+					role: 'delete'
+				}, {
+					role: 'selectall'
+				}
+			]
+		}, {
+			label: 'View',
+			submenu: [
+				{
+					label: 'Reload',
+					accelerator: 'CmdOrCtrl+R',
+					click: function (item, focusedWindow) {
+						if (focusedWindow) {
+							focusedWindow.reload();
+						}
+					}
+				}, {
+					label: 'Toggle Developer Tools',
+					accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+					click: function (item, focusedWindow) {
+						if (focusedWindow) {
+							focusedWindow.webContents.toggleDevTools();
+						}
+					}
+				}, {
+					type: 'separator'
+				}, {
+					role: 'resetzoom'
+				}, {
+					role: 'zoomin'
+				}, {
+					role: 'zoomout'
+				}, {
+					type: 'separator'
+				}, {
+					role: 'togglefullscreen'
+				}
+			]
+		}, {
+			role: 'window',
+			submenu: [
+				{
+					role: 'minimize'
+				}, {
+					role: 'close'
+				}
+			]
+		}
+	];
 
-	// Open the DevTools.
-	//mainWindow.webContents.openDevTools();
+	if (process.platform === 'darwin') {
+		const name = app.getName();
+		template.unshift({
+			label: name,
+			submenu: [
+				{
+					role: 'about'
+				}, {
+					type: 'separator'
+				}, {
+					role: 'services',
+					submenu: []
+				}, {
+					type: 'separator'
+				}, {
+					role: 'hide'
+				}, {
+					role: 'hideothers'
+				}, {
+					role: 'unhide'
+				}, {
+					type: 'separator'
+				}, {
+					role: 'quit'
+				}
+			]
+		});
+		// Edit menu.
+		template[2].submenu.push(
+			{
+				type: 'separator'
+			}, {
+				label: 'Speech',
+				submenu: [
+					{
+						role: 'startspeaking'
+					}, {
+						role: 'stopspeaking'
+					}
+				]
+			}
+		);
+		// Window menu.
+		template[4].submenu = [
+			{
+				label: 'Close',
+				accelerator: 'CmdOrCtrl+W',
+				role: 'close'
+			}, {
+				label: 'Minimize',
+				accelerator: 'CmdOrCtrl+M',
+				role: 'minimize'
+			}, {
+				label: 'Zoom',
+				role: 'zoom'
+			}, {
+				type: 'separator'
+			}, {
+				label: 'Bring All to Front',
+				role: 'front'
+			}
+		];
+	}
+
+	const menu = Menu.buildFromTemplate(template)
+	Menu.setApplicationMenu(menu)
+}
+
+function createWindow() {
+	mainWindowState = windowStateKeeper({
+		defaultWidth: 1024,
+		defaultHeight: 768,
+		path: os.homedir() + '/.postage/',
+		file: 'main-window-state.json'
+	});
+
+	configWindowState = windowStateKeeper({
+		defaultWidth: 1024,
+		defaultHeight: 768,
+		path: os.homedir() + '/.postage/',
+		file: 'config-window-state.json'
+	});
+
+	// Create the browser window.
+	mainWindow = new BrowserWindow({
+		'x': mainWindowState.x,
+		'y': mainWindowState.y,
+		'width': mainWindowState.width,
+		'height': mainWindowState.height
+	});
+	mainWindowState.manage(mainWindow);
 
 	mainWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/index.html',  { 'extraHeaders': 'pragma: no-cache\n' });
 
-	mainWindow.setMenu(null);
+	//mainWindow.setMenu(null);
+	setMenu();
 
 	// Emitted when the window is closed.
 	mainWindow.on('closed', function () {
