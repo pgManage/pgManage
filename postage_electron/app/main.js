@@ -164,7 +164,7 @@ function setMenu() {
 	];
 
 	if (process.platform === 'darwin') {
-		const name = require('electron').remote.app.getName();
+		const name = app.getName();
 		template.unshift({
 			label: name,
 			submenu: [
