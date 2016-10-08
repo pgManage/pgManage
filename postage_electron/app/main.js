@@ -80,6 +80,9 @@ ipcMain.on('postage', function (event, arg) {
 
 })
 
+app.on('will-quit', function () {
+	electron.globalShortcut.unregisterAll();
+});
 app.on('quit', function () {
 	console.log('quitting');
 	proc.kill();
@@ -110,7 +113,9 @@ function createWindow() {
 	mainWindowState.manage(mainWindow);
 
 	// Open the DevTools.
-	mainWindow.webContents.openDevTools();
+	electron.globalShortcut.register('CommandOrControl+I', function () {
+		mainWindow.webContents.openDevTools();
+	});
 
 	mainWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/index.html',  { 'extraHeaders': 'pragma: no-cache\n' });
 
