@@ -180,6 +180,12 @@ function menuTools(target) {
                             no-focus iconleft icon="lock" onclick="dialogLocks()">Transaction Locks</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft icon="film" onclick="dialogPreparedTransactions()">Prepared Transactions</gs-button>
+                
+                <gs-button class="postage-menu-item-button" dialogclose
+                            no-focus iconleft icon="list-alt" onclick="dialogReloadConf()">Reload Postgres Conf</gs-button>
+                <gs-button class="postage-menu-item-button" dialogclose
+                            no-focus iconleft icon="history" onclick="dialogRotateLog()">Rotate Log File</gs-button>
+                
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft onclick="dialogStats()" icon="bar-chart-o">Database Info &amp; Stats</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
@@ -234,6 +240,56 @@ function menuTab(target) {
     */});
 
     GS.openDialogToElement(target, templateElement, 'down');
+}
+
+function dialogReloadConf() {
+    "use strict";
+    GS.msgbox('Are you sure...',
+                'Are you sure you want to reload the Postgres configuration?',
+                ['No', 'Yes'],
+                function (strAnswer) {
+        if (strAnswer === 'Yes') {
+            GS.addLoader('reload', 'Reloading Conf...');
+            GS.requestFromSocket(GS.envSocket,
+                                'RAW\nSELECT pg_reload_conf();',
+                                function (response, error) {
+                if (!error) {
+                    if (response === 'TRANSACTION COMPLETED') {
+                        GS.removeLoader('reload');
+                        GS.pushMessage('<center><h3>Successfully Reloaded Conf</h3></center>', 1500);
+                    }
+                } else {
+                    GS.removeLoader(document.getElementById('process-table-container'));
+                    GS.ajaxErrorDialog(response);
+                }
+            });
+        }
+    });
+}
+
+function dialogRotateLog() {
+    "use strict";
+    GS.msgbox('Are you sure...',
+                'Are you sure you want to rotate the Postgres log files?',
+                ['No', 'Yes'],
+                function (strAnswer) {
+        if (strAnswer === 'Yes') {
+            GS.addLoader('reload', 'Rotating Log...');
+            GS.requestFromSocket(GS.envSocket,
+                                'RAW\nSELECT pg_rotate_logfile();',
+                                function (response, error) {
+                if (!error) {
+                    if (response === 'TRANSACTION COMPLETED') {
+                        GS.removeLoader('reload');
+                        GS.pushMessage('<center><h3>Successfully Rotated Log</h3></center>', 1500);
+                    }
+                } else {
+                    GS.removeLoader(document.getElementById('process-table-container'));
+                    GS.ajaxErrorDialog(response);
+                }
+            });
+        }
+    });
 }
 
 

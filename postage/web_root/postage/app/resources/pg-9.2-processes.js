@@ -218,13 +218,16 @@ function dialogProcesses() {
         <gs-page>
             <gs-header><center><h3>Process Manager</h3></center></gs-header>
             <gs-body padded>
-                <gs-datasheet id="datasheet-processes" src="pg_catalog.pg_stat_activity" pk="pid" lock="pid" socket="postageProcessDialogSocket">
+                <gs-datasheet id="datasheet-processes" src="pg_catalog.pg_stat_activity"
+                            pk="pid" lock="pid" socket="postageProcessDialogSocket" no-filter
+                            ord="pid ASC">
                     <template for="table">
                         <table>
                             <thead>
                                 <th>#</th>
+                                <th style="width: 6em;"></th>
+                                <th style="width: 5em;"></th>
                                 <th style="width: 8em;">Database</th>
-                                <th style="width: 10em;"></th>
                                 <th style="width: 6em;">Process ID</th>
                                 <th style="width: 12em;">Username</th>
                                 <th style="width: 5em;">Waiting?</th>
@@ -242,9 +245,19 @@ function dialogProcesses() {
                             <tbody>
                                 <tr>
                                     <th heading="#">{{! row_number }}</th>
-                                    <th heading="">
-                                        <gs-button onclick="stopProcess({{! row.pid }})" bg-danger>Kill Process</gs-button>
-                                    </th>
+                                    <td heading="" title="Cancel current query for this backend">
+                                        {{? row.state.indexOf('idle') === 0 }}
+                                            <gs-button onclick="cancelProcess({{! row.pid }})" bg-danger disabled
+                                                    style="padding-left: 0; padding-right: 0;">Cancel Query</gs-button>
+                                        {{??}}
+                                            <gs-button onclick="cancelProcess({{! row.pid }})" bg-danger
+                                                    style="padding-left: 0; padding-right: 0;">Cancel Query</gs-button>
+                                        {{?}}
+                                    </td>
+                                    <td heading="" title="Terminate/kill backend">
+                                        <gs-button onclick="terminateProcess({{! row.pid }})" bg-danger
+                                                    style="padding-left: 0; padding-right: 0;">Terminate</gs-button>
+                                    </td>
                                     <td heading="Database"><label>{{! row.datname }}</label></td>
                                     <td heading="Proccess ID"><label>{{! row.pid }}</label></td>
                                     <td heading="Username"><label>{{! row.usename }}</label></td>
@@ -297,15 +310,43 @@ function dialogProcesses() {
     GS.openDialog(templateElement);
 }
 
-function stopProcess(intPID) {
-    GS.msgbox('Are you sure...', 'Are you sure you want to stop this process?', ['No', 'Yes'], function (strAnswer) {
+function cancelProcess(intPID) {
+    GS.msgbox('Are you sure...',
+                'Are you sure you want to cancel this query?',
+                ['No', 'Yes'],
+                function (strAnswer) {
         if (strAnswer === 'Yes') {
             GS.addLoader(document.getElementById('process-table-container'), 'Cancelling Process...');
-            GS.requestFromSocket(GS.postageProcessDialogSocket, 'RAW\nSELECT pg_cancel_backend(' + intPID + ');', function (response, error) {
+            GS.requestFromSocket(GS.postageProcessDialogSocket,
+                                'RAW\nSELECT pg_cancel_backend(' + intPID + ');',
+                                function (response, error) {
                 if (!error) {
-                    document.getElementById('datasheet-processes').refresh();
-                    
                     if (response === 'TRANSACTION COMPLETED') {
+                        document.getElementById('datasheet-processes').refresh();
+                        GS.removeLoader(document.getElementById('process-table-container'));
+                    }
+                } else {
+                    GS.removeLoader(document.getElementById('process-table-container'));
+                    GS.ajaxErrorDialog(response);
+                }
+            });
+        }
+    });
+}
+
+function terminateProcess(intPID) {
+    GS.msgbox('Are you sure...',
+                'Are you sure you want to terminate this process?',
+                ['No', 'Yes'],
+                function (strAnswer) {
+        if (strAnswer === 'Yes') {
+            GS.addLoader(document.getElementById('process-table-container'), 'Terminate Process...');
+            GS.requestFromSocket(GS.postageProcessDialogSocket,
+                                'RAW\nSELECT pg_terminate_backend(' + intPID + ');',
+                                function (response, error) {
+                if (!error) {
+                    if (response === 'TRANSACTION COMPLETED') {
+                        document.getElementById('datasheet-processes').refresh();
                         GS.removeLoader(document.getElementById('process-table-container'));
                     }
                 } else {

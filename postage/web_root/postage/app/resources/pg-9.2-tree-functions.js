@@ -10,11 +10,9 @@ var bolTreeFunctionsLoaded = true
       , 'shownItems':   []
       , 'shownObjects': []
       , 'whiteRows':    0
-      
       , 'rolesMarker':  null
       , 'moreMarker':   null
       , 'schemaMarker': null
-      
       , 'rolesMarkerMaster':  null
       , 'moreMarkerMaster':   null
       , 'schemaMarkerMaster': null
@@ -65,7 +63,10 @@ function treeStart() {
     
     // set ace inital value and selection in the ace
     //treeGlobals.ace.setValue('Schemas\n');
-    treeGlobals.ace.selection.setSelectionRange(new Range(0, 0, 0, 0));
+    //treeGlobals.ace.selection.setSelectionRange(new Range(0, 0, 0, 0));
+    
+    // make nothing initially selected - didn't work
+    treeGlobals.ace.setHighlightActiveLine(false);
     
     // create "Roles" and "More" markers
     treeGlobals.rolesMarkerMaster = {
@@ -132,6 +133,9 @@ function treeStart() {
         var intStartRow = treeGlobals.ace.getSelectionRange().start.row
           , intEndRow = treeGlobals.ace.getSelectionRange().end.row
           , rowData = treeGlobals.data[intStartRow];
+        
+        // allow highlight color
+        treeGlobals.ace.setHighlightActiveLine(true);
         
         // if we found a row
         if (intStartRow === intEndRow && rowData) {

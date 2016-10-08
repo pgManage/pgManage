@@ -1444,7 +1444,7 @@ scriptQuery.objectTable = ml(function () {/*
                             ),
                         E',\n'),
                     '') ||
-                    COALESCE(em2.con_full, '') || COALESCE(em3.con_full, '') ||
+                    COALESCE(em2.con_full, '') ||
             E'\n)' || (E' WITH (\n  ' || 
                             CASE WHEN pg_class.relhasoids THEN
                                 'OIDS=TRUE'
@@ -1482,7 +1482,7 @@ scriptQuery.objectTable = ml(function () {/*
           ORDER BY attnum ASC) em1 ON pg_class.oid = em1.attrelid
                 
                 
-          -- non-CHECK CONSTRAINTs
+          -- CONSTRAINTs
         LEFT JOIN (SELECT conrelid AS oid, array_to_string(array_agg(
                 E',\n  CONSTRAINT ' || pg_constraint.conname || ' ' || pg_get_constraintdef(pg_constraint.oid, true)-- ||
                                         --(CASE WHEN pg_constraint.confmatchtype = 'f' THEN ' MATCH FULL'
@@ -1510,22 +1510,13 @@ scriptQuery.objectTable = ml(function () {/*
         GROUP BY conrelid) em2 ON pg_class.oid = em2.oid
           
           
-          -- CHECK CONSTRAINTs
-        LEFT JOIN 
-                (SELECT pg_class.oid, array_to_string(array_agg(
-                                        E',\n  CONSTRAINT ' || conname || ' ' || pg_get_constraintdef(pg_constraint.oid, true)
-                                  ), E'') as con_full
-                  FROM pg_constraint
-                  JOIN pg_class pg_class ON pg_class.oid = conrelid
-                 WHERE contype = 'c'
-                GROUP BY pg_class.oid) em3 ON pg_class.oid = em3.oid
         
         -- back to the unknown program
          JOIN pg_roles ON pg_roles.oid = pg_class.relowner
          JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRNAME}}'
         GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relacl,
-                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, em3.con_full, pg_description.description, reloptions)
+                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, pg_description.description, reloptions)
                 
         || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
         	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
