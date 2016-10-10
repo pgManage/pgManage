@@ -267,6 +267,9 @@ function alreadyLoadedFiles() {
 //}
 
 function dialogScriptOpen() {
+	console.log('test');
+	GS.closeDialog(document.getElementsByTagName('gs-dialog')[0]);
+
 	// We are in electron here
 	var fs = require('fs');
 	var path = require('path');
@@ -333,6 +336,22 @@ function dialogScriptOpen() {
 			}
 		});
 	}
+}
+
+function saveCurrentScript(bolForceSaveAs) {
+	var strQueryString = GS.getQueryString()
+      , strView = GS.qryGetVal(strQueryString, 'view')
+      , strCurrentTab;
+
+    if (strView.indexOf('tab:') === 0) {
+        strCurrentTab = strView.substring('tab:'.length);
+		strCurrentTab = '/open/' + encodeTabNameForFileName(strCurrentTab.substring('/open/'.length));
+		saveScriptAsFile(strCurrentTab, bolForceSaveAs);
+    } else {
+		alert('There is no tab selected!');
+	}
+
+	GS.closeDialog(document.getElementsByTagName('gs-dialog')[0]);
 }
 
 function dialogScriptUpload() {
