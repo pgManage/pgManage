@@ -8,6 +8,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	SDEFINE_VAR_MORE(str_user_agent, str_host);
 	SDEFINE_VAR_MORE(str_uri_user_agent, str_uri_ip_address, str_uri_host);
 	char *str_conn = NULL;
+	bool bol_public = false;
 	ssize_t int_i = 0;
 	ssize_t int_len = 0;
 	size_t int_conn_index = 0;
@@ -15,6 +16,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	size_t int_user_length = 0;
 	size_t int_password_length = 0;
 	size_t int_dbname_length = 0;
+	size_t int_cookie_len = 0;
 #ifdef ENVELOPE
 #else
 	size_t int_connname_length = 0;
@@ -39,92 +41,162 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	SDEBUG("client->str_cookie_name: %s", client->str_cookie_name);
 	str_cookie_encrypted = str_cookie(str_request, client->str_cookie_name);
 	if (str_cookie_encrypted == NULL || strlen(str_cookie_encrypted) <= 0) {
-		SFINISH("No Cookie.");
+#ifdef ENVELOPE
+		if (strstr(str_uri_temp, "acceptnc_") != NULL) {
+			char *ptr_dot = strstr(str_uri_temp, ".");
+			if (
+				(
+					ptr_dot != NULL &&
+					strncmp(ptr_dot + 1, "acceptnc_", 9) == 0
+				) ||
+				strncmp(str_uri_temp, "/env/acceptnc_", 14) == 0
+			) {
+				bol_public = true;
+			}
+		} else if (strstr(str_uri_temp, "actionnc_") != NULL) {
+			char *ptr_dot = strstr(str_uri_temp, ".");
+			if (
+				(
+					ptr_dot != NULL &&
+					strncmp(ptr_dot + 1, "actionnc_", 9) == 0
+				) ||
+				strncmp(str_uri_temp, "/env/actionnc_", 14) == 0
+			) {
+				bol_public = true;
+			}
+		}
+		SDEBUG("bol_public: %s", bol_public ? "true" : "false");
+#endif
+		SFINISH_CHECK(bol_public, "No Cookie.");
 	}
-	size_t int_cookie_len = strlen(str_cookie_encrypted);
+	if (bol_public == false) {
+		int_cookie_len = strlen(str_cookie_encrypted);
 
-	// Make sure we have the last close time
-	if (client->int_last_activity_i == -1) {
-		// If we don't, then find it
-		for (int_i = 0, int_len = (ssize_t)DArray_end(client->server->arr_client_last_activity); int_i < int_len; int_i += 1) {
-			struct sock_ev_client_last_activity *client_last_activity =
-				(struct sock_ev_client_last_activity *)DArray_get(client->server->arr_client_last_activity, (size_t)int_i);
-			// The two things that need to be the same, are the ip and the cookie
-			// (these are stored by the auth?action=login
-			// request handler)
-			if (client_last_activity != NULL &&
-				strncmp(client_last_activity->str_client_ip, client->str_client_ip, INET_ADDRSTRLEN) == 0 &&
-				strncmp(client_last_activity->str_cookie, str_cookie_encrypted, strlen(str_cookie_encrypted)) == 0) {
-				client->int_last_activity_i = int_i;
+		// Make sure we have the last close time
+		if (client->int_last_activity_i == -1) {
+			// If we don't, then find it
+			for (int_i = 0, int_len = (ssize_t)DArray_end(client->server->arr_client_last_activity); int_i < int_len; int_i += 1) {
+				struct sock_ev_client_last_activity *client_last_activity =
+					(struct sock_ev_client_last_activity *)DArray_get(client->server->arr_client_last_activity, (size_t)int_i);
+				// The two things that need to be the same, are the ip and the cookie
+				// (these are stored by the auth?action=login
+				// request handler)
+				if (client_last_activity != NULL &&
+					strncmp(client_last_activity->str_client_ip, client->str_client_ip, INET_ADDRSTRLEN) == 0 &&
+					strncmp(client_last_activity->str_cookie, str_cookie_encrypted, strlen(str_cookie_encrypted)) == 0) {
+					client->int_last_activity_i = int_i;
+					break;
+				}
+			}
+			// If we don't have it, we don't need it
+		}
+
+		// Find another client from the same place/cookie
+		LIST_FOREACH(client->server->list_client, first, next, node) {
+			struct sock_ev_client *other_client = node->value;
+			SDEBUG("other_client                        = %p", other_client);
+			SDEBUG("other_client->node                  = %p", other_client->node);
+			SDEBUG("client->node                        = %p", client->node);
+			SDEBUG("other_client->int_last_activity_i   = %d", other_client->int_last_activity_i);
+			SDEBUG("client->int_last_activity_i         = %d", client->int_last_activity_i);
+			if (other_client != NULL && client->node != other_client->node &&
+				client->int_last_activity_i == other_client->int_last_activity_i) {
+				other_client_node = node;
 				break;
 			}
 		}
-		// If we don't have it, we don't need it
-	}
 
-	// Find another client from the same place/cookie
-	LIST_FOREACH(client->server->list_client, first, next, node) {
-		struct sock_ev_client *other_client = node->value;
-		SDEBUG("other_client                        = %p", other_client);
-		SDEBUG("other_client->node                  = %p", other_client->node);
-		SDEBUG("client->node                        = %p", client->node);
-		SDEBUG("other_client->int_last_activity_i   = %d", other_client->int_last_activity_i);
-		SDEBUG("client->int_last_activity_i         = %d", client->int_last_activity_i);
-		if (other_client != NULL && client->node != other_client->node &&
-			client->int_last_activity_i == other_client->int_last_activity_i) {
-			other_client_node = node;
-			break;
+		SDEBUG("List_count(client->server->list_client)   = %d", List_count(client->server->list_client));
+		SDEBUG("client->server->arr_client_last_activity  = %p", client->server->arr_client_last_activity);
+		SDEBUG("client->int_last_activity_i               = %d", client->int_last_activity_i);
+		SDEBUG("other_client_node                         = %p", other_client_node);
+
+		// Grab the last close time if we have it
+		struct sock_ev_client_last_activity *client_last_activity = NULL;
+		if (client->int_last_activity_i != -1) {
+			client_last_activity = (struct sock_ev_client_last_activity *)DArray_get(
+				client->server->arr_client_last_activity, (size_t)client->int_last_activity_i);
+
+			SDEBUG(" ev_now(global_loop)                                            : %f", ev_now(global_loop));
+			SDEBUG("                       client_last_activity->last_activity_time : %f", client_last_activity->last_activity_time);
+			SDEBUG("(ev_now(global_loop) - client_last_activity->last_activity_time): %f", (ev_now(global_loop) - client_last_activity->last_activity_time));
 		}
-	}
+		// Grab the other client if we have it
+		struct sock_ev_client *other_client = NULL;
+		SDEBUG("other_client_node = %p", other_client_node);
+		if (other_client_node != NULL) {
+			other_client = other_client_node->value;
+		}
+		// Check to see if we have another client, if we don't check to see if the
+		// session has expired
+		if (
+			!(
+				(
+					other_client != NULL &&
+					other_client->conn != NULL
+				) ||
+				(
+					client->int_last_activity_i != -1 &&
+					(
+						ev_now(global_loop) - client_last_activity->last_activity_time
+					) < int_global_login_timeout
+				)
+			)
+		) {
+#ifdef ENVELOPE
+			if (strstr(str_uri_temp, "acceptnc_") != NULL) {
+				char *ptr_dot = strstr(str_uri_temp, ".");
+				if (
+					(
+						ptr_dot != NULL &&
+						strncmp(ptr_dot + 1, "acceptnc_", 9) == 0
+					) ||
+					strncmp(str_uri_temp, "/env/acceptnc_", 14) == 0
+				) {
+					bol_public = true;
+				}
+			} else if (strstr(str_uri_temp, "actionnc_") != NULL) {
+				char *ptr_dot = strstr(str_uri_temp, ".");
+				if (
+					(
+						ptr_dot != NULL &&
+						strncmp(ptr_dot + 1, "actionnc_", 9) == 0
+					) ||
+					strncmp(str_uri_temp, "/env/actionnc_", 14) == 0
+				) {
+					bol_public = true;
+				}
+			}
+#endif
+			SFINISH_CHECK(bol_public, "Session expired");
+		}
+		SDEBUG("bol_public: %s", bol_public ? "true" : "false");
 
-	SDEBUG("List_count(client->server->list_client)   = %d", List_count(client->server->list_client));
-	SDEBUG("client->server->arr_client_last_activity  = %p", client->server->arr_client_last_activity);
-	SDEBUG("client->int_last_activity_i               = %d", client->int_last_activity_i);
-	SDEBUG("other_client_node                         = %p", other_client_node);
+		str_cookie_decrypted = aes_decrypt(str_cookie_encrypted, &int_cookie_len);
 
-	// Grab the last close time if we have it
-	struct sock_ev_client_last_activity *client_last_activity = NULL;
-	if (client->int_last_activity_i != -1) {
-		client_last_activity = (struct sock_ev_client_last_activity *)DArray_get(
-			client->server->arr_client_last_activity, (size_t)client->int_last_activity_i);
+		// **** WARNING ****
+		// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE FULL COOKIE IN THE CLEAR
+		// IN THE LOG!!!!
+		// SDEBUG("str_cookie_decrypted: >%s<", str_cookie_decrypted);
+		// **** WARNING ****
 
-		SDEBUG(" ev_now(global_loop)                                            : %f", ev_now(global_loop));
-		SDEBUG("                       client_last_activity->last_activity_time : %f", client_last_activity->last_activity_time);
-		SDEBUG("(ev_now(global_loop) - client_last_activity->last_activity_time): %f", (ev_now(global_loop) - client_last_activity->last_activity_time));
-	}
-	// Grab the other client if we have it
-	struct sock_ev_client *other_client = NULL;
-	SDEBUG("other_client_node = %p", other_client_node);
-	if (other_client_node != NULL) {
-		other_client = other_client_node->value;
-	}
-	// Check to see if we have another client, if we don't check to see if the
-	// session has expired
-	SFINISH_CHECK((other_client != NULL && other_client->conn != NULL) ||
-					  (client->int_last_activity_i != -1 &&
-						  (ev_now(global_loop) - client_last_activity->last_activity_time) < int_global_login_timeout),
-		"Session expired");
+		SFINISH_CHECK(str_cookie_decrypted != NULL, "aes_decrypt failed");
 
-	str_cookie_decrypted = aes_decrypt(str_cookie_encrypted, &int_cookie_len);
+		////GET THINGS FOR CONNECTION STRING
+		str_username = str_tolower(getpar(str_cookie_decrypted, "username", int_cookie_len, &int_user_length));
+		SFINISH_CHECK(str_username != NULL, "str_tolower(getpar()) failed");
+		SNOTICE("REQUEST USERNAME: %s", str_username);
+		str_database = str_tolower(getpar(str_cookie_decrypted, "dbname", int_cookie_len, &int_dbname_length));
+		if (str_database != NULL && strlen(str_database) == 0) {
+			SFREE(str_database);
+		}
+		if (str_database != NULL) {
+			SNOTICE("REQUEST DATABASE: %s", str_database);
+		}
 
-	// **** WARNING ****
-	// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE FULL COOKIE IN THE CLEAR
-	// IN THE LOG!!!!
-	// SDEBUG("str_cookie_decrypted: >%s<", str_cookie_decrypted);
-	// **** WARNING ****
-
-	SFINISH_CHECK(str_cookie_decrypted != NULL, "aes_decrypt failed");
-
-	////GET THINGS FOR CONNECTION STRING
-	str_username = str_tolower(getpar(str_cookie_decrypted, "username", int_cookie_len, &int_user_length));
-	SFINISH_CHECK(str_username != NULL, "str_tolower(getpar()) failed");
-	SNOTICE("REQUEST USERNAME: %s", str_username);
-	str_database = str_tolower(getpar(str_cookie_decrypted, "dbname", int_cookie_len, &int_dbname_length));
-	if (str_database != NULL && strlen(str_database) == 0) {
-		SFREE(str_database);
-	}
-	if (str_database != NULL) {
-		SNOTICE("REQUEST DATABASE: %s", str_database);
+	} else {
+		SFINISH_CAT_CSTR(str_username, str_global_public_username);
+		int_user_length = strlen(str_global_public_username);
 	}
 
 #ifdef ENVELOPE
@@ -180,8 +252,15 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 												"restart " SUN_PROGRAM_LOWER_NAME "");
 	}
 
-	str_password = getpar(str_cookie_decrypted, "password", int_cookie_len, &int_password_length);
-	SFINISH_CHECK(str_password != NULL, "getpar failed");
+	SDEBUG("bol_public: %s", bol_public ? "true" : "false");
+	if (bol_public == false) {
+		str_password = getpar(str_cookie_decrypted, "password", int_cookie_len, &int_password_length);
+		SFINISH_CHECK(str_password != NULL, "getpar failed");
+
+	} else {
+		SFINISH_CAT_CSTR(str_password, str_global_public_password);
+		int_password_length = strlen(str_global_public_password);
+	}
 
 	SDEBUG("client->str_conn: %s", client->str_conn);
 	SDEBUG("str_connname: %s", str_connname);

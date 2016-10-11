@@ -1,7 +1,10 @@
 ALTER ROLE postgres PASSWORD 'password';
 CREATE ROLE test_user LOGIN PASSWORD 'password';
+CREATE ROLE public_user LOGIN PASSWORD 'youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08';
 CREATE ROLE developer_g   NOLOGIN NOCREATEROLE  NOSUPERUSER    INHERIT  NOCREATEDB  NOREPLICATION    CONNECTION LIMIT -1   VALID UNTIL 'infinity';
+CREATE ROLE public_g   NOLOGIN NOCREATEROLE  NOSUPERUSER    INHERIT  NOCREATEDB  NOREPLICATION    CONNECTION LIMIT -1   VALID UNTIL 'infinity';
 GRANT developer_g TO postgres;
+GRANT public_g TO public_user;
 CREATE TABLE IF NOT EXISTS rtesting_table
 (
 id serial,
@@ -22,6 +25,7 @@ CREATE OR REPLACE VIEW ttesting_view AS
 		  ) em1
 	   ) em2
 	 ) em3;
+
 CREATE OR REPLACE FUNCTION public.accept_testing(str_args text)
 RETURNS text AS
 $BODY$
@@ -36,6 +40,23 @@ BEGIN
 RETURN '"' || str_args || '"';
 END
 $BODY$ LANGUAGE plpgsql VOLATILE;
+
+CREATE OR REPLACE FUNCTION public.acceptnc_testing(str_args text)
+RETURNS text AS
+$BODY$
+BEGIN
+RETURN E'HTTP/1.1 200 OK\r\n\r\n' || str_args;
+END
+$BODY$ LANGUAGE plpgsql VOLATILE;
+GRANT EXECUTE ON FUNCTION public.acceptnc_testing(str_args text) TO public_g;
+CREATE OR REPLACE FUNCTION public.actionnc_testing(str_args text)
+RETURNS text AS
+$BODY$
+BEGIN
+RETURN '"' || str_args || '"';
+END
+$BODY$ LANGUAGE plpgsql VOLATILE;
+GRANT EXECUTE ON FUNCTION public.actionnc_testing(str_args text) TO public_g;
 
 
 CREATE OR REPLACE FUNCTION public.action_reset_seq(str_args text)

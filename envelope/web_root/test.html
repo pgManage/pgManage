@@ -251,6 +251,10 @@
 */ })],
 			//Custom GS.ajaxText looks for /test.txt?if_modified_since=true
 			//It then sends a If-Modified-Since header
+			['ACCEPTNC FAIL', 'ajax', 500, '/env/public.acceptnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.acceptnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.acceptnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPTNC', 'ajax', 200, '/env/public.acceptnc_testing', 'testingnitset', 'testingnitset'],
+			['ACTIONNC FAIL', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTIONNC', 'ajax', 200, '/env/public.actionnc_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
 			['File Read If-Modified-Since', 'ajax', 304, '/test.txt?if_modified_since=true', '', ''],
 			['List Connections', 'ajax', 500, '/env/auth', 'action=list',
 				ml(function () {/*"The list action is useful in postage, but not envelope."*/})],
@@ -455,7 +459,7 @@ File already exists.*/})],
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE WRITE FAIL 2', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\t{{CHANGESTAMP}}\nThis is a test1\n',
 				[
-					"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|all/test.txtπ<"
+					"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<"
 				]
 			],
 			['APP FILE WRITE FAIL 3', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt\t',
@@ -463,9 +467,9 @@ File already exists.*/})],
 			['APP FILE WRITE FAIL 4', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt',
 				["Invalid Request"]],
 			['APP FILE WRITE FAIL 5', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\tCHANGESTAMP\nThis is a test1\n',
-				["../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|all/test.txtπ<"]],
+				["../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<"]],
 			['APP FILE WRITE FAIL 6', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\t\'2016-8-8 11:15:46\'\nThis is a test1\n',
-				["../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|all/test.txtπ<"]],
+				["../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<"]],
 			['APP FILE WRITE 4', 'websocket', '', 'FILE\tWRITE\t/app/all/test1.txt\t10000000000000\nThis is a test\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE WRITE FAIL 8', 'websocket', '', 'FILE\tWRITE\t/app/all/test1.txt 10000000000000\nThis is a test\n',
@@ -497,7 +501,7 @@ File already exists.*/})],
 			['APP FILE READ FAIL 2', 'websocket', '', 'FILE\tREAD\t/ap/all/test.txt',
 				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
 			['APP FILE READ FAIL 3', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited('/role/trusted_g/test.txt > /role/trusted_g/test2.txt'),
-				["../util/util_canonical.c:canonical: trusted_g/test.txt > /role/trusted_g/test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/role|trusted_g/test.txt > /role/trusted_g/test2.txt<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/test.txt > /role/trusted_g/test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/test.txt > /role/trusted_g/test2.txt<","TRANSACTION COMPLETED"]],
 			['APP FILE READ FAIL 4', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited(''),
 				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
 			['APP FILE READ FAIL 5', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited('../'),
@@ -551,19 +555,19 @@ File already exists.*/})],
 			['APP FILE CREATE_FOLDER FAIL 1', 'websocket', '', 'FILE\tCREATE_FOLDER\t/test/\n',
 				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 2', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/app/trusted_g/test-test--test-test') + '\n',
-				["../util/util_canonical.c:canonical: trusted_g/test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|trusted_g/test-test--test-test<"]],
+				["../util/util_canonical.c:canonical: trusted_g/test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g/test-test--test-test<"]],
 			['APP FILE CREATE_FOLDER FAIL 3', 'websocket', '', 'FILE\tCREATE_FOLDER',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 4', 'websocket', '', 'FILE\tCREATE_PI',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 5', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/app/trusted_g///////') + '\n',
-				["../util/util_canonical.c:canonical: trusted_g/////// is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|trusted_g///////<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/////// is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g///////<","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 6', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/role/trusted_g/ > /opt/test') + '\n',
-				["../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/role|trusted_g/ > /opt/test<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/ > /opt/test<","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 7', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/role/trusted_g/ > /opt/test'),
-				["../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/role|trusted_g/ > /opt/test<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/ > /opt/test<","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 8', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/role/trusted_g/π'),
-				["../util/util_canonical.c:canonical: trusted_g/π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/role|trusted_g/π<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/π<","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER', 'websocket', '', 'FILE\tCREATE_FOLDER\t/app/all/test3/test4/',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 
@@ -592,7 +596,7 @@ File already exists.*/})],
 				["File already exists."]],
 			['APP FILE CREATE_FILE FAIL 9', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/test.π'),
-				["../util/util_canonical.c:canonical: trusted_g/test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|trusted_g/test.π<","TRANSACTION COMPLETED"]],
+				["../util/util_canonical.c:canonical: trusted_g/test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g/test.π<","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FILE', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/all/test3.txt'),
 				['ANYTHING', 'TRANSACTION COMPLETED']],
@@ -640,7 +644,7 @@ File already exists.*/})],
 			['APP FILE SEARCH FAIL 1', 'websocket', '', 'FILE\tSEARCH\t/ap/\tgs-page > gs-header,\nRECURSIVE\n',
 				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"]],
 			['APP FILE SEARCH FAIL 2', 'websocket', '', 'FILE\tSEARCH\t/app/nonexisitant/\tgs-page > gs-header,\nRECURSIVE\n',
-				["../util/util_canonical.c:canonical: read_dir: /home/super/Repos/github/postage/envelope/app/|nonexisitant/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|nonexisitant/<"]
+				["../util/util_canonical.c:canonical: read_dir: /home/super/Repos/postage/envelope/app/|nonexisitant/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|nonexisitant/<"]
 			],
 			['APP FILE SEARCH FAIL 3', 'websocket', '', 'FILE\tSEARCH\t/app/\tThis is a test of the [search|bran|envelope,\nREGEX\n',
 				["regcomp failed: 7 (Missing ']')"]],
@@ -648,7 +652,7 @@ File already exists.*/})],
 				GS.encodeForTabDelimited('/app/trust_g/') + '\t' +
 				GS.encodeForTabDelimited('This....a test of the search') + '\n' +
 				'INSENSITIVE\tREGEX' + '\n',
-				["../util/util_canonical.c:canonical: read_dir: /home/super/Repos/github/postage/envelope/app/|trust_g/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/github/postage/envelope/app|trust_g/<"]],
+				["../util/util_canonical.c:canonical: read_dir: /home/super/Repos/postage/envelope/app/|trust_g/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trust_g/<"]],
 			['APP FILE SEARCH FAIL 5', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('../../') + '\t' +
 				GS.encodeForTabDelimited('This is a test of the search') + '\n' +
@@ -745,9 +749,13 @@ File already exists.*/})],
 
 			['ACCEPT FAIL', 'ajax', 500, '/env/public.accept_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.accept_testing1(unknown) does not exist\\nLINE 1: SELECT public.accept_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
 			['ACCEPT', 'ajax', 200, '/env/public.accept_testing', 'testingnitset', 'testingnitset'],
+			['ACCEPTNC FAIL', 'ajax', 500, '/env/public.acceptnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.acceptnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.acceptnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPTNC', 'ajax', 200, '/env/public.acceptnc_testing', 'testingnitset', 'testingnitset'],
 			['ACTION FAIL', 'ajax', 500, '/env/public.action_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.action_testing1(unknown) does not exist\\nLINE 1: SELECT public.action_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
 			['ACTION', 'ajax', 200, '/env/public.action_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
-			['action_info', 'ajax', 200, '/env/action_info', '', ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.4 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 6.1.1 20160621 (Red Hat 6.1.1-3), 64-bit","envelope": "2.1.0RC3"}}*/ })],
+			['ACTIONNC FAIL', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTIONNC', 'ajax', 200, '/env/public.actionnc_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
+			['action_info', 'ajax', 200, '/env/action_info', '', ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.4 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 6.1.1 20160621 (Red Hat 6.1.1-3), 64-bit","envelope": "2.1.0RC6"}}*/ })],
 			['ACTION FAIL 1', 'websocket', '', ml(function () {/*ACTION	public	action_testing1	testingnitset
 */}),
 			["FATAL\nerror_text\tERROR:  function public.action_testing1(unknown) does not exist\\nLINE 1: COPY (SELECT \"public\".\"action_testing1\"('testingnitset')) TO...\\n                     ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t14\n"]],
@@ -1058,9 +1066,9 @@ id
 <head><script>window.open('/', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })]
 				]);
 				Local.tests = JSON.parse(JSON.stringify(Global.tests));
-				Local.tests[31][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'text/plain'});
-				Local.tests[32][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'application/octet-binary'});
-				Local.tests[33][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'application/x-binary'});
+				Local.tests[35][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'text/plain'});
+				Local.tests[36][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'application/octet-binary'});
+				Local.tests[37][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'application/x-binary'});
 				//application/octet-binary
 				//ml(function () {/*asdfasdfasdf*/})
 				window.addEventListener('load', function () {

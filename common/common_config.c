@@ -13,6 +13,8 @@ bool bol_global_super_only = true;
 bool bol_global_allow_custom_connections = false;
 size_t int_global_login_timeout = 1200;
 size_t int_global_custom_connection_number = 0;
+char *str_global_public_username = NULL;
+char *str_global_public_password = NULL;
 
 DArray *darr_global_connection = NULL;
 
@@ -50,6 +52,8 @@ char *POSTAGE_PREFIX = NULL;
 // int_global_login_timeout	 			login_timeout					t							login-timeout
 // str_global_log_level					log_level						l							log-level
 // str_global_logfile					log_file						o							log-file
+// str_global_public_username			public_username					u							public-username
+// str_global_public_password			public_password					w							public-password
 // clang-format on
 
 /*
@@ -75,6 +79,15 @@ static int handler(void *str_user, const char *str_section, const char *str_name
 	} else if (SMATCH("", "role_path")) {
 		SFREE(str_global_role_path);
 		SERROR_CAT_CSTR(str_global_role_path, str_value);
+
+	} else if (SMATCH("", "public_username")) {
+		SFREE(str_global_public_username);
+		SERROR_CAT_CSTR(str_global_public_username, str_value);
+
+	} else if (SMATCH("", "public_password")) {
+		SFREE(str_global_public_password);
+		SERROR_CAT_CSTR(str_global_public_password, str_value);
+
 #endif
 	} else if (SMATCH("", "mode")) {
 #ifdef ENVELOPE_ODBC
@@ -424,10 +437,12 @@ bool parse_options(int argc, char *const *argv) {
 #else
 	SERROR_CAT_CSTR(str_global_port, "8080");
 #endif
+	SERROR_CAT_CSTR(str_global_public_username, "");
+	SERROR_CAT_CSTR(str_global_public_password, "");
 
 	// options descriptor
 	// clang-format off
-	static struct option longopts[20] = {
+	static struct option longopts[22] = {
 		{"help",							no_argument,			NULL,	'h'},
 		{"version",							no_argument,			NULL,	'v'},
 		{"config-file",						required_argument,		NULL,	'c'},
@@ -436,6 +451,8 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef ENVELOPE
 		{"app-path",						required_argument,		NULL,	'y'},
 		{"role-path",						required_argument,		NULL,	'z'},
+		{"public-username",					required_argument,		NULL,	'u'},
+		{"public-password",					required_argument,		NULL,	'w'},
 #else
 		{"allow-custom-connections",		required_argument,		NULL,	'n'},
 		{"local-only",						required_argument,		NULL,	'x'},
@@ -454,7 +471,7 @@ bool parse_options(int argc, char *const *argv) {
 // clang-format on
 
 #ifdef ENVELOPE
-	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:u:w:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #else
 	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #endif
@@ -481,7 +498,7 @@ bool parse_options(int argc, char *const *argv) {
 	ini_parse(str_global_config_file, handler, &str_config_empty);
 
 #ifdef ENVELOPE
-	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:u:w:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #else
 	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #endif
@@ -510,6 +527,14 @@ bool parse_options(int argc, char *const *argv) {
 		} else if (ch == 'z') {
 			SFREE(str_global_role_path);
 			SERROR_CAT_CSTR(str_global_role_path, optarg);
+
+		} else if (ch == 'u') {
+			SFREE(str_global_public_username);
+			SERROR_CAT_CSTR(str_global_public_username, optarg);
+
+		} else if (ch == 'w') {
+			SFREE(str_global_public_password);
+			SERROR_CAT_CSTR(str_global_public_password, optarg);
 #else
 		} else if (ch == 'n') {
 			bol_global_allow_custom_connections = *optarg == 'T' || *optarg == 't';

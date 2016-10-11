@@ -2,8 +2,11 @@
 
 bool check_to_escape(char *str_input, bool bol_as_ident) {
 	char *ptr_input = str_input;
-	char *ptr_end_input = (str_input + strlen(str_input)) - 1;
+	char *ptr_end_input = (str_input + strlen(str_input));
 	size_t int_num_quotes = 0;
+	if (ptr_end_input > ptr_input) {
+		ptr_end_input -= 1;
+	}
 	while (isspace(*ptr_input)) {
 		ptr_input++;
 	}
