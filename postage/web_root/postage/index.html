@@ -193,15 +193,6 @@ function getUserName() {
 
 window.addEventListener('load', function () {
     var strQueryString = GS.getQueryString(); //, strUnameCookie = GS.getCookie('greyspots_postage_username');
-
-	if (window.process && window.process.type === 'renderer') {
-		var button = document.getElementById('button-config');
-		const ipcRenderer = require('electron').ipcRenderer;
-		button.removeAttribute('hidden');
-		button.addEventListener('click', function () {
-			ipcRenderer.send('postage', 'edit_config');
-		});
-	}
 	
     // fill the error element with any error text from the query string (coalesce to empty string)
     document.getElementById('container-error').textContent = GS.qryGetVal(strQueryString, 'error') || '';
@@ -259,14 +250,6 @@ window.addEventListener('load', function () {
                 -o-border-radius: 0 0 0.25em 0.25em;
                 border-radius: 0 0 0.25em 0.25em;
             }
-			
-			#button-config {
-				float: right;
-				border-bottom: none;
-			}
-			gs-optionbox {
-				clear: both;
-			}
         </style>
     </head>
     <body>
@@ -307,7 +290,6 @@ window.addEventListener('load', function () {
                         <label class="style-bracket-header">Connections</label>
                         <div class="style-bracket-left"></div>
                         <div class="style-bracket-right"></div>
-	                    <gs-button bg-primary remove-bottom id="button-config" hidden inline>Edit Configuration</gs-button>
                         
                         <gs-optionbox id="option-connection" no-target mini></gs-optionbox>
                     </div>

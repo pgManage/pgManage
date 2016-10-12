@@ -21,28 +21,33 @@
 			const fs = require('fs');
 			const ipcRenderer = require('electron').ipcRenderer;
 			window.Range = require('ace/range').Range;
+			const file = GS.qryGetVal(GS.getQueryString(), 'file');
+			
+			document.title = file;
 			
 			function restartPostage() {
 				ipcRenderer.send('postage', 'restart');
 			}
 			
-			function createEditor(id, file) {
-		        var 	indicator = document.getElementById(id + '-indicator')
+			document.addEventListener('DOMContentLoaded', function () {
+				var 	indicator = document.getElementById('conf-indicator')
 					,	editor;
 				
-				editor = ace.edit(id + '-editor');
-		        editor.setTheme('ace/theme/eclipse');
-		        editor.getSession().setMode('ace/mode/ini');
-		        editor.setShowPrintMargin(false);
-		        editor.setDisplayIndentGuides(true);
-		        editor.setShowFoldWidgets(false);
-		        editor.session.setUseWrapMode('free');
-		        editor.setBehavioursEnabled(false);
-		        editor.$blockScrolling = Infinity;
+				document.getElementById('header-text-container').textContent = file;
 				
-		        editor.ignoreChange = true;
+				editor = ace.edit('conf-editor');
+				editor.setTheme('ace/theme/eclipse');
+				editor.getSession().setMode('ace/mode/ini');
+				editor.setShowPrintMargin(false);
+				editor.setDisplayIndentGuides(true);
+				editor.setShowFoldWidgets(false);
+				editor.session.setUseWrapMode('free');
+				editor.setBehavioursEnabled(false);
+				editor.$blockScrolling = Infinity;
+
+				editor.ignoreChange = true;
 				 
-				fs.readFile(os.homedir() + '/.postage/' + file + '.conf', 'utf8', function readCallback(err, strValue) {
+				fs.readFile(os.homedir() + '/.postage/' + file, 'utf8', function readCallback(err, strValue) {
 					if (err) {
 						var templateElement = document.createElement('template');
 						templateElement.innerHTML = ml(function () {/*
@@ -61,7 +66,7 @@
 							indicator.textContent = '';
 							
 						}, function (event) {
-							fs.readFile(os.homedir() + '/.postage/' + file + '.conf', 'utf8', readCallback);
+							fs.readFile(os.homedir() + '/.postage/' + file, 'utf8', readCallback);
 						});
 					} else {
 				        editor.setValue(strValue);
@@ -79,7 +84,7 @@
 						
 						editor.on('change', function save() {
 							indicator.textContent = 'Saving...';
-							fs.writeFile(os.homedir() + '/.postage/' + file + '.conf', editor.getValue(), 'utf8', function (err) {
+							fs.writeFile(os.homedir() + '/.postage/' + file, editor.getValue(), 'utf8', function (err) {
 								if (err) {
 									var templateElement = document.createElement('template');
 		                            templateElement.innerHTML = ml(function () {/*
@@ -105,36 +110,6 @@
 								}
 							});
 						});
-					}
-				});
-				
-				return editor;
-			}
-			
-			document.addEventListener('DOMContentLoaded', function () {
-				var 	confEditor = createEditor('conf', 'postage')
-					,	confPane = document.getElementById('conf-pane')
-					,	confButton = document.getElementById('conf-button')
-					,	connEditor = createEditor('conn', 'postage-connections')
-					,	connPane = document.getElementById('conn-pane')
-					,	connButton = document.getElementById('conn-button');
-					
-				confButton.addEventListener('click', function () {
-					if (connButton.hasAttribute('bg-primary')) {
-						connButton.removeAttribute('bg-primary');
-						connPane.setAttribute('hidden', true);
-						
-						confPane.removeAttribute('hidden');
-						confButton.setAttribute('bg-primary', true);
-					}
-				});
-				connButton.addEventListener('click', function () {
-					if (confButton.hasAttribute('bg-primary')) {
-						confButton.removeAttribute('bg-primary');
-						confPane.setAttribute('hidden', true);
-						
-						connPane.removeAttribute('hidden');
-						connButton.setAttribute('bg-primary', true);
 					}
 				});
 			});
@@ -172,21 +147,9 @@
 					<gs-button inline class="header-button-text" onclick="restartPostage();">Reload Postage</gs-button>
 				</div>
 			</gs-header>
-            <gs-body flex-vertical>
-				<div id="tab-buttons">
-					<gs-button inline id="conf-button" remove-all bg-primary>postage.conf</gs-button><gs-button inline id="conn-button" remove-all>postage-connections.conf</gs-button>
-				</div>
-				<div flex>
-					<div id="conf-pane">
-						<div id="conf-indicator" class="indicator"></div>
-						<div id="conf-editor"></div>
-					</div>
-					
-					<div id="conn-pane" hidden>
-						<div id="conn-indicator" class="indicator"></div>
-						<div id="conn-editor"></div>
-					</div>
-				</div>
+            <gs-body>
+				<div id="conf-indicator" class="indicator"></div>
+				<div id="conf-editor"></div>
             </gs-body>
         </gs-page>
     </body>
