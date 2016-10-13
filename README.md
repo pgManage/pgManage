@@ -14,7 +14,7 @@ Currently we release every Saturday.
 
 ## FEEDBACK AND BUG REPORTS
 
-Please contact us with your feedback! Github issues and pull requests are welcome. Please report any issues you have for FREE support. More information is available at the project home page: https://www.workflowproducts.com/postage.html
+Please contact us with your feedback! Github issues and pull requests are welcome. Please report any issues you have for [FREE support](https://github.com/workflowproducts/postage/issues).
 
 ## Licensing
 
