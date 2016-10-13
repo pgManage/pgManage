@@ -5,7 +5,7 @@ If you'd like to try Postage please go to ["Releases"](https://github.com/workfl
 ### Application mode
 Releases marked "3.x.x" are Application mode packages. They run in a desktop window and connect to Postgres locally or remotely. 
 
-## Web Server mode
+### Web Server mode
 Releases marked "Source code" run like a web server. This enables you to connect to Postage from any browser, even on a phone. Remember to set your firewall appropriately, or even better, use a VPN. This mode is the only mode available for phone/table access at this time.
 
 ## Release Schedule
