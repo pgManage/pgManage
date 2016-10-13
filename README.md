@@ -1,108 +1,26 @@
 # Postage - A fast replacement for PGAdmin
 
-## About
-Postage is built on Envelope technology. Postage and Envelope are products of Workflow Products, LLC. 
+If you'd like to try Postage please go to ["Releases"](https://github.com/workflowproducts/postage/releases) and download the appropriate package for your OS. 
 
-Since postage runs in a browser we don't recommend you use postage with a non-UTF8 PostgreSQL database.
+### Application mode
+Releases marked "3.x.x" are Application mode packages. They run in a desktop window and connect to Postgres locally or remotely. 
 
-Currently we release once a week. To download Postage for install purposes, please go to ["Releases"](https://github.com/workflowproducts/postage/releases)
+## Web Server mode
+Releases marked "Source code" run like a web server. This enables you to connect to Postage from any browser, even on a phone. Remember to set your firewall appropriately, or even better, use a VPN. This mode is the only mode available for phone/table access at this time.
 
-## Dependencies
+## Release Schedule
 
-#### LIBPQ
-In order for Postage to talk to PostgreSQL you need to have the libpq library installed. If you don't have LibPQ or the Postage compile process can't find it, please consult the file INSTALL_LIBPQ for some OS-specific advice on how to get libpq.
+Currently we release every Saturday. 
 
-#### LIBRESSL
-Postage uses the new TLS API found in LibreSSL. It can take some time to compile LibreSSL. If LibreSSL is already installed on your machine, then the compile process dynamically loads that one. This way you can avoid the wait. If not, it's compiled in statically. Please be patient. 
-
-####DOWNLOADING POSTAGE
-
-https://github.com/workflowproducts/postage/releases
-
-####INSTALLING POSTAGE
-
-If you'd like to test Postage before you install, see the section "Testing Postage Before Installing" further down.
-
-*`make` will take a while as it builds libressl.*
-
-    cd postage
-    ./configure
-    make
-    sudo make install
-
-If you are on OpenBSD or FreeBSD, use gmake instead.
-Postage will be installed in `/usr/local/sbin`. All other files such as the html, javascript and configuration files will be installed to `/usr/local/etc/postage`.
-
-####RUNNING POSTAGE
-
-To run Postage:
-
-    /usr/local/sbin/postage
-
-Long Version:
-
-    /usr/local/sbin/postage \
-    -c /usr/local/etc/postage/postage.conf \
-    -d /usr/local/etc/postage/postage-connections.conf
-
-####Configuring POSTAGE
-
-Before running Postage for the first time you may want to configure some options. All the options are explained in the Postage man file:
-
-    man postage
-
-Current configuration options allow you to set various paths, various access restrictions, web port and log level. Note that in order to make Postage publish to HTTPS, you need to add paths for a TLS cert and key.
-
-You'll also need to set up a connection string to tell Postage where your PostgreSQL databases are published. The default connection string config file located in /usr/local/etc/postage/. There are examples in the provided postage-connections.conf file and further info is available in the man file.
-
-####TESTING POSTAGE BEFORE INSTALLING
-
-    cd postage
-    ./configure
-    make
-    nano config/postage-connections.conf
-    make test
-
-If you want to test Postage before you install, edit the `config/postage-connections.conf` file to add a connection string for your Postgres database. Instructions for adding a connection string are included in the Postage man page. To look at the Postage man page before installing Postage:
-
-    ./configure
-    man -M man postage
-
-By default Postage runs on port 8080, so if you need to change that you do it in the `postage.conf` file. You can also set other options like whether to use TLS to connect.
-
-Once you've added a connection string to the postage-connections.conf file, start the Postage server with:
-
-    make test
-
-Postage will push a message like:
-
-    Open http(s)://<this computer's ip>:8080/ in your web browser
-
-Once you see that message that means Postage is running, open your web browser to the link shown.
-
-####UNINSTALLING POSTAGE
-
-If you still have your original build directory then:
-
-    cd postage
-    ./configure
-    make uninstall
-    
-Postage saves SQL scripts that you create in Postage to the .postage folder. If you're removing Postage you may want to remove the .postage directory.
-
-    rm -r ~/.postage/
-
-If you don't have your original build directory check the following locations:
-
-    rm -r /usr/local/etc/postage        # you may wish to save your config files first
-    rm /usr/local/sbin/postage          # this removes the binary
-    rm /usr/local/man/man1/postage.1    # this removes the man page
-
-####FEEDBACK AND BUG REPORTS
+## FEEDBACK AND BUG REPORTS
 
 Please contact us with your feedback! Github issues and pull requests are welcome. Please report any issues you have for FREE support. More information is available at the project home page: https://www.workflowproducts.com/postage.html
 
-####Licensing
+## Licensing
+
+Postage is built on Envelope technology. Postage and Envelope are products of Workflow Products, LLC. However, we would very much like Postage to be a community project. Anyone presenting a quality patch that asks for commit privileges will likely receive them! 
+
+Since Postage runs in a browser we don't really know what will happen if you use Postage with a non-UTF8 PostgreSQL database. If you experience a problem then please post an issue to [Github Issues](https://github.com/workflowproducts/postage/issues).
 
 If you like some or all of Postage's functionality and the current license won't suit your needs, commercial licensing is available starting at $99. Please call Justin at Workflow Products, 817-503-9545 for details.
 
@@ -116,7 +34,7 @@ Then E*********DB committed several people to PGAdmin4. We realized that Postage
 
 Then someone expressed interest in Postage. We figured out a way to keep the developer overhead low and got back onto Github. So now we're back.
 
-At this point Postage is Workflow Products' flagship. We're content that Postage play the role of showing off the rich, desktop-like functionality possible with Envelope, the platform we wrote for our business applications. It would have been nice for it to become popular some day but that isn't going to happen. Fortunately for us we don't need it to be popular. We use it every day. If you do give Postage a try then you have our gratitude. Let us know what you think and we'll make it better.
+At this point Postage is Workflow Products' flagship. We're content that Postage play the role of showing off the rich, desktop-like functionality possible with Envelope, the platform we wrote for our business applications. It would have been nice for Postage to become popular some day but that isn't likely to happen. Fortunately for us we don't need it to be popular. We use it every day. If you do give Postage a try then you have our gratitude. Let us know what you think and we'll make it better!
 
 ## Roadmap
 
