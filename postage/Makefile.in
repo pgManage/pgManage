@@ -36,10 +36,10 @@ libressl: ../dependencies/libressl/Makefile
 libressl-install: ../dependencies/libressl/Makefile
 	$(MAKE) install -C ../dependencies/libressl/
 
-../dependencies/libressl/Makefile:
+../dependencies/libressl/Makefile: ../dependencies/libressl/Makefile.in
 	cd ../dependencies/libressl/; ./configure; cd ../../$(BINARY)
 
-ev.o:
+ev.o: ../dependencies/libev/ev.c
 	$(CC) ../dependencies/libev/ev.c @libev_CPPFLAGS@ -c -o ev.o
 
 ../dependencies/tre/lib/%.o: ../dependencies/tre/lib/%.c
@@ -49,11 +49,13 @@ libtre_SOURCES = $(wildcard ../dependencies/tre/lib/*.c)
 libtre_OBJECTS = $(libtre_SOURCES:.c=.o)
 
 #### BUILDING
-all: $(BUILD_DEPS) $(postage_OBJECTS)
-	$(CC) $(postage_OBJECTS) $(LDFLAGS) $(CFLAGS) \
-		-o ./$(BINARY)
+all: $(BINARY)
 	@echo
 	@echo "Compilation Successful"
+
+$(BINARY): $(BUILD_DEPS) $(postage_OBJECTS)
+	$(CC) $(postage_OBJECTS) $(LDFLAGS) $(CFLAGS) \
+		-o ./$(BINARY)
 
 all-format:
 	cd ..; ./cleanup_format.sh; cd $(BINARY)
@@ -64,7 +66,7 @@ all-format:
 
 #### CLEAN
 clean:
-	rm -f $(postage_OBJECTS) $(BINARY)
+	rm -f $(postage_OBJECTS) $(libtre_OBJECTS) ev.o $(BINARY)
 	@echo
 	@echo "Clean Successful"
 
@@ -72,11 +74,11 @@ clean:
 @prefix@/etc/$(BINARY)/:
 	mkdir -p @prefix@/etc/$(BINARY)/
 
-@prefix@/etc/$(BINARY)/$(BINARY).conf:
-	install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf;
+@prefix@/etc/$(BINARY)/$(BINARY).conf: config/$(BINARY).conf
+	test -f @prefix@/etc/$(BINARY)/$(BINARY).conf || install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf;
 
-@prefix@/etc/$(BINARY)/$(BINARY)-connections.conf: @prefix@/etc/$(BINARY)/
-	install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf;
+@prefix@/etc/$(BINARY)/$(BINARY)-connections.conf: config/$(BINARY)-connections.conf
+	test -f @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf || install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf;
 
 install: $(INSTALL_DEPS)
 	mkdir -p @prefix@/etc/$(BINARY)/web_root/$(BINARY)
