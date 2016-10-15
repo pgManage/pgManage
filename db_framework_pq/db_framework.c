@@ -43,6 +43,7 @@ DB_conn *DB_connect(EV_P, void *cb_data, char *str_connstring, char *str_user, s
 	conn->int_sock = -1;
 #endif
 
+
 	str_escape_username = escape_conninfo_value(str_user, &int_escape_username_length);
 	str_escape_password = escape_conninfo_value(str_password, &int_escape_password_length);
 	int_conn_length = strlen(str_connstring) + 6 + int_escape_username_length + 10 + int_escape_password_length + 1;
@@ -56,9 +57,9 @@ DB_conn *DB_connect(EV_P, void *cb_data, char *str_connstring, char *str_user, s
 	memcpy(
 		str_conn + strlen(str_connstring) + 6 + int_escape_username_length + 10, str_escape_password, int_escape_password_length);
 	// **** WARNING ****
-	// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE NEW PASSWORD IN THE
+	// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE PASSWORD IN THE
 	// CLEAR IN THE LOG!!!!
-	SDEBUG("str_conn>%s<", str_conn);
+	// SDEBUG("str_conn>%s<", str_conn);
 	// **** WARNING ****
 	pg_conn = PQconnectStart(str_conn);
 

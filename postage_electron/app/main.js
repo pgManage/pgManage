@@ -56,26 +56,20 @@ spawnPostage();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow = null;
+let mainWindows = [];
 let configWindow = null;
+let connectionWindow = null;
 let mainWindowState = null;
 let configWindowState = null;
+let connectionWindowState = null;
 
 ipcMain.on('postage', function (event, arg) {
 	if (arg === 'restart') {
 		proc.kill();
 		spawnPostage();
-		mainWindow.webContents.executeJavaScript('window.location.reload();');
-	} else if (arg === 'edit_config') {
-		configWindow = new BrowserWindow({
-			'x': configWindowState.x,
-			'y': configWindowState.y,
-			'width': configWindowState.width,
-			'height': configWindowState.height
+		mainWindows.forEach(function (curWindow) {
+			curWindow.webContents.executeJavaScript('window.location.reload();');
 		});
-		configWindowState.manage(configWindow);
-		configWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html',  { 'extraHeaders': 'pragma: no-cache\n' });
-		configWindow.setMenu(null);
 	}
 
 })
@@ -91,6 +85,37 @@ function setMenu() {
 		{
 			label: 'File',
 			submenu: [
+				{
+					label: 'New Window',
+					accelerator: 'CmdOrCtrl+N',
+					click: openWindow
+				},
+				{
+					label: 'Edit postage.conf',
+					click: function () {
+						configWindow = new BrowserWindow({
+							'x': configWindowState.x,
+							'y': configWindowState.y,
+							'width': configWindowState.width,
+							'height': configWindowState.height
+						});
+						configWindowState.manage(configWindow);
+						configWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
+					}
+				},
+				{
+					label: 'Edit postage-connections.conf',
+					click: function () {
+						connectionWindow = new BrowserWindow({
+							'x': connectionWindowState.x,
+							'y': connectionWindowState.y,
+							'width': connectionWindowState.width,
+							'height': connectionWindowState.height
+						});
+						connectionWindowState.manage(connectionWindow);
+						connectionWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
+					}
+				},
 				{
 					role: 'quit'
 				}
@@ -231,7 +256,28 @@ function setMenu() {
 	Menu.setApplicationMenu(menu)
 }
 
-function createWindow() {
+function openWindow() {
+	var curWindow = new BrowserWindow({
+		'x': mainWindowState.x,
+		'y': mainWindowState.y,
+		'width': mainWindowState.width,
+		'height': mainWindowState.height
+	});
+	mainWindows.push(curWindow);
+	mainWindowState.manage(curWindow);
+
+	curWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/index.html',  { 'extraHeaders': 'pragma: no-cache\n' });
+
+	// Emitted when the window is closed.
+	curWindow.on('closed', function () {
+		// Dereference the window object, usually you would store windows
+		// in an array if your app supports multi windows, this is the time
+		// when you should delete the corresponding element.
+		mainWindows.splice(mainWindows.indexOf(curWindow), 1);
+	});
+}
+
+function appStart() {
 	mainWindowState = windowStateKeeper({
 		defaultWidth: 1024,
 		defaultHeight: 768,
@@ -246,33 +292,22 @@ function createWindow() {
 		file: 'config-window-state.json'
 	});
 
-	// Create the browser window.
-	mainWindow = new BrowserWindow({
-		'x': mainWindowState.x,
-		'y': mainWindowState.y,
-		'width': mainWindowState.width,
-		'height': mainWindowState.height
+	connectionWindowState = windowStateKeeper({
+		defaultWidth: 1024,
+		defaultHeight: 768,
+		path: os.homedir() + '/.postage/',
+		file: 'connection-window-state.json'
 	});
-	mainWindowState.manage(mainWindow);
 
-	mainWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/index.html',  { 'extraHeaders': 'pragma: no-cache\n' });
+	openWindow();
 
-	//mainWindow.setMenu(null);
 	setMenu();
-
-	// Emitted when the window is closed.
-	mainWindow.on('closed', function () {
-		// Dereference the window object, usually you would store windows
-		// in an array if your app supports multi windows, this is the time
-		// when you should delete the corresponding element.
-		mainWindow = null;
-	});
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', appStart);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

@@ -1,5 +1,20 @@
 #!/bin/sh
 
+printf "checking for compiler..."
+echo "int main() {" > test.c
+echo "    return 0;" >> test.c
+echo "}" >> test.c
+cc -o test.o test.c > /dev/null 2> /dev/null
+if test $? = 0; then
+	echo "yes"
+else
+	echo "no"
+	echo
+	echo "ERROR: No compiler found!"
+	exit
+fi
+rm -f test.c test.o
+
 printf "checking for pg_config..."
 pg_config > /dev/null
 if test $? = 0; then

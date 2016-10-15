@@ -100,16 +100,36 @@ void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 		SFINISH_CHECK(DB_exec(EV_A, client->conn, client, str_sql, http_client_info_cb), "DB_exec failed");
 
 #ifdef ENVELOPE
-	} else if (strstr(str_uri, "accept_") != NULL) {
+	} else if (strstr(str_uri, "accept_") != NULL || strstr(str_uri, "acceptnc_") != NULL) {
 		char *ptr_dot = strstr(str_uri, ".");
-		if ((ptr_dot != NULL && strncmp(ptr_dot + 1, "accept_", 7) == 0) || strncmp(str_uri, "/env/accept_", 12) == 0) {
+		if (
+			(
+				ptr_dot != NULL &&
+				(
+					strncmp(ptr_dot + 1, "accept_", 7) == 0 ||
+					strncmp(ptr_dot + 1, "acceptnc_", 9) == 0
+				)
+			) ||
+			strncmp(str_uri, "/env/accept_", 12) == 0 ||
+			strncmp(str_uri, "/env/acceptnc_", 14) == 0
+		) {
 			http_accept_step1(client);
 		} else {
 			http_file_step1(client);
 		}
-	} else if (strstr(str_uri, "action_") != NULL) {
+	} else if (strstr(str_uri, "action_") != NULL || strstr(str_uri, "actionnc_") != NULL) {
 		char *ptr_dot = strstr(str_uri, ".");
-		if ((ptr_dot != NULL && strncmp(ptr_dot + 1, "action_", 7) == 0) || strncmp(str_uri, "/env/action_", 12) == 0) {
+		if (
+			(
+				ptr_dot != NULL &&
+				(
+					strncmp(ptr_dot + 1, "action_", 7) == 0 ||
+					strncmp(ptr_dot + 1, "actionnc_", 9) == 0
+				)
+			) ||
+			strncmp(str_uri, "/env/action_", 12) == 0 ||
+			strncmp(str_uri, "/env/actionnc_", 14) == 0
+		) {
 			http_action_step1(client);
 		} else {
 			http_file_step1(client);

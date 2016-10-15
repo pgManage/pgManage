@@ -37,6 +37,8 @@ extern char *str_global_port;
 extern bool bol_global_local_only;
 extern bool bol_global_super_only;
 extern bool bol_global_allow_custom_connections;
+extern char *str_global_public_username;
+extern char *str_global_public_password;
 
 extern DArray *darr_global_connection;
 extern size_t int_global_login_timeout;

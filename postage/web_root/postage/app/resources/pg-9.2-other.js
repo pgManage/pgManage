@@ -180,12 +180,12 @@ function menuTools(target) {
                             no-focus iconleft icon="lock" onclick="dialogLocks()">Transaction Locks</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft icon="film" onclick="dialogPreparedTransactions()">Prepared Transactions</gs-button>
-                
+
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft icon="list-alt" onclick="dialogReloadConf()">Reload Postgres Conf</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft icon="history" onclick="dialogRotateLog()">Rotate Log File</gs-button>
-                
+
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft onclick="dialogStats()" icon="bar-chart-o">Database Info &amp; Stats</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
@@ -224,6 +224,11 @@ function menuTab(target) {
 	                <gs-button class="postage-menu-item-button" dialogclose iconleft
 	                        onclick="dialogScriptOpen()" icon="folder-open-o"
 	                        title="Open a .sql file to a tab" no-focus>Open File...</gs-button>
+					<gs-button onclick="saveCurrentScript()" icon="save" iconleft  class="postage-menu-item-button" title="Save" no-focus>Save File</gs-button>
+					<gs-button id="button-tab-current-save-as" onclick="saveCurrentScript(true)" icon="save" iconleft class="postage-menu-item-button button-save-as" title="Save As..." remove-all no-focus>
+	                    <span class="save-as-pencil">&#xf040;</span>
+						Save As...
+					</gs-button>
 	                <gs-button class="postage-menu-item-button" dialogclose iconleft
 	                        onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icon="folder-o"
 	                        title="Create a blank script tab" no-focus id="menu-button-new-tab">
