@@ -141,7 +141,7 @@ void http_ev_step1(struct sock_ev_client *client) {
 #endif
 	ssize_t int_i = _loop->anfdmax;
 	while (int_i >= 0 && (bol_kill == false || bol_killed == false)) {
-		ANFD *anfd = _loop->anfds + ((size_t)int_i * sizeof(ANFD));
+		ANFD *anfd = &_loop->anfds[int_i];
 
 #ifdef _WIN32
 		unsigned long arg = 0;
@@ -150,7 +150,9 @@ void http_ev_step1(struct sock_ev_client *client) {
 			continue;
 		}
 #else
-		if (anfd->events == 0) { // fcntl((int)int_i, F_GETFD, &arg) != -1) {
+		unsigned long arg = 0;
+		// All of our sockets are non-blocking
+		if (fcntl((int)int_i, F_GETFL, &arg) & O_NONBLOCK == O_NONBLOCK) {
 			int_i -= 1;
 			continue;
 		}
