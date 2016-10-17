@@ -1,3 +1,13 @@
+Changes since 2.1.0RC6 and 3.0.0RC2:
+make http_ev work on *nix systems (addresses #20)
+add compiler check to configure (closes #21)
+check if config file exists before installing it (closes #25)
+add ability to open new windows in electron postage (closes workflowproducts/postage#29)
+add libpq as a depenedency for deb/rpm targets
+move 'Edit Configuration' button to electron menubar (closes #18)
+add actionnc_/acceptnc_
+copy save/save as buttons to tab menu
+
 Changes since 2.1.0RC5:
 Usability: remove old man page that was confusing
 Usability: fix makefiles to use the VERSION file
