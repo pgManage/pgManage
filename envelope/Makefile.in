@@ -41,7 +41,7 @@ libressl: ../dependencies/libressl/Makefile
 libressl-install: ../dependencies/libressl/Makefile
 	$(MAKE) install -C ../dependencies/libressl/
 
-../dependencies/libressl/Makefile:
+../dependencies/libressl/Makefile: ../dependencies/libressl/Makefile.in
 	cd ../dependencies/libressl/; ./configure; cd ../../$(BINARY)
 
 ev.o:
@@ -54,10 +54,12 @@ libtre_SOURCES = $(wildcard ../dependencies/tre/lib/*.c)
 libtre_OBJECTS = $(libtre_SOURCES:.c=.o)
 
 #### BUILDING
-all: $(BUILD_DEPS) $(envelope_OBJECTS) $(libtre_OBJECTS)
-	$(CC) $(envelope_OBJECTS) $(libtre_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
+all: $(BINARY)
 	@echo
 	@echo "Compilation Successful"
+
+$(BINARY): $(BUILD_DEPS) $(envelope_OBJECTS) $(libtre_OBJECTS)
+	$(CC) $(envelope_OBJECTS) $(libtre_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
 
 all-format:
 	cd ..; ./cleanup_format.sh; cd $(BINARY)
@@ -98,11 +100,11 @@ clean:
 @prefix@/etc/envelope/role/:
 	mkdir -p @prefix@/etc/envelope/role/
 
-@prefix@/etc/$(BINARY)/$(BINARY).conf: @prefix@/etc/$(BINARY)/
-	install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf;
+@prefix@/etc/$(BINARY)/$(BINARY).conf: @prefix@/etc/$(BINARY)/ config/$(BINARY).conf
+	test -f @prefix@/etc/$(BINARY)/$(BINARY).conf || install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf;
 
-@prefix@/etc/$(BINARY)/$(BINARY)-connections.conf: @prefix@/etc/$(BINARY)/
-	install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf;
+@prefix@/etc/$(BINARY)/$(BINARY)-connections.conf: @prefix@/etc/$(BINARY)/ config/$(BINARY)-connections.conf
+	test -f @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf || install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf;
 
 install: $(INSTALL_DEPS)
 	install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf.example
