@@ -1806,7 +1806,8 @@ function executeScript() {
             var tableElement, scrollElement, trElement, arrRecords
               , arrCells, intRows, strHTML, arrLines, strError
               , intLine, i, len, col_i, col_len, rec_i, rec_len
-              , warningHTML, buttonContainerElement;
+              , warningHTML, buttonContainerElement, strCSS
+              , styleElement;
 
             if (bolIgnoreMessages === false) {
                 if (!error) {
@@ -1969,6 +1970,7 @@ function executeScript() {
                                 bindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
 
                                 strHTML = '<thead><tr><th>#</th>';
+                                strCSS = '';
                                 for (col_i = 0, col_len = data.arrColumnNames.length; col_i < col_len; col_i += 1) {
                                     strHTML += '<th>';
                                     strHTML +=     '<b>';
@@ -1978,14 +1980,38 @@ function executeScript() {
                                     strHTML +=          encodeHTML(GS.decodeFromTabDelimited(data.arrColumnTypes[col_i]));
                                     strHTML +=     '</small>';
                                     strHTML += '</th>';
+                                    
+                                    
+                                    //int2 / smallint
+                                    //int4 / integer
+                                    //int8 / bigint
+                                    //numeric
+                                    //float
+                                    //decimal
+                                    //real
+                                    //double
+                                    //money
+                                    //oid
+                                    
+                                    // if this column is a number type: align column text to the right
+                                    if ((/^(int|smallint|bigint|numeric|float|decimal|real|double|money|oid)/gi).test(data.arrColumnTypes[col_i])) {
+                                        strCSS += ' table[data-query-number="' + data.intQueryNumber + '"] tbody tr :nth-child(' + (col_i + 2) + ') { ';
+                                        strCSS += '     text-align: right;';
+                                        strCSS += ' } ';
+                                    }
                                 }
                                 strHTML += '</tr></thead>';
+
 
                                 tableElement = document.createElement('table');
                                 tableElement.classList.add('results-table');
                                 tableElement.setAttribute('data-query-number', data.intQueryNumber);
                                 tableElement.innerHTML = strHTML;
                                 scrollElement.appendChild(tableElement);
+
+                                styleElement = document.createElement('style');
+                                styleElement.innerHTML = strCSS;
+                                scrollElement.appendChild(styleElement);
 
                                 currentTargetTbody = document.createElement('tbody');
                                 tableElement.appendChild(currentTargetTbody);

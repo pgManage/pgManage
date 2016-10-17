@@ -752,9 +752,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 //console.log(intColumnElementFocusNumber, jsnSelection);
                 
-                if (arrElements.length > intColumnElementFocusNumber && jsnSelection) {
+                if (arrElements.length > intColumnElementFocusNumber) {
                     arrElements[intColumnElementFocusNumber].focus();
-                    GS.setInputSelection(document.activeElement, jsnSelection.start, jsnSelection.end);
+                    if (jsnSelection) {
+                        GS.setInputSelection(document.activeElement, jsnSelection.start, jsnSelection.end);
+                    }
                 }
             }
             
