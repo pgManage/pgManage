@@ -42,7 +42,7 @@ libressl-install: ../dependencies/libressl/Makefile
 ev.o: ../dependencies/libev/ev.c
 	$(CC) ../dependencies/libev/ev.c @libev_CPPFLAGS@ -c -o ev.o
 
-../dependencies/tre/lib/%.o: ../dependencies/tre/lib/%.c
+$(libtre_OBJECTS): %.o: %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $< -c -o $@
 
 libtre_SOURCES = $(wildcard ../dependencies/tre/lib/*.c)
@@ -74,10 +74,10 @@ clean:
 @prefix@/etc/$(BINARY)/:
 	mkdir -p @prefix@/etc/$(BINARY)/
 
-@prefix@/etc/$(BINARY)/$(BINARY).conf: config/$(BINARY).conf
+@prefix@/etc/$(BINARY)/$(BINARY).conf: @prefix@/etc/$(BINARY)/ config/$(BINARY).conf
 	test -f @prefix@/etc/$(BINARY)/$(BINARY).conf || install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf;
 
-@prefix@/etc/$(BINARY)/$(BINARY)-connections.conf: config/$(BINARY)-connections.conf
+@prefix@/etc/$(BINARY)/$(BINARY)-connections.conf: @prefix@/etc/$(BINARY)/ config/$(BINARY)-connections.conf
 	test -f @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf || install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf;
 
 install: $(INSTALL_DEPS)
