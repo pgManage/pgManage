@@ -904,6 +904,8 @@ OFFSET
                 ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Select Fail 2', 'ajax', 500, '/env/action_select', 'view=rtesting_table2',
                 ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+            ['Select Fail 3', 'ajax', 500, '/env/action_select', 'view=rtesting_table&where=test_name%20%3D%20asdf',
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'asdf'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Select 1', 'ajax', 200, '/env/action_select', 'src=rtesting_table&limit=1&order_by=id%20ASC&cols=id,test_name,test_name2,change_stamp,testint',
                 ml(function () {/*{"stat": true, "dat": {"arr_column": ["id","test_name","test_name2","change_stamp","testint"], "dat": [[2,"Bob","","Jun 15 2016  1:17PM",0]], "row_count": 4}}*/ })],
 
@@ -931,6 +933,8 @@ OFFSET
                 ml(function () {/*{"stat": true, "dat": {"lastval": 6}}*/ })],
             ['Insert 2', 'ajax', 200, '/env/action_insert', 'view=rtesting_table&data=' + encodeURIComponent('test_name=test&test_name2=test'),
                 ml(function () {/*{"stat": true, "dat": {"lastval": 7}}*/ })],
+            ['Insert 3', 'ajax', 200, '/env/action_insert', 'view=ttesting_view_simple&currval=rtesting_table&data=' + encodeURIComponent('test_name=test&test_name2=test'),
+                ml(function () {/*{"stat": true, "dat": {"lastval": 8}}*/ })],
             ['Update Fail', 'ajax', 500, '/env/action_update', 'src=rtesting_table&column=first_name&value=Test&where=' + encodeURIComponent('id=6'),
                 ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'first_name'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Update 1', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=Test&where=' + encodeURIComponent('id=6'),
@@ -1071,7 +1075,7 @@ test_name	test_name2
 Al\\i\t\tce	Ali\r\n\ncia
 E\n\nv\n\te	A\rda\t\nm
 */}),
-				["8\tAl\\i\\t\\tce\tAli\\r\\n\\ncia\n9\tE\\n\\nv\\n\\te\tA\\rda\\t\\nm\n", "TRANSACTION COMPLETED"]],
+				["9\tAl\\i\\t\\tce\tAli\\r\\n\\ncia\n10\tE\\n\\nv\\n\\te\tA\\rda\\t\\nm\n", "TRANSACTION COMPLETED"]],
 			['COMMIT', 'websocket', '', ml(function () {/*COMMIT*/ }),
 				['OK']],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table
@@ -1080,7 +1084,7 @@ RETURN	id	test_name	test_name2
 LIMIT	OFFSET
 2	1
 */}),
-				["id\ttest_name\ttest_name2\nint identity\tvarchar\tvarchar\n", "8\tAl\\i\\t\\tce\tAli\\r\\n\\ncia\n9\tE\\n\\nv\\n\\te\tA\\rda\\t\\nm\n", "TRANSACTION COMPLETED"]],
+				["id\ttest_name\ttest_name2\nint identity\tvarchar\tvarchar\n", "8\ttest\ttest\n9\tAl\\i\\t\\tce\tAli\\r\\n\\ncia\n", "TRANSACTION COMPLETED"]],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['DELETE 4', 'websocket', '', ml(function () {/*DELETE	rtesting_table
