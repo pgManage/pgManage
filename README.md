@@ -28,7 +28,7 @@ If you like some or all of Postage's functionality and the current license won't
 
 It's a long sad story really. Let's look at the bright side instead. Postage is pretty awesome. It's also a demonstration of [Envelope](https://github.com/workflowproducts/envelope), our application platform that makes building desktop-quality database applications on top of PostgreSQL or SQL Server a breeze.
 
-Once you to try Postage please give Envelope a try. Envelope can help you leverage your SQL skills to build rich, desktop quality web and desktop applications like Postage in less time than you ever thought possible. 
+Once you try Postage we hope it inspires you to have a look at Envelope. Envelope can help you leverage your SQL skills to build rich web and desktop applications in less time than you ever thought possible. 
 
 If you do give Postage a try then you have our gratitude. Let us know what you think and we'll make it better!
 
