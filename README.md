@@ -1,12 +1,12 @@
-# Postage - A fast replacement for PGAdmin
+# Postage - A fast alternative to PGAdmin
 
 If you'd like to try Postage please go to ["Releases"](https://github.com/workflowproducts/postage/releases) and download the appropriate package for your OS. 
 
 ### Application mode
-Releases marked "3.x.x" are Application mode packages. They run in a desktop window and connect to Postgres locally or remotely. 
+Releases marked "3.x.x" are Application mode packages. They run in a desktop window and can connect to Postgres locally or remotely. These packages are self contained and very easy to install and remove. Note that all the thanks for our wonderful installation process goes to Github and the Electron team.
 
 ### Web Server mode
-Releases marked "Source code" run like a web server. This enables you to connect to Postage from any browser, even on a phone. Remember to set your firewall appropriately, or even better, use a VPN. This mode is the only mode available for phone/table access at this time.
+Releases marked "Source code" run like a web server. This enables you to connect to Postage from any browser, even on a phone. Remember to set your firewall appropriately, or even better, use a VPN. This mode is the only mode available for phone/tablet access. This mode makes it easy to install Postage on one box, then have multiple developers log in and work. We find it convenient when we're at a client site and need to work from whatever workstation we're in front of at that moment.
 
 ## Release Schedule
 
@@ -26,27 +26,23 @@ If you like some or all of Postage's functionality and the current license won't
 
 ## Why?
 
-It's a sad story really. We had an in-house version for six or seven years. Then we decided it would be a good idea to polish it up and open source it. If it became popular it could be good for us. We then proceeded to invest an embarrassing amount of work into it. 
+It's a long sad story really. Let's look at the bright side instead. Postage is pretty awesome. It's also a demonstration of [Envelope](https://github.com/workflowproducts/envelope), our application platform that makes building desktop-quality database applications on top of PostgreSQL or SQL Server a breeze.
 
-It was available for some months on Github and there was no activity from outside developers or users. We did get a few stars but just one one-line patch. We were ok with that though because we figured at some point the number of users would increase. Everyone we showed it to at the DFW and Austin PUGs were very impressed and enthusiastic.
+Once you to try Postage please give Envelope a try. Envelope can help you leverage your SQL skills to build rich, desktop quality web and desktop applications like Postage in less time than you ever thought possible. 
 
-Then E*********DB committed several people to PGAdmin4. We realized that Postage was unlikely to be popular if PGAdmin4 gets to a place where it is 'good enough'. So we left Github to save developer overhead. 
-
-Then someone expressed interest in Postage. We figured out a way to keep the developer overhead low and got back onto Github. So now we're back.
-
-At this point Postage is Workflow Products' flagship. We're content that Postage play the role of showing off the rich, desktop-like functionality possible with Envelope, the platform we wrote for our business applications. It would have been nice for Postage to become popular some day but that isn't likely to happen. Fortunately for us we don't need it to be popular. We use it every day. If you do give Postage a try then you have our gratitude. Let us know what you think and we'll make it better!
+If you do give Postage a try then you have our gratitude. Let us know what you think and we'll make it better!
 
 ## Roadmap
 
 We aren't able to give any advance notice of features in development. However, if you are wondering about our commitment to Postage then wonder no longer. 
 
-Workflow Products has committed an embarrassing amount of resources to Postage over the years. The current average for 2016 is two full time people. Current priority is debugging install on various platforms. Next we'll be setting up various packages to make installation even easier. Then we'll move back into feature expansion. We have identified four major features we want to bring to Postage over the next six to eight months.
+Workflow Products has committed an embarrassing amount of resources to Postage over the years. The current average for 2016 is two full time people and holding. With the new Electron version released, installation (and uninstallation) has never been easier. Therefore, it's time we move back into feature expansion. We have identified four major features we want to bring to Postage over the next six to eight months. The first is in development. Watch this space for announcements. Do you know of a feature that would make Postage better? Please submit an [issue](https://github.com/workflowproducts/postage/issues).
 
-Workflow Products itself is healthier than it's ever been. We're celebrating our tenth year in November 2016. We're now at five full time employees and we expect to be around in another ten years. If you have any further questions please contact us directly at 817-503-9545.
+Workflow Products itself is healthier than it's ever been. We're celebrating our tenth year in November 2016. We're now at five full time employees and we expect to be around in another ten years. If you have any further questions please contact us directly at 817-503-9545. We'd love to hear from you.
 
 ## Contributing
 
-If you would like to contribute to Postage, first submit an issue. Please include how you plan to solve the issue. Then work on the patch. This way we get a moment to give feedback before you invest your time. 
+If you would like to contribute to Postage, first submit an issue. Please include how you plan to solve the issue. Then work on the patch. This way everyone gets a moment to give feedback before you invest your time. 
 
 Anyone presenting a quality patch that asks for commit privileges will likely receive them! Please leave the releases to Nunzio though. He has an extensive testing process. 
 
