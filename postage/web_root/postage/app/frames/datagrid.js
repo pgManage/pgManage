@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     function handleData(element, data) {
-        var strHTML, i, len, cell_i, cell_len, col_len, arrRecords, arrCells, disabled, arrColumns;
+        var strHTML, strCSS, i, len, cell_i, cell_len, col_len, arrRecords, arrCells, disabled, arrColumns;
         
         // calculate the number of cells across
         if (element.getAttribute('cols')) {
@@ -290,12 +290,24 @@ document.addEventListener('DOMContentLoaded', function () {
             };
             
             strHTML = '<th style="width: 4em;">#</th>';
+            strCSS = '';
             for (i = 0, len = arrColumns.length; i < len; i += 1) {
                 strHTML += '<th>' +
                                 '<b>' + encodeHTML(data.arrColumnNames[arrColumns[i]]) + '</b><br />' +
                                 '<small>' + encodeHTML(data.arrColumnTypes[arrColumns[i]]) + '</small>' +
                             '</th>';
+                
+                // if this column is a number type: align column text to the right
+                if ((/^(int|smallint|bigint|numeric|float|decimal|real|double|money|oid)/gi).test(data.arrColumnTypes[arrColumns[i]])) {
+                    strCSS += ' gs-datagrid[data-sheet-id="' + element.datasheetID + '"] ';
+                    strCSS +=      'tbody tr :nth-child(' + (i + 2) + ') textarea { ';
+                    strCSS += '    text-align: right;';
+                    strCSS += ' }';
+                }
             }
+            
+            element.styleContainer.innerHTML = strCSS;
+            
             
             element.scrollContainer.innerHTML = ml(function () {/*
                 <table>
@@ -1253,6 +1265,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     
     // clean the slate and set initial html
+    var datasheetID = 0;
     function prepareElement(element) {
         element.innerHTML = ml(function () {/*
             <div class="root" flex-vertical flex-fill>
@@ -1262,13 +1275,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     <textarea class="hidden-focus-control">Focus Control</textarea>
                 </div>
                 <div class="scroll-container" flex></div>
+                <style class="style-container" hidden></style>
             </div>
         */});
         
+        // put a unique identifier on this datasheet and increment datasheetID
+        element.setAttribute('data-sheet-id', datasheetID);
+        element.datasheetID = datasheetID;
+        datasheetID += 1;
+        
+        // save element shortcuts so that we don't have to do all kinds of selectors everywhere
+        //      and so that we can change the structure of the element but not need to update selectors
         element.root = element.children[0];
         
         element.hudContainer    = element.root.children[0];
         element.scrollContainer = element.root.children[1];
+        element.styleContainer  = element.root.children[2];
         
         element.refreshButton = element.hudContainer.children[0];
         element.deleteButton  = element.hudContainer.children[1];
