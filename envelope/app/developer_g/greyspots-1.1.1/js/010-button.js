@@ -596,6 +596,7 @@
                if (selectedElement.hasAttribute('usps'))  { strService = 'usps';
         } else if (selectedElement.hasAttribute('ups'))   { strService = 'ups';
         } else if (selectedElement.hasAttribute('fedex')) { strService = 'fedex';
+        } else if (selectedElement.hasAttribute('royal')) { strService = 'royal';
         } else if (selectedElement.hasAttribute('amz'))   { strService = 'amz'; }
         
         addProp('Service', true, '<gs-select class="target" value="' + strService + '" mini>' +
@@ -603,11 +604,13 @@
                                             '   <option value="usps">USPS</option>' +
                                             '   <option value="ups">UPS</option>' +
                                             '   <option value="fedex">FEDEX</option>' +
+                                            '   <option value="royal">Royal Mail</option>' +
                                             '   <option value="amz">Amazon</option>' +
                                             '</gs-select>', function () {
             selectedElement.removeAttribute('usps');
             selectedElement.removeAttribute('ups');
             selectedElement.removeAttribute('fedex');
+            selectedElement.removeAttribute('royal');
             selectedElement.removeAttribute('amazon');
             
             if (this.value) {
@@ -630,13 +633,16 @@
             } else if (element.hasAttribute('fedex') === true) {
                 window.open('https://www.fedex.com/apps/fedextrack/index.html?tracknumbers=' + strTrackingNumber);
                 
+            } else if (element.hasAttribute('royal') === true) {
+                window.open('https://www.royalmail.com/track-your-item?trackNumber=' + strTrackingNumber);
+                
             } else if (element.hasAttribute('amz') === true) {
                 window.open(strTrackingNumber);
                 
             } else {
                 GS.msgbox('Please Choose...',
-                          '<center>Please Choose UPS, USPS, Fedex or Amazon</center>',
-                          ['UPS', 'USPS', 'Fedex', 'Amazon'],
+                          '<center>Please Choose UPS, USPS, Fedex, Royal Mail or Amazon</center>',
+                          ['UPS', 'USPS', 'Fedex', 'Royal Mail', 'Amazon'],
                           function (strAnswer) {
                     if (strAnswer === 'UPS') {
                         window.open('http://www.ups.com/WebTracking/processInputRequest?tracknum=' + strTrackingNumber);
@@ -644,6 +650,8 @@
                          window.open('https://tools.usps.com/go/TrackConfirmAction?tLabels=' + strTrackingNumber);
                     } else if (strAnswer === 'Fedex') {
                          window.open('https://www.fedex.com/apps/fedextrack/index.html?tracknumbers=' + strTrackingNumber);
+                    } else if (strAnswer === 'Royal Mail') {
+                         window.open('https://www.royalmail.com/track-your-item?trackNumber' + strTrackingNumber);
                     } else if (strAnswer === 'Amazon') {
                          window.open(strTrackingNumber);
                     }

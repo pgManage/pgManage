@@ -385,6 +385,11 @@ document.addEventListener('DOMContentLoaded', function () {
         GS.openDialog(templateElement, function () {
             var dialog = this;
             
+            // if gs-datasheet has sequence attribute: add sequence attribute to gs-insert
+            if (element.getAttribute('seq')) {
+                document.getElementById('insert-dialog-content-container').setAttribute('seq', element.getAttribute('seq'));
+            }
+            
             GS.triggerEvent(element, 'insert_dialog_open');
             
             xtag.query(dialog, '.dialog-envelope-insert')[0].addEventListener('click', function () {

@@ -164,7 +164,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     var element = this, strInsertString = '', arrElement, i, len, jsnRow = {}, parentSrcElement,
                         strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') ||
-                                                                                   element.getAttribute('source') || ''));
+                                                                                   element.getAttribute('source') || '')),
+                        strParameters, strLink;
                     
                     // if there is an addin attribute on this element:
                     if (element.getAttribute('addin')) {
@@ -191,12 +192,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     strInsertString = encodeURIComponent(strInsertString);
                     
+                    strParameters = 'src=' + encodeURIComponent(strSource) + '&data=' + strInsertString;
+                    
+                    if (element.getAttribute('seq')) {
+                        strParameters += '&currval=' + element.getAttribute('seq');
+                    }
+                    
+                    strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') +
+                              (element.getAttribute('action-insert') || 'env/action_insert');
+                    
                     // add a loader to the page
                     GS.addLoader('gs-insert', 'Inserting Record...');
                     
                     // make the insert call
-                    GS.ajaxJSON((location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-insert') || 'env/action_insert'),
-                                'src=' + encodeURIComponent(strSource) + '&data=' + strInsertString, function (data, error) {
+                    GS.ajaxJSON(strLink, strParameters, function (data, error) {
                         GS.removeLoader('gs-insert');
                         
                         // if there was no error: trigger event

@@ -11090,6 +11090,7 @@ document.addEventListener('DOMContentLoaded', function () {
                if (selectedElement.hasAttribute('usps'))  { strService = 'usps';
         } else if (selectedElement.hasAttribute('ups'))   { strService = 'ups';
         } else if (selectedElement.hasAttribute('fedex')) { strService = 'fedex';
+        } else if (selectedElement.hasAttribute('royal')) { strService = 'royal';
         } else if (selectedElement.hasAttribute('amz'))   { strService = 'amz'; }
         
         addProp('Service', true, '<gs-select class="target" value="' + strService + '" mini>' +
@@ -11097,11 +11098,13 @@ document.addEventListener('DOMContentLoaded', function () {
                                             '   <option value="usps">USPS</option>' +
                                             '   <option value="ups">UPS</option>' +
                                             '   <option value="fedex">FEDEX</option>' +
+                                            '   <option value="royal">Royal Mail</option>' +
                                             '   <option value="amz">Amazon</option>' +
                                             '</gs-select>', function () {
             selectedElement.removeAttribute('usps');
             selectedElement.removeAttribute('ups');
             selectedElement.removeAttribute('fedex');
+            selectedElement.removeAttribute('royal');
             selectedElement.removeAttribute('amazon');
             
             if (this.value) {
@@ -11124,13 +11127,16 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (element.hasAttribute('fedex') === true) {
                 window.open('https://www.fedex.com/apps/fedextrack/index.html?tracknumbers=' + strTrackingNumber);
                 
+            } else if (element.hasAttribute('royal') === true) {
+                window.open('https://www.royalmail.com/track-your-item?trackNumber=' + strTrackingNumber);
+                
             } else if (element.hasAttribute('amz') === true) {
                 window.open(strTrackingNumber);
                 
             } else {
                 GS.msgbox('Please Choose...',
-                          '<center>Please Choose UPS, USPS, Fedex or Amazon</center>',
-                          ['UPS', 'USPS', 'Fedex', 'Amazon'],
+                          '<center>Please Choose UPS, USPS, Fedex, Royal Mail or Amazon</center>',
+                          ['UPS', 'USPS', 'Fedex', 'Royal Mail', 'Amazon'],
                           function (strAnswer) {
                     if (strAnswer === 'UPS') {
                         window.open('http://www.ups.com/WebTracking/processInputRequest?tracknum=' + strTrackingNumber);
@@ -11138,6 +11144,8 @@ document.addEventListener('DOMContentLoaded', function () {
                          window.open('https://tools.usps.com/go/TrackConfirmAction?tLabels=' + strTrackingNumber);
                     } else if (strAnswer === 'Fedex') {
                          window.open('https://www.fedex.com/apps/fedextrack/index.html?tracknumbers=' + strTrackingNumber);
+                    } else if (strAnswer === 'Royal Mail') {
+                         window.open('https://www.royalmail.com/track-your-item?trackNumber' + strTrackingNumber);
                     } else if (strAnswer === 'Amazon') {
                          window.open(strTrackingNumber);
                     }
@@ -14478,6 +14486,11 @@ document.addEventListener('DOMContentLoaded', function () {
         
         GS.openDialog(templateElement, function () {
             var dialog = this;
+            
+            // if gs-datasheet has sequence attribute: add sequence attribute to gs-insert
+            if (element.getAttribute('seq')) {
+                document.getElementById('insert-dialog-content-container').setAttribute('seq', element.getAttribute('seq'));
+            }
             
             GS.triggerEvent(element, 'insert_dialog_open');
             
@@ -24766,8 +24779,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 arrElements = xtag.query(element, '[column]');
                 matchElement = GS.findParentElement(document.activeElement, '[column]');
                 
-                console.log('0***', matchElement);
-                
                 if (document.activeElement.nodeName === 'INPUT' || document.activeElement.nodeName === 'TEXTAREA') {
                     jsnSelection = GS.getInputSelection(document.activeElement);
                 }
@@ -24801,15 +24812,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             // if there is a intColumnElementFocusNumber: restore focus
-            console.log('1***', intColumnElementFocusNumber);
             if (intColumnElementFocusNumber) {
                 arrElements = xtag.query(element, '[column]');
                 
                 //console.log(intColumnElementFocusNumber, jsnSelection);
-                
-                console.log('2***', arrElements[intColumnElementFocusNumber]);
-                console.log('3***', arrElements);
-                console.log('4***', jsnSelection);
                 
                 if (arrElements.length > intColumnElementFocusNumber) {
                     arrElements[intColumnElementFocusNumber].focus();
@@ -26623,7 +26629,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     var element = this, strInsertString = '', arrElement, i, len, jsnRow = {}, parentSrcElement,
                         strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') ||
-                                                                                   element.getAttribute('source') || ''));
+                                                                                   element.getAttribute('source') || '')),
+                        strParameters, strLink;
                     
                     // if there is an addin attribute on this element:
                     if (element.getAttribute('addin')) {
@@ -26650,12 +26657,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     strInsertString = encodeURIComponent(strInsertString);
                     
+                    strParameters = 'src=' + encodeURIComponent(strSource) + '&data=' + strInsertString;
+                    
+                    if (element.getAttribute('seq')) {
+                        strParameters += '&currval=' + element.getAttribute('seq');
+                    }
+                    
+                    strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') +
+                              (element.getAttribute('action-insert') || 'env/action_insert');
+                    
                     // add a loader to the page
                     GS.addLoader('gs-insert', 'Inserting Record...');
                     
                     // make the insert call
-                    GS.ajaxJSON((location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-insert') || 'env/action_insert'),
-                                'src=' + encodeURIComponent(strSource) + '&data=' + strInsertString, function (data, error) {
+                    GS.ajaxJSON(strLink, strParameters, function (data, error) {
                         GS.removeLoader('gs-insert');
                         
                         // if there was no error: trigger event
