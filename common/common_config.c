@@ -455,8 +455,8 @@ bool parse_options(int argc, char *const *argv) {
 		{"public-password",					required_argument,		NULL,	'w'},
 #else
 		{"allow-custom-connections",		required_argument,		NULL,	'n'},
-		{"local-only",						required_argument,		NULL,	'x'},
 #endif
+		{"local-only",						required_argument,		NULL,	'x'},
 		{"web-root",						required_argument,		NULL,	'r'},
 		{"data-root",						required_argument,		NULL,	'a'},
 		{""SUN_PROGRAM_LOWER_NAME"-port",	required_argument,		NULL,	'p'},
@@ -471,7 +471,7 @@ bool parse_options(int argc, char *const *argv) {
 // clang-format on
 
 #ifdef ENVELOPE
-	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:u:w:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:u:w:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #else
 	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #endif
@@ -498,7 +498,7 @@ bool parse_options(int argc, char *const *argv) {
 	ini_parse(str_global_config_file, handler, &str_config_empty);
 
 #ifdef ENVELOPE
-	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:u:w:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:u:w:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #else
 	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #endif
@@ -539,10 +539,10 @@ bool parse_options(int argc, char *const *argv) {
 		} else if (ch == 'n') {
 			bol_global_allow_custom_connections = *optarg == 'T' || *optarg == 't';
 
+#endif
 		} else if (ch == 'x') {
 			bol_global_local_only = *optarg == 'T' || *optarg == 't';
 
-#endif
 		} else if (ch == 'r') {
 			SFREE(str_global_web_root);
 			SERROR_CAT_CSTR(str_global_web_root, optarg);

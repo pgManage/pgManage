@@ -316,7 +316,7 @@ bool http_insert_step4(EV_P, void *cb_data, DB_result *res) {
 	char *str_response = NULL;
 	char *_str_response = NULL;
 	DArray *arr_row_values = NULL;
-	SDEFINE_VAR_ALL(str_temp);
+	SDEFINE_VAR_ALL(str_temp, str_col_seq);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
@@ -332,9 +332,11 @@ bool http_insert_step4(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_insert->str_sql, http_insert_step5), "DB_exec failed");
 	} else if (DB_connection_driver(client->conn) == DB_DRIVER_SQL_SERVER) {
 		if (client_insert->str_sequence_name != NULL && strlen(client_insert->str_sequence_name) > 0) {
+			str_col_seq = DB_escape_literal(client->conn, client_insert->str_sequence_name, strlen(client_insert->str_sequence_name));
+			SFINISH_CHECK(str_col_seq != NULL, "DB_escape_literal failed!");
 			SFINISH_CAT_CSTR(client_insert->str_sql,
-				"SELECT IDENT_CURRENT(",
-				client_insert->str_sequence_name, ")");
+				"SELECT CAST(IDENT_CURRENT(",
+				str_col_seq, ") AS nvarchar(MAX));");
 		} else {
 			SFINISH_CAT_CSTR(client_insert->str_sql, "SELECT CAST(SCOPE_IDENTITY() AS nvarchar(MAX));");
 		}
