@@ -1,3 +1,7 @@
+Changes since 3.0.0RC3:
+Right justify number columns
+Fix appId in package.json
+
 Changes since 2.1.0RC6 and 3.0.0RC2:
 make http_ev work on *nix systems (addresses #20)
 add compiler check to configure (closes #21)
