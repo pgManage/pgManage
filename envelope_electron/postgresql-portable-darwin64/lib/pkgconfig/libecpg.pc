@@ -1,0 +1,9 @@
+Name: libecpg
+Description: PostgreSQL libecpg library
+Url: http://www.postgresql.org/
+Version: 9.6.0
+Requires: 
+Requires.private: libpq libpgtypes
+Cflags: -I/Users/nunzio/Repos/postgresql-portable/prefix/include
+Libs: -L/Users/nunzio/Repos/postgresql-portable/prefix/lib -lecpg
+Libs.private: -L/Users/nunzio/Repos/postgresql-portable/prefix/lib -L/opt/local/lib -lm
