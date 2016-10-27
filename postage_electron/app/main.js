@@ -15,6 +15,8 @@ const int_postage_port = parseInt(Math.random().toString().substring(2)) % (6553
 const child_process = require('child_process');
 var proc = null;
 
+require('electron-context-menu')({});
+
 try {
 	fs.statSync(os.homedir() + '/.postage/');
 	fs.statSync(os.homedir() + '/.postage/postage.conf');
