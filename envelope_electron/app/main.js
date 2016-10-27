@@ -1,5 +1,6 @@
 const os = require('os');
 
+const net = require('net');
 const path = require('path');
 const electron = require('electron');
 const fs = require('fs-extra');
@@ -28,7 +29,8 @@ function spawnEnvelope() {
 			'-y', path.normalize(app.getAppPath() + '/envelope/app'),
 			//'-z', path.normalize(app.getAppPath() + '/envelope/role'),
 			'-x', 't',
-			'-p', int_envelope_port
+			'-p', int_envelope_port,
+			(process.platform == 'win32' ? '-o' : ''), (process.platform == 'win32' ? 'stderr' : '')
 		], {
 			detached: true
 		}
@@ -64,7 +66,17 @@ let mainWindowState = null;
 app.on('quit', function() {
 	console.log('quitting');
 	envelopeProc.kill();
-	postgresqlProc.kill();
+	var pipe = net.connect('\\\\.\\pipe\\pgsignal_' + postgresqlProc.pid, function () {
+		var uint8Data = new Uint8Array(1),
+			data = new Buffer(uint8Data.buffer);
+		uint8Data[0] = 15; // SIGTERM
+		pipe.on('error', function () {
+			console.log('error', arguments);
+		});
+
+		pipe.write(data);
+		pipe.end();
+	});
 	process.exit();
 });
 
@@ -234,7 +246,7 @@ function appStart() {
 		fs.statSync(os.homedir() + '/.' + strAppName + '/data');
 
 		// Start postgres
-		postgresqlProc = child_process.spawn(path.normalize(app.getAppPath() + '/envelope/postgresql/bin/postgres'), [
+		postgresqlProc = child_process.spawn(path.normalize(app.getAppPath() + '/envelope/postgresql/bin/postgres' + (process.platform == 'win32' ? '.exe' : '')), [
 			'-D', path.normalize(os.homedir() + '/.' + strAppName + '/data'),
 			'-k', '/tmp'
 		], {
@@ -268,7 +280,8 @@ function appStart() {
 			'	   <span>Performing one-time setup</span>' +
 			'	   <progress style="width: 100%; display: inline-block; text-align: center;" value="0" max="1000" />' +
 			'</center>\';' +
-			'document.body.style.background = \'none\';',
+			'document.body.style.background = \'none\';' +
+			'document.body.style.overflow = \'none\';',
 			function() {
 				// Create the data directory
 				fs.mkdirsSync(os.homedir() + '/.' + strAppName + '/');
@@ -276,8 +289,9 @@ function appStart() {
 				fs.mkdirsSync(os.homedir() + '/.' + strAppName + '/data');
 
 				const int_postgres_port = parseInt(Math.random().toString().substring(2)) % (65535 - 1024) + 1024;
-				postgresqlProc = child_process.spawn(path.normalize(app.getAppPath() + '/envelope/postgresql/bin/initdb'), [
+				postgresqlProc = child_process.spawn(path.normalize(app.getAppPath() + '/envelope/postgresql/bin/initdb' + (process.platform == 'win32' ? '.exe' : '')), [
 					'-D', path.normalize(os.homedir() + '/.' + strAppName + '/data'),
+					'-E', 'UTF8',
 					'-U', 'postgres'
 				], {
 					cwd: path.normalize(app.getAppPath() + '/envelope/postgresql/bin/')
@@ -302,7 +316,7 @@ function appStart() {
 						'\n\nport = ' + int_postgres_port + '\nlog_destination = stderr\nlogging_collector = off\n\n');
 
 					// spawn postgres
-					postgresqlProc = child_process.spawn(path.normalize(app.getAppPath() + '/envelope/postgresql/bin/postgres'), [
+					postgresqlProc = child_process.spawn(path.normalize(app.getAppPath() + '/envelope/postgresql/bin/postgres' + (process.platform == 'win32' ? '.exe' : '')), [
 						'-D', path.normalize(os.homedir() + '/.' + strAppName + '/data'),
 						'-k', '/tmp'
 					], {
@@ -322,9 +336,9 @@ function appStart() {
 						// When we are ready
 						if (data.indexOf('database system is ready to accept connections') > -1) {
 							// Run init.sql againts the database
-							var psqlProc = child_process.spawn(path.normalize(app.getAppPath() + '/envelope/postgresql/bin/psql'), [
+							var psqlProc = child_process.spawn(path.normalize(app.getAppPath() + '/envelope/postgresql/bin/psql' + (process.platform == 'win32' ? '.exe' : '')), [
 								'-f', path.normalize(app.getAppPath() + '/init.sql'),
-								'-h', '/tmp',
+								'-h', (process.platform == 'win32' ? '127.0.0.1' : '/tmp'),
 								'-p', int_postgres_port,
 								'-U', 'postgres'
 							], {
@@ -345,13 +359,20 @@ function appStart() {
 								console.log('psql ' + psqlProc.pid + ' closed with code ' + code);
 
 								// Set up pg_hba.conf
-								fs.writeFileSync(
-									path.normalize(os.homedir() + '/.' + strAppName + '/data/pg_hba.conf'),
-									'local		  all			 all			 md5'
-								);
+								if (process.platform == 'win32') {
+									fs.writeFileSync(
+										path.normalize(os.homedir() + '/.' + strAppName + '/data/pg_hba.conf'),
+										'host		  all			 all			127.0.0.1/32			 md5'
+									);
+								} else {
+									fs.writeFileSync(
+										path.normalize(os.homedir() + '/.' + strAppName + '/data/pg_hba.conf'),
+										'local		  all			 all			 md5'
+									);
+								}
 								// Restart postgresql (by listening for close, and then killing)
 								postgresqlProc.on('close', function(code) {
-									postgresqlProc = child_process.spawn(path.normalize(app.getAppPath() + '/envelope/postgresql/bin/postgres'), [
+									postgresqlProc = child_process.spawn(path.normalize(app.getAppPath() + '/envelope/postgresql/bin/postgres' + (process.platform == 'win32' ? '.exe' : '')), [
 										'-D', path.normalize(os.homedir() + '/.' + strAppName + '/data'),
 										'-k', '/tmp'
 									], {
@@ -372,7 +393,7 @@ function appStart() {
 											postgresqlProc.stderr.removeListener('data', thisCallback);
 											fs.writeFileSync(
 												path.normalize(os.homedir() + '/.' + strAppName + '/envelope-connections.conf'),
-												'data:  host=/tmp port=' + int_postgres_port + ' dbname=postgres'
+												'data:  host=' + (process.platform == 'win32' ? '127.0.0.1' : '/tmp') + ' port=' + int_postgres_port + ' dbname=postgres'
 											);
 											// Start up envelope
 											spawnEnvelope();
@@ -387,7 +408,18 @@ function appStart() {
 									});
 								});
 
-								postgresqlProc.kill();
+								var pipe = net.connect('\\\\.\\pipe\\pgsignal_' + postgresqlProc.pid, function () {
+									var uint8Data = new Uint8Array(1),
+										data = new Buffer(uint8Data.buffer);
+									uint8Data[0] = 15; // SIGTERM
+									pipe.on('error', function () {
+										console.log('error', arguments);
+									});
+
+									pipe.write(data);
+									pipe.end();
+								});
+								//postgresqlProc.kill();
 							});
 						}
 					});
