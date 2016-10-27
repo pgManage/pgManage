@@ -2290,9 +2290,13 @@ id_1
 						if (Local.tests[i][4] && Local.tests[i][4].indexOf && Local.tests[i][4].indexOf('/open/test') === 0) {
 							Local.tests[i][4] = '/open/test' + test_random + '.sql';
 						}
-						
+
 						if (Local.tests[i][3] && Local.tests[i][3].indexOf && Local.tests[i][3].indexOf('/postage/0/download/open/test') === 0) {
 							Local.tests[i][3] = '/postage/0/download/open/test' + test_random + '.sql';
+						}
+
+						if (Local.tests[i][3] && Local.tests[i][3].indexOf && Local.tests[i][3].indexOf('/open/test') >= 0) {
+							Local.tests[i][3] = Local.tests[i][3].replace(/test([0-9]*)\.sql/gi, 'test' + test_random + '.sql');
 						}
 						
 						if (Local.tests[i][5] && Local.tests[i][5].indexOf && Local.tests[i][5].indexOf('/postgres/open/test') >= 0) {

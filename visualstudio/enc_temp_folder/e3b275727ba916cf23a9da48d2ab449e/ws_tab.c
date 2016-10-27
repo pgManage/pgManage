@@ -1,6 +1,5 @@
 #ifndef ENVELOPE
 
-#define UTIL_DEBUG
 #include "ws_tab.h"
 
 static const char *str_date_format = "%Y-%m-%d %H:%M:%S";

@@ -130,7 +130,6 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 
 		SFREE(str_temp1);
 
-		SINFO("str_pk_header: %s", str_pk_header);
 		if (strncmp(str_pk_header, "pk", 2) == 0) {
 			if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
 				SFINISH_CAT_APPEND(client_update->str_pk_where_clause, int_x == 0 ? "" : " AND ",
