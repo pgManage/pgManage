@@ -131,7 +131,7 @@ README.md
 /envelope_service_win
 /configure
 /Makefile
-/visualstudio/envelope
+/visualstudio/envelope_ss
 /visualstudio/Debug
 /visualstudio/x64
 /visualstudio/postage/Debug

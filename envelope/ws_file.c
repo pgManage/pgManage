@@ -1825,6 +1825,10 @@ bool ws_file_search_step2(EV_P, void *cb_data, bool bol_group) {
 						  client_request, ws_file_search_step3, ws_file_search_step4),
 			"canonical_recurse_directory failed");
 	} else {
+		size_t int_len = strlen(client_file->str_path);
+		if (client_file->str_path[int_len - 1] == '\\') {
+			client_file->str_path[int_len - 1] = 0;
+		}
 		SFINISH_CHECK((str_path = canonical(client_file->str_canonical_start, client_file->str_partial_path, "read_dir")),
 			"canonical failed");
 		dirp = opendir(str_path);
@@ -1912,11 +1916,7 @@ bool ws_file_search_step3(EV_P, void *cb_data, char *_str_file_name) {
 	}
 
 #ifdef _WIN32
-	if (client_file->str_path[strlen(client_file->str_path) - 1] == '\\') {
-		SFINISH_CAT_CSTR(str_file_name, client_file->str_path, _str_file_name);
-	} else {
-		SFINISH_CAT_CSTR(str_file_name, client_file->str_path, "\\", _str_file_name);
-	}
+	SFINISH_CAT_CSTR(str_file_name, client_file->str_path, "\\", _str_file_name);
 	SFINISH_SALLOC(statdata, sizeof(struct stat));
 	stat(str_file_name, statdata);
 

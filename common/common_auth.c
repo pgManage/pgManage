@@ -197,6 +197,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	} else {
 		SFINISH_CAT_CSTR(str_username, str_global_public_username);
 		int_user_length = strlen(str_global_public_username);
+		SINFO("str_username: %s", str_username);
 	}
 
 #ifdef ENVELOPE
@@ -260,6 +261,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	} else {
 		SFINISH_CAT_CSTR(str_password, str_global_public_password);
 		int_password_length = strlen(str_global_public_password);
+		SINFO("str_password: %s", str_password);
 	}
 
 	SDEBUG("client->str_conn: %s", client->str_conn);

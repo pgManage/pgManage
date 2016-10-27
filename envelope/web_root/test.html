@@ -335,7 +335,12 @@
 				ml(function () {/*{"stat": true, "dat": "/env/app/all/index.html"}*/ })],
 			
 			['File Read Fail 5', 'ajax', 500, '/env/0//index.html', '',
-				ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0//index.html is a bad path. Path contains invalid characters.\n\nBad file path"*/ })],
+				function (arg) {
+					console.warn('test1');
+					return arg === ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0//index.html is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: 0\\\\index.html is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
+				}
+			],
 			['File Read Fail 6', 'ajax', 404, '/env/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/index.html', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
 			['File Read Fail 7', 'ajax', 404, '/env/00/index.html', '',
@@ -343,7 +348,12 @@
 			['File Read Fail 8', 'ajax', 404, '/env/postage/0/index.html', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
 			['File Read Fail 9', 'ajax', 500, '/env/0/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/index.html', '',
-				ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/AS\nBad file path"*/ })],
+				function (arg) {
+					console.warn('test2');
+					return ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/AS\nBad file path"*/ })
+						|| ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: 0\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\AS\nBad file path"*/ })
+				}
+			],
 			['File Read 2', 'ajax', 200, '/test.txt', '',
 				ml(function () {/*πππøˆ¨¥†ƒ©√˙∫˚∆¨¥†ƒç©˙∆√˙˚∫∆¨¥ˆ†∂®†®∂¥†®´∑œ£™¢∞§¶•ª¶¥†¶•∞§¢´£¢™§¶§¢•∞‡ﬁ‡´ﬁﬂ‹›Œ„´‰ÁˇÎ¨ÁÏÓ˝ÔÏÇÓ˛˝ÏÎÍ¸‰´ˇÁˇ¨ÁÏˆ˝ØÓ¨ÒÁ¨ˆÁØ‡°ˇ°‰ﬂﬁ´›ﬁ‹€ﬁ„‹†´®ß©≈˙ƒ∆˙©∆˚˚136789864512321
 */ })],
@@ -353,15 +363,30 @@
 			['File Read Fail 10', 'ajax', 404, '/env/0/index.htm', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
 			['File Read Fail 11', 'ajax', 500, '/env/0/index.π', '',
-				ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0/index.π is a bad path. Path contains invalid characters.\n\nBad file path"*/ })],
+				function (arg) {
+					console.warn('test1');
+					return arg === ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0/index.π is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: 0\\index.π is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
+				}
+			],
 			['File Read Fail 12', 'ajax', 404, '/env/0/index.php', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
 			['File Read Fail 13', 'ajax', 404, '/env/index.php', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
 			['File Read Fail 14', 'ajax', 500, '/env/π', '',
-				ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: π is a bad path. Path contains invalid characters.\n\nBad file path"*/ })],
+				function (arg) {
+					console.warn('test1');
+					return arg === ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: π is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: π is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
+				}
+			],
 			['File Read Fail 15', 'ajax', 500, ml(function () {/*/env/0/index.html?view=home&test=!@#$%^&*()<>?:"{}|,./;'[]\=/*-+.~`œ∑´®†¥¨ˆøπåßƒ©˙∆˚¬Ω≈√∫˜µŒ„´‰ˇÁ¨ˆØ∏ÅÍÎÏ˝ÓÔÒ¸˛Ç◊ı˜Â*/}), '',
-				ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: * is a bad path. Path contains invalid characters.\n\nBad file path"*/ })],
+				function (arg) {
+					console.warn('test1');
+					return arg === ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: * is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: * is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
+				}
+			],
 			['File Read 4', 'ajax', 200, '/test.txt?test=test/env/index.html?test=test', '',
 				ml(function () {/*πππøˆ¨¥†ƒ©√˙∫˚∆¨¥†ƒç©˙∆√˙˚∫∆¨¥ˆ†∂®†®∂¥†®´∑œ£™¢∞§¶•ª¶¥†¶•∞§¢´£¢™§¶§¢•∞‡ﬁ‡´ﬁﬂ‹›Œ„´‰ÁˇÎ¨ÁÏÓ˝ÔÏÇÓ˛˝ÏÎÍ¸‰´ˇÁˇ¨ÁÏˆ˝ØÓ¨ÒÁ¨ˆÁØ‡°ˇ°‰ﬂﬁ´›ﬁ‹€ﬁ„‹†´®ß©≈˙ƒ∆˙©∆˚˚136789864512321
 */ })],
@@ -388,7 +413,12 @@
 		
 		Global.app_tests = [
 			['App Upload Fail 1', 'ajax', 500, '/env/upload', '',
-				ml(function () {/*"FATAL\n../util/util_request.c:get_sun_upload: Cannot find boundary for request\nget_sun_upload failed"*/ })],
+				function (arg) {
+					console.warn('test1');
+					return arg === ml(function () {/*"FATAL\n../util/util_request.c:get_sun_upload: Cannot find boundary for request\nget_sun_upload failed"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\util\\util_request.c:get_sun_upload: Cannot find boundary for request\nget_sun_upload failed"*/ })
+				}
+			],
 			['App Upload', 'upload', 200, '/env/upload', '/app//all/test5.txt',
 				ml(function () {/*Upload Succeeded
 */})],
@@ -406,22 +436,57 @@ File already exists.*/})],
 				['Invalid Request', 'TRANSACTION COMPLETED']],
 			['APP FILE LIST FAIL 2', 'websocket', '', 'FILE\tLIST\t' +
 				GS.encodeForTabDelimited('/ipen/') + '',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE LIST FAIL 3', 'websocket', '', 'FILE\tLISTA\t' +
 				GS.encodeForTabDelimited('/open/') + '',
 				["Unknown FILE request type LISTA","TRANSACTION COMPLETED"]],
 			['APP FILE LIST FAIL 4', 'websocket', '', 'FILE\tLIST\t' +
 				GS.encodeForTabDelimited('///////') + '',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE LIST FAIL 5', 'websocket', '', 'FILE\tLIST\t' +
 				GS.encodeForTabDelimited('../../') + '',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE LIST FAIL 6', 'websocket', '', 'FILE\tLIST\t' +
 				GS.encodeForTabDelimited('/asdf/asdf/asdf/asd/fasdf/asdf/') + '',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE LIST FAIL 7', 'websocket', '', 'FILE\tLIST\t' +
 				GS.encodeForTabDelimited('/πππ/') + '',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE LIST FAIL 8', 'websocket', '', 'FILE\tLIST',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE LIST FAIL 9', 'websocket', '', 'FILE LIST',
@@ -434,7 +499,14 @@ File already exists.*/})],
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE LIST FAIL 13', 'websocket', '', 'FILE\tLIST\t' +
 				encodeURIComponent('..') + '',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE LIST', 'websocket', '', 'FILE\tLIST\t/',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE LIST', 'websocket', '', 'FILE\tLIST\t/app',
@@ -459,7 +531,11 @@ File already exists.*/})],
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE WRITE FAIL 2', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\t{{CHANGESTAMP}}\nThis is a test1\n',
 				[
-					"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<"
+					[
+						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<",
+						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<"
+					],
+					"TRANSACTION COMPLETED"
 				]
 			],
 			['APP FILE WRITE FAIL 3', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt\t',
@@ -467,9 +543,23 @@ File already exists.*/})],
 			['APP FILE WRITE FAIL 4', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txt',
 				["Invalid Request"]],
 			['APP FILE WRITE FAIL 5', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\tCHANGESTAMP\nThis is a test1\n',
-				["../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<"]],
+				[
+					[
+						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<",
+						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE WRITE FAIL 6', 'websocket', '', 'FILE\tWRITE\t/app/all/test.txtπ\t\'2016-8-8 11:15:46\'\nThis is a test1\n',
-				["../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<"]],
+				[
+					[
+						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<",
+						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE WRITE 4', 'websocket', '', 'FILE\tWRITE\t/app/all/test1.txt\t10000000000000\nThis is a test\n',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE WRITE FAIL 8', 'websocket', '', 'FILE\tWRITE\t/app/all/test1.txt 10000000000000\nThis is a test\n',
@@ -497,17 +587,60 @@ File already exists.*/})],
 				'This is a test of the envelope. (test line #4)',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE READ FAIL 1', 'websocket', '', 'FILE\tREAD\t/appp/all/test.txt',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE READ FAIL 2', 'websocket', '', 'FILE\tREAD\t/ap/all/test.txt',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE READ FAIL 3', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited('/role/trusted_g/test.txt > /role/trusted_g/test2.txt'),
-				["../util/util_canonical.c:canonical: trusted_g/test.txt > /role/trusted_g/test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/test.txt > /role/trusted_g/test2.txt<","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../util/util_canonical.c:canonical: trusted_g/test.txt > /role/trusted_g/test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/test.txt > /role/trusted_g/test2.txt<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.txt > \\role\\trusted_g\\test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/test.txt > /role/trusted_g/test2.txt<"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE READ FAIL 4', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited(''),
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE READ FAIL 5', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited('../'),
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE READ FAIL 6', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited('π'),
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE READ 1', 'websocket', '', 'FILE\tREAD\t/app/all/test.txt',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE READ 2', 'websocket', '', 'FILE\tREAD\t' + GS.encodeForTabDelimited('/role/trusted_g/test.txt'),
@@ -519,15 +652,36 @@ File already exists.*/})],
 			['APP FILE MOVE FAIL 1', 'websocket', '', 'FILE\tMOVE\t' +
 				GS.encodeForTabDelimited('/test.txt') + '\t' +
 				GS.encodeForTabDelimited('/test2.txt') + '\n',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE MOVE FAIL 2', 'websocket', '', 'FILE\tMOVE\t' +
 				GS.encodeForTabDelimited('') + '\t' +
 				GS.encodeForTabDelimited('/app/all/test2.txt') + '\n',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE MOVE FAIL 3', 'websocket', '', 'FILE\tMOVE\t' +
 				GS.encodeForTabDelimited('/app/all/test.txt') + '\t' +
 				GS.encodeForTabDelimited('') + '\n',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE MOVE FAIL 4', 'websocket', '', 'FILE\tMOVE\t' +
 				GS.encodeForTabDelimited('/app/all/test.txt') + '\n',
 				["Invalid Request","TRANSACTION COMPLETED"]],
@@ -537,15 +691,36 @@ File already exists.*/})],
 			['APP FILE MOVE FAIL 6', 'websocket', '', 'FILE\tMOVE\t' +
 				GS.encodeForTabDelimited('../') + '\t' +
 				GS.encodeForTabDelimited('/') + '\n',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE MOVE FAIL 7', 'websocket', '', 'FILE\tMOVE\t' +
 				GS.encodeForTabDelimited('/') + '\t' +
 				GS.encodeForTabDelimited('../') + '\n',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE MOVE FAIL 8', 'websocket', '', 'FILE\tMOVE\t' +
 				GS.encodeForTabDelimited('/') + '\t' +
 				GS.encodeForTabDelimited('../'),
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE MOVE', 'websocket', '', 'FILE\tMOVE\t/app/all/test.txt\t/app/all/test2.txt',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE COPY FAIL', 'websocket', '', 'FILE\tCOPY\t/test2.txt\t/app/all/test1.txt',
@@ -553,30 +728,87 @@ File already exists.*/})],
 			['APP FILE COPY', 'websocket', '', 'FILE\tCOPY\t/app/all/test2.txt\t/app/all/test.txt',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE CREATE_FOLDER FAIL 1', 'websocket', '', 'FILE\tCREATE_FOLDER\t/test/\n',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE CREATE_FOLDER FAIL 2', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/app/trusted_g/test-test--test-test') + '\n',
-				["../util/util_canonical.c:canonical: trusted_g/test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g/test-test--test-test<"]],
+				[
+					[
+						"../util/util_canonical.c:canonical: trusted_g/test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g/test-test--test-test<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g/test-test--test-test<"
+					]
+				]
+			],
 			['APP FILE CREATE_FOLDER FAIL 3', 'websocket', '', 'FILE\tCREATE_FOLDER',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 4', 'websocket', '', 'FILE\tCREATE_PI',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FOLDER FAIL 5', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/app/trusted_g///////') + '\n',
-				["../util/util_canonical.c:canonical: trusted_g/////// is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g///////<","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../util/util_canonical.c:canonical: trusted_g/////// is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g///////<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\\\\\\\\\\\\\ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g///////<"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE CREATE_FOLDER FAIL 6', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/role/trusted_g/ > /opt/test') + '\n',
-				["../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/ > /opt/test<","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/ > /opt/test<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\ > \\opt\\test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/ > /opt/test<"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE CREATE_FOLDER FAIL 7', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/role/trusted_g/ > /opt/test'),
-				["../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/ > /opt/test<","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/ > /opt/test<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\ > \\opt\\test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/ > /opt/test<"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE CREATE_FOLDER FAIL 8', 'websocket', '', 'FILE\tCREATE_FOLDER\t' + GS.encodeForTabDelimited('/role/trusted_g/π'),
-				["../util/util_canonical.c:canonical: trusted_g/π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/π<","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../util/util_anonical.c:canonical: trusted_g/π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/π<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/π<"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE CREATE_FOLDER', 'websocket', '', 'FILE\tCREATE_FOLDER\t/app/all/test3/test4/',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 
-			['APP FILE CREATE_FILE FAIL 1', 'websocket', '', 'FILE\tCREATE_FILE\t/test.txt',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+			['APP FILE CREATE_FILE FAIL 1', 'websocket', '', 'FILE\tCREATE_FILE\t/test.txt' +
+				GS.encodeForTabDelimited('/') + '\t' +
+				GS.encodeForTabDelimited('../') + '\n',
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE CREATE_FILE FAIL 2', 'websocket', '', 'FILE\tCREATE_FILE',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FILE FAIL 3', 'websocket', '', 'FILE\tCREATE_FILE\t',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE CREATE_FILE FAIL 4', 'websocket', '', 'FILE\tCREATE_FILE\n',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE CREATE_FILE FAIL 5', 'websocket', '', 'FILE\tCREATE_FILEA\t' +
@@ -590,23 +822,63 @@ File already exists.*/})],
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE CREATE_FILE FAIL 7', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/test.txt') + '\n',
-				["File already exists."]],
+				[
+					[
+						"File already exists.",
+						"CreateFile failed: 0x50 (The file exists.\r\n)"
+					]
+				]
+			],
 			['APP FILE CREATE_FILE FAIL 8', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/test.txt'),
-				["File already exists."]],
+				[
+					[
+						"File already exists.",
+						"CreateFile failed: 0x50 (The file exists.\r\n)"
+					]
+				]
+			],
 			['APP FILE CREATE_FILE FAIL 9', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/test.π'),
-				["../util/util_canonical.c:canonical: trusted_g/test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g/test.π<","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../util/util_canonical.c:canonical: trusted_g/test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g/test.π<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g/test.π<"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE CREATE_FILE', 'websocket', '', 'FILE\tCREATE_FILE\t' +
 				GS.encodeForTabDelimited('/app/all/test3.txt'),
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 
 			['APP FILE DELETE FAIL 1', 'websocket', '', 'FILE\tDELETE\t/test.txt',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE DELETE FAIL 2', 'websocket', '', 'FILE\tDELETE\t' + GS.encodeForTabDelimited('../'),
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE DELETE FAIL 3', 'websocket', '', 'FILE\tDELETE\t' + GS.encodeForTabDelimited('π'),
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path","TRANSACTION COMPLETED"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE DELETE FAIL 4', 'websocket', '', 'FILE\tDELETE',
 				["Invalid Request","TRANSACTION COMPLETED"]],
 			['APP FILE DELETE FAIL 5', 'websocket', '', 'FILE\tDELETE   ',
@@ -642,9 +914,21 @@ File already exists.*/})],
 				'This is a test of the envelope. (test line #4)',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE SEARCH FAIL 1', 'websocket', '', 'FILE\tSEARCH\t/ap/\tgs-page > gs-header,\nRECURSIVE\n',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH FAIL 2', 'websocket', '', 'FILE\tSEARCH\t/app/nonexisitant/\tgs-page > gs-header,\nRECURSIVE\n',
-				["../util/util_canonical.c:canonical: read_dir: /home/super/Repos/postage/envelope/app/|nonexisitant/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|nonexisitant/<"]
+				[
+					[
+						"../util/util_canonical.c:canonical: read_dir: /home/super/Repos/postage/envelope/app/|nonexisitant/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|nonexisitant/<",
+						"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app\\|nonexisitant\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|nonexisitant/<"
+					]
+				]
 			],
 			['APP FILE SEARCH FAIL 3', 'websocket', '', 'FILE\tSEARCH\t/app/\tThis is a test of the [search|bran|envelope,\nREGEX\n',
 				["regcomp failed: 7 (Missing ']')"]],
@@ -652,42 +936,143 @@ File already exists.*/})],
 				GS.encodeForTabDelimited('/app/trust_g/') + '\t' +
 				GS.encodeForTabDelimited('This....a test of the search') + '\n' +
 				'INSENSITIVE\tREGEX' + '\n',
-				["../util/util_canonical.c:canonical: read_dir: /home/super/Repos/postage/envelope/app/|trust_g/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trust_g/<"]],
+				[
+					[
+						"../util/util_canonical.c:canonical: read_dir: /home/super/Repos/postage/envelope/app/|trust_g/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trust_g/<",
+						"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app\\|trust_g\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trust_g/<"
+					]
+				]
+			],
 			['APP FILE SEARCH FAIL 5', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('../../') + '\t' +
 				GS.encodeForTabDelimited('This is a test of the search') + '\n' +
 				'INSENSITIVE' + '\n',
-				["../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"]],
+				[
+					[
+						"../common/common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path",
+						"..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH 1', 'websocket', '', 'FILE\tSEARCH\t/app/trusted_g/\tbran muffin\nRECURSIVE\n',
-				["/test.txt:2:This is a test of the bran muffin. (test line #2)\n","/test/test.txt:2:This is a test of the bran muffin. (test line #2)\n","TRANSACTION COMPLETED"]],
+				[
+					[
+						"/test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+						"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n"
+					],
+					[
+						"/test/test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+						"\\test\\test.txt:2:This is a test of the bran muffin. (test line #2)\n"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH 2', 'websocket', '', 'FILE\tSEARCH\t/app/trusted_g/\tBrAn mUfFiN\nINSENSITIVE\n',
-				["/test.txt:2:This is a test of the bran muffin. (test line #2)\n","TRANSACTION COMPLETED"]],
+				[
+					[
+						"/test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+						"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH 3', 'websocket', '', 'FILE\tSEARCH\t/app/trusted_g/\tbran muffin\nREGEX\n',
-				["/test.txt:2:This is a test of the bran muffin. (test line #2)\n","TRANSACTION COMPLETED"]],
+				[
+					[
+						"/test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+						"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH 4', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/') + '\t' +
 				GS.encodeForTabDelimited('This is a test of the [search|bran|envelope]') + '\n' +
 				'INSENSITIVE\tREGEX\tRECURSIVE' + '\n',
-				["/test.txt:1:This is a test of the search. (test line #1)\n"]],
+				[
+					[
+						"/test.txt:1:This is a test of the search. (test line #1)\n",
+						"\\test.txt:1:This is a test of the search. (test line #1)\n"
+					],
+					[
+						"/test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+						"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n"
+					],
+					[
+						"/test.txt:4:This is a test of the envelope. (test line #4)\n",
+						"\\test.txt:4:This is a test of the envelope. (test line #4)"
+					],
+					[
+						"/test/test.txt:1:This is a test of the search. (test line #1)\n",
+						"\\test\\test.txt:1:This is a test of the search. (test line #1)\n"
+					],
+					[
+						"/test/test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+						"\\test\\test.txt:2:This is a test of the bran muffin. (test line #2)\n"
+					],
+					[
+						"/test/test.txt:4:This is a test of the envelope. (test line #4)\n",
+						"\\test\\test.txt:4:This is a test of the envelope. (test line #4)"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH 5', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/') + '\t' +
 				GS.encodeForTabDelimited('This is a test of the [search|bran|envelope]') + '\n' +
 				'INSENSITIVE\tREGEX' + '\n',
-				["/test.txt:1:This is a test of the search. (test line #1)\n"]],
+				[
+					[
+						"/test.txt:1:This is a test of the search. (test line #1)\n",
+						"\\test.txt:1:This is a test of the search. (test line #1)\n"
+					],
+					[
+						"/test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+						"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n"
+					],
+					[
+						"/test.txt:4:This is a test of the envelope. (test line #4)\n",
+						"\\test.txt:4:This is a test of the envelope. (test line #4)"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH 6', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/') + '\t' +
 				GS.encodeForTabDelimited('This....a test of the search') + '\n' +
 				'INSENSITIVE\tREGEX' + '\n',
-				["/test.txt:1:This is a test of the search. (test line #1)\n"]],
+				[
+					[
+						"/test.txt:1:This is a test of the search. (test line #1)\n",
+						"\\test.txt:1:This is a test of the search. (test line #1)\n"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH 7', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/') + '\t' +
 				GS.encodeForTabDelimited('This is a test of the search'),
-				["/test.txt:1:This is a test of the search. (test line #1)\n"]],
+				[
+					[
+						"/test.txt:1:This is a test of the search. (test line #1)\n",
+						"\\test.txt:1:This is a test of the search. (test line #1)\n"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH 8', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/') + '\t' +
 				GS.encodeForTabDelimited('This....a test of the search') + '\n' +
 				'INSENSITIVE\tREGEX' + '\n',
-				["/test.txt:1:This is a test of the search. (test line #1)\n"]],
+				[
+					[
+						"/test.txt:1:This is a test of the search. (test line #1)\n",
+						"\\test.txt:1:This is a test of the search. (test line #1)\n"
+					],
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH END', 'websocket', '', 'FILE\tDELETE\t/app/trusted_g/',
 				['OK', 'TRANSACTION COMPLETED']]
 		];
@@ -698,12 +1083,22 @@ File already exists.*/})],
 			Global.role_tests[i][0] = Global.role_tests[i][0].replace(/APP/g, 'ROLE');
 			Global.role_tests[i][0] = Global.role_tests[i][0].replace(/App/g, 'Role');
 			Global.role_tests[i][3] = Global.role_tests[i][3].replace(/app/gi, 'role');
+			if (typeof (Global.app_tests[i][5]) === 'function') {
+					Global.role_tests[i][5] = Global.app_tests[i][5];
+			}
 			if (typeof (Global.role_tests[i][4]) === 'string') {
 				Global.role_tests[i][4] = Global.role_tests[i][4].replace(/app/gi, 'role');
 			} else {
 				var role_i, role_len = Global.role_tests[i][4].length;
 				for (role_i = 0; role_i < role_len; role_i++) {
-					Global.role_tests[i][4][role_i] = Global.role_tests[i][4][role_i].replace(/app/gi, 'role');
+					if (typeof (Global.role_tests[i][4][role_i]) === 'string') {
+						Global.role_tests[i][4][role_i] = Global.role_tests[i][4][role_i].replace(/app/gi, 'role');
+					} else {
+						var role_j, role_len2 = Global.role_tests[i][4][role_i].length;
+						for (role_j = 0; role_j < role_len2; role_j++) {
+							Global.role_tests[i][4][role_i][role_j] = Global.role_tests[i][4][role_i][role_j].replace(/app/gi, 'role');
+						}
+					}
 				}
 			}
 		}
@@ -717,6 +1112,9 @@ File already exists.*/})],
 			Global.web_root_tests[i][3] = Global.web_root_tests[i][3].replace(/env\/app\/all\//gi, '');
 			Global.web_root_tests[i][3] = Global.web_root_tests[i][3].replace(/app/gi, 'web_root');
 			Global.web_root_tests[i][3] = Global.web_root_tests[i][3].replace(/all\//gi, '');
+			if (typeof (Global.app_tests[i][5]) === 'function') {
+				Global.web_root_tests[i][5] = Global.app_tests[i][5];
+			}
 			if (typeof (Global.web_root_tests[i][4]) === 'string') {
 				Global.web_root_tests[i][4] = Global.web_root_tests[i][4].replace(/env\/app\/all\//gi, '');
 				Global.web_root_tests[i][4] = Global.web_root_tests[i][4].replace(/app/gi, 'web_root');
@@ -724,11 +1122,22 @@ File already exists.*/})],
 			} else {
 				var web_root_i, web_root_len = Global.web_root_tests[i][4].length;
 				for (web_root_i = 0; web_root_i < web_root_len; web_root_i++) {
-					Global.web_root_tests[i][4][web_root_i] = Global.web_root_tests[i][4][web_root_i].replace(/env\\app\\all\\/gi, '');
-					Global.web_root_tests[i][4][web_root_i] = Global.web_root_tests[i][4][web_root_i].replace(/env\/app\/all\//gi, '');
-					Global.web_root_tests[i][4][web_root_i] = Global.web_root_tests[i][4][web_root_i].replace(/app/gi, 'web_root');
-					Global.web_root_tests[i][4][web_root_i] = Global.web_root_tests[i][4][web_root_i].replace(/all\\/gi, '');
-					Global.web_root_tests[i][4][web_root_i] = Global.web_root_tests[i][4][web_root_i].replace(/all\//gi, '');
+					if (typeof (Global.web_root_tests[i][4][web_root_i]) === 'string') {
+						Global.web_root_tests[i][4][web_root_i] = Global.web_root_tests[i][4][web_root_i].replace(/env\\app\\all\\/gi, '');
+						Global.web_root_tests[i][4][web_root_i] = Global.web_root_tests[i][4][web_root_i].replace(/env\/app\/all\//gi, '');
+						Global.web_root_tests[i][4][web_root_i] = Global.web_root_tests[i][4][web_root_i].replace(/app/gi, 'web_root');
+						Global.web_root_tests[i][4][web_root_i] = Global.web_root_tests[i][4][web_root_i].replace(/all\\/gi, '');
+						Global.web_root_tests[i][4][web_root_i] = Global.web_root_tests[i][4][web_root_i].replace(/all\//gi, '');
+					} else {
+						var web_root_j, web_root_len2 = Global.web_root_tests[i][4][web_root_i].length;
+						for (web_root_j = 0; web_root_j < web_root_len2; web_root_j++) {
+							Global.web_root_tests[i][4][web_root_i][web_root_j] = Global.web_root_tests[i][4][web_root_i][web_root_j].replace(/env\\app\\all\\/gi, '');
+							Global.web_root_tests[i][4][web_root_i][web_root_j] = Global.web_root_tests[i][4][web_root_i][web_root_j].replace(/env\/app\/all\//gi, '');
+							Global.web_root_tests[i][4][web_root_i][web_root_j] = Global.web_root_tests[i][4][web_root_i][web_root_j].replace(/app/gi, 'web_root');
+							Global.web_root_tests[i][4][web_root_i][web_root_j] = Global.web_root_tests[i][4][web_root_i][web_root_j].replace(/all\\/gi, '');
+							Global.web_root_tests[i][4][web_root_i][web_root_j] = Global.web_root_tests[i][4][web_root_i][web_root_j].replace(/all\//gi, '');
+						}
+					}
 				}
 			}
 		}
@@ -755,7 +1164,12 @@ File already exists.*/})],
 			['ACTION', 'ajax', 200, '/env/public.action_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
 			['ACTIONNC FAIL', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
 			['ACTIONNC', 'ajax', 200, '/env/public.actionnc_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
-			['action_info', 'ajax', 200, '/env/action_info', '', ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.4 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 6.1.1 20160621 (Red Hat 6.1.1-3), 64-bit","envelope": "2.1.0RC6"}}*/ })],
+			['action_info', 'ajax', 200, '/env/action_info', '',
+				function (arg) {
+					return arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.4 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 6.1.1 20160621 (Red Hat 6.1.1-3), 64-bit","envelope": "2.1.0RC7"}}*/ })
+						|| arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.2, compiled by Visual C++ build 1800, 64-bit","envelope": "2.1.0RC7"}}*/ })
+				}
+			],
 			['ACTION FAIL 1', 'websocket', '', ml(function () {/*ACTION	public	action_testing1	testingnitset
 */}),
 			["FATAL\nerror_text\tERROR:  function public.action_testing1(unknown) does not exist\\nLINE 1: COPY (SELECT \"public\".\"action_testing1\"('testingnitset')) TO...\\n                     ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t14\n"]],
@@ -804,7 +1218,13 @@ RETURN	id	test_name	test_full
 ORDER BY
 id DESC
 */}),
-				["../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  column rtesting_table.test_full does not exist\\nLINE 1: ...esting_table\".\"id\", \"rtesting_table\".\"test_name\", \"rtesting_...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t61\n"]],
+				[
+					[
+						"../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  column rtesting_table.test_full does not exist\\nLINE 1: ...esting_table\".\"id\", \"rtesting_table\".\"test_name\", \"rtesting_...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t61\n",
+						"..\\..\\db_framework_pq\\db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  column rtesting_table.test_full does not exist\\nLINE 1: ...esting_table\".\"id\", \"rtesting_table\".\"test_name\", \"rtesting_...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t61\n"
+					]
+				]
+			],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table
@@ -912,9 +1332,17 @@ OFFSET
 				['OK']],
 
 			['Select Fail 1', 'ajax', 500, '/env/action_select', 'src=rtesting_table1',
-				ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t73\n"*/})],
+				function (arg) {
+					return arg === ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t73\n"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\db_framework_pq\\db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t73\n"*/ })
+				}
+			],
 			['Select Fail 2', 'ajax', 500, '/env/action_select', 'view=rtesting_table1',
-				ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t73\n"*/})],
+				function (arg) {
+					return arg === ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t73\n"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\db_framework_pq\\db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t73\n"*/ })
+				}
+			],
 			['Select 1', 'ajax', 200, '/env/action_select', 'src=rtesting_table&limit=1&order_by=id%20ASC',
 				ml(function () {/*{"stat": true, "dat": {"arr_column": ["id","test_name","test_name2","change_stamp"], "dat": [[2,"Bob","","2016-07-12 05:13:00"]], "row_count": 3}}*/})],
 
@@ -929,9 +1357,17 @@ OFFSET
 			['Select 6', 'ajax', 200, '/env/action_select', 'src=generate_series(1,16300)',
 				ml(function () {/*{"stat": true, "dat": {"arr_column": ["generate_series"], "dat": [*/}) + '[' + makeArray(16300, function (i) { return i + 1;}).join('],[') + ']' + ml(function () {/*], "row_count": 16300}}*/})],
 			['Insert Fail 1', 'ajax', 500, '/env/action_insert', 'src=rtesting_table1&data=id%3D1',
-				ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t19\n"*/})],
+				function (arg) {
+					return arg === ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t19\n"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\db_framework_pq\\db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t19\n"*/ })
+				}
+			],
 			['Insert Fail 2', 'ajax', 500, '/env/action_insert', 'view=rtesting_table1&data=id%3D1',
-				ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t19\n"*/})],
+				function (arg) {
+					return arg === ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t19\n"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\db_framework_pq\\db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t19\n"*/ })
+				}
+			],
             ['Insert Fail 3', 'ajax', 500, '/env/action_insert', 'src=rtesting_table',
                 ml(function () {/*"FATAL\nNo insert data"*/ })],
 			['Insert 1', 'ajax', 200, '/env/action_insert', 'src=rtesting_table&data=' + encodeURIComponent('test_name=test&test_name2=test'),
@@ -939,7 +1375,10 @@ OFFSET
 			['Insert 2', 'ajax', 200, '/env/action_insert', 'view=rtesting_table&data=' + encodeURIComponent('test_name=test&test_name2=test'),
 				ml(function () {/*{"stat": true, "dat": {"lastval": 6}}*/})],
 			['Update Fail', 'ajax', 500, '/env/action_update', 'src=rtesting_table&column=first_name&value=Test&where=' + encodeURIComponent('id=5'),
-				ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  column \"first_name\" does not exist\\nLINE 1: SELECT \"first_name\", \"id\", * FROM rtesting_table\\n               ^\\nHINT:  Perhaps you meant to reference the column \"rtesting_table.test_name\".\\n\nerror_detail\t\nerror_hint\tPerhaps you meant to reference the column \"rtesting_table.test_name\".\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/})],
+				function (arg) {
+					return arg === ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  column \"first_name\" does not exist\\nLINE 1: SELECT \"first_name\", \"id\", * FROM rtesting_table\\n               ^\\nHINT:  Perhaps you meant to reference the column \"rtesting_table.test_name\".\\n\nerror_detail\t\nerror_hint\tPerhaps you meant to reference the column \"rtesting_table.test_name\".\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\db_framework_pq\\db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  column \"first_name\" does not exist\\nLINE 1: SELECT \"first_name\", \"id\", * FROM rtesting_table\\n               ^\\nHINT:  Perhaps you meant to reference the column \"rtesting_table.test_name\".\\n\nerror_detail\t\nerror_hint\tPerhaps you meant to reference the column \"rtesting_table.test_name\".\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })
+				}],
 			['Update 1', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=Test&where=' + encodeURIComponent('id=5'),
 				ml(function () {/*{"stat": true, "dat": ["5","Test","test","2016-07-12 05:13:00"]}*/})],
 			['Update 2', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=NULL&where=' + encodeURIComponent('id=5&change_stamp=2016-07-12%2005:13:00'),
@@ -1017,7 +1456,13 @@ id
 3
 4
 */}),
-				["../common/common_util_sql.c:get_table_name: Invalid request\nFailed to get table name from query"]],
+				[
+					[
+						"../common/common_util_sql.c:get_table_name: Invalid request\nFailed to get table name from query",
+						"..\\..\\common\\common_util_sql.c:get_table_name: Invalid request\nFailed to get table name from query"
+					]
+				]
+			],
 			['ROLLBACK', 'websocket', '', ml(function () {/*COMMIT*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -1068,7 +1513,12 @@ id
 				Local.tests = JSON.parse(JSON.stringify(Global.tests));
 				Local.tests[35][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'text/plain'});
 				Local.tests[36][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'application/octet-binary'});
-				Local.tests[37][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'application/x-binary'});
+				Local.tests[37][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], { type: 'application/x-binary' });
+				for (i = 0, len = Local.tests.length; i < len; i++) {
+					if (typeof (Global.tests[i][5]) === 'function') {
+						Local.tests[i][5] = Global.tests[i][5];
+					}
+				}
 				//application/octet-binary
 				//ml(function () {/*asdfasdfasdf*/})
 				window.addEventListener('load', function () {
@@ -1164,6 +1614,8 @@ id
 									Local.tests[i][4] = '/open/test' + test_random + '.sql';
 								} else if (Local.tests[i][3] && Local.tests[i][3].indexOf && Local.tests[i][3].indexOf('/postage/0/download/open/test') === 0) {
 									Local.tests[i][3] = '/postage/0/download/open/test' + test_random + '.sql';
+								} else if (typeof(Global.tests[i][5]) === 'function') {
+									Local.tests[i][5] = Global.tests[i][5];
 								}
 							}
 
@@ -1239,6 +1691,7 @@ id
 							} else {
 								bolMatch = (strResult === expectedOutput);
 							}
+							console.log(expectedOutput, strResult, bolMatch);
 
 							if (bolMatch && intStatusCode === ajax.status) {
 								change_status(intCurrent, 'running', 'pass');
@@ -1290,9 +1743,9 @@ id
 										console.log(ajax.status, data);
 										console.log(intStatusCode, strExpectedOutput);
 										//console.log(data.error_text);
-										change_status(intCurrent, 'running', 'fail', i, data);
+										change_status(intCurrent, 'running', 'fail', i, strResult);
 										document.getElementById('actual_status').value = i;
-										document.getElementById('actual_output').value = data;
+										document.getElementById('actual_output').value = strResult;
 									}
 									if (i == 100) {
 										run_test(intCurrent + 1);
