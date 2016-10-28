@@ -1,9 +1,8 @@
-﻿  ws_update.c
-..\..\common\ws_update.c(355): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+﻿  ws_file.c
   Generating code
-  6 of 511 functions ( 1.2%) were compiled, the rest were copied from previous compilation.
+  96 of 511 functions (18.8%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    10 functions had inline decision re-evaluated but remain unchanged
+    22 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.exe
   envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.pdb (Full PDB)

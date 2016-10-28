@@ -1,11 +1,8 @@
-﻿  db_framework.c
-..\..\db_framework_pq\db_framework.c(72): warning C4022: 'DuplicateHandle': pointer mismatch for actual parameter 2
-..\..\db_framework_pq\db_framework.c(72): warning C4047: 'function': 'intptr_t' differs in levels of indirection from 'HANDLE'
-..\..\db_framework_pq\db_framework.c(72): warning C4024: '_open_osfhandle': different types for formal and actual parameter 1
+﻿  ws_tab.c
   Generating code
-  62 of 405 functions (15.3%) were compiled, the rest were copied from previous compilation.
+  3 of 404 functions ( 0.7%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    92 functions had inline decision re-evaluated but remain unchanged
+    15 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.exe
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)
