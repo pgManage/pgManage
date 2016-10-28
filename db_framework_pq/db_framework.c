@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "db_framework.h"
 
 const char *const WONT_GUESS = "____GS_YOU_WONT_GUESS_THIS_DATA_JHDFKSHDFURIHKSDJFHUIRSDJHF____";
@@ -115,6 +116,8 @@ bool _DB_exec(
 	DB_result_poll *res_poll = NULL;
 
 	SERROR_SALLOC(res_poll, sizeof(DB_result_poll));
+
+	conn->EV_A = EV_A;
 
 	res_poll->conn = conn;
 	res_poll->cb_data = cb_data;
@@ -588,6 +591,13 @@ void _DB_finish(DB_conn *conn) {
 	}
 #endif
 
+	SDEBUG("conn->copy_check: %p", conn->copy_check);
+	if (conn->copy_check != NULL) {
+		ev_check_stop(conn->EV_A, &conn->copy_check->check);
+		PQclear(conn->copy_check->res);
+		SFREE(conn->copy_check);
+	}
+
 	SFREE(conn->str_response);
 	SFREE(conn->str_literal_context_data);
 	PQfinish(conn->conn);
@@ -655,6 +665,7 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 			db_copy_check->res = res;
 			ev_check_init(&db_copy_check->check, db_copy_out_check_cb);
 			ev_check_start(EV_A, &db_copy_check->check);
+			res_poll->conn->copy_check = db_copy_check;
 
 			increment_idle(EV_A);
 
@@ -803,6 +814,7 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 	if (revents != 0) {
 	} // get rid of unused parameter warning
 	DB_copy_check *copy_check = (DB_copy_check *)w;
+	SDEBUG("copy_check: %p", copy_check);
 
 	char *str_response = NULL;
 	char **buffer_ptr_ptr;
@@ -811,6 +823,7 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 
 	int int_status = 0;
 
+	SFINISH_CHECK(copy_check->conn != NULL, "copy_check->conn == NULL");
 	SFINISH_SALLOC(buffer_ptr_ptr, sizeof(void *));
 
 	int int_i = 0;
@@ -842,8 +855,8 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 				res = PQgetResult(copy_check->conn->conn);
 			}
 
-			SFINISH_CAT_CSTR(str_response, "TRANSACTION COMPLETED");
-			copy_check->copy_cb(EV_A, true, true, copy_check->cb_data, str_response, strlen(str_response));
+			void *cb_data = copy_check->cb_data;
+			copy_cb_t copy_cb = copy_check->copy_cb;
 
 			decrement_idle(EV_A);
 			ev_check_stop(EV_A, &copy_check->check);
@@ -852,10 +865,15 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 			// ev_io_init(&res_poll->io, db_query_cb, conn->int_sock, EV_READ);
 			// ev_io_start(EV_A, &copy_check->res_poll->io);
 
+			SDEBUG("SFREE(copy_check);");
+			copy_check->conn->copy_check = NULL;
 			SFREE(copy_check);
 			// client_request_free(client_request);
 			// client_request_free takes care of this
 			// SFREE(client_insert);
+
+			SFINISH_CAT_CSTR(str_response, "TRANSACTION COMPLETED");
+			copy_cb(EV_A, true, true, cb_data, str_response, strlen(str_response));
 		}
 		int_i += 1;
 		PQfreemem(*buffer_ptr_ptr);
@@ -864,12 +882,14 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 
 	bol_error_state = false;
 finish:
+	SDEBUG("finish1");
 	if (bol_error_state == true || int_status == -2 || result == PGRES_FATAL_ERROR) {
 		// client_request_free(client_request);
 		// client_request_free takes care of this
 		// SFREE(client_insert);
 		bol_error_state = false;
 
+		SDEBUG("finish2");
 		str_response = _DB_get_diagnostic(copy_check->conn, res ? res : PQgetResult(copy_check->conn->conn));
 		copy_check->copy_cb(EV_A, false, true, copy_check->cb_data, str_response, strlen(str_response));
 		ev_check_stop(EV_A, &copy_check->check);
