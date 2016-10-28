@@ -355,7 +355,8 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                         arrQueries = [autocompleteQuery.schemas];
                         
                     // after SELECT, ALL or DISTINCT:
-                    } else if ((/(SELECT|ALL|DISTINCT)/gi).test(strPreviousWord) && (bolFirstSpace)) {
+                    } else if (((/(SELECT|ALL|DISTINCT)/gi).test(strPreviousWord) && bolFirstSpace) ||
+                                ((/(SELECT|ALL|DISTINCT)/gi).test(strPreviousKeyWord) && bolAfterComma)) {
                         arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
                         arrContextLists = ['tables', 'views'];
                     }

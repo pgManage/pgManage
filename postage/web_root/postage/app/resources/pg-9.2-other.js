@@ -1730,7 +1730,7 @@ function executeScript() {
         // this function is going to be bound to the "Stop Execution" button,
         //      it uses the "messageID" variable to send a "CANCEL" signal through the websocket
         cancelSignalHandler = function () {
-            GS.requestFromSocket(GS.envSocket, 'CANCEL', '', messageID);
+            GS.requestFromSocket(GS.querySocket, 'CANCEL', '', messageID);
         };
         
         // this function is run when we send the queries through the websocket,
@@ -1802,7 +1802,7 @@ function executeScript() {
         
         // begin
         startExecute();
-        messageID = GS.requestRawFromSocket(GS.envSocket, jsnCurrentQuery.strQuery, function (data, error) {
+        messageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
             var tableElement, scrollElement, trElement, arrRecords
               , arrCells, intRows, strHTML, arrLines, strError
               , intLine, i, len, col_i, col_len, rec_i, rec_len

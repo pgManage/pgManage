@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 for (col_i = 0, col_len = arrLock.length; col_i < col_len; col_i += 1) {
                     strRecordToHash += (strRecordToHash ? '\t' : '');
                     strTemp = arrSelectRecords[i].getAttribute('data-' + arrLock[col_i]);
-                    strRecordToHash += (strTemp === 'NULL' ? '' : strTemp);
+                    strRecordToHash += (strTemp === '\\N' ? '' : strTemp);
                 }
                 
                 strDeleteData += (strRecord + (strRecord ? '\t' : '') + CryptoJS.MD5(strRecordToHash).toString() + '\n');
@@ -1239,7 +1239,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     for (col_i = 0, col_len = arrLock.length; col_i < col_len; col_i += 1) {
                         strRecordToHash += (strRecordToHash ? '\t' : '');
                         strTemp = arrSelectRecords[i].getAttribute('data-' + arrLock[col_i]);
-                        strRecordToHash += (strTemp === 'NULL' ? '' : strTemp);
+                        strRecordToHash += (strTemp === '\\N' ? '' : strTemp);
                     }
                     
                     strRecord += (strRecord ? '\t' : '') + CryptoJS.MD5(strRecordToHash).toString();
@@ -1776,7 +1776,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             for (col_i = 0, col_len = arrLock.length; col_i < col_len; col_i += 1) {
                                 strRecordToHash += (strRecordToHash ? '\t' : '');
                                 strTemp = arrRecords[i].getAttribute('data-' + arrLock[col_i]);
-                                strRecordToHash += (strTemp === 'NULL' ? '' : strTemp);
+                                strRecordToHash += (strTemp === '\\N' ? '' : strTemp);
                             }
                             
                             strRecord += (strRecord ? '\t' : '') + CryptoJS.MD5(strRecordToHash).toString();
@@ -1985,7 +1985,7 @@ document.addEventListener('DOMContentLoaded', function () {
             for (col_i = 0, col_len = arrLock.length; col_i < col_len; col_i += 1) {
                 strRecordToHash += (strRecordToHash ? '\t' : '');
                 strTemp = updateRecord.getAttribute('data-' + arrLock[col_i]);
-                strRecordToHash += (strTemp === 'NULL' ? '' : strTemp);
+                strRecordToHash += (strTemp === '\\N' ? '' : strTemp);
             }
             
             strRecord += (strRecord ? '\t' : '') + CryptoJS.MD5(strRecordToHash).toString();
@@ -2043,7 +2043,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     
                     strColumns += arrElements[i].getAttribute('column');
-                    strInsertData += GS.encodeForTabDelimited(arrElements[i].value || 'NULL');
+                    strInsertData += GS.encodeForTabDelimited(arrElements[i].value || '\\N');
                 }
                 
                 if (strLocalColumns) {

@@ -9334,7 +9334,7 @@ GS.decodeFromTabDelimited = function (strValue, nullValue) {
     var i, len, strRet = '';
     
     if (nullValue === undefined) {
-        nullValue = 'NULL';
+        nullValue = '\\N';
     }
     
     for (i = 0, len = strValue.length; i < len; i += 1) {
@@ -14177,8 +14177,8 @@ window.addEventListener('design-register-element', function (event) {
             return setOrRemoveTextAttribute(selectedElement, 'reflow-at', this.value);
         });
         
-        addProp('Scroll To Bottom', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('scroll-to-bottom') || '') + '" mini></gs-text>', function () {
-            return setOrRemoveBooleanAttribute(selectedElement, 'scroll-to-bottom', (this.value === 'true'), false);
+        addProp('Scroll To Bottom', true, '<gs-checkbox class="target" value="' + encodeHTML(selectedElement.hasAttribute('scroll-to-bottom') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'scroll-to-bottom', (this.value === 'true'), true);
         });
         
         addProp('HUD Paginate', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-hudpaginate')) + '" mini></gs-checkbox>', function () {
@@ -14215,7 +14215,7 @@ window.addEventListener('design-register-element', function (event) {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
+        var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
         if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
         if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
@@ -20224,8 +20224,8 @@ GS.closeDialog = function (dialog, strAnswer) {
             return setOrRemoveTextAttribute(selectedElement, 'reflow-at', this.value);
         });
         
-        addProp('Scroll To Bottom', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('scroll-to-bottom') || '') + '" mini></gs-text>', function () {
-            return setOrRemoveBooleanAttribute(selectedElement, 'scroll-to-bottom', (this.value === 'true'), false);
+        addProp('Scroll To Bottom', true, '<gs-checkbox class="target" value="' + encodeHTML(selectedElement.hasAttribute('scroll-to-bottom') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'scroll-to-bottom', (this.value === 'true'), true);
         });
         
         addProp('HUD Orderby', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-hudorderby')) + '" mini></gs-checkbox>', function () {
@@ -20274,7 +20274,7 @@ GS.closeDialog = function (dialog, strAnswer) {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
+        var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
         if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
         if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
@@ -23560,17 +23560,19 @@ window.addEventListener('design-register-element', function () {
                 strPath = getPath(element) + document.getElementById('gs-file-manager-text-file-name').value;
                 //console.log('Create:', strPath);
                 
-                GS.requestFromSocket(GS.envSocket
-                                   , 'FILE\tCREATE_FILE\t' + GS.encodeForTabDelimited(strPath) + '\n'
-                                   , function (data, error, errorData) {
-                    if (!error && data.trim() && data.indexOf('Failed to get canonical path') === -1) {
-                        if (data === 'TRANSACTION COMPLETED') {
-                            getData(element);
+                if (document.getElementById('gs-file-manager-text-file-name').value.trim()) {
+                    GS.requestFromSocket(GS.envSocket
+                                       , 'FILE\tCREATE_FILE\t' + GS.encodeForTabDelimited(strPath) + '\n'
+                                       , function (data, error, errorData) {
+                        if (!error && data.trim() && data.indexOf('Failed to get canonical path') === -1) {
+                            if (data === 'TRANSACTION COMPLETED') {
+                                getData(element);
+                            }
+                        } else if (error) {
+                            GS.webSocketErrorDialog(errorData);
                         }
-                    } else if (error) {
-                        GS.webSocketErrorDialog(errorData);
-                    }
-                });
+                    });
+                }
             }
         });
     }

@@ -15,13 +15,23 @@ function explain(bolRun) {
     resultsTitleElement = currentTab.relatedResultsTitleElement;
     jsnCurrentQuery = getCurrentQuery();
     strRunQuery = jsnCurrentQuery.strQuery;
-    currentTab.relatedResultsTitleElement.textContent = 'Query Explain';
+    
+    
+    
+    //currentTab.relatedResultsTitleElement.textContent = 'Query Explain';
+    //currentTab.relatedClearButton.setAttribute('hidden', '');
+    //currentTab.relatedCopyOptionsButton.setAttribute('hidden', '');
+    currentTab.relatedStopButton.removeAttribute('hidden');
+    //currentTab.handlingQuery = true;
+    //currentTab.relatedResultsHeaderElement.classList.add('executing');
+    currentTab.relatedResultsHeaderElement.classList.remove('error');
+    currentTab.relatedResultsHeaderElement.classList.remove('executing');
+    
+    
     
     // request using raw query
     GS.addLoader(editor.container.parentNode.parentNode, 'Getting Explain...');
-    currentTab.relatedStopButton.removeAttribute('hidden');
-    currentTab.relatedClearButton.setAttribute('disabled', '');
-    messageID = GS.requestRawFromSocket(GS.envSocket,
+    messageID = GS.requestRawFromSocket(GS.querySocket,
                             (bolRun ?
                                 'EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) ' :
                                 'EXPLAIN (FORMAT JSON, VERBOSE) ') +
@@ -78,7 +88,6 @@ function explain(bolRun) {
             //);
         }
     });
-    currentTab.relatedStopButton.setAttribute('onclick', 'cancelExecute(\'' + messageID + '\')');
 }
 
 function handleExplain(explainJSON, target, bolRun) {

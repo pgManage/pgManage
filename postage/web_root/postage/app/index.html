@@ -79,8 +79,12 @@
                 // load ace undo manager so that we can clear the undo stack of an ace
                 window.UndoManager = require('ace/undomanager').UndoManager;
                 
-                // open socket for queries
+                // open socket for postage
                 GS.envSocket = GS.openSocket('env');
+                
+                // open socket for query execution
+                GS.querySocket = GS.openSocket('env');
+                
                 
                 // load context info
                 loadContextData(function () {

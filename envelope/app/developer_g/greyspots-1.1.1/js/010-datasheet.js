@@ -75,8 +75,8 @@ window.addEventListener('design-register-element', function (event) {
             return setOrRemoveTextAttribute(selectedElement, 'reflow-at', this.value);
         });
         
-        addProp('Scroll To Bottom', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('scroll-to-bottom') || '') + '" mini></gs-text>', function () {
-            return setOrRemoveBooleanAttribute(selectedElement, 'scroll-to-bottom', (this.value === 'true'), false);
+        addProp('Scroll To Bottom', true, '<gs-checkbox class="target" value="' + encodeHTML(selectedElement.hasAttribute('scroll-to-bottom') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'scroll-to-bottom', (this.value === 'true'), true);
         });
         
         addProp('HUD Paginate', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-hudpaginate')) + '" mini></gs-checkbox>', function () {
@@ -113,7 +113,7 @@ window.addEventListener('design-register-element', function (event) {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
+        var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
         if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
         if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }

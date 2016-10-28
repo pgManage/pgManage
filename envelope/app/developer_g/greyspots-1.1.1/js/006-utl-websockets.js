@@ -1056,7 +1056,7 @@ GS.decodeFromTabDelimited = function (strValue, nullValue) {
     var i, len, strRet = '';
     
     if (nullValue === undefined) {
-        nullValue = 'NULL';
+        nullValue = '\\N';
     }
     
     for (i = 0, len = strValue.length; i < len; i += 1) {

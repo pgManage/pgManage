@@ -87,7 +87,7 @@
                 
                 <div class="doc-example-description">
                     <span class="h3">Attributes "href" and "value":</span><br />
-                    <p>Sometimes you want to open a page like you would a link, but you want the appearance of a button. The target="" and href="" attributes work just like with an &lt;a&gt; tag. This is especially recommended if the target is an application or a download. Note that new windows will either appear as new browser windows or new tabs depending on brower settings. Also note that the "href" and "value" attributes are interchangable.</p>
+                    <p>Sometimes you want to open a page like you would a link, but you want the appearance of a button. The target="" and href="" attributes work just like with an &lt;a&gt; tag. This is especially recommended if the target is an application or a download. Note that new windows will either appear as new browser windows or new tabs depending on brower settings. To force a file to download, use the HTML5 download="" attribute to set the file name. Or just use download by itself. Also note that the "href" and "value" attributes are interchangable.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="auto">
@@ -102,6 +102,12 @@
                         </gs-button>
                         <gs-button href="http://www.wikipedia.org/" target="_blank">
                             "target" Attribute (New Tab/Page)
+                        </gs-button>
+                        <gs-button href="https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2.png" download>
+                            "download" Attribute (Download Image)
+                        </gs-button>
+                        <gs-button href="https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2.png">
+                            No Attribute (Won't Download)
                         </gs-button>
                     </template>
                 </gs-doc-example>

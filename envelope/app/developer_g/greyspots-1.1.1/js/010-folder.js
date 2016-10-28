@@ -572,17 +572,19 @@ window.addEventListener('design-register-element', function () {
                 strPath = getPath(element) + document.getElementById('gs-file-manager-text-file-name').value;
                 //console.log('Create:', strPath);
                 
-                GS.requestFromSocket(GS.envSocket
-                                   , 'FILE\tCREATE_FILE\t' + GS.encodeForTabDelimited(strPath) + '\n'
-                                   , function (data, error, errorData) {
-                    if (!error && data.trim() && data.indexOf('Failed to get canonical path') === -1) {
-                        if (data === 'TRANSACTION COMPLETED') {
-                            getData(element);
+                if (document.getElementById('gs-file-manager-text-file-name').value.trim()) {
+                    GS.requestFromSocket(GS.envSocket
+                                       , 'FILE\tCREATE_FILE\t' + GS.encodeForTabDelimited(strPath) + '\n'
+                                       , function (data, error, errorData) {
+                        if (!error && data.trim() && data.indexOf('Failed to get canonical path') === -1) {
+                            if (data === 'TRANSACTION COMPLETED') {
+                                getData(element);
+                            }
+                        } else if (error) {
+                            GS.webSocketErrorDialog(errorData);
                         }
-                    } else if (error) {
-                        GS.webSocketErrorDialog(errorData);
-                    }
-                });
+                    });
+                }
             }
         });
     }
