@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "db_framework.h"
 
 const char *const WONT_GUESS = "____GS_YOU_WONT_GUESS_THIS_DATA_JHDFKSHDFURIHKSDJFHUIRSDJHF____";
@@ -593,6 +592,7 @@ void _DB_finish(DB_conn *conn) {
 
 	SDEBUG("conn->copy_check: %p", conn->copy_check);
 	if (conn->copy_check != NULL) {
+		decrement_idle(conn->EV_A);
 		ev_check_stop(conn->EV_A, &conn->copy_check->check);
 		PQclear(conn->copy_check->res);
 		SFREE(conn->copy_check);
