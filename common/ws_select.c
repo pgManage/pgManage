@@ -311,6 +311,7 @@ bool ws_select_step4(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_CAT_CSTR(str_sql, "COPY (", client_select->str_sql, ") TO STDOUT;");
 #else
 	SFINISH_CAT_CSTR(str_sql, client_select->str_sql_escaped_return);
+	SDEBUG("client_select->str_sql_escaped_return: %s", client_select->str_sql_escaped_return);
 #endif
 
 	SFINISH_CHECK(
