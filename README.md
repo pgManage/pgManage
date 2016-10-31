@@ -10,7 +10,7 @@ Releases marked "Source code" run like a web server. This enables you to connect
 
 ## Release Schedule
 
-Currently we release every Saturday. 
+Currently we release twice a month. 
 
 ## FEEDBACK AND BUG REPORTS
 
