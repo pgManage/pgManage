@@ -10,7 +10,7 @@
         
         <script>
             //jslint white:true multivar:true
-            var bolPropertyPanelOpen = false, arrNotification = [], bolCurl = false;
+            var bolPropertyPanelOpen = false, bolCurl = false;
             
             window.addEventListener('DOMContentLoaded', function () {
                 'use strict';
@@ -27,6 +27,21 @@
                 document.body.appendChild(link5);
             });
             
+            var reconnectNumber = 0;
+            window.addEventListener('socket-connect', function (event) {
+                "use strict";
+                reconnectNumber = 0;
+            });
+            window.addEventListener('socket-reconnect', function (event) {
+                "use strict";
+                reconnectNumber -= 1;
+                
+                if (reconnectNumber <= -6) {
+                    window.location = '/postage/auth?action=logout';
+                }
+            });
+            
+            var arrNotification = [];
             window.addEventListener('notification', function (event) {
                 'use strict';
                 var strBatch = event.message, arrBatch = strBatch.split('\n'), i, len

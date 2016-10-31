@@ -8576,8 +8576,8 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         } else {
             socket.notifications = [];
         }
-       socket.onmessage = function (event) {
-           var message = event.data, messageID, responseNumber, key, strError, arrLines, i, len, jsnMessage, startFrom;
+        socket.onmessage = function (event) {
+            var message = event.data, messageID, responseNumber, key, strError, arrLines, i, len, jsnMessage, startFrom;
             
             if (typeof (message) === 'object') {
                 var buf = message;
@@ -8589,6 +8589,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
             // if sessionid
             if (message.indexOf('sessionid = ') === 0) {
                 socket.GSSessionID = message.substring('sessionid = '.length, message.indexOf('\n'));
+                GS.triggerEvent(window, 'socket-connect');
                 
                 for (key in jsnMessages) {
                     jsnMessage = jsnMessages[key];
@@ -8736,6 +8737,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
             if (!socket.stayClosed) {
                 setTimeout(function() {
                     console.log('ATTEMPTING SOCKET RE-OPEN', socket);
+                    GS.triggerEvent(window, 'socket-reconnect');
                     GS.envSocket = GS.openSocket('env', GS.envSocket.GSSessionID, GS.envSocket.notifications);
                 }, 1000);
             } else {
