@@ -23074,12 +23074,20 @@ window.addEventListener('design-register-element', function () {
     function getData(element) {
         var strPath = getPath(element)
           , bolFolders = !element.hasAttribute('no-folders')
-          , bolFiles = !element.hasAttribute('no-files');
+          , bolFiles = !element.hasAttribute('no-files')
+          , strHeader;
         
         element.folderList.innerHTML = '';
         element.fileList.innerHTML = '';
         
-        element.pathTitle.textContent = '/' + element.arrPath.join('/');
+        strHeader = GS.trim('/' + element.arrPath.join('/'), '/');
+        
+        // if there is something in the header: wrap it with slashes
+        if (strHeader) {
+            strHeader = '/' + strHeader + '/';
+        }
+        
+        element.pathTitle.textContent = strHeader;
         
         if (element.arrPath.length > 0) {
             element.backButton.removeAttribute('disabled');

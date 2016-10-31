@@ -14241,7 +14241,7 @@ gs-folder[mini] {
 gs-folder > .root .path-title {
     text-align: center;
     color: #BBB;
-    padding-bottom: 0.25em;
+    /*padding-bottom: 0.25em;*/
 }
 
 /* ###############################################################
