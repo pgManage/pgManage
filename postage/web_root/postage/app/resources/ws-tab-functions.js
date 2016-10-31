@@ -1791,10 +1791,10 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
         //console.log(data, error, errorData);
 
         if (!error) {
-            tabElement.saveState = 'saved';
             if (data !== 'TRANSACTION COMPLETED') {
                 callbackSuccess(data);
             }
+            tabElement.saveState = 'saved';
 
         } else {
             // saveFile is called on datasheet, editor and table designer tabs.
@@ -1812,13 +1812,13 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
                 });
             }
 
-            tabElement.saveState = 'error';
-
             if (callbackFail) {
                 callbackFail(errorData);
             } else {
                 GS.webSocketErrorDialog(errorData);
             }
+
+            tabElement.saveState = 'error';
         }
     });
 }
