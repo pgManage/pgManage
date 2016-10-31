@@ -125,25 +125,25 @@ test-ssl: test-common
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 
 gdb: test-common
-	echo -n "run" > temp_gdb_commands
+	echo "run" > temp_gdb_commands
 	gdb -x temp_gdb_commands --args ./$(BINARY) $(CONFIGS) $(WEBROOTS) -l info || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_gdb_commands
 
 gdb-ssl: test-common
-	echo -n "run" > temp_gdb_commands
+	echo "run" > temp_gdb_commands
 	gdb -x temp_gdb_commands --args ./$(BINARY) $(CONFIGS) $(WEBROOTS) -j ../ssl/self.crt -k ../ssl/self.key -l info || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_gdb_commands
 
 lldb: test-common
-	echo -n "run" > temp_lldb_commands
+	echo "run" > temp_lldb_commands
 	lldb -s temp_lldb_commands -- ./$(BINARY) $(CONFIGS) $(WEBROOTS) -l info || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_lldb_commands
 
 lldb-ssl: test-common
-	echo -n "run" > temp_lldb_commands
+	echo "run" > temp_lldb_commands
 	lldb -s temp_lldb_commands -- ./$(BINARY) $(CONFIGS) $(WEBROOTS) -j ../ssl/self.crt -k ../ssl/self.key -l info || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_lldb_commands
