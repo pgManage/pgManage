@@ -1,3 +1,17 @@
+Changes since 3.0.0RC4 and 2.1.0RC7:
+postage login timeout: go back to login screen (closes #10)
+fix `echo -n` in Makefile (there is no -n flag on macOS)
+fix visual representation of NULL in postage (closes #35)
+fix tab/file move change_stamp generation (closes #24)
+fix 100% cpu and remove a UTIL_DEBUG
+fix crash when logging out during a select (closes #20)
+fix TAB WRITE FAIL 1 test (closes #34)
+add electron-context-menu (for workflowproducts/envelope#10)
+remove PostageGUI (closes workflowproducts/envelope#11)
+add windows libpq envelope
+fix re-opening window on macOS
+
+
 Changes since 3.0.0RC3:
 Right justify number columns
 Fix appId in package.json
