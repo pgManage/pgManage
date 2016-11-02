@@ -2175,14 +2175,15 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 			int_end_pos = (size_t)ftell(client_file->fp);
 			int_line_length = int_end_pos - int_start_pos;
 
-			if (strlen(str_line) < int_line_length) {
+			// commented because we had a file that was excluded we did not want to be excluded
+			/*if (strlen(str_line) < int_line_length) {
 				// binary file, skip
 				Queue_recv(client_file->que_file);
 				SFREE(str_current_file_name);
 				fclose(client_file->fp);
 				client_file->fp = NULL;
 				goto finish;
-			}
+			}*/
 
 			bool bol_match = false;
 			if (!client_file->bol_regex) {

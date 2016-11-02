@@ -347,6 +347,7 @@ bool http_update_step3(EV_P, void *cb_data, DB_result *res) {
 			"=CAST(", str_value_literal, " AS ", client_update->str_col_data_type, ")", " WHERE ", client_update->str_u_where,
 			";");
 	}
+	SDEBUG("client_update->str_sql: %s", client_update->str_sql);
 	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_update->str_sql, http_update_step4), "DB_exec failed");
 
 	DB_free_result(res);

@@ -345,8 +345,8 @@
 			['Change Password', 'ajax', 200, '/env/auth', 'action=change_pw&password_old=test1&password_new=456456',
 				ml(function () {/*{"stat": true, "dat": "OK"}*/ })],
 			
-			['action_info', 'ajax', 200, '/env/action_info', '', ml(function () {/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8888, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0RC6"}}*/})],
-			['action_info *', 'ajax spam', 200, '/env/action_info', '', ml(function (){/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8888, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0RC6"}}*/})],
+			['action_info', 'ajax', 200, '/env/action_info', '', ml(function () {/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8888, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0RC7"}}*/})],
+			['action_info *', 'ajax spam', 200, '/env/action_info', '', ml(function (){/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8888, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0RC7"}}*/})],
 			['WEBSOCKET OPEN W/INFO ACTION', 'websocket start', '', '', '']
 		];
 		console.log('test4');
@@ -618,38 +618,77 @@ File already exists.*/})],
 				'INSENSITIVE' + '\n',
 				["..\\..\\common\\common_util_sql.c:canonical_full_start: Starting path not recognized.\nInvalid Path", "TRANSACTION COMPLETED"]],
 			['APP FILE SEARCH 1', 'websocket', '', 'FILE\tSEARCH\t/app/trusted_g/\tbran muffin\nRECURSIVE\n',
-				["test.txt:2:This is a test of the bran muffin. (test line #2)\n", "test\\test.txt:2:This is a test of the bran muffin. (test line #2)\n", "TRANSACTION COMPLETED"]],
+				[
+					"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+					"\\test\\test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH 2', 'websocket', '', 'FILE\tSEARCH\t/app/trusted_g/\tBrAn mUfFiN\nINSENSITIVE\n',
-				["test.txt:2:This is a test of the bran muffin. (test line #2)\n",'TRANSACTION COMPLETED']],
+				[
+					"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+					'TRANSACTION COMPLETED'
+				]
+			],
 			['APP FILE SEARCH 3', 'websocket', '', 'FILE\tSEARCH\t/app/trusted_g/\tbran muffin\nREGEX\n',
-				["test.txt:2:This is a test of the bran muffin. (test line #2)\n",'TRANSACTION COMPLETED']],
+				[
+					"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+					'TRANSACTION COMPLETED'
+				]
+			],
 			['APP FILE SEARCH 4', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/') + '\t' +
 				GS.encodeForTabDelimited('This is a test of the [search|bran|envelope]') + '\n' +
 				'INSENSITIVE\tREGEX\tRECURSIVE' + '\n',
-				["test.txt:1:This is a test of the search. (test line #1)\n", "test.txt:2:This is a test of the bran muffin. (test line #2)\n", "test.txt:4:This is a test of the envelope. (test line #4)", "test\\test.txt:1:This is a test of the search. (test line #1)\n", "test\\test.txt:2:This is a test of the bran muffin. (test line #2)\n", "test\\test.txt:4:This is a test of the envelope. (test line #4)", "TRANSACTION COMPLETED"]
+				[
+					"\\test.txt:1:This is a test of the search. (test line #1)\n",
+					"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+					"\\test.txt:4:This is a test of the envelope. (test line #4)",
+					"\\test\\test.txt:1:This is a test of the search. (test line #1)\n",
+					"\\test\\test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+					"\\test\\test.txt:4:This is a test of the envelope. (test line #4)",
+					"TRANSACTION COMPLETED"
+				]
 			],
 			['APP FILE SEARCH 5', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/') + '\t' +
 				GS.encodeForTabDelimited('This is a test of the [search|bran|envelope]') + '\n' +
 				'INSENSITIVE\tREGEX' + '\n',
-				["test.txt:1:This is a test of the search. (test line #1)\n", "test.txt:2:This is a test of the bran muffin. (test line #2)\n", "test.txt:4:This is a test of the envelope. (test line #4)", "TRANSACTION COMPLETED"]],
+				[
+					"\\test.txt:1:This is a test of the search. (test line #1)\n",
+					"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n",
+					"\\test.txt:4:This is a test of the envelope. (test line #4)",
+					"TRANSACTION COMPLETED"
+				]
+			],
 			['APP FILE SEARCH 6', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/') + '\t' +
 				GS.encodeForTabDelimited('This....a test of the search') + '\n' +
 				'INSENSITIVE\tREGEX' + '\n',
-				["test.txt:1:This is a test of the search. (test line #1)\n", 'TRANSACTION COMPLETED']],
+				[
+					"\\test.txt:1:This is a test of the search. (test line #1)\n",
+					'TRANSACTION COMPLETED'
+				]
+			],
 			['APP FILE SEARCH 7', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/') + '\t' +
 				GS.encodeForTabDelimited('This is a test of the search'),
-				["test.txt:1:This is a test of the search. (test line #1)\n", 'TRANSACTION COMPLETED']],
+				[
+					"\\test.txt:1:This is a test of the search. (test line #1)\n",
+					'TRANSACTION COMPLETED'
+				]
+			],
 			['APP FILE SEARCH 8', 'websocket', '', 'FILE\tSEARCH\t' +
 				GS.encodeForTabDelimited('/app/trusted_g/') + '\t' +
 				GS.encodeForTabDelimited('This....a test of the search') + '\n' +
 				'INSENSITIVE\tREGEX' + '\n',
-				["test.txt:1:This is a test of the search. (test line #1)\n", 'TRANSACTION COMPLETED']],
-			['APP FILE SEARCH END', 'websocket', '', 'FILE\tDELETE\t/app/trusted_g/',
-				['OK', 'TRANSACTION COMPLETED']]
+				[
+					"\\test.txt:1:This is a test of the search. (test line #1)\n",
+					'TRANSACTION COMPLETED'
+				]
+			],
+			//['APP FILE SEARCH END', 'websocket', '', 'FILE\tDELETE\t/app/trusted_g/',
+			//	['OK', 'TRANSACTION COMPLETED']]
 		];
 		console.log('test5');
 
@@ -719,7 +758,8 @@ File already exists.*/})],
 			['RAW FAIL', 'websocket', '', ml(function () {/*RAW*/}),
 				["Invalid Request Type \"RAW\"\n"]],
 			['Accept FAIL', 'ajax', 500, '/env/dbo.accept_testing1', 'testingnitset', ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Could not find stored procedure 'dbo.accept_testing1'.(2812)\n"*/ })],
-			['Accept', 'ajax', 200, '/env/dbo.accept_testing', 'testingnitset', 'testingnitset'],
+			['Accept 1', 'ajax', 200, '/env/dbo.accept_testing', 'testingnitset', 'testingnitset'],
+			['Accept 2', 'ajax', 200, '/env/dbo.accept_testing_large_return', '', '[[' + makeArray(16300, function (i) { return i + 1; }).join('], [') + ']]'],
 			['Action FAIL', 'ajax', 500, '/env/dbo.action_testing1', 'testingnitset', ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed, res->status == 5:\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Could not find stored procedure 'dbo.action_testing1'.(2812)\n"*/ })],
 			['Action 1', 'ajax', 200, '/env/dbo.action_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
 			['Action 2', 'ajax', 200, '/env/dbo.action_testing_nvarchar', 'testingnitset', '{"stat":true, "dat": "utf-8: ↑ utf-16: § §"}'],
@@ -780,7 +820,7 @@ RETURN	id	test_name	test_full
 ORDER BY
 id DESC
 */}),
-				["db_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'test_full'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"]],
+				["db_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'test_full'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"]],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table
@@ -789,7 +829,7 @@ RETURN	id	test_name	test_name2
 ORDER BY
 id DESC
 */}),
-				["id\ttest_name\ttest_name2\nint identity\tvarchar\tvarchar\n", "TRANSACTION COMPLETED"]],
+				["id\ttest_name\ttest_name2\nint identity\tvarchar(150)\tvarchar(150)\n", "TRANSACTION COMPLETED"]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -881,7 +921,7 @@ RETURN	id	test_name	test_name2
 LIMIT	OFFSET
 2	1
 */}),
-				["id\ttest_name\ttest_name2\nint identity\tvarchar\tvarchar\n", "3\tAlice\tAlicia\n4\tEve\tAdam\n", "TRANSACTION COMPLETED"]],
+				["id\ttest_name\ttest_name2\nint identity\tvarchar(150)\tvarchar(150)\n", "3\tAlice\tAlicia\n4\tEve\tAdam\n", "TRANSACTION COMPLETED"]],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table
@@ -890,22 +930,22 @@ RETURN	id	test_name	test_name2
 LIMIT
 2
 */}),
-				["id\ttest_name\ttest_name2\nint identity\tvarchar\tvarchar\n", "2\tBob\t\n3\tAlice\tAlicia\n", "TRANSACTION COMPLETED"]],
+				["id\ttest_name\ttest_name2\nint identity\tvarchar(150)\tvarchar(150)\n", "2\tBob\t\n3\tAlice\tAlicia\n", "TRANSACTION COMPLETED"]],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table
 RETURN	id	test_name	test_name2
 
 OFFSET
 2
 */}),
-				["id\ttest_name\ttest_name2\nint identity\tvarchar\tvarchar\n", "4\tEve\tAdam\n5\tBob\t\n", "TRANSACTION COMPLETED"]],
+				["id\ttest_name\ttest_name2\nint identity\tvarchar(150)\tvarchar(150)\n", "4\tEve\tAdam\n5\tBob\t\n", "TRANSACTION COMPLETED"]],
 			['COMMIT', 'websocket', '', ml(function () {/*COMMIT*/ }),
 				['OK']],
             ['Select Fail 1', 'ajax', 500, '/env/action_select', 'src=rtesting_table2',
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Select Fail 2', 'ajax', 500, '/env/action_select', 'view=rtesting_table2',
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Select Fail 3', 'ajax', 500, '/env/action_select', 'view=rtesting_table&where=test_name%20%3D%20asdf',
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'asdf'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'asdf'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Select 1', 'ajax', 200, '/env/action_select', 'src=rtesting_table&limit=1&order_by=id%20ASC&cols=id,test_name,test_name2,change_stamp,testint',
                 ml(function () {/*{"stat": true, "dat": {"arr_column": ["id","test_name","test_name2","change_stamp","testint"], "dat": [[2,"Bob","","Jun 15 2016  1:17PM",0]], "row_count": 4}}*/ })],
 
@@ -922,9 +962,9 @@ OFFSET
             ['Insert Fail 1', 'ajax', 500, '/env/action_insert', 'src=rtesting_table2&data=test',
                 ml(function () {/*"FATAL\nBadly formed data string. Should be URI encoded 'key=value&key=value'."*/ })],
             ['Insert Fail 2', 'ajax', 500, '/env/action_insert', 'src=rtesting_table2&data=test%3Dtest',
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Insert Fail 3', 'ajax', 500, '/env/action_insert', 'view=rtesting_table2&data=test%3Dtest',
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Insert Fail 4', 'ajax', 500, '/env/action_insert', 'src=rtesting_table&data=',
 				ml(function () {/*"FATAL\nNo insert data"*/ })],
             ['Insert Fail 5', 'ajax', 500, '/env/action_insert', 'view=ttesting_view2&data=' + encodeURIComponent('test_name_1=test&test_name2_1=test&test_name_2=test&test_name2_2=test'),
@@ -935,8 +975,12 @@ OFFSET
                 ml(function () {/*{"stat": true, "dat": {"lastval": 7}}*/ })],
             ['Insert 3', 'ajax', 200, '/env/action_insert', 'view=ttesting_view_simple&currval=rtesting_table&data=' + encodeURIComponent('test_name=test&test_name2=test'),
                 ml(function () {/*{"stat": true, "dat": {"lastval": 8}}*/ })],
+            ['Insert 4', 'ajax', 200, '/env/action_insert', 'src=rtesting_table3&data=' + encodeURIComponent('test_name=test&test_name2=test'),
+                ml(function () {/*{"stat": true, "dat": {"lastval": 1}}*/ })],
+            ['Insert 5', 'ajax', 200, '/env/action_insert', 'src=rtesting_table4&data=' + encodeURIComponent('test_name=test&test_name2=test'),
+                ml(function () {/*{"stat": true, "dat": {"lastval": 1}}*/ })],
             ['Update Fail', 'ajax', 500, '/env/action_update', 'src=rtesting_table&column=first_name&value=Test&where=' + encodeURIComponent('id=6'),
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'first_name'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'first_name'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Update 1', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=Test&where=' + encodeURIComponent('id=6'),
                 ml(function () {/*{"stat": true, "dat": ["6","Test","test","Jun 15 2016  1:17PM","0"]}*/ })],
             ['Update 2', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=NULL&where=' + encodeURIComponent('id=6&change_stamp=' + encodeURIComponent('Jun 15 2016  1:17PM')),
@@ -947,6 +991,12 @@ OFFSET
                 ml(function () {/*{"stat": true, "dat": ["6","NU\nLL","test","Jun 15 2016  1:17PM","0"]}*/ })],
             ['Update 5', 'ajax', 200, '/env/action_update', 'src=ttesting_view2&column=test_name_2&value=testest&where=' + encodeURIComponent('id_2=6&change_stamp_2=' + encodeURIComponent('Jun 15 2016  1:17PM')),
                 ml(function () {/*{"stat": true, "dat": [null,null,null,null,null,"6","testest","test","0","Jun 15 2016  1:17PM"]}*/ })],
+            ['Update 6', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=123456789012345678901234567890testtesttest&where=' + encodeURIComponent('id=6'),
+                ml(function () {/*{"stat": true, "dat": ["6","123456789012345678901234567890testtesttest","test","Jun 15 2016  1:17PM","0"]}*/ })],
+            ['Update 7', 'ajax', 200, '/env/action_update', 'src=rtesting_table3&column=test_name&value=123456789012345678901234567890testtesttest&where=' + encodeURIComponent('id=1'),
+                ml(function () {/*{"stat": true, "dat": ["1","123456789012345678901234567890testtesttest","test","Jun 15 2016  1:17PM",null]}*/ })],
+            ['Update 8', 'ajax', 200, '/env/action_update', 'src=rtesting_table4&column=test_name&value=123456789012345678901234567890testtesttest&where=' + encodeURIComponent('id=1'),
+                ml(function () {/*{"stat": true, "dat": ["1","123456789012345678901234567890testtesttest","test","Jun 15 2016  1:17PM",null]}*/ })],
             ['Delete Fail 1', 'ajax', 500, '/env/action_delete', 'src=rtesting_table2&id=5',
                 ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_exec_query_cb: SQLExecDirect Failed!\nDB_exec failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n"*/ })],
             ['Delete Fail 2', 'ajax', 500, '/env/action_delete', 'src=ttesting_view2&id=8',
@@ -1084,7 +1134,7 @@ RETURN	id	test_name	test_name2
 LIMIT	OFFSET
 2	1
 */}),
-				["id\ttest_name\ttest_name2\nint identity\tvarchar\tvarchar\n", "8\ttest\ttest\n9\tAl\\i\\t\\tce\tAli\\r\\n\\ncia\n", "TRANSACTION COMPLETED"]],
+				["id\ttest_name\ttest_name2\nint identity\tvarchar(150)\tvarchar(150)\n", "8\ttest\ttest\n9\tAl\\i\\t\\tce\tAli\\r\\n\\ncia\n", "TRANSACTION COMPLETED"]],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['DELETE 4', 'websocket', '', ml(function () {/*DELETE	rtesting_table
@@ -1103,7 +1153,7 @@ RETURN	*
 WHERE	LIMIT	OFFSET
 1=1	ALL	0
 */}),
-				["id\tSampleId\tFreezerId\tDrawId\tPartId\tPartIDDisplay\tbatchid\tSampleCreateLogin\tAliquotCreateStampFormatted\tSampleCreateStampFormatted\tDrawDate\tDrawTime\tAliquotType\tFreezerBox\tAliquotNumber\tProcessTime\tAliquotDeleted\tstat\tfname\tDrawType\tFreezerShelf\tFreezerRack\tFreezerRow\tFreezerColumn\tInitialAmount\tCurrentAmount\tNumberOfThaws\tCryovialLot\tDrawToCentrifuge\tCentrifugeToMinus80\tAliquotCreateLogin\tBarcode\tProject\tNotes\tSampleDeleted\tConcentration\tVisitNumber\tAge\tBloodType\tAbc\tMedID\nvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tint\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tvarchar\tint\tint\tint\tint\tint\tvarchar\tvarchar\tint\n", "304839\t107420\t10002\t725011\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t0123456789\t7\t1\t01:05\t0\tinv\t0123\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t103822\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304840\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t0123456789\t7\t2\t01:05\t0\tinv\t0123\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304841\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t0123456789\t10\t3\t\\N\t-1\tdeleted\t012345678901234\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304842\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t0123456789\t10\t4\t\\N\t-1\tdeleted\t012345678901234\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304843\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t1\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304844\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t2\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304845\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t3\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304846\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t4\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304847\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t5\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304848\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t6\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n", "304849\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t7\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304850\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t8\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304851\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t9\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304852\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t10\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304853\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t11\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304854\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t12\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304855\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t13\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304856\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t14\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304857\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t15\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304858\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t16\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n", "TRANSACTION COMPLETED"]],
+				["id\tSampleId\tFreezerId\tDrawId\tPartId\tPartIDDisplay\tbatchid\tSampleCreateLogin\tAliquotCreateStampFormatted\tSampleCreateStampFormatted\tDrawDate\tDrawTime\tAliquotType\tFreezerBox\tAliquotNumber\tProcessTime\tAliquotDeleted\tstat\tfname\tDrawType\tFreezerShelf\tFreezerRack\tFreezerRow\tFreezerColumn\tInitialAmount\tCurrentAmount\tNumberOfThaws\tCryovialLot\tDrawToCentrifuge\tCentrifugeToMinus80\tAliquotCreateLogin\tBarcode\tProject\tNotes\tSampleDeleted\tConcentration\tVisitNumber\tAge\tBloodType\tAbc\tMedID\nvarchar(6)\tvarchar(6)\tvarchar(5)\tvarchar(6)\tvarchar(6)\tvarchar(6)\tvarchar(2)\tvarchar(6)\tvarchar(16)\tvarchar(16)\tvarchar(10)\tvarchar(7)\tvarchar(10)\tvarchar(2)\tvarchar(2)\tvarchar(5)\tvarchar(2)\tvarchar(7)\tvarchar(15)\tint\tvarchar(1)\tvarchar(1)\tvarchar(1)\tvarchar(1)\tvarchar(1)\tvarchar(1)\tvarchar(1)\tvarchar(7)\tvarchar(1)\tvarchar(1)\tvarchar(6)\tvarchar(6)\tvarchar(10)\tint\tint\tint\tint\tint\tvarchar(2)\tvarchar(6)\tint\n", "304839\t107420\t10002\t725011\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t0123456789\t7\t1\t01:05\t0\tinv\t0123\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t103822\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304840\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t0123456789\t7\t2\t01:05\t0\tinv\t0123\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304841\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t0123456789\t10\t3\t\\N\t-1\tdeleted\t012345678901234\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304842\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t0123456789\t10\t4\t\\N\t-1\tdeleted\t012345678901234\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304843\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t1\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304844\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t2\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304845\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t3\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304846\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t4\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304847\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t5\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304848\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t6\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n", "304849\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t7\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304850\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t8\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304851\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t9\t01:05\t0\tinv\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304852\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t10\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304853\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t11\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304854\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t12\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304855\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t13\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304856\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t14\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304857\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t15\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n304858\t012345\t01234\t012345\t885533\t012345\t76\t123456\t0123456789012345\t0123456789012345\t0123456789\t1234567\t012345\t11\t16\t\\N\t-1\tdeleted\t012345\t\\N\t1\t1\tA\t1\t1\t1\t0\t0123456\t\t\t012345\t012345\t0123456789\t\\N\t0\t\\N\t1\t\\N\tA+\t012345\t\\N\n", "TRANSACTION COMPLETED"]],
 			['WEBSOCKET CLOSE', 'websocket end', '', '', ''],
 			
 			['Logout', 'ajax', 200, '/env/auth', 'action=logout',
