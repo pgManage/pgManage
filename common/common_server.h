@@ -38,10 +38,9 @@
 #define SERROR_LIBTLS_CONTEXT(C, M, ...) SERROR("LIBTLS: %s " M, tls_error(C), ##__VA_ARGS__);
 #define SERROR_NORESPONSE_LIBTLS_CONTEXT(C, M, ...) SERROR_NORESPONSE("LIBTLS: %s " M, tls_error(C), ##__VA_ARGS__);
 
-#define SFINISH_LIBTLS_NOCONTEXT(M, ...) SFINISH("LIBTLS: " M "\n", ##__VA_ARGS__);
-#define SFINISH_NORESPONSE_LIBTLS_NOCONTEXT(M, ...) SWARN_NORESPONSE("LIBTLS: " M, ##__VA_ARGS__);
-#define SFINISH_LIBTLS_CONTEXT(C, M, ...) SFINISH("LIBTLS: %s " M "\n", tls_error(C), ##__VA_ARGS__);
-#define SFINISH_NORESPONSE_LIBTLS_CONTEXT(C, M, ...) SWARN_NORESPONSE("LIBTLS: %s " M, tls_error(C), ##__VA_ARGS__);
+#define SFINISH_LIBTLS_NOCONTEXT(M, ...) SFINISH_ERROR("LIBTLS: " M "\n", ##__VA_ARGS__);
+//#define SFINISH_LIBTLS_CONTEXT are you sure?
+#define SFINISH_LIBTLS_CONTEXT(C, M, ...) SFINISH_ERROR("LIBTLS: %s " M "\n", tls_error(C), ##__VA_ARGS__);
 
 extern struct ev_loop *global_loop;
 extern bool bol_tls;

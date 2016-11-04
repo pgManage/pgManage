@@ -112,7 +112,7 @@ finish:
 		SFREE(_str_response);
 		if ((int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
 			if (bol_tls) {
-				SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
+				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {
 				SERROR_NORESPONSE("write() failed");
 			}

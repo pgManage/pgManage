@@ -345,8 +345,8 @@
 			['Change Password', 'ajax', 200, '/env/auth', 'action=change_pw&password_old=test1&password_new=456456',
 				ml(function () {/*{"stat": true, "dat": "OK"}*/ })],
 			
-			['action_info', 'ajax', 200, '/env/action_info', '', ml(function () {/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8888, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0RC7"}}*/})],
-			['action_info *', 'ajax spam', 200, '/env/action_info', '', ml(function (){/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8888, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0RC7"}}*/})],
+			['action_info', 'ajax', 200, '/env/action_info', '', ml(function () {/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8888, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0"}}*/})],
+			['action_info *', 'ajax spam', 200, '/env/action_info', '', ml(function (){/*{"stat": true, "dat": {"username": "test1", "session_user": "test1", "current_user": "test1", "groups": ["developer_g", "public", "test1", "trusted_g", "trusted_w"], "port": 8888, "database_version": "Microsoft SQL Server 2016 (RTM-CU1-GDR) (KB3179258) - 13.0.2151.0 (X64) \n\tAug  3 2016 20:12:22 \n\tCopyright (c) Microsoft Corporation\n\tExpress Edition (64-bit) on Windows 10 Pro 6.3 <X64> (Build 14393: )\n","envelope": "2.1.0"}}*/})],
 			['WEBSOCKET OPEN W/INFO ACTION', 'websocket start', '', '', '']
 		];
 		console.log('test4');
@@ -820,7 +820,7 @@ RETURN	id	test_name	test_full
 ORDER BY
 id DESC
 */}),
-				["db_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'test_full'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"]],
+				["db_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'test_full'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"]],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table
@@ -941,11 +941,11 @@ OFFSET
 			['COMMIT', 'websocket', '', ml(function () {/*COMMIT*/ }),
 				['OK']],
             ['Select Fail 1', 'ajax', 500, '/env/action_select', 'src=rtesting_table2',
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Select Fail 2', 'ajax', 500, '/env/action_select', 'view=rtesting_table2',
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Select Fail 3', 'ajax', 500, '/env/action_select', 'view=rtesting_table&where=test_name%20%3D%20asdf',
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'asdf'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'asdf'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Select 1', 'ajax', 200, '/env/action_select', 'src=rtesting_table&limit=1&order_by=id%20ASC&cols=id,test_name,test_name2,change_stamp,testint',
                 ml(function () {/*{"stat": true, "dat": {"arr_column": ["id","test_name","test_name2","change_stamp","testint"], "dat": [[2,"Bob","","Jun 15 2016  1:17PM",0]], "row_count": 4}}*/ })],
 
@@ -962,9 +962,9 @@ OFFSET
             ['Insert Fail 1', 'ajax', 500, '/env/action_insert', 'src=rtesting_table2&data=test',
                 ml(function () {/*"FATAL\nBadly formed data string. Should be URI encoded 'key=value&key=value'."*/ })],
             ['Insert Fail 2', 'ajax', 500, '/env/action_insert', 'src=rtesting_table2&data=test%3Dtest',
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Insert Fail 3', 'ajax', 500, '/env/action_insert', 'view=rtesting_table2&data=test%3Dtest',
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S02] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid object name 'rtesting_table2'.(208)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Insert Fail 4', 'ajax', 500, '/env/action_insert', 'src=rtesting_table&data=',
 				ml(function () {/*"FATAL\nNo insert data"*/ })],
             ['Insert Fail 5', 'ajax', 500, '/env/action_insert', 'view=ttesting_view2&data=' + encodeURIComponent('test_name_1=test&test_name2_1=test&test_name_2=test&test_name2_2=test'),
@@ -980,7 +980,7 @@ OFFSET
             ['Insert 5', 'ajax', 200, '/env/action_insert', 'src=rtesting_table4&data=' + encodeURIComponent('test_name=test&test_name2=test'),
                 ml(function () {/*{"stat": true, "dat": {"lastval": 1}}*/ })],
             ['Update Fail', 'ajax', 500, '/env/action_update', 'src=rtesting_table&column=first_name&value=Test&where=' + encodeURIComponent('id=6'),
-                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLNumResultCols Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'first_name'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
+                ml(function () {/*"FATAL\ndb_framework_odbc\\db_framework.c:db_column_types_query_cb: SQLPrepare Failed!\nQuery failed:\n[42S22] [Microsoft][SQL Server Native Client 11.0][SQL Server]Invalid column name 'first_name'.(207)\n[42000] [Microsoft][SQL Server Native Client 11.0][SQL Server]Statement(s) could not be prepared.(8180)\n"*/ })],
             ['Update 1', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=Test&where=' + encodeURIComponent('id=6'),
                 ml(function () {/*{"stat": true, "dat": ["6","Test","test","Jun 15 2016  1:17PM","0"]}*/ })],
             ['Update 2', 'ajax', 200, '/env/action_update', 'src=rtesting_table&column=test_name&value=NULL&where=' + encodeURIComponent('id=6&change_stamp=' + encodeURIComponent('Jun 15 2016  1:17PM')),
@@ -1482,9 +1482,40 @@ WHERE	LIMIT	OFFSET
 				});
 			} else if (strType === 'websocket end') {
 				change_status(intCurrent, 'waiting', 'running');
-				GS.closeSocket(GS.envSocket);
-				change_status(intCurrent, 'running', 'pass');
-				run_test(intCurrent + 1);
+				var i = 0;
+				GS.requestFromSocket(GS.envSocket, 'SELECT	rtesting_large_table\nRETURN	*\n\n', function (data, error, errorData) {
+					if (i === 0) {
+						i += 1;
+
+						GS.closeSocket(GS.envSocket);
+
+						GS.envSocket = GS.openSocket('/env/1/env');
+						var j = 0;
+						GS.requestFromSocket(GS.envSocket, 'SELECT	rtesting_table\nRETURN	*\n\n', function (data, error, errorData) {
+							j += 1;
+							if (j === 2) {
+								GS.closeSocket(GS.envSocket);
+								var ajax = GS.ajaxText('/env/action_select', 'src=generate_series(1,163000,1)&order_by=IntValue', function () {
+								});
+								
+								setTimeout(function () {
+									ajax.abort();
+									ajax = GS.ajaxText('/env/action_select', 'src=generate_series(1,16300,1)&order_by=IntValue', function (data, error) {
+										if (!error) {
+											change_status(intCurrent, 'running', 'pass');
+											run_test(intCurrent + 1);
+										} else {
+											change_status(intCurrent, 'running', 'fail', ajax.status, data.error_text);
+											document.getElementById('actual_status').value = ajax.status;
+											document.getElementById('actual_output').value = data.error_text;
+											run_test(intCurrent + 1);
+										}
+									});
+								}, 1000);
+							}
+						});
+					}
+				});
 			} else if (strType === 'wait') {
 				change_status(intCurrent, 'waiting', 'running');
 				setTimeout(function () {

@@ -415,7 +415,7 @@ finish:
 
 		if ((int_response_write_len = CLIENT_WRITE(client_request->parent, _str_response, strlen(_str_response))) < 0) {
 			if (bol_tls) {
-				SFINISH_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
+				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
 			} else {
 				SERROR_NORESPONSE("write() failed");
 			}

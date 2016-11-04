@@ -672,7 +672,7 @@ finish:
 		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, strlen(str_response))) < 0) {
 			SFREE(str_response);
 			if (bol_tls) {
-				SFINISH_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
+				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
 			} else {
 				SERROR_NORESPONSE("write() failed");
 			}
@@ -897,7 +897,7 @@ finish:
 
 	if ((int_len = CLIENT_WRITE(client_request->parent, str_response, strlen(str_response))) < 0) {
 		if (bol_tls) {
-			SFINISH_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
+			SERROR_NORESPONSE_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
 		} else {
 			SERROR_NORESPONSE("write() failed");
 		}
@@ -988,7 +988,7 @@ finish:
 		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, strlen(str_response))) < 0) {
 			SFREE(str_response);
 			if (bol_tls) {
-				SFINISH_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
+				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
 			} else {
 				SERROR_NORESPONSE("write() failed");
 			}
@@ -1091,7 +1091,7 @@ finish:
 	ssize_t int_response_len = 0;
 	if ((int_response_len = CLIENT_WRITE(client_request->parent, str_response, strlen(str_response))) < 0) {
 		if (bol_tls) {
-			SFINISH_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
+			SERROR_NORESPONSE_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
 		} else {
 			SERROR_NORESPONSE("write() failed");
 		}
@@ -1257,7 +1257,7 @@ finish:
 	ssize_t int_response_len = 0;
 	if ((int_response_len = CLIENT_WRITE(client_auth->parent, str_response, strlen(str_response))) < 0) {
 		if (bol_tls) {
-			SFINISH_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
+			SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
 		} else {
 			SERROR_NORESPONSE("write() failed");
 		}

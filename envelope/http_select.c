@@ -117,7 +117,7 @@ finish:
 	if (str_response != NULL && (int_len_response = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
-			SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
+			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 		} else {
 			SERROR_NORESPONSE("write() failed");
 		}
@@ -244,7 +244,7 @@ finish:
 	if (str_response != NULL && (int_len_response = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
-			SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
+			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 		} else {
 			SERROR_NORESPONSE("write() failed");
 		}
@@ -305,6 +305,7 @@ bool http_select_step3(EV_P, void *cb_data, DB_result *res) {
 	increment_idle(EV_A);
 	ev_check_init(&client_copy_check->check, http_select_step4);
 	ev_check_start(EV_A, &client_copy_check->check);
+	client->client_copy_check = client_copy_check;
 
 	bol_error_state = false;
 finish:
@@ -328,7 +329,7 @@ finish:
 		SDEBUG("int_len_response: %d", int_len_response);
 		if (int_len_response < 0) {
 			if (bol_tls) {
-				SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
+				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {
 				SERROR_NORESPONSE("write() failed");
 			}
@@ -437,10 +438,12 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 		SFINISH_SALLOC(client_copy_io, sizeof(struct sock_ev_client_copy_io));
 
 		ev_check_stop(EV_A, w);
+		decrement_idle(EV_A);
 		ev_io_init(&client_copy_io->io, http_select_step5, GET_CLIENT_SOCKET(client_request->parent), EV_WRITE);
 		ev_io_start(EV_A, &client_copy_io->io);
 
 		client_copy_io->client_copy_check = client_copy_check;
+		client_request->parent->client_copy_io = client_copy_io;
 
 		DB_free_result(client_copy_check->res);
 	}
@@ -473,6 +476,9 @@ finish:
 			SFREE(client_copy_check->str_response);
 			SFREE(client_copy_check);
 			SFREE(client_copy_io);
+			client_request->parent->client_copy_check = NULL;
+			client_request->parent->client_copy_io = NULL;
+
 		}
 	}
 	ssize_t int_response_len = 0;
@@ -481,7 +487,7 @@ finish:
 		SDEBUG("int_response_len: %d", int_response_len);
 		if (int_response_len < 0) {
 			if (bol_tls) {
-				SFINISH_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
+				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
 			} else {
 				SERROR_NORESPONSE("write() failed");
 			}
@@ -548,11 +554,12 @@ void http_select_step5(EV_P, ev_io *w, int revents) {
 
 	if (client_copy_check->int_written == client_copy_check->int_response_len) {
 		ev_io_stop(EV_A, w);
-		decrement_idle(EV_A);
 
 		SFREE(client_copy_check->str_response);
 		SFREE(client_copy_check);
 		SFREE(client_copy_io);
+		client_request->parent->client_copy_check = NULL;
+		client_request->parent->client_copy_io = NULL;
 
 		SDEBUG("DONE");
 		struct sock_ev_client *client = client_request->parent;
@@ -574,6 +581,8 @@ finish:
 			SFREE(client_copy_check->str_response);
 			SFREE(client_copy_check);
 			SFREE(client_copy_io);
+			client_request->parent->client_copy_check = NULL;
+			client_request->parent->client_copy_io = NULL;
 		}
 		str_response = NULL;
 		bol_error_state = false;
@@ -588,7 +597,7 @@ finish:
 		SDEBUG("int_response_len: %d", int_response_len);
 		if (int_response_len < 0) {
 			if (bol_tls) {
-				SFINISH_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
+				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
 			} else {
 				SERROR_NORESPONSE("write() failed");
 			}

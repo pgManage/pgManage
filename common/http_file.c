@@ -234,7 +234,7 @@ finish:
 		http_file_free(client_http_file);
 		client_http_file = NULL;
 		if (bol_tls) {
-			SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
+			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 		} else {
 			SERROR_NORESPONSE("write() failed");
 		}

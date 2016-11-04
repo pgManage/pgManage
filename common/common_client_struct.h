@@ -142,6 +142,8 @@ struct sock_ev_client {
 	struct sock_ev_client_request *cur_request;
 	Queue *que_request;
 	struct sock_ev_client_request_watcher *client_request_watcher;
+	struct sock_ev_client_copy_check *client_copy_check;
+	struct sock_ev_client_copy_io *client_copy_io;
 	bool bol_request_in_progress;
 
 	struct sock_ev_client_notify_watcher *notify_watcher;
