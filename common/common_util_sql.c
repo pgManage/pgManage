@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "common_util_sql.h"
 
 char *get_table_name(char *_str_query) {

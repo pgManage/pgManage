@@ -94,27 +94,30 @@ function taskEdit(_event) {
 
 	input.classList.add('edit');
 	input.value = this.innerText;
-	input.addEventListener('blur', function _self(event) {
+
+	function blurHandler(event) {
 		input.removeEventListener('blur', _self);
 		self.innerText = input.value;
 		taskChange.apply(input, []);
 		self.li.classList.remove('editing');
 		self.li.removeChild(input);
-	});
-	input.addEventListener('keypress', function (event) {
+	}
+	input.addEventListener('blur', blurHandler);
+	input.addEventListener('keyup', function (event) {
 		if (event.keyCode === 13) {
-			input.removeEventListener('blur', taskChange);
+			input.removeEventListener('blur', blurHandler);
 
 			self.innerText = input.value;
 			taskChange.apply(input, []);
 			self.li.classList.remove('editing');
 			self.li.removeChild(input);
 		} else if (event.keyCode === 27) { // esc
-			input.removeEventListener('blur', taskChange);
+			input.removeEventListener('blur', blurHandler);
 
 			self.li.classList.remove('editing');
 			self.li.removeChild(input);
 		}
+		console.log(event.keyCode);
 	});
 	self.li.appendChild(input);
 	input.focus();

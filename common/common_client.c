@@ -264,7 +264,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 		int_len = CLIENT_READ(client, str_buffer, MAX_BUFFER);
 		SDEBUG("client->int_request_len: %zu", client->int_request_len);
 		SDEBUG("int_len: %zd", int_len);
-		SERROR_CHECK(
+		SWARN_CHECK(
 			client->int_request_len != 0 || int_len != 0, "Libev said EV_READ, but there is nothing to read. Closing socket");
 
 		if (int_len == -1) {
@@ -1730,6 +1730,8 @@ void client_close_immediate(struct sock_ev_client *client) {
 				http_auth_free(client_request->vod_request_data);
 			}
 			client_request_free(client_request);
+			// This is because we increment idle when we push to this queue
+			decrement_idle(global_loop);
 		}
 		Queue_destroy(client->que_request);
 		client->que_request = NULL;

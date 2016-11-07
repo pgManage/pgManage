@@ -1491,27 +1491,46 @@ WHERE	LIMIT	OFFSET
 
 						GS.envSocket = GS.openSocket('/env/1/env');
 						var j = 0;
-						GS.requestFromSocket(GS.envSocket, 'SELECT	rtesting_table\nRETURN	*\n\n', function (data, error, errorData) {
-							j += 1;
-							if (j === 2) {
+						GS.requestFromSocket(GS.envSocket, 'INFO\n', function (data, error, errorData) {
+							if (j === 0) {
+								j += 1;
 								GS.closeSocket(GS.envSocket);
-								var ajax = GS.ajaxText('/env/action_select', 'src=generate_series(1,163000,1)&order_by=IntValue', function () {
+								var k = 0;
+								GS.envSocket = GS.openSocket('/env/1/env');
+								GS.requestFromSocket(GS.envSocket, 'SELECT	ttesting_large_view\nRETURN	*\n\n', function (data, error, errorData) {
+									if (k === 0) {
+										k += 1;
+										GS.closeSocket(GS.envSocket);
+
+										setTimeout(function () {
+											GS.envSocket = GS.openSocket('/env/1/env');
+											var l = 0;
+											GS.requestFromSocket(GS.envSocket, 'SELECT	rtesting_table\nRETURN	*\n\n', function (data, error, errorData) {
+												l += 1;
+												if (l === 2) {
+													GS.closeSocket(GS.envSocket);
+													var ajax = GS.ajaxText('/env/action_select', 'src=generate_series(1,163000,1)&order_by=IntValue', function () {
+													});
+
+													setTimeout(function () {
+														ajax.abort();
+														ajax = GS.ajaxText('/env/action_select', 'src=generate_series(1,16300,1)&order_by=IntValue', function (data, error) {
+															if (!error) {
+																change_status(intCurrent, 'running', 'pass');
+																run_test(intCurrent + 1);
+															} else {
+																change_status(intCurrent, 'running', 'fail', ajax.status, data.error_text);
+																document.getElementById('actual_status').value = ajax.status;
+																document.getElementById('actual_output').value = data.error_text;
+																run_test(intCurrent + 1);
+															}
+														});
+													}, 1000);
+												}
+											});
+										}, 15000);
+									}
 								});
-								
-								setTimeout(function () {
-									ajax.abort();
-									ajax = GS.ajaxText('/env/action_select', 'src=generate_series(1,16300,1)&order_by=IntValue', function (data, error) {
-										if (!error) {
-											change_status(intCurrent, 'running', 'pass');
-											run_test(intCurrent + 1);
-										} else {
-											change_status(intCurrent, 'running', 'fail', ajax.status, data.error_text);
-											document.getElementById('actual_status').value = ajax.status;
-											document.getElementById('actual_output').value = data.error_text;
-											run_test(intCurrent + 1);
-										}
-									});
-								}, 1000);
 							}
 						});
 					}

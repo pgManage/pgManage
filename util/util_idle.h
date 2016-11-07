@@ -27,5 +27,5 @@ removes the idle watcher.
 */
 void _decrement_idle(EV_P);
 #define decrement_idle(A)                                                                                                        \
-	_decrement_idle(A);                                                                                                          \
-	SDEBUG("decrement_idle: %d", int_idle_count);
+	SDEBUG("decrement_idle: %d", int_idle_count);                                                                                 \
+	_decrement_idle(A);
