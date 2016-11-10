@@ -5,13 +5,13 @@
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
-        
+
         <title>Postage Log In</title>
-        
+
 		<script src="/postage/js/greyspots.js" type="text/javascript"></script>
         <link href="/postage/css/greyspots.css" rel="stylesheet" type="text/css" />
         <link href="/postage/css/postage.css" rel="stylesheet" type="text/css" />
-        
+
         <script>
 var bolCurl = false;
 var bolTutorial = false;
@@ -174,7 +174,7 @@ function getConnections() {
                         </gs-grid>
                     </gs-option>
                 */});
-                
+
                 var divOneTime = document.getElementById('afterOneTime');
                 divOneTime.innerHTML = ml(function () {/*<br/><br/>*/});
 
@@ -204,7 +204,7 @@ function getUserName() {
 
 window.addEventListener('load', function () {
     var strQueryString = GS.getQueryString(); //, strUnameCookie = GS.getCookie('greyspots_postage_username');
-	
+
     // fill the error element with any error text from the query string (coalesce to empty string)
     document.getElementById('container-error').textContent = GS.qryGetVal(strQueryString, 'error') || '';
 
@@ -233,12 +233,11 @@ window.addEventListener('load', function () {
     if (window.process && window.process.type === 'renderer') {
         document.getElementById('buttonNewConnections').removeAttribute('hidden');
 
-        const electron = require('electron').remote;
-        const app = electron.app;
-
-        document.getElementById('buttonNewConnections').addEventListener('click', function () {
-            window.open('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage-connections.conf');
-        });
+        const electron = require('electron');
+        const ipcRenderer = electron.ipcRenderer;
+		document.getElementById('buttonNewConnections').addEventListener('click', function () {
+			ipcRenderer.send('postage', 'edit connections');
+		});
     }
 
     // when the connection optionbox is changed: try to get a username from the cookie
@@ -308,30 +307,30 @@ window.addEventListener('load', function () {
                 <gs-container id="container-login" min-width="768px">
                     <center><h3><b>Login</b></h3></center>
                     <br />
-                    
+
                     <gs-optionbox no-target mini>
                         <div class="style-bracket-container">
                             <label class="style-bracket-header">Choose a server</label>
                             <div class="style-bracket-left"></div>
                             <div class="style-bracket-right"></div>
-                            
+
                             <gs-button id="buttonNewConnections" hidden style="float: right;" inline bg-primary remove-bottom>Edit postage-connections.conf</gs-button>
-                            
+
                             <div id="option-connection" style="clear: both;"></div>
                         </div>
                         <br /><br />
-                        
+
                         <div id="oneTime">
                         </div>
-                        
+
                         <div id="afterOneTime"></div>
                     </gs-optionbox>
-                    
+
                     <div class="style-bracket-container">
                         <label class="style-bracket-header">Credentials</label>
                         <div class="style-bracket-left"></div>
                         <div class="style-bracket-right"></div>
-                        
+
                         <gs-grid reflow-at="350px" gutter>
                             <gs-block>
                                 <label for="text-username">Username:</label>
@@ -347,7 +346,7 @@ window.addEventListener('load', function () {
                     <gs-button id="button-login" jumbo bg-primary>Log In</gs-button>
                     <br /><br />
                 </gs-container>
-                
+
                 <gs-container min-width="768px">
                     <center id="container-error" style="white-space: pre-wrap;" txt-danger></center>
                 </gs-container>
