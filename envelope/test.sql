@@ -67,3 +67,32 @@ ALTER SEQUENCE rtesting_table_id_seq RESTART;
 RETURN '""';
 END
 $BODY$ LANGUAGE plpgsql VOLATILE;
+
+CREATE TABLE rtesting_large_table (
+    id    integer NOT NULL,
+    test1 VARCHAR (61) NOT NULL,
+    test2 VARCHAR (64) NOT NULL,
+CONSTRAINT rtesting_large_table_pk PRIMARY KEY (id)
+) WITH (
+OIDS=FALSE
+);
+
+CREATE VIEW ttesting_large_view AS
+	SELECT	rtesting_large_table0.id AS id0, rtesting_large_table0.test1 AS test10, rtesting_large_table0.test2 AS test20,
+			rtesting_large_table1.id AS id1, rtesting_large_table1.test1 AS test11, rtesting_large_table1.test2 AS test21
+		FROM rtesting_large_table AS rtesting_large_table0
+		LEFT JOIN rtesting_large_table AS rtesting_large_table1 ON rtesting_large_table0.test1 = rtesting_large_table1.test1
+		WHERE rtesting_large_table0.id < 50;
+
+INSERT INTO rtesting_large_table (id, test1, test2) 
+	SELECT generate_series, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg', ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj'
+		FROM generate_series(1, 1000);
+
+
+
+
+
+
+
+
+
