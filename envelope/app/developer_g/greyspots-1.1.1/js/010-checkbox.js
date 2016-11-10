@@ -47,6 +47,13 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
         
+        addProp('Type', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('type') || '') + '" mini>' +
+                                        '<option value="smallint">Smallint</option>' +
+                                        '<option value="">Boolean</option>' +
+                                    '</gs-select>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'type', this.value);
+        });
+        
         // visibility attributes
         strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -350,7 +357,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         this.setAttribute('value', false);
                         
                     } else {
-                        this.setAttribute('value', 'true');
+                        if (this.getAttribute('type') === 'smallint') {
+                            this.setAttribute('value', '-1');
+                        } else {
+                            this.setAttribute('value', 'true');
+                        }
                     }
                     
                     this.classList.remove('down');

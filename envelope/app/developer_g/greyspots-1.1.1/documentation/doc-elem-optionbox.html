@@ -63,7 +63,7 @@
                     </div>
                     <gs-doc-example>
                         <template for="html" height="12">
-                            <gs-optionbox onchange="alert('value changed')">
+                            <gs-optionbox onchange="alert('value changed: ' + this.value)">
                                 <gs-option>Option 1</gs-option>
                                 <gs-option>Option 2</gs-option>
                                 <gs-option>Option 3</gs-option>
@@ -83,6 +83,27 @@
                                 <gs-option>Option 2</gs-option>
                                 <gs-option>Option 3</gs-option>
                                 <gs-option>Option 4</gs-option>
+                            </gs-optionbox>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Horizontal optionbox:</span>
+                        <p>To run make the optionbox horizontal, put the [inline] attribute on the gs-options.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="17">
+                            <gs-optionbox>
+                                <gs-option inline>Option 1</gs-option>
+                                <gs-option inline>Option 2</gs-option>
+                                <gs-option inline>Option 3</gs-option>
+                                <gs-option inline>Option 4</gs-option>
+                            </gs-optionbox>
+                            <gs-optionbox no-target>
+                                <gs-option inline>Option 1</gs-option>
+                                <gs-option inline>Option 2</gs-option>
+                                <gs-option inline>Option 3</gs-option>
+                                <gs-option inline>Option 4</gs-option>
                             </gs-optionbox>
                         </template>
                     </gs-doc-example>

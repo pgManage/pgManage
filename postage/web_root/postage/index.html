@@ -133,40 +133,46 @@ function getConnections() {
     GS.ajaxText('/postage/auth', 'action=canadd', function (data, error) {
         if (!error) {
             if (data.trim() === 'true') {
-                var optionControl = document.getElementById('option-connection');
-                var optionElement = document.createElement('gs-option');
+                var divOneTime = document.getElementById('oneTime');
 
-                optionElement.setAttribute('value', 'custom');
-                optionElement.setAttribute('no-focus', '');
-                optionElement.innerHTML = ml(function () {/*
-                    <gs-grid min-width="all {reflow}; 400px {1,1}; 640px {4,2,4,4}">
-                        <gs-block flex-horizontal>
-                            <b>Host:&nbsp;</b>
-                            <gs-text id="text-custom-host" placeholder="host" flex></gs-text>
-                        </gs-block>
-                        <gs-block flex-horizontal>
-                            <b>&nbsp;Port:&nbsp;</b>
-                            <gs-text id="text-custom-port" placeholder="port" flex></gs-text>
-                        </gs-block>
-                        <gs-block flex-horizontal>
-                            <b>&nbsp;DB Name:&nbsp;</b>
-                            <gs-text id="text-custom-db" placeholder="dbname" flex></gs-text>
-                        </gs-block>
-                        <gs-block flex-horizontal>
-                            <b>&nbsp;SSL Mode:&nbsp;</b>
-                            <gs-select id="text-custom-ssl" placeholder="sslmode" value="prefer" flex>
-                                <option value="disable">Disable</option>
-                                <option value="allow">Allow</option>
-                                <option value="prefer">Prefer</option>
-                                <option value="require">Require</option>
-                                <option value="verify-ca">Verify Authority</option>
-                                <option value="verify-full">Verify Full</option>
-                            </gs-select>
-                        </gs-block>
-                    </gs-grid>
+                divOneTime.setAttribute('class', 'style-bracket-container');
+
+                divOneTime.innerHTML = ml(function () {/*
+                    <label class="style-bracket-header">Or enter a one time connection</label>
+                    <div class="style-bracket-left"></div>
+                    <div class="style-bracket-right"></div>
+                    <gs-option value="custom">
+                        <gs-grid min-width="all {reflow}; 400px {1,1}; 640px {4,2,4,4}">
+                            <gs-block flex-horizontal>
+                                <b>Host:&nbsp;</b>
+                                <gs-text id="text-custom-host" placeholder="host" flex></gs-text>
+                            </gs-block>
+                            <gs-block flex-horizontal>
+                                <b>&nbsp;Port:&nbsp;</b>
+                                <gs-text id="text-custom-port" placeholder="port" flex></gs-text>
+                            </gs-block>
+                            <gs-block flex-horizontal>
+                                <b>&nbsp;DB Name:&nbsp;</b>
+                                <gs-text id="text-custom-db" placeholder="dbname" flex></gs-text>
+                            </gs-block>
+                            <gs-block flex-horizontal>
+                                <b>&nbsp;SSL Mode:&nbsp;</b>
+                                <gs-select id="text-custom-ssl" placeholder="sslmode" value="prefer" flex>
+                                    <option value="disable">Disable</option>
+                                    <option value="allow">Allow</option>
+                                    <option value="prefer">Prefer</option>
+                                    <option value="require">Require</option>
+                                    <option value="verify-ca">Verify Authority</option>
+                                    <option value="verify-full">Verify Full</option>
+                                </gs-select>
+                            </gs-block>
+                        </gs-grid>
+                    </gs-option>
                 */});
+                
+                var divOneTime = document.getElementById('afterOneTime');
+                divOneTime.innerHTML = ml(function () {/*<br/><br/>*/});
 
-                optionControl.appendChild(optionElement);
             }
         } else {
             appendError(data);
@@ -217,6 +223,14 @@ window.addEventListener('load', function () {
             login();
         }
     });
+
+    if (window.process && window.process.type === 'renderer') {
+        document.getElementById('labelNewConnections').removeAttribute('hidden');
+        const electron = require('electron').remote;
+        const app = electron.app;
+
+        document.getElementById('linkNewConnections').href = 'file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage-connections.conf';
+    }
 
     // when the connection optionbox is changed: try to get a username from the cookie
     document.getElementById('option-connection').addEventListener('change', getUserName);
@@ -286,14 +300,22 @@ window.addEventListener('load', function () {
                     <center><h3><b>Login</b></h3></center>
                     <br />
                     
-                    <div class="style-bracket-container">
-                        <label class="style-bracket-header">Connections</label>
-                        <div class="style-bracket-left"></div>
-                        <div class="style-bracket-right"></div>
+                    <gs-optionbox no-target mini>
+                        <div class="style-bracket-container">
+                            <label class="style-bracket-header">Choose a server</label>
+                            <label id="labelNewConnections" hidden style="text-align: right; color: #CCC;"><a id="linkNewConnections" target="_blank">You can create new connections for this list under the "File" menu</a></label>
+                            <div class="style-bracket-left"></div>
+                            <div class="style-bracket-right"></div>
+                            
+                            <div id="option-connection"></div>
+                        </div>
+                        <br /><br />
                         
-                        <gs-optionbox id="option-connection" no-target mini></gs-optionbox>
-                    </div>
-                    <br /><br />
+                        <div id="oneTime">
+                        </div>
+                        
+                        <div id="afterOneTime"></div>
+                    </gs-optionbox>
                     
                     <div class="style-bracket-container">
                         <label class="style-bracket-header">Credentials</label>

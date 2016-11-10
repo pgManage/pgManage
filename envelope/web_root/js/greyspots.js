@@ -12026,6 +12026,13 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
         
+        addProp('Type', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('type') || '') + '" mini>' +
+                                        '<option value="smallint">Smallint</option>' +
+                                        '<option value="">Boolean</option>' +
+                                    '</gs-select>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'type', this.value);
+        });
+        
         // visibility attributes
         strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -12329,7 +12336,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         this.setAttribute('value', false);
                         
                     } else {
-                        this.setAttribute('value', 'true');
+                        if (this.getAttribute('type') === 'smallint') {
+                            this.setAttribute('value', '-1');
+                        } else {
+                            this.setAttribute('value', 'true');
+                        }
                     }
                     
                     this.classList.remove('down');
@@ -12480,6 +12491,22 @@ window.addEventListener('design-register-element', function () {
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
+        });
+        
+        addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
         });
         
         // visibility attributes
@@ -13453,7 +13480,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 'autocorrect',
                 'autocapitalize',
                 'autocomplete',
-                'autofocus'
+                'autofocus',
+                'spellcheck'
             ];
         
         // if the gs-text element has a tabindex: save the tabindex and remov the attribute
@@ -13492,12 +13520,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         
         // bind change event to control
-        console.log('change bound');
+        //console.log('change bound');
         element.control.addEventListener('change', function (event) {
             event.preventDefault();
             event.stopPropagation();
             
-            console.log('change detected');
+            //console.log('change detected');
             if (!element.ignoreChange) {
                 selectRecordFromValue(element, this.value, true);
             }
@@ -14142,7 +14170,7 @@ window.addEventListener('design-register-element', function (event) {
             return setOrRemoveTextAttribute(selectedElement, 'lock', this.value);
         });
         
-        addProp('Primary Keys Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('pk') || '') + '" mini></gs-text>',
+        addProp('Primary Keys', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('pk') || '') + '" mini></gs-text>',
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'pk', this.value);
         });
@@ -14197,10 +14225,6 @@ window.addEventListener('design-register-element', function (event) {
         
         addProp('Expand&nbsp;To&nbsp;Content', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('expand-to-content')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'expand-to-content', (this.value === 'true'), true);
-        });
-        
-        addProp('Primary Keys', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('primary-keys') || '') + '" mini></gs-text>', function () {
-            return setOrRemoveTextAttribute(selectedElement, 'primary-keys', this.value);
         });
         
         addProp('Null String', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('null-string') || '') + '" mini></gs-text>', function () {
@@ -17355,6 +17379,22 @@ document.addEventListener('DOMContentLoaded', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
         
+        addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
+        });
+        
         // visibility attributes
         strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -18877,7 +18917,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         'autocorrect',
                         'autocapitalize',
                         'autocomplete',
-                        'autofocus'
+                        'autofocus',
+                        'spellcheck'
                     ];
                     for (i = 0, len = arrPassThroughAttributes.length; i < len; i += 1) {
                         if (element.hasAttribute(arrPassThroughAttributes[i])) {
@@ -27913,6 +27954,22 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
         
+        addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
+        });
+        
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
@@ -28297,7 +28354,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         'autocapitalize',
                         'autocomplete',
                         'autofocus',
-                        'rows'
+                        'rows',
+                        'spellcheck'
                     ];
                     for (i = 0, len = arrPassThroughAttributes.length; i < len; i += 1) {
                         if (this.hasAttribute(arrPassThroughAttributes[i])) {
@@ -28838,6 +28896,22 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
         
+        addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
+        });
+        
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
@@ -29315,7 +29389,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         'autocorrect',
                         'autocapitalize',
                         'autocomplete',
-                        'autofocus'
+                        'autofocus',
+                        'spellcheck'
                     ];
                     for (i = 0, len = arrPassThroughAttributes.length; i < len; i += 1) {
                         if (this.hasAttribute(arrPassThroughAttributes[i])) {
@@ -30351,6 +30426,22 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
         
+        addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
+        });
+        
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
@@ -30573,7 +30664,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // copy passthrough attributes to control
                 arrPassThroughAttributes = [
-                    'placeholder', 'name', 'type', 'maxlength', 'autocorrect', 'autocapitalize', 'autocomplete', 'autofocus'
+                    'placeholder', 'name', 'type', 'maxlength', 'autocorrect', 'autocapitalize', 'autocomplete', 'autofocus', 'spellcheck'
                 ];
                 for (i = 0, len = arrPassThroughAttributes.length; i < len; i += 1) {
                     if (element.hasAttribute(arrPassThroughAttributes[i])) {
@@ -31715,6 +31806,10 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
         });
         
+        addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
+        });
+        
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
@@ -31944,7 +32039,7 @@ document.addEventListener('DOMContentLoaded', function () {
             handleContents: function () {
                 var arrPassThroughAttrs = [
                         'placeholder', 'name', 'maxlength', 'autocorrect',
-                        'autocapitalize', 'autocomplete', 'autofocus'
+                        'autocapitalize', 'autocomplete', 'autofocus', 'spellcheck'
                     ], i, len;
                 
                 // if the gs-text element has a tabindex: save the tabindex and remov the attribute
@@ -32065,6 +32160,22 @@ document.addEventListener('DOMContentLoaded', function () {
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
+        });
+        
+        addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
         });
         
         // visibility attributes
@@ -32228,7 +32339,16 @@ document.addEventListener('DOMContentLoaded', function () {
             element.button = element.children[1];
             
             // handle passthrough attributes
-            arrPassThroughAttributes = ['placeholder', 'name', 'maxlength', 'autocorrect', 'autocapitalize', 'autocomplete', 'autofocus'];
+            arrPassThroughAttributes = [
+                'placeholder',
+                'name',
+                'maxlength',
+                'autocorrect',
+                'autocapitalize',
+                'autocomplete',
+                'autofocus',
+                'spellcheck'
+            ];
             
             for (i = 0, len = arrPassThroughAttributes.length; i < len; i += 1) {
                 if (element.hasAttribute(arrPassThroughAttributes[i])) {

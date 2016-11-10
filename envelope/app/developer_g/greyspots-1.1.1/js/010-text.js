@@ -52,6 +52,10 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
         });
         
+        addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
+        });
+        
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
@@ -281,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
             handleContents: function () {
                 var arrPassThroughAttrs = [
                         'placeholder', 'name', 'maxlength', 'autocorrect',
-                        'autocapitalize', 'autocomplete', 'autofocus'
+                        'autocapitalize', 'autocomplete', 'autofocus', 'spellcheck'
                     ], i, len;
                 
                 // if the gs-text element has a tabindex: save the tabindex and remov the attribute

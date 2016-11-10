@@ -2436,7 +2436,7 @@ function exportCSV() {
                                 Quote Columns:
                                 <small>This is a comma seperated list of columns that you want the values to always be quoted.</small>
                             </label>
-                            <gs-text id="text-force-quote" autocorrect="off" autocapitalize="off" autocomplete="off"></gs-text>
+                            <gs-text id="text-force-quote" autocorrect="off" autocapitalize="off" autocomplete="off" value="*"></gs-text>
                         </div>
                         
                         <div id="container-text-escape">
@@ -2574,7 +2574,11 @@ function exportCSV() {
                     
                     if (!forceQuoteContainerElement.hasAttribute('hidden') && forceQuoteElement.value) {
                         arrRequestHeaders.push('FORCE_QUOTE');
-                        arrRequestValues.push('(' + GS.encodeForTabDelimited(forceQuoteElement.value) + ')');
+                        if (forceQuoteElement.value === '*') {
+                            arrRequestValues.push('*');
+                        } else {
+                            arrRequestValues.push('(' + GS.encodeForTabDelimited(forceQuoteElement.value) + ')');
+                        }
                     }
                     
                     strRequestString = GS.encodeForTabDelimited(GS.trim(jsnCurrentQuery.strQuery.trim(), ';')) + '\n' +
