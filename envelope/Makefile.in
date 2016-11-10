@@ -122,6 +122,18 @@ uninstall:
 	@echo
 	@echo "Uninstall Successful"
 
+destroy:
+	@printf "Are you sure? This will delete all of your application HTML [Y/n]: "
+	@{ \
+		read; \
+		if test "$$REPLY" = "Y" -o "$$REPLY" = "y"; then \
+			rm @prefix@/sbin/$(BINARY); \
+			rm -rf @prefix@/etc/$(BINARY); \
+			echo; \
+			echo "Destroy Successful"; \
+		fi; \
+	}
+
 #### TESTING
 test-common:
 	-kill `cat postgres.pid`

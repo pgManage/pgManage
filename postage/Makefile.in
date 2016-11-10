@@ -27,7 +27,7 @@ postage_OBJECTS = $(postage_SOURCES:.c=.o)
 #postage_OBJECTS3 = $(postage_OBJECTS2:../util/=)
 #postage_OBJECTS = obj/$(postage_OBJECTS3:../db_framework_pq/=)
 
-.PHONY: libressl libressl-install
+.PHONY: libressl libressl-install destroy
 
 #### DEPENDENCIES
 libressl: ../dependencies/libressl/Makefile
@@ -96,6 +96,14 @@ uninstall:
 	rm -rf @prefix@/etc/$(BINARY)/*.example
 	@echo
 	@echo "Uninstall Successful"
+
+destroy:
+	rm @prefix@/sbin/$(BINARY)
+	rm -rf @prefix@/etc/$(BINARY)
+	@echo
+	@echo "Destroy Successful"
+	@echo "NOTE: Even though all configuration files have been destroyed, your sql files have been preserved. They should be in you home folder under .postage"
+
 
 #### TESTING
 test-common:
