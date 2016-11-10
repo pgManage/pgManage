@@ -12208,7 +12208,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 // default value to false
-                if (this.getAttribute('type') === 'smallint') {
+                if (this && this.getAttribute('type') === 'smallint') {
                     element.value = element.getAttribute('value') || 0;
                 } else {
                     element.value = element.getAttribute('value') || false;
