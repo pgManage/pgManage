@@ -96,6 +96,11 @@ function appendConnection(connName, strButtons) {
     var optionControl = document.getElementById('option-connection');
     var optionElement = document.createElement('gs-option');
 
+    //if we are in electron, remove the top right corner
+    if (window.process && window.process.type === 'renderer' && optionControl.children.length === 0) {
+        optionElement.setAttribute('remove-top-right', true);
+    }
+
     optionElement.setAttribute('value', connName);
     optionElement.textContent = connName;
     optionControl.appendChild(optionElement);
@@ -224,12 +229,16 @@ window.addEventListener('load', function () {
         }
     });
 
+    //if we are in electron, then add a button to edit the connection file
     if (window.process && window.process.type === 'renderer') {
-        document.getElementById('labelNewConnections').removeAttribute('hidden');
+        document.getElementById('buttonNewConnections').removeAttribute('hidden');
+
         const electron = require('electron').remote;
         const app = electron.app;
 
-        document.getElementById('linkNewConnections').href = 'file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage-connections.conf';
+        document.getElementById('buttonNewConnections').addEventListener('click', function () {
+            window.open('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage-connections.conf');
+        });
     }
 
     // when the connection optionbox is changed: try to get a username from the cookie
@@ -303,11 +312,12 @@ window.addEventListener('load', function () {
                     <gs-optionbox no-target mini>
                         <div class="style-bracket-container">
                             <label class="style-bracket-header">Choose a server</label>
-                            <label id="labelNewConnections" hidden style="text-align: right; color: #CCC;"><a id="linkNewConnections" target="_blank">You can create new connections for this list under the "File" menu</a></label>
                             <div class="style-bracket-left"></div>
                             <div class="style-bracket-right"></div>
                             
-                            <div id="option-connection"></div>
+                            <gs-button id="buttonNewConnections" hidden style="float: right;" inline bg-primary remove-bottom>Edit postage-connections.conf</gs-button>
+                            
+                            <div id="option-connection" style="clear: both;"></div>
                         </div>
                         <br /><br />
                         
