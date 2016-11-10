@@ -12208,7 +12208,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 // default value to false
-                element.value = element.getAttribute('value') || false;
+                if (this.getAttribute('type') === 'smallint') {
+                    element.value = element.getAttribute('value') || 0;
+                } else {
+                    element.value = element.getAttribute('value') || false;
+                }
                 
                 // add a tabindex to allow focus
                 if (!element.hasAttribute('tabindex')) {
@@ -12333,7 +12337,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         
                     } else if (strValue === null) {
-                        this.setAttribute('value', false);
+                        //this.setAttribute('value', false);
+                        if (this.getAttribute('type') === 'smallint') {
+                            this.setAttribute('value', '-1');
+                        } else {
+                            this.setAttribute('value', 'true');
+                        }
                         
                     } else {
                         if (this.getAttribute('type') === 'smallint') {

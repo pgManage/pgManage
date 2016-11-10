@@ -77,8 +77,25 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[type]</code>:</span><br />
+                    <p>Two <code>&lt;gs-checkbox&gt;</code> elements with the <code>[type]</code> attribute set. The <code>[type]</code> attribute sets the value type of the checkbox. If there is no attribute then it does boolean values: <code>true</code>, <code>false</code> If the attribute is set to <code>smalling</code> then it uses smallint values: <code>-1</code>, <code>0</code> The javascript in this example is so you can see the value when you click on the checkbox.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="5">
+                        <gs-checkbox triplestate></gs-checkbox>
+                        <br />
+                        <gs-checkbox triplestate type="smallint"></gs-checkbox>
+                    </template>
+                    <template for="js" height="5">
+                        window.addEventListener('change', function (event) {
+                            alert(event.target.value);
+                        });
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
                     <span class="h3">Attribute <code>[triplestate]</code>:</span><br />
-                    <p>Four <code>&lt;gs-checkbox&gt;</code> elements with the <code>[value]</code> and <code>[triplestate]</code> attributes set. The <code>[triplestate]</code> attribute adds the value "null" or "n" depending on the type. The javascript in this example is so you can see the value when you click on the checkbox.</p>
+                    <p>Six <code>&lt;gs-checkbox&gt;</code> elements with the <code>[value]</code> and <code>[triplestate]</code> attributes set. The <code>[triplestate]</code> attribute adds the value "null" or "n" depending on the type. The javascript in this example is so you can see the value when you click on the checkbox.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="14">
