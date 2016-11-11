@@ -94,6 +94,7 @@ function login() {
 function appendConnection(connName, strButtons) {
     'use strict';
     var optionControl = document.getElementById('option-connection');
+    var optionContainer = document.getElementById('predefined-option-container');
     var optionElement = document.createElement('gs-option');
 
     //if we are in electron, remove the top right corner
@@ -103,7 +104,7 @@ function appendConnection(connName, strButtons) {
 
     optionElement.setAttribute('value', connName);
     optionElement.textContent = connName;
-    optionControl.appendChild(optionElement);
+    optionContainer.appendChild(optionElement);
 
     if (!optionControl.value) {
         optionControl.value = connName;
@@ -112,9 +113,10 @@ function appendConnection(connName, strButtons) {
 
 function getConnections() {
     'use strict';
-    var strQueryString = GS.getQueryString(), strConnName = GS.qryGetVal(strQueryString, 'connection');
+    var strQueryString = GS.getQueryString();
+    var strConnName = GS.qryGetVal(strQueryString, 'connection');
 
-    document.getElementById('option-connection').innerHTML = '';
+    document.getElementById('predefined-option-container').innerHTML = '';
 
     // get connection list
     GS.ajaxText('/postage/auth', 'action=list', function (data, error) {
@@ -248,24 +250,24 @@ window.addEventListener('load', function () {
 });
         </script>
         <style>
-            #option-connection gs-option:not(:last-child) {
+            #predefined-option-container gs-option:not(:last-child) {
                 border-bottom: 0 none;
             }
-            #option-connection gs-option:not(:last-child):not(:first-child) {
+            #predefined-option-container gs-option:not(:last-child):not(:first-child) {
                 -webkit-border-radius: 0;
                 -moz-border-radius: 0;
                 -ms-border-radius: 0;
                 -o-border-radius: 0;
                 border-radius: 0;
             }
-            #option-connection gs-option:first-child {
+            #predefined-option-container gs-option:first-child {
                 -webkit-border-radius: 0.25em 0 0 0;
                 -moz-border-radius: 0.25em 0 0 0;
                 -ms-border-radius: 0.25em 0 0 0;
                 -o-border-radius: 0.25em 0 0 0;
                 border-radius: 0.25em 0 0 0;
             }
-            #option-connection gs-option:last-child {
+            #predefined-option-container gs-option:last-child {
                 -webkit-border-radius: 0 0 0.25em 0.25em;
                 -moz-border-radius: 0 0 0.25em 0.25em;
                 -ms-border-radius: 0 0 0.25em 0.25em;
@@ -308,7 +310,7 @@ window.addEventListener('load', function () {
                     <center><h3><b>Login</b></h3></center>
                     <br />
 
-                    <gs-optionbox no-target mini>
+                    <gs-optionbox id="option-connection" no-target mini>
                         <div class="style-bracket-container">
                             <label class="style-bracket-header">Choose a server</label>
                             <div class="style-bracket-left"></div>
@@ -316,7 +318,7 @@ window.addEventListener('load', function () {
 
                             <gs-button id="buttonNewConnections" hidden style="float: right;" inline bg-primary remove-bottom>Edit postage-connections.conf</gs-button>
 
-                            <div id="option-connection" style="clear: both;"></div>
+                            <div id="predefined-option-container" style="clear: both;"></div>
                         </div>
                         <br /><br />
 
