@@ -22,468 +22,607 @@
                 display: none;
             }
             */
-            .line_1 {
-                fill: none;
-                stroke: #FF8888;
-                stroke-width: 1.5px;
+            gs-chart-line {
+                display: block;
+                width: 100%;
+                height: 100%;
             }
-            .line_2 {
+            
+            gs-chart-line .line {
                 fill: none;
-                stroke: #88FF88;
-                stroke-width: 1.5px;
-            }
-            .line_3 {
-                fill: none;
-                stroke: #8888FF;
                 stroke-width: 1.5px;
             }
         </style>
         <script>
 /*jslint browser*/
-/*global window, GS, d3, console*/
-var Global = {};
+/*global xtag, window, GS, d3, console, ml*/
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+    function pushReplacePopHandler(element) {
 
-function startData() {
-    "use strict";
-    Global.svg = d3.select("svg");
-
-    Global.margin = {top: 20, right: 20, bottom: 30, left: 50};
-    Global.width = +Global.svg.attr("width") - Global.margin.left - Global.margin.right;
-    Global.height = +Global.svg.attr("height") - Global.margin.top - Global.margin.bottom;
-
-    Global.g = Global.svg.append("g").attr("transform", "translate(" + Global.margin.left + "," + Global.margin.top + ")")
-        .attr("id", "master_g");
-
-    Global.x = d3.scaleLinear()
-        .rangeRound([0, Global.width]);
-
-    Global.y = d3.scaleLinear()
-        .rangeRound([Global.height, 0]);
-
-    Global.line_1_f = d3.line()
-        .x(function (d) {
-            return Global.x(d.x);
-        })
-        .y(function (d) {
-            return Global.y(d.total_1);
-        });
-
-    Global.line_2_f = d3.line()
-        .x(function (d) {
-            return Global.x(d.x);
-        })
-        .y(function (d) {
-            return Global.y(d.total_2);
-        });
-
-    Global.line_3_f = d3.line()
-        .x(function (d) {
-            return Global.x(d.x);
-        })
-        .y(function (d) {
-            return Global.y(d.total_3);
-        });
-
-    Global.x.domain([0, 40]);
-
-    //append x axis
-    Global.axis_x = Global.g.append("g")
-        .attr("id", "axis_x")
-        .attr("class", "axis axis--x")
-        .attr("transform", "translate(0," + Global.height + ")")
-        .call(d3.axisBottom(Global.x));
-
-    //append y axis
-    Global.axis_y = Global.g.append("g")
-        .attr("id", "axis_y")
-        .attr("class", "axis axis--y")
-        .call(d3.axisLeft(Global.y));
-
-    //append total label
-    Global.axis_y.append("text")
-        .attr("id", "text_label_1")
-        .attr("fill", "#ff8888")
-        //.attr("transform", "rotate(-90)")
-        .attr("x", 25)
-        .attr("y", 10)
-        .attr("dy", "0.71em")
-        .style("text-anchor", "start")
-        .style("font-family", "Helvetica Bold")
-        .style("font-size", "20px")
-        .text("Total");
-
-    //append active label
-    Global.axis_y.append("text")
-        .attr("id", "text_label_2")
-        .attr("fill", "#88ff88")
-        //.attr("transform", "rotate(-90)")
-        .attr("x", 25)
-        .attr("y", 30)
-        .attr("dy", "0.71em")
-        .style("text-anchor", "start")
-        .style("font-family", "Helvetica Bold")
-        .style("font-size", "20px")
-        .text("Active");
-
-    //append inactive label
-    Global.axis_y.append("text")
-        .attr("id", "text_label_3")
-        .attr("fill", "#8888ff")
-        //.attr("transform", "rotate(-90)")
-        .attr("x", 25)
-        .attr("y", 50)
-        .attr("dy", "0.71em")
-        .style("text-anchor", "start")
-        .style("font-family", "Helvetica Bold")
-        .style("font-size", "20px")
-        .text("Inactive");
-
-    //append holder
-    var holder = Global.svg.append("defs");
-    holder.append("svg:clipPath")
-        .attr("id", "innerGraph")
-        .append("svg:rect")
-        .attr("x", 0)
-        .attr("y", 0)
-        .style("fill", "gray")
-        .attr("height", Global.height)
-        .attr("width", Global.width);
-
-    console.log('test1');
-
-    //append active line
-    Global.line_1 = Global.g.append("path")
-        .attr("clip-path", "url(#innerGraph)")
-        .attr("id", "line_1")
-        .attr("class", "line_1");
-
-    console.log('test2');
-
-    //append active line
-    Global.line_2 = Global.g.append("path")
-        .attr("clip-path", "url(#innerGraph)")
-        .attr("id", "line_2")
-        .attr("class", "line_2");
-
-    console.log('test3');
-
-    //append inactive line
-    Global.line_3 = Global.g.append("path")
-        .attr("clip-path", "url(#innerGraph)")
-        .attr("id", "line_3")
-        .attr("class", "line_3");
-
-    console.log('test4');
-}
-
-
-function newData(data) {
-    "use strict";
-    //prepare arr_total with data in format that lines will understand
-    var i = 0;
-    var len = data.length;
-    var arr_total = [];
-    while (i < len) {
-        arr_total.push({
-            x: i,
-            total_1: data[i][0],
-            total_2: data[i][1],
-            total_3: data[i][2]
-        });
-
-        i += 1;
     }
 
-    //get the minimum and maximum of the date and set the minimum and maximum of the chart
-    var extent_0 = d3.extent(arr_total, function (d) {
-        return d.x;
-    });
+    // dont do anything that modifies the element here
+    function elementCreated(element) {
+        // if "created" hasn't been suspended: run created code
+        if (!element.hasAttribute('suspend-created')) {
 
-    extent_0[0] = Math.min(extent_0[0], 0);
-
-    //x.domain(extent_0);
-    Global.x.domain([0, 40]);
-
-    //get the minimum and maximum of the three lines and set the minimum and maximum of the chart
-    var extent_1 = d3.extent(arr_total, function (d) {
-        return d.total_1;
-    });
-    var extent_2 = d3.extent(arr_total, function (d) {
-        return d.total_2;
-    });
-    var extent_3 = d3.extent(arr_total, function (d) {
-        return d.total_3;
-    });
-
-    extent_1[0] = Math.min(extent_1[0], 0);
-    extent_2[0] = Math.min(extent_2[0], 0);
-    extent_3[0] = Math.min(extent_3[0], 0);
-
-    Global.y.domain([Math.min(extent_1[0], extent_2[0], extent_3[0]), Math.max(extent_1[1], extent_2[1], extent_3[1])]);
-
-    console.log(extent_0);
-    console.log(extent_1);
-    console.log(extent_2);
-    console.log(extent_3);
-
-    //append x axis
-    Global.axis_x
-        .call(d3.axisBottom(Global.x));
-
-    Global.axis_x.enter();
-    Global.axis_x.exit();
-
-    //append y axis
-    Global.axis_y
-        .call(d3.axisLeft(Global.y));
-
-    Global.axis_x.enter();
-    Global.axis_y.exit();
-
-    console.log(arr_total);
-
-    Global.line_1
-        .datum(arr_total)
-        .attr("d", Global.line_1_f)
-        .attr("transform", null)
-        .transition()
-        .duration(950)
-        .attr("transform", "translate(" + (Global.x(0) - Global.x(1)) + ")");
-
-    Global.line_2
-        .datum(arr_total)
-        .attr("d", Global.line_2_f)
-        .attr("transform", null)
-        .transition()
-        .duration(950)
-        .attr("transform", "translate(" + (Global.x(0) - Global.x(1)) + ")");
-
-    Global.line_3
-        .datum(arr_total)
-        .attr("d", Global.line_3_f)
-        .attr("transform", null)
-        .transition()
-        .duration(950)
-        .attr("transform", "translate(" + (Global.x(0) - Global.x(1)) + ")");
-}
-/*
-function newData(data) {
-    "use strict";
-    //d3
-    var svg = d3.select("svg");
-
-    var margin = {top: 20, right: 20, bottom: 30, left: 50};
-    var width = +svg.attr("width") - margin.left - margin.right;
-    var height = +svg.attr("height") - margin.top - margin.bottom;
-
-    var g = d3.select('master_g');
-
-    console.log('g', g);
-
-    g = document.getElementById("master_g");
-    g.parentNode.removeChild(g);
-
-    console.log('g', g);
-    console.log('document.getElementById("master_g")', document.getElementById("master_g"));
-
-    g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        .attr("id", "master_g");
-
-    var x = d3.scaleLinear()
-        .rangeRound([0, width]);
-
-    var y = d3.scaleLinear()
-        .rangeRound([height, 0]);
-
-    var line_1 = d3.line()
-        .x(function (d) {
-            return x(d.x);
-        })
-        .y(function (d) {
-            return y(d.total_1);
-        });
-
-    var line_2 = d3.line()
-        .x(function (d) {
-            return x(d.x);
-        })
-        .y(function (d) {
-            return y(d.total_2);
-        });
-
-    var line_3 = d3.line()
-        .x(function (d) {
-            return x(d.x);
-        })
-        .y(function (d) {
-            return y(d.total_3);
-        });
-
-    //prepare arr_total with data in format that lines will understand
-    var i = 0;
-    var len = data.length;
-    var arr_total = [];
-    while (i < len) {
-        arr_total.push({
-            x: i,
-            total_1: data[i][0],
-            total_2: data[i][1],
-            total_3: data[i][2]
-        });
-
-        i += 1;
+        }
     }
 
-    //get the minimum and maximum of the date and set the minimum and maximum of the chart
-    var extent_0 = d3.extent(arr_total, function (d) {
-        return d.x;
-    });
+    function elementInterval(element) {
+        var d3_element = d3.select(element);
 
-    extent_0[0] = Math.min(extent_0[0], 0);
+        //prepare arr_d3_data with data in format that lines will understand
+        var x_len = element.rowData.length;
+        var x = 0;
+        var i_len = element.rowData[0].length;
+        var i = 0;
 
-    //x.domain(extent_0);
-    x.domain([0, 40]);
+        //console.log('element.rowData', element.rowData);
+        //console.log('i_len', i_len);
 
-    //get the minimum and maximum of the three lines and set the minimum and maximum of the chart
-    var extent_1 = d3.extent(arr_total, function (d) {
-        return d.total_1;
-    });
-    var extent_2 = d3.extent(arr_total, function (d) {
-        return d.total_2;
-    });
-    var extent_3 = d3.extent(arr_total, function (d) {
-        return d.total_3;
-    });
+        //fill array of d3 data
+        element.arr_d3_data = [];
+        while (i < i_len) {
+            element.arr_d3_data[i] = [];
 
-    extent_1[0] = Math.min(extent_1[0], 0);
-    extent_2[0] = Math.min(extent_2[0], 0);
-    extent_3[0] = Math.min(extent_3[0], 0);
+            x = 0;
+            while (x < x_len) {
+                element.arr_d3_data[i].push({
+                    x: x,
+                    y: element.rowData[x][i]
+                });
 
-    y.domain([Math.min(extent_1[0], extent_2[0], extent_3[0]), Math.max(extent_1[1], extent_2[1], extent_3[1])]);
+                x += 1;
+            }
 
-    console.log(extent_0);
-    console.log(extent_1);
-    console.log(extent_2);
-    console.log(extent_3);
+            i += 1;
+        }
 
-    //append x axis
-    g.append("g")
-        .attr("class", "axis axis--x")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
+        //console.log('element.arr_d3_data', element.arr_d3_data);
 
-    //append y axis
-    var axis_y = g.append("g")
-        .attr("class", "axis axis--y")
-        .call(d3.axisLeft(y));
+        //set max and min of axis's
+        //console.log('element.extent_x', element.extent_x);
+        element.x.domain(element.extent_x);
+        //console.log('element.extent_y', element.extent_y);
+        element.y.domain(element.extent_y);
 
-    //append total label
-    axis_y.append("text")
-        .attr("id", "text_label_1")
-        .attr("fill", "#ff8888")
-        //.attr("transform", "rotate(-90)")
-        .attr("x", 25)
-        .attr("y", 10)
-        .attr("dy", "0.71em")
-        .style("text-anchor", "start")
-        .style("font-family", "Helvetica Bold")
-        .style("font-size", "20px")
-        .text("Total");
+        //reset x axis
+        element.axis_x
+            .call(d3.axisBottom(element.x));
+        element.axis_x.enter();
+        element.axis_x.exit();
 
-    //append active label
-    axis_y.append("text")
-        .attr("id", "text_label_2")
-        .attr("fill", "#88ff88")
-        //.attr("transform", "rotate(-90)")
-        .attr("x", 25)
-        .attr("y", 30)
-        .attr("dy", "0.71em")
-        .style("text-anchor", "start")
-        .style("font-family", "Helvetica Bold")
-        .style("font-size", "20px")
-        .text("Active");
+        //reset y axis
+        element.axis_y
+            .call(d3.axisLeft(element.y));
+        element.axis_y.enter();
+        element.axis_y.exit();
 
-    //append inactive label
-    axis_y.append("text")
-        .attr("id", "text_label_3")
-        .attr("fill", "#8888ff")
-        //.attr("transform", "rotate(-90)")
-        .attr("x", 25)
-        .attr("y", 50)
-        .attr("dy", "0.71em")
-        .style("text-anchor", "start")
-        .style("font-family", "Helvetica Bold")
-        .style("font-size", "20px")
-        .text("Inactive");
+        //append line labels
+        var caption_i = d3_element.selectAll("text.caption").size();
+        var caption_len = element.line_captions.length;
+        var bbox;
 
-    console.log(arr_total);
+        while (caption_i < caption_len) {
+            bbox = element.axis_y.append("text")
+                .attr("id", "text_" + element.arr_column[caption_i])
+                .attr("class", "caption")
+                .attr("fill", element.line_colors[caption_i])
+                //.attr("transform", "rotate(-90)")
+                .attr("x", element.label_x)
+                .attr("y", -17)
+                .attr("dy", "0.71em")
+                .style("text-anchor", "start")
+                .style("font-family", "Helvetica")
+                .style("font-weight", "bold")
+                .style("font-size", "20px")
+                .text(element.line_captions[caption_i])
+                .node().getBBox();
 
-    //append total line
-    g.append("path")
-        .attr("id", "line_1")
-        .datum(arr_total)
-        .attr("class", "line_1")
-        .attr("d", line_1);
+            element.label_x += bbox.width + 5;
 
-    //append active line
-    g.append("path")
-        .attr("id", "line_2")
-        .datum(arr_total)
-        .attr("class", "line_2")
-        .attr("d", line_2);
+            caption_i += 1;
+        }
 
-    //append inactive line
-    g.append("path")
-        .attr("id", "line_3")
-        .datum(arr_total)
-        .attr("class", "line_3")
-        .attr("d", line_3);
-}
-*/
-window.addEventListener('load', function () {
-    "use strict";
+        //append lines
+        i = 0;
+        i_len = d3_element.selectAll("path.line").size();
+        var objCurrentLine;
 
-    var connectionsData = d3.range(0, 43).map(function () {
-        return [0, 0, 0];
-    });
+        while (i < element.arr_column.length) {
+            if (i < i_len) {
+                objCurrentLine = element.g.select("#line_" + element.arr_column[i]);
+            } else {
+                objCurrentLine = element.g.append("path");
+            }
+            objCurrentLine
+                .attr("id", "line_" + element.arr_column[i])
+                .attr("class", "line line_" + element.arr_column[i])
+                .attr("style", "stroke: " + element.line_colors[i] + ";")
+                .attr("stroke", element.line_colors[i])
+                .datum(element.arr_d3_data[i])
+                .attr("d", element.line_f);
+            i += 1;
+        }
 
-    startData();
+    }
 
-    Global.interval = setInterval(function () {
-        GS.ajaxJSON(
-            '/env/action_select',
-            'src=' + encodeURIComponent('(SELECT count(*) AS total_connections, ' +
-                    'sum(CASE WHEN state =  \'active\' THEN 1 ELSE 0 END) AS active_connections, ' +
-                    'sum(CASE WHEN state <> \'active\' THEN 1 ELSE 0 END) AS inactive_connections ' +
-                    'FROM pg_catalog.pg_stat_activity) em'),
-            function (data, error) {
+    //hand the ajax style data
+    function handleData(element, data) {
+        //document.getElementById('result').textContent = JSON.stringify(data.dat);
 
-                if (!error) {
-                    //document.getElementById('result').textContent = JSON.stringify(data.dat);
+        //append means the difference between records is what we need to show
+        if (element.hasAttribute('append')) {
+            if (element.lastRowData) {
+                var arrCur = data.dat[0];
+                var arrPrev = element.lastRowData;
+                var arrDiff = [];
 
-                    console.log(data.dat.dat[0]);
-                    connectionsData.push(data.dat.dat[0]);
-                    console.log(connectionsData);
+                var i = 0;
+                var len = data.dat[0].length;
+                while (i < len) {
+                    arrDiff[i] = arrCur[i] - arrPrev[i];
+                    i += 1;
+                }
+                //console.log('arrCur', arrCur);
+                //console.log('arrPrev', arrPrev);
+                //console.log('arrDiff', arrDiff);
 
-                    while (connectionsData.length > 42) {
-                        connectionsData.shift();
+                //save the last record
+                element.lastRowData = arrCur;
+
+                //add to beginning of array the difference between the last two records
+                element.rowData.push(arrDiff);
+
+                element.arr_column = data.arr_column;
+
+                //remove any extraneous records
+                while (element.hasAttribute('extent_x') && element.rowData.length > element.extent_x_diff + 1) {
+                    element.rowData.shift();
+                }
+
+                console.log('element.rowData', element.rowData);
+
+                //run interval function
+                elementInterval(element);
+            } else {
+                //save the last record
+                element.lastRowData = data.dat[0];
+            }
+
+        } else {
+            //add to beginning of array the new record
+            element.rowData.push(data.dat[0]);
+
+            element.arr_column = data.arr_column;
+
+            //console.log('element.extent_x'     , element.extent_x     );
+            //console.log('element.extent_x_diff', element.extent_x_diff);
+
+            //remove and extraneous records
+            while (element.hasAttribute('extent_x') && element.rowData.length > element.extent_x_diff + 1) {
+                element.rowData.shift();
+            }
+
+            console.log('element.rowData', element.rowData);
+
+            //run interval function
+            elementInterval(element);
+        }
+    }
+
+    //
+    function elementInserted(element) {
+        // if this is the first time inserted has been run: continue
+        if (!element.inserted) {
+            element.inserted = true;
+
+            //fill gs-chart-line with svg
+            element.innerHTML = ml(function () {/*
+    <div class="root">
+        <svg width="100%" height="100%">
+        </svg>
+    </div>*/});
+
+            //prepare svg
+            element.d3_element = d3.select(element);
+            element.svg = element.d3_element.select("svg");
+
+            element.margin = {top: 20, right: 20, bottom: 30, left: 60};
+
+            var rect = element.svg.node().getBoundingClientRect();
+
+            element.width = +rect.width - element.margin.left - element.margin.right;
+            element.height = +rect.height - element.margin.top - element.margin.bottom;
+
+            //add g element
+            element.g = element.svg.append("g").attr("transform", "translate(" + element.margin.left + "," + element.margin.top + ")")
+                .attr("id", "master_g");
+
+            //set x and y variable
+            element.x = d3.scaleLinear()
+                .rangeRound([0, element.width]);
+
+            element.y = d3.scaleLinear()
+                .rangeRound([element.height, 0]);
+
+            //create line functions using the x and y variables
+            element.line_f = d3.line()
+                .x(function (d) {
+                    return element.x(d.x);
+                })
+                .y(function (d) {
+                    return element.y(d.y);
+                });
+
+            //set min/max of data and x/y variables
+            element.arr_d3_data = [];
+            //console.log('element.extent_x', element.extent_x);
+            element.x.domain(element.extent_x);
+            //console.log('element.extent_y', element.extent_y);
+            element.y.domain(element.extent_y);
+
+            //append x axis
+            element.axis_x = element.g.append("g")
+                .attr("id", "axis_x")
+                .attr("class", "axis axis--x")
+                .attr("transform", "translate(0," + element.height + ")")
+                .call(d3.axisBottom(element.x));
+
+            //append y axis
+            element.axis_y = element.g.append("g")
+                .attr("id", "axis_y")
+                .attr("class", "axis axis--y")
+                .call(d3.axisLeft(element.y));
+
+            //create row data
+            element.rowData = [];
+
+            //create chart caption
+            element.label_x = 25;
+            var bbox = element.axis_y.append("text")
+                    .attr("id", "text_chart_caption")
+                    .attr("class", "chart_caption")
+                    .attr("fill", "#000000")
+                    //.attr("transform", "rotate(-90)")
+                    .attr("x", element.label_x)
+                    .attr("y", -17)
+                    .attr("dy", "0.71em")
+                    .style("text-anchor", "start")
+                    .style("font-family", "Helvetica")
+                    .style("font-weight", "bold")
+                    .style("font-size", "20px")
+                    .text(element.getAttribute('chart_caption'))
+                    .node().getBBox();
+
+            element.label_x = element.label_x + bbox.width + 20;
+
+            //if type is live
+
+            //if raw="" is set
+            if (element.hasAttribute('raw')) {
+                //then set an interval to get the data every second
+                element.interval = setInterval(function () {
+                    var arrTotalRecords = [];
+                    GS.requestRawFromSocket(GS.envSocket,
+                        element.getAttribute('raw'),
+                        function (data, error) {
+                            if (!error) {
+                                if (data.strMessage !== 'TRANSACTION COMPLETED') {
+                                    var arrRecords = GS.trim(data.strMessage, '\n').split('\n');
+
+                                    var cell_i;
+                                    var cell_len;
+                                    var arrCells;
+
+                                    var i = 0;
+                                    var len = arrRecords.length;
+                                    while (i < len) {
+                                        arrCells = arrRecords[i].split('\t');
+
+                                        cell_i = 0;
+                                        cell_len = arrCells.length;
+                                        while (cell_i < cell_len) {
+                                            arrCells[cell_i] = GS.decodeFromTabDelimited(arrCells[cell_i]);
+                                            cell_i += 1;
+                                        }
+
+                                        arrTotalRecords.push(arrCells);
+                                        i += 1;
+                                    }
+                                } else {
+                                    element.arrColumns = data.arrColumnNames;
+
+                                    handleData(element, {
+                                        "arr_column": data.arrColumnNames
+                                      , "dat": arrTotalRecords
+                                      , "row_count": arrTotalRecords.length
+                                    });
+                                }
+
+                            } else {
+                                GS.ajaxErrorDialog(data);
+                            }
+                        }
+                    );
+                }, 1000);
+
+            //if src="" is set
+            } else if (element.hasAttribute('src')) {
+                //then set an interval to get the data every second
+                element.interval = setInterval(function () {
+                    var arrSRC = element.getAttribute('src').split('.');
+                    var arrTotalRecords;
+                    GS.ajaxJSON(
+                        '/env/action_select'
+                      , 'src=' + encodeURIComponent(element.getAttribute('src') || '') +
+                        '&limit=' + encodeURIComponent(element.getAttribute('limit') || '') +
+                        '&offset=' + encodeURIComponent(element.getAttribute('offset') || '') +
+                        '&order_by=' + encodeURIComponent(element.getAttribute('ord') || '') +
+                        '&where=' + encodeURIComponent(element.getAttribute('where') || '') +
+                        '&cols=' + encodeURIComponent(element.getAttribute('cols') || '')
+                      , function (data, error) {
+                            if (!error) {
+                                handleData(element, data.dat);
+
+                            } else {
+                                GS.ajaxErrorDialog(data);
+                            }
+                        }
+                    );
+                }, 1000);
+
+            // use externally supplied rowdata (currently unused and untested)
+            } else {
+                element.addEventListener('rowdata_updated', function () {
+                    //add to beginning of array the new record
+                    element.rowData.unshift(element.data.dat.dat[0]);
+
+                    element.arr_column = element.data.dat.arr_column;
+
+                    //console.log('element.extent_x', element.extent_x);
+                    //console.log('element.extent_x_diff', element.extent_x_diff);
+
+                    //remove and extraneous records
+                    while (element.rowData.length > element.extent_x_diff + 1) {
+                        element.rowData.pop();
                     }
 
-                    newData(connectionsData);
+                    //console.log('element.rowData', element.rowData);
 
-                } else {
-                    GS.ajaxErrorDialog(data);
+                    //run interval function
+                    elementInterval(element);
+                });
+            }
+        }
+    }
+
+/*
+<gs-chart-line type="live" extent_x="0,30" line_captions="Total,Active,Idle" line_colors="#FF8888,#88FF88,#8888FF" src="(SELECT count(*) AS total_connections, sum(CASE WHEN state = 'active' THEN 1 ELSE 0 END) AS active_connections, sum(CASE WHEN state = 'active' THEN 0 ELSE 1 END) AS inactive_connections FROM pg_catalog.pg_stat_activity) em"></gs-chart-line>
+
+<svg width="960" height="500">
+</svg>
+
+<gs-chart-line type="" x_column="" y_column="" extent_x="" extent_y="" line_captions="" line_captions="" where="" limit="" offset="" ord="" cols="" src=""></gs-chart-line>
+*/
+
+    xtag.register('gs-chart-line', {
+        lifecycle: {
+            created: function () {
+                elementCreated(this);
+            },
+
+            inserted: function () {
+                elementInserted(this);
+            },
+
+            attributeChanged: function (strAttrName, oldValue, newValue) {
+                // if "suspend-created" has been removed: run created and inserted code
+                if (strAttrName === 'suspend-created' && newValue === null) {
+                    elementCreated(this);
+                    elementInserted(this);
+
+                // if "suspend-inserted" has been removed: run inserted code
+                } else if (strAttrName === 'suspend-inserted' && newValue === null) {
+                    elementInserted(this);
+
+                } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                    // attribute code
                 }
             }
-        );
-    }, 1000);
+        },
+        events: {
+
+        },
+        accessors: {
+            extent_x: {
+                // get extent straight from the attribute
+                get: function () {
+                    if (this.hasAttribute('extent_x')) {
+                        var x_arr = this.getAttribute('extent_x').split(',');
+
+                        var x_i = 0;
+                        var x_len = x_arr.length;
+
+                        while (x_i < x_len) {
+                            x_arr[x_i] = parseInt(x_arr[x_i], 10);
+                            x_i += 1;
+                        }
+
+                        return x_arr;
+                    } else {
+                        //get the minimum and maximum all the lines and set the minimum and maximum of the chart
+                        var extent_i = 0;
+                        var extent_len = this.arr_d3_data.length;
+                        var extent = [];
+                        var oldExtent;
+
+                        while (extent_i < extent_len) {
+                            extent = d3.extent(this.arr_d3_data[extent_i], function (d) {
+                                return d.x;
+                            });
+
+                            if (oldExtent) {
+                                extent[0] = Math.min(extent[0], oldExtent[0], 0);
+                                extent[1] = Math.max(extent[1], oldExtent[1], 0);
+                            } else {
+                                extent[0] = Math.min(extent[0], 0);
+                                extent[1] = Math.max(extent[1], 0);
+                            }
+
+                            oldExtent = extent;
+
+                            extent_i += 1;
+                        }
+
+                        if (this.hasAttribute('extent_x_reverse')) {
+                            var temp = extent[0];
+                            extent[0] = extent[1];
+                            extent[1] = temp;
+                        }
+
+                        return extent;
+                    }
+                },
+
+                // set the extent attribute
+                set: function (newValue) {
+                    this.setAttribute('extent_x', newValue);
+                }
+            },
+            extent_x_diff: {
+                // get value from the other accessor
+                get: function () {
+                    var x_arr = this.extent_x;
+                    if (x_arr[1] > x_arr[0]) {
+                        return x_arr[1] - x_arr[0];
+                    } else {
+                        return x_arr[0] - x_arr[1];
+                    }
+                }
+            },
+            line_captions: {
+                // get captions straight from the attribute
+                get: function () {
+                    return this.getAttribute('line_captions').split(',');
+                },
+
+                // set the caption attribute
+                set: function (newValue) {
+                    this.setAttribute('line_captions', newValue.join(','));
+                }
+            },
+            line_colors: {
+                // get captions straight from the attribute
+                get: function () {
+                    return this.getAttribute('line_colors').split(',');
+                },
+
+                // set the caption attribute
+                set: function (newValue) {
+                    this.setAttribute('line_colors', newValue.join(','));
+                }
+            },
+            extent_y: {
+                // get extent straight from the attribute
+                get: function () {
+                    if (this.hasAttribute('extent_y')) {
+                        var y_arr = this.getAttribute('extent_y').split(',');
+
+                        var y_i = 0;
+                        var y_len = y_arr.length;
+
+                        while (y_i < y_len) {
+                            y_arr[y_i] = parseInt(y_arr[y_i], 10);
+                            y_i += 1;
+                        }
+
+                        return y_arr;
+
+                    } else {
+                        //get the minimum and maximum all the lines and set the minimum and maximum of the chart
+                        var extent_i = 0;
+                        var extent_len = this.arr_d3_data.length;
+                        var extent = [];
+                        var oldExtent;
+
+                        while (extent_i < extent_len) {
+                            extent = d3.extent(this.arr_d3_data[extent_i], function (d) {
+                                return d.y;
+                            });
+
+                            if (oldExtent) {
+                                extent[0] = Math.min(extent[0], oldExtent[0], 0);
+                                extent[1] = Math.max(extent[1], oldExtent[1], 0);
+                            } else {
+                                extent[0] = Math.min(extent[0], 0);
+                                extent[1] = Math.max(extent[1], 0);
+                            }
+
+                            oldExtent = extent;
+
+                            extent_i += 1;
+                        }
+
+                        if (this.hasAttribute('extent_y_reverse')) {
+                            var temp = extent[0];
+                            extent[0] = extent[1];
+                            extent[1] = temp;
+                        }
+
+                        return extent;
+                    }
+                },
+
+                // set the extent attribute
+                set: function (newValue) {
+                    this.setAttribute('extent_y', newValue);
+                }
+            },
+            extent_y_diff: {
+                // get value from the other accessor
+                get: function () {
+                    var y_arr = this.extent_y;
+                    if (y_arr[1] > y_arr[0]) {
+                        return y_arr[1] - y_arr[0];
+                    } else {
+                        return y_arr[0] - y_arr[1];
+                    }
+                }
+            },
+        },
+        methods: {
+
+        }
+    });
+});
+
+window.addEventListener('load', function () {
+    GS.envSocket = GS.openSocket('env');
 });
         </script>
     </head>
     <body>
-    <br/>
-        <svg width="960" height="500">
-        </svg>
+        <gs-grid widths="1,1">
+            <gs-block>
+                <gs-chart-line chart_caption="Connections" type="live" line_captions="Total,Active,Idle" line_colors="#FF8888,#88FF88,#8888FF" raw="SELECT count(*) AS total_connections, sum(CASE WHEN state = 'active' THEN 1 ELSE 0 END) AS active_connections, sum(CASE WHEN state = 'active' THEN 0 ELSE 1 END) AS inactive_connections FROM pg_catalog.pg_stat_activity" style="height: 300px;"></gs-chart-line>
+            </gs-block>
+            <gs-block>
+                <gs-chart-line chart_caption="Transactions" type="live" append line_captions="Total,Commits,Rollback" line_colors="#FF8888,#88FF88,#8888FF" raw="SELECT sum(xact_commit) + sum(xact_rollback) AS total_transactions, sum(xact_commit) AS commit_transactions, sum(xact_rollback) AS rollback_transactions FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+            </gs-block>
+        </gs-grid>
+        <gs-grid widths="1,1,1">
+            <gs-block>
+                <gs-chart-line chart_caption="Tuples" type="live" append line_captions="Inserted,Updated,Deleted" line_colors="#88FF88,#8888FF,#FF8888" raw="SELECT sum(tup_inserted) AS total_inserted, sum(tup_updated) AS total_updated, sum(tup_deleted) AS total_deleted FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+            </gs-block>
+            <gs-block>
+                <gs-chart-line chart_caption="Tuples" type="live" append line_captions="Fetched,Returned" line_colors="#FF8888,#88FF88,#8888FF" raw="SELECT sum(tup_fetched) AS total_fetched, sum(tup_returned) AS total_returned FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+            </gs-block>
+            <gs-block>
+                <gs-chart-line chart_caption="Block IO" type="live" append line_captions="Read,Hit" line_colors="#FF8888,#88FF88,#8888FF" raw="SELECT sum(blks_read) AS total_read, sum(blks_hit) AS total_hit FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+            </gs-block>
+        </gs-grid>
     </body>
 </html>

@@ -191,50 +191,50 @@ document.addEventListener('DOMContentLoaded', function () {
     'use strict';
     function pushReplacePopHandler(element) {
         var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-        
+
         if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
             element.value = GS.qryGetVal(strQueryString, strQSCol);
         }
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
         if (!element.hasAttribute('suspend-created')) {
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         var strQSValue;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+
                 // if this checkbox has the "qs" attribute: fill from querystring and bind to querystring
                 if (element.hasAttribute('qs')) {
                     strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
-                    
+
                     if (strQSValue !== '' || !element.getAttribute('value')) {
                         element.setAttribute('value', strQSValue);
                     }
-                    
+
                     window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
                 }
-                
+
                 // default value to false
                 if (element.getAttribute('type') === 'smallint') {
                     element.value = element.getAttribute('value') || 0;
                 } else {
                     element.value = element.getAttribute('value') || false;
                 }
-                
+
                 // add a tabindex to allow focus
                 if (!element.hasAttribute('tabindex')) {
                     element.tabIndex = 0;
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-checkbox', {
         lifecycle: {
             created: function () {
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 //      ("delete" keyword added because of firefox)
                 if (!this.getAttribute('value') &&
                     this.value !== null &&
-                    this.value !== undefined && 
+                    this.value !== undefined &&
                     (
                         typeof this.value === 'boolean' ||
                         this.value === '-1' ||
@@ -264,24 +264,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     this.setAttribute('value', this.value);
                     delete this.value;
                 }
-                
+
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     // attribute code
                 }
@@ -302,61 +302,61 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             'click': function (event) {
                 var strValue, bolTripleState;
-                
+
                 if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     strValue = this.getAttribute('value');
                     bolTripleState = this.hasAttribute('triplestate');
-                    
+
                     // here be dragons
                     if (strValue === 'false') {
                         this.setAttribute('value', 'true');
-                        
+
                     } else if (strValue === 'true') {
                         if (bolTripleState) {
                             this.setAttribute('value', 'null');
                         } else {
                             this.setAttribute('value', 'false');
                         }
-                        
+
                     } else if (strValue === 'null') {
                         this.setAttribute('value', 'false');
-                        
+
                     } else if (strValue === '0') {
                         this.setAttribute('value', '-1');
-                        
+
                     } else if (strValue === '-1') {
                         if (bolTripleState) {
                             this.setAttribute('value', 'n');
                         } else {
                             this.setAttribute('value', '0');
                         }
-                        
+
                     } else if (strValue === 'n') {
                         this.setAttribute('value', '0');
-                        
+
                     } else if (strValue === 0) {
                         this.setAttribute('value', -1);
-                        
+
                     } else if (strValue === -1) {
                         if (bolTripleState) {
                             this.setAttribute('value', 'n');
                         } else {
                             this.setAttribute('value', 0);
                         }
-                        
+
                     } else if (strValue === 'n') {
                         this.setAttribute('value', 0);
-                        
+
                     } else if (strValue === false) {
                         this.setAttribute('value', true);
-                        
+
                     } else if (strValue === true) {
                         if (bolTripleState) {
                             this.setAttribute('value', null);
                         } else {
                             this.setAttribute('value', false);
                         }
-                        
+
                     } else if (strValue === null) {
                         //this.setAttribute('value', false);
                         if (this.getAttribute('type') === 'smallint') {
@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         } else {
                             this.setAttribute('value', 'true');
                         }
-                        
+
                     } else {
                         if (this.getAttribute('type') === 'smallint') {
                             this.setAttribute('value', '-1');
@@ -372,9 +372,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             this.setAttribute('value', 'true');
                         }
                     }
-                    
+
                     this.classList.remove('down');
-                    
+
                     xtag.fireEvent(this, 'change', {
                         bubbles: true,
                         cancelable: true
@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         event.preventDefault();
                         event.stopPropagation();
                     }
-                    
+
                     // if we are not disabled and we pressed return (13) or space (32): trigger click
                     if (!this.attributes.disabled && (event.keyCode === 13 || event.keyCode === 32)) {
                         xtag.fireEvent(this, 'click', { bubbles: true, cancelable: true });
@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 get: function () {
                     return this.getAttribute('value');
                 },
-                
+
                 // set the value attribute
                 set: function (newValue) {
                     this.setAttribute('value', newValue);
@@ -413,21 +413,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 // return a text representation of the value
                 get: function () {
                     var currentValue = this.getAttribute('value');
-                    
+
                     // if value is true: return YES
                     if (currentValue === '-1' || currentValue === 'true') {
                         return 'YES';
                     }
-                    
+
                     // if value is false: return NO
                     if (currentValue === '0' || currentValue === 'false') {
                         return 'NO';
                     }
-                    
+
                     // if value is null: return empty string
                     return '';
                 },
-                
+
                 // set the value attribute
                 set: function (newValue) {
                     if (newValue === 'YES') {
@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         methods: {
-            
+
         }
     });
 });

@@ -63,6 +63,11 @@
                         strCurrentLineNumber = arrCurrentLine.shift();
                         strCurrentMatchLine = arrCurrentLine.join(':');
 
+                        // if the first character of the path is a backslash: we're on windows, replace all backslashes with forward slashes
+                        if (strCurrentPath[0] === '\\') {
+                            strCurrentPath = strCurrentPath.replace(/\\/gi, '/');
+                        }
+
                         if (arrPaths.indexOf(strCurrentPath) === -1) {
                             arrPaths.push(strCurrentPath);
                             arrMatches.push('');
@@ -188,14 +193,12 @@
                                             document.getElementById('matches').textContent = '';
                                             document.getElementById('results-container').innerHTML = '';
                                         }
-                                        
                                         parseResults(strResults, false);
                                         removeLoaderElements();
                                     }
                                     
                                     //if (data === 'TRANSACTION COMPLETED') {
                                     //    parseResults(strResults, true);
-                                    //    
                                     //} else {
                                     //    strResults += (strResults ? '\n' : '') + data;
                                     //}

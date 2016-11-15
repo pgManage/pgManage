@@ -991,9 +991,9 @@ SELECT *
             window.addEventListener('load', function () {
                 GS.triggerEvent(window, 'load_data');
                 
-                color = d3.scale.ordinal()
+                color = d3.scaleOrdinal()
                     .domain([])
-                    .range(d3.scale.category20().range().concat(d3.scale.category20c().range()));
+                    .range(d3.scaleOrdinal(d3.schemeCategory20).range().concat(d3.scaleOrdinal(d3.schemeCategory20C).range()));
                 color('TYPE'                    );
                 color('ROLE'                    );
                 color('FUNCTION'                );
@@ -1122,7 +1122,7 @@ SELECT *
                     .attr('width', _width)
                     .attr('height', _height)
                   .append('g')
-                    .call(d3.behavior.zoom().on('zoom', rescale))
+                    .call(d3.zoom().on('zoom', rescale))
                   .append('g');
                 
                 svg.append('defs').selectAll('marker')
@@ -1261,11 +1261,17 @@ SELECT *
                 document.getElementById('search_nodes').focus();
                 
                 if (force === null) {
-                    force = d3.layout.force()
-                        .charge(-300)
-                        .linkDistance(function (d) {
-                            return d.source.group === d.target.group ? 30 : 100;
-                        })//100)
+                    force = d3.forceSimulation()
+                        .force("charge", d3.forceManyBody()
+                            .strength(function () {
+                                return -300;
+                            })
+                        )
+                        .force("link", d3.forceLink()
+                            .distance(function (d) {
+                                return d.source.group === d.target.group ? 30 : 100;
+                            })//100)
+                        )
                         .gravity(0.1)
                         .size([_width, _height])
                         .nodes(graph.nodes)

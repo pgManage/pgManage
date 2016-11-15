@@ -174,6 +174,8 @@ function menuTools(target) {
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-body>
+                <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft icon="line-chart" target="_blank"
+                            href="stats.html">Open Statistics</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft icon="tasks" onclick="dialogProcesses()">Process Manager</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
