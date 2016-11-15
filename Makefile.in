@@ -22,5 +22,8 @@ install:
 uninstall:
 	$(MAKE) -C postage uninstall
 
+destroy:
+	$(MAKE) -C postage destroy
+
 clean:
 	$(MAKE) -C postage clean

@@ -38,7 +38,7 @@ window.addEventListener('design-register-element', function (event) {
             return setOrRemoveTextAttribute(selectedElement, 'lock', this.value);
         });
         
-        addProp('Primary Keys Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('pk') || '') + '" mini></gs-text>',
+        addProp('Primary Keys', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('pk') || '') + '" mini></gs-text>',
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'pk', this.value);
         });
@@ -93,10 +93,6 @@ window.addEventListener('design-register-element', function (event) {
         
         addProp('Expand&nbsp;To&nbsp;Content', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('expand-to-content')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'expand-to-content', (this.value === 'true'), true);
-        });
-        
-        addProp('Primary Keys', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('primary-keys') || '') + '" mini></gs-text>', function () {
-            return setOrRemoveTextAttribute(selectedElement, 'primary-keys', this.value);
         });
         
         addProp('Null String', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('null-string') || '') + '" mini></gs-text>', function () {

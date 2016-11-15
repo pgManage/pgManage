@@ -5,13 +5,13 @@
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
-        
+
         <title>Postage Log In</title>
-        
+
 		<script src="/postage/js/greyspots.js" type="text/javascript"></script>
         <link href="/postage/css/greyspots.css" rel="stylesheet" type="text/css" />
         <link href="/postage/css/postage.css" rel="stylesheet" type="text/css" />
-        
+
         <script>
 var bolCurl = false;
 var bolTutorial = false;
@@ -94,11 +94,17 @@ function login() {
 function appendConnection(connName, strButtons) {
     'use strict';
     var optionControl = document.getElementById('option-connection');
+    var optionContainer = document.getElementById('predefined-option-container');
     var optionElement = document.createElement('gs-option');
+
+    //if we are in electron, remove the top right corner
+    if (window.process && window.process.type === 'renderer' && optionControl.children.length === 0) {
+        optionElement.setAttribute('remove-top-right', true);
+    }
 
     optionElement.setAttribute('value', connName);
     optionElement.textContent = connName;
-    optionControl.appendChild(optionElement);
+    optionContainer.appendChild(optionElement);
 
     if (!optionControl.value) {
         optionControl.value = connName;
@@ -107,9 +113,10 @@ function appendConnection(connName, strButtons) {
 
 function getConnections() {
     'use strict';
-    var strQueryString = GS.getQueryString(), strConnName = GS.qryGetVal(strQueryString, 'connection');
+    var strQueryString = GS.getQueryString();
+    var strConnName = GS.qryGetVal(strQueryString, 'connection');
 
-    document.getElementById('option-connection').innerHTML = '';
+    document.getElementById('predefined-option-container').innerHTML = '';
 
     // get connection list
     GS.ajaxText('/postage/auth', 'action=list', function (data, error) {
@@ -133,40 +140,46 @@ function getConnections() {
     GS.ajaxText('/postage/auth', 'action=canadd', function (data, error) {
         if (!error) {
             if (data.trim() === 'true') {
-                var optionControl = document.getElementById('option-connection');
-                var optionElement = document.createElement('gs-option');
+                var divOneTime = document.getElementById('oneTime');
 
-                optionElement.setAttribute('value', 'custom');
-                optionElement.setAttribute('no-focus', '');
-                optionElement.innerHTML = ml(function () {/*
-                    <gs-grid min-width="all {reflow}; 400px {1,1}; 640px {4,2,4,4}">
-                        <gs-block flex-horizontal>
-                            <b>Host:&nbsp;</b>
-                            <gs-text id="text-custom-host" placeholder="host" flex></gs-text>
-                        </gs-block>
-                        <gs-block flex-horizontal>
-                            <b>&nbsp;Port:&nbsp;</b>
-                            <gs-text id="text-custom-port" placeholder="port" flex></gs-text>
-                        </gs-block>
-                        <gs-block flex-horizontal>
-                            <b>&nbsp;DB Name:&nbsp;</b>
-                            <gs-text id="text-custom-db" placeholder="dbname" flex></gs-text>
-                        </gs-block>
-                        <gs-block flex-horizontal>
-                            <b>&nbsp;SSL Mode:&nbsp;</b>
-                            <gs-select id="text-custom-ssl" placeholder="sslmode" value="prefer" flex>
-                                <option value="disable">Disable</option>
-                                <option value="allow">Allow</option>
-                                <option value="prefer">Prefer</option>
-                                <option value="require">Require</option>
-                                <option value="verify-ca">Verify Authority</option>
-                                <option value="verify-full">Verify Full</option>
-                            </gs-select>
-                        </gs-block>
-                    </gs-grid>
+                divOneTime.setAttribute('class', 'style-bracket-container');
+
+                divOneTime.innerHTML = ml(function () {/*
+                    <label class="style-bracket-header">Or enter a one time connection</label>
+                    <div class="style-bracket-left"></div>
+                    <div class="style-bracket-right"></div>
+                    <gs-option value="custom">
+                        <gs-grid min-width="all {reflow}; 400px {1,1}; 640px {4,2,4,4}">
+                            <gs-block flex-horizontal>
+                                <b>Host:&nbsp;</b>
+                                <gs-text id="text-custom-host" placeholder="host" flex></gs-text>
+                            </gs-block>
+                            <gs-block flex-horizontal>
+                                <b>&nbsp;Port:&nbsp;</b>
+                                <gs-text id="text-custom-port" placeholder="port" flex></gs-text>
+                            </gs-block>
+                            <gs-block flex-horizontal>
+                                <b>&nbsp;DB Name:&nbsp;</b>
+                                <gs-text id="text-custom-db" placeholder="dbname" flex></gs-text>
+                            </gs-block>
+                            <gs-block flex-horizontal>
+                                <b>&nbsp;SSL Mode:&nbsp;</b>
+                                <gs-select id="text-custom-ssl" placeholder="sslmode" value="prefer" flex>
+                                    <option value="disable">Disable</option>
+                                    <option value="allow">Allow</option>
+                                    <option value="prefer">Prefer</option>
+                                    <option value="require">Require</option>
+                                    <option value="verify-ca">Verify Authority</option>
+                                    <option value="verify-full">Verify Full</option>
+                                </gs-select>
+                            </gs-block>
+                        </gs-grid>
+                    </gs-option>
                 */});
 
-                optionControl.appendChild(optionElement);
+                var divOneTime = document.getElementById('afterOneTime');
+                divOneTime.innerHTML = ml(function () {/*<br/><br/>*/});
+
             }
         } else {
             appendError(data);
@@ -193,7 +206,7 @@ function getUserName() {
 
 window.addEventListener('load', function () {
     var strQueryString = GS.getQueryString(); //, strUnameCookie = GS.getCookie('greyspots_postage_username');
-	
+
     // fill the error element with any error text from the query string (coalesce to empty string)
     document.getElementById('container-error').textContent = GS.qryGetVal(strQueryString, 'error') || '';
 
@@ -218,6 +231,17 @@ window.addEventListener('load', function () {
         }
     });
 
+    //if we are in electron, then add a button to edit the connection file
+    if (window.process && window.process.type === 'renderer') {
+        document.getElementById('buttonNewConnections').removeAttribute('hidden');
+
+        const electron = require('electron');
+        const ipcRenderer = electron.ipcRenderer;
+		document.getElementById('buttonNewConnections').addEventListener('click', function () {
+			ipcRenderer.send('postage', 'edit connections');
+		});
+    }
+
     // when the connection optionbox is changed: try to get a username from the cookie
     document.getElementById('option-connection').addEventListener('change', getUserName);
 
@@ -226,24 +250,24 @@ window.addEventListener('load', function () {
 });
         </script>
         <style>
-            #option-connection gs-option:not(:last-child) {
+            #predefined-option-container gs-option:not(:last-child) {
                 border-bottom: 0 none;
             }
-            #option-connection gs-option:not(:last-child):not(:first-child) {
+            #predefined-option-container gs-option:not(:last-child):not(:first-child) {
                 -webkit-border-radius: 0;
                 -moz-border-radius: 0;
                 -ms-border-radius: 0;
                 -o-border-radius: 0;
                 border-radius: 0;
             }
-            #option-connection gs-option:first-child {
+            #predefined-option-container gs-option:first-child {
                 -webkit-border-radius: 0.25em 0 0 0;
                 -moz-border-radius: 0.25em 0 0 0;
                 -ms-border-radius: 0.25em 0 0 0;
                 -o-border-radius: 0.25em 0 0 0;
                 border-radius: 0.25em 0 0 0;
             }
-            #option-connection gs-option:last-child {
+            #predefined-option-container gs-option:last-child {
                 -webkit-border-radius: 0 0 0.25em 0.25em;
                 -moz-border-radius: 0 0 0.25em 0.25em;
                 -ms-border-radius: 0 0 0.25em 0.25em;
@@ -285,21 +309,30 @@ window.addEventListener('load', function () {
                 <gs-container id="container-login" min-width="768px">
                     <center><h3><b>Login</b></h3></center>
                     <br />
-                    
-                    <div class="style-bracket-container">
-                        <label class="style-bracket-header">Connections</label>
-                        <div class="style-bracket-left"></div>
-                        <div class="style-bracket-right"></div>
-                        
-                        <gs-optionbox id="option-connection" no-target mini></gs-optionbox>
-                    </div>
-                    <br /><br />
-                    
+
+                    <gs-optionbox id="option-connection" no-target mini>
+                        <div class="style-bracket-container">
+                            <label class="style-bracket-header">Choose a server</label>
+                            <div class="style-bracket-left"></div>
+                            <div class="style-bracket-right"></div>
+
+                            <gs-button id="buttonNewConnections" hidden style="float: right;" inline bg-primary remove-bottom>Edit postage-connections.conf</gs-button>
+
+                            <div id="predefined-option-container" style="clear: both;"></div>
+                        </div>
+                        <br /><br />
+
+                        <div id="oneTime">
+                        </div>
+
+                        <div id="afterOneTime"></div>
+                    </gs-optionbox>
+
                     <div class="style-bracket-container">
                         <label class="style-bracket-header">Credentials</label>
                         <div class="style-bracket-left"></div>
                         <div class="style-bracket-right"></div>
-                        
+
                         <gs-grid reflow-at="350px" gutter>
                             <gs-block>
                                 <label for="text-username">Username:</label>
@@ -315,7 +348,7 @@ window.addEventListener('load', function () {
                     <gs-button id="button-login" jumbo bg-primary>Log In</gs-button>
                     <br /><br />
                 </gs-container>
-                
+
                 <gs-container min-width="768px">
                     <center id="container-error" style="white-space: pre-wrap;" txt-danger></center>
                 </gs-container>

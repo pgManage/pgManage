@@ -274,6 +274,9 @@
     <ClInclude Include="..\..\util\util_string.h" />
     <ClInclude Include="..\..\util\util_strptime.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\envelope\web_root\test.html" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -1166,8 +1166,8 @@ File already exists.*/})],
 			['ACTIONNC', 'ajax', 200, '/env/public.actionnc_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
 			['action_info', 'ajax', 200, '/env/action_info', '',
 				function (arg) {
-					return arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.4 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 6.1.1 20160621 (Red Hat 6.1.1-3), 64-bit","envelope": "2.1.0RC7"}}*/ })
-						|| arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.2, compiled by Visual C++ build 1800, 64-bit","envelope": "2.1.0RC7"}}*/ })
+					return arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.4 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 6.1.1 20160621 (Red Hat 6.1.1-3), 64-bit","envelope": "2.1.0"}}*/ })
+						|| arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.2, compiled by Visual C++ build 1800, 64-bit","envelope": "2.1.0"}}*/ })
 				}
 			],
 			['ACTION FAIL 1', 'websocket', '', ml(function () {/*ACTION	public	action_testing1	testingnitset
@@ -1930,9 +1930,63 @@ id
 						});
 					} else if (strType === 'websocket end') {
 						change_status(intCurrent, 'waiting', 'running');
+						var i = 0;
+						GS.requestFromSocket(GS.envSocket, 'SELECT	rtesting_large_table\nRETURN	*\n\n', function (data, error, errorData) {
+							if (i === 0) {
+								i += 1;
+
+								GS.closeSocket(GS.envSocket);
+
+								GS.envSocket = GS.openSocket('/env/1/env');
+								var j = 0;
+								GS.requestFromSocket(GS.envSocket, 'INFO\n', function (data, error, errorData) {
+									if (j === 0) {
+										j += 1;
+										GS.closeSocket(GS.envSocket);
+										var k = 0;
+										GS.envSocket = GS.openSocket('/env/1/env');
+										GS.requestFromSocket(GS.envSocket, 'SELECT	ttesting_large_view\nRETURN	*\n\n', function (data, error, errorData) {
+											if (k === 0) {
+												k += 1;
+												GS.closeSocket(GS.envSocket);
+
+												setTimeout(function () {
+													GS.envSocket = GS.openSocket('/env/1/env');
+													var l = 0;
+													GS.requestFromSocket(GS.envSocket, 'SELECT	rtesting_table\nRETURN	*\n\n', function (data, error, errorData) {
+														l += 1;
+														if (l === 2) {
+															GS.closeSocket(GS.envSocket);
+															var ajax = GS.ajaxText('/env/action_select', 'src=generate_series(1,163000,1)&order_by=generate_series', function () {
+															});
+
+															setTimeout(function () {
+																ajax.abort();
+																ajax = GS.ajaxText('/env/action_select', 'src=generate_series(1,16300,1)&order_by=generate_series', function (data, error) {
+																	if (!error) {
+																		change_status(intCurrent, 'running', 'pass');
+																		run_test(intCurrent + 1);
+																	} else {
+																		change_status(intCurrent, 'running', 'fail', ajax.status, data.error_text);
+																		document.getElementById('actual_status').value = ajax.status;
+																		document.getElementById('actual_output').value = data.error_text;
+																		run_test(intCurrent + 1);
+																	}
+																});
+															}, 1000);
+														}
+													});
+												}, 15000);
+											}
+										});
+									}
+								});
+							}
+						});
+						/*change_status(intCurrent, 'waiting', 'running');
 						GS.closeSocket(GS.envSocket);
 						change_status(intCurrent, 'running', 'pass');
-						run_test(intCurrent + 1);
+						run_test(intCurrent + 1);*/
 					} else if (strType === 'wait') {
 						change_status(intCurrent, 'waiting', 'running');
 						setTimeout(function () {

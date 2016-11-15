@@ -49,7 +49,7 @@ ev_check print_watchers;
 This function is run when the program exits
 */
 void program_exit() {
-	fprintf(stderr, "POSTAGE IS SHUTTING DOWN\n");
+	fprintf(stderr, SUN_PROGRAM_UPPER_NAME" IS SHUTTING DOWN\n");
 	if (global_loop != NULL) {
 		size_t int_i, int_len;
 

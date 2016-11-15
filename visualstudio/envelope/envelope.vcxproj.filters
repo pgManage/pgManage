@@ -369,4 +369,7 @@
       <Filter>Source Files\tre</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\envelope\web_root\test.html" />
+  </ItemGroup>
 </Project>

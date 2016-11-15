@@ -20,6 +20,22 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
         
+        addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
+        });
+        
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
@@ -242,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // copy passthrough attributes to control
                 arrPassThroughAttributes = [
-                    'placeholder', 'name', 'type', 'maxlength', 'autocorrect', 'autocapitalize', 'autocomplete', 'autofocus'
+                    'placeholder', 'name', 'type', 'maxlength', 'autocorrect', 'autocapitalize', 'autocomplete', 'autofocus', 'spellcheck'
                 ];
                 for (i = 0, len = arrPassThroughAttributes.length; i < len; i += 1) {
                     if (element.hasAttribute(arrPassThroughAttributes[i])) {

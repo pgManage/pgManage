@@ -72,8 +72,16 @@ ipcMain.on('postage', function (event, arg) {
 		mainWindows.forEach(function (curWindow) {
 			curWindow.webContents.executeJavaScript('window.location.reload();');
 		});
+	} else if (arg === 'edit connections') {
+		connectionWindow = new BrowserWindow({
+			'x': connectionWindowState.x,
+			'y': connectionWindowState.y,
+			'width': connectionWindowState.width,
+			'height': connectionWindowState.height
+		});
+		connectionWindowState.manage(connectionWindow);
+		connectionWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
 	}
-
 })
 
 app.on('quit', function () {

@@ -68,7 +68,9 @@ c:\users\nunzio tocci\repos\postage\dependencies\libev\ev_select.c(200): warning
   util_string.c
   util_strptime.c
   Generating code
-  All 406 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  108 of 404 functions (26.7%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    60 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.exe
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)
