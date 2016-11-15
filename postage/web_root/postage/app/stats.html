@@ -13,6 +13,8 @@
         <script src="/js/greyspots.js" type="text/javascript"></script>
         <link href="/css/greyspots.css" type="text/css" rel="stylesheet">
         
+        <link href="../css/postage.css" type="text/css" rel="stylesheet" />
+        
         <script src="/js/d3.js"></script>
         
         <title>Statistics</title>
@@ -310,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.getAttribute('raw'),
                         function (data, error) {
                             if (!error) {
-                                if (data.strMessage !== 'TRANSACTION COMPLETED') {
+                                if (data.strMessage !== '\\.') {
                                     var arrRecords = GS.trim(data.strMessage, '\n').split('\n');
 
                                     var cell_i;
@@ -333,6 +335,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                         i += 1;
                                     }
                                 } else {
+                                    console.log('data', data);
+                                    console.log('arrTotalRecords', arrTotalRecords);
                                     element.arrColumns = data.arrColumnNames;
 
                                     handleData(element, {
@@ -605,24 +609,31 @@ window.addEventListener('load', function () {
         </script>
     </head>
     <body>
-        <gs-grid widths="1,1">
-            <gs-block>
-                <gs-chart-line chart_caption="Connections" type="live" line_captions="Total,Active,Idle" line_colors="#FF8888,#88FF88,#8888FF" raw="SELECT count(*) AS total_connections, sum(CASE WHEN state = 'active' THEN 1 ELSE 0 END) AS active_connections, sum(CASE WHEN state = 'active' THEN 0 ELSE 1 END) AS inactive_connections FROM pg_catalog.pg_stat_activity" style="height: 300px;"></gs-chart-line>
-            </gs-block>
-            <gs-block>
-                <gs-chart-line chart_caption="Transactions" type="live" append line_captions="Total,Commits,Rollback" line_colors="#FF8888,#88FF88,#8888FF" raw="SELECT sum(xact_commit) + sum(xact_rollback) AS total_transactions, sum(xact_commit) AS commit_transactions, sum(xact_rollback) AS rollback_transactions FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
-            </gs-block>
-        </gs-grid>
-        <gs-grid widths="1,1,1">
-            <gs-block>
-                <gs-chart-line chart_caption="Tuples" type="live" append line_captions="Inserted,Updated,Deleted" line_colors="#88FF88,#8888FF,#FF8888" raw="SELECT sum(tup_inserted) AS total_inserted, sum(tup_updated) AS total_updated, sum(tup_deleted) AS total_deleted FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
-            </gs-block>
-            <gs-block>
-                <gs-chart-line chart_caption="Tuples" type="live" append line_captions="Fetched,Returned" line_colors="#FF8888,#88FF88,#8888FF" raw="SELECT sum(tup_fetched) AS total_fetched, sum(tup_returned) AS total_returned FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
-            </gs-block>
-            <gs-block>
-                <gs-chart-line chart_caption="Block IO" type="live" append line_captions="Read,Hit" line_colors="#FF8888,#88FF88,#8888FF" raw="SELECT sum(blks_read) AS total_read, sum(blks_hit) AS total_hit FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
-            </gs-block>
-        </gs-grid>
+        <gs-page>
+            <gs-header>
+                <center><h3>Activity Statistics</h3></center>
+            </gs-header>
+            <gs-body padded>
+                <gs-grid widths="1,1">
+                    <gs-block>
+                        <gs-chart-line chart_caption="Connections" type="live" line_captions="Total,Active,Idle" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT count(*) AS total_connections, sum(CASE WHEN state = 'active' THEN 1 ELSE 0 END) AS active_connections, sum(CASE WHEN state = 'active' THEN 0 ELSE 1 END) AS inactive_connections FROM pg_catalog.pg_stat_activity" style="height: 300px;"></gs-chart-line>
+                    </gs-block>
+                    <gs-block>
+                        <gs-chart-line chart_caption="Transactions" type="live" append line_captions="Total,Commits,Rollback" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT sum(xact_commit) + sum(xact_rollback) AS total_transactions, sum(xact_commit) AS commit_transactions, sum(xact_rollback) AS rollback_transactions FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+                    </gs-block>
+                </gs-grid>
+                <gs-grid widths="1,1,1">
+                    <gs-block>
+                        <gs-chart-line chart_caption="Tuples" type="live" append line_captions="Inserted,Updated,Deleted" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT sum(tup_inserted) AS total_inserted, sum(tup_updated) AS total_updated, sum(tup_deleted) AS total_deleted FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+                    </gs-block>
+                    <gs-block>
+                        <gs-chart-line chart_caption="Tuples" type="live" append line_captions="Fetched,Returned" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT sum(tup_fetched) AS total_fetched, sum(tup_returned) AS total_returned FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+                    </gs-block>
+                    <gs-block>
+                        <gs-chart-line chart_caption="Block IO" type="live" append line_captions="Read,Hit" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT sum(blks_read) AS total_read, sum(blks_hit) AS total_hit FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+                    </gs-block>
+                </gs-grid>
+            </gs-body>
+        </gs-page>
     </body>
 </html>

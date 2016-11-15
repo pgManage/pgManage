@@ -93,39 +93,30 @@ function explain(bolRun) {
 function handleExplain(explainJSON, target, bolRun) {
     'use strict';
     var force = null;
-    
+
+    function dragstarted(d) {
+        if (!d3.event.active) force.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+    }
+
+    function dragged(d) {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+    }
+
+    function dragended(d) {
+        if (!d3.event.active) force.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+    }
+
     target.innerHTML = '';
     target.style.padding = '0px';
     target.style.overflow = 'hidden';
     
     var rand = function () {
         return parseInt(('' + Math.random()).substring(2), 10);
-    };
-    
-    var collide = function (alpha) {
-        var quadtree = d3.geom.quadtree(graph.nodes);
-        return function(d) {
-            var rb = 2 * radius + padding,
-                nx1 = d.x - rb,
-                nx2 = d.x + rb,
-                ny1 = d.y - rb,
-                ny2 = d.y + rb;
-            quadtree.visit(function(quad, x1, y1, x2, y2) {
-                if (quad.point && (quad.point !== d)) {
-                    var x = d.x - quad.point.x,
-                    y = d.y - quad.point.y,
-                    l = Math.sqrt(x * x + y * y);
-                    if (l < rb) {
-                        l = (l - rb) / l * alpha;
-                        d.x -= x *= l;
-                        d.y -= y *= l;
-                        quad.point.x += x;
-                        quad.point.y += y;
-                    }
-                }
-                return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-            });
-        };
     };
     
     var dragStartEvent;
@@ -157,9 +148,9 @@ function handleExplain(explainJSON, target, bolRun) {
         svg.attr('transform', 'translate(' + trans + ') ' + 'scale(' + scale + ')');
     };
     
-    var color = d3.scale.ordinal()
+    var color = d3.scaleOrdinal()
                     .domain([])
-                    .range(d3.scale.category20().range().concat(d3.scale.category20c().range()));
+                    .range(d3.scaleOrdinal(d3.schemeCategory20).range().concat(d3.scaleOrdinal(d3.schemeCategory20c).range()));
     
     var _width = target.clientWidth;
     var _height = target.clientHeight;
@@ -176,7 +167,7 @@ function handleExplain(explainJSON, target, bolRun) {
                         .attr('height', '100%')
                     .append('g')
                     .call(
-                        d3.behavior.zoom().on('zoom', function () {
+                        d3.zoom().on('zoom', function () {
                             if (bolZoom) {
                                 rescale();
                             }
@@ -277,18 +268,23 @@ function handleExplain(explainJSON, target, bolRun) {
 
     levelTraveler(0, 0, 0, '', {}, explainJSON[0].Plan);
     
-    force = d3.layout.force()
-        .charge(-600) //-300
-        .linkDistance(100)
-        //.linkDistance(function (d) {
-        //    return d.source.group === d.target.group ? 30 : 100;
-        //})//100)
-        .gravity(0.06) //0.03 //0.1
-        .size([_width, _height])
+    force = d3.forceSimulation()
         .nodes(graph.nodes)
-        .links(graph.links);
-    
-    force.start();
+        .force("charge", d3.forceManyBody()
+            .strength(function () {
+                return -600;
+            })
+        )
+        .force("link", d3.forceLink(graph.links)
+            .distance(function (d) {
+                return 100;
+            })//100)
+        )
+        .force('collide', d3.forceCollide().radius(radius))
+        .force('x', d3.forceX(_width / 2).strength(0.2))
+        .force('y', d3.forceY(_height / 2).strength(0.2));
+        //.gravity(0.06) //0.03 //0.1
+        //.size([_width, _height]);
     
     var link = svg.selectAll('.link')
                 .data(graph.links).enter()
@@ -320,7 +316,11 @@ function handleExplain(explainJSON, target, bolRun) {
                     //d3.select('#' + target.getAttribute('id') + ' > svg > g').on('.zoom', null);
                 })
                 .on('click', dialogExplainPlan)
-                .call(force.drag);
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended)
+                );;
     
     var nodesExceptResult = nodes.filter(function (node) {
                                 return node.data.level !== 0;
@@ -388,7 +388,11 @@ function handleExplain(explainJSON, target, bolRun) {
                             //d3.select('#' + target.getAttribute('id') + ' > svg > g').on('.zoom', null);
                         })
                         .on('click', dialogExplainPlan)
-                        .call(force.drag);
+                        .call(d3.drag()
+                            .on("start", dragstarted)
+                            .on("drag", dragged)
+                            .on("end", dragended)
+                        );;
     
     
     window.addEventListener('mouseup', function (dragEndEvent) {
@@ -413,8 +417,6 @@ function handleExplain(explainJSON, target, bolRun) {
     
     
     force.on('tick', function (e) {
-        nodes.each(collide(0.5));
-        
         //link.attr('x1', function (d) {
         //        return d.target.x;
         //    })

@@ -169,13 +169,13 @@ function menuTools(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-	if (window.process && window.process.type === 'renderer' && window.opn === undefined) {
-		const electron = require('electron');
-		const path = require('path');
-		window.opn = require(path.normalize(electron.remote.app.getAppPath() + '/node_modules/opn'));
-	} else {
-		window.opn = window.open;
-	}
+    if (window.process && window.process.type === 'renderer' && window.opn === undefined) {
+        const electron = require('electron');
+        const path = require('path');
+        window.opn = require(path.normalize(electron.remote.app.getAppPath() + '/node_modules/opn'));
+    } else {
+        window.opn = window.open;
+    }
 
     templateElement.setAttribute('data-max-width', '150px');
     templateElement.setAttribute('data-overlay-close', 'true');
@@ -183,7 +183,7 @@ function menuTools(target) {
         <gs-page>
             <gs-body>
                 <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft icon="line-chart" target="_blank"
-                            href="stats.html">Open Statistics</gs-button>
+                            href="stats.html">Activity Statistics</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft icon="tasks" onclick="dialogProcesses()">Process Manager</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose

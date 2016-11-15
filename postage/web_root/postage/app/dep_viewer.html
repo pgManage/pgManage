@@ -29,7 +29,7 @@
             var _width, _height, color, force = null, svg, link, node, node_text, inspector_body, graph = {
                     nodes: [],
                     links: []
-                }, mousedown_node, scripts = {}, depData = '', hidingOptions = {}, arrLine, arrColumn, trans = '0, 0', scale = '1', where_clause = 'TRUE', search_value = '';
+                }, mousedown_node, scripts = {}, depData = '', hidingOptions = {}, arrLine, arrColumn, trans = '0, 0', scale = '1', where_clause = 'TRUE', search_value = '', radius = 11.25;
             
             scripts.dependents = ml(function () {/*
 WITH RECURSIVE dep_recursive AS (
@@ -773,41 +773,8 @@ SELECT *
             
             GS.envSocket = GS.openSocket('env');
             
-            var padding = 1, // separation between circles
-                radius = 11.25;
-            function collide(alpha) {
-                var quadtree = d3.geom.quadtree(graph.nodes);
-                return function(d) {
-                    var rb = 2 * radius + padding,
-                        nx1 = d.x - rb,
-                        nx2 = d.x + rb,
-                        ny1 = d.y - rb,
-                        ny2 = d.y + rb;
-                    quadtree.visit(function(quad, x1, y1, x2, y2) {
-                        if (quad.point && (quad.point !== d)) {
-                            var x = d.x - quad.point.x,
-                            y = d.y - quad.point.y,
-                            l = Math.sqrt(x * x + y * y);
-                            if (l < rb) {
-                                l = (l - rb) / l * alpha;
-                                d.x -= x *= l;
-                                d.y -= y *= l;
-                                quad.point.x += x;
-                                quad.point.y += y;
-                            }
-                        }
-                        return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-                    });
-                };
-            }
-            
             function rescale() {
-                trans = d3.event.translate;
-                scale = d3.event.scale;
-                
-                svg.attr('transform',
-                    'translate(' + trans + ') ' +
-                    'scale(' + scale + ')');
+                svg.attr('transform', d3.event.transform.toString());
             }
             
             window.addEventListener('mouseup', function () {
@@ -816,7 +783,7 @@ SELECT *
             
             window.addEventListener('mousedown', function () {
                 if (mousedown_node !== -1) {
-                    d3.select('#inspector_body > svg > g').call(d3.behavior.zoom().on('zoom', rescale));
+                    d3.select('#inspector_body > svg > g').call(d3.zoom().on('zoom', rescale));
                 }
             });
             
@@ -825,15 +792,20 @@ SELECT *
                 
                 d3.event.stopPropagation();
                 
+                var i, len;
                 for (i = 0, len = graph.nodes.length; i < len; i += 1) {
                     var node = document.getElementById('node' + i);
                     node.classList.remove('selected');
                 }
                 
-                var i, len;
-                for (i = 0, len = graph.links.length; i < len; i += 1) {
-                    if (graph.links[i].target === d) {
-                        var node = document.getElementById('node' + graph.links[i].source.index);
+                var depType = GS.qryGetVal(GS.getQueryString(), 'dep-type');
+                if (depType !== 'dependencies' && depType !== 'dependents') {
+                    depType = 'dependents';
+                }
+                
+                for (i = 0, len = graph.nodes.length; i < len; i += 1) {
+                    if (graph.nodes[i] === d) {
+                        var node = document.getElementById('node' + i);
                         node.classList.add('selected');
                     }
                 }
@@ -960,13 +932,14 @@ SELECT *
                 if (event.target.getAttribute('id') === 'refresh_view') {
                     GS.triggerEvent(window, 'load_data');
                     
-                    _width = inspector_body.clientWidth;
+                    /*_width = inspector_body.clientWidth;
                     _height = inspector_body.clientHeight;
                     force
-                        .size([_width, _height]);
+                        .force('x', d3.forceX(_width / 2).strength(0.2))
+                        .force('y', d3.forceY(_height / 2).strength(0.2));
                     d3.select('svg')
                         .attr('width', _width)
-                        .attr('height', _height);
+                        .attr('height', _height);*/
                 } else if ( event.target.tagName.toUpperCase() === 'SVG' ||
                             event.target.tagName.toUpperCase() === 'RECT') {
                     for (i = 0, len = graph.nodes.length; i < len; i += 1) {
@@ -978,7 +951,8 @@ SELECT *
                     _width = inspector_body.clientWidth;
                     _height = inspector_body.clientHeight;
                     force
-                        .size([_width, _height]);
+                        .force('x', d3.forceX(_width / 2).strength(0.2))
+                        .force('y', d3.forceY(_height / 2).strength(0.2));
                     d3.select('svg')
                         .attr('width', _width)
                         .attr('height', _height);
@@ -1031,7 +1005,8 @@ SELECT *
                 document.getElementById('obj_properties').innerHTML = '';
                 if (force !== null) {
                     force
-                        .size([_width, _height]);
+                        .force('x', d3.forceX(_width / 2).strength(0.2))
+                        .force('y', d3.forceY(_height / 2).strength(0.2));
                 }
                 d3.select('svg')
                     .attr('width', _width)
@@ -1102,6 +1077,23 @@ SELECT *
                 GS.triggerEvent(window, 'load_data');
             }
             
+            function dragstarted(d) {
+                if (!d3.event.active) force.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+            
+            function dragged(d) {
+                d.fx = d3.event.x;
+                d.fy = d3.event.y;
+            }
+            
+            function dragended(d) {
+                if (!d3.event.active) force.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+            
             window.addEventListener('show_data', function () {
                 'use strict';
                 
@@ -1122,6 +1114,7 @@ SELECT *
                     .attr('width', _width)
                     .attr('height', _height)
                   .append('g')
+                    .attr('class', 'zoom')
                     .call(d3.zoom().on('zoom', rescale))
                   .append('g');
                 
@@ -1262,6 +1255,7 @@ SELECT *
                 
                 if (force === null) {
                     force = d3.forceSimulation()
+                        .nodes(graph.nodes)
                         .force("charge", d3.forceManyBody()
                             .strength(function () {
                                 return -300;
@@ -1272,13 +1266,18 @@ SELECT *
                                 return d.source.group === d.target.group ? 30 : 100;
                             })//100)
                         )
-                        //.gravity(0.1)
-                        //.size([_width, _height])
+                        .force('collide', d3.forceCollide().radius(radius))
+                        .force('x', d3.forceX(_width / 2).strength(0.2))
+                        .force('y', d3.forceY(_height / 2).strength(0.2));
+                } else {
+                    force
                         .nodes(graph.nodes)
-                        //.links(graph.links);
+                        .force("link", d3.forceLink(graph.links)
+                            .distance(function (d) {
+                                return d.source.group === d.target.group ? 30 : 100;
+                            })//100)
+                        ).restart();
                 }
-                
-                force.start();
                 
                 link = svg.selectAll('.link')
                     .data(graph.links)
@@ -1295,12 +1294,12 @@ SELECT *
                     .attr('class', 'node')
                     .attr('r', radius)
                     .style('fill', function (d) { return color(d.group); })
-                    .on('mousedown', function (d) {
-                        mousedown_node = d.index;
-                        d3.select('#inspector_body > svg > g').on('.zoom', null);
-                    })
                     .on('click', node_click)
-                    .call(force.drag);
+                    .call(d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended)
+                    );
                 
                 node_text = svg.selectAll('.node_text')
                     .data(graph.nodes)
@@ -1342,12 +1341,11 @@ SELECT *
                                 d.group === 'TABLESPACE'                ? 'SPC' : '';
                         return d.groupAbbr;
                     })
-                    .on('mousedown', function (d) {
-                        d3.event.preventDefault();
-                        mousedown_node = d.index;
-                        d3.select('#inspector_body > svg > g').on('.zoom', null);
-                    })
-                    .call(force.drag);
+                    .call(d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended)
+                    );
                 
                 node.append('title')
                     .text(function (d) { return d.name; });
@@ -1355,8 +1353,6 @@ SELECT *
                     .text(function (d) { return d.name; });
                 
                 force.on('tick', function (e) {
-                    node.each(collide(0.5));
-                    
                     link.attr('x1', function (d) { return d.target.x; })
                         .attr('y1', function (d) { return d.target.y; })
                         .attr('x2', function (d) { return d.source.x + ((Math.cos(Math.atan2((d.target.y - d.source.y), (d.target.x - d.source.x))) * (radius + 5))); })
