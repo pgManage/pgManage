@@ -1797,28 +1797,28 @@ function saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess,
             tabElement.saveState = 'saved';
 
         } else {
-            //// saveFile is called on datasheet, editor and table designer tabs.
-            ////      this warning popup code is now only used on an editor tab
-            //if (tabElement.relatedEditor) {
-            //    var warningElement = document.createElement('div');
+            // saveFile is called on datasheet, editor and table designer tabs.
+            //      this warning popup code is now only used on an editor tab
+            if (tabElement.relatedEditor) {
+                var warningElement = document.createElement('div');
 
-            //    warningElement.classList.add('editor-warning');
-            //    warningElement.innerHTML = 'CHANGES ARE NOT SAVED<br />CLICK HERE TO TRY AGAIN';
+                warningElement.classList.add('editor-warning');
+                warningElement.innerHTML = 'CHANGES ARE NOT SAVED<br />CLICK HERE TO TRY AGAIN';
 
-            //    tabElement.relatedEditor.container.parentNode.appendChild(warningElement);
+                tabElement.relatedEditor.container.parentNode.appendChild(warningElement);
 
-            //    warningElement.addEventListener('click', function () {
-            //        saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess, callbackFail);
-            //    });
-            //}
+                warningElement.addEventListener('click', function () {
+                    saveFile(tabElement, strPath, changeStamp, strContent, callbackSuccess, callbackFail);
+                });
+            }
 
-            //if (callbackFail) {
-            //    callbackFail(errorData);
-            //} else {
-            GS.webSocketErrorDialog(errorData);
-            //}
+            if (callbackFail) {
+                callbackFail(errorData);
+            } else {
+                GS.webSocketErrorDialog(errorData);
+            }
 
-            //tabElement.saveState = 'error';
+            tabElement.saveState = 'error';
         }
     });
 }

@@ -1267,15 +1267,15 @@ SELECT *
                                 return -300;
                             })
                         )
-                        .force("link", d3.forceLink()
+                        .force("link", d3.forceLink(graph.links)
                             .distance(function (d) {
                                 return d.source.group === d.target.group ? 30 : 100;
                             })//100)
                         )
-                        .gravity(0.1)
-                        .size([_width, _height])
+                        //.gravity(0.1)
+                        //.size([_width, _height])
                         .nodes(graph.nodes)
-                        .links(graph.links);
+                        //.links(graph.links);
                 }
                 
                 force.start();
