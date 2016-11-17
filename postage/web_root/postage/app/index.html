@@ -5,13 +5,13 @@
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
-        
+
         <title>Postage</title>
-        
+
         <script>
             //jslint white:true multivar:true
             var bolPropertyPanelOpen = false, bolCurl = false;
-            
+
             window.addEventListener('DOMContentLoaded', function () {
                 'use strict';
                 var link1 = GS.stringToElement('<link href="resources/ws-tab-functions.css" type="text/css" rel="stylesheet" />'),
@@ -19,14 +19,14 @@
                     link3 = GS.stringToElement('<link href="resources/pg-9.2-tree-functions.css" type="text/css" rel="stylesheet" />'),
                     link4 = GS.stringToElement('<link href="resources/pg-9.2-other.css" type="text/css" rel="stylesheet" />'),
                     link5 = GS.stringToElement('<link href="resources/pg-9.2-autocomplete.css" type="text/css" rel="stylesheet" />');
-                
+
                 document.body.appendChild(link1);
                 document.body.appendChild(link2);
                 document.body.appendChild(link3);
                 document.body.appendChild(link4);
                 document.body.appendChild(link5);
             });
-            
+
             var reconnectNumber = 0;
             window.addEventListener('socket-connect', function (event) {
                 "use strict";
@@ -35,36 +35,36 @@
             window.addEventListener('socket-reconnect', function (event) {
                 "use strict";
                 reconnectNumber -= 1;
-                
+
                 if (reconnectNumber <= -6) {
                     window.location = '/postage/auth?action=logout';
                 }
             });
-            
+
             var arrNotification = [];
             window.addEventListener('notification', function (event) {
                 'use strict';
                 var strBatch = event.message, arrBatch = strBatch.split('\n'), i, len
                   , strMessage, strType, strChannel, strPID, strPayload, jsnMessage;
-                
+
                 // remove extra \n
                 arrBatch.pop();
-                
+
                 for (i = 0, len = arrBatch.length; i < len; i += 1) {
                     strMessage = arrBatch[i];
                     strType = strMessage.substring(0, strMessage.indexOf('\t'));
                     strMessage = strMessage.substring(strMessage.indexOf('\t') + 1);
-                    
+
                     if (strType !== 'WARNING') {
                         strChannel = strMessage.substring(0, strMessage.indexOf('\t'));
                         strMessage = strMessage.substring(strMessage.indexOf('\t') + 1);
-                        
+
                         strPID = strMessage.substring(0, strMessage.indexOf('\t'));
                         strMessage = strMessage.substring(strMessage.indexOf('\t') + 1);
                     }
-                    
+
                     strPayload = GS.decodeFromTabDelimited(strMessage);
-                    
+
                     jsnMessage = {
                         'strType': strType || '',
                         'strMessage': strMessage || '',
@@ -73,34 +73,34 @@
                         'strPID': strPID || '',
                         'hasBeenRead': false
                     };
-                    
+
                     arrNotification.push(jsnMessage);
                 }
-                
+
                 document.getElementById('badge-notification-feed').removeAttribute('hidden');
                 document.getElementById('badge-notification-feed').textContent = (parseInt(document.getElementById('badge-notification-feed').textContent, 10) + arrBatch.length);
-                
+
                 GS.triggerEvent(window, 'notification-received', {'message': event.message, 'jsnMessage': jsnMessage});
             });
-            
+
             window.addEventListener('load', function () {
                 'use strict';
                 // load ace range constructor so that we can select text programatically
                 window.Range = require('ace/range').Range;
-                
+
                 // load ace snippet manager so that we can load our own snippets
                 window.snippetManager = require('ace/snippets').snippetManager;
-                
+
                 // load ace undo manager so that we can clear the undo stack of an ace
                 window.UndoManager = require('ace/undomanager').UndoManager;
-                
+
                 // open socket for postage
                 GS.envSocket = GS.openSocket('env');
-                
+
                 // open socket for query execution
                 GS.querySocket = GS.openSocket('env');
-                
-                
+
+
                 // load context info
                 loadContextData(function () {
                     // time to get things started
@@ -109,33 +109,33 @@
                     autocompleteStart();
                     loadHeaderText();
                     loadTabsFromServer();
-                    
+
                     // load state from query string
                     handleLoad();
-                    
+
                     // put connection name in tab name
                     document.title = 'Postage: ' + contextData.connectionName;
                 });
-                
+
                 //// if we're too small for the panel: close the panel
                 //if (window.innerWidth <= 768) {
                 //    hideLeftBar()
                 //}
-                
+
                 if (localStorage.greyspots_postage_tutorial === 'true') {
                     // tutorial code should go here
-                    
+
                     localStorage.greyspots_postage_tutorial = 'false';
                 }
-                
+
                 document.getElementById('right-bar').addEventListener('show', function () {
                     bolPropertyPanelOpen = true;
                 });
-                
+
                 document.getElementById('right-bar').addEventListener('hide', function () {
                     bolPropertyPanelOpen = false;
                 });
-                
+
                 // there is a font difference between chrome on mac and chrome on windows
                 //      this class should allow us to resolve the differences
                 if (navigator.userAgent.indexOf('Mac') > 0) {
@@ -143,17 +143,17 @@
                 } else {
                     document.body.classList.add('pc');
                 }
-                
+
                 if (!evt.touchDevice) {
                     startPanelResize(document.getElementById('left-bar'));
                 }
-                
+
                 // on before unload, make sure no tabs have unsaved changes: popup if there is unsaved changes
                 GS.addBeforeUnloadEvent(function () {
                     var strMessage = '';
                     var strName;
                     var arrElements = xtag.queryChildren(document.getElementById('tab-bar'), '.tab-button');
-                    
+
                     arrElements.forEach(function (tab) {
                         strName = decodeFileNameForTabName(
                             tab.filePath.substring(
@@ -161,20 +161,34 @@
                                 tab.filePath.lastIndexOf('.')
                             )
                         );
-                        
+
                         if (tab.saveState === 'saving') {
                             strMessage += '\n  "' + strName + '" Is still attempting to save.';
-                            
+
                         } else if (tab.saveState === 'error') {
                             strMessage += '\n  "' + strName + '" Has unsaved changes.';
                         }
                     });
-                    
+
                     if (strMessage !== '') {
-                        return 'You have unsaved changes!' + strMessage;
+						if (window.process && window.process.type === 'renderer') {
+							const remote = require('electron').remote;
+							var choice = remote.dialog.showMessageBox(
+									remote.getCurrentWindow(),
+									{
+										type: 'question',
+										buttons: ['No', 'Yes'],
+										title: 'You have unsaved changes!',
+										message: strMessage + '\n\nAre you sure you want to quit?'
+									});
+
+							return choice === 0;
+						} else {
+	                        return 'You have unsaved changes!' + strMessage;
+						}
                     }
                 });
-                
+
                 console.log('bolAutocompleteLogicLoaded:  ', window.bolAutocompleteLogicLoaded);
                 console.log('bolAutocompleteQueriesLoaded:', window.bolAutocompleteQueriesLoaded);
                 console.log('autocompleteLoaded:          ', window.autocompleteLoaded);
@@ -188,7 +202,7 @@
                 console.log('bolTabFunctionsLoaded:       ', window.bolTabFunctionsLoaded);
                 console.log('bolExplainLoaded:            ', window.bolExplainLoaded);
                 console.log('bolD3Loaded:                 ', window.bolD3Loaded);
-                
+
                 // if a file didn't load: popup an error (execute orderSixtySix)
                 if (!window.bolAutocompleteLogicLoaded
                  || !window.bolAutocompleteQueriesLoaded
@@ -206,18 +220,18 @@
                     orderSixtySix();
                 }
             });
-            
+
             function orderSixtySix() {
                 'use strict';
                 var styleElement = document.createElement('style')
                   , dialogElement = document.createElement('div');
-                
+
                 styleElement.innerHTML =
                     '#dialog-something-wrong { position:fixed; left:0; top:0; z-index:5000; width:100%; height:100%; background:#636579; color:#FFF;} ' +
                     '.something-wrong-title  { text-align: center; padding-top: 3em; font-size: 25px; }' +
                     '.something-wrong-content   { max-width: 500px; margin: 0 auto; }' +
                     '.something-wrong-content a { color: #44FB96; }';
-                
+
                 dialogElement.setAttribute('id', 'dialog-something-wrong');
                 dialogElement.innerHTML =
                     '<div class="something-wrong-title">' +
@@ -226,11 +240,11 @@
                     '<div class="something-wrong-content">' +
                         'We apologize for the inconvenience, but not all of the files that postage needs successfully loaded. If possible, please open your console by right-clicking on this page and clicking the "Inspect Element" or "Inspect" choice. After doing so, please go to the "Console" tab and email a screenshot to <a href="mailto:michael@workflowproducts.com">me (Michael)</a>.' +
                     '</div>';
-                
+
                 document.head.appendChild(styleElement);
                 document.body.appendChild(dialogElement);
             }
-            
+
             function showLeftBar() {
                 'use strict';
                 document.getElementById('panel').show('left-bar');
@@ -243,40 +257,40 @@
             }
             function qsLoadLeftPanel(strQueryString) {
                 var bolOpenPanel = GS.qryGetVal(strQueryString, 'leftpanel') !== 'false';
-                
+
                 if (bolOpenPanel) {
                     document.getElementById('panel').show('left-bar');
                 } else {
                     document.getElementById('panel').hide('left-bar');
                 }
             }
-            
+
             (function () {
                 var strViewCache;
-                
+
                 window.qsLoadScriptTab = function (strQueryString) {
                     var strView = GS.qryGetVal(strQueryString, 'view'), arrParts, buttons, strScript, strName, strButtons
                       , strTemplate, strOID, strSchema, strObjectName, strFinalName, arrElements, i, len, strCurrentTab
                       , currentElement;
-                    
+
                     if (strView && strView !== strViewCache) {
                         strViewCache = strView;
-                        
+
                         if (strView === 'home') {
                             openHome();
-                            
+
                         } else if (strView === 'splash') {
                             openSplash();
-                            
+
                         } else if (strView.indexOf('tab:') !== 0) {
                             arrParts = strView.split(':');
                             buttons = associatedButtons[arrParts[0]];
-                            
+
                             strTemplate   = arrParts[0];
                             strOID        = arrParts[1];
                             strSchema     = arrParts[2];
                             strObjectName = arrParts[3];
-                            
+
                             // get tab name
                             if (strSchema && strObjectName) {
                                 // "strObjectName" should already be quote_ident in the listQuery
@@ -286,9 +300,9 @@
                             } else {
                                 strFinalName = quote_ident(strSchema);
                             }
-                            
+
                             strScript = treePrepareQuery(scriptQuery[arrParts[0]], strOID, strFinalName, strFinalName);
-                            
+
                             // get toolbar
                             strButtons = '';
                             if (buttons.indexOf('propertyButton') !== -1) {
@@ -306,20 +320,20 @@
                             if (buttons.indexOf('dataObjectButtons') !== -1) {
                                 strButtons += dataObjectButtons(strTemplate, strOID, strSchema, strObjectName);
                             }
-                            
+
                             getScript(strFinalName, strButtons, strScript);
-                            
+
                         } else {
                             arrElements = xtag.toArray(document.getElementsByClassName('tab-button'));
                             strCurrentTab = strView.substring('tab:'.length);
-                            
+
                             for (i = 0, len = arrElements.length; i < len; i += 1) {
                                 if (arrElements[i].filePath === strCurrentTab) {
                                     currentElement = arrElements[i];
                                     break;
                                 }
                             }
-                            
+
                             if (currentElement) {
                                 setFrame(currentElement, currentElement.relatedFrame, false);
                             } else {
@@ -335,14 +349,14 @@
                     }
                 }
             })();
-            
+
             function handleLoad() {
                 'use strict';
                 var strQueryString = GS.getQueryString(), strView;
-                
+
                 qsLoadLeftPanel(strQueryString);
                 qsLoadShowHide(strQueryString);
-                
+
                 // handle preview script, if the querystring is not for home or tab
                 //      tab is handled by the tab listing function after load
                 strView = GS.qryGetVal(strQueryString, 'view');
@@ -350,24 +364,24 @@
                     qsLoadScriptTab(strQueryString);
                 }
             }
-            
+
             function handleReplacePop() {
                 'use strict';
                 var strQueryString = GS.getQueryString();
-                
+
                 qsLoadLeftPanel(strQueryString);
                 qsLoadScriptTab(strQueryString);
                 qsLoadShowHide(strQueryString);
             }
-            
+
             function handlePush() {
                 'use strict';
                 var strQueryString = GS.getQueryString();
-                
+
                 qsLoadScriptTab(strQueryString);
                 qsLoadShowHide(strQueryString);
             }
-            
+
             window.addEventListener('pushstate', function () { handlePush(); });
             window.addEventListener('replacestate', function () { handleReplacePop(); });
             window.addEventListener('popstate', function () { handleReplacePop(); });
@@ -376,7 +390,7 @@
             #panel[right-bar="hide"] #postage-main-content {
                 border-right: 0 none;
             }
-            
+
             #grid-panel-buttons gs-button {
                 border-top: 0 none;
                 border-left: 0 none;
@@ -395,13 +409,13 @@
         <script id="initial-loader-script">
             (function () {
                 var divElement = document.createElement('div');
-                
+
                 divElement.setAttribute('id','loading-screen');
                 divElement.innerHTML =
                     '<div id="loading-icon">Loading Postage...</div>';
-                
+
                 document.body.appendChild(divElement);
-                
+
                 window.addEventListener('load', function () {
                     document.body.removeChild(divElement);
                     document.body.removeChild(document.getElementById('initial-loader-script'));
@@ -448,16 +462,16 @@
                     <gs-button id="panel-open" class="header-button" icononly no-focus
                                     icon="arrow-right" onclick="showLeftBar();" title="Show the left panel"></gs-button>
                     <div flex></div>
-                    
+
                     <gs-button class="header-button-text" onclick="menuUser(this);" no-focus icon="angle-down" inline title="Links related to the user.">User</gs-button>
-                    
+
                     <gs-button class="header-button-text" onclick="menuTab(this);" no-focus icon="angle-down" inline title="Tools for handling Tabs.">Tab</gs-button>
-                    
+
                     <gs-button class="header-button-text" onclick="menuTools(this);" no-focus icon="angle-down" inline title="Tools for Processes and Information.">Tools</gs-button>
-                    
+
                     <gs-button id="button-history" class="header-button-text" onclick="dialogExecuteHistory();" no-focus
                                     icon="book" inline title="Query history for this session">History</gs-button>
-                    
+
                     <gs-button id="button-feed" class="header-button-text" onclick="dialogOpenFeed();" no-focus
                                     icon="comments-o" inline title="Notification feed">Notify
                         <span id="badge-notification-feed" hidden>0</span></gs-button>
@@ -476,20 +490,20 @@
                 <gs-body padded></gs-body>
             </gs-page>
         </gs-panel>
-        
+
         <script src="../js/greyspots.js" type="text/javascript"></script>
         <link href="../css/greyspots.css" type="text/css" rel="stylesheet" />
-        
+
         <link href="../css/postage.css" type="text/css" rel="stylesheet" />
-        
+
         <script src="resources/ace/ace.js" data-ace-base="resources/ace/" type="text/javascript" charset="utf-8"></script>
         <script src="resources/ace/ext-language_tools.js" type="text/javascript"></script>
         <script src="resources/ace/ext-searchbox.js" type="text/javascript"></script>
-        
+
         <script src="resources/ws-get-functions.js" type="text/javascript"></script>
         <script src="resources/ws-tab-functions.js" type="text/javascript"></script>
         <script src="resources/ws-home.js" type="text/javascript"></script>
-        
+
         <script src="resources/pg-9.2-tree-functions.js" type="text/javascript"></script>
         <script src="resources/pg-9.2-tree-queries.js" type="text/javascript"></script>
         <script src="resources/pg-9.2-autocomplete.js" type="text/javascript"></script>
