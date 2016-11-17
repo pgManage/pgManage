@@ -4,18 +4,12 @@ const electron = require('electron');
 const fs = require('fs-extra');
 const hidefile = require('hidefile');
 const windowStateKeeper = require('electron-window-state');
+const tcpPortUsed = require('tcp-port-used');
 const ipcMain = electron.ipcMain;
 // Module to control application life.
 const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
-
-const int_postage_port = parseInt(Math.random().toString().substring(2)) % (65535 - 1024) + 1024;
-
-const child_process = require('child_process');
-var proc = null;
-
-require('electron-context-menu')({});
 
 try {
 	fs.statSync(os.homedir() + '/.postage/');
@@ -46,6 +40,9 @@ function spawnPostage() {
 
 	proc.stdout.on('data', function (data) {
 		console.log('got data:\n' + data);
+		if (data.toString().indexOf('in your web browser') > -1) {
+			fs.writeFileSync(path.normalize(os.homedir() + '/.postage/postage_port'), int_postage_port.toString());
+		}
 	});
 	proc.stderr.on('data', function (data) {
 		console.log('got data:\n' + data);
@@ -54,7 +51,42 @@ function spawnPostage() {
 		console.log(proc.pid + ' closed with code ' + code);
 	});
 }
-spawnPostage();
+
+var int_postage_port = null;
+
+try {
+	int_postage_port = parseInt(fs.readFileSync(path.normalize(os.homedir() + '/.postage/postage_port')), 10);
+	tcpPortUsed.check(int_postage_port, '127.0.0.1').then(function (taken) {
+		if (!taken) {
+			spawnPostage();
+		} else {
+			electron.dialog.showErrorBox('Error', 'The port that postage was going to use is taken.');
+			app.quit();
+		}
+	}, function (err) {
+	    throw err;
+	});
+} catch (e) {
+	int_postage_port = parseInt(Math.random().toString().substring(2), 10) % (65535 - 1024) + 1024;
+	tcpPortUsed.check(int_postage_port, '127.0.0.1').then(function this_callback(taken) {
+		if (!taken) {
+			spawnPostage();
+		} else {
+			int_postage_port = parseInt(Math.random().toString().substring(2), 10) % (65535 - 1024) + 1024;
+			tcpPortUsed.check(int_postage_port, '127.0.0.1').then(this_callback, function (err) {
+				electron.dialog.showErrorBox('Error', err.message);
+				app.quit();
+			});
+		}
+	}, function (err) {
+	    throw err;
+	});
+}
+
+const child_process = require('child_process');
+var proc = null;
+
+require('electron-context-menu')({});
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -85,7 +117,6 @@ ipcMain.on('postage', function (event, arg) {
 })
 
 app.on('quit', function () {
-	console.log('quitting');
 	proc.kill();
 });
 
@@ -280,9 +311,6 @@ function openWindow() {
 
 	// Emitted when the window is closed.
 	curWindow.on('closed', function () {
-		// Dereference the window object, usually you would store windows
-		// in an array if your app supports multi windows, this is the time
-		// when you should delete the corresponding element.
 		mainWindows.splice(mainWindows.indexOf(curWindow), 1);
 	});
 }
