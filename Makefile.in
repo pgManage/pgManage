@@ -7,14 +7,26 @@ test-common:
 test:
 	$(MAKE) -C postage test
 
+test-ssl:
+	$(MAKE) -C postage test-ssl
+
 lldb:
 	$(MAKE) -C postage lldb
+
+lldb-ssl:
+	$(MAKE) -C postage lldb-ssl
 
 gdb:
 	$(MAKE) -C postage gdb
 
+gdb-ssl:
+	$(MAKE) -C postage gdb-ssl
+
 valgrind:
 	$(MAKE) -C postage valgrind
+
+valgrind-ssl:
+	$(MAKE) -C postage valgrind-ssl
 
 install:
 	$(MAKE) -C postage install
