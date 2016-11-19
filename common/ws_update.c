@@ -90,6 +90,7 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 	int int_x = 0;
 	int int_y = 0;
 	int int_z = 0;
+	SFINISH_CAT_CSTR(client_update->str_pk_join_clause, "");
 	SFINISH_CAT_CSTR(client_update->str_pk_where_clause, "");
 	SFINISH_CAT_CSTR(client_update->str_temp_col_list, "");
 	SFINISH_CAT_CSTR(client_update->str_set_col_list, "");
@@ -132,10 +133,15 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 
 		if (strncmp(str_pk_header, "pk", 2) == 0) {
 			if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-				SFINISH_CAT_APPEND(client_update->str_pk_where_clause, int_x == 0 ? "" : " AND ",
+				SFINISH_CAT_APPEND(client_update->str_pk_join_clause, int_x == 0 ? "" : " AND ",
 					client_update->str_temp_table_name, ".", str_temp, " IS NOT DISTINCT FROM ",
 					client_update->str_real_table_name, ".", str_col_name);
+				SFINISH_CAT_APPEND(client_update->str_pk_where_clause, int_x == 0 ? "" : " AND ",
+					client_update->str_real_table_name, ".", str_col_name, " = ANY(array(SELECT ", client_update->str_temp_table_name, ".", str_temp, " FROM ", client_update->str_temp_table_name, "))");
 			} else {
+				SFINISH_CAT_APPEND(client_update->str_pk_join_clause, int_x == 0 ? "" : " AND ",
+					client_update->str_temp_table_name, ".", str_temp, " = ", client_update->str_real_table_name, ".",
+					str_col_name);
 				SFINISH_CAT_APPEND(client_update->str_pk_where_clause, int_x == 0 ? "" : " AND ",
 					client_update->str_temp_table_name, ".", str_temp, " = ", client_update->str_real_table_name, ".",
 					str_col_name);
@@ -199,7 +205,7 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 		SFINISH_CHECK(int_z == 1, "Hash columns supplied, but hashes unknown");
 	}
 
-	SFINISH_CHECK(client_update->str_pk_where_clause[0] != 0, "Primary key required");
+	SFINISH_CHECK(client_update->str_pk_join_clause[0] != 0, "Primary key required");
 
 	////CREATE TEMP TABLE
 	if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
@@ -416,20 +422,20 @@ bool ws_update_step4(EV_P, void *cb_data, DB_result *res) {
 		if (client_update->str_hash_where_clause != NULL) {
 			SFINISH_CAT_CSTR(str_sql, "SELECT count(*), sum(CASE WHEN ", client_update->str_hash_where_clause,
 				" THEN 1 ELSE 0 END) FROM ", client_update->str_temp_table_name, " ", "INNER JOIN ",
-				client_update->str_real_table_name, " ON ", client_update->str_pk_where_clause, ";");
+				client_update->str_real_table_name, " ON ", client_update->str_pk_join_clause, ";");
 		} else {
 			SFINISH_CAT_CSTR(str_sql, "SELECT count(*) FROM ", client_update->str_temp_table_name, " ", "INNER JOIN ",
-				client_update->str_real_table_name, " ON ", client_update->str_pk_where_clause, ";");
+				client_update->str_real_table_name, " ON ", client_update->str_pk_join_clause, ";");
 		}
 	} else {
 		if (client_update->str_hash_where_clause != NULL) {
 			SFINISH_CAT_CSTR(str_sql, "SELECT CAST(count(*) AS nvarchar(MAX)), CAST(sum(CASE WHEN ",
 				client_update->str_hash_where_clause, " THEN 1 ELSE 0 END) AS nvarchar(MAX)) FROM ",
 				client_update->str_temp_table_name, " ", "INNER JOIN ", client_update->str_real_table_name, " ON ",
-				client_update->str_pk_where_clause, ";");
+				client_update->str_pk_join_clause, ";");
 		} else {
 			SFINISH_CAT_CSTR(str_sql, "SELECT CAST(count(*) AS nvarchar(MAX)) FROM ", client_update->str_temp_table_name, " ",
-				"INNER JOIN ", client_update->str_real_table_name, " ON ", client_update->str_pk_where_clause, ";");
+				"INNER JOIN ", client_update->str_real_table_name, " ON ", client_update->str_pk_join_clause, ";");
 		}
 	}
 	SDEBUG("str_sql: %s", str_sql);
@@ -509,11 +515,11 @@ bool ws_update_step5(EV_P, void *cb_data, DB_result *res) {
 	DB_free_result(res);
 	if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
 		SFINISH_CAT_CSTR(str_sql, "UPDATE ", client_update->str_real_table_name, " SET ", client_update->str_set_col_list,
-			" FROM ", client_update->str_temp_table_name, " WHERE ", client_update->str_pk_where_clause, ";");
+			" FROM ", client_update->str_temp_table_name, " WHERE ", client_update->str_pk_join_clause, ";");
 	} else {
 		SFINISH_CAT_CSTR(str_sql, "MERGE INTO ", client_update->str_real_table_name, " WITH (HOLDLOCK) "
 																					 "USING ",
-			client_update->str_temp_table_name, " ", "ON ", client_update->str_pk_where_clause, " ", "WHEN MATCHED ",
+			client_update->str_temp_table_name, " ", "ON ", client_update->str_pk_join_clause, " ", "WHEN MATCHED ",
 			"THEN UPDATE ", "SET ", client_update->str_set_col_list, ";");
 	}
 
@@ -577,11 +583,11 @@ bool ws_update_step6(EV_P, void *cb_data, DB_result *res) {
 // Start copying into temp table
 #ifdef POSTAGE_INTERFACE_LIBPQ
 	SFINISH_CAT_CSTR(str_sql, "COPY (SELECT ", client_update->str_return_columns, " FROM ", client_update->str_real_table_name,
-		" LEFT JOIN ", client_update->str_temp_table_name, " ON ", client_update->str_pk_where_clause, " WHERE ",
+		" LEFT JOIN ", client_update->str_temp_table_name, " ON ", client_update->str_pk_join_clause, " WHERE ",
 		client_update->str_pk_where_clause, ") TO STDOUT;");
 #else
 	SFINISH_CAT_CSTR(str_sql, "SELECT ", client_update->str_return_escaped_columns, " FROM ", client_update->str_real_table_name,
-		" LEFT JOIN ", client_update->str_temp_table_name, " ON ", client_update->str_pk_where_clause, " WHERE ",
+		" LEFT JOIN ", client_update->str_temp_table_name, " ON ", client_update->str_pk_join_clause, " WHERE ",
 		client_update->str_pk_where_clause, ";");
 #endif
 
@@ -643,6 +649,7 @@ void ws_update_free(struct sock_ev_client_update *to_free) {
 	SFREE(to_free->str_insert_parameter_markers);
 #endif
 	SFREE(to_free->str_pk_where_clause);
+	SFREE(to_free->str_pk_join_clause);
 	SFREE(to_free->str_temp_col_list);
 	SFREE(to_free->str_set_col_list);
 	SFREE(to_free->str_real_table_name);

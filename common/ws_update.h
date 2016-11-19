@@ -14,6 +14,7 @@ struct sock_ev_client_update {
 	char *str_insert_column_names;
 	char *str_insert_parameter_markers;
 #endif
+	char *str_pk_join_clause;
 	char *str_pk_where_clause;
 	char *str_hash_where_clause;
 	char *str_temp_col_list;
