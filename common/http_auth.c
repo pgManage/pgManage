@@ -514,13 +514,15 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			(bol_tls ? "; secure" : ""), "; HttpOnly\015\012"
 										 "Location: /index.html\015\012\015\012");
 #else
+		size_t i = strtol(ptr_conn, NULL, 10);
+		struct struct_connection *current_connection = DArray_get(darr_global_connection, i);
 		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 303 See Other\015\012"
 									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 									   "Set-Cookie: postage_",
 			ptr_conn, "="
 					  "; path=/; expires=Tue, 01 Jan 1990 00:00:00 GMT",
 			(bol_tls ? "; secure" : ""), "; HttpOnly\015\012"
-										 "Location: /postage/index.html\015\012\015\012");
+										 "Location: /postage/index.html?connection=", current_connection->str_connection_name, "\015\012\015\012");
 #endif
 		SFREE_PWORD(str_form_data);
 		http_auth_free(client_auth);

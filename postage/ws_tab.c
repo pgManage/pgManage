@@ -985,6 +985,7 @@ void ws_tab_move_step2(EV_P, ev_check *w, int revents) {
 
 	char *str_response = NULL;
 	ev_check_stop(EV_A, w);
+	decrement_idle(EV_A);
 
 	SFINISH_SALLOC(str_response, 101);
 #ifdef _WIN32

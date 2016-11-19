@@ -272,7 +272,6 @@ void http_ev_step2(EV_P, ev_io *w, int revents) {
 
 	if (client_copy_check->int_written == client_copy_check->int_response_len) {
 		ev_io_stop(EV_A, w);
-		decrement_idle(EV_A);
 
 		SFREE(client_copy_check->str_response);
 		SFREE(client_copy_check);
