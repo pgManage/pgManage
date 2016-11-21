@@ -492,9 +492,9 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 						strcmp(other_client->str_client_ip, client_auth->parent->str_client_ip) == 0) {
 						client_timeout_prepare_free(other_client->client_timeout_prepare);
 						other_client->bol_fast_close = true;
-						client_close(other_client);
 						SDEBUG("node->next: %p", node->next);
 						node = node->next;
+						client_close(other_client);
 					} else {
 						SDEBUG("node->next: %p", node->next);
 						node = node->next;
