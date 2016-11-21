@@ -575,9 +575,12 @@ window.addEventListener('design-register-element', function () {
         
         GS.openDialogToElement(target, templateElement, 'down', '', function (event, strAnswer) {
             var strPath;
+            var strName = document.getElementById('gs-file-manager-text-file-name').value || '';
             
-            if (strAnswer === 'Create') {
-                strPath = getPath(element) + document.getElementById('gs-file-manager-text-file-name').value;
+            //console.log('Name:', strName);
+            
+            if (strAnswer === 'Create' && strName) {
+                strPath = getPath(element) + strName;
                 //console.log('Create:', strPath);
                 
                 if (document.getElementById('gs-file-manager-text-file-name').value.trim()) {

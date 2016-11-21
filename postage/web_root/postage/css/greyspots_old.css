@@ -75,14 +75,14 @@ body {
  *  Font Awesome 4.5.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
  */
-
+ 
 @font-face {
     font-family: 'FontAwesome';
-    src: url('../fonts/fontawesome-webfont.eot?v=4.6.3');
-    src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.6.3')             format('embedded-opentype'),
-         url('../fonts/fontawesome-webfont.woff?v=4.6.3')                   format('woff'),
-         url('../fonts/fontawesome-webfont.ttf?v=4.6.3')                    format('truetype'),
-         url('../fonts/fontawesome-webfont.svg?v=4.6.3#fontawesomeregular') format('svg');
+    src: url('../fonts/fontawesome-webfont.eot?v=4.5.0');
+    src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.5.0')             format('embedded-opentype'),
+         url('../fonts/fontawesome-webfont.woff?v=4.5.0')                   format('woff'),
+         url('../fonts/fontawesome-webfont.ttf?v=4.5.0')                    format('truetype'),
+         url('../fonts/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -975,19 +975,11 @@ pre{
 	font-size:13px;
 	line-height:1.42857143;
 	color:#333;
+	word-break:break-all;
+	word-wrap:break-word;
 	background-color:#f5f5f5;
 	border:1px solid #ccc;
-	border-radius:4px;
-	
-	white-space: pre-wrap;
-	word-break: break-all;
-	word-break: break-word;
-	word-wrap: break-word;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	-ms-box-sizing: border-box;
-	-o-box-sizing: border-box;
-	box-sizing: border-box;
+	border-radius:4px
 }
 
 pre code{
@@ -1313,7 +1305,7 @@ select:focus {
 }
 
 *[selected-secondary] {
-    background-color: #B3E4FF !important; /* FFFFEE */
+    background-color: #EEF9FF !important; /* FFFFEE */
 }
 
 *[tempselect] {
@@ -12564,13 +12556,10 @@ gs-combo .drop_down_button {
     top: 0;
     right: 0;
     width: 1.6em;
-    
-    /*height: 1.6em;*/
-    height: 2.2em;
-    min-height: 0;
-    
+    height: 1.6em;
     /*
     padding-top: 0.2em;
+    
     text-align: center;
     */
     -webkit-box-sizing: border-box;
@@ -12788,7 +12777,6 @@ gs-container[padded] {
 }gs-datasheet {
     display: block;
     height: 100%;
-    min-height: 10em;
     
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -12896,11 +12884,6 @@ gs-datasheet table {
 gs-datasheet .floating-button-container {
     display: inline-block;
     position: fixed;
-    opacity: 0.2;
-}
-
-gs-datasheet .floating-button-container:hover {
-    opacity: 1;
 }
 
 gs-datasheet .hud-container gs-button {
@@ -13020,7 +13003,7 @@ gs-datasheet > .root > .data-container.grid-reflow > .data-flex-reset > .scroll-
 /* ###############################################################
    ########################## TEXTAREAS ##########################
    ############################################################### */
-/*
+
 gs-datasheet table textarea {
     display: block;
     resize: none;
@@ -13035,7 +13018,7 @@ gs-datasheet table textarea {
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
-}*/
+}
 
 gs-datasheet textarea.hidden-focus-control {
     width: 1px;
@@ -13128,10 +13111,6 @@ gs-datasheet th, gs-datasheet td {
 
 gs-datasheet th:first-child {
     vertical-align: middle;
-}
-
-gs-datasheet tbody th:first-child {
-    color: #CCC;
 }
 
 
@@ -14241,7 +14220,7 @@ gs-folder[mini] {
 gs-folder > .root .path-title {
     text-align: center;
     color: #BBB;
-    /*padding-bottom: 0.25em;*/
+    padding-bottom: 0.25em;
 }
 
 /* ###############################################################
@@ -14567,68 +14546,6 @@ gs-grid[force-reflow] {
 gs-grid[force-reflow] > gs-block {
     width: auto !important;
     float: none;
-}
-gs-group {
-    display: block; /* inline-block */
-    /*width: 100%;*/
-    /*height: 100%;*/
-    
-    display: -webkit-box;
-    display: -moz-box;     /* OLD - iOS 6-, Safari 3.1-6 */
-    display: -ms-flexbox;  /* OLD - Firefox 19- (buggy but mostly works) */
-    display: -webkit-flex; /* TWEENER - IE 10 */
-    display: flex;         /* NEW - Chrome */
-    
-    flex-direction: column;
-    -ms-flex-direction: column;
-    -webkit-flex-direction: column;
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
-gs-group[padded] {
-    padding: 1em;
-}
-
-gs-group > .root {
-    height: 100%;
-    width: 100%;
-}
-
-gs-groupborder {
-    display: block;
-    padding: 0.25em;
-    border: 1px solid #999;
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-    
-    -webkit-border-radius: 0.25em;
-    -moz-border-radius: 0.25em;
-    -ms-border-radius: 0.25em;
-    -o-border-radius: 0.25em;
-    border-radius: 0.25em;
-}
-gs-grouptitle {
-    display: block;
-    text-align: center;
-    color: #999;
-    font-style: italic;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-    cursor: default;
 }gs-img {
     display: block;
     background-size: 100%;
@@ -14693,8 +14610,6 @@ gs-jumbo gs-container {
     position: relative;
     
     height: 100%;
-    
-    border-left: 1px solid #CCC;
     
     overflow: auto;
     -webkit-overflow-scrolling: touch;
@@ -15666,10 +15581,6 @@ gs-time[disabled] .control {
     background-color: #D5D5D5;
 }
 
-gs-time[disabled]:not([mini]) {
-    min-height: 1.358em;
-}
-
 
 /* ###################################################################################### */
 /* ################################## ATTRIBUTE:  "mini" ################################ */
@@ -15683,13 +15594,8 @@ gs-time[mini] {
     box-shadow: 0 0 0 0 #FFFFFF;
 }
 
-gs-time[no-picker][mini] {
-    padding: 0;
-}
-
 gs-time[mini] .time-picker-button {
     width: 1.5em;
-    min-height: 0.8em;
 }
 
 gs-time[mini] .time-picker-button:after {

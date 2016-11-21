@@ -103,6 +103,16 @@
                             qs="example_id"></gs-folder>
                     </template>
                 </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute "<code>no-list-error</code>":</span>
+                    <p>The "<code>no-list-error</code>" is useful because the folder that a gs-folder is pointed at may not exist yet. Once the user uploads/creates a file: the necessary folders will be created automatically.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="30">
+                        <gs-folder no-list-error path="/role/trusted_g/test{{! (window.folder || (window.folder = Math.random().toString().substring(2))) }}/"></gs-folder>
+                    </template>
+                </gs-doc-example>
             </div>
         </gs-container>
         <br />

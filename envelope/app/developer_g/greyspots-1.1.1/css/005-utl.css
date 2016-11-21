@@ -165,7 +165,7 @@ select:focus {
 }
 
 *[selected-secondary] {
-    background-color: #EEF9FF !important; /* FFFFEE */
+    background-color: #B3E4FF !important; /* FFFFEE */
 }
 
 *[tempselect] {

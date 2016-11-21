@@ -2448,7 +2448,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 set: function (newValue) {
                     var i, len, intIdIndex, arrCells = xtag.query(this, '[selected]'),
                         cell_i, cell_len, arrRowIndexes = [], arrHeaderIndexes = [],
-                        arrRecordSelectors, arrHeaders;
+                        arrRecordSelectors, arrHeaders, elmRow, arrRowElements;
                     
                     // clear old selection
                     for (i = 0, len = arrCells.length; i < len; i += 1) {
@@ -2474,12 +2474,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         arrCells[i].setAttribute('selected', '');
                     }
                     
-                    // highlight non-selected headers and row selectors
-                    
-                    arrRecordSelectors = xtag.query(this, 'tbody th, thead th:first-child');
-                    for (i = 0, len = arrRecordSelectors.length; i < len; i += 1) {
-                        if (arrRowIndexes.indexOf(i) !== -1 && !arrRecordSelectors[i].hasAttribute('selected')) {
-                            arrRecordSelectors[i].setAttribute('selected-secondary', '');
+                    // highlight selected rows
+                    for (i = 0, len = arrCells.length; i < len; i += 1) {
+                        elmRow = arrCells[i].parentNode;
+                        arrRowElements = xtag.query(elmRow, 'th, td');
+                        
+                        for (i = 0, len = arrRowElements.length; i < len; i += 1) {
+                            if (!arrRowElements[i].hasAttribute('selected')) {
+                                arrRowElements[i].setAttribute('selected-secondary', '');
+                            }
                         }
                     }
                     
