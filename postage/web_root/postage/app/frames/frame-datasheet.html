@@ -144,7 +144,7 @@
                                 var templateElement = document.createElement('template');
                                 templateElement.setAttribute('data-max-width', '400px');
                                 templateElement.setAttribute('data-overlay-close', 'true');
-                                templateElement.innerHTML = '<div id="datagrid-column-list"></div>';
+                                templateElement.innerHTML = '<div id="datagrid-column-list" style="height: 100%; overflow: auto"></div>';
                                 
                                 // open column dialog
                                 GS.openDialogToElement(this, templateElement, 'left', function () {

@@ -8580,6 +8580,8 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
             var message = event.data, messageID, responseNumber, key, strError, arrLines, i, len, jsnMessage, startFrom;
             
             if (typeof (message) === 'object') {
+                //window.binaryTestTEST = message;
+                //console.log(message);
                 var buf = message;
                 message = String.fromCharCode.apply(null, new Uint8Array(buf));
                 //console.log(buf);
