@@ -117,6 +117,7 @@ bool _DB_exec(
 	SERROR_SALLOC(res_poll, sizeof(DB_result_poll));
 
 	conn->EV_A = EV_A;
+	conn->res_poll = res_poll;
 
 	res_poll->conn = conn;
 	res_poll->cb_data = cb_data;
@@ -185,6 +186,7 @@ bool DB_get_column_types_for_query(EV_P, DB_conn *conn, char *str_sql, void *cb_
 	// Allocate polling data
 	SERROR_SALLOC(res_poll, sizeof(DB_result_poll));
 
+	conn->res_poll = res_poll;
 	res_poll->conn = conn;
 	res_poll->cb_data = res_poll_child;
 	res_poll->query_cb = DB_get_column_types_for_query2;
@@ -221,6 +223,7 @@ bool DB_get_column_types_for_query2(EV_P, void *cb_data, DB_result *res) {
 	// Allocate polling data
 	SERROR_SALLOC(res_poll, sizeof(DB_result_poll));
 
+	res_poll_child->conn->res_poll = res_poll;
 	res_poll->conn = res_poll_child->conn;
 	res_poll->cb_data = res_poll_child;
 	res_poll->query_cb = DB_get_column_types_for_query3;
@@ -597,6 +600,10 @@ void _DB_finish(DB_conn *conn) {
 		PQclear(conn->copy_check->res);
 		SFREE(conn->copy_check);
 	}
+	if (conn->res_poll != NULL) {
+		ev_io_stop(conn->EV_A, &conn->res_poll->io);
+		DB_res_poll_free(conn->res_poll);
+	}
 
 	SFREE(conn->str_response);
 	SFREE(conn->str_literal_context_data);
@@ -628,6 +635,7 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 	int_status = PQconsumeInput(conn->conn);
 	if (int_status != 1) {
 		SERROR_NORESPONSE("PQconsumeInput failed %s", PQerrorMessage(conn->conn));
+		conn->res_poll = NULL;
 		ev_io_stop(EV_A, &res_poll->io);
 		res_poll->query_cb(EV_A, res_poll->cb_data, db_res);
 		DB_res_poll_free(res_poll);
@@ -683,6 +691,7 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 				int_i++;
 			}
 			DArray_destroy(arr_res);
+			conn->res_poll = NULL;
 			ev_io_stop(EV_A, &res_poll->io);
 			DB_res_poll_free(res_poll);
 			SFREE_ALL();
@@ -719,6 +728,7 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 			PQclear(res);
 		}
 
+		conn->res_poll = NULL;
 		// Now we loop through the gathered results
 		int_len = DArray_end(arr_res);
 		while (int_i < int_len) {
@@ -803,6 +813,7 @@ error:
 		}
 		int_i++;
 	}
+	conn->res_poll = NULL;
 	DArray_destroy(arr_res);
 	DB_res_poll_free(res_poll);
 
