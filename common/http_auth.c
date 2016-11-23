@@ -494,7 +494,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 						other_client->bol_fast_close = true;
 						SDEBUG("node->next: %p", node->next);
 						node = node->next;
-						client_close(other_client);
+						client_close_immediate(other_client);
 					} else {
 						SDEBUG("node->next: %p", node->next);
 						node = node->next;
@@ -524,6 +524,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			(bol_tls ? "; secure" : ""), "; HttpOnly\015\012"
 										 "Location: /postage/index.html?connection=", current_connection->str_connection_name, "\015\012\015\012");
 #endif
+		//client_auth->parent->bol_fast_close = true;
 		SFREE_PWORD(str_form_data);
 		http_auth_free(client_auth);
 		SFREE(client_auth);

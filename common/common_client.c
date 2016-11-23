@@ -1579,7 +1579,7 @@ bool client_close(struct sock_ev_client *client) {
 			client_close_immediate(client);
 		} else {
 			if (client->client_timeout_prepare == NULL) {
-				SDEBUG("test1");
+				SINFO("test1: %p", client);
 				SERROR_SALLOC(client->client_timeout_prepare, sizeof(struct sock_ev_client_timeout_prepare));
 				client->client_timeout_prepare->close_time = ev_now(global_loop);
 				client->client_timeout_prepare->parent = client;
@@ -1615,7 +1615,7 @@ void client_close_timeout_prepare_cb(EV_P, ev_prepare *w, int revents) {
 	ev_io_stop(EV_A, &client_timeout_prepare->parent->io);
 	if ((client_timeout_prepare->close_time + 10) <= ev_now(EV_A) ||
 		(client->bol_fast_close && (client->que_message == NULL || client->que_message->first == NULL))) {
-		SDEBUG("test2");
+		SDEBUG("test2: %p", client);
 		ev_prepare_stop(EV_A, w);
 		if (w == &client->client_timeout_prepare->prepare) {
 			client_timeout_prepare->parent->client_timeout_prepare = NULL;
@@ -1628,9 +1628,9 @@ void client_close_timeout_prepare_cb(EV_P, ev_prepare *w, int revents) {
 			SDEBUG("`client->client_timeout_prepare` == %p", client->client_timeout_prepare);
 		}
 
-		// DEBUG("BEFORE client_close_immediate(%p)", client);
+		SDEBUG("BEFORE client_close_immediate(%p)", client);
 		client_close_immediate(client);
-		// DEBUG("AFTER  client_close_immediate(%p)", client);
+		SDEBUG("AFTER  client_close_immediate(%p)", client);
 	}
 	bol_error_state = false;
 }
@@ -1787,7 +1787,7 @@ void _client_timeout_prepare_free(struct sock_ev_client_timeout_prepare *client_
 void client_paused_request_free(struct sock_ev_client_paused_request *client_paused_request) {
 	if (client_paused_request != NULL) {
 		if (client_paused_request->watcher != NULL) {
-			SNOTICE("client_paused_request->watcher: %p", client_paused_request->watcher);
+			SDEBUG("client_paused_request->watcher: %p", client_paused_request->watcher);
 			if (client_paused_request->revents == EV_CHECK) {
 				ev_check_stop(global_loop, (ev_check *)client_paused_request->watcher);
 			} else {
