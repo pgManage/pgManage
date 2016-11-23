@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "ws_raw.h"
 
 #ifdef ENVELOPE
@@ -156,8 +157,24 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 		SFINISH_CHECK(snprintf(str_temp, 100, "%ld", (unsigned long)tv_time.tv_usec) != 0, "snprintf() failed");
 		SFINISH_CAT_APPEND(str_response, "\t", str_temp);
 
+		SDEBUG("BEFORE str_response>%s<", str_response);
+
+
+		SDEBUG("client_request->arr_response: %p", client_request->arr_response);
+#ifdef UTIL_DEBUG
+		if (client_request->arr_response != NULL) {
+			int i = 0;
+			int len = DArray_max(client_request->arr_response);
+			while (i < len) {
+				SDEBUG("client_request->arr_response[%d]: %s", i, DArray_get(client_request->arr_response, i));
+				i++;
+			}
+		}
+#endif
+
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
+		SDEBUG("AFTER");
 		str_response = NULL;
 	}
 

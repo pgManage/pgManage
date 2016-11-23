@@ -17,7 +17,7 @@ void notice_processor(void *arg, const char *str_notice) {
 	SDEBUG("%s", str_notice);
 	char *ptr_actual_message = strstr(str_notice, ": ");
 	if (ptr_actual_message == NULL) {
-		ptr_actual_message = str_notice;
+		ptr_actual_message = (char *)str_notice;
 		str_notice = "NOTICE";
 	} else {
 		ptr_actual_message += 2;
@@ -58,7 +58,7 @@ void _send_notices(struct sock_ev_client *client) {
 		}
 		SFINISH_CAT_APPEND(str_response, client->str_notice != NULL ? client->str_notice : "");
 		SFREE(client->str_notice);
-		WS_sendFrame(global_loop, client, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(global_loop, client, true, 0x02, str_response, strlen(str_response));
 		if (client->cur_request != NULL) {
 			DArray_push(client->cur_request->arr_response, str_response);
 		}
@@ -286,7 +286,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				SERROR("read() failed");
 			}
 		} else if (int_len >= 0) {
-			if (bol_tls == false && (client->int_request_len == 0 || int_len == 0) && bstrstr(str_buffer, int_len, "HTTP", 4) == NULL) {
+			if (bol_tls == false && (client->int_request_len == 0 || int_len == 0) && bstrstr(str_buffer, (size_t)int_len, "HTTP", 4) == NULL) {
 				SERROR("Someone is trying to connect with TLS!");
 			}
 
@@ -1228,6 +1228,7 @@ void cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 	client->bol_connected = true;
 
 #ifdef POSTAGE_INTERFACE_LIBPQ
+	//PQsetNoticeProcessor(client->cnxn, notice_processor, client);
 	PQsetNoticeProcessor(client->cnxn, notice_processor, client);
 	SERROR_SALLOC(client->notify_watcher, sizeof(struct sock_ev_client_notify_watcher));
 	ev_io_init(&client->notify_watcher->io, client_notify_cb, GET_CLIENT_PQ_SOCKET(client), EV_READ);

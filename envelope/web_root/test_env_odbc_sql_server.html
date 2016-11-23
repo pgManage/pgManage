@@ -1571,6 +1571,9 @@ WHERE	LIMIT	OFFSET
                         <center><h3>Postage Test Backend</h3></center>
                         <h3 style="float: right;"><span id="iterations">0</span> Successful Iterations</h3>
                         <gs-button onclick="bol_run = false; this.parentNode.removeChild(this);">Stop after this iteration</gs-button>
+		                <gs-button onclick="window.open('/postage/0/action_ev?action=list');" inline>
+		                    <b>List Watchers</b>
+		                </gs-button>
                         <p>The reason we only have one test going at a time, even though it is slower, is so that if there is a crash we know which call caused it.</p>
                         <div class="style-bracket-container">
                                 <label class="style-bracket-header">Tests</label>
