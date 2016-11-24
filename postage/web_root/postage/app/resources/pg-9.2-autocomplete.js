@@ -26,10 +26,10 @@ function autocompleteBindEditor(tabElement, editor) {
             // create popup element
             autocompleteGlobals.popupElement = document.createElement('div');
             autocompleteGlobals.popupElement.setAttribute('id', 'autocomplete-popup');
-            autocompleteGlobals.popupElement.innerHTML = '<div id="autocomplete-popup-ace"></div>';
+            autocompleteGlobals.popupElement.innerHTML = '<div id="autocomplete-popup-instruction">Press Tab to Autocomplete</div><div id="autocomplete-popup-ace"></div>';
             
             // create and configure popup ace
-            autocompleteGlobals.popupAce = ace.edit(autocompleteGlobals.popupElement.children[0]);
+            autocompleteGlobals.popupAce = ace.edit(autocompleteGlobals.popupElement.children[1]);
             autocompleteGlobals.popupAce.setTheme('ace/theme/clouds'); //eclipse
             autocompleteGlobals.popupAce.getSession().setMode('ace/mode/text');
             autocompleteGlobals.popupAce.setShowPrintMargin(false);

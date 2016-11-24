@@ -673,7 +673,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //      error:    add error classes
     function handleData(element, data, error, strAction, failCallback) {
         var arrElements, i, len, arrHeaders = [], intColumnElementFocusNumber, jsnSelection, matchElement,
-            templateElement = document.createElement('template');
+            templateElement = document.createElement('template'), focusTimerID, focusToElement, timer_i;
         
         // clear any old error status
         element.classList.remove('error');
@@ -751,14 +751,50 @@ document.addEventListener('DOMContentLoaded', function () {
                 arrElements = xtag.query(element, '[column]');
                 
                 //console.log(intColumnElementFocusNumber, jsnSelection);
+                //
+                //console.log('arrElements: ', arrElements);
+                //console.log('intColumnElementFocusNumber: ', intColumnElementFocusNumber);
+                //console.log('element: ', arrElements[intColumnElementFocusNumber]);
+                //console.log('jsnSelection: ', jsnSelection);
+                //
+                //console.log('element upgrade: ', arrElements[intColumnElementFocusNumber].__upgraded__);
                 
+                //console.log('1***');
                 if (arrElements.length > intColumnElementFocusNumber) {
-                    arrElements[intColumnElementFocusNumber].focus();
-                    if (jsnSelection) {
-                        GS.setInputSelection(document.activeElement, jsnSelection.start, jsnSelection.end);
+                    //console.log('2***', document.activeElement);
+                    focusToElement = arrElements[intColumnElementFocusNumber];
+                    
+                    // if element registration is not shimmed, we can just focus into the target element
+                    if (shimmed.registerElement === false) {
+                        focusToElement.focus();
+                        if (jsnSelection) {
+                            GS.setInputSelection(document.activeElement, jsnSelection.start, jsnSelection.end);
+                        }
+                        
+                    // else, we have to check on a loop to see if the element has been upgraded,
+                    //      the reason I need to use a loop here is because there is no event for
+                    //      when an element is upgraded (if there was then 1000 custom elements
+                    //      would emit 1000 events, which is a lot and we don't want to bog the
+                    //      browser down)
+                    } else {
+                        timer_i = 0;
+                        focusTimerID = setInterval(function () {
+                            if (focusToElement.__upgraded__ || timer_i >= 10) {
+                                clearTimeout(focusTimerID);
+                            }
+                            if (focusToElement.__upgraded__) {
+                                focusToElement.focus();
+                                if (jsnSelection) {
+                                    GS.setInputSelection(document.activeElement, jsnSelection.start, jsnSelection.end);
+                                }
+                            }
+                            timer_i += 1;
+                        }, 5);
                     }
                 }
             }
+            
+            //console.log('current element', document.activeElement);
             
             // trigger after_select
             GS.triggerEvent(element, 'after_select');
