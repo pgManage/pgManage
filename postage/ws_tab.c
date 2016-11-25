@@ -1047,6 +1047,7 @@ void ws_tab_move_step2(EV_P, ev_check *w, int revents) {
 
 	bol_error_state = false;
 finish:
+	SFREE(cb_data);
 #ifdef _WIN32
 	if (strErrorText != NULL) {
 		LocalFree(strErrorText);

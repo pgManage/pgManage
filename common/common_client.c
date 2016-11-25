@@ -1767,6 +1767,7 @@ void client_close_immediate(struct sock_ev_client *client) {
 	SFREE(client->str_database);
 	SFREE(client->str_notice);
 	SFREE(client->str_boundary);
+	SFREE(client->str_connname_folder);
 	// DEBUG("%p->str_cookie: %p", client, client->str_cookie);
 	SFREE_PWORD(client->str_cookie);
 	SFREE_PWORD(client->str_cookie_name);

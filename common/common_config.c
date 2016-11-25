@@ -650,8 +650,10 @@ bool parse_options(int argc, char *const *argv) {
 		str_temp = canonical("", str_global_data_root, "create_dir");
 	}
 	SFREE(str_temp);
+
 	str_temp = canonical("", str_global_data_root, "read_dir");
 	SERROR_CHECK(str_temp != NULL, "canonical failed!");
+	SFREE(str_temp);
 
 	SDEBUG("str_global_sql_root: %s", str_global_sql_root);
 	if (str_global_sql_root == NULL) {
