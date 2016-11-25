@@ -1,3 +1,5 @@
+.PHONY test test-ssl lldb lldb-ssl gdb gdb-ssl valgrind valgrind-ssl destroy
+
 all:
 	$(MAKE) -C postage all
 
