@@ -152,7 +152,7 @@ void http_ev_step1(struct sock_ev_client *client) {
 #else
 		unsigned long arg = 0;
 		// All of our sockets are non-blocking
-		if (fcntl((int)int_i, F_GETFL, &arg) & O_NONBLOCK == O_NONBLOCK) {
+		if ((fcntl((int)int_i, F_GETFL, &arg) & O_NONBLOCK) == O_NONBLOCK) {
 			int_i -= 1;
 			continue;
 		}

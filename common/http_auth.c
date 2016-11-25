@@ -514,7 +514,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			(bol_tls ? "; secure" : ""), "; HttpOnly\015\012"
 										 "Location: /index.html\015\012\015\012");
 #else
-		size_t i = strtol(ptr_conn, NULL, 10);
+		size_t i = (size_t)strtol(ptr_conn, NULL, 10);
 		struct struct_connection *current_connection = DArray_get(darr_global_connection, i);
 		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 303 See Other\015\012"
 									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012"

@@ -472,6 +472,20 @@ test
 SELECT pg_sleep(5);
 */})],
 			['RAW FAIL 1', 'websocket', '', ml(function () {/*RAW
+DO $$ DECLARE
+BEGIN
+RAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';
+END $$
+*/}),
+			[
+				["QUERY\tDO $$ DECLARE\\nBEGIN\\nRAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';\\nEND $$\\n",
+				"START",
+				"NOTICE\t å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n",
+				"END",
+				"Rows Affected\n0\n",
+				"TRANSACTION COMPLETED"]
+			]],
+			['RAW FAIL 2', 'websocket', '', ml(function () {/*RAW
 å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥
 */}),
 			[
@@ -481,7 +495,7 @@ SELECT pg_sleep(5);
 				"END",
 				"Query failed: ERROR:  syntax error at or near \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\"\nLINE 1: å´†"
 			]],
-			['RAW FAIL 2', 'websocket', '', ml(function () {/*RAW*/}),
+			['RAW FAIL 3', 'websocket', '', ml(function () {/*RAW*/}),
 			["Invalid RAW request"]],
 			['RAW', 'websocket', '', ml(function () {/*RAW
 SELECT 'This is some test sql';

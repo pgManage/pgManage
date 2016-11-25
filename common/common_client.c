@@ -14,7 +14,10 @@
 void notice_processor(void *arg, const char *str_notice) {
 	struct sock_ev_client *client = (struct sock_ev_client *)arg;
 	char *str_temp = NULL;
-	SDEBUG("%s", str_notice);
+	SINFO("%s", str_notice);
+	for (int i = 0, len = strlen(str_notice); i < len; i += 1) {
+		SINFO("%c: %u", str_notice[i], (unsigned char)str_notice[i]);
+	}
 	char *ptr_actual_message = strstr(str_notice, ": ");
 	if (ptr_actual_message == NULL) {
 		ptr_actual_message = (char *)str_notice;
@@ -24,7 +27,7 @@ void notice_processor(void *arg, const char *str_notice) {
 		*(ptr_actual_message - 2) = 0;
 	}
 	str_temp = escape_value(ptr_actual_message);
-	SDEBUG("%s\t%s", str_notice, str_temp);
+	SINFO("%s\t%s", str_notice, str_temp);
 	if (client->str_notice != NULL) {
 		client->str_notice = cat_append(client->str_notice, "\012", str_notice, "\t", str_temp);
 	} else {
@@ -41,9 +44,9 @@ void _send_notices(struct sock_ev_client *client) {
 	PGnotify *pg_notify_current = NULL;
 	pg_notify_current = PQnotifies(client->cnxn);
 
-	SDEBUG("preparing to send notices");
+	SINFO("preparing to send notices");
 	if (client->str_notice != NULL) {
-		SDEBUG("sending notices");
+		SINFO("sending notices");
 		if (client->cur_request != NULL) {
 			client->cur_request->int_response_id += 1;
 			snprintf(str_temp, 100, "%zd", client->cur_request->int_response_id);
@@ -58,12 +61,12 @@ void _send_notices(struct sock_ev_client *client) {
 		}
 		SFINISH_CAT_APPEND(str_response, client->str_notice != NULL ? client->str_notice : "");
 		SFREE(client->str_notice);
-		WS_sendFrame(global_loop, client, true, 0x02, str_response, strlen(str_response));
+		WS_sendFrame(global_loop, client, true, 0x01, str_response, strlen(str_response));
 		if (client->cur_request != NULL) {
 			DArray_push(client->cur_request->arr_response, str_response);
 		}
 		str_response = NULL;
-		SDEBUG("notices sent");
+		SINFO("notices sent");
 	}
 
 	if (pg_notify_current != NULL) {

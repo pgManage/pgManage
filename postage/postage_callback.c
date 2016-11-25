@@ -11,6 +11,8 @@ void _query_callback(EV_P, struct sock_ev_client_request *client_request, sock_e
 	cb_data->client_request->cb_data = cb_data;
 	cb_data->callback = callback;
 
+	SDEBUG("GET_CLIENT_PQ_SOCKET(cb_data->client_request->parent): %d", GET_CLIENT_PQ_SOCKET(cb_data->client_request->parent));
+	SDEBUG("cb_data %p", cb_data);
 	ev_io_init(&cb_data->io, query_callback_handler, GET_CLIENT_PQ_SOCKET(cb_data->client_request->parent), EV_READ);
 	ev_io_start(EV_A, &cb_data->io);
 	SDEBUG("_query_callback");
