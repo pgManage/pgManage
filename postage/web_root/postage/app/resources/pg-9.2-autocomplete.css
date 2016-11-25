@@ -16,12 +16,25 @@
     -o-box-sizing: border-box;
     box-sizing: border-box;*/
 }
-#autocomplete-popup > div {
+
+#autocomplete-popup > #autocomplete-popup-ace {
     height: 100%;
 }
 
 #autocomplete-popup > div > .ace_scroller {
     cursor: pointer;
+}
+
+#autocomplete-popup > #autocomplete-popup-instruction {
+    text-align: right;
+    font-style: italic;
+    color: #AAA;
+    width: 100%;
+    font-size: 0.65em;
+    position: absolute;
+    top: -1.4em;
+    right: 0.2em;
+    height: 1.5em;
 }
 
 /*
