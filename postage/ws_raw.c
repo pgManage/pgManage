@@ -380,9 +380,10 @@ finish:
 		}
 		SFINISH_CAT_APPEND(str_response, _str_response);
 		SFREE(_str_response);
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
-		DArray_push(client_request->arr_response, str_response);
-		// client_request_free(client_request);
+
+		client_request->str_current_response = str_response;
+		str_response = NULL;
+
 		client_request->int_i = client_request->int_len + 10;
 		int_status = PQsendQuery(client_request->parent->cnxn, "ROLLBACK");
 		if (int_status != 1) {
@@ -404,6 +405,11 @@ bool ws_raw_step3(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 	} // get rid of unused parameter warning
 	if (res != NULL) {
 		PQclear(res);
+	}
+	if (client_request->str_current_response != NULL) {
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, client_request->str_current_response, strlen(client_request->str_current_response));
+		DArray_push(client_request->arr_response, client_request->str_current_response);
+		client_request->str_current_response = NULL;
 	}
 	return true;
 }
