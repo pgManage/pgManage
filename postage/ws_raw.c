@@ -67,13 +67,14 @@ char *ws_raw_step1(struct sock_ev_client_request *client_request) {
 		goto finish;
 	}
 	client_request->int_i = -1;
-	client_request->int_response_id = -1;
 	client_request->int_len = (ssize_t)DArray_end(client_request->arr_query);
 
 	int_status = PQsendQuery(client_request->parent->cnxn, "BEGIN");
 	if (int_status != 1) {
 		SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
 	}
+
+	client_request->int_response_id = -1;
 
 	query_callback(global_loop, client_request, ws_raw_step2);
 
@@ -97,18 +98,7 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
 		// client_request_free(client_request);
-		client_request->int_i = client_request->int_len + 10;
-		if (int_status != 1) {
-			int_status = PQsendQuery(client_request->parent->cnxn, "ROLLBACK");
-			if (int_status != 1) {
-				SWARN_NORESPONSE("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
-				return NULL;
-			}
-			struct sock_ev_client_request *temp_client_request =
-				create_request(client_request->parent, client_request->frame, client_request->str_message_id,
-					client_request->str_transaction_id, client_request->ptr_query, 0, POSTAGE_REQ_RAW);
-			query_callback(global_loop, temp_client_request, ws_raw_step3);
-		}
+		ws_raw_step3(global_loop, NULL, 0, client_request);
 	}
 	bol_error_state = false;
 	return str_response;
@@ -398,9 +388,7 @@ finish:
 		if (int_status != 1) {
 			SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
 		}
-		struct sock_ev_client_request *temp_client_request = create_request(client_request->parent, client_request->frame,
-			client_request->str_message_id, client_request->str_transaction_id, client_request->ptr_query, 0, POSTAGE_REQ_RAW);
-		query_callback(EV_A, temp_client_request, ws_raw_step3);
+		query_callback(EV_A, client_request, ws_raw_step3);
 	} else {
 		SFREE(str_response);
 	}
@@ -412,10 +400,11 @@ bool ws_raw_step3(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 	} // get rid of unused parameter warning
 	if (result != 0) {
 	} // get rid of unused parameter warning
+	if (client_request != NULL) {
+	} // get rid of unused parameter warning
 	if (res != NULL) {
 		PQclear(res);
 	}
-	SFREE(client_request);
 	return true;
 }
 
