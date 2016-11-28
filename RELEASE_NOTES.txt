@@ -7,13 +7,13 @@ Add [type] attribute to checkbox
 Add `make destroy`
 Fix connection list not selecting first connection
 Fix gs-checkbox element `inserted` function by changing "this" to "element"
-Make github links open in browser
+Make Github links open in browser
 Add some instructions to DMG background (closes workflowproducts/postage#37)
 Fix search page on Windows to use forward slashes
 Fix saving of localStorage/cookies (closes workflowproducts/postage#47)
 Fix closing window when a tab is not saved (closes workflowproducts/postage#45)
 Update LibreSSL to 2.4.3
-Improve pass-through akefile
+Improve pass-through Makefile
 Fix missing decrement_idle
 Fix extra decrement_idle
 Make logout select last connection on login page
