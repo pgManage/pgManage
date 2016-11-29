@@ -848,19 +848,19 @@ function dialogAceInfo() {
         <gs-page>
             <gs-header><center><h3>Editor Info</h3></center></gs-header>
             <gs-body padded>
-                <i>SQL Tab windows use <a href="http://ace.c9.io/" target="_blank">Ace Editor</a>.</i><br /><br />
+                <i>SQL tab windows use <a href="http://ace.c9.io/" target="_blank">Ace Editor</a>.</i><br /><br />
 
-                Ace is a very capable text editor, here are some tips to get you started:<br />
+                Ace is a very capable text editor. Here are some tips to get you started:<br />
                 <ul>
                     <li>You can open a hidden preferences panel using the <kbd>CMD-COMMA</kbd> shortcut (might be <kbd>CTRL-COMMA</kbd> on Windows).</li>
 
-                	<li>In the hidden preferences you can change the input type to "vim" or "emacs" by clicking the dropdown called "Keyboard Handler"</li>
+                	<li>In the hidden preferences, you can change the input type to "vim" or "emacs" by clicking the dropdown called "Keyboard Handler".</li>
 
-                	<li>Queries wont be syntax highlighted unless the first character of the query is at the beginning of its line or if it's inside a <code>BEGIN...END</code> statement.</li>
+                	<li>Queries won't be syntax highlighted unless the first character of the query is at the beginning of its line or if it's inside a <code>BEGIN...END</code> statement.</li>
 
                 	<li>Ace is double dollar sign aware. When the first character inside a dollar quote is a <kbd>RETURN</kbd>, the contents of the string are syntax highlighted. When the first character is not a return, everything inside is colored as a quoted string.</li>
 
-                	<li>You can type in using multiple cursors at once. To select in multiple places hold down <kbd>CMD</kbd> (might be <kbd>CTRL</kbd> on Windows) and click in several places. To put a cursor in the same place on multiple lines: hold <kbd>OPTION</kbd> and then click and drag.</li>
+                	<li>You can type using multiple cursors at once. To select in multiple places, hold down <kbd>CMD</kbd> (might be <kbd>CTRL</kbd> on Windows) and click in several places. To put a cursor in the same place on multiple lines, hold <kbd>OPTION</kbd> and then click and drag.</li>
                 </ul>
             </gs-body>
             <gs-footer>
@@ -1450,7 +1450,7 @@ function dialogStats() {
 
                     strHTML += '<center><h4>Transaction Stats</h4></center>';
                     strHTML += '<table class="table-stats">';
-                    strHTML += '<tr><th>Transactions Commited</th><td>' + encodeHTML(arrColumns[1]) + '</td></tr>';
+                    strHTML += '<tr><th>Transactions Committed</th><td>' + encodeHTML(arrColumns[1]) + '</td></tr>';
                     strHTML += '<tr><th>Transactions Rolled Back</th><td>' + encodeHTML(arrColumns[2]) + '</td></tr>';
                     strHTML += '</table>';
                     strHTML += '<br/>';
