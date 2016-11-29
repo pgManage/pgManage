@@ -164,7 +164,7 @@ void http_action_step3(EV_P, ev_io *w, int revents) {
 	struct sock_ev_client_copy_io *client_copy_io = (struct sock_ev_client_copy_io *)w;
 	struct sock_ev_client_copy_check *client_copy_check = client_copy_io->client_copy_check;
 	struct sock_ev_client_request *client_request = client_copy_check->client_request;
-	struct sock_ev_client *client = client_request->parent;
+//	struct sock_ev_client *client = client_request->parent;
 	char *str_response = NULL;
 	char *_str_response = NULL;
 
