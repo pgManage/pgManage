@@ -22,6 +22,7 @@ Back in FreeBSD:
 ```
 gmake test-common
 su -
+cd /home/super/postage-master/
 gmake install
 exit
 /usr/local/sbin/postage
@@ -33,8 +34,7 @@ http://\<ip>:8080/postage/test.html
 Back in FreeBSD:
 ```
 su -
-cd ..
-cd home/super/postage-master
+cd /home/super/postage-master
 gmake uninstall
 ```
 
@@ -62,6 +62,7 @@ Back in FreeBSD:
 ```
 gmake test-common
 su -
+cd /home/super/envelope-master/
 gmake install
 /usr/local/sbin/envelope
 ```
@@ -72,8 +73,7 @@ http://\<ip>:8888/test.html
 Back in FreeBSD:
 ```
 su -
-cd ..
-cd home/super/envelope-master
+cd /home/super/envelope-master
 gmake uninstall
 ```
 
@@ -100,6 +100,7 @@ Back in OpenBSD:
 ```
 gmake test-common
 su -
+cd /home/super/postage-master/
 gmake install
 exit
 /usr/local/sbin/postage
@@ -111,8 +112,7 @@ http://\<ip>:8080/postage/test.html
 Back in OpenBSD:
 ```
 su -
-cd ..
-cd home/super/postage-master
+cd /home/super/postage-master
 gmake uninstall
 ```
 
@@ -139,6 +139,7 @@ Back in OpenBSD:
 ```
 gmake test-common
 su -
+cd /home/super/envelope-master/
 gmake install
 /usr/local/sbin/envelope
 ```
@@ -149,19 +150,20 @@ http://\<ip>:8888/test.html
 Back in OpenBSD:
 ```
 su -
-cd ..
-cd home/super/envelope-master
+cd /home/super/envelope-master
 gmake uninstall
 ```
 
 # Ubuntu Postage
 In terminal:
 ```
+sudo apt-get install postgresql-server-dev-9.5
+sudo apt-get install postgresql-9.5
+export PATH="/usr/lib/postgresql/9.5/bin:$PATH"
 wget https://github.com/workflowproducts/postage/archive/master.zip
 unzip master.zip 
 cd postage-master/
 ./configure && make
-export PATH="/usr/lib/postgresql/9.5/bin:$PATH"
 make test
 ```
 
@@ -191,13 +193,11 @@ make uninstall
 # Ubuntu Envelope
 In terminal:
 ```
+export PATH="/usr/lib/postgresql/9.5/bin:$PATH"
 wget https://github.com/workflowproducts/envelope/archive/master.zip
 unzip master.zip 
 cd envelope-master/
 ./configure && make
-sudo apt-get install postgresql-server-dev-9.5
-sudo apt-get install postgresql-9.5
-export PATH="/usr/lib/postgresql/9.5/bin:$PATH"
 make test
 ```
 
@@ -232,9 +232,8 @@ wget https://github.com/workflowproducts/postage/archive/master.zip
 unzip master.zip 
 cd postage-master/
 ./configure && make
-```
-
 make test
+```
 
 In your browser:
 Go to the Postage testing page: http://127.0.0.1:8080/postage/test.html
@@ -265,9 +264,8 @@ wget https://github.com/workflowproducts/envelope/archive/master.zip
 unzip master.zip 
 cd envelope-master/
 ./configure && make
-```
-
 make test
+```
 
 In your browser:
 Go to the Envelope testing page: http://127.0.0.1:8888/test.html
