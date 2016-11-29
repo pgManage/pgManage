@@ -848,7 +848,7 @@ function dialogAceInfo() {
         <gs-page>
             <gs-header><center><h3>Editor Info</h3></center></gs-header>
             <gs-body padded>
-                <i>SQL Tab windows uses <a href="http://ace.c9.io/" target="_blank">Ace Editor</a>.</i><br /><br />
+                <i>SQL tab windows use <a href="http://ace.c9.io/" target="_blank">Ace Editor</a>.</i><br /><br />
 
                 Ace is a very capable text editor. Here are some tips to get you started:<br />
                 <ul>
