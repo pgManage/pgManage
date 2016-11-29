@@ -290,3 +290,80 @@ su -
 cd /home/super/envelope-master/
 make uninstall
 ```
+
+# macOS Postage:
+Use Google Chrome
+
+In terminal:
+```
+curl -OL https://github.com/workflowproducts/postage/archive/master.zip
+unzip master.zip 
+cd postage-master/
+./configure
+make all test
+```
+
+In your browser:
+Go to the Postage testing page: http://127.0.0.1:8080/test.html
+
+Back in Terminal:
+```
+sudo su -
+cd /Users/super/postage-master/
+make install
+exit
+make test-common
+/usr/local/sbin/postage
+```
+
+In your browser:
+Go to the Postage testing page: http://127.0.0.1:8080/test.html
+
+To uninstall:
+```
+sudo su -
+cd /Users/super/postage-master/
+make uninstall
+```
+
+# macOS Envelope
+
+Use Google Chrome
+
+In terminal:
+```
+
+//ENVELOPE
+curl -OL https://github.com/workflowproducts/envelope/archive/master.zip
+unzip master.zip 
+cd envelope-master/
+./configure
+make all test
+```
+
+In your browser:
+Go to the Envelope testing page: http://127.0.0.1:8888/test.html
+
+Back in Terminal:
+```
+sudo su -
+cd /Users/super/envelope-master/
+make install
+exit
+make test-common
+sudo su -
+/usr/local/sbin/envelope
+```
+
+In your browser:
+Go to the Envelope testing page: http://127.0.0.1:8888/test.html
+
+To uninstall:
+```
+sudo su -
+cd /Users/super/envelope-master/
+make uninstall
+exit
+cd ~
+rm -rf master.zip
+```
