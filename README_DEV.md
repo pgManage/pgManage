@@ -1,3 +1,7 @@
+# Attention Contributors!!
+
+At this time, Postage is under an MIT license. Submitting a patch to this project means you automatically assign copyright to Workflow Products, LLC. This allows us to distribute any and all Postage code submitted by any contributer under any license at any time.
+
 # Developer Guide
 
 ##TROUBLESHOOTING PERFORMANCE
