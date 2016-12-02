@@ -703,7 +703,7 @@ GS.getInertDOMHTML = function (inertDOM) {
                                               arrCells[cell_i].lastElementChild.value ||
                                               (arrCells[cell_i].lastElementChild.checked || '').toString();
                             } else {
-                                strCellHTML = arrCells[cell_i].textContent.trim();
+                                strCellHTML = arrCells[cell_i].textContent;//.trim();
                             }
                             
                             strCellHTML = encodeHTML(strCellHTML).replace(/\n/gim, '<br />');
@@ -779,14 +779,14 @@ GS.getInertDOMHTML = function (inertDOM) {
                         strCellText = arrCells[cell_i].firstElementChild.textValue ||
                                       arrCells[cell_i].firstElementChild.value ||
                                       (arrCells[cell_i].firstElementChild.checked || '').toString() ||
-                                      arrCells[cell_i].firstElementChild.textContent.trim();
+                                      arrCells[cell_i].firstElementChild.textContent;//.trim();
                         
                     } else if (arrCells[cell_i].lastElementChild) {
                         strCellText = arrCells[cell_i].lastElementChild.textValue ||
                                       arrCells[cell_i].lastElementChild.value ||
                                       (arrCells[cell_i].lastElementChild.checked || '').toString();
                     } else {
-                        strCellText = arrCells[cell_i].textContent.trim();
+                        strCellText = arrCells[cell_i].textContent;//.trim();
                     }
                     
                     strCellText = strCellText.replace(quoteRegex, (strQuoteChar + strQuoteChar));
@@ -821,14 +821,14 @@ GS.getInertDOMHTML = function (inertDOM) {
                             strCellText = arrCells[cell_i].firstElementChild.textValue ||
                                           arrCells[cell_i].firstElementChild.value ||
                                           (arrCells[cell_i].firstElementChild.checked || '').toString() ||
-                                          arrCells[cell_i].firstElementChild.textContent.trim();
+                                          arrCells[cell_i].firstElementChild.textContent;//.trim();
                             
                         } else if (arrCells[cell_i].lastElementChild) {
                             strCellText = arrCells[cell_i].lastElementChild.textValue ||
                                           arrCells[cell_i].lastElementChild.value ||
                                           (arrCells[cell_i].lastElementChild.checked || '').toString();
                         } else {
-                            strCellText = arrCells[cell_i].textContent.trim();
+                            strCellText = arrCells[cell_i].textContent;//.trim();
                         }
                         
                         strCellText = strCellText.replace(quoteRegex, (strQuoteChar + strQuoteChar));
