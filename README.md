@@ -42,13 +42,7 @@ Workflow Products itself is healthier than it's ever been. We're celebrating our
 
 ## Contributing
 
-If you would like to contribute to Postage, first submit an issue. Please include how you plan to solve the issue. Then work on the patch. This way everyone gets a moment to give feedback before you invest your time. 
-
-Anyone presenting a quality patch that asks for commit privileges will likely receive them! Please leave the releases to Nunzio though. He has an extensive testing process. 
-
-We're not against forking. We just want people communicating. It would be preferable if everyone did that before putting forth effort. If we all use the Github issue tracker then there will be a minimum of wasted effort. 
-
-You should probably also read the [README_DEV](https://github.com/workflowproducts/postage/blob/master/README_DEV.md) file.
+Please read the [README_DEV](https://github.com/workflowproducts/postage/blob/master/README_DEV.md) file.
 
 
 Copyright 2016 Workflow Products LLC
