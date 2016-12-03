@@ -422,10 +422,12 @@ bool ws_update_step4(EV_P, void *cb_data, DB_result *res) {
 		if (client_update->str_hash_where_clause != NULL) {
 			SFINISH_CAT_CSTR(str_sql, "SELECT count(*), sum(CASE WHEN ", client_update->str_hash_where_clause,
 				" THEN 1 ELSE 0 END) FROM ", client_update->str_temp_table_name, " ", "INNER JOIN ",
-				client_update->str_real_table_name, " ON ", client_update->str_pk_join_clause, ";");
+				client_update->str_real_table_name, " ON ", client_update->str_pk_join_clause, " WHERE ",
+				client_update->str_pk_where_clause, ";");
 		} else {
 			SFINISH_CAT_CSTR(str_sql, "SELECT count(*) FROM ", client_update->str_temp_table_name, " ", "INNER JOIN ",
-				client_update->str_real_table_name, " ON ", client_update->str_pk_join_clause, ";");
+				client_update->str_real_table_name, " ON ", client_update->str_pk_join_clause, " WHERE ",
+				client_update->str_pk_where_clause, ";");
 		}
 	} else {
 		if (client_update->str_hash_where_clause != NULL) {
