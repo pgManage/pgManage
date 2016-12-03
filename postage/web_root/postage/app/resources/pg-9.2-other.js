@@ -1712,7 +1712,7 @@ function executeScript() {
         editor.getSession().setAnnotations([]);
 
         // clear query data store
-        arrQueryDataStore = [];
+        currentTab.arrQueryDataStore = [];
 
         // set the results pane header and clear out the results pane content
         currentTab.relatedResultsTitleElement.textContent = 'Results';
@@ -1839,7 +1839,7 @@ function executeScript() {
                         }
 
                         // add datastore entry for the current query's results
-                        arrQueryDataStore.push([]);
+                        currentTab.arrQueryDataStore.push([]);
 
                         //console.log(((data.strQuery.match(/\n/gim) || []).length), data);
                         intErrorStartLine += (data.strQuery.match(/\n/gim) || []).length;
@@ -2037,18 +2037,33 @@ function executeScript() {
                                 GS.makeTableSelectable(tableElement, evt.touchDevice);
                             }
 
+                            //console.log('0***', data);
                             // if not end query, therefore: results
                             if (data.strMessage !== '\\.') {
                                 arrRecords = data.strMessage.split('\n');
                                 strHTML = '';
 
+                                //console.log(
+                                //    '1***',
+                                //    data.intCallbackNumberThisQuery,
+                                //    data.intQueryNumber,
+                                //    arrRecords
+                                //);
+
                                 for (rec_i = 0, rec_len = arrRecords.length; rec_i < rec_len; rec_i += 1) {
-                                    // if appending this would make more than 100 records: save to data store
+                                    // if appending this would make more than 10 records: save to data store
                                     if (data.intCallbackNumberThisQuery >= 1) {
-                                        arrQueryDataStore[data.intQueryNumber].push((intRecordsThisQuery + 1) + '\t' + arrRecords[rec_i]);
+                                        //console.log(
+                                        //    '2***',
+                                        //    intRecordsThisQuery,
+                                        //    currentTab.arrQueryDataStore[data.intQueryNumber].length,
+                                        //    arrRecords[rec_i]
+                                        //);
+                                        currentTab.arrQueryDataStore[data.intQueryNumber].push((intRecordsThisQuery + 1) + '\t' + arrRecords[rec_i]);
 
                                         // if this is the first time adding to the data store: add append buttons below the table
-                                        if (arrQueryDataStore[data.intQueryNumber].length === 1) {
+                                        if (currentTab.arrQueryDataStore[data.intQueryNumber].length === 1) {
+                                            //console.log('3***');
                                             buttonContainerElement = document.createElement('div');
                                             buttonContainerElement.style.whiteSpace = 'normal';
 
@@ -2076,6 +2091,11 @@ function executeScript() {
                                     } else {
                                         trElement = document.createElement('tr');
                                         arrCells = arrRecords[rec_i].split('\t');
+                                        
+                                        //console.log(
+                                        //    '4***',
+                                        //    arrCells
+                                        //);
 
                                         strHTML = '<th>' + (intRecordsThisQuery + 1) + '</th>';
                                         for (col_i = 0, col_len = arrCells.length; col_i < col_len; col_i += 1) {
@@ -2098,6 +2118,7 @@ function executeScript() {
 
                             // else if end message
                             } else if (data.strMessage === '\\.') {
+                                //console.log('5***');
                                 // add a br for spacing/padding
                                 resultsContainer.appendChild(document.createElement('br'));
 
@@ -2181,10 +2202,15 @@ function executeScript() {
 
 function showMoreResults(buttonElement, intQuery, howMany) {
     'use strict';
+    var currentTab = document.getElementsByClassName('current-tab')[0];
     var i, len, col_i, col_len, tbodyElement, trElement, gridElement, arrRecords, strHTML, arrCells;
 
-    tbodyElement = xtag.query(document.getElementById('tab-frames'), '.results-table[data-query-number="' + intQuery + '"] tbody')[0];
-    arrRecords = arrQueryDataStore[intQuery];
+    tbodyElement = xtag.query(
+                        currentTab.relatedResultsArea,
+                        '.results-table[data-query-number="' + intQuery + '"] tbody'
+                    )[0];
+
+    arrRecords = currentTab.arrQueryDataStore[intQuery];
 
     for (i = 0, len = (howMany === 'all' ? arrRecords.length : howMany); i < len; i += 1) {
         if (!arrRecords[0]) {
