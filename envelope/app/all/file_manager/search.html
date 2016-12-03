@@ -95,18 +95,21 @@
                 
                 if (bolClear === true) {
                     if (strHTML) {
-                        document.getElementById('matches').textContent = arrLines.length + ' Matches';
+                        document.getElementById('matches').textContent =
+                            arrPaths.length + ' File' + (arrPaths.length != 1 ? 's' : '') + ', ' + arrLines.length + ' Occurrence' + (arrLines.length != 1 ? 's' : '');
                     } else {
-                        document.getElementById('matches').textContent = '0 Matches';
+                        document.getElementById('matches').textContent = '0 Files, 0 Occurrences';
                     }
     
-                    document.getElementById('results-container').innerHTML = (strHTML || '<center>No Matches</center>');
+                    document.getElementById('results-container').innerHTML = (strHTML || '<center>0 Files, 0 Occurrences</center>');
                 } else {
-                    var intMatches = parseInt(document.getElementById('matches').textContent || '0', 10) || 0;
+                    //var intMatches = parseInt(document.getElementById('matches').textContent || '0', 10) || 0;
 
-                    document.getElementById('matches').textContent = (intMatches + arrLines.length) + ' Matches';
+                    //document.getElementById('matches').textContent = (intMatches + arrLines.length) + ' Matches';
+                    document.getElementById('matches').textContent =
+                        arrPaths.length + ' File' + (arrPaths.length != 1 ? 's' : '') + ', ' + arrLines.length + ' Occurrence' + (arrLines.length != 1 ? 's' : '');
     
-                    document.getElementById('results-container').innerHTML += (strHTML || '<center>No Matches</center>');
+                    document.getElementById('results-container').innerHTML += (strHTML || '<center>0 Files, 0 Occurrences</center>');
                 }
                 
                 if (bolScrollToEnd) {

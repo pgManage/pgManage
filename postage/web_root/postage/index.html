@@ -15,6 +15,7 @@
         <script>
 var bolCurl = false;
 var bolTutorial = false;
+var ajxCurrent;
 
 function appendError(data) {
     var errorContainer = document.getElementById('container-error');
@@ -47,8 +48,8 @@ function login() {
         strCustomConn = '';
     }
 
-    GS.addLoader('login', 'Logging In...');
-    GS.ajaxJSON('/postage/auth',
+    GS.addLoader('login', 'Logging In...<gs-button onclick="GS.removeLoader(\'login\'); ajxCurrent.abort();">Cancel</gs-button>');
+    ajxCurrent = GS.ajaxJSON('/postage/auth',
                 'action=login' + strCustomConn +
                    '&connname=' + encodeURIComponent(strConnName) +
                    '&username=' + encodeURIComponent(document.getElementById('text-username').value) +

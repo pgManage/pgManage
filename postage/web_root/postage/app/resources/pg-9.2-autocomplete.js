@@ -111,6 +111,13 @@ function autocompleteBindEditor(tabElement, editor) {
             }
         });
         
+        // bind scroll
+        editor.session.addEventListener('changeScrollTop', function (event) {
+            if (autocompleteGlobals.popupOpen === true && autocompleteGlobals.popupLoading === false) {
+                autocompletePopupClose(editor);
+            }
+        });
+        
         //editor.container.addEventListener('range-update', function () { });
         //editor.addEventListener('change', function () { });
     }
