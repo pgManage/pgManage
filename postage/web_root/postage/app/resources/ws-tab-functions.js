@@ -1323,7 +1323,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                         </div>
                     </gs-body>
                     <gs-footer>
-                        <center>Changes are effective immediately after clicking <b>"Save"</b>.</center>
+                        <center>You need to re-copy your data after clicking <b>"Save"</b>.</center>
                         <gs-grid gutter>
                             <gs-block><gs-button jumbo dialogclose>Cancel</gs-button></gs-block>
                             <gs-block><gs-button jumbo dialogclose bg-primary>Save</gs-button></gs-block>
