@@ -70,8 +70,9 @@ var treeStructure = [
             [3, 'script', 'objectOperatorFamily'],
         [2, 'folder,refresh', 'objectSequence'],
             [3, 'script', 'objectSequence'],
-        [2, 'folder,refresh', 'objectTable'],
-            [3, 'script', 'objectTable'],
+        [2, 'folder,refresh', 'objectTableList'],
+            [3, 'folder,script', 'objectTable'],
+                [4, 'script', 'objectTable'],
         [2, 'folder,refresh', 'objectTriggerFunction'],
             [3, 'script', 'objectFunction'],
         [2, 'folder,refresh', 'objectType'],
@@ -89,14 +90,15 @@ var treeStructure = [
 
 
 
-
-
-
-
 listQuery.schemas = ml(function () {/*
      SELECT oid, nspname AS name
        FROM pg_namespace
-      WHERE ((NOT nspname LIKE 'pg\_%') OR nspname = 'pg_catalog') AND (NOT nspname LIKE 'information%')
+      WHERE (
+                (NOT nspname LIKE 'pg\_%')
+                OR
+                nspname = 'pg_catalog'
+            )
+        AND (NOT nspname LIKE 'information%')
    ORDER BY nspname;
 */});
 
@@ -172,7 +174,7 @@ listQuery.objectSchema = listQuery.schemaContents = ml(function () {/*
               WHERE relkind = 'S'
                 AND pg_class.relnamespace = '{{INTOID}}'::oid) AS obj_count
         UNION
-        SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Tables' AS name, 'objectTable' AS obj_query, (SELECT count(relname) AS result
+        SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Tables' AS name, 'objectTableList' AS obj_query, (SELECT count(relname) AS result
                  FROM pg_class rel
                 WHERE relkind IN ('r','s','t')
                   AND rel.relnamespace = '{{INTOID}}'::oid) AS obj_count
@@ -207,6 +209,36 @@ listQuery.objectSchema = listQuery.schemaContents = ml(function () {/*
      WHERE srt = CASE WHEN (SELECT sum(obj_count) FROM folders filders_where) > 1 THEN 2 ELSE 999 END
        AND obj_count > 0;
 */});
+
+
+/*
+
+columns
+keys
+constraints
+triggers
+indexes
+
+*/
+
+
+listQuery.objectTable = ml(function () {/*
+    SELECT {{INTOID}} AS oid,
+            COALESCE(attname,'') ||
+                ' (' ||
+                    COALESCE(format_type(atttypid, atttypmod),'') ||
+                ')',
+            '' AS schema_name,
+            'CL' AS bullet
+      FROM pg_catalog.pg_attribute
+     WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0
+       AND attrelid = {{INTOID}}
+  ORDER BY attnum ASC;
+*/});
+
+
+
+
 
 
 titleRefreshQuery.objectAggregate = titleRefreshQuery.aggregateNumber = ml(function () {/*
@@ -314,7 +346,7 @@ titleRefreshQuery.objectSequence = titleRefreshQuery.sequenceNumber = ml(functio
 */});
 
 
-titleRefreshQuery.objectTable = titleRefreshQuery.tableNumber = ml(function () {/*
+titleRefreshQuery.objectTableList = titleRefreshQuery.tableNumber = ml(function () {/*
     SELECT count(relname) AS result
       FROM pg_class rel
      WHERE relkind IN ('r','s','t') AND rel.relnamespace = {{INTOID}};
@@ -350,13 +382,16 @@ titleRefreshQuery.objectView = titleRefreshQuery.viewNumber = ml(function () {/*
 
 
 
-listQuery.objectTable = listQuery.tables = ml(function () {/*
-      SELECT pg_class.oid, quote_ident(relname) AS name, pg_namespace.nspname AS schema_name, 'TB' AS bullet
+listQuery.objectTableList = ml(function () {/*
+      SELECT pg_class.oid, quote_ident(relname) AS name, pg_namespace.nspname AS schema_name--, 'TB' AS bullet
         FROM pg_class
    LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
        WHERE relkind IN ('r','s','t') AND pg_class.relnamespace = {{INTOID}}
     ORDER BY relname;
 */});
+
+
+
 
 
 listQuery.objectTriggerFunction = listQuery.triggers = ml(function () {/*
