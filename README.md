@@ -22,7 +22,7 @@ Postage is built on Envelope technology. Postage and Envelope are products of Wo
 
 Since Postage runs in a browser we don't really know what will happen if you use Postage with a non-UTF8 PostgreSQL database. If you experience a problem then please post an issue to [Github Issues](https://github.com/workflowproducts/postage/issues).
 
-If you like some or all of Postage's functionality and the current license won't suit your needs, commercial licensing is available starting at $99. Please call Justin at Workflow Products, 817-503-9545 for details.
+Postage is free for personal and commercial use. If you like some or all of Postage's functionality and the current license won't suit your needs, custom licensing is available starting at $99. Please call Justin at Workflow Products, 817-503-9545 for details.
 
 ## Why?
 
