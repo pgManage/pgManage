@@ -1186,11 +1186,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     for (col_i = 0, col_len = Math.min(arrSetColumns.length, arrPasteRecords[0].children.length), strRecord = ''; col_i < col_len; col_i += 1) {
                         cell = arrPasteRecords[i].children[col_i];
                         if (cell) {
-                            if (cell.children && cell.children.length > 0) {
-                                strRecord += (strRecord ? '\t' : '') + GS.encodeForTabDelimited(cell.children[0].innerText || cell.children[0].textContent);
-                            } else {
-                                strRecord += (strRecord ? '\t' : '') + GS.encodeForTabDelimited(cell.innerText || cell.textContent);
-                            }
+                            strRecord += (strRecord ? '\t' : '') + GS.encodeForTabDelimited(cell.innerText.trim() || cell.textContent.trim());
                         } else {
                             strRecord += (strRecord ? '\t' : '') + GS.encodeForTabDelimited('NULL');
                         }
