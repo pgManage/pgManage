@@ -1,8 +1,8 @@
-﻿  ws_raw.c
+﻿  util_error.c
   Generating code
-  15 of 405 functions ( 3.7%) were compiled, the rest were copied from previous compilation.
+  155 of 405 functions (38.3%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    136 functions had inline decision re-evaluated but remain unchanged
+    14 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.exe
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)
