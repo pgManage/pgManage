@@ -14,7 +14,7 @@ Fix autocomplete scroll (closes workflowproducts/postage#54)
 Add cancel option to login (closes workflowproducts/postage#50)
 Fix mac dmg image to be taller (closes workflowproducts/postage#61)
 Fix grep search in envelope
-fix `make install` not creating sbin (closes #58)
+fix `make install` not creating sbin (closes workflowproducts/postage#58)
 Merge pull request workflowproducts/postage#63 from anthonydb/master (Minor spelling and grammar updates to text)
 
 Changes since 3.0.0 and 2.1.0:
