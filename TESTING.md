@@ -3,7 +3,7 @@
 su -
 pkg install
 pkg install unzip
-pkg install postgresql-server
+pkg install postgresql96-server
 pkg install gmake
 pkg install wget
 exit
@@ -43,7 +43,7 @@ gmake uninstall
 su -
 pkg install
 pkg install unzip
-pkg install postgresql-server
+pkg install postgresql96-server
 pkg install gmake
 pkg install wget
 exit

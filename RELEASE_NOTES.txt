@@ -1,3 +1,22 @@
+Changes since 3.1.0 and 2.2.0:
+Make NSIS installer check for ucrt (closes workflowproducts/postage#67)
+Add column list to tree view (closes workflowproducts/postage#9)
+Clipboard handle container for text (closes workflowproducts/postage#69)
+Add NULL to cells that don't exist (closes workflowproducts/postage#68)
+Fix clip options label (closes workflowproducts/postage#66)
+Fix raw error reporting to not be truncated at 255 chars (for workflowproducts/postage#65)
+Make raw errors more detailed like PGAdmin (closes workflowproducts/postage#65)
+Fixed Postage issue where in certain cases results could not be seen.
+Fixed Postage issue where switching to a tab with results in it: the top portion of the results was chopped off.
+Speed up update on complex views (workflowproducts/envelope#23)
+Remove .trim()s (closes workflowproducts/envelope#64)
+Fix autocomplete scroll (closes workflowproducts/postage#54)
+Add cancel option to login (closes workflowproducts/postage#50)
+Fix mac dmg image to be taller (closes workflowproducts/postage#61)
+Fix grep search in envelope
+fix `make install` not creating sbin (closes workflowproducts/postage#58)
+Merge pull request workflowproducts/postage#63 from anthonydb/master (Minor spelling and grammar updates to text)
+
 Changes since 3.0.0 and 2.1.0:
 Fix http_accept to be able to return long strings
 Fix hang when TLS is enabled
