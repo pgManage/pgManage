@@ -6,7 +6,7 @@
 static const char *str_date_format = "%Y/%m/%d";
 static const char *str_time_format = "%H:%M:%S";
 
-static char *get_error_message_pretty(PGconn *conn, PGresult *res);
+extern char *_DB_get_diagnostic(DB_conn *conn, PGresult *res);
 
 char *ws_raw_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_query = NULL;
@@ -182,10 +182,10 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 	client_request->int_i += 1;
 	if (client_request->int_i <= client_request->int_len) {
 		if (client_request->int_i == 0) {
-			SFINISH_CHECK(result == PGRES_COMMAND_OK, "BEGIN failed: %s", get_error_message_pretty(client_request->parent->cnxn, res));
+			SFINISH_CHECK(result == PGRES_COMMAND_OK, "BEGIN failed: %s", _DB_get_diagnostic(client_request->parent->conn, res));
 
 		} else if (result == PGRES_FATAL_ERROR) {
-			SFINISH("Query failed: %s", get_error_message_pretty(client_request->parent->cnxn, res));
+			SFINISH("Query failed: %s", _DB_get_diagnostic(client_request->parent->conn, res));
 
 		} else if (result == PGRES_EMPTY_QUERY) {
 			// FINISH("Query empty");
@@ -206,10 +206,10 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			SFINISH_CAT_APPEND(str_response, "\\.");
 
 		} else if (result == PGRES_BAD_RESPONSE) {
-			SFINISH("Bad response from server: %s", get_error_message_pretty(client_request->parent->cnxn, res));
+			SFINISH("Bad response from server: %s", _DB_get_diagnostic(client_request->parent->conn, res));
 
 		} else if (result == PGRES_NONFATAL_ERROR) {
-			SFINISH("Nonfatal error: %s", get_error_message_pretty(client_request->parent->cnxn, res));
+			SFINISH("Nonfatal error: %s", _DB_get_diagnostic(client_request->parent->conn, res));
 
 		} else if (result == PGRES_COMMAND_OK) {
 			str_rows = PQcmdTuples(res);
@@ -248,7 +248,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			}
 			query_callback(EV_A, client_request, _raw_tuples_callback);
 		} else {
-			SFINISH("Unexpected result status %s: %s", PQresStatus(result), get_error_message_pretty(client_request->parent->cnxn, res));
+			SFINISH("Unexpected result status %s: %s", PQresStatus(result), _DB_get_diagnostic(client_request->parent->conn, res));
 		}
 	} else {
 		client_request->int_response_id -= 1;
@@ -660,64 +660,6 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
 	}
-}
-
-static char *get_error_message_pretty(PGconn *conn, PGresult *res) {
-	// TODO: error message cuts off
-	char *str_response = NULL;
-	char *str_temp = NULL;
-
-	// get vars with error stuff
-	char *return_severity = PQresultErrorField(res, PG_DIAG_SEVERITY);
-	char *return_error = PQresultErrorField(res, PG_DIAG_MESSAGE_PRIMARY);
-	char *return_sqlstate = PQresultErrorField(res, PG_DIAG_SQLSTATE);
-	char *return_detail = PQresultErrorField(res, PG_DIAG_MESSAGE_DETAIL);
-	char *return_hint = PQresultErrorField(res, PG_DIAG_MESSAGE_HINT);
-	char *return_query = PQresultErrorField(res, PG_DIAG_INTERNAL_QUERY);
-	char *return_context = PQresultErrorField(res, PG_DIAG_CONTEXT);
-	char *return_err_pos = PQresultErrorField(res, PG_DIAG_STATEMENT_POSITION);
-
-	// jsonify vars
-	return_error = return_error != NULL ? cat_cstr(return_error) : cat_cstr("");
-	return_detail = return_detail != NULL ? cat_cstr(return_detail) : cat_cstr("");
-	return_hint = return_hint != NULL ? cat_cstr(return_hint) : cat_cstr("");
-	return_query = return_query != NULL ? cat_cstr(return_query) : cat_cstr("");
-	return_context = return_context != NULL ? cat_cstr(return_context) : cat_cstr("");
-	return_err_pos = return_err_pos != NULL ? cat_cstr(return_err_pos) : cat_cstr("");
-
-	SFINISH_CHECK(return_error != NULL, "return_error failed");
-	SFINISH_CHECK(return_detail != NULL, "return_detail failed");
-	SFINISH_CHECK(return_hint != NULL, "return_hint failed");
-	SFINISH_CHECK(return_query != NULL, "return_query failed");
-	SFINISH_CHECK(return_context != NULL, "return_context failed");
-	SFINISH_CHECK(return_err_pos != NULL, "return_err_pos failed");
-
-	// build response
-	SFINISH_CAT_CSTR(str_response, "");
-	// clang-format off
-	SFINISH_CAT_APPEND(str_response,
-		"SEVERITY: ", return_severity, "\012",
-		"ERROR: ", return_error, "\012",
-		"SQLSTATE: ", return_sqlstate, "\012",
-		"DETAIL: ", return_detail, "\012",
-		"HINT: ", return_hint, "\012",
-		"QUERY: ", return_query, "\012",
-		"CONTEXT: ", return_context, "\012",
-		"POSITION: ", return_err_pos, "\012");
-	// clang-format on
-	SDEBUG("str_response: %s", str_response);
-
-finish:
-	// free
-	SFREE(str_temp);
-	SFREE(return_error);
-	SFREE(return_detail);
-	SFREE(return_hint);
-	SFREE(return_query);
-	SFREE(return_context);
-	SFREE(return_err_pos);
-
-	return str_response;
 }
 
 #endif

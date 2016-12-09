@@ -11,7 +11,7 @@ bool DB_init_framework() {
 		SFREE(A);                                                                                                                \
 	}
 
-static char *_DB_get_diagnostic(DB_conn *conn, PGresult *res);
+char *_DB_get_diagnostic(DB_conn *conn, PGresult *res);
 static void db_query_cb(EV_P, ev_io *w, int revents);
 static void db_copy_out_check_cb(EV_P, ev_check *w, int revents);
 static void db_cnxn_cb(EV_P, ev_io *w, int revents);
@@ -437,7 +437,7 @@ char *DB_get_diagnostic(DB_conn *conn, DB_result *res) {
 	return str_response;
 }
 
-static char *_DB_get_diagnostic(DB_conn *conn, PGresult *res) {
+char *_DB_get_diagnostic(DB_conn *conn, PGresult *res) {
 	// TODO: error message cuts off
 	char *str_response = NULL;
 	char *str_temp = NULL;
