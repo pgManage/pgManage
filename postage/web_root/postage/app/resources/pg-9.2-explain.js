@@ -2,93 +2,230 @@
 var bolExplainLoaded = true;
 
 
-// call explain then send the data to the handleExplain function
 function explain(bolRun) {
     'use strict';
-    var currentTab, editor, resultsContainer, strRunQuery, messageID,
-        resultsTallyElement, resultsTitleElement, jsnCurrentQuery;
-    
-    currentTab = document.getElementsByClassName('current-tab')[0];
-    editor = currentTab.relatedEditor;
-    resultsContainer = currentTab.relatedResultsArea;
-    resultsTallyElement = currentTab.relatedResultsTallyElement;
-    resultsTitleElement = currentTab.relatedResultsTitleElement;
-    jsnCurrentQuery = getCurrentQuery();
-    strRunQuery = jsnCurrentQuery.strQuery;
-    
-    
-    
-    //currentTab.relatedResultsTitleElement.textContent = 'Query Explain';
-    //currentTab.relatedClearButton.setAttribute('hidden', '');
-    //currentTab.relatedCopyOptionsButton.setAttribute('hidden', '');
-    currentTab.relatedStopButton.removeAttribute('hidden');
-    //currentTab.handlingQuery = true;
-    //currentTab.relatedResultsHeaderElement.classList.add('executing');
-    currentTab.relatedResultsHeaderElement.classList.remove('error');
-    currentTab.relatedResultsHeaderElement.classList.remove('executing');
-    
-    
-    
-    // request using raw query
-    GS.addLoader(editor.container.parentNode.parentNode, 'Getting Explain...');
-    messageID = GS.requestRawFromSocket(GS.querySocket,
-                            (bolRun ?
-                                'EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) ' :
-                                'EXPLAIN (FORMAT JSON, VERBOSE) ') +
-                            strRunQuery,
-                            function (data, error) {
-        var i, len, arrLines, divElement, strError, intLine;
-        
-        if (!error) {
-            // if message 0
-            if (data.intCallbackNumber === 0) {
-                GS.removeLoader(editor.container.parentNode.parentNode);
-                currentTab.relatedStopButton.setAttribute('hidden', '');
-                currentTab.relatedClearButton.removeAttribute('disabled');
-                
-                handleExplain(JSON.parse(GS.decodeFromTabDelimited(data.strMessage)), resultsContainer, bolRun);
-            }
-            
-        } else {
+    var currentTab           = document.getElementsByClassName('current-tab')[0]
+      , editor               = currentTab.relatedEditor
+      , resultsContainer     = currentTab.relatedResultsArea
+      , resultsTallyElement  = currentTab.relatedResultsTallyElement
+      , resultsHeaderElement = currentTab.relatedResultsHeaderElement
+      , jsnCurrentQuery, startExecute, endExecute, startLoading, endLoading, updateTally
+      , stopLoadingHandler, bolIgnoreMessages = false, cancelSignalHandler
+      , messageID, currentTargetTbody, intError, intQuery
+      , divElement, intErrorStartLine, bindShowQueryButton, strRunQuery;
+
+    // if we found an editor to get the query from and the current tab is not already running a query
+    if (editor && currentTab.handlingQuery !== true) {
+        // get current query
+        jsnCurrentQuery = getCurrentQuery();
+
+        // clear error annotation in ace
+        editor.getSession().setAnnotations([]);
+
+        // clear query data store
+        currentTab.arrQueryDataStore = [];
+
+        // set the results pane header and clear out the results pane content
+        currentTab.relatedResultsTitleElement.textContent = 'Results';
+        resultsContainer.innerHTML = '';
+        resultsHeaderElement.classList.remove('error');
+        resultsHeaderElement.classList.remove('executing');
+
+        // set number tracking variables
+        intError = 0;            // number error the callback is on
+        intQuery = 0;            // number query the callback is on
+        intErrorStartLine = 0;   // number of lines in the queries that successfully ran, so that we can offset the error annotation
+
+        // this function is going to be bound to the "Stop Execution" button,
+        //      it sets the "bolIgnoreMessages" variable to true, meaning the callback for the query execution will not do anything
+        //      it also changes the results pane header (the tally results portion) to "(Loading Stopped)"
+        //      it also runs the "endExecute" and "endLoading" functions
+        stopLoadingHandler = function () {
+            bolIgnoreMessages = true;
+            resultsTallyElement.innerHTML = ' (Loading Stopped)';
+            endExecute();
+            endLoading();
+        };
+
+        // this function is going to be bound to the "Stop Execution" button,
+        //      it uses the "messageID" variable to send a "CANCEL" signal through the websocket
+        cancelSignalHandler = function () {
+            GS.requestFromSocket(GS.querySocket, 'CANCEL', '', messageID);
+        };
+
+        // this function is run when we send the queries through the websocket,
+        //      it adds a loader, disables the "Clear" button and shows/binds the "Stop Execution" button
+        startExecute = function () {
+            GS.addLoader(editor.container.parentNode.parentNode, 'Executing Query...');
+            currentTab.relatedClearButton.setAttribute('hidden', '');
+            currentTab.relatedCopyOptionsButton.setAttribute('hidden', '');
+            currentTab.handlingQuery = true;
+
+            resultsHeaderElement.classList.add('executing');
+            currentTab.relatedStopButton.removeAttribute('hidden');
+            currentTab.relatedStopButton.addEventListener('click', cancelSignalHandler);
+        };
+
+        // this function is run when we get our first callback,
+        //      it removes the loader, hides/unbinds the "Stop Execution" button
+        endExecute = function () {
             GS.removeLoader(editor.container.parentNode.parentNode);
+
             currentTab.relatedStopButton.setAttribute('hidden', '');
-            currentTab.relatedClearButton.removeAttribute('disabled');
-            //GS.webSocketErrorDialog(data);
-            
-            arrLines = data.error_text.split('\n');
-            
-            for (i = 0, len = arrLines.length; i < len; i += 1) {
-                if (arrLines[i].substring(0, arrLines[i].indexOf(':')) === 'ERROR') {
-                    strError = arrLines[i].substring(arrLines[i].indexOf(':') + 1, arrLines[i].length).trim();
-                }
-                if (arrLines[i].substring(0, arrLines[i].indexOf(' ')) === 'LINE') {
-                    intLine = parseInt(arrLines[i].substring(arrLines[i].indexOf(' ') + 1, arrLines[i].indexOf(':')), 10);
+            currentTab.relatedStopButton.removeEventListener('click', cancelSignalHandler);
+        };
+
+        // this function is run when we get our first callback,
+        //      it shows and binds the "Stop Loading" button
+        startLoading = function () {
+            currentTab.relatedClearButton.setAttribute('hidden', '');
+
+            //currentTab.relatedStopLoadingButton.removeAttribute('hidden');
+            //currentTab.relatedStopLoadingButton.addEventListener('click', stopLoadingHandler);
+        };
+
+        // this function is run when we encounter an error or we've recieved the last transmission,
+        //      it enables the "Clear" button and hides/unbinds the "Stop Loading" button
+        endLoading = function () {
+            currentTab.relatedClearButton.removeAttribute('hidden');
+            resultsHeaderElement.classList.remove('executing');
+            currentTab.handlingQuery = false;
+
+            //currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
+            //currentTab.relatedStopLoadingButton.removeEventListener('click', stopLoadingHandler);
+        };
+
+        // this function is run when the user clicks "Show Query",
+        //      it opens a dialog with the query in it
+        bindShowQueryButton = function (element, strQuery) {
+            element.addEventListener('click', function () {
+                var templateElement = document.createElement('template');
+
+                templateElement.setAttribute('data-overlay-close', 'true');
+                templateElement.innerHTML = ml(function () {/*
+                    <gs-page>
+                        <gs-body padded>
+                            <pre>{{STRHTML}}</pre>
+                        </gs-body>
+                    </gs-page>
+                */}).replace(/\{\{STRHTML\}\}/gim, encodeHTML(strQuery));
+
+                GS.openDialogToElement(element, templateElement, 'left');
+            });
+        };
+
+        // This function updates the results header Success/Error tally
+        updateTally = function (intQuery, intError) {
+            resultsTallyElement.innerHTML = ' (<b>Pass: ' + (intQuery - intError) + '</b>, <b>Fail: ' + (intError) + '</b>)';
+            //resultsTallyElement.innerHTML = ' (<b>Success: ' + (intQuery - intError) + '</b>, <b>Error: ' + (intError) + '</b>)';
+        };
+
+        // get the current query
+        strRunQuery = jsnCurrentQuery.strQuery;
+
+        // append explain-specific delarations depending on wheather or not we are going to run the actual code
+        if (bolRun) {
+            strRunQuery = 'EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) ' + strRunQuery;
+        } else {
+            strRunQuery = 'EXPLAIN (FORMAT JSON, VERBOSE) ' + strRunQuery;
+        }
+
+        // begin
+        startExecute();
+        messageID = GS.requestRawFromSocket(GS.querySocket, strRunQuery, function (data, error) {
+            var tableElement, scrollElement, trElement, arrRecords
+              , arrCells, intRows, strHTML, arrLines, strError
+              , intLine, i, len, col_i, col_len, rec_i, rec_len
+              , warningHTML, buttonContainerElement, strCSS
+              , styleElement;
+
+            if (bolIgnoreMessages === false) {
+                if (!error) {
+                    if (data.intCallbackNumber === 0) {
+                        endExecute();
+                        startLoading();
+                    }
+                    if (data.bolLastMessage) {
+                        endLoading();
+                    }
+                    if (data.intCallbackNumberThisQuery === 0) {
+                        intErrorStartLine += (data.strQuery.match(/\n/gim) || []).length;
+                    }
+
+                    // if not end query, therefore: results
+                    if (data.strMessage !== '\\.') {
+                        //console.log('1***', data.intCallbackNumber, data.intCallbackNumberThisQuery, data.strMessage);
+
+                        if (data.intCallbackNumber === 0) {
+                            resultsContainer.innerHTML = '<div style="width: 100%; height: 100%;"></div>';
+    
+                            handleExplain(JSON.parse(GS.decodeFromTabDelimited(data.strMessage)), resultsContainer.children[0], bolRun);
+                        }
+
+                    // else if end message
+                    } else if (data.strMessage === '\\.') {
+                        // set part number to 0 and add one to the query number
+                        intQuery += 1;
+
+                        // update the success and error tally
+                        updateTally(intQuery, intError);
+
+                        currentTab.relatedClearButton.removeAttribute('disabled');
+                        currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
+                        currentTab.relatedStopLoadingButton.removeEventListener('click', stopLoadingHandler);
+                    }
+                } else {
+                    endExecute();
+                    endLoading();
+
+                    // template warnings
+                    for (i = 0, len = data.arrMessages.length, warningHTML = ''; i < len; i += 1) {
+                        warningHTML += '<i>' +
+                                            '<b>' + data.arrMessages[i].level + ':</b> ' +
+                                            encodeHTML(data.arrMessages[i].content) +
+                                        '</i>';
+                    }
+
+                    // handle putting the error response in the results pane
+                    arrLines = data.error_text.split('\n');
+                    intQuery += 1;
+                    intError += 1;
+
+                    for (i = 0, len = arrLines.length; i < len; i += 1) {
+                        if (arrLines[i].substring(0, arrLines[i].indexOf(':')) === 'ERROR') {
+                            strError = arrLines[i].substring(arrLines[i].indexOf(':') + 1, arrLines[i].length).trim();
+                        }
+                        if (arrLines[i].substring(0, arrLines[i].indexOf(' ')) === 'LINE') {
+                            intLine = parseInt(arrLines[i].substring(arrLines[i].indexOf(' ') + 1, arrLines[i].indexOf(':')), 10);
+                        }
+                    }
+
+                    divElement = document.createElement('div');
+                    divElement.innerHTML = '<h4>Query #' + (intQuery) + ' Error:</h4>' + warningHTML +
+                                            '<pre>' + encodeHTML(GS.decodeFromTabDelimited(data.error_text)) + '</pre>'; //strError ||
+                    resultsContainer.appendChild(divElement);
+                    resultsContainer.appendChild(document.createElement('br'));
+                    resultsContainer.scrollTop = resultsContainer.scrollHeight + resultsContainer.offsetHeight;
+                    resultsHeaderElement.classList.add('error');
+
+                    if (intLine) {
+                        editor.getSession().setAnnotations([
+                            {'row': jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1), 'column': parseInt(data.error_position, 10) || 0,
+                                'text': strError, 'type': 'error'}
+                        ]);
+
+                        editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1)), true, true);
+                    }
+
+                    // update the success and error tally
+                    updateTally(intQuery, intError);
                 }
             }
-            
-            resultsContainer.innerHTML = '';
-            divElement = document.createElement('div');
-            divElement.innerHTML = '<h4>Query Error:</h4>' +
-                                    '<pre>' + encodeHTML(GS.decodeFromTabDelimited(data.error_text)) + '</pre>'; //strError ||
-            resultsContainer.appendChild(divElement);
-            resultsContainer.appendChild(document.createElement('br'));
-            resultsContainer.scrollTop = resultsContainer.scrollHeight + resultsContainer.offsetHeight;
-            
-            editor.getSession().setAnnotations([
-                {'row': jsnCurrentQuery.start_row + (intLine - 1), 'column': parseInt(data.error_position, 10) || 0,
-                    'text': strError, 'type': 'error'}
-            ]);
-            
-            editor.scrollToLine((jsnCurrentQuery.start_row + intLine), true, true);
-            
-            //editor.gotoLine(
-            //    (jsnCurrentQuery.start_row + intLine),
-            //    (parseInt(data.error_position, 10) || 0),
-            //    true
-            //);
-        }
-    });
+        });
+    }
 }
+
+
 
 function handleExplain(explainJSON, target, bolRun) {
     'use strict';

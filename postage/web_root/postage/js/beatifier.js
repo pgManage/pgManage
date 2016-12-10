@@ -10,139 +10,233 @@
         cursurReturnToken: '\n',
         scopeTabCoefficient: 1,
         linebreakKeywords: [
+			{
+				capitalize: false,
+				keyword: "CREATE\\sOR\\sREPLACE\\sFUNCTION\\s([^ \\t\(\)]*\.)?[^ \\t\(\)]*\\s*\([^ \\t\(\)]*\)$",
+				tabBefore: false,
+				newlineBefore: true,
+				newlineAfter: true
+			},
             {
+				capitalize: true,
+				keyword: "CREATE\\sOR\\sREPLACE",
+				tabBefore: false,
+				newlineBefore: false,
+				newlineAfter: false
+			},
+            {
+				capitalize: true,
+				keyword: "VIEW",
+				tabBefore: false,
+				newlineBefore: false,
+				newlineAfter: false
+			},
+            {
+				capitalize: true,
+				keyword: "TABLE",
+				tabBefore: false,
+				newlineBefore: false,
+				newlineAfter: false
+			},
+            {
+				capitalize: true,
+				keyword: "FUNCTION",
+				tabBefore: false,
+				newlineBefore: false,
+				newlineAfter: false
+			},
+            {
+				capitalize: true,
+				keyword: "SEQUENCE",
+				tabBefore: false,
+				newlineBefore: false,
+				newlineAfter: false
+			},
+            {
+				capitalize: true,
+				keyword: "GRANT",
+				tabBefore: false,
+				newlineBefore: true,
+				newlineAfter: false
+			},
+            {
+				capitalize: true,
                 keyword: "SELECT",
                 tabBefore: true,
 				newlineBefore: true,
                 newlinesAfter: false
             },
             {
+				capitalize: true,
                 keyword: "INSERT",
                 tabBefore: true,
 				newlineBefore: true,
                 newlineAfter: false
             },
             {
+				capitalize: true,
                 keyword: "FROM",
                 tabBefore: true,
 				newlineBefore: true,
                 newlineAfter: false
             },
             {
+				capitalize: true,
                 keyword: "WHERE",
                 tabBefore: true,
 				newlineBefore: true,
                 newlineAfter: false
             },
             {
+				capitalize: true,
                 keyword: "ORDER BY",
                 tabBefore: true,
 				newlineBefore: true,
                 newlineAfter: false
             },
             {
+				capitalize: true,
                 keyword: "GROUP BY",
                 tabBefore: true,
 			   	newlineBefore: true,
                 newlineAfter: false
             },
             {
+				capitalize: true,
                 keyword: "HAVING",
                 tabBefore: true,
 			   	newlineBefore: true,
                 newlineAfter: false
             },
             {
+				capitalize: true,
                 keyword: "FETCH",
                 tabBefore: true,
 				newlineBefore: true,
                 newlineAfter: false
             },
             {
+				capitalize: true,
                 keyword: "UPDATE",
                 tabBefore: true,
 				newlineBefore: true,
                 newlineAfter: false
             },
             {
+				capitalize: true,
                 keyword: "DELETE",
                 tabBefore: true,
 				newlineBefore: true,
                 newlineAfter: false
             },
-			/*
             {
-                keyword: "INNER JOIN",
+				capitalize: true,
+                keyword: "(LEFT|LEFT\\sOUTER|RIGHT|RIGHT\\sOUTER|INNER)?\\s?JOIN",
                 tabBefore: true,
 				newlineBefore: true,
                 newlineAfter: false
             },
             {
-                keyword: "LEFT OUTER JOIN",
-                tabBefore: true,
-				newlineBefore: true,
-                newlineAfter: false
-            },
-            {
-                keyword: "LEFT JOIN",
-                tabBefore: true,
-				newlineBefore: true,
-                newlineAfter: false
-            },
-            {
-                keyword: "RIGHT OUTER JOIN",
-                tabBefore: true,
-				newlineBefore: true,
-                newlineAfter: false
-            },
-            {
-                keyword: "RIGHT JOIN",
-                tabBefore: true,
-				newlineBefore: true,
-                newlineAfter: false
-            },*/
-            {
-                keyword: "(LEFT|LEFT\\sOUTER|RIGHT|RIGHT\\sOUTER|INNER)? ?JOIN",
-                tabBefore: true,
-				newlineBefore: true,
-                newlineAfter: false
-            },
-            {
+				capitalize: true,
                 keyword: "AND",
                 tabBefore: true,
 				newlineBefore: true,
                 newlineAfter: false
             },
             {
+				capitalize: true,
                 keyword: "OR",
-                tabBefore: true,
-				newlineBefore: true,
+                tabBefore: false,
+				newlineBefore: false,
                 newlineAfter: false
             },
             {
+				capitalize: true,
                 keyword: "SET",
                 tabBefore: true,
 				newlineBefore: true,
                 newlineAfter: false
             },
             {
+				capitalize: true,
+                keyword: "IF",
+                tabBefore: false,
+				newlineBefore: false,
+                newlineAfter: false
+            },
+            {
+				capitalize: true,
                 keyword: "ON",
                 tabBefore: false,
 				newlineBefore: false,
                 newlineAfter: false
             },
 			{
+				capitalize: true,
                 keyword: "AS",
                 tabBefore: false,
 				newlineBefore: false,
                 newlineAfter: false
+            },
+			{
+				capitalize: false,
+                keyword: "[^ \\t]*;",
+                tabBefore: false,
+				newlineBefore: false,
+                newlineAfter: false,
+                newlineAfterNoExtraTab: true
+            },
+			{
+				capitalize: true,
+                keyword: "RETURNS",
+                tabBefore: false,
+				newlineBefore: true,
+                newlineAfter: false
+            },
+			{
+				capitalize: true,
+                keyword: "DECLARE",
+                tabBefore: false,
+				newlineBefore: true,
+                newlineAfter: true
+            },
+			{
+				capitalize: true,
+                keyword: "BEGIN",
+                tabBefore: false,
+				newlineBefore: true,
+                newlineAfter: false,
+                newlineAfterNoExtraTab: true
+            },
+			{
+				capitalize: true,
+                keyword: "THEN",
+                tabBefore: false,
+				newlineBefore: false,
+                newlineAfter: false,
+                newlineAfterNoExtraTab: true
+            },
+			{
+				capitalize: true,
+                keyword: "END(\\s?IF;)?",
+                tabBefore: false,
+				newlineBefore: false,
+                newlineAfter: false,
+                newlineAfterNoExtraTab: true
+            },
+			{
+				capitalize: true,
+                keyword: "\\$BODY\\$",
+                tabBefore: false,
+				newlineBefore: true,
+                newlineAfter: true
             }
         ]
 
     };
 
 
-    _formatsql.formatQuery = function(inputText){
+    _formatsql.formatQuery = function (inputText) {
         var outputText = ' ' + _formatsql.normalizeWhiteSpace(_removeComments(inputText));
 
         outputText = _addLineBreaksBeta(outputText);
@@ -150,10 +244,10 @@
         return outputText;
     };
 
-    _formatsql.normalizeWhiteSpace = function(inputText){
+    _formatsql.normalizeWhiteSpace = function (inputText) {
         var outputText = "";
 
-        if(inputText.length > 0){
+        if (inputText.length > 0) {
             var isWhitespace = /\s/.test(inputText[0]);
             var inLiteral = false;
 
@@ -256,7 +350,13 @@
 				postfix = '';
 				if (keyword.newlineAfter) {
 					postfix += '\r\n';
-					for(var i = 0; i < 1+(_defaultOptions.scopeTabCoefficient * itm.scopeDepth); i++) {
+					for (var i = 0; i < 1 + (_defaultOptions.scopeTabCoefficient * itm.scopeDepth); i++) {
+						postfix += '\t';
+					}
+				}
+				if (keyword.newlineAfterNoExtraTab) {
+					postfix += '\r\n\r\n';
+					for (var i = 0; i < (_defaultOptions.scopeTabCoefficient * itm.scopeDepth); i++) {
 						postfix += '\t';
 					}
 				}
@@ -264,9 +364,15 @@
 					postfix = ' ';
 				}
 
-				itemString = itemString.replace(re, function (strMatch) {
-					return prefix + strMatch.trim().toUpperCase() + postfix;
-				});
+				if (keyword.capitalize) {
+					itemString = itemString.replace(re, function (strMatch) {
+						return prefix + strMatch.trim().toUpperCase() + postfix;
+					});
+				} else {
+					itemString = itemString.replace(re, function (strMatch) {
+						return prefix + strMatch.trim() + postfix;
+					});
+				}
 			});
 
 			return {"sortOrder":itm.sortOrder, "value": itemString};
@@ -280,10 +386,9 @@
             return result + iter.value;
             }, '');
 
-        if( result.length > 0) {
+        if (result.length > 0) {
             return result.substring(1);
-            }
-        else{
+        } else {
             return "";
         }
     }
@@ -294,6 +399,7 @@
 
     var splitListByParenthesisAndScope = function(list){
         var curScopeDepth = 0;
+		var bolDeclare = false;
 
         var brokenList = list.map(function(item){
             var resultList = [];
@@ -302,16 +408,74 @@
 
             for(var i = 0; i < item.value.length; i++){
                 curText += item.value[i];
-                if(item.value[i] == '('){
-                    resultList.push({"sortOrder":curOrder, "scopeDepth":curScopeDepth, "value": curText});
-                    curScopeDepth++;
-                    curOrder += 0.000000001;
-                    curText = "";
-                } else if(item.value[i] == ')'){
-                    resultList.push({"sortOrder":curOrder, "scopeDepth":curScopeDepth, "value": curText});
+				/*
+				if (i === 757) {
+					console.log('>>>>');
+					console.log(item.value);
+					console.log(item.value.substring(i, i + 6));
+					console.log('<<<<');
+				}
+				*/
+                if (item.value[i] == '(') {
+                    resultList.push({"sortOrder": curOrder, "scopeDepth": curScopeDepth, "value": curText});
+					curScopeDepth++;
+					curOrder += 0.000000001;
+					curText = "";
+					console.log(">(|" + curScopeDepth + "<")
+
+				} else if (item.value[i] == ')') {
+                    resultList.push({"sortOrder": curOrder, "scopeDepth": curScopeDepth, "value": curText});
                     curScopeDepth--;
                     curOrder += 0.000000001;
                     curText = "";
+					console.log(">)|" + curScopeDepth + "<")
+
+				} else if (item.value.substring(i, i + 7) == 'DECLARE') {
+					curText += 'ECLARE';
+					i = i + 6 + 1;//after the space
+                    resultList.push({"sortOrder": curOrder, "scopeDepth": curScopeDepth, "value": curText});
+                    curScopeDepth++;
+                    curOrder += 0.000000001;
+                    curText = "";
+					bolDeclare = true;
+					console.log(">DECLARE|" + curScopeDepth + "<")
+
+                } else if (item.value.substring(i, i + 5) == 'BEGIN') {
+					curText += 'EGIN';
+					i = i + 4 + 1;//after the space
+                    resultList.push({"sortOrder": curOrder, "scopeDepth": curScopeDepth, "value": curText});
+					if (bolDeclare) {
+						bolDeclare = false;
+					} else {
+                    	curScopeDepth++;
+					}
+                    curOrder += 0.000000001;
+                    curText = "";
+					console.log(">BEGIN|" + curScopeDepth + "<")
+
+                } else if (item.value.substring(i, i + 4) == 'THEN') {
+					curText += 'HEN';
+					i = i + 3 + 1;//after the space
+                    resultList.push({"sortOrder": curOrder, "scopeDepth": curScopeDepth, "value": curText});
+					if (bolDeclare) {
+						bolDeclare = false;
+					} else {
+                    	curScopeDepth++;
+					}
+                    curOrder += 0.000000001;
+                    curText = "";
+					console.log(">THEN|" + curScopeDepth + "<")
+
+				} else if (item.value.substring(i, i + 3) == 'END') {
+					//curText = curText.substring(1,i - 1); //remove \tE
+					//curText += 'END';
+					curText += 'ND';
+					i = i + 2 + 1;//after the space
+                    resultList.push({"sortOrder": curOrder, "scopeDepth": curScopeDepth, "value": curText});
+                    curScopeDepth--;
+                    curOrder += 0.000000001;
+                    curText = "";
+					console.log(">END|" + curScopeDepth + "<")
                 }
             }
 
