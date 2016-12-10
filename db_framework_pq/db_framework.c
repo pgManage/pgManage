@@ -399,7 +399,7 @@ error:
 // Get lengths for each value of the current row
 DArray *DB_get_row_lengths(DB_result *res) {
 	DArray *darr_ret = NULL;
-	int *int_temp = NULL;
+	size_t *int_temp = NULL;
 	int int_num_columns = PQnfields(res->res);
 	darr_ret = DArray_create(sizeof(size_t), 1);
 	int i;
