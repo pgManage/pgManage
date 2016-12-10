@@ -1690,7 +1690,7 @@ function setClipSetting(propertyName, newValue) {
 }
 
 // executes SQL in current tab
-var arrExecuteHistory = [], arrQueryDataStore = [];
+var arrExecuteHistory = [];
 function executeScript() {
     'use strict';
     var currentTab           = document.getElementsByClassName('current-tab')[0]

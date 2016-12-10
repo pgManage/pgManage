@@ -1491,13 +1491,45 @@ scriptQuery.objectTable = ml(function () {/*
                                     ELSE ''
                             END) || E'\n);') ||
               E'\n\nALTER TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-              ' OWNER TO ' || pg_roles.rolname || E';' ||
-              COALESCE(E'\n\nCOMMENT ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' IS ' ||
-                quote_literal(pg_description.description) || E';', '')-- || E'\n' ||
-               --'--SELECT' || (array_to_string(array_agg(' ' || em1.attname), ','::text)) || ' FROM ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ';'
+              ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
+                
+                -- get table and column comments
+                (
+                     SELECT  COALESCE(
+                                array_to_string(
+                                    array_agg(
+                                        COALESCE(
+                                            full_text,
+                                            ''
+                                        )
+                                    ),
+                                E'\n'),
+                            '') AS full_text
+                      FROM (
+                               SELECT COALESCE(
+                                            (
+                                                'COMMENT ON ' || (
+                                                        CASE WHEN objsubid = 0 THEN 'TABLE' ELSE 'COLUMN' END
+                                                ) || ' ' ||
+                                                quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
+                                                ' IS ' ||
+                                                quote_literal(pg_description.description) || E';'
+                                            ),
+                                            ''
+                                        ) AS full_text
+                                 FROM pg_description
+                            LEFT JOIN pg_class ON pg_class.oid = pg_description.objoid 
+                            LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                            LEFT JOIN pg_attribute ON attrelid = pg_description.objoid
+                                                  AND pg_attribute.attnum = pg_description.objsubid
+                                WHERE objoid = {{INTOID}}
+                             ORDER BY objsubid ASC
+                        ) descriptions
+                )
         
         FROM pg_class
-        LEFT JOIN pg_description ON pg_class.oid = pg_description.objoid
+        --LEFT JOIN pg_description ON pg_class.oid = pg_description.objoid AND pg_description.objsubid IS NULL
+        
         LEFT JOIN (SELECT attrelid, quote_ident(attname) AS attname, atttypid, atttypmod, typname, attnotnull, atthasdef, pg_attrdef.adbin, pg_attrdef.adrelid,
                    CASE WHEN typname = 'varchar' AND atttypmod = 6 THEN 'chk_'
                         WHEN typname ~ '^(text|varchar|bpchar|name|char)$' THEN 'str_'
@@ -1551,7 +1583,7 @@ scriptQuery.objectTable = ml(function () {/*
          JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRNAME}}'
         GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relacl,
-                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, pg_description.description, reloptions)
+                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions) --pg_description.description
                 
         || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
         	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
