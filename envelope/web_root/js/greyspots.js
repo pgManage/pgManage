@@ -4872,7 +4872,7 @@ if (window.shimmed === undefined) {
 // ##############################################################
 
 if (window.functionality === undefined) {
-    window.functionality = {};
+    window.functionality = {"errors": {}};
 }
 
 // ##############################################################
@@ -5281,40 +5281,48 @@ window.addEventListener('load', function () {
                     intBottomLine = GS.emToPx(document.body, intMaxHeight);
                 }
                 
-                curlElement.classList.add('animating');
-                menuElement.classList.add('animating');
+                //curlElement.classList.add('animating');
+                //menuElement.classList.add('animating');
                 
                 if (bolOpen === false) {
                     document.body.insertBefore(GS.stringToElement('<div id="gs-document-curl-modal-background"></div>'), curlElement);
                     document.getElementById('gs-document-curl-modal-background').addEventListener('click', toggleCurl);
                     
-                    GS.animateStyle(curlElement, 'font-size', closedSize, intFontSize + 'em', function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
+                    curlElement.style.fontSize = intFontSize + 'em';
+                    curlElement.style.bottom = intBottomLine + 'px';
+                    menuElement.style.height = intBottomLine + 'px';
                     
-                    GS.animateStyle(curlElement, 'bottom', '0px', intBottomLine + 'px', function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
-                    
-                    GS.animateStyle(menuElement, 'height', '0px', intBottomLine + 'px', function () {
-                        menuElement.classList.remove('animating');
-                    }, 185, 14);
+                    //GS.animateStyle(curlElement, 'font-size', closedSize, intFontSize + 'em', function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(curlElement, 'bottom', '0px', intBottomLine + 'px', function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(menuElement, 'height', '0px', intBottomLine + 'px', function () {
+                    //    menuElement.classList.remove('animating');
+                    //}, 185, 14);
                     
                     bolOpen = true;
                 } else {
                     document.body.removeChild(document.getElementById('gs-document-curl-modal-background'));
                     
-                    GS.animateStyle(curlElement, 'font-size', intFontSize + 'em', closedSize, function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
+                    curlElement.style.fontSize = closedSize;
+                    curlElement.style.bottom = '0px';
+                    menuElement.style.height = '0px';
                     
-                    GS.animateStyle(curlElement, 'bottom', intBottomLine + 'px', '0px', function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
-                    
-                    GS.animateStyle(menuElement, 'height', intBottomLine + 'px', '0px', function () {
-                        menuElement.classList.remove('animating');
-                    }, 185, 14);
+                    //GS.animateStyle(curlElement, 'font-size', intFontSize + 'em', closedSize, function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(curlElement, 'bottom', intBottomLine + 'px', '0px', function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(menuElement, 'height', intBottomLine + 'px', '0px', function () {
+                    //    menuElement.classList.remove('animating');
+                    //}, 185, 14);
                     
                     bolOpen = false;
                 }
@@ -5420,6 +5428,7 @@ window.addEventListener('load', function () {
         
     } catch (e) {
         functionality.matchesSelector = false;
+        functionality.errors.matchesSelector = e;
     }
     
     functionality.MutationObserver = false;
@@ -5434,6 +5443,7 @@ window.addEventListener('load', function () {
         testElement.appendChild(document.createElement('div'));
     } catch (e) {
         functionality.MutationObserver = false;
+        functionality.errors.MutationObserver = e;
     }
     
     functionality.WeakMap = false;
@@ -5451,6 +5461,7 @@ window.addEventListener('load', function () {
         
     } catch (e) {
         functionality.WeakMap = false;
+        functionality.errors.WeakMap = e;
     }
     
     functionality.registerElement = false;
@@ -5466,6 +5477,7 @@ window.addEventListener('load', function () {
         
     } catch (e) {
         functionality.registerElement = false;
+        functionality.errors.registerElement = e;
     }
     
     functionality.DOMTokenList = false;
@@ -5473,6 +5485,7 @@ window.addEventListener('load', function () {
         functionality.DOMTokenList = Boolean(document.body.classList);
     } catch (e) {
         functionality.DOMTokenList = false;
+        functionality.errors.DOMTokenList = e;
     }
     
     functionality.HTMLTemplateElement = false;
@@ -5482,18 +5495,20 @@ window.addEventListener('load', function () {
         xtag.register('asdf-test-two', {
             'lifecycle': {
                 'created': function () {
-                    this.appendChild(document.createElement('div'));
+                    var divElement = document.createElement('div');
+                    divElement.classList.add('find-me');
+                    this.appendChild(divElement);
                 }
             }
         });
         
         testElement.innerHTML = '<div></div><p></p><asdf-test-two></asdf-test-two>';
         
-        functionality.HTMLTemplateElement = (testElement.content.children.length === 3);
-        functionality.HTMLTemplateElement = (functionality.HTMLTemplateElement && testElement.content.children[2].children.length === 0);
+        functionality.HTMLTemplateElement = (xtag.query(testElement, '.find-me').length === 0);
         
     } catch (e) {
         functionality.HTMLTemplateElement = false;
+        functionality.errors.HTMLTemplateElement = e;
     }
     
     // function to show shim and functionality results
@@ -10477,6 +10492,10 @@ window.addEventListener('design-register-element', function () {
     window.designElementProperty_GSBODY = function(selectedElement) {
         addFlexContainerProps(selectedElement);
         //addFlexProps(selectedElement);
+        
+        addProp('Padded', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('padded')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'padded', (this.value === 'true'), true);
+        });
     };
     
     registerDesignSnippet('<gs-body>', '<gs-body>', 'gs-body>\n' +
@@ -11979,7 +11998,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-checkbox>', '<gs-checkbox>', 'gs-checkbox type="smallint" column="${1:ready_to_ship}">${2}</gs-checkbox>');
     registerDesignSnippet('<gs-checkbox> With Label', '<gs-checkbox>',
                     'label for="${1:date-insert-ready_to_ship}">${2:Ready To Ship?}:</label>\n' +
@@ -13693,7 +13712,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                         if (!element.getAttribute('src') && !element.getAttribute('source') && !element.getAttribute('initalize')) {
                             //element.staticDropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]);
-                            element.dropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]); //element.staticDropDownTable;
+                            //element.dropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]); //element.staticDropDownTable;
+                            
+                            element.dropDownTable = GS.cloneElement(xtag.query(tableTemplateElementCopy.content, 'table')[0]);
                         }
                     }
                 }
@@ -15804,9 +15825,10 @@ document.addEventListener('DOMContentLoaded', function () {
             throw 'gs-datasheet error: No table template provided.';
         }
         
-        if (tableTemplateElement.content.children[0].nodeName !== 'TABLE') {
-            throw 'gs-datasheet error: Table is not the first element in the provided table template.';
-        }
+        // V----- cannot do .children on template.content
+        //if (tableTemplateElement.content.children[0].nodeName !== 'TABLE') {
+        //    throw 'gs-datasheet error: Table is not the first element in the provided table template.';
+        //}
         
         // make header template
         headerRecordElement = xtag.query(tableTemplateElement.content, 'thead tr')[0];
@@ -21045,12 +21067,15 @@ document.addEventListener('DOMContentLoaded', function () {
             customHudTemplate = document.createElement('template');
             customHudTemplate.innerHTML = element.hudTemplate;
             
-            customHudElements = customHudTemplate.content.childNodes;
+            elementHudTopContainer.appendChild(customHudTemplate.content.cloneNode(true));
             
-            for (i = 0, len = customHudElements.length; i < len; i += 1) {
-                //customHudElements[i].setAttribute('inline', '');
-                elementHudTopContainer.appendChild(customHudElements[0]);
-            }
+            // V------ you can't use .children on a template.content
+            //customHudElements = customHudTemplate.content.childNodes;
+            //
+            //for (i = 0, len = customHudElements.length; i < len; i += 1) {
+            //    //customHudElements[i].setAttribute('inline', '');
+            //    elementHudTopContainer.appendChild(customHudElements[0]);
+            //}
             //elementHudTopContainer.innerHTML += element.hudTemplate; <-- this causes events to be lost in the hud-top container
         }
         
@@ -25324,7 +25349,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
     registerDesignSnippet('<gs-grid>', '<gs-grid>', 'gs-grid widths="${1}">\n' +
                                                     '    <gs-block>${2}</gs-block>\n' +
                                                     '</gs-grid>');
