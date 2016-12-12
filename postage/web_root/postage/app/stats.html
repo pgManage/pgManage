@@ -460,20 +460,21 @@ document.addEventListener('DOMContentLoaded', function () {
                         //get the minimum and maximum all the lines and set the minimum and maximum of the chart
                         var extent_i = 0;
                         var extent_len = this.arr_d3_data.length;
-                        var extent = [];
+                        var curExtent = [];
                         var oldExtent;
+                        var extent = [];
 
                         while (extent_i < extent_len) {
-                            extent = d3.extent(this.arr_d3_data[extent_i], function (d) {
-                                return d.x;
+                            curExtent = d3.extent(this.arr_d3_data[extent_i], function (d) {
+                                return parseInt(d.x, 10);
                             });
 
                             if (oldExtent) {
-                                extent[0] = Math.min(extent[0], oldExtent[0], 0);
-                                extent[1] = Math.max(extent[1], oldExtent[1], 0);
+                                extent[0] = Math.min(curExtent[0], oldExtent[0], curExtent[1], oldExtent[1], 0);
+                                extent[1] = Math.max(curExtent[0], oldExtent[0], curExtent[1], oldExtent[1], 0);
                             } else {
-                                extent[0] = Math.min(extent[0], 0);
-                                extent[1] = Math.max(extent[1], 0);
+                                extent[0] = Math.min(curExtent[0], curExtent[1], 0);
+                                extent[1] = Math.max(curExtent[0], curExtent[1], 0);
                             }
 
                             oldExtent = extent;
@@ -549,20 +550,25 @@ document.addEventListener('DOMContentLoaded', function () {
                         //get the minimum and maximum all the lines and set the minimum and maximum of the chart
                         var extent_i = 0;
                         var extent_len = this.arr_d3_data.length;
-                        var extent = [];
+                        var curExtent = [];
                         var oldExtent;
+                        var extent = [];
 
                         while (extent_i < extent_len) {
-                            extent = d3.extent(this.arr_d3_data[extent_i], function (d) {
-                                return d.y;
+                            curExtent = d3.extent(this.arr_d3_data[extent_i], function (d) {
+                                return parseInt(d.y, 10);
                             });
-
+                            
+                            if (this.getAttribute('chart_caption') === 'Connections') console.log('this.arr_d3_data[extent_i]:', this.arr_d3_data[extent_i]);
+                            
+                            if (this.getAttribute('chart_caption') === 'Connections') console.log('partial:', curExtent);
+                            
                             if (oldExtent) {
-                                extent[0] = Math.min(extent[0], oldExtent[0], 0);
-                                extent[1] = Math.max(extent[1], oldExtent[1], 0);
+                                extent[0] = Math.min(curExtent[0], oldExtent[0], curExtent[1], oldExtent[1], 0);
+                                extent[1] = Math.max(curExtent[0], oldExtent[0], curExtent[1], oldExtent[1], 0);
                             } else {
-                                extent[0] = Math.min(extent[0], 0);
-                                extent[1] = Math.max(extent[1], 0);
+                                extent[0] = Math.min(curExtent[0], curExtent[1], 0);
+                                extent[1] = Math.max(curExtent[0], curExtent[1], 0);
                             }
 
                             oldExtent = extent;
@@ -575,6 +581,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             extent[0] = extent[1];
                             extent[1] = temp;
                         }
+                        if (this.getAttribute('chart_caption') === 'Connections') console.log('full:', extent);
 
                         return extent;
                     }
