@@ -952,14 +952,14 @@ return request;};GS.ajaxText=function(strLink,strParams,callback,intTimeout){var
 return request;};}());(function(){"use strict";function cleanErrorValue(strValue){strValue=strValue||'';if(strValue.indexOf('DB_exec failed:')!==-1){strValue=strValue.replace(/[.\s\S]*DB_exec\ failed:/mi,'');}
 if(strValue.indexOf('Query failed:')!==-1){strValue=strValue.replace(/[.\s\S]*Query\ failed:/mi,'');}
 if(strValue.indexOf('FATAL')!==-1){strValue=strValue.replace(/[.\s\S]*FATAL/mi,'');}
-strValue=strValue.replace(/\\n/gi,'\n').replace(/\\t/gi,'\t').replace(/\[.*\]/gi,'').replace(/\([0-9]*\)/gi,'');return GS.trim(strValue.trim(),'"');}
+console.log('oldstr',strValue);strValue=strValue.replace(/\\?\\n/gi,'\n').replace(/\\?\\t/gi,'\t').replace(/\[.*\]/gi,'').replace(/\([0-9]*\)/gi,'');console.log('newstr',strValue);return GS.trim(strValue.trim(),'"');}
 function errorJSONToHTML(errorJSON){return'<pre style="word-break: break-all; white-space: pre-wrap;">'+'There was an error:'+
 (errorJSON.error_text?'<br /><br />'+encodeHTML(errorJSON.error_text):'')+
 (errorJSON.error_file?'<br /><br />The error was on file: '+encodeHTML(errorJSON.error_file):'')+
 (errorJSON.error_hint?'<br /><br />'+encodeHTML(errorJSON.error_hint):'')+
 (errorJSON.error_context?'<br /><br />'+encodeHTML(errorJSON.error_context):'')+
 (errorJSON.error_addin?'<br /><br />'+encodeHTML(errorJSON.error_addin):'')+'</pre>';}
-GS.ajaxErrorDialog=function(jsnError,tryAgainCallback,cancelCallback){'use strict';var templateElement=document.createElement('template'),strHTML;var jsnErrorCopy={};jsnErrorCopy.error_text=cleanErrorValue(jsnError.error_text);jsnErrorCopy.error_file=cleanErrorValue(jsnError.error_file);jsnErrorCopy.error_hint=cleanErrorValue(jsnError.error_hint);jsnErrorCopy.error_context=cleanErrorValue(jsnError.error_context);jsnErrorCopy.error_addin=cleanErrorValue(jsnError.error_addin);templateElement.setAttribute('data-theme','error');strHTML=ml(function(){/*
+GS.ajaxErrorDialog=function(jsnError,tryAgainCallback,cancelCallback){'use strict';var templateElement=document.createElement('template'),strHTML;var jsnErrorCopy={};console.log('oldobj',jsnError);jsnErrorCopy.error_text=cleanErrorValue(jsnError.error_text);jsnErrorCopy.error_file=cleanErrorValue(jsnError.error_file);jsnErrorCopy.error_hint=cleanErrorValue(jsnError.error_hint);jsnErrorCopy.error_context=cleanErrorValue(jsnError.error_context);jsnErrorCopy.error_addin=cleanErrorValue(jsnError.error_addin);console.log('newobj',jsnErrorCopy);templateElement.setAttribute('data-theme','error');strHTML=ml(function(){/*
             <gs-page>
                 <gs-header><center><h3>There was an error!</h3></center></gs-header>
                 <gs-body padded>

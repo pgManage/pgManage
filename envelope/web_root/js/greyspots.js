@@ -6083,12 +6083,14 @@ window.addEventListener('design-register-element', function () {
             strValue = strValue.replace(/[.\s\S]*FATAL/mi, '');
         }
         
+        console.log('oldstr', strValue);
         strValue = strValue
-                        .replace(/\\n/gi, '\n')
-                        .replace(/\\t/gi, '\t')
+                        .replace(/\\?\\n/gi, '\n')
+                        .replace(/\\?\\t/gi, '\t')
                         .replace(/\[.*\]/gi, '')
                         .replace(/\([0-9]*\)/gi, '');
         
+        console.log('newstr', strValue);
         return GS.trim(strValue.trim(), '"');
     }
     
@@ -6118,11 +6120,13 @@ window.addEventListener('design-register-element', function () {
         var templateElement = document.createElement('template'), strHTML;
         
         var jsnErrorCopy = {};
+        console.log('oldobj', jsnError);
         jsnErrorCopy.error_text =     cleanErrorValue(jsnError.error_text);
         jsnErrorCopy.error_file =     cleanErrorValue(jsnError.error_file);
         jsnErrorCopy.error_hint =     cleanErrorValue(jsnError.error_hint);
         jsnErrorCopy.error_context =  cleanErrorValue(jsnError.error_context);
         jsnErrorCopy.error_addin =    cleanErrorValue(jsnError.error_addin);
+        console.log('newobj', jsnErrorCopy);
         
         templateElement.setAttribute('data-theme', 'error');
         strHTML = ml(function () {/*
