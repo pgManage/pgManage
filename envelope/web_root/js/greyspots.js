@@ -6083,14 +6083,12 @@ window.addEventListener('design-register-element', function () {
             strValue = strValue.replace(/[.\s\S]*FATAL/mi, '');
         }
         
-        console.log('oldstr', strValue);
         strValue = strValue
                         .replace(/\\?\\n/gi, '\n')
                         .replace(/\\?\\t/gi, '\t')
                         .replace(/\[.*\]/gi, '')
                         .replace(/\([0-9]*\)/gi, '');
         
-        console.log('newstr', strValue);
         return GS.trim(strValue.trim(), '"');
     }
     
@@ -6120,13 +6118,11 @@ window.addEventListener('design-register-element', function () {
         var templateElement = document.createElement('template'), strHTML;
         
         var jsnErrorCopy = {};
-        console.log('oldobj', jsnError);
-        jsnErrorCopy.error_text =     cleanErrorValue(jsnError.error_text);
-        jsnErrorCopy.error_file =     cleanErrorValue(jsnError.error_file);
-        jsnErrorCopy.error_hint =     cleanErrorValue(jsnError.error_hint);
-        jsnErrorCopy.error_context =  cleanErrorValue(jsnError.error_context);
-        jsnErrorCopy.error_addin =    cleanErrorValue(jsnError.error_addin);
-        console.log('newobj', jsnErrorCopy);
+        jsnErrorCopy.error_text    = cleanErrorValue(jsnError.error_text);
+        jsnErrorCopy.error_file    = cleanErrorValue(jsnError.error_file);
+        jsnErrorCopy.error_hint    = cleanErrorValue(jsnError.error_hint);
+        jsnErrorCopy.error_context = cleanErrorValue(jsnError.error_context);
+        jsnErrorCopy.error_addin   = cleanErrorValue(jsnError.error_addin);
         
         templateElement.setAttribute('data-theme', 'error');
         strHTML = ml(function () {/*
@@ -12049,8 +12045,9 @@ window.addEventListener('design-register-element', function () {
         });
 
         addProp('Type', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('type') || '') + '" mini>' +
+                                        '<option value="">Detect</option>' +
                                         '<option value="smallint">Smallint</option>' +
-                                        '<option value="">Boolean</option>' +
+                                        '<option value="boolean">Boolean</option>' +
                                     '</gs-select>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'type', this.value);
         });
@@ -12302,84 +12299,138 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             'click': function (event) {
-                var strValue, bolTripleState;
+                var bolTripleState;
+                var strValue;
+                var strType;
 
                 if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    strValue = this.getAttribute('value');
                     bolTripleState = this.hasAttribute('triplestate');
+                    strValue = this.getAttribute('value').trim().toLowerCase();
 
-                    // here be dragons
-                    if (strValue === 'false') {
-                        this.setAttribute('value', 'true');
+                    // get type from type attribute
+                    strType = this.getAttribute('type');
 
-                    } else if (strValue === 'true') {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'null');
+                    // if type is not valid, get type from current value
+                    if (strType !== 'smallint' && strType !== 'boolean') {
+                        if (strValue === 'false' || strValue === 'true' || strValue === 'null') {
+                            strType = 'boolean';
+                        } else if (strValue === '0' || strValue === '-1' || strValue === 'n') {
+                            strType = 'smallint';
+                    // else default to boolean (backwards compatibility)
                         } else {
-                            this.setAttribute('value', 'false');
-                        }
-
-                    } else if (strValue === 'null') {
-                        this.setAttribute('value', 'false');
-
-                    } else if (strValue === '0') {
-                        this.setAttribute('value', '-1');
-
-                    } else if (strValue === '-1') {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'n');
-                        } else {
-                            this.setAttribute('value', '0');
-                        }
-
-                    } else if (strValue === 'n') {
-                        this.setAttribute('value', '0');
-
-                    } else if (strValue === 0) {
-                        this.setAttribute('value', -1);
-
-                    } else if (strValue === -1) {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'n');
-                        } else {
-                            this.setAttribute('value', 0);
-                        }
-
-                    } else if (strValue === 'n') {
-                        this.setAttribute('value', 0);
-
-                    } else if (strValue === false) {
-                        this.setAttribute('value', true);
-
-                    } else if (strValue === true) {
-                        if (bolTripleState) {
-                            this.setAttribute('value', null);
-                        } else {
-                            this.setAttribute('value', false);
-                        }
-
-                    } else if (strValue === null) {
-                        //this.setAttribute('value', false);
-                        if (this.getAttribute('type') === 'smallint') {
-                            this.setAttribute('value', '-1');
-                        } else {
-                            this.setAttribute('value', 'true');
-                        }
-
-                    } else {
-                        if (this.getAttribute('type') === 'smallint') {
-                            this.setAttribute('value', '-1');
-                        } else {
-                            this.setAttribute('value', 'true');
+                            strType = 'boolean';
                         }
                     }
 
-                    this.classList.remove('down');
+                    // resolve current value to the correct type
+                    if (strType === 'smallint') {
+                        if (strValue === '0' || strValue === 'false') {
+                            strValue = '0';
+                        } else if (strValue === '-1' || strValue === 'true') {
+                            strValue = '-1';
+                        } else if (strValue === 'n' || strValue === 'null') {
+                            strValue = 'n';
+                        } else {
+                            strValue = '0';
+                        }
+                    } else if (strType === 'boolean') {
+                        if (strValue === '0' || strValue === 'false') {
+                            strValue = 'false';
+                        } else if (strValue === '-1' || strValue === 'true') {
+                            strValue = 'true';
+                        } else if (strValue === 'n' || strValue === 'null') {
+                            strValue = 'null';
+                        } else {
+                            strValue = 'false';
+                        }
+                    }
 
-                    xtag.fireEvent(this, 'change', {
-                        bubbles: true,
-                        cancelable: true
-                    });
+                    // get new value based on current value
+                    if (strType === 'smallint') {
+                        if (strValue === '0') {
+                            strValue = '-1';
+                        } else if (strValue === '-1') {
+                            if (bolTripleState) {
+                                strValue = 'n';
+                            } else {
+                                strValue = '0';
+                            }
+                        } else if (strValue === 'n') {
+                            strValue = '0';
+                        }
+                    } else if (strType === 'boolean') {
+                        if (strValue === 'false') {
+                            strValue = 'true';
+                        } else if (strValue === 'true') {
+                            if (bolTripleState) {
+                                strValue = 'null';
+                            } else {
+                                strValue = 'false';
+                            }
+                        } else if (strValue === 'null') {
+                            strValue = 'false';
+                        }
+                    }
+
+                    // set new value
+                    this.setAttribute('value', strValue);
+
+                    //// here be dragons
+                    //if (strValue === 'false') {
+                    //    this.setAttribute('value', 'true');
+                    //} else if (strValue === 'true') {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'null');
+                    //    } else {
+                    //        this.setAttribute('value', 'false');
+                    //    }
+                    //} else if (strValue === 'null') {
+                    //    this.setAttribute('value', 'false');
+                    //} else if (strValue === '0') {
+                    //    this.setAttribute('value', '-1');
+                    //} else if (strValue === '-1') {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'n');
+                    //    } else {
+                    //        this.setAttribute('value', '0');
+                    //    }
+                    //} else if (strValue === 'n') {
+                    //    this.setAttribute('value', '0');
+                    //} else if (strValue === 0) {
+                    //    this.setAttribute('value', -1);
+                    //} else if (strValue === -1) {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'n');
+                    //    } else {
+                    //        this.setAttribute('value', 0);
+                    //    }
+                    //} else if (strValue === 'n') {
+                    //    this.setAttribute('value', 0);
+                    //} else if (strValue === false) {
+                    //    this.setAttribute('value', true);
+                    //} else if (strValue === true) {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', null);
+                    //    } else {
+                    //        this.setAttribute('value', false);
+                    //    }
+                    //} else if (strValue === null) {
+                    //    //this.setAttribute('value', false);
+                    //    if (this.getAttribute('type') === 'smallint') {
+                    //        this.setAttribute('value', '-1');
+                    //    } else {
+                    //        this.setAttribute('value', 'true');
+                    //    }
+                    //} else {
+                    //    if (this.getAttribute('type') === 'smallint') {
+                    //        this.setAttribute('value', '-1');
+                    //    } else {
+                    //        this.setAttribute('value', 'true');
+                    //    }
+                    //}
+
+                    this.classList.remove('down');
+                    xtag.fireEvent(this, 'change', {bubbles: true, cancelable: true});
                 }
             },
             'keydown': function (event) {
