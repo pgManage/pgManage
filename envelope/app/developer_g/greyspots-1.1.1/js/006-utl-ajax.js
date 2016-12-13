@@ -300,8 +300,8 @@ window.addEventListener('design-register-element', function () {
         }
         
         strValue = strValue
-                        .replace(/\\n/gi, '\n')
-                        .replace(/\\t/gi, '\t')
+                        .replace(/\\?\\n/gi, '\n')
+                        .replace(/\\?\\t/gi, '\t')
                         .replace(/\[.*\]/gi, '')
                         .replace(/\([0-9]*\)/gi, '');
         
@@ -334,11 +334,11 @@ window.addEventListener('design-register-element', function () {
         var templateElement = document.createElement('template'), strHTML;
         
         var jsnErrorCopy = {};
-        jsnErrorCopy.error_text =     cleanErrorValue(jsnError.error_text);
-        jsnErrorCopy.error_file =     cleanErrorValue(jsnError.error_file);
-        jsnErrorCopy.error_hint =     cleanErrorValue(jsnError.error_hint);
-        jsnErrorCopy.error_context =  cleanErrorValue(jsnError.error_context);
-        jsnErrorCopy.error_addin =    cleanErrorValue(jsnError.error_addin);
+        jsnErrorCopy.error_text    = cleanErrorValue(jsnError.error_text);
+        jsnErrorCopy.error_file    = cleanErrorValue(jsnError.error_file);
+        jsnErrorCopy.error_hint    = cleanErrorValue(jsnError.error_hint);
+        jsnErrorCopy.error_context = cleanErrorValue(jsnError.error_context);
+        jsnErrorCopy.error_addin   = cleanErrorValue(jsnError.error_addin);
         
         templateElement.setAttribute('data-theme', 'error');
         strHTML = ml(function () {/*

@@ -4872,7 +4872,7 @@ if (window.shimmed === undefined) {
 // ##############################################################
 
 if (window.functionality === undefined) {
-    window.functionality = {};
+    window.functionality = {"errors": {}};
 }
 
 // ##############################################################
@@ -5281,40 +5281,48 @@ window.addEventListener('load', function () {
                     intBottomLine = GS.emToPx(document.body, intMaxHeight);
                 }
                 
-                curlElement.classList.add('animating');
-                menuElement.classList.add('animating');
+                //curlElement.classList.add('animating');
+                //menuElement.classList.add('animating');
                 
                 if (bolOpen === false) {
                     document.body.insertBefore(GS.stringToElement('<div id="gs-document-curl-modal-background"></div>'), curlElement);
                     document.getElementById('gs-document-curl-modal-background').addEventListener('click', toggleCurl);
                     
-                    GS.animateStyle(curlElement, 'font-size', closedSize, intFontSize + 'em', function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
+                    curlElement.style.fontSize = intFontSize + 'em';
+                    curlElement.style.bottom = intBottomLine + 'px';
+                    menuElement.style.height = intBottomLine + 'px';
                     
-                    GS.animateStyle(curlElement, 'bottom', '0px', intBottomLine + 'px', function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
-                    
-                    GS.animateStyle(menuElement, 'height', '0px', intBottomLine + 'px', function () {
-                        menuElement.classList.remove('animating');
-                    }, 185, 14);
+                    //GS.animateStyle(curlElement, 'font-size', closedSize, intFontSize + 'em', function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(curlElement, 'bottom', '0px', intBottomLine + 'px', function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(menuElement, 'height', '0px', intBottomLine + 'px', function () {
+                    //    menuElement.classList.remove('animating');
+                    //}, 185, 14);
                     
                     bolOpen = true;
                 } else {
                     document.body.removeChild(document.getElementById('gs-document-curl-modal-background'));
                     
-                    GS.animateStyle(curlElement, 'font-size', intFontSize + 'em', closedSize, function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
+                    curlElement.style.fontSize = closedSize;
+                    curlElement.style.bottom = '0px';
+                    menuElement.style.height = '0px';
                     
-                    GS.animateStyle(curlElement, 'bottom', intBottomLine + 'px', '0px', function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
-                    
-                    GS.animateStyle(menuElement, 'height', intBottomLine + 'px', '0px', function () {
-                        menuElement.classList.remove('animating');
-                    }, 185, 14);
+                    //GS.animateStyle(curlElement, 'font-size', intFontSize + 'em', closedSize, function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(curlElement, 'bottom', intBottomLine + 'px', '0px', function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(menuElement, 'height', intBottomLine + 'px', '0px', function () {
+                    //    menuElement.classList.remove('animating');
+                    //}, 185, 14);
                     
                     bolOpen = false;
                 }
@@ -5420,6 +5428,7 @@ window.addEventListener('load', function () {
         
     } catch (e) {
         functionality.matchesSelector = false;
+        functionality.errors.matchesSelector = e;
     }
     
     functionality.MutationObserver = false;
@@ -5434,6 +5443,7 @@ window.addEventListener('load', function () {
         testElement.appendChild(document.createElement('div'));
     } catch (e) {
         functionality.MutationObserver = false;
+        functionality.errors.MutationObserver = e;
     }
     
     functionality.WeakMap = false;
@@ -5451,6 +5461,7 @@ window.addEventListener('load', function () {
         
     } catch (e) {
         functionality.WeakMap = false;
+        functionality.errors.WeakMap = e;
     }
     
     functionality.registerElement = false;
@@ -5466,6 +5477,7 @@ window.addEventListener('load', function () {
         
     } catch (e) {
         functionality.registerElement = false;
+        functionality.errors.registerElement = e;
     }
     
     functionality.DOMTokenList = false;
@@ -5473,6 +5485,7 @@ window.addEventListener('load', function () {
         functionality.DOMTokenList = Boolean(document.body.classList);
     } catch (e) {
         functionality.DOMTokenList = false;
+        functionality.errors.DOMTokenList = e;
     }
     
     functionality.HTMLTemplateElement = false;
@@ -5482,18 +5495,20 @@ window.addEventListener('load', function () {
         xtag.register('asdf-test-two', {
             'lifecycle': {
                 'created': function () {
-                    this.appendChild(document.createElement('div'));
+                    var divElement = document.createElement('div');
+                    divElement.classList.add('find-me');
+                    this.appendChild(divElement);
                 }
             }
         });
         
         testElement.innerHTML = '<div></div><p></p><asdf-test-two></asdf-test-two>';
         
-        functionality.HTMLTemplateElement = (testElement.content.children.length === 3);
-        functionality.HTMLTemplateElement = (functionality.HTMLTemplateElement && testElement.content.children[2].children.length === 0);
+        functionality.HTMLTemplateElement = (xtag.query(testElement, '.find-me').length === 0);
         
     } catch (e) {
         functionality.HTMLTemplateElement = false;
+        functionality.errors.HTMLTemplateElement = e;
     }
     
     // function to show shim and functionality results
@@ -6069,8 +6084,8 @@ window.addEventListener('design-register-element', function () {
         }
         
         strValue = strValue
-                        .replace(/\\n/gi, '\n')
-                        .replace(/\\t/gi, '\t')
+                        .replace(/\\?\\n/gi, '\n')
+                        .replace(/\\?\\t/gi, '\t')
                         .replace(/\[.*\]/gi, '')
                         .replace(/\([0-9]*\)/gi, '');
         
@@ -6103,11 +6118,11 @@ window.addEventListener('design-register-element', function () {
         var templateElement = document.createElement('template'), strHTML;
         
         var jsnErrorCopy = {};
-        jsnErrorCopy.error_text =     cleanErrorValue(jsnError.error_text);
-        jsnErrorCopy.error_file =     cleanErrorValue(jsnError.error_file);
-        jsnErrorCopy.error_hint =     cleanErrorValue(jsnError.error_hint);
-        jsnErrorCopy.error_context =  cleanErrorValue(jsnError.error_context);
-        jsnErrorCopy.error_addin =    cleanErrorValue(jsnError.error_addin);
+        jsnErrorCopy.error_text    = cleanErrorValue(jsnError.error_text);
+        jsnErrorCopy.error_file    = cleanErrorValue(jsnError.error_file);
+        jsnErrorCopy.error_hint    = cleanErrorValue(jsnError.error_hint);
+        jsnErrorCopy.error_context = cleanErrorValue(jsnError.error_context);
+        jsnErrorCopy.error_addin   = cleanErrorValue(jsnError.error_addin);
         
         templateElement.setAttribute('data-theme', 'error');
         strHTML = ml(function () {/*
@@ -7969,11 +7984,8 @@ window.addEventListener('design-register-element', function () {
     'use strict';
     
     registerDesignSnippet('GS.userChangePassword', 'GS.userChangePassword', 'GS.userChangePassword();');
-    
     //registerDesignSnippet('GS.superChangePassword', 'GS.superChangePassword', 'GS.superChangePassword();');
-    
     //registerDesignSnippet('GS.superUserLogin', 'GS.superUserLogin', 'GS.superUserLogin(${0:loggedInCallback});');
-    
     registerDesignSnippet('GS.normalUserLogin', 'GS.normalUserLogin', 'GS.normalUserLogin(${0:loggedInCallback});');
 });
 
@@ -10480,6 +10492,10 @@ window.addEventListener('design-register-element', function () {
     window.designElementProperty_GSBODY = function(selectedElement) {
         addFlexContainerProps(selectedElement);
         //addFlexProps(selectedElement);
+        
+        addProp('Padded', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('padded')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'padded', (this.value === 'true'), true);
+        });
     };
     
     registerDesignSnippet('<gs-body>', '<gs-body>', 'gs-body>\n' +
@@ -11982,59 +11998,60 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
-    registerDesignSnippet('<gs-checkbox>', '<gs-checkbox>', 'gs-checkbox value="0" column="${1:ready_to_ship}">${2}</gs-checkbox>');
+
+    registerDesignSnippet('<gs-checkbox>', '<gs-checkbox>', 'gs-checkbox type="smallint" column="${1:ready_to_ship}">${2}</gs-checkbox>');
     registerDesignSnippet('<gs-checkbox> With Label', '<gs-checkbox>',
                     'label for="${1:date-insert-ready_to_ship}">${2:Ready To Ship?}:</label>\n' +
-                    '<gs-checkbox id="${1:date-insert-ready_to_ship}" value="0" column="${3:ready_to_ship}"></gs-checkbox>');
-    
+                    '<gs-checkbox id="${1:date-insert-ready_to_ship}" type="smallint" column="${3:ready_to_ship}"></gs-checkbox>');
+
     designRegisterElement('gs-checkbox',
                             (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-checkbox.html');
-    
+
     window.designElementProperty_GSCHECKBOX = function(selectedElement) {
         var strVisibilityAttribute;
-        
+
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Triple State', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('triplestate')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'triplestate', (this.value === 'true'), true);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
         });
-        
+
         addProp('Inline', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('inline')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'inline', (this.value === 'true'), true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         addProp('Type', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('type') || '') + '" mini>' +
+                                        '<option value="">Detect</option>' +
                                         '<option value="smallint">Smallint</option>' +
-                                        '<option value="">Boolean</option>' +
+                                        '<option value="boolean">Boolean</option>' +
                                     '</gs-select>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'type', this.value);
         });
-        
+
         // visibility attributes
         strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -12044,7 +12061,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -12282,84 +12299,138 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             'click': function (event) {
-                var strValue, bolTripleState;
+                var bolTripleState;
+                var strValue;
+                var strType;
 
                 if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    strValue = this.getAttribute('value');
                     bolTripleState = this.hasAttribute('triplestate');
+                    strValue = this.getAttribute('value').trim().toLowerCase();
 
-                    // here be dragons
-                    if (strValue === 'false') {
-                        this.setAttribute('value', 'true');
+                    // get type from type attribute
+                    strType = this.getAttribute('type');
 
-                    } else if (strValue === 'true') {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'null');
+                    // if type is not valid, get type from current value
+                    if (strType !== 'smallint' && strType !== 'boolean') {
+                        if (strValue === 'false' || strValue === 'true' || strValue === 'null') {
+                            strType = 'boolean';
+                        } else if (strValue === '0' || strValue === '-1' || strValue === 'n') {
+                            strType = 'smallint';
+                    // else default to boolean (backwards compatibility)
                         } else {
-                            this.setAttribute('value', 'false');
-                        }
-
-                    } else if (strValue === 'null') {
-                        this.setAttribute('value', 'false');
-
-                    } else if (strValue === '0') {
-                        this.setAttribute('value', '-1');
-
-                    } else if (strValue === '-1') {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'n');
-                        } else {
-                            this.setAttribute('value', '0');
-                        }
-
-                    } else if (strValue === 'n') {
-                        this.setAttribute('value', '0');
-
-                    } else if (strValue === 0) {
-                        this.setAttribute('value', -1);
-
-                    } else if (strValue === -1) {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'n');
-                        } else {
-                            this.setAttribute('value', 0);
-                        }
-
-                    } else if (strValue === 'n') {
-                        this.setAttribute('value', 0);
-
-                    } else if (strValue === false) {
-                        this.setAttribute('value', true);
-
-                    } else if (strValue === true) {
-                        if (bolTripleState) {
-                            this.setAttribute('value', null);
-                        } else {
-                            this.setAttribute('value', false);
-                        }
-
-                    } else if (strValue === null) {
-                        //this.setAttribute('value', false);
-                        if (this.getAttribute('type') === 'smallint') {
-                            this.setAttribute('value', '-1');
-                        } else {
-                            this.setAttribute('value', 'true');
-                        }
-
-                    } else {
-                        if (this.getAttribute('type') === 'smallint') {
-                            this.setAttribute('value', '-1');
-                        } else {
-                            this.setAttribute('value', 'true');
+                            strType = 'boolean';
                         }
                     }
 
-                    this.classList.remove('down');
+                    // resolve current value to the correct type
+                    if (strType === 'smallint') {
+                        if (strValue === '0' || strValue === 'false') {
+                            strValue = '0';
+                        } else if (strValue === '-1' || strValue === 'true') {
+                            strValue = '-1';
+                        } else if (strValue === 'n' || strValue === 'null') {
+                            strValue = 'n';
+                        } else {
+                            strValue = '0';
+                        }
+                    } else if (strType === 'boolean') {
+                        if (strValue === '0' || strValue === 'false') {
+                            strValue = 'false';
+                        } else if (strValue === '-1' || strValue === 'true') {
+                            strValue = 'true';
+                        } else if (strValue === 'n' || strValue === 'null') {
+                            strValue = 'null';
+                        } else {
+                            strValue = 'false';
+                        }
+                    }
 
-                    xtag.fireEvent(this, 'change', {
-                        bubbles: true,
-                        cancelable: true
-                    });
+                    // get new value based on current value
+                    if (strType === 'smallint') {
+                        if (strValue === '0') {
+                            strValue = '-1';
+                        } else if (strValue === '-1') {
+                            if (bolTripleState) {
+                                strValue = 'n';
+                            } else {
+                                strValue = '0';
+                            }
+                        } else if (strValue === 'n') {
+                            strValue = '0';
+                        }
+                    } else if (strType === 'boolean') {
+                        if (strValue === 'false') {
+                            strValue = 'true';
+                        } else if (strValue === 'true') {
+                            if (bolTripleState) {
+                                strValue = 'null';
+                            } else {
+                                strValue = 'false';
+                            }
+                        } else if (strValue === 'null') {
+                            strValue = 'false';
+                        }
+                    }
+
+                    // set new value
+                    this.setAttribute('value', strValue);
+
+                    //// here be dragons
+                    //if (strValue === 'false') {
+                    //    this.setAttribute('value', 'true');
+                    //} else if (strValue === 'true') {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'null');
+                    //    } else {
+                    //        this.setAttribute('value', 'false');
+                    //    }
+                    //} else if (strValue === 'null') {
+                    //    this.setAttribute('value', 'false');
+                    //} else if (strValue === '0') {
+                    //    this.setAttribute('value', '-1');
+                    //} else if (strValue === '-1') {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'n');
+                    //    } else {
+                    //        this.setAttribute('value', '0');
+                    //    }
+                    //} else if (strValue === 'n') {
+                    //    this.setAttribute('value', '0');
+                    //} else if (strValue === 0) {
+                    //    this.setAttribute('value', -1);
+                    //} else if (strValue === -1) {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'n');
+                    //    } else {
+                    //        this.setAttribute('value', 0);
+                    //    }
+                    //} else if (strValue === 'n') {
+                    //    this.setAttribute('value', 0);
+                    //} else if (strValue === false) {
+                    //    this.setAttribute('value', true);
+                    //} else if (strValue === true) {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', null);
+                    //    } else {
+                    //        this.setAttribute('value', false);
+                    //    }
+                    //} else if (strValue === null) {
+                    //    //this.setAttribute('value', false);
+                    //    if (this.getAttribute('type') === 'smallint') {
+                    //        this.setAttribute('value', '-1');
+                    //    } else {
+                    //        this.setAttribute('value', 'true');
+                    //    }
+                    //} else {
+                    //    if (this.getAttribute('type') === 'smallint') {
+                    //        this.setAttribute('value', '-1');
+                    //    } else {
+                    //        this.setAttribute('value', 'true');
+                    //    }
+                    //}
+
+                    this.classList.remove('down');
+                    xtag.fireEvent(this, 'change', {bubbles: true, cancelable: true});
                 }
             },
             'keydown': function (event) {
@@ -13696,7 +13767,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                         if (!element.getAttribute('src') && !element.getAttribute('source') && !element.getAttribute('initalize')) {
                             //element.staticDropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]);
-                            element.dropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]); //element.staticDropDownTable;
+                            //element.dropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]); //element.staticDropDownTable;
+                            
+                            element.dropDownTable = GS.cloneElement(xtag.query(tableTemplateElementCopy.content, 'table')[0]);
                         }
                     }
                 }
@@ -15807,9 +15880,10 @@ document.addEventListener('DOMContentLoaded', function () {
             throw 'gs-datasheet error: No table template provided.';
         }
         
-        if (tableTemplateElement.content.children[0].nodeName !== 'TABLE') {
-            throw 'gs-datasheet error: Table is not the first element in the provided table template.';
-        }
+        // V----- cannot do .children on template.content
+        //if (tableTemplateElement.content.children[0].nodeName !== 'TABLE') {
+        //    throw 'gs-datasheet error: Table is not the first element in the provided table template.';
+        //}
         
         // make header template
         headerRecordElement = xtag.query(tableTemplateElement.content, 'thead tr')[0];
@@ -21048,12 +21122,15 @@ document.addEventListener('DOMContentLoaded', function () {
             customHudTemplate = document.createElement('template');
             customHudTemplate.innerHTML = element.hudTemplate;
             
-            customHudElements = customHudTemplate.content.childNodes;
+            elementHudTopContainer.appendChild(customHudTemplate.content.cloneNode(true));
             
-            for (i = 0, len = customHudElements.length; i < len; i += 1) {
-                //customHudElements[i].setAttribute('inline', '');
-                elementHudTopContainer.appendChild(customHudElements[0]);
-            }
+            // V------ you can't use .children on a template.content
+            //customHudElements = customHudTemplate.content.childNodes;
+            //
+            //for (i = 0, len = customHudElements.length; i < len; i += 1) {
+            //    //customHudElements[i].setAttribute('inline', '');
+            //    elementHudTopContainer.appendChild(customHudElements[0]);
+            //}
             //elementHudTopContainer.innerHTML += element.hudTemplate; <-- this causes events to be lost in the hud-top container
         }
         
@@ -25327,7 +25404,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
     registerDesignSnippet('<gs-grid>', '<gs-grid>', 'gs-grid widths="${1}">\n' +
                                                     '    <gs-block>${2}</gs-block>\n' +
                                                     '</gs-grid>');

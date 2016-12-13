@@ -1,59 +1,60 @@
 
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
-    registerDesignSnippet('<gs-checkbox>', '<gs-checkbox>', 'gs-checkbox value="0" column="${1:ready_to_ship}">${2}</gs-checkbox>');
+
+    registerDesignSnippet('<gs-checkbox>', '<gs-checkbox>', 'gs-checkbox type="smallint" column="${1:ready_to_ship}">${2}</gs-checkbox>');
     registerDesignSnippet('<gs-checkbox> With Label', '<gs-checkbox>',
                     'label for="${1:date-insert-ready_to_ship}">${2:Ready To Ship?}:</label>\n' +
-                    '<gs-checkbox id="${1:date-insert-ready_to_ship}" value="0" column="${3:ready_to_ship}"></gs-checkbox>');
-    
+                    '<gs-checkbox id="${1:date-insert-ready_to_ship}" type="smallint" column="${3:ready_to_ship}"></gs-checkbox>');
+
     designRegisterElement('gs-checkbox',
                             (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-checkbox.html');
-    
+
     window.designElementProperty_GSCHECKBOX = function(selectedElement) {
         var strVisibilityAttribute;
-        
+
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Triple State', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('triplestate')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'triplestate', (this.value === 'true'), true);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
         });
-        
+
         addProp('Inline', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('inline')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'inline', (this.value === 'true'), true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         addProp('Type', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('type') || '') + '" mini>' +
+                                        '<option value="">Detect</option>' +
                                         '<option value="smallint">Smallint</option>' +
-                                        '<option value="">Boolean</option>' +
+                                        '<option value="boolean">Boolean</option>' +
                                     '</gs-select>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'type', this.value);
         });
-        
+
         // visibility attributes
         strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -63,7 +64,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -301,84 +302,138 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             'click': function (event) {
-                var strValue, bolTripleState;
+                var bolTripleState;
+                var strValue;
+                var strType;
 
                 if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    strValue = this.getAttribute('value');
                     bolTripleState = this.hasAttribute('triplestate');
+                    strValue = this.getAttribute('value').trim().toLowerCase();
 
-                    // here be dragons
-                    if (strValue === 'false') {
-                        this.setAttribute('value', 'true');
+                    // get type from type attribute
+                    strType = this.getAttribute('type');
 
-                    } else if (strValue === 'true') {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'null');
+                    // if type is not valid, get type from current value
+                    if (strType !== 'smallint' && strType !== 'boolean') {
+                        if (strValue === 'false' || strValue === 'true' || strValue === 'null') {
+                            strType = 'boolean';
+                        } else if (strValue === '0' || strValue === '-1' || strValue === 'n') {
+                            strType = 'smallint';
+                    // else default to boolean (backwards compatibility)
                         } else {
-                            this.setAttribute('value', 'false');
-                        }
-
-                    } else if (strValue === 'null') {
-                        this.setAttribute('value', 'false');
-
-                    } else if (strValue === '0') {
-                        this.setAttribute('value', '-1');
-
-                    } else if (strValue === '-1') {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'n');
-                        } else {
-                            this.setAttribute('value', '0');
-                        }
-
-                    } else if (strValue === 'n') {
-                        this.setAttribute('value', '0');
-
-                    } else if (strValue === 0) {
-                        this.setAttribute('value', -1);
-
-                    } else if (strValue === -1) {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'n');
-                        } else {
-                            this.setAttribute('value', 0);
-                        }
-
-                    } else if (strValue === 'n') {
-                        this.setAttribute('value', 0);
-
-                    } else if (strValue === false) {
-                        this.setAttribute('value', true);
-
-                    } else if (strValue === true) {
-                        if (bolTripleState) {
-                            this.setAttribute('value', null);
-                        } else {
-                            this.setAttribute('value', false);
-                        }
-
-                    } else if (strValue === null) {
-                        //this.setAttribute('value', false);
-                        if (this.getAttribute('type') === 'smallint') {
-                            this.setAttribute('value', '-1');
-                        } else {
-                            this.setAttribute('value', 'true');
-                        }
-
-                    } else {
-                        if (this.getAttribute('type') === 'smallint') {
-                            this.setAttribute('value', '-1');
-                        } else {
-                            this.setAttribute('value', 'true');
+                            strType = 'boolean';
                         }
                     }
 
-                    this.classList.remove('down');
+                    // resolve current value to the correct type
+                    if (strType === 'smallint') {
+                        if (strValue === '0' || strValue === 'false') {
+                            strValue = '0';
+                        } else if (strValue === '-1' || strValue === 'true') {
+                            strValue = '-1';
+                        } else if (strValue === 'n' || strValue === 'null') {
+                            strValue = 'n';
+                        } else {
+                            strValue = '0';
+                        }
+                    } else if (strType === 'boolean') {
+                        if (strValue === '0' || strValue === 'false') {
+                            strValue = 'false';
+                        } else if (strValue === '-1' || strValue === 'true') {
+                            strValue = 'true';
+                        } else if (strValue === 'n' || strValue === 'null') {
+                            strValue = 'null';
+                        } else {
+                            strValue = 'false';
+                        }
+                    }
 
-                    xtag.fireEvent(this, 'change', {
-                        bubbles: true,
-                        cancelable: true
-                    });
+                    // get new value based on current value
+                    if (strType === 'smallint') {
+                        if (strValue === '0') {
+                            strValue = '-1';
+                        } else if (strValue === '-1') {
+                            if (bolTripleState) {
+                                strValue = 'n';
+                            } else {
+                                strValue = '0';
+                            }
+                        } else if (strValue === 'n') {
+                            strValue = '0';
+                        }
+                    } else if (strType === 'boolean') {
+                        if (strValue === 'false') {
+                            strValue = 'true';
+                        } else if (strValue === 'true') {
+                            if (bolTripleState) {
+                                strValue = 'null';
+                            } else {
+                                strValue = 'false';
+                            }
+                        } else if (strValue === 'null') {
+                            strValue = 'false';
+                        }
+                    }
+
+                    // set new value
+                    this.setAttribute('value', strValue);
+
+                    //// here be dragons
+                    //if (strValue === 'false') {
+                    //    this.setAttribute('value', 'true');
+                    //} else if (strValue === 'true') {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'null');
+                    //    } else {
+                    //        this.setAttribute('value', 'false');
+                    //    }
+                    //} else if (strValue === 'null') {
+                    //    this.setAttribute('value', 'false');
+                    //} else if (strValue === '0') {
+                    //    this.setAttribute('value', '-1');
+                    //} else if (strValue === '-1') {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'n');
+                    //    } else {
+                    //        this.setAttribute('value', '0');
+                    //    }
+                    //} else if (strValue === 'n') {
+                    //    this.setAttribute('value', '0');
+                    //} else if (strValue === 0) {
+                    //    this.setAttribute('value', -1);
+                    //} else if (strValue === -1) {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'n');
+                    //    } else {
+                    //        this.setAttribute('value', 0);
+                    //    }
+                    //} else if (strValue === 'n') {
+                    //    this.setAttribute('value', 0);
+                    //} else if (strValue === false) {
+                    //    this.setAttribute('value', true);
+                    //} else if (strValue === true) {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', null);
+                    //    } else {
+                    //        this.setAttribute('value', false);
+                    //    }
+                    //} else if (strValue === null) {
+                    //    //this.setAttribute('value', false);
+                    //    if (this.getAttribute('type') === 'smallint') {
+                    //        this.setAttribute('value', '-1');
+                    //    } else {
+                    //        this.setAttribute('value', 'true');
+                    //    }
+                    //} else {
+                    //    if (this.getAttribute('type') === 'smallint') {
+                    //        this.setAttribute('value', '-1');
+                    //    } else {
+                    //        this.setAttribute('value', 'true');
+                    //    }
+                    //}
+
+                    this.classList.remove('down');
+                    xtag.fireEvent(this, 'change', {bubbles: true, cancelable: true});
                 }
             },
             'keydown': function (event) {

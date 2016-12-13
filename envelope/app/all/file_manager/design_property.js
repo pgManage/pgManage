@@ -74,30 +74,42 @@ function setOrRemoveBooleanAttribute(element, strAttrName, bolValue, bolAddState
 }
 
 function addFlexContainerProps(selectedElement) {
-    //addProp('Flex Container', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('flex-horizontal') || selectedElement.hasAttribute('flex-vertical')) + '" mini></gs-checkbox>', function () {
-    //    if (this.value === 'true') {
-    //        selectedElement.setAttribute('flex-horizontal', '');
-    //    } else {
-    //        selectedElement.removeAttribute('flex-horizontal');
-    //        selectedElement.removeAttribute('flex-vertical');
-    //    }
-    //    
-    //    return selectedElement;
-    //});
-    //
-    //if (selectedElement.hasAttribute('flex-horizontal') || selectedElement.hasAttribute('flex-vertical')) {
-    //    addProp('Flex Direction', true, '<gs-select class="target" value="' + (selectedElement.hasAttribute('flex-horizontal') ? 'horizontal' : 'vertical') + '" mini>' +
-    //                                        '<option value="horizontal">Horizontal</option>' +
-    //                                        '<option value="vertical">Vertical</option>' +
-    //                                    '</gs-select>', function () {
-    //        selectedElement.removeAttribute('flex-horizontal');
-    //        selectedElement.removeAttribute('flex-vertical');
-    //        
-    //        selectedElement.setAttribute('flex-' + this.value, '');
-    //        
-    //        return selectedElement;
-    //    });
-    //}
+    addProp('Flex Container', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('flex-horizontal') || selectedElement.hasAttribute('flex-vertical')) + '" mini></gs-checkbox>', function () {
+        if (this.value === 'true') {
+            selectedElement.setAttribute('flex-horizontal', '');
+        } else {
+            selectedElement.removeAttribute('flex-horizontal');
+            selectedElement.removeAttribute('flex-vertical');
+        }
+        
+        return selectedElement;
+    });
+    
+    if (selectedElement.hasAttribute('flex-horizontal') || selectedElement.hasAttribute('flex-vertical')) {
+        addProp('Flex Direction', true, '<gs-select class="target" value="' + (selectedElement.hasAttribute('flex-horizontal') ? 'horizontal' : 'vertical') + '" mini>' +
+                                            '<option value="horizontal">Horizontal</option>' +
+                                            '<option value="vertical">Vertical</option>' +
+                                        '</gs-select>', function () {
+            selectedElement.removeAttribute('flex-horizontal');
+            selectedElement.removeAttribute('flex-vertical');
+            
+            selectedElement.setAttribute('flex-' + this.value, '');
+            
+            return selectedElement;
+        });
+        
+        addProp('Flex Fill', true,
+                '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('flex-fill')) + '" mini></gs-checkbox>',
+                function () {
+            if (this.value === 'true') {
+                selectedElement.setAttribute('flex-fill', '');
+            } else {
+                selectedElement.removeAttribute('flex-fill');
+            }
+            
+            return selectedElement;
+        });
+    }
 }
 
 function addFlexProps(selectedElement) {
@@ -105,12 +117,17 @@ function addFlexProps(selectedElement) {
     //    addProp('Flex Width', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('flex') || '') + '" mini></gs-checkbox>', function () {
     //        return setOrRemoveBooleanAttribute(selectedElement, 'flex', this.value === 'true', true);
     //    });
-    //    
+    //
     //} else if (selectedElement.parentNode.hasAttribute('flex-vertical')) {
     //    addProp('Flex Height', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('flex') || '') + '" mini></gs-checkbox>', function () {
     //        return setOrRemoveBooleanAttribute(selectedElement, 'flex', this.value === 'true', true);
     //    });
     //}
+    addProp('Flex', true,
+            '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('flex') || '') + '" mini></gs-checkbox>',
+            function () {
+        return setOrRemoveBooleanAttribute(selectedElement, 'flex', this.value === 'true', true);
+    });
 }
 
 function propertyList(selectedElement, currentElement) {
