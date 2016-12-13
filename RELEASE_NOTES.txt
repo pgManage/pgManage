@@ -1,3 +1,15 @@
+Changes since 3.1.0 and 2.2.1:
+Fix version number inconsistency (closes workflowproducts/postage#62)
+Fix inconsistency in checkbox type handling
+Error messages had extra slashes (closes workflowproducts/postage#76)
+Added designer attributes for flex, gs-grid padding and gutter, gs-body padded
+Updated template code to work on IE Edge (.children on .content issue)
+Fix activity page (closes workflowproducts/postage#74)
+Fix occasional issue where results can't be scrolled even though there is too much to see at once.
+Fix issue where comments on columns break table script generation (closes workflowproducts/postage#81)
+Remove strlen in accept (fixes crash when there is no return from the PostgreSQL function)
+Fix raw errors (closes workflowproducts/postage#79)
+
 Changes since 3.1.0 and 2.2.0:
 Make NSIS installer check for ucrt (closes workflowproducts/postage#67)
 Add column list to tree view (closes workflowproducts/postage#9)
