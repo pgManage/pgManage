@@ -829,10 +829,10 @@ function autocompleteGetPrefix(strScript, cursorPosition) {
         } else if (str_form_data.substr(ptr_loop, 1) === "\\" && int_qs !== 4 && int_qs !== 2 && int_qs !== 5 && int_qs !== 6) {
             // skip next character
             ptr_loop += 1;
-            int_inputstring_len -= int_chunk_len;
             int_chunk_len = 1;
+            int_inputstring_len -= int_chunk_len;
             int_element_len += int_chunk_len;
-            //console.log("found slash ptr_loop: " + ptr_loop);
+            //console.log("found slash ptr_loop: " + ptr_loop, ptr_loop, int_inputstring_len, int_chunk_len, int_element_len);
             
         // FOUND SINGLE QUOTE:
         } else if (int_qs === 0 && str_form_data.substr(ptr_loop, 1) === "'") {

@@ -1,4 +1,9 @@
 
+.ace-selected-query {
+    position: absolute;
+    background-color: #FBFFBE;
+    z-index: 4;
+}
 
 div#header-text-container {
     padding: 0 0.5em;
