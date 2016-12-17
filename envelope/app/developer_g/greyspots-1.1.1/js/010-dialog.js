@@ -110,7 +110,7 @@ window.addEventListener('design-register-element', function () {
                 for (i = 0, len = buttons.length; i < len; i += 1) {
                     strHTML +=
                         '<gs-block gs-dynamic>' +
-                            '<gs-button dialogclose ' + (i === len - 1 ? 'bg-primary' : '') + ' gs-dynamic>' +
+                            '<gs-button dialogclose ' + (i === len - 1 ? 'bg-primary listen-for-return' : '') + ' gs-dynamic>' +
                                 encodeHTML(buttons[i]) +
                             '</gs-button>' +
                         '</gs-block>';
@@ -292,7 +292,7 @@ GS.closeDialog = function (dialog, strAnswer) {
                 for (i = 0, len = options.buttons.length; i < len; i += 1) {
                     strButtons +=
                         '<gs-block gs-dynamic>' +
-                            '<gs-button dialogclose ' + (i === len - 1 ? 'bg-primary' : '') + ' gs-dynamic>' +
+                            '<gs-button dialogclose ' + (i === len - 1 ? 'bg-primary listen-for-return' : '') + ' gs-dynamic>' +
                                 encodeHTML(options.buttons[i]) +
                             '</gs-button>' +
                         '</gs-block>';

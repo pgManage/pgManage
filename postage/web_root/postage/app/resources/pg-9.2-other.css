@@ -347,216 +347,83 @@ gs-button.button-save-as .save-as-pencil {
 /* ################### EXPLAIN NODES ################### */
 /* ##################################################### */
 
-.node-container {
-    padding-top: 1em;
-    padding-bottom: 1em;
-    font-size: 0.8em;
-}
-
-.node-layer {
-    text-align: left;
-    white-space: nowrap;
-    height: 5em;
-}
-
-.node-container.taller-nodes .node-layer {
-    height: 6.4em;
-}
-
-.node {
+.costliest-label, .largest-label, .slowest-label {
+    background: #f00;
+    color: #fff;
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -ms-border-radius: 0.5em;
+    -o-border-radius: 0.5em;
+    border-radius: 0.5em;
+    padding: 0.1em 0.2em;
     display: inline-block;
-    width: 16em;
-    height: 100%;
+}
 
-    text-align: left;
+.explain-bar {
     font-family: monospace;
-    white-space: normal;
-    word-break: break-all;
-    border: 1px solid #000000;
-    margin-left: 1em;
-    margin-right: 1em;
-
-    border-radius: 0.2em;
-    background-color: #FFFFFF;
-    box-shadow: 0.1em 0.1em 0.3em 0.05em #CCCCCC;
-
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
+    margin: 0;
 }
 
-.node.blank {
-    border: 0 none;
-    border-radius: 0;
-    background-color: transparent;
-    box-shadow: 0 0 0 0 transparent;
-    color: transparent;
-}
-
-.node .node-content-container {
-    height: 100%;
-}
-
-.node .explain-context-container {
-    padding: 0.2em;
-
-}
-
-.node .explain-speed-container {
-    white-space: nowrap;
-    border-left: 1px solid #CCCCCC;
-    padding: 0.2em;
-}
-
-.explain-speed-container .progressbar-outer {
-    border: 1px solid #CCCCCC;
-    height: 0.3em;
-    background-color: #F0F0F0;
-}
-.explain-speed-container .progressbar-inner {
-    height: 100%;
-    background-color: #0000FF;
-}
-
-.explain-speed-container .progressbar-outer.red .progressbar-inner {
-    background-color: #FF0000;
-}
-
-.explain-speed-container .progressbar-outer.blue .progressbar-inner {
-    background-color: #0000FF;
-}
-
-.explain-speed-container .progressbar-outer.green .progressbar-inner {
-    background-color: #00FF00;
-}
-
-.explain-speed-container .progressbar-outer.unknown {
-    background-color: #EFEFEF;
-}
-
-
-.line-layer {
-    white-space: nowrap;
-    height: 2em;
-}
-
-.line-layer .line {
-    position: relative;
-    width: 18em;
+.explain-bar-0 {
+    margin: 0;
+    padding: 0.1em;
     display: inline-block;
-    height: 2em;
 }
 
-.line-layer .up-down .line-arrow,
-.line-layer .up-right-down .line-arrow/*,
-.line-layer .down-left .line-arrow,
-.line-layer .right-down-left .line-arrow*/ {
-    display: block;
-    position: absolute;
-    content: '';
-    top: 0; /*bottom: 0;*/
-    left: 50%;
-	width: 0;
-	height: 0;
-
-	border-bottom: 7px solid #000;
-	border-left: 4px solid transparent;
-	border-right: 4px solid transparent;
-    margin-left: -3px;
+.explain-bar-block {
+    margin: 0;
+    padding: 0.1em;
+    display: inline-block;
+    width: 0.5em;
 }
 
-/* up and down */
-.line-layer .up-down .line-part-1 {
-    display: block;
-    position: absolute;
-    content: '';
-    top: 8%;
-    left: 50%;
-    width: 2px;
-    background-color: #000;
-    height: 92%; /* not 100% because we want to stay out of the way of the point of the arrow */
+.explain-bar.red .explain-bar-block {
+    background: #f00;
+    color: #fff;
 }
 
-/* up, right and down */
-.line-layer .up-right-down .line-part-1 {
-    display: block;
-    position: absolute;
-    content: '';
-    top: 8%;
-    left: 50%;
-    width: 2px;
-    background-color: #000;
-    height: 92%; /* not 100% because we want to stay out of the way of the point of the arrow */
-}
-.line-layer .up-right-down .line-part-2 {
-    display: block;
-    position: absolute;
-    content: '';
-    top: 50%;
-    left: 50%;
-    height: 2px;
-    background-color: #000;
-    width: 50%;
+.explain-bar.yellow .explain-bar-block {
+    background: #ff0;
+    color: #000;
 }
 
-/* down and left */
-.line-layer .down-left .line-part-1 {
-    display: block;
-    position: absolute;
-    content: '';
-    top: 50%;
-    left: 0;
-    width: 50%;
-    height: 2px;
-    background-color: #000;
-}
-.line-layer .down-left .line-part-2 {
-    display: block;
-    position: absolute;
-    content: '';
-    top: 50%;
-    left: 50%;
-    width: 2px;
-    height: 50%;
-    background-color: #000;
+.explain-bar.green .explain-bar-block {
+    background: #0f0;
+    color: #000;
 }
 
-/* right and left */
-.line-layer .right-left .line-part-1 {
-    display: block;
-    position: absolute;
-    content: '';
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: #000;
+.explain-bar.cyan .explain-bar-block {
+    background: #0ff;
+    color: #000;
 }
 
-/* right, down and left */
-.line-layer .right-down-left .line-part-1 {
-    display: block;
-    position: absolute;
-    content: '';
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: #000;
-}
-.line-layer .right-down-left .line-part-2 {
-    display: block;
-    position: absolute;
-    content: '';
-    top: 50%;
-    left: 50%;
-    width: 2px;
-    height: 42%; /* not 50% because we want to stay out of the way of the point of the arrow */
-    background-color: #000;
+.explain-bar.blue .explain-bar-block {
+    background: #00f;
+    color: #fff;
 }
 
+.explain-bar-label {
+    font-family: monospace;
+    margin: 0;
+    padding: 0.1em;
+    width: 3em;
+}
+
+.explain-node circle {
+    fill: #555;
+}
+
+.explain-node text {
+    text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+    font: 10px sans-serif;
+}
+
+.explain-link {
+    fill: none;
+    stroke: #555;
+    stroke-opacity: 0.4;
+    stroke-width: 1.5px;
+}
 
 /* ##################################################### */
 /* ################ NOTIFICATION DIALOG ################ */

@@ -259,6 +259,45 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
         intNeedle -= 1;
     }
 
+    /*
+
+    // sometimes a query doesn't have a semicolon like it's supposed to, here we define
+    //      what query starting keywords mark the end of other queries
+    var arrAllQueryEndKeywords = [
+        'ABORT', 'ALTER', 'ANALYZE', 'CHECKPOINT', 'CLOSE', 'CLUSTER', 'COMMENT',
+        'COMMIT', 'COPY', 'CREATE', 'DEALLOCATE', 'DELETE', 'DISCARD', 'DO', 'DROP',
+        'EXECUTE', 'EXPLAIN', 'FETCH', 'GRANT', 'IMPORT', 'INSERT', 'LISTEN',
+        'LOAD', 'LOCK', 'MOVE', 'NOTIFY', 'PREPARE', 'REASSIGN', 'REFRESH', 'REINDEX',
+        'RELEASE', 'RESET', 'REVOKE', 'ROLLBACK', 'SAVEPOINT', 'SECURITY',
+        'SET', 'SHOW', 'START', 'TRUNCATE', 'UNLISTEN', 'UPDATE', 'VACUUM', 'VALUES',
+        'WITH' //, 'BEGIN', 'DECLARE', 'END'
+    ];
+    var jsnQueryEndKeywords = {
+        "insert": [
+            'SELECT'
+        ],
+        "grant": [
+            'EXECUTE', 'SELECT', 'TRUNCATE', 'INSERT', 'UPDATE', 'DELETE'
+        ],
+        "revoke": [
+            'EXECUTE', 'SELECT', 'TRUNCATE', 'INSERT', 'UPDATE', 'DELETE'
+        ],
+        "explain": [
+            'ANALYZE', 'SELECT'
+        ],
+        "create": [
+            'ANALYZE', 'SELECT', 'WITH', 'EXECUTE', 'INSERT', 'UPDATE', 'DELETE',
+            'COMMIT', 'TRUNCATE', 'SECURITY'
+        ],
+        "alter": [
+            'ALTER', 'SET', 'RESET', 'DROP', 'WITH', 'GRANT', 'REVOKE', 'SELECT',
+            'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'EXECUTE', 'SECURITY'
+        ],
+        "else": []
+    };
+
+    */
+
     // quote status (intQuoteStatus) values
     //      0 => no quotes
     //      2 => dollar tag
@@ -322,7 +361,7 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
                 intParenLevel = intParenLevel + 1;
 
             // FOUND CLOSE PARENTHESIS
-            } else if (intQuoteStatus === 0 && strChar === ")" && intParenLevel > 0) {
+            } else if (intQuoteStatus === 0 && strChar === ")") {
                 intParenLevel = intParenLevel - 1;
 
             // FOUND DOLLAR TAG START:
@@ -345,14 +384,20 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
 
                 // move pointer to end of end dollar tag
                 intNeedle += strTag.length;
+            }
 
             // FOUND AN UNQUOTED SEMICOLON:
-            } else if (intParenLevel === 0 && intQuoteStatus === 0 && strChar === ';') {
+            if (intParenLevel === 0 && intQuoteStatus === 0 && strChar === ';') {
                 intQueryEnd = intNeedle;
                 break;
 
             // FOUND THE SCRIPT END:
             } else if (intNeedle === (scriptLen - 1)) {
+                intQueryEnd = intNeedle;
+                break;
+                
+            // FOUND EXTRA PAREN:
+            } else if (intParenLevel < 0) {
                 intQueryEnd = intNeedle;
                 break;
             }
@@ -364,7 +409,26 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
             intNeedle += 1;
         }
     }
-    strFirstWord
+    
+    // V--- chops off the last character
+    //// move the needle back one character so that we don't include the character that ended the query detection
+    //intQueryEnd -= 1;
+    
+    // V--- prevents you from adding lines after the query and still detecting the query
+    //// move the needle backwards to trim off extra whitespace (if needed)
+    //if (strScript[intQueryEnd - 1] && (/^[\s]$/g).test(strScript[intQueryEnd - 1])) {
+    //    intNeedle = (intQueryEnd - 1);
+    //    while (intNeedle > intQueryStart) {
+    //        if (strScript[intNeedle] && !(/^[\s]$/g).test(strScript[intNeedle])) {
+    //            intQueryEnd = (intNeedle + 1);
+    //            break;
+    //        }
+    //        intNeedle -= 1;
+    //    }
+    //    
+    //}
+
+    // return the query start/end, first word end and parenthesis level at the cursor
     return {
         'intQueryStart': intQueryStart,
         'intFirstWordEnd': intQueryStart + (strFirstWord || '').length,
@@ -386,6 +450,17 @@ function selectionFindRange(tabElement, editor) {
     var arrQueryStartKeywords;
     var arrDangerousQueryStartKeywords;
     var arrExtraSearchKeywords;
+
+    // ######################
+    //      known issues
+    //      in a query that looks like this: "EXPLAIN ANALYZE ..." the ANALYZE is found
+    //              first. to fix this we need to alter the extra search code to handle
+    //              different patterns of extra search (currently it's handling only
+    //              GRANT/REVOKE queries)
+    //              (same thing for ROLLBACK TO SAVEPOINT and SAVEPOINT)
+    //              (same thing for (SELECT, INSERT, UPDATE, DELETE) and WITH)
+    //              (same thing for (SELECT, INSERT, UPDATE, DELETE) and CREATE TRIGGER)
+    // ######################
 
     arrQueryStartKeywords = [
         'ABORT', 'ALTER', 'ANALYZE', 'CHECKPOINT', 'CLOSE', 'CLUSTER', 'COMMENT',
@@ -454,12 +529,14 @@ function selectionFindRange(tabElement, editor) {
         };
         
         //console.log(JSON.stringify(editor.currentQueryRange));
+        //console.log(editor.currentQueryRange.text);
     }
 
     highlightCurrentQuery(
         tabElement,
         jsnQueryStart,
-        indexToRowAndColumn(strScript, jsnQuery.intFirstWordEnd)//jsnQueryEnd
+        indexToRowAndColumn(strScript, jsnQuery.intFirstWordEnd)
+        //jsnQueryEnd // <--- replace above line with this when testing
     );
 
     GS.triggerEvent(editor.container, 'range-update');

@@ -7,6 +7,7 @@ gs-memo input,
 gs-combo input,
 gs-time input,
 gs-select select,
+gs-interval input,
 gs-memo textarea {
     width: 100%;
     border: 0 none;
