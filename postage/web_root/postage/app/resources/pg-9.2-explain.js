@@ -360,8 +360,9 @@ function handleExplain(explainJSON, target, bolRun) {
             .attr("class", "explain-node")
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
             .on('click', function (d) {
+                console.log(d);
                 return dialogExplainPlan(d.data);
-            }, true);
+            }, true);;
     
     node.append('rect')
         .attr("y", -100)
@@ -379,7 +380,7 @@ function handleExplain(explainJSON, target, bolRun) {
             .html(function (d) {
                 var strHTML = '';
                 
-                strHTML += '<div style="width: 190px">';
+                strHTML += '<div class="explain-node-container" style="width: 190px">';
                 strHTML += '<h3 style="margin: 0; margin-bottom: 2px;">' + d.data.data['Node Type'] + '</h3>'
                 
                 if (d.data.costliest) {
@@ -480,39 +481,6 @@ function handleExplain(explainJSON, target, bolRun) {
                                 '</div>';
                 }
                 
-                /*
-                strHTML +=  '<div class="explain-speed-container">'
-                if (d.data.data['Node Cost'] !== undefined) {
-                    strHTML +=  '<div class="progressbar-outer red" title="(red): Percentage of Node Cost.">' +
-                                    '<div class="progressbar-inner" style="width: ' + (parseFloat(d.data.data['Node Cost']) / (d.data.data.intTotalCost / 100)) + '%;"></div>' +
-                                '</div>';
-                }
-                if (d.data.data['Plan Rows'] !== undefined) {
-                    strHTML +=  '<div class="progressbar-outer blue" title="(blue): Percentage of Planned Rows.">' +
-                                    '<div class="progressbar-inner" style="width: ' + (parseFloat(d.data.data['Plan Rows']) / (d.data.data.intTotalRecords / 100)) + '%;"></div>' +
-                                '</div>';
-                }
-                if (d.data.data['Actual Total Time'] !== undefined) {
-                    strHTML +=  '<div class="progressbar-outer green" title="(green): Percentage of Actual Total Time.">' +
-                                    '<div class="progressbar-inner" style="width: ' + (parseFloat(d.data.data['Actual Total Time']) / (d.data.data.intTotalTime / 100)) + '%;"></div>' +
-                                '</div>';
-                }
-                strHTML+= '</div>';
-                */
-                /*if (d.data.data['Plan Rows']) {
-                    strHTML += '<div class="progressbar-outer blue" style="height: 0.5em;" title="(blue): Percentage of Planned Rows.">' +
-                                 '<div class="progressbar-inner" ' +
-                                  'style="width: ' + (parseFloat(d.data.data['Plan Rows']) / (d.data.data.intTotalRecords / 100)) + '%;"></div>' +
-                                '</div>';
-                }
-                if (d.data.data['Actual Total Time']) {
-                    strHTML += '<div class="progressbar-outer green" style="height: 0.5em;" title="(green): Percentage of Actual Total Time.">' +
-                                  '<div class="progressbar-inner" ' +
-                                    'style="width: ' + (parseFloat(d.data.data['Actual Total Time']) / (d.data.data.intTotalTime / 100)) + '%;">' +
-                                  '</div>' +
-                                '</div>';
-                }*/
-                
                 strHTML += '</div>';
                 
                 return strHTML;
@@ -526,9 +494,6 @@ function dialogExplainPlan(d) {
     if (d3.event.defaultPrevented) {
         return;
     }
-    
-    
-    //d3.event.stopPropagation();
     
     strHTML += '<table class="explain-property-table"><tbody>';
     strHTML += '<td style="width: 15em;">Node Cost</td><td>' + encodeHTML(d.data['Node Cost']) + '</td>';
@@ -561,21 +526,6 @@ function dialogExplainPlan(d) {
     }
     strHTML += '</tbody></table>';
     
-    //if (evt.deviceType !== 'phone') {
-    //    templateElement.setAttribute('data-max-width', '500px');
-    //    templateElement.setAttribute('data-overlay-close', 'true');
-    //    templateElement.innerHTML = ml(function () {/*
-    //        <gs-page>
-    //            <gs-header><center><h4>{{NODETYPE}}</h4></center></gs-header>
-    //            <gs-body padded>
-    //                {{STRHTML}}
-    //            </gs-body>
-    //        </gs-page>
-    //    */}).replace(/\{\{STRHTML\}\}/gim, strHTML)
-    //        .replace(/\{\{NODETYPE\}\}/gim, event.data['Node Type']);
-    //    
-    //    GS.openDialogToElement(element, templateElement, 'down');
-    //} else {
     if (evt.deviceType === 'phone') {
         templateElement.setAttribute('data-mode', 'full');
     } else {
