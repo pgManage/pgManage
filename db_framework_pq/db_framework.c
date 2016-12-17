@@ -399,12 +399,12 @@ error:
 // Get lengths for each value of the current row
 DArray *DB_get_row_lengths(DB_result *res) {
 	DArray *darr_ret = NULL;
-	size_t *int_temp = NULL;
+	ssize_t *int_temp = NULL;
 	int int_num_columns = PQnfields(res->res);
-	darr_ret = DArray_create(sizeof(size_t), 1);
+	darr_ret = DArray_create(sizeof(ssize_t *), 1);
 	int i;
 	for (i = 0; i < int_num_columns; i++) {
-		SERROR_SALLOC(int_temp, sizeof(size_t));
+		SERROR_SALLOC(int_temp, sizeof(ssize_t));
 		if (PQgetisnull(res->res, res->int_row, i)) {
 			*int_temp = -1;
 		} else {
@@ -438,7 +438,7 @@ char *DB_get_diagnostic(DB_conn *conn, DB_result *res) {
 }
 
 char *_DB_get_diagnostic(DB_conn *conn, PGresult *res) {
-	// TODO: error message cuts off
+	// DO NOT MESS WITH THE RETURN FORMAT OF THIS FUNCTION WITHOUT UPDATING THE JS
 	char *str_response = NULL;
 	char *str_temp = NULL;
 

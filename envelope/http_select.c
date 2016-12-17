@@ -381,7 +381,7 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 
 		SFINISH_CAT_APPEND(str_temp, "[");
 		for (i = 1; i < int_len; i += 1) {
-			int int_current_length = *(int *)DArray_get(arr_row_lengths, i);
+			ssize_t int_current_length = *(ssize_t *)DArray_get(arr_row_lengths, i);
 			str_type = DArray_get(client_select->darr_column_types, i);
 			// Get column value and escape it
 			if (int_current_length == -1) {
