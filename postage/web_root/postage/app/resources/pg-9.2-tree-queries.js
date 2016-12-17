@@ -1512,6 +1512,9 @@ scriptQuery.objectTable = ml(function () {/*
                                                         CASE WHEN objsubid = 0 THEN 'TABLE' ELSE 'COLUMN' END
                                                 ) || ' ' ||
                                                 quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
+                                                (
+                                                    CASE WHEN objsubid = 0 THEN '' ELSE '.' || quote_ident(pg_attribute.attname) END
+                                                ) ||
                                                 ' IS ' ||
                                                 quote_literal(pg_description.description) || E';'
                                             ),

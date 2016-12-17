@@ -230,7 +230,7 @@
                 
                 <div class="doc-example-description">
                     <span class="h3">Attribute "save-while-typing":</span>
-                    <p>attribute causes the form to update after the user has stopped typing for a certain period of time. Doing this means the user does not have to leave the field or press return to save.</p>
+                    <p>the "size-while-typing" attribute causes the form to update after the user has stopped typing for a certain period of time. Doing this means the user does not have to leave the field or press return to save.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="15">
@@ -244,6 +244,30 @@
                             </template>
                         </gs-form>
                     </template>
+                </gs-doc-example>
+                
+                
+                <div class="doc-example-description">
+                    <span class="h3">"after_update" event and ".column()" method:</span>
+                    <p>After an update, the "after_update" event gets triggered. To access a column inside this event and elsewhere, use the ".column()" method.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-form id="form_name" src="gsdoc.tpeople" where="id=2341" save-while-typing>
+                            <template>
+                                <label for="first_name">First Name:</label>
+                                <gs-text id="first_name" column="first_name"></gs-text>
+                                
+                                <label for="last_name">Last Name:</label>
+                                <gs-text id="last_name" column="last_name"></gs-text>
+                            </template>
+                        </gs-form>
+                    </template>
+<template for="js" height="10">window.addEventListener('load', function (event) {
+    document.getElementById('form_name').addEventListener('after_update', function (event) {
+        alert(this.column('first_name'));
+    });
+});</template>
                 </gs-doc-example>
             </div>
         </gs-container>
