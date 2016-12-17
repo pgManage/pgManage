@@ -1269,7 +1269,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                         if (!element.getAttribute('src') && !element.getAttribute('source') && !element.getAttribute('initalize')) {
                             //element.staticDropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]);
-                            element.dropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]); //element.staticDropDownTable;
+                            //element.dropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]); //element.staticDropDownTable;
+                            
+                            element.dropDownTable = GS.cloneElement(xtag.query(tableTemplateElementCopy.content, 'table')[0]);
                         }
                     }
                 }

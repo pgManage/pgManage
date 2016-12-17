@@ -1488,6 +1488,7 @@ gs-memo input,
 gs-combo input,
 gs-time input,
 gs-select select,
+gs-interval input,
 gs-memo textarea {
     width: 100%;
     border: 0 none;
@@ -14649,7 +14650,195 @@ gs-img[image-cover] {
     background-size: cover;
 }gs-insert {
     display: block;
-}gs-jumbo {
+}gs-interval {
+    position: relative;
+    display: block;
+    
+    padding: 0.2em 2.2em 0.2em 0.2em;
+    min-height: 1em;
+    background-color: #FFFFFF;
+    
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+}
+
+gs-interval .time-picker-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    
+    width: 2em;
+    height: 100%;
+    min-height: 1em;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+gs-interval .time-picker-button:after {
+    font-size: 1em;
+}
+
+
+/* ###################################################################################### */
+/* ################################ ATTRIBUTE: "no-picker" ############################## */
+/* ###################################################################################### */
+
+gs-interval[no-picker] {
+    padding: 0.2em;
+}
+
+
+/* ###################################################################################### */
+/* ################################ ATTRIBUTE:  "disabled" ############################## */
+/* ###################################################################################### */
+
+gs-interval[disabled],
+gs-interval[disabled] .control {
+    background-color: #D5D5D5;
+}
+
+gs-interval[disabled]:not([mini]) {
+    min-height: 1.358em;
+}
+
+
+/* ###################################################################################### */
+/* ################################## ATTRIBUTE:  "mini" ################################ */
+/* ###################################################################################### */
+
+gs-interval[mini] {
+    padding: 0 1.5em 0 0;
+    
+    border: 0;
+    border-radius: 0;
+    box-shadow: 0 0 0 0 #FFFFFF;
+}
+
+gs-interval[no-picker][mini] {
+    padding: 0;
+}
+
+gs-interval[mini] .time-picker-button {
+    width: 1.5em;
+    min-height: 0.8em;
+}
+
+gs-interval[mini] .time-picker-button:after {
+    font-size: 0.8em;
+}
+
+
+/* ###################################################################################### */
+/* ####################################### DROPDOWN ##################################### */
+/* ###################################################################################### */
+
+.gs-interval-time-picker-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 110;
+}
+
+html.no-scroll-except-for-dialog > body > div.gs-interval-time-picker-container,
+html.no-scroll-except-for-dialog > body > div.gs-interval-time-picker-container * {
+    overflow: visible !important
+}
+
+.gs-interval-time-picker-container .gs-interval-time-picker-overlay {
+    position: absolute;
+    
+    top: 0;
+    left: 0;
+    
+    background-color: #000000;
+    opacity: 0.4;
+}
+
+.gs-interval-time-picker-container .gs-interval-time-picker {
+    position: absolute;
+    
+    padding: 5px;
+    
+    background-color: #F5F5F5;
+    
+    border: 1px solid #000000;
+}
+
+
+
+
+.gs-interval-time-picker-container {
+    width: 100%;
+    height: 100%;
+}
+
+.gs-interval-time-picker-container .gs-interval-time-picker-overlay {
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.gs-interval-time-picker-container select {
+    width: 1.3em;
+    height: 1.5em;
+    border: 1px solid #AAA;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
+    font-family: inherit;
+    
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    -webkit-border-radius: inherit;
+}
+.gs-interval-time-picker-container .colon {
+    display: inline-block;
+    width: 1em;
+    height: 0.3em;
+    text-align: center;
+    border: 1px solid #F5F5F5;
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
+    font-family: inherit;
+    
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    -webkit-border-radius: inherit;
+}
+
+
+/* ##################################################################################### */
+/* ######################################## MODAL ###################################### */
+/* ##################################################################################### */
+/*
+.gs-interval-time-picker-container.modal {
+    width: 100%;
+    height: 100%;
+}
+
+.gs-interval-time-picker-container.modal .gs-interval-time-picker-overlay {
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.gs-interval-time-picker-container.modal .gs-interval-time-picker {
+    position: relative;
+    margin: 0 auto;
+    width: 94%;
+}
+*/
+
+gs-jumbo {
     padding-top: 30px;
     padding-bottom: 30px;
     margin-bottom: 30px;

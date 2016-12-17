@@ -1141,9 +1141,11 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (window.clipboardData) {
             pastePlain = clipboardData.getData('Text');
+            //console.log('PLAIN:', pastePlain);
         } else {
             pasteHTML = clipboardData.getData('text/html');
             pastePlain = clipboardData.getData('Text');
+            //console.log('HTML:', pasteHTML);
         }
         
         // if no html: build HTML using plain
@@ -1183,7 +1185,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 for (i = 0, len = arrPasteRecords.length, strInsertData = '', strLocalData = ''; i < len; i += 1) {
                     for (col_i = 0, col_len = Math.min(arrSetColumns.length, arrPasteRecords[0].children.length), strRecord = ''; col_i < col_len; col_i += 1) {
                         cell = arrPasteRecords[i].children[col_i];
-                        strRecord += (strRecord ? '\t' : '') + GS.encodeForTabDelimited(cell.innerText || cell.textContent);
+                        if (cell) {
+                            strRecord += (strRecord ? '\t' : '') + GS.encodeForTabDelimited(cell.innerText.trim() || cell.textContent.trim());
+                        } else {
+                            strRecord += (strRecord ? '\t' : '') + GS.encodeForTabDelimited('NULL');
+                        }
                     }
                     
                     strInsertData += strRecord + '\n';
@@ -2009,7 +2015,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         
-        window.addEventListener('blur', function () {
+        window.addEventListener('blur', function (event) {
             var target = event.target;
             
             if (element.parentNode) {

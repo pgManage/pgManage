@@ -1,7 +1,6 @@
 
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
     registerDesignSnippet('<gs-grid>', '<gs-grid>', 'gs-grid widths="${1}">\n' +
                                                     '    <gs-block>${2}</gs-block>\n' +
                                                     '</gs-grid>');

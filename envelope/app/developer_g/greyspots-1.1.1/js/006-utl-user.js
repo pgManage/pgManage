@@ -3,11 +3,8 @@ window.addEventListener('design-register-element', function () {
     'use strict';
     
     registerDesignSnippet('GS.userChangePassword', 'GS.userChangePassword', 'GS.userChangePassword();');
-    
     //registerDesignSnippet('GS.superChangePassword', 'GS.superChangePassword', 'GS.superChangePassword();');
-    
     //registerDesignSnippet('GS.superUserLogin', 'GS.superUserLogin', 'GS.superUserLogin(${0:loggedInCallback});');
-    
     registerDesignSnippet('GS.normalUserLogin', 'GS.normalUserLogin', 'GS.normalUserLogin(${0:loggedInCallback});');
 });
 

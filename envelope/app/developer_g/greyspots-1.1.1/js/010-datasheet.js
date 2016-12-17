@@ -1664,9 +1664,10 @@ document.addEventListener('DOMContentLoaded', function () {
             throw 'gs-datasheet error: No table template provided.';
         }
         
-        if (tableTemplateElement.content.children[0].nodeName !== 'TABLE') {
-            throw 'gs-datasheet error: Table is not the first element in the provided table template.';
-        }
+        // V----- cannot do .children on template.content
+        //if (tableTemplateElement.content.children[0].nodeName !== 'TABLE') {
+        //    throw 'gs-datasheet error: Table is not the first element in the provided table template.';
+        //}
         
         // make header template
         headerRecordElement = xtag.query(tableTemplateElement.content, 'thead tr')[0];

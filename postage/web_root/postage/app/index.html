@@ -282,6 +282,7 @@
                         } else if (strView === 'splash') {
                             openSplash();
 
+                        // else if not a tab link
                         } else if (strView.indexOf('tab:') !== 0) {
                             arrParts = strView.split(':');
                             buttons = associatedButtons[arrParts[0]];
@@ -323,6 +324,7 @@
 
                             getScript(strFinalName, strButtons, strScript);
 
+                        // else, tab link
                         } else {
                             arrElements = xtag.toArray(document.getElementsByClassName('tab-button'));
                             strCurrentTab = strView.substring('tab:'.length);
@@ -336,6 +338,7 @@
 
                             if (currentElement) {
                                 setFrame(currentElement, currentElement.relatedFrame, false);
+                                GS.triggerEvent(window, 'resize');
                             } else {
                                 addHomeQuery('', 'Couldn\'t Load Tab'
                                            , 'SELECT E\'\n\n-- Couldn\'\'t Load Tab: The tab "' + strCurrentTab + '" is no longer open.\n\n\'', '');
@@ -403,6 +406,7 @@
             #grid-panel-buttons gs-block:last-child gs-button {
                 border-right: 0 none;
             }
+        
         </style>
     </head>
     <body>

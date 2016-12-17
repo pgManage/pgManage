@@ -3,6 +3,10 @@ window.addEventListener('design-register-element', function () {
     window.designElementProperty_GSBODY = function(selectedElement) {
         addFlexContainerProps(selectedElement);
         //addFlexProps(selectedElement);
+        
+        addProp('Padded', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('padded')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'padded', (this.value === 'true'), true);
+        });
     };
     
     registerDesignSnippet('<gs-body>', '<gs-body>', 'gs-body>\n' +

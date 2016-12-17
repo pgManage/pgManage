@@ -106,11 +106,11 @@
                 
                 <div class="doc-example-description">
                     <span class="h3">Attribute "<code>no-list-error</code>":</span>
-                    <p>The "<code>no-list-error</code>" is useful because the folder that a gs-folder is pointed at may not exist yet. Once the user uploads/creates a file: the necessary folders will be created automatically.</p>
+                    <p>The "<code>no-list-error</code>" attribute causes errors that occur when the <code>gs-folder</code> attempts to load a folder to be ignored. This attribute is useful because sometimes, the folder that a gs-folder is looking at may not exist yet. <b>Note:</b> Once the user uploads or creates a file inside the folder: the necessary folders will be created automatically.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="30">
-                        <gs-folder no-list-error path="/role/trusted_g/test{{! (window.folder || (window.folder = Math.random().toString().substring(2))) }}/"></gs-folder>
+                        <gs-folder no-list-error path="/role/trusted_g/test_{{! Math.random().toString().substring(2) }}/"></gs-folder>
                     </template>
                 </gs-doc-example>
             </div>

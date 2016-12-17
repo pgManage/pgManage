@@ -835,12 +835,15 @@ document.addEventListener('DOMContentLoaded', function () {
             customHudTemplate = document.createElement('template');
             customHudTemplate.innerHTML = element.hudTemplate;
             
-            customHudElements = customHudTemplate.content.childNodes;
+            elementHudTopContainer.appendChild(customHudTemplate.content.cloneNode(true));
             
-            for (i = 0, len = customHudElements.length; i < len; i += 1) {
-                //customHudElements[i].setAttribute('inline', '');
-                elementHudTopContainer.appendChild(customHudElements[0]);
-            }
+            // V------ you can't use .children on a template.content
+            //customHudElements = customHudTemplate.content.childNodes;
+            //
+            //for (i = 0, len = customHudElements.length; i < len; i += 1) {
+            //    //customHudElements[i].setAttribute('inline', '');
+            //    elementHudTopContainer.appendChild(customHudElements[0]);
+            //}
             //elementHudTopContainer.innerHTML += element.hudTemplate; <-- this causes events to be lost in the hud-top container
         }
         

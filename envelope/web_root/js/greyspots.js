@@ -4872,7 +4872,7 @@ if (window.shimmed === undefined) {
 // ##############################################################
 
 if (window.functionality === undefined) {
-    window.functionality = {};
+    window.functionality = {"errors": {}};
 }
 
 // ##############################################################
@@ -5281,40 +5281,48 @@ window.addEventListener('load', function () {
                     intBottomLine = GS.emToPx(document.body, intMaxHeight);
                 }
                 
-                curlElement.classList.add('animating');
-                menuElement.classList.add('animating');
+                //curlElement.classList.add('animating');
+                //menuElement.classList.add('animating');
                 
                 if (bolOpen === false) {
                     document.body.insertBefore(GS.stringToElement('<div id="gs-document-curl-modal-background"></div>'), curlElement);
                     document.getElementById('gs-document-curl-modal-background').addEventListener('click', toggleCurl);
                     
-                    GS.animateStyle(curlElement, 'font-size', closedSize, intFontSize + 'em', function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
+                    curlElement.style.fontSize = intFontSize + 'em';
+                    curlElement.style.bottom = intBottomLine + 'px';
+                    menuElement.style.height = intBottomLine + 'px';
                     
-                    GS.animateStyle(curlElement, 'bottom', '0px', intBottomLine + 'px', function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
-                    
-                    GS.animateStyle(menuElement, 'height', '0px', intBottomLine + 'px', function () {
-                        menuElement.classList.remove('animating');
-                    }, 185, 14);
+                    //GS.animateStyle(curlElement, 'font-size', closedSize, intFontSize + 'em', function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(curlElement, 'bottom', '0px', intBottomLine + 'px', function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(menuElement, 'height', '0px', intBottomLine + 'px', function () {
+                    //    menuElement.classList.remove('animating');
+                    //}, 185, 14);
                     
                     bolOpen = true;
                 } else {
                     document.body.removeChild(document.getElementById('gs-document-curl-modal-background'));
                     
-                    GS.animateStyle(curlElement, 'font-size', intFontSize + 'em', closedSize, function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
+                    curlElement.style.fontSize = closedSize;
+                    curlElement.style.bottom = '0px';
+                    menuElement.style.height = '0px';
                     
-                    GS.animateStyle(curlElement, 'bottom', intBottomLine + 'px', '0px', function () {
-                        curlElement.classList.remove('animating');
-                    }, 185, 14);
-                    
-                    GS.animateStyle(menuElement, 'height', intBottomLine + 'px', '0px', function () {
-                        menuElement.classList.remove('animating');
-                    }, 185, 14);
+                    //GS.animateStyle(curlElement, 'font-size', intFontSize + 'em', closedSize, function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(curlElement, 'bottom', intBottomLine + 'px', '0px', function () {
+                    //    curlElement.classList.remove('animating');
+                    //}, 185, 14);
+                    //
+                    //GS.animateStyle(menuElement, 'height', intBottomLine + 'px', '0px', function () {
+                    //    menuElement.classList.remove('animating');
+                    //}, 185, 14);
                     
                     bolOpen = false;
                 }
@@ -5420,6 +5428,7 @@ window.addEventListener('load', function () {
         
     } catch (e) {
         functionality.matchesSelector = false;
+        functionality.errors.matchesSelector = e;
     }
     
     functionality.MutationObserver = false;
@@ -5434,6 +5443,7 @@ window.addEventListener('load', function () {
         testElement.appendChild(document.createElement('div'));
     } catch (e) {
         functionality.MutationObserver = false;
+        functionality.errors.MutationObserver = e;
     }
     
     functionality.WeakMap = false;
@@ -5451,6 +5461,7 @@ window.addEventListener('load', function () {
         
     } catch (e) {
         functionality.WeakMap = false;
+        functionality.errors.WeakMap = e;
     }
     
     functionality.registerElement = false;
@@ -5466,6 +5477,7 @@ window.addEventListener('load', function () {
         
     } catch (e) {
         functionality.registerElement = false;
+        functionality.errors.registerElement = e;
     }
     
     functionality.DOMTokenList = false;
@@ -5473,6 +5485,7 @@ window.addEventListener('load', function () {
         functionality.DOMTokenList = Boolean(document.body.classList);
     } catch (e) {
         functionality.DOMTokenList = false;
+        functionality.errors.DOMTokenList = e;
     }
     
     functionality.HTMLTemplateElement = false;
@@ -5482,18 +5495,20 @@ window.addEventListener('load', function () {
         xtag.register('asdf-test-two', {
             'lifecycle': {
                 'created': function () {
-                    this.appendChild(document.createElement('div'));
+                    var divElement = document.createElement('div');
+                    divElement.classList.add('find-me');
+                    this.appendChild(divElement);
                 }
             }
         });
         
         testElement.innerHTML = '<div></div><p></p><asdf-test-two></asdf-test-two>';
         
-        functionality.HTMLTemplateElement = (testElement.content.children.length === 3);
-        functionality.HTMLTemplateElement = (functionality.HTMLTemplateElement && testElement.content.children[2].children.length === 0);
+        functionality.HTMLTemplateElement = (xtag.query(testElement, '.find-me').length === 0);
         
     } catch (e) {
         functionality.HTMLTemplateElement = false;
+        functionality.errors.HTMLTemplateElement = e;
     }
     
     // function to show shim and functionality results
@@ -6069,8 +6084,8 @@ window.addEventListener('design-register-element', function () {
         }
         
         strValue = strValue
-                        .replace(/\\n/gi, '\n')
-                        .replace(/\\t/gi, '\t')
+                        .replace(/\\?\\n/gi, '\n')
+                        .replace(/\\?\\t/gi, '\t')
                         .replace(/\[.*\]/gi, '')
                         .replace(/\([0-9]*\)/gi, '');
         
@@ -6103,11 +6118,11 @@ window.addEventListener('design-register-element', function () {
         var templateElement = document.createElement('template'), strHTML;
         
         var jsnErrorCopy = {};
-        jsnErrorCopy.error_text =     cleanErrorValue(jsnError.error_text);
-        jsnErrorCopy.error_file =     cleanErrorValue(jsnError.error_file);
-        jsnErrorCopy.error_hint =     cleanErrorValue(jsnError.error_hint);
-        jsnErrorCopy.error_context =  cleanErrorValue(jsnError.error_context);
-        jsnErrorCopy.error_addin =    cleanErrorValue(jsnError.error_addin);
+        jsnErrorCopy.error_text    = cleanErrorValue(jsnError.error_text);
+        jsnErrorCopy.error_file    = cleanErrorValue(jsnError.error_file);
+        jsnErrorCopy.error_hint    = cleanErrorValue(jsnError.error_hint);
+        jsnErrorCopy.error_context = cleanErrorValue(jsnError.error_context);
+        jsnErrorCopy.error_addin   = cleanErrorValue(jsnError.error_addin);
         
         templateElement.setAttribute('data-theme', 'error');
         strHTML = ml(function () {/*
@@ -6936,7 +6951,7 @@ GS.getInertDOMHTML = function (inertDOM) {
                                               arrCells[cell_i].lastElementChild.value ||
                                               (arrCells[cell_i].lastElementChild.checked || '').toString();
                             } else {
-                                strCellHTML = arrCells[cell_i].textContent.trim();
+                                strCellHTML = arrCells[cell_i].textContent;//.trim();
                             }
                             
                             strCellHTML = encodeHTML(strCellHTML).replace(/\n/gim, '<br />');
@@ -7012,14 +7027,14 @@ GS.getInertDOMHTML = function (inertDOM) {
                         strCellText = arrCells[cell_i].firstElementChild.textValue ||
                                       arrCells[cell_i].firstElementChild.value ||
                                       (arrCells[cell_i].firstElementChild.checked || '').toString() ||
-                                      arrCells[cell_i].firstElementChild.textContent.trim();
+                                      arrCells[cell_i].firstElementChild.textContent;//.trim();
                         
                     } else if (arrCells[cell_i].lastElementChild) {
                         strCellText = arrCells[cell_i].lastElementChild.textValue ||
                                       arrCells[cell_i].lastElementChild.value ||
                                       (arrCells[cell_i].lastElementChild.checked || '').toString();
                     } else {
-                        strCellText = arrCells[cell_i].textContent.trim();
+                        strCellText = arrCells[cell_i].textContent;//.trim();
                     }
                     
                     strCellText = strCellText.replace(quoteRegex, (strQuoteChar + strQuoteChar));
@@ -7054,14 +7069,14 @@ GS.getInertDOMHTML = function (inertDOM) {
                             strCellText = arrCells[cell_i].firstElementChild.textValue ||
                                           arrCells[cell_i].firstElementChild.value ||
                                           (arrCells[cell_i].firstElementChild.checked || '').toString() ||
-                                          arrCells[cell_i].firstElementChild.textContent.trim();
+                                          arrCells[cell_i].firstElementChild.textContent;//.trim();
                             
                         } else if (arrCells[cell_i].lastElementChild) {
                             strCellText = arrCells[cell_i].lastElementChild.textValue ||
                                           arrCells[cell_i].lastElementChild.value ||
                                           (arrCells[cell_i].lastElementChild.checked || '').toString();
                         } else {
-                            strCellText = arrCells[cell_i].textContent.trim();
+                            strCellText = arrCells[cell_i].textContent;//.trim();
                         }
                         
                         strCellText = strCellText.replace(quoteRegex, (strQuoteChar + strQuoteChar));
@@ -7969,11 +7984,8 @@ window.addEventListener('design-register-element', function () {
     'use strict';
     
     registerDesignSnippet('GS.userChangePassword', 'GS.userChangePassword', 'GS.userChangePassword();');
-    
     //registerDesignSnippet('GS.superChangePassword', 'GS.superChangePassword', 'GS.superChangePassword();');
-    
     //registerDesignSnippet('GS.superUserLogin', 'GS.superUserLogin', 'GS.superUserLogin(${0:loggedInCallback});');
-    
     registerDesignSnippet('GS.normalUserLogin', 'GS.normalUserLogin', 'GS.normalUserLogin(${0:loggedInCallback});');
 });
 
@@ -10480,6 +10492,10 @@ window.addEventListener('design-register-element', function () {
     window.designElementProperty_GSBODY = function(selectedElement) {
         addFlexContainerProps(selectedElement);
         //addFlexProps(selectedElement);
+        
+        addProp('Padded', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('padded')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'padded', (this.value === 'true'), true);
+        });
     };
     
     registerDesignSnippet('<gs-body>', '<gs-body>', 'gs-body>\n' +
@@ -11982,59 +11998,60 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
-    registerDesignSnippet('<gs-checkbox>', '<gs-checkbox>', 'gs-checkbox value="0" column="${1:ready_to_ship}">${2}</gs-checkbox>');
+
+    registerDesignSnippet('<gs-checkbox>', '<gs-checkbox>', 'gs-checkbox type="smallint" column="${1:ready_to_ship}">${2}</gs-checkbox>');
     registerDesignSnippet('<gs-checkbox> With Label', '<gs-checkbox>',
                     'label for="${1:date-insert-ready_to_ship}">${2:Ready To Ship?}:</label>\n' +
-                    '<gs-checkbox id="${1:date-insert-ready_to_ship}" value="0" column="${3:ready_to_ship}"></gs-checkbox>');
-    
+                    '<gs-checkbox id="${1:date-insert-ready_to_ship}" type="smallint" column="${3:ready_to_ship}"></gs-checkbox>');
+
     designRegisterElement('gs-checkbox',
                             (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-checkbox.html');
-    
+
     window.designElementProperty_GSCHECKBOX = function(selectedElement) {
         var strVisibilityAttribute;
-        
+
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Triple State', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('triplestate')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'triplestate', (this.value === 'true'), true);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
         });
-        
+
         addProp('Inline', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('inline')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'inline', (this.value === 'true'), true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         addProp('Type', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('type') || '') + '" mini>' +
+                                        '<option value="">Detect</option>' +
                                         '<option value="smallint">Smallint</option>' +
-                                        '<option value="">Boolean</option>' +
+                                        '<option value="boolean">Boolean</option>' +
                                     '</gs-select>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'type', this.value);
         });
-        
+
         // visibility attributes
         strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -12044,7 +12061,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -12282,84 +12299,138 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             'click': function (event) {
-                var strValue, bolTripleState;
+                var bolTripleState;
+                var strValue;
+                var strType;
 
                 if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    strValue = this.getAttribute('value');
                     bolTripleState = this.hasAttribute('triplestate');
+                    strValue = this.getAttribute('value').trim().toLowerCase();
 
-                    // here be dragons
-                    if (strValue === 'false') {
-                        this.setAttribute('value', 'true');
+                    // get type from type attribute
+                    strType = this.getAttribute('type');
 
-                    } else if (strValue === 'true') {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'null');
+                    // if type is not valid, get type from current value
+                    if (strType !== 'smallint' && strType !== 'boolean') {
+                        if (strValue === 'false' || strValue === 'true' || strValue === 'null') {
+                            strType = 'boolean';
+                        } else if (strValue === '0' || strValue === '-1' || strValue === 'n') {
+                            strType = 'smallint';
+                    // else default to boolean (backwards compatibility)
                         } else {
-                            this.setAttribute('value', 'false');
-                        }
-
-                    } else if (strValue === 'null') {
-                        this.setAttribute('value', 'false');
-
-                    } else if (strValue === '0') {
-                        this.setAttribute('value', '-1');
-
-                    } else if (strValue === '-1') {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'n');
-                        } else {
-                            this.setAttribute('value', '0');
-                        }
-
-                    } else if (strValue === 'n') {
-                        this.setAttribute('value', '0');
-
-                    } else if (strValue === 0) {
-                        this.setAttribute('value', -1);
-
-                    } else if (strValue === -1) {
-                        if (bolTripleState) {
-                            this.setAttribute('value', 'n');
-                        } else {
-                            this.setAttribute('value', 0);
-                        }
-
-                    } else if (strValue === 'n') {
-                        this.setAttribute('value', 0);
-
-                    } else if (strValue === false) {
-                        this.setAttribute('value', true);
-
-                    } else if (strValue === true) {
-                        if (bolTripleState) {
-                            this.setAttribute('value', null);
-                        } else {
-                            this.setAttribute('value', false);
-                        }
-
-                    } else if (strValue === null) {
-                        //this.setAttribute('value', false);
-                        if (this.getAttribute('type') === 'smallint') {
-                            this.setAttribute('value', '-1');
-                        } else {
-                            this.setAttribute('value', 'true');
-                        }
-
-                    } else {
-                        if (this.getAttribute('type') === 'smallint') {
-                            this.setAttribute('value', '-1');
-                        } else {
-                            this.setAttribute('value', 'true');
+                            strType = 'boolean';
                         }
                     }
 
-                    this.classList.remove('down');
+                    // resolve current value to the correct type
+                    if (strType === 'smallint') {
+                        if (strValue === '0' || strValue === 'false') {
+                            strValue = '0';
+                        } else if (strValue === '-1' || strValue === 'true') {
+                            strValue = '-1';
+                        } else if (strValue === 'n' || strValue === 'null') {
+                            strValue = 'n';
+                        } else {
+                            strValue = '0';
+                        }
+                    } else if (strType === 'boolean') {
+                        if (strValue === '0' || strValue === 'false') {
+                            strValue = 'false';
+                        } else if (strValue === '-1' || strValue === 'true') {
+                            strValue = 'true';
+                        } else if (strValue === 'n' || strValue === 'null') {
+                            strValue = 'null';
+                        } else {
+                            strValue = 'false';
+                        }
+                    }
 
-                    xtag.fireEvent(this, 'change', {
-                        bubbles: true,
-                        cancelable: true
-                    });
+                    // get new value based on current value
+                    if (strType === 'smallint') {
+                        if (strValue === '0') {
+                            strValue = '-1';
+                        } else if (strValue === '-1') {
+                            if (bolTripleState) {
+                                strValue = 'n';
+                            } else {
+                                strValue = '0';
+                            }
+                        } else if (strValue === 'n') {
+                            strValue = '0';
+                        }
+                    } else if (strType === 'boolean') {
+                        if (strValue === 'false') {
+                            strValue = 'true';
+                        } else if (strValue === 'true') {
+                            if (bolTripleState) {
+                                strValue = 'null';
+                            } else {
+                                strValue = 'false';
+                            }
+                        } else if (strValue === 'null') {
+                            strValue = 'false';
+                        }
+                    }
+
+                    // set new value
+                    this.setAttribute('value', strValue);
+
+                    //// here be dragons
+                    //if (strValue === 'false') {
+                    //    this.setAttribute('value', 'true');
+                    //} else if (strValue === 'true') {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'null');
+                    //    } else {
+                    //        this.setAttribute('value', 'false');
+                    //    }
+                    //} else if (strValue === 'null') {
+                    //    this.setAttribute('value', 'false');
+                    //} else if (strValue === '0') {
+                    //    this.setAttribute('value', '-1');
+                    //} else if (strValue === '-1') {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'n');
+                    //    } else {
+                    //        this.setAttribute('value', '0');
+                    //    }
+                    //} else if (strValue === 'n') {
+                    //    this.setAttribute('value', '0');
+                    //} else if (strValue === 0) {
+                    //    this.setAttribute('value', -1);
+                    //} else if (strValue === -1) {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', 'n');
+                    //    } else {
+                    //        this.setAttribute('value', 0);
+                    //    }
+                    //} else if (strValue === 'n') {
+                    //    this.setAttribute('value', 0);
+                    //} else if (strValue === false) {
+                    //    this.setAttribute('value', true);
+                    //} else if (strValue === true) {
+                    //    if (bolTripleState) {
+                    //        this.setAttribute('value', null);
+                    //    } else {
+                    //        this.setAttribute('value', false);
+                    //    }
+                    //} else if (strValue === null) {
+                    //    //this.setAttribute('value', false);
+                    //    if (this.getAttribute('type') === 'smallint') {
+                    //        this.setAttribute('value', '-1');
+                    //    } else {
+                    //        this.setAttribute('value', 'true');
+                    //    }
+                    //} else {
+                    //    if (this.getAttribute('type') === 'smallint') {
+                    //        this.setAttribute('value', '-1');
+                    //    } else {
+                    //        this.setAttribute('value', 'true');
+                    //    }
+                    //}
+
+                    this.classList.remove('down');
+                    xtag.fireEvent(this, 'change', {bubbles: true, cancelable: true});
                 }
             },
             'keydown': function (event) {
@@ -13696,7 +13767,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                         if (!element.getAttribute('src') && !element.getAttribute('source') && !element.getAttribute('initalize')) {
                             //element.staticDropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]);
-                            element.dropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]); //element.staticDropDownTable;
+                            //element.dropDownTable = GS.cloneElement(tableTemplateElementCopy.content.children[0]); //element.staticDropDownTable;
+                            
+                            element.dropDownTable = GS.cloneElement(xtag.query(tableTemplateElementCopy.content, 'table')[0]);
                         }
                     }
                 }
@@ -15807,9 +15880,10 @@ document.addEventListener('DOMContentLoaded', function () {
             throw 'gs-datasheet error: No table template provided.';
         }
         
-        if (tableTemplateElement.content.children[0].nodeName !== 'TABLE') {
-            throw 'gs-datasheet error: Table is not the first element in the provided table template.';
-        }
+        // V----- cannot do .children on template.content
+        //if (tableTemplateElement.content.children[0].nodeName !== 'TABLE') {
+        //    throw 'gs-datasheet error: Table is not the first element in the provided table template.';
+        //}
         
         // make header template
         headerRecordElement = xtag.query(tableTemplateElement.content, 'thead tr')[0];
@@ -19057,7 +19131,7 @@ window.addEventListener('design-register-element', function () {
                 for (i = 0, len = buttons.length; i < len; i += 1) {
                     strHTML +=
                         '<gs-block gs-dynamic>' +
-                            '<gs-button dialogclose ' + (i === len - 1 ? 'bg-primary' : '') + ' gs-dynamic>' +
+                            '<gs-button dialogclose ' + (i === len - 1 ? 'bg-primary listen-for-return' : '') + ' gs-dynamic>' +
                                 encodeHTML(buttons[i]) +
                             '</gs-button>' +
                         '</gs-block>';
@@ -19239,7 +19313,7 @@ GS.closeDialog = function (dialog, strAnswer) {
                 for (i = 0, len = options.buttons.length; i < len; i += 1) {
                     strButtons +=
                         '<gs-block gs-dynamic>' +
-                            '<gs-button dialogclose ' + (i === len - 1 ? 'bg-primary' : '') + ' gs-dynamic>' +
+                            '<gs-button dialogclose ' + (i === len - 1 ? 'bg-primary listen-for-return' : '') + ' gs-dynamic>' +
                                 encodeHTML(options.buttons[i]) +
                             '</gs-button>' +
                         '</gs-block>';
@@ -21048,12 +21122,15 @@ document.addEventListener('DOMContentLoaded', function () {
             customHudTemplate = document.createElement('template');
             customHudTemplate.innerHTML = element.hudTemplate;
             
-            customHudElements = customHudTemplate.content.childNodes;
+            elementHudTopContainer.appendChild(customHudTemplate.content.cloneNode(true));
             
-            for (i = 0, len = customHudElements.length; i < len; i += 1) {
-                //customHudElements[i].setAttribute('inline', '');
-                elementHudTopContainer.appendChild(customHudElements[0]);
-            }
+            // V------ you can't use .children on a template.content
+            //customHudElements = customHudTemplate.content.childNodes;
+            //
+            //for (i = 0, len = customHudElements.length; i < len; i += 1) {
+            //    //customHudElements[i].setAttribute('inline', '');
+            //    elementHudTopContainer.appendChild(customHudElements[0]);
+            //}
             //elementHudTopContainer.innerHTML += element.hudTemplate; <-- this causes events to be lost in the hud-top container
         }
         
@@ -25327,7 +25404,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
     registerDesignSnippet('<gs-grid>', '<gs-grid>', 'gs-grid widths="${1}">\n' +
                                                     '    <gs-block>${2}</gs-block>\n' +
                                                     '</gs-grid>');
@@ -26789,6 +26865,1463 @@ document.addEventListener('DOMContentLoaded', function () {
                             GS.ajaxErrorDialog(data);
                         }
                     });
+                }
+            }
+        }
+    });
+});//global GS, window, document, xtag, evt, ml, encodeHTML, setOrRemoveTextAttribute, setOrRemoveBooleanAttribute, addProp
+
+window.addEventListener('design-register-element', function () {
+    'use strict';
+    
+    registerDesignSnippet('<gs-date>', '<gs-date>', 'gs-date column="${1:name}"></gs-date>');
+    registerDesignSnippet('<gs-date> With Label', '<gs-date>', 'label for="${1:date-insert-start_date}">${2:Start Date}:</label>\n' +
+                                                               '<gs-date id="${1:date-insert-start_date}" column="${3:start_date}"></gs-date>');
+    
+    designRegisterElement('gs-date', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-date.html');
+    
+    window.designElementProperty_GSDATE = function(selectedElement) {
+        addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
+        });
+
+        addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
+        });
+
+        addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
+        });
+
+        addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
+        });
+
+        addProp('Time Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-picker')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'no-picker', (this.value === 'true'), false);
+        });
+
+
+        addProp(
+            'Source Unit',
+            true,
+            '        <gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('unit') || 'hours') + '" mini>' +
+                    '    <option value="hours">Hours</option>' +
+                    '    <option value="minutes">Minutes</option>' +
+                    '    <option value="seconds">Seconds</option>' +
+                    '</gs-select>',
+            function () {
+                return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
+            }
+        );
+
+        addProp('Hour Places', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('hour-places') || '3') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
+        });
+
+        addProp('Minute Places', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('minute-places') || '2') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
+        });
+
+        addProp('Second Places', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('second-places') || '0') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
+        });
+        /*
+        
+        
+        hour-places
+        minute-places
+        second-places
+        
+        */
+
+        // TITLE attribute
+        addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
+        });
+
+        // TABINDEX attribute
+        addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
+        });
+        
+        
+        
+        // visibility attributes
+        strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
+        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
+        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
+        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
+        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
+        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
+        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
+        
+        addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
+                                        '<option value="">Visible</option>' +
+                                        '<option value="hidden">Invisible</option>' +
+                                        '<option value="hide-on-desktop">Invisible at desktop size</option>' +
+                                        '<option value="hide-on-tablet">Invisible at tablet size</option>' +
+                                        '<option value="hide-on-phone">Invisible at phone size</option>' +
+                                        '<option value="show-on-desktop">Visible at desktop size</option>' +
+                                        '<option value="show-on-tablet">Visible at tablet size</option>' +
+                                        '<option value="show-on-phone">Visible at phone size</option>' +
+                                    '</gs-select>', function () {
+            selectedElement.removeAttribute('hidden');
+            selectedElement.removeAttribute('hide-on-desktop');
+            selectedElement.removeAttribute('hide-on-tablet');
+            selectedElement.removeAttribute('hide-on-phone');
+            selectedElement.removeAttribute('show-on-desktop');
+            selectedElement.removeAttribute('show-on-tablet');
+            selectedElement.removeAttribute('show-on-phone');
+            
+            if (this.value) {
+                selectedElement.setAttribute(this.value, '');
+            }
+            
+            return selectedElement;
+        });
+        
+        // DISABLED attribute
+        addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
+        });
+        
+        //addFlexContainerProps(selectedElement);
+        addFlexProps(selectedElement);
+        
+        //// SUSPEND-CREATED attribute
+        //addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
+        //    return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
+        //});
+        
+        // SUSPEND-INSERTED attribute
+        addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
+        });
+    };
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+    //x attributes:
+    //x      disabled:      copy to control element
+    //x      tabindex:      move to control element
+    //x      qs:            fill value from querystring, update value as querystring changes
+    //x      value:         affects control value
+    //x      no-picker:     affects innerHTML because it removes the picker button
+    //x      unit
+    //x      hour-places
+    //x      minute-places
+    //x      second-places
+
+    //x accessors:
+    //x      value:     returns text value
+    //x      state:     returns text representation of state: "open" or "closed"
+
+    //x methods:
+    //x      open:   opens popup
+    //x      close:  closes popup
+    //x      toggle: toggles open and closed methods
+
+    //x text editing behaviours:
+    //x      text is divided by colons into portions
+    //x      if value is deleted or empty, it displays with zeros
+
+    //x events:
+    //x      picker button click: runs "toggle" method
+    //x      control keydown:
+    //x          up arrow:    increase currently selected portion
+    //x          down arrow:  previous minute
+    //x          left arrow:  select previous portion
+    //x          right arrow: select next portion
+
+    //x dropdown behaviours:
+    //x          if from control to bottom has enough room: popup below
+    //x          else: popup above
+
+
+    function handleChange(element) {
+        element.close();
+        if (element.lastChangeValue !== element.getAttribute('value')) {
+            GS.triggerEvent(element, 'change');
+            element.lastChangeValue = element.getAttribute('value');
+        }
+    }
+
+    // #####################################################################################
+    // ################################## EVENT RETARGETING ################################
+    // #####################################################################################
+
+    // re-target change event from control to element
+    function changeFunction(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        event.target.parentNode.setAttribute('value', event.target.value);
+        handleChange(event.target.parentNode);
+    }
+
+    // re-target focus event from control to element
+    function focusFunction(event) {
+        GS.triggerEvent(event.target.parentNode, 'focus');
+    }
+
+
+    // #####################################################################################
+    // ######################################## VALUE ######################################
+    // #####################################################################################
+
+    function translateValueToNumber(element, newValue) {
+        var i;
+        var len;
+
+        // get place setting numbers
+        var intHourPlaces = parseInt(element.getAttribute('hour-places'), 10);
+        var intMinutePlaces = parseInt(element.getAttribute('minute-places'), 10);
+        var intSecondPlaces = parseInt(element.getAttribute('second-places'), 10);
+
+        // default place settings
+        if (isNaN(intHourPlaces)) {
+            intHourPlaces = 3;
+        }
+        if (isNaN(intMinutePlaces)) {
+            intMinutePlaces = 2;
+        }
+        if (isNaN(intSecondPlaces)) {
+            intSecondPlaces = 0;
+        }
+
+        // create an array with the place setting names
+        var arrPlaces = [];
+
+        if (intHourPlaces > 0) {
+            arrPlaces.push('hours');
+        }
+        if (intMinutePlaces > 0) {
+            arrPlaces.push('minutes');
+        }
+        if (intSecondPlaces > 0) {
+            arrPlaces.push('seconds');
+        }
+
+        // create an array with the new values parts
+        var arrParts = newValue.split(':');
+
+        // get the current control's unit
+        var strUnit = element.getAttribute('unit');
+
+        // loop through parts and add to integer of new value
+        var intNewValue = 0;
+        var intPart;
+
+        if (strUnit === 'minutes') {
+            i = 0;
+            len = arrParts.length;
+            while (i < len) {
+                intPart = parseInt(arrParts[i], 10);
+                if (arrPlaces[i] === 'hours') {
+                    intNewValue += (intPart * 60);
+                } else if (arrPlaces[i] === 'minutes') {
+                    intNewValue += intPart;
+                } else if (arrPlaces[i] === 'seconds') {
+                    intNewValue += (intPart / 60);
+                }
+                i += 1;
+            }
+        } else if (strUnit === 'seconds') {
+            i = 0;
+            len = arrParts.length;
+            while (i < len) {
+                intPart = parseInt(arrParts[i], 10);
+                if (arrPlaces[i] === 'hours') {
+                    intNewValue += ((intPart * 60) * 60);
+                } else if (arrPlaces[i] === 'minutes') {
+                    intNewValue += (intPart / 60);
+                } else if (arrPlaces[i] === 'seconds') {
+                    intNewValue += intPart;
+                }
+                i += 1;
+            }
+        } else {
+            i = 0;
+            len = arrParts.length;
+            while (i < len) {
+                intPart = parseInt(arrParts[i], 10);
+                if (arrPlaces[i] === 'hours') {
+                    intNewValue += intPart;
+                } else if (arrPlaces[i] === 'minutes') {
+                    intNewValue += (intPart / 60);
+                } else if (arrPlaces[i] === 'seconds') {
+                    intNewValue += ((intPart / 100) / 60);
+                }
+                i += 1;
+            }
+        }
+
+        //console.log(intNewValue, translateValue(element, intNewValue + ''), arrParts, arrPlaces);
+
+        return intNewValue;
+    }
+
+    // translate inputed value to a format that is allowed
+    function translateValue(element, newValue) {
+        //var oldValue = newValue;
+
+        // get place setting numbers
+        var intHourPlaces = parseInt(element.getAttribute('hour-places'), 10);
+        var intMinutePlaces = parseInt(element.getAttribute('minute-places'), 10);
+        var intSecondPlaces = parseInt(element.getAttribute('second-places'), 10);
+
+        // default place settings
+        if (isNaN(intHourPlaces)) {
+            intHourPlaces = 3;
+        }
+        if (isNaN(intMinutePlaces)) {
+            intMinutePlaces = 2;
+        }
+        if (isNaN(intSecondPlaces)) {
+            intSecondPlaces = 0;
+        }
+
+        // get hours/minutes/seconds from value
+        var strUnit = element.getAttribute('unit');
+        newValue = parseFloat(newValue);
+
+        var intHours;
+        var intMinutes;
+        var intSeconds;
+
+        if (strUnit === 'minutes') {
+            intHours = Math.floor(newValue / 60);
+            newValue = newValue - (intHours * 60); // remove the hours from newValue
+
+            intMinutes = Math.floor(newValue);
+            newValue = newValue - Math.floor(newValue); // remove the minutes from newValue
+
+            intSeconds = Math.round(newValue * 60);
+
+        } else if (strUnit === 'seconds') {
+            intHours = Math.floor((newValue / 60) / 60);
+            newValue = newValue - ((intHours * 60) * 60); // remove the hours from newValue
+
+            intMinutes = Math.floor(newValue / 60);
+            newValue = newValue - (intMinutes * 60); // remove the minutes from newValue
+
+            intSeconds = Math.round(newValue);
+        } else {
+            intHours = Math.floor(newValue);
+            newValue = newValue - intHours; // remove the hours from newValue
+
+            intMinutes = Math.floor(newValue * 60);
+            newValue = newValue - (intMinutes / 60);
+
+            intSeconds = Math.round((newValue * 100) * 60);
+        }
+
+        if (isNaN(intHours) || intHours === 0) {
+            intHours = '';
+        }
+        if (isNaN(intMinutes) || intMinutes === 0) {
+            intMinutes = '';
+        }
+        if (isNaN(intSeconds) || intSeconds === 0) {
+            intSeconds = '';
+        }
+
+        // get translated value
+        var translatedValue;
+
+        //console.log(oldValue, intHours + ' hours, ' + intMinutes + ' mins, ' + intSeconds + ' seconds', intHourPlaces, intMinutePlaces, intSecondPlaces);
+
+        translatedValue = '';
+
+        if (intHourPlaces > 0) {
+            translatedValue += GS.leftPad(intHours || '', '0', intHourPlaces);
+        }
+
+        if (intMinutePlaces > 0) {
+            translatedValue += (translatedValue ? ':' : '');
+            translatedValue += GS.leftPad(intMinutes || '', '0', intMinutePlaces);
+        }
+
+        if (intSecondPlaces > 0) {
+            translatedValue += (translatedValue ? ':' : '');
+            translatedValue += GS.leftPad(intSeconds || '', '0', intSecondPlaces);
+        }
+
+        //console.log(translatedValue);
+
+        return translatedValue || '000:00';
+    }
+
+    //console.log('1***', translateValue(GS.stringToElement('<gs-interval unit="hours"></gs-interval>'), '5.255')); // 5 hours, 15 mins, 30 seconds
+    //console.log('2***', translateValue(GS.stringToElement('<gs-interval unit="minutes"></gs-interval>'), '500.25')); // 8 hours, 20 mins, 15 seconds
+    //console.log('3***', translateValue(GS.stringToElement('<gs-interval unit="seconds"></gs-interval>'), '5000')); // 1 hour, 23 mins, 20 seconds
+    //console.log('4***', translateValue(GS.stringToElement('<gs-interval unit="seconds"></gs-interval>'), '0.03333333333333333')); // 2 mins
+
+    function refreshPickerValue(element) {
+        
+    }
+
+
+    function setValueDisplay(element, newValue) {
+        //var translatedValue = translateValue(element, newValue);
+
+        //element.setAttribute('value', newValue);
+
+        //if (!element.hasAttribute('disabled')) {
+        //    element.control.value = translatedValue;
+        //} else {
+        //    element.textContent = translatedValue;
+        //}
+
+        //if (element.innerState === 'open') {
+        //    refreshPickerValue(element);
+        //}
+    }
+
+
+
+
+    // update the value attribute based on the new internal value
+    function trinkleValueDown(element) {
+        var strUnit = element.getAttribute('unit');
+        var intValue = 0;
+
+        if (strUnit === 'minutes') {
+            intValue += (element.internal.value.hours * 60);
+            intValue += element.internal.value.minutes;
+            intValue += (element.internal.value.seconds / 60);
+        } else if (strUnit === 'seconds') {
+            intValue += ((element.internal.value.hours * 60) * 60);
+            intValue += (element.internal.value.minutes * 60);
+            intValue += element.internal.value.seconds;
+        } else {//hours
+            intValue += element.internal.value.hours;
+            intValue += parseFloat((element.internal.value.minutes / 60).toFixed(5));
+            intValue += parseFloat(((element.internal.value.seconds / 60) / 60).toFixed(5));
+        }
+
+        element.setAttribute('value', intValue);
+    }
+
+    // turn the value attribute into the translated value and store it internally
+    function displayValue(element) {
+        var strDisplayValue = '';
+        if (element.internal.places.hours > 0) {
+            strDisplayValue += GS.leftPad(element.internal.value.hours || '', '0', element.internal.places.hours);
+        }
+
+        if (element.internal.places.minutes > 0) {
+            strDisplayValue += (strDisplayValue ? ':' : '');
+            strDisplayValue += GS.leftPad(element.internal.value.minutes || '', '0', element.internal.places.minutes);
+        }
+
+        if (element.internal.places.seconds > 0) {
+            strDisplayValue += (strDisplayValue ? ':' : '');
+            strDisplayValue += GS.leftPad(element.internal.value.seconds || '', '0', element.internal.places.seconds);
+        }
+
+        if (element.control) {
+            element.control.value = strDisplayValue;
+        } else {
+            element.textContent = strDisplayValue;
+        }
+    }
+
+    function prepElement(element) {
+        element.internal = {};
+
+        element.internal.value = {
+            "hours": 0,
+            "minutes": 0,
+            "seconds": 0
+        };
+
+        element.internal.places = {
+            "hours": 0,
+            "minutes": 0,
+            "seconds": 0
+        };
+
+        element.internal.unit = '';
+    }
+
+    function siphonElement(element) {
+        // siphon the place settings
+        var intHourPlaces = parseInt(element.getAttribute('hour-places'), 10);
+        var intMinutePlaces = parseInt(element.getAttribute('minute-places'), 10);
+        var intSecondPlaces = parseInt(element.getAttribute('second-places'), 10);
+
+        // default place settings
+        if (isNaN(intHourPlaces)) {
+            intHourPlaces = 3;
+        }
+        if (isNaN(intMinutePlaces)) {
+            intMinutePlaces = 2;
+        }
+        if (isNaN(intSecondPlaces)) {
+            intSecondPlaces = 0;
+        }
+
+        element.internal.places.hours = intHourPlaces;
+        element.internal.places.minutes = intMinutePlaces;
+        element.internal.places.seconds = intSecondPlaces;
+
+        // siphon the unit
+        element.internal.unit = element.getAttribute('unit') || '';
+        element.internal.unit = element.internal.unit.toLowerCase();
+        element.internal.unit = element.internal.unit || 'hours';
+
+        if (element.internal.unit !== 'hours' &&
+                element.internal.unit !== 'minutes' &&
+                element.internal.unit !== 'seconds') {
+            element.internal.unit = 'hours';
+            console.warn(
+                'gs-interval Warning: invalid "unit" attribute. ' +
+                        'Please use "hours", "minutes" or "seconds".  ' +
+                        'Defaulting "unit" to "hours"',
+                element
+            );
+        }
+
+        // siphon the value attribute
+        // get hours/minutes/seconds from value
+        var strUnit = element.internal.unit;
+        var fltValue = parseFloat(element.getAttribute('value') || '0');
+
+        var intHours;
+        var intMinutes;
+        var intSeconds;
+
+        if (strUnit === 'minutes') {
+            intHours = Math.floor(fltValue / 60);
+            fltValue = fltValue - (intHours * 60); // remove the hours from fltValue
+
+            intMinutes = Math.floor(fltValue);
+            fltValue = fltValue - Math.floor(fltValue); // remove the minutes from fltValue
+
+            intSeconds = Math.round(fltValue * 60);
+
+        } else if (strUnit === 'seconds') {
+            intHours = Math.floor((fltValue / 60) / 60);
+            fltValue = fltValue - ((intHours * 60) * 60); // remove the hours from fltValue
+
+            intMinutes = Math.floor(fltValue / 60);
+            fltValue = fltValue - (intMinutes * 60); // remove the minutes from fltValue
+
+            intSeconds = Math.round(fltValue);
+        } else {
+            intHours = Math.floor(fltValue);
+            fltValue = fltValue - intHours; // remove the hours from fltValue
+
+            intMinutes = Math.floor(fltValue * 60);
+            fltValue = fltValue - (intMinutes / 60);
+
+            intSeconds = Math.round((fltValue * 100) * 60);
+        }
+
+        if (isNaN(intHours)) {
+            intHours = 0;
+        }
+        if (isNaN(intMinutes)) {
+            intMinutes = 0;
+        }
+        if (isNaN(intSeconds)) {
+            intSeconds = 0;
+        }
+
+        element.internal.value.hours = intHours;
+        element.internal.value.minutes = intMinutes;
+        element.internal.value.seconds = intSeconds;
+    }
+
+
+    // #####################################################################################
+    // ####################################### CONTROL #####################################
+    // #####################################################################################
+
+    function refreshControl(element) {
+        var i;
+        var len;
+        var arrPassThroughAttributes;
+        var strHTML;
+
+        // clear out HTML
+        element.innerHTML = '';
+
+        // clear out element variables
+        element.control = '';
+        element.button = '';
+
+        // if we are not disabled:
+        if (!element.hasAttribute('disabled')) {
+            // build HTML
+            strHTML =
+                    '<input class="control" gs-dynamic type="text" ' +
+                    'autocorrect="off" autocapitalize="off" ' +
+                    'autocomplete="off" spellcheck="false" />';
+            if (!element.hasAttribute('no-picker')) {
+                strHTML += '<gs-button class="time-picker-button" gs-dynamic inline icononly icon="hourglass-o" no-focus></gs-button>';
+            }
+
+            // set control HTML
+            element.innerHTML = strHTML;
+
+            // fill element variables
+            element.control = element.children[0];
+            element.button = element.children[1];
+
+            // handle passthrough attributes
+            arrPassThroughAttributes = ['name', 'autofocus', 'spellcheck'];
+
+            i = 0;
+            len = arrPassThroughAttributes.length;
+            while (i < len) {
+                if (element.hasAttribute(arrPassThroughAttributes[i])) {
+                    element.control.setAttribute(arrPassThroughAttributes[i], element.getAttribute(arrPassThroughAttributes[i]) || '');
+                }
+                i += 1;
+            }
+
+            // move tabindex, tabindex is special because tabindex affects any displayed element it's used on
+            if (element.hasAttribute('tabindex')) {
+                element.oldTabIndex = element.getAttribute('tabindex');
+                element.removeAttribute('tabindex');
+            }
+
+            if (element.oldTabIndex) {
+                element.control.tabIndex = element.oldTabIndex;
+            }
+
+            // bind control retargeting
+            element.control.removeEventListener('change', changeFunction);
+            element.control.addEventListener('change', changeFunction);
+
+            element.control.removeEventListener('focus', focusFunction);
+            element.control.addEventListener('focus', focusFunction);
+        }
+
+        // display value
+        displayValue(element);
+        //setValueDisplay(element, element.getAttribute('value'));
+    }
+
+
+    // #####################################################################################
+    // ##################################### QUERYSTRING ###################################
+    // #####################################################################################
+
+    function pushReplacePopHandler(element) {
+        var strQueryString = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+
+        if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+            element.setAttribute('value', GS.qryGetVal(strQueryString, strQSCol));
+        }
+    }
+
+    function handleQS(element) {
+        var strQSValue;
+
+        if (!element.qsEventFunction) {
+            element.qsEventFunction = function () {
+                pushReplacePopHandler(element);
+            };
+        }
+
+        window.removeEventListener('pushstate', element.qsEventFunction);
+        window.removeEventListener('replacestate', element.qsEventFunction);
+        window.removeEventListener('popstate', element.qsEventFunction);
+
+        // handle "qs" attribute
+        if (element.getAttribute('qs')) {
+            strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+
+            if (strQSValue !== '' || !element.getAttribute('value')) {
+                element.setAttribute('value', strQSValue);
+            }
+
+            window.addEventListener('pushstate', element.qsEventFunction);
+            window.addEventListener('replacestate', element.qsEventFunction);
+            window.addEventListener('popstate', element.qsEventFunction);
+        }
+    }
+
+
+    // #####################################################################################
+    // ###################################### LIFECYCLE ####################################
+    // #####################################################################################
+
+    // dont do anything that modifies the element here
+    function elementCreated(element) {
+        // if "created" hasn't been suspended: run created code
+        if (!element.hasAttribute('suspend-created')) {
+            // if the value was set before the "created" lifecycle code runs: set attribute
+            //      (discovered when trying to set a value of a date control in the after_open of a dialog)
+            //      ("delete" keyword added because of firefox)
+            if (element.value) {
+                element.setAttribute('value', element.value);
+                delete element.value;
+            }
+        }
+    }
+
+    //
+    function elementInserted(element) {
+        // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
+        if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
+            // if this is the first time inserted has been run: continue
+            if (!element.inserted) {
+                element.inserted = true;
+                element.innerState = 'closed';
+
+                prepElement(element);
+                siphonElement(element);
+                refreshControl(element);
+
+                if (element.getAttribute('qs')) {
+                    handleQS(element);
+                }
+
+                element.lastChangeValue = element.getAttribute('value');
+            }
+        }
+    }
+
+
+    // ######################################################################################
+    // ##################################### REGISTRATION ###################################
+    // ######################################################################################
+
+    xtag.register('gs-interval', {
+        lifecycle: {
+            created: function () {
+                elementCreated(this);
+            },
+
+            inserted: function () {
+                elementInserted(this);
+            },
+
+            attributeChanged: function (strAttrName, oldValue, newValue) {
+                var element = this;
+                // if "suspend-created" has been removed: run created and inserted code
+                if (strAttrName === 'suspend-created' && newValue === null) {
+                    elementCreated(element);
+                    elementInserted(element);
+
+                // if "suspend-inserted" has been removed: run inserted code
+                } else if (strAttrName === 'suspend-inserted' && newValue === null) {
+                    elementInserted(element);
+
+                } else if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
+                    if (strAttrName === 'disabled' || strAttrName === 'no-picker' || strAttrName === 'tabindex') {
+                        siphonElement(element);
+                        refreshControl(element);
+
+                    } else if (strAttrName === 'qs') {
+                        handleQS(element);
+
+                    } else if (strAttrName === 'value' && element.inserted) {
+                        //displayValue(element);
+                        siphonElement(element);
+                        displayValue(element);
+                        //setValueDisplay(element, newValue);
+                    }
+                }
+            }
+        },
+        events: {
+            'click': function (event) {
+                var element = this;
+                if (event.target === element.button) {
+                    element.toggle();
+                }
+            },
+
+            'mouseup': function (event) {
+                var element = this;
+                var strValue = element.control.value;
+                var jsnTextSelection;
+                var intCursor;
+                var i;
+                var len;
+                var arrDelimiterIndexes;
+                var intSection;
+
+                element.numberOfCharsTyped = 0;
+
+                jsnTextSelection = GS.getInputSelection(element.control);
+
+                i = 0;
+                len = strValue.length;
+                arrDelimiterIndexes = [0];
+                while (i < len) {
+                    if (strValue[i] === ':') {
+                        arrDelimiterIndexes.push(i);
+                    }
+                    i += 1;
+                }
+                arrDelimiterIndexes.push(strValue.length);
+
+                event.preventDefault();
+
+                intCursor = jsnTextSelection.start;
+
+                // find out what section the cursor is in
+                i = 1;
+                len = arrDelimiterIndexes.length;
+                while (i < len) {
+                    if (intCursor >= arrDelimiterIndexes[i - 1] && intCursor <= arrDelimiterIndexes[i]) {
+                        intSection = i;
+                        break;
+                    }
+                    i += 1;
+                }
+
+                // select the section of the value that the cursor is in
+                if (intSection === 1) {
+                    GS.setInputSelection(element.control, arrDelimiterIndexes[intSection - 1], arrDelimiterIndexes[intSection]);
+                } else {
+                    GS.setInputSelection(element.control, arrDelimiterIndexes[intSection - 1] + 1, arrDelimiterIndexes[intSection]);
+                }
+            },
+
+            'keydown': function (event) { // don't use the "input" event, doesn't work for this
+                var element = this;
+                var strValue = element.control.value;
+                var intKeyCode = (event.keyCode || event.which);
+
+                var jsnTextSelection;
+                var arrDelimiterIndexes;
+                var i;
+                var len;
+                var intCursor;
+                var intSection;
+                var strPlace;
+                var strChar;
+                var strSection;
+
+                jsnTextSelection = GS.getInputSelection(element.control);
+
+                i = 0;
+                len = strValue.length;
+                arrDelimiterIndexes = [0];
+                while (i < len) {
+                    if (strValue[i] === ':') {
+                        arrDelimiterIndexes.push(i);
+                    }
+                    i += 1;
+                }
+                arrDelimiterIndexes.push(strValue.length);
+
+                // get cursor position
+                intCursor = jsnTextSelection.start;
+
+                // find out what section the cursor is in
+                i = 1;
+                len = arrDelimiterIndexes.length;
+                while (i < len) {
+                    if (intCursor >= arrDelimiterIndexes[i - 1] && intCursor <= arrDelimiterIndexes[i]) {
+                        intSection = i;
+                        break;
+                    }
+                    i += 1;
+                }
+
+                // if key was an arrow
+                if (intKeyCode >= 37 && intKeyCode <= 40) {
+                    element.numberOfCharsTyped = 0;
+                    event.preventDefault();
+
+                    // left     37
+                    // top      38
+                    // right    39
+                    // down     40
+
+                    // handle/right arrows moving the cursor
+                    if (intKeyCode === 37) {
+                        intSection -= 1;
+                        intSection = Math.max(intSection, 1);
+                    } else if (intKeyCode === 39) {
+                        intSection += 1;
+                        intSection = Math.min(intSection, arrDelimiterIndexes.length - 1);
+                    }
+
+                    // select the section of the value that the cursor is in
+                    if (intSection === 1) {
+                        GS.setInputSelection(element.control, arrDelimiterIndexes[intSection - 1], arrDelimiterIndexes[intSection]);
+                    } else {
+                        GS.setInputSelection(element.control, arrDelimiterIndexes[intSection - 1] + 1, arrDelimiterIndexes[intSection]);
+                    }
+
+                    // find out what section that the cursor is in (hours, minutes or seconds)
+                    if (intSection === 0 || intSection === 1) {
+                        strPlace = 'hours';
+                    } else if (intSection === 2) {
+                        strPlace = 'minutes';
+                    } else if (intSection === 3 || intSection === 4) {
+                        strPlace = 'seconds';
+                    }
+
+                    // update text selection variable
+                    jsnTextSelection = GS.getInputSelection(element.control);
+
+                    // handle up and down arrows incrementing/decrementing
+                    //      the value of the currently selected section
+                    if (intKeyCode === 38) { // up
+                        if (strPlace === 'hours') {
+                            element.internal.value.hours += 1;
+                        } else if (strPlace === 'minutes') {
+                            element.internal.value.minutes += 1;
+                        } else if (strPlace === 'seconds') {
+                            element.internal.value.seconds += 1;
+                        }
+
+                        if (element.internal.value.seconds > 59) {
+                            element.internal.value.minutes += 1;
+                            element.internal.value.seconds = 0;
+                        }
+                        if (element.internal.value.minutes > 59) {
+                            element.internal.value.hours += 1;
+                            element.internal.value.minutes = 0;
+                        }
+
+                    } else if (intKeyCode === 40) { // down
+                        if (strPlace === 'hours') {
+                            element.internal.value.hours -= 1;
+                        } else if (strPlace === 'minutes') {
+                            element.internal.value.minutes -= 1;
+                        } else if (strPlace === 'seconds') {
+                            element.internal.value.seconds -= 1;
+                        }
+
+                        if (element.internal.value.seconds < 0) {
+                            if (element.internal.value.minutes > 0) {
+                                element.internal.value.minutes -= 1;
+                                element.internal.value.seconds = 59;
+                            } else if (element.internal.value.hours > 0) {
+                                element.internal.value.hours -= 1;
+                                element.internal.value.minutes = 59;
+                                element.internal.value.seconds = 59;
+                            } else {
+                                element.internal.value.seconds = 0;
+                            }
+                        }
+                        if (element.internal.value.minutes < 0) {
+                            if (element.internal.value.hours > 0) {
+                                element.internal.value.minutes = 59;
+                                element.internal.value.hours -= 1;
+                            } else {
+                                element.internal.value.minutes = 0;
+                            }
+                        }
+                        if (element.internal.value.hours < 0) {
+                            element.internal.value.hours = 0;
+                        }
+                    }
+
+                    if (intKeyCode === 38 || intKeyCode === 40) {
+                        trinkleValueDown(element);
+                        displayValue(element);
+                        GS.setInputSelection(element.control, jsnTextSelection.start, jsnTextSelection.end);
+                    }
+
+                // if key was a number
+                } else if ((intKeyCode >= 48 && intKeyCode <= 57) || (intKeyCode >= 96 && intKeyCode <= 105)) {
+                    element.numberOfCharsTyped = element.numberOfCharsTyped || 0;
+                    event.preventDefault();
+    
+                    // get the character that was typed
+                    strChar = String.fromCharCode(intKeyCode);
+                    if (intKeyCode === 96)  { strChar = '0'; }
+                    if (intKeyCode === 97)  { strChar = '1'; }
+                    if (intKeyCode === 98)  { strChar = '2'; }
+                    if (intKeyCode === 99)  { strChar = '3'; }
+                    if (intKeyCode === 100) { strChar = '4'; }
+                    if (intKeyCode === 101) { strChar = '5'; }
+                    if (intKeyCode === 102) { strChar = '6'; }
+                    if (intKeyCode === 103) { strChar = '7'; }
+                    if (intKeyCode === 104) { strChar = '8'; }
+                    if (intKeyCode === 105) { strChar = '9'; }
+
+                    // select the section of the value that the cursor is in
+                    if (intSection === 1) {
+                        GS.setInputSelection(element.control, arrDelimiterIndexes[intSection - 1], arrDelimiterIndexes[intSection]);
+                    } else {
+                        GS.setInputSelection(element.control, arrDelimiterIndexes[intSection - 1] + 1, arrDelimiterIndexes[intSection]);
+                    }
+
+                    // find out what section that the cursor is in (hours, minutes or seconds)
+                    if (intSection === 0 || intSection === 1) {
+                        strPlace = 'hours';
+                    } else if (intSection === 2) {
+                        strPlace = 'minutes';
+                    } else if (intSection === 3 || intSection === 4) {
+                        strPlace = 'seconds';
+                    }
+
+                    // update text selection variable
+                    jsnTextSelection = GS.getInputSelection(element.control);
+
+                    // when you type in a number,
+                    //      if no data is set saying "this is where the typing begins":
+                    //              insert the number as the first character of the section
+                    //              after that set data to say where the typing begins
+                    //      no matter what is typed: stay in the same section
+                    strSection = strValue.substring(jsnTextSelection.start, jsnTextSelection.end);
+
+                    strSection =
+                            strSection.substring(0, element.numberOfCharsTyped) +
+                            strChar +
+                            strSection.substring(element.numberOfCharsTyped + 1);
+
+                    strValue =
+                            strValue.substring(0, jsnTextSelection.start) +
+                            strSection +
+                            strValue.substring(jsnTextSelection.end);
+
+                    //console.log(element.numberOfCharsTyped);
+                    element.numberOfCharsTyped += 1;
+
+                    if (element.numberOfCharsTyped === strSection.length) {
+                        element.numberOfCharsTyped = 0;
+                    }
+
+                    if (strPlace === 'hours') {
+                        element.internal.value.hours = parseInt(strSection, 10);
+                    }
+                    if (strPlace === 'minutes') {
+                        element.internal.value.minutes = parseInt(strSection, 10);
+                    }
+                    if (strPlace === 'seconds') {
+                        element.internal.value.seconds = parseInt(strSection, 10);
+                    }
+
+                    //console.log(strValue, element.control.value, translateValueToNumber(element, strValue));
+
+                    if (strValue !== element.control.value) {
+                        trinkleValueDown(element);
+                        displayValue(element);
+                        GS.setInputSelection(element.control, jsnTextSelection.start, jsnTextSelection.end);
+                    }
+                } else if (intKeyCode !== 9 && event.ctrlKey === false && event.metaKey === false) {
+                    element.numberOfCharsTyped = 0;
+                    event.preventDefault();
+                }
+            },
+            'focusout': function () {
+                if (this.innerState === 'closed') {
+                    handleChange(this);
+                }
+            }
+        },
+        accessors: {
+            value: {
+                get: function () {
+                    return this.getAttribute('value');
+                },
+                set: function (newValue) {
+                    this.setAttribute('value', newValue);
+                }
+            },
+            state: {
+                get: function () {
+                    return this.innerState;
+                },
+                set: function (newValue) {
+                    if (newValue === 'open') {
+                        this.open();
+                    } else {
+                        this.close();
+                    }
+                }
+            }
+        },
+        methods: {
+            focus: function () {
+                this.control.focus();
+            },
+
+            open: function () {
+                var element = this;
+                var pickerContainerElement;
+                var overlayElement;
+                var pickerElement;
+                var handleLook;
+                var strHTML;
+                var i;
+                var len;
+                var arrElements;
+                var strUnit = element.getAttribute('unit') || 'hours';
+
+                var currentValue = translateValue(element, element.getAttribute('value'));
+                var intHourPlaces = parseInt(element.getAttribute('hour-places'), 10);
+                var intMinutePlaces = parseInt(element.getAttribute('minute-places'), 10);
+                var intSecondPlaces = parseInt(element.getAttribute('second-places'), 10);
+
+                // default place settings
+                if (isNaN(intHourPlaces)) {
+                    intHourPlaces = 3;
+                }
+                if (isNaN(intMinutePlaces)) {
+                    intMinutePlaces = 2;
+                }
+                if (isNaN(intSecondPlaces)) {
+                    intSecondPlaces = 0;
+                }
+
+                if (element.innerState === 'closed') {
+                    element.innerState = 'open';
+                    element.lastClosedValue = element.getAttribute('value');
+
+                    // if we are not on a touch device: focus control
+                    if (!evt.touchDevice) {
+                        element.control.focus();
+                        GS.setInputSelection(element.control, 0, element.control.value.length);
+                    }
+
+                    // create picker elements
+                    pickerContainerElement = document.createElement('div');
+                    pickerContainerElement.classList.add('gs-interval-time-picker-container');
+
+                    overlayElement = document.createElement('div');
+                    overlayElement.classList.add('gs-interval-time-picker-overlay');
+
+                    pickerElement = document.createElement('div');
+                    pickerElement.classList.add('gs-interval-time-picker');
+
+                    // save picker container
+                    element.pickerContainerElement = pickerContainerElement;
+
+                    // append picker elements
+                    pickerContainerElement.appendChild(overlayElement);
+                    pickerContainerElement.appendChild(pickerElement);
+
+                    document.body.appendChild(pickerContainerElement);
+
+                    // fill picker popup
+                    strHTML = '';
+                    strHTML += '<div class="time-inner-container">';
+
+                    i = 0;
+                    len = intHourPlaces;
+                    while (i < len) {
+                        strHTML +=
+                                '<select class="gs-interval-hour" data-hour="' + i + '">' +
+                                '    <option value="0">&nbsp;0</option>' +
+                                '    <option value="1">&nbsp;1</option>' +
+                                '    <option value="2">&nbsp;2</option>' +
+                                '    <option value="3">&nbsp;3</option>' +
+                                '    <option value="4">&nbsp;4</option>' +
+                                '    <option value="5">&nbsp;5</option>' +
+                                '    <option value="6">&nbsp;6</option>' +
+                                '    <option value="7">&nbsp;7</option>' +
+                                '    <option value="8">&nbsp;8</option>' +
+                                '    <option value="9">&nbsp;9</option>' +
+                                '</select>';
+                        i += 1;
+                    }
+
+                    if (intHourPlaces && intMinutePlaces > 0) {
+                        strHTML += '<span class="colon">:</span>';
+                    }
+
+                    i = 0;
+                    len = intMinutePlaces;
+                    while (i < len) {
+                        strHTML +=
+                                '<select class="gs-interval-minute" data-minute="' + i + '">' +
+                                '    <option value="0">&nbsp;0</option>' +
+                                '    <option value="1">&nbsp;1</option>' +
+                                '    <option value="2">&nbsp;2</option>' +
+                                '    <option value="3">&nbsp;3</option>' +
+                                '    <option value="4">&nbsp;4</option>' +
+                                '    <option value="5">&nbsp;5</option>';
+
+                        if (i > 0) {
+                            strHTML +=
+                                    '<option value="6">&nbsp;6</option>' +
+                                    '<option value="7">&nbsp;7</option>' +
+                                    '<option value="8">&nbsp;8</option>' +
+                                    '<option value="9">&nbsp;9</option>';
+                        }
+
+                        strHTML +=
+                                '</select>';
+                        i += 1;
+                    }
+
+                    if (intMinutePlaces > 0 && intSecondPlaces > 0) {
+                        strHTML += '<span class="colon">:</span>';
+                    }
+
+                    i = 0;
+                    len = intSecondPlaces;
+                    while (i < len) {
+                        strHTML +=
+                                '<select class="gs-interval-second" data-second="' + i + '">' +
+                                '    <option value="0">&nbsp;0</option>' +
+                                '    <option value="1">&nbsp;1</option>' +
+                                '    <option value="2">&nbsp;2</option>' +
+                                '    <option value="3">&nbsp;3</option>' +
+                                '    <option value="4">&nbsp;4</option>' +
+                                '    <option value="5">&nbsp;5</option>';
+
+                        if (i > 0) {
+                            strHTML +=
+                                    '<option value="6">&nbsp;6</option>' +
+                                    '<option value="7">&nbsp;7</option>' +
+                                    '<option value="8">&nbsp;8</option>' +
+                                    '<option value="9">&nbsp;9</option>';
+                        }
+
+                        strHTML +=
+                                '</select>';
+                        i += 1;
+                    }
+
+                    strHTML += '</div>';
+                    pickerElement.innerHTML = strHTML;
+
+                    // set value of the select boxes
+                    i = 0;
+                    len = intHourPlaces;
+                    arrElements = xtag.query(pickerElement, '[data-hour]');
+                    while (i < len) {
+                        arrElements[i].value = currentValue[i];
+                        i += 1;
+                    }
+
+                    i = 0;
+                    len = intMinutePlaces;
+                    arrElements = xtag.query(pickerElement, '[data-minute]');
+                    while (i < len) {
+                        arrElements[i].value = currentValue[intHourPlaces + 1 + i];
+                        i += 1;
+                    }
+
+                    i = 0;
+                    len = intSecondPlaces;
+                    arrElements = xtag.query(pickerElement, '[data-second]');
+                    while (i < len) {
+                        arrElements[i].value = currentValue[intHourPlaces + intMinutePlaces + 2 + i];
+                        i += 1;
+                    }
+
+                    // set picker value
+                    refreshPickerValue(element);
+
+                    // bind picker click
+                    overlayElement.addEventListener('click', function () {
+                        element.close();
+                    });
+
+                    pickerElement.addEventListener('change', function () {//event
+                        //var arrElements;
+                        //var i;
+                        //var len;
+                        var newValue = 0;
+                        var strCurrentValue;
+
+                        if (strUnit === 'hours') {
+                            i = 0;
+                            len = intHourPlaces;
+                            arrElements = xtag.query(pickerElement, '[data-hour]');
+                            strCurrentValue = '';
+                            while (i < len) {
+                                strCurrentValue += arrElements[i].value;
+                                i += 1;
+                            }
+                            if (arrElements.length > 0) {
+                                newValue += parseInt(strCurrentValue, 10);
+                            }
+
+                            i = 0;
+                            len = intMinutePlaces;
+                            arrElements = xtag.query(pickerElement, '[data-minute]');
+                            strCurrentValue = '';
+                            while (i < len) {
+                                strCurrentValue += arrElements[i].value;
+                                i += 1;
+                            }
+                            if (arrElements.length > 0) {
+                                newValue += (parseInt(strCurrentValue, 10) / 60);
+                            }
+
+                            i = 0;
+                            len = intSecondPlaces;
+                            arrElements = xtag.query(pickerElement, '[data-second]');
+                            strCurrentValue = '';
+                            while (i < len) {
+                                strCurrentValue += arrElements[i].value;
+                                i += 1;
+                            }
+                            if (arrElements.length > 0) {
+                                newValue += ((parseInt(strCurrentValue, 10) / 60) / 60);
+                            }
+                        }
+                        if (strUnit === 'minutes') {
+                            i = 0;
+                            len = intHourPlaces;
+                            arrElements = xtag.query(pickerElement, '[data-hour]');
+                            strCurrentValue = '';
+                            while (i < len) {
+                                strCurrentValue += arrElements[i].value;
+                                i += 1;
+                            }
+                            if (arrElements.length > 0) {
+                                newValue += parseInt(strCurrentValue, 10) * 60;
+                            }
+
+                            i = 0;
+                            len = intMinutePlaces;
+                            arrElements = xtag.query(pickerElement, '[data-minute]');
+                            strCurrentValue = '';
+                            while (i < len) {
+                                strCurrentValue += arrElements[i].value;
+                                i += 1;
+                            }
+                            if (arrElements.length > 0) {
+                                newValue += parseInt(strCurrentValue, 10);
+                            }
+
+                            i = 0;
+                            len = intSecondPlaces;
+                            arrElements = xtag.query(pickerElement, '[data-second]');
+                            strCurrentValue = '';
+                            while (i < len) {
+                                strCurrentValue += arrElements[i].value;
+                                i += 1;
+                            }
+                            if (arrElements.length > 0) {
+                                newValue += ((parseInt(strCurrentValue, 10) * 60) * 60);
+                            }
+                        }
+                        if (strUnit === 'seconds') {
+                            i = 0;
+                            len = intHourPlaces;
+                            arrElements = xtag.query(pickerElement, '[data-hour]');
+                            strCurrentValue = '';
+                            while (i < len) {
+                                strCurrentValue += arrElements[i].value;
+                                i += 1;
+                            }
+                            if (arrElements.length > 0) {
+                                newValue += ((parseInt(strCurrentValue, 10) * 60) * 60);
+                            }
+
+                            i = 0;
+                            len = intMinutePlaces;
+                            arrElements = xtag.query(pickerElement, '[data-minute]');
+                            strCurrentValue = '';
+                            while (i < len) {
+                                strCurrentValue += arrElements[i].value;
+                                i += 1;
+                            }
+                            if (arrElements.length > 0) {
+                                newValue += parseInt(strCurrentValue, 10) * 60;
+                            }
+
+                            i = 0;
+                            len = intSecondPlaces;
+                            arrElements = xtag.query(pickerElement, '[data-second]');
+                            strCurrentValue = '';
+                            while (i < len) {
+                                strCurrentValue += arrElements[i].value;
+                                i += 1;
+                            }
+                            if (arrElements.length > 0) {
+                                newValue += parseInt(strCurrentValue, 10);
+                            }
+                        }
+
+                        element.setAttribute('value', newValue);
+                        //trinkleValueDown(element);
+                        //setValueDisplay(element, newValue);
+                    });
+
+                    // handle/bind positioning and look
+                    handleLook = function () {
+                        var positionData;
+                        var intPopupHeight;
+                        var intPopupWidth;
+
+                        if (pickerContainerElement.parentNode !== document.body) {
+                            window.removeEventListener('resize', handleLook);
+                            window.removeEventListener('orientationchange', handleLook);
+                            return;
+                        }
+
+                        // clear current styles
+                        pickerElement.style.top = '';
+                        pickerElement.style.left = '';
+                        pickerElement.style.marginTop = '';
+                        //pickerContainerElement.classList.remove('modal');
+
+                        // get position/size data
+                        positionData = GS.getElementPositionData(element);
+                        intPopupHeight = pickerElement.offsetHeight;
+                        intPopupWidth = pickerElement.offsetWidth;
+
+                        //// if from control to bottom is too small and from control to top is too small
+                        ////      OR window width < 400px: dialog
+                        ////      OR window height < 550px: dialog
+                        //if ((positionData.intRoomAbove < intPopupHeight && positionData.intRoomBelow < intPopupHeight) ||
+                        //    window.innerWidth < 400 ||
+                        //    window.innerHeight < 550) {
+                        //    // dialog mode
+                        //    pickerElement.style.marginTop = '1em';
+                        //    pickerContainerElement.classList.add('modal');
+                        //} else {
+
+                        // if from control to bottom has enough room: popup below
+                        if (positionData.intRoomBelow > intPopupHeight) {
+                            pickerElement.style.top = (positionData.objElementOffset.top + positionData.intElementHeight) + 'px';
+
+                        // else: popup above
+                        } else {
+                            pickerElement.style.top = (positionData.objElementOffset.top - intPopupHeight) + 'px';
+                        }
+
+                        pickerElement.style.left =
+                                ((positionData.objElementOffset.left + positionData.intElementWidth) - intPopupWidth) + 'px';
+
+                        //}
+                    };
+
+                    handleLook();
+
+                    window.addEventListener('resize', handleLook);
+                    window.addEventListener('orientationchange', handleLook);
+                }
+            },
+
+            close: function () {
+                var element = this;
+
+                if (element.innerState === 'open') {
+                    element.innerState = 'closed';
+                    if (element.pickerContainerElement) {
+                        document.body.removeChild(element.pickerContainerElement);
+                        element.pickerContainerElement = '';
+                    }
+                    if (element.getAttribute('value') !== element.lastClosedValue) {
+                        handleChange(element);
+                    }
+                }
+            },
+
+            toggle: function () {
+                var element = this;
+
+                if (element.innerState === 'open') {
+                    element.close();
+                } else {
+                    element.open();
                 }
             }
         }

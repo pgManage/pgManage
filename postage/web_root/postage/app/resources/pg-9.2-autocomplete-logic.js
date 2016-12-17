@@ -2660,6 +2660,8 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 jsnPrefix = autocompleteGetPrefix(strScript, intCursorPosition + 1);
                 arrPrefix = jsnPrefix.arrStrings;
                 
+                //console.log('1***', JSON.stringify(arrPrefix));
+                
                 // if we have more than zero prefix elements
                 if (arrPrefix.length > 0) {
                     // these are set outside the websocket call because they might

@@ -98,6 +98,7 @@ bool http_accept_step2(EV_P, void *cb_data, DB_result *res) {
 	char *_str_response = NULL;
 	ssize_t int_len = 0;
 	DArray *arr_row_values = NULL;
+	DArray *arr_row_lengths = NULL;
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_TUPLES_OK, "DB_exec failed");
@@ -105,6 +106,8 @@ bool http_accept_step2(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_CHECK(DB_fetch_row(res) == DB_FETCH_OK, "DB_fetch_row failed");
 	arr_row_values = DB_get_row_values(res);
 	SFINISH_CHECK(arr_row_values != NULL, "DB_get_row_values failed");
+	arr_row_lengths = DB_get_row_lengths(res);
+	SFINISH_CHECK(arr_row_lengths != NULL, "DB_get_row_lengths failed");
 
 	str_response = DArray_get(arr_row_values, 0);
 	SDEBUG("str_response: %s", str_response);
@@ -115,7 +118,7 @@ bool http_accept_step2(EV_P, void *cb_data, DB_result *res) {
 
 	client_copy_check->str_response = str_response;
 	str_response = NULL;
-	client_copy_check->int_response_len = (ssize_t)strlen(client_copy_check->str_response);
+	client_copy_check->int_response_len = (ssize_t)(*(size_t *)DArray_get(arr_row_lengths, 0));
 	client_copy_check->client_request = client->cur_request;
 
 	SFINISH_SALLOC(client_copy_io, sizeof(struct sock_ev_client_copy_io));

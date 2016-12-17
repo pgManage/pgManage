@@ -6,6 +6,8 @@
 static const char *str_date_format = "%Y/%m/%d";
 static const char *str_time_format = "%H:%M:%S";
 
+extern char *_DB_get_diagnostic(DB_conn *conn, PGresult *res);
+
 char *ws_raw_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_query = NULL;
 	char *str_response = NULL;
@@ -180,10 +182,10 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 	client_request->int_i += 1;
 	if (client_request->int_i <= client_request->int_len) {
 		if (client_request->int_i == 0) {
-			SFINISH_CHECK(result == PGRES_COMMAND_OK, "BEGIN failed: %s", PQerrorMessage(client_request->parent->cnxn));
+			SFINISH_CHECK(result == PGRES_COMMAND_OK, "BEGIN failed: %s", _DB_get_diagnostic(client_request->parent->conn, res));
 
 		} else if (result == PGRES_FATAL_ERROR) {
-			SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
+			SFINISH("Query failed: %s", _DB_get_diagnostic(client_request->parent->conn, res));
 
 		} else if (result == PGRES_EMPTY_QUERY) {
 			// FINISH("Query empty");
@@ -204,10 +206,10 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			SFINISH_CAT_APPEND(str_response, "\\.");
 
 		} else if (result == PGRES_BAD_RESPONSE) {
-			SFINISH("Bad response from server: %s", PQerrorMessage(client_request->parent->cnxn));
+			SFINISH("Bad response from server: %s", _DB_get_diagnostic(client_request->parent->conn, res));
 
 		} else if (result == PGRES_NONFATAL_ERROR) {
-			SFINISH("Nonfatal error: %s", PQerrorMessage(client_request->parent->cnxn));
+			SFINISH("Nonfatal error: %s", _DB_get_diagnostic(client_request->parent->conn, res));
 
 		} else if (result == PGRES_COMMAND_OK) {
 			str_rows = PQcmdTuples(res);
@@ -246,7 +248,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			}
 			query_callback(EV_A, client_request, _raw_tuples_callback);
 		} else {
-			SFINISH("Unexpected result status %s: %s", PQresStatus(result), PQerrorMessage(client_request->parent->cnxn));
+			SFINISH("Unexpected result status %s: %s", PQresStatus(result), _DB_get_diagnostic(client_request->parent->conn, res));
 		}
 	} else {
 		client_request->int_response_id -= 1;
@@ -379,6 +381,10 @@ finish:
 			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
 		}
 		SFINISH_CAT_APPEND(str_response, _str_response);
+		SDEBUG("       str_response : %s", str_response);
+		SDEBUG("strlen(str_response): %d", strlen(str_response));
+		SDEBUG("       _str_response : %s", _str_response);
+		SDEBUG("strlen(_str_response): %d", strlen(_str_response));
 		SFREE(_str_response);
 
 		client_request->str_current_response = str_response;
@@ -407,6 +413,8 @@ bool ws_raw_step3(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 		PQclear(res);
 	}
 	if (client_request->str_current_response != NULL) {
+		SDEBUG("       client_request->str_current_response : %s", client_request->str_current_response);
+		SDEBUG("strlen(client_request->str_current_response): %d", strlen(client_request->str_current_response));
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, client_request->str_current_response, strlen(client_request->str_current_response));
 		DArray_push(client_request->arr_response, client_request->str_current_response);
 		client_request->str_current_response = NULL;

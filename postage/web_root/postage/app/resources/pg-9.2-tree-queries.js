@@ -70,8 +70,9 @@ var treeStructure = [
             [3, 'script', 'objectOperatorFamily'],
         [2, 'folder,refresh', 'objectSequence'],
             [3, 'script', 'objectSequence'],
-        [2, 'folder,refresh', 'objectTable'],
-            [3, 'script', 'objectTable'],
+        [2, 'folder,refresh', 'objectTableList'],
+            [3, 'folder,script', 'objectTable'],
+                [4, 'script', 'objectTable'],
         [2, 'folder,refresh', 'objectTriggerFunction'],
             [3, 'script', 'objectFunction'],
         [2, 'folder,refresh', 'objectType'],
@@ -89,14 +90,15 @@ var treeStructure = [
 
 
 
-
-
-
-
 listQuery.schemas = ml(function () {/*
      SELECT oid, nspname AS name
        FROM pg_namespace
-      WHERE ((NOT nspname LIKE 'pg\_%') OR nspname = 'pg_catalog') AND (NOT nspname LIKE 'information%')
+      WHERE (
+                (NOT nspname LIKE 'pg\_%')
+                OR
+                nspname = 'pg_catalog'
+            )
+        AND (NOT nspname LIKE 'information%')
    ORDER BY nspname;
 */});
 
@@ -172,7 +174,7 @@ listQuery.objectSchema = listQuery.schemaContents = ml(function () {/*
               WHERE relkind = 'S'
                 AND pg_class.relnamespace = '{{INTOID}}'::oid) AS obj_count
         UNION
-        SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Tables' AS name, 'objectTable' AS obj_query, (SELECT count(relname) AS result
+        SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Tables' AS name, 'objectTableList' AS obj_query, (SELECT count(relname) AS result
                  FROM pg_class rel
                 WHERE relkind IN ('r','s','t')
                   AND rel.relnamespace = '{{INTOID}}'::oid) AS obj_count
@@ -207,6 +209,36 @@ listQuery.objectSchema = listQuery.schemaContents = ml(function () {/*
      WHERE srt = CASE WHEN (SELECT sum(obj_count) FROM folders filders_where) > 1 THEN 2 ELSE 999 END
        AND obj_count > 0;
 */});
+
+
+/*
+
+columns
+keys
+constraints
+triggers
+indexes
+
+*/
+
+
+listQuery.objectTable = ml(function () {/*
+    SELECT {{INTOID}} AS oid,
+            COALESCE(attname,'') ||
+                ' (' ||
+                    COALESCE(format_type(atttypid, atttypmod),'') ||
+                ')',
+            '' AS schema_name,
+            'CL' AS bullet
+      FROM pg_catalog.pg_attribute
+     WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0
+       AND attrelid = {{INTOID}}
+  ORDER BY attnum ASC;
+*/});
+
+
+
+
 
 
 titleRefreshQuery.objectAggregate = titleRefreshQuery.aggregateNumber = ml(function () {/*
@@ -314,7 +346,7 @@ titleRefreshQuery.objectSequence = titleRefreshQuery.sequenceNumber = ml(functio
 */});
 
 
-titleRefreshQuery.objectTable = titleRefreshQuery.tableNumber = ml(function () {/*
+titleRefreshQuery.objectTableList = titleRefreshQuery.tableNumber = ml(function () {/*
     SELECT count(relname) AS result
       FROM pg_class rel
      WHERE relkind IN ('r','s','t') AND rel.relnamespace = {{INTOID}};
@@ -350,13 +382,16 @@ titleRefreshQuery.objectView = titleRefreshQuery.viewNumber = ml(function () {/*
 
 
 
-listQuery.objectTable = listQuery.tables = ml(function () {/*
-      SELECT pg_class.oid, quote_ident(relname) AS name, pg_namespace.nspname AS schema_name, 'TB' AS bullet
+listQuery.objectTableList = ml(function () {/*
+      SELECT pg_class.oid, quote_ident(relname) AS name, pg_namespace.nspname AS schema_name--, 'TB' AS bullet
         FROM pg_class
    LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
        WHERE relkind IN ('r','s','t') AND pg_class.relnamespace = {{INTOID}}
     ORDER BY relname;
 */});
+
+
+
 
 
 listQuery.objectTriggerFunction = listQuery.triggers = ml(function () {/*
@@ -1456,13 +1491,48 @@ scriptQuery.objectTable = ml(function () {/*
                                     ELSE ''
                             END) || E'\n);') ||
               E'\n\nALTER TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-              ' OWNER TO ' || pg_roles.rolname || E';' ||
-              COALESCE(E'\n\nCOMMENT ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' IS ' ||
-                quote_literal(pg_description.description) || E';', '')-- || E'\n' ||
-               --'--SELECT' || (array_to_string(array_agg(' ' || em1.attname), ','::text)) || ' FROM ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ';'
+              ' OWNER TO ' || pg_roles.rolname || E';\n\n' ||
+                
+                -- get table and column comments
+                (
+                     SELECT  COALESCE(
+                                array_to_string(
+                                    array_agg(
+                                        COALESCE(
+                                            full_text,
+                                            ''
+                                        )
+                                    ),
+                                E'\n'),
+                            '') AS full_text
+                      FROM (
+                               SELECT COALESCE(
+                                            (
+                                                'COMMENT ON ' || (
+                                                        CASE WHEN objsubid = 0 THEN 'TABLE' ELSE 'COLUMN' END
+                                                ) || ' ' ||
+                                                quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
+                                                (
+                                                    CASE WHEN objsubid = 0 THEN '' ELSE '.' || quote_ident(pg_attribute.attname) END
+                                                ) ||
+                                                ' IS ' ||
+                                                quote_literal(pg_description.description) || E';'
+                                            ),
+                                            ''
+                                        ) AS full_text
+                                 FROM pg_description
+                            LEFT JOIN pg_class ON pg_class.oid = pg_description.objoid 
+                            LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                            LEFT JOIN pg_attribute ON attrelid = pg_description.objoid
+                                                  AND pg_attribute.attnum = pg_description.objsubid
+                                WHERE objoid = {{INTOID}}
+                             ORDER BY objsubid ASC
+                        ) descriptions
+                )
         
         FROM pg_class
-        LEFT JOIN pg_description ON pg_class.oid = pg_description.objoid
+        --LEFT JOIN pg_description ON pg_class.oid = pg_description.objoid AND pg_description.objsubid IS NULL
+        
         LEFT JOIN (SELECT attrelid, quote_ident(attname) AS attname, atttypid, atttypmod, typname, attnotnull, atthasdef, pg_attrdef.adbin, pg_attrdef.adrelid,
                    CASE WHEN typname = 'varchar' AND atttypmod = 6 THEN 'chk_'
                         WHEN typname ~ '^(text|varchar|bpchar|name|char)$' THEN 'str_'
@@ -1516,7 +1586,7 @@ scriptQuery.objectTable = ml(function () {/*
          JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRNAME}}'
         GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relacl,
-                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, pg_description.description, reloptions)
+                pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions) --pg_description.description
                 
         || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
         	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)

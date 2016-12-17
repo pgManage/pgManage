@@ -422,10 +422,12 @@ bool ws_update_step4(EV_P, void *cb_data, DB_result *res) {
 		if (client_update->str_hash_where_clause != NULL) {
 			SFINISH_CAT_CSTR(str_sql, "SELECT count(*), sum(CASE WHEN ", client_update->str_hash_where_clause,
 				" THEN 1 ELSE 0 END) FROM ", client_update->str_temp_table_name, " ", "INNER JOIN ",
-				client_update->str_real_table_name, " ON ", client_update->str_pk_join_clause, ";");
+				client_update->str_real_table_name, " ON ", client_update->str_pk_join_clause, " WHERE ",
+				client_update->str_pk_where_clause, ";");
 		} else {
 			SFINISH_CAT_CSTR(str_sql, "SELECT count(*) FROM ", client_update->str_temp_table_name, " ", "INNER JOIN ",
-				client_update->str_real_table_name, " ON ", client_update->str_pk_join_clause, ";");
+				client_update->str_real_table_name, " ON ", client_update->str_pk_join_clause, " WHERE ",
+				client_update->str_pk_where_clause, ";");
 		}
 	} else {
 		if (client_update->str_hash_where_clause != NULL) {
@@ -515,7 +517,7 @@ bool ws_update_step5(EV_P, void *cb_data, DB_result *res) {
 	DB_free_result(res);
 	if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
 		SFINISH_CAT_CSTR(str_sql, "UPDATE ", client_update->str_real_table_name, " SET ", client_update->str_set_col_list,
-			" FROM ", client_update->str_temp_table_name, " WHERE ", client_update->str_pk_join_clause, ";");
+			" FROM ", client_update->str_temp_table_name, " WHERE ", client_update->str_pk_join_clause, " AND ", client_update->str_pk_where_clause, ";");
 	} else {
 		SFINISH_CAT_CSTR(str_sql, "MERGE INTO ", client_update->str_real_table_name, " WITH (HOLDLOCK) "
 																					 "USING ",
