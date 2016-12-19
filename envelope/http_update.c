@@ -466,7 +466,7 @@ bool http_update_step5(EV_P, void *cb_data, DB_result *res) {
 
 	SFINISH_CAT_CSTR(str_data, "[");
 	for (y = 0; y < maxy; y++) {
-		if ((*(int *)DArray_get(darr_data_length, y)) == -1) {
+		if ((*(ssize_t *)DArray_get(darr_data_length, y)) == -1) {
 			SFINISH_CAT_APPEND(str_data, (y == 0 ? "" : ","), "null");
 		} else {
 			str_temp = jsonify(DArray_get(darr_data, y));

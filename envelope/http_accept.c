@@ -118,7 +118,7 @@ bool http_accept_step2(EV_P, void *cb_data, DB_result *res) {
 
 	client_copy_check->str_response = str_response;
 	str_response = NULL;
-	client_copy_check->int_response_len = (ssize_t)(*(size_t *)DArray_get(arr_row_lengths, 0));
+	client_copy_check->int_response_len = (*(ssize_t *)DArray_get(arr_row_lengths, 0));
 	client_copy_check->client_request = client->cur_request;
 
 	SFINISH_SALLOC(client_copy_io, sizeof(struct sock_ev_client_copy_io));
@@ -132,6 +132,9 @@ bool http_accept_step2(EV_P, void *cb_data, DB_result *res) {
 finish:
 	if (arr_row_values != NULL) {
 		DArray_destroy(arr_row_values);
+	}
+	if (arr_row_lengths != NULL) {
+		DArray_destroy(arr_row_lengths);
 	}
 	SFREE(_str_response);
 	_str_response = str_response;

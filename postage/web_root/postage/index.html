@@ -177,10 +177,14 @@ function getConnections() {
                         </gs-grid>
                     </gs-option>
                 */});
+				if (strConnName === 'custom') {
+		            try {
+		                document.getElementById('option-connection').value = strConnName;
+		            } catch (e) {}
+				}
 
                 var divOneTime = document.getElementById('afterOneTime');
                 divOneTime.innerHTML = ml(function () {/*<br/><br/>*/});
-
             }
         } else {
             appendError(data);

@@ -522,7 +522,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			ptr_conn, "="
 					  "; path=/; expires=Tue, 01 Jan 1990 00:00:00 GMT",
 			(bol_tls ? "; secure" : ""), "; HttpOnly\015\012"
-										 "Location: /postage/index.html?connection=", current_connection->str_connection_name, "\015\012\015\012");
+										 "Location: /postage/index.html?connection=", (current_connection != NULL ? current_connection->str_connection_name : "custom"), "\015\012\015\012");
 #endif
 		//client_auth->parent->bol_fast_close = true;
 		SFREE_PWORD(str_form_data);
