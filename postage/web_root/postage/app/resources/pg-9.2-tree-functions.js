@@ -132,14 +132,24 @@ function treeStart() {
     treeGlobals.ace.addEventListener('click', function () {
         var intStartRow = treeGlobals.ace.getSelectionRange().start.row
           , intEndRow = treeGlobals.ace.getSelectionRange().end.row
-          , rowData = treeGlobals.data[intStartRow];
+          , intStartColumn = treeGlobals.ace.getSelectionRange().start.column
+          , intEndColumn = treeGlobals.ace.getSelectionRange().end.column
+          , rowData = treeGlobals.data[intStartRow]
+          , arrType;
         
         // allow highlight color
         treeGlobals.ace.setHighlightActiveLine(true);
         
         // if we found a row
-        if (intStartRow === intEndRow && rowData) {
-            treeHandleLineTrigger(intStartRow);
+        if (intStartRow === intEndRow && intStartColumn === intEndColumn && rowData) {
+            /*
+            // if the current line has an action function
+            if (rowData.action) {
+                arrType = rowData.type.split(',');
+                
+            */
+            
+            treeHandleLineTrigger(intStartRow, intStartColumn);
         }
     });
     
@@ -194,7 +204,7 @@ function treeStart() {
 // ############## TREE FOLDER OPEN/CLOSE FUNCTIONS ##############
 // ##############################################################
 
-function treeHandleLineTrigger(intRow) {
+function treeHandleLineTrigger(intRow, intColumn) {
     'use strict';
     var rowData = treeGlobals.data[intRow], arrType;
     
@@ -213,37 +223,24 @@ function treeHandleLineTrigger(intRow) {
                 treeReloadLine(titleRefreshQuery[rowData.query].replace(/{{INTOID}}/gi, rowData.schemaOID), rowData, intRow);
             }
             
-            // if the current line is a folder
-            if (arrType.indexOf('folder') !== -1) {
-                // if the folder is closed
-                if (rowData.open === false) {
-                    // mark as open
-                    rowData.open = true;
-                    
-                    // replace the folderplus with the folderminus
-                    rowData.real_text = rowData.real_text.replace(treeGlobals.folderPlus, treeGlobals.folderMinus);
-                    treeReplaceLine(intRow, rowData.real_text);
-                    
-                    // run the action
-                    rowData.action(rowData, intRow);
-                    
-                // else (folder is already open)
-                } else {
-                    // mark as closed
-                    rowData.open = false;
-                    
-                    // replace the folderminus with the folderplus
-                    rowData.real_text = rowData.real_text.replace(treeGlobals.folderMinus, treeGlobals.folderPlus);
-                    treeReplaceLine(intRow, rowData.real_text);
-                    
-                    // close the folder
-                    treeListClose(intRow);
-                }
-                
-            // else (the current line is not a folder): run the action
-            } else {
-                rowData.action(rowData, intRow);
-            }
+            // V---- the .action function deals with all of this now
+            //// if the current line is a folder
+            //if (arrType.indexOf('folder') !== -1) {
+            //    // if the folder is closed
+            //    if (rowData.open === false) {
+            //        // run the action
+            //        rowData.action(rowData, intRow, intColumn);
+            //        
+            //    // else (folder is already open)
+            //    } else {
+            //        rowData.action(rowData, intRow, intColumn);
+            //        
+            //    }
+            //    
+            //// else (the current line is not a folder): run the action
+            //} else {
+            rowData.action(rowData, intRow, intColumn);
+            //}
         }
         
         // set the selected line in the ace to the row that was clicked
@@ -1170,90 +1167,131 @@ function treeGetLineChildren(index) {
     return arrChildren;
 }
 
-function treeLoad(data, index) {
+function treeLoad(data, index, intColumn) {
     'use strict';
     var arrType = data.type.split(','), intLine, arrLine, strName, strSqlSafeName, arrChildren;
     
-    if (arrType.indexOf('folder') !== -1) {
-        intLine = treeGetLineFromData(data);
-        arrChildren = treeGetLineChildren(intLine);
-        
-        // get name and SQL safe name
-        if (data.name && data.schemaName) {
-            strName = data.schemaName + '.' + data.name;
-            strSqlSafeName = quote_ident(data.schemaName) + '.' + quote_ident(data.name);
-        } else {
-            strName = data.name;
-            strSqlSafeName = quote_ident(data.name);
-        }
-        
-        // if there's only one child: all of the loaded children are of that type
-        if (arrChildren.length === 1) {
-            arrLine = arrChildren[0];
+    if (arrType.indexOf('folder') !== -1 &&
+        (
+            (
+                arrType.indexOf('script') !== -1 && (
+                    //If object is not a schema folder or a table folder then continue
+                    (data.query !== 'objectSchema' && data.query !== 'objectTable') ||
+                    //If its not a mouse event then continue
+                    (!intColumn) ||
+                    //If object is a schema folder, and the position of the click is before the arrow, then continue
+                    data.real_text.search(/[^ ]/) + 2 >= intColumn
+                )
+            ) ||
+            (arrType.indexOf('script') === -1)
+        )) {
+        if (data.open === false) {
+            intLine = treeGetLineFromData(data);
+            arrChildren = treeGetLineChildren(intLine);
             
-            treeListLoad(index, treePrepareQuery(listQuery[data.query], data.oid, strName, strSqlSafeName), function (arrRow) {
-                var jsnRow = {'name': arrRow[1], 'oid': arrRow[0], 'type': arrLine[1], 'query': arrLine[2], 'action': treeLoad};
-                
-                if (jsnRow.name === 'Nothing In This Folder') {
-                    jsnRow.action = undefined;
-                    jsnRow.query = undefined;
-                    jsnRow.type = '';
-                }
-                
-                if (arrRow[3]) {
-                    jsnRow.bullet = arrRow[3];
-                }
-                
-                if (data.query === 'objectSchema') {
-                    jsnRow.schemaName = (data.truename || data.name);
-                    jsnRow.schemaOID = (data.oid);
-                } else if (data.schemaName) {
-                    jsnRow.schemaName = data.schemaName;
-                    jsnRow.schemaOID = data.schemaOID;
-                }
-                
-                //console.log(jsnRow);
-                
-                return jsnRow;
-            });
+            // mark as open
+            data.open = true;
             
-        // else: children must match up on queryname
-        } else {
-            treeListLoad(index, treePrepareQuery(listQuery[data.query], data.oid, strName, strSqlSafeName), function (arrRow) {
-                var i, len, jsnRow = {'name': arrRow[1], 'oid': arrRow[0], 'query': arrRow[2], 'action': treeLoad};
+            // replace the folderplus with the folderminus
+            data.real_text = data.real_text.replace(treeGlobals.folderPlus, treeGlobals.folderMinus);
+            treeReplaceLine(treeGlobals.data.indexOf(data), data.real_text);
+            
+            // get name and SQL safe name
+            if (data.name && data.schemaName) {
+                strName = data.schemaName + '.' + data.name;
+                strSqlSafeName = quote_ident(data.schemaName) + '.' + quote_ident(data.name);
+            } else {
+                strName = data.name;
+                strSqlSafeName = quote_ident(data.name);
+            }
+            
+            // if there's only one child: all of the loaded children are of that type
+            if (arrChildren.length === 1) {
+                arrLine = arrChildren[0];
                 
-                for (i = 0, len = arrChildren.length; i < len; i += 1) {
-                    if (arrChildren[i][2] === arrRow[2]) {
-                        jsnRow.type = arrChildren[i][1];
+                treeListLoad(index, treePrepareQuery(listQuery[data.query], data.oid, strName, strSqlSafeName), function (arrRow) {
+                    var jsnRow = {'name': arrRow[1], 'oid': arrRow[0], 'type': arrLine[1], 'query': arrLine[2], 'action': treeLoad};
+                    
+                    if (jsnRow.name === 'Nothing In This Folder') {
+                        jsnRow.action = undefined;
+                        jsnRow.query = undefined;
+                        jsnRow.type = '';
                     }
-                }
+                    
+                    if (arrRow[3]) {
+                        jsnRow.bullet = arrRow[3];
+                    }
+                    
+                    if (data.query === 'objectSchema') {
+                        jsnRow.schemaName = (data.truename || data.name);
+                        jsnRow.schemaOID = (data.oid);
+                    } else if (data.schemaName) {
+                        jsnRow.schemaName = data.schemaName;
+                        jsnRow.schemaOID = data.schemaOID;
+                    }
+                    
+                    //console.log(jsnRow);
+                    
+                    return jsnRow;
+                });
                 
-                if (jsnRow.name === 'Nothing In This Folder') {
-                    jsnRow.action = undefined;
-                    jsnRow.query = undefined;
-                    jsnRow.type = '';
-                }
-                
-                if (arrRow[3]) {
-                    jsnRow.bullet = arrRow[3];
-                }
-                
-                if (data.query === 'objectSchema') {
-                    jsnRow.schemaName = (data.truename || data.name);
-                    jsnRow.schemaOID = (data.oid);
-                } else if (data.schemaName) {
-                    jsnRow.schemaName = data.schemaName;
-                    jsnRow.schemaOID = data.schemaOID;
-                }
-                
-                //console.log(jsnRow);
-                
-                return jsnRow;
-            });
+            // else: children must match up on queryname
+            } else {
+                treeListLoad(index, treePrepareQuery(listQuery[data.query], data.oid, strName, strSqlSafeName), function (arrRow) {
+                    var i, len, jsnRow = {'name': arrRow[1], 'oid': arrRow[0], 'query': arrRow[2], 'action': treeLoad};
+                    
+                    for (i = 0, len = arrChildren.length; i < len; i += 1) {
+                        if (arrChildren[i][2] === arrRow[2]) {
+                            jsnRow.type = arrChildren[i][1];
+                        }
+                    }
+                    
+                    if (jsnRow.name === 'Nothing In This Folder') {
+                        jsnRow.action = undefined;
+                        jsnRow.query = undefined;
+                        jsnRow.type = '';
+                    }
+                    
+                    if (arrRow[3]) {
+                        jsnRow.bullet = arrRow[3];
+                    }
+                    
+                    if (data.query === 'objectSchema') {
+                        jsnRow.schemaName = (data.truename || data.name);
+                        jsnRow.schemaOID = (data.oid);
+                    } else if (data.schemaName) {
+                        jsnRow.schemaName = data.schemaName;
+                        jsnRow.schemaOID = data.schemaOID;
+                    }
+                    
+                    //console.log(jsnRow);
+                    
+                    return jsnRow;
+                });
+            }
+        } else {
+            // mark as closed
+            data.open = false;
+            
+            // replace the folderminus with the folderplus
+            data.real_text = data.real_text.replace(treeGlobals.folderMinus, treeGlobals.folderPlus);
+            treeReplaceLine(index, data.real_text);
+            
+            // close the folder
+            treeListClose(index);
         }
     }
     
-    if (arrType.indexOf('script') !== -1) {
+    if (arrType.indexOf('script') !== -1 &&
+        (
+            //If object is not a schema folder or a table folder then continue
+            (data.query !== 'objectSchema' && data.query !== 'objectTable') ||
+            //If its not a mouse event then continue
+            (!intColumn) ||
+            //If object is a schema folder, and the position of the click is before the arrow, then continue
+            data.real_text.search(/[^ ]/) + 2 < intColumn
+        )) {
+        
         GS.pushQueryString('view=' + encodeURIComponent(data.query + ':' + data.oid + ':' + (data.schemaName || '') + ':' + (data.truename || data.name)));
         strPreviousScript = encodeURIComponent(
                                 data.query + ':' +
