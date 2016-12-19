@@ -26869,18 +26869,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
-});//global GS, window, document, xtag, evt, ml, encodeHTML, setOrRemoveTextAttribute, setOrRemoveBooleanAttribute, addProp
+});//global GS, window, document, xtag, evt, ml, encodeHTML, addFlexProps, setOrRemoveTextAttribute, setOrRemoveBooleanAttribute, addProp
 
 window.addEventListener('design-register-element', function () {
     'use strict';
+
+    registerDesignSnippet('<gs-interval>', '<gs-interval>', 'gs-interval column="${1:complete_time}"></gs-interval>');
+    registerDesignSnippet('<gs-interval> With Label', '<gs-interval>', 'label for="${1:interval-insert-complete_time}">${2:Time to complete}:</label>\n' +
+                                                               '<gs-interval id="${1:interval-insert-complete_time}" column="${3:complete_time}"></gs-interval>');
     
-    registerDesignSnippet('<gs-date>', '<gs-date>', 'gs-date column="${1:name}"></gs-date>');
-    registerDesignSnippet('<gs-date> With Label', '<gs-date>', 'label for="${1:date-insert-start_date}">${2:Start Date}:</label>\n' +
-                                                               '<gs-date id="${1:date-insert-start_date}" column="${3:start_date}"></gs-date>');
-    
-    designRegisterElement('gs-date', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-date.html');
-    
-    window.designElementProperty_GSDATE = function(selectedElement) {
+    designRegisterElement('gs-interval', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-interval.html');
+
+    window.designElementProperty_GSINTERVAL = function (selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
@@ -26903,7 +26903,7 @@ window.addEventListener('design-register-element', function () {
 
 
         addProp(
-            'Source Unit',
+            'Unit',
             true,
             '        <gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('unit') || 'hours') + '" mini>' +
                     '    <option value="hours">Hours</option>' +
@@ -26911,29 +26911,13 @@ window.addEventListener('design-register-element', function () {
                     '    <option value="seconds">Seconds</option>' +
                     '</gs-select>',
             function () {
-                return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
+                return setOrRemoveTextAttribute(selectedElement, 'unit', this.value);
             }
         );
 
         addProp('Hour Places', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('hour-places') || '3') + '" mini></gs-text>', function () {
-            return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
+            return setOrRemoveTextAttribute(selectedElement, 'hour-places', this.value);
         });
-
-        addProp('Minute Places', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('minute-places') || '2') + '" mini></gs-text>', function () {
-            return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
-        });
-
-        addProp('Second Places', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('second-places') || '0') + '" mini></gs-text>', function () {
-            return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
-        });
-        /*
-        
-        
-        hour-places
-        minute-places
-        second-places
-        
-        */
 
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
@@ -26944,29 +26928,46 @@ window.addEventListener('design-register-element', function () {
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
-        
-        
+
+
         // visibility attributes
+        var strVisibilityAttribute;
         strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
-        addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
-                                        '<option value="">Visible</option>' +
-                                        '<option value="hidden">Invisible</option>' +
-                                        '<option value="hide-on-desktop">Invisible at desktop size</option>' +
-                                        '<option value="hide-on-tablet">Invisible at tablet size</option>' +
-                                        '<option value="hide-on-phone">Invisible at phone size</option>' +
-                                        '<option value="show-on-desktop">Visible at desktop size</option>' +
-                                        '<option value="show-on-tablet">Visible at tablet size</option>' +
-                                        '<option value="show-on-phone">Visible at phone size</option>' +
-                                    '</gs-select>', function () {
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
+        addProp('Visibility',
+                true,
+                '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
+                '    <option value="">Visible</option>' +
+                '    <option value="hidden">Invisible</option>' +
+                '    <option value="hide-on-desktop">Invisible at desktop size</option>' +
+                '    <option value="hide-on-tablet">Invisible at tablet size</option>' +
+                '    <option value="hide-on-phone">Invisible at phone size</option>' +
+                '    <option value="show-on-desktop">Visible at desktop size</option>' +
+                '    <option value="show-on-tablet">Visible at tablet size</option>' +
+                '    <option value="show-on-phone">Visible at phone size</option>' +
+                '</gs-select>',
+                function () {
             selectedElement.removeAttribute('hidden');
             selectedElement.removeAttribute('hide-on-desktop');
             selectedElement.removeAttribute('hide-on-tablet');
@@ -26974,27 +26975,26 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // DISABLED attribute
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
-        //addFlexContainerProps(selectedElement);
+
         addFlexProps(selectedElement);
-        
-        //// SUSPEND-CREATED attribute
-        //addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
-        //    return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
-        //});
-        
+
+        // SUSPEND-CREATED attribute
+        addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
+        });
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
@@ -27041,6 +27041,18 @@ document.addEventListener('DOMContentLoaded', function () {
     //x          if from control to bottom has enough room: popup below
     //x          else: popup above
 
+    /*
+        unit:
+            hours: shows hours only
+            minutes: shows minutes and hours
+            seconds: shows seconds, minutes and hours
+        hour-places: allows the dev to choose the maximum places in the hours
+    */
+
+
+    // #####################################################################################
+    // ################################## EVENT  TRIGGERING ################################
+    // #####################################################################################
 
     function handleChange(element) {
         element.close();
@@ -27072,7 +27084,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // #####################################################################################
     // ######################################## VALUE ######################################
     // #####################################################################################
-
+/*
     function translateValueToNumber(element, newValue) {
         var i;
         var len;
@@ -27163,8 +27175,8 @@ document.addEventListener('DOMContentLoaded', function () {
         //console.log(intNewValue, translateValue(element, intNewValue + ''), arrParts, arrPlaces);
 
         return intNewValue;
-    }
-
+    }*/
+/*
     // translate inputed value to a format that is allowed
     function translateValue(element, newValue) {
         //var oldValue = newValue;
@@ -27252,191 +27264,165 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         //console.log(translatedValue);
-
         return translatedValue || '000:00';
     }
+*/
 
     //console.log('1***', translateValue(GS.stringToElement('<gs-interval unit="hours"></gs-interval>'), '5.255')); // 5 hours, 15 mins, 30 seconds
     //console.log('2***', translateValue(GS.stringToElement('<gs-interval unit="minutes"></gs-interval>'), '500.25')); // 8 hours, 20 mins, 15 seconds
     //console.log('3***', translateValue(GS.stringToElement('<gs-interval unit="seconds"></gs-interval>'), '5000')); // 1 hour, 23 mins, 20 seconds
     //console.log('4***', translateValue(GS.stringToElement('<gs-interval unit="seconds"></gs-interval>'), '0.03333333333333333')); // 2 mins
 
-    function refreshPickerValue(element) {
-        
-    }
 
 
-    function setValueDisplay(element, newValue) {
-        //var translatedValue = translateValue(element, newValue);
-
-        //element.setAttribute('value', newValue);
-
-        //if (!element.hasAttribute('disabled')) {
-        //    element.control.value = translatedValue;
-        //} else {
-        //    element.textContent = translatedValue;
-        //}
-
-        //if (element.innerState === 'open') {
-        //    refreshPickerValue(element);
-        //}
-    }
-
-
-
-
-    // update the value attribute based on the new internal value
-    function trinkleValueDown(element) {
-        var strUnit = element.getAttribute('unit');
+    function valueGetCurrentNumber(element) {
         var intValue = 0;
 
-        if (strUnit === 'minutes') {
+        if (element.internal.unit === 'minutes') {
             intValue += (element.internal.value.hours * 60);
             intValue += element.internal.value.minutes;
-            intValue += (element.internal.value.seconds / 60);
-        } else if (strUnit === 'seconds') {
+            //intValue += (element.internal.value.seconds / 60);
+        } else if (element.internal.unit === 'seconds') {
             intValue += ((element.internal.value.hours * 60) * 60);
             intValue += (element.internal.value.minutes * 60);
             intValue += element.internal.value.seconds;
         } else {//hours
             intValue += element.internal.value.hours;
-            intValue += parseFloat((element.internal.value.minutes / 60).toFixed(5));
-            intValue += parseFloat(((element.internal.value.seconds / 60) / 60).toFixed(5));
+            //intValue += parseFloat((element.internal.value.minutes / 60).toFixed(5));
+            //intValue += parseFloat(((element.internal.value.seconds / 60) / 60).toFixed(5));
         }
 
-        element.setAttribute('value', intValue);
+        return String(intValue);
     }
 
-    // turn the value attribute into the translated value and store it internally
-    function displayValue(element) {
-        var strDisplayValue = '';
+    function valueGetCurrentDisplay(element) {
+        var strValue = '';
+        var intHours = element.internal.value.hours;
+        var intMinutes = element.internal.value.minutes;
+        var intSeconds = element.internal.value.seconds;
+
         if (element.internal.places.hours > 0) {
-            strDisplayValue += GS.leftPad(element.internal.value.hours || '', '0', element.internal.places.hours);
+            strValue += GS.leftPad(intHours || '', '0', element.internal.places.hours);
         }
 
         if (element.internal.places.minutes > 0) {
-            strDisplayValue += (strDisplayValue ? ':' : '');
-            strDisplayValue += GS.leftPad(element.internal.value.minutes || '', '0', element.internal.places.minutes);
+            strValue += (strValue ? ':' : '');
+            strValue += GS.leftPad(intMinutes || '', '0', element.internal.places.minutes);
         }
 
         if (element.internal.places.seconds > 0) {
-            strDisplayValue += (strDisplayValue ? ':' : '');
-            strDisplayValue += GS.leftPad(element.internal.value.seconds || '', '0', element.internal.places.seconds);
+            strValue += (strValue ? ':' : '');
+            strValue += GS.leftPad(intSeconds || '', '0', element.internal.places.seconds);
         }
 
+        return String(strValue);
+    }
+
+    function valueUpdatePicker(element) {
+        var currentValue = valueGetCurrentDisplay(element);
+        var i;
+        var len;
+        var arrElements;
+        var intColons = 0;
+
+        //console.log('currentValue:', currentValue);
+        //console.log('PLACES: ', element.internal.places.hours, element.internal.places.minutes, element.internal.places.seconds);
+
+        // set value of the select boxes
+        i = 0;
+        len = element.internal.places.hours;
+        arrElements = xtag.query(element.internal.picker, '[data-hour]');
+        while (i < len) {
+            //console.log('SELECTBOX HR: ', arrElements[i]);
+            arrElements[i].value = currentValue[i];
+            i += 1;
+        }
+        if (len > 0) {
+            intColons += 1;
+        }
+
+        i = 0;
+        len = element.internal.places.minutes;
+        arrElements = xtag.query(element.internal.picker, '[data-minute]');
+        while (i < len) {
+            //console.log('SELECTBOX MIN: ', arrElements[i]);
+            arrElements[i].value =
+                    currentValue[element.internal.places.hours + intColons + i];
+            i += 1;
+        }
+        if (len > 0) {
+            intColons += 1;
+        }
+
+        i = 0;
+        len = element.internal.places.seconds;
+        arrElements = xtag.query(element.internal.picker, '[data-second]');
+        while (i < len) {
+            //console.log('SELECTBOX SEC: ', arrElements[i]);
+            arrElements[i].value =
+                    currentValue[element.internal.places.hours + element.internal.places.minutes + intColons + i];
+            i += 1;
+        }
+    }
+
+    function valueUpdateDisplay(element) {
         if (element.control) {
-            element.control.value = strDisplayValue;
+            element.control.value = valueGetCurrentDisplay(element);
         } else {
-            element.textContent = strDisplayValue;
+            element.textContent = valueGetCurrentDisplay(element);
         }
     }
 
-    function prepElement(element) {
-        element.internal = {};
-
-        element.internal.value = {
-            "hours": 0,
-            "minutes": 0,
-            "seconds": 0
-        };
-
-        element.internal.places = {
-            "hours": 0,
-            "minutes": 0,
-            "seconds": 0
-        };
-
-        element.internal.unit = '';
+    function valueUpdateAttribute(element) {
+        element.setAttribute('value', valueGetCurrentNumber(element));
     }
 
-    function siphonElement(element) {
-        // siphon the place settings
-        var intHourPlaces = parseInt(element.getAttribute('hour-places'), 10);
-        var intMinutePlaces = parseInt(element.getAttribute('minute-places'), 10);
-        var intSecondPlaces = parseInt(element.getAttribute('second-places'), 10);
+    //// update the value attribute based on the new internal value
+    //function trinkleValueDown(element) {
+    //    var strUnit = element.getAttribute('unit');
+    //    var intValue = 0;
 
-        // default place settings
-        if (isNaN(intHourPlaces)) {
-            intHourPlaces = 3;
-        }
-        if (isNaN(intMinutePlaces)) {
-            intMinutePlaces = 2;
-        }
-        if (isNaN(intSecondPlaces)) {
-            intSecondPlaces = 0;
-        }
+    //    if (strUnit === 'minutes') {
+    //        intValue += (element.internal.value.hours * 60);
+    //        intValue += element.internal.value.minutes;
+    //        //intValue += (element.internal.value.seconds / 60);
+    //    } else if (strUnit === 'seconds') {
+    //        intValue += ((element.internal.value.hours * 60) * 60);
+    //        intValue += (element.internal.value.minutes * 60);
+    //        intValue += element.internal.value.seconds;
+    //    } else {//hours
+    //        intValue += element.internal.value.hours;
+    //        //intValue += parseFloat((element.internal.value.minutes / 60).toFixed(5));
+    //        //intValue += parseFloat(((element.internal.value.seconds / 60) / 60).toFixed(5));
+    //    }
 
-        element.internal.places.hours = intHourPlaces;
-        element.internal.places.minutes = intMinutePlaces;
-        element.internal.places.seconds = intSecondPlaces;
+    //    element.setAttribute('value', intValue);
+    //}
 
-        // siphon the unit
-        element.internal.unit = element.getAttribute('unit') || '';
-        element.internal.unit = element.internal.unit.toLowerCase();
-        element.internal.unit = element.internal.unit || 'hours';
 
-        if (element.internal.unit !== 'hours' &&
-                element.internal.unit !== 'minutes' &&
-                element.internal.unit !== 'seconds') {
-            element.internal.unit = 'hours';
-            console.warn(
-                'gs-interval Warning: invalid "unit" attribute. ' +
-                        'Please use "hours", "minutes" or "seconds".  ' +
-                        'Defaulting "unit" to "hours"',
-                element
-            );
-        }
+    //// turn the value attribute into the translated value and store it internally
+    //function displayValue(element) {
+    //    var strDisplayValue = '';
+    //    if (element.internal.places.hours > 0) {
+    //        strDisplayValue += GS.leftPad(element.internal.value.hours || '', '0', element.internal.places.hours);
+    //    }
 
-        // siphon the value attribute
-        // get hours/minutes/seconds from value
-        var strUnit = element.internal.unit;
-        var fltValue = parseFloat(element.getAttribute('value') || '0');
+    //    if (element.internal.places.minutes > 0) {
+    //        strDisplayValue += (strDisplayValue ? ':' : '');
+    //        strDisplayValue += GS.leftPad(element.internal.value.minutes || '', '0', element.internal.places.minutes);
+    //    }
 
-        var intHours;
-        var intMinutes;
-        var intSeconds;
+    //    if (element.internal.places.seconds > 0) {
+    //        strDisplayValue += (strDisplayValue ? ':' : '');
+    //        strDisplayValue += GS.leftPad(element.internal.value.seconds || '', '0', element.internal.places.seconds);
+    //    }
 
-        if (strUnit === 'minutes') {
-            intHours = Math.floor(fltValue / 60);
-            fltValue = fltValue - (intHours * 60); // remove the hours from fltValue
-
-            intMinutes = Math.floor(fltValue);
-            fltValue = fltValue - Math.floor(fltValue); // remove the minutes from fltValue
-
-            intSeconds = Math.round(fltValue * 60);
-
-        } else if (strUnit === 'seconds') {
-            intHours = Math.floor((fltValue / 60) / 60);
-            fltValue = fltValue - ((intHours * 60) * 60); // remove the hours from fltValue
-
-            intMinutes = Math.floor(fltValue / 60);
-            fltValue = fltValue - (intMinutes * 60); // remove the minutes from fltValue
-
-            intSeconds = Math.round(fltValue);
-        } else {
-            intHours = Math.floor(fltValue);
-            fltValue = fltValue - intHours; // remove the hours from fltValue
-
-            intMinutes = Math.floor(fltValue * 60);
-            fltValue = fltValue - (intMinutes / 60);
-
-            intSeconds = Math.round((fltValue * 100) * 60);
-        }
-
-        if (isNaN(intHours)) {
-            intHours = 0;
-        }
-        if (isNaN(intMinutes)) {
-            intMinutes = 0;
-        }
-        if (isNaN(intSeconds)) {
-            intSeconds = 0;
-        }
-
-        element.internal.value.hours = intHours;
-        element.internal.value.minutes = intMinutes;
-        element.internal.value.seconds = intSeconds;
-    }
+    //    if (element.control) {
+    //        element.control.value = strDisplayValue;
+    //    } else {
+    //        element.textContent = strDisplayValue;
+    //    }
+    //}
 
 
     // #####################################################################################
@@ -27505,8 +27491,63 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // display value
-        displayValue(element);
+        valueUpdateDisplay(element);
+        //displayValue(element);
         //setValueDisplay(element, element.getAttribute('value'));
+    }
+
+    function valueSiphonAttribute(element) {
+        var fltValue = parseFloat(element.getAttribute('value') || '0');
+
+        var intHours;
+        var intMinutes;
+        var intSeconds;
+
+        if (element.internal.unit === 'minutes') {
+            intHours = Math.floor(fltValue / 60);
+            fltValue = fltValue - (intHours * 60); // remove the hours from fltValue
+
+            intMinutes = Math.floor(fltValue);
+            fltValue = fltValue - Math.floor(fltValue); // remove the minutes from fltValue
+
+            intSeconds = 0; //Math.floor(fltValue);
+
+        } else if (element.internal.unit === 'seconds') {
+            intHours = Math.floor((fltValue / 60) / 60);
+            fltValue = fltValue - ((intHours * 60) * 60); // remove the hours from fltValue
+
+            intMinutes = Math.floor(fltValue / 60);
+            fltValue = fltValue - (intMinutes * 60); // remove the minutes from fltValue
+
+            intSeconds = Math.round(fltValue);
+        } else {
+            intHours = Math.floor(fltValue);
+            //fltValue = fltValue - intHours; // remove the hours from fltValue
+
+            intMinutes = 0;//Math.floor(fltValue * 60);
+            //fltValue = fltValue - (intMinutes / 60);
+
+            intSeconds = 0;//Math.round((fltValue * 100) * 60);
+        }
+
+        if (isNaN(intHours)) {
+            intHours = 0;
+        }
+        if (isNaN(intMinutes)) {
+            intMinutes = 0;
+        }
+        if (isNaN(intSeconds)) {
+            intSeconds = 0;
+        }
+
+        //console.log('siphon: ', element);
+        //console.log('intHours:   ', intHours);
+        //console.log('intMinutes: ', intMinutes);
+        //console.log('intSeconds: ', intSeconds);
+
+        element.internal.value.hours = intHours;
+        element.internal.value.minutes = intMinutes;
+        element.internal.value.seconds = intSeconds;
     }
 
 
@@ -27550,6 +27591,72 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // #####################################################################################
+    // ################################### PARENT  ELEMENT #################################
+    // #####################################################################################
+
+    function prepElement(element) {
+        element.internal = {};
+
+        element.internal.value = {
+            "hours": 0,
+            "minutes": 0,
+            "seconds": 0
+        };
+
+        element.internal.places = {
+            "hours": 0,
+            "minutes": 0,
+            "seconds": 0
+        };
+
+        element.internal.unit = '';
+
+        element.internal.picker = '';
+    }
+
+    function siphonElement(element) {
+        // siphon the unit
+        element.internal.unit = element.getAttribute('unit') || '';
+        element.internal.unit = element.internal.unit.toLowerCase();
+        element.internal.unit = element.internal.unit || 'minutes';
+
+        if (element.internal.unit !== 'hours' &&
+                element.internal.unit !== 'minutes' &&
+                element.internal.unit !== 'seconds') {
+            element.internal.unit = 'minutes';
+            console.warn(
+                'gs-interval Warning: invalid "unit" attribute. ' +
+                        'Please use "hours", "minutes" or "seconds".  ' +
+                        'Defaulting "unit" to "minutes"',
+                element
+            );
+        }
+
+        // get the place settings
+        var intHourPlaces = parseInt(element.getAttribute('hour-places'), 10);
+        var intMinutePlaces = 0;
+        var intSecondPlaces = 0;
+
+        // default place settings
+        if (isNaN(intHourPlaces)) {
+            intHourPlaces = 3;
+        }
+        if (element.internal.unit === 'minutes' || element.internal.unit === 'seconds') {
+            intMinutePlaces = 2;
+        }
+        if (element.internal.unit === 'seconds') {
+            intSecondPlaces = 2;
+        }
+
+        element.internal.places.hours = intHourPlaces;
+        element.internal.places.minutes = intMinutePlaces;
+        element.internal.places.seconds = intSecondPlaces;
+
+        // siphon the value attribute
+        // get hours/minutes/seconds from value
+        valueSiphonAttribute(element);
+    }
 
     // #####################################################################################
     // ###################################### LIFECYCLE ####################################
@@ -27591,7 +27698,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-
     // ######################################################################################
     // ##################################### REGISTRATION ###################################
     // ######################################################################################
@@ -27626,10 +27732,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         handleQS(element);
 
                     } else if (strAttrName === 'value' && element.inserted) {
+                        ////displayValue(element);
+                        //siphonElement(element);
                         //displayValue(element);
-                        siphonElement(element);
-                        displayValue(element);
-                        //setValueDisplay(element, newValue);
+                        ////setValueDisplay(element, newValue);
+                        valueSiphonAttribute(element);
+                        valueUpdateDisplay(element);
+
+                        if (element.innerState === 'open') {
+                            valueUpdatePicker(element);
+                        }
                     }
                 }
             }
@@ -27781,6 +27893,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             element.internal.value.seconds += 1;
                         }
 
+                        if (String(element.internal.value.hours).length > element.internal.places.hours) {
+                            element.internal.value.hours = parseInt(
+                                '999999999999999'.substring(0, element.internal.places.hours),
+                                10
+                            );
+                        }
                         if (element.internal.value.seconds > 59) {
                             element.internal.value.minutes += 1;
                             element.internal.value.seconds = 0;
@@ -27825,8 +27943,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     if (intKeyCode === 38 || intKeyCode === 40) {
-                        trinkleValueDown(element);
-                        displayValue(element);
+                        //trinkleValueDown(element);
+                        //displayValue(element);
+                        valueUpdateAttribute(element);
                         GS.setInputSelection(element.control, jsnTextSelection.start, jsnTextSelection.end);
                     }
 
@@ -27834,13 +27953,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if ((intKeyCode >= 48 && intKeyCode <= 57) || (intKeyCode >= 96 && intKeyCode <= 105)) {
                     element.numberOfCharsTyped = element.numberOfCharsTyped || 0;
                     event.preventDefault();
-    
+
                     // get the character that was typed
                     strChar = String.fromCharCode(intKeyCode);
-                    if (intKeyCode === 96)  { strChar = '0'; }
-                    if (intKeyCode === 97)  { strChar = '1'; }
-                    if (intKeyCode === 98)  { strChar = '2'; }
-                    if (intKeyCode === 99)  { strChar = '3'; }
+                    if (intKeyCode === 96) { strChar = '0'; }
+                    if (intKeyCode === 97) { strChar = '1'; }
+                    if (intKeyCode === 98) { strChar = '2'; }
+                    if (intKeyCode === 99) { strChar = '3'; }
                     if (intKeyCode === 100) { strChar = '4'; }
                     if (intKeyCode === 101) { strChar = '5'; }
                     if (intKeyCode === 102) { strChar = '6'; }
@@ -27904,18 +28023,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     //console.log(strValue, element.control.value, translateValueToNumber(element, strValue));
 
                     if (strValue !== element.control.value) {
-                        trinkleValueDown(element);
-                        displayValue(element);
+                        //trinkleValueDown(element);
+                        //displayValue(element);
+                        valueUpdateAttribute(element);
                         GS.setInputSelection(element.control, jsnTextSelection.start, jsnTextSelection.end);
                     }
+                } else if (intKeyCode === 13) {
+                    element.numberOfCharsTyped = 0;
+                    event.preventDefault();
+                    handleChange(element);
                 } else if (intKeyCode !== 9 && event.ctrlKey === false && event.metaKey === false) {
                     element.numberOfCharsTyped = 0;
                     event.preventDefault();
                 }
             },
-            'focusout': function () {
-                if (this.innerState === 'closed') {
-                    handleChange(this);
+            'blur': function () {// don't use 'focusout', it doesn't work on firefox
+                var element = this;
+                if (element.innerState === 'closed') {
+                    handleChange(element);
                 }
             }
         },
@@ -27933,10 +28058,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     return this.innerState;
                 },
                 set: function (newValue) {
+                    var element = this;
                     if (newValue === 'open') {
-                        this.open();
+                        element.open();
                     } else {
-                        this.close();
+                        element.close();
                     }
                 }
             }
@@ -27956,23 +28082,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 var i;
                 var len;
                 var arrElements;
-                var strUnit = element.getAttribute('unit') || 'hours';
-
-                var currentValue = translateValue(element, element.getAttribute('value'));
-                var intHourPlaces = parseInt(element.getAttribute('hour-places'), 10);
-                var intMinutePlaces = parseInt(element.getAttribute('minute-places'), 10);
-                var intSecondPlaces = parseInt(element.getAttribute('second-places'), 10);
-
-                // default place settings
-                if (isNaN(intHourPlaces)) {
-                    intHourPlaces = 3;
-                }
-                if (isNaN(intMinutePlaces)) {
-                    intMinutePlaces = 2;
-                }
-                if (isNaN(intSecondPlaces)) {
-                    intSecondPlaces = 0;
-                }
 
                 if (element.innerState === 'closed') {
                     element.innerState = 'open';
@@ -27993,6 +28102,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     pickerElement = document.createElement('div');
                     pickerElement.classList.add('gs-interval-time-picker');
+                    element.internal.picker = pickerElement;
 
                     // save picker container
                     element.pickerContainerElement = pickerContainerElement;
@@ -28008,7 +28118,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     strHTML += '<div class="time-inner-container">';
 
                     i = 0;
-                    len = intHourPlaces;
+                    len = element.internal.places.hours;
                     while (i < len) {
                         strHTML +=
                                 '<select class="gs-interval-hour" data-hour="' + i + '">' +
@@ -28026,12 +28136,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         i += 1;
                     }
 
-                    if (intHourPlaces && intMinutePlaces > 0) {
+                    if (element.internal.places.hours > 0 && element.internal.places.minutes > 0) {
                         strHTML += '<span class="colon">:</span>';
                     }
 
                     i = 0;
-                    len = intMinutePlaces;
+                    len = element.internal.places.minutes;
                     while (i < len) {
                         strHTML +=
                                 '<select class="gs-interval-minute" data-minute="' + i + '">' +
@@ -28055,12 +28165,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         i += 1;
                     }
 
-                    if (intMinutePlaces > 0 && intSecondPlaces > 0) {
+                    if (element.internal.places.minutes > 0 && element.internal.places.seconds > 0) {
                         strHTML += '<span class="colon">:</span>';
                     }
 
                     i = 0;
-                    len = intSecondPlaces;
+                    len = element.internal.places.seconds;
                     while (i < len) {
                         strHTML +=
                                 '<select class="gs-interval-second" data-second="' + i + '">' +
@@ -28087,33 +28197,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     strHTML += '</div>';
                     pickerElement.innerHTML = strHTML;
 
-                    // set value of the select boxes
-                    i = 0;
-                    len = intHourPlaces;
-                    arrElements = xtag.query(pickerElement, '[data-hour]');
-                    while (i < len) {
-                        arrElements[i].value = currentValue[i];
-                        i += 1;
-                    }
-
-                    i = 0;
-                    len = intMinutePlaces;
-                    arrElements = xtag.query(pickerElement, '[data-minute]');
-                    while (i < len) {
-                        arrElements[i].value = currentValue[intHourPlaces + 1 + i];
-                        i += 1;
-                    }
-
-                    i = 0;
-                    len = intSecondPlaces;
-                    arrElements = xtag.query(pickerElement, '[data-second]');
-                    while (i < len) {
-                        arrElements[i].value = currentValue[intHourPlaces + intMinutePlaces + 2 + i];
-                        i += 1;
-                    }
 
                     // set picker value
-                    refreshPickerValue(element);
+                    valueUpdatePicker(element);
 
                     // bind picker click
                     overlayElement.addEventListener('click', function () {
@@ -28127,9 +28213,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         var newValue = 0;
                         var strCurrentValue;
 
-                        if (strUnit === 'hours') {
+                        if (element.internal.unit === 'hours') {
                             i = 0;
-                            len = intHourPlaces;
+                            len = element.internal.places.hours;
                             arrElements = xtag.query(pickerElement, '[data-hour]');
                             strCurrentValue = '';
                             while (i < len) {
@@ -28140,33 +28226,33 @@ document.addEventListener('DOMContentLoaded', function () {
                                 newValue += parseInt(strCurrentValue, 10);
                             }
 
-                            i = 0;
-                            len = intMinutePlaces;
-                            arrElements = xtag.query(pickerElement, '[data-minute]');
-                            strCurrentValue = '';
-                            while (i < len) {
-                                strCurrentValue += arrElements[i].value;
-                                i += 1;
-                            }
-                            if (arrElements.length > 0) {
-                                newValue += (parseInt(strCurrentValue, 10) / 60);
-                            }
+                            //i = 0;
+                            //len = element.internal.places.minutes;
+                            //arrElements = xtag.query(pickerElement, '[data-minute]');
+                            //strCurrentValue = '';
+                            //while (i < len) {
+                            //    strCurrentValue += arrElements[i].value;
+                            //    i += 1;
+                            //}
+                            //if (arrElements.length > 0) {
+                            //    newValue += (parseInt(strCurrentValue, 10) / 60);
+                            //}
 
-                            i = 0;
-                            len = intSecondPlaces;
-                            arrElements = xtag.query(pickerElement, '[data-second]');
-                            strCurrentValue = '';
-                            while (i < len) {
-                                strCurrentValue += arrElements[i].value;
-                                i += 1;
-                            }
-                            if (arrElements.length > 0) {
-                                newValue += ((parseInt(strCurrentValue, 10) / 60) / 60);
-                            }
+                            //i = 0;
+                            //len = element.internal.places.seconds;
+                            //arrElements = xtag.query(pickerElement, '[data-second]');
+                            //strCurrentValue = '';
+                            //while (i < len) {
+                            //    strCurrentValue += arrElements[i].value;
+                            //    i += 1;
+                            //}
+                            //if (arrElements.length > 0) {
+                            //    newValue += ((parseInt(strCurrentValue, 10) / 60) / 60);
+                            //}
                         }
-                        if (strUnit === 'minutes') {
+                        if (element.internal.unit === 'minutes') {
                             i = 0;
-                            len = intHourPlaces;
+                            len = element.internal.places.hours;
                             arrElements = xtag.query(pickerElement, '[data-hour]');
                             strCurrentValue = '';
                             while (i < len) {
@@ -28178,7 +28264,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
 
                             i = 0;
-                            len = intMinutePlaces;
+                            len = element.internal.places.minutes;
                             arrElements = xtag.query(pickerElement, '[data-minute]');
                             strCurrentValue = '';
                             while (i < len) {
@@ -28189,21 +28275,21 @@ document.addEventListener('DOMContentLoaded', function () {
                                 newValue += parseInt(strCurrentValue, 10);
                             }
 
-                            i = 0;
-                            len = intSecondPlaces;
-                            arrElements = xtag.query(pickerElement, '[data-second]');
-                            strCurrentValue = '';
-                            while (i < len) {
-                                strCurrentValue += arrElements[i].value;
-                                i += 1;
-                            }
-                            if (arrElements.length > 0) {
-                                newValue += ((parseInt(strCurrentValue, 10) * 60) * 60);
-                            }
+                            //i = 0;
+                            //len = element.internal.places.seconds;
+                            //arrElements = xtag.query(pickerElement, '[data-second]');
+                            //strCurrentValue = '';
+                            //while (i < len) {
+                            //    strCurrentValue += arrElements[i].value;
+                            //    i += 1;
+                            //}
+                            //if (arrElements.length > 0) {
+                            //    newValue += ((parseInt(strCurrentValue, 10) * 60) * 60);
+                            //}
                         }
-                        if (strUnit === 'seconds') {
+                        if (element.internal.unit === 'seconds') {
                             i = 0;
-                            len = intHourPlaces;
+                            len = element.internal.places.hours;
                             arrElements = xtag.query(pickerElement, '[data-hour]');
                             strCurrentValue = '';
                             while (i < len) {
@@ -28215,7 +28301,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
 
                             i = 0;
-                            len = intMinutePlaces;
+                            len = element.internal.places.minutes;
                             arrElements = xtag.query(pickerElement, '[data-minute]');
                             strCurrentValue = '';
                             while (i < len) {
@@ -28227,7 +28313,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
 
                             i = 0;
-                            len = intSecondPlaces;
+                            len = element.internal.places.seconds;
                             arrElements = xtag.query(pickerElement, '[data-second]');
                             strCurrentValue = '';
                             while (i < len) {
@@ -28267,17 +28353,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         intPopupHeight = pickerElement.offsetHeight;
                         intPopupWidth = pickerElement.offsetWidth;
 
-                        //// if from control to bottom is too small and from control to top is too small
-                        ////      OR window width < 400px: dialog
-                        ////      OR window height < 550px: dialog
-                        //if ((positionData.intRoomAbove < intPopupHeight && positionData.intRoomBelow < intPopupHeight) ||
-                        //    window.innerWidth < 400 ||
-                        //    window.innerHeight < 550) {
-                        //    // dialog mode
-                        //    pickerElement.style.marginTop = '1em';
-                        //    pickerContainerElement.classList.add('modal');
-                        //} else {
-
                         // if from control to bottom has enough room: popup below
                         if (positionData.intRoomBelow > intPopupHeight) {
                             pickerElement.style.top = (positionData.objElementOffset.top + positionData.intElementHeight) + 'px';
@@ -28288,9 +28363,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
 
                         pickerElement.style.left =
-                                ((positionData.objElementOffset.left + positionData.intElementWidth) - intPopupWidth) + 'px';
-
-                        //}
+                                (((positionData.objElementOffset.left + positionData.intElementWidth) - intPopupWidth) - 4) + 'px';
                     };
 
                     handleLook();
