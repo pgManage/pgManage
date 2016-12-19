@@ -255,4 +255,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\postage\web_root\postage\test.html">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

@@ -205,3 +205,33 @@ char *c_char_append(char *str_input, char chr_input);
 #define SFINISH_CAT_CHAR_APPEND(A, B) SFINISH_ERROR_CHECK(A = cat_char_append(A, B), "cat_char_append failed")
 
 // cat_append is just like cat_cstr except the first argument is free()d
+
+
+
+
+
+
+
+
+
+
+
+
+char *_sncat(size_t int_num_arg, size_t *ptr_int_len, ...);
+#define sncat(A, B, C, ...) _sncat(VA_NUM_ARGS(__VA_ARGS__), A, B, C, ##__VA_ARGS__)
+#define SERROR_SNCAT(A, ...) SERROR_CHECK(A = sncat(__VA_ARGS__), "sncat failed")
+#define SFINISH_SNCAT(A, ...) SFINISH_ERROR_CHECK(A = sncat(__VA_ARGS__), "sncat failed")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
