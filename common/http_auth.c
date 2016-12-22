@@ -58,13 +58,14 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SNOTICE("REQUEST USERNAME: %s", client_auth->str_user);
 
 		client_auth->str_password = getpar(str_form_data, "password", int_query_length, &client_auth->int_password_length);
-#ifdef ENVELOPE_ODBC
-		if (strncmp(str_global_mode, "msaccess", 9) != 0) {
-			SFINISH_CHECK(client_auth->str_password != NULL && client_auth->int_password_length > 0, "no password");
-		}
-#else
-		SFINISH_CHECK(client_auth->str_password != NULL && client_auth->int_password_length > 0, "no password");
-#endif
+// The reason this was removed is because libpq will give an error if a password is required
+//#ifdef ENVELOPE_ODBC
+//		if (strncmp(str_global_mode, "msaccess", 9) != 0) {
+//			SFINISH_CHECK(client_auth->str_password != NULL && client_auth->int_password_length > 0, "no password");
+//		}
+//#else
+//		SFINISH_CHECK(client_auth->str_password != NULL && client_auth->int_password_length > 0, "no password");
+//#endif
 
 		SFINISH_CHECK(bstrstr(client_auth->str_user, client_auth->int_user_length, ";", 1) == NULL, "no semi-colons allowed");
 		SFINISH_CHECK(
