@@ -24,8 +24,8 @@
 		"dmg": {
 			"icon": null,
 			"contents": [
-				{ "x": 448, "y": 372, "type": "link", "path": "/Applications" },
-				{ "x": 192, "y": 372 }
+				{ "x": 353, "y": 372, "type": "link", "path": "/Applications" },
+				{ "x": 97, "y": 372 }
 			]
 		}
 	},
