@@ -337,11 +337,11 @@ finish:
 			"Set-Cookie: ", client->str_cookie_name, "=; path=/; expires=Tue, 01 Jan 1990 00:00:00 GMT", (bol_tls ? "; secure" : ""), "; HttpOnly\015\012");
 		if (conn_info != NULL) {
 #ifdef ENVELOPE
-		SFINISH_CAT_APPEND(str_response, "Refresh: 0; url=/index.html?redirect=", str_uri, "\015\012\015\012");
+			SFINISH_CAT_APPEND(str_response, "Refresh: 0; url=/index.html?redirect=", str_uri, "\015\012\015\012");
 #else
-		str_temp = cstr_to_uri(conn_info->str_connection_name);
-		SFINISH_CAT_APPEND(str_response, "Refresh: 0; url=/postage/index.html?connection=", str_temp, "&redirect=", str_uri, "\015\012\015\012");
-		SFREE(str_temp);
+			str_temp = cstr_to_uri(conn_info->str_connection_name);
+			SFINISH_CAT_APPEND(str_response, "Refresh: 0; url=/postage/index.html?connection=", str_temp, "&redirect=", str_uri, "\015\012\015\012");
+			SFREE(str_temp);
 #endif
 		} else {
 #ifdef ENVELOPE

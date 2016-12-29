@@ -621,7 +621,7 @@ char *cstr_to_uri(char *str_input) {
 	char *ptr_input = str_input;
 	for (; *ptr_input; ptr_input++) {
 		if (!((*ptr_input >= 'a' && *ptr_input <= 'z') || (*ptr_input >= 'A' && *ptr_input <= 'Z') ||
-				(*ptr_input >= '0' && *ptr_input <= '9') || *ptr_input == '&' || *ptr_input == '+' || *ptr_input == ',' ||
+				(*ptr_input >= '0' && *ptr_input <= '9') || *ptr_input == '+' || *ptr_input == ',' ||
 				*ptr_input == '.' || *ptr_input == '_' || *ptr_input == '-' || *ptr_input == '/')) {
 			sprintf(str_temp, "%%%02X", *ptr_input);
 		} else {
