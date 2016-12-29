@@ -206,6 +206,7 @@
 		test_change_stamp.setMinutes(test_change_stamp.getMinutes());
 		test_change_stamp = test_change_stamp.toISOString().replace('T', ' ').replace(/\..*/gi, '');
 		Local.tests = [
+			//['Stress test', 'stress'],
 			['File Read Fail 1', 'ajax', 404, '/test2.txt', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
 			['File Read Fail 2', 'ajax', 440, '/postage/66/index.html', '',
@@ -240,7 +241,7 @@ host example*/})],
 			['Login Fail 6', 'ajax', 500, '/postage/auth', 'action=login&connname=test&password=' + encodeURIComponent('asdfasdf\'asdf"asdfasdf'),
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 7', 'ajax', 500, '/postage/auth', 'action=login&connname=&username=password=asdfasdfasdfasdf',
-				ml(function () {/*"FATAL\nno password"*/ })],
+				ml(function () {/*"FATAL\nThere is no connection info with that name."*/ })],
 			['Login Fail 8', 'ajax', 500, '/postage/auth', 'action=login&connname=&username=&password=',
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 9', 'ajax', 500, '/postage/auth', 'action=login&connname=test&username=&password=',
@@ -563,63 +564,63 @@ CREATE OR REPLACE RULE ttesting_view2_update AS
     ON UPDATE TO ttesting_view2 DO INSTEAD  UPDATE rtesting_table SET test_name = new.test_name_1
   WHERE old.id_1 = rtesting_table.id;
 NOTIFY postgres, 'testing';
-*/}),
-			[
-				"QUERY\tLISTEN postgres;",
-				"START",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nDROP VIEW IF EXISTS ttesting_view2;",
-				"START",
-				"OPTIONALNOTICE\t view \"ttesting_view2\" does not exist, skipping\\n",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nDROP VIEW IF EXISTS ttesting_view;",
-				"START",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nDROP TABLE IF EXISTS rtesting_table2;",
-				"START",
-				"NOTICE\t table \"rtesting_table2\" does not exist, skipping\\n",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nDROP TABLE IF EXISTS rtesting_table;",
-				"START",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nCREATE TABLE rtesting_table\\n(\\nid integer,\\ntest_name character varying(150),\\n\"select\" character varying(150),\\n\"test@test\" character varying(150),\\nCONSTRAINT rtesting_table_pk PRIMARY KEY (id)\\n) WITH (\\nOIDS=FALSE\\n);",
-				"START",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nCREATE OR REPLACE VIEW ttesting_view AS\\n SELECT id, test_name\\n   FROM (\\n\\t SELECT id, test_name\\n       FROM (SELECT id, test_name\\n         FROM (SELECT id, test_name\\n           FROM rtesting_table\\n          ) em1\\n       ) em2\\n     ) em3;",
-				"START",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nCREATE TABLE rtesting_table2\\n(\\nid integer,\\ntest_name character varying(150),\\n\"select\" character varying(150),\\n\"test@test\" character varying(150),\\nCONSTRAINT rtesting_table2_pk PRIMARY KEY (id)\\n) WITH (\\nOIDS=FALSE\\n);",
-				"START",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nCREATE OR REPLACE VIEW ttesting_view2 AS\\n SELECT rtesting_table.id AS id_1, \\n\\t\\trtesting_table.test_name AS test_name_1,\\n\\t\\trtesting_table2.id AS id_2, \\n\\t\\trtesting_table2.test_name AS test_name_2\\n   FROM rtesting_table\\n   LEFT JOIN rtesting_table2 ON rtesting_table2.id = rtesting_table.id;",
-				"START",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nCREATE OR REPLACE RULE ttesting_view2_delete AS\\n    ON DELETE TO ttesting_view2 DO INSTEAD  DELETE FROM rtesting_table\\n  WHERE old.id_1 = rtesting_table.id;",
-				"START",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nCREATE OR REPLACE RULE ttesting_view2_insert AS\\n    ON INSERT TO ttesting_view2 DO INSTEAD  INSERT INTO rtesting_table (id, test_name) \\n  VALUES (new.id_1, new.test_name_1);",
-				"START",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nCREATE OR REPLACE RULE ttesting_view2_update AS\\n    ON UPDATE TO ttesting_view2 DO INSTEAD  UPDATE rtesting_table SET test_name = new.test_name_1\\n  WHERE old.id_1 = rtesting_table.id;",
-				"START",
-				"END",
-				"Rows Affected\n0\n",
-				"QUERY\t\\nNOTIFY postgres, 'testing';",
-				"START",
-				"END",
-				"Rows Affected\n0\n"
-			]
+*/
+			}),
+				[
+					"QUERY\tLISTEN postgres;",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nDROP VIEW IF EXISTS ttesting_view2;",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nDROP VIEW IF EXISTS ttesting_view;",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nDROP TABLE IF EXISTS rtesting_table2;",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nDROP TABLE IF EXISTS rtesting_table;",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nCREATE TABLE rtesting_table\\n(\\nid integer,\\ntest_name character varying(150),\\n\"select\" character varying(150),\\n\"test@test\" character varying(150),\\nCONSTRAINT rtesting_table_pk PRIMARY KEY (id)\\n) WITH (\\nOIDS=FALSE\\n);",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nCREATE OR REPLACE VIEW ttesting_view AS\\n SELECT id, test_name\\n   FROM (\\n\\t SELECT id, test_name\\n       FROM (SELECT id, test_name\\n         FROM (SELECT id, test_name\\n           FROM rtesting_table\\n          ) em1\\n       ) em2\\n     ) em3;",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nCREATE TABLE rtesting_table2\\n(\\nid integer,\\ntest_name character varying(150),\\n\"select\" character varying(150),\\n\"test@test\" character varying(150),\\nCONSTRAINT rtesting_table2_pk PRIMARY KEY (id)\\n) WITH (\\nOIDS=FALSE\\n);",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nCREATE OR REPLACE VIEW ttesting_view2 AS\\n SELECT rtesting_table.id AS id_1, \\n\\t\\trtesting_table.test_name AS test_name_1,\\n\\t\\trtesting_table2.id AS id_2, \\n\\t\\trtesting_table2.test_name AS test_name_2\\n   FROM rtesting_table\\n   LEFT JOIN rtesting_table2 ON rtesting_table2.id = rtesting_table.id;",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nCREATE OR REPLACE RULE ttesting_view2_delete AS\\n    ON DELETE TO ttesting_view2 DO INSTEAD  DELETE FROM rtesting_table\\n  WHERE old.id_1 = rtesting_table.id;",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nCREATE OR REPLACE RULE ttesting_view2_insert AS\\n    ON INSERT TO ttesting_view2 DO INSTEAD  INSERT INTO rtesting_table (id, test_name) \\n  VALUES (new.id_1, new.test_name_1);",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nCREATE OR REPLACE RULE ttesting_view2_update AS\\n    ON UPDATE TO ttesting_view2 DO INSTEAD  UPDATE rtesting_table SET test_name = new.test_name_1\\n  WHERE old.id_1 = rtesting_table.id;",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nNOTIFY postgres, 'testing';",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"TRANSACTION COMPLETED"
+				]
 			],
 			['BEGIN FAIL 1', 'websocket', '', ml(function () {/*BEGINπ*/ }),
 			["Invalid Request Type \"BEGINπ\"\n"]],
@@ -2257,7 +2258,7 @@ id_1
             });
 
             document.getElementById('gridtests').firstElementChild.addEventListener('click', function (event) {
-            	console.log('event.target:', event.target);
+            	// console.log('event.target:', event.target);
             	GS.openDialogToElement(
 					event.target, // element to position too
 					'errorDialog', // template for the dialog
@@ -2294,14 +2295,14 @@ id_1
 		*/
 		var bol_run = true, bol_refresh = false;
 		function run_test(intCurrent) {
-			console.log('run_test:', intCurrent);
+			// console.log('run_test:', intCurrent);
 			var arrCurrent = Local.tests[intCurrent];
 			if (arrCurrent === undefined) {
 				if (bol_run) {
 					test_random = Math.random().toString().substring(2);
 					for (i = 0, len = Local.tests.length; i < len; i++) {
 						change_status(i, 'pass', 'waiting');
-						console.log(Local.tests[i][3], Local.tests[i][4]);
+						// console.log(Local.tests[i][3], Local.tests[i][4]);
 						if (Local.tests[i][4] && Local.tests[i][4].indexOf && Local.tests[i][4].indexOf('/open/test') === 0) {
 							Local.tests[i][4] = '/open/test' + test_random + '.sql';
 						}
@@ -2334,8 +2335,66 @@ id_1
 				return;
 			}
 			var strType = arrCurrent[1], intStatusCode, strLink, strArgs, strExpectedOutput, i, arrStrActualOutput, expectedOutput;
-			if (strType === 'ajax') {
-				console.log('ASDFASDFASDFASDF');
+			if (strType === 'stress') {
+				change_status(intCurrent, 'waiting', 'running');
+				var ajax = GS.ajaxText('/postage/auth', 'action=login&connname=test&username=postgres&password=password', function (data, error) {
+					if (!error) {
+						var i = 1;
+						while (i <= 100) {
+							(function () {
+								var socket = GS.openSocket('/env/1/env');
+								var j = 0, h = i;
+								GS.requestFromSocket(socket, 'INFO', function (data, error, errorData) {
+									if (j === -1) {
+										return;
+									}
+									j = -1;
+									var k = 0;
+									GS.requestFromSocket(socket, 'RAW\nLISTEN test;', function (data, error, errorData) {
+										if (k === -1) {
+											return;
+										}
+										k = -1;
+										setTimeout(function () {
+											var m = 0;
+											var interval = setInterval(function () {
+												var l = 0;
+												if ((h % 5) === 0 || Math.random() < 1) {
+													GS.requestFromSocket(socket, 'RAW\nNOTIFY test;', function (data, error, errorData) {
+														if (l === -1) {
+															return;
+													}
+														l = -1;
+														socket.close();
+													});
+												}
+												m += 1;
+												// console.log(h, m);
+												if (m === 100) {
+													clearInterval(interval);
+													if (h === 100) {
+														change_status(intCurrent, 'running', 'pass', ajax.status, data.error_text);
+														run_test(intCurrent + 1);
+													}
+												}
+											}, 100);
+										}, 10000);
+									});
+								});
+							})();
+							i += 1;
+						}
+
+					} else {
+						change_status(intCurrent, 'running', 'fail', ajax.status, data.error_text);
+						document.getElementById('actual_status').value = ajax.status;
+						document.getElementById('actual_output').value = data.error_text;
+						run_test(intCurrent + 1);
+					}
+				});
+				
+			} else if (strType === 'ajax') {
+				// console.log('ASDFASDFASDFASDF');
 				if (typeof (arrCurrent[5]) === 'string') {
 					arrCurrent[5] = arrCurrent[5].replace(/\r\n/gi, '\n');
 				}
@@ -2345,37 +2404,7 @@ id_1
 				var strArgs = arrCurrent[4];
 				var expectedOutput = arrCurrent[5];
 				change_status(intCurrent, 'waiting', 'running');
-				/*
-				var ajax = GS.ajaxText(strLink, strArgs, function (data, error) {
-					//console.log('>' + intCurrent + '|' + data + '|' + error + '<');
-					//console.log(data.error_text);
-					//console.log(strExpectedOutput);
-					//console.log(data.error_text);
-					if (!error) {
-						data = data.replace(/\r\n/gi, '\n');
-						if (data === strExpectedOutput && intStatusCode === ajax.status) {
-							change_status(intCurrent, 'running', 'pass', ajax.status, data);
-							run_test(intCurrent + 1);
-						} else {
-							change_status(intCurrent, 'running', 'fail', ajax.status, data);
-							document.getElementById('actual_status').value = ajax.status;
-							document.getElementById('actual_output').value = data;
-							run_test(intCurrent + 1);
-						}
-					} else {
-						if (data.error_text === strExpectedOutput && intStatusCode === ajax.status) {
-							change_status(intCurrent, 'running', 'pass', ajax.status, data.error_text);
-							run_test(intCurrent + 1);
-						} else {
-							change_status(intCurrent, 'running', 'fail', ajax.status, data.error_text);
-							document.getElementById('actual_status').value = ajax.status;
-							document.getElementById('actual_output').value = data.error_text;
-							run_test(intCurrent + 1);
-						}
-					}
-				});
-				*/
-				console.log('P##########################', strArgs);
+				// console.log('P##########################', strArgs);
 				var ajax = GS.ajaxText(strLink, strArgs, function (data, error) {
 					var strResult;
 					var bolMatch;
@@ -2420,7 +2449,6 @@ id_1
 							var strResult;
 							var bolMatch;
 
-							//if (!error_occurred) {
 							if (!error) {
 								strResult = data.replace(/\r\n/gi, '\n');
 							} else {
@@ -2438,18 +2466,17 @@ id_1
 								}
 							} else {
 								error_occurred = true;
-								//console.log('>' + intCurrent + '|' + data + '|' + error + '<');
-								console.log(ajax.status, data);
-								console.log(intStatusCode, strExpectedOutput);
-								//console.log(data.error_text);
-								change_status(intCurrent, 'running', 'fail', i, data);
+								//// console.log('>' + intCurrent + '|' + data + '|' + error + '<');
+								// console.log(ajax.status, data);
+								// console.log(intStatusCode, strExpectedOutput);
+								// console.log(data.error_text);
+								change_status(intCurrent, 'running', 'fail', i, JSON.stringify(data));
 								document.getElementById('actual_status').value = i;
-								document.getElementById('actual_output').value = data;
+								document.getElementById('actual_output').value = JSON.stringify(data);
 							}
 							if (i == 100) {
 								run_test(intCurrent + 1);
 							}
-							//}
 						});
 					})(i)
 					i += 1;
@@ -2510,15 +2537,15 @@ id_1
 				var i = 0;
 				var bolIsRead = strArgs.substring ? strArgs.substring(0, 9) === 'FILE\tREAD' : false;
 				var bolIsWrite = strArgs.substring ? strArgs.substring(0, 10) === 'FILE\tWRITE' : false;
-				//console.log('strArgs: ' + strArgs);
+				//// console.log('strArgs: ' + strArgs);
 				GS.requestFromSocket(GS.envSocket, strArgs, function (data, error, errorData) {
 					if (bolIsRead || bolIsWrite) {
 						var lastModified = data.substring(0, data.indexOf('\n'));
 						if (!lastModified) {
 							lastModified = data;
 						}
-						console.log('lastModified: ' + lastModified);
-						console.log(Local.tests[intCurrent + 1][3]);
+						// console.log('lastModified: ' + lastModified);
+						// console.log(Local.tests[intCurrent + 1][3]);
 						Local.tests[intCurrent + 1][3] = Local.tests[intCurrent + 1][3]
 							.replace(/\{\{CHANGESTAMP\}\}/gi, GS.encodeForTabDelimited(lastModified)); // {{CHANGESTAMP}}
 						bolIsRead = false;
@@ -2533,16 +2560,16 @@ id_1
 						data === 'TRANSACTION COMPLETED' ||
 						data.indexOf('FATAL') === 0
 					) {
-						console.log(i, data);
+						// console.log(i, data);
 						var j, k, l, len, len1;
 						for (j = 0, k = 0, len = i; j < len; j += 1, k += 1) {
 							if (arrCurrent[0] === 'RAW W/NOTIFY') {
-								console.log(arrStrActualOutput[j]);
-								console.log(arrStrExpectedOutput[k]);
+								// console.log(arrStrActualOutput[j]);
+								// console.log(arrStrExpectedOutput[k]);
 							}
 							if (typeof (arrStrExpectedOutput[k]) === 'string') {
-								//console.log(j, arrStrActualOutput[j]);
-								//console.log(k, arrStrExpectedOutput[k]);
+								//// console.log(j, arrStrActualOutput[j]);
+								//// console.log(k, arrStrExpectedOutput[k]);
 								if (arrStrActualOutput[j] === arrStrExpectedOutput[k] ||
 									arrStrExpectedOutput[k] === 'ANYTHING' ||
 									arrStrExpectedOutput[k].substring(0, 8) === 'OPTIONAL' ||
@@ -2585,11 +2612,11 @@ id_1
 							}
 						}
 						if (arrCurrent[0] === 'RAW W/NOTIFY') {
-							console.log(j - 1, k - 1, len, error);
-							console.log(arrStrActualOutput[j - 1]);
-							console.log(arrStrExpectedOutput[k - 1]);
-							console.log(btoa(unescape(encodeURIComponent(arrStrActualOutput[j - 1]))));
-							console.log(btoa(unescape(encodeURIComponent(arrStrExpectedOutput[k - 1]))));
+							// console.log(j - 1, k - 1, len, error);
+							// console.log(arrStrActualOutput[j - 1]);
+							// console.log(arrStrExpectedOutput[k - 1]);
+							// console.log(btoa(unescape(encodeURIComponent(arrStrActualOutput[j - 1]))));
+							// console.log(btoa(unescape(encodeURIComponent(arrStrExpectedOutput[k - 1]))));
 						}
 						if (error === false) {
 							change_status(intCurrent, 'running', 'pass', 0, JSON.stringify(arrStrActualOutput));
@@ -2614,7 +2641,7 @@ id_1
 					if (i === 0 && data.indexOf('QUERY') === 0) {
 					} else if (i === 1 && data.indexOf('START') === 0) {
 						GS.requestFromSocket(GS.envSocket, 'CANCEL', function (data) {
-							console.log(data);
+							// console.log(data);
 						});
 					} else if (i === 2 && data.indexOf('END') === 0) {
 					} else if (i === 3 && data === ml(function () {/*Query failed: FATAL

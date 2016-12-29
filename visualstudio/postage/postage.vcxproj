@@ -101,6 +101,9 @@
     <ClInclude Include="..\..\util\util_string.h" />
     <ClInclude Include="..\..\util\util_strptime.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\postage\web_root\postage\test.html" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{610DEA50-50E1-48A6-BF11-78F555E5EF51}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

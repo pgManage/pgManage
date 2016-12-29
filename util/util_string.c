@@ -621,7 +621,7 @@ char *cstr_to_uri(char *str_input) {
 	char *ptr_input = str_input;
 	for (; *ptr_input; ptr_input++) {
 		if (!((*ptr_input >= 'a' && *ptr_input <= 'z') || (*ptr_input >= 'A' && *ptr_input <= 'Z') ||
-				(*ptr_input >= '0' && *ptr_input <= '9') || *ptr_input == '&' || *ptr_input == '+' || *ptr_input == ',' ||
+				(*ptr_input >= '0' && *ptr_input <= '9') || *ptr_input == '+' || *ptr_input == ',' ||
 				*ptr_input == '.' || *ptr_input == '_' || *ptr_input == '-' || *ptr_input == '/')) {
 			sprintf(str_temp, "%%%02X", *ptr_input);
 		} else {
@@ -876,5 +876,48 @@ char *c_char_append(char *str_input, char chr_input) {
 
 	return str_input;
 error:
+	return NULL;
+}
+
+char *_sncat(size_t int_num_arg, size_t *ptr_int_len, ...) {
+	char *str_result = NULL;
+	va_list ap;
+	va_list bp;
+	size_t int_i = 0;
+	size_t int_offset = 0;
+	char *ptr_temp = NULL;
+
+	*ptr_int_len = 0;
+
+	// Two va_start()s don't always work
+	// https://gcc.gnu.org/ml/gcc/2001-08/msg00489.html
+	va_start(ap, int_num_arg);
+	va_copy(bp, ap);
+
+	// Add all the lengths
+	for (int_i = 0; int_i < int_num_arg; int_i += 2) {
+		size_t int_len = va_arg(ap, size_t);
+		*ptr_int_len += int_len;
+
+		ptr_temp = va_arg(ap, char *);
+	}
+	va_end(ap);
+
+	// Allocate return
+	SERROR_SALLOC(str_result, *ptr_int_len);
+
+	// Copy into return variable
+	for (int_i = 0; int_i < int_num_arg; int_i += 2) {
+		size_t int_len = va_arg(bp, size_t);
+		int_offset += int_len;
+
+		ptr_temp = va_arg(bp, char *);
+		memcpy(str_result + int_offset, ptr_temp, int_len);
+	}
+	va_end(bp);
+
+	return str_result;
+error:
+	SFREE(str_result);
 	return NULL;
 }

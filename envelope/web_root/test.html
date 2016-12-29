@@ -274,7 +274,7 @@
 			['Login Fail 6', 'ajax', 500, '/env/auth', 'action=login&connname=test&password=' + encodeURIComponent('asdfasdf\'asdf"asdfasdf'),
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 7', 'ajax', 500, '/env/auth', 'action=login&connname=&username=password=asdfasdfasdfasdf',
-				ml(function () {/*"FATAL\nno password"*/ })],
+				ml(function () {/*"FATAL\n..\\..\\db_framework_pq\\db_framework.c:escape_conninfo_value: escape_conninfo_value: strlen = 0\nConnect failed: fe_sendauth: no password supplied\n"*/ })],
 			['Login Fail 8', 'ajax', 500, '/env/auth', 'action=login&connname=&username=&password=',
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 9', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=&password=',
@@ -1168,7 +1168,7 @@ File already exists.*/})],
 			['action_info', 'ajax', 200, '/env/action_info', '',
 				function (arg) {
 					return arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.4 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 6.1.1 20160621 (Red Hat 6.1.1-3), 64-bit","envelope": "2.2.1"}}*/ })
-						|| arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.2, compiled by Visual C++ build 1800, 64-bit","envelope": "2.2.1"}}*/ })
+						|| arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.2, compiled by Visual C++ build 1800, 64-bit","envelope": "3.1.3"}}*/ })
 				}
 			],
 			['ACTION FAIL 1', 'websocket', '', ml(function () {/*ACTION	public	action_testing1	testingnitset
@@ -1604,19 +1604,18 @@ id
 						if (bol_run) {
 							test_random = Math.random().toString().substring(2);
 							Local.tests = JSON.parse(JSON.stringify(Global.tests));
-							Local.tests[31][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'text/plain'});
-							Local.tests[32][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'application/octet-binary'});
-							Local.tests[33][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'application/x-binary'});
-							
+
 							for (i = 0, len = Local.tests.length; i < len; i++) {
 								change_status(i, 'pass', 'waiting');
 								console.log(Local.tests[i][3], Local.tests[i][4]);
-								if (Local.tests[i][4] && Local.tests[i][4].indexOf && Local.tests[i][4].indexOf('/open/test') === 0) {
-									Local.tests[i][4] = '/open/test' + test_random + '.sql';
-								} else if (Local.tests[i][3] && Local.tests[i][3].indexOf && Local.tests[i][3].indexOf('/postage/0/download/open/test') === 0) {
-									Local.tests[i][3] = '/postage/0/download/open/test' + test_random + '.sql';
-								} else if (typeof(Global.tests[i][5]) === 'function') {
+								if (typeof(Global.tests[i][5]) === 'function') {
 									Local.tests[i][5] = Global.tests[i][5];
+								} else if (Global.tests[i][0] === 'Login 2') {
+									Local.tests[i][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], { type: 'text/plain' });
+								} else if (Global.tests[i][0] === 'Login 3') {
+									Local.tests[i][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], { type: 'application/octet-binary' });
+								} else if (Global.tests[i][0] === 'Login 4') {
+									Local.tests[i][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], { type: 'application/x-binary' });
 								}
 							}
 
