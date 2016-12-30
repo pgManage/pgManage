@@ -19458,7 +19458,8 @@ GS.closeDialog = function (dialog, strAnswer) {
     GS.openDialog = function (templateLink, afterOpenFunction, beforeCloseFunction, afterCloseFunction) {
         var template, templateID, strHTML, dialogOverlay, dialog, i, len, arrCloseButtons, clickHandler, sizingFunction,
             observer, arrElements, strTag, returnTarget, strTheme, strMaxWidth, strMaxHeight, strMode, refocusElement,
-            scrollTarget, jsnInitalMousePos, scrollProtectorTouchStart, scrollProtectorTouchMove, scrollProtectorMouseWheel;
+            scrollTarget, jsnInitalMousePos, scrollProtectorTouchStart, scrollProtectorTouchMove, scrollProtectorMouseWheel,
+            strTag, xtagSelector, intervalID, intervalI;
         
         // save and blur currently focused element
         refocusElement = document.activeElement;
@@ -19677,38 +19678,6 @@ GS.closeDialog = function (dialog, strAnswer) {
             }
         });
         
-        // focus autofocus element if there is one
-        arrElements = xtag.query(dialog, '[autofocus]');
-        
-        if (arrElements.length > 0) {
-            arrElements[0].focus();
-            
-        // else if there is a listen-for-return: focus that
-        } else {
-            arrElements = xtag.query(dialog, '[listen-for-return]');
-            
-            if (arrElements.length > 0) {
-                arrElements[0].focus();
-            }
-        }
-        
-        // bind listening for return if there is an element with the "listen-for-return"
-        arrElements = xtag.query(dialog, '[listen-for-return]');
-        
-        if (arrElements.length > 0) {
-            returnTarget = arrElements[0];
-            
-            dialog.addEventListener('keydown', function (event) { // keydown, keyup, keypress
-                if (event.target !== returnTarget && (event.keyCode === 13 || event.which === 13)) {
-                    //event.stopPropagation();
-                    GS.triggerEvent(returnTarget, 'click');
-                }
-            });
-            
-            if (arrElements.length > 1) {
-                console.warn('dialog Warning: Too many [listen-for-return] elements, defaulting to the first one. Please have only one [listen-for-return] element per dialog.');
-            }
-        }
         
         // if mode equals 'detect'
         //console.log(strMode);
@@ -19739,10 +19708,114 @@ GS.closeDialog = function (dialog, strAnswer) {
             observer.observe(dialog, {childList: true, subtree: true, attributes: true});
         }
         
-        // after open function call
-        if (typeof afterOpenFunction === 'function') {
-            afterOpenFunction.apply(dialog, []);
+        
+        var elementReadyCallback = function () {
+            // focus autofocus element if there is one
+            arrElements = xtag.query(dialog, '[autofocus]');
+            
+            if (arrElements.length > 0) {
+                arrElements[0].focus();
+                
+            // else if there is a listen-for-return: focus that
+            } else {
+                arrElements = xtag.query(dialog, '[listen-for-return]');
+                
+                if (arrElements.length > 0) {
+                    arrElements[0].focus();
+                }
+            }
+            
+            // bind listening for return if there is an element with the "listen-for-return"
+            arrElements = xtag.query(dialog, '[listen-for-return]');
+            
+            if (arrElements.length > 0) {
+                returnTarget = arrElements[0];
+                
+                dialog.addEventListener('keydown', function (event) { // keydown, keyup, keypress
+                    if (event.target !== returnTarget && (event.keyCode === 13 || event.which === 13)) {
+                        //event.stopPropagation();
+                        GS.triggerEvent(returnTarget, 'click');
+                    }
+                });
+                
+                if (arrElements.length > 1) {
+                    console.warn('dialog Warning: Too many [listen-for-return] elements, defaulting to the first one. Please have only one [listen-for-return] element per dialog.');
+                }
+            }
+            
+            if (typeof afterOpenFunction === 'function') {
+                afterOpenFunction.apply(dialog, []);
+            }
+        };
+        
+        
+        // get a list of all the xtag elements
+        // if they are not all instantiated check: on an interval until they are all instantiated
+        
+        
+        // if element registration is shimmed: we need to wait to run the callback
+        //      until after the elements are ready. to do this we'll get a list of
+        //      the current elements that are xtag-defined and on a 30ms loop we'll
+        //      check their __upgraded__ property until they are all true
+        if (shimmed.registerElement === true) {
+            // build selector to get all xtag elements
+            xtagSelector = '';
+            for (strTag in xtag.tags) {
+                xtagSelector += (xtagSelector ? ',' : '');
+                xtagSelector += strTag;
+            }
+            
+            // get all xtag elements
+            var elem_wait = xtag.query(dialog, xtagSelector);
+            var elem_i;
+            var elem_len;
+            
+            // begin interval (max out at 1 second)
+            intervalI = 0;
+            intervalID = setInterval(function () {
+                if (elem_wait.length === 0 || intervalI >= 30) {
+                    elementReadyCallback();
+                    clearInterval(intervalID);
+                } else {
+                    elem_i = 0;
+                    elem_len = elem_wait.length;
+                    while (elem_i < elem_len) {
+                        if (elem_wait[elem_i].__upgraded__ === true) {
+                            elem_wait.splice(elem_i, 1);
+                            elem_i -= 1;
+                            elem_len -= 1;
+                        }
+                        elem_i += 1;
+                    }
+                }
+                
+                intervalI += 1;
+            }, 30);
+            
+            
+            
+        // else: element instantiation blocks JS execution until the elements
+        //      are ready, so we don't need to wait to run the after open callback
+        } else {
+            elementReadyCallback();
         }
+        
+        
+        //// after open function call
+        //if (typeof afterOpenFunction === 'function') {
+        //    if (dialog.inserted === true) {
+        //        console.log('1***');
+        //        afterOpenFunction.apply(dialog, []);
+        //    } else {
+        //        console.log('2***', new Date().getTime());
+        //        dialog.addEventListener('dialog-inserted', function () {
+        //            console.log('3***', new Date().getTime());
+        //            afterOpenFunction.apply(dialog, []);
+        //        });
+        //    }
+        //    
+        //    
+        //}
         
         return dialog;
     };
@@ -20217,10 +20290,16 @@ GS.closeDialog = function (dialog, strAnswer) {
             },
             
             inserted: function () {
-                if (!this.hasAttribute('no-window-listen')) {
-                    this.bind();
+                if (this.inserted !== true) {
+                    this.inserted = true;
                     
-                    this.windowResizeHandler();
+                    if (!this.hasAttribute('no-window-listen')) {
+                        this.bind();
+                        
+                        this.windowResizeHandler();
+                    }
+                    
+                    GS.triggerEvent(this, 'dialog-inserted');
                 }
             },
             
