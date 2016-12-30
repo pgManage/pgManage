@@ -214,7 +214,8 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		*ptr_conn_end = 0;
 		SDEBUG("ptr_conn: %s", ptr_conn);
 
-		SFINISH_SNCAT(str_cookie_name, "postage_", 8, ptr_conn, strlen(ptr_conn));
+		size_t int_temp = 0;
+		SFINISH_SNCAT(str_cookie_name, &int_temp, "postage_", 8, ptr_conn, strlen(ptr_conn));
 #endif
 
 		SFREE_PWORD(str_form_data);
