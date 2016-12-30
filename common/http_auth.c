@@ -32,6 +32,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 	size_t int_query_length = 0;
 	size_t int_action_length = 0;
 	size_t int_experation_length = 0;
+	size_t int_cookie_len = 0;
 
 	// get form data
 	str_form_data = query(client_auth->parent->str_request, client_auth->parent->int_request_len, &int_query_length);
@@ -73,7 +74,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			bstrstr(client_auth->str_password, client_auth->int_password_length, ";", 1) == NULL, "no semi-colons allowed");
 
 #ifdef ENVELOPE
-		SFINISH_CAT_CSTR(client_auth->str_connname, "");
+		SFINISH_SNCAT(&client_auth->int_conn_length, client_auth->str_connname, 0, "");
 #else
 		client_auth->str_connname = getpar(str_form_data, "connname", int_query_length, &client_auth->int_connname_length);
 		SFINISH_CHECK(client_auth->str_connname != NULL, "no connection name");
@@ -82,7 +83,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		if (client_auth->str_conn != NULL && client_auth->int_conn_length == 0) {
 			SFREE(client_auth->str_conn);
 		} else {
-			SFINISH_CAT_CSTR(client_auth->parent->str_conn, client_auth->str_conn);
+			SFINISH_SNCAT(client_auth->parent->str_conn, &client_auth->int_conn_length, client_auth->str_conn, client_auth->int_conn_length);
 		}
 
 		if (bol_global_allow_custom_connections == false) {
@@ -102,13 +103,22 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFREE(str_one_day_expire);
 		SFINISH_CHECK(str_uri_expires != NULL, "cstr_to_uri failed");
 
-		SFINISH_CAT_CSTR(str_cookie_decrypted, str_form_data, "&expiration=", str_uri_expires, "&sessionid=", str_session_id);
+		SFINISH_SNCAT(
+			str_cookie_decrypted, &int_cookie_len,
+			str_form_data, int_query_length,
+			"&expiration=", 12,
+			str_uri_expires, strlen(str_uri_expires),
+			"&sessionid=", 11,
+			str_session_id, strlen(str_session_id)
+		);
 
 #ifdef ENVELOPE
 #else
 		if (client_auth->str_conn == NULL) {
-			SFINISH_CAT_CSTR(client_auth->str_database, get_connection_database(client_auth->str_connname));
-			SFINISH_CAT_APPEND(str_cookie_decrypted, "&dbname=", client_auth->str_database);
+			char *str_temp = get_connection_database(client_auth->str_connname);
+			size_t int_temp = str_temp ? strlen(str_temp) : 0;
+			SFINISH_SNCAT(client_auth->str_database, &int_temp, str_temp, int_temp);
+			SFINISH_SNFCAT(str_cookie_decrypted, &int_cookie_len, "&dbname=", 8, client_auth->str_database, int_temp);
 		}
 #endif
 
@@ -119,7 +129,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 
 		SDEBUG("str_uri_timeout: %s", str_uri_timeout);
 
-		SFINISH_CAT_APPEND(str_cookie_decrypted, "&timeout=", str_uri_timeout);
+		SFINISH_SNFCAT(str_cookie_decrypted, &int_cookie_len, "&timeout=", 9, str_uri_timeout, strlen(str_uri_timeout));
 		SFREE(str_uri_timeout);
 
 		// encrypt
@@ -135,18 +145,19 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			"There is no connection info with that name.");
 
 		if (client_auth->str_conn != NULL) {
-			SFINISH_CAT_CSTR(str_conn, client_auth->str_conn);
+			SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, client_auth->str_conn, client_auth->int_conn_length);
 			client_auth->int_connection_index = (int_global_custom_connection_number += 1);
 		} else {
+			char *str_temp = get_connection_info(client_auth->str_connname, &client_auth->int_connection_index);
+			size_t int_temp = strlen(str_temp);
 #ifdef POSTAGE_INTERFACE_LIBPQ
 			if (client_auth->str_database != NULL) {
-				SFINISH_CAT_CSTR(str_conn, get_connection_info(client_auth->str_connname, &client_auth->int_connection_index),
-					" dbname=", client_auth->str_database);
+				SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, str_temp, int_temp, " dbname=", 8, client_auth->str_database, strlen(client_auth->str_database));
 			} else {
-				SFINISH_CAT_CSTR(str_conn, get_connection_info(client_auth->str_connname, &client_auth->int_connection_index));
+				SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, str_temp, int_temp);
 			}
 #else
-			SFINISH_CAT_CSTR(str_conn, get_connection_info(client_auth->str_connname, &client_auth->int_connection_index));
+			SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, str_temp, int_temp);
 #endif
 		}
 		SFINISH_SALLOC(client_auth->str_int_connection_index, 20);
@@ -188,7 +199,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 
 		SDEBUG("client_auth->parent->str_request: %s", client_auth->parent->str_request);
 #ifdef ENVELOPE
-		SFINISH_CAT_CSTR(str_cookie_name, "envelope");
+		SFINISH_SNCAT(str_cookie_name, "envelope", 8);
 #else
 		str_referer = request_header(client_auth->parent->str_request, "referer");
 		SFINISH_CHECK(str_referer != NULL, "No Referer header");
@@ -203,7 +214,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		*ptr_conn_end = 0;
 		SDEBUG("ptr_conn: %s", ptr_conn);
 
-		SFINISH_CAT_CSTR(str_cookie_name, "postage_", ptr_conn);
+		SFINISH_SNCAT(str_cookie_name, "postage_", 8, ptr_conn, strlen(ptr_conn));
 #endif
 
 		SFREE_PWORD(str_form_data);
@@ -217,7 +228,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		str_expiration = getpar(str_cookie_decrypted, "expiration", cookie_len, &int_experation_length);
 
 #ifdef ENVELOPE
-		SFINISH_CAT_CSTR(client_auth->str_connname, "");
+		SFINISH_SNCAT(&client_auth->int_conn_length, client_auth->str_connname, 0, "");
 #else
 		client_auth->str_database = getpar(str_cookie_decrypted, "dbname", cookie_len, &client_auth->int_dbname_length);
 		client_auth->str_connname = getpar(str_cookie_decrypted, "connname", cookie_len, &client_auth->int_connname_length);
@@ -227,7 +238,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		if (client_auth->str_conn != NULL && client_auth->int_conn_length == 0) {
 			SFREE(client_auth->str_conn);
 		} else {
-			SFINISH_CAT_CSTR(client_auth->parent->str_conn, client_auth->str_conn);
+			SFINISH_SNCAT(client_auth->parent->str_conn, &client_auth->int_conn_length, client_auth->str_conn, client_auth->int_conn_length);
 		}
 
 		if (bol_global_allow_custom_connections == false) {
