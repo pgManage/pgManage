@@ -906,12 +906,14 @@ char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...) {
 	// Allocate return
 	if (!bol_free) {
 		SERROR_SALLOC(str_result, *ptr_int_len + 1);
+		SINFO("*ptr_int_len: %zu", *ptr_int_len);
 		int_i = 0;
 	} else {
 		int_i = 2;
 		int_offset += va_arg(bp, size_t);
 		str_result = va_arg(bp, char *);
 		SERROR_SREALLOC(str_result, *ptr_int_len + 1);
+		SINFO("*ptr_int_len: %zu", *ptr_int_len);
 	}
 
 	// Copy into return variable

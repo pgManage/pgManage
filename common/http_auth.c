@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "http_auth.h"
 
 // response with redirect
