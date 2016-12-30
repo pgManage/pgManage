@@ -896,18 +896,15 @@ char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...) {
 
 	// Add all the lengths
 	for (int_i = 0; int_i < int_num_arg; int_i += 2) {
-		size_t int_len = va_arg(ap, size_t);
-		*ptr_int_len += int_len;
-		fprintf(stderr, "%zu: %zu\n", int_i, int_len);
-
 		ptr_temp = va_arg(ap, char *);
-		fprintf(stderr, "%zu: %s\n", int_i, ptr_temp);
+		size_t int_len = va_arg(ap, size_t);
+		
+		*ptr_int_len += int_len;
 	}
 	va_end(ap);
 
 	// Allocate return
 	if (!bol_free) {
-		fprintf(stderr, "%zu\n", *ptr_int_len);
 		SERROR_SALLOC(str_result, *ptr_int_len + 1);
 		int_i = 0;
 	} else {
@@ -919,9 +916,9 @@ char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...) {
 
 	// Copy into return variable
 	for (; int_i < int_num_arg; int_i += 2) {
+		ptr_temp = va_arg(bp, char *);
 		size_t int_len = va_arg(bp, size_t);
 
-		ptr_temp = va_arg(bp, char *);
 		memcpy(str_result + int_offset, ptr_temp, int_len);
 		int_offset += int_len;
 	}
