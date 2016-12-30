@@ -453,7 +453,7 @@ char *_DB_get_diagnostic(DB_conn *conn, PGresult *res) {
 	char *return_context = PQresultErrorField(res, PG_DIAG_CONTEXT);
 	char *return_err_pos = PQresultErrorField(res, PG_DIAG_STATEMENT_POSITION);
 
-	// jsonify vars
+	// coalesce vars
 	return_error = return_error != NULL ? cat_cstr(return_error) : cat_cstr("");
 	return_detail = return_detail != NULL ? cat_cstr(return_detail) : cat_cstr("");
 	return_hint = return_hint != NULL ? cat_cstr(return_hint) : cat_cstr("");

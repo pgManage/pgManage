@@ -27,7 +27,7 @@ postage_OBJECTS = $(postage_SOURCES:.c=.o)
 #postage_OBJECTS3 = $(postage_OBJECTS2:../util/=)
 #postage_OBJECTS = obj/$(postage_OBJECTS3:../db_framework_pq/=)
 
-.PHONY: libressl libressl-install destroy
+.PHONY: libressl libressl-install destroy check
 
 #### DEPENDENCIES
 libressl: ../dependencies/libressl/Makefile
@@ -66,7 +66,7 @@ all-format:
 
 #### CLEAN
 clean:
-	rm -f $(postage_OBJECTS) $(libtre_OBJECTS) ev.o $(BINARY)
+	rm -f $(postage_OBJECTS) $(libtre_OBJECTS) ../check/*.o ev.o $(BINARY)
 	@echo
 	@echo "Clean Successful"
 
@@ -109,6 +109,17 @@ destroy:
 
 
 #### TESTING
+check_SOURCES = $(filter-out ../util/util_getopt.c, $(filter-out ../util/util_strptime.c, $(filter-out ../util/util_exec.c, $(wildcard ../util/*.c)))) $(db_framework_pq_SOURCES) $(wildcard ../check/*.c)
+check_OBJECTS = $(check_SOURCES:.c=.o)
+
+check: $(BUILD_DEPS) $(check_OBJECTS)
+	$(CC) $(check_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./check
+	./check
+
+check-valgrind: $(BUILD_DEPS) $(check_OBJECTS)
+	$(CC) $(check_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./check
+	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./check
+
 test-common:
 	-kill `cat postgres.pid`
 	-rm postgres.pid

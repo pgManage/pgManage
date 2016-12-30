@@ -217,21 +217,8 @@ char *c_char_append(char *str_input, char chr_input);
 
 
 
-char *_sncat(size_t int_num_arg, size_t *ptr_int_len, ...);
-#define sncat(A, B, C, ...) _sncat(VA_NUM_ARGS(__VA_ARGS__), A, B, C, ##__VA_ARGS__)
-#define SERROR_SNCAT(A, ...) SERROR_CHECK(A = sncat(__VA_ARGS__), "sncat failed")
-#define SFINISH_SNCAT(A, ...) SFINISH_ERROR_CHECK(A = sncat(__VA_ARGS__), "sncat failed")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...);
+#define SERROR_SNCAT(A, B, ...) SERROR_CHECK(A = _sncat(false, VA_NUM_ARGS(__VA_ARGS__), B, ##__VA_ARGS__), "sncat failed")
+#define SFINISH_SNCAT(A, B, ...) SFINISH_ERROR_CHECK(A = _sncat(false, VA_NUM_ARGS(__VA_ARGS__), B, ##__VA_ARGS__), "sncat failed")
+#define SERROR_SNFCAT(A, B, ...) SERROR_CHECK(A = _sncat(true, VA_NUM_ARGS(__VA_ARGS__) + 2, B, *B, A, ##__VA_ARGS__), "sncat failed")
+#define SFINISH_SNFCAT(A, B, ...) SFINISH_ERROR_CHECK(A = _sncat(true, VA_NUM_ARGS(__VA_ARGS__) + 2, B, *B, A, ##__VA_ARGS__), "sncat failed")

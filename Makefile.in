@@ -6,6 +6,9 @@ all:
 test-common:
 	$(MAKE) -C postage test-common
 
+check:
+	$(MAKE) -C postage check
+
 test:
 	$(MAKE) -C postage test
 
