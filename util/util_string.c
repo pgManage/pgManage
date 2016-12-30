@@ -898,22 +898,22 @@ char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...) {
 	for (int_i = 0; int_i < int_num_arg; int_i += 2) {
 		ptr_temp = va_arg(ap, char *);
 		size_t int_len = va_arg(ap, size_t);
-		
+
 		*ptr_int_len += int_len;
 	}
 	va_end(ap);
 
 	// Allocate return
 	if (!bol_free) {
-		SERROR_SALLOC(str_result, *ptr_int_len + 1);
 		SINFO("*ptr_int_len: %zu", *ptr_int_len);
+		SERROR_SALLOC(str_result, (*ptr_int_len) + 1);
 		int_i = 0;
 	} else {
-		int_i = 2;
-		int_offset += va_arg(bp, size_t);
 		str_result = va_arg(bp, char *);
-		SERROR_SREALLOC(str_result, *ptr_int_len + 1);
+		int_offset += va_arg(bp, size_t);
 		SINFO("*ptr_int_len: %zu", *ptr_int_len);
+		SERROR_SREALLOC(str_result, (*ptr_int_len) + 1);
+		int_i = 2;
 	}
 
 	// Copy into return variable
