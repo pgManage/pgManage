@@ -204,7 +204,7 @@ listQuery.objectSchema = listQuery.schemaContents = ml(function () {/*
                 AND c.relnamespace = '{{INTOID}}'::oid) AS obj_count
         ORDER BY srt ASC, name ASC
     )
-    SELECT oid, CASE WHEN name = 'Empty' THEN 'Nothing In This Folder' ELSE name || ' (' || obj_count || ')' END, obj_query
+    SELECT oid, CASE WHEN name = 'Empty' THEN 'Nothing In This Folder' ELSE name || ' (' || obj_count::text || ')' END, obj_query
       FROM folders
      WHERE srt = CASE WHEN (SELECT sum(obj_count) FROM folders filders_where) > 1 THEN 2 ELSE 999 END
        AND obj_count > 0;

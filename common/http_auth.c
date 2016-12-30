@@ -697,7 +697,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_auth *client_auth = (struct sock_ev_client_auth *)(client_request->vod_request_data);
 	SDEFINE_VAR_ALL(str_user_literal, str_temp1, str_expires, str_int_len);
 	SDEFINE_VAR_MORE(str_content_length, str_connstring, str_user, str_open);
-	SDEFINE_VAR_MORE(str_closed, str_temp_connstring, str_rolsuper, str_rolgroup);
+	SDEFINE_VAR_MORE(str_closed, str_temp_connstring, str_rolsuper, str_rolgroup, str_temp);
 	char *str_response = NULL;
 	DArray *arr_row_values = NULL;
 	DB_fetch_status status = 0;
@@ -725,11 +725,14 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 #ifdef ENVELOPE
 #else
 	if (bol_global_super_only == true && strncmp(str_rolsuper, "FALSE", 5) == 0) {
+		SFINISH_CAT_CSTR(str_temp,
+			"{\"stat\": false, \"dat\": \"You must login as a super user to use Postage. If you would like to use a non-superuser role, change the `super_only` parameter to false\"}");
+		char str_length[50];
+		snprintf(str_length, 50, "%zu", strlen(str_temp));
 		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 403 Forbidden\015\012"
 									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
-			"Content-Length: 71\015\012\015\012", "{\"stat\": false, \"dat\": "
-												  "\"You must login as a super "
-												  "user to use Postage\"}");
+			"Content-Length: ", str_length, "\015\012\015\012", str_temp);
+		SFREE(str_temp)
 	} else if (str_global_login_group != NULL && strncmp(str_rolgroup, "FALSE", 5) == 0) {
 		size_t int_content_length = 83 + strlen(str_global_login_group);
 		// 255 chars should be enough
