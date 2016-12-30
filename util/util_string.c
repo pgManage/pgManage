@@ -879,6 +879,7 @@ error:
 	return NULL;
 }
 
+// Make sure to cast to size_t when passing lengths
 char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...) {
 	char *str_result = NULL;
 	va_list ap;
@@ -905,13 +906,11 @@ char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...) {
 
 	// Allocate return
 	if (!bol_free) {
-		SINFO("*ptr_int_len: %zu", *ptr_int_len);
 		SERROR_SALLOC(str_result, (*ptr_int_len) + 1);
 		int_i = 0;
 	} else {
 		str_result = va_arg(bp, char *);
 		int_offset += va_arg(bp, size_t);
-		SINFO("*ptr_int_len: %zu", *ptr_int_len);
 		SERROR_SREALLOC(str_result, (*ptr_int_len) + 1);
 		int_i = 2;
 	}
