@@ -62,65 +62,82 @@ This function is called for each directive in the ini file
 static int handler(void *str_user, const char *str_section, const char *str_name, const char *str_value) {
 	if (str_user != NULL) {
 	} // get rid of unused variable warning
+
+	size_t int_len = 0;
+
 #define SMATCH(s, n) strcmp(str_section, s) == 0 && strcmp(str_name, n) == 0
 	if (SMATCH("", "connection_file")) {
 		SFREE(str_global_connection_file);
-		SERROR_CAT_CSTR(str_global_connection_file, str_value);
+		//TODO: add lengths to handler()
+		SERROR_SNCAT(str_global_connection_file, &int_len,
+			str_value, strlen(str_value));
 
 	} else if (SMATCH("", "login_group")) {
 		SFREE(str_global_login_group);
-		SERROR_CAT_CSTR(str_global_login_group, str_value);
+		SERROR_SNCAT(str_global_login_group, &int_len,
+			str_value, strlen(str_value));
 
 #ifdef ENVELOPE
 	} else if (SMATCH("", "app_path")) {
 		SFREE(str_global_app_path);
-		SERROR_CAT_CSTR(str_global_app_path, str_value);
+		SERROR_SNCAT(str_global_app_path, &int_len,
+			str_value, strlen(str_value));
 
 	} else if (SMATCH("", "role_path")) {
 		SFREE(str_global_role_path);
-		SERROR_CAT_CSTR(str_global_role_path, str_value);
+		SERROR_SNCAT(str_global_role_path, &int_len,
+			str_value, strlen(str_value));
 
 	} else if (SMATCH("", "public_username")) {
 		SFREE(str_global_public_username);
-		SERROR_CAT_CSTR(str_global_public_username, str_value);
+		SERROR_SNCAT(str_global_public_username, &int_len,
+			str_value, strlen(str_value));
 
 	} else if (SMATCH("", "public_password")) {
 		SFREE(str_global_public_password);
-		SERROR_CAT_CSTR(str_global_public_password, str_value);
+		SERROR_SNCAT(str_global_public_password, &int_len,
+			str_value, strlen(str_value));
 
 #endif
 	} else if (SMATCH("", "mode")) {
 #ifdef ENVELOPE_ODBC
 		SFREE(str_global_mode);
-		SERROR_CAT_CSTR(str_global_mode, str_value);
+		SERROR_SNCAT(str_global_mode, &int_len,
+			str_value, strlen(str_value));
 #endif
 
 	} else if (SMATCH("", "web_root")) {
 		SFREE(str_global_web_root);
-		SERROR_CAT_CSTR(str_global_web_root, str_value);
+		SERROR_SNCAT(str_global_web_root, &int_len,
+			str_value, strlen(str_value));
 
 	} else if (SMATCH("", "data_root")) {
 		SFREE(str_global_data_root);
-		SERROR_CAT_CSTR(str_global_data_root, str_value);
+		SERROR_SNCAT(str_global_data_root, &int_len,
+			str_value, strlen(str_value));
 
 	} else if (SMATCH("", "" SUN_PROGRAM_LOWER_NAME "_port")) {
 		SFREE(str_global_port);
-		SERROR_CAT_CSTR(str_global_port, str_value);
+		SERROR_SNCAT(str_global_port, &int_len,
+			str_value, strlen(str_value));
 
 	} else if (SMATCH("", "tls_cert")) {
 		SFREE(str_global_tls_cert);
-		SERROR_CAT_CSTR(str_global_tls_cert, str_value);
+		SERROR_SNCAT(str_global_tls_cert, &int_len,
+			str_value, strlen(str_value));
 
 	} else if (SMATCH("", "tls_key")) {
 		SFREE(str_global_tls_key);
-		SERROR_CAT_CSTR(str_global_tls_key, str_value);
+		SERROR_SNCAT(str_global_tls_key, &int_len,
+			str_value, strlen(str_value));
 
 	} else if (SMATCH("", "super_only")) {
 		bol_global_super_only = *str_value == 'T' || *str_value == 't';
 
 	} else if (SMATCH("", "log_level")) {
 		SFREE(str_global_log_level);
-		SERROR_CAT_CSTR(str_global_log_level, str_value);
+		SERROR_SNCAT(str_global_log_level, &int_len,
+			str_value, strlen(str_value));
 
 	} else if (SMATCH("", "allow_custom_connections")) {
 		bol_global_allow_custom_connections = *str_value == 'T' || *str_value == 't';
@@ -130,7 +147,8 @@ static int handler(void *str_user, const char *str_section, const char *str_name
 
 	} else if (SMATCH("", "log_file")) {
 		SFREE(str_global_logfile);
-		SERROR_CAT_CSTR(str_global_logfile, str_value);
+		SERROR_SNCAT(str_global_logfile, &int_len,
+			str_value, strlen(str_value));
 
 	} else {
 		SERROR("Unknown config section/name: %s %s", str_section, str_name);
@@ -224,6 +242,7 @@ bool parse_connection_file() {
 	char *ptr_content = NULL;
 	char *ptr_end_content = NULL;
 
+	size_t int_temp_len = 0;
 	size_t int_line_length = 0;
 	ssize_t int_ftell = 0;
 	size_t int_length = 0;
@@ -232,6 +251,9 @@ bool parse_connection_file() {
 	size_t int_i = 0;
 	size_t int_len = 0;
 	size_t int_chunk_len = 0;
+
+	size_t int_connection_info_len = 0;
+	size_t int_temp1_len = 0;
 
 	FILE *fp = NULL;
 	SDEFINE_VAR_ALL(str_content, str_temp, str_temp1);
@@ -290,7 +312,8 @@ bool parse_connection_file() {
 				memcpy(temp_connection->str_connection_info, ptr_content, int_line_length);
 				temp_connection->str_connection_info[int_line_length] = '\0';
 
-				SERROR_CAT_CSTR(str_temp, temp_connection->str_connection_info);
+				SERROR_SNCAT(str_temp, &int_temp_len,
+					temp_connection->str_connection_info, strlen(temp_connection->str_connection_info));
 				ptr_temp = str_temp;
 				int_i = 0;
 				int_len = int_line_length;
@@ -337,7 +360,8 @@ bool parse_connection_file() {
 							SDEBUG("str_connection_database: %s", temp_connection->str_connection_database);
 						}
 
-						SERROR_CAT_CSTR(str_temp1, ptr_temp + int_param_len);
+						SERROR_SNCAT(str_temp1, &int_temp1_len,
+							ptr_temp + int_param_len, strlen(ptr_temp + int_param_len));
 						memcpy(ptr_temp, str_temp1, (int_line_length - int_i) - int_param_len);
 						SFREE(str_temp1);
 						memset(ptr_temp + ((int_line_length - int_i) - int_param_len), 0, int_param_len);
@@ -367,7 +391,8 @@ bool parse_connection_file() {
 					ptr_temp += int_chunk_len;
 				}
 				SFREE(temp_connection->str_connection_info);
-				SERROR_CAT_CSTR(temp_connection->str_connection_info, str_temp);
+				SERROR_SNCAT(temp_connection->str_connection_info, &int_connection_info_len,
+					str_temp, strlen(str_temp));
 				SFREE(str_temp);
 
 				int_line_length = strcspn(ptr_content, "\012");
@@ -397,10 +422,23 @@ bool parse_options(int argc, char *const *argv) {
 	//		 usage();
 	//		 abort();
 	// }
-	SERROR_CAT_CSTR(str_global_log_level, "error");
+	size_t int_global_len = 0;
+	size_t int_global_data_root_len = 0;
+#ifdef ENVELOPE
+	size_t int_global_app_path_len = 0;
+#endif
+	size_t int_global_role_path_len = 0;
+	size_t int_global_logfile_len = 0;
+	size_t int_global_web_root_len = 0;
+	size_t int_prefix_len = 0;
+	size_t int_temp_len = 0;
+
+	SERROR_SNCAT(str_global_log_level, &int_global_len,
+		"error", (size_t)5);
 
 #ifdef ENVELOPE_ODBC
-	SERROR_CAT_CSTR(str_global_mode, "");
+	SERROR_SNCAT(str_global_mode, &int_global_len,
+		"", (size_t)0);
 #endif
 
 	int ch;
@@ -411,34 +449,54 @@ bool parse_options(int argc, char *const *argv) {
 
 #ifdef _WIN32
 #ifdef _WIN64
-	SERROR_CAT_CSTR(POSTAGE_PREFIX, "\\Program Files\\Workflow Products");
+	SERROR_SNCAT(POSTAGE_PREFIX, &int_prefix_len,
+		"\\Program Files\\Workflow Products", (size_t)32);
 #else
 	BOOL bolWow64 = FALSE;
 	if (IsWow64Process(GetCurrentProcess(), &bolWow64) != FALSE && bolWow64 == TRUE) {
-		SERROR_CAT_CSTR(POSTAGE_PREFIX, "\\Program Files (x86)\\Workflow Products");
+		SERROR_SNCAT(POSTAGE_PREFIX, &int_prefix_len,
+			"\\Program Files (x86)\\Workflow Products", (size_t)38);
 	} else {
-		SERROR_CAT_CSTR(POSTAGE_PREFIX, "\\Program Files\\Workflow Products");
+		SERROR_SNCAT(POSTAGE_PREFIX, &int_prefix_len,
+			"\\Program Files\\Workflow Products", (size_t)32);
 	}
 #endif
 #endif
 
 #ifdef _WIN32
-	SERROR_CAT_CSTR(
-		str_global_config_file, POSTAGE_PREFIX, "\\" SUN_PROGRAM_WORD_NAME "\\config\\" SUN_PROGRAM_LOWER_NAME ".conf");
-	SERROR_CAT_CSTR(str_global_connection_file,
-		POSTAGE_PREFIX, "\\" SUN_PROGRAM_WORD_NAME "\\config\\" SUN_PROGRAM_LOWER_NAME "-connections.conf");
+	SERROR_SNCAT(
+		str_global_config_file, &int_global_len,
+		POSTAGE_PREFIX, int_prefix_len,
+		"\\" SUN_PROGRAM_WORD_NAME "\\config\\" SUN_PROGRAM_LOWER_NAME ".conf",
+			strlen("\\" SUN_PROGRAM_WORD_NAME "\\config\\" SUN_PROGRAM_LOWER_NAME ".conf"));
+	SERROR_SNCAT(
+		str_global_connection_file, &int_global_len,
+		POSTAGE_PREFIX, int_prefix_len,
+		"\\" SUN_PROGRAM_WORD_NAME "\\config\\" SUN_PROGRAM_LOWER_NAME "-connections.conf",
+			strlen("\\" SUN_PROGRAM_WORD_NAME "\\config\\" SUN_PROGRAM_LOWER_NAME "-connections.conf"));
 #else
-	SERROR_CAT_CSTR(str_global_config_file, POSTAGE_PREFIX, "/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME ".conf");
-	SERROR_CAT_CSTR(
-		str_global_connection_file, POSTAGE_PREFIX, "/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME "-connections.conf");
+	SERROR_SNCAT(
+		str_global_config_file, &int_global_len,
+		POSTAGE_PREFIX, int_prefix_len,
+		"/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME ".conf",
+			strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME ".conf"));
+	SERROR_SNCAT(
+		str_global_connection_file, &int_global_len,
+		POSTAGE_PREFIX, int_prefix_len,
+		"/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME "-connections.conf",
+			strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME "-connections.conf"));
 #endif
 #ifdef ENVELOPE
-	SERROR_CAT_CSTR(str_global_port, "8888");
+	SERROR_SNCAT(str_global_port, &int_global_len,
+		"8888", (size_t)4);
 #else
-	SERROR_CAT_CSTR(str_global_port, "8080");
+	SERROR_SNCAT(str_global_port, &int_global_len,
+		"8080", (size_t)4);
 #endif
-	SERROR_CAT_CSTR(str_global_public_username, "");
-	SERROR_CAT_CSTR(str_global_public_password, "");
+	SERROR_SNCAT(str_global_public_username, &int_global_len,
+		"", (size_t)0);
+	SERROR_SNCAT(str_global_public_password, &int_global_len,
+		"", (size_t)0);
 
 	// options descriptor
 	// clang-format off
@@ -487,7 +545,8 @@ bool parse_options(int argc, char *const *argv) {
 			goto error;
 		} else if (ch == 'c') {
 			SFREE(str_global_config_file);
-			SERROR_CAT_CSTR(str_global_config_file, optarg);
+			SERROR_SNCAT(str_global_config_file, &int_global_len,
+				optarg, strlen(optarg));
 		}
 	}
 
@@ -517,24 +576,29 @@ bool parse_options(int argc, char *const *argv) {
 
 		} else if (ch == 'g') {
 			SFREE(str_global_login_group);
-			SERROR_CAT_CSTR(str_global_login_group, optarg);
+			SERROR_SNCAT(str_global_login_group, &int_global_len,
+				optarg, strlen(optarg));
 
 #ifdef ENVELOPE
 		} else if (ch == 'y') {
 			SFREE(str_global_app_path);
-			SERROR_CAT_CSTR(str_global_app_path, optarg);
+			SERROR_SNCAT(str_global_app_path, &int_global_app_path_len,
+				optarg, strlen(optarg));
 
 		} else if (ch == 'z') {
 			SFREE(str_global_role_path);
-			SERROR_CAT_CSTR(str_global_role_path, optarg);
+			SERROR_SNCAT(str_global_role_path, &int_global_len,
+				optarg, strlen(optarg));
 
 		} else if (ch == 'u') {
 			SFREE(str_global_public_username);
-			SERROR_CAT_CSTR(str_global_public_username, optarg);
+			SERROR_SNCAT(str_global_public_username, &int_global_len,
+				optarg, strlen(optarg));
 
 		} else if (ch == 'w') {
 			SFREE(str_global_public_password);
-			SERROR_CAT_CSTR(str_global_public_password, optarg);
+			SERROR_SNCAT(str_global_public_password, &int_global_len,
+				optarg, strlen(optarg));
 #else
 		} else if (ch == 'n') {
 			bol_global_allow_custom_connections = *optarg == 'T' || *optarg == 't';
@@ -545,23 +609,28 @@ bool parse_options(int argc, char *const *argv) {
 
 		} else if (ch == 'r') {
 			SFREE(str_global_web_root);
-			SERROR_CAT_CSTR(str_global_web_root, optarg);
+			SERROR_SNCAT(str_global_web_root, &int_global_web_root_len,
+				optarg, strlen(optarg));
 
 		} else if (ch == 'a') {
 			SFREE(str_global_data_root);
-			SERROR_CAT_CSTR(str_global_data_root, optarg);
+			SERROR_SNCAT(str_global_data_root, &int_global_len,
+				optarg, strlen(optarg));
 
 		} else if (ch == 'p') {
 			SFREE(str_global_port);
-			SERROR_CAT_CSTR(str_global_port, optarg);
+			SERROR_SNCAT(str_global_port, &int_global_len,
+				optarg, strlen(optarg));
 
 		} else if (ch == 'j') {
 			SFREE(str_global_tls_cert);
-			SERROR_CAT_CSTR(str_global_tls_cert, optarg);
+			SERROR_SNCAT(str_global_tls_cert, &int_global_len,
+				optarg, strlen(optarg));
 
 		} else if (ch == 'k') {
 			SFREE(str_global_tls_key);
-			SERROR_CAT_CSTR(str_global_tls_key, optarg);
+			SERROR_SNCAT(str_global_tls_key, &int_global_len,
+				optarg, strlen(optarg));
 
 		} else if (ch == 's') {
 			bol_global_super_only = *optarg == 'T' || *optarg == 't';
@@ -571,11 +640,13 @@ bool parse_options(int argc, char *const *argv) {
 
 		} else if (ch == 'l') {
 			SFREE(str_global_log_level);
-			SERROR_CAT_CSTR(str_global_log_level, optarg);
+			SERROR_SNCAT(str_global_log_level, &int_global_len,
+				optarg, strlen(optarg));
 
 		} else if (ch == 'o') {
 			SFREE(str_global_logfile);
-			SERROR_CAT_CSTR(str_global_logfile, optarg);
+			SERROR_SNCAT(str_global_logfile, &int_global_logfile_len,
+				optarg, strlen(optarg));
 
 		} else if (ch == 0) {
 			fprintf(stderr, "no options");
@@ -593,26 +664,44 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef ENVELOPE
 	if (str_global_app_path == NULL) {
 #ifdef _WIN32
-		SERROR_CAT_CSTR(str_global_app_path, POSTAGE_PREFIX, "\\" SUN_PROGRAM_WORD_NAME "\\app");
+		SERROR_SNCAT(str_global_app_path, &int_global_app_path_len,
+			POSTAGE_PREFIX, int_prefix_len,
+			"\\" SUN_PROGRAM_WORD_NAME "\\app",
+				strlen("\\" SUN_PROGRAM_WORD_NAME "\\app"));
 #else
-		SERROR_CAT_CSTR(str_global_app_path, POSTAGE_PREFIX, "/etc/" SUN_PROGRAM_LOWER_NAME "/app");
+		SERROR_SNCAT(str_global_app_path, &int_global_app_path_len,
+			POSTAGE_PREFIX, int_prefix_len,
+			"/etc/" SUN_PROGRAM_LOWER_NAME "/app",
+				strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/app"));
 #endif //_WIN32
 	}
 
 	if (str_global_role_path == NULL) {
 #ifdef _WIN32
-		SERROR_CAT_CSTR(str_global_role_path, POSTAGE_PREFIX, "\\" SUN_PROGRAM_WORD_NAME "\\role");
+		SERROR_SNCAT(str_global_role_path, &int_global_role_path_len,
+			POSTAGE_PREFIX, int_prefix_len,
+			"\\" SUN_PROGRAM_WORD_NAME "\\role",
+				strlen("\\" SUN_PROGRAM_WORD_NAME "\\role"));
 #else
-		SERROR_CAT_CSTR(str_global_role_path, POSTAGE_PREFIX, "/etc/" SUN_PROGRAM_LOWER_NAME "/role");
+		SERROR_SNCAT(str_global_role_path, &int_global_role_path_len,
+			POSTAGE_PREFIX, int_prefix_len,
+			"/etc/" SUN_PROGRAM_LOWER_NAME "/role",
+				strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/role"));
 #endif //_WIN32
 	}
 #endif // ENVELOPE
 
 	if (str_global_web_root == NULL) {
 #ifdef _WIN32
-		SERROR_CAT_CSTR(str_global_web_root, POSTAGE_PREFIX, "\\" SUN_PROGRAM_WORD_NAME "\\web_root");
+		SERROR_SNCAT(str_global_web_root, &int_global_role_path_len,
+			POSTAGE_PREFIX, int_prefix_len,
+			"\\" SUN_PROGRAM_WORD_NAME "\\web_root",
+				strlen("\\" SUN_PROGRAM_WORD_NAME "\\web_root"));
 #else
-		SERROR_CAT_CSTR(str_global_web_root, POSTAGE_PREFIX, "/etc/" SUN_PROGRAM_LOWER_NAME "/web_root");
+		SERROR_SNCAT(str_global_web_root, &int_global_role_path_len,
+			POSTAGE_PREFIX, int_prefix_len,
+			"/etc/" SUN_PROGRAM_LOWER_NAME "/web_root",
+				strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/web_root"));
 #endif //_WIN32
 	}
 
@@ -620,8 +709,10 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef _WIN32
 		char *str_app_data = getenv("AppData"); // NULL;
 		SDEBUG("str_app_data: %s", str_app_data);
-		SERROR_CAT_CSTR(str_global_data_root, ((char *)str_app_data) + 2,
-			str_app_data[strlen(str_app_data) - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME);
+		SERROR_SNCAT(str_global_data_root, &int_global_data_root_len,
+			((char *)str_app_data) + 2, strlen(((char *)str_app_data) + 2),
+			str_app_data[strlen(str_app_data) - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME,
+				strlen(str_app_data[strlen(str_app_data) - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME));
 #else
 		// free MUST NOT be called on this struct
 		struct passwd pw_result;
@@ -634,8 +725,10 @@ bool parse_options(int argc, char *const *argv) {
 		SERROR_SALLOC(str_temp, (size_t)bufsize + 1);
 		getpwuid_r(getuid(), pw, str_temp, (size_t)bufsize, &pw);
 
-		SERROR_CAT_CSTR(str_global_data_root, pw->pw_dir,
-			pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME);
+		SERROR_SNCAT(str_global_data_root, &int_global_data_root_len,
+			pw->pw_dir, strlen(pw->pw_dir),
+			pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME,
+				strlen(pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME));
 		SFREE(str_temp);
 #endif
 	}
@@ -657,8 +750,10 @@ bool parse_options(int argc, char *const *argv) {
 
 	SDEBUG("str_global_sql_root: %s", str_global_sql_root);
 	if (str_global_sql_root == NULL) {
-		SERROR_CAT_CSTR(str_global_sql_root, str_global_data_root,
-			str_global_data_root[strlen(str_global_data_root) - 1] == '/' ? "sql" : "/sql");
+		SERROR_SNCAT(str_global_sql_root, &int_global_len,
+			str_global_data_root, int_global_data_root_len,
+			str_global_data_root[strlen(str_global_data_root) - 1] == '/' ? "sql" : "/sql",
+				strlen(str_global_data_root[strlen(str_global_data_root) - 1] == '/' ? "sql" : "/sql"));
 	}
 	SDEBUG("str_global_sql_root: %s", str_global_sql_root);
 
@@ -686,9 +781,15 @@ bool parse_options(int argc, char *const *argv) {
 	if (str_global_web_root[0] != '/') {
 #endif
 #ifdef _WIN32
-		SERROR_CAT_CSTR(str_temp, cwd + 2, "/", str_global_web_root);
+		SERROR_SNCAT(str_temp, &int_temp_len,
+			cwd + 2, strlen(cwd + 2),
+			"/", (size_t)1,
+			str_global_web_root, int_global_web_root_len);
 #else
-		SERROR_CAT_CSTR(str_temp, cwd, "/", str_global_web_root);
+		SERROR_SNCAT(str_temp, &int_temp_len,
+			cwd, strlen(cwd),
+			"/", (size_t)1,
+			str_global_web_root, int_global_web_root_len);
 #endif
 		SDEBUG("str_temp: %s", str_temp);
 		SFREE(str_global_web_root);
@@ -697,7 +798,8 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef _WIN32
 	} else if (str_global_web_root[1] == ':') {
 		str_temp = str_global_web_root;
-		SERROR_CAT_CSTR(str_global_web_root, str_global_web_root + 2);
+		SERROR_SNCAT(str_global_web_root, &int_global_web_root_len,
+			str_global_web_root + 2, int_global_web_root_len - 2);
 		SFREE(str_temp);
 	}
 #else
@@ -712,9 +814,15 @@ bool parse_options(int argc, char *const *argv) {
 	if (str_global_app_path[0] != '/') {
 #endif // _WIN32
 #ifdef _WIN32
-		SERROR_CAT_CSTR(str_temp, cwd + 2, "/", str_global_app_path);
+		SERROR_SNCAT(str_temp, &int_temp_len,
+			cwd + 2, strlen(cwd + 2),
+			"/", (size_t)1,
+			str_global_app_path, &int_global_app_path_len);
 #else
-		SERROR_CAT_CSTR(str_temp, cwd, "/", str_global_app_path);
+		SERROR_SNCAT(str_temp, &int_temp_len,
+			cwd, strlen(cwd),
+			"/", (size_t)1,
+			str_global_app_path, &int_global_app_path_len);
 #endif // _WIN32
 		SDEBUG("str_temp: %s", str_temp);
 		SFREE(str_global_app_path);
@@ -723,7 +831,8 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef _WIN32
 	} else if (str_global_app_path[1] == ':') {
 		str_temp = str_global_app_path;
-		SERROR_CAT_CSTR(str_global_app_path, str_global_app_path + 2);
+		SERROR_SNCAT(str_global_app_path, &int_global_app_path_len,
+			str_global_app_path + 2, strlen(str_global_app_path + 2));
 		SFREE(str_temp);
 	}
 #else
@@ -737,9 +846,15 @@ bool parse_options(int argc, char *const *argv) {
 	if (str_global_role_path[0] != '/') {
 #endif // _WIN32
 #ifdef _WIN32
-		SERROR_CAT_CSTR(str_temp, cwd + 2, "/", str_global_role_path);
+		SERROR_SNCAT(str_temp, &int_temp_len,
+			cwd + 2, strlen(cwd + 2),
+			"/", (size_t)1,
+			str_global_role_path, int_global_role_path_len);
 #else
-		SERROR_CAT_CSTR(str_temp, cwd, "/", str_global_role_path);
+		SERROR_SNCAT(str_temp, &int_temp_len,
+			cwd, strlen(cwd),
+			"/", (size_t)1,
+			str_global_role_path, int_global_role_path_len);
 #endif // _WIN32
 		SDEBUG("str_temp: %s", str_temp);
 		SFREE(str_global_role_path);
@@ -748,7 +863,8 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef _WIN32
 	} else if (str_global_role_path[1] == ':') {
 		str_temp = str_global_role_path;
-		SERROR_CAT_CSTR(str_global_role_path, str_global_role_path + 2);
+		SERROR_SNCAT(str_global_role_path, &int_global_role_path_len,
+			str_global_role_path + 2, int_global_role_path_len - 2);
 		SFREE(str_temp);
 	}
 #else
@@ -759,18 +875,26 @@ bool parse_options(int argc, char *const *argv) {
 
 #ifdef _WIN32
 	if (str_global_logfile == NULL) {
-		SERROR_CAT_CSTR(str_global_logfile, POSTAGE_PREFIX, "\\" SUN_PROGRAM_WORD_NAME "\\log\\" SUN_PROGRAM_WORD_NAME ".log");
+		SERROR_SNCAT(str_global_logfile, &int_global_logfile_len,
+			POSTAGE_PREFIX, int_prefix_len,
+			"\\" SUN_PROGRAM_WORD_NAME "\\log\\" SUN_PROGRAM_WORD_NAME ".log",
+				strlen("\\" SUN_PROGRAM_WORD_NAME "\\log\\" SUN_PROGRAM_WORD_NAME ".log"));
 	}
 	if (strcmp(str_global_logfile, "stderr") != 0) {
 		if (str_global_logfile[1] != ':' && str_global_logfile[0] != '\\' && str_global_logfile[0] != '/') {
-			SERROR_CAT_CSTR(str_temp, cwd + 2, "/", str_global_logfile);
+			SERROR_SNCAT(str_temp, &int_temp_len,
+				cwd + 2, strlen(cwd + 2),
+				"/", (size_t)1,
+				str_global_logfile, int_global_logfile_len);
 			SDEBUG("str_temp: %s", str_temp);
 			SFREE(str_global_logfile);
 			str_global_logfile = canonical("", str_temp, "valid_path");
 			SFREE(str_temp);
+
 		} else if (str_global_logfile[1] == ':') {
 			str_temp = str_global_logfile;
-			SERROR_CAT_CSTR(str_global_logfile, str_global_logfile + 2);
+			SERROR_SNCAT(str_global_logfile, &int_global_logfile_len
+				str_global_logfile + 2, int_global_logfile_len - 2);
 			SFREE(str_temp);
 		}
 	}
