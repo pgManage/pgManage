@@ -525,7 +525,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 
 #ifdef ENVELOPE
 		size_t int_temp = 0;
-		SFINISH_SNCAT(str_cookie_name, int_temp, "envelope", 8);
+		SFINISH_SNCAT(str_cookie_name, &int_temp, "envelope", 8);
 #else
 		SDEBUG("client_auth->parent->str_request: %s", client_auth->parent->str_request);
 		str_referer = request_header(client_auth->parent->str_request, "referer");
@@ -734,7 +734,7 @@ void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 			"Set-Cookie: envelope=";
 		char *str_temp2 =
-			"; HttpOnly;\015\012Set-Cookie: DB=ACCESS; path=/;\015\012Content-Length: 48\015\012\015\012"
+			"; HttpOnly;\015\012Set-Cookie: DB=SS; path=/;\015\012Content-Length: 48\015\012\015\012"
 			"{\"stat\": true, \"dat\": \"/env/app/all/index.html\"}";
 		str_expires = str_expire_one_day();
 		SFINISH_SNCAT(
@@ -837,6 +837,9 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 	SDEFINE_VAR_MORE(str_closed, str_temp_connstring, str_rolsuper, str_rolgroup, str_temp);
 	char *str_response = NULL;
 	DArray *arr_row_values = NULL;
+	DArray *arr_row_lengths = NULL;
+	size_t int_temp = 0;
+	size_t int_response_len = 0;
 	DB_fetch_status status = 0;
 	SDEBUG("http_auth_login_step3");
 
@@ -845,15 +848,25 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 
 	SFINISH_CHECK((status = DB_fetch_row(res)) == DB_FETCH_OK, "DB_fetch_row failed");
 	arr_row_values = DB_get_row_values(res);
-	SFINISH_CAT_CSTR(str_rolsuper, DArray_get(arr_row_values, 0));
+	arr_row_lengths = DB_get_row_lengths(res);
+
+	SFINISH_SNCAT(str_rolsuper, &int_temp, DArray_get(arr_row_values, 0), *(size_t *)DArray_get(arr_row_lengths, 0));
+
 	DArray_clear_destroy(arr_row_values);
 	arr_row_values = NULL;
+	DArray_clear_destroy(arr_row_lengths);
+	arr_row_lengths = NULL;
 
 	SFINISH_CHECK((status = DB_fetch_row(res)) == DB_FETCH_OK, "DB_fetch_row failed");
 	arr_row_values = DB_get_row_values(res);
-	SFINISH_CAT_CSTR(str_rolgroup, DArray_get(arr_row_values, 0));
+	arr_row_lengths = DB_get_row_lengths(res);
+
+	SFINISH_SNCAT(str_rolgroup, &int_temp, DArray_get(arr_row_values, 0), *(size_t *)DArray_get(arr_row_lengths, 0));
+
 	DArray_clear_destroy(arr_row_values);
 	arr_row_values = NULL;
+	DArray_clear_destroy(arr_row_lengths);
+	arr_row_lengths = NULL;
 
 	SFINISH_CHECK((status = DB_fetch_row(res)) == DB_FETCH_END, "DB_fetch_row failed");
 
@@ -862,13 +875,21 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 #ifdef ENVELOPE
 #else
 	if (bol_global_super_only == true && strncmp(str_rolsuper, "FALSE", 5) == 0) {
-		SFINISH_CAT_CSTR(str_temp,
-			"{\"stat\": false, \"dat\": \"You must login as a super user to use Postage. If you would like to use a non-superuser role, change the `super_only` parameter to false\"}");
+		char *str_temp1 = "{\"stat\": false, \"dat\": \"You must login as a super user to use Postage. If you would like to use a non-superuser role, change the `super_only` parameter to false\"}";
+		SFINISH_SNCAT(str_temp, &int_temp, str_temp1, strlen(str_temp1));
 		char str_length[50];
 		snprintf(str_length, 50, "%zu", strlen(str_temp));
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 403 Forbidden\015\012"
-									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
-			"Content-Length: ", str_length, "\015\012\015\012", str_temp);
+		str_temp1 =
+			"HTTP/1.1 403 Forbidden\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len, 
+			str_temp1, strlen(str_temp1), 
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4, 
+			str_temp, strlen(str_temp)
+		);
 		SFREE(str_temp)
 	} else if (str_global_login_group != NULL && strncmp(str_rolgroup, "FALSE", 5) == 0) {
 		size_t int_content_length = 83 + strlen(str_global_login_group);
@@ -877,13 +898,24 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		snprintf(str_content_length, 255, "%zu", int_content_length);
 		str_content_length[255] = 0;
 
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 403 Forbidden\015\012"
-									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-									   "Content-Length: ",
-			str_content_length, "\015\012\015\012"
-								"{\"stat\": false, \"dat\": \"You must login as a member "
-								"of the group '",
-			str_global_login_group, "' to use Postage\"}");
+		char *str_temp1 =
+			"HTTP/1.1 403 Forbidden\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		char *str_temp2 =
+			"{\"stat\": false, \"dat\": \"You must login as a member "
+			"of the group '";
+		char *str_temp3 =
+			"' to use Postage\"}";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp1, strlen(str_temp1),
+			str_content_length, strlen(str_content_length),
+			"\015\012\015\012", (size_t)4,
+			str_temp2, strlen(str_temp2),
+			str_global_login_group, strlen(str_global_login_group),
+			str_temp3, strlen(str_temp3)
+		);
 
 		SFREE(str_content_length);
 	} else
@@ -891,21 +923,60 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 	{
 		str_expires = str_expire_one_day();
 #ifdef ENVELOPE
-		SFINISH_CAT_CSTR(str_int_len, "48");
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
-			"Set-Cookie: envelope=", client_auth->str_cookie_encrypted, "; path=/; expires=", str_expires,
-			(bol_tls ? "; secure" : ""), "; HttpOnly;\015\012", "Set-Cookie: DB=", (DB_connection_driver(client_auth->parent->conn) == DB_DRIVER_POSTGRES ? "PG" : "SS"), "; path=/;\015\012Content-Length: ", str_int_len, "\015\012\015\012",
-			"{\"stat\": true, \"dat\": \"/env/app/all/index.html\"}");
+		char *str_temp1 =
+			"HTTP/1.1 200 OK\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Set-Cookie: envelope=";
+		char *str_temp2 =
+			"; HttpOnly;\015\012Set-Cookie: DB=";
+		char *str_temp3 =
+			"; path=/;\015\012Content-Length: 48\015\012\015\012"
+			"{\"stat\": true, \"dat\": \"/env/app/all/index.html\"}";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp1, strlen(str_temp1),
+			client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
+			"; path=/; expires=", 18,
+			str_expires, strlen(str_expires),
+			str_temp2, strlen(str_temp2),
+			(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
+			(DB_connection_driver(client_auth->parent->conn) == DB_DRIVER_POSTGRES ? "PG" : "SS"), (size_t)2,
+			str_temp3, strlen(str_temp3)
+		);
 #else
 		SFINISH_SALLOC(str_int_len, 20);
 		snprintf(str_int_len, 20, "%zu", 45 + strlen(client_auth->str_int_connection_index));
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
-									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
-			"Set-Cookie: postage_", client_auth->str_int_connection_index, "=", client_auth->str_cookie_encrypted,
-			"; path=/; expires=", str_expires, (bol_tls ? "; secure" : ""), "; HttpOnly;\015\012", "Content-Length: ",
-			str_int_len, "\015\012\015\012", "{\"stat\": true, \"dat\": \"/postage/", client_auth->str_int_connection_index,
-			"/index.html\"}");
+
+		char *str_temp1 =
+			"HTTP/1.1 200 OK\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Set-Cookie: postage_";
+		char *str_temp2 =
+			"; HttpOnly;\015\012Set-Cookie: DB=";
+		char *str_temp3 =
+			"; path=/;\015\012Content-Length: ";
+		char *str_temp4 =
+			"\015\012\015\012"
+			"{\"stat\": true, \"dat\": \"/postage/";
+		char *str_temp5 =
+			"/index.html\"}";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp1, strlen(str_temp1),
+			client_auth->str_int_connection_index, strlen(client_auth->str_int_connection_index),
+			"=", 1,
+			client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
+			"; path=/; expires=", 18,
+			str_expires, strlen(str_expires),
+			str_temp2, strlen(str_temp2),
+			(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
+			(DB_connection_driver(client_auth->parent->conn) == DB_DRIVER_POSTGRES ? "PG" : "SS"), (size_t)2,
+			str_temp3, strlen(str_temp3),
+			str_int_len, strlen(str_int_len),
+			str_temp4, strlen(str_temp4),
+			client_auth->str_int_connection_index, strlen(client_auth->str_int_connection_index),
+			str_temp5, strlen(str_temp5)
+		);
 #endif
 		SFREE(str_expires);
 
@@ -927,7 +998,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		if (client->int_last_activity_i == -1) {
 			SFINISH_SALLOC(client_last_activity, sizeof(struct sock_ev_client_last_activity));
 			memcpy(client_last_activity->str_client_ip, client_auth->parent->str_client_ip, INET_ADDRSTRLEN);
-			SFINISH_CAT_CSTR(client_last_activity->str_cookie, client_auth->str_cookie_encrypted);
+			SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted));
 			client_last_activity->last_activity_time = ev_now(EV_A);
 			client_auth->parent->int_last_activity_i =
 				(ssize_t)DArray_push(client_auth->parent->server->arr_client_last_activity, client_last_activity);
@@ -939,12 +1010,12 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 			client_auth->int_connection_index = (int_global_custom_connection_number += 1);
 		}
 
-		SFINISH_CAT_CSTR(client_request->parent->str_connname_folder, client_auth->str_connname);
+		SFINISH_SNCAT(client_request->parent->str_connname_folder, &int_temp, client_auth->str_connname, strlen(client_auth->str_connname));
 		if (client_auth->str_database != NULL) {
-			SFINISH_CAT_APPEND(client_request->parent->str_connname_folder, "_", client_auth->str_database);
+			SFINISH_SNFCAT(client_request->parent->str_connname_folder, &int_temp, "_", (size_t)1, client_auth->str_database, strlen(client_auth->str_database));
 		}
 		if (client_request->parent->str_conn != NULL) {
-			SFINISH_CAT_APPEND(client_request->parent->str_connname_folder, "_", client_request->parent->str_conn);
+			SFINISH_SNFCAT(client_request->parent->str_connname_folder, &int_temp, "_", (size_t)1, client_request->parent->str_conn, strlen(client_request->parent->str_conn));
 		}
 		int_i = 0;
 		int_len = strlen(client_request->parent->str_connname_folder);
@@ -960,9 +1031,26 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_CHECK((client_auth->str_user = cstr_to_uri(str_temp1)) != NULL, "cstr_to_uri failed");
 		SFREE(str_temp1);
 
-		SFINISH_CAT_CSTR(str_user, client_request->parent->str_connname_folder, "/", client_auth->str_user);
-		SFINISH_CAT_CSTR(str_open, client_request->parent->str_connname_folder, "/", client_auth->str_user, "/open");
-		SFINISH_CAT_CSTR(str_closed, client_request->parent->str_connname_folder, "/", client_auth->str_user, "/closed");
+		SFINISH_SNCAT(
+			str_user, &int_temp,
+			client_request->parent->str_connname_folder, strlen(client_request->parent->str_connname_folder),
+			"/", (size_t)1,
+			client_auth->str_user, strlen(client_auth->str_user)
+		);
+		SFINISH_SNCAT(
+			str_open, &int_temp,
+			client_request->parent->str_connname_folder, strlen(client_request->parent->str_connname_folder),
+			"/", (size_t)1,
+			client_auth->str_user, strlen(client_auth->str_user),
+			"/open", (size_t)5
+		);
+		SFINISH_SNCAT(
+			str_closed, &int_temp,
+			client_request->parent->str_connname_folder, strlen(client_request->parent->str_connname_folder),
+			"/", (size_t)1,
+			client_auth->str_user, strlen(client_auth->str_user),
+			"/closed", (size_t)7
+		);
 
 		// connection folder
 		char *str_temp = canonical(str_global_sql_root, client_request->parent->str_connname_folder, "read_dir");
@@ -1020,6 +1108,9 @@ finish:
 	if (arr_row_values != NULL) {
 		DArray_clear_destroy(arr_row_values);
 	}
+	if (arr_row_lengths != NULL) {
+		DArray_clear_destroy(arr_row_lengths);
+	}
 	SFREE_ALL();
 
 	ssize_t int_len = 0;
@@ -1029,13 +1120,24 @@ finish:
 		char *_str_response = str_response;
 		char str_length[50];
 		snprintf(str_length, 50, "%zu", strlen(_str_response));
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-			"Content-Length: ",
-			str_length, "\015\012\015\012", _str_response);
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, (int_response_len != 0 ? int_response_len : strlen(_str_response))
+		);
 		SFREE(_str_response);
 		if (client_request->parent->conn->str_response != NULL && client_request->parent->conn->str_response[0] != 0) {
-			SFINISH_CAT_APPEND(str_response, ":\n", client_request->parent->conn->str_response);
+			SFINISH_SNFCAT(
+				str_response, &int_response_len, 
+				":\n", (size_t)2, 
+				client_request->parent->conn->str_response, strlen(client_request->parent->conn->str_response)
+			);
 		}
 		SFREE(client_request->parent->conn->str_response);
 	}
