@@ -20899,12 +20899,10 @@ GS.closeDialog = function (dialog, strAnswer) {
             elementReadyCallback();
         }
         
-        
-        
-        // after open function call
-        if (typeof afterOpenFunction === 'function') {
-            afterOpenFunction.apply(dialogElement, []);
-        }
+        //// after open function call
+        //if (typeof afterOpenFunction === 'function') {
+        //    afterOpenFunction.apply(dialogElement, []);
+        //}
         
         return dialogElement;
     };
