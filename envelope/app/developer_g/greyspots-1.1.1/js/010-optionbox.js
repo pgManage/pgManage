@@ -174,88 +174,76 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
-    
+
     // #################################################################
     // ########################## USER EVENTS ##########################
     // #################################################################
     /*
     // handle behaviours on keydown
     function handleKeyDown(event) {
-        var element = event.target, intKeyCode = event.keyCode || event.which, selectedOption, selectedOptionIndex,
+        var element = event.target, intKeyCode = event.keyCode || event.which,
+            selectedOption, selectedOptionIndex,
             tempSelectedOption, tempSelectedOptionIndex, arrOptions, i, len;
-        
+
         if (!element.hasAttribute('disabled')) {
             if ((intKeyCode === 40 || intKeyCode === 38) && !event.shiftKey && !event.metaKey && !event.ctrlKey && !element.error) {
-                
                 arrOptions = xtag.query(element, 'gs-option');
-                
+
                 for (i = 0, len = arrOptions.length; i < len; i += 1) {
                     if (arrOptions[i].hasAttribute('tempselect')) {
                         tempSelectedOptionIndex = i;
                         tempSelectedOption = arrOptions[i];
                         arrOptions[i].removeAttribute('tempselect');
                     }
-                    
+
                     if (arrOptions[i].hasAttribute('selected')) {
                         selectedOptionIndex = i;
                         selectedOption = arrOptions[i];
                     }
-                    
+
                     if (selectedOption && tempSelectedOption) {
                         break;
                     }
                 }
-                
+
                 //console.log(selectedOption, selectedOptionIndex, tempSelectedOption, tempSelectedOptionIndex, arrOptions.length);
-                
-                //
+
                 if (tempSelectedOption && tempSelectedOptionIndex !== arrOptions.length - 1 && intKeyCode === 40) {
                     if (!arrOptions[tempSelectedOptionIndex + 1].hasAttribute('selected')) {
                         arrOptions[tempSelectedOptionIndex + 1].setAttribute('tempselect', '');
                     }
-                    
-                //
                 } else if (tempSelectedOption && tempSelectedOptionIndex !== 0 && intKeyCode === 38) {
                     if (!arrOptions[tempSelectedOptionIndex - 1].hasAttribute('selected')) {
                         arrOptions[tempSelectedOptionIndex - 1].setAttribute('tempselect', '');
                     }
-                    
-                //
                 } else if (!tempSelectedOption && selectedOption && selectedOptionIndex !== arrOptions.length - 1 && intKeyCode === 40) {
                     if (!arrOptions[selectedOptionIndex + 1].hasAttribute('selected')) {
                         arrOptions[selectedOptionIndex + 1].setAttribute('tempselect', '');
                     }
-                    
-                //
                 } else if (!tempSelectedOption && selectedOption && selectedOptionIndex !== 0 && intKeyCode === 38) {
                     if (!arrOptions[selectedOptionIndex - 1].hasAttribute('selected')) {
                         arrOptions[selectedOptionIndex - 1].setAttribute('tempselect', '');
                     }
-                    
                 // tempselect first record
                 } else if (intKeyCode === 40) {
                     if (!arrOptions[0].hasAttribute('selected')) {
                         arrOptions[0].setAttribute('tempselect', '');
                     }
-                    
                 // tempselect last record
                 } else if (intKeyCode === 38) {
                     if (!arrOptions[arrOptions.length - 1].hasAttribute('selected')) {
                         arrOptions[arrOptions.length - 1].setAttribute('tempselect', '');
                     }
                 }
-                
                 event.preventDefault();
                 event.stopPropagation();
-                
+
             } else if (event.keyCode === 13 || event.keyCode === 32) {
                 selectedOption = xtag.query(element, 'gs-option[selected]')[0];
                 tempSelectedOption = xtag.query(element, 'gs-option[tempselect]')[0];
-                
+
                 if (tempSelectedOption) {
                     selectOption(element, tempSelectedOption, true);
-                    
                 } else if (selectedOption) {
                     selectOption(element, selectedOption, true);
                 }
@@ -266,50 +254,122 @@ document.addEventListener('DOMContentLoaded', function () {
                 event.stopPropagation();
             }
         }
-        
+
         //console.log('handleKeyDown', intKeyCode, event);
     }*/
-    
+
     function getParentOption(element) {
         var currentElement = element;
-        
+
         while (currentElement.nodeName !== 'GS-OPTION' && currentElement.nodeName !== 'HTML') {
             currentElement = currentElement.parentNode;
         }
-        
+
         if (currentElement.nodeName !== 'GS-OPTION') {
             return undefined;
         }
-        
+
         return currentElement;
     }
-    
-    function createPushReplacePopHandler(element) {
-        var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-        
-        if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-            element.value = GS.qryGetVal(strQueryString, strQSCol);
+
+    //function createPushReplacePopHandler(element) {
+    //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+    //
+    //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+    //        element.value = GS.qryGetVal(strQueryString, strQSCol);
+    //    }
+    //}
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
         }
     }
-    
+
+    function createPushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i];
+                arrQSParts = strQSCol.split('=');
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present: go to the attribute's default or remove it
+                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                // else: set attribute to exact text from QS
+                } else {
+                    element.setAttribute(strQSAttr, (
+                        GS.qryGetVal(strQS, strQSCol) ||
+                        element.internal.defaultAttributes[strQSAttr] ||
+                        ''
+                    ));
+                }
+                i += 1;
+            }
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun !== true) {
+                if (strQSValue !== '' || !element.getAttribute('value')) {
+                    element.setAttribute('value', strQSValue);
+                }
+            } else {
+                element.value = strQSValue;
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
+    }
+
     function enhanceChildren(element) {
         var arrElement, i, len;
-        
+
         arrElement = xtag.query(element, 'gs-option');
-        
+
         for (i = 0, len = arrElement.length; i < len; i += 1) {
             // this if allows the developer to define the icon position
             if (!arrElement[i].hasAttribute('icontop')
-             && !arrElement[i].hasAttribute('iconleft')
-             && !arrElement[i].hasAttribute('iconbottom')
-             && !arrElement[i].hasAttribute('iconright')) {
-                
+                    && !arrElement[i].hasAttribute('iconleft')
+                    && !arrElement[i].hasAttribute('iconbottom')
+                    && !arrElement[i].hasAttribute('iconright')) {
                 arrElement[i].setAttribute('iconleft', '');
             }
             arrElement[i].setAttribute('icon', '');
         }
     }
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -324,71 +384,73 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     //
     function elementInserted(element) {
         var strQSValue, observer;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+                element.internal = {};
+                saveDefaultAttributes(element);
+
                 //// allows the element to have focus
                 //if (!element.hasAttribute('tabindex')) {
                 //    element.setAttribute('tabindex', '0');
                 //}
-                
+
                 if (element.getAttribute('value')) {
                     selectOption(element, element.getAttribute('value'), false);
                 }
-                
+
                 if (element.getAttribute('qs')) {
-                    strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
-                    
-                    if (strQSValue !== '') {
-                        selectOption(element, strQSValue, false);
-                    }
-                    
+                    //strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+
+                    //if (strQSValue !== '') {
+                    //    selectOption(element, strQSValue, false);
+                    //}
+                    createPushReplacePopHandler(element);
                     window.addEventListener('pushstate',    function () { createPushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { createPushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { createPushReplacePopHandler(element); });
                 }
-                
+
                 // if we are not [no-target]
                 if (!element.hasAttribute('no-target')) {
                     enhanceChildren(element);
-                    
+
                     // put an observer on the option element to enhance new children
-                    
+
                     // create an observer instance
                     observer = new MutationObserver(function(mutations) {
                         var bolRefreshOptionList = true;
-                        
+
                         // check each mutation: if only option and optgroup tags were added: refersh option tags in select
                         mutations.forEach(function(mutation) {
                             var i, len;
-                            
+
                             for (i = 0, len = mutation.addedNodes.length; i < len; i += 1) {
                                 if (mutation.addedNodes[i].nodeName !== 'GS-OPTION') {
                                     bolRefreshOptionList = false;
                                 }
                             }
                         });
-                        
+
                         if (bolRefreshOptionList) {
                             enhanceChildren(element);
                         }
                     });
-                    
+
                     // pass in the element node, as well as the observer options
                     observer.observe(element, {childList: true});
                 }
             }
         }
     }
-    
+
     xtag.register('gs-optionbox', {
         lifecycle: {
             created: function () {
@@ -422,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function () {
             //},
             
             'click': function (event) {
-                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted') && !this.hasAttribute('readonly')) {
                     var parentOption = getParentOption(event.target);
                     
                     //console.log(parentOption);

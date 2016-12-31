@@ -166,9 +166,7 @@ window.addEventListener('design-register-element', function () {
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
-        //<gs-toggle txt-primary>
-        
+
         // Font Color attributes
         strFontAttribute = '';
         if (selectedElement.hasAttribute('txt-primary'))  { strFontAttribute = 'txt-primary'; }
@@ -176,7 +174,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('txt-info'))     { strFontAttribute = 'txt-info'; }
         if (selectedElement.hasAttribute('txt-warning'))  { strFontAttribute = 'txt-warning'; }
         if (selectedElement.hasAttribute('txt-danger'))   { strFontAttribute = 'txt-danger'; }
-        
+
         addProp('Font Color', true, '<gs-select class="target" value="' + strFontAttribute + '" mini>' +
                                         '<option value="">Default</option>' +
                                         '<option value="txt-primary">Primary</option>' +
@@ -190,14 +188,14 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('txt-info');
             selectedElement.removeAttribute('txt-warning');
             selectedElement.removeAttribute('txt-danger');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // Background Color attributes
         strBackgroundAttribute = '';
         if (selectedElement.hasAttribute('bg-primary'))  { strBackgroundAttribute = 'bg-primary'; }
@@ -205,7 +203,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('bg-info'))     { strBackgroundAttribute = 'bg-info'; }
         if (selectedElement.hasAttribute('bg-warning'))  { strBackgroundAttribute = 'bg-warning'; }
         if (selectedElement.hasAttribute('bg-danger'))   { strBackgroundAttribute = 'bg-danger'; }
-        
+
         addProp('Background Color', true, '<gs-select class="target" value="' + strBackgroundAttribute + '" mini>' +
                                         '<option value="">Default</option>' +
                                         '<option value="bg-primary">Primary</option>' +
@@ -219,59 +217,59 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('bg-info');
             selectedElement.removeAttribute('bg-warning');
             selectedElement.removeAttribute('bg-danger');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         addProp('Corners', true,   '<div class="target">' +
                                         '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                                                                     selectedElement.hasAttribute('remove-top') ||
                                                                     selectedElement.hasAttribute('remove-left') ||
-                                                                    selectedElement.hasAttribute('remove-top-left'))).toString() + 
+                                                                    selectedElement.hasAttribute('remove-top-left'))).toString() +
                                                 '" remove-right remove-bottom id="round-top-left-corner________" inline></gs-checkbox>' +
-                                                
+
                                         '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                                                                     selectedElement.hasAttribute('remove-top') ||
                                                                     selectedElement.hasAttribute('remove-right') ||
-                                                                    selectedElement.hasAttribute('remove-top-right'))).toString() + 
+                                                                    selectedElement.hasAttribute('remove-top-right'))).toString() +
                                                 '" remove-left remove-bottom id="round-top-right-corner________" inline></gs-checkbox><br />' +
-                                                
+
                                         '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                                                                     selectedElement.hasAttribute('remove-bottom') ||
                                                                     selectedElement.hasAttribute('remove-left') ||
-                                                                    selectedElement.hasAttribute('remove-bottom-left'))).toString() + 
+                                                                    selectedElement.hasAttribute('remove-bottom-left'))).toString() +
                                                 '" remove-right remove-top id="round-bottom-left-corner________" inline></gs-checkbox>' +
-                                                
+
                                         '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                                                                     selectedElement.hasAttribute('remove-bottom') ||
                                                                     selectedElement.hasAttribute('remove-right') ||
-                                                                    selectedElement.hasAttribute('remove-bottom-right'))).toString() + 
+                                                                    selectedElement.hasAttribute('remove-bottom-right'))).toString() +
                                                 '" remove-left remove-top id="round-bottom-right-corner________" inline></gs-checkbox>' +
                                     '</div>', function () {
             var topLeft =     document.getElementById('round-top-left-corner________').value === 'true',
@@ -279,7 +277,7 @@ window.addEventListener('design-register-element', function () {
                 bottomLeft =  document.getElementById('round-bottom-left-corner________').value === 'true',
                 bottomRight = document.getElementById('round-bottom-right-corner________').value === 'true',
                 arrStrAttr = [], i, len;
-            
+
             selectedElement.removeAttribute('remove-all');
             selectedElement.removeAttribute('remove-top');
             selectedElement.removeAttribute('remove-bottom');
@@ -289,20 +287,19 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('remove-top-right');
             selectedElement.removeAttribute('remove-bottom-left');
             selectedElement.removeAttribute('remove-bottom-right');
-            
+
             if (!topLeft && !topRight && !bottomLeft && !bottomRight) {
                 arrStrAttr.push('remove-all');
             } else if (!topLeft && !topRight) {
                 arrStrAttr.push('remove-top');
             } else if (!bottomLeft && !bottomRight) {
                 arrStrAttr.push('remove-bottom');
-                
             } else if (!topLeft && !bottomLeft) {
                 arrStrAttr.push('remove-left');
             } else if (!topRight && !bottomRight) {
                 arrStrAttr.push('remove-right');
             }
-            
+
             if (!topLeft && !bottomLeft && arrStrAttr[0] !== 'remove-all') {
                 arrStrAttr.push('remove-left');
             } else if (!topLeft && topRight) {
@@ -310,7 +307,7 @@ window.addEventListener('design-register-element', function () {
             } else if (!bottomLeft && bottomRight) {
                 arrStrAttr.push('remove-bottom-left');
             }
-            
+
             if (!topRight && !bottomRight && arrStrAttr[0] !== 'remove-all') {
                 arrStrAttr.push('remove-right');
             } else if (topLeft && !topRight) {
@@ -318,38 +315,111 @@ window.addEventListener('design-register-element', function () {
             } else if (bottomLeft && !bottomRight) {
                 arrStrAttr.push('remove-bottom-right');
             }
-            
+
             for (i = 0, len = arrStrAttr.length; i < len; i += 1) {
                 selectedElement.setAttribute(arrStrAttr[i], '');
             }
-            
+
             return selectedElement;
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
 });
-        
+
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
-    function pushReplacePopHandler(element) {
-        var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-        
-        if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-            element.value = GS.qryGetVal(strQueryString, strQSCol);
+
+    //function pushReplacePopHandler(element) {
+    //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+    //
+    //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+    //        element.value = GS.qryGetVal(strQueryString, strQSCol);
+    //    }
+    //}
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        arrAttr = element.attributes;
+        i = 0;
+        len = arrAttr.length;
+        while (i < len) {
+            jsnAttr = arrAttr[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
         }
     }
-    
+
+    function pushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i];
+                arrQSParts = strQSCol.split('=');
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present: go to the attribute's default or remove it
+                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                // else: set attribute to exact text from QS
+                } else {
+                    element.setAttribute(strQSAttr, (
+                        GS.qryGetVal(strQS, strQSCol) ||
+                        element.internal.defaultAttributes[strQSAttr] ||
+                        ''
+                    ));
+                }
+                i += 1;
+            }
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun !== true) {
+                if (strQSValue !== '' || !element.getAttribute('value')) {
+                    element.setAttribute('value', strQSValue);
+                }
+            } else {
+                element.value = strQSValue;
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
+    }
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
         if (!element.hasAttribute('suspend-created')) {
-            
+
         }
     }
-    
+
     //
     function elementInserted(element) {
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
@@ -357,28 +427,27 @@ document.addEventListener('DOMContentLoaded', function () {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
-                var strQSValue;
-                
+                element.internal = {};
+                saveDefaultAttributes(element);
+
                 // add a tabindex to allow focus
                 if (!element.hasAttribute('tabindex')) {
                     element.tabIndex = 0;
                 }
-                
+
                 if (typeof element.getAttribute('value') === 'string') {
                     if (element.getAttribute('value') === 'true' || element.getAttribute('value') === '-1') {
                         element.setAttribute('selected', '');
                     }
                 }
-                
+
                 // handle "qs" attribute
                 if (element.getAttribute('qs')) {
-                    strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
-                    
-                    if (strQSValue !== '' || !element.getAttribute('value')) {
-                        element.value = strQSValue;
-                    }
-                    
+                    //var strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+                    //if (strQSValue !== '' || !element.getAttribute('value')) {
+                    //    element.value = strQSValue;
+                    //}
+                    pushReplacePopHandler(element);
                     window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });

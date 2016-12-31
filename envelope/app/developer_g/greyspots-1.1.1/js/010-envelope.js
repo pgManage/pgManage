@@ -109,6 +109,20 @@ window.addEventListener('design-register-element', function (event) {
             return setOrRemoveTextAttribute(selectedElement, 'action-delete', this.value);
         });
         
+        // Disable insert/update
+        addProp('Disable Insert', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-insert') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'no-insert', this.value === 'true', true);
+        });
+        
+        addProp('Disable Update', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-update') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'no-update', this.value === 'true', true);
+        });
+        
+        // TEMPLATE attribute
+        addProp('Record Template', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('template') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'template', this.value);
+        });
+        
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
@@ -804,7 +818,7 @@ document.addEventListener('DOMContentLoaded', function () {
         elementHudBottomContainer.innerHTML = '';
         
         // insert hud button
-        if (element.insertTemplate) {
+        if (element.insertTemplate && !element.hasAttribute('no-insert')) {
             divElement.innerHTML = '<gs-button inline icononly icon="plus" no-focus gs-dynamic>Insert</gs-button>';
             
             hudInsertButton = divElement.childNodes[0];
@@ -1476,33 +1490,144 @@ document.addEventListener('DOMContentLoaded', function () {
         return currentElement;
     }
     
+    //function pushReplacePopHandler(element) {
+    //    var i, len, arrPopKeys, bolRefresh = false, currentValue, strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+    //    
+    //    if (strQSCol && GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+    //        element.value = GS.qryGetVal(strQueryString, strQSCol);
+    //    }
+    //    
+    //    if (element.hasAttribute('refresh-on-querystring-values')) {
+    //        arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(',');
+    //        
+    //        for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
+    //            currentValue = GS.qryGetVal(strQueryString, arrPopKeys[i]);
+    //            
+    //            if (element.popValues[arrPopKeys[i]] !== currentValue) {
+    //                bolRefresh = true;
+    //            }
+    //            
+    //            element.popValues[arrPopKeys[i]] = currentValue;
+    //        }
+    //    } else if (element.hasAttribute('refresh-on-querystring-change')) {
+    //        bolRefresh = true;
+    //    }
+    //    
+    //    if (bolRefresh) {
+    //        element.refresh();
+    //    }
+    //}
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
+        }
+    }
+
     function pushReplacePopHandler(element) {
-        var i, len, arrPopKeys, bolRefresh = false, currentValue, strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-        
-        if (strQSCol && GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-            element.value = GS.qryGetVal(strQueryString, strQSCol);
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+        var arrPopKeys;
+        var currentValue;
+        var bolRefresh;
+
+        if (strQSCol) {
+            if (strQSCol.indexOf('=') !== -1) {
+                arrAttrParts = strQSCol.split(',');
+                i = 0;
+                len = arrAttrParts.length;
+                while (i < len) {
+                    strQSCol = arrAttrParts[i]
+                    arrQSParts = strQSCol.split('=');
+                    strQSCol = arrQSParts[0];
+                    strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
+                    i += 1;
+                }
+            } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+                strQSValue = GS.qryGetVal(strQS, strQSCol);
+    
+                if (element.internal.bolQSFirstRun !== true) {
+                    if (strQSValue !== '' || !element.getAttribute('value')) {
+                        element.setAttribute('value', strQSValue);
+                    }
+                } else {
+                    element.value = strQSValue;
+                }
+            }
         }
         
-        if (element.hasAttribute('refresh-on-querystring-values')) {
-            arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(',');
-            
-            for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
-                currentValue = GS.qryGetVal(strQueryString, arrPopKeys[i]);
+        // handle "refresh-on-querystring-values" and "refresh-on-querystring-change" attributes
+        if (element.internal.bolQSFirstRun === true) {
+            if (element.hasAttribute('refresh-on-querystring-values')) {
+                arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
                 
-                if (element.popValues[arrPopKeys[i]] !== currentValue) {
-                    bolRefresh = true;
+                for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
+                    currentValue = GS.qryGetVal(strQS, arrPopKeys[i]);
+                    
+                    if (element.popValues[arrPopKeys[i]] !== currentValue) {
+                        bolRefresh = true;
+                    }
+                    
+                    element.popValues[arrPopKeys[i]] = currentValue;
                 }
-                
-                element.popValues[arrPopKeys[i]] = currentValue;
+            } else if (element.hasAttribute('refresh-on-querystring-change')) {
+                bolRefresh = true;
             }
             
-        } else if (element.hasAttribute('refresh-on-querystring-change')) {
-            bolRefresh = true;
+            if (bolRefresh && element.hasAttribute('src')) {
+                console.log('pushReplacePopHandler: getData', element);
+                getData(element);
+            } else if (bolRefresh && !element.hasAttribute('src')) {
+                console.warn('gs-combo Warning: element has "refresh-on-querystring-values" or "refresh-on-querystring-change", but no "src".', element);
+            }
+        } else {
+            if (element.hasAttribute('refresh-on-querystring-values')) {
+                arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
+                
+                for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
+                    element.popValues[arrPopKeys[i]] = GS.qryGetVal(strQS, arrPopKeys[i]);
+                }
+            }
         }
         
-        if (bolRefresh) {
-            element.refresh();
-        }
+        element.internal.bolQSFirstRun = true;
     }
     
     // dont do anything that modifies the element here
@@ -1524,6 +1649,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
+                element.internal = {};
+                saveDefaultAttributes(element);
                 
                 GS.addBeforeUnloadEvent(function () {
                     document.activeElement.blur();
@@ -1534,13 +1661,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.getAttribute('refresh-on-querystring-values') ||
                         element.hasAttribute('refresh-on-querystring-change')) {
                     element.popValues = {};
-                    
-                    strQSValue = GS.qryGetVal(strQueryString, element.getAttribute('qs'));
-                    
-                    if (strQSValue !== '' || !element.getAttribute('value')) {
-                        element.setAttribute('value', strQSValue);
-                    }
-                    
+                    //strQSValue = GS.qryGetVal(strQueryString, element.getAttribute('qs'));
+                    //
+                    //if (strQSValue !== '' || !element.getAttribute('value')) {
+                    //    element.setAttribute('value', strQSValue);
+                    //}
+                    pushReplacePopHandler(element);
                     window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
@@ -1574,8 +1700,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // selecting for template elements
                 hudTemplateElement    = xtag.queryChildren(element, 'template[for="hud"]')[0];
-                tableTemplateElement  = xtag.queryChildren(element, 'template[for="table"]')[0];
+                tableTemplateElement  = xtag.queryChildren(element, 'template[for="table"]' + (element.hasAttribute('template') ? '[id="' + element.getAttribute('template') + '"': ''))[0];
+                if (!tableTemplateElement && element.hasAttribute('template')) {
+                    console.warn('ENVELOPE WARNING: Hey! You used the name of a non-existant record template!');
+                    tableTemplateElement  = xtag.queryChildren(element, 'template[for="table"]')[0];
+                }
                 insertTemplateElement = xtag.queryChildren(element, 'template[for="insert"]')[0];
+                
+                element.templates = {};
+                xtag.queryChildren(element, 'template[for="table"]').forEach(function (cur, i) {
+                    if (i === 0) {
+                        element.templates['default'] = cur;
+                    }
+                    if (cur.hasAttribute('id')) {
+                        element.templates[cur.getAttribute('id')] = cur;
+                    }
+                });
                 
                 // checking/saving template elements
                 if (hudTemplateElement) {
@@ -1655,7 +1795,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         parentTr = GS.findParentTag(event.target, 'tr');
                         
                         // if the control is a direct child of this envelope (fixes sub envelope update)
-                        if (parentTr.parentNode.parentNode.parentNode === element.scrollContainerElement) {
+                        if (parentTr.parentNode.parentNode.parentNode === element.scrollContainerElement && !element.hasAttribute('no-update')) {
                             updateRecord(element, parentTr, event.target.getAttribute('column'), newValue);
                         }
                     }
@@ -2086,6 +2226,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
                     
+                } else if (strAttrName === 'template') {
+                    var tableTemplateElement, tableTemplateElementCopy, recordElement, element = this, i, len;
+                    tableTemplateElement  = element.templates[element.getAttribute('template') || 'default'];
+                    console.log(tableTemplateElement);
+                    if (!tableTemplateElement && element.hasAttribute('template')) {
+                        console.warn('ENVELOPE WARNING: Hey! You used the name of a non-existant record template!');
+                        tableTemplateElement = element.templates['default'];
+                    }
+                    console.log(tableTemplateElement);
+                    
+                    if (tableTemplateElement) {
+                        console.log(tableTemplateElement);
+                        tableTemplateElementCopy = document.createElement('template');
+                        tableTemplateElementCopy.innerHTML = tableTemplateElement.innerHTML;
+                        
+                        recordElement = xtag.query(xtag.query(tableTemplateElementCopy.content, 'tbody')[0], 'tr')[0];
+                        
+                        if (recordElement) {
+                            // add a data- attribute for all where columns (most of the time: id and change_stamp)
+                            for (i = 0, len = element.arrWhereColumns.length; i < len; i += 1) {
+                                recordElement.setAttribute('data-' + element.arrWhereColumns[i], '{{! row.' + element.arrWhereColumns[i] + ' }}');
+                            }
+                            
+                            // add a doT.js coded "value" attribute to any element with a "column" attribute but no "value" attribute
+                            element.tableTemplate = GS.templateColumnToValue(tableTemplateElementCopy.innerHTML);
+                        }
+                    } else {
+                        throw 'Envelope error: table template is required.';
+                    }
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     if (strAttrName === 'no-hudlimit' ||
                         strAttrName === 'no-hudorderby' ||

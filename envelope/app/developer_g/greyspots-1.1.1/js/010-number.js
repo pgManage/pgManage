@@ -113,37 +113,109 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
     var singleLineTemplateElement = document.createElement('template'),
         singleLineTemplate;
-    
+
     singleLineTemplateElement.innerHTML = '<input class="control" gs-dynamic type="text" />';
-    
     singleLineTemplate = singleLineTemplateElement.content;
-    
+
     // re-target change event from control to element
     function changeFunction(event) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         GS.triggerEvent(event.target.parentNode, 'change');
-        
+
         handleFormat(event.target.parentNode, event);
     }
-    
+
     // re-target focus event from control to element
     function focusFunction(event) {
         GS.triggerEvent(event.target.parentNode, 'focus');
     }
+
+    //function createPushReplacePopHandler(element) {
+    //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+
+    //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+    //        element.value = GS.qryGetVal(strQueryString, strQSCol);
+    //    }
+    //}
     
-    function createPushReplacePopHandler(element) {
-        var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-        
-        if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-            element.value = GS.qryGetVal(strQueryString, strQSCol);
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        arrAttr = element.attributes;
+        i = 0;
+        len = arrAttr.length;
+        while (i < len) {
+            jsnAttr = arrAttr[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
         }
     }
-    
+
+    function createPushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i];
+                arrQSParts = strQSCol.split('=');
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present: go to the attribute's default or remove it
+                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                // else: set attribute to exact text from QS
+                } else {
+                    element.setAttribute(strQSAttr, (
+                        GS.qryGetVal(strQS, strQSCol) ||
+                        element.internal.defaultAttributes[strQSAttr] ||
+                        ''
+                    ));
+                }
+                i += 1;
+            }
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun !== true) {
+                if (strQSValue !== '' || !element.getAttribute('value')) {
+                    element.setAttribute('value', strQSValue);
+                }
+            } else {
+                element.value = strQSValue;
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
+    }
+
     // sync control value and resize to text
     function syncView(element) {
         if (element.control) {
@@ -152,29 +224,29 @@ document.addEventListener('DOMContentLoaded', function () {
             element.setAttribute('value', element.innerHTML);
         }
     }
-    
+
     function handleFormat(element, event, bolAlertOnError) {
         var strFormat, intValue;
-        
+
         if (element.hasAttribute('format')) {
             strFormat = element.getAttribute('format');
-            
+
             intValue = element.value; // parseFloat(element.value.replace(/[^0-9.]*/g, ''), 10);
-            
+
             if (isNaN(intValue)) {
                 if (bolAlertOnError !== undefined && bolAlertOnError !== false) {
                     alert('Invalid Number: ' + element.value);
                 }
-                
+
                 if (element.control) {
                     GS.setInputSelection(element.control, 0, element.value.length);
                 }
-                
+
                 if (event) {
                     event.stopPropagation();
                     event.preventDefault();
                 }
-                
+
             } else {
                 if (element.control) {
                     element.control.value = formatNumber(intValue, strFormat);
@@ -184,29 +256,29 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     function formatNumber(intValue, strFormat) {
         /* (this function contains a (modified) substantial portion of code from another source
             here is the copyright for sake of legality) (Uses code by Matt Kruse)
         Copyright (c) 2006-2009 Rostislav Hristov, Asual DZZD
-        
-        Permission is hereby granted, free of charge, to any person obtaining a 
-        copy of this software and associated documentation files 
-        (the "Software"), to deal in the Software without restriction, 
-        including without limitation the rights to use, copy, modify, merge, 
-        publish, distribute, sublicense, and/or sell copies of the Software, 
-        and to permit persons to whom the Software is furnished to do so, 
+
+        Permission is hereby granted, free of charge, to any person obtaining a
+        copy of this software and associated documentation files
+        (the "Software"), to deal in the Software without restriction,
+        including without limitation the rights to use, copy, modify, merge,
+        publish, distribute, sublicense, and/or sell copies of the Software,
+        and to permit persons to whom the Software is furnished to do so,
         subject to the following conditions:
-        
-        The above copyright notice and this permission notice shall be included 
+
+        The above copyright notice and this permission notice shall be included
         in all copies or substantial portions of the Software.
-        
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-        OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+        OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
         SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
         var groupingSeparator,
             groupingIndex,
@@ -221,15 +293,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 currencySymbol: '$',
                 percentSymbol: '%'
             };
-        
+
         if (strFormat.toLowerCase() === 'currency') {
             strFormat = locale.currencySymbol + '0.00';
-            
         } else if (strFormat.toLowerCase() === 'percent') {
             intValue = intValue * 100;
             strFormat = locale.percentSymbol + '0.00';
         }
-        
+
         var integer = '',
             fraction = '',
             negative,
@@ -238,21 +309,21 @@ document.addEventListener('DOMContentLoaded', function () {
             powFraction,
             bolCurrencySymbol = strFormat[0] === locale.currencySymbol,
             bolPercentSymbol = strFormat[0] === locale.percentSymbol;
-        
+
         if (bolCurrencySymbol || bolPercentSymbol) {
             strFormat = strFormat.substring(1);
         }
-        
+
         groupingSeparator = ',';
         groupingIndex = strFormat.lastIndexOf(groupingSeparator);
         decimalSeparator = '.';
         decimalIndex = strFormat.indexOf(decimalSeparator);
-        
+
         negative = intValue < 0;
         minFraction = strFormat.substr(decimalIndex + 1).replace(/#/g, '').length;
         maxFraction = strFormat.substr(decimalIndex + 1).length;
         powFraction = 10;
-        
+
         intValue = Math.abs(intValue);
 
         if (decimalIndex != -1) {
@@ -278,11 +349,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 for (i = 0; i < (maxFraction - fraction.length); i++) {
                     tempFraction += '0';
                 }
-                var symbol, 
-                    formattedFraction = '';
+                var symbol, formattedFraction = '';
+
                 for (i = 0; i < tempFraction.length; i++) {
                     symbol = tempFraction.substr(i, 1);
-                    if (i >= minFraction && symbol == '0' && /^0*$/.test(tempFraction.substr(i+1))) {
+                    if (i >= minFraction && symbol == '0' && (/^0*$/).test(tempFraction.substr(i + 1))) {
                         break;
                     }
                     formattedFraction += symbol;
@@ -354,17 +425,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
-    //
+
     function elementInserted(element) {
-        var strQSValue;
-        
+        //var strQSValue;
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+                element.internal = {};
+                saveDefaultAttributes(element);
+
                 if (element.hasAttribute('tabindex')) {
                     element.setAttribute('data-tabindex', element.getAttribute('tabindex'));
                     element.removeAttribute('tabindex');
@@ -378,19 +450,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         xtag.query(element, '.control')[0].setAttribute('tabindex', element.getAttribute('data-tabindex'));
                     }
                 }
-                
+
                 if (element.getAttribute('qs')) {
-                    strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
-                    
-                    if (strQSValue !== '' || !element.getAttribute('value')) {
-                        element.value = strQSValue;
-                    }
-                    
+                    //strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+                    //
+                    //if (strQSValue !== '' || !element.getAttribute('value')) {
+                    //    element.value = strQSValue;
+                    //}
+
+                    createPushReplacePopHandler(element);
                     window.addEventListener('pushstate',    function () { createPushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { createPushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { createPushReplacePopHandler(element); });
                 }
-                
+
                 if (element.innerHTML === '') {
                     element.appendChild(singleLineTemplate.cloneNode(true));
                     if (element.hasAttribute('data-tabindex')) {
@@ -401,27 +474,27 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-number', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
                     elementInserted(this);
-                    
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
                     elementInserted(this);
-                    
+
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     // attribute code
                     if (strAttrName === 'disabled') {
@@ -438,7 +511,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 xtag.query(this, '.control')[0].setAttribute('tabindex', this.getAttribute('data-tabindex'));
                             }
                         }
-                        
+
                         this.refresh();
                     }
                 }
@@ -463,10 +536,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }//,
             //'change:delegate(.control)': function (event) {
             //    var element = this.parentNode;
-            //    
+            //
             //    event.preventDefault();
             //    event.stopPropagation();
-            //    
+            //
             //    xtag.fireEvent(element, 'change', {
             //        bubbles: true,
             //        cancelable: true
@@ -534,7 +607,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         'autocapitalize',
                         'autocomplete',
                         'autofocus',
-                        'spellcheck'
+                        'spellcheck',
+                        'readonly'
                     ];
                     for (i = 0, len = arrPassThroughAttributes.length; i < len; i += 1) {
                         if (this.hasAttribute(arrPassThroughAttributes[i])) {

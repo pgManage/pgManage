@@ -52,8 +52,6 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('GS.searchToWhere', 'GS.searchToWhere', 'GS.searchToWhere(\'${1:columns}\', ${0:searchClause});');
     
-    registerDesignSnippet('GS.pushQueryString', 'GS.pushQueryString', 'GS.pushQueryString(${0:newQueryString});');
-    
     registerDesignSnippet('GS.iconList', 'GS.iconList', 'GS.iconList();');
     
     registerDesignSnippet('GS.lorem', 'GS.lorem', 'GS.lorem();');
@@ -977,14 +975,6 @@ GS.searchToWhere = function (columns, searchClause) {
     //console.log('strRet: ' + strRet);
     
     return strRet;
-};
-
-GS.pushQueryString = function (QS) {
-    var arrNewQS = QS.split('&'), i, len, newQS = GS.getQueryString();
-    for (i = 0, len = arrNewQS.length; i < len; i += 1) {
-        newQS = GS.qrySetVal(newQS, arrNewQS[i]);
-    }
-    GS.pushState({}, '', '?' + newQS);
 };
 
 GS.iconList = function () {

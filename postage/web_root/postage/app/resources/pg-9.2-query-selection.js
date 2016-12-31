@@ -460,6 +460,7 @@ function selectionFindRange(tabElement, editor) {
     //              (same thing for ROLLBACK TO SAVEPOINT and SAVEPOINT)
     //              (same thing for (SELECT, INSERT, UPDATE, DELETE) and WITH)
     //              (same thing for (SELECT, INSERT, UPDATE, DELETE) and CREATE TRIGGER)
+    //              (same thing for (SET) and UPDATE)
     // ######################
 
     arrQueryStartKeywords = [

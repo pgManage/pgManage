@@ -10,6 +10,10 @@ gs-select {
     min-height: 1em;
 }
 
+gs-select > select {
+    background-color: #FFFFFF;
+}
+
 gs-select > option {
     display: none;
 }
@@ -41,4 +45,17 @@ gs-select[mini] {
     border: 0;
     border-radius: 0;
     box-shadow: 0 0 0 0;
+}
+
+
+/* readonly: light border, not clickable, no chevron */
+gs-select[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+}
+
+gs-select[readonly]:after {
+    display: none;
 }

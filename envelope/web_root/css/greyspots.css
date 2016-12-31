@@ -12504,9 +12504,17 @@ gs-body {
 
 gs-body[padded] {
     padding: 1em;
-}gs-checkbox:not([mini]):not(:focus) {
+}gs-checkbox:not([readonly]):not([mini]):not(:focus) {
     box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
 }
+
+gs-checkbox[readonly] {
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+}
+
+
 
 /* ##################################################################################### */
 /* ############################## UNCHECKED / CHECKED STATE ############################ */
@@ -12606,6 +12614,29 @@ gs-combo[mini] .drop_down_button {
     height: 1.6em;
     right: 0.2em;
     min-height: 0;
+}
+
+
+/* ########################################################## */
+/* ##################### READONLY STATE ##################### */
+/* ########################################################## */
+
+gs-combo[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+}
+
+gs-combo[readonly] > .root {
+    padding-right: 0;
+}
+
+gs-combo[readonly] .drop_down_button {
+    display: none;
+    cursor: default;
+    opacity: 0.9;
+    pointer-events: none;
 }
 
 
@@ -13279,6 +13310,27 @@ gs-date[mini] .date-picker-button {
 gs-date[mini] .date-picker-button:after {
     font-size: 0.8em;
 }
+
+
+/* ########################################################## */
+/* ##################### READONLY STATE ##################### */
+/* ########################################################## */
+
+gs-date[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+    padding: 0.2em;
+}
+
+gs-date[readonly] .date-picker-button {
+    display: none;
+    cursor: default;
+    opacity: 0.9;
+    pointer-events: none;
+}
+
 
 /* ###################################################################################### */
 /* ###################################### DATEPICKER #################################### */
@@ -14213,7 +14265,22 @@ gs-file-manager > .root > .file-manager-list .goto-file {
 
 gs-file-manager > .root > .file-manager-upload {
     margin-top: 0.2em;
-}/* defaults */
+}
+
+gs-file-manager[readonly] > .root > .file-manager-upload,
+gs-file-manager[readonly] > .root > .file-edit-file,
+gs-file-manager[readonly] > .root > .file-delete-file {
+    display: none;
+}
+
+gs-file-manager[readonly] > .root > .goto-file {
+    -webkit-border-radius: 4px !important;
+    -moz-border-radius: 4px !important;
+    -ms-border-radius: 4px !important;
+    -o-border-radius: 4px !important;
+    border-radius: 4px !important;
+}
+/* defaults */
 gs-folder {
     display: block;
     border: 1px solid #006E00;
@@ -14297,8 +14364,8 @@ gs-folder > .root .file-line:not(:first-child) > gs-button {
     border-top-left-radius: 0;
 }
 
-gs-folder > .root .open-folder,
-gs-folder > .root .open-file {
+gs-folder:not([readonly]) > .root .open-folder,
+gs-folder:not([readonly]) > .root .open-file {
     border-left: 0 none;
 }
 
@@ -14309,6 +14376,18 @@ gs-folder > .root .open-file {
     word-break: break-all;
 }
 
+
+/* readonly */
+gs-folder[readonly] > .root .more-folder,
+gs-folder[readonly] > .root .more-file {
+    display: none;
+}
+gs-folder[readonly] > .root .open-folder,
+gs-folder[readonly] > .root .open-file {
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+}
+
 /* ##############################################################
 ###################### LIST HEADER BUTTONS ######################
 ############################################################## */
@@ -14317,11 +14396,13 @@ gs-folder > .root .open-file {
 gs-folder > .root .folder-list-header gs-button,
 gs-folder > .root .file-list-header gs-button {
     border: 1px solid #006E00;
+    margin-left: 0.2em;
 }
 gs-folder > .root .folder-list-header gs-button[remove-bottom],
 gs-folder > .root .file-list-header gs-button[remove-bottom] {
     border-bottom: 0 none;
 }
+/*
 gs-folder > .root .folder-list-header gs-button[remove-right],
 gs-folder > .root .file-list-header gs-button[remove-right] {
     border-right: 0 none;
@@ -14329,13 +14410,20 @@ gs-folder > .root .file-list-header gs-button[remove-right] {
 gs-folder > .root .folder-list-header gs-button[remove-left],
 gs-folder > .root .file-list-header gs-button[remove-left] {
     border-left: 0 none;
-}
+}*/
 
 /* mini */
 /*gs-folder[mini] > .root .folder-list-header gs-button,
 gs-folder[mini] > .root .file-list-header gs-button {
     border: 0 none;
 }*/
+
+/* readonly */
+gs-folder[readonly] > .root .folder-list-header .button-new-folder,
+gs-folder[readonly] > .root .file-list-header .button-new-file,
+gs-folder[readonly] > .root .file-list-header .button-upload-file {
+    display: none;
+}
 
 /* ###############################################################
 ######################### LIST CONTAINER #########################
@@ -14690,6 +14778,27 @@ gs-interval .time-picker-button:after {
 
 gs-interval[no-picker] {
     padding: 0.2em;
+}
+
+
+/* ###################################################################################### */
+/* ################################ ATTRIBUTE:  "readonly" ############################## */
+/* ###################################################################################### */
+
+gs-interval[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+    padding: 0.2em;
+}
+
+gs-interval[readonly] {
+    padding: 0.2em;
+}
+
+gs-interval[readonly] .time-picker-button {
+    display: none;
 }
 
 
@@ -15290,6 +15399,18 @@ gs-memo[mini] {
 
 
 /* ###################################################################################### */
+/* #################################### READONLY STATE ################################## */
+/* ###################################################################################### */
+
+gs-memo[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+}
+
+
+/* ###################################################################################### */
 /* ######################################## FLEXED ###################################### */
 /* ###################################################################################### */
 
@@ -15381,6 +15502,19 @@ gs-number[mini] {
 gs-number[disabled],
 gs-number[disabled] .control {
     background-color: #D5D5D5;
+}
+
+
+/* ###################################################################################### */
+/* #################################### READONLY STATE ################################## */
+/* ###################################################################################### */
+
+gs-number[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+    padding: 0.2em;
 }gs-optionbox {
     display: block;
     border: 2px solid #AAAAAA;
@@ -15419,6 +15553,17 @@ gs-optionbox:not([no-target]) gs-option:after {
 gs-optionbox:not([no-target]) gs-option[selected]:after {
     /* fa-dot-circle-o */
     content: '\f192';
+}
+
+
+
+gs-optionbox[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+    padding: 0.2em;
+    pointer-events: none;
 }
 
 /*
@@ -15679,6 +15824,18 @@ gs-search[disabled],
 gs-search[disabled] .control {
     background-color: #D5D5D5;
 }
+
+
+/* ###################################################################################### */
+/* #################################### READONLY STATE ################################## */
+/* ###################################################################################### */
+
+gs-search[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+}
 gs-select {
     position: relative;
     display: block;
@@ -15688,6 +15845,10 @@ gs-select {
     border-radius: 0.2em;
     box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
     min-height: 1em;
+}
+
+gs-select > select {
+    background-color: #FFFFFF;
 }
 
 gs-select > option {
@@ -15721,6 +15882,19 @@ gs-select[mini] {
     border: 0;
     border-radius: 0;
     box-shadow: 0 0 0 0;
+}
+
+
+/* readonly: light border, not clickable, no chevron */
+gs-select[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+}
+
+gs-select[readonly]:after {
+    display: none;
 }
 gs-static {
     display: block; /* inline-block */
@@ -15804,6 +15978,18 @@ gs-text[disabled],
 gs-text[disabled] .control {
     height: 1.35em;
     background-color: #D5D5D5;
+}
+
+
+/* ###################################################################################### */
+/* #################################### READONLY STATE ################################## */
+/* ###################################################################################### */
+
+gs-text[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
 }gs-time {
     position: relative;
     display: block;
@@ -15843,6 +16029,26 @@ gs-time .time-picker-button:after {
 
 gs-time[no-picker] {
     padding: 0.2em;
+}
+
+
+/* ###################################################################################### */
+/* ################################ ATTRIBUTE: "no-picker" ############################## */
+/* ###################################################################################### */
+
+gs-time[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+    padding: 0.2em;
+}
+
+gs-time[readonly] .time-picker-button {
+    display: none;
+    cursor: default;
+    opacity: 0.9;
+    pointer-events: none;
 }
 
 

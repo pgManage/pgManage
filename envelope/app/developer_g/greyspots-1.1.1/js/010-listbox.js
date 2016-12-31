@@ -581,34 +581,145 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('resize', windowResizeHandler);  // I want to debounce this event but that would require a timer -michael
     window.addEventListener('orientationchange', windowResizeHandler);
     
+    //function pushReplacePopHandler(element) {
+    //    var i, len, currentValue, bolRefresh = false, strQueryString = GS.getQueryString(), arrPopKeys, strQSCol = element.getAttribute('qs');
+    //    
+    //    if (strQSCol && GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1 && element.value !== GS.qryGetVal(strQueryString, strQSCol)) {
+    //        element.value = GS.qryGetVal(strQueryString, strQSCol);
+    //    }
+    //    
+    //    // if this element has a refresh-on-querystring-values attribute: check for changes
+    //    if (element.hasAttribute('refresh-on-querystring-values')) {
+    //        arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
+    //        
+    //        for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
+    //            currentValue = GS.qryGetVal(strQueryString, arrPopKeys[i]);
+    //            
+    //            if ((element.popValues[arrPopKeys[i]] || '') !== currentValue) {
+    //                bolRefresh = true;
+    //            }
+    //            
+    //            element.popValues[arrPopKeys[i]] = currentValue;
+    //        }
+    //        
+    //    } else if (element.hasAttribute('refresh-on-querystring-change')) {
+    //        bolRefresh = true;
+    //    }
+    //    
+    //    if (bolRefresh) {
+    //        element.refresh();
+    //    }
+    //}
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
+        }
+    }
+
     function pushReplacePopHandler(element) {
-        var i, len, currentValue, bolRefresh = false, strQueryString = GS.getQueryString(), arrPopKeys, strQSCol = element.getAttribute('qs');
-        
-        if (strQSCol && GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1 && element.value !== GS.qryGetVal(strQueryString, strQSCol)) {
-            element.value = GS.qryGetVal(strQueryString, strQSCol);
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+        var arrPopKeys;
+        var currentValue;
+        var bolRefresh;
+
+        if (strQSCol) {
+            if (strQSCol.indexOf('=') !== -1) {
+                arrAttrParts = strQSCol.split(',');
+                i = 0;
+                len = arrAttrParts.length;
+                while (i < len) {
+                    strQSCol = arrAttrParts[i]
+                    arrQSParts = strQSCol.split('=');
+                    strQSCol = arrQSParts[0];
+                    strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
+                    i += 1;
+                }
+            } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+                strQSValue = GS.qryGetVal(strQS, strQSCol);
+    
+                if (element.internal.bolQSFirstRun !== true) {
+                    if (strQSValue !== '' || !element.getAttribute('value')) {
+                        element.setAttribute('value', strQSValue);
+                    }
+                } else if (element.value !== strQSValue) {
+                    element.value = strQSValue;
+                }
+            }
         }
         
-        // if this element has a refresh-on-querystring-values attribute: check for changes
-        if (element.hasAttribute('refresh-on-querystring-values')) {
-            arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-            
-            for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
-                currentValue = GS.qryGetVal(strQueryString, arrPopKeys[i]);
+        // handle "refresh-on-querystring-values" and "refresh-on-querystring-change" attributes
+        if (element.internal.bolQSFirstRun === true) {
+            if (element.hasAttribute('refresh-on-querystring-values')) {
+                arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
                 
-                if ((element.popValues[arrPopKeys[i]] || '') !== currentValue) {
-                    bolRefresh = true;
+                for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
+                    currentValue = GS.qryGetVal(strQS, arrPopKeys[i]);
+                    
+                    if (element.popValues[arrPopKeys[i]] !== currentValue) {
+                        bolRefresh = true;
+                    }
+                    
+                    element.popValues[arrPopKeys[i]] = currentValue;
                 }
-                
-                element.popValues[arrPopKeys[i]] = currentValue;
+            } else if (element.hasAttribute('refresh-on-querystring-change')) {
+                bolRefresh = true;
             }
             
-        } else if (element.hasAttribute('refresh-on-querystring-change')) {
-            bolRefresh = true;
+            if (bolRefresh && element.hasAttribute('src')) {
+                getData(element);
+            } else if (bolRefresh && !element.hasAttribute('src')) {
+                console.warn('gs-combo Warning: element has "refresh-on-querystring-values" or "refresh-on-querystring-change", but no "src".', element);
+            }
+        } else {
+            if (element.hasAttribute('refresh-on-querystring-values')) {
+                arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
+                
+                for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
+                    element.popValues[arrPopKeys[i]] = GS.qryGetVal(strQS, arrPopKeys[i]);
+                }
+            }
         }
         
-        if (bolRefresh) {
-            element.refresh();
-        }
+        element.internal.bolQSFirstRun = true;
     }
     
     // dont do anything that modifies the element here
@@ -636,22 +747,25 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!element.inserted) {
                 element.inserted = true;
                 element.error = false;
+                element.internal = {};
+                saveDefaultAttributes(element);
                 
                 // handle "qs" attribute
                 if (element.hasAttribute('qs') ||
                         element.hasAttribute('refresh-on-querystring-values') ||
                         element.hasAttribute('refresh-on-querystring-change')) {
                     element.popValues = {};
-                    strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
-                    
-                    if (strQSValue !== '' || !element.getAttribute('value')) {
-                        element.setAttribute('value', strQSValue);
-                    }
-                    
+                    //strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+                    //
+                    //if (strQSValue !== '' || !element.getAttribute('value')) {
+                    //    element.setAttribute('value', strQSValue);
+                    //}
+
+                    pushReplacePopHandler(element);
                     window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
-                    element.popValues = GS.qryToJSON(GS.getQueryString());
+                    //element.popValues = GS.qryToJSON(GS.getQueryString());
                 }
                 
                 // allows the element to have focus
@@ -667,7 +781,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.tableTemplate = GS.templateColumnToValue(tableTemplateElement.innerHTML);
                 }
                 
-                console.log(element.tableTemplate);
+                //console.log(element.tableTemplate);
                 
                 if (element.getAttribute('src') || element.getAttribute('source')) {
                     getData(element, '', true);

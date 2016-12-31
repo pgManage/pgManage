@@ -164,6 +164,7 @@ gs-doc-example .example-display-container {
 
 gs-doc-example .query-string-container {
     border-bottom: 1px solid #000000;
+    min-height: 2em;
 }
 
 gs-doc-example .example-display-refresh-modal {

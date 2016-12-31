@@ -1,84 +1,84 @@
 window.addEventListener('design-register-element', function () {
-    
+
     registerDesignSnippet('<gs-time>', '<gs-time>', 'gs-time column="${1:name}"></gs-time>');
     registerDesignSnippet('<gs-time> With Label', '<gs-time>', 'label for="${1:time-insert-start_time}">${2:Start Time}:</label>\n' +
                                                                '<gs-time id="${1:time-insert-start_time}" column="${3:start_time}"></gs-time>');
-    
+
     designRegisterElement('gs-time', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-time.html');
-    
+
     window.designElementProperty_GSTIME = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('placeholder') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'placeholder', this.value);
         });
-        
+
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
         });
-        
+
         addProp('Time Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-picker')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-picker', (this.value === 'true'), false);
         });
-        
+
         addProp('Non-Empty', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('non-empty')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'non-empty', (this.value === 'true'), true);
         });
-        
+
         addProp('Now Button', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-now-button')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-now-button', (this.value === 'true'), false);
         });
-        
+
         addProp('Display Format', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('format') || '') + '" mini>' +
                                     '<option value="">Regular (1:30 PM)</option>' +
                                     '<option value="military">Military (13:30)</option>' +
                                 '</gs-select>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'format', this.value);
         });
-        
+
         addProp('Output Format', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('output-format') || '') + '" mini>' +
                                     '<option value="">Regular (1:30 PM)</option>' +
                                     '<option value="military">Military (13:30)</option>' +
                                 '</gs-select>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'output-format', this.value);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
         });
-        
+
         // visibility attributes
         strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
@@ -88,7 +88,7 @@ window.addEventListener('design-register-element', function () {
         if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
         if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
         if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -106,27 +106,27 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // DISABLED attribute
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
-        
-        //// SUSPEND-CREATED attribute
-        //addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
-        //    return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
-        //});
-        
+
+        // SUSPEND-CREATED attribute
+        addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
+        });
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
@@ -137,7 +137,7 @@ window.addEventListener('design-register-element', function () {
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
     var currentErrorControl;
-    
+
     window.addEventListener('focus', function (event) {
         if (currentErrorControl && event.target !== currentErrorControl.control) {
             currentErrorControl.control.focus();
@@ -145,12 +145,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 GS.setInputSelection(currentErrorControl.control, 0, currentErrorControl.control.value.length);
             }
         }
-        
+
         if (currentErrorControl && currentErrorControl.control && currentErrorControl.control.value) {
             currentErrorControl = '';
         }
     });
-    
+
     //x attributes:
     //x      placeholder:   copy to control element
     //x      disabled:      copy to control element
@@ -161,17 +161,17 @@ document.addEventListener('DOMContentLoaded', function () {
     //x      no-now-button: affects dropdown html and "n" key
     //x      value:         affects control value
     //x      no-picker:     affects innerHTML because it removes the picker button
-    
+
     //x accessors:
     //x      value:     returns text value
     //x      dateValue: returns value as a date object
     //x      state:     returns text representation of state: "open" or "closed"
-    
+
     //x methods:
     //x      open:   opens popup
     //x      close:  closes popup
     //x      toggle: toggles open and closed methods
-    
+
     //x events:
     //x      picker button click: runs "toggle" method
     //x      control keydown:
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //x          right arrow: next minute
     //x          "c":         clear (if allowed)
     //x          "n":         now (if allowed)
-    
+
     //x dropdown behaviours:
     //x      if from control to bottom is too small and from control to top is too small: dialog
     //x      else if window width < 400px: dialog
@@ -189,41 +189,41 @@ document.addEventListener('DOMContentLoaded', function () {
     //x      else:
     //x          if from control to bottom has enough room: popup below
     //x          else: popup above
-    
+
     // #####################################################################################
     // ################################## EVENT RETARGETING ################################
     // #####################################################################################
-    
+
     // re-target change event from control to element
     function changeFunction(event) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         event.target.parentNode.setAttribute('value', event.target.value);
         //console.log('this is a test', event.target);
         handleChange(event.target.parentNode);
     }
-    
+
     // re-target focus event from control to element
     function focusFunction(event) {
         GS.triggerEvent(event.target.parentNode, 'focus');
     }
-    
-    
+
+
     // #####################################################################################
     // ####################################### CONTROL #####################################
     // #####################################################################################
-    
+
     function refreshControl(element) {
         var i, len, arrPassThroughAttributes, strHTML;
-        
+
         // clear out HTML
         element.innerHTML = '';
-        
+
         // clear out element variables
         element.control = '';
         element.button = '';
-        
+
         // if we are not disabled:
         if (!element.hasAttribute('disabled')) {
             // build HTML
@@ -231,54 +231,55 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!element.hasAttribute('no-picker')) {
                 strHTML += '<gs-button class="time-picker-button" gs-dynamic inline icononly icon="clock-o" no-focus></gs-button>';
             }
-            
+
             // set control HTML
             element.innerHTML = strHTML;
-            
+
             // fill element variables
             element.control = element.children[0];
             element.button = element.children[1];
-            
+
             // handle passthrough attributes
             arrPassThroughAttributes = [
-                'placeholder',
-                'name',
-                'maxlength',
-                'autocorrect',
-                'autocapitalize',
-                'autocomplete',
-                'autofocus',
-                'spellcheck'
+                'placeholder', 'name', 'maxlength', 'autocorrect',
+                'autocapitalize', 'autocomplete', 'autofocus', 'spellcheck',
+                'readonly'
             ];
-            
-            for (i = 0, len = arrPassThroughAttributes.length; i < len; i += 1) {
+
+            i = 0;
+            len = arrPassThroughAttributes.length;
+            while (i < len) {
                 if (element.hasAttribute(arrPassThroughAttributes[i])) {
-                    element.control.setAttribute(arrPassThroughAttributes[i], element.getAttribute(arrPassThroughAttributes[i]) || '');
+                    element.control.setAttribute(
+                        arrPassThroughAttributes[i],
+                        element.getAttribute(arrPassThroughAttributes[i]) || ''
+                    );
                 }
+                i += 1;
             }
-            
+
             // move tabindex
             if (element.hasAttribute('tabindex')) {
                 element.oldTabIndex = element.getAttribute('tabindex');
                 element.removeAttribute('tabindex');
             }
-            
+
             if (element.oldTabIndex) {
                 element.control.tabIndex = element.oldTabIndex;
             }
-            
+
             // bind control retargeting
             element.control.removeEventListener('change', changeFunction);
             element.control.addEventListener('change', changeFunction);
-            
+
             element.control.removeEventListener('focus', focusFunction);
             element.control.addEventListener('focus', focusFunction);
         }
-        
+
         // display value
         setValueDisplay(element, element.getAttribute('value'));
     }
-    
+
     function handleChange(element) {
         element.close();
         if (handleNonEmpty(element) && element.lastChangeValue !== element.getAttribute('value')) {
@@ -286,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function () {
             element.lastChangeValue = element.getAttribute('value');
         }
     }
-    
+
     function handleNonEmpty(element) {
         var bolAllClear = true;
 
@@ -307,7 +308,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // translate inputed value to a format that is allowed. no seconds as of yet, defaults to AM
     function translateValue(strFormat, newValue) {
-        var translatedValue, valueDate, strHour, strMinute, strPeriod, arrParts, intHours;
+        var translatedValue;
+        var valueDate;
+        var strHour;
+        var strMinute;
+        var strPeriod;
+        var arrParts;
+        var intHours;
 
         // coalesce value
         newValue = newValue || '';
@@ -425,49 +432,57 @@ document.addEventListener('DOMContentLoaded', function () {
 
         return translatedValue;
     }
-    
+
     function setValueDisplay(element, newValue) {
-        var translatedOutputValue = translateValue((element.getAttribute('output-format') === 'military' ? 'military' : 'regular'), newValue),
-            translatedDisplayValue = translateValue((element.getAttribute('format') === 'military' ? 'military' : 'regular'), newValue);
-        
+        var translatedOutputValue = translateValue((element.getAttribute('output-format') === 'military' ? 'military' : 'regular'), newValue);
+        var translatedDisplayValue = translateValue((element.getAttribute('format') === 'military' ? 'military' : 'regular'), newValue);
+
         element.setAttribute('value', translatedOutputValue);
-        
+
         if (!element.hasAttribute('disabled')) {
             element.control.value = translatedDisplayValue;
         } else {
             element.textContent = translatedDisplayValue || element.getAttribute('placeholder') || '';
         }
-        
+
         if (element.innerState === 'open') {
             refreshPickerValue(element);
         }
     }
-    
+
     function refreshPickerValue(element) {
-        var arrElements, strTranslatedValue, dteTranslatedValue, i, len, intHours;
-        
+        var arrElements;
+        var strTranslatedValue;
+        var dteTranslatedValue;
+        var i;
+        var len;
+        var intHours;
+
         if (element.innerState === 'open') {
             strTranslatedValue = translateValue((element.getAttribute('format') === 'military' ? 'military' : 'regular'), element.getAttribute('value'));
             dteTranslatedValue = new Date('1/1/1111 ' + strTranslatedValue);
-            
+
             element.pickerModalControlElement.setAttribute('value', strTranslatedValue);
-            
+
             arrElements = xtag.query(element.pickerContainerElement, '.selected');
-            
-            for (i = 0, len = arrElements.length; i < len; i += 1) {
+
+            i = 0;
+            len = arrElements.length;
+            while (i < len) {
                 arrElements[i].classList.remove('selected');
+                i += 1;
             }
-            
-            
+
+
             intHours = dteTranslatedValue.getHours();
-            
+
             if (intHours >= 12) {
                 intHours = intHours - 12;
             }
             if (intHours === 0) {
                 intHours = 12;
             }
-            
+
             xtag.query(element.pickerContainerElement,
                 '.clock-hour[data-value="' + intHours + '"]')[0].classList.add('selected');
             xtag.query(element.pickerContainerElement,
@@ -476,52 +491,128 @@ document.addEventListener('DOMContentLoaded', function () {
                 '.clock-period-switch.' + (dteTranslatedValue.getHours() >= 12 ? 'pm' : 'am'))[0].classList.add('selected');
         }
     }
-    
-    
+
+
     // #####################################################################################
     // ##################################### QUERYSTRING ###################################
     // #####################################################################################
-    
+
     function handleQS(element) {
         var strQSValue;
-        
+
         if (!element.qsEventFunction) {
             element.qsEventFunction = function () {
                 pushReplacePopHandler(element);
             };
         }
-        
+
         window.removeEventListener('pushstate',    element.qsEventFunction);
         window.removeEventListener('replacestate', element.qsEventFunction);
         window.removeEventListener('popstate',     element.qsEventFunction);
-        
+
         // handle "qs" attribute
         if (element.getAttribute('qs')) {
-            strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
-            
-            if (strQSValue !== '' || !element.getAttribute('value')) {
-                element.setAttribute('value', strQSValue);
-            }
-            
+            //strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+
+            //if (strQSValue !== '' || !element.getAttribute('value')) {
+            //    element.setAttribute('value', strQSValue);
+            //}
+            pushReplacePopHandler(element);
             window.addEventListener('pushstate',    element.qsEventFunction);
             window.addEventListener('replacestate', element.qsEventFunction);
             window.addEventListener('popstate',     element.qsEventFunction);
         }
     }
-    
-    function pushReplacePopHandler(element) {
-        var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-        
-        if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-            element.setAttribute('value', GS.qryGetVal(strQueryString, strQSCol));
+
+
+    //function pushReplacePopHandler(element) {
+    //    var strQueryString = GS.getQueryString();
+    //    var strQSCol = element.getAttribute('qs');
+
+    //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+    //        element.setAttribute('value', GS.qryGetVal(strQueryString, strQSCol));
+    //    }
+    //}
+
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
         }
     }
-    
-    
+
+    function pushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i];
+                arrQSParts = strQSCol.split('=');
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present: go to the attribute's default or remove it
+                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                // else: set attribute to exact text from QS
+                } else {
+                    element.setAttribute(strQSAttr, (
+                        GS.qryGetVal(strQS, strQSCol) ||
+                        element.internal.defaultAttributes[strQSAttr] ||
+                        ''
+                    ));
+                }
+                i += 1;
+            }
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun !== true) {
+                if (strQSValue !== '' || !element.getAttribute('value')) {
+                    element.setAttribute('value', strQSValue);
+                }
+            } else {
+                element.value = strQSValue;
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
+    }
+
+
     // #####################################################################################
     // ###################################### LIFECYCLE ####################################
     // #####################################################################################
-    
+
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -533,43 +624,45 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.setAttribute('value', element.value);
                 delete element.value;
             }
-            
         }
     }
-    
+
     //
     function elementInserted(element) {
-        var now, strQSValue;
-        
+        var now;
+        var strQSValue;
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.innerState = 'closed';
-                
+                element.internal = {};
+                saveDefaultAttributes(element);
+
                 // if value attribute = now: set value attribute to the current time
                 if (element.getAttribute('value') === 'now') {
                     now = new Date();
-                    
+
                     if (now.getHours() > 12) {
                         now = GS.leftPad(now.getHours() - 12, '0', 2) + ':' + GS.leftPad(now.getMinutes(), '0', 2) + ' PM';
                     } else {
                         now = GS.leftPad(now.getHours(), '0', 2) + ':' + GS.leftPad(now.getMinutes(), '0', 2) + ' AM';
                     }
-                    
+
                     element.setAttribute('value', now);
                 }
-                
+
                 element.inserted = true;
-                
+
                 refreshControl(element);
-                
+
                 if (element.getAttribute('qs')) {
                     handleQS(element);
                 }
-                
+
                 element.lastChangeValue = element.getAttribute('value');
-                
+
                 if (element.hasAttribute('non-empty') && !element.getAttribute('value')) {
                     console.warn('gs-time Warning: No value provided on "non-empty" gs-time control. Defaulting to "12:00 PM". Please provide a default value.');
                     element.setAttribute('value', '12:00 PM');
@@ -577,104 +670,109 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
-    
+
+
     // ######################################################################################
     // ##################################### REGISTRATION ###################################
     // ######################################################################################
-    
+
     xtag.register('gs-time', {
         lifecycle: {
             created: function () {
                 elementCreated(this);
             },
-            
+
             inserted: function () {
                 elementInserted(this);
             },
-            
+
             attributeChanged: function (strAttrName, oldValue, newValue) {
+                var element = this;
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
-                    elementCreated(this);
-                    elementInserted(this);
-                    
+                    elementCreated(element);
+                    elementInserted(element);
+
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
-                    elementInserted(this);
-                    
-                } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                    elementInserted(element);
+
+                } else if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
                     if (strAttrName === 'placeholder' ||
                         strAttrName === 'disabled' ||
                         strAttrName === 'format' ||
                         strAttrName === 'no-picker' ||
                         strAttrName === 'tabindex') {
-                        refreshControl(this);
-                        
+                        refreshControl(element);
+
                     } else if (strAttrName === 'qs') {
-                        handleQS(this);
-                        
-                    } else if (strAttrName === 'value' && this.inserted) {// && this.control
-                        setValueDisplay(this, newValue);
+                        handleQS(element);
+
+                    } else if (strAttrName === 'value' && element.inserted) {// && this.control
+                        setValueDisplay(element, newValue);
                     }
                 }
             }
         },
         events: {
             'click': function (event) {
-                if (event.target === this.button) {
-                    this.toggle();
+                var element = this;
+                if (event.target === element.button) {
+                    element.toggle();
                 }
             },
             'keydown:': function (event) {
-                var intKeyCode = (event.keyCode || event.which), newControlValue;
-                
-                if (!this.hasAttribute('no-keys')) {
-                    if (this.getAttribute('value') && (intKeyCode === 38 || intKeyCode === 39 || intKeyCode === 40 || intKeyCode === 37)) {
-                        newControlValue = new Date('1/1/1111 ' + this.getAttribute('value'));
+                var element = this;
+                var intKeyCode = (event.keyCode || event.which);
+                var newControlValue;
+
+                if (!element.hasAttribute('no-keys') && !element.hasAttribute('readonly')) {
+                    if (element.getAttribute('value') && (intKeyCode === 38 || intKeyCode === 39 || intKeyCode === 40 || intKeyCode === 37)) {
+                        newControlValue = new Date('1/1/1111 ' + element.getAttribute('value'));
                         event.preventDefault();
                         event.stopPropagation();
-                        
+
                         // up arrow:    next minute
                         // right arrow: next minute
                         if (intKeyCode === 38 || intKeyCode === 39) {
                             newControlValue = newControlValue.setMinutes(newControlValue.getMinutes() + 1);
-                            
+
                         // down arrow: previous minute
                         // left arrow: previous minute
                         } else if (intKeyCode === 40 || intKeyCode === 37) {
                             newControlValue = newControlValue.setMinutes(newControlValue.getMinutes() - 1);
                         }
                     }
-                    
+
                     // "c": clear (if allowed)
-                    if (intKeyCode === 67 && !event.ctrlKey && !event.metaKey && !this.hasAttribute('non-empty')) {
+                    if (intKeyCode === 67 && !event.ctrlKey && !event.metaKey && !element.hasAttribute('non-empty')) {
                         newControlValue = '';
                         event.preventDefault();
                         event.stopPropagation();
-                        
+
                     // "n": now (if allowed)
-                    } else if (intKeyCode === 78 && !event.ctrlKey && !event.metaKey && !this.hasAttribute('no-now-button')) {
+                    } else if (intKeyCode === 78 && !event.ctrlKey && !event.metaKey && !element.hasAttribute('no-now-button')) {
                         newControlValue = new Date();
                         event.preventDefault();
                         event.stopPropagation();
                     }
-                    
+
                     if (newControlValue !== undefined) {
-                        setValueDisplay(this, newControlValue);
-                        GS.setInputSelection(this.control, 0, this.control.value.length);
+                        setValueDisplay(element, newControlValue);
+                        GS.setInputSelection(element.control, 0, element.control.value.length);
                     }
-                    
+
                     if (intKeyCode === 13) {
-                        handleNonEmpty(this);
+                        handleNonEmpty(element);
                     }
                 }
             },
             'focusout': function (event) {
-                if (this.innerState === 'open') {
-                    this.close();
+                var element = this;
+                if (element.innerState === 'open') {
+                    element.close();
                 } else {
-                    handleChange(this);
+                    handleChange(element);
                 }
             }
         },
@@ -700,10 +798,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     return this.innerState;
                 },
                 set: function (newValue) {
+                    var element = this;
                     if (newValue === 'open') {
-                        this.open();
+                        element.open();
                     } else {
-                        this.close();
+                        element.close();
                     }
                 }
             }
@@ -712,43 +811,48 @@ document.addEventListener('DOMContentLoaded', function () {
             focus: function () {
                 this.control.focus();
             },
-            
+
             open: function () {
-                var element = this, pickerContainerElement, overlayElement, pickerElement, handleLook, strHTML;
-                
+                var element = this;
+                var pickerContainerElement;
+                var overlayElement;
+                var pickerElement;
+                var handleLook;
+                var strHTML;
+
                 if (element.innerState === 'closed') {
                     element.innerState = 'open';
                     element.lastClosedValue = element.getAttribute('value');
-                    
+
                     // if we are not on a touch device: focus control
                     if (!evt.touchDevice) {
                         element.control.focus();
                         GS.setInputSelection(element.control, 0, element.control.value.length);
-                        
+
                     } else {
                         //this.control.focus()
                         //this.control.blur();
                     }
-                    
+
                     // create picker elements
                     pickerContainerElement = document.createElement('div');
                     pickerContainerElement.classList.add('gs-time-time-picker-container');
-                    
+
                     overlayElement = document.createElement('div');
                     overlayElement.classList.add('gs-time-time-picker-overlay');
-                    
+
                     pickerElement = document.createElement('div');
                     pickerElement.classList.add('gs-time-time-picker');
-                    
+
                     // save picker container
                     element.pickerContainerElement = pickerContainerElement;
-                    
+
                     // append picker elements
                     pickerContainerElement.appendChild(overlayElement);
                     pickerContainerElement.appendChild(pickerElement);
-                    
+
                     document.body.appendChild(pickerContainerElement);
-                    
+
                     // fill picker popup
                     strHTML = ml(function () {/*
                         <div class="time-modal-control-container" flex-horizontal>
@@ -802,43 +906,43 @@ left: 49.75%;"><div class="clock-button clock-minute" data-value="25"><span clas
                             </div>
                         </div>
                     */});
-                    
+
                     strHTML += '<div class="time-bottom-toolbar">' +
                                     '<div flex-horizontal align-top>';
-                    
+
                     if (!element.hasAttribute('no-now-button')) {
                         strHTML += '<gs-button class="now-time">Now</gs-button>';
                     }
-                    
+
                     strHTML += '<gs-button class="done" flex>Done</gs-button>';
-                    
+
                     if (!element.hasAttribute('non-empty')) {
                         strHTML += '<gs-button class="clear-time">Clear</gs-button>';
                     }
-                    
+
                     strHTML +=      '</div>' +
                                 '</div>';
-                    
+
                     pickerElement.innerHTML = strHTML;
-                    
+
                     // save picker control
                     element.pickerModalControlElement = xtag.query(pickerContainerElement, '.time-modal-control')[0];
-                    
+
                     // set picker value
                     refreshPickerValue(element);
-                    
+
                     // bind picker control change
                     element.pickerModalControlElement.addEventListener('change', function (event) {
                         setValueDisplay(element, this.value);
                     });
-                    
+
                     // bind picker control keydown
                     element.pickerModalControlElement.addEventListener('keydown', function (event) {
                         if ((event.keyCode || event.which) === 13) {
                             element.close();
                         }
                     });
-                    
+
                     // bind picker click
                     pickerElement.addEventListener('mousedown', function (event) {
                         if (!evt.touchDevice) {
@@ -846,17 +950,17 @@ left: 49.75%;"><div class="clock-button clock-minute" data-value="25"><span clas
                             event.stopPropagation();
                         }
                     });
-                    
+
                     //console.log('0***', pickerElement);
                     pickerElement.addEventListener('click', function (event) {
                         var target = event.target, arrElements, i, len, newValue;
-                        
+
                         //console.log('1***', newValue);
-                        
+
                         if (target.classList.contains('content')) {
                             target = target.parentNode;
                         }
-                        
+
                         if (target.classList.contains('clock-button') || target.classList.contains('clock-period-switch')) {
                             if (target.classList.contains('clock-hour')) {
                                 arrElements = xtag.query(pickerElement, '.clock-hour');
@@ -867,13 +971,13 @@ left: 49.75%;"><div class="clock-button clock-minute" data-value="25"><span clas
                             if (target.classList.contains('clock-period-switch')) {
                                 arrElements = xtag.query(pickerElement, '.clock-period-switch');
                             }
-                            
+
                             for (i = 0, len = arrElements.length; i < len; i += 1) {
                                 arrElements[i].classList.remove('selected');
                             }
-                            
+
                             target.classList.add('selected');
-                            
+
                             arrElements = xtag.query(pickerElement, '.selected');
                             if (arrElements.length === 3) {
                                 newValue = arrElements[0].textContent + ':' +
@@ -881,56 +985,53 @@ left: 49.75%;"><div class="clock-button clock-minute" data-value="25"><span clas
                                            arrElements[2].textContent;
                             }
                         }
-                        
+
                         if (target.classList.contains('increment-time') && element.getAttribute('value')) {
                             newValue = new Date('1/1/1111 ' + element.getAttribute('value'));
                             newValue = newValue.setMinutes(newValue.getMinutes() + 1);
-                            
                         } else if (target.classList.contains('decrement-time') && element.getAttribute('value')) {
                             newValue = new Date('1/1/1111 ' + element.getAttribute('value'));
                             newValue = newValue.setMinutes(newValue.getMinutes() - 1);
-                            
                         } else if (target.classList.contains('now-time')) {
                             newValue = new Date();
-                            
                         } else if (target.classList.contains('clear-time')) {
                             newValue = '';
                         } else if (target.classList.contains('modal-done') || target.classList.contains('done')) {
                             element.close();
                         }
-                        
+
                         //console.log('2***', newValue);
                         if (newValue !== undefined) {
                             setValueDisplay(element, newValue);
                             //console.log('3***', element, element.getAttribute('value'), element.value);
-                            
+
                             if (!evt.touchDevice) {
                                 GS.setInputSelection(element.control, 0, element.control.value.length);
                             }
                         }
                     });
-                    
+
                     // handle/bind positioning and look
                     handleLook = function () {
                         var positionData, intPopupHeight, intPopupWidth;
-                        
+
                         if (pickerContainerElement.parentNode !== document.body) {
                             window.removeEventListener('resize', handleLook);
                             window.removeEventListener('orientationchange', handleLook);
                             return;
                         }
-                        
+
                         // clear current styles
                         pickerElement.style.top = '';
                         pickerElement.style.left = '';
                         pickerElement.style.marginTop = '';
                         pickerContainerElement.classList.remove('modal');
-                        
+
                         // get position/size data
                         positionData = GS.getElementPositionData(element);
                         intPopupHeight = pickerElement.offsetHeight;
                         intPopupWidth = pickerElement.offsetWidth;
-                        
+
                         // if from control to bottom is too small and from control to top is too small
                         //      OR window width < 400px: dialog
                         //      OR window height < 550px: dialog
@@ -940,32 +1041,32 @@ left: 49.75%;"><div class="clock-button clock-minute" data-value="25"><span clas
                             // dialog mode
                             pickerElement.style.marginTop = '1em';
                             pickerContainerElement.classList.add('modal');
-                            
+
                         } else {
                             // if from control to bottom has enough room: popup below
                             if (positionData.intRoomBelow > intPopupHeight) {
                                 pickerElement.style.top  = (positionData.objElementOffset.top + positionData.intElementHeight) + 'px';
-                                
+
                             // else: popup above
                             } else {
                                 pickerElement.style.top  = (positionData.objElementOffset.top - intPopupHeight) + 'px';
                             }
-                            
+
                             pickerElement.style.left =
                                 ((positionData.objElementOffset.left + positionData.intElementWidth) - intPopupWidth) + 'px';
                         }
                     };
-                    
+
                     handleLook();
-                    
+
                     window.addEventListener('resize', handleLook);
                     window.addEventListener('orientationchange', handleLook);
                 }
             },
-            
+
             close: function () {
                 var element = this;
-                
+
                 if (element.innerState === 'open') {
                     element.innerState = 'closed';
                     //console.trace('closed', element.pickerContainerElement);
@@ -973,7 +1074,7 @@ left: 49.75%;"><div class="clock-button clock-minute" data-value="25"><span clas
                         document.body.removeChild(element.pickerContainerElement);
                         element.pickerContainerElement = '';
                     }
-                    
+
                     if (element.getAttribute('value') !== element.lastClosedValue) {
                         handleChange(element);
                     } else if (!element.getAttribute('value')) {
@@ -981,7 +1082,7 @@ left: 49.75%;"><div class="clock-button clock-minute" data-value="25"><span clas
                     }
                 }
             },
-            
+
             toggle: function () {
                 if (this.innerState === 'open') {
                     this.close();

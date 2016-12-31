@@ -190,11 +190,78 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    function pushReplacePopHandler(element) {
-        var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
 
-        if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-            element.value = GS.qryGetVal(strQueryString, strQSCol);
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
+        }
+    }
+
+    function pushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i]
+                arrQSParts = strQSCol.split('=');
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present: go to the attribute's default or remove it
+                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+
+                // else: set attribute to exact text from QS
+                } else {
+                    element.setAttribute(strQSAttr, (
+                        GS.qryGetVal(strQS, strQSCol) ||
+                        element.internal.defaultAttributes[strQSAttr] ||
+                        ''
+                    ));
+                }
+                i += 1;
+            }
+
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun !== true) {
+                element.internal.bolQSFirstRun = true;
+                if (strQSValue !== '' || !element.getAttribute('value')) {
+                    element.setAttribute('value', strQSValue);
+                }
+            } else {
+                element.value = strQSValue;
+            }
         }
     }
 
@@ -208,21 +275,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //
     function elementInserted(element) {
-        var strQSValue;
-
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
+                element.internal = {};
+
+                // save default attribute settings so that the qs code can access those values
+                saveDefaultAttributes(element);
 
                 // if this checkbox has the "qs" attribute: fill from querystring and bind to querystring
                 if (element.hasAttribute('qs')) {
-                    strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
-
-                    if (strQSValue !== '' || !element.getAttribute('value')) {
-                        element.setAttribute('value', strQSValue);
-                    }
+                    pushReplacePopHandler(element);
 
                     window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
@@ -290,7 +355,9 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         events: {
             'mousedown': function () {
-                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                if (!this.hasAttribute('suspend-created') &&
+                    !this.hasAttribute('suspend-inserted') &&
+                    !this.hasAttribute('readonly')) {
                     this.classList.add('down');
                 }
             },
@@ -306,7 +373,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 var strValue;
                 var strType;
 
-                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                if (!this.hasAttribute('suspend-created') &&
+                    !this.hasAttribute('suspend-inserted') &&
+                    !this.hasAttribute('readonly')) {
                     bolTripleState = this.hasAttribute('triplestate');
                     strValue = this.getAttribute('value').trim().toLowerCase();
 
@@ -437,7 +506,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             'keydown': function (event) {
-                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                if (!this.hasAttribute('suspend-created') &&
+                    !this.hasAttribute('suspend-inserted') &&
+                    !this.hasAttribute('readonly')) {
                     // if we pressed return (13) or space (32)
                     if (event.keyCode === 13 || event.keyCode === 32) {
                         // prevent default and stop propagation (to prevent scrolling of the page)

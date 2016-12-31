@@ -218,22 +218,26 @@ document.addEventListener('DOMContentLoaded', function () {
     //
     function keydownFunction(event) {
         var element = event.target;
-        if (element.getAttribute('disabled') !== null && event.keyCode !== 9 && !(event.keyCode === 122 && event.metaKey)) {
-            event.preventDefault();
-            event.stopPropagation();
-        } else {
-            //this.parentNode.syncView();
-            element.parentNode.setAttribute('value', element.value);
-            element.parentNode.handleResizeToText();
+        if (!element.hasAttribute('readonly')) {
+            if (element.getAttribute('disabled') !== null && event.keyCode !== 9 && !(event.keyCode === 122 && event.metaKey)) {
+                event.preventDefault();
+                event.stopPropagation();
+            } else {
+                //this.parentNode.syncView();
+                element.parentNode.setAttribute('value', element.value);
+                element.parentNode.handleResizeToText();
+            }
         }
     }
     
     //
     function keyupFunction(event) {
         var element = event.target;
-        //this.parentNode.syncView();
-        element.parentNode.setAttribute('value', element.value);
-        element.parentNode.handleResizeToText();
+        if (!element.hasAttribute('readonly')) {
+            //this.parentNode.syncView();
+            element.parentNode.setAttribute('value', element.value);
+            element.parentNode.handleResizeToText();
+        }
     }
     
     function insertFunction(event) {
@@ -241,13 +245,87 @@ document.addEventListener('DOMContentLoaded', function () {
         element.parentNode.handleResizeToText();
     }
     
-    //
-    function createPushReplacePopHandler(element) {
-        var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-        
-        if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-            element.value = GS.qryGetVal(strQueryString, strQSCol);
+    ////
+    //function createPushReplacePopHandler(element) {
+    //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+    //    
+    //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+    //        element.value = GS.qryGetVal(strQueryString, strQSCol);
+    //    }
+    //}
+    
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        arrAttr = element.attributes;
+        i = 0;
+        len = arrAttr.length;
+        while (i < len) {
+            jsnAttr = arrAttr[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
         }
+    }
+
+    function createPushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i];
+                arrQSParts = strQSCol.split('=');
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present: go to the attribute's default or remove it
+                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                // else: set attribute to exact text from QS
+                } else {
+                    element.setAttribute(strQSAttr, (
+                        GS.qryGetVal(strQS, strQSCol) ||
+                        element.internal.defaultAttributes[strQSAttr] ||
+                        ''
+                    ));
+                }
+                i += 1;
+            }
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun !== true) {
+                if (strQSValue !== '' || !element.getAttribute('value')) {
+                    element.value = strQSValue;
+                }
+            } else {
+                element.value = strQSValue;
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
     }
     
     // dont do anything that modifies the element here
@@ -264,40 +342,43 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     //
     function elementInserted(element) {
-        var strQSValue;
-        
+        //var strQSValue;
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+                element.internal = {};
+                saveDefaultAttributes(element);
+
                 if (element.hasAttribute('tabindex')) {
                     element.setAttribute('data-tabindex', element.getAttribute('tabindex'));
                     element.removeAttribute('tabindex');
                 }
-                
+
                 element.appendChild(multiLineTemplate.cloneNode(true));
                 if (element.hasAttribute('data-tabindex')) {
                     xtag.query(element, '.control')[0].setAttribute('tabindex', element.getAttribute('data-tabindex'));
                 }
                 // set a variable with the control element for convenience and speed
                 element.control = xtag.queryChildren(element, '.control')[0];
-                
+
                 element.control.lastWidth = element.control.clientWidth;
                 element.control.lastHeight = element.control.clientHeight;
                 element.syncView();
-                
+
                 if (element.getAttribute('qs')) {
-                    strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
-                    
-                    if (strQSValue !== '' || !element.getAttribute('value')) {
-                        element.value = strQSValue;
-                    }
-                    
+                    //strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+                    //
+                    //if (strQSValue !== '' || !element.getAttribute('value')) {
+                    //    element.value = strQSValue;
+                    //}
+
+                    createPushReplacePopHandler(element);
                     window.addEventListener('pushstate',    function () { createPushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { createPushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { createPushReplacePopHandler(element); });
@@ -305,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
     xtag.register('gs-memo', {
         lifecycle: {
             created: function () {
@@ -453,7 +534,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         'autocomplete',
                         'autofocus',
                         'rows',
-                        'spellcheck'
+                        'spellcheck',
+                        'readonly'
                     ];
                     for (i = 0, len = arrPassThroughAttributes.length; i < len; i += 1) {
                         if (this.hasAttribute(arrPassThroughAttributes[i])) {

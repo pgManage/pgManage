@@ -802,7 +802,8 @@ GS.closeDialog = function (dialog, strAnswer) {
             intDialogResolvedWidth, intDialogResolvedHeight, strResolvedDirection, intMargin = 5, intElementMidPoint,
             intDialogMidPoint, i, len, arrTests, arrCloseButtons, clickHandler, arrElements, template, strTheme, strMaxWidth,
             strMaxHeight, strTag, dialogOverlay, refocusElement, jsnInitalMousePos, scrollTarget, returnTarget,
-            scrollProtectorTouchStart, scrollProtectorTouchMove, scrollProtectorMouseWheel, templateID;
+            scrollProtectorTouchStart, scrollProtectorTouchMove, scrollProtectorMouseWheel, templateID,
+            strTag, xtagSelector, intervalID, intervalI;
         
         // save and blur currently focused element
         refocusElement = document.activeElement;
@@ -1244,6 +1245,92 @@ GS.closeDialog = function (dialog, strAnswer) {
         // the observer is on "dialogElement.children[0]" because when we refresh the position of the dialog:
         //      the "style" attribute is changed which causes the observer to run again ergo: infinite loop
         observer.observe(dialogElement.children[0], {childList: true, subtree: true, attributes: true});
+        
+        
+        var elementReadyCallback = function () {
+            // focus autofocus element if there is one
+            arrElements = xtag.query(dialogElement, '[autofocus]');
+            
+            if (arrElements.length > 0) {
+                arrElements[0].focus();
+                
+            // else if there is a listen-for-return: focus that
+            } else {
+                arrElements = xtag.query(dialogElement, '[listen-for-return]');
+                
+                if (arrElements.length > 0) {
+                    arrElements[0].focus();
+                }
+            }
+            
+            // bind listening for return if there is an element with the "listen-for-return"
+            arrElements = xtag.query(dialogElement, '[listen-for-return]');
+            
+            if (arrElements.length > 0) {
+                returnTarget = arrElements[0];
+                
+                dialogElement.addEventListener('keydown', function (event) { // keydown, keyup, keypress
+                    if (event.target !== returnTarget && (event.keyCode === 13 || event.which === 13)) {
+                        //event.stopPropagation();
+                        GS.triggerEvent(returnTarget, 'click');
+                    }
+                });
+                
+                if (arrElements.length > 1) {
+                    console.warn('dialog Warning: Too many [listen-for-return] elements, defaulting to the first one. Please have only one [listen-for-return] element per dialog.');
+                }
+            }
+            
+            if (typeof afterOpenFunction === 'function') {
+                afterOpenFunction.apply(dialogElement, []);
+            }
+        };
+        
+        // if element registration is shimmed: we need to wait to run the callback
+        //      until after the elements are ready. to do this we'll get a list of
+        //      the current elements that are xtag-defined and on a 30ms loop we'll
+        //      check their __upgraded__ property until they are all true
+        if (shimmed.registerElement === true) {
+            // build selector to get all xtag elements
+            xtagSelector = '';
+            for (strTag in xtag.tags) {
+                xtagSelector += (xtagSelector ? ',' : '');
+                xtagSelector += strTag;
+            }
+            
+            // get all xtag elements
+            var elem_wait = xtag.query(dialogElement, xtagSelector);
+            var elem_i;
+            var elem_len;
+            
+            // begin interval (max out at 1 second)
+            intervalI = 0;
+            intervalID = setInterval(function () {
+                if (elem_wait.length === 0 || intervalI >= 30) {
+                    elementReadyCallback();
+                    clearInterval(intervalID);
+                } else {
+                    elem_i = 0;
+                    elem_len = elem_wait.length;
+                    while (elem_i < elem_len) {
+                        if (elem_wait[elem_i].__upgraded__ === true) {
+                            elem_wait.splice(elem_i, 1);
+                            elem_i -= 1;
+                            elem_len -= 1;
+                        }
+                        elem_i += 1;
+                    }
+                }
+                intervalI += 1;
+            }, 30);
+            
+        // else: element instantiation blocks JS execution until the elements
+        //      are ready, so we don't need to wait to run the after open callback
+        } else {
+            elementReadyCallback();
+        }
+        
+        
         
         // after open function call
         if (typeof afterOpenFunction === 'function') {

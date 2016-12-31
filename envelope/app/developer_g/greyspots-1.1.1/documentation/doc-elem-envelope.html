@@ -714,6 +714,131 @@
                     </gs-envelope>
                 </template>
             </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3"><code>[no-insert]</code> Example:</span>
+                <p>This is an example of an envelope with the <code>[no-insert]</code> attribute.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="30">
+                    <gs-envelope src="gsdoc.texample" no-insert>
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                        <template for="insert">
+                            <label for="text-insert-first_name">First Name:</label>
+                            <gs-text id="text-insert-first_name" column="first_name"></gs-text>
+                            <label for="text-insert-last_name">Last Name:</label>
+                            <gs-text id="text-insert-last_name" column="last_name"></gs-text>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3"><code>[no-update]</code> Example:</span>
+                <p>This is an example of an envelope with the <code>[no-update]</code> attribute.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="30">
+                    <gs-envelope src="gsdoc.texample" no-update>
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                        <template for="insert">
+                            <label for="text-insert-first_name">First Name:</label>
+                            <gs-text id="text-insert-first_name" column="first_name"></gs-text>
+                            <label for="text-insert-last_name">Last Name:</label>
+                            <gs-text id="text-insert-last_name" column="last_name"></gs-text>
+                        </template>
+                    </gs-envelope>
+                </template>
+            </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3"><code>[template]</code> Example:</span>
+                <p>This is an example of an envelope with the <code>[template]</code> attribute.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="50">
+                    <gs-button onclick="setTemplateAttr()">Set Template</gs-button>
+                    <gs-button onclick="removeTemplateAttr()">Reset Template</gs-button>
+                    <gs-envelope src="gsdoc.texample" id="test-envelope">
+                        <template for="table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="First Name">
+                                            <gs-text mini column="first_name"></gs-text>
+                                        </td>
+                                        <td heading="Last Name">
+                                            <gs-text mini column="last_name"></gs-text>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                        <template for="table" id="test1">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th heading="#">
+                                            <gs-static column="row_number"></gs-static>
+                                        </th>
+                                        <td heading="Last Name">
+                                            <gs-static mini column="last_name"></gs-static>
+                                        </td>
+                                        <td heading="First Name">
+                                            <gs-static mini column="first_name"></gs-static>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-envelope>
+                </template>
+                <template for="js" height="10">
+                    function setTemplateAttr() {
+                        document.getElementById('test-envelope').setAttribute('template', 'test1');
+                        document.getElementById('test-envelope').refresh();
+                    }
+                    function removeTemplateAttr() {
+                        document.getElementById('test-envelope').removeAttribute('template');
+                        document.getElementById('test-envelope').refresh();
+                    }
+                </template>
+            </gs-doc-example>
         </gs-container>
         <br />
         <br />
