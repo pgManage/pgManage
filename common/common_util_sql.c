@@ -8,23 +8,37 @@ char *get_table_name(char *_str_query) {
 	char *str_table_name = NULL;
 	char *str_query = NULL;
 
-	SERROR_CAT_CSTR(str_table_name, "");
-	SERROR_CAT_CSTR(str_query, _str_query);
+	size_t int_query_len = 0;
+	size_t int_table_name_len = 0;
+	size_t int_temp_len = 0;
+
+	//TODO: strlen(_str_query), add length to get_table_name
+	SERROR_SNCAT(str_query, &int_query_len,
+		_str_query, strlen(_str_query));
 
 	ptr_table_name = str_query + 6;
 	SERROR_CHECK(*ptr_table_name == '\t', "Invalid request");
 	ptr_table_name += 1;
 	ptr_end_table_name = ptr_table_name + strcspn(ptr_table_name, "\t\012");
 	bool bol_schema = *ptr_end_table_name == '\t';
-	*ptr_end_table_name = 0;
+	*ptr_end_table_name = '\0';
 
-	SERROR_CAT_CSTR(str_temp, ptr_table_name);
+	SERROR_SNCAT(str_temp, &int_temp_len,
+		ptr_table_name, ptr_end_table_name - ptr_table_name);
+
+	//TODO: SERROR_REPLACE() lengths
 	SERROR_REPLACE(str_temp, "\"", "\"\"", "");
 
+	//TODO: unescape_value() lengths
 	str_temp1 = unescape_value(str_temp);
 	SERROR_CHECK(str_temp1 != NULL, "unescape_value failed");
 	SFREE(str_temp);
-	SERROR_CAT_APPEND(str_table_name, "\"", str_temp1, "\"");
+
+	//TODO: str_temp1 length
+	SERROR_SNCAT(str_table_name, &int_table_name_len,
+		"\"", (size_t)1,
+		str_temp1, strlen(str_temp1),
+		"\"", (size_t)1);
 	SFREE(str_temp1);
 
 	if (bol_schema) {
@@ -32,13 +46,19 @@ char *get_table_name(char *_str_query) {
 		ptr_end_table_name = strstr(ptr_table_name, "\012");
 		*ptr_end_table_name = 0;
 
-		SERROR_CAT_CSTR(str_temp, ptr_table_name);
+		SERROR_SNCAT(str_temp, &int_temp_len, ptr_table_name, ptr_end_table_name - ptr_table_name);
+		//TODO: SERROR_REPLACE() lengths
 		SERROR_REPLACE(str_temp, "\"", "\"\"", "");
 
+		//TODO: unescape_value() lengths
 		str_temp1 = unescape_value(str_temp);
 		SERROR_CHECK(str_temp1 != NULL, "unescape_value failed");
 		SFREE(str_temp);
-		SERROR_CAT_APPEND(str_table_name, ".\"", str_temp1, "\"");
+
+		SERROR_SNFCAT(str_table_name, &int_table_name_len,
+			".\"", (size_t)2,
+			str_temp1, strlen(str_temp1),
+			"\"", (size_t)1);
 		SFREE(str_temp1);
 	}
 
@@ -61,7 +81,13 @@ char *get_return_columns(char *_str_query, char *str_table_name) {
 	char *ptr_end_return_columns = NULL;
 	char *str_return_columns = NULL;
 	char *str_query = NULL;
-	SERROR_CAT_CSTR(str_query, _str_query);
+	size_t int_temp_len = 0;
+	size_t int_return_columns_len = 0;
+
+	size_t int_query_len = 0;
+	//TODO: add lengths to get_return_columns
+	SERROR_SNCAT(str_query, &int_query_len,
+		_str_query, strlen(_str_query));
 
 	ptr_return_columns = strstr(str_query, "RETURN\t");
 	SERROR_CHECK(ptr_return_columns != NULL, "strstr failed");
@@ -70,21 +96,31 @@ char *get_return_columns(char *_str_query, char *str_table_name) {
 	SERROR_CHECK(ptr_end_return_columns != NULL, "strstr failed");
 	*ptr_end_return_columns = 0;
 
-	SERROR_CAT_CSTR(str_temp, ptr_return_columns);
+	SERROR_SNCAT(str_temp, &int_temp_len,
+		ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
 
 	if (strncmp(str_temp, "*", 2) != 0) {
+		//TODO: SERROR_REPLACE() lengths
 		SERROR_REPLACE(str_temp, "\"", "\"\"", "");
 		SERROR_REPLACE(str_temp, "\t", "\", {{TABLE}}.\"", "g");
 
+		//TODO: unescape_value() lengths
 		str_temp1 = unescape_value(str_temp);
 		SERROR_CHECK(str_temp1 != NULL, "unescape_value failed");
 		SFREE(str_temp);
-		SERROR_CAT_CSTR(str_return_columns, "{{TABLE}}.\"", str_temp1, "\"");
+
+		SERROR_SNCAT(str_return_columns, &int_return_columns_len,
+			"{{TABLE}}.\"", (size_t)11,
+			str_temp1, strlen(str_temp1),
+			"\"", (size_t)1);
 		SFREE(str_temp1);
 
+		//TODO: SERROR_REPLACE() lengths
 		SERROR_REPLACE(str_return_columns, "{{TABLE}}", str_table_name, "g");
 	} else {
-		SERROR_CAT_CSTR(str_return_columns, str_temp);
+		//TODO: int_temp_len
+		SERROR_SNCAT(str_return_columns, &int_return_columns_len,
+			str_temp, strlen(str_temp));
 	}
 	SFREE(str_temp);
 	SFREE(str_query);
@@ -107,17 +143,24 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query) {
 	char *ptr_end_return_columns = NULL;
 	char *str_return_columns = NULL;
 	char *str_query = NULL;
-	SERROR_CAT_CSTR(str_query, _str_query);
+	size_t int_temp_len = 0;
+	size_t int_return_columns_len = 0;
+
+	size_t int_query_len = 0;
+	//TODO: add lengths to get_return_escaped_columns
+	SERROR_SNCAT(str_query, &int_query_len,
+		_str_query, strlen(_str_query));
 
 	ptr_return_columns = strstr(str_query, "RETURN\t");
 	SERROR_CHECK(ptr_return_columns != NULL, "strstr failed");
 	ptr_return_columns += 7;
 	ptr_end_return_columns = strstr(ptr_return_columns, "\012");
 	SERROR_CHECK(ptr_end_return_columns != NULL, "strstr failed");
-	*ptr_end_return_columns = 0;
+	*ptr_end_return_columns = '\0';
 
-	SERROR_CAT_CSTR(str_temp, ptr_return_columns);
+	SERROR_SNCAT(str_temp, int_temp_len, ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
 	if (strncmp(str_temp, "*", 2) != 0) {
+		//TODO: SERROR_REPLACE() add lengths
 		SERROR_REPLACE(str_temp, "\"", "\"\"", "");
 
 		SERROR_REPLACE(str_temp, "\\t", "TABHERE3141592653589793TABHERE", "g");
@@ -133,14 +176,21 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query) {
 		}
 		SERROR_REPLACE(str_temp1, "TABHERE3141592653589793TABHERE", "\t", "g");
 		if (driver == DB_DRIVER_POSTGRES) {
-			SERROR_CAT_CSTR(str_return_columns, "replace(replace(replace(replace(COALESCE(\"", str_temp1, "\"::text, '\\N'), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || E'\n'");
+			SERROR_SNCAT(str_return_columns, &int_return_columns_len,
+				"replace(replace(replace(replace(COALESCE(\"", (size_t)42,
+				str_temp1, strlen(str_temp1),
+				"\"::text, '\\N'), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || E'\n'", (size_t)81);
 		} else {
-			SERROR_CAT_CSTR(str_return_columns, "replace(replace(replace(replace(CAST(COALESCE(CAST(\"", str_temp1,
-				"\" AS nvarchar(MAX)), CAST('\\N' AS nvarchar(MAX))) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX))");
+			SERROR_SNCAT(str_return_columns, &int_return_columns_len,
+				"replace(replace(replace(replace(CAST(COALESCE(CAST(\"", (size_t)52,
+				str_temp1, strlen(str_temp1),
+				"\" AS nvarchar(MAX)), CAST('\\N' AS nvarchar(MAX))) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX))", (size_t)162);
 		}
 		SFREE(str_temp1);
 	} else {
-		SERROR_CAT_CSTR(str_return_columns, str_temp);
+		//TODO: get length of str_temp
+		SERROR_SNCAT(str_return_columns, &int_return_columns_len,
+			str_temp, strlen(str_temp));
 	}
 	SFREE(str_temp);
 	SFREE(str_query);
@@ -162,7 +212,12 @@ char *get_hash_columns(char *_str_query) {
 	char *ptr_end_hash_columns = NULL;
 	char *str_hash_columns = NULL;
 	char *str_query = NULL;
-	SERROR_CAT_CSTR(str_query, _str_query);
+	size_t int_hash_columns_len = 0;
+	size_t int_query_len = 0;
+
+	//TODO: add lengths to get_hash_columns()
+	SERROR_SNCAT(str_query, &int_query_len,
+		_str_query, strlen(_str_query));
 
 	ptr_hash_columns = strstr(str_query, "HASH\t");
 	SERROR_CHECK(ptr_hash_columns != NULL, "strstr failed");
@@ -171,7 +226,8 @@ char *get_hash_columns(char *_str_query) {
 	SERROR_CHECK(ptr_end_hash_columns != NULL, "strstr failed");
 	*ptr_end_hash_columns = 0;
 
-	SERROR_CAT_CSTR(str_hash_columns, ptr_hash_columns);
+	SERROR_SNCAT(str_hash_columns, &int_hash_columns_len,
+		ptr_hash_columns, ptr_end_hash_columns - ptr_hash_columns);
 	SFREE(str_query);
 
 	return str_hash_columns;
@@ -195,15 +251,20 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 			char str_temp[101] = {0};
 			snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
-			SFINISH_CAT_CSTR(client_request->str_current_response, "messageid = ", client_request->str_message_id,
+			SFINISH_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
 				"\012"
-				"responsenumber = ",
-				str_temp, "\012");
+				"responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1);
 			if (client_request->str_transaction_id != NULL) {
-				SFINISH_CAT_APPEND(
-					client_request->str_current_response, "transactionid = ", client_request->str_transaction_id, "\012");
+				SFINISH_SNFCAT(
+					client_request->str_current_response, &client_request->int_current_response_length,
+					"transactionid = ", (size_t)16,
+					client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+					"\012", (size_t)1);
 			}
-			client_request->int_current_response_length = strlen(client_request->str_current_response);
 		}
 
 		if (!bol_last) {
@@ -230,17 +291,23 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 			char str_temp[101] = {0};
 			snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
-			SFINISH_CAT_CSTR(client_request->str_current_response, "messageid = ", client_request->str_message_id,
+			SFINISH_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
 				"\012"
-				"responsenumber = ",
-				str_temp, "\012");
+				"responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1);
 			if (client_request->str_transaction_id != NULL) {
-				SFINISH_CAT_APPEND(
-					client_request->str_current_response, "transactionid = ", client_request->str_transaction_id, "\012");
+				SFINISH_SNFCAT(
+					client_request->str_current_response, &client_request->int_current_response_length,
+					"transactionid = ", (size_t)16,
+					client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+					"\012", (size_t)1);
 			}
 
-			SFINISH_CAT_APPEND(client_request->str_current_response, "TRANSACTION COMPLETED");
-			client_request->int_current_response_length = strlen(client_request->str_current_response);
+			SFINISH_SNFCAT(client_request->str_current_response, &client_request->int_current_response_length,
+				"TRANSACTION COMPLETED", (size_t)21);
 
 			SDEBUG("Send \"TRANSACTION COMPLETED\" Message...");
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, client_request->str_current_response,
@@ -274,15 +341,20 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		SDEBUG("Send Error...");
-		SFINISH_CAT_CSTR(client_request->str_current_response, "messageid = ", client_request->str_message_id,
+		SFINISH_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
 			"\012"
-			"responsenumber = ",
-			str_temp, "\012");
+			"responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(
-				client_request->str_current_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(
+				client_request->str_current_response, &client_request->int_current_response_length,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		client_request->int_current_response_length = strlen(client_request->str_current_response);
 		SFINISH_SREALLOC(client_request->str_current_response, client_request->int_current_response_length + int_len + 6 + 1);
 
 		memcpy(client_request->str_current_response + client_request->int_current_response_length, "FATAL\012", 6);
@@ -348,6 +420,8 @@ bool http_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, ch
 	struct sock_ev_client *client = client_request->parent;
 	size_t int_header_len = 0;
 	ssize_t int_response_write_len = 0;
+	size_t _int_response_len = 0;
+
 	char str_length[50];
 	memset(str_length, 0, 50);
 	SDEFINE_VAR_ALL(str_header, _str_response);
@@ -371,11 +445,14 @@ bool http_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, ch
 
 		if (bol_last) {
 			snprintf(str_length, 50, "%zd", client_request->int_current_response_length);
-			SFINISH_CAT_CSTR(str_header, "HTTP/1.1 200 OK\015\012"
-										 "Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-										 "Content-Length: ",
-				str_length, "\015\012\015\012");
-			int_header_len = strlen(str_header);
+			SFINISH_SNCAT(str_header, &int_header_len,
+				"HTTP/1.1 200 OK\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Content-Length: ",strlen("HTTP/1.1 200 OK\015\012"
+					"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+					"Content-Length: "),
+				str_length, strlen(str_length),
+				"\015\012\015\012", (size_t)4);
 			SDEBUG("str_header: %s", str_header);
 
 			SFINISH_SALLOC(_str_response, client_request->int_current_response_length + int_header_len + 1);
@@ -408,10 +485,15 @@ finish:
 	if (bol_error_state == true) {
 		bol_error_state = false;
 		snprintf(str_length, 50, "%zu", strlen(str_response));
-		SFINISH_CAT_CSTR(_str_response, "HTTP/1.1 500 Internal Server Error\015\012"
-										"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-										"Content-Length: ",
-			str_length, "\015\012\015\012", str_response);
+		SFINISH_SNCAT(_str_response, &_int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ", strlen("HTTP/1.1 500 Internal Server Error\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Content-Length: "),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			str_response, int_response_len);
 
 		if ((int_response_write_len = CLIENT_WRITE(client_request->parent, _str_response, strlen(_str_response))) < 0) {
 			if (bol_tls) {
@@ -513,13 +595,20 @@ char *canonical_full_start(char *str_path) {
 	if (*ptr_path == '/') {
 		ptr_path++;
 	}
+	size_t int_return_len = 0;
 
 	if (strncmp(ptr_path, "role/", 5) == 0 || strncmp(ptr_path, "role", 5) == 0) {
-		SERROR_CAT_CSTR(str_return, str_global_role_path);
+		SERROR_SNCAT(str_return, &int_return_len,
+			str_global_role_path, strlen(str_global_role_path));
+
 	} else if (strncmp(ptr_path, "web_root/", 9) == 0 || strncmp(ptr_path, "web_root", 9) == 0) {
-		SERROR_CAT_CSTR(str_return, str_global_web_root);
+		SERROR_SNCAT(str_return, &int_return_len,
+			str_global_web_root, strlen(str_global_web_root));
+
 	} else if (strncmp(ptr_path, "app/", 4) == 0 || strncmp(ptr_path, "app", 4) == 0) {
-		SERROR_CAT_CSTR(str_return, str_global_app_path);
+		SERROR_SNCAT(str_return, &int_return_len,
+			str_global_app_path, strlen(str_global_app_path));
+
 	} else {
 		SERROR("Starting path not recognized.");
 	}
@@ -535,6 +624,10 @@ static bool ddl_readable_done(EV_P, void *cb_data, DB_result *res);
 bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void *cb_data, readable_cb_t readable_cb) {
 	SNOTICE("SQL.C READABLE");
 	DB_readable_poll *readable_poll = NULL;
+	size_t int_folder_write_len = 0;
+	size_t int_folder_len = 0;
+	size_t int_sql_len = 0;
+
 	SDEFINE_VAR_ALL(str_folder, str_folder_write, str_folder_literal, str_folder_write_literal, str_sql);
 
 	SERROR_CHECK(cb_data != NULL, "cb_data == NULL");
@@ -557,14 +650,17 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 	SDEBUG("slash_position: %d", slash_position);
 
 	if (bol_writeable) {
-		SERROR_CAT_CSTR(str_folder_write, ptr_path);
+		//TODO: add lengths to ddl_readable()
+		SERROR_SNCAT(str_folder_write, &int_folder_write_len,
+			ptr_path, strlen(ptr_path));
 		str_folder_write[slash_position - 1] = 'w';
 		str_folder_write[slash_position] = '\0';
-		str_folder_write_literal = DB_escape_literal(conn, str_folder_write, strlen(str_folder_write));
+		str_folder_write_literal = DB_escape_literal(conn, str_folder_write, int_folder_write_len);
 		SERROR_CHECK(str_folder_write_literal != NULL, "DB_escape_literal failed");
 	}
 
-	SERROR_CAT_CSTR(str_folder, ptr_path);
+	SERROR_SNCAT(str_folder, &int_folder_len,
+		ptr_path, strlen(ptr_path));
 	str_folder[slash_position] = '\0';
 	str_folder_literal = DB_escape_literal(conn, str_folder, strlen(str_folder));
 	SERROR_CHECK(str_folder_literal != NULL, "DB_escape_literal failed");
@@ -573,41 +669,62 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 	SFREE(str_folder);
 	if (DB_connection_driver(conn) == DB_DRIVER_POSTGRES) {
 		if (bol_writeable) {
-			SERROR_CAT_CSTR(str_sql, "\
-			SELECT CASE WHEN count(*) > 0 OR \
-				   lower(",
-				str_folder_literal, ") = 'all' OR \
-				   lower(",
-				str_folder_literal, ") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END::text \
+			SERROR_SNCAT(str_sql, &int_sql_len,
+				"\
+			SELECT CASE WHEN count(*) > 0 OR lower(", (size_t)42,
+				str_folder_literal, strlen(str_folder_literal),
+				") = 'all' OR lower(", (size_t)19,
+				str_folder_literal, strlen(str_folder_literal),
+				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END::text \
 			FROM pg_roles r \
 			JOIN pg_auth_members ON r.oid=roleid \
 			JOIN pg_roles u ON member = u.oid \
-			WHERE (lower(r.rolname) = lower(",
-				str_folder_write_literal, ") OR \
+			WHERE (lower(r.rolname) = lower(", (size_t)190,
+				str_folder_write_literal, strlen(str_folder_write_literal),
+				") OR \
 				  lower(r.rolname) = 'developer_g') AND lower(u.rolname) = lower(session_user); \
-			");
+			", (size_t)92);
 		} else {
-			SERROR_CAT_CSTR(str_sql, "\
-			SELECT CASE WHEN count(*) > 0 OR 'all' = lower(",
-				str_folder_literal, ") OR '' = ", str_folder_literal, " OR \
-					lower(",
-				str_folder_literal, ") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END::text \
+			SERROR_SNCAT(str_sql, &int_sql_len,
+				"\
+			SELECT CASE WHEN count(*) > 0 OR 'all' = lower(", (size_t)50,
+				str_folder_literal, strlen(str_folder_literal),
+				") OR '' = ", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				" OR lower(", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END::text \
 			FROM pg_roles r \
 			JOIN pg_auth_members ON r.oid=roleid \
 			JOIN pg_roles u ON member = u.oid \
-			WHERE (lower(r.rolname) = lower(",
-				str_folder_literal, ") OR \
-				  lower(r.rolname) = 'developer_g') AND lower(u.rolname) = lower(session_user);");
+			WHERE (lower(r.rolname) = lower(", (size_t)190,
+				str_folder_literal, strlen(str_folder_literal),
+				") OR \
+				  lower(r.rolname) = 'developer_g') AND lower(u.rolname) = lower(session_user);", (size_t)88);
 		}
 	} else {
 		if (bol_writeable) {
-			SERROR_CAT_CSTR(str_sql, "SELECT CASE WHEN IS_MEMBER(", str_folder_write_literal, ") = 1 OR 'all' = lower(",
-				str_folder_literal, ") OR '' = ", str_folder_literal, " OR lower(", str_folder_literal,
-				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END;");
+			SERROR_CAT_CSTR(str_sql, &int_sql_len,
+				"SELECT CASE WHEN IS_MEMBER(", (size_t)27,
+				str_folder_write_literal, strlen(str_folder_write_literal),
+				") = 1 OR 'all' = lower(", (size_t)23,
+				str_folder_literal, strlen(str_folder_literal),
+				") OR '' = ", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				" OR lower(", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END;", (size_t)53);
 		} else {
-			SERROR_CAT_CSTR(str_sql, "SELECT CASE WHEN IS_MEMBER(", str_folder_literal, ") = 1 OR 'all' = lower(",
-				str_folder_literal, ") OR '' = ", str_folder_literal, " OR lower(", str_folder_literal,
-				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END;");
+			SERROR_CAT_CSTR(str_sql, &int_sql_len,
+				"SELECT CASE WHEN IS_MEMBER(", (size_t)27,
+				str_folder_literal, strlen(str_folder_literal),
+				") = 1 OR 'all' = lower(", (size_t)23,
+				str_folder_literal, strlen(str_folder_literal),
+				") OR '' = ", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				" OR lower(", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END;", (size_t)53);
 		}
 	}
 	SDEBUG(">%s<", str_sql);

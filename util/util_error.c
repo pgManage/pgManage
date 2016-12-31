@@ -32,7 +32,7 @@ void warn_root(char *str_file, int int_line_no, char *str_function, char *str_er
 	va_copy(va_arg3, va_arg1);
 
 	SERROR_SALLOC(str_response, 2);
-	size_t int_len = vsnprintf(str_response, 1, str_error, va_arg2);
+	size_t int_len = (size_t)vsnprintf(str_response, 1, str_error, va_arg2);
 	SERROR_SREALLOC(str_response, int_len + 2);
 	memset(str_response, 0, int_len + 2);
 	vsnprintf(str_response, int_len + 1, str_error, va_arg3);
@@ -74,7 +74,7 @@ void error_noresponse_root(char *str_file, int int_line_no, char *str_function, 
 	va_copy(va_arg3, va_arg1);
 
 	SERROR_SALLOC(str_response, 2);
-	size_t int_len = vsnprintf(str_response, 1, str_error, va_arg2);
+	size_t int_len = (size_t)vsnprintf(str_response, 1, str_error, va_arg2);
 	SERROR_SREALLOC(str_response, int_len + 2);
 	memset(str_response, 0, int_len + 2);
 	vsnprintf(str_response, int_len + 1, str_error, va_arg3);
@@ -102,7 +102,7 @@ char *error_response_root(char *str_file, int int_line_no, char *str_function, c
 	va_copy(va_arg3, va_arg1);
 
 	SERROR_SALLOC(str_response, 2);
-	size_t int_len = vsnprintf(str_response, 1, str_error, va_arg2);
+	size_t int_len = (size_t)vsnprintf(str_response, 1, str_error, va_arg2);
 	SERROR_SREALLOC(str_response, int_len + 2);
 	memset(str_response, 0, int_len + 2);
 	vsnprintf(str_response, int_len + 1, str_error, va_arg3);
@@ -141,7 +141,7 @@ char *warn_response_root(char *str_file, int int_line_no, char *str_function, ch
 	va_copy(va_arg3, va_arg1);
 
 	SERROR_SALLOC(str_response, 2);
-	size_t int_len = vsnprintf(str_response, 1, str_error, va_arg2);
+	size_t int_len = (size_t)vsnprintf(str_response, 1, str_error, va_arg2);
 	SERROR_SREALLOC(str_response, int_len + 2);
 	memset(str_response, 0, int_len + 2);
 	vsnprintf(str_response, int_len + 1, str_error, va_arg3);

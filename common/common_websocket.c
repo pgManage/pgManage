@@ -4,11 +4,14 @@ char *WS_handshakeResponse(char *str_request) {
 	char *str_response = NULL;
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;
+	size_t int_response_len = 0;
 
 	SDEFINE_VAR_ALL(str_websocket_key, str_websocket_accept);
 
-	SERROR_CAT_CSTR(str_response, "HTTP/1.1 101 Switching Protocols\015\012", "Upgrade: websocket\015\012",
-		"Connection: Upgrade\015\012", "Sec-WebSocket-Accept: ");
+	SERROR_SNCAT(str_response, &int_response_len, "HTTP/1.1 101 Switching Protocols\015\012", (size_t)34,
+		"Upgrade: websocket\015\012", (size_t)20,
+		"Connection: Upgrade\015\012", (size_t)21,
+		"Sec-WebSocket-Accept: ", (size_t)22);
 
 	// The Sec-WebSocket-Accept part is interesting.
 	// The server must derive it from the Sec-WebSocket-Key that the client sent.
@@ -20,8 +23,11 @@ char *WS_handshakeResponse(char *str_request) {
 	// Copy the request
 	str_websocket_key = request_header(str_request, "Sec-WebSocket-Key");
 	SERROR_CHECK(str_websocket_key != NULL, "get_header(\"Sec-WebSocket-Key\") failed!");
+
 	// Concat
-	SERROR_CAT_CSTR(str_temp1, str_websocket_key, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
+	size_t int_temp1_len = 0;
+	//TODO: strlen(str_websocket_key), binary version of request_header
+	SERROR_SNCAT(str_temp1, &int_temp1_len, str_websocket_key, strlen(str_websocket_key), "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", (size_t)36);
 
 	// SHA and b64
 	SERROR_SALLOC(str_websocket_accept, 20);
@@ -34,7 +40,8 @@ char *WS_handshakeResponse(char *str_request) {
 	SFREE(str_temp1);
 
 	// Add it to the response
-	SERROR_CAT_APPEND(str_response, str_websocket_accept, "\015\012Sec-WebSocket-Version: 13\015\012\015\012");
+	SERROR_SNFCAT(str_response, &int_response_len, str_websocket_accept, int_len,
+		"\015\012Sec-WebSocket-Version: 13\015\012\015\012", (size_t)31);
 
 	SFREE_ALL();
 	bol_error_state = false;

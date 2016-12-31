@@ -118,7 +118,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 	struct timeval tv_time;
 	char str_temp[101];
 	int int_status = 0;
-	SDEFINE_VAR_ALL(str_escaped_sql, str_sql_temp, str_sql_column_types);
+	SDEFINE_VAR_ALL(str_escaped_sql, str_sql_temp, str_sql_column_types, str_error);
 
 	if (client_request->int_i >= 0 && client_request->int_i < client_request->int_len) {
 		client_request->int_response_id += 1;
@@ -182,10 +182,12 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 	client_request->int_i += 1;
 	if (client_request->int_i <= client_request->int_len) {
 		if (client_request->int_i == 0) {
-			SFINISH_CHECK(result == PGRES_COMMAND_OK, "BEGIN failed: %s", _DB_get_diagnostic(client_request->parent->conn, res));
+			str_error = _DB_get_diagnostic(client_request->parent->conn, res);
+			SFINISH_CHECK(result == PGRES_COMMAND_OK, "BEGIN failed: %s", str_error);
 
 		} else if (result == PGRES_FATAL_ERROR) {
-			SFINISH("Query failed: %s", _DB_get_diagnostic(client_request->parent->conn, res));
+			str_error = _DB_get_diagnostic(client_request->parent->conn, res);
+			SFINISH("Query failed: %s", str_error);
 
 		} else if (result == PGRES_EMPTY_QUERY) {
 			// FINISH("Query empty");
