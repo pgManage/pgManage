@@ -420,6 +420,8 @@ bool http_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, ch
 	struct sock_ev_client *client = client_request->parent;
 	size_t int_header_len = 0;
 	ssize_t int_response_write_len = 0;
+	size_t _int_response_len = 0;
+
 	char str_length[50];
 	memset(str_length, 0, 50);
 	SDEFINE_VAR_ALL(str_header, _str_response);
@@ -443,11 +445,14 @@ bool http_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, ch
 
 		if (bol_last) {
 			snprintf(str_length, 50, "%zd", client_request->int_current_response_length);
-			SFINISH_CAT_CSTR(str_header, "HTTP/1.1 200 OK\015\012"
-										 "Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-										 "Content-Length: ",
-				str_length, "\015\012\015\012");
-			int_header_len = strlen(str_header);
+			SFINISH_SNCAT(str_header, &int_header_len,
+				"HTTP/1.1 200 OK\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Content-Length: ",strlen("HTTP/1.1 200 OK\015\012"
+					"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+					"Content-Length: "),
+				str_length, strlen(str_length),
+				"\015\012\015\012", (size_t)4);
 			SDEBUG("str_header: %s", str_header);
 
 			SFINISH_SALLOC(_str_response, client_request->int_current_response_length + int_header_len + 1);
@@ -480,10 +485,15 @@ finish:
 	if (bol_error_state == true) {
 		bol_error_state = false;
 		snprintf(str_length, 50, "%zu", strlen(str_response));
-		SFINISH_CAT_CSTR(_str_response, "HTTP/1.1 500 Internal Server Error\015\012"
-										"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-										"Content-Length: ",
-			str_length, "\015\012\015\012", str_response);
+		SFINISH_SNCAT(_str_response, &_int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ", strlen("HTTP/1.1 500 Internal Server Error\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Content-Length: "),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			str_response, int_response_len);
 
 		if ((int_response_write_len = CLIENT_WRITE(client_request->parent, _str_response, strlen(_str_response))) < 0) {
 			if (bol_tls) {
@@ -585,13 +595,20 @@ char *canonical_full_start(char *str_path) {
 	if (*ptr_path == '/') {
 		ptr_path++;
 	}
+	size_t int_return_len = 0;
 
 	if (strncmp(ptr_path, "role/", 5) == 0 || strncmp(ptr_path, "role", 5) == 0) {
-		SERROR_CAT_CSTR(str_return, str_global_role_path);
+		SERROR_SNCAT(str_return, &int_return_len,
+			str_global_role_path, strlen(str_global_role_path));
+
 	} else if (strncmp(ptr_path, "web_root/", 9) == 0 || strncmp(ptr_path, "web_root", 9) == 0) {
-		SERROR_CAT_CSTR(str_return, str_global_web_root);
+		SERROR_SNCAT(str_return, &int_return_len,
+			str_global_web_root, strlen(str_global_web_root));
+
 	} else if (strncmp(ptr_path, "app/", 4) == 0 || strncmp(ptr_path, "app", 4) == 0) {
-		SERROR_CAT_CSTR(str_return, str_global_app_path);
+		SERROR_SNCAT(str_return, &int_return_len,
+			str_global_app_path, strlen(str_global_app_path));
+
 	} else {
 		SERROR("Starting path not recognized.");
 	}
@@ -607,6 +624,10 @@ static bool ddl_readable_done(EV_P, void *cb_data, DB_result *res);
 bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void *cb_data, readable_cb_t readable_cb) {
 	SNOTICE("SQL.C READABLE");
 	DB_readable_poll *readable_poll = NULL;
+	size_t int_folder_write_len = 0;
+	size_t int_folder_len = 0;
+	size_t int_sql_len = 0;
+
 	SDEFINE_VAR_ALL(str_folder, str_folder_write, str_folder_literal, str_folder_write_literal, str_sql);
 
 	SERROR_CHECK(cb_data != NULL, "cb_data == NULL");
@@ -629,14 +650,17 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 	SDEBUG("slash_position: %d", slash_position);
 
 	if (bol_writeable) {
-		SERROR_CAT_CSTR(str_folder_write, ptr_path);
+		//TODO: add lengths to ddl_readable()
+		SERROR_SNCAT(str_folder_write, &int_folder_write_len,
+			ptr_path, strlen(ptr_path));
 		str_folder_write[slash_position - 1] = 'w';
 		str_folder_write[slash_position] = '\0';
-		str_folder_write_literal = DB_escape_literal(conn, str_folder_write, strlen(str_folder_write));
+		str_folder_write_literal = DB_escape_literal(conn, str_folder_write, int_folder_write_len);
 		SERROR_CHECK(str_folder_write_literal != NULL, "DB_escape_literal failed");
 	}
 
-	SERROR_CAT_CSTR(str_folder, ptr_path);
+	SERROR_SNCAT(str_folder, &int_folder_len,
+		ptr_path, strlen(ptr_path));
 	str_folder[slash_position] = '\0';
 	str_folder_literal = DB_escape_literal(conn, str_folder, strlen(str_folder));
 	SERROR_CHECK(str_folder_literal != NULL, "DB_escape_literal failed");
@@ -645,41 +669,62 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 	SFREE(str_folder);
 	if (DB_connection_driver(conn) == DB_DRIVER_POSTGRES) {
 		if (bol_writeable) {
-			SERROR_CAT_CSTR(str_sql, "\
-			SELECT CASE WHEN count(*) > 0 OR \
-				   lower(",
-				str_folder_literal, ") = 'all' OR \
-				   lower(",
-				str_folder_literal, ") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END::text \
+			SERROR_SNCAT(str_sql, &int_sql_len,
+				"\
+			SELECT CASE WHEN count(*) > 0 OR lower(", (size_t)42,
+				str_folder_literal, strlen(str_folder_literal),
+				") = 'all' OR lower(", (size_t)19,
+				str_folder_literal, strlen(str_folder_literal),
+				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END::text \
 			FROM pg_roles r \
 			JOIN pg_auth_members ON r.oid=roleid \
 			JOIN pg_roles u ON member = u.oid \
-			WHERE (lower(r.rolname) = lower(",
-				str_folder_write_literal, ") OR \
+			WHERE (lower(r.rolname) = lower(", (size_t)190,
+				str_folder_write_literal, strlen(str_folder_write_literal),
+				") OR \
 				  lower(r.rolname) = 'developer_g') AND lower(u.rolname) = lower(session_user); \
-			");
+			", (size_t)92);
 		} else {
-			SERROR_CAT_CSTR(str_sql, "\
-			SELECT CASE WHEN count(*) > 0 OR 'all' = lower(",
-				str_folder_literal, ") OR '' = ", str_folder_literal, " OR \
-					lower(",
-				str_folder_literal, ") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END::text \
+			SERROR_SNCAT(str_sql, &int_sql_len,
+				"\
+			SELECT CASE WHEN count(*) > 0 OR 'all' = lower(", (size_t)50,
+				str_folder_literal, strlen(str_folder_literal),
+				") OR '' = ", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				" OR lower(", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END::text \
 			FROM pg_roles r \
 			JOIN pg_auth_members ON r.oid=roleid \
 			JOIN pg_roles u ON member = u.oid \
-			WHERE (lower(r.rolname) = lower(",
-				str_folder_literal, ") OR \
-				  lower(r.rolname) = 'developer_g') AND lower(u.rolname) = lower(session_user);");
+			WHERE (lower(r.rolname) = lower(", (size_t)190,
+				str_folder_literal, strlen(str_folder_literal),
+				") OR \
+				  lower(r.rolname) = 'developer_g') AND lower(u.rolname) = lower(session_user);", (size_t)88);
 		}
 	} else {
 		if (bol_writeable) {
-			SERROR_CAT_CSTR(str_sql, "SELECT CASE WHEN IS_MEMBER(", str_folder_write_literal, ") = 1 OR 'all' = lower(",
-				str_folder_literal, ") OR '' = ", str_folder_literal, " OR lower(", str_folder_literal,
-				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END;");
+			SERROR_CAT_CSTR(str_sql, &int_sql_len,
+				"SELECT CASE WHEN IS_MEMBER(", (size_t)27,
+				str_folder_write_literal, strlen(str_folder_write_literal),
+				") = 1 OR 'all' = lower(", (size_t)23,
+				str_folder_literal, strlen(str_folder_literal),
+				") OR '' = ", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				" OR lower(", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END;", (size_t)53);
 		} else {
-			SERROR_CAT_CSTR(str_sql, "SELECT CASE WHEN IS_MEMBER(", str_folder_literal, ") = 1 OR 'all' = lower(",
-				str_folder_literal, ") OR '' = ", str_folder_literal, " OR lower(", str_folder_literal,
-				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END;");
+			SERROR_CAT_CSTR(str_sql, &int_sql_len,
+				"SELECT CASE WHEN IS_MEMBER(", (size_t)27,
+				str_folder_literal, strlen(str_folder_literal),
+				") = 1 OR 'all' = lower(", (size_t)23,
+				str_folder_literal, strlen(str_folder_literal),
+				") OR '' = ", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				" OR lower(", (size_t)10,
+				str_folder_literal, strlen(str_folder_literal),
+				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END;", (size_t)53);
 		}
 	}
 	SDEBUG(">%s<", str_sql);
