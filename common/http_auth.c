@@ -31,6 +31,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 	size_t int_query_length = 0;
 	size_t int_action_length = 0;
 	size_t int_experation_length = 0;
+	size_t int_cookie_len = 0;
 
 	// get form data
 	str_form_data = query(client_auth->parent->str_request, client_auth->parent->int_request_len, &int_query_length);
@@ -72,7 +73,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			bstrstr(client_auth->str_password, client_auth->int_password_length, ";", 1) == NULL, "no semi-colons allowed");
 
 #ifdef ENVELOPE
-		SFINISH_CAT_CSTR(client_auth->str_connname, "");
+		SFINISH_SNCAT(&client_auth->int_conn_length, client_auth->str_connname, (size_t)0, "");
 #else
 		client_auth->str_connname = getpar(str_form_data, "connname", int_query_length, &client_auth->int_connname_length);
 		SFINISH_CHECK(client_auth->str_connname != NULL, "no connection name");
@@ -81,7 +82,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		if (client_auth->str_conn != NULL && client_auth->int_conn_length == 0) {
 			SFREE(client_auth->str_conn);
 		} else {
-			SFINISH_CAT_CSTR(client_auth->parent->str_conn, client_auth->str_conn);
+			SFINISH_SNCAT(client_auth->parent->str_conn, &client_auth->int_conn_length, client_auth->str_conn, client_auth->int_conn_length);
 		}
 
 		if (bol_global_allow_custom_connections == false) {
@@ -101,13 +102,22 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFREE(str_one_day_expire);
 		SFINISH_CHECK(str_uri_expires != NULL, "cstr_to_uri failed");
 
-		SFINISH_CAT_CSTR(str_cookie_decrypted, str_form_data, "&expiration=", str_uri_expires, "&sessionid=", str_session_id);
+		SFINISH_SNCAT(
+			str_cookie_decrypted, &int_cookie_len,
+			str_form_data, int_query_length,
+			"&expiration=", (size_t)12,
+			str_uri_expires, strlen(str_uri_expires),
+			"&sessionid=", (size_t)11,
+			str_session_id, strlen(str_session_id)
+		);
 
 #ifdef ENVELOPE
 #else
 		if (client_auth->str_conn == NULL) {
-			SFINISH_CAT_CSTR(client_auth->str_database, get_connection_database(client_auth->str_connname));
-			SFINISH_CAT_APPEND(str_cookie_decrypted, "&dbname=", client_auth->str_database);
+			char *str_temp = get_connection_database(client_auth->str_connname);
+			size_t int_temp = str_temp ? strlen(str_temp) : 0;
+			SFINISH_SNCAT(client_auth->str_database, &int_temp, str_temp, int_temp);
+			SFINISH_SNFCAT(str_cookie_decrypted, &int_cookie_len, "&dbname=", (size_t)8, client_auth->str_database, int_temp);
 		}
 #endif
 
@@ -118,7 +128,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 
 		SDEBUG("str_uri_timeout: %s", str_uri_timeout);
 
-		SFINISH_CAT_APPEND(str_cookie_decrypted, "&timeout=", str_uri_timeout);
+		SFINISH_SNFCAT(str_cookie_decrypted, &int_cookie_len, "&timeout=", (size_t)9, str_uri_timeout, strlen(str_uri_timeout));
 		SFREE(str_uri_timeout);
 
 		// encrypt
@@ -134,18 +144,19 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			"There is no connection info with that name.");
 
 		if (client_auth->str_conn != NULL) {
-			SFINISH_CAT_CSTR(str_conn, client_auth->str_conn);
+			SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, client_auth->str_conn, client_auth->int_conn_length);
 			client_auth->int_connection_index = (int_global_custom_connection_number += 1);
 		} else {
+			char *str_temp = get_connection_info(client_auth->str_connname, &client_auth->int_connection_index);
+			size_t int_temp = strlen(str_temp);
 #ifdef POSTAGE_INTERFACE_LIBPQ
 			if (client_auth->str_database != NULL) {
-				SFINISH_CAT_CSTR(str_conn, get_connection_info(client_auth->str_connname, &client_auth->int_connection_index),
-					" dbname=", client_auth->str_database);
+				SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, str_temp, int_temp, " dbname=", (size_t)8, client_auth->str_database, strlen(client_auth->str_database));
 			} else {
-				SFINISH_CAT_CSTR(str_conn, get_connection_info(client_auth->str_connname, &client_auth->int_connection_index));
+				SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, str_temp, int_temp);
 			}
 #else
-			SFINISH_CAT_CSTR(str_conn, get_connection_info(client_auth->str_connname, &client_auth->int_connection_index));
+			SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, str_temp, int_temp);
 #endif
 		}
 		SFINISH_SALLOC(client_auth->str_int_connection_index, 20);
@@ -187,7 +198,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 
 		SDEBUG("client_auth->parent->str_request: %s", client_auth->parent->str_request);
 #ifdef ENVELOPE
-		SFINISH_CAT_CSTR(str_cookie_name, "envelope");
+		SFINISH_SNCAT(str_cookie_name, "envelope", (size_t)8);
 #else
 		str_referer = request_header(client_auth->parent->str_request, "referer");
 		SFINISH_CHECK(str_referer != NULL, "No Referer header");
@@ -202,7 +213,8 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		*ptr_conn_end = 0;
 		SDEBUG("ptr_conn: %s", ptr_conn);
 
-		SFINISH_CAT_CSTR(str_cookie_name, "postage_", ptr_conn);
+		size_t int_temp = 0;
+		SFINISH_SNCAT(str_cookie_name, &int_temp, "postage_", (size_t)8, ptr_conn, strlen(ptr_conn));
 #endif
 
 		SFREE_PWORD(str_form_data);
@@ -216,7 +228,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		str_expiration = getpar(str_cookie_decrypted, "expiration", cookie_len, &int_experation_length);
 
 #ifdef ENVELOPE
-		SFINISH_CAT_CSTR(client_auth->str_connname, "");
+		SFINISH_SNCAT(&client_auth->int_conn_length, client_auth->str_connname, (size_t)0, "");
 #else
 		client_auth->str_database = getpar(str_cookie_decrypted, "dbname", cookie_len, &client_auth->int_dbname_length);
 		client_auth->str_connname = getpar(str_cookie_decrypted, "connname", cookie_len, &client_auth->int_connname_length);
@@ -226,7 +238,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		if (client_auth->str_conn != NULL && client_auth->int_conn_length == 0) {
 			SFREE(client_auth->str_conn);
 		} else {
-			SFINISH_CAT_CSTR(client_auth->parent->str_conn, client_auth->str_conn);
+			SFINISH_SNCAT(client_auth->parent->str_conn, &client_auth->int_conn_length, client_auth->str_conn, client_auth->int_conn_length);
 		}
 
 		if (bol_global_allow_custom_connections == false) {
@@ -240,12 +252,24 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 
 		str_uri_new_password = cstr_to_uri(client_auth->str_new_password);
 		str_uri_expiration = cstr_to_uri(str_expiration);
-		SFINISH_CAT_CSTR(str_new_cookie, "username=", client_auth->str_user, "&connname=", client_auth->str_connname,
-			"&password=", str_uri_new_password, "&expiration=", str_uri_expiration, "&dbname=", client_auth->str_database,
-			"&sessionid=", str_session_id);
+		SFINISH_SNCAT(
+			str_new_cookie, &int_cookie_len,
+			"username=", (size_t)9,
+			client_auth->str_user, client_auth->int_user_length,
+			"&connname=", (size_t)10,
+			client_auth->str_connname, client_auth->int_connname_length,
+			"&password=", (size_t)10,
+			str_uri_new_password, strlen(str_uri_new_password), // TODO: cstr_to_uri with lengths
+			"&expiration=", (size_t)12,
+			str_uri_expiration, strlen(str_uri_expiration),
+			"&dbname=", (size_t)8,
+			client_auth->str_database, client_auth->int_dbname_length,
+			"&sessionid=", (size_t)11,
+			str_session_id, strlen(str_session_id)
+		);
 
 		if (client_auth->str_conn != NULL) {
-			SFINISH_CAT_APPEND(str_new_cookie, "&conn=", client_auth->str_conn);
+			SFINISH_SNFCAT(str_new_cookie, &int_cookie_len, "&conn=", (size_t)6, client_auth->str_conn, client_auth->int_conn_length);
 		}
 
 		// **** WARNING ****
@@ -269,21 +293,23 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			"There is no connection info with that name.");
 
 		if (client_auth->str_conn != NULL) {
-			SFINISH_CAT_CSTR(str_conn, client_auth->str_conn);
+			SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, client_auth->str_conn, client_auth->int_conn_length);
 #ifdef ENVELOPE
 #else
-			SFINISH_CAT_CSTR(client_auth->str_int_connection_index, ptr_conn);
+			size_t int_temp = strlen(str_temp);
+			SFINISH_SNCAT(client_auth->str_int_connection_index, &int_temp, ptr_conn, strlen(ptr_conn));
 #endif
 		} else {
+			char *str_temp = get_connection_info(client_auth->str_connname, &client_auth->int_connection_index);
+			size_t int_temp = strlen(str_temp);
 #ifdef POSTAGE_INTERFACE_LIBPQ
 			if (client_auth->str_database != NULL) {
-				SFINISH_CAT_CSTR(str_conn, get_connection_info(client_auth->str_connname, &client_auth->int_connection_index),
-					" dbname=", client_auth->str_database);
+				SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, str_temp, int_temp, " dbname=", (size_t)8, client_auth->str_database, strlen(client_auth->str_database));
 			} else {
-				SFINISH_CAT_CSTR(str_conn, get_connection_info(client_auth->str_connname, &client_auth->int_connection_index));
+				SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, str_temp, int_temp);
 			}
 #else
-			SFINISH_CAT_CSTR(str_conn, get_connection_info(client_auth->str_connname, &client_auth->int_connection_index));
+			SFINISH_SNCAT(str_conn, &client_auth->int_conn_length, str_temp, int_temp);
 #endif
 			SFINISH_SALLOC(client_auth->str_int_connection_index, 20);
 			snprintf(client_auth->str_int_connection_index, 20, "%zu", client_auth->int_connection_index);
@@ -300,18 +326,26 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 	} else if (strncmp(client_auth->str_action, "change_database", 16) == 0) {
 		SNOTICE("REQUEST TYPE: Not a valid action.");
 
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 500 Internal Server Error\015\012"
-									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
-									   "The change_database action is useful in postage, but not envelope.");
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+			"The change_database action is useful in postage, but not envelope.";
+		size_t int_temp = 0;
+		SFINISH_SNCAT(str_response, &int_temp, str_temp, strlen(str_temp));
+
 		SFREE_PWORD(str_form_data);
 		http_auth_free(client_auth);
 		SFREE(client_auth);
 	} else if (strncmp(client_auth->str_action, "list", 16) == 0) {
 		SNOTICE("REQUEST TYPE: Not a valid action.");
 
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 500 Internal Server Error\015\012"
-									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
-									   "The list action is useful in postage, but not envelope.");
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+			"The list action is useful in postage, but not envelope.";
+		size_t int_temp = 0;
+		SFINISH_SNCAT(str_response, &int_temp, str_temp, strlen(str_temp));
+
 		SFREE_PWORD(str_form_data);
 		http_auth_free(client_auth);
 		SFREE(client_auth);
@@ -319,9 +353,13 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 	} else if (strncmp(client_auth->str_action, "canadd", 16) == 0) {
 		SNOTICE("REQUEST TYPE: Not a valid action.");
 
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 500 Internal Server Error\015\012"
-									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
-									   "The canadd action is useful in postage, but not envelope.");
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+			"The canadd action is useful in postage, but not envelope.";
+		size_t int_temp = 0;
+		SFINISH_SNCAT(str_response, &int_temp, str_temp, strlen(str_temp));
+
 		SFREE_PWORD(str_form_data);
 		http_auth_free(client_auth);
 		SFREE(client_auth);

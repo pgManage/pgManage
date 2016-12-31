@@ -30,6 +30,7 @@ envelope/web_root
 !envelope/web_root/test.txt
 
 /postage/postage
+/postage/check
 /postage/data_test
 /postage/default_config/postage.conf
 /postage/Makefile

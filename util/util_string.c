@@ -879,7 +879,8 @@ error:
 	return NULL;
 }
 
-char *_sncat(size_t int_num_arg, size_t *ptr_int_len, ...) {
+// Make sure to cast to size_t when passing lengths
+char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...) {
 	char *str_result = NULL;
 	va_list ap;
 	va_list bp;
@@ -891,30 +892,40 @@ char *_sncat(size_t int_num_arg, size_t *ptr_int_len, ...) {
 
 	// Two va_start()s don't always work
 	// https://gcc.gnu.org/ml/gcc/2001-08/msg00489.html
-	va_start(ap, int_num_arg);
+	va_start(ap, ptr_int_len);
 	va_copy(bp, ap);
 
 	// Add all the lengths
 	for (int_i = 0; int_i < int_num_arg; int_i += 2) {
-		size_t int_len = va_arg(ap, size_t);
-		*ptr_int_len += int_len;
-
 		ptr_temp = va_arg(ap, char *);
+		size_t int_len = va_arg(ap, size_t);
+
+		*ptr_int_len += int_len;
 	}
 	va_end(ap);
 
 	// Allocate return
-	SERROR_SALLOC(str_result, *ptr_int_len);
+	if (!bol_free) {
+		SERROR_SALLOC(str_result, (*ptr_int_len) + 1);
+		int_i = 0;
+	} else {
+		str_result = va_arg(bp, char *);
+		int_offset += va_arg(bp, size_t);
+		SERROR_SREALLOC(str_result, (*ptr_int_len) + 1);
+		int_i = 2;
+	}
 
 	// Copy into return variable
-	for (int_i = 0; int_i < int_num_arg; int_i += 2) {
-		size_t int_len = va_arg(bp, size_t);
-		int_offset += int_len;
-
+	for (; int_i < int_num_arg; int_i += 2) {
 		ptr_temp = va_arg(bp, char *);
+		size_t int_len = va_arg(bp, size_t);
+
 		memcpy(str_result + int_offset, ptr_temp, int_len);
+		int_offset += int_len;
 	}
 	va_end(bp);
+
+	str_result[*ptr_int_len] = 0;
 
 	return str_result;
 error:

@@ -1,10 +1,13 @@
-.PHONY: test test-ssl lldb lldb-ssl gdb gdb-ssl valgrind valgrind-ssl destroy
+.PHONY: test test-ssl lldb lldb-ssl gdb gdb-ssl valgrind valgrind-ssl destroy check
 
 all:
 	$(MAKE) -C postage all
 
 test-common:
 	$(MAKE) -C postage test-common
+
+check:
+	$(MAKE) -C postage check
 
 test:
 	$(MAKE) -C postage test
