@@ -1,1 +1,8 @@
-﻿
+﻿  http_auth.c
+  Generating code
+  7 of 512 functions ( 1.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.exe
+  envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.pdb (Full PDB)
