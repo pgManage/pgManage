@@ -26,6 +26,7 @@ char *WS_handshakeResponse(char *str_request) {
 
 	// Concat
 	size_t int_temp1_len = 0;
+	//TODO: strlen(str_websocket_key), binary version of request_header
 	SERROR_SNCAT(str_temp1, &int_temp1_len, str_websocket_key, strlen(str_websocket_key), "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", (size_t)36);
 
 	// SHA and b64
