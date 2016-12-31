@@ -20,6 +20,10 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('GS.qryDeleteKey', 'GS.qryDeleteKey', 'GS.qryDeleteKey(${1:queryString}, \'${0:keyToDelete}\');');
     
     registerDesignSnippet('GS.getQueryString', 'GS.getQueryString', 'GS.getQueryString();');
+    
+    registerDesignSnippet('GS.pushQueryString', 'GS.pushQueryString', 'GS.pushQueryString(${0:newQueryString});');
+    
+    registerDesignSnippet('GS.removeFromQueryString', 'GS.removeFromQueryString', 'GS.removeFromQueryString(${0:removeKeys});');
 });
 
 
@@ -217,4 +221,21 @@ GS.qryDeleteKey = function (strQueryString, strKey) {
 GS.getQueryString = function () {
     'use strict';
     return window.location.search.substring(1);
+};
+
+GS.pushQueryString = function (QS) {
+    var arrNewQS = QS.split('&'), i, len, newQS = GS.getQueryString();
+    for (i = 0, len = arrNewQS.length; i < len; i += 1) {
+        newQS = GS.qrySetVal(newQS, arrNewQS[i]);
+    }
+    GS.pushState({}, '', '?' + newQS);
+};
+
+
+GS.removeFromQueryString = function (keys) {
+    var arrRemoveKeys = keys.split(','), i, len, newQS = GS.getQueryString();
+    for (i = 0, len = arrRemoveKeys.length; i < len; i += 1) {
+        newQS = GS.qryDeleteKey(newQS, arrRemoveKeys[i]);
+    }
+    GS.pushState({}, '', '?' + newQS);
 };

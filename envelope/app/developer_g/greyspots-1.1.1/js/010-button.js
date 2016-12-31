@@ -2,20 +2,20 @@
 
 (function () {
     'use strict';
-    
+
     function defineButton(strTagName, strDocLink, arrDisableWhenEmptyAttributes, designAdditionalFunction, clickFunction) {
         strDocLink = strDocLink || (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html';
         designAdditionalFunction = designAdditionalFunction || function () {};
         clickFunction = clickFunction || function () {};
-        
+
         window.addEventListener('design-register-element', function () {
             registerDesignSnippet('<' + strTagName + '>', '<' + strTagName + '>', strTagName + '>${1}</' + strTagName + '>');
-            
+
             designRegisterElement(strTagName, strDocLink);
-            
+
             window['designElementProperty_' + strTagName.replace(/[^a-z0-9]/gi, '').toUpperCase()] = function (selectedElement) {
                 var strIconPos = '', strIconRotation = '', strVisibilityAttribute = '', strFontAttribute = '', strBackgroundAttribute = '';
-                
+
                 addProp('Icon', true, '<div flex-horizontal>' +
                                       '     <gs-text id="prop-icon-input" class="target" value="' + (selectedElement.getAttribute('icon') || '') +
                                                                                                             '" mini flex></gs-text>' +
@@ -24,17 +24,17 @@
                                       '</div>', function () {
                     return setOrRemoveTextAttribute(selectedElement, 'icon', this.value, false);
                 });
-                
+
                 document.getElementById('prop-icon-picker-button').addEventListener('click', function () {
                     var i, len, html, arrIcons = GS.iconList(), strName, templateElement;
-                    
+
                     for (i = 0, len = arrIcons.length, html = ''; i < len; i += 1) {
                         strName = arrIcons[i].name;
                         html += '<gs-block>' +
                                     '<gs-button iconleft icon="' + strName + '" dialogclose>' + strName + '</gs-button>' +
                                 '</gs-block>';
                     }
-                    
+
                     templateElement = document.createElement('template');
                     templateElement.setAttribute('data-max-width', '1100px');
                     templateElement.innerHTML =
@@ -43,23 +43,23 @@
                         '    <gs-body padded><gs-grid widths="1,1,1,1" reflow-at="767px">' + html + '</gs-grid></gs-body>' +
                         '    <gs-footer><gs-button dialogclose>Cancel</gs-button></gs-footer>' +
                         '</gs-page>';
-                    
+
                     GS.openDialog(templateElement, '', function (event, strAnswer) {
                         var propInput = document.getElementById('prop-icon-input');
-                        
+
                         if (strAnswer !== 'Cancel') {
                             propInput.value = strAnswer;
                             GS.triggerEvent(propInput, 'change');
                         }
                     });
                 });
-                
+
                        if (selectedElement.hasAttribute('iconleft'))   { strIconPos = 'iconleft';
                 } else if (selectedElement.hasAttribute('iconright'))  { strIconPos = 'iconright';
                 } else if (selectedElement.hasAttribute('icontop'))    { strIconPos = 'icontop';
                 } else if (selectedElement.hasAttribute('iconbottom')) { strIconPos = 'iconbottom';
                 } else if (selectedElement.hasAttribute('icononly'))   { strIconPos = 'icononly'; }
-                
+
                 addProp('Icon Position', true, '<gs-select class="target" value="' + strIconPos + '" mini>' +
                                                     '   <option value="">Default</option>' +
                                                     '   <option value="iconleft">Left</option>' +
@@ -73,14 +73,14 @@
                     selectedElement.removeAttribute('icontop');
                     selectedElement.removeAttribute('iconbottom');
                     selectedElement.removeAttribute('icononly');
-                    
+
                     if (this.value) {
                         selectedElement.setAttribute(this.value, '');
                     }
-                    
+
                     return selectedElement;
                 });
-                
+
                        if (selectedElement.hasAttribute('iconrotateright')) { strIconRotation = 'iconrotateright';
                 } else if (selectedElement.hasAttribute('iconrotatedown'))  { strIconRotation = 'iconrotatedown';
                 } else if (selectedElement.hasAttribute('iconrotateleft'))  { strIconRotation = 'iconrotateleft'; }
@@ -126,10 +126,10 @@
                     return setOrRemoveBooleanAttribute(selectedElement, 'emphasis', (this.value === 'true'), true);
                 });
                 */
-                
-                
+
+
                 //<gs-delete-button>
-                
+
                 // Font Color attributes
                 strFontAttribute = '';
                 if (selectedElement.hasAttribute('txt-primary'))  { strFontAttribute = 'txt-primary'; }
@@ -158,7 +158,7 @@
                     
                     return selectedElement;
                 });
-                
+
                 // Background Color attributes
                 strBackgroundAttribute = '';
                 if (selectedElement.hasAttribute('bg-primary'))  { strBackgroundAttribute = 'bg-primary'; }
@@ -166,7 +166,7 @@
                 if (selectedElement.hasAttribute('bg-info'))     { strBackgroundAttribute = 'bg-info'; }
                 if (selectedElement.hasAttribute('bg-warning'))  { strBackgroundAttribute = 'bg-warning'; }
                 if (selectedElement.hasAttribute('bg-danger'))   { strBackgroundAttribute = 'bg-danger'; }
-                
+
                 addProp('Background Color', true, '<gs-select class="target" value="' + strBackgroundAttribute + '" mini>' +
                                                 '<option value="">Default</option>' +
                                                 '<option value="bg-primary">Primary</option>' +
@@ -180,57 +180,57 @@
                     selectedElement.removeAttribute('bg-info');
                     selectedElement.removeAttribute('bg-warning');
                     selectedElement.removeAttribute('bg-danger');
-                    
+
                     if (this.value) {
                         selectedElement.setAttribute(this.value, '');
                     }
-                    
+
                     return selectedElement;
                 });
-                
+
                 addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '0') + '" mini></gs-number>', function () {
                     return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
                 });
-                
+
                 addProp('Inline', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('inline')) + '" mini></gs-checkbox>', function () {
                     return setOrRemoveBooleanAttribute(selectedElement, 'inline', (this.value === 'true'), true);
                 });
                 addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
                     return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
                 });
-                
+
                 addProp('Key', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('key') || '') + '" mini></gs-text>', function () {
                     return setOrRemoveTextAttribute(selectedElement, 'key', this.value, false);
                 });
-                
+
                 addProp('No Modifier Key For Hot Key', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-modifier-key') || '') + '" mini></gs-checkbox>', function () {
                     return setOrRemoveBooleanAttribute(selectedElement, 'no-modifier-key', this.value === 'true', true);
                 });
-                
+
                 // TITLE attribute
                 addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
                     return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
                 });
-                
+
                 // DISABLED attribute
                 addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
                     return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
                 });
-                
+
                 // SUSPEND-INSERTED attribute
                 addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
                     return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
                 });
-                
+
                 // visibility attributes
-                if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-                if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-                if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-                if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-                if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-                if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-                if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-                
+                if (selectedElement.hasAttribute('hidden'))          { strVisibilityAttribute = 'hidden'; }
+                if (selectedElement.hasAttribute('hide-on-desktop')) { strVisibilityAttribute = 'hide-on-desktop'; }
+                if (selectedElement.hasAttribute('hide-on-tablet'))  { strVisibilityAttribute = 'hide-on-tablet'; }
+                if (selectedElement.hasAttribute('hide-on-phone'))   { strVisibilityAttribute = 'hide-on-phone'; }
+                if (selectedElement.hasAttribute('show-on-desktop')) { strVisibilityAttribute = 'show-on-desktop'; }
+                if (selectedElement.hasAttribute('show-on-tablet'))  { strVisibilityAttribute = 'show-on-tablet'; }
+                if (selectedElement.hasAttribute('show-on-phone'))   { strVisibilityAttribute = 'show-on-phone'; }
+
                 addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                                 '<option value="">Visible</option>' +
                                                 '<option value="hidden">Invisible</option>' +
@@ -322,7 +322,7 @@
                     } else if (!bottomLeft && bottomRight) {
                         arrStrAttr.push('remove-bottom-left');
                     }
-                    
+
                     if (!topRight && !bottomRight && arrStrAttr[0] !== 'remove-all') {
                         arrStrAttr.push('remove-right');
                     } else if (topLeft && !topRight) {
@@ -330,14 +330,14 @@
                     } else if (bottomLeft && !bottomRight) {
                         arrStrAttr.push('remove-bottom-right');
                     }
-                    
+
                     for (i = 0, len = arrStrAttr.length; i < len; i += 1) {
                         selectedElement.setAttribute(arrStrAttr[i], '');
                     }
-                    
+
                     return selectedElement;
                 });
-                
+
                 designAdditionalFunction(selectedElement);
             };
         });
@@ -345,9 +345,9 @@
         document.addEventListener('DOMContentLoaded', function () {
             function handleDisable(element) {
                 var i, len;
-                
+
                 element.removeAttribute('disabled');
-                
+
                 for (i = 0, len = arrDisableWhenEmptyAttributes.length; i < len; i += 1) {
                     if (!element.getAttribute(arrDisableWhenEmptyAttributes[i])) {
                         element.setAttribute('disabled', '');
@@ -355,49 +355,123 @@
                     }
                 }
             }
-            
-            function pushReplacePopHandler(element) {
-                var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-                
-                if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-                    element.setAttribute('value', GS.qryGetVal(strQueryString, strQSCol));
+
+            //function pushReplacePopHandler(element) {
+            //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+
+            //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+            //        element.setAttribute('value', GS.qryGetVal(strQueryString, strQSCol));
+            //    }
+            //}
+            function saveDefaultAttributes(element) {
+                var i;
+                var len;
+                var arrAttr;
+                var jsnAttr;
+        
+                // we need a place to store the attributes
+                element.internal.defaultAttributes = {};
+        
+                // loop through attributes and store them in the internal defaultAttributes object
+                arrAttr = element.attributes;
+                i = 0;
+                len = arrAttr.length;
+                while (i < len) {
+                    jsnAttr = arrAttr[i];
+        
+                    element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+        
+                    i += 1;
                 }
             }
-            
+        
+            function pushReplacePopHandler(element) {
+                var i;
+                var len;
+                var strQS = GS.getQueryString();
+                var strQSCol = element.getAttribute('qs');
+                var strQSValue;
+                var strQSAttr;
+                var arrQSParts;
+                var arrAttrParts;
+        
+                if (strQSCol.indexOf('=') !== -1) {
+                    arrAttrParts = strQSCol.split(',');
+                    i = 0;
+                    len = arrAttrParts.length;
+                    while (i < len) {
+                        strQSCol = arrAttrParts[i];
+                        arrQSParts = strQSCol.split('=');
+                        strQSCol = arrQSParts[0];
+                        strQSAttr = arrQSParts[1] || arrQSParts[0];
+        
+                        // if the key is not present: go to the attribute's default or remove it
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                                element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                            } else {
+                                element.removeAttribute(strQSAttr);
+                            }
+                        // else: set attribute to exact text from QS
+                        } else {
+                            element.setAttribute(strQSAttr, (
+                                GS.qryGetVal(strQS, strQSCol) ||
+                                element.internal.defaultAttributes[strQSAttr] ||
+                                ''
+                            ));
+                        }
+                        i += 1;
+                    }
+                } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+                    strQSValue = GS.qryGetVal(strQS, strQSCol);
+        
+                    if (element.internal.bolQSFirstRun !== true) {
+                        if (strQSValue !== '' || !element.getAttribute('value')) {
+                            element.setAttribute('value', strQSValue);
+                        }
+                    } else {
+                        element.setAttribute('value', strQSValue);
+                    }
+                }
+        
+                element.internal.bolQSFirstRun = true;
+            }
+
             // dont do anything that modifies the element here
             function elementCreated(element) {
                 // if "created" hasn't been suspended: run created code
                 if (!element.hasAttribute('suspend-created')) {
-                    
+
                 }
             }
-            
+
             //
             function elementInserted(element) {
                 var strKey, strQSValue;
-                
+
                 if (element.tagName.toUpperCase() === 'GS-DELETE-BUTTON' && !element.hasAttribute('src')) {
                     console.warn(element, 'gs-delete-button needs a [src=""] attribute!');
                 }
-                
+
                 // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
                 if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
                     // if this is the first time inserted has been run: continue
                     if (!element.inserted) {
                         element.inserted = true;
-                        
+                        element.internal = {};
+                        saveDefaultAttributes(element);
+
                         if (element.getAttribute('qs')) {
-                            strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
-                            
-                            if (strQSValue !== '' || !element.getAttribute('value')) {
-                                element.setAttribute('value', strQSValue);
-                            }
-                            
+                            //strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+                            //if (strQSValue !== '' || !element.getAttribute('value')) {
+                            //    element.setAttribute('value', strQSValue);
+                            //}
+                            pushReplacePopHandler(element);
                             window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                             window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                             window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
                         }
-                        
+
                         // add a tabindex to allow focus (if allowed)
                         if (!element.hasAttribute('no-focus')) {
                             if ((!element.tabIndex) || element.tabIndex === -1) {
@@ -1074,7 +1148,7 @@ window.addEventListener('design-register-element', function () {
         //<gs-button txt-info bg-success>
         
         // Font Color attributes
-        strFontAttribute = '';
+        var strFontAttribute = '';
         if (selectedElement.hasAttribute('txt-primary'))  { strFontAttribute = 'txt-primary'; }
         if (selectedElement.hasAttribute('txt-success'))  { strFontAttribute = 'txt-success'; }
         if (selectedElement.hasAttribute('txt-info'))     { strFontAttribute = 'txt-info'; }
@@ -1103,7 +1177,7 @@ window.addEventListener('design-register-element', function () {
         });
         
         // Background Color attributes
-        strBackgroundAttribute = '';
+        var strBackgroundAttribute = '';
         if (selectedElement.hasAttribute('bg-primary'))  { strBackgroundAttribute = 'bg-primary'; }
         if (selectedElement.hasAttribute('bg-success'))  { strBackgroundAttribute = 'bg-success'; }
         if (selectedElement.hasAttribute('bg-info'))     { strBackgroundAttribute = 'bg-info'; }
@@ -1162,14 +1236,14 @@ window.addEventListener('design-register-element', function () {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden'))          { strVisibilityAttribute = 'hidden'; }
+        if (selectedElement.hasAttribute('hide-on-desktop')) { strVisibilityAttribute = 'hide-on-desktop'; }
+        if (selectedElement.hasAttribute('hide-on-tablet'))  { strVisibilityAttribute = 'hide-on-tablet'; }
+        if (selectedElement.hasAttribute('hide-on-phone'))   { strVisibilityAttribute = 'hide-on-phone'; }
+        if (selectedElement.hasAttribute('show-on-desktop')) { strVisibilityAttribute = 'show-on-desktop'; }
+        if (selectedElement.hasAttribute('show-on-tablet'))  { strVisibilityAttribute = 'show-on-tablet'; }
+        if (selectedElement.hasAttribute('show-on-phone'))   { strVisibilityAttribute = 'show-on-phone'; }
         
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
@@ -1280,10 +1354,10 @@ window.addEventListener('design-register-element', function () {
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
         
-        //// SUSPEND-CREATED attribute
-        //addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
-        //    return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
-        //});
+        // SUSPEND-CREATED attribute
+        addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
+        });
         
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
@@ -1323,6 +1397,80 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        arrAttr = element.attributes;
+        i = 0;
+        len = arrAttr.length;
+        while (i < len) {
+            jsnAttr = arrAttr[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
+        }
+    }
+
+    function pushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i];
+                arrQSParts = strQSCol.split('=');
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present: go to the attribute's default or remove it
+                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                // else: set attribute to exact text from QS
+                } else {
+                    element.setAttribute(strQSAttr, (
+                        GS.qryGetVal(strQS, strQSCol) ||
+                        element.internal.defaultAttributes[strQSAttr] ||
+                        ''
+                    ));
+                }
+                i += 1;
+            }
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun !== true) {
+                if (strQSValue !== '' || !element.getAttribute('value')) {
+                    element.setAttribute('value', strQSValue);
+                }
+            } else {
+                element.setAttribute('value', strQSValue);
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
+    }
+    
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -1340,7 +1488,19 @@ document.addEventListener('DOMContentLoaded', function () {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+                element.internal = {};
+                saveDefaultAttributes(element);
+
+                if (element.getAttribute('qs')) {
+                    //var strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+                    //if (strQSValue !== '' || !element.getAttribute('value')) {
+                    //    element.setAttribute('value', strQSValue);
+                    //}
+                    pushReplacePopHandler(element);
+                    window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
+                    window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
+                    window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
+                }
                 
                 // add a tabindex to allow focus (if allowed)
                 if (!element.hasAttribute('no-focus')) {
@@ -1465,7 +1625,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         } else if (this.hasAttribute('no-focus')) {
                             this.removeAttribute('tabindex');
                         }
-                        
                     } else if (strAttrName === 'disabled') {
                         this.classList.remove('down');
                         
@@ -1477,8 +1636,6 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         events: {},
         accessors: {},
-        methods: {
-            
-        }
+        methods: {}
     });
 });

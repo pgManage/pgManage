@@ -93,14 +93,34 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "<code>qs</code>":</span>
-                    <p>The "<code>qs</code>" attribute makes the element listen for changes in the query string. If the column that element listens for is in the query string then it will refresh when the query string changes. <b>Note:</b> The "<code>path</code>" attribute is templated by doT.js and the "<code>qs</code>" variable is a JSON equivalent of the query string.</p>
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span><br />
+                    <p>The name <code>[qs]</code> stands for "querystring". The querystring is the part in the URL after the "?". The <code>[qs]</code> attribute has two formats, each with their own use.</p>
+                    
+                    <ul>
+                        <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
+                        <li>qs="<i>key</i>". This format will cause the gs-folder to refresh when a change occurs in the query string and the key is present.</li>
+                    </ul>
                 </div>
-                <gs-doc-example query-string="example_id=3">
-                    <template for="html" height="30">
-                        <gs-folder
-                            path="/role/trusted_g/{{! qs.example_id ? 'doc_example_' + qs.example_id : '' }}/"
-                            qs="example_id"></gs-folder>
+                <gs-doc-example query-string="test1=true&test2=false">
+                    <template for="html" height="35">
+                        <gs-folder qs="test1=value"></gs-folder>
+                        <gs-folder qs="test2=hidden"></gs-folder>
+                        <br />
+                        <br />
+                        <gs-grid widths="1,1">
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test1=test');">Add "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test1');">Remove "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test2=');">Add "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test2');">Remove "test2"</gs-button>
+                            </gs-block>
+                        </gs-grid>
                     </template>
                 </gs-doc-example>
                 

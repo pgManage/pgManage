@@ -159,62 +159,136 @@ document.addEventListener('DOMContentLoaded', function () {
     'use strict';
     var singleLineTemplateElement = document.createElement('template'),
         singleLineTemplate;
-    
+
     singleLineTemplateElement.innerHTML = '<input class="control" gs-dynamic type="text" />' +
                              '<gs-button class="date-picker-button" gs-dynamic inline icononly icon="calendar" no-focus></gs-button>';
-    
+
     singleLineTemplate = singleLineTemplateElement.content;
-    
+
     // re-target change event from control to element
     function changeFunction(event) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         //console.log('change event triggered');
-        
+
         GS.triggerEvent(event.target.parentNode, 'change');
-        
+
         handleFormat(event.target.parentNode, event);
     }
-    
+
     // re-target focus event from control to element
     function focusFunction(event) {
         GS.triggerEvent(event.target.parentNode, 'focus');
     }
-    
+
     function buttonClickFunction(event) {
         openDatePicker(event.target.parentNode);
     }
-    
-    function pushReplacePopHandler(element) {
-        var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-        
-        if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-            element.setAttribute('value', GS.qryGetVal(strQueryString, strQSCol));
+
+    //function pushReplacePopHandler(element) {
+    //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+    //
+    //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+    //        element.setAttribute('value', GS.qryGetVal(strQueryString, strQSCol));
+    //    }
+    //}
+
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
         }
     }
-        
+
+    function pushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i]
+                arrQSParts = strQSCol.split('=');
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present: go to the attribute's default or remove it
+                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                // else: set attribute to exact text from QS
+                } else {
+                    element.setAttribute(strQSAttr, (
+                        GS.qryGetVal(strQS, strQSCol) ||
+                        element.internal.defaultAttributes[strQSAttr] ||
+                        ''
+                    ));
+                }
+                i += 1;
+            }
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun !== true) {
+                if (strQSValue !== '' || !element.getAttribute('value')) {
+                    element.setAttribute('value', strQSValue);
+                }
+            } else {
+                element.value = strQSValue;
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
+    }
+
     // sync control value and resize to text
     function syncView(element) {
         if (element.control) {
             element.setAttribute('value', element.control.value);
         }
     }
-    
+
     function openDatePicker(element, dteDate) {
         var divElement = document.createElement('div')
           , jsnOffset = GS.getElementOffset(element.datePickerButton)
           , jsnControlOffset = GS.getElementOffset(element)
           , datePickerContainer, datePicker, strHTML = '', intTop, bolSelectOrigin
           , i, len, dateClickHandler, arrDateButtons, dteCurrent, strInputValue = element.control.value;
-        
+
         // if there is a day of the week in the value: remove it
         if (strInputValue.match(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim)) {
             strInputValue = strInputValue.replace(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim, '')
                                          .replace(/  /gim, ' ')
                                          .trim();
         }
-        
+
         // fix date being off by one day by replacing the dashes with slashes
         strInputValue = strInputValue.replace(/-/, '/')  // replace first dash with forward slash
                                      .replace(/-/, '/'); // replace second dash with forward slash
@@ -718,6 +792,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
+                element.internal = {};
+                saveDefaultAttributes(element)
                 
                 if (element.hasAttribute('tabindex')) {
                     element.oldTabIndex = element.getAttribute('tabindex');
@@ -731,12 +807,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // handle "qs" attribute
                 if (element.getAttribute('qs')) {
-                    strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+                    //strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+                    //
+                    //if (strQSValue !== '' || !element.getAttribute('value')) {
+                    //    element.setAttribute('value', strQSValue);
+                    //}
                     
-                    if (strQSValue !== '' || !element.getAttribute('value')) {
-                        element.setAttribute('value', strQSValue);
-                    }
-                    
+                    pushReplacePopHandler(element);
                     window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
@@ -863,7 +940,7 @@ document.addEventListener('DOMContentLoaded', function () {
             click: function (event) {
                 var jsnTextSelection, intStart, strFormat, strValue, delimiter1index, delimiter2index;
                 
-                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted') && !this.hasAttribute('readonly')) {
                     jsnTextSelection = GS.getInputSelection(this.control);
                     strFormat = getFormatString(this);
                     strValue = this.control.value;
@@ -909,7 +986,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     intCurrentSection, strCurrentSection, arrParts, dteDate, intCurrentSectionSize,
                     jsnState;
                 
-                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted') && !this.hasAttribute('readonly')) {
                     jsnTextSelection = GS.getInputSelection(this.control);
                     strValue = this.control.value;
                     strFormat = getFormatString(this);
@@ -1055,7 +1132,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     delimiter1index, delimiter2index, intCurrentSection, strCurrentSection,
                     arrParts, dteDate, intCurrentSectionSize, jsnState;
                 
-                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted') && !this.hasAttribute('readonly')) {
                     strFormat = getFormatString(this);
                     
                     // if format is dash delimited or slash delimited and
@@ -1559,13 +1636,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     var tempSelection = this.control ? GS.getInputSelection(this.control) : null;
                     
                     if (this.control) {
-                        if (typeof newValue === 'object') {
+                        if (newValue && typeof newValue === 'object') {
                             this.control.value = newValue.toLocaleDateString();
                         } else {
-                            this.control.value = newValue;
+                            this.control.value = newValue || '';
                         }
                         
-                        //console.log('1***', this.control);
                         if (document.activeElement === this.control) {
                            GS.setInputSelection(this.control, tempSelection.start, tempSelection.end);
                         }
@@ -1623,7 +1699,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         'autocapitalize',
                         'autocomplete',
                         'autofocus',
-                        'spellcheck'
+                        'spellcheck',
+                        'readonly'
                     ];
                     for (i = 0, len = arrPassThroughAttributes.length; i < len; i += 1) {
                         if (element.hasAttribute(arrPassThroughAttributes[i])) {

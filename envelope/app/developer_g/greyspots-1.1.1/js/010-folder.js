@@ -180,22 +180,24 @@ window.addEventListener('design-register-element', function () {
                     <div class="folder-list-container" flex-vertical flex-fill flex>
                         <div class="folder-list-header" flex-horizontal>
                             <b flex prevent-text-selection>Folders:</b>
-                            <gs-button class="button-back-folder" icon="long-arrow-left" icononly remove-bottom remove-right disabled no-focus></gs-button>
-                            <gs-button class="button-new-folder" icon="plus" icononly remove-bottom remove-left no-focus></gs-button>
+                            <gs-button class="button-back-folder" icon="long-arrow-left" icononly remove-bottom disabled no-focus></gs-button>
+                            <gs-button class="button-new-folder" icon="plus" icononly remove-bottom no-focus></gs-button>
                         </div>
                         <div class="folder-list" flex></div>
                     </div>
                     <div class="file-list-container" flex-vertical flex-fill flex>
                         <div class="file-list-header" flex-horizontal>
                             <b flex prevent-text-selection>Files:</b>
-                            <gs-button class="button-new-file" icon="plus" icononly remove-bottom remove-right no-focus></gs-button>
-                            <gs-button class="button-upload-file" icon="upload" icononly remove-bottom remove-left no-focus></gs-button>
+                            <gs-button class="button-new-file" icon="plus" icononly remove-bottom no-focus></gs-button>
+                            <gs-button class="button-upload-file" icon="upload" icononly remove-bottom no-focus></gs-button>
                         </div>
                         <div class="file-list" flex></div>
                     </div>
                 </div>
             </div>
         */});
+        //remove-right
+        //remove-left
         
         element.root             = xtag.queryChildren(element, '.root')[0];
         element.folderListHeader = xtag.query(element.root, '.folder-list-header')[0];
@@ -214,12 +216,82 @@ window.addEventListener('design-register-element', function () {
         element.arrPath = [];
     }
     
-    function pushReplacePopHandler(element) {
-        var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-        
-        if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-            getData(element);
+    //function pushReplacePopHandler(element) {
+    //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+    //    
+    //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+    //        getData(element);
+    //    }
+    //}
+    
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
         }
+    }
+
+    function pushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+
+        if (strQSCol && strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i]
+                arrQSParts = strQSCol.split('=');
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present: go to the attribute's default or remove it
+                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                // else: set attribute to exact text from QS
+                } else {
+                    element.setAttribute(strQSAttr, (
+                        GS.qryGetVal(strQS, strQSCol) ||
+                        element.internal.defaultAttributes[strQSAttr] ||
+                        ''
+                    ));
+                }
+                i += 1;
+            }
+        } else {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun === true && GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+                getData(element);
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
     }
     
     function bindElement(element) {
@@ -741,14 +813,19 @@ window.addEventListener('design-register-element', function () {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
+                element.internal = {};
+                saveDefaultAttributes(element);
                 
                 prepareElement(element);
                 bindElement(element);
                 
                 //// if no "qs" set or "qs" key set in query string <- non-standard behaviour, you could want 
                 //if ((!element.hasAttribute('qs') || GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs')))) {
-                getData(element);
+                //    getData(element);
                 //}
+                
+                getData(element);
+                //pushReplacePopHandler(element);
             }
         }
     }

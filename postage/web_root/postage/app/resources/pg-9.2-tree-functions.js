@@ -1175,8 +1175,8 @@ function treeLoad(data, index, intColumn) {
         (
             (
                 arrType.indexOf('script') !== -1 && (
-                    //If object is not a schema folder or a table folder then continue
-                    (data.query !== 'objectSchema' && data.query !== 'objectTable') ||
+                    ////If object is not a schema folder or a table folder then continue
+                    //(data.query !== 'objectSchema' && data.query !== 'objectTable') ||
                     //If its not a mouse event then continue
                     (!intColumn) ||
                     //If object is a schema folder, and the position of the click is before the arrow, then continue
@@ -1605,7 +1605,7 @@ function dataObjectButtons(strType, intOID, strSchema, strName) {
 
 
 function dumpButton(strOid, strName) {
-    return '<gs-button icononly icon="download" no-focus title="Dump schema objects"'
+    return '<gs-button icononly icon="edit" no-focus title="Dump schema objects"'
                     + ' onclick="dialogSchemaSurgery(\'' + strOid + '\', \'' + strName + '\')"></gs-button>';
 }
 
@@ -1622,7 +1622,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-header>
-                <center><h3>Schema Download</h3></center>
+                <center><h3>Dump Schema Objects</h3></center>
             </gs-header>
             <gs-body padded>
                 <center>What code do you want for the schema: "<span id="dialog-sql-dump-schema"></span>"?</center>
@@ -1668,7 +1668,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             <gs-footer>
                 <gs-grid>
                     <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
-                    <gs-block><gs-button id="button-schema-dump" dialogclose>Download</gs-button></gs-block>
+                    <gs-block><gs-button id="button-schema-dump" dialogclose>Open Script</gs-button></gs-block>
                 </gs-grid>
             </gs-footer>
         </gs-page>
@@ -1709,7 +1709,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
         var bolDropStatments, bolSchema, bolFunctions, bolOperators, bolAggregates,
             bolTriggerFunctions, bolSequences, bolTables, bolViews, strQuery, handleListResults, arrQuery;
         
-        if (strAnswer === 'Download') {
+        if (strAnswer === 'Open Script') {
             bolDropStatments    = document.getElementById('checkbox-schema-dump-drop-statements').value   === 'true';
             bolSchema           = document.getElementById('checkbox-schema-dump-schema').value            === 'true';
             bolFunctions        = document.getElementById('checkbox-schema-dump-functions').value         === 'true';
@@ -1751,7 +1751,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             }
             if (bolTables) {
                 arrQuery.push('\n\n SELECT oid, name, schema_name, \'Table\' AS objType, 5 AS order_no FROM (' +
-                    listQuery.tables.replace(/\{\{INTOID\}\}/gim,     intSchemaOid).replace(';', '') +
+                    listQuery.objectTableList.replace(/\{\{INTOID\}\}/gim,     intSchemaOid).replace(';', '') +
                 ') em ');
             }
             if (bolViews) {
@@ -1823,7 +1823,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                 }
             };
             
-            // load lists of objects to download
+            // load lists of objects to dump
             if (strQuery) {
                 getListsForDump(strQuery, function (arrResults) {
                     arrResults.splice(0, 1);

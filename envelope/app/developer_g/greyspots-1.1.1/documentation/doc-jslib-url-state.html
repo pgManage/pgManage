@@ -29,6 +29,7 @@
                     <p>GS.pushState(&lt;STATE-OBJ&gt;, &lt;TITLE&gt;, &lt;URL&gt;);<br />
                     GS.replaceState(&lt;STATE-OBJ&gt;, &lt;TITLE&gt;, &lt;URL&gt;);<br />
                     GS.pushQueryString(&lt;OVERRIDING-QUERYSTRING&gt;);</p>
+                    GS.removeFromQueryString(&lt;REMOVE-KEYS&gt;);</p>
                 </div>
                 
                 <h3 class="doc-header">Description:</h3>
@@ -106,6 +107,26 @@
                             
                             function testPushQS4(strNewQueryString) {
                                 GS.pushQueryString('test=&asdf=asdf');
+                            }
+                        </template>
+                    </gs-doc-example>
+                    <div class="doc-example-description">
+                        <span class="h3">GS.removeFromQueryString Example:</span><br />
+                        <p>In this example when you click the "Reset QS" button, the querystring in the URL is reset. When you click the RemoveKeys button, it removes the test, test1, and test2 keys using the GS.removeFromQueryString function. When the GS.removeFromQueryString function changes the querystring the user can use the back button to go back to a previous querystring (or no querystring for that matter) without reloading the page.</p>
+                    </div>
+                    <gs-doc-example query-string="test=test&test1=test1&test2=test2&test3=test3">
+                        <template for="html" height="6">
+                            <gs-button onclick="resetQS()">Reset QS</gs-button>
+                            <gs-button onclick="testRemoveQS()">Remove Keys</gs-button>
+                        </template>
+                        <template for="js" height="22">
+                            function resetQS(strNewQueryString) {
+                                GS.pushQueryString('test=test&test1=test1&test2=test2&test3=test3');
+                            }
+                            
+                            function testRemoveQS() {
+                                GS.removeFromQueryString('test');
+                                GS.removeFromQueryString('test1,test2');
                             }
                         </template>
                     </gs-doc-example>

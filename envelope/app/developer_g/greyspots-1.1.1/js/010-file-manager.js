@@ -32,18 +32,92 @@ window.addEventListener('design-register-element', function () {
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
     
-    function pushReplacePopHandler(element) {
-        var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-        
-        if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-            if (element.getAttribute('folder') === 'dev') {
-                element.innerPath = 'app/' + GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
-            } else {
-                element.innerPath = element.getAttribute('folder') + '/' + GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
-            }
-            element.getFiles();
+    //function pushReplacePopHandler(element) {
+    //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+    //    
+    //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+    //        if (element.getAttribute('folder') === 'dev') {
+    //            element.innerPath = 'app/' + GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
+    //        } else {
+    //            element.innerPath = element.getAttribute('folder') + '/' + GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
+    //        }
+    //        element.getFiles();
+    //    }
+    //}
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
         }
     }
+
+    function pushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i];
+                arrQSParts = strQSCol.split('=');
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present: go to the attribute's default or remove it
+                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                // else: set attribute to exact text from QS
+                } else {
+                    element.setAttribute(strQSAttr, (
+                        GS.qryGetVal(strQS, strQSCol) ||
+                        element.internal.defaultAttributes[strQSAttr] ||
+                        ''
+                    ));
+                }
+                i += 1;
+            }
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            if (element.internal.bolQSFirstRun === true) {
+                if (element.getAttribute('folder') === 'dev') {
+                    element.innerPath = 'app/' + GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
+                } else {
+                    element.innerPath = element.getAttribute('folder') + '/' +
+                                        GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
+                }
+                element.getFiles();
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
+    }
+    
     
     // dont do anything that modifies the element here
     function elementCreated(element) {
@@ -62,6 +136,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
+                element.internal = {};
+                saveDefaultAttributes(element);
                 
                 if (element.getAttribute('folder') !== 'dev' &&
                     element.getAttribute('folder') !== 'role' &&
@@ -75,6 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // bind/handle query string
                 if (element.getAttribute('qs')) {
+                    pushReplacePopHandler(element);
                     window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });

@@ -38,6 +38,17 @@ gs-optionbox:not([no-target]) gs-option[selected]:after {
     content: '\f192';
 }
 
+
+
+gs-optionbox[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+    padding: 0.2em;
+    pointer-events: none;
+}
+
 /*
 gs-optionbox:focus {
     outline-offset: -4px;

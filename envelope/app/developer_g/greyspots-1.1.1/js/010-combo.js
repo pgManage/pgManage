@@ -686,7 +686,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function handleKeyDown(element, event) {
         var intKeyCode = event.keyCode || event.which, selectedTr, trs, i, len, selectedRecordIndex, firstTd, lastChild, strTextValue;
         
-        if (!element.hasAttribute('disabled')) {
+        if (!element.hasAttribute('disabled') && !element.hasAttribute('readonly')) {
             if ((intKeyCode === 40 || intKeyCode === 38) && !event.shiftKey && !event.metaKey && !event.ctrlKey && !element.error) {
                 if (!element.open) {
                     openDropDown(element);
@@ -1065,7 +1065,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 'autocapitalize',
                 'autocomplete',
                 'autofocus',
-                'spellcheck'
+                'spellcheck',
+                'readonly'
             ];
         
         // if the gs-text element has a tabindex: save the tabindex and remov the attribute
@@ -1167,7 +1168,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         element.control.addEventListener('keyup', function (event) {
             // if the key was return
-            if ((event.keyCode || event.which) === 13) {
+            if ((event.keyCode || event.which) === 13 && !element.hasAttribute('readonly')) {
                 if (element.changeOccured === true) {
                     element.changeOccured = false;
                 } else if (element.control.value !== element.lastValue) {
@@ -1177,33 +1178,144 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     
+    //function pushReplacePopHandler(element) {
+    //    var i, len, arrPopKeys, currentValue, bolRefresh = false, strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+    //    
+    //    if (strQSCol && GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+    //        element.value = GS.qryGetVal(strQueryString, strQSCol);
+    //    }
+    //    
+    //    if (element.hasAttribute('refresh-on-querystring-values')) {
+    //        arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
+    //        
+    //        for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
+    //            currentValue = GS.qryGetVal(strQueryString, arrPopKeys[i]);
+    //            
+    //            if (element.popValues[arrPopKeys[i]] !== currentValue) {
+    //                bolRefresh = true;
+    //            }
+    //            
+    //            element.popValues[arrPopKeys[i]] = currentValue;
+    //        }
+    //        
+    //    } else if (element.hasAttribute('refresh-on-querystring-change')) {
+    //        bolRefresh = true;
+    //    }
+    //    
+    //    if (bolRefresh) {
+    //        getData(element);
+    //    }
+    //}
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
+        }
+    }
+
     function pushReplacePopHandler(element) {
-        var i, len, arrPopKeys, currentValue, bolRefresh = false, strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
-        
-        if (strQSCol && GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
-            element.value = GS.qryGetVal(strQueryString, strQSCol);
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+        var arrPopKeys;
+        var currentValue;
+        var bolRefresh;
+
+        if (strQSCol) {
+            if (strQSCol.indexOf('=') !== -1) {
+                arrAttrParts = strQSCol.split(',');
+                i = 0;
+                len = arrAttrParts.length;
+                while (i < len) {
+                    strQSCol = arrAttrParts[i]
+                    arrQSParts = strQSCol.split('=');
+                    strQSCol = arrQSParts[0];
+                    strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
+                    i += 1;
+                }
+            } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+                strQSValue = GS.qryGetVal(strQS, strQSCol);
+    
+                if (element.internal.bolQSFirstRun !== true) {
+                    if (strQSValue !== '' || !element.getAttribute('value')) {
+                        element.setAttribute('value', strQSValue);
+                    }
+                } else {
+                    element.value = strQSValue;
+                }
+            }
         }
         
-        if (element.hasAttribute('refresh-on-querystring-values')) {
-            arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
-            
-            for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
-                currentValue = GS.qryGetVal(strQueryString, arrPopKeys[i]);
+        // handle "refresh-on-querystring-values" and "refresh-on-querystring-change" attributes
+        if (element.internal.bolQSFirstRun === true) {
+            if (element.hasAttribute('refresh-on-querystring-values')) {
+                arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
                 
-                if (element.popValues[arrPopKeys[i]] !== currentValue) {
-                    bolRefresh = true;
+                for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
+                    currentValue = GS.qryGetVal(strQS, arrPopKeys[i]);
+                    
+                    if (element.popValues[arrPopKeys[i]] !== currentValue) {
+                        bolRefresh = true;
+                    }
+                    
+                    element.popValues[arrPopKeys[i]] = currentValue;
                 }
-                
-                element.popValues[arrPopKeys[i]] = currentValue;
+            } else if (element.hasAttribute('refresh-on-querystring-change')) {
+                bolRefresh = true;
             }
             
-        } else if (element.hasAttribute('refresh-on-querystring-change')) {
-            bolRefresh = true;
+            if (bolRefresh && element.hasAttribute('src')) {
+                getData(element);
+            } else if (bolRefresh && !element.hasAttribute('src')) {
+                console.warn('gs-combo Warning: element has "refresh-on-querystring-values" or "refresh-on-querystring-change", but no "src".', element);
+            }
+        } else {
+            if (element.hasAttribute('refresh-on-querystring-values')) {
+                arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
+                
+                for (i = 0, len = arrPopKeys.length; i < len; i += 1) {
+                    element.popValues[arrPopKeys[i]] = GS.qryGetVal(strQS, arrPopKeys[i]);
+                }
+            }
         }
         
-        if (bolRefresh) {
-            getData(element);
-        }
+        element.internal.bolQSFirstRun = true;
     }
     
     // dont do anything that modifies the element here
@@ -1224,6 +1336,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
+                element.internal = {};
+                saveDefaultAttributes(element);
                 
                 element.open = false;
                 element.error = false;
@@ -1233,13 +1347,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (element.getAttribute('qs') ||
                         element.getAttribute('refresh-on-querystring-values') ||
                         element.hasAttribute('refresh-on-querystring-change')) {
-                    strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
-                    
-                    if (strQSValue !== '' || !element.getAttribute('value')) {
-                        element.setAttribute('value', strQSValue);
-                    }
+                    //strQSValue = GS.qryGetVal(GS.getQueryString(), element.getAttribute('qs'));
+                    //
+                    //if (strQSValue !== '' || !element.getAttribute('value')) {
+                    //    element.setAttribute('value', strQSValue);
+                    //}
                     
                     element.popValues = {};
+                    pushReplacePopHandler(element);
                     window.addEventListener('pushstate', function () {    pushReplacePopHandler(element); });
                     window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
                     window.addEventListener('popstate', function () {     pushReplacePopHandler(element); });

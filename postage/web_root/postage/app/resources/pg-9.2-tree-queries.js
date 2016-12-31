@@ -72,13 +72,15 @@ var treeStructure = [
             [3, 'script', 'objectSequence'],
         [2, 'folder,refresh', 'objectTableList'],
             [3, 'folder,script', 'objectTable'],
-                [4, 'script', 'objectTable'],
+                [4, '', ''], //'script', 'objectTable'
         [2, 'folder,refresh', 'objectTriggerFunction'],
             [3, 'script', 'objectFunction'],
         [2, 'folder,refresh', 'objectType'],
             [3, 'script', 'objectType'],
-        [2, 'folder,refresh', 'objectView'],
-            [3, 'script', 'objectView']
+        [2, 'folder,refresh', 'objectViewList'],
+            //[3, 'script', 'objectView']
+            [3, 'folder,script', 'objectView'],
+                [4, '', ''], //'script', 'objectView'
 ];
 
 
@@ -196,7 +198,7 @@ listQuery.objectSchema = listQuery.schemaContents = ml(function () {/*
                AND (pg_type.typnamespace = '{{INTOID}}'::oid)
                AND (pg_type.typtype <> 'd')) AS obj_count
         UNION
-        SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Views' AS name, 'objectView' AS obj_query, (SELECT count(c.relname) AS result
+        SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Views' AS name, 'objectViewList' AS obj_query, (SELECT count(c.relname) AS result
                FROM pg_class c
               WHERE ((c.relhasrules AND (EXISTS (
                       SELECT r.rulename FROM pg_rewrite r
@@ -223,6 +225,20 @@ indexes
 
 
 listQuery.objectTable = ml(function () {/*
+    SELECT {{INTOID}} AS oid,
+            COALESCE(attname,'') ||
+                ' (' ||
+                    COALESCE(format_type(atttypid, atttypmod),'') ||
+                ')',
+            '' AS schema_name,
+            'CL' AS bullet
+      FROM pg_catalog.pg_attribute
+     WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0
+       AND attrelid = {{INTOID}}
+  ORDER BY attnum ASC;
+*/});
+
+listQuery.objectView = ml(function () {/*
     SELECT {{INTOID}} AS oid,
             COALESCE(attname,'') ||
                 ' (' ||
@@ -372,7 +388,7 @@ titleRefreshQuery.objectType = titleRefreshQuery.typeNumber = ml(function () {/*
 */});
 
 
-titleRefreshQuery.objectView = titleRefreshQuery.viewNumber = ml(function () {/*
+titleRefreshQuery.objectViewList = titleRefreshQuery.viewNumber = ml(function () {/*
      SELECT count(c.relname) AS result
        FROM pg_class c
       WHERE ((c.relhasrules AND (EXISTS (
@@ -383,7 +399,7 @@ titleRefreshQuery.objectView = titleRefreshQuery.viewNumber = ml(function () {/*
 
 
 listQuery.objectTableList = ml(function () {/*
-      SELECT pg_class.oid, quote_ident(relname) AS name, pg_namespace.nspname AS schema_name--, 'TB' AS bullet
+      SELECT pg_class.oid, quote_ident(relname) AS name, pg_namespace.nspname AS schema_name, 'TB' AS bullet
         FROM pg_class
    LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
        WHERE relkind IN ('r','s','t') AND pg_class.relnamespace = {{INTOID}}
@@ -416,7 +432,7 @@ listQuery.objectType = listQuery.types = ml(function () {/*
 */});
 
 
-listQuery.objectView = listQuery.views = ml(function () {/*
+listQuery.objectViewList = listQuery.views = ml(function () {/*
       SELECT c.oid, quote_ident(c.relname) AS name, pg_namespace.nspname AS schema_name, 'VW' AS bullet
         FROM pg_class c
    LEFT JOIN pg_namespace ON pg_namespace.oid = c.relnamespace

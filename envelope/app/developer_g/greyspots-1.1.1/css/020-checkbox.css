@@ -1,6 +1,14 @@
-gs-checkbox:not([mini]):not(:focus) {
+gs-checkbox:not([readonly]):not([mini]):not(:focus) {
     box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
 }
+
+gs-checkbox[readonly] {
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+}
+
+
 
 /* ##################################################################################### */
 /* ############################## UNCHECKED / CHECKED STATE ############################ */

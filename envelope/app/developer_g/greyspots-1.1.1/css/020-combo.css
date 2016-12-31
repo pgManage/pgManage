@@ -78,6 +78,29 @@ gs-combo[mini] .drop_down_button {
 
 
 /* ########################################################## */
+/* ##################### READONLY STATE ##################### */
+/* ########################################################## */
+
+gs-combo[readonly] {
+    box-shadow: 0 0 0 0 #000 inset;
+    opacity: 0.9;
+    border-color: #E6E6E6;
+    cursor: default;
+}
+
+gs-combo[readonly] > .root {
+    padding-right: 0;
+}
+
+gs-combo[readonly] .drop_down_button {
+    display: none;
+    cursor: default;
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+
+/* ########################################################## */
 /* ##################### DISABLED STATE ##################### */
 /* ########################################################## */
 
