@@ -893,7 +893,7 @@ bool parse_options(int argc, char *const *argv) {
 
 		} else if (str_global_logfile[1] == ':') {
 			str_temp = str_global_logfile;
-			SERROR_SNCAT(str_global_logfile, &int_global_logfile_len
+			SERROR_SNCAT(str_global_logfile, &int_global_logfile_len,
 				str_global_logfile + 2, int_global_logfile_len - 2);
 			SFREE(str_temp);
 		}

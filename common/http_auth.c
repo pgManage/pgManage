@@ -1164,6 +1164,8 @@ void http_auth_change_pw_step2(EV_P, void *cb_data, DB_conn *conn) {
 	struct sock_ev_client_auth *client_auth = cb_data;
 	SDEFINE_VAR_ALL(str_sql, str_user_quote, str_old_password_literal, str_new_password_literal);
 	char *str_response = NULL;
+	size_t int_response_len = 0;
+	size_t int_temp = 0;
 
 	SFINISH_CHECK(conn->int_status == 1, "%s", conn->str_response);
 
@@ -1184,12 +1186,27 @@ void http_auth_change_pw_step2(EV_P, void *cb_data, DB_conn *conn) {
 		DB_escape_literal(client_auth->parent->conn, client_auth->str_new_password, strlen(client_auth->str_new_password));
 	SFREE_PWORD(client_auth->str_new_password);
 	if (DB_connection_driver(client_auth->parent->conn) == DB_DRIVER_POSTGRES) {
-		SFINISH_CAT_CSTR(str_sql, "ALTER ROLE ", str_user_quote, " PASSWORD ", str_new_password_literal, ";");
+		SFINISH_SNCAT(
+			str_sql, &int_temp,
+			"ALTER ROLE ", (size_t)11,
+			str_user_quote, strlen(str_user_quote),
+			" PASSWORD ", (size_t)10,
+			str_new_password_literal, strlen(str_new_password_literal),
+			";", (size_t)1
+		);
 	} else {
 		str_old_password_literal = DB_escape_literal(
 			client_auth->parent->conn, client_auth->str_old_check_password, strlen(client_auth->str_old_check_password));
-		SFINISH_CAT_CSTR(str_sql, "ALTER LOGIN ", str_user_quote, " WITH PASSWORD = ", str_new_password_literal,
-			" OLD_PASSWORD = ", str_old_password_literal, ";");
+		SFINISH_SNCAT(
+			str_sql, &int_temp,
+			"ALTER LOGIN ", (size_t)12,
+			str_user_quote, strlen(str_user_quote),
+			" WITH PASSWORD = ", (size_t)18,
+			str_new_password_literal, strlen(str_new_password_literal),
+			" OLD_PASSWORD = ", (size_t)17,
+			str_old_password_literal, strlen(str_old_password_literal),
+			";", (size_t)1
+		);
 	}
 	SFREE_PWORD(client_auth->str_old_check_password);
 	SFREE(client_auth->str_user);
@@ -1227,12 +1244,19 @@ finish:
 		char str_length[50];
 		ssize_t int_len = 0;
 		snprintf(str_length, 50, "%zu", strlen(_str_response));
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-								"Content-Length: ",
-			str_length, "\015\012\015\012", _str_response);
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, strlen(_str_response)
+		);
 		SFREE(_str_response);
-		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, strlen(str_response))) < 0) {
+		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, int_response_len)) < 0) {
 			SFREE(str_response);
 			if (bol_tls) {
 				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
@@ -1253,6 +1277,8 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
 	struct sock_ev_client_auth *client_auth = (struct sock_ev_client_auth *)(client_request->vod_request_data);
 	char *str_response = NULL;
+	size_t int_response_len = 0;
+	size_t int_temp = 0;
 	SDEFINE_VAR_ALL(str_expires);
 
 	SDEBUG("res->status: %d", res->status);
@@ -1270,18 +1296,33 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 	str_expires = str_expire_one_day();
 
 #ifdef ENVELOPE
-	SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
-								   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012Content-Type: "
-								   "application/json; charset=UTF-8\015\012",
-		"Set-Cookie: envelope=", client_auth->str_cookie_encrypted, "; path=/; expires=", str_expires,
-		(bol_tls ? "; secure" : ""), "; HttpOnly\015\012\015\012", "{\"stat\": true, \"dat\": \"OK\"}");
+	char *str_temp1 = 
+		"HTTP/1.1 200 OK\015\012"
+		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012Content-Type: application/json; charset=UTF-8\015\012"
+		"Set-Cookie: envelope=";
+	char *str_temp2 = "; HttpOnly\015\012\015\012{\"stat\": true, \"dat\": \"OK\"}";
+	SFINISH_SNCAT(str_response, &int_response_len, 
+		str_temp1, strlen(str_temp1),
+		client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
+		"; path=/; expires=", 18,
+		str_expires, strlen(str_expires),
+		(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
+		str_temp2, strlen(str_temp2));
 #else
-	SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
-								   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012Content-Type: "
-								   "application/json; charset=UTF-8\015\012",
-		"Set-Cookie: postage_", client_auth->str_int_connection_index, "=", client_auth->str_cookie_encrypted,
-		"; path=/; expires=", str_expires, (bol_tls ? "; secure" : ""), "; HttpOnly\015\012\015\012",
-		"{\"stat\": true, \"dat\": \"OK\"}");
+	char *str_temp1 =
+		"HTTP/1.1 200 OK\015\012"
+		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012Content-Type: application/json; charset=UTF-8\015\012"
+		"Set-Cookie: postage_";
+	char *str_temp2 = "; HttpOnly\015\012\015\012{\"stat\": true, \"dat\": \"OK\"}";
+	SFINISH_SNCAT(str_response, &int_response_len,
+		str_temp1, strlen(str_temp1),
+		client_auth->str_int_connection_index, strlen(client_auth->str_int_connection_index),
+		"=", (size_t)1,
+		client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
+		"; path=/; expires=", 18,
+		str_expires, strlen(str_expires),
+		(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
+		str_temp2, strlen(str_temp2));
 #endif
 
 	client_auth->parent->int_last_activity_i = -1;
@@ -1300,13 +1341,13 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 		struct sock_ev_client_last_activity *client_last_activity = (struct sock_ev_client_last_activity *)DArray_get(
 			client_auth->parent->server->arr_client_last_activity, (size_t)client_auth->parent->int_last_activity_i);
 		SFREE(client_last_activity->str_cookie);
-		SFINISH_CAT_CSTR(client_last_activity->str_cookie, client_auth->str_cookie_encrypted);
+		SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted));
 		SDEBUG("New cookie is %s", client_last_activity->str_cookie);
 	} else {
 		struct sock_ev_client_last_activity *client_last_activity;
 		SFINISH_SALLOC(client_last_activity, sizeof(struct sock_ev_client_last_activity));
 		memcpy(client_last_activity->str_client_ip, client_auth->parent->str_client_ip, INET_ADDRSTRLEN);
-		SFINISH_CAT_CSTR(client_last_activity->str_cookie, client_auth->str_cookie_encrypted);
+		SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted));
 		client_last_activity->last_activity_time = ev_now(EV_A);
 		client_auth->parent->int_last_activity_i =
 			(ssize_t)DArray_push(client_auth->parent->server->arr_client_last_activity, client_last_activity);
@@ -1335,8 +1376,7 @@ finish:
 		SFREE(_str_response);
 	}
 
-	ssize_t int_response_len = 0;
-	if ((int_response_len = CLIENT_WRITE(client_request->parent, str_response, strlen(str_response))) < 0) {
+	if (CLIENT_WRITE(client_request->parent, str_response, strlen(str_response)) < 0) {
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
 		} else {
