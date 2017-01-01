@@ -16,6 +16,8 @@ void notice_processor(void *arg, const char *str_notice) {
 	char *str_temp = NULL;
 	SDEBUG("%s", str_notice);
 	char *ptr_actual_message = strstr(str_notice, ": ");
+	size_t int_notice_len = 0;
+
 	if (ptr_actual_message == NULL) {
 		ptr_actual_message = (char *)str_notice;
 		str_notice = "NOTICE";
@@ -26,11 +28,26 @@ void notice_processor(void *arg, const char *str_notice) {
 	str_temp = escape_value(ptr_actual_message);
 	SDEBUG("%s\t%s", str_notice, str_temp);
 	if (client->str_notice != NULL) {
-		client->str_notice = cat_append(client->str_notice, "\012", str_notice, "\t", str_temp);
+		int_notice_len = strlen(client->str_notice);
+		SERROR_SNFCAT(client->str_notice, &int_notice_len,
+			"\012", (size_t)1,
+			str_notice, strlen(str_notice),
+			"\t", (size_t)1,
+			str_temp, strlen(str_temp));
+		//client->str_notice = cat_append(client->str_notice, "\012", str_notice, "\t", str_temp);
 	} else {
-		client->str_notice = cat_cstr(str_notice, "\t", str_temp);
+		//client->str_notice = cat_cstr(str_notice, "\t", str_temp);
+		SERROR_SNCAT(client->str_notice, &int_notice_len,
+			str_notice, strlen(str_notice),
+			"\t", (size_t)1,
+			str_temp, strlen(str_temp));
 	}
 	SFREE(str_temp);
+	bol_error_state = false;
+	return;
+
+error:
+	SERROR_NORESPONSE("notice_processor failed");
 	bol_error_state = false;
 }
 #ifdef POSTAGE_INTERFACE_LIBPQ
