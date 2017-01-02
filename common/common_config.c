@@ -817,12 +817,12 @@ bool parse_options(int argc, char *const *argv) {
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			cwd + 2, strlen(cwd + 2),
 			"/", (size_t)1,
-			str_global_app_path, &int_global_app_path_len);
+			str_global_app_path, int_global_app_path_len);
 #else
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			cwd, strlen(cwd),
 			"/", (size_t)1,
-			str_global_app_path, &int_global_app_path_len);
+			str_global_app_path, int_global_app_path_len);
 #endif // _WIN32
 		SDEBUG("str_temp: %s", str_temp);
 		SFREE(str_global_app_path);
