@@ -881,13 +881,13 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		snprintf(str_length, 50, "%zu", strlen(str_temp));
 		str_temp1 =
 			"HTTP/1.1 403 Forbidden\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
-			str_response, &int_response_len, 
-			str_temp1, strlen(str_temp1), 
+			str_response, &int_response_len,
+			str_temp1, strlen(str_temp1),
 			str_length, strlen(str_length),
-			"\015\012\015\012", (size_t)4, 
+			"\015\012\015\012", (size_t)4,
 			str_temp, strlen(str_temp)
 		);
 		SFREE(str_temp)
@@ -936,7 +936,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 			str_response, &int_response_len,
 			str_temp1, strlen(str_temp1),
 			client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
-			"; path=/; expires=", 18,
+			"; path=/; expires=", (size_t)18,
 			str_expires, strlen(str_expires),
 			str_temp2, strlen(str_temp2),
 			(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
@@ -964,9 +964,9 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 			str_response, &int_response_len,
 			str_temp1, strlen(str_temp1),
 			client_auth->str_int_connection_index, strlen(client_auth->str_int_connection_index),
-			"=", 1,
+			"=", (size_t)1,
 			client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
-			"; path=/; expires=", 18,
+			"; path=/; expires=", (size_t)18,
 			str_expires, strlen(str_expires),
 			str_temp2, strlen(str_temp2),
 			(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
@@ -1134,8 +1134,8 @@ finish:
 		SFREE(_str_response);
 		if (client_request->parent->conn->str_response != NULL && client_request->parent->conn->str_response[0] != 0) {
 			SFINISH_SNFCAT(
-				str_response, &int_response_len, 
-				":\n", (size_t)2, 
+				str_response, &int_response_len,
+				":\n", (size_t)2,
 				client_request->parent->conn->str_response, strlen(client_request->parent->conn->str_response)
 			);
 		}
@@ -1296,12 +1296,12 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 	str_expires = str_expire_one_day();
 
 #ifdef ENVELOPE
-	char *str_temp1 = 
+	char *str_temp1 =
 		"HTTP/1.1 200 OK\015\012"
 		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012Content-Type: application/json; charset=UTF-8\015\012"
 		"Set-Cookie: envelope=";
 	char *str_temp2 = "; HttpOnly\015\012\015\012{\"stat\": true, \"dat\": \"OK\"}";
-	SFINISH_SNCAT(str_response, &int_response_len, 
+	SFINISH_SNCAT(str_response, &int_response_len,
 		str_temp1, strlen(str_temp1),
 		client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
 		"; path=/; expires=", 18,
@@ -1319,7 +1319,7 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 		client_auth->str_int_connection_index, strlen(client_auth->str_int_connection_index),
 		"=", (size_t)1,
 		client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
-		"; path=/; expires=", 18,
+		"; path=/; expires=", (size_t)18,
 		str_expires, strlen(str_expires),
 		(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
 		str_temp2, strlen(str_temp2));
