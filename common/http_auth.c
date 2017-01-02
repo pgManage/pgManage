@@ -1253,7 +1253,7 @@ finish:
 			str_temp, strlen(str_temp),
 			str_length, strlen(str_length),
 			"\015\012\015\012", (size_t)4,
-			_str_response, strlen(_str_response)
+			_str_response, (int_response_len != 0 ? int_response_len : strlen(_str_response))
 		);
 		SFREE(_str_response);
 		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, int_response_len)) < 0) {
@@ -1378,7 +1378,7 @@ finish:
 			str_temp, strlen(str_temp),
 			str_length, strlen(str_length), 
 			"\015\012\015\012", (size_t)4, 
-			_str_response, int_response_len
+			_str_response, (int_response_len != 0 ? int_response_len : strlen(_str_response))
 		);
 		SFREE(_str_response);
 	}
@@ -1601,7 +1601,7 @@ finish:
 			str_temp, strlen(str_temp),
 			str_length, strlen(str_length),
 			"\015\012\015\012", (size_t)4,
-			_str_response, int_response_len
+			_str_response, (int_response_len != 0 ? int_response_len : strlen(_str_response))
 		);
 		SFREE(_str_response);
 	}
