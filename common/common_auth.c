@@ -15,8 +15,16 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	size_t int_uri_length = 0;
 	size_t int_user_length = 0;
 	size_t int_password_length = 0;
-	size_t int_dbname_length = 0;
 	size_t int_cookie_len = 0;
+	size_t int_conn_index_len = 0;
+	size_t int_connname_len = 0;
+	size_t int_connname_folder_len = 0;
+	size_t int_username_len = 0;
+	size_t int_database_len = 0;
+	size_t int_conn_len = 0;
+	size_t int_user_agent_len = 0;
+	size_t int_host_len = 0;
+	size_t int_response_len = 0;
 #ifdef ENVELOPE
 #else
 	size_t int_connname_length = 0;
@@ -27,14 +35,18 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
 	SFINISH_CHECK(str_uri_temp != NULL, "str_uri_path failed");
 #ifdef ENVELOPE
-	SFINISH_CAT_CSTR(client->str_cookie_name, "envelope");
+	SFINISH_SNCAT(client->str_cookie_name, &int_cookie_len,
+		"envelope", (size_t)8);
 #else
 	char *ptr_slash = strchr(str_uri_temp + 9, '/');
 	SFINISH_CHECK(ptr_slash != NULL, "strchr failed!");
 	*ptr_slash = 0;
-	SFINISH_CAT_CSTR(str_conn_index, str_uri_temp + 9);
+	SFINISH_SNCAT(str_conn_index, &int_conn_index_len,
+		str_uri_temp + 9, strlen(str_uri_temp + 9));
 	int_conn_index = (size_t)strtol(str_conn_index, NULL, 10);
-	SFINISH_CAT_CSTR(client->str_cookie_name, "postage_", str_conn_index);
+	SFINISH_SNCAT(client->str_cookie_name, &int_cookie_len,
+		"postage_", (size_t)8,
+		str_conn_index, strlen(str_conn_index));
 #endif
 
 	////DECRYPT
@@ -186,7 +198,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		str_username = str_tolower(getpar(str_cookie_decrypted, "username", int_cookie_len, &int_user_length));
 		SFINISH_CHECK(str_username != NULL, "str_tolower(getpar()) failed");
 		SNOTICE("REQUEST USERNAME: %s", str_username);
-		str_database = str_tolower(getpar(str_cookie_decrypted, "dbname", int_cookie_len, &int_dbname_length));
+		str_database = str_tolower(getpar(str_cookie_decrypted, "dbname", int_cookie_len, &int_database_len));
 		if (str_database != NULL && strlen(str_database) == 0) {
 			SFREE(str_database);
 		}
@@ -195,13 +207,15 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		}
 
 	} else {
-		SFINISH_CAT_CSTR(str_username, str_global_public_username);
+		SFINISH_SNCAT(str_username, &int_username_len,
+			str_global_public_username, strlen(str_global_public_username));
 		int_user_length = strlen(str_global_public_username);
 		SINFO("str_username: %s", str_username);
 	}
 
 #ifdef ENVELOPE
-	SFINISH_CAT_CSTR(str_connname, "");
+	SFINISH_SNCAT(str_connname, &int_connname_len,
+		"", (size_t)0);
 #else
 	str_connname = getpar(str_cookie_decrypted, "connname", int_cookie_len, &int_connname_length);
 	SFINISH_CHECK(str_connname != NULL, "getpar failed");
@@ -213,13 +227,19 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 #endif
 
 	if (client->str_connname == NULL) {
-		SFINISH_CAT_CSTR(client->str_connname, str_connname);
-		SFINISH_CAT_CSTR(client->str_connname_folder, str_connname);
+		SFINISH_SNCAT(client->str_connname, &int_connname_len,
+			str_connname, int_connname_len);
+		SFINISH_SNCAT(client->str_connname_folder, &int_connname_folder_len,
+			str_connname, int_connname_len);
 		if (str_database != NULL) {
-			SFINISH_CAT_APPEND(client->str_connname_folder, "_", str_database);
+			SFINISH_SNFCAT(client->str_connname_folder, &int_connname_folder_len,
+				"_", (size_t)1,
+				str_database, int_database_len);
 		}
 		if (str_conn != NULL) {
-			SFINISH_CAT_APPEND(client->str_connname_folder, "_", str_conn);
+			SFINISH_SNFCAT(client->str_connname_folder, &int_connname_folder_len,
+				"_", (size_t)1,
+			str_conn, int_conn_length);
 		}
 		size_t int_i = 0, int_len = strlen(client->str_connname_folder);
 		while (int_i < int_len) {
@@ -231,26 +251,31 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		}
 	}
 	if (client->str_username == NULL) {
-		SFINISH_CAT_CSTR(client->str_username, str_username);
+		SFINISH_SNCAT(client->str_username, &int_username_len,
+			str_username, strlen(str_username));
 	}
 	if (client->str_database == NULL) {
-		SFINISH_CAT_CSTR(client->str_database, str_database);
+		SFINISH_SNCAT(client->str_database, &int_database_len,
+			str_database, strlen(str_database));
 	}
 	if (str_conn != NULL && client->str_conn == NULL) {
-		SFINISH_CAT_CSTR(client->str_conn, str_conn);
+		SFINISH_SNCAT(client->str_conn, &int_conn_length,
+			str_conn, strlen(str_conn));
 	}
 	SFREE(str_conn);
 	if (client->str_cookie == NULL) {
-		SFINISH_CAT_CSTR(client->str_cookie, str_cookie_encrypted);
+		SFINISH_SNCAT(client->str_cookie, &int_cookie_len,
+			str_cookie_encrypted, strlen(str_cookie_encrypted));
 		SDEBUG("%p->str_cookie: %p", client, client->str_cookie);
 	}
 
 	SFREE_PWORD(str_cookie_encrypted);
 
 	if (bol_global_allow_custom_connections == false) {
-		SFINISH_CHECK(client->str_conn == NULL, "Cannot specify a custom connection string with current configuration,"
-												"if you wish to do this, change allow_custom_connections to true and "
-												"restart " SUN_PROGRAM_LOWER_NAME "");
+		SFINISH_CHECK(client->str_conn == NULL,
+			"Cannot specify a custom connection string with current configuration,"
+			"if you wish to do this, change allow_custom_connections to true and "
+			"restart " SUN_PROGRAM_LOWER_NAME "");
 	}
 
 	SDEBUG("bol_public: %s", bol_public ? "true" : "false");
@@ -259,8 +284,8 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		SFINISH_CHECK(str_password != NULL, "getpar failed");
 
 	} else {
-		SFINISH_CAT_CSTR(str_password, str_global_public_password);
-		int_password_length = strlen(str_global_public_password);
+		SFINISH_SNCAT(str_password, &int_password_length,
+			str_global_public_password, strlen(str_global_public_password));
 		SINFO("str_password: %s", str_password);
 	}
 
@@ -275,22 +300,32 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	if (client->str_conn != NULL) {
 #ifdef POSTAGE_INTERFACE_LIBPQ
 		if (str_database != NULL) {
-			SFINISH_CAT_CSTR(str_conn, client->str_conn, " dbname=", str_database);
+			SFINISH_SNCAT(str_conn, &int_conn_len,
+				client->str_conn, strlen(client->str_conn),
+				" dbname=", (size_t)8,
+				str_database, int_database_len);
 		} else {
-			SFINISH_CAT_CSTR(str_conn, client->str_conn);
+			SFINISH_SNCAT(str_conn, &int_conn_len,
+				client->str_conn, strlen(client->str_conn));
 		}
 #else
-		SFINISH_CAT_CSTR(str_conn, client->str_conn);
+		SFINISH_SNCAT(str_conn, &int_conn_len,
+			client->str_conn, strlen(client->str_conn));
 #endif
 	} else {
 #ifdef POSTAGE_INTERFACE_LIBPQ
 		if (str_database != NULL) {
-			SFINISH_CAT_CSTR(str_conn, get_connection_info(str_connname, NULL), " dbname=", str_database);
+			SFINISH_SNCAT(str_conn, &int_conn_len,
+				get_connection_info(str_connname, NULL), strlen(get_connection_info(str_connname, NULL)),
+				" dbname=", (size_t)8,
+				str_database, int_database_len);
 		} else {
-			SFINISH_CAT_CSTR(str_conn, get_connection_info(str_connname, NULL));
+			SFINISH_SNCAT(str_conn, &int_conn_len,
+				get_connection_info(str_connname, NULL), strlen(get_connection_info(str_connname, NULL)));
 		}
 #else
-		SFINISH_CAT_CSTR(str_conn, get_connection_info(str_connname, NULL));
+		SFINISH_SNCAT(str_conn, &int_conn_len,
+			get_connection_info(str_connname, NULL), strlen(get_connection_info(str_connname, NULL)));
 #endif
 	}
 
@@ -301,11 +336,13 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	if (connect_cb != NULL) {
 		str_user_agent = request_header(str_request, "User-Agent");
 		if (str_user_agent == NULL) {
-			SFINISH_CAT_CSTR(str_user_agent, "");
+			SFINISH_SNCAT(str_user_agent, &int_user_agent_len,
+				"", (size_t)0);
 		}
 		str_host = request_header(str_request, "Host");
 		if (str_host == NULL) {
-			SFINISH_CAT_CSTR(str_host, "");
+			SFINISH_SNCAT(str_host, &int_host_len,
+				"", (size_t)0);
 		}
 		str_uri_user_agent = cstr_to_uri(str_user_agent);
 		SFINISH_CHECK(str_uri_user_agent != NULL, "cstr_to_uri failed on string \"%s\"", str_user_agent);
@@ -332,25 +369,46 @@ finish:
 		SFREE(str_temp);
 		struct struct_connection *conn_info = DArray_get(darr_global_connection, int_conn_index);
 
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 440 Login Timeout\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
-			"Set-Cookie: ", client->str_cookie_name, "=; path=/; expires=Tue, 01 Jan 1990 00:00:00 GMT", (bol_tls ? "; secure" : ""), "; HttpOnly\015\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 440 Login Timeout\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Set-Cookie: ",
+			strlen(
+				"HTTP/1.1 440 Login Timeout\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Set-Cookie: "
+			),
+			client->str_cookie_name, strlen(client->str_cookie_name),
+			"=; path=/; expires=Tue, 01 Jan 1990 00:00:00 GMT", (size_t)48,
+			bol_tls ? "; secure" : "", strlen(bol_tls ? "; secure" : ""),
+			"; HttpOnly\015\012", (size_t)12);
 		if (conn_info != NULL) {
 #ifdef ENVELOPE
-			SFINISH_CAT_APPEND(str_response, "Refresh: 0; url=/index.html?redirect=", str_uri, "\015\012\015\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"Refresh: 0; url=/index.html?redirect=", (size_t)37,
+				str_uri, strlen(str_uri),
+				"\015\012\015\012", (size_t)4);
 #else
 			str_temp = cstr_to_uri(conn_info->str_connection_name);
-			SFINISH_CAT_APPEND(str_response, "Refresh: 0; url=/postage/index.html?connection=", str_temp, "&redirect=", str_uri, "\015\012\015\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"Refresh: 0; url=/postage/index.html?connection=", (size_t)47,
+				str_temp, strlen(str_temp),
+				"&redirect=", (size_t)10,
+				str_uri, strlen(str_uri),
+				"\015\012\015\012", (size_t)4);
 			SFREE(str_temp);
 #endif
 		} else {
 #ifdef ENVELOPE
-			SFINISH_CAT_APPEND(str_response, "Refresh: 0; url=/index.html", "\015\012\015\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"Refresh: 0; url=/index.html\015\012\015\012", (size_t)31);
 #else
-			SFINISH_CAT_APPEND(str_response, "Refresh: 0; url=/postage/index.html", "\015\012\015\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"Refresh: 0; url=/postage/index.html\015\012\015\012", (size_t)39);
 #endif
 		}
-		SFINISH_CAT_APPEND(str_response, "You need to login.\012");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"You need to login.\012", (size_t)19);
 
 		/*
 		if (conn_info != NULL) {
