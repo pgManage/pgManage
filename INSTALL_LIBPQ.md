@@ -79,4 +79,10 @@ For more information go to: http://www.postgresql.org/download/freebsd/
 
 More information at http://www.postgresql.org/download/linux/suse/
 
+
+##PROBLEM 3: I DON'T HAVE SSL IN MY LIBPQ
+
+Mac OS Sierra (10.12) seems to have this issue. You'll need to install a version of LIBPQ that has SSL enabled. The easiest way to do this on Mac is usually to just install PostgreSQL from source. If anyone solves this problem in an easy way please let us know and we'll update this section.
+
+
 Copyright 2016 Workflow Products LLC
