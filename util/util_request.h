@@ -31,7 +31,10 @@ char *str_uri_path(char *str_request, size_t int_request_length, size_t *int_uri
 typedef struct {
 	char *str_name;
 	char *str_file_content;
-	size_t int_file_content_length;
+	
+	//variable lengths
+	size_t int_name_len;
+	size_t int_file_content_len;
 } sun_upload;
 
 /*

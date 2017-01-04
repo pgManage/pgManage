@@ -222,17 +222,17 @@ error:
 	return NULL;
 }
 
-sun_upload *get_sun_upload(char *str_request, size_t int_request_length) {
+sun_upload *get_sun_upload(char *str_request, size_t int_request_len) {
 	sun_upload *sun_return = NULL;
 	char *boundary_ptr = NULL;
 	char *boundary_end_ptr = NULL;
-	size_t int_boundary_length = 0;
+	size_t int_boundary_len = 0;
 	SDEFINE_VAR_ALL(str_boundary, str_content_type, str_name, str_file_content, str_upper_request);
-	SERROR_SALLOC(str_upper_request, int_request_length + 1);
-	memcpy(str_upper_request, str_request, int_request_length);
-	str_upper_request[int_request_length] = 0;
+	SERROR_SALLOC(str_upper_request, int_request_len + 1);
+	memcpy(str_upper_request, str_request, int_request_len);
+	str_upper_request[int_request_len] = 0;
 	// str_toupper operates in place
-	bstr_toupper(str_upper_request, int_request_length);
+	bstr_toupper(str_upper_request, int_request_len);
 
 	SDEBUG("str_request: %s", str_request);
 	SDEBUG("str_upper_request: %s", str_upper_request);
@@ -243,10 +243,10 @@ sun_upload *get_sun_upload(char *str_request, size_t int_request_length) {
 	boundary_ptr = str_request + 44 + (boundary_ptr - str_upper_request);
 
 	boundary_end_ptr = strchr(boundary_ptr, 13) != 0 ? strchr(boundary_ptr, 13) : strchr(boundary_ptr, 10);
-	int_boundary_length = (size_t)((boundary_end_ptr - boundary_ptr) + 2);
+	int_boundary_len = (size_t)((boundary_end_ptr - boundary_ptr) + 2);
 
-	SERROR_SALLOC(str_boundary, int_boundary_length + 1); // null byte
-	memcpy(str_boundary + 2, boundary_ptr, int_boundary_length - 2);
+	SERROR_SALLOC(str_boundary, int_boundary_len + 1); // null byte
+	memcpy(str_boundary + 2, boundary_ptr, int_boundary_len - 2);
 	// This was adding two dashes to the end, but that was actually not working
 	// (the file name was coming in after the file content),
 	// and now I found out that you need them at the beginning instead (they are
@@ -254,13 +254,13 @@ sun_upload *get_sun_upload(char *str_request, size_t int_request_length) {
 	// - Nunzio on Wed Feb 17 at 2:26 PM
 	str_boundary[0] = '-';
 	str_boundary[1] = '-';
-	str_boundary[int_boundary_length] = '\0';
+	str_boundary[int_boundary_len] = '\0';
 
 	SDEBUG(">BOUNDARY|%s<", str_boundary);
 
 	////GET FILE NAME
 	// get file name
-	char *ptr_name = bstrstr(str_upper_request, int_request_length, "CONTENT-DISPOSITION: FORM-DATA; NAME=\"FILE_NAME\"", 48);
+	char *ptr_name = bstrstr(str_upper_request, int_request_len, "CONTENT-DISPOSITION: FORM-DATA; NAME=\"FILE_NAME\"", 48);
 	SERROR_CHECK(ptr_name != NULL, "No Content Disposition for File Name, (Maybe there is no file name?)");
 	ptr_name = str_request + (ptr_name - str_upper_request);
 	ptr_name = ptr_name + 48;
@@ -281,15 +281,15 @@ sun_upload *get_sun_upload(char *str_request, size_t int_request_length) {
 	size_t int_name_newline = (size_t)(strchr(ptr_name, '\012') - ptr_name);
 	size_t int_name_boundary = (size_t)(strstr(ptr_name, str_boundary) - ptr_name);
 	// clang-format off
-	size_t int_name_length =
+	size_t int_name_len =
 		int_name_carriage < int_name_newline	? int_name_carriage :
 		int_name_carriage < int_name_boundary	? int_name_carriage :
 		int_name_boundary < int_name_carriage	? int_name_boundary :
 													int_name_boundary;
 	// clang-format on
-	SERROR_SALLOC(str_name, int_name_length + 1);
-	memcpy(str_name, ptr_name, int_name_length);
-	str_name[int_name_length] = '\0';
+	SERROR_SALLOC(str_name, int_name_len + 1);
+	memcpy(str_name, ptr_name, int_name_len);
+	str_name[int_name_len] = '\0';
 	SDEBUG(">FILE NAME|%s<", str_name);
 
 	////GET FILE
@@ -297,14 +297,14 @@ sun_upload *get_sun_upload(char *str_request, size_t int_request_length) {
 	SDEBUG("str_request: %20.20s", str_request);
 
 	char *ptr_file_content =
-		bstrstr(str_upper_request, int_request_length, "CONTENT-DISPOSITION: FORM-DATA; NAME=\"FILE_CONTENT\"", 51);
+		bstrstr(str_upper_request, int_request_len, "CONTENT-DISPOSITION: FORM-DATA; NAME=\"FILE_CONTENT\"", 51);
 	SERROR_CHECK(ptr_file_content != NULL, "No Content Disposition for File "
 										   "Content, (Maybe there is no file "
 										   "content?)");
 	ptr_file_content = ptr_file_content + 51;
 	ptr_file_content = str_request + (ptr_file_content - str_upper_request);
 
-	SDEBUG("str_request + int_request_length d: %d", str_request + int_request_length);
+	SDEBUG("str_request + int_request_len d: %d", str_request + int_request_len);
 	SDEBUG("ptr_file_content: %20.20s", ptr_file_content);
 
 	char *ptr_file_content_dos = strstr(ptr_file_content, "\015\012\015\012");
@@ -319,33 +319,35 @@ sun_upload *get_sun_upload(char *str_request, size_t int_request_length) {
 	// clang-format on
 
 	// copy file content
-	size_t int_file_content_length =
-		(size_t)(bstrstr(ptr_file_content, (size_t)((str_request + int_request_length) - ptr_file_content), str_boundary,
-					 int_boundary_length) -
+	size_t int_file_content_len =
+		(size_t)(bstrstr(ptr_file_content, (size_t)((str_request + int_request_len) - ptr_file_content), str_boundary,
+					 int_boundary_len) -
 				 ptr_file_content);
 	// clang-format off
     // This is because the browser sends a newline after the file content
     // - Nunzio on Wed Feb 17 at 2:26 PM
-    int_file_content_length -=
+    int_file_content_len -=
             ptr_file_content_dos  > ptr_file_content_unix   ? 2 :
             ptr_file_content_dos  > ptr_file_content_mac    ? 2 :
             ptr_file_content_unix > ptr_file_content_mac    ? 1 :
                                                               1;
 	// clang-format on
-	SERROR_SALLOC(str_file_content, int_file_content_length + 1);
-	memcpy(str_file_content, ptr_file_content, int_file_content_length);
-	str_file_content[int_file_content_length] = '\0';
+	SERROR_SALLOC(str_file_content, int_file_content_len + 1);
+	memcpy(str_file_content, ptr_file_content, int_file_content_len);
+	str_file_content[int_file_content_len] = '\0';
 	SDEBUG(">FILE CONTENT|%s<", str_file_content);
-	SDEBUG(">FILE CONTENT LENGTH|%i<", int_file_content_length);
+	SDEBUG(">FILE CONTENT LENGTH|%i<", int_file_content_len);
 
 	////RETURN
 	SERROR_SALLOC(sun_return, sizeof(sun_upload));
 	SFREE(str_boundary);
 	sun_return->str_name = str_name;
 	str_name = NULL;
+	sun_return->int_name_len = int_name_len;
+
 	sun_return->str_file_content = str_file_content;
 	str_file_content = NULL;
-	sun_return->int_file_content_length = int_file_content_length;
+	sun_return->int_file_content_len = int_file_content_len;
 
 	SFREE_ALL();
 	return sun_return;

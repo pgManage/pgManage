@@ -2,6 +2,7 @@
 
 void http_upload_step1(struct sock_ev_client *client) {
 	SDEBUG("http_upload_step1");
+	size_t int_response_len = 0;
 
 	SDEFINE_VAR_ALL(str_temp, str_query, str_canonical_start, str_full_path);
 	char *str_response = NULL;
@@ -22,13 +23,14 @@ void http_upload_step1(struct sock_ev_client *client) {
 	// Get upload from request
 	client_upload->sun_current_upload = get_sun_upload(client->str_request, client->int_request_len);
 	SFINISH_CHECK(client_upload->sun_current_upload != NULL, "get_sun_upload failed");
-	SDEBUG("upload length: %i", client_upload->sun_current_upload->int_file_content_length);
+	SDEBUG("upload length: %i", client_upload->sun_current_upload->int_file_content_len);
 
 	client_upload->ptr_content = client_upload->sun_current_upload->str_file_content;
 	SDEBUG("upload contents: %s", client_upload->ptr_content);
 
 #ifdef ENVELOPE
-	SFINISH_CAT_CSTR(client_upload->str_file_name, client_upload->sun_current_upload->str_name);
+	SFINISH_SNCAT(client_upload->str_file_name, &client_upload->int_file_name_len,
+		client_upload->sun_current_upload->str_name);
 
 	client_upload->str_canonical_start = canonical_full_start(client_upload->str_file_name);
 	SFINISH_CHECK(client_upload->str_file_name != NULL, "canonical_full_start() failed, %s", client_upload->str_file_name);
@@ -49,8 +51,13 @@ void http_upload_step1(struct sock_ev_client *client) {
 		"permissions_write_check() failed");
 	SFREE(str_temp);
 #else
-	SFINISH_CAT_CSTR(client_upload->str_canonical_start, str_global_sql_root);
-	SFINISH_CAT_CSTR(client_upload->str_file_name, client->str_connname_folder, "/", client->str_username, client_upload->sun_current_upload->str_name);
+	SFINISH_SNCAT(client_upload->str_canonical_start, &client_upload->int_canonical_start_len,
+		str_global_sql_root, strlen(str_global_sql_root));
+	SFINISH_SNCAT(client_upload->str_file_name, &client_upload->int_file_name_len,
+		client->str_connname_folder, strlen(client->str_connname_folder),
+		"/", (size_t)1,
+		client->str_username, strlen(client->str_username),
+		client_upload->sun_current_upload->str_name, client_upload->sun_current_upload->int_name_len);
 
 	http_upload_step2(global_loop, client_upload, true);
 #endif
@@ -65,14 +72,21 @@ finish:
 		SDEBUG("str_response: %s", str_response);
 		char *_str_response = str_response;
 		char str_length[50];
-		ssize_t int_response_len = 0;
 		snprintf(str_length, 50, "%zu", strlen(_str_response));
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME ""
-								"Content-Length: ",
-			str_length, "\015\012\015\012", _str_response);
+
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ",
+			strlen("HTTP/1.1 500 Internal Server Error\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Content-Length: "),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, strlen(_str_response));
+
 		SFREE(_str_response);
-		if ((int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
 			if (bol_tls) {
 				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {
@@ -94,6 +108,7 @@ bool http_upload_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_upload *client_upload = (struct sock_ev_client_upload *)cb_data;
 	struct sock_ev_client *client = client_upload->parent;
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_temp);
 #ifdef _WIN32
 	char *strErrorText = NULL;
@@ -147,13 +162,20 @@ finish:
 		char *_str_response = str_response;
 		char str_length[50];
 		snprintf(str_length, 50, "%zu", strlen(_str_response));
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME ""
-								"Content-Length: ",
-			str_length, "\015\012\015\012", _str_response);
+
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ",
+			strlen("HTTP/1.1 500 Internal Server Error\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Content-Length: "),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, strlen(_str_response));
+
 		SFREE(_str_response);
-		ssize_t int_response_len = 0;
-		if ((int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
 			if (bol_tls) {
 				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {
@@ -178,6 +200,7 @@ void http_upload_step3(EV_P, ev_check *w, int revents) {
 	struct sock_ev_client_upload *client_upload = (struct sock_ev_client_upload *)w;
 	struct sock_ev_client *client = client_upload->parent;
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
 #endif
@@ -185,7 +208,7 @@ void http_upload_step3(EV_P, ev_check *w, int revents) {
 #ifdef _WIN32
 	DWORD int_temp = 0;
 	BOOL bol_result = WriteFile(client_upload->h_file, client_upload->ptr_content + client_upload->int_written,
-		(DWORD)(client_upload->sun_current_upload->int_file_content_length - client_upload->int_written), &int_temp, NULL);
+		(DWORD)(client_upload->sun_current_upload->int_file_content_len - client_upload->int_written), &int_temp, NULL);
 	if (bol_result == FALSE) {
 		int int_err = GetLastError();
 		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, int_err,
@@ -198,19 +221,24 @@ void http_upload_step3(EV_P, ev_check *w, int revents) {
 #else
 	ssize_t int_temp = 0;
 	int_temp = write(client_upload->int_fd, client_upload->ptr_content + client_upload->int_written,
-		(size_t)((ssize_t)client_upload->sun_current_upload->int_file_content_length - client_upload->int_written));
+		(size_t)((ssize_t)client_upload->sun_current_upload->int_file_content_len - client_upload->int_written));
 	SFINISH_CHECK(int_temp != -1, "write failed");
 #endif
 	client_upload->int_written += int_temp;
 
-	if (client_upload->int_written == (ssize_t)client_upload->sun_current_upload->int_file_content_length) {
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
-									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-									   "Content-Length: 17\015\012"
-									   "\015\012"
-									   "Upload Succeeded\012");
-		ssize_t int_response_len = 0;
-		if ((int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (client_upload->int_written == (ssize_t)client_upload->sun_current_upload->int_file_content_len) {
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 200 OK\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: 17\015\012"
+			"\015\012"
+			"Upload Succeeded\012",
+				strlen("HTTP/1.1 200 OK\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Content-Length: 17\015\012"
+				"\015\012"
+				"Upload Succeeded\012"));
+		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
 			if (bol_tls) {
 				SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {
@@ -232,13 +260,18 @@ finish:
 		char *_str_response = str_response;
 		char str_length[50];
 		snprintf(str_length, 50, "%zu", strlen(_str_response));
-		ssize_t int_response_len = 0;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME ""
-								"Content-Length: ",
-			str_length, "\015\012\015\012", _str_response);
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ",
+				strlen("HTTP/1.1 500 Internal Server Error\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Content-Length: "),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
-		if ((int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
 			if (bol_tls) {
 				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {

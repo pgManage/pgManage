@@ -35,7 +35,7 @@ void http_export_step1(struct sock_ev_client *client) {
 	ptr_attr_header += 1;
 	*(ptr_attr_header - 1) = 0;
 	// Re-calculate length of query
-	int_query_len = (ptr_attr_header - 1) - client->str_request;
+	int_query_len = (size_t)((ptr_attr_header - 1) - client->str_request);
 
 	// Get end of headers
 	ptr_end_attr_header = strstr(ptr_attr_header, "\012");
