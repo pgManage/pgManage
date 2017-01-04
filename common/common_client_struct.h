@@ -109,6 +109,12 @@ struct sock_ev_client {
 	char *str_cookie;
 	char *str_cookie_name;
 
+	size_t int_username_len;
+	size_t int_database_len;
+	size_t int_connname_len;
+	size_t int_connname_folder_len;
+	size_t int_conn_len;
+
 	ListNode *node;
 	ssize_t int_last_activity_i;
 	char str_client_ip[INET_ADDRSTRLEN];

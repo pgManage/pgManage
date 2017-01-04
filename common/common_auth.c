@@ -17,11 +17,6 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	size_t int_password_length = 0;
 	size_t int_cookie_len = 0;
 	size_t int_conn_index_len = 0;
-	size_t int_connname_len = 0;
-	size_t int_connname_folder_len = 0;
-	size_t int_username_len = 0;
-	size_t int_database_len = 0;
-	size_t int_conn_len = 0;
 	size_t int_user_agent_len = 0;
 	size_t int_host_len = 0;
 	size_t int_response_len = 0;
@@ -196,7 +191,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		str_username = str_tolower(getpar(str_cookie_decrypted, "username", int_cookie_len, &int_user_length));
 		SFINISH_CHECK(str_username != NULL, "str_tolower(getpar()) failed");
 		SNOTICE("REQUEST USERNAME: %s", str_username);
-		str_database = str_tolower(getpar(str_cookie_decrypted, "dbname", int_cookie_len, &int_database_len));
+		str_database = str_tolower(getpar(str_cookie_decrypted, "dbname", int_cookie_len, &client->int_database_len));
 		if (str_database != NULL && strlen(str_database) == 0) {
 			SFREE(str_database);
 		}
@@ -205,7 +200,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		}
 
 	} else {
-		SFINISH_SNCAT(str_username, &int_username_len,
+		SFINISH_SNCAT(str_username, &client->int_username_len,
 			str_global_public_username, strlen(str_global_public_username));
 		int_user_length = strlen(str_global_public_username);
 		SINFO("str_username: %s", str_username);
@@ -215,9 +210,9 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	SFINISH_SNCAT(str_connname, &int_connname_len,
 		"", (size_t)0);
 #else
-	str_connname = getpar(str_cookie_decrypted, "connname", int_cookie_len, &int_connname_len);
+	str_connname = getpar(str_cookie_decrypted, "connname", int_cookie_len, &client->int_connname_len);
 	SFINISH_CHECK(str_connname != NULL, "getpar failed");
-	str_conn = getpar(str_cookie_decrypted, "conn", int_cookie_len, &int_conn_len);
+	str_conn = getpar(str_cookie_decrypted, "conn", int_cookie_len, &client->int_conn_len);
 	if (str_conn != NULL && strlen(str_conn) == 0) {
 		SFREE(str_conn);
 	}
@@ -226,27 +221,27 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 
 	if (client->str_connname == NULL) {
 		SFINISH_SNCAT(
-			client->str_connname, &int_connname_len,
-			str_connname, int_connname_len
+			client->str_connname, &client->int_connname_len,
+			str_connname, client->int_connname_len
 		);
 
 		SFINISH_SNCAT(
-			client->str_connname_folder, &int_connname_folder_len,
-			client->str_connname, int_connname_len
+			client->str_connname_folder, &client->int_connname_folder_len,
+			client->str_connname, client->int_connname_len
 		);
 
 		if (str_database != NULL) {
 			SFINISH_SNFCAT(
-				client->str_connname_folder, &int_connname_folder_len,
+				client->str_connname_folder, &client->int_connname_folder_len,
 				"_", (size_t)1,
-				str_database, int_database_len
+				str_database, client->int_database_len
 			);
 		}
 		if (str_conn != NULL) {
 			SFINISH_SNFCAT(
-				client->str_connname_folder, &int_connname_folder_len,
+				client->str_connname_folder, &client->int_connname_folder_len,
 				"_", (size_t)1,
-				str_conn, int_conn_len
+				str_conn, client->int_conn_len
 			);
 		}
 		size_t int_i = 0, int_len = strlen(client->str_connname_folder);
@@ -259,15 +254,15 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		}
 	}
 	if (client->str_username == NULL) {
-		SFINISH_SNCAT(client->str_username, &int_username_len,
+		SFINISH_SNCAT(client->str_username, &client->int_username_len,
 			str_username, strlen(str_username));
 	}
 	if (client->str_database == NULL) {
-		SFINISH_SNCAT(client->str_database, &int_database_len,
+		SFINISH_SNCAT(client->str_database, &client->int_database_len,
 			str_database, strlen(str_database));
 	}
 	if (str_conn != NULL && client->str_conn == NULL) {
-		SFINISH_SNCAT(client->str_conn, &int_conn_len,
+		SFINISH_SNCAT(client->str_conn, &client->int_conn_len,
 			str_conn, strlen(str_conn));
 	}
 	SFREE(str_conn);
@@ -308,31 +303,31 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	if (client->str_conn != NULL) {
 #ifdef POSTAGE_INTERFACE_LIBPQ
 		if (str_database != NULL) {
-			SFINISH_SNCAT(str_conn, &int_conn_len,
+			SFINISH_SNCAT(str_conn, &client->int_conn_len,
 				client->str_conn, strlen(client->str_conn),
 				" dbname=", (size_t)8,
-				str_database, int_database_len);
+				str_database, client->int_database_len);
 		} else {
-			SFINISH_SNCAT(str_conn, &int_conn_len,
+			SFINISH_SNCAT(str_conn, &client->int_conn_len,
 				client->str_conn, strlen(client->str_conn));
 		}
 #else
-		SFINISH_SNCAT(str_conn, &int_conn_len,
+		SFINISH_SNCAT(str_conn, &client->int_conn_len,
 			client->str_conn, strlen(client->str_conn));
 #endif
 	} else {
 #ifdef POSTAGE_INTERFACE_LIBPQ
 		if (str_database != NULL) {
-			SFINISH_SNCAT(str_conn, &int_conn_len,
+			SFINISH_SNCAT(str_conn, &client->int_conn_len,
 				get_connection_info(str_connname, NULL), strlen(get_connection_info(str_connname, NULL)),
 				" dbname=", (size_t)8,
-				str_database, int_database_len);
+				str_database, client->int_database_len);
 		} else {
-			SFINISH_SNCAT(str_conn, &int_conn_len,
+			SFINISH_SNCAT(str_conn, &client->int_conn_len,
 				get_connection_info(str_connname, NULL), strlen(get_connection_info(str_connname, NULL)));
 		}
 #else
-		SFINISH_SNCAT(str_conn, &int_conn_len,
+		SFINISH_SNCAT(str_conn, &client->int_conn_len,
 			get_connection_info(str_connname, NULL), strlen(get_connection_info(str_connname, NULL)));
 #endif
 	}

@@ -6,7 +6,6 @@ void http_file_step1(struct sock_ev_client *client) {
 	SDEBUG("http_file_step1");
 	char *str_response = NULL;
 	char *ptr_end_uri = NULL;
-	size_t int_uri_length = 0;
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
 #endif
@@ -32,49 +31,63 @@ void http_file_step1(struct sock_ev_client *client) {
 	client_http_file->io.fd = INVALID_SOCKET;
 
 	// get path
-	client_http_file->str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
+	client_http_file->str_uri = str_uri_path(client->str_request, client->int_request_len, &client_http_file->int_uri_len);
 	SFINISH_CHECK(client_http_file->str_uri, "str_uri_path failed");
 	ptr_end_uri = strchr(client_http_file->str_uri, '?');
 	if (ptr_end_uri != NULL) {
 		*ptr_end_uri = 0;
+		client_http_file->int_uri_len = (size_t)(ptr_end_uri - client_http_file->str_uri);
 	}
 	ptr_end_uri = strchr(client_http_file->str_uri, '#');
 	if (ptr_end_uri != NULL) {
 		*ptr_end_uri = 0;
+		client_http_file->int_uri_len = (size_t)(ptr_end_uri - client_http_file->str_uri);
 	}
 
 	client_http_file->bol_download = false;
 #ifdef ENVELOPE
 	client_http_file->str_uri_part = client_http_file->str_uri;
+	client_http_file->int_uri_part_len = client_http_file->int_uri_len;
+	client_http_file->int_uri_len = 0;
 	client_http_file->str_uri = NULL;
 #else
 	if (isdigit(client_http_file->str_uri[9])) {
 		str_uri_temp = client_http_file->str_uri;
 		str_temp = strchr(str_uri_temp + 9, '/');
 		SFINISH_CHECK(str_temp != NULL, "strchr failed");
-		SFINISH_CAT_CSTR(client_http_file->str_uri, "/postage/app", str_temp);
+		SFINISH_SNCAT(
+			client_http_file->str_uri, &client_http_file->int_uri_len, 
+			"/postage/app", (size_t)12,
+			str_temp, client_http_file->int_uri_len - (size_t)(str_temp - str_uri_temp)
+		);
 		SFREE(str_uri_temp);
 	}
 
 	if (strncmp(client_http_file->str_uri, "/postage/app/download", 21) == 0) {
-		size_t int_len1 = strlen(client_http_file->str_uri) - 9;
-		SFINISH_CAT_CSTR(client_http_file->str_uri_part, client->str_connname_folder, "/", client->str_username,
-			client_http_file->str_uri + strlen("/postage/app/download"));
-		int_len1 = 0;
+		SFINISH_SNCAT(
+			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
+			client->str_connname_folder, client->int_connname_folder_len,
+			"/", (size_t)1,
+			client->str_username, client->int_username_len,
+			// we need to go past "/postage/app/download"
+			client_http_file->str_uri + 21, client_http_file->int_uri_len - 21
+		);
 		SFREE(client_http_file->str_uri);
 
 		client_http_file->bol_download = true;
 	} else {
 		client_http_file->str_uri_part = client_http_file->str_uri;
+		client_http_file->int_uri_part_len = client_http_file->int_uri_len;
+		client_http_file->int_uri_len = 0;
 		client_http_file->str_uri = NULL;
 
 		// empty url, default to index.html in directories
 		str_temp = canonical(str_global_web_root, client_http_file->str_uri_part, "read_dir");
 		if (strlen(client_http_file->str_uri_part) <= 1 || str_temp != NULL) {
 			if (*(client_http_file->str_uri_part + strlen(client_http_file->str_uri_part) - 1) == '/') {
-				SFINISH_CAT_APPEND(client_http_file->str_uri_part, "index.html");
+				SFINISH_SNFCAT(client_http_file->str_uri_part, &client_http_file->int_uri_part_len, "index.html", (size_t)10);
 			} else {
-				SFINISH_CAT_APPEND(client_http_file->str_uri_part, "/index.html");
+				SFINISH_SNFCAT(client_http_file->str_uri_part, &client_http_file->int_uri_part_len, "/index.html", (size_t)10);
 			}
 		}
 		SFREE(str_global_error);
@@ -82,8 +95,7 @@ void http_file_step1(struct sock_ev_client *client) {
 	}
 #endif
 
-	int_uri_length = strlen(client_http_file->str_uri_part);
-	str_temp = uri_to_cstr(client_http_file->str_uri_part, &int_uri_length);
+	str_temp = uri_to_cstr(client_http_file->str_uri_part, &client_http_file->int_uri_part_len);
 	SFREE(client_http_file->str_uri_part);
 	client_http_file->str_uri_part = str_temp;
 	str_temp = NULL;

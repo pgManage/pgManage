@@ -7,7 +7,9 @@ struct sock_ev_client_http_file {
 	ev_io io;
 
 	char *str_uri;
+	size_t int_uri_len;
 	char *str_uri_part;
+	size_t int_uri_part_len;
 #ifdef _WIN32
 	HANDLE h_file;
 #else
