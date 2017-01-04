@@ -667,9 +667,12 @@ GS.getInertDOMHTML = function (inertDOM) {
     function getSelectedCopyHTML(element) {
         var strHTMLCopyString, intFromRecord, intToRecord, intFromCell = 9999999, intToCell = 0
           , i, len, cell_i, cell_len, arrSelected, strCellHTML, arrRecords, arrCells
-          , strHTMLRecordString;
+          , strHTMLRecordString, strNull, bolColumns;
         
         arrSelected = element.selectedCells;
+        
+        strNull    = (element.getAttribute('null-values')  || "NULL");
+        bolColumns = (element.getAttribute('column-names') || "true") === "true";
         
         // loop through the selected cells and create an html string using the text of the cell
         if (arrSelected.length > 0) {
@@ -689,6 +692,43 @@ GS.getInertDOMHTML = function (inertDOM) {
             arrRecords = xtag.query(element, 'tr');
             strHTMLCopyString = '';
             
+            // if bolColumns is true and the first record is not selected: add first record first
+            if (bolColumns && intFromRecord > 0) {
+                arrCells = arrRecords[0].children;
+                strHTMLRecordString = '';
+                
+                for (cell_i = intFromCell, cell_len = intToCell; cell_i < cell_len; cell_i += 1) {
+                    strCellHTML = '';
+                    
+                    if (arrCells[cell_i].nodeName === 'TH' && arrCells[cell_i].firstElementChild) {
+                        strCellHTML = arrCells[cell_i].firstElementChild.textValue ||
+                                      arrCells[cell_i].firstElementChild.value ||
+                                      (arrCells[cell_i].firstElementChild.checked || '').toString() ||
+                                      arrCells[cell_i].firstElementChild.textContent || '';//.trim();
+                        
+                    } else if (arrCells[cell_i].lastElementChild) { 
+                        strCellHTML = arrCells[cell_i].lastElementChild.textValue ||
+                                      arrCells[cell_i].lastElementChild.value ||
+                                      (arrCells[cell_i].lastElementChild.checked || '').toString() ||
+                                      arrCells[cell_i].lastElementChild.textContent || '';
+                    } else {
+                        strCellHTML = arrCells[cell_i].textContent;//.trim();
+                    }
+                    
+                    strCellHTML = encodeHTML(strCellHTML).replace(/\n/gim, '<br />');
+                    
+                    strCellHTML = '<' + 'td rowspan="1" colspan="1">' + (strCellHTML || '') + '</td>'
+                    
+                    strHTMLRecordString += (cell_i === intFromCell ? '<' + 'tr>' : '');
+                    strHTMLRecordString += (strCellHTML || '');
+                    strHTMLRecordString += (cell_i === (intToCell - 1) ? '<' + '/tr>' : '');
+                }
+                
+                if (strHTMLRecordString.trim()) {
+                    strHTMLCopyString += strHTMLRecordString;
+                }
+            }
+            
             for (i = intFromRecord, len = intToRecord; i < len; i += 1) {
                 arrCells = arrRecords[i].children;
                 strHTMLRecordString = '';
@@ -697,16 +737,27 @@ GS.getInertDOMHTML = function (inertDOM) {
                     for (cell_i = intFromCell, cell_len = intToCell; cell_i < cell_len; cell_i += 1) {
                         strCellHTML = '';
                         
-                        if (arrCells[cell_i].hasAttribute('selected')) {
-                            if (arrCells[cell_i].lastElementChild) { 
+                        if (arrCells[cell_i].hasAttribute('selected') || (i === 0 && bolColumns)) {
+                            if (arrCells[cell_i].nodeName === 'TH' && arrCells[cell_i].firstElementChild) {
+                                strCellHTML = arrCells[cell_i].firstElementChild.textValue ||
+                                              arrCells[cell_i].firstElementChild.value ||
+                                              (arrCells[cell_i].firstElementChild.checked || '').toString() ||
+                                              arrCells[cell_i].firstElementChild.textContent || '';//.trim();
+                                
+                            } else if (arrCells[cell_i].lastElementChild) { 
                                 strCellHTML = arrCells[cell_i].lastElementChild.textValue ||
                                               arrCells[cell_i].lastElementChild.value ||
-                                              (arrCells[cell_i].lastElementChild.checked || '').toString();
+                                              (arrCells[cell_i].lastElementChild.checked || '').toString() ||
+                                              arrCells[cell_i].lastElementChild.textContent || '';
                             } else {
                                 strCellHTML = arrCells[cell_i].textContent;//.trim();
                             }
                             
                             strCellHTML = encodeHTML(strCellHTML).replace(/\n/gim, '<br />');
+                            
+                            if (strCellHTML === 'NULL' || strCellHTML === '\N') {
+                                strCellHTML = strNull;
+                            }
                         }
                         
                         strCellHTML = '<' + 'td rowspan="1" colspan="1">' + (strCellHTML || '') + '</td>'
@@ -720,7 +771,7 @@ GS.getInertDOMHTML = function (inertDOM) {
                     strHTMLCopyString += strHTMLRecordString;
                 }
             }
-            
+            //console.log('*****', strHTMLCopyString);
             if (strHTMLCopyString) {
                 strHTMLCopyString = '<' + 'style>' +
                                         'br { mso-data-placement:same-cell; } ' +
@@ -779,7 +830,7 @@ GS.getInertDOMHTML = function (inertDOM) {
                         strCellText = arrCells[cell_i].firstElementChild.textValue ||
                                       arrCells[cell_i].firstElementChild.value ||
                                       (arrCells[cell_i].firstElementChild.checked || '').toString() ||
-                                      arrCells[cell_i].firstElementChild.textContent;//.trim();
+                                      arrCells[cell_i].firstElementChild.textContent || '';//.trim();
                         
                     } else if (arrCells[cell_i].lastElementChild) {
                         strCellText = arrCells[cell_i].lastElementChild.textValue ||
@@ -841,6 +892,10 @@ GS.getInertDOMHTML = function (inertDOM) {
                             } else if (strQuoteType === 'strings' && isNaN(strCellText)) {
                                 strCellText = strQuoteChar + strCellText + strQuoteChar;
                             }
+                        }
+                    } else {
+                        if (strQuoteType === 'all' || strQuoteType === 'strings') {
+                            strCellText = strQuoteChar + strCellText + strQuoteChar;
                         }
                     }
                     
