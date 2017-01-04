@@ -10,25 +10,34 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_end_seq = NULL;
 	char *ptr_column_names = NULL;
 	char *ptr_end_column_names = NULL;
+	size_t int_col_name_len = 0;
+	size_t int_col_seq_len = 0;
+	size_t int_sql_len = 0;
+	size_t int_response_len = 0;
 
 	client_request->arr_response = DArray_create(sizeof(char *), 1);
 
 	// This is a name used for a temporary statement to get the column types
 	if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-		SFINISH_CAT_CSTR(client_insert->str_temp_table_name, "temp_insert");
+		SFINISH_SNCAT(client_insert->str_temp_table_name, &client_insert->int_temp_table_name_len,
+			"temp_insert", (size_t)11);
 	} else {
-		SFINISH_CAT_CSTR(client_insert->str_temp_table_name, "#temp_insert");
+		SFINISH_SNCAT(client_insert->str_temp_table_name, &client_insert->int_temp_table_name_len,
+			"#temp_insert", (size_t)12);
 	}
+	client_insert->int_temp_table_name_len = strlen(client_insert->str_temp_table_name);
 
 	// Get table names and return columns
 	SFINISH_ERROR_CHECK((client_insert->str_real_table_name = get_table_name(client_request->ptr_query)) != NULL,
 		"Failed to get table name from query");
 	// DEBUG("client_insert->str_real_table_name: %s",
 	// client_insert->str_real_table_name);
+	client_insert->int_real_table_name_len = strlen(client_insert->str_real_table_name);
 
 	SFINISH_ERROR_CHECK((client_insert->str_return_columns =
 								get_return_columns(client_request->ptr_query, client_insert->str_real_table_name)) != NULL,
 		"Failed to get return columns from query");
+	client_insert->int_return_columns_len = strlen(client_insert->str_return_columns);
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
 	SFINISH_ERROR_CHECK((client_insert->str_return_escaped_columns = get_return_escaped_columns(
@@ -66,7 +75,8 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 	*ptr_end_column_names = 0;
 	client_insert->ptr_values = ptr_end_column_names + 1;
 
-	SFINISH_CAT_CSTR(client_insert->str_column_names, ptr_column_names);
+	SFINISH_SNCAT(client_insert->str_column_names, &client_insert->int_column_names_len,
+		ptr_column_names, strlen(ptr_column_names));
 
 	// Replace double quotes with double double quotes (this allows double quotes
 	// within column names)
@@ -77,53 +87,74 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 	str_temp = unescape_value(client_insert->str_column_names);
 	SFINISH_CHECK(str_temp != NULL, "unescape_value failed, malformed request?");
 	SFREE(client_insert->str_column_names);
-	SFINISH_CAT_CSTR(client_insert->str_column_names, "\"", str_temp, "\"");
+	SFINISH_SNCAT(client_insert->str_column_names, &client_insert->int_column_names_len,
+		"\"", (size_t)1,
+		str_temp, strlen(str_temp),
+		"\"", (size_t)1);
 	SFREE(str_temp);
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
-	SFINISH_CAT_CSTR(client_insert->str_insert_column_names, "");
-	SFINISH_CAT_CSTR(client_insert->str_insert_parameter_markers, "");
+
+	SFINISH_SNCAT(client_insert->str_insert_column_names, &client_insert->int_insert_column_names_len,
+		"", (size_t)0);
+	SFINISH_SNCAT(client_insert->str_insert_parameter_markers, &client_insert->int_insert_parameter_markers_len,
+		"", (size_t)0);
 #endif
-	SFINISH_CAT_CSTR(client_insert->str_pk_join_clause, "");
-	SFINISH_CAT_CSTR(client_insert->str_pk_where_clause, ""); //"id = lastval()");
-	size_t int_i = 0, int_j = 0, int_k = 0, int_length = 0;
+	SFINISH_SNCAT(client_insert->str_pk_join_clause, &client_insert->int_pk_join_clause_len,
+		"", (size_t)0);
+	SFINISH_SNCAT(client_insert->str_pk_where_clause, &client_insert->int_pk_where_clause_len,
+		"", (size_t)0); //"id = lastval()");
+	size_t int_i = 0, int_j = 0, int_k = 0;
 	while (ptr_pk < ptr_end_pk) {
 		// PK name
-		int_length = strcspn(ptr_pk, "\t\012");
-		SFINISH_SALLOC(str_col_name, int_length + 1);
-		memcpy(str_col_name, ptr_pk, int_length);
-		str_col_name[int_length] = '\0';
-		ptr_pk += int_length + 1;
+		int_col_name_len = strcspn(ptr_pk, "\t\012");
+		SFINISH_SALLOC(str_col_name, int_col_name_len + 1);
+		memcpy(str_col_name, ptr_pk, int_col_name_len);
+		str_col_name[int_col_name_len] = '\0';
+		ptr_pk += int_col_name_len + 1;
 
-		str_temp1 = DB_escape_identifier(client_request->parent->conn, str_col_name, int_length);
+		str_temp1 = DB_escape_identifier(client_request->parent->conn, str_col_name, int_col_name_len);
 		SFINISH_CHECK(str_temp1 != NULL, "unescape_value failed, malformed request?");
 		SFREE(str_col_name);
 		str_col_name = str_temp1;
+		int_col_name_len = strlen(str_col_name);
 		str_temp1 = NULL;
 
 		// PK sequence
-		int_length = strcspn(ptr_seq, "\t\012");
-		SFINISH_SALLOC(str_col_seq, int_length + 1);
-		memcpy(str_col_seq, ptr_seq, int_length);
-		str_col_seq[int_length] = '\0';
-		ptr_seq += int_length + 1;
+		int_col_seq_len = strcspn(ptr_seq, "\t\012");
+		SFINISH_SALLOC(str_col_seq, int_col_seq_len + 1);
+		memcpy(str_col_seq, ptr_seq, int_col_seq_len);
+		str_col_seq[int_col_seq_len] = '\0';
+		ptr_seq += int_col_seq_len + 1;
 
-		str_temp1 = DB_escape_literal(client_request->parent->conn, str_col_seq, int_length);
+		str_temp1 = DB_escape_literal(client_request->parent->conn, str_col_seq, int_col_seq_len);
 		SFINISH_CHECK(str_temp1 != NULL, "unescape_value failed, malformed request?");
 		SFREE(str_col_seq);
 		str_col_seq = str_temp1;
+		int_col_seq_len = strlen(str_col_seq);
 		str_temp1 = NULL;
 
 		SFREE(str_temp1);
 
 		if (strncmp(str_col_seq, "''", 2) != 0) {
 			if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-				SFINISH_CAT_APPEND(client_insert->str_pk_where_clause, (int_i > 0 ? " AND " : ""),
-					client_insert->str_real_table_name, ".", str_col_name, " = currval(", str_col_seq, "::name::regclass)");
+				SFINISH_SNFCAT(client_insert->str_pk_where_clause, &client_insert->int_pk_where_clause_len,
+					int_i > 0 ? " AND " : "", strlen(int_i > 0 ? " AND " : ""),
+					client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+					".", (size_t)1,
+					str_col_name, int_col_name_len,
+					" = currval(", (size_t)11,
+					str_col_seq, int_col_seq_len,
+					"::name::regclass)", (size_t)17);
 			} else {
-				SFINISH_CAT_APPEND(client_insert->str_pk_where_clause, (int_i > 0 ? " AND " : ""),
-					client_insert->str_real_table_name, ".", str_col_name,
-					" = IDENT_CURRENT(", str_col_seq, ")");
+				SFINISH_SNFCAT(client_insert->str_pk_where_clause, &client_insert->int_pk_where_clause_len,
+					int_i > 0 ? " AND " : "", strlen(int_i > 0 ? " AND " : ""),
+					client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+					".", (size_t)1,
+					str_col_name, int_col_name_len,
+					" = IDENT_CURRENT(", (size_t)17,
+					str_col_seq, int_col_seq_len,
+					")", (size_t)1);
 			}
 
 		} else {
@@ -131,19 +162,38 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 				int_j += 1;
 				SFINISH_CHECK(int_j == 1, "Only one PK column allowed to not have an unspecified value");
 				if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-					SFINISH_CAT_APPEND(client_insert->str_pk_where_clause, (int_i > 0 ? " AND " : ""),
-						client_insert->str_real_table_name, ".", str_col_name, " = lastval()");
+					SFINISH_SNFCAT(client_insert->str_pk_where_clause, &client_insert->int_pk_where_clause_len,
+						int_i > 0 ? " AND " : "", strlen(int_i > 0 ? " AND " : ""),
+						client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+						".", (size_t)1,
+						str_col_name, int_col_name_len,
+						" = lastval()", (size_t)12);
 				} else {
-					SFINISH_CAT_APPEND(client_insert->str_pk_where_clause, (int_i > 0 ? " AND " : ""),
-						client_insert->str_real_table_name, ".", str_col_name, " = SCOPE_IDENTITY()");
-					SFINISH_CAT_CSTR(client_insert->str_identity_column_name, str_col_name);
+					SFINISH_SNFCAT(client_insert->str_pk_where_clause, &client_insert->int_pk_where_clause_len,
+						int_i > 0 ? " AND " : "", strlen(int_i > 0 ? " AND " : ""),
+						client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+						".", (size_t)1,
+						str_col_name, int_col_name_len,
+						" = SCOPE_IDENTITY()", (size_t)19);
+					SFINISH_SNCAT(client_insert->str_identity_column_name, &client_insert->int_identity_column_name_len,
+						str_col_name, int_col_name_len);
 				}
 			} else {
-				SFINISH_CAT_APPEND(client_insert->str_pk_join_clause, (int_k > 0 ? " AND " : ""),
-					client_insert->str_real_table_name, ".", str_col_name, " = ", client_insert->str_temp_table_name, ".",
-					str_col_name);
-				SFINISH_CAT_APPEND(client_insert->str_pk_where_clause, (int_i > 0 ? " AND " : ""),
-					client_insert->str_temp_table_name, ".", str_col_name, " IS NOT NULL");
+				SFINISH_SNFCAT(client_insert->str_pk_join_clause, &client_insert->int_pk_join_clause_len,
+					int_k > 0 ? " AND " : "", strlen(int_k > 0 ? " AND " : ""),
+					client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+					".", (size_t)1,
+					str_col_name, int_col_name_len,
+					" = ", (size_t)3,
+					client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+					".", (size_t)1,
+					str_col_name, int_col_name_len);
+				SFINISH_SNFCAT(client_insert->str_pk_where_clause, &client_insert->int_pk_where_clause_len,
+					int_i > 0 ? " AND " : "", strlen(int_i > 0 ? " AND " : ""),
+					client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+					".", (size_t)1,
+					str_col_name, int_col_name_len,
+					" IS NOT NULL", (size_t)12);
 			}
 		}
 		int_i += 1;
@@ -156,29 +206,37 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 #ifndef POSTAGE_INTERFACE_LIBPQ
 	while (ptr_column_names < ptr_end_column_names) {
 		SDEBUG("ptr_column_names                           : %s", ptr_column_names);
-		int_length = strcspn(ptr_column_names, "\t\012");
-		SFINISH_SALLOC(str_col_name, int_length + 1);
-		memcpy(str_col_name, ptr_column_names, int_length);
-		str_col_name[int_length] = '\0';
-		ptr_column_names += int_length + 1;
+		int_col_name_len = strcspn(ptr_column_names, "\t\012");
+		SFINISH_SALLOC(str_col_name, int_col_name_len + 1);
+		memcpy(str_col_name, ptr_column_names, int_col_name_len);
+		str_col_name[int_col_name_len] = '\0';
+		ptr_column_names += int_col_name_len + 1;
 
 		SFINISH_REPLACE(str_col_name, "\"", "\"\"", "g");
 		str_temp1 = unescape_value(str_col_name);
 		SFINISH_CHECK(str_temp1 != NULL, "unescape_value failed, malformed request?");
 		SFREE(str_col_name);
-		SFINISH_CAT_CSTR(str_col_name, "\"", str_temp1, "\"");
+		SFINISH_SNCAT(str_col_name, &int_col_name_len,
+			"\"", (size_t)1,
+			str_temp1, strlen(str_temp1),
+			"\"", (size_t)1);
 		SFREE(str_temp1);
 
-		SFINISH_CAT_APPEND(
-			client_insert->str_insert_column_names, str_col_name, (ptr_column_names < ptr_end_column_names ? ", " : ""));
+		SFINISH_SNFCAT(client_insert->str_insert_column_names, client_insert->int_insert_column_names_len,
+			str_col_name, int_col_name_len,
+			ptr_column_names < ptr_end_column_names ? ", " : "",
+			strlen(ptr_column_names < ptr_end_column_names ? ", " : ""));
 		SDEBUG("str_col_name                               : %s", str_col_name);
 
 		if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_CAT_APPEND(
-				client_insert->str_insert_parameter_markers, "E?", (ptr_column_names < ptr_end_column_names ? ", " : ""));
+			SFINISH_SNFCAT(client_insert->str_insert_parameter_markers, client_insert->int_insert_parameter_markers_len,
+				"E?", (size_t)2,
+				ptr_column_names < ptr_end_column_names ? ", " : "",
+				strlen(ptr_column_names < ptr_end_column_names ? ", " : ""));
 		} else {
-			SFINISH_CAT_APPEND(
-				client_insert->str_insert_parameter_markers, "?", (ptr_column_names < ptr_end_column_names ? ", " : ""));
+			SFINISH_SNFCAT(client_insert->str_insert_parameter_markers, client_insert->int_insert_parameter_markers_len,
+				"?", (size_t)1,
+				ptr_column_names < ptr_end_column_names ? ", " : "", strlen(ptr_column_names < ptr_end_column_names ? ", " : ""));
 		}
 
 		SFREE(str_col_name);
@@ -190,23 +248,44 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 
 	// Create first temp table (this one holds the data from the client)
 	if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-		SFINISH_CAT_CSTR(str_sql, "CREATE TEMP TABLE ", client_insert->str_temp_table_name, " ON COMMIT DROP AS\n", "SELECT ",
-			client_insert->str_column_names, " FROM ", client_insert->str_real_table_name, " LIMIT 0;");
+		SFINISH_SNCAT(str_sql, &int_sql_len,
+			"CREATE TEMP TABLE ", (size_t)18,
+			client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+			" ON COMMIT DROP AS\nSELECT ", (size_t)26,
+			client_insert->str_column_names, client_insert->int_column_names_len,
+			" FROM ", (size_t)6,
+			client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+			" LIMIT 0;", (size_t)9);
 		DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step2);
 	} else {
 #ifndef POSTAGE_INTERFACE_LIBPQ
 		if (client_insert->str_identity_column_name != NULL) {
-			SFINISH_CAT_CSTR(str_sql, "IF OBJECT_ID('tempdb..", client_insert->str_temp_table_name,
-				"') IS NOT NULL\n\tDROP TABLE ", client_insert->str_temp_table_name, "\n",
-				"SELECT TOP 0 CAST('' AS timestamp) AS identity_temp_123123123123123, ", client_insert->str_identity_column_name,
-				" AS id_temp123123123, ", client_insert->str_column_names, " INTO ", client_insert->str_temp_table_name, " FROM ",
-				client_insert->str_real_table_name, ";");
+			SFINISH_CAT_CSTR(str_sql, &int_sql_len,
+				"IF OBJECT_ID('tempdb..", (size_t)22,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"') IS NOT NULL\n\tDROP TABLE ", (size_t)27,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"\nSELECT TOP 0 CAST('' AS timestamp) AS identity_temp_123123123123123, ", (size_t)70, client_insert->str_identity_column_name, client_insert->int_identity_column_len,
+				" AS id_temp123123123, ", (size_t)22,
+				client_insert->str_column_names, client_insert->int_column_names_len,
+				" INTO ", (size_t)6,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				" FROM ", (size_t)6,
+				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+				";", (size_t)1);
 			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step15_sql_server);
 		} else {
-			SFINISH_CAT_CSTR(str_sql, "IF OBJECT_ID('tempdb..", client_insert->str_temp_table_name,
-				"') IS NOT NULL\n\tDROP TABLE ", client_insert->str_temp_table_name, "\n",
-				"SELECT TOP 0 CAST('' AS timestamp) AS identity_temp_123123123123123, ", client_insert->str_column_names,
-				" INTO ", client_insert->str_temp_table_name, " FROM ", client_insert->str_real_table_name, ";");
+			SFINISH_CAT_CSTR(str_sql, &int_sql_len,
+				"IF OBJECT_ID('tempdb..", (size_t)22,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"') IS NOT NULL\n\tDROP TABLE ", (size_t)27,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"\nSELECT TOP 0 CAST('' AS timestamp) AS identity_temp_123123123123123, ", (size_t)70, client_insert->str_column_names, client_insert->int_column_names_len,
+				" INTO ", (size_t)6,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				" FROM ", (size_t)6,
+				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+				";", (size_t)1);
 			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step2);
 		}
 #endif
@@ -223,13 +302,20 @@ finish:
 		snprintf(str_temp2, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp2, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp2, strlen(str_temp2),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
@@ -246,15 +332,20 @@ bool ws_insert_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
 	char str_temp[101];
 	bool bol_ret = true;
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_sql);
-	SFINISH_CAT_CSTR(str_response, "");
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"", (size_t)0);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
 
 	DB_free_result(res);
 
-	SFINISH_CAT_CSTR(str_sql, "ALTER TABLE ", client_insert->str_temp_table_name, " DROP COLUMN id_temp123123123;");
+	SFINISH_SNCAT(str_sql, &int_sql_len,
+		"ALTER TABLE ", (size_t)12,
+		client_insert->str_temp_table_name, strlen(client_insert->int_temp_table_name_len),
+		" DROP COLUMN id_temp123123123;", (size_t)30);
 	SDEBUG("str_sql: %s", str_sql);
 
 	SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step2), "DB_exec failed");
@@ -271,16 +362,25 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client_request->parent->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
@@ -304,19 +404,31 @@ bool ws_insert_step2(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
 	size_t int_len_content;
 	SDEFINE_VAR_ALL(str_sql);
+	size_t int_response_len = 0;
+	size_t int_sql_len = 0;
 	char *str_response = NULL;
 	bool bol_ret = true;
-	SFINISH_CAT_CSTR(str_response, "");
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"", (size_t)0);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
 
 // Start copying into the first temp table
 #ifdef POSTAGE_INTERFACE_LIBPQ
-	SFINISH_CAT_CSTR(str_sql, "COPY ", client_insert->str_temp_table_name, " FROM STDIN;");
+	SFINISH_SNCAT(str_sql, &int_sql_len,
+		"COPY ", (size_t)5,
+		client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+		" FROM STDIN;", (size_t)12);
 #else
-	SFINISH_CAT_CSTR(str_sql, "INSERT INTO ", client_insert->str_temp_table_name, " (", client_insert->str_insert_column_names,
-		") VALUES (", client_insert->str_insert_parameter_markers, ")");
+	SFINISH_SNCAT(str_sql, &int_sql_len,
+		"INSERT INTO ", (size_t)12,
+		client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+		" (", (size_t)2,
+		client_insert->str_insert_column_names, client_insert->int_insert_column_names_len,
+		") VALUES (", (size_t)10,
+		client_insert->str_insert_parameter_markers, client_insert->int_insert_parameter_markers_len,
+		")", (size_t)1);
 	SDEBUG("str_sql: %s", str_sql);
 #endif
 
@@ -341,16 +453,25 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client_request->parent->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
@@ -372,6 +493,8 @@ bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 	SDEFINE_VAR_ALL(str_sql);
 	char *str_response = NULL;
 	bool bol_ret = true;
+	size_t int_sql_len = 0;
+	size_t int_response_len = 0;
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
@@ -383,21 +506,45 @@ bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 	// Create second temp table
 	// This will hold all of the records with sequences, triggers, etc...
 	if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-		SFINISH_CAT_CSTR(str_sql, "CREATE TEMP TABLE ", client_insert->str_temp_table_name, "_2", " ON COMMIT DROP AS\n",
-			"SELECT ", client_insert->str_return_columns, " FROM ", client_insert->str_real_table_name, " LIMIT 0;");
+		SFINISH_SNCAT(str_sql, &int_sql_len,
+			"CREATE TEMP TABLE ", (size_t)18,
+			client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+			"_2 ON COMMIT DROP AS\nSELECT ", (size_t)28,
+			client_insert->str_return_columns, client_insert->int_return_columns_len,
+			" FROM ", (size_t)6,
+			client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+			" LIMIT 0;", (size_t)9);
 	} else {
 		if (client_insert->str_identity_column_name != NULL) {
-			SFINISH_CAT_CSTR(str_sql, "IF OBJECT_ID('tempdb..", client_insert->str_temp_table_name,
-				"_2') IS NOT NULL\n\tDROP TABLE ", client_insert->str_temp_table_name, "_2\n", "SELECT TOP 0 ",
-				client_insert->str_identity_column_name, " AS id_temp123123123, ", client_insert->str_return_columns, " INTO ",
-				client_insert->str_temp_table_name, "_2 FROM ", client_insert->str_real_table_name, "; "
-																									"ALTER TABLE ",
-				client_insert->str_temp_table_name, "_2 DROP COLUMN id_temp123123123;");
+			SFINISH_SNCAT(str_sql, &int_sql_len,
+				"IF OBJECT_ID('tempdb..", (size_t)22,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"_2') IS NOT NULL\n\tDROP TABLE ", (size_t)29,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"_2\nSELECT TOP 0 ", (size_t)16,
+				client_insert->str_identity_column_name, client_insert->int_identity_column_name_len,
+				" AS id_temp123123123, ", (size_t)22,
+				client_insert->str_return_columns, client_insert->int_return_columns_len,
+				" INTO ", (size_t)6,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"_2 FROM ", (size_t)8,
+				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+				"; ALTER TABLE ", (size_t)14,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"_2 DROP COLUMN id_temp123123123;", (size_t)32);
 		} else {
-			SFINISH_CAT_CSTR(str_sql, "IF OBJECT_ID('tempdb..", client_insert->str_temp_table_name,
-				"_2') IS NOT NULL\n\tDROP TABLE ", client_insert->str_temp_table_name, "_2\n", "SELECT TOP 0 ",
-				client_insert->str_return_columns, " INTO ", client_insert->str_temp_table_name, "_2 FROM ",
-				client_insert->str_real_table_name, ";");
+			SFINISH_SNCAT(str_sql, &int_sql_len,
+				"IF OBJECT_ID('tempdb..", (size_t)22,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"_2') IS NOT NULL\n\tDROP TABLE ", (size_t)29,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"_2\nSELECT TOP 0 ", (size_t)16,
+				client_insert->str_return_columns, client_insert->int_return_columns_len,
+				" INTO ", (size_t)6,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"_2 FROM ", (size_t)8,
+				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+				";", (size_t)1);
 		}
 	}
 
@@ -416,16 +563,25 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client_request->parent->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
@@ -447,7 +603,12 @@ bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
 	size_t int_i = 0;
 	char str_i[101];
 	SDEFINE_VAR_ALL(str_sql, str_insert_columns, str_replace_table_name);
-	SFINISH_CAT_CSTR(str_response, "");
+	size_t int_replace_table_name_len = 0;
+	size_t int_insert_columns_len = 0;
+	size_t int_response_len = 0;
+	size_t int_sql_len = 0;
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"", (size_t)0);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
@@ -456,32 +617,64 @@ bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
 
 	client_insert->darr_insert_queries = DArray_create(sizeof(char *), 10);
 
-	SFINISH_CAT_CSTR(str_replace_table_name, client_insert->str_real_table_name, ".");
-	SFINISH_CAT_CSTR(str_insert_columns, client_insert->str_return_columns);
+	SFINISH_SNCAT(str_replace_table_name, &int_replace_table_name_len,
+		client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+		".", (size_t)1);
+	SFINISH_SNCAT(str_insert_columns, &int_insert_columns_len,
+		client_insert->str_return_columns, client_insert->int_return_columns_len);
 	SFINISH_REPLACE(str_insert_columns, str_replace_table_name, "", "g");
+	int_insert_columns_len = strlen(str_insert_columns);
 
 	for (int_i = 0; int_i < client_request->int_num_rows; int_i += 1) {
 		memset(str_i, 0, 101);
 		if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
 			snprintf(str_i, 100, "%zd", int_i);
-			SFINISH_CAT_CSTR(str_sql, "INSERT INTO ", client_insert->str_real_table_name, " (", client_insert->str_column_names,
-				")", "\n", "SELECT ", client_insert->str_column_names, "\n", "       FROM ", client_insert->str_temp_table_name,
-				"\n", "       LIMIT 1", "\n", "       OFFSET ", str_i, ";", "\n");
+			SFINISH_SNCAT(str_sql, &int_sql_len,
+				"INSERT INTO ", (size_t)12,
+				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+				" (", (size_t)2,
+				client_insert->str_column_names, client_insert->int_column_names_len,
+				")\nSELECT ", (size_t)9,
+				client_insert->str_column_names, client_insert->int_column_names_len,
+				"\n       FROM ", (size_t)13,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"\n       LIMIT 1\n       OFFSET ", (size_t)30,
+				str_i, strlen(str_i),
+				";\n", (size_t)2);
 		} else {
 			snprintf(str_i, 100, "%zd", int_i + 1);
-			SFINISH_CAT_CSTR(str_sql, "INSERT INTO ", client_insert->str_real_table_name, " (", client_insert->str_column_names,
-				")", "\n", "SELECT ", client_insert->str_column_names, "\n", "       FROM ( SELECT ",
-				client_insert->str_column_names, ", ROW_NUMBER() OVER (ORDER BY identity_temp_123123123123123) row_num FROM ",
-				client_insert->str_temp_table_name, ") em\n", "       WHERE row_num = ", str_i, ";", "\n");
+			SFINISH_SNCAT(str_sql, &int_sql_len,
+				"INSERT INTO ", (size_t)12,
+				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+				" (", (size_t)2,
+				client_insert->str_column_names, client_insert->int_column_names_len,
+				")\nSELECT ", (size_t)9,
+				client_insert->str_column_names, client_insert->int_column_names_len,
+				"\n       FROM ( SELECT ", (size_t)22,
+				client_insert->str_column_names, client_insert->int_column_names_len,
+				", ROW_NUMBER() OVER (ORDER BY identity_temp_123123123123123) row_num FROM ", (size_t)74,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				") em\n       WHERE row_num = ", (size_t)28,
+				str_i, strlen(str_i),
+				";\n", (size_t)2);
 		}
 
 		DArray_push(client_insert->darr_insert_queries, str_sql);
 		str_sql = NULL;
 
 		if (client_insert->str_pk_join_clause == NULL || client_insert->str_pk_join_clause[0] == 0) {
-			SFINISH_CAT_CSTR(str_sql, "INSERT INTO ", client_insert->str_temp_table_name, "_2 (", str_insert_columns, ")", "\n",
-				"SELECT ", client_insert->str_return_columns, "\n", "       FROM ", client_insert->str_real_table_name,
-				"       WHERE ", client_insert->str_pk_where_clause, ";", "\n\n");
+			SFINISH_SNCAT(str_sql, &int_sql_len,
+				"INSERT INTO ", (size_t)12,
+				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+				"_2 (", (size_t)4,
+				str_insert_columns, int_insert_columns_len,
+				")\nSELECT ", (size_t)9,
+				client_insert->str_return_columns, client_insert->int_return_columns_len,
+				"\n       FROM ", (size_t)13,
+				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+				"       WHERE ", (size_t)13,
+				client_insert->str_pk_where_clause, client_insert->int_pk_where_clause_len,
+				";\n\n", (size_t)3);
 
 			DArray_push(client_insert->darr_insert_queries, str_sql);
 			str_sql = NULL;
@@ -489,10 +682,22 @@ bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
 	}
 
 	if (client_insert->str_pk_join_clause != NULL && client_insert->str_pk_join_clause[0] != 0) {
-		SFINISH_CAT_CSTR(str_sql, "\n", "INSERT INTO ", client_insert->str_temp_table_name, "_2 (", str_insert_columns, ")", "\n",
-			"SELECT ", client_insert->str_return_columns, "\n", "       FROM ", client_insert->str_real_table_name,
-			"       LEFT JOIN ", client_insert->str_temp_table_name, " ON ", client_insert->str_pk_join_clause, "\n",
-			"       WHERE ", client_insert->str_pk_where_clause, ";", "\n\n");
+		SFINISH_SNCAT(str_sql, &int_sql_len,
+			"\nINSERT INTO ", (size_t)13,
+			client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+			"_2 (", (size_t)4,
+			str_insert_columns, int_insert_columns_len,
+			")\nSELECT ", (size_t)9,
+			client_insert->str_return_columns, client_insert->int_return_columns_len,
+			"\n       FROM ", (size_t)13,
+			client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+			"       LEFT JOIN ", (size_t)17,
+			client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+			" ON ", (size_t)4,
+			client_insert->str_pk_join_clause, client_insert->int_pk_join_clause_len,
+			"\n       WHERE ", (size_t)14,
+			client_insert->str_pk_where_clause, client_insert->int_pk_where_clause_len,
+			";\n\n", (size_t)3);
 
 		DArray_push(client_insert->darr_insert_queries, str_sql);
 		str_sql = NULL;
@@ -517,16 +722,25 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client_request->parent->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
@@ -547,8 +761,10 @@ bool ws_insert_step6(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
 	SDEFINE_VAR_ALL(str_temp, str_sql);
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	bool bol_ret = true;
-	SFINISH_CAT_CSTR(str_response, "");
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"", (size_t)0);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
@@ -576,17 +792,26 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 		SFREE(str_temp);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client_request->parent->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
@@ -607,8 +832,12 @@ bool ws_insert_step7(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
 	char *str_response = NULL;
 	bool bol_ret = true;
+	size_t int_temp_len = 0;
+	size_t int_response_len = 0;
+	size_t int_sql_len = 0;
 	SDEFINE_VAR_ALL(str_temp, str_sql);
-	SFINISH_CAT_CSTR(str_response, "");
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"", (size_t)0);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
@@ -616,17 +845,28 @@ bool ws_insert_step7(EV_P, void *cb_data, DB_result *res) {
 	SDEBUG("...DONE INSERTING");
 	// Replace the real table name with the second temp table name in the return
 	// columns
-	SFINISH_CAT_CSTR(str_temp, client_insert->str_temp_table_name, "_2");
+	SFINISH_SNCAT(str_temp, &int_temp_len,
+		client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+		"_2", (size_t)2);
 	SFINISH_REPLACE(client_insert->str_return_columns, client_insert->str_real_table_name, str_temp, "g");
+	client_insert->int_return_columns_len = strlen(client_insert->str_return_columns);
 
 	DB_free_result(res);
 
 #ifdef POSTAGE_INTERFACE_LIBPQ
-	SFINISH_CAT_CSTR(str_sql, "COPY (SELECT ", client_insert->str_return_columns, " FROM ", client_insert->str_temp_table_name,
-		"_2) TO STDOUT;");
+	SFINISH_SNCAT(str_sql, &int_sql_len,
+		"COPY (SELECT ", (size_t)13,
+		client_insert->str_return_columns, client_insert->int_return_columns_len,
+		" FROM ", (size_t)6,
+		client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+		"_2) TO STDOUT;", (size_t)14);
 #else
-	SFINISH_CAT_CSTR(
-		str_sql, "SELECT ", client_insert->str_return_escaped_columns, " FROM ", client_insert->str_temp_table_name, "_2;");
+	SFINISH_SNCAT(str_sql, &int_sql_len,
+		"SELECT ", (size_t)7,
+		client_insert->str_return_escaped_columns, client_insert->int_return_escaped_columns_len,
+		" FROM ", (size_t)6,
+		client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+		"_2;", (size_t)3);
 #endif
 	SDEBUG("str_sql: >%s<", str_sql);
 
@@ -646,17 +886,26 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 		SFREE(str_temp);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client_request->parent->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
