@@ -1010,7 +1010,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 			client_auth->int_connection_index = (int_global_custom_connection_number += 1);
 		}
 
-		SFINISH_SNCAT(client_request->parent->str_connname_folder, &int_temp, client_auth->str_connname, strlen(client_auth->str_connname));
+		SFINISH_SNCAT(client_request->parent->str_connname_folder, &int_temp, client_auth->str_connname, client_auth->int_connname_length);
 		if (client_auth->str_database != NULL) {
 			SFINISH_SNFCAT(client_request->parent->str_connname_folder, &int_temp, "_", (size_t)1, client_auth->str_database, strlen(client_auth->str_database));
 		}
@@ -1488,7 +1488,7 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 
 	SFINISH_SNCAT(
 		client_auth->parent->str_connname_folder, &int_temp,
-		client_auth->str_connname, strlen(client_auth->str_connname),
+		client_auth->str_connname, client_auth->int_connname_length,
 		"_", (size_t)1,
 		client_auth->str_database, strlen(client_auth->str_database)
 	);
