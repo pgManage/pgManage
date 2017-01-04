@@ -21,12 +21,24 @@ struct sock_ev_client_select {
 	size_t int_where_length;
 	char *str_order_by;
 	size_t int_order_by_length;
-	char *str_offset;
-	size_t int_offset_length;
 	char *str_limit;
 	size_t int_limit_length;
+	char *str_offset;
+	size_t int_offset_length;
 	DArray *darr_column_types;
 	DArray *darr_column_names;
+
+	//variable lengths
+	size_t int_statement_name_len;
+	size_t int_sql_len;
+	size_t int_sql_escaped_return_len;
+	size_t int_return_columns_len;
+	size_t int_return_escaped_columns_len;
+	size_t int_real_table_name_len;
+	size_t int_where_len;
+	size_t int_order_by_len;
+	size_t int_limit_len;
+	size_t int_offset_len;
 };
 
 /*

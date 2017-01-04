@@ -43,6 +43,17 @@ struct sock_ev_client_update {
 	size_t int_update_count;
 
 	size_t int_update_columns;
+
+	//variable lengths for SFINISH_SNCAT
+	size_t int_temp_table_name_len;
+	size_t int_real_table_name_len;
+	size_t int_insert_column_names_len;
+	size_t int_insert_parameter_markers_len;
+	size_t int_pk_join_clause_len;
+	size_t int_pk_where_clause_len;
+	size_t int_hash_where_clause_len;
+	size_t int_set_col_list_len;
+	size_t int_return_columns_len;
 };
 
 /*

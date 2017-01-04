@@ -32,6 +32,17 @@ struct sock_ev_client_insert {
 	char *str_identity_column_name;
 	size_t int_currval_length;
 	size_t int_data_length;
+
+	//variable lengths
+	size_t int_real_table_name_len;
+	size_t int_temp_table_name_len;
+	size_t int_column_names_len;
+	size_t int_insert_column_names_len;
+	size_t int_insert_parameter_markers_len;
+	size_t int_pk_join_clause_len;
+	size_t int_pk_where_clause_len;
+	size_t int_identity_column_name_len;
+	size_t int_return_columns_len;
 };
 
 /*

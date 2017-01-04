@@ -10,14 +10,16 @@ void http_export_step1(struct sock_ev_client *client) {
 	char *ptr_end_attr_header = NULL;
 	char *ptr_attr_values = NULL;
 	struct sock_ev_client_request *client_request = NULL;
-	size_t int_length;
-	size_t int_query_length = 0;
+	size_t int_query_len = 0;
+	size_t int_sql_len = 0;
+	size_t int_attr_header_len = 0;
+	size_t int_attr_value_len = 0;
 
 	SDEBUG("client->str_request: %s", client->str_request);
 
-	str_temp = query(client->str_request, client->int_request_len, &int_query_length);
+	str_temp = query(client->str_request, client->int_request_len, &int_query_len);
 	SFINISH_CHECK(str_temp != NULL, "query failed");
-	str_query = uri_to_cstr(str_temp, &int_query_length);
+	str_query = uri_to_cstr(str_temp, &int_query_len);
 	SFINISH_CHECK(str_query != NULL, "uri_to_cstr failed");
 	SFREE(str_temp);
 
@@ -32,6 +34,9 @@ void http_export_step1(struct sock_ev_client *client) {
 	SFINISH_CHECK(ptr_attr_header != NULL, "could not find start of attr names");
 	ptr_attr_header += 1;
 	*(ptr_attr_header - 1) = 0;
+	// Re-calculate length of query
+	int_query_len = (ptr_attr_header - 1) - client->str_request;
+
 	// Get end of headers
 	ptr_end_attr_header = strstr(ptr_attr_header, "\012");
 	SFINISH_CHECK(ptr_end_attr_header != NULL, "could not find end of attr names");
@@ -39,50 +44,61 @@ void http_export_step1(struct sock_ev_client *client) {
 	// Get start of attr values
 	ptr_attr_values = ptr_end_attr_header + 1;
 	*(ptr_attr_values - 1) = 0;
-	int_length = strlen(client->str_request);
 
 	// This will hold the SQL query becuase we are ending the string right before
 	// the attr headers start
-	str_query = unescape_value(client->str_request);
+	str_query = bunescape_value(client->str_request, &int_query_len);
 	SFINISH_CHECK(str_query != NULL, "unescape_value failed");
 
 	// Start building SQL
-	SFINISH_CAT_CSTR(str_sql, "COPY (", str_query, ")\012", "\tTO STDOUT\012", "\tWITH (\012");
-
-	int_length = 0;
+	SFINISH_SNCAT(
+		str_sql, &int_sql_len,
+		"COPY (", (size_t)6,
+		str_query, int_query_len,
+		")\012\tTO STDOUT\012\tWITH (\012", (size_t)21
+	);
 
 	// Loop through attributes
 	while (ptr_attr_header < ptr_end_attr_header) {
 		// Get attr name
-		int_length = strcspn(ptr_attr_header, "\t\012");
-		SFINISH_SALLOC(str_attr_name, int_length + 1);
-		memcpy(str_attr_name, ptr_attr_header, int_length);
-		str_attr_name[int_length] = '\0';
-		ptr_attr_header += int_length + 1;
+		// TODO: strcspn lengths
+		int_attr_header_len = strcspn(ptr_attr_header, "\t\012");
+		SFINISH_SALLOC(str_attr_name, int_attr_header_len + 1);
+		memcpy(str_attr_name, ptr_attr_header, int_attr_header_len);
+		str_attr_name[int_attr_header_len] = '\0';
+		ptr_attr_header += int_attr_header_len + 1;
 
 		// Get attr value
-		int_length = strcspn(ptr_attr_values, "\t\012");
-		SFINISH_SALLOC(str_attr_value, int_length + 1);
-		memcpy(str_attr_value, ptr_attr_values, int_length);
-		str_attr_value[int_length] = '\0';
-		ptr_attr_values += int_length + 1;
+		int_attr_value_len = strcspn(ptr_attr_values, "\t\012");
+		SFINISH_SALLOC(str_attr_value, int_attr_value_len + 1);
+		memcpy(str_attr_value, ptr_attr_values, int_attr_value_len);
+		str_attr_value[int_attr_value_len] = '\0';
+		ptr_attr_values += int_attr_value_len + 1;
 
 		// Unescape the value
 		str_temp = str_attr_value;
-		str_attr_value = unescape_value(str_temp);
+		str_attr_value = bunescape_value(str_temp, &int_attr_value_len);
 		SFINISH_CHECK(str_attr_value != NULL, "unescape_value failed");
 		SFREE(str_temp);
 
+		// TODO: str_toupper lengths
+
 		// Add both to the sql
-		SFINISH_CAT_APPEND(str_sql, "\t\t", str_toupper(str_attr_name), " ", str_attr_value,
-			ptr_attr_header < ptr_end_attr_header ? "," : "", "\012");
+		SFINISH_SNFCAT(
+			str_sql, &int_sql_len,
+			"\t\t", (size_t)2,
+			str_toupper(str_attr_name), strlen(str_attr_name),
+			" ", (size_t)1,
+			str_attr_value, int_attr_value_len,
+			ptr_attr_header < ptr_end_attr_header ? ",\012" : "\012", (size_t)(ptr_attr_header < ptr_end_attr_header ? 2 : 1)
+		);
 
 		// Free name and value
 		SFREE(str_attr_name);
 		SFREE(str_attr_value);
 	}
 
-	SFINISH_CAT_APPEND(str_sql, "\t);");
+	SFINISH_SNFCAT(str_sql, &int_sql_len, "\t);", (size_t)3);
 
 	SDEBUG("str_sql: %s", str_sql);
 
@@ -90,7 +106,8 @@ void http_export_step1(struct sock_ev_client *client) {
 	client->cur_request = client_request;
 	SFINISH_CHECK(client_request != NULL, "Could not create request data!");
 
-	SFINISH_CAT_CSTR(client->str_response, "");
+	SFINISH_SALLOC(client->str_response, 1);
+	client->str_response[0] = 0;
 
 	SFINISH_CHECK(
 		DB_copy_out(global_loop, client_request->parent->conn, client_request, str_sql, http_copy_check_cb), "DB_exec failed");

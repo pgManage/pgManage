@@ -16,6 +16,8 @@ void notice_processor(void *arg, const char *str_notice) {
 	char *str_temp = NULL;
 	SDEBUG("%s", str_notice);
 	char *ptr_actual_message = strstr(str_notice, ": ");
+	size_t int_notice_len = 0;
+
 	if (ptr_actual_message == NULL) {
 		ptr_actual_message = (char *)str_notice;
 		str_notice = "NOTICE";
@@ -26,11 +28,26 @@ void notice_processor(void *arg, const char *str_notice) {
 	str_temp = escape_value(ptr_actual_message);
 	SDEBUG("%s\t%s", str_notice, str_temp);
 	if (client->str_notice != NULL) {
-		client->str_notice = cat_append(client->str_notice, "\012", str_notice, "\t", str_temp);
+		int_notice_len = strlen(client->str_notice);
+		SERROR_SNFCAT(client->str_notice, &int_notice_len,
+			"\012", (size_t)1,
+			str_notice, strlen(str_notice),
+			"\t", (size_t)1,
+			str_temp, strlen(str_temp));
+		//client->str_notice = cat_append(client->str_notice, "\012", str_notice, "\t", str_temp);
 	} else {
-		client->str_notice = cat_cstr(str_notice, "\t", str_temp);
+		//client->str_notice = cat_cstr(str_notice, "\t", str_temp);
+		SERROR_SNCAT(client->str_notice, &int_notice_len,
+			str_notice, strlen(str_notice),
+			"\t", (size_t)1,
+			str_temp, strlen(str_temp));
 	}
 	SFREE(str_temp);
+	bol_error_state = false;
+	return;
+
+error:
+	SERROR_NORESPONSE("notice_processor failed");
 	bol_error_state = false;
 }
 #ifdef POSTAGE_INTERFACE_LIBPQ
@@ -38,6 +55,8 @@ void _send_notices(struct sock_ev_client *client) {
 	char str_temp[101] = {0};
 	char *str_temp2 = NULL;
 	char *str_response = NULL;
+	size_t int_response_len = 0;
+
 	PGnotify *pg_notify_current = NULL;
 	pg_notify_current = PQnotifies(client->cnxn);
 
@@ -47,16 +66,25 @@ void _send_notices(struct sock_ev_client *client) {
 		if (client->cur_request != NULL) {
 			client->cur_request->int_response_id += 1;
 			snprintf(str_temp, 100, "%zd", client->cur_request->int_response_id);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client->cur_request->str_message_id, "\012"
-																								"responsenumber = ",
-				str_temp, "\012");
+			SFINISH_SNCAT(str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client->cur_request->str_message_id, strlen(client->cur_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1);
 			if (client->cur_request->str_transaction_id != NULL) {
-				SFINISH_CAT_APPEND(str_response, "transactionid = ", client->cur_request->str_transaction_id, "\012");
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"transactionid = ", (size_t)16,
+					client->cur_request->str_transaction_id, strlen(client->cur_request->str_transaction_id),
+					"\012", (size_t)1);
 			}
 		} else {
-			SFINISH_CAT_CSTR(str_response, "messageid = NULL\012");
+			SFINISH_SNCAT(str_response, &int_response_len,
+				"messageid = NULL\012", (size_t)17);
 		}
-		SFINISH_CAT_APPEND(str_response, client->str_notice != NULL ? client->str_notice : "");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			client->str_notice != NULL ? client->str_notice : "",
+			client->str_notice != NULL ? strlen(client->str_notice) : (size_t)0);
 		SFREE(client->str_notice);
 		WS_sendFrame(global_loop, client, true, 0x01, str_response, strlen(str_response));
 		if (client->cur_request != NULL) {
@@ -67,14 +95,22 @@ void _send_notices(struct sock_ev_client *client) {
 	}
 
 	if (pg_notify_current != NULL) {
-		SFINISH_CAT_CSTR(str_response, "messageid = NULL\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = NULL\012", (size_t)17);
 	}
 	while (pg_notify_current != NULL) {
 		memset(str_temp, 0, 101);
 		sprintf(str_temp, "%d", pg_notify_current->be_pid);
 		str_temp2 = escape_value(pg_notify_current->extra != NULL ? pg_notify_current->extra : "");
 		SFINISH_CHECK(str_temp2 != NULL, "escape_value failed");
-		SFINISH_CAT_APPEND(str_response, "NOTIFY\t", pg_notify_current->relname, "\t", str_temp, "\t", str_temp2, "\012");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"NOTIFY\t", (size_t)7,
+			pg_notify_current->relname, strlen(pg_notify_current->relname),
+			"\t", (size_t)1,
+			str_temp, strlen(str_temp),
+			"\t", (size_t)1,
+			str_temp2, strlen(str_temp2),
+			"\012", (size_t)1);
 		SDEBUG("%s", str_response);
 		PQfreemem(pg_notify_current);
 
@@ -246,6 +282,8 @@ void client_cb(EV_P, ev_io *w, int revents) {
 	char *str_buffer = NULL;
 	ssize_t int_len = 0;
 	size_t int_content_length = 0;
+	size_t int_response_len = 0;
+
 	char *ptr_session_id = NULL;
 #ifdef _WIN32
 	char *str_temp = NULL;
@@ -410,8 +448,10 @@ void client_cb(EV_P, ev_io *w, int revents) {
 							(unsigned char)(client->str_request[int_i]) < 160))) {
 					char str_int_code[4] = {0};
 					snprintf(str_int_code, 3, "%d", (unsigned char)(client->str_request[int_i]));
-					SERROR_CAT_CSTR(str_response, "HTTP/1.1 400 Bad Request\r\n\r\nAn invalid character with the code '",
-						str_int_code, "' was found");
+					SERROR_SNCAT(str_response, &int_response_len,
+						"HTTP/1.1 400 Bad Request\r\n\r\nAn invalid character with the code '", (size_t)64,
+						str_int_code, strlen(str_int_code),
+						"' was found", (size_t)11);
 
 					SBFREE_PWORD(str_upper_request, client->int_request_len);
 
@@ -456,7 +496,10 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				if (str_session_id != NULL) {
 #ifdef _WIN32
 					str_temp = str_session_id;
-					SERROR_CAT_CSTR(str_session_id, "0x", str_temp + strspn(str_temp, "0"));
+					SERROR_SNCAT(str_session_id, &int_session_id_length,
+						"0x", (size_t)2,
+						str_temp + strspn(str_temp, "0"),
+							strlen(str_temp + strspn(str_temp, "0")));
 					SFREE(str_temp);
 					ptr_session_id = str_session_id;
 #else
@@ -655,7 +698,13 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 	struct sock_ev_client *client = frame->parent;
 	size_t int_response_confirmed = 0;
 	char *ptr_query = NULL;
+	char *ptr_end_query = NULL;
+	size_t int_temp_len = 0;
 	size_t int_old_length = 0;
+	size_t int_message_id_len = 0;
+	size_t int_transaction_id_len = 0;
+	size_t int_first_word_len = 0;
+
 #ifdef POSTAGE_INTERFACE_LIBPQ
 	PGcancel *cancel_request = NULL;
 #endif
@@ -680,8 +729,8 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 
 	if (frame->bol_fin == false) {
 		if (client->str_message == NULL) {
-			SERROR_CAT_CSTR(client->str_message, "");
-			client->int_request_len = 0;
+			SERROR_SNCAT(client->str_message, &client->int_request_len,
+				"", (size_t)0);
 		}
 		int_old_length = client->int_request_len;
 		client->int_request_len += frame->int_length;
@@ -758,27 +807,33 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 		// Advance past the message id and null terminate it so that
 		// frame->str_message contains the message id line
 		ptr_query = strstr(frame->str_message, "\012") + 1;
+		ptr_end_query = frame->str_message + frame->int_length;
+
 		// Without this, we segfault
 		SERROR_CHECK(ptr_query != NULL, "Invalid message format");
 		*(ptr_query - 1) = 0;
 
-		SERROR_CAT_CSTR(str_message_id, frame->str_message + 12);
+		SERROR_SNCAT(str_message_id, &int_message_id_len,
+			frame->str_message + 12, (size_t)(frame->int_length - 12));
 
 		// same for transaction id (if there is one)
 		if (strncmp(ptr_query, "transactionid = ", 16) == 0) {
 			char *ptr_query2 = ptr_query;
 			ptr_query = strstr(ptr_query, "\012") + 1;
 			*(ptr_query - 1) = 0;
-			SERROR_CAT_CSTR(str_transaction_id, ptr_query2 + 16);
+			SERROR_SNCAT(str_transaction_id, &int_transaction_id_len,
+				ptr_query2 + 16, ptr_end_query - (ptr_query2 + 16));
 		}
 
-		SERROR_CAT_CSTR(str_first_word, ptr_query);
+		SERROR_SNCAT(str_first_word, &int_first_word_len,
+			ptr_query, ptr_end_query - ptr_query);
 		str_temp = str_first_word + strcspn(str_first_word, "\t \012");
 		if (str_temp) {
 			*str_temp = 0;
 		}
 
-		SERROR_CAT_CSTR(str_temp, str_first_word);
+		SERROR_SNCAT(str_temp, &int_temp_len,
+			str_first_word, int_first_word_len);
 		SFREE(str_first_word);
 		// str_toupper operates in-place
 		str_first_word = str_toupper(str_temp);
@@ -943,9 +998,16 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 
 		} else {
 			SFREE(frame->str_message);
-			SERROR_CAT_CSTR(frame->str_message, "messageid = ", str_message_id, "\012FATAL\012Invalid Request Type \"",
-				str_first_word, "\"\012");
-			WS_sendFrame(EV_A, client, 0x01, true, frame->str_message, strlen(frame->str_message));
+			size_t int_message_len = 0;
+			SERROR_SNCAT(frame->str_message, &int_message_len,
+				"messageid = ", (size_t)12,
+				str_message_id, strlen(str_message_id),
+				"\012FATAL\012Invalid Request Type \"", (size_t)29,
+				str_first_word, strlen(str_first_word),
+				"\"\012", (size_t)2);
+			frame->int_length = int_message_len;
+
+			WS_sendFrame(EV_A, client, 0x01, true, frame->str_message, frame->int_length);
 
 			WS_freeFrame(frame);
 			SFREE(str_message_id);
@@ -1095,6 +1157,7 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 	struct sock_ev_client *client = client_request_watcher->parent;
 	char *str_query = NULL;
 	int int_len = Queue_count(client->que_request);
+	size_t int_query_len = 0;
 	SDEFINE_VAR_ALL(str_sql);
 
 	if (int_len > 0) {
@@ -1133,19 +1196,29 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 				client->bol_request_in_progress = true;
 				client_request->arr_response = DArray_create(sizeof(char *), 1);
 				if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-					SERROR_CAT_CSTR(
-						str_query, client_request->int_req_type == POSTAGE_REQ_BEGIN
-									   ? "BEGIN;"
-									   : client_request->int_req_type == POSTAGE_REQ_COMMIT
-											 ? "COMMIT;"
-											 : client_request->int_req_type == POSTAGE_REQ_ROLLBACK ? "ROLLBACK;" : "");
+					//clang-format off
+					SERROR_SNCAT(str_query, &int_query_len,
+						client_request->int_req_type == POSTAGE_REQ_BEGIN ? "BEGIN;" :
+						client_request->int_req_type == POSTAGE_REQ_COMMIT ? "COMMIT;" :
+						client_request->int_req_type == POSTAGE_REQ_ROLLBACK ? "ROLLBACK;" : "",
+						strlen(
+							client_request->int_req_type == POSTAGE_REQ_BEGIN ? "BEGIN;" :
+							client_request->int_req_type == POSTAGE_REQ_COMMIT ? "COMMIT;" :
+							client_request->int_req_type == POSTAGE_REQ_ROLLBACK ? "ROLLBACK;" : ""
+						));
+					//clang-format on
 				} else {
-					SERROR_CAT_CSTR(str_query,
-						client_request->int_req_type == POSTAGE_REQ_BEGIN
-							? "BEGIN TRANSACTION;"
-							: client_request->int_req_type == POSTAGE_REQ_COMMIT
-								  ? "COMMIT TRANSACTION;"
-								  : client_request->int_req_type == POSTAGE_REQ_ROLLBACK ? "ROLLBACK TRANSACTION;" : "");
+					//clang-format off
+					SERROR_SNCAT(str_query, &int_query_len,
+						client_request->int_req_type == POSTAGE_REQ_BEGIN ? "BEGIN TRANSACTION;" :
+						client_request->int_req_type == POSTAGE_REQ_COMMIT ? "COMMIT TRANSACTION;" :
+						client_request->int_req_type == POSTAGE_REQ_ROLLBACK ? "ROLLBACK TRANSACTION;" : "",
+						strlen(
+							client_request->int_req_type == POSTAGE_REQ_BEGIN ? "BEGIN TRANSACTION;" :
+							client_request->int_req_type == POSTAGE_REQ_COMMIT ? "COMMIT TRANSACTION;" :
+							client_request->int_req_type == POSTAGE_REQ_ROLLBACK ? "ROLLBACK TRANSACTION;" : ""
+						));
+		  			//clang-format on
 				}
 
 				SERROR_CHECK(
@@ -1177,25 +1250,29 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 				client->bol_request_in_progress = true;
 				client_request->arr_response = DArray_create(sizeof(char *), 1);
 
+				size_t int_sql_len = 0;
 				if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-					SERROR_CAT_CSTR(str_sql,
-						"SELECT SESSION_USER::text "
-						"UNION ALL "
-						"SELECT g.rolname"
-						"	FROM pg_catalog.pg_roles g "
-						"	LEFT JOIN pg_catalog.pg_auth_members m ON m.roleid = g.oid "
-						"	LEFT JOIN pg_catalog.pg_roles u ON m.member = u.oid "
-						"	WHERE g.rolcanlogin = FALSE AND u.rolname = SESSION_USER::text AND g.rolname IS NOT NULL");
+					SERROR_SNCAT(str_sql, &int_sql_len,
+						"SELECT SESSION_USER::text " //26
+						"UNION ALL " //10
+						"SELECT g.rolname" //16
+						"	FROM pg_catalog.pg_roles g " //28
+						"	LEFT JOIN pg_catalog.pg_auth_members m ON m.roleid = g.oid " //60
+						"	LEFT JOIN pg_catalog.pg_roles u ON m.member = u.oid " //53
+						"	WHERE g.rolcanlogin = FALSE AND u.rolname = SESSION_USER::text AND g.rolname IS NOT NULL",
+						(size_t)282); //89
 				} else {
-					SERROR_CAT_CSTR(str_sql, "SELECT CAST(SYSTEM_USER AS nvarchar(MAX)) AS user_group_name, '1' AS srt "
-											 "UNION ALL "
-											 "SELECT CAST([name] AS nvarchar(MAX)) AS user_group_name, '2' AS srt "
-											 "	FROM ( "
-											 "		SELECT *, is_member(name) AS [is_member] "
-											 "			FROM [sys].[database_principals] "
-											 "	) em "
-											 "	WHERE [is_member] = 1 "
-											 "	ORDER BY 2, 1");
+					SERROR_SNCAT(str_sql, &int_sql_len,
+						"SELECT CAST(SYSTEM_USER AS nvarchar(MAX)) AS user_group_name, '1' AS srt " //73
+						"UNION ALL " //10
+						"SELECT CAST([name] AS nvarchar(MAX)) AS user_group_name, '2' AS srt " //68
+						"	FROM ( " //8
+						"		SELECT *, is_member(name) AS [is_member] " //43
+						"			FROM [sys].[database_principals] " //36
+						"	) em " //6
+						"	WHERE [is_member] = 1 " //23
+						"	ORDER BY 2, 1",
+						(size_t)281); //14
 				}
 
 				SERROR_CHECK(DB_exec(EV_A, client->conn, client_request, str_sql, ws_client_info_cb), "DB_exec failed");
@@ -1218,10 +1295,13 @@ error:
 void cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 	struct sock_ev_client *client = cb_data;
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 
 	if (conn->int_status != 1) {
 		SERROR_NORESPONSE("%s", conn->str_response);
-		SERROR_CAT_CSTR(str_response, "messageid = NULL\012", conn->str_response);
+		SERROR_SNCAT(str_response, &int_response_len,
+			"messageid = NULL\012", (size_t)17,
+			conn->str_response, strlen(conn->str_response));
 		WS_sendFrame(EV_A, client, 0x01, true, str_response, strlen(str_response));
 	}
 
@@ -1254,18 +1334,33 @@ bool ws_client_info_cb(EV_P, void *cb_data, DB_result *res) {
 	bool bol_ret = true;
 	DArray *arr_values = NULL;
 	int int_i = 0;
+	size_t int_conn_desc_len = 0;
+	size_t int_response_len = 0;
+	size_t int_user_len = 0;
 	DB_fetch_status status = DB_FETCH_OK;
 	SDEFINE_VAR_ALL(str_conn_desc, str_conn_desc_enc, str_user);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_TUPLES_OK, "DB_exec failed");
 
-	SFINISH_CAT_CSTR(str_conn_desc, client_request->parent->str_connname, "\t",
-		(client_request->parent->str_conn != NULL ? client_request->parent->str_conn
-												  : get_connection_info(client_request->parent->str_connname, NULL)));
+	SFINISH_SNCAT(str_conn_desc, &int_conn_desc_len,
+		client_request->parent->str_connname, strlen(client_request->parent->str_connname),
+		"\t", (size_t)1,
+		client_request->parent->str_conn != NULL ? client_request->parent->str_conn :
+		get_connection_info(client_request->parent->str_connname, NULL),
+		strlen(
+			client_request->parent->str_conn != NULL ? client_request->parent->str_conn :
+			get_connection_info(client_request->parent->str_connname, NULL)
+		));
+
 	str_conn_desc_enc = escape_value(str_conn_desc);
 	SFINISH_CHECK(str_conn_desc_enc != NULL, "escape_value failed!");
-	SFINISH_CAT_CSTR(str_response, "VERSION\t", VERSION, "\012CONNECTION\t", str_conn_desc_enc, "\012GROUPS\t[");
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"VERSION\t", (size_t)8,
+		VERSION, strlen(VERSION),
+		"\012CONNECTION\t", (size_t)12,
+		str_conn_desc_enc, strlen(str_conn_desc_enc),
+		"\012GROUPS\t[", (size_t)9);
 
 	while ((status = DB_fetch_row(res)) != DB_FETCH_END) {
 		SFINISH_CHECK(status != DB_FETCH_ERROR, "DB_fetch_row failed");
@@ -1274,16 +1369,23 @@ bool ws_client_info_cb(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_CHECK(arr_values != NULL, "DB_get_row_values failed");
 
 		if (int_i == 0) {
-			SFINISH_CAT_CSTR(str_user, DArray_get(arr_values, 0));
+			SFINISH_SNFCAT(str_user, &int_user_len,
+				DArray_get(arr_values, 0), strlen(DArray_get(arr_values, 0)));
 		} else if (DArray_get(arr_values, 0) != NULL) {
-			SFINISH_CAT_APPEND(str_response, int_i == 1 ? "" : ", ", "\"", DArray_get(arr_values, 0), "\"");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				int_i == 1 ? "" : ", ", strlen(int_i == 1 ? "" : ", "),
+				"\"", (size_t)1,
+				DArray_get(arr_values, 0), strlen(DArray_get(arr_values, 0)),
+				"\"", (size_t)1);
 		}
 
 		DArray_clear_destroy(arr_values);
 		arr_values = NULL;
 		int_i += 1;
 	}
-	SFINISH_CAT_APPEND(str_response, "]\012USER\t", str_user);
+	SFINISH_SNFCAT(str_response, &int_response_len,
+		"]\012USER\t", (size_t)7,
+		str_user, int_user_len);
 
 	bol_error_state = false;
 	bol_ret = true;
@@ -1298,21 +1400,30 @@ finish:
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 	char *_str_response = str_response;
-	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																				   "responsenumber = ",
-		str_temp, "\012");
-	SFINISH_CAT_APPEND(str_response, _str_response);
+	size_t _int_response_len = int_response_len;
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"messageid = ", (size_t)12,
+		client_request->str_message_id, strlen(client_request->str_message_id),
+		"\012responsenumber = ", (size_t)18,
+		str_temp, strlen(str_temp),
+		"\012", (size_t)1);
+	SFINISH_SNFCAT(str_response, &int_response_len,
+		_str_response, _int_response_len);
 	SFREE(_str_response);
 	if (res != NULL && (res->status != DB_RES_TUPLES_OK || status == DB_FETCH_ERROR || status != DB_FETCH_END)) {
 		_str_response = DB_get_diagnostic(client_request->parent->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 	} else if (res == NULL && client_request->parent->conn->str_response != NULL) {
-		SFINISH_CAT_APPEND(str_response, ":\n", client_request->parent->conn->str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			client_request->parent->conn->str_response, strlen(client_request->parent->conn->str_response));
 		SFREE(client_request->parent->conn->str_response);
 	}
 
-	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 	DArray_push(client_request->arr_response, str_response);
 	str_response = NULL;
 
@@ -1320,9 +1431,13 @@ finish:
 		client_request->int_response_id += 1;
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012", "responsenumber = ", str_temp,
-			"\012", "TRANSACTION COMPLETED");
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012TRANSACTION COMPLETED", (size_t)22);
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
 	} else {
@@ -1346,11 +1461,13 @@ bool client_cmd_cb(EV_P, void *cb_data, DB_result *res) {
 	bool bol_ret = true;
 	char str_temp[101];
 	memset(str_temp, 0, 101);
+	size_t int_response_len = 0;
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
 
-	SFINISH_CAT_CSTR(str_response, "OK");
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"OK", (size_t)2);
 
 	bol_error_state = false;
 	bol_ret = true;
@@ -1359,17 +1476,27 @@ finish:
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 	char *_str_response = str_response;
-	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																				   "responsenumber = ",
-		str_temp, "\012", "transactionid = ", client_request->str_message_id, "\012");
-	SFINISH_CAT_APPEND(str_response, _str_response);
+	size_t _int_response_len = int_response_len;
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"messageid = ", (size_t)12,
+		client_request->str_message_id, strlen(client_request->str_message_id),
+		"\012responsenumber = ", (size_t)18,
+		str_temp, strlen(str_temp),
+		"\012transactionid = ", (size_t)17,
+		client_request->str_message_id, strlen(client_request->str_message_id),
+		"\012", (size_t)1,
+		_str_response, _int_response_len);
 	SFREE(_str_response);
 	if (res != NULL && res->status != DB_RES_COMMAND_OK) {
 		_str_response = DB_get_diagnostic(client_request->parent->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, _int_response_len);
 		SFREE(_str_response);
 	} else if (res == NULL && client_request->parent->conn->str_response != NULL) {
-		SFINISH_CAT_APPEND(str_response, ":\n", client_request->parent->conn->str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			client_request->parent->conn->str_response, strlen(client_request->parent->conn->str_response));
 		SFREE(client_request->parent->conn->str_response);
 	}
 
@@ -1557,7 +1684,8 @@ bool client_close(struct sock_ev_client *client) {
 			client_last_activity = NULL;
 			SERROR_SALLOC(client_last_activity, sizeof(struct sock_ev_client_last_activity));
 			memcpy(client_last_activity->str_client_ip, client->str_client_ip, INET_ADDRSTRLEN);
-			SERROR_CAT_CSTR(client_last_activity->str_cookie, client->str_cookie);
+			SERROR_SNCAT(client_last_activity->str_cookie, &int_cookie_len,
+				client->str_cookie, int_cookie_len);
 			client->int_last_activity_i = (ssize_t)DArray_push(_server.arr_client_last_activity, client_last_activity);
 		}
 	}
