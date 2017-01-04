@@ -17,6 +17,9 @@ struct sock_ev_client_upload {
 	char *ptr_content;
 	ssize_t int_written;
 
+	size_t int_canonical_start_len;
+	size_t int_file_name_len;
+
 	sun_upload *sun_current_upload;
 	struct sock_ev_client *parent;
 };
