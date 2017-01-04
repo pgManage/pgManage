@@ -74,13 +74,48 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute <code>[qs=""]</code>:</span>
-                    <p>The <code>[qs=""]</code> attribute can be used to sync the <code>&lt;gs-number&gt;</code> with the query string.</p>
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span><br />
+                    <p>The name <code>[qs]</code> stands for "querystring". The querystring is the part in the URL after the "?". The <code>[qs]</code> attribute has two formats, each with their own use.</p>
+                    
+                    <ul>
+                        <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
+                        <li>qs="<i>key</i>". This format will update the <code>[value]</code> attribute with the querystring whenever the querystring changes.</li>
+                    </ul>
                 </div>
-                <gs-doc-example query-string="test=12345">
-                    <template for="html" height="15">
-                        <label for="number_qs">Number Query String:</label>
-                        <gs-number id="number_qs" qs="test"></gs-number>
+                <gs-doc-example query-string="test1=true&test2=false">
+                    <template for="html" height="35">
+                        <gs-number qs="test1"></gs-number>
+                        <gs-number qs="test2"></gs-number>
+                        <gs-number qs="test3=value"></gs-number>
+                        <gs-number qs="test4=hidden"></gs-number>
+                        <br />
+                        <br />
+                        <gs-grid widths="1,1">
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test1=true');">Add "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test1');">Remove "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test2=false');">Add "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test2');">Remove "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test3=test');">Add "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test3');">Remove "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test4=');">Add "test4"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test4');">Remove "test4"</gs-button>
+                            </gs-block>
+                        </gs-grid>
                     </template>
                 </gs-doc-example>
                 
@@ -123,6 +158,7 @@
                         <gs-number tabindex="4" id="number_4"></gs-number>
                     </template>
                 </gs-doc-example>
+                
                 <div class="doc-example-description">
                     <span class="h3">Attribute <code>[disabled]</code>:</span>
                     <p>With the <code>[disabled]</code> attribute, you can control whether or not you can use the control.</p>
@@ -133,6 +169,16 @@
                         <gs-number disabled id="number_disabled"></gs-number>
                         <label for="number_enabled">Not Disabled:</label>
                         <gs-number id="number_enabled"></gs-number>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[readonly]</code>:</span><br />
+                    <p>The <code>[readonly]</code> attribute is similar to <code>[disabled]</code> because it prevents the value from changing. The differences are that readonly is styled differently and allows you to copy the current text from the control.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-number readonly>5555</gs-number>
                     </template>
                 </gs-doc-example>
             </div>

@@ -61,12 +61,48 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute <code>[qs=""]</code>:</span>
-                    <p>In order to change the query string using the text inside the control, you need to use the <code>[qs=""]</code> attribute.</p>
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span><br />
+                    <p>The name <code>[qs]</code> stands for "querystring". The querystring is the part in the URL after the "?". The <code>[qs]</code> attribute has two formats, each with their own use.</p>
+                    
+                    <ul>
+                        <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
+                        <li>qs="<i>key</i>". This format will update the <code>[value]</code> attribute with the querystring whenever the querystring changes.</li>
+                    </ul>
                 </div>
-                <gs-doc-example query-string="test=test">
-                    <template for="html" height="15">
-                        <gs-search qs="test"></gs-search>
+                <gs-doc-example query-string="test1=true&test2=false">
+                    <template for="html" height="35">
+                        <gs-search qs="test1"></gs-search>
+                        <gs-search qs="test2"></gs-search>
+                        <gs-search qs="test3=value"></gs-search>
+                        <gs-search qs="test4=hidden"></gs-search>
+                        <br />
+                        <br />
+                        <gs-grid widths="1,1">
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test1=test1');">Add "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test1');">Remove "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test2=test2');">Add "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test2');">Remove "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test3=test3');">Add "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test3');">Remove "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test4=test4');">Add "test4"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test4');">Remove "test4"</gs-button>
+                            </gs-block>
+                        </gs-grid>
                     </template>
                 </gs-doc-example>
                 
@@ -110,6 +146,16 @@
                 <gs-doc-example>
                     <template for="html" height="5">
                         <gs-search disabled></gs-search>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[readonly]</code>:</span><br />
+                    <p>The <code>[readonly]</code> attribute is similar to <code>[disabled]</code> because it prevents the value from changing. The differences are that readonly is styled differently and allows you to copy the current text from the control.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-search readonly></gs-search>
                     </template>
                 </gs-doc-example>
                 

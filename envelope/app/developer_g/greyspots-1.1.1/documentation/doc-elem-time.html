@@ -20,7 +20,7 @@
     </head>
     <body>
         <gs-jumbo>
-            <h1 class="text-center">Dialog</h1>
+            <h1 class="text-center">Time</h1>
         </gs-jumbo>
             
         <gs-container min-width="sml;med;lrg">
@@ -64,15 +64,50 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Query String Attribute Example:</span>
-                        <p>The "qs" attribute can be used to sync the gs-date with the query string.</p>
-                    </div>
-                    <gs-doc-example query-string="test=15:30">
-                        <template for="html" height="28">
-                            <label for="control_qs">Date Query String:</label>
-                            <gs-date id="control_qs" qs="test"></gs-date>
-                        </template>
-                    </gs-doc-example>
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span><br />
+                    <p>The name <code>[qs]</code> stands for "querystring". The querystring is the part in the URL after the "?". The <code>[qs]</code> attribute has two formats, each with their own use.</p>
+                    
+                    <ul>
+                        <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
+                        <li>qs="<i>key</i>". This format will update the <code>[value]</code> attribute with the querystring whenever the querystring changes.</li>
+                    </ul>
+                </div>
+                <gs-doc-example query-string="test1=1:30 PM&test2=1:30 PM">
+                    <template for="html" height="35">
+                        <gs-time qs="test1"></gs-time>
+                        <gs-time qs="test2"></gs-time>
+                        <gs-time qs="test3=value"></gs-time>
+                        <gs-time qs="test4=hidden"></gs-time>
+                        <br />
+                        <br />
+                        <gs-grid widths="1,1">
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test1=1:30 PM');">Add "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test1');">Remove "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test2=1:30 PM');">Add "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test2');">Remove "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test3=1:30 PM');">Add "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test3');">Remove "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test4=1:30 PM');">Add "test4"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test4');">Remove "test4"</gs-button>
+                            </gs-block>
+                        </gs-grid>
+                    </template>
+                </gs-doc-example>
                     
                     <div class="doc-example-description">
                         <span class="h3">Placeholder Attribute Example:</span>
@@ -179,18 +214,25 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Disabled Attribute Example:</span>
-                        <p>With the "disabled" attribute, you can control whether or not you can use the control.</p>
+                        <span class="h3">Attribute <code>[readonly]</code>:</span><br />
+                        <p>The <code>[readonly]</code> attribute is similar to <code>[disabled]</code> because it prevents the value from changing. The differences are that readonly is styled differently and allows you to copy the current text from the control.</p>
                     </div>
                     <gs-doc-example>
-                        <template for="html" height="28">
-                            <label for="documentation-disabled">Disabled:</label>
-                            <gs-time disabled id="documentation-disabled"></gs-time>
-                            <label for="documentation-enabled">Not Disabled:</label>
-                            <gs-time id="documentation-enabled"></gs-time>
+                        <template for="html" height="15">
+                            <gs-time readonly value="1:30 PM"></gs-time>
                         </template>
                     </gs-doc-example>
                 </div>
         </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
     </body>
 </html>
