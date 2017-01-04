@@ -54,17 +54,17 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 
 	if (client_update->str_hash_where_clause != NULL) {
 		client_update->int_hash_where_clause_len = strlen(client_update->str_hash_where_clause);
+		SFINISH_BREPLACE(client_update->str_hash_where_clause, &client_update->int_hash_where_clause_len, "\"", "\"\"", "g");
 
-		SFINISH_REPLACE(client_update->str_hash_where_clause, "\"", "\"\"", "g");
 		if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_REPLACE(client_update->str_hash_where_clause, "\t", "\"::text, '') || '\t' || COALESCE(\"", "g");
+			SFINISH_BREPLACE(client_update->str_hash_where_clause, &client_update->int_hash_where_clause_len, "\t", "\"::text, '') || '\t' || COALESCE(\"", "g");
 			SFINISH_SNCAT(str_where_temp, &int_where_temp_len,
 				client_update->str_temp_table_name, strlen(client_update->str_temp_table_name),
 				"_hash = MD5(COALESCE(\"", (size_t)22,
 				client_update->str_hash_where_clause, client_update->int_hash_where_clause_len,
 				"\"::text, ''))", (size_t)13);
 		} else {
-			SFINISH_REPLACE(client_update->str_hash_where_clause, "\t",
+			SFINISH_BREPLACE(client_update->str_hash_where_clause, &client_update->int_hash_where_clause_len, "\t",
 				"\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX))) + CAST('\t' AS nvarchar(MAX)) + COALESCE(CAST(\"", "g");
 			SFINISH_SNCAT(str_where_temp, &int_where_temp_len,
 				client_update->str_temp_table_name, client_update->int_temp_table_name_len,
@@ -73,6 +73,7 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 		}
 		SFREE(client_update->str_hash_where_clause);
 		client_update->str_hash_where_clause = str_where_temp;
+		client_update->int_hash_where_clause_len = int_where_temp_len;
 		str_where_temp = NULL;
 	}
 
