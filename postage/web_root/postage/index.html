@@ -87,6 +87,7 @@ function login() {
             }
         } else {
             appendError(data);
+            GS.ajaxErrorDialog(data);
             document.getElementById('text-password').value = '';
         }
     });
@@ -248,7 +249,11 @@ window.addEventListener('load', function () {
     }
 
     // when the connection optionbox is changed: try to get a username from the cookie
-    document.getElementById('option-connection').addEventListener('change', getUserName);
+    document.getElementById('option-connection').addEventListener('change', function (event) {
+        if (event.target.getAttribute('id') === 'option-connection') {
+            getUserName();
+        }
+    });
 
     // get connection list
     getConnections();
