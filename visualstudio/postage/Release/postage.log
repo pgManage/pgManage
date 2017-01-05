@@ -1,8 +1,8 @@
-﻿  ws_tab.c
+﻿  ws_raw.c
   Generating code
-  5 of 405 functions ( 1.2%) were compiled, the rest were copied from previous compilation.
+  1 of 405 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    60 functions had inline decision re-evaluated but remain unchanged
+    2 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.exe
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)

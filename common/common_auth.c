@@ -207,7 +207,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	}
 
 #ifdef ENVELOPE
-	SFINISH_SNCAT(str_connname, &int_connname_len,
+	SFINISH_SNCAT(str_connname, &client->int_connname_len,
 		"", (size_t)0);
 #else
 	str_connname = getpar(str_cookie_decrypted, "connname", int_cookie_len, &client->int_connname_len);
@@ -259,14 +259,14 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	}
 	if (client->str_database == NULL) {
 		SFINISH_SNCAT(client->str_database, &client->int_database_len,
-			str_database, strlen(str_database));
+			str_database, client->int_database_len);
 	}
 	if (str_conn != NULL && client->str_conn == NULL) {
 		SFINISH_SNCAT(client->str_conn, &client->int_conn_len,
 			str_conn, strlen(str_conn));
 	}
 	SFREE(str_conn);
-	if (client->str_cookie == NULL) {
+	if (client->str_cookie == NULL && str_cookie_encrypted != NULL) {
 		SFINISH_SNCAT(client->str_cookie, &int_cookie_len,
 			str_cookie_encrypted, strlen(str_cookie_encrypted));
 		SDEBUG("%p->str_cookie: %p", client, client->str_cookie);

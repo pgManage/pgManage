@@ -4,7 +4,7 @@ void http_upload_step1(struct sock_ev_client *client) {
 	SDEBUG("http_upload_step1");
 	size_t int_response_len = 0;
 
-	SDEFINE_VAR_ALL(str_temp, str_query, str_canonical_start, str_full_path);
+	SDEFINE_VAR_ALL(str_temp, str_full_path);
 	char *str_response = NULL;
 	struct sock_ev_client_upload *client_upload = NULL;
 #ifdef _WIN32
@@ -30,10 +30,10 @@ void http_upload_step1(struct sock_ev_client *client) {
 
 #ifdef ENVELOPE
 	SFINISH_SNCAT(client_upload->str_file_name, &client_upload->int_file_name_len,
-		client_upload->sun_current_upload->str_name);
+		client_upload->sun_current_upload->str_name, strlen(client_upload->sun_current_upload->str_name));
 
 	client_upload->str_canonical_start = canonical_full_start(client_upload->str_file_name);
-	SFINISH_CHECK(client_upload->str_file_name != NULL, "canonical_full_start() failed, %s", client_upload->str_file_name);
+	SFINISH_CHECK(client_upload->str_canonical_start != NULL, "canonical_full_start() failed, %s", client_upload->str_canonical_start);
 
 	str_temp = client_upload->str_file_name;
 	client_upload->str_file_name = canonical_strip_start(str_temp);

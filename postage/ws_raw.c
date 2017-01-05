@@ -67,10 +67,8 @@ char *ws_raw_step1(struct sock_ev_client_request *client_request) {
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"responsenumber = ", (size_t)17,
 			str_temp, strlen(str_temp),
-			"\012", (size_t)1);
-		SFINISH_SNFCAT(str_response, &int_response_len,
-			"\\.", (size_t)2);
-		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
+			"\012\\.", (size_t)3);
+		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
 
@@ -702,7 +700,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				memset(str_temp, 0, 101);
 				snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 				SFINISH_SNCAT(str_response, &int_response_len,
-					"messageid = ", (size_t)16,
+					"messageid = ", (size_t)12,
 					client_request->str_message_id, strlen(client_request->str_message_id),
 					"\012responsenumber = ", (size_t)18,
 					str_temp, strlen(str_temp),
@@ -717,7 +715,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"\\.", (size_t)2);
-			WS_sendFrame(EV_A, client, true, 0x01, str_response, strlen(str_response));
+			WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len);
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
 
