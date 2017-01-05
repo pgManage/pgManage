@@ -1874,6 +1874,8 @@ void client_close_immediate(struct sock_ev_client *client) {
 	if (client->client_copy_check != NULL) {
 		ev_check_stop(global_loop, &client->client_copy_check->check);
 		decrement_idle(global_loop);
+		DB_free_result(client->client_copy_check->res);
+		SFREE(client->client_copy_check->str_response);
 		SFREE(client->client_copy_check);
 	}
 	if (client->client_copy_io != NULL) {

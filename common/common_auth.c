@@ -16,12 +16,12 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	size_t int_user_length = 0;
 	size_t int_password_length = 0;
 	size_t int_cookie_len = 0;
-	size_t int_conn_index_len = 0;
 	size_t int_user_agent_len = 0;
 	size_t int_host_len = 0;
 	size_t int_response_len = 0;
 #ifdef ENVELOPE
 #else
+	size_t int_conn_index_len = 0;
 #endif
 	ListNode *other_client_node = NULL;
 
