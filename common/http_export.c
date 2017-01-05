@@ -14,6 +14,7 @@ void http_export_step1(struct sock_ev_client *client) {
 	size_t int_sql_len = 0;
 	size_t int_attr_header_len = 0;
 	size_t int_attr_value_len = 0;
+	size_t int_response_len = 0;
 
 	SDEBUG("client->str_request: %s", client->str_request);
 
@@ -118,7 +119,6 @@ finish:
 	SFREE_ALL();
 	if (str_response != NULL) {
 		SDEBUG("str_response: %s", str_response);
-		size_t int_response_len = 0;
 		char *_str_response = str_response;
 		char str_length[50];
 		snprintf(str_length, 50, "%zu", (int_response_len != 0 ? int_response_len : strlen(_str_response)));
@@ -135,7 +135,7 @@ finish:
 		);
 		SFREE(_str_response);
 
-		if ((int_response_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
+		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
 			if (bol_tls) {
 				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {
