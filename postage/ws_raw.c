@@ -15,6 +15,7 @@ char *ws_raw_step1(struct sock_ev_client_request *client_request) {
 	client_request->int_response_id = 0;
 	char str_temp[101];
 	int int_status = 1;
+	size_t int_response_len = 0;
 
 	client_request->arr_response = DArray_create(sizeof(char *), 1);
 
@@ -29,12 +30,22 @@ char *ws_raw_step1(struct sock_ev_client_request *client_request) {
 		client_request->int_response_id += 1;
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, "responsenumber = ", str_temp, "\012");
-		SFINISH_CAT_APPEND(str_response, "EMPTY");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"responsenumber = ", (size_t)17,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"EMPTY", (size_t)5);
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
@@ -43,13 +54,21 @@ char *ws_raw_step1(struct sock_ev_client_request *client_request) {
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, "responsenumber = ", str_temp, "\012");
-		SFINISH_CAT_APPEND(str_response, "\\.");
-		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"responsenumber = ", (size_t)17,
+			str_temp, strlen(str_temp),
+			"\012\\.", (size_t)3);
+		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
 
@@ -57,12 +76,22 @@ char *ws_raw_step1(struct sock_ev_client_request *client_request) {
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id,
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, "responsenumber = ", str_temp, "\012");
-		SFINISH_CAT_APPEND(str_response, "TRANSACTION COMPLETED");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"responsenumber = ", (size_t)17,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"TRANSACTION COMPLETED", (size_t)21);
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
@@ -88,13 +117,20 @@ finish:
 		client_request->int_response_id += 1;
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
@@ -118,17 +154,32 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 	struct timeval tv_time;
 	char str_temp[101];
 	int int_status = 0;
+	size_t int_response_len = 0;
+	size_t int_sql_column_types_len = 0;
+	size_t int_oid_type_len = 0;
+	size_t int_int_mod_len = 0;
+	size_t int_sql_temp_len = 0;
+	size_t int_escaped_sql_len = 0;
 	SDEFINE_VAR_ALL(str_escaped_sql, str_sql_temp, str_sql_column_types, str_error);
 
 	if (client_request->int_i >= 0 && client_request->int_i < client_request->int_len) {
 		client_request->int_response_id += 1;
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, "responsenumber = ", str_temp, "\012");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"responsenumber = ", (size_t)17,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 
 		gettimeofday(&tv_time, NULL);
 #ifdef _WIN32
@@ -137,16 +188,22 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 		gmtime_r(&tv_time.tv_sec, &tm_time);
 #endif
 		SFINISH_CHECK(strftime(str_temp, 100, str_date_format, &tm_time) != 0, "strftime() failed");
-		SFINISH_CAT_APPEND(str_response, "END\t", str_temp);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"END\t", (size_t)4,
+			str_temp, strlen(str_temp));
 
 		memset(str_temp, 0, 101);
 		SFINISH_CHECK(strftime(str_temp, 100, str_time_format, &tm_time) != 0, "strftime() failed");
-		SFINISH_CAT_APPEND(str_response, "\t", str_temp);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"\t", (size_t)1,
+			str_temp, strlen(str_temp));
 
 		memset(str_temp, 0, 101);
 
 		SFINISH_CHECK(snprintf(str_temp, 100, "%ld", (unsigned long)tv_time.tv_usec) != 0, "snprintf() failed");
-		SFINISH_CAT_APPEND(str_response, "\t", str_temp);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"\t", (size_t)1,
+			str_temp, strlen(str_temp));
 
 		SDEBUG("BEFORE str_response>%s<", str_response);
 
@@ -172,11 +229,20 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 	client_request->int_response_id += 1;
 	memset(str_temp, 0, 101);
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012");
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"messageid = ", (size_t)12,
+		client_request->str_message_id, strlen(client_request->str_message_id),
+		"\012", (size_t)1);
 	if (client_request->str_transaction_id) {
-		SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"transactionid = ", (size_t)16,
+			client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+			"\012", (size_t)1);
 	}
-	SFINISH_CAT_APPEND(str_response, "responsenumber = ", str_temp, "\012");
+	SFINISH_SNFCAT(str_response, &int_response_len,
+		"responsenumber = ", (size_t)17,
+		str_temp, strlen(str_temp),
+		"\012", (size_t)1);
 
 	SFINISH_CHECK(res != NULL, "query_callback failed!");
 	client_request->int_i += 1;
@@ -191,7 +257,8 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 
 		} else if (result == PGRES_EMPTY_QUERY) {
 			// FINISH("Query empty");
-			SFINISH_CAT_APPEND(str_response, "EMPTY");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"EMPTY", (size_t)5);
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
@@ -200,12 +267,22 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			memset(str_temp, 0, 101);
 			snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012");
+			SFINISH_SNCAT(str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012");
 			if (client_request->str_transaction_id) {
-				SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"transactionid = ", (size_t)16,
+					client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+					"\012", (size_t)1);
 			}
-			SFINISH_CAT_APPEND(str_response, "responsenumber = ", str_temp, "\012");
-			SFINISH_CAT_APPEND(str_response, "\\.");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"responsenumber = ", (size_t)17,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1);
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"\\.", (size_t)2);
 
 		} else if (result == PGRES_BAD_RESPONSE) {
 			SFINISH("Bad response from server: %s", _DB_get_diagnostic(client_request->parent->conn, res));
@@ -216,12 +293,16 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 		} else if (result == PGRES_COMMAND_OK) {
 			str_rows = PQcmdTuples(res);
 			str_rows = *str_rows == '\0' ? "0" : str_rows;
-			SFINISH_CAT_APPEND(str_response, "Rows Affected\012", str_rows, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"Rows Affected\012", (size_t)14,
+				str_rows, strlen(str_rows),
+				"\012", (size_t)1);
 
 		} else if (result == PGRES_TUPLES_OK) {
 			SDEBUG("PGRES_TUPLES_OK");
 			client_request->res = res;
-			SFINISH_CAT_CSTR(str_sql_column_types, "SELECT ");
+			SFINISH_SNCAT(str_sql_column_types, &int_sql_column_types_len,
+				"SELECT ", 7);
 
 			int int_column;
 			int int_num_columns = PQnfields(res);
@@ -229,14 +310,21 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 				memset(str_temp, 0, 101);
 				sprintf(str_temp, "%d", PQftype(res, int_column));
 				str_oid_type = PQescapeLiteral(client_request->parent->cnxn, str_temp, strlen(str_temp));
+				int_oid_type_len = strlen(str_oid_type);
 
 				memset(str_temp, 0, 101);
 				sprintf(str_temp, "%d", PQfmod(res, int_column));
 				str_int_mod = PQescapeLiteral(client_request->parent->cnxn, str_temp, strlen(str_temp));
+				int_int_mod_len = strlen(str_int_mod);
 
 				// get type
-				SFINISH_CAT_APPEND(str_sql_column_types, "format_type(", str_oid_type, ", ", str_int_mod, ")",
-					int_column < (int_num_columns - 1) ? "," : ";");
+				SFINISH_SNFCAT(str_sql_column_types, &int_sql_column_types_len,
+					"format_type(", (size_t)12,
+					str_oid_type, int_oid_type_len,
+					", ", (size_t)2,
+					str_int_mod, int_int_mod_len,
+					")", (size_t)1,
+					int_column < (int_num_columns - 1) ? "," : ";", (size_t)1);
 				PQfreemem(str_oid_type);
 				str_oid_type = NULL;
 				PQfreemem(str_int_mod);
@@ -273,29 +361,46 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 
 		if (client_request->int_i < client_request->int_len) {
 			str_sql = (char *)DArray_get(client_request->arr_query, (size_t)client_request->int_i);
-			SFINISH_CAT_CSTR(str_sql_temp, str_sql);
+
+			SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
+				str_sql, strlen(str_sql));
 			str_escaped_sql = escape_value(str_sql_temp);
 			SFREE(str_sql_temp);
 			SFINISH_CHECK(str_escaped_sql != NULL, "escape_value failed");
+			int_escaped_sql_len = strlen(str_escaped_sql);
 
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012");
+			SFINISH_SNCAT(str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1);
 			if (client_request->str_transaction_id != NULL) {
-				SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"transactionid = ", (size_t)16,
+					client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+					"\012", (size_t)1);
 			}
-			SFINISH_CAT_APPEND(str_response, "QUERY\t", str_escaped_sql);
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"QUERY\t", (size_t)6,
+				str_escaped_sql, int_escaped_sql_len);
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 			DArray_push(client_request->arr_response, str_response);
 
 			client_request->int_response_id += 1;
 			memset(str_temp, 0, 101);
 			snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012");
+			SFINISH_SNCAT(str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1);
 			if (client_request->str_transaction_id != NULL) {
-				SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"transactionid = ", (size_t)16,
+					client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+					"\012", (size_t)1);
 			}
 
 			memset(str_temp, 0, 101);
@@ -308,15 +413,21 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 #endif
 			SDEBUG("tm_time.tm_mon: %d", tm_time.tm_mon);
 			SFINISH_CHECK(strftime(str_temp, 100, str_date_format, &tm_time) != 0, "strftime() failed");
-			SFINISH_CAT_APPEND(str_response, "START\t", str_temp);
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"START\t", (size_t)6,
+				str_temp, strlen(str_temp));
 
 			memset(str_temp, 0, 101);
 			SFINISH_CHECK(strftime(str_temp, 100, str_time_format, &tm_time) != 0, "strftime() failed");
-			SFINISH_CAT_APPEND(str_response, "\t", str_temp);
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"\t", (size_t)1,
+				str_temp, strlen(str_temp));
 
 			memset(str_temp, 0, 101);
 			SFINISH_CHECK(snprintf(str_temp, 100, "%ld", (unsigned long)tv_time.tv_usec) != 0, "snprintf() failed");
-			SFINISH_CAT_APPEND(str_response, "\t", str_temp);
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"\t", (size_t)1,
+				str_temp, strlen(str_temp));
 
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 			DArray_push(client_request->arr_response, str_response);
@@ -335,13 +446,20 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			}
 			query_callback(EV_A, client_request, ws_raw_step2);
 		} else if (client_request->int_i > client_request->int_len) {
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012");
+			SFINISH_SNCAT(str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1);
 			if (client_request->str_transaction_id != NULL) {
-				SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"transactionid = ", (size_t)16,
+					client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+					"\012", (size_t)1);
 			}
-			SFINISH_CAT_APPEND(str_response, "TRANSACTION COMPLETED");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"TRANSACTION COMPLETED", (size_t)21);
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
@@ -376,13 +494,20 @@ finish:
 	if (bol_error_state == true) {
 		bol_error_state = false;
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
 		SDEBUG("       str_response : %s", str_response);
 		SDEBUG("strlen(str_response): %d", strlen(str_response));
 		SDEBUG("       _str_response : %s", _str_response);
@@ -433,6 +558,7 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 	struct sock_ev_client_copy_check *client_copy_check = NULL;
 	SFINISH_SALLOC(client_copy_check, sizeof(struct sock_ev_client_copy_check));
 	client_copy_check->client_request = client_request;
+	size_t int_response_len = 0;
 
 	client_request->int_response_id += 1;
 	memset(str_temp, 0, 101);
@@ -443,15 +569,23 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 		return false;
 	}
 
-	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																				   "responsenumber = ",
-		str_temp, "\012");
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"messageid = ", (size_t)12,
+		client_request->str_message_id, strlen(client_request->str_message_id),
+		"\012responsenumber = ", (size_t)18,
+		str_temp, strlen(str_temp),
+		"\012", (size_t)1);
 	if (client_request->str_transaction_id != NULL) {
-		SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"transactionid = ", 16,
+			client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+			"\012", (size_t)1);
 	}
 	memset(str_temp, 0, 101);
 	snprintf(str_temp, 100, "%d", PQntuples(client_request->res));
-	SFINISH_CAT_APPEND(str_response, "ROWS\t", str_temp);
+	SFINISH_SNFCAT(str_response, &int_response_len,
+		"ROWS\t", (size_t)5,
+		str_temp, strlen(str_temp));
 	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 	DArray_push(client_request->arr_response, str_response);
 	str_response = NULL;
@@ -459,22 +593,32 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 	client_request->int_response_id += 1;
 	memset(str_temp, 0, 101);
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																				   "responsenumber = ",
-		str_temp, "\012");
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"messageid = ", (size_t)12,
+		client_request->str_message_id, strlen(client_request->str_message_id),
+		"\012responsenumber = ", (size_t)18,
+		str_temp, strlen(str_temp),
+		"\012", (size_t)1);
 	if (client_request->str_transaction_id != NULL) {
-		SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"transactionid = ", (size_t)16,
+			client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+			"\012", (size_t)1);
 	}
-	SFINISH_CAT_APPEND(str_response, "COLUMNS\012");
+	SFINISH_SNFCAT(str_response, &int_response_len,
+		"COLUMNS\012", (size_t)8);
 
 	int int_num_columns = PQnfields(client_request->res);
 	int int_column;
 	for (int_column = 0; int_column < int_num_columns; int_column += 1) {
-		SFINISH_CAT_APPEND(
-			str_response, PQfname(client_request->res, int_column), int_column < (int_num_columns - 1) ? "\t" : "\012");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			PQfname(client_request->res, int_column), strlen(PQfname(client_request->res, int_column)),
+			int_column < (int_num_columns - 1) ? "\t" : "\012", (size_t)1);
 	}
 	for (int_column = 0; int_column < int_num_columns; int_column += 1) {
-		SFINISH_CAT_APPEND(str_response, PQgetvalue(res, 0, int_column), int_column < (int_num_columns - 1) ? "\t" : "\012");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			PQgetvalue(res, 0, int_column), strlen(PQgetvalue(res, 0, int_column)),
+			int_column < (int_num_columns - 1) ? "\t" : "\012", (size_t)1);
 	}
 	PQclear(res);
 
@@ -516,6 +660,8 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 	ssize_t int_column = 0;
 	ssize_t int_num_columns = 0;
 	ssize_t int_num_rows = 0;
+	size_t int_response_len = 0;
+	size_t int_sql_temp_len = 0;
 	int int_status = 0;
 	SDEFINE_VAR_ALL(str_temp1, str_escaped_sql);
 	// This must not be freed
@@ -528,11 +674,17 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 
 	client_request->int_response_id += 1;
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																				   "responsenumber = ",
-		str_temp, "\012");
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"messageid = ", (size_t)12,
+		client_request->str_message_id, strlen(client_request->str_message_id),
+		"\012responsenumber = ", (size_t)18,
+		str_temp, strlen(str_temp),
+		"\012", (size_t)1);
 	if (client_request->str_transaction_id != NULL) {
-		SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"transactionid = ", (size_t)16,
+			client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+			"\012", (size_t)1);
 	}
 
 	int_num_columns = PQnfields(res);
@@ -547,16 +699,23 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				client_request->int_response_id += 1;
 				memset(str_temp, 0, 101);
 				snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-				SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																							   "responsenumber = ",
-					str_temp, "\012");
+				SFINISH_SNCAT(str_response, &int_response_len,
+					"messageid = ", (size_t)12,
+					client_request->str_message_id, strlen(client_request->str_message_id),
+					"\012responsenumber = ", (size_t)18,
+					str_temp, strlen(str_temp),
+					"\012", (size_t)1);
 				if (client_request->str_transaction_id != NULL) {
-					SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+					SFINISH_SNFCAT(str_response, &int_response_len,
+						"transactionid = ", (size_t)16,
+						client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+						"\012", (size_t)1);
 				}
 			}
 
-			SFINISH_CAT_APPEND(str_response, "\\.");
-			WS_sendFrame(EV_A, client, true, 0x01, str_response, strlen(str_response));
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"\\.", (size_t)2);
+			WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len);
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
 
@@ -566,22 +725,31 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 
 			decrement_idle(EV_A);
 
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012");
+			SFINISH_SNCAT(str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1);
 			if (client_request->str_transaction_id != NULL) {
-				SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"transactionid = ", (size_t)16,
+					client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+					"\012", (size_t)1);
 			}
 			PQclear(res);
 
 			if (client_request->int_i < client_request->int_len) {
 				str_sql = (char *)DArray_get(client_request->arr_query, (size_t)client_request->int_i);
-				SFINISH_CAT_CSTR(str_sql_temp, str_sql);
+				SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
+					str_sql, strlen(str_sql));
 				str_escaped_sql = escape_value(str_sql_temp);
 				SFREE(str_sql_temp);
 				SFINISH_CHECK(str_escaped_sql != NULL, "unescape_value failed");
 
-				SFINISH_CAT_APPEND(str_response, "QUERY\t", str_escaped_sql);
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"QUERY\t", (size_t)6,
+					str_escaped_sql, strlen(str_escaped_sql));
 
 				WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 				DArray_push(client_request->arr_response, str_response);
@@ -589,11 +757,20 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				client_request->int_response_id += 1;
 				memset(str_temp, 0, 101);
 				snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-				SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012");
+				SFINISH_SNCAT(str_response, &int_response_len,
+					"messageid = ", (size_t)12,
+					client_request->str_message_id, strlen(client_request->str_message_id),
+					"\012", (size_t)1);
 				if (client_request->str_transaction_id) {
-					SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+					SFINISH_SNFCAT(str_response, &int_response_len,
+						"transactionid = ", (size_t)18,
+						client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+						"\012", (size_t)1);
 				}
-				SFINISH_CAT_APPEND(str_response, "responsenumber = ", str_temp, "\012");
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"responsenumber = ", (size_t)17,
+					str_temp, strlen(str_temp),
+					"\012", (size_t)1);
 
 				memset(str_temp, 0, 101);
 				struct tm tm_time;
@@ -605,15 +782,21 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				gmtime_r(&tv_time.tv_sec, &tm_time);
 #endif
 				SFINISH_CHECK(strftime(str_temp, 100, str_date_format, &tm_time) != 0, "strftime() failed");
-				SFINISH_CAT_APPEND(str_response, "START\t", str_temp);
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"START\t", (size_t)6,
+					str_temp, strlen(str_temp));
 
 				memset(str_temp, 0, 101);
 				SFINISH_CHECK(strftime(str_temp, 100, str_time_format, &tm_time) != 0, "strftime() failed");
-				SFINISH_CAT_APPEND(str_response, "\t", str_temp);
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"\t", (size_t)1,
+					str_temp, strlen(str_temp));
 
 				memset(str_temp, 0, 101);
 				SFINISH_CHECK(snprintf(str_temp, 100, "%ld", (unsigned long)tv_time.tv_usec) != 0, "snprintf() failed");
-				SFINISH_CAT_APPEND(str_response, "\t", str_temp);
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"\t", (size_t)1,
+					str_temp, strlen(str_temp));
 
 				int_status = PQsendQuery(client_request->parent->cnxn, str_sql);
 				if (int_status != 1) {
@@ -629,7 +812,8 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				}
 				query_callback(EV_A, client_request, ws_raw_step2);
 			} else if (client_request->int_i > client_request->int_len) {
-				SFINISH_CAT_APPEND(str_response, "TRANSACTION COMPLETED");
+				SFINISH_SNFCAT(str_response, &int_response_len,
+					"TRANSACTION COMPLETED", (size_t)21);
 			}
 
 			ev_check_stop(EV_A, &client_copy_check->check);
@@ -638,16 +822,21 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 		}
 
 		for (int_column = 0; int_column < int_num_columns; int_column += 1) {
-			SFINISH_CAT_CSTR(str_sql_temp, PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column));
+			SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
+				PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column),
+				strlen(PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column)));
 			str_temp1 = escape_value(str_sql_temp);
 			SFREE(str_sql_temp);
 			SFINISH_CHECK(str_temp1 != NULL, "escape_value failed");
 
-			SFINISH_CAT_APPEND(str_response, str_temp1,
-				int_column < (int_num_columns - 1)
-					? "\t"
-					: (ssize_t)client_copy_check->int_i < (int_num_rows - 1) && (client_copy_check->int_i % 10) < 9 ? "\012"
-																													: "");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				str_temp1, strlen(str_temp1),
+				int_column < (int_num_columns - 1) ? "\t" :
+				(ssize_t)client_copy_check->int_i < (int_num_rows - 1)
+				&& (client_copy_check->int_i % 10) < 9 ? "\012": "",
+				strlen(int_column < (int_num_columns - 1) ? "\t" :
+					(ssize_t)client_copy_check->int_i < (int_num_rows - 1)
+					&& (client_copy_check->int_i % 10) < 9 ? "\012": ""));
 			SFREE(str_temp1);
 		}
 
