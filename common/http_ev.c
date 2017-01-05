@@ -120,7 +120,7 @@ void http_ev_step1(struct sock_ev_client *client) {
 			} else {
 				char *ptr_cb_name = cb_to_name(_loop->pendings[pendingpri][int_i].w->cb);
 				SFINISH_SNFCAT(
-					client_copy_check->str_response, &int_response_len, 
+					client_copy_check->str_response, &int_response_len,
 					"	watcher at ", (size_t)12,
 					str_current_address, strlen(str_current_address),
 					" with priority ", (size_t)15,
@@ -342,7 +342,9 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
-		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp), _str_response, strlen(_str_response));
+		SFINISH_SNCAT(str_response, (size_t *)&int_response_len,
+			str_temp, strlen(str_temp),
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}
 	if (str_response != NULL) {

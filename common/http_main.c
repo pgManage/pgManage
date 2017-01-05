@@ -14,11 +14,13 @@ void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 	char *str_sql = NULL;
 	char *ptr_end_uri = NULL;
 	char str_length[50];
-	size_t int_uri_length = 0;
+	size_t int_uri_len = 0;
+	size_t int_sql_len = 0;
+	size_t int_response_len = 0;
 
 	SFINISH_CHECK(conn->int_status == 1, "%s", conn->str_response);
 
-	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
+	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_len);
 	SFINISH_CHECK(str_uri, "str_uri_path failed");
 
 #ifdef ENVELOPE
@@ -27,17 +29,21 @@ void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 		str_uri_temp = str_uri;
 		char *str_temp = strchr(str_uri_temp + 9, '/');
 		SFINISH_CHECK(str_temp != NULL, "strchr failed");
-		SFINISH_CAT_CSTR(str_uri, "/postage/app", str_temp);
+		SFINISH_SNCAT(str_uri, &int_uri_len,
+			"/postage/app", (size_t)12,
+			str_temp, strlen(str_temp));
 		SFREE(str_uri_temp);
 	}
 #endif
 	ptr_end_uri = strchr(str_uri, '?');
 	if (ptr_end_uri != NULL) {
-		*ptr_end_uri = 0;
+		*ptr_end_uri = '\0';
+		int_uri_len = (size_t)(ptr_end_uri - str_uri);
 	}
 	ptr_end_uri = strchr(str_uri, '#');
 	if (ptr_end_uri != NULL) {
-		*ptr_end_uri = 0;
+		*ptr_end_uri = '\0';
+		int_uri_len = (size_t)(ptr_end_uri - str_uri);
 	}
 
 	SDEBUG("str_uri: %s", str_uri);
@@ -73,7 +79,7 @@ void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 	} else if (strncmp(str_uri, "/postage/app/action_info", 25) == 0) {
 #endif
 		if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_CAT_CSTR(str_sql,
+			SFINISH_SNCAT(str_sql, &int_sql_len,
 				"SELECT version() "
 				"UNION ALL "
 				"SELECT SESSION_USER::text "
@@ -82,19 +88,40 @@ void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 				"	FROM pg_catalog.pg_roles g "
 				"	LEFT JOIN pg_catalog.pg_auth_members m ON m.roleid = g.oid "
 				"	LEFT JOIN pg_catalog.pg_roles u ON m.member = u.oid "
-				"	WHERE g.rolcanlogin = FALSE AND u.rolname = SESSION_USER::text AND g.rolname IS NOT NULL");
+				"	WHERE g.rolcanlogin = FALSE AND u.rolname = SESSION_USER::text AND g.rolname IS NOT NULL",
+				strlen("SELECT version() "
+					"UNION ALL "
+					"SELECT SESSION_USER::text "
+					"UNION ALL "
+					"SELECT g.rolname "
+					"	FROM pg_catalog.pg_roles g "
+					"	LEFT JOIN pg_catalog.pg_auth_members m ON m.roleid = g.oid "
+					"	LEFT JOIN pg_catalog.pg_roles u ON m.member = u.oid "
+					"	WHERE g.rolcanlogin = FALSE AND u.rolname = SESSION_USER::text AND g.rolname IS NOT NULL"));
 		} else {
-			SFINISH_CAT_CSTR(str_sql, "SELECT CAST(@@VERSION AS nvarchar(MAX)), '0' AS srt "
-									  "UNION ALL "
-									  "SELECT CAST(SYSTEM_USER AS nvarchar(MAX)) AS user_group_name, '1' AS srt "
-									  "UNION ALL "
-									  "SELECT CAST([name] AS nvarchar(MAX)) AS user_group_name, '2' AS srt "
-									  "	FROM ( "
-									  "		SELECT *, is_member(name) AS [is_member] "
-									  "			FROM [sys].[database_principals] "
-									  "	) em "
-									  "	WHERE [is_member] = 1 "
-									  "	ORDER BY 2, 1");
+			SFINISH_SNCAT(str_sql, &int_sql_len,
+				"SELECT CAST(@@VERSION AS nvarchar(MAX)), '0' AS srt "
+				"UNION ALL "
+				"SELECT CAST(SYSTEM_USER AS nvarchar(MAX)) AS user_group_name, '1' AS srt "
+				"UNION ALL "
+				"SELECT CAST([name] AS nvarchar(MAX)) AS user_group_name, '2' AS srt "
+				"	FROM ( "
+				"		SELECT *, is_member(name) AS [is_member] "
+				"			FROM [sys].[database_principals] "
+				"	) em "
+				"	WHERE [is_member] = 1 "
+				"	ORDER BY 2, 1",
+				strlen("SELECT CAST(@@VERSION AS nvarchar(MAX)), '0' AS srt "
+					"UNION ALL "
+					"SELECT CAST(SYSTEM_USER AS nvarchar(MAX)) AS user_group_name, '1' AS srt "
+					"UNION ALL "
+					"SELECT CAST([name] AS nvarchar(MAX)) AS user_group_name, '2' AS srt "
+					"	FROM ( "
+					"		SELECT *, is_member(name) AS [is_member] "
+					"			FROM [sys].[database_principals] "
+					"	) em "
+					"	WHERE [is_member] = 1 "
+					"	ORDER BY 2, 1"));
 		}
 
 		SFINISH_CHECK(DB_exec(EV_A, client->conn, client, str_sql, http_client_info_cb), "DB_exec failed");
@@ -143,12 +170,13 @@ finish:
 	if (str_response != NULL) {
 		_str_response = str_response;
 		snprintf(str_length, 50, "%zu", strlen(_str_response));
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Content-Length: ",
-			str_length, "\015\012\015\012", _str_response);
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012Content-Length: ", (size_t)52,
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
-		ssize_t int_response_len = 0;
-		if ((int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
 			if (bol_tls) {
 				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {
@@ -175,18 +203,21 @@ void http_main(struct sock_ev_client *client) {
 	SDEFINE_VAR_ALL(str_uri, str_conninfo);
 	char *str_response = NULL;
 	char *ptr_end_uri = NULL;
-	size_t int_uri_length = 0;
+	size_t int_uri_len = 0;
+	size_t int_response_len = 0;
 	// get path
-	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
+	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_len);
 	SFINISH_CHECK(str_uri, "str_uri_path failed");
 
 	ptr_end_uri = strchr(str_uri, '?');
 	if (ptr_end_uri != NULL) {
-		*ptr_end_uri = 0;
+		*ptr_end_uri = '\0';
+		int_uri_len = (size_t)(ptr_end_uri - str_uri);
 	}
 	ptr_end_uri = strchr(str_uri, '#');
 	if (ptr_end_uri != NULL) {
-		*ptr_end_uri = 0;
+		*ptr_end_uri = '\0';
+		int_uri_len = (size_t)(ptr_end_uri - str_uri);
 	}
 
 	SDEBUG("#################################################################################################");
@@ -204,6 +235,7 @@ void http_main(struct sock_ev_client *client) {
 		client_auth->parent = client;
 
 		str_response = http_auth(client_auth);
+		int_response_len = strlen(str_response);
 	} else if (strncmp(str_uri, "/env", 4) == 0) {
 		// set_cnxn does its own error handling
 		SDEBUG("str_uri: %s", str_uri);
@@ -217,9 +249,10 @@ void http_main(struct sock_ev_client *client) {
 	}
 #else
 	if (strncmp(str_uri, "/postage", 8) != 0) {
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 303 See Other\015\012"
-									   "Location: /postage",
-			str_uri, "\015\012\015\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 303 See Other\015\012Location: /postage", (size_t)42,
+			str_uri, int_uri_len,
+			"\015\012\015\012", (size_t)4);
 	} else if (strncmp(str_uri, "/postage/auth", 14) == 0) {
 		SDEBUG("str_uri: %s", str_uri);
 
@@ -247,8 +280,8 @@ void http_main(struct sock_ev_client *client) {
 finish:
 	bol_error_state = false;
 	SFREE_PWORD_ALL();
-	ssize_t int_response_len = 0;
-	if (str_response != NULL && (int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	ssize_t int_client_write_len = 0;
+	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 		} else {
@@ -256,7 +289,7 @@ finish:
 		}
 	}
 	SFREE(str_response);
-	if (int_response_len != 0) {
+	if (int_client_write_len != 0) {
 		SFINISH_CLIENT_CLOSE(client);
 	}
 }
@@ -280,7 +313,15 @@ bool http_client_info_cb(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_TUPLES_OK, "DB_exec failed");
 
-	SFINISH_CAT_CSTR(str_groups, "[");
+	size_t int_groups_len = 0;
+	size_t int_version_len = 0;
+	size_t int_user_len = 0;
+	size_t int_response_len = 0;
+	size_t int_json_version_len = 0;
+	size_t int_json_user_len = 0;
+
+	SFINISH_SNCAT(str_groups, &int_groups_len,
+		"[", (size_t)1);
 
 	while ((status = DB_fetch_row(res)) != DB_FETCH_END) {
 		SFINISH_CHECK(status != DB_FETCH_ERROR, "DB_fetch_row failed");
@@ -289,11 +330,17 @@ bool http_client_info_cb(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_CHECK(arr_values != NULL, "DB_get_row_values failed");
 
 		if (int_i == 0) {
-			SFINISH_CAT_CSTR(str_version, DArray_get(arr_values, 0));
+			SFINISH_SNCAT(str_version, &int_version_len,
+				DArray_get(arr_values, 0), strlen(DArray_get(arr_values, 0)));
 		} else if (int_i == 1) {
-			SFINISH_CAT_CSTR(str_user, DArray_get(arr_values, 0));
+			SFINISH_SNCAT(str_user, &int_user_len,
+				DArray_get(arr_values, 0), strlen(DArray_get(arr_values, 0)));
 		} else {
-			SFINISH_CAT_APPEND(str_groups, int_i == 2 ? "" : ", ", "\"", DArray_get(arr_values, 0), "\"");
+			SFINISH_SNFCAT(str_groups, &int_groups_len,
+				int_i == 2 ? "" : ", ", strlen(int_i == 2 ? "" : ", "),
+				"\"", (size_t)1,
+				DArray_get(arr_values, 0), strlen(DArray_get(arr_values, 0)),
+				"\"", (size_t)1);
 		}
 
 		DArray_clear_destroy(arr_values);
@@ -301,15 +348,31 @@ bool http_client_info_cb(EV_P, void *cb_data, DB_result *res) {
 		int_i += 1;
 	}
 
-	SFINISH_CAT_APPEND(str_groups, "]");
+	SFINISH_SNFCAT(str_groups, &int_groups_len,
+		"]", (size_t)1);
 
 	SFINISH_CHECK((str_json_version = jsonify(str_version)), "jsonify failed");
-	SFINISH_CHECK((str_json_user = jsonify(str_user)), "jsonify failed");
+	int_json_version_len = strlen(str_json_version);
 
-	SFINISH_CAT_CSTR(str_response, "{\"stat\": true, \"dat\": {", "\"username\": ", str_json_user, ", ", "\"session_user\": ",
-		str_json_user, ", ", "\"current_user\": ", str_json_user, ", ", "\"groups\": ", str_groups, ", ", "\"port\": ",
-		str_global_port, ", ", "\"database_version\": ", str_json_version, ",", "\"" SUN_PROGRAM_LOWER_NAME "\": \"", VERSION,
-		"\"", "}}");
+	SFINISH_CHECK((str_json_user = jsonify(str_user)), "jsonify failed");
+	int_json_user_len = strlen(str_json_user);
+
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"{\"stat\": true, \"dat\": {\"username\": ", (size_t)35,
+		str_json_user, int_json_user_len,
+		", \"session_user\": ", (size_t)18,
+		str_json_user, int_json_user_len,
+		", \"current_user\": ", (size_t)18,
+		str_json_user, int_json_user_len,
+		", \"groups\": ", (size_t)12,
+		str_groups, int_groups_len,
+		", \"port\": ", (size_t)10,
+		str_global_port, strlen(str_global_port),
+		", \"database_version\": ", (size_t)22,
+		str_json_version, int_json_version_len,
+		",\"" SUN_PROGRAM_LOWER_NAME "\": \"", strlen(",\"" SUN_PROGRAM_LOWER_NAME "\": \""),
+		VERSION, strlen(VERSION),
+		"\"}}", (size_t)3);
 
 	/*
 	SFINISH_CAT_CSTR(str_conn_desc, client->str_connname, "\t",
@@ -348,10 +411,14 @@ finish:
 	char *_str_response = NULL;
 	if (res != NULL && (res->status != DB_RES_TUPLES_OK || status == DB_FETCH_ERROR || status != DB_FETCH_END)) {
 		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 	} else if (res == NULL && client->conn->str_response != NULL) {
-		SFINISH_CAT_APPEND(str_response, ":\n", client->conn->str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			client->conn->str_response, strlen(client->conn->str_response));
 		SFREE(client->conn->str_response);
 	}
 
@@ -359,17 +426,20 @@ finish:
 	char str_length[50];
 	snprintf(str_length, 50, "%zu", strlen(_str_response));
 	if (bol_error_state) {
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Content-Length: ",
-			str_length, "\015\012\015\012", _str_response);
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012Content-Length: ", (size_t)52,
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, strlen(_str_response))
 	} else {
-		str_response = cat_cstr("HTTP/1.1 200 OK\015\012"
-								"Content-Length: ",
-			str_length, "\015\012Content-Type: application/json\015\012\015\012", _str_response);
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 200 OK\015\012Content-Length: ", (size_t)33,
+			str_length, strlen(str_length),
+			"\015\012Content-Type: application/json\015\012\015\012", (size_t)36,
+			_str_response, strlen(_str_response));
 	}
 	SFREE(_str_response);
-	ssize_t int_response_len = 0;
-	if ((int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (CLIENT_WRITE(client, str_response, strlen(str_response)) < 0) {
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 		} else {

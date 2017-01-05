@@ -6,10 +6,10 @@ void http_file_step1(struct sock_ev_client *client) {
 	SDEBUG("http_file_step1");
 	char *str_response = NULL;
 	char *ptr_end_uri = NULL;
-	size_t int_uri_length = 0;
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
 #endif
+	size_t int_response_len = 0;
 
 	struct sock_ev_client_copy_check *client_copy_check = NULL;
 	struct sock_ev_client_http_file *client_http_file = NULL;
@@ -23,58 +23,72 @@ void http_file_step1(struct sock_ev_client *client) {
 #else
 	client_http_file->int_file_fd = -1;
 #endif
-	client_http_file->int_response_header_length = 0;
-	client_http_file->int_response_length = 0;
+	client_http_file->int_response_header_len = 0;
+	client_http_file->int_response_len = 0;
 	client_http_file->int_read = 0;
-	client_http_file->int_read_length = 0;
+	client_http_file->int_read_len = 0;
 	client_http_file->bol_download = 0;
 	client_http_file->int_written = 0;
 	client_http_file->io.fd = INVALID_SOCKET;
 
 	// get path
-	client_http_file->str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
+	client_http_file->str_uri = str_uri_path(client->str_request, client->int_request_len, &client_http_file->int_uri_len);
 	SFINISH_CHECK(client_http_file->str_uri, "str_uri_path failed");
 	ptr_end_uri = strchr(client_http_file->str_uri, '?');
 	if (ptr_end_uri != NULL) {
 		*ptr_end_uri = 0;
+		client_http_file->int_uri_len = (size_t)(ptr_end_uri - client_http_file->str_uri);
 	}
 	ptr_end_uri = strchr(client_http_file->str_uri, '#');
 	if (ptr_end_uri != NULL) {
 		*ptr_end_uri = 0;
+		client_http_file->int_uri_len = (size_t)(ptr_end_uri - client_http_file->str_uri);
 	}
 
 	client_http_file->bol_download = false;
 #ifdef ENVELOPE
 	client_http_file->str_uri_part = client_http_file->str_uri;
+	client_http_file->int_uri_part_len = client_http_file->int_uri_len;
+	client_http_file->int_uri_len = 0;
 	client_http_file->str_uri = NULL;
 #else
 	if (isdigit(client_http_file->str_uri[9])) {
 		str_uri_temp = client_http_file->str_uri;
 		str_temp = strchr(str_uri_temp + 9, '/');
 		SFINISH_CHECK(str_temp != NULL, "strchr failed");
-		SFINISH_CAT_CSTR(client_http_file->str_uri, "/postage/app", str_temp);
+		SFINISH_SNCAT(
+			client_http_file->str_uri, &client_http_file->int_uri_len, 
+			"/postage/app", (size_t)12,
+			str_temp, client_http_file->int_uri_len - (size_t)(str_temp - str_uri_temp)
+		);
 		SFREE(str_uri_temp);
 	}
 
 	if (strncmp(client_http_file->str_uri, "/postage/app/download", 21) == 0) {
-		size_t int_len1 = strlen(client_http_file->str_uri) - 9;
-		SFINISH_CAT_CSTR(client_http_file->str_uri_part, client->str_connname_folder, "/", client->str_username,
-			client_http_file->str_uri + strlen("/postage/app/download"));
-		int_len1 = 0;
+		SFINISH_SNCAT(
+			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
+			client->str_connname_folder, client->int_connname_folder_len,
+			"/", (size_t)1,
+			client->str_username, client->int_username_len,
+			// we need to go past "/postage/app/download"
+			client_http_file->str_uri + 21, client_http_file->int_uri_len - 21
+		);
 		SFREE(client_http_file->str_uri);
 
 		client_http_file->bol_download = true;
 	} else {
 		client_http_file->str_uri_part = client_http_file->str_uri;
+		client_http_file->int_uri_part_len = client_http_file->int_uri_len;
+		client_http_file->int_uri_len = 0;
 		client_http_file->str_uri = NULL;
 
 		// empty url, default to index.html in directories
 		str_temp = canonical(str_global_web_root, client_http_file->str_uri_part, "read_dir");
 		if (strlen(client_http_file->str_uri_part) <= 1 || str_temp != NULL) {
 			if (*(client_http_file->str_uri_part + strlen(client_http_file->str_uri_part) - 1) == '/') {
-				SFINISH_CAT_APPEND(client_http_file->str_uri_part, "index.html");
+				SFINISH_SNFCAT(client_http_file->str_uri_part, &client_http_file->int_uri_part_len, "index.html", (size_t)10);
 			} else {
-				SFINISH_CAT_APPEND(client_http_file->str_uri_part, "/index.html");
+				SFINISH_SNFCAT(client_http_file->str_uri_part, &client_http_file->int_uri_part_len, "/index.html", (size_t)10);
 			}
 		}
 		SFREE(str_global_error);
@@ -82,8 +96,7 @@ void http_file_step1(struct sock_ev_client *client) {
 	}
 #endif
 
-	int_uri_length = strlen(client_http_file->str_uri_part);
-	str_temp = uri_to_cstr(client_http_file->str_uri_part, &int_uri_length);
+	str_temp = uri_to_cstr(client_http_file->str_uri_part, &client_http_file->int_uri_part_len);
 	SFREE(client_http_file->str_uri_part);
 	client_http_file->str_uri_part = str_temp;
 	str_temp = NULL;
@@ -106,22 +119,34 @@ void http_file_step1(struct sock_ev_client *client) {
 	if (strncmp(str_uri_temp, "/env/app/", 9) == 0) {
 		str_canonical_start = canonical_full_start("/app/");
 		SFINISH_CHECK(str_canonical_start != NULL, "canonical_full_start failed");
-		SFINISH_CAT_CSTR(client_http_file->str_uri_part, str_uri_temp + 9);
+		SFINISH_SNCAT(
+			client_http_file->str_uri_part, &client_http_file->int_uri_part_len, 
+			str_uri_temp + 9, client_http_file->int_uri_part_len - 9
+		);
 
 	} else if (strncmp(str_uri_temp, "/env/role/", 10) == 0) {
 		str_canonical_start = canonical_full_start("/role/");
 		SFINISH_CHECK(str_canonical_start != NULL, "canonical_full_start failed");
-		SFINISH_CAT_CSTR(client_http_file->str_uri_part, str_uri_temp + 10);
+		SFINISH_SNCAT(
+			client_http_file->str_uri_part, &client_http_file->int_uri_part_len, 
+			str_uri_temp + 10, client_http_file->int_uri_part_len - 10
+		);
 
 	} else if (strncmp(str_uri_temp, "/env/", 5) == 0) {
 		str_canonical_start = canonical_full_start("/web_root/");
 		SFINISH_CHECK(str_canonical_start != NULL, "canonical_full_start failed");
-		SFINISH_CAT_CSTR(client_http_file->str_uri_part, str_uri_temp + 5);
+		SFINISH_SNCAT(
+			client_http_file->str_uri_part, &client_http_file->int_uri_part_len, 
+			str_uri_temp + 5, client_http_file->int_uri_part_len - 5
+		);
 
 	} else {
 		str_canonical_start = canonical_full_start("/web_root/");
 		SFINISH_CHECK(str_canonical_start != NULL, "canonical_full_start failed");
-		SFINISH_CAT_CSTR(client_http_file->str_uri_part, str_uri_temp);
+		SFINISH_SNCAT(
+			client_http_file->str_uri_part, &client_http_file->int_uri_part_len, 
+			str_uri_temp, client_http_file->int_uri_part_len
+		);
 	}
 	SFREE(str_uri_temp);
 
@@ -132,9 +157,15 @@ void http_file_step1(struct sock_ev_client *client) {
 	str_temp = canonical(str_canonical_start, client_http_file->str_uri_part, "read_dir");
 	if (strlen(client_http_file->str_uri_part) <= 1 || str_temp != NULL) {
 		if (*(client_http_file->str_uri_part + strlen(client_http_file->str_uri_part) - 1) == '/') {
-			SFINISH_CAT_APPEND(client_http_file->str_uri_part, "index.html");
+			SFINISH_SNFCAT(
+				client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
+				"index.html", (size_t)10
+			);
 		} else {
-			SFINISH_CAT_APPEND(client_http_file->str_uri_part, "/index.html");
+			SFINISH_SNFCAT(
+				client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
+				"/index.html", (size_t)11
+			);
 		}
 	}
 	SFREE(str_global_error);
@@ -144,9 +175,15 @@ void http_file_step1(struct sock_ev_client *client) {
 	client_http_file->str_uri_part = NULL;
 	if (strncmp(str_uri_temp, "/download", 9) == 0) {
 		client_http_file->bol_download = true;
-		SFINISH_CAT_CSTR(client_http_file->str_uri_part, str_uri_temp + 9);
+		SFINISH_SNCAT(
+			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
+			str_uri_temp + 9, client_http_file->int_uri_part_len - 9
+		);
 	} else {
-		SFINISH_CAT_CSTR(client_http_file->str_uri_part, str_uri_temp);
+		SFINISH_SNCAT(
+			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
+			str_uri_temp, client_http_file->int_uri_part_len
+		);
 	}
 	SFREE(str_uri_temp);
 
@@ -174,12 +211,15 @@ void http_file_step1(struct sock_ev_client *client) {
 			SFREE(str_response);
 			SERROR_NORESPONSE("CreateFileA failed!");
 			SFREE(str_global_error);
-			SFINISH_CAT_CSTR(str_response, "HTTP/1.1 404 Not Found\015\012"
-										   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-										   "Content-Length: 40\015\012"
-										   "Content-Type: text/plain\015\012"
-										   "\015\012"
-										   "The file you are requesting is not here.");
+			char *str_temp =
+				"HTTP/1.1 404 Not Found\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Content-Length: 40\015\012"
+				"Content-Type: text/plain\015\012"
+				"\015\012"
+				"The file you are requesting is not here.";
+			SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
+			bol_error_state = false;
 			goto finish;
 		}
 		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, int_err,
@@ -195,12 +235,15 @@ void http_file_step1(struct sock_ev_client *client) {
 		SFREE(str_response);
 		SERROR_NORESPONSE("open failed! %d (%s)", errno, strerror(errno));
 		SFREE(str_global_error);
-		SFINISH_CAT_CSTR(str_response, "HTTP/1.1 404 Not Found\015\012"
-									   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-									   "Content-Length: 40\015\012"
-									   "Content-Type: text/plain\015\012"
-									   "\015\012"
-									   "The file you are requesting is not here.");
+		char *str_temp =
+			"HTTP/1.1 404 Not Found\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: 40\015\012"
+			"Content-Type: text/plain\015\012"
+			"\015\012"
+			"The file you are requesting is not here.";
+		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
+		bol_error_state = false;
 		goto finish;
 	}
 #endif
@@ -215,21 +258,19 @@ void http_file_step1(struct sock_ev_client *client) {
 finish:
 	SFREE_ALL();
 	SDEBUG("test1");
-	ssize_t int_response_len = 0;
 	if (bol_error_state) {
 		bol_error_state = false;
 		http_file_free(client_http_file);
 		client_http_file = NULL;
 
-		if (strncmp("HTTP", str_response, 4) != 0) {
-			char *_str_response = str_response;
-			str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-									"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-				_str_response);
-			SFREE(_str_response);
-		}
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
+		char *_str_response = str_response;
+		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp), _str_response, strlen(_str_response));
+		SFREE(_str_response);
 	}
-	if (str_response != NULL && (int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
 		SFREE(str_response);
 		http_file_free(client_http_file);
 		client_http_file = NULL;
@@ -271,14 +312,13 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 	SDEBUG("client_http_file->str_uri: %s", client_http_file->str_uri);
 
 #ifdef _WIN32
-	client_http_file->int_read_length = GetFileSize(client_http_file->h_file, NULL);
+	client_http_file->int_read_len = GetFileSize(client_http_file->h_file, NULL);
 #else
-	client_http_file->int_read_length = (ssize_t)lseek(client_http_file->int_file_fd, 0, SEEK_END);
-	SERROR_CHECK(client_http_file->int_read_length != -1, "lseek(0, SEEK_END) failed");
+	client_http_file->int_read_len = (ssize_t)lseek(client_http_file->int_file_fd, 0, SEEK_END);
+	SERROR_CHECK(client_http_file->int_read_len != -1, "lseek(0, SEEK_END) failed");
 	SERROR_CHECK(lseek(client_http_file->int_file_fd, 0, SEEK_SET) != -1, "lseek(0, SEEK_SET) failed");
 #endif
 
-	char temp[101];
 	SERROR_SALLOC(tm_change_stamp, sizeof(struct tm));
 #ifdef _WIN32
 	gmtime_s(tm_change_stamp, &(statdata->st_mtime));
@@ -296,6 +336,7 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 		tim_if_modified_by = mktime(tm_if_modified_by);
 		tim_change_stamp = mktime(tm_change_stamp);
 
+		char temp[101] = { 0 };
 		SDEBUG("----------");
 		SDEBUG("name: %s", client_http_file->str_uri_part);
 		SERROR_CHECK(strftime(temp, 100, str_date_format, tm_if_modified_by) != 0, "strftime() failed");
@@ -313,12 +354,11 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 		SFREE(str_global_error);
 	}
 
-	SERROR_CHECK(strftime(temp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
-	temp[100] = 0;
-	SERROR_CAT_CSTR(str_last_modified, temp);
+	SERROR_SALLOC(str_last_modified, 101)
+	SERROR_CHECK(strftime(str_last_modified, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
 
 	char str_length[50];
-	sprintf(str_length, "%zu", client_http_file->int_read_length);
+	sprintf(str_length, "%zu", client_http_file->int_read_len);
 
 	str_content_type = contenttype(client_http_file->str_uri_part);
 	SERROR_CHECK(str_content_type, "contenttype failed");
@@ -337,12 +377,21 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 	char *str_maybe_download = client_http_file->bol_download ? "Content-Disposition: attachment\015\012" : "";
 
 	if (strncmp(str_content_type, "text/html", 9) != 0 && tim_if_modified_by != 0 && tim_if_modified_by >= tim_change_stamp) {
-		SERROR_CAT_CSTR(client->str_response, "HTTP/1.1 304 Not Modified\015\012ETag: \"", str_etag, "\"\015\012Last-Modified: ",
-			str_last_modified, "\015\012Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012");
+		char *str_temp1 = "HTTP/1.1 304 Not Modified\015\012ETag: \"";
+		char *str_temp2 = "\"\015\012Last-Modified: ";
+		char *str_temp3 = "\015\012Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
+		SERROR_SNCAT(
+			client->str_response, &client_http_file->int_response_len,
+			str_temp1, strlen(str_temp1),
+			str_etag, strlen(str_etag),
+			str_temp2, strlen(str_temp2),
+			str_last_modified, strlen(str_last_modified),
+			str_temp3, strlen(str_temp3)
+		);
 
 		client_http_file->int_read = 0;
-		client_http_file->int_response_header_length = strlen(client->str_response);
-		client_http_file->int_response_length = client_http_file->int_response_header_length;
+		client_http_file->int_response_header_len = strlen(client->str_response);
+		client_http_file->int_response_len = client_http_file->int_response_header_len;
 
 		ev_check_stop(EV_A, &client_copy_check->check);
 		SFREE(client_copy_check);
@@ -350,36 +399,50 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 		ev_io_init(&client_http_file->io, http_file_write_cb, client->io.fd, EV_WRITE);
 		ev_io_start(EV_A, &client_http_file->io);
 	} else {
-		SERROR_CAT_CSTR(client->str_response, "HTTP/1.1 200 OK\015\012",
-			str_maybe_download);
+		SERROR_SNCAT(
+			client->str_response, &client_http_file->int_response_len,
+			"HTTP/1.1 200 OK\015\012", (size_t)19,
+			str_maybe_download, strlen(str_maybe_download)
+		);
 
 		if (strncmp(str_content_type, "text/html", 9) == 0) {
-			SERROR_CAT_APPEND(client->str_response,
-				"Cache-Control: no-cache\015\012");
+			SERROR_SNFCAT(
+				client->str_response, &client_http_file->int_response_len,
+				"Cache-Control: no-cache\015\012", (size_t)25
+			);
 		} else {
-			SERROR_CAT_APPEND(client->str_response,
-				"ETag: \"", str_etag, "\"\015\012",
-				"Last-Modified: ", str_last_modified, "\015\012"
+			SERROR_SNFCAT(
+				client->str_response, &client_http_file->int_response_len,
+				"ETag: \"", (size_t)8,
+				str_etag, strlen(str_etag),
+				"\"\015\012", (size_t)3,
+				"Last-Modified: ", (size_t)15,
+				str_last_modified, strlen(str_last_modified),
+				"\015\012", (size_t)2
 				// Not needed right now, but here it is in case we do later.
 				//"Cache-Control: no-store\015\012"
 			);
 		}
 
-		SERROR_CAT_APPEND(client->str_response,
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
-			"Content-Length: ", str_length, "\015\012",
-			"Content-Type:", str_content_type, "\015\012",
-			"\015\012");
+		char *str_temp4 = "Server: " SUN_PROGRAM_LOWER_NAME "\015\012Content-Length: ";
+		SERROR_SNFCAT(
+			client->str_response, &client_http_file->int_response_len,
+			str_temp4, strlen(str_temp4), 
+			str_length, strlen(str_length),
+			"\015\012Content-Type:", (size_t)15,
+			str_content_type, strlen(str_content_type),
+			"\015\012\015\012", (size_t)4
+		);
 
 		client_http_file->int_read = 0;
-		client_http_file->int_response_header_length = strlen(client->str_response);
-		client_http_file->int_response_length =
-			client_http_file->int_response_header_length + (size_t)client_http_file->int_read_length;
+		client_http_file->int_response_header_len = client_http_file->int_response_len;
+		client_http_file->int_response_len =
+			client_http_file->int_response_header_len + (size_t)client_http_file->int_read_len;
 		SERROR_SREALLOC(
-			client->str_response, client_http_file->int_response_header_length + (size_t)client_http_file->int_read_length + 1);
-		memset(client->str_response + client_http_file->int_response_header_length, 0,
-			(size_t)client_http_file->int_read_length + 1);
-		client->str_response[client_http_file->int_response_header_length + (size_t)client_http_file->int_read_length] = 0;
+			client->str_response, client_http_file->int_response_header_len + (size_t)client_http_file->int_read_len + 1);
+		memset(client->str_response + client_http_file->int_response_header_len, 0,
+			(size_t)client_http_file->int_read_len + 1);
+		client->str_response[client_http_file->int_response_header_len + (size_t)client_http_file->int_read_len] = 0;
 
 		ev_check_stop(EV_A, &client_copy_check->check);
 		ev_check_init(&client_copy_check->check, http_file_step3);
@@ -416,10 +479,10 @@ void http_file_step3(EV_P, ev_check *w, int revents) {
 	LPTSTR strErrorText = NULL;
 #endif
 
-	SDEBUG("client_http_file->int_response_header_length: %d", client_http_file->int_response_header_length);
+	SDEBUG("client_http_file->int_response_header_len: %d", client_http_file->int_response_header_len);
 	SDEBUG("client_http_file->int_read: %d", client_http_file->int_read);
-	SDEBUG("client_http_file->int_read_length: %d", client_http_file->int_read_length);
-	if (client_http_file->int_read == client_http_file->int_read_length) {
+	SDEBUG("client_http_file->int_read_len: %d", client_http_file->int_read_len);
+	if (client_http_file->int_read == client_http_file->int_read_len) {
 		ev_check_stop(EV_A, &client_copy_check->check);
 		SFREE(client_copy_check);
 		decrement_idle(EV_A);
@@ -438,8 +501,8 @@ void http_file_step3(EV_P, ev_check *w, int revents) {
 #ifdef _WIN32
 		DWORD int_read = 0;
 		BOOL bol_result = ReadFile(client_http_file->h_file,
-			client->str_response + client_http_file->int_response_header_length + client_http_file->int_read,
-			(DWORD)(client_http_file->int_read_length - client_http_file->int_read), &int_read, NULL);
+			client->str_response + client_http_file->int_response_header_len + client_http_file->int_read,
+			(DWORD)(client_http_file->int_read_len - client_http_file->int_read), &int_read, NULL);
 		if (bol_result == FALSE) {
 			int int_err = GetLastError();
 			FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
@@ -452,13 +515,13 @@ void http_file_step3(EV_P, ev_check *w, int revents) {
 #else
 		lseek(client_http_file->int_file_fd, (off_t)client_http_file->int_read, SEEK_SET);
 		ssize_t int_read = read(client_http_file->int_file_fd,
-			client->str_response + (off_t)client_http_file->int_response_header_length + client_http_file->int_read,
-			(size_t)(client_http_file->int_read_length - client_http_file->int_read));
+			client->str_response + (off_t)client_http_file->int_response_header_len + client_http_file->int_read,
+			(size_t)(client_http_file->int_read_len - client_http_file->int_read));
 		// SDEBUG("int_read: %d", int_read);
 		// SDEBUG("client->str_response +
-		// client_http_file->int_response_header_length +
+		// client_http_file->int_response_header_len +
 		// client_http_file->int_read:\n>%s<",
-		// client->str_response + client_http_file->int_response_header_length +
+		// client->str_response + client_http_file->int_response_header_len +
 		// client_http_file->int_read);
 		SERROR_CHECK(int_read > 0, "Read failed: %d (%s)", errno, strerror(errno));
 #endif
@@ -484,7 +547,7 @@ void http_file_write_cb(EV_P, ev_io *w, int revents) {
 	SDEBUG("http_file_check_cb");
 	struct sock_ev_client_http_file *client_http_file = (struct sock_ev_client_http_file *)w;
 	struct sock_ev_client *client = client_http_file->parent;
-	ssize_t int_response_len = (ssize_t)client_http_file->int_response_length - (ssize_t)client_http_file->int_written;
+	ssize_t int_response_len = (ssize_t)client_http_file->int_response_len - (ssize_t)client_http_file->int_written;
 	if (int_response_len > MB) {
 		int_response_len = MB;
 	}
@@ -496,14 +559,14 @@ void http_file_write_cb(EV_P, ev_io *w, int revents) {
 	int_response_len = CLIENT_WRITE(client, client->str_response + client_http_file->int_written, (size_t)int_response_len);
 
 	SDEBUG("write(%i, %p, %i): %i", client->int_sock, client->str_response + client_http_file->int_written,
-		client_http_file->int_response_length - client_http_file->int_written, int_response_len);
+		client_http_file->int_response_len - client_http_file->int_written, int_response_len);
 
 	if (int_response_len == -1 && errno != EAGAIN) {
 		if (bol_tls) {
 			SERROR_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 		} else {
 			SERROR("write(%i, %p, %i) failed: %i", client->int_sock, client->str_response + client_http_file->int_written,
-				client_http_file->int_response_length - client_http_file->int_written, int_response_len);
+				client_http_file->int_response_len - client_http_file->int_written, int_response_len);
 		}
 	} else if (int_response_len == TLS_WANT_POLLIN) {
 		ev_io_stop(EV_A, w);
@@ -525,7 +588,7 @@ void http_file_write_cb(EV_P, ev_io *w, int revents) {
 		client_http_file->int_written += (size_t)int_response_len;
 	}
 
-	if (client_http_file->int_written == client_http_file->int_response_length) {
+	if (client_http_file->int_written == client_http_file->int_response_len) {
 		SFREE(client->str_response);
 		ev_io_stop(EV_A, &client_http_file->parent->io);
 		ev_io_stop(EV_A, w);
