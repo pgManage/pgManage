@@ -45,9 +45,10 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 	SFREE(str_global_error);
 
 	if (client_delete->str_hash_where_clause != NULL) {
-		SFINISH_REPLACE(client_delete->str_hash_where_clause, "\"", "\"\"", "g");
+		client_delete->int_hash_where_clause_len = strlen(client_delete->str_hash_where_clause);
+		SFINISH_BREPLACE(client_delete->str_hash_where_clause, &client_delete->int_hash_where_clause_len, "\"", "\"\"", "g");
 		if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_REPLACE(client_delete->str_hash_where_clause, "\t", "\"::text, '') || '\t' || COALESCE(\"", "g");
+			SFINISH_BREPLACE(client_delete->str_hash_where_clause, &client_delete->int_hash_where_clause_len, "\t", "\"::text, '') || '\t' || COALESCE(\"", "g");
 			client_delete->int_hash_where_clause_len = strlen(client_delete->str_hash_where_clause);
 			SFINISH_SNCAT(str_where_temp, &int_where_temp_len,
 				client_delete->str_temp_table_name, client_delete->int_temp_table_name_len,
@@ -55,7 +56,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 				client_delete->str_hash_where_clause, client_delete->int_hash_where_clause_len,
 				"\"::text, ''))", (size_t)13);
 		} else {
-			SFINISH_REPLACE(client_delete->str_hash_where_clause, "\t",
+			SFINISH_BREPLACE(client_delete->str_hash_where_clause, &client_delete->int_hash_where_clause_len, "\t",
 				"\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX))) + CAST('\t' AS nvarchar(MAX)) + COALESCE(CAST(\"", "g");
 			client_delete->int_hash_where_clause_len = strlen(client_delete->str_hash_where_clause);
 			SFINISH_SNCAT(str_where_temp, &int_where_temp_len,
@@ -65,6 +66,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 		}
 		SFREE(client_delete->str_hash_where_clause);
 		client_delete->str_hash_where_clause = str_where_temp;
+		client_delete->int_hash_where_clause_len = int_where_temp_len;
 		str_where_temp = NULL;
 	}
 
@@ -522,7 +524,7 @@ bool ws_delete_step4(EV_P, void *cb_data, DB_result *res) {
 		if (client_delete->str_hash_where_clause != NULL) {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
 				"SELECT count(*), sum(CASE WHEN ", (size_t)31,
-				client_delete->str_hash_where_clause, client_delete->int_pk_where_clause_len,
+				client_delete->str_hash_where_clause, client_delete->int_hash_where_clause_len,
 				" THEN 1 ELSE 0 END) FROM ", (size_t)25,
 				client_delete->str_temp_table_name, client_delete->int_temp_table_name_len,
 				" INNER JOIN ", (size_t)12,
@@ -544,7 +546,7 @@ bool ws_delete_step4(EV_P, void *cb_data, DB_result *res) {
 		if (client_delete->str_hash_where_clause != NULL) {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
 				"SELECT CAST(count(*) AS nvarchar(MAX)), CAST(sum(CASE WHEN ", (size_t)59,
-				client_delete->str_hash_where_clause, client_delete->int_pk_where_clause_len,
+				client_delete->str_hash_where_clause, client_delete->int_hash_where_clause_len,
 				" THEN 1 ELSE 0 END) AS nvarchar(MAX)) FROM ", (size_t)43,
 				client_delete->str_temp_table_name, client_delete->int_temp_table_name_len,
 				" INNER JOIN ", (size_t)12,
@@ -750,9 +752,9 @@ bool ws_delete_step6(EV_P, void *cb_data, DB_result *res) {
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 	SFINISH_SNCAT(str_response, &int_response_len,
-		"messageid = ", (size_t)1,
+		"messageid = ", (size_t)12,
 		client_request->str_message_id, strlen(client_request->str_message_id),
-		"\012responsenumber = ", (size_t)1,
+		"\012responsenumber = ", (size_t)18,
 		str_temp, strlen(str_temp),
 		"\012", (size_t)1);
 	if (client_request->str_transaction_id != NULL) {
@@ -766,7 +768,7 @@ bool ws_delete_step6(EV_P, void *cb_data, DB_result *res) {
 		str_rows, strlen(str_rows),
 		"\012", (size_t)1);
 
-	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 	DArray_push(client_request->arr_response, str_response);
 
 	// Build second response (tells the client we're done)
@@ -789,7 +791,7 @@ bool ws_delete_step6(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_SNFCAT(str_response, &int_response_len,
 		"TRANSACTION COMPLETED", (size_t)21);
 
-	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 	DArray_push(client_request->arr_response, str_response);
 	str_response = NULL;
 

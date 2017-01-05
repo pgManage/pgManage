@@ -15,10 +15,10 @@ struct sock_ev_client_http_file {
 #else
 	int int_file_fd;
 #endif
-	size_t int_response_header_length;
-	size_t int_response_length;
+	size_t int_response_header_len;
+	size_t int_response_len;
 	ssize_t int_read;
-	ssize_t int_read_length;
+	ssize_t int_read_len;
 	bool bol_download;
 	size_t int_written;
 
