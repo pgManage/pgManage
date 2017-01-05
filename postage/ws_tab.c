@@ -90,8 +90,8 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 		// TODO: replace these `strstr` calls with `bstrstr`
 		client_tab->ptr_content = strstr(ptr_query, "\012") + 1;
 		SFINISH_SNCAT(
-			str_query, &int_query_len, 
-			ptr_query, (size_t)(client_request->frame->int_length - (ptr_query - client_request->frame->str_message))
+			str_query, &int_query_len,
+			ptr_query, (size_t)(client_request->frame->int_length - (size_t)(ptr_query - client_request->frame->str_message))
 		);
 		ptr_query = strstr(str_query, "\t");
 		SFINISH_CHECK(ptr_query != NULL, "strstr failed");
@@ -187,7 +187,7 @@ finish:
 			client_request->str_message_id, strlen(client_request->str_message_id),
 			"\012responsenumber = ", (size_t)18,
 			str_temp1, strlen(str_temp1),
-			"\012", (size_t)1, 
+			"\012", (size_t)1,
 			_str_response, strlen(_str_response)
 		);
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_reponse_len);
