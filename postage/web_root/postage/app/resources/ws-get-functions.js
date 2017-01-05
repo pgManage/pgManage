@@ -1,7 +1,7 @@
 /* global GS, ml, editor, Range, setHomeValue, xtag, closeFolder, addHomeQuery, newTab, scriptQuery, detailQuery */
 var bolGetFunctionsLoaded = true;
 
-function getListData(strQuery, loaderTarget, callback) {
+function getListData(strQuery, loaderTarget, callback, socket) {
     'use strict';
     var arrRecords = [], bolSkipNext = false;
     
@@ -9,7 +9,7 @@ function getListData(strQuery, loaderTarget, callback) {
     GS.addLoader(loaderTarget, 'Getting list...');
     
     // request using raw query
-    GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
+    GS.requestRawFromSocket(socket || GS.envSocket, strQuery, function (data, error) {
         var arrLines, arrRecord, i, len, col_i, col_len;
         
         if (!error) {
