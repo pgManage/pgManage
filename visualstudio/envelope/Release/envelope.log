@@ -1,8 +1,8 @@
-﻿  ws_file.c
+﻿  ws_action.c
   Generating code
-  6 of 512 functions ( 1.2%) were compiled, the rest were copied from previous compilation.
+  2 of 512 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    119 functions had inline decision re-evaluated but remain unchanged
+    2 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.exe
   envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.pdb (Full PDB)

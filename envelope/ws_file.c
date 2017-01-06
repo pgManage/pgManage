@@ -507,7 +507,7 @@ bool ws_file_list_step2(EV_P, void *cb_data, bool bol_group) {
 		);
 		ent = NULL;
 	}
-	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 	DArray_push(client_request->arr_response, str_response);
 
 	client_request->int_response_id += 1;
@@ -1307,7 +1307,7 @@ finish:
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -1395,7 +1395,7 @@ finish:
 		);
 		SFREE(_str_response);
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -1616,7 +1616,7 @@ finish:
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		if (client_file != NULL) {
@@ -1641,7 +1641,7 @@ finish:
 				_str_response, strlen(_str_response)
 			);
 			SFREE(_str_response);
-			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 			DArray_push(client_request->arr_response, str_response);
 
 			client_request->int_response_id += 1;
@@ -1655,7 +1655,7 @@ finish:
 				str_temp, strlen(str_temp),
 				"\012TRANSACTION COMPLETED", (size_t)22
 			);
-			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 			DArray_push(client_request->arr_response, str_response);
 
 			str_response = NULL;
@@ -1757,7 +1757,7 @@ finish:
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -1826,7 +1826,7 @@ finish:
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -1848,7 +1848,7 @@ finish:
 			_str_response, strlen(_str_response)
 		);
 		SFREE(_str_response);
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		client_request->int_response_id += 1;
@@ -1862,7 +1862,7 @@ finish:
 			str_temp, strlen(str_temp),
 			"\012TRANSACTION COMPLETED", (size_t)22
 		);
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
@@ -1943,7 +1943,7 @@ finish:
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -1965,7 +1965,7 @@ finish:
 			_str_response, strlen(_str_response)
 		);
 		SFREE(_str_response);
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		client_request->int_response_id += 1;
@@ -1979,7 +1979,7 @@ finish:
 			str_temp, strlen(str_temp),
 			"\012TRANSACTION COMPLETED", (size_t)22
 		);
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
@@ -2057,7 +2057,7 @@ finish:
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -2120,7 +2120,7 @@ finish:
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -2142,7 +2142,7 @@ finish:
 			_str_response, strlen(_str_response)
 		);
 		SFREE(_str_response);
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		client_request->int_response_id += 1;
@@ -2156,7 +2156,7 @@ finish:
 			str_temp, strlen(str_temp),
 			"\012TRANSACTION COMPLETED", (size_t)22
 		);
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
@@ -2231,7 +2231,7 @@ finish:
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -2253,7 +2253,7 @@ finish:
 			_str_response, strlen(_str_response)
 		);
 		SFREE(_str_response);
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		client_request->int_response_id += 1;
@@ -2267,7 +2267,7 @@ finish:
 			str_temp, strlen(str_temp),
 			"\012TRANSACTION COMPLETED", (size_t)22
 		);
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
@@ -2384,7 +2384,7 @@ finish:
 		);
 		SFREE(_str_response);
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		SFREE(client_request_watcher);
@@ -2461,7 +2461,7 @@ finish:
 		);
 		SFREE(_str_response);
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -2507,7 +2507,7 @@ finish:
 		);
 		SFREE(_str_response);
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -2557,7 +2557,7 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 			"\012TRANSACTION COMPLETED", (size_t)22
 		);
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
 
@@ -2648,7 +2648,7 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 					str_line, int_line_length
 				);
 
-				WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+				WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 				DArray_push(client_request->arr_response, str_response);
 				str_response = NULL;
 			}
@@ -2677,7 +2677,7 @@ finish:
 		);
 		SFREE(_str_response);
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		decrement_idle(EV_A);
