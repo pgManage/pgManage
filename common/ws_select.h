@@ -39,6 +39,7 @@ struct sock_ev_client_select {
 	size_t int_order_by_len;
 	size_t int_limit_len;
 	size_t int_offset_len;
+	size_t int_row_count_len;
 };
 
 /*

@@ -43,6 +43,7 @@ struct sock_ev_client_insert {
 	size_t int_identity_column_name_len;
 	size_t int_return_columns_len;
 	size_t int_sql_len;
+	size_t int_result_len;
 };
 
 /*

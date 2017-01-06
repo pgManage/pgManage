@@ -6,7 +6,6 @@ void http_action_step1(struct sock_ev_client *client) {
 	char *ptr_end_uri = NULL;
 	ssize_t int_len = 0;
 	size_t int_uri_len = 0;
-	size_t int_query_len = 0;
 	size_t int_args_len = 0;
 	size_t int_action_name_len = 0;
 	size_t int_sql_len = 0;
@@ -23,7 +22,7 @@ void http_action_step1(struct sock_ev_client *client) {
 		}
 	}
 
-	str_args = query(client->str_request, client->int_request_len, &int_query_len);
+	str_args = query(client->str_request, client->int_request_len, &int_args_len);
 	if (str_args == NULL) {
 		SFINISH_SNCAT(str_args, &int_args_len,
 			"", (size_t)0);
@@ -45,7 +44,8 @@ void http_action_step1(struct sock_ev_client *client) {
 	SDEBUG("str_args: %s", str_args);
 
 	str_temp = str_args;
-	str_args = DB_escape_literal(client->conn, str_temp, strlen(str_args));
+	str_args = DB_escape_literal(client->conn, str_temp, int_args_len);
+	int_args_len = strlen(str_args);
 	SFINISH_CHECK(str_args != NULL, "DB_escape_literal failed");
 
 	SDEBUG("str_args: %s", str_args);
@@ -112,6 +112,7 @@ bool http_action_step2(EV_P, void *cb_data, DB_result *res) {
 	ssize_t int_len = 0;
 	size_t int_response_len = 0;
 	DArray *arr_row_values = NULL;
+	DArray *arr_row_lengths = NULL;
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed, res == NULL");
 	SFINISH_CHECK(res->status == DB_RES_TUPLES_OK, "DB_exec failed, res->status == %d", res->status);
@@ -119,6 +120,8 @@ bool http_action_step2(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_CHECK(DB_fetch_row(res) == DB_FETCH_OK, "DB_fetch_row failed");
 	arr_row_values = DB_get_row_values(res);
 	SFINISH_CHECK(arr_row_values != NULL, "DB_get_row_values failed");
+	arr_row_lengths = DB_get_row_lengths(res);
+	SFINISH_CHECK(arr_row_lengths != NULL, "DB_get_row_lengths failed");
 
 	_str_response = DArray_get(arr_row_values, 0);
 	SFINISH_SNCAT(str_response, &int_response_len,
@@ -130,7 +133,7 @@ bool http_action_step2(EV_P, void *cb_data, DB_result *res) {
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 			"Content-Type: application/json; charset=UTF-8\015\012\015\012"
 			"{\"stat\":true, \"dat\": "),
-		_str_response, strlen(_str_response),
+		_str_response, (*(ssize_t *)DArray_get(arr_row_lengths, 0)),
 		"}", (size_t)1);
 	SFREE(_str_response);
 	SDEBUG("str_response: %s", str_response);
@@ -141,7 +144,7 @@ bool http_action_step2(EV_P, void *cb_data, DB_result *res) {
 
 	client_copy_check->str_response = str_response;
 	str_response = NULL;
-	client_copy_check->int_response_len = (ssize_t)strlen(client_copy_check->str_response);
+	client_copy_check->int_response_len = (ssize_t)int_response_len;
 	client_copy_check->client_request = client->cur_request;
 
 	SFINISH_SALLOC(client_copy_io, sizeof(struct sock_ev_client_copy_io));
@@ -154,7 +157,12 @@ bool http_action_step2(EV_P, void *cb_data, DB_result *res) {
 	bol_error_state = false;
 finish:
 	if (arr_row_values != NULL) {
+		// the value in this array is used as str_response in the struct
 		DArray_destroy(arr_row_values);
+	}
+	if (arr_row_lengths != NULL) {
+		// we copy the length into the struct, so we can free it in the array
+		DArray_clear_destroy(arr_row_lengths);
 	}
 	SFREE(_str_response);
 	_str_response = str_response;

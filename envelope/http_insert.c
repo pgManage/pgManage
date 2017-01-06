@@ -359,6 +359,7 @@ bool http_insert_step4(EV_P, void *cb_data, DB_result *res) {
 	char *str_response = NULL;
 	char *_str_response = NULL;
 	DArray *arr_row_values = NULL;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_temp, str_col_seq);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
@@ -383,7 +384,7 @@ bool http_insert_step4(EV_P, void *cb_data, DB_result *res) {
 			SFINISH_CHECK(str_col_seq != NULL, "DB_escape_literal failed!");
 			SFINISH_SNCAT(client_insert->str_sql, &client_insert->int_sql_len,
 				"SELECT CAST(IDENT_CURRENT(", (size_t)26,
-				str_col_seq, int_col_seq_len,
+				str_col_seq, strlen(str_col_seq),
 				") AS nvarchar(MAX));", (size_t)20);
 		} else {
 			SFINISH_SNCAT(client_insert->str_sql, &client_insert->int_sql_len,
@@ -415,16 +416,21 @@ finish:
 		bol_error_state = false;
 
 		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
+			strlen("HTTP/1.1 500 Internal Server Error\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}
-	ssize_t int_response_len = 0;
-	if (str_response != NULL && (int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	ssize_t int_client_write_len = 0;
+	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -434,7 +440,7 @@ finish:
 	}
 	SFREE(str_response);
 	DB_free_result(res);
-	if (int_response_len != 0) {
+	if (int_client_write_len != 0) {
 		ws_insert_free(client_insert);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
@@ -450,6 +456,7 @@ bool http_insert_step5(EV_P, void *cb_data, DB_result *res) {
 	char *str_response = NULL;
 	char *_str_response = NULL;
 	DArray *arr_row_values = NULL;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_temp);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
@@ -460,7 +467,8 @@ bool http_insert_step5(EV_P, void *cb_data, DB_result *res) {
 	arr_row_values = DB_get_row_values(res);
 	SFINISH_CHECK(arr_row_values != NULL, "DB_get_row_values failed");
 
-	SFINISH_CAT_CSTR(client_insert->str_result, DArray_get(arr_row_values, 0));
+	SFINISH_SNCAT(client_insert->str_result, &client_insert->int_result_len,
+		DArray_get(arr_row_values, 0), strlen(DArray_get(arr_row_values, 0)));
 	DArray_clear_destroy(arr_row_values);
 	arr_row_values = NULL;
 
@@ -484,16 +492,21 @@ finish:
 		bol_error_state = false;
 
 		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
+			strlen("HTTP/1.1 500 Internal Server Error\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}
-	ssize_t int_response_len = 0;
-	if (str_response != NULL && (int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	ssize_t int_client_write_len = 0;
+	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -503,7 +516,7 @@ finish:
 	}
 	SFREE(str_response);
 	DB_free_result(res);
-	if (int_response_len != 0) {
+	if (int_client_write_len != 0) {
 		ws_insert_free(client_insert);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
@@ -518,6 +531,7 @@ bool http_insert_step6(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
 	char *_str_response = NULL;
+	size_t int_response_len = 0;
 	DArray *arr_row_values = NULL;
 	SDEFINE_VAR_ALL(str_temp);
 
@@ -530,7 +544,8 @@ bool http_insert_step6(EV_P, void *cb_data, DB_result *res) {
 		arr_row_values = DB_get_row_values(res);
 		SFINISH_CHECK(arr_row_values != NULL, "DB_get_row_values failed");
 
-		SFINISH_CAT_CSTR(client_insert->str_result, DArray_get(arr_row_values, 0));
+		SFINISH_SNCAT(client_insert->str_result, &client_insert->int_result_len,
+			DArray_get(arr_row_values, 0), strlen(DArray_get(arr_row_values, 0)));
 		DArray_clear_destroy(arr_row_values);
 		arr_row_values = NULL;
 
@@ -539,10 +554,15 @@ bool http_insert_step6(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
 	}
 
-	SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
-								   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
-								   "{\"stat\": true, \"dat\": {\"lastval\": ",
-		client_insert->str_result, "}}");
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"HTTP/1.1 200 OK\015\012"
+		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+		"{\"stat\": true, \"dat\": {\"lastval\": ",
+		strlen("HTTP/1.1 200 OK\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+			"{\"stat\": true, \"dat\": {\"lastval\": "),
+		client_insert->str_result, client_insert->int_result_len,
+		"}}", (size_t)2);
 	SFREE(str_temp);
 
 	SDEBUG("str_response: %s", str_response);
@@ -557,16 +577,21 @@ finish:
 		bol_error_state = false;
 
 		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
+			strlen("HTTP/1.1 500 Internal Server Error\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}
-	ssize_t int_response_len = 0;
-	if (str_response != NULL && (int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	ssize_t int_client_write_len = 0;
+	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -577,7 +602,7 @@ finish:
 	SFREE(str_response);
 	DB_free_result(res);
 	ws_insert_free(client_insert);
-	if (int_response_len != 0) {
+	if (int_client_write_len != 0) {
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");

@@ -2432,7 +2432,7 @@ bool ws_file_search_step3(EV_P, void *cb_data, char *_str_file_name) {
 	}
 #else
 	SFINISH_SNCAT(
-		str_file_name, &int_file_name_len
+		str_file_name, &int_file_name_len,
 		client_file->str_path, strlen(client_file->str_path),
 		"/", (size_t)1,
 		_str_file_name, strlen(_str_file_name)
@@ -2606,7 +2606,7 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 			bool bol_match = false;
 			if (!client_file->bol_regex) {
 				SFINISH_SNCAT(
-					str_line_copy, &int_line_length, 
+					str_line_copy, &int_line_length,
 					str_line, int_line_length
 				);
 				if (client_file->bol_case_insensitive) {
@@ -2644,7 +2644,7 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 				SFINISH_SNFCAT(
 					str_response, &int_response_len,
 					str_temp, strlen(str_temp),
-					":", (size_t)1, 
+					":", (size_t)1,
 					str_line, int_line_length
 				);
 

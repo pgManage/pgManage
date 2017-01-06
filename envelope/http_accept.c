@@ -154,15 +154,17 @@ bool http_accept_step2(EV_P, void *cb_data, DB_result *res) {
 
 	client_copy_io->client_copy_check = client_copy_check;
 
-	ev_io_init(&client_copy_io->io, http_action_step3, GET_CLIENT_SOCKET(client), EV_WRITE);
+	ev_io_init(&client_copy_io->io, http_accept_step3, GET_CLIENT_SOCKET(client), EV_WRITE);
 	ev_io_start(EV_A, &client_copy_io->io);
 
 	bol_error_state = false;
 finish:
 	if (arr_row_values != NULL) {
-		DArray_clear_destroy(arr_row_values);
+		// the value in this array is used as str_response in the struct
+		DArray_destroy(arr_row_values);
 	}
 	if (arr_row_lengths != NULL) {
+		// we copy the length into the struct, so we can free it in the array
 		DArray_clear_destroy(arr_row_lengths);
 	}
 	SFREE(_str_response);
