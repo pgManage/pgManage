@@ -1304,7 +1304,7 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_SNCAT(str_response, &int_response_len,
 		str_temp1, strlen(str_temp1),
 		client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
-		"; path=/; expires=", 18,
+		"; path=/; expires=", (size_t)18,
 		str_expires, strlen(str_expires),
 		(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
 		str_temp2, strlen(str_temp2));
@@ -1369,15 +1369,15 @@ finish:
 		SFREE(str_response);
 		char str_length[50];
 		snprintf(str_length, 50, "%zu", strlen(_str_response));
-		char *str_temp = 
+		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
-			str_response, &int_response_len, 
+			str_response, &int_response_len,
 			str_temp, strlen(str_temp),
-			str_length, strlen(str_length), 
-			"\015\012\015\012", (size_t)4, 
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
 			_str_response, (int_response_len != 0 ? int_response_len : strlen(_str_response))
 		);
 		SFREE(_str_response);
@@ -1494,8 +1494,8 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 	);
 	if (client_auth->str_conn != NULL) {
 		SFINISH_SNFCAT(
-			client_auth->parent->str_connname_folder, &int_temp, 
-			"_", (size_t)1, 
+			client_auth->parent->str_connname_folder, &int_temp,
+			"_", (size_t)1,
 			client_auth->str_conn, client_auth->int_conn_length
 		);
 	}

@@ -416,7 +416,8 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 		arr_row_lengths = NULL;
 	}
 
-	SFINISH_CAT_APPEND(client_copy_check->str_response, str_temp);
+	SFINISH_CAT_APPEND(client_copy_check->str_response,
+		str_temp);
 	client_copy_check->int_response_len += (ssize_t)strlen(str_temp);
 	SFREE(str_temp);
 	SFREE(str_row_count);

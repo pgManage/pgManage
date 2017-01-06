@@ -876,29 +876,37 @@ function dialogOpenFeedLoadChannelList(bolChooseFirst) {
     'use strict';
 
     getListData('SELECT pg_listening_channels() AS channel_name', 'current-channels', function (data) {
-        var i, len, strHTML, strCurrentHTML, jsnUnread = {};
+        var arrChannel = [], i, len, strHTML, strCurrentHTML, jsnUnread = {};
 
         for (i = 0, len = arrNotification.length; i < len; i += 1) {
             if (arrNotification[i].hasBeenRead === false) {
                 jsnUnread[arrNotification[i].strChannel] = (jsnUnread[arrNotification[i].strChannel] || 0);
                 jsnUnread[arrNotification[i].strChannel] += 1;
+
+                GS.listAdd(arrChannel, arrNotification[i].strChannel);
             }
         }
 
         for (i = 1, len = data.length, strHTML = ''; i < len; i += 1) {
-            jsnUnread[data[i][0]] = jsnUnread[data[i][0]] || 0;
+            GS.listAdd(arrChannel, data[i][0]);
+        }
+
+        //console.log(arrChannel, data);
+
+        for (i = 0, len = arrChannel.length, strHTML = ''; i < len; i += 1) {
+            jsnUnread[arrChannel[i]] = jsnUnread[arrChannel[i]] || 0;
 
             strCurrentHTML =
-                '<div class="channel" data-channel-name="' + encodeHTML(data[i][0]) + '" ' +
-                            (strCurrentChannel === data[i][0] ? 'selected' : '') + ' flex-horizontal>' +
-                    '<h5 flex>' + encodeHTML(data[i][0]) + '</h5>' +
-                    '<span class="channel-unread-number ' + (jsnUnread[data[i][0]] > 0 ? 'unread': '') + '">' + jsnUnread[data[i][0]] + '</span>' +
-                    '<gs-button onclick="removeChannelListener(\'' + singleQuoteSafe(data[i][0]) + '\');' +
+                '<div class="channel" data-channel-name="' + encodeHTML(arrChannel[i]) + '" ' +
+                            (strCurrentChannel === arrChannel[i] ? 'selected' : '') + ' flex-horizontal>' +
+                    '<h5 flex>' + encodeHTML(arrChannel[i]) + '</h5>' +
+                    '<span class="channel-unread-number ' + (jsnUnread[arrChannel[i]] > 0 ? 'unread': '') + '">' + jsnUnread[arrChannel[i]] + '</span>' +
+                    '<gs-button onclick="removeChannelListener(\'' + singleQuoteSafe(arrChannel[i]) + '\');' +
                                         'dialogOpenFeedLoadChannelList();" ' +
                               ' icon="times" class="channel-delete" icononly>&nbsp;</gs-button>' +
                 '</div>';
 
-            if (jsnUnread[data[i][0]] === 0) {
+            if (jsnUnread[arrChannel[i]] === 0) {
                 strHTML += strCurrentHTML;
             } else {
                 strHTML = strHTML + strCurrentHTML;
@@ -914,7 +922,7 @@ function dialogOpenFeedLoadChannelList(bolChooseFirst) {
         if (data.length === 1) {
             document.getElementById('notification-messagebox').setAttribute('disabled', '');
         }
-    });
+    }, GS.querySocket);
     //getListData('SELECT pg_listening_channels() AS channel_name', 'current-channels', function (data) {
     //    var i, len, strHTML;
     //
@@ -1006,7 +1014,7 @@ function dialogOpenFeed() {
     strCurrentChannel = '';
     GS.openDialog(templateElement, function () {
         var strMessage, strType, strChannel, strPID, strPayload, strHTML = '',
-            arrNotifications = GS.envSocket.notifications, i, len, keydownHandler,
+            arrNotifications = GS.querySocket.notifications, i, len, keydownHandler,
             notificationList = document.getElementById('notification-list');
 
         document.getElementById('button-channel-bar-close').addEventListener('click', function (event) {
@@ -1070,7 +1078,7 @@ function dialogOpenFeed() {
 
             if (event.keyCode === 13 && strValue && strCurrentChannel) {
                 arrSentNotifications.push({'strChannel': strCurrentChannel, 'strPayload': strValue});
-                GS.requestRawFromSocket(GS.envSocket,
+                GS.requestRawFromSocket(GS.querySocket,
                                         'NOTIFY ' + quote_ident(strCurrentChannel) +
                                                 ',  $message_4_channel$' + strValue + '$message_4_channel$',
                                         function (data, error) {
@@ -1183,7 +1191,7 @@ function addChannelListener(strName, callback) {
     'use strict';
     var notificationList = document.getElementById('notification-list');
 
-    GS.requestRawFromSocket(GS.envSocket, 'LISTEN ' + quote_ident(strName) + ';', function (data, error) {
+    GS.requestRawFromSocket(GS.querySocket, 'LISTEN ' + quote_ident(strName) + ';', function (data, error) {
         var divElement;
 
         if (!error) {
@@ -1192,7 +1200,7 @@ function addChannelListener(strName, callback) {
                 //divElement.classList.add('text-right');
                 //divElement.innerHTML = '<b>@' + encodeHTML(strName) + ':</b> ADDED LISTENER';
                 //
-                //if (GS.envSocket.notifications.length > 0) {
+                //if (GS.querySocket.notifications.length > 0) {
                 //    notificationList.appendChild(document.createElement('hr'));
                 //}
                 //notificationList.appendChild(divElement);
@@ -1201,7 +1209,7 @@ function addChannelListener(strName, callback) {
                 //notificationList.scrollTop = notificationList.scrollHeight;
                 //
                 //// add message to notification array
-                //GS.envSocket.notifications.push('ADDED\t' + GS.encodeForTabDelimited(strName) + '\t\tADDED LISTENER');
+                //GS.querySocket.notifications.push('ADDED\t' + GS.encodeForTabDelimited(strName) + '\t\tADDED LISTENER');
 
                 strCurrentChannel = strName;
                 dialogOpenFeedLoadChannelList(true);
@@ -1220,13 +1228,24 @@ function addChannelListener(strName, callback) {
 function removeChannelListener(strName, callback) {
     'use strict';
     var notificationList = document.getElementById('notification-list');
+    var i;
+    var len;
 
     if (strCurrentChannel === strName) {
         strCurrentChannel = '';
         clearNotificationList();
     }
 
-    GS.requestRawFromSocket(GS.envSocket, 'UNLISTEN ' + quote_ident(strName) + ';', function (data, error) {
+    i = 0;
+    len = arrNotification.length;
+    while (i < len) {
+        if (arrNotification[i].strChannel === strName) {
+            arrNotification[i].hasBeenRead = true;
+        }
+        i += 1;
+    }
+
+    GS.requestRawFromSocket(GS.querySocket, 'UNLISTEN ' + quote_ident(strName) + ';', function (data, error) {
         var divElement;
 
         if (!error) {
@@ -1235,7 +1254,7 @@ function removeChannelListener(strName, callback) {
                 //divElement.classList.add('text-right');
                 //divElement.innerHTML = '<b>@' + encodeHTML(strName) + ':</b> REMOVED LISTENER';
                 //
-                //if (GS.envSocket.notifications.length > 0) {
+                //if (GS.querySocket.notifications.length > 0) {
                 //    notificationList.appendChild(document.createElement('hr'));
                 //}
                 //notificationList.appendChild(divElement);
@@ -1244,7 +1263,7 @@ function removeChannelListener(strName, callback) {
                 //notificationList.scrollTop = notificationList.scrollHeight;
                 //
                 //// add message to notification array
-                //GS.envSocket.notifications.push('ADDED\t' + GS.encodeForTabDelimited(strName) + '\t\tREMOVED LISTENER');
+                //GS.querySocket.notifications.push('ADDED\t' + GS.encodeForTabDelimited(strName) + '\t\tREMOVED LISTENER');
 
                 if (typeof callback === 'function') {
                     callback();
