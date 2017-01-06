@@ -1383,20 +1383,17 @@ finish:
 		client_request->int_response_id = (ssize_t)DArray_end(client_request->arr_response) + 1;
 		char str_temp[101] = {0};
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-		if (errno != 0) {
-			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to stat file ", client_file->str_path, " ", strerror(errno));
-		} else {
-			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
-			SFREE(_str_response);
-		}
+		char *_str_response = str_response;
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1,
+			_str_response, strlen(_str_response)
+		);
+		SFREE(_str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
@@ -1412,6 +1409,7 @@ finish:
 bool ws_file_move_step3(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	size_t int_response_len = 0;
 
 	char *str_response = NULL;
 #ifdef _WIN32
@@ -1462,6 +1460,7 @@ bool ws_file_move_step3(EV_P, void *cb_data, bool bol_group) {
 			"snprintf() failed"
 		);
 		str_response[100] = 0;
+		int_response_len = strlen(str_response);
 #else
 		SFINISH_SALLOC(statdata, sizeof(struct stat));
 		if (stat(client_file->str_path_to, statdata) == 0) {
@@ -1478,7 +1477,12 @@ bool ws_file_move_step3(EV_P, void *cb_data, bool bol_group) {
 #endif
 			str_nanoseconds[100] = 0;
 
-			SFINISH_CAT_APPEND(str_response, ".", str_nanoseconds);
+			int_response_len = strlen(str_response);
+			SFINISH_SNFCAT(
+				str_response, &int_response_len,
+				".", (size_t)1,
+				str_nanoseconds, strlen(str_nanoseconds)
+			);
 #endif
 		} else {
 			SFINISH("stat failed");
@@ -1527,6 +1531,7 @@ bool ws_file_move_step3(EV_P, void *cb_data, bool bol_group) {
 				"snprintf() failed"
 			);
 			str_response[100] = 0;
+			int_response_len = strlen(str_response);
 #else
 			SFINISH_SALLOC(statdata, sizeof(struct stat));
 			if (stat(client_file->str_path_to, statdata) == 0) {
@@ -1543,7 +1548,12 @@ bool ws_file_move_step3(EV_P, void *cb_data, bool bol_group) {
 #endif
 				str_nanoseconds[100] = 0;
 
-				SFINISH_CAT_APPEND(str_response, ".", str_nanoseconds);
+				int_response_len = strlen(str_response);
+				SFINISH_SNFCAT(
+					str_response, &int_response_len,
+					".", (size_t)1,
+					str_nanoseconds, strlen(str_nanoseconds)
+				);
 #endif
 			} else {
 				SFINISH("stat failed");
@@ -1580,16 +1590,29 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to rename file ", client_file->str_path, " to ", client_file->str_path_to, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to stat file ", (size_t)16,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
@@ -1608,9 +1631,15 @@ finish:
 			char str_temp[101] = {0};
 			snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 			DArray_push(client_request->arr_response, str_response);
@@ -1618,9 +1647,14 @@ finish:
 			client_request->int_response_id += 1;
 			memset(str_temp, 0, 101);
 			snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012TRANSACTION COMPLETED");
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012TRANSACTION COMPLETED", (size_t)22
+			);
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 			DArray_push(client_request->arr_response, str_response);
 
@@ -1648,12 +1682,32 @@ bool ws_file_copy_step4(EV_P, void *cb_data, char *str_path) {
 	if (*(client_file->str_partial_path_to + strlen(client_file->str_partial_path_to) - 1) == '/') {
 		*(client_file->str_partial_path_to + strlen(client_file->str_partial_path_to) - 1) = '\0';
 	}
+	size_t int_new_path_len = 0;
+	size_t int_new_path_to_len = 0;
 	if (*str_path == '/') {
-		SFINISH_CAT_CSTR(str_new_path, client_file->str_partial_path, str_path);
-		SFINISH_CAT_CSTR(str_new_path_to, client_file->str_partial_path_to, str_path);
+		SFINISH_SNCAT(
+			str_new_path, &int_new_path_len,
+			client_file->str_partial_path, strlen(client_file->str_partial_path),
+			str_path, strlen(str_path)
+		);
+		SFINISH_SNCAT(
+			str_new_path_to, &int_new_path_to_len,
+			client_file->str_partial_path_to, strlen(client_file->str_partial_path),
+			str_path, strlen(str_path)
+		);
 	} else {
-		SFINISH_CAT_CSTR(str_new_path, client_file->str_partial_path, "/", str_path);
-		SFINISH_CAT_CSTR(str_new_path_to, client_file->str_partial_path_to, "/", str_path);
+		SFINISH_SNCAT(
+			str_new_path, &int_new_path_len,
+			client_file->str_partial_path, strlen(client_file->str_partial_path),
+			"/", (size_t)1,
+			str_path, strlen(str_path)
+		);
+		SFINISH_SNCAT(
+			str_new_path_to, &int_new_path_to_len,
+			client_file->str_partial_path_to, strlen(client_file->str_partial_path),
+			"/", (size_t)1,
+			str_path, strlen(str_path)
+		);
 	}
 
 	str_result_path = canonical(client_file->str_canonical_start, str_new_path, "read_file");
@@ -1677,16 +1731,29 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to delete file ", client_file->str_canonical_start, "/", str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to delete file ", (size_t)18,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
@@ -1733,16 +1800,29 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to stat file ", client_file->str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to stat file ", (size_t)16,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
@@ -1758,9 +1838,15 @@ finish:
 		char str_temp[101] = {0};
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012", _str_response);
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1,
+			_str_response, strlen(_str_response)
+		);
 		SFREE(_str_response);
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
@@ -1768,9 +1854,14 @@ finish:
 		client_request->int_response_id += 1;
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012TRANSACTION COMPLETED");
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012TRANSACTION COMPLETED", (size_t)22
+		);
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
 
@@ -1803,7 +1894,10 @@ bool ws_file_delete_step2(EV_P, void *cb_data, bool bol_group) {
 	client_file->str_path = canonical(client_file->str_canonical_start, client_file->str_partial_path, "read_file");
 	if (client_file->str_path != NULL) {
 		SFINISH_CHECK(unlink(client_file->str_path) == 0, "unlink failed");
-		SFINISH_CAT_CSTR(str_response, "OK");
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"OK", (size_t)2
+		);
 	} else {
 		SFREE(str_global_error);
 		client_file->str_path = canonical(client_file->str_canonical_start, client_file->str_partial_path, "read_dir");
@@ -1823,16 +1917,29 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to stat file ", client_file->str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to stat file ", (size_t)16,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
@@ -1848,9 +1955,15 @@ finish:
 		char str_temp[101] = {0};
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012", _str_response);
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1,
+			_str_response, strlen(_str_response)
+		);
 		SFREE(_str_response);
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
@@ -1858,9 +1971,14 @@ finish:
 		client_request->int_response_id += 1;
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012TRANSACTION COMPLETED");
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012TRANSACTION COMPLETED", (size_t)22
+		);
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
 
@@ -1883,10 +2001,20 @@ bool ws_file_delete_step3(EV_P, void *cb_data, char *str_path) {
 	if (*(client_file->str_partial_path + strlen(client_file->str_partial_path) - 1) == '/') {
 		*(client_file->str_partial_path + strlen(client_file->str_partial_path) - 1) = '\0';
 	}
+	size_t int_new_path_len = 0;
 	if (*str_path == '/') {
-		SFINISH_CAT_CSTR(str_new_path, client_file->str_partial_path, str_path);
+		SFINISH_SNCAT(
+			str_new_path, &int_new_path_len,
+			client_file->str_partial_path, strlen(client_file->str_partial_path),
+			str_path, strlen(str_path)
+		);
 	} else {
-		SFINISH_CAT_CSTR(str_new_path, client_file->str_partial_path, "/", str_path);
+		SFINISH_SNCAT(
+			str_new_path, &int_new_path_len,
+			client_file->str_partial_path, strlen(client_file->str_partial_path),
+			"/", (size_t)1,
+			str_path, strlen(str_path)
+		);
 	}
 
 	SDEBUG("client_file->str_canonical_start: %s", client_file->str_canonical_start);
@@ -1903,16 +2031,29 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to delete file ", client_file->str_canonical_start, "/", str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to delete file ", (size_t)18,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
@@ -1939,7 +2080,10 @@ bool ws_file_delete_step4(EV_P, void *cb_data, bool bol_success) {
 
 	SFINISH_CHECK(bol_success, "Error in canonical_delete");
 
-	SFINISH_CAT_CSTR(str_response, "OK");
+	SFINISH_SNCAT(
+		str_response, &int_response_len,
+		"OK", (size_t)2
+	);
 
 	bol_error_state = false;
 finish:
@@ -1950,16 +2094,29 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to stat file ", client_file->str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to stat file ", (size_t)16,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
@@ -1970,14 +2127,20 @@ finish:
 		// client_request_free(client_request);
 		// client_request_free takes care of this
 		// SFREE(client_file);
-	} else {
+	} else if (str_response != NULL) {
 		client_request->int_response_id += 1;
-		char str_temp[101] = {0};
+		char str_temp[101] = { 0 };
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012", _str_response);
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1,
+			_str_response, strlen(_str_response)
+		);
 		SFREE(_str_response);
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
@@ -1985,9 +2148,14 @@ finish:
 		client_request->int_response_id += 1;
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012TRANSACTION COMPLETED");
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012TRANSACTION COMPLETED", (size_t)22
+		);
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
 
@@ -2037,16 +2205,29 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to stat file ", client_file->str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to stat file ", (size_t)16,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
@@ -2062,9 +2243,15 @@ finish:
 		char str_temp[101] = {0};
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012", _str_response);
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1,
+			_str_response, strlen(_str_response)
+		);
 		SFREE(_str_response);
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
@@ -2072,9 +2259,14 @@ finish:
 		client_request->int_response_id += 1;
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012TRANSACTION COMPLETED");
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012TRANSACTION COMPLETED", (size_t)22
+		);
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
 
@@ -2135,11 +2327,12 @@ bool ws_file_search_step2(EV_P, void *cb_data, bool bol_group) {
 		dirp = opendir(str_path);
 		SFINISH_ERROR_CHECK(dirp != NULL, "opendir failed");
 
+		size_t int_name_len = 0;
 		while (dirp) {
 			errno = 0;
 			if ((dp = readdir(dirp)) != NULL) {
 				// dp->d_name
-				SFINISH_CAT_CSTR(str_name, dp->d_name);
+				SFINISH_SNCAT(str_name, &int_name_len, dp->d_name, strlen(dp->d_name));
 				if (strncmp(str_name, "..", 3) != 0 && strncmp(str_name, ".", 2) != 0) {
 					str_canonical_name = canonical(str_path, str_name, "valid_path");
 					SFINISH_CHECK(str_canonical_name != NULL, "canonical failed");
@@ -2180,9 +2373,15 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012", _str_response);
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1,
+			_str_response, strlen(_str_response)
+		);
 		SFREE(_str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
@@ -2205,6 +2404,7 @@ bool ws_file_search_step3(EV_P, void *cb_data, char *_str_file_name) {
 	char *ptr_extension = NULL;
 	struct stat *statdata = NULL;
 	size_t int_response_len = 0;
+	size_t int_file_name_len = 0;
 	ptr_extension = strrchr(_str_file_name, '.');
 	if (ptr_extension != NULL) {
 		ptr_extension += 1;
@@ -2218,7 +2418,12 @@ bool ws_file_search_step3(EV_P, void *cb_data, char *_str_file_name) {
 	}
 
 #ifdef _WIN32
-	SFINISH_CAT_CSTR(str_file_name, client_file->str_path, "\\", _str_file_name);
+	SFINISH_SNCAT(
+		str_file_name, &int_file_name_len,
+		client_file->str_path, strlen(client_file->str_path),
+		"\\", (size_t)1,
+		_str_file_name, strlen(_str_file_name)
+	);
 	SFINISH_SALLOC(statdata, sizeof(struct stat));
 	stat(str_file_name, statdata);
 
@@ -2226,7 +2431,12 @@ bool ws_file_search_step3(EV_P, void *cb_data, char *_str_file_name) {
 		Queue_send(client_file->que_file, str_file_name);
 	}
 #else
-	SFINISH_CAT_CSTR(str_file_name, client_file->str_path, "/", _str_file_name);
+	SFINISH_SNCAT(
+		str_file_name, &int_file_name_len
+		client_file->str_path, strlen(client_file->str_path),
+		"/", (size_t)1,
+		_str_file_name, strlen(_str_file_name)
+	);
 	Queue_send(client_file->que_file, str_file_name);
 #endif
 
@@ -2240,9 +2450,15 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012", _str_response);
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1,
+			_str_response, strlen(_str_response)
+		);
 		SFREE(_str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
@@ -2280,9 +2496,15 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012", _str_response);
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1,
+			_str_response, strlen(_str_response)
+		);
 		SFREE(_str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
@@ -2326,9 +2548,14 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 		client_request->int_response_id = (ssize_t)DArray_end(client_request->arr_response) + 1;
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012", "TRANSACTION COMPLETED");
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012TRANSACTION COMPLETED", (size_t)22
+		);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
@@ -2378,7 +2605,10 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 
 			bool bol_match = false;
 			if (!client_file->bol_regex) {
-				SFINISH_CAT_CSTR(str_line_copy, str_line);
+				SFINISH_SNCAT(
+					str_line_copy, &int_line_length, 
+					str_line, int_line_length
+				);
 				if (client_file->bol_case_insensitive) {
 					str_toupper(str_line_copy);
 					str_toupper(client_file->str_search);
@@ -2398,13 +2628,25 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 				client_request->int_response_id = (ssize_t)DArray_end(client_request->arr_response) + 1;
 				snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
-				SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																							   "responsenumber = ",
-					str_temp, "\012", str_current_file_name + strlen(client_file->str_path), ":");
+				SFINISH_SNCAT(
+					str_response, &int_response_len,
+					"messageid = ", (size_t)12,
+					client_request->str_message_id, strlen(client_request->str_message_id),
+					"\012responsenumber = ", (size_t)18,
+					str_temp, strlen(str_temp),
+					"\012", (size_t)1,
+					str_current_file_name + strlen(client_file->str_path), strlen(str_current_file_name) - strlen(client_file->str_path),
+					":", (size_t)1
+				);
 
 				snprintf(str_temp, 100, "%zd", client_file->int_line_number);
 
-				SFINISH_CAT_APPEND(str_response, str_temp, ":", str_line);
+				SFINISH_SNFCAT(
+					str_response, &int_response_len,
+					str_temp, strlen(str_temp),
+					":", (size_t)1, 
+					str_line, int_line_length
+				);
 
 				WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 				DArray_push(client_request->arr_response, str_response);
@@ -2424,9 +2666,15 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012", _str_response);
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1,
+			_str_response, strlen(_str_response)
+		);
 		SFREE(_str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
