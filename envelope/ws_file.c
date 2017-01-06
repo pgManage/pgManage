@@ -305,10 +305,14 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 			ptr_query += 1;
 		}
 
+		// TODO: replace all `unescape_value` calls with `bunescape_value`
 		str_search_temp = unescape_value(str_temp);
 		SFINISH_CHECK(str_search_temp != NULL, "unescape_value failed");
 
-		SFINISH_CAT_CSTR(client_file->str_search, str_search_temp);
+		SFINISH_SNCAT(
+			client_file->str_search, &client_file->int_search_len,
+			str_search_temp, strlen(str_search_temp)
+		);
 
 		SDEBUG("ptr_query: %s", ptr_query);
 		SDEBUG("client_file->str_path: %s", client_file->str_path);
@@ -361,20 +365,31 @@ finish:
 		client_request->int_response_id += 1;
 		char str_temp1[101] = {0};
 		snprintf(str_temp1, 100, "%zd", client_request->int_response_id);
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp1, "\012", _str_response);
-		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp1, strlen(str_temp1),
+			"\012", (size_t)1,
+			_str_response, strlen(_str_response)
+		);
+		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		SFREE(_str_response);
 
 		client_request->int_response_id += 1;
 		memset(str_temp1, 0, 101);
 		snprintf(str_temp1, 100, "%zd", client_request->int_response_id);
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp1, "\012TRANSACTION COMPLETED");
-		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp1, strlen(str_temp1),
+			"\012TRANSACTION COMPLETED", (size_t)22
+		);
+		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 	}
 	return str_response;
@@ -401,6 +416,7 @@ int ws_file_list_sort(const void *arg1, const void *arg2) {
 bool ws_file_list_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
 	char *str_response = NULL;
+	SDEFINE_VAR_ALL(str_temp_path, str_temp1, str_name, str_canonical_name);
 
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 	client_file->arr_contents = DArray_create(sizeof(struct list_dirent_ent), 100);
@@ -410,7 +426,8 @@ bool ws_file_list_step2(EV_P, void *cb_data, bool bol_group) {
 	DIR *dirp = NULL;
 	struct dirent *dp = NULL;
 	size_t int_i = 0, int_len = 0;
-	SDEFINE_VAR_ALL(str_temp_path, str_temp1, str_name, str_canonical_name);
+	size_t int_name_len = 0;
+	size_t int_response_len = 0;
 
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
 
@@ -421,7 +438,7 @@ bool ws_file_list_step2(EV_P, void *cb_data, bool bol_group) {
 		errno = 0;
 		if ((dp = readdir(dirp)) != NULL) {
 			// dp->d_name
-			SFINISH_CAT_CSTR(str_name, dp->d_name);
+			SFINISH_SNCAT(str_name, &int_name_len, dp->d_name, strlen(dp->d_name));
 			if (strncmp(str_name, "..", 3) != 0 && strncmp(str_name, ".", 2) != 0) {
 				str_canonical_name = canonical(client_file->str_path, str_name, "valid_path");
 				SFINISH_CHECK(str_canonical_name != NULL, "canonical failed");
@@ -467,14 +484,27 @@ bool ws_file_list_step2(EV_P, void *cb_data, bool bol_group) {
 
 	client_request->int_response_id += 1;
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012", "responsenumber = ", str_temp, "\012");
+	SFINISH_SNCAT(
+		str_response, &int_response_len,
+		"messageid = ", (size_t)12,
+		client_request->str_message_id, strlen(client_request->str_message_id),
+		"\012responsenumber = ", (size_t)18,
+		str_temp, strlen(str_temp),
+		"\012", (size_t)1
+	);
 	int_len = DArray_end(client_file->arr_contents);
 	for (int_i = 0; int_i < int_len; int_i += 1) {
 		ent = DArray_get(client_file->arr_contents, int_i);
 		SDEBUG("%p->arr_contents[%d]->str_name        : %s", client_file, int_i, ent->str_name);
 		SDEBUG("%p->arr_contents[%d]->int_change_stamp: %d", client_file, int_i, ent->int_change_stamp);
 		SDEBUG("%p->arr_contents[%d]->str_type        : %s", client_file, int_i, ent->str_type);
-		SFINISH_CAT_APPEND(str_response, ent->str_name, "\t", ent->str_type, "\012");
+		SFINISH_SNFCAT(
+			str_response, &int_response_len,
+			ent->str_name, strlen(ent->str_name),
+			"\t", (size_t)1,
+			ent->str_type, strlen(ent->str_type),
+			"\012", (size_t)1
+		);
 		ent = NULL;
 	}
 	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
@@ -483,11 +513,15 @@ bool ws_file_list_step2(EV_P, void *cb_data, bool bol_group) {
 	client_request->int_response_id += 1;
 	memset(str_temp, 0, 101);
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																				   "responsenumber = ",
-		str_temp, "\012"
-				  "TRANSACTION COMPLETED");
-	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+	SFINISH_SNCAT(
+		str_response, &int_response_len,
+		"messageid = ", (size_t)12,
+		client_request->str_message_id, strlen(client_request->str_message_id),
+		"\012responsenumber = ", (size_t)18,
+		str_temp, strlen(str_temp),
+		"\012TRANSACTION COMPLETED", (size_t)22
+	);
+	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 	DArray_push(client_request->arr_response, str_response);
 
 	str_response = NULL;
@@ -506,12 +540,19 @@ finish:
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		char *_str_response = NULL;
-		SFINISH_CAT_CSTR(_str_response, "messageid = ", client_request->str_message_id, "\012"
-																						"responsenumber = ",
-			str_temp, "\012"
-					  "FATAL\012",
-			"Failed to list directory ", client_file->str_path, ": ", str_response != NULL ? str_response : strerror(errno));
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, _str_response, strlen(_str_response));
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012FATAL\012", (size_t)7,
+			"Failed to list directory ", (size_t)25,
+			client_file->str_path, strlen(client_file->str_path),
+			": ", (size_t)2,
+			strerror(errno), strlen(strerror(errno))
+		);
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, _str_response, int_response_len);
 		DArray_push(client_request->arr_response, _str_response);
 
 		if (client_file->arr_contents != NULL) {
@@ -538,8 +579,9 @@ bool ws_file_read_step2(EV_P, void *cb_data, bool bol_group) {
 	LPSTR strErrorText = NULL;
 #else
 	struct stat *statdata = NULL;
-		char *str_nanoseconds = NULL;
+	char *str_nanoseconds = NULL;
 #endif
+	size_t int_response_len = 0;
 
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
 
@@ -605,7 +647,12 @@ bool ws_file_read_step2(EV_P, void *cb_data, bool bol_group) {
 #endif
 	str_nanoseconds[100] = 0;
 
-	SFINISH_CAT_APPEND(client_file->str_change_stamp, ".", str_nanoseconds);
+	size_t int_temp = strlen(client_tab->str_change_stamp);
+	SFINISH_SNFCAT(
+		client_tab->str_change_stamp, &int_temp,
+		".", (size_t)1,
+		str_nanoseconds, strlen(str_nanoseconds)
+	);
 #endif
 #endif
 
@@ -634,20 +681,33 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to open file ", client_file->str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to open file ", (size_t)16,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -667,6 +727,7 @@ void ws_file_read_step3(EV_P, ev_check *w, int revents) {
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
 #endif
+	size_t int_response_len = 0;
 
 #ifdef _WIN32
 	DWORD int_temp = 0;
@@ -709,20 +770,33 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to read file ", client_file->str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to read file ", (size_t)16,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -735,23 +809,37 @@ finish:
 void ws_file_read_step4(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	size_t int_response_len = 0;
 
 	client_request->int_response_id += 1;
 	char str_temp[101] = {0};
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																				   "responsenumber = ",
-		str_temp, "\012", client_file->str_change_stamp, "\012", client_file->str_content);
-	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+	SFINISH_SNCAT(
+		str_response, &int_response_len,
+		"messageid = ", (size_t)12,
+		client_request->str_message_id, strlen(client_request->str_message_id),
+		"\012responsenumber = ", (size_t)18,
+		str_temp, strlen(str_temp),
+		"\012", (size_t)1,
+		client_file->str_change_stamp, strlen(client_file->str_change_stamp),
+		"\012", (size_t)1,
+		client_file->str_content, client_file->int_length
+	);
+	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 	DArray_push(client_request->arr_response, str_response);
 
 	client_request->int_response_id += 1;
 	memset(str_temp, 0, 101);
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-	SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																				   "responsenumber = ",
-		str_temp, "\012TRANSACTION COMPLETED");
-	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+	SFINISH_SNCAT(
+		str_response, &int_response_len,
+		"messageid = ", (size_t)12,
+		client_request->str_message_id, strlen(client_request->str_message_id),
+		"\012responsenumber = ", (size_t)18,
+		str_temp, strlen(str_temp),
+		"\012TRANSACTION COMPLETED", (size_t)22
+	);
+	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 	DArray_push(client_request->arr_response, str_response);
 
 	str_response = NULL;
@@ -773,20 +861,33 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to read file ", client_file->str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to read file ", (size_t)16,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -816,6 +917,7 @@ bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 	struct stat *statdata = NULL;
 	char *str_nanoseconds = NULL;
 #endif
+	size_t int_response_len = 0;
 
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
 
@@ -886,7 +988,12 @@ bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 #endif
 			str_nanoseconds[100] = 0;
 
-			SFINISH_CAT_APPEND(str_change_stamp, ".", str_nanoseconds);
+			size_t int_temp = strlen(client_tab->str_change_stamp);
+			SFINISH_SNFCAT(
+				client_tab->str_change_stamp, &int_temp,
+				".", (size_t)1,
+				str_nanoseconds, strlen(str_nanoseconds)
+			);
 #endif
 
 			if (strncmp(client_file->str_change_stamp, str_change_stamp, strlen(str_change_stamp)) != 0) {
@@ -949,20 +1056,33 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to open file for writing ", client_file->str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to open file for writing ", (size_t)30,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -983,6 +1103,7 @@ void ws_file_write_step3(EV_P, ev_check *w, int revents) {
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
 #endif
+	size_t int_response_len = 0;
 
 #ifdef _WIN32
 	int int_temp = 0;
@@ -1025,20 +1146,33 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to write to file ", client_file->str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to write to file ", (size_t)20,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		ws_file_free(client_file);
@@ -1057,6 +1191,7 @@ void ws_file_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 	struct stat *statdata = NULL;
 	char *str_nanoseconds = NULL;
 #endif
+	size_t int_response_len = 0;
 
 	SFINISH_SALLOC(str_response, 101);
 #ifdef _WIN32
@@ -1092,7 +1227,8 @@ void ws_file_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 		) > 0,
 		"snprintf() failed"
 	);
-		str_response[100] = 0;
+	str_response[100] = 0;
+	int_response_len = strlen(str_response);
 #else
 	SFINISH_SALLOC(statdata, sizeof(struct stat));
 	if (stat(client_file->str_path, statdata) == 0) {
@@ -1109,7 +1245,14 @@ void ws_file_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 #endif
 		str_nanoseconds[100] = 0;
 
-		SFINISH_CAT_APPEND(str_response, ".", str_nanoseconds);
+		int_response_len = strlen(str_response);
+		SINFO("int_response_len: %zu", int_response_len);
+		SFINISH_SNFCAT(
+			str_response, &int_response_len,
+			".", (size_t)1,
+			str_nanoseconds, strlen(str_nanoseconds)
+		);
+		SINFO("int_response_len: %zu", int_response_len);
 #endif
 	} else {
 		SFINISH("stat failed");
@@ -1135,18 +1278,34 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		if (errno != 0) {
 			SFREE(str_response);
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012"
-						  "FATAL\012",
-				"Failed to stat file ", client_file->str_path, " ", strerror(errno));
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to stat file ", (size_t)16,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
 		} else {
 			char *_str_response = str_response;
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																						   "responsenumber = ",
-				str_temp, "\012", _str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
 			SFREE(_str_response);
 		}
+
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
+		DArray_push(client_request->arr_response, str_response);
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
@@ -1160,20 +1319,34 @@ finish:
 		char str_temp[101] = {0};
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012", _str_response);
+		SINFO("int_response_len: %zu", int_response_len);
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1,
+			_str_response, int_response_len
+		);
+		SINFO("_str_response: %s", _str_response);
+		SINFO("str_response: %s", str_response);
 		SFREE(_str_response);
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		client_request->int_response_id += 1;
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012TRANSACTION COMPLETED");
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012TRANSACTION COMPLETED", (size_t)22
+		);
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
@@ -1194,6 +1367,7 @@ bool ws_file_move_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
 
@@ -1466,6 +1640,7 @@ bool ws_file_copy_step4(EV_P, void *cb_data, char *str_path) {
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 	bool bol_ret = true;
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_new_path, str_new_path_to, str_result_path);
 	if (*(client_file->str_partial_path + strlen(client_file->str_partial_path) - 1) == '/') {
 		*(client_file->str_partial_path + strlen(client_file->str_partial_path) - 1) = '\0';
@@ -1537,6 +1712,7 @@ bool ws_file_copy_step5(EV_P, void *cb_data, bool bol_success) {
 	struct stat statbuf;
 
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 
 	SFINISH_CHECK(bol_success, "Error in canonical_copy");
 
@@ -1618,6 +1794,7 @@ bool ws_file_delete_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
 
@@ -1701,6 +1878,7 @@ bool ws_file_delete_step3(EV_P, void *cb_data, char *str_path) {
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 	bool bol_ret = true;
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_new_path);
 	if (*(client_file->str_partial_path + strlen(client_file->str_partial_path) - 1) == '/') {
 		*(client_file->str_partial_path + strlen(client_file->str_partial_path) - 1) = '\0';
@@ -1757,6 +1935,7 @@ bool ws_file_delete_step4(EV_P, void *cb_data, bool bol_success) {
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 
 	SFINISH_CHECK(bol_success, "Error in canonical_delete");
 
@@ -1831,6 +2010,7 @@ bool ws_file_create_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	struct stat statbuf;
 	memset(&statbuf, 0, sizeof(statbuf));
 
@@ -1922,6 +2102,7 @@ bool ws_file_search_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request_watcher *client_request_watcher = NULL;
 
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_canonical_name, str_name, str_path);
 
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
@@ -2023,6 +2204,7 @@ bool ws_file_search_step3(EV_P, void *cb_data, char *_str_file_name) {
 	char *str_file_name = NULL;
 	char *ptr_extension = NULL;
 	struct stat *statdata = NULL;
+	size_t int_response_len = 0;
 	ptr_extension = strrchr(_str_file_name, '.');
 	if (ptr_extension != NULL) {
 		ptr_extension += 1;
@@ -2078,6 +2260,7 @@ bool ws_file_search_step4(EV_P, void *cb_data, bool bol_success) {
 	struct sock_ev_client_request *client_request = cb_data;
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	struct sock_ev_client_request_watcher *client_request_watcher = NULL;
 
 	SFINISH_CHECK(bol_success, "canonical_recurse failed");
@@ -2121,6 +2304,7 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 	struct sock_ev_client_request *client_request = client_request_watcher->parent->cur_request;
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	char *str_current_file_name = NULL;
 	size_t int_end_pos;
 	size_t int_line_length;

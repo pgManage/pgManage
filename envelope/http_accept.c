@@ -6,7 +6,6 @@ void http_accept_step1(struct sock_ev_client *client) {
 	char *ptr_end_uri = NULL;
 	ssize_t int_len = 0;
 	size_t int_uri_len = 0;
-	size_t int_query_len = 0;
 	size_t int_args_len = 0;
 	size_t int_temp_len = 0;
 	size_t int_action_name_len = 0;
@@ -24,7 +23,7 @@ void http_accept_step1(struct sock_ev_client *client) {
 		}
 	}
 
-	str_args = query(client->str_request, client->int_request_len, &int_query_len);
+	str_args = query(client->str_request, client->int_request_len, &int_args_len);
 	if (str_args == NULL) {
 		SFINISH_SNCAT(str_args, &int_args_len,
 			"", (size_t)0);
@@ -66,8 +65,10 @@ void http_accept_step1(struct sock_ev_client *client) {
 	}
 
 	str_temp = str_args;
-	str_args = DB_escape_literal(client->conn, str_temp, strlen(str_args));
+	// TODO: DB_escape_literal return length
+	str_args = DB_escape_literal(client->conn, str_temp, int_args_len);
 	SFINISH_CHECK(str_args != NULL, "DB_escape_literal failed");
+	int_args_len = strlen(str_args);
 
 	SDEBUG("str_args: %s", str_args);
 
