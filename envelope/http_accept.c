@@ -160,10 +160,10 @@ bool http_accept_step2(EV_P, void *cb_data, DB_result *res) {
 	bol_error_state = false;
 finish:
 	if (arr_row_values != NULL) {
-		DArray_destroy(arr_row_values);
+		DArray_clear_destroy(arr_row_values);
 	}
 	if (arr_row_lengths != NULL) {
-		DArray_destroy(arr_row_lengths);
+		DArray_clear_destroy(arr_row_lengths);
 	}
 	SFREE(_str_response);
 	_str_response = str_response;

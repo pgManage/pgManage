@@ -423,9 +423,6 @@ bool parse_options(int argc, char *const *argv) {
 	//		 abort();
 	// }
 	size_t int_global_len = 0;
-#ifdef ENVELOPE
-	size_t int_global_app_path_len = 0;
-#endif
 	size_t int_global_logfile_len = 0;
 	size_t int_prefix_len = 0;
 	size_t int_temp_len = 0;
@@ -722,7 +719,7 @@ bool parse_options(int argc, char *const *argv) {
 		SERROR_SALLOC(str_temp, (size_t)bufsize + 1);
 		getpwuid_r(getuid(), pw, str_temp, (size_t)bufsize, &pw);
 
-		SERROR_SNCAT(str_global_data_root, &int_global_data_root_len,
+		SERROR_SNCAT(str_global_data_root, &int_global_len,
 			pw->pw_dir, strlen(pw->pw_dir),
 			pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME,
 				strlen(pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME));

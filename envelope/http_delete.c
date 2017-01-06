@@ -12,18 +12,18 @@ void http_delete_step1(struct sock_ev_client *client) {
 	char *ptr_data = NULL;
 	char *ptr_data_end = NULL;
 	ssize_t int_len = 0;
-	size_t int_uri_length = 0;
-	size_t int_query_length = 0;
-	size_t int_data_length = 0;
+	size_t int_uri_len = 0;
+	size_t int_query_len = 0;
+	size_t int_data_len = 0;
 
 	client->cur_request =
 		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_delete), POSTAGE_REQ_DELETE);
 	SFINISH_CHECK(client->cur_request != NULL, "create_request failed!");
 	client_delete = (struct sock_ev_client_delete *)(client->cur_request->vod_request_data);
 
-	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
+	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_len);
 	SFINISH_CHECK(str_uri != NULL, "str_uri_path() failed");
-	str_args = query(client->str_request, client->int_request_len, &int_query_length);
+	str_args = query(client->str_request, client->int_request_len, &int_query_len);
 	SFINISH_CHECK(str_args != NULL, "query() failed");
 
 	SDEBUG("str_uri: %s", str_uri);
@@ -41,19 +41,19 @@ void http_delete_step1(struct sock_ev_client *client) {
 	SDEBUG("str_args: %s", str_args);
 
 	// Get table names
-	client_delete->str_real_table_name = getpar(str_args, "src", int_query_length, &client_delete->int_real_table_name_length);
+	client_delete->str_real_table_name = getpar(str_args, "src", int_query_len, &client_delete->int_real_table_name_len);
 	if (client_delete->str_real_table_name == NULL || strlen(client_delete->str_real_table_name) == 0) {
 		SFREE(client_delete->str_real_table_name);
 		client_delete->str_real_table_name =
-			getpar(str_args, "view", int_query_length, &client_delete->int_real_table_name_length);
+			getpar(str_args, "view", int_query_len, &client_delete->int_real_table_name_len);
 	}
 	SFINISH_ERROR_CHECK(client_delete->str_real_table_name != NULL, "Failed to get table name from query");
 
 	// Get return columns
-	str_data = getpar(str_args, "id", int_query_length, &int_data_length);
+	str_data = getpar(str_args, "id", int_query_len, &int_data_len);
 
 	ptr_data = str_data;
-	ptr_data_end = str_data + int_data_length;
+	ptr_data_end = str_data + int_data_len;
 	while (ptr_data < ptr_data_end) {
 		if (*ptr_data != '0' && *ptr_data != '1' && *ptr_data != '2' && *ptr_data != '3' && *ptr_data != '4' &&
 			*ptr_data != '5' && *ptr_data != '6' && *ptr_data != '7' && *ptr_data != '8' && *ptr_data != '9' &&
@@ -63,8 +63,12 @@ void http_delete_step1(struct sock_ev_client *client) {
 		ptr_data++;
 	}
 
-	SFINISH_CAT_CSTR(
-		client_delete->str_sql, "DELETE FROM ", client_delete->str_real_table_name, " WHERE id IN (", str_data, ");");
+	SFINISH_SNCAT(client_delete->str_sql, &client_delete->int_sql_len,
+		"DELETE FROM ", (size_t)12,
+		client_delete->str_real_table_name, client_delete->int_real_table_name_len,
+		" WHERE id IN (", (size_t)14,
+		str_data, int_data_len,
+		");", (size_t)2);
 
 	SDEBUG("client_delete->str_sql: %s", client_delete->str_sql);
 	if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
@@ -101,6 +105,7 @@ bool http_delete_step2(EV_P, void *cb_data, DB_result *res) {
 	char *str_response = NULL;
 	char *_str_response = NULL;
 	ssize_t int_len = 0;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_temp);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
@@ -119,12 +124,20 @@ finish:
 		bol_error_state = false;
 
 		_str_response = str_response;
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
+			strlen("HTTP/1.1 500 Internal Server Error\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
+			_str_response, strlen(_str_response))
 		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
 								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
 			_str_response);
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}
 	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
@@ -153,6 +166,7 @@ bool http_delete_step3(EV_P, void *cb_data, DB_result *res) {
 	char *str_response = NULL;
 	char *_str_response = NULL;
 	ssize_t int_len = 0;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_temp);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
@@ -174,12 +188,17 @@ finish:
 		bol_error_state = false;
 
 		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
+			strlen("HTTP/1.1 500 Internal Server Error\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}
 	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
@@ -208,6 +227,7 @@ bool http_delete_step4(EV_P, void *cb_data, DB_result *res) {
 	char *str_response = NULL;
 	char *_str_response = NULL;
 	ssize_t int_len = 0;
+	size_t int_response_len = 0;
 	DArray *arr_row_values = NULL;
 	SDEFINE_VAR_ALL(str_temp);
 
@@ -231,12 +251,17 @@ finish:
 		bol_error_state = false;
 
 		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
+			strlen("HTTP/1.1 500 Internal Server Error\015\012"
+				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}
 	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {

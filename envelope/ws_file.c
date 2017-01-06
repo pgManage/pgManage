@@ -647,9 +647,9 @@ bool ws_file_read_step2(EV_P, void *cb_data, bool bol_group) {
 #endif
 	str_nanoseconds[100] = 0;
 
-	size_t int_temp = strlen(client_tab->str_change_stamp);
+	size_t int_temp = strlen(client_file->str_change_stamp);
 	SFINISH_SNFCAT(
-		client_tab->str_change_stamp, &int_temp,
+		client_file->str_change_stamp, &int_temp,
 		".", (size_t)1,
 		str_nanoseconds, strlen(str_nanoseconds)
 	);
@@ -988,9 +988,9 @@ bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 #endif
 			str_nanoseconds[100] = 0;
 
-			size_t int_temp = strlen(client_tab->str_change_stamp);
+			size_t int_temp = strlen(client_file->str_change_stamp);
 			SFINISH_SNFCAT(
-				client_tab->str_change_stamp, &int_temp,
+				client_file->str_change_stamp, &int_temp,
 				".", (size_t)1,
 				str_nanoseconds, strlen(str_nanoseconds)
 			);

@@ -267,7 +267,8 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	}
 	SFREE(str_conn);
 	if (client->str_cookie == NULL && str_cookie_encrypted != NULL) {
-		SFINISH_SNCAT(client->str_cookie, &int_cookie_len,
+		size_t int_temp = 0;
+		SFINISH_SNCAT(client->str_cookie, &int_temp,
 			str_cookie_encrypted, strlen(str_cookie_encrypted));
 		SDEBUG("%p->str_cookie: %p", client, client->str_cookie);
 	}
