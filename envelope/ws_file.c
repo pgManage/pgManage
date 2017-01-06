@@ -17,6 +17,8 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_change_stamp = NULL;
 	char *str_request_type = NULL;
 	char *ptr_query = NULL;
+	size_t int_response_len = 0;
+	size_t int_query_len = 0;
 
 	client_request->int_response_id = 0;
 	client_request->arr_response = DArray_create(sizeof(char *), 1);
@@ -84,7 +86,10 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 							  client_request, ws_file_list_step2),
 				"permissions_check() failed");
 		} else {
-			SFINISH_CAT_CSTR(str_response, "/app/\tfolder\012/role/\tfolder\012/web_root/\tfolder\012");
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"/app/\tfolder\012/role/\tfolder\012/web_root/\tfolder\012", strlen("/app/\tfolder\012/role/\tfolder\012/web_root/\tfolder\012")
+			);
 			ws_file_free(client_file);
 		}
 
@@ -119,7 +124,10 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 		client_file->file_type = POSTAGE_FILE_WRITE;
 		SNOTICE("FILE WRITE");
 		client_file->ptr_content = strstr(ptr_query, "\012") + 1;
-		SFINISH_CAT_CSTR(str_query, ptr_query);
+		SFINISH_SNCAT(
+			str_query, &int_query_len,
+			ptr_query, (size_t)(client_request->frame->int_length - (size_t)(ptr_query - client_request->frame->str_message))
+		);
 		ptr_query = strstr(str_query, "\t");
 		SFINISH_CHECK(ptr_query != NULL, "Invalid Request");
 		*ptr_query = 0;
@@ -228,7 +236,6 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 		SFINISH_CHECK(client_file->str_path != NULL, "Failed to get canonical path: >%s|%s<", client_file->str_canonical_start,
 			client_file->str_partial_path);
 
-		SDEBUG("client_file->str_path: %s", client_file->str_path);
 		SFINISH_CHECK(permissions_write_check(global_loop, client_request->parent->conn, client_file->str_input_path,
 						  client_request, ws_file_delete_step2),
 			"permissions_write_check() failed");

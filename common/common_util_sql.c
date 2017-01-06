@@ -561,6 +561,7 @@ bool permissions_write_check(EV_P, DB_conn *conn, char *str_path, void *cb_data,
 char *canonical_strip_start(char *str_path) {
 	char *str_return = NULL;
 	char *ptr_path = str_path;
+	size_t int_return_len = 0;
 	if (*ptr_path == '/') {
 		ptr_path++;
 	}
@@ -581,7 +582,7 @@ char *canonical_strip_start(char *str_path) {
 		SERROR("Starting path not recognized.");
 	}
 
-	SERROR_CAT_CSTR(str_return, ptr_path);
+	SERROR_SNCAT(str_return, &int_return_len, ptr_path, strlen(ptr_path));
 
 	return str_return;
 error:
