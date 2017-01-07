@@ -10,6 +10,7 @@ char *ws_action_step1(struct sock_ev_client_request *client_request) {
 	size_t int_request_length = 0;
 	size_t int_action_full_name_len = 0;
 	size_t int_sql_len = 0;
+	size_t int_response_len = 0;
 
 	client_request->arr_response = DArray_create(sizeof(char *), 1);
 	SFINISH_CHECK(client_request->arr_response != NULL, "DArray_create failed");
@@ -115,13 +116,20 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));

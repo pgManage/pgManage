@@ -1,6 +1,3 @@
-#ifdef ENVELOPE
-
-#define UTIL_DEBUG
 #include "http_select.h"
 
 void http_select_step1(struct sock_ev_client *client) {
@@ -57,15 +54,16 @@ void http_select_step1(struct sock_ev_client *client) {
 
 	// If src is in fact a query, not a object name, then wrap with parentheses
 	SFINISH_SNCAT(str_temp, &int_temp_len,
-		client_select->str_real_table_name, client_select->int_return_columns_len);
+		client_select->str_real_table_name, client_select->int_real_table_name_len);
 	str_temp = str_toupper(str_temp);
+	SDEBUG("str_temp: %s", str_temp);
 	if (strstr(str_temp, "SELECT") != NULL && *client_select->str_real_table_name != '(') {
 		SFREE(str_temp);
 		str_temp = client_select->str_real_table_name;
 		int_temp_len = client_select->int_real_table_name_len;
 		client_select->str_real_table_name = NULL;
 
-		SFINISH_SNCAT(client_select->str_real_table_name, &client_select->int_return_columns_len,
+		SFINISH_SNCAT(client_select->str_real_table_name, &client_select->int_real_table_name_len,
 			"(", (size_t)1,
 			str_temp, int_temp_len,
 			") sun_sub_query_you_wont_guess_this", (size_t)35);
@@ -763,5 +761,3 @@ finish:
 		SERROR_CHECK_NORESPONSE(client_close(client_request->parent), "Error closing Client");
 	}
 }
-
-#endif

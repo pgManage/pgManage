@@ -274,7 +274,10 @@
 			['Login Fail 6', 'ajax', 500, '/env/auth', 'action=login&connname=test&password=' + encodeURIComponent('asdfasdf\'asdf"asdfasdf'),
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 7', 'ajax', 500, '/env/auth', 'action=login&connname=&username=password=asdfasdfasdfasdf',
-				ml(function () {/*"FATAL\n..\\..\\db_framework_pq\\db_framework.c:escape_conninfo_value: escape_conninfo_value: strlen = 0\nConnect failed: fe_sendauth: no password supplied\n"*/ })],
+				function (arg) {
+					return arg === ml(function () {/*"FATAL\n..\\..\\db_framework_pq\\db_framework.c:escape_conninfo_value: escape_conninfo_value: strlen = 0\nConnect failed: fe_sendauth: no password supplied\n"*/})
+					|| arg === ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:escape_conninfo_value: escape_conninfo_value: strlen = 0\nConnect failed: fe_sendauth: no password supplied\n"*/})
+				}],
 			['Login Fail 8', 'ajax', 500, '/env/auth', 'action=login&connname=&username=&password=',
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 9', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=&password=',
@@ -336,7 +339,6 @@
 			
 			['File Read Fail 5', 'ajax', 500, '/env/0//index.html', '',
 				function (arg) {
-					console.warn('test1');
 					return arg === ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0//index.html is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
 						|| arg === ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: 0\\\\index.html is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
 				}
@@ -533,7 +535,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<",
-						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<"
+						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<",
+						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|all/test.txtπ<"
 					],
 					"TRANSACTION COMPLETED"
 				]
@@ -546,7 +549,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<",
-						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<"
+						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<",
+						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|all/test.txtπ<"
 					],
 					"TRANSACTION COMPLETED"
 				]
@@ -555,7 +559,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<",
-						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<"
+						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<",
+						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|all/test.txtπ<"
 					],
 					"TRANSACTION COMPLETED"
 				]
@@ -609,7 +614,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/test.txt > /role/trusted_g/test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/test.txt > /role/trusted_g/test2.txt<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.txt > \\role\\trusted_g\\test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/test.txt > /role/trusted_g/test2.txt<"
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.txt > \\role\\trusted_g\\test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/test.txt > /role/trusted_g/test2.txt<",
+						"../util/util_canonical.c:canonical: trusted_g/test.txt > /role/trusted_g/test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/test.txt > /role/trusted_g/test2.txt<"
 					],
 					"TRANSACTION COMPLETED"
 				]
@@ -740,7 +746,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g/test-test--test-test<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g/test-test--test-test<"
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g/test-test--test-test<",
+						"../util/util_canonical.c:canonical: trusted_g/test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trusted_g/test-test--test-test<"
 					]
 				]
 			],
@@ -752,7 +759,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/////// is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g///////<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\\\\\\\\\\\\\ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g///////<"
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\\\\\\\\\\\\\ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g///////<",
+						"../util/util_canonical.c:canonical: trusted_g/////// is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trusted_g///////<"
 					],
 					"TRANSACTION COMPLETED"
 				]
@@ -761,7 +769,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/ > /opt/test<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\ > \\opt\\test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/ > /opt/test<"
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\ > \\opt\\test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/ > /opt/test<",
+						"../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/ > /opt/test<"
 					],
 					"TRANSACTION COMPLETED"
 				]
@@ -770,7 +779,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/ > /opt/test<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\ > \\opt\\test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/ > /opt/test<"
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\ > \\opt\\test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/ > /opt/test<",
+						"../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/ > /opt/test<"
 					],
 					"TRANSACTION COMPLETED"
 				]
@@ -779,7 +789,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_anonical.c:canonical: trusted_g/π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/π<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/π<"
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/π<",
+						"../util/util_canonical.c:canonical: trusted_g/π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/π<"
 					],
 					"TRANSACTION COMPLETED"
 				]
@@ -843,7 +854,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g/test.π<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g/test.π<"
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g/test.π<",
+						"../util/util_canonical.c:canonical: trusted_g/test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trusted_g/test.π<"
 					],
 					"TRANSACTION COMPLETED"
 				]
@@ -926,7 +938,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: read_dir: /home/super/Repos/postage/envelope/app/|nonexisitant/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|nonexisitant/<",
-						"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app\\|nonexisitant\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|nonexisitant/<"
+						"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app\\|nonexisitant\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|nonexisitant/<",
+						"../util/util_canonical.c:canonical: read_dir: /Users/joseph/Repos/postage/envelope/app/|nonexisitant/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|nonexisitant/<"
 					]
 				]
 			],
@@ -939,7 +952,8 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: read_dir: /home/super/Repos/postage/envelope/app/|trust_g/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trust_g/<",
-						"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app\\|trust_g\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trust_g/<"
+						"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app\\|trust_g\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trust_g/<",
+						"../util/util_canonical.c:canonical: read_dir: /Users/joseph/Repos/postage/envelope/app/|trust_g/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trust_g/<"
 					]
 				]
 			],
@@ -1000,7 +1014,7 @@ File already exists.*/})],
 						"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n"
 					],
 					[
-						"/test.txt:4:This is a test of the envelope. (test line #4)\n",
+						"/test.txt:4:This is a test of the envelope. (test line #4)",
 						"\\test.txt:4:This is a test of the envelope. (test line #4)"
 					],
 					[
@@ -1012,7 +1026,7 @@ File already exists.*/})],
 						"\\test\\test.txt:2:This is a test of the bran muffin. (test line #2)\n"
 					],
 					[
-						"/test/test.txt:4:This is a test of the envelope. (test line #4)\n",
+						"/test/test.txt:4:This is a test of the envelope. (test line #4)",
 						"\\test\\test.txt:4:This is a test of the envelope. (test line #4)"
 					],
 					"TRANSACTION COMPLETED"
@@ -1032,7 +1046,7 @@ File already exists.*/})],
 						"\\test.txt:2:This is a test of the bran muffin. (test line #2)\n"
 					],
 					[
-						"/test.txt:4:This is a test of the envelope. (test line #4)\n",
+						"/test.txt:4:This is a test of the envelope. (test line #4)",
 						"\\test.txt:4:This is a test of the envelope. (test line #4)"
 					],
 					"TRANSACTION COMPLETED"
@@ -1169,6 +1183,7 @@ File already exists.*/})],
 				function (arg) {
 					return arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.4 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 6.1.1 20160621 (Red Hat 6.1.1-3), 64-bit","envelope": "2.2.1"}}*/ })
 						|| arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.2, compiled by Visual C++ build 1800, 64-bit","envelope": "3.1.3"}}*/ })
+						|| arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.6.1 on x86_64-apple-darwin15.6.0, compiled by Apple LLVM version 8.0.0 (clang-800.0.42.1), 64-bit","envelope": "3.1.3"}}*/ })
 				}
 			],
 			['ACTION FAIL 1', 'websocket', '', ml(function () {/*ACTION	public	action_testing1	testingnitset
