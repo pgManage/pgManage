@@ -158,7 +158,7 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 			// if no such file exists create any dirs that are needed
 		} else {
 #ifdef _WIN32
-			SERROR_SNCAT(str_temp, &int_temp_len,
+			SERROR_SNCAT(str_temp, &int_canonical_filename_len,
 				canonical_filename, int_canonical_filename_len);
 			char *ptr_last_slash = strrchr(str_temp, '\\');
 			SDEBUG("str_temp>%s<", str_temp);

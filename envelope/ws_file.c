@@ -1760,7 +1760,9 @@ finish:
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
-		ws_file_free(client_file);
+		// This is handled in step5
+		// ws_file_free(client_file);
+
 		// client_request_free(client_request);
 		// client_request_free takes care of this
 		// SFREE(client_file);

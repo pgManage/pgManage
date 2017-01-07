@@ -547,7 +547,6 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 
 	SFINISH_SNFCAT(client_copy_check->str_response, (size_t*)&client_copy_check->int_response_len,
 		str_rows, int_rows_len);
-	client_copy_check->int_response_len += (ssize_t)strlen(str_rows);
 	SFREE(str_rows);
 
 	if (status == DB_FETCH_END && client_copy_check->str_response[0] != '\0' &&
@@ -561,7 +560,6 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 			SFINISH_SNCAT(client_select->str_row_count, &client_select->int_row_count_len,
 				"0", (size_t)1);
 		}
-		client_copy_check->int_response_len += (ssize_t)strlen(client_select->str_row_count) + 16 + 2;
 		SFINISH_SNFCAT(client_copy_check->str_response, (size_t*)&client_copy_check->int_response_len,
 			"], \"row_count\": ", (size_t)16,
 			client_select->str_row_count, client_select->int_row_count_len,

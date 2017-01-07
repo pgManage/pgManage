@@ -4,8 +4,7 @@ void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents);
 void free_recursive_callback_data(recursive_callback_data *rec_data);
 void free_recursive_directory_data(recursive_directory_data *dir_data);
 
-bool canonical_recurse_directory(EV_P, char *str_canonical_start, char *str_partial_path, void *cb_data,
-	recursive_step_callback_t step_callback, recursive_finish_callback_t finish_callback) {
+bool canonical_recurse_directory(EV_P, char *str_canonical_start, char *str_partial_path, void *cb_data, recursive_step_callback_t step_callback, recursive_finish_callback_t finish_callback) {
 	SDEBUG("canonical_recurse_directory");
 	recursive_callback_data *rec_data = NULL;
 	recursive_directory_data *dir_data = NULL;
@@ -19,6 +18,7 @@ bool canonical_recurse_directory(EV_P, char *str_canonical_start, char *str_part
 
 	rec_data->str_path = canonical(str_canonical_start, str_partial_path, "valid_path");
 	SERROR_CHECK(rec_data->str_path != NULL, "canonical failed");
+	rec_data->int_path_len = strlen(rec_data->str_path);
 
 	if (rec_data->str_path[strlen(rec_data->str_path) - 1] != '/') {
 		SERROR_SNFCAT(rec_data->str_path, &rec_data->int_path_len,
