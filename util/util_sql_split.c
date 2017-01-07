@@ -17,10 +17,12 @@ DArray *DArray_sql_split(char *str_form_data) {
 	size_t int_chunk_len = 0;
 	size_t int_tag = 0;
 	size_t int_last_query = 0;
+	size_t int_tag_len = 0;
 	SDEFINE_VAR_ALL(str_tag, str_temp, str_trailing);
 	DArray *darr_list = NULL;
 
-	SERROR_CAT_CSTR(str_tag, "");
+	SERROR_SNCAT(str_tag, &int_tag_len,
+		"", (size_t)0);
 
 	darr_list = DArray_create(sizeof(char *), 1);
 
@@ -56,7 +58,7 @@ DArray *DArray_sql_split(char *str_form_data) {
 			start_ptr = start_ptr + 1;
 			element_len = 0;
 			SDEBUG("test start_ptr: %i;", start_ptr[0] );
-		
+
 		// FOUND MULTILINE COMMENT:
 		} else*/ if (int_qs == 0 && int_inputstring_len > 1 && strncmp(ptr_loop, "/*", int_chunk_len + 1) == 0) {
 			int_qs = 5;

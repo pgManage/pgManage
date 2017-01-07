@@ -34,9 +34,7 @@ void notice_processor(void *arg, const char *str_notice) {
 			str_notice, strlen(str_notice),
 			"\t", (size_t)1,
 			str_temp, strlen(str_temp));
-		//client->str_notice = cat_append(client->str_notice, "\012", str_notice, "\t", str_temp);
 	} else {
-		//client->str_notice = cat_cstr(str_notice, "\t", str_temp);
 		SERROR_SNCAT(client->str_notice, &int_notice_len,
 			str_notice, strlen(str_notice),
 			"\t", (size_t)1,

@@ -260,7 +260,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 	} else {
 #ifndef POSTAGE_INTERFACE_LIBPQ
 		if (client_insert->str_identity_column_name != NULL) {
-			SFINISH_CAT_CSTR(str_sql, &int_sql_len,
+			SFINISH_SNCAT(str_sql, &int_sql_len,
 				"IF OBJECT_ID('tempdb..", (size_t)22,
 				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
 				"') IS NOT NULL\n\tDROP TABLE ", (size_t)27,
@@ -275,7 +275,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 				";", (size_t)1);
 			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step15_sql_server);
 		} else {
-			SFINISH_CAT_CSTR(str_sql, &int_sql_len,
+			SFINISH_SNCAT(str_sql, &int_sql_len,
 				"IF OBJECT_ID('tempdb..", (size_t)22,
 				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
 				"') IS NOT NULL\n\tDROP TABLE ", (size_t)27,

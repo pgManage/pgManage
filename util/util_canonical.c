@@ -46,19 +46,27 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 	char *ptr_path = _path;
 
 	bool bol_path_exists = false;
+
 	size_t int_file_base_len = 0;
-	SERROR_CAT_CSTR(str_file_base, file_base);
-	int_file_base_len = strlen(str_file_base);
+	size_t int_path_len = 0;
+	size_t int_len = 0;
+	size_t int_return_len = 0;
+	size_t int_canonical_filename_len = 0;
+
+	SERROR_SNCAT(str_file_base, &int_file_base_len,
+		file_base, strlen(file_base));
 
 #ifdef _WIN32
 	if ((int_file_base_len == 0 || str_file_base[int_file_base_len - 1] != '\\') &&
 		(int_file_base_len == 0 || str_file_base[int_file_base_len - 1] != '/')) {
-		SERROR_CAT_APPEND(str_file_base, "\\");
+		SERROR_SNFCAT(str_file_base, &int_file_base_len,
+			"\\", (size_t)1);
 	}
 	while (ptr_path[0] == '\\' || ptr_path[0] == '/') {
 		ptr_path += 1;
 	}
-	SERROR_CAT_CSTR(path, ptr_path);
+	SERROR_SNCAT(path, &int_path_len,
+		ptr_path, strlen(ptr_path));
 	ptr_path = path;
 	while (*ptr_path != 0) {
 		if (*ptr_path == '/') {
@@ -67,24 +75,30 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 		ptr_path += 1;
 	}
 #else
-	SERROR_CAT_CSTR(path, ptr_path);
+	SERROR_SNCAT(path, &int_path_len,
+		ptr_path, strlen(ptr_path));
 	if (int_file_base_len == 0 || str_file_base[int_file_base_len - 1] != '/') {
-		SERROR_CAT_APPEND(str_file_base, "/");
+		SERROR_SNFCAT(str_file_base, &int_file_base_len,
+			"/", (size_t)1);
 	}
 	while (path[0] == '/') {
 		ptr_path += 1;
 		path2 = path;
-		SERROR_CAT_CSTR(path, ptr_path);
+		SERROR_SNCAT(path, &int_path_len,
+			ptr_path, strlen(ptr_path));
 		SFREE(path2);
 	}
 #endif
 
-	SERROR_CAT_CSTR(str, str_file_base, path);
+	SERROR_SNCAT(str, &int_len,
+		str_file_base, int_file_base_len,
+		path, int_path_len);
 	// SDEBUG("\"%s\" + \"%s\" = \"%s\"", str_file_base, path, str);
 
 	// if no path to canonicalize was provided then just return the file_base
 	if (strlen(path) == 0) {
-		SERROR_CAT_CSTR(str_return, str_file_base);
+		SERROR_SNCAT(str_return, &int_return_len,
+			str_file_base, int_file_base_len);
 		SFREE_ALL();
 		return str_return;
 	}
@@ -117,9 +131,12 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 		SWARN("stat failed: %d (%s)", errno, strerror(errno));
 	}
 	if ((canonical_filename[0] == 'C' || canonical_filename[0] == 'c') && canonical_filename[1] == ':') {
-		SERROR_CAT_CSTR(canonical_filename, realpath_res + 2);
+		SERROR_SNCAT(canonical_filename, &int_canonical_filename_len,
+			realpath_res + 2, strlen(realpath_res + 2));
 		SFREE(realpath_res);
 		realpath_res = canonical_filename;
+	} else {
+		int_canonical_filename_len = strlen(canonical_filename);
 	}
 
 	// DO NOT COMMENT, THIS IS SO THAT THE ERROR DOES NOT PROPOGATE
@@ -141,7 +158,8 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 			// if no such file exists create any dirs that are needed
 		} else {
 #ifdef _WIN32
-			SERROR_CAT_CSTR(str_temp, canonical_filename);
+			SERROR_SNCAT(str_temp, &int_temp_len,
+				canonical_filename, int_canonical_filename_len);
 			char *ptr_last_slash = strrchr(str_temp, '\\');
 			SDEBUG("str_temp>%s<", str_temp);
 			SDEBUG("ptr_last_slash: %s", str_temp);
@@ -167,7 +185,8 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 //}
 // SDEBUG("test4");
 #endif
-			SERROR_CAT_CSTR(str_return, str);
+			SERROR_SNCAT(str_return, &int_return_len,
+				str, int_len);
 			SFREE_ALL();
 			return str_return;
 		}
@@ -213,7 +232,8 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 		SERROR("%s is not a valid canonical type.\012", check_type);
 	}
 
-	SERROR_CAT_CSTR(str_return, canonical_filename);
+	SERROR_SNCAT(str_return, &int_return_len,
+		canonical_filename, int_canonical_filename_len);
 	SFREE_ALL();
 	return str_return;
 error:

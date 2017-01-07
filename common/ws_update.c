@@ -352,9 +352,6 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 			SFINISH_CHECK(
 				DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_update_step2), "DB_exec failed");
 		}
-// SFINISH_CAT_CSTR(str_sql, "SELECT TOP 0 ", client_update->str_temp_col_list, " INTO ", client_update->str_temp_table_name,
-//	" FROM ", client_update->str_real_table_name, ";");
-
 #endif
 	}
 
@@ -619,7 +616,7 @@ bool ws_update_step4(EV_P, void *cb_data, DB_result *res) {
 				client_update->str_pk_join_clause, client_update->int_pk_join_clause_len,
 				";", (size_t)1);
 		} else {
-			SFINISH_CAT_CSTR(str_sql, &int_sql_len,
+			SFINISH_SNCAT(str_sql, &int_sql_len,
 				"SELECT CAST(count(*) AS nvarchar(MAX)) FROM ", (size_t)44,
 				client_update->str_temp_table_name, client_update->int_temp_table_name_len,
 				" INNER JOIN ", (size_t)12,

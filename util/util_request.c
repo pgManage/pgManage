@@ -59,9 +59,14 @@ error:
 char *request_header(char *str_request, char *str_name) {
 	char *str_return = NULL;
 
+	size_t int_upper_name_len = 0;
+	size_t int_upper_request_len = 0;
+
 	SDEFINE_VAR_ALL(str_upper_name, str_upper_request);
-	SERROR_CAT_CSTR(str_upper_name, str_name);
-	SERROR_CAT_CSTR(str_upper_request, str_request);
+	SERROR_SNCAT(str_upper_name, &int_upper_name_len,
+		str_name, strlen(str_name));
+	SERROR_SNCAT(str_upper_request, &int_upper_request_len,
+		str_request, strlen(str_request));
 	// str_toupper operates in place
 	str_toupper(str_upper_name);
 	str_toupper(str_upper_request);
@@ -102,37 +107,6 @@ char *request_header(char *str_request, char *str_name) {
 	memcpy(str_return, ptr_header, int_header_len);
 	str_return[int_header_len] = '\0';
 
-	// find the header
-	/*char *ptr_header = strstr(str_request, str_full_name);
-	SWARN_CHECK(ptr_header != NULL, "no %s found", str_name);
-
-	ptr_header = ptr_header + strlen(str_full_name); // advance cursor past
-	"<name>: "
-
-	// get header length
-	char *ptr_header_end_return = strstr(ptr_header, "\015\012");
-	int int_header_len;
-	if (ptr_header_end_return == NULL) {
-			ptr_header_end_return = strstr(ptr_header, "\015");
-			if (ptr_header_end_return == NULL) {
-					ptr_header_end_return = strstr(ptr_header, "\012");
-					if (ptr_header_end_return == NULL) {
-							int_header_len = strlen(ptr_header);
-					} else {
-							int_header_len = ptr_header_end_return - ptr_header;
-					}
-			} else {
-					int_header_len = ptr_header_end_return - ptr_header;
-			}
-	} else {
-			int_header_len = ptr_header_end_return - ptr_header;
-	}
-
-	// return just the header
-	SERROR_SALLOC(str_return, int_header_len + 1);
-	memcpy(str_return, ptr_header, int_header_len);
-	str_return[int_header_len] = '\0';*/
-
 	SFREE_ALL();
 	return str_return;
 error:
@@ -147,11 +121,14 @@ char *str_cookie(char *str_request, char *str_cookie_name) {
 	char *ptr_cookie_end_semi = NULL;
 	size_t int_cookie_end_semi = 0;
 	size_t int_cookie_len = 0;
+	size_t int_full_cookie_len = 0;
 	SDEFINE_VAR_ALL(str_cookie, str_full_cookie);
 
 	SDEBUG("str_cookie 1");
 
-	SERROR_CAT_CSTR(str_full_cookie, str_cookie_name, "=");
+	SERROR_SNCAT(str_full_cookie, &int_full_cookie_len,
+		str_cookie_name, strlen(str_cookie_name),
+		"=", (size_t)1);
 
 	SDEBUG("str_cookie 2");
 

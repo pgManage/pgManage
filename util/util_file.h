@@ -25,6 +25,10 @@ typedef struct {
 	char *str_path;
 	char *str_partial_path;
 	bool bol_done;
+
+	//variable lengths
+	size_t int_path_len;
+	size_t int_partial_path_len;
 } recursive_directory_data;
 
 typedef struct {
@@ -35,6 +39,10 @@ typedef struct {
 	recursive_step_callback_t step_callback;
 	recursive_finish_callback_t finish_callback;
 	char *str_canonical_start;
+
+	//variable lengths
+	size_t int_path_len;
+	size_t int_canonical_start_len;
 } recursive_callback_data;
 
 bool canonical_recurse_directory(EV_P, char *str_canonical_start, char *str_partial_path, void *cb_data,

@@ -63,6 +63,9 @@ typedef struct DB_conn {
 	// ONLY FOR db_conn_error_cb!!!!
 	void *cb_data;
 	connect_cb_t connect_cb;
+
+	//variable lengths
+	size_t int_response_len;
 } DB_conn;
 
 typedef struct {
