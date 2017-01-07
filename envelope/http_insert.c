@@ -8,7 +8,6 @@ void http_insert_step1(struct sock_ev_client *client) {
 	SDEFINE_VAR_ALL(str_uri, str_uri_temp, str_action_name, str_temp);
 	SDEFINE_VAR_MORE(str_args, str_sql, str_data, str_one_col, str_one_val);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	char *ptr_end_uri = NULL;
 	size_t int_count;
 	char *ptr_end = NULL;
@@ -142,13 +141,20 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		SFINISH_SNCAT(str_response, &int_response_len,
+		char *_str_response = str_response;
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response));
+		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			strlen("HTTP/1.1 500 Internal Server Error\015\012"
-				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
-			_str_response, strlen(_str_response));
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, strlen(_str_response)
+		);
 		SFREE(_str_response);
 	}
 	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
@@ -172,7 +178,6 @@ bool http_insert_step2(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	DArray *arr_row_values = NULL;
 	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_temp);
@@ -197,19 +202,25 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		SFINISH_SNCAT(str_response, &int_response_len,
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			strlen("HTTP/1.1 500 Internal Server Error\015\012"
-				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_SNFCAT(str_response, &int_response_len,
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
 			":\n", (size_t)2,
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
 	ssize_t int_client_write_len = 0;
 	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
@@ -237,7 +248,6 @@ bool http_insert_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
 	size_t int_response_len = 0;
-	char *_str_response = NULL;
 	size_t i = 0, int_len = 0;
 	SDEFINE_VAR_ALL(str_temp);
 
@@ -317,19 +327,25 @@ finish:
 			client_insert->darr_column_types = NULL;
 		}
 
-		_str_response = str_response;
-		SFINISH_SNCAT(str_response, &int_response_len,
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			strlen("HTTP/1.1 500 Internal Server Error\015\012"
-				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_SNFCAT(str_response, &int_response_len,
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
 			":\n", (size_t)2,
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
 	ssize_t int_client_write_len = 0;
 	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
@@ -356,7 +372,6 @@ bool http_insert_step4(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	DArray *arr_row_values = NULL;
 	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_temp, str_col_seq);
@@ -414,19 +429,25 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		SFINISH_SNCAT(str_response, &int_response_len,
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			strlen("HTTP/1.1 500 Internal Server Error\015\012"
-				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_SNFCAT(str_response, &int_response_len,
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
 			":\n", (size_t)2,
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
 	ssize_t int_client_write_len = 0;
 	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
@@ -453,7 +474,6 @@ bool http_insert_step5(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	DArray *arr_row_values = NULL;
 	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_temp);
@@ -490,19 +510,25 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		SFINISH_SNCAT(str_response, &int_response_len,
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			strlen("HTTP/1.1 500 Internal Server Error\015\012"
-				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_SNFCAT(str_response, &int_response_len,
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
 			":\n", (size_t)2,
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
 	ssize_t int_client_write_len = 0;
 	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
@@ -529,7 +555,6 @@ bool http_insert_step6(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	size_t int_response_len = 0;
 	DArray *arr_row_values = NULL;
 	SDEFINE_VAR_ALL(str_temp);
@@ -575,19 +600,25 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		SFINISH_SNCAT(str_response, &int_response_len,
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			strlen("HTTP/1.1 500 Internal Server Error\015\012"
-				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_SNFCAT(str_response, &int_response_len,
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
 			":\n", (size_t)2,
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
 	ssize_t int_client_write_len = 0;
 	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {

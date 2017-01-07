@@ -1,6 +1,3 @@
-#ifdef ENVELOPE
-
-#define UTIL_DEBUG
 #include "http_update.h"
 
 void http_update_step1(struct sock_ev_client *client) {
@@ -773,5 +770,3 @@ finish:
 	}
 	return true;
 }
-
-#endif
