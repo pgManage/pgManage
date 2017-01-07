@@ -1346,7 +1346,6 @@ OFFSET
 			],
 			['Select 1', 'ajax', 200, '/env/action_select', 'src=rtesting_table&limit=1&order_by=id%20ASC',
 				ml(function () {/*{"stat": true, "dat": {"arr_column": ["id","test_name","test_name2","change_stamp"], "dat": [[2,"Bob","","2016-07-12 05:13:00"]], "row_count": 3}}*/})],
-
 			['Select 2', 'ajax', 200, '/env/action_select', 'view=SELECT * FROM rtesting_table&limit=1&order_by=id%20ASC',
 				ml(function () {/*{"stat": true, "dat": {"arr_column": ["id","test_name","test_name2","change_stamp"], "dat": [[2,"Bob","","2016-07-12 05:13:00"]], "row_count": 3}}*/})],
 			['Select 3', 'ajax', 200, '/env/action_select', 'src=(SELECT * FROM rtesting_table) em&limit=1&order_by=id%20ASC&where=id%20%3D%206',
@@ -1363,13 +1362,7 @@ OFFSET
 						|| arg === ml(function () {/*"FATAL\n..\\..\\db_framework_pq\\db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t19\n"*/ })
 				}
 			],
-			['Insert Fail 2', 'ajax', 500, '/env/action_insert', 'view=rtesting_table1&data=id%3D1',
-				function (arg) {
-					return arg === ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t19\n"*/ })
-						|| arg === ml(function () {/*"FATAL\n..\\..\\db_framework_pq\\db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  relation \"rtesting_table1\" does not exist\\nLINE 2:    FROM rtesting_table1;\\n                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t19\n"*/ })
-				}
-			],
-            ['Insert Fail 3', 'ajax', 500, '/env/action_insert', 'src=rtesting_table',
+			['Insert Fail 2', 'ajax', 500, '/env/action_insert', 'src=rtesting_table',
                 ml(function () {/*"FATAL\nNo insert data"*/ })],
 			['Insert 1', 'ajax', 200, '/env/action_insert', 'src=rtesting_table&data=' + encodeURIComponent('test_name=test&test_name2=test'),
 				ml(function () {/*{"stat": true, "dat": {"lastval": 5}}*/})],

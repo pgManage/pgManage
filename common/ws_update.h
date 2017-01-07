@@ -53,6 +53,7 @@ struct sock_ev_client_update {
 	size_t int_hash_where_clause_len;
 	size_t int_set_col_list_len;
 	size_t int_return_columns_len;
+	size_t int_col_data_type_len;
 };
 
 /*

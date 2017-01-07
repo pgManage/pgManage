@@ -1,5 +1,6 @@
 #ifdef ENVELOPE
 
+#define UTIL_DEBUG
 #include "http_update.h"
 
 void http_update_step1(struct sock_ev_client *client) {
@@ -203,13 +204,10 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_CHECK(darr_column_types != NULL, "DB_get_row_values failed");
 
 	SFINISH_SNCAT(
-		client_update->str_col_data_type,
+		client_update->str_col_data_type, &client_update->int_col_data_type_len,
 		DArray_get(darr_column_types, 0), strlen(DArray_get(darr_column_types, 0))
 	);
-	SDEBUG("DArray_get(darr_column_names, 0): %s", DArray_get(darr_column_names, 0));
-	SDEBUG("client_update->str_col_data_type: %s", client_update->str_col_data_type);
-	SDEBUG("DArray_get(darr_column_types, 0): %s", DArray_get(darr_column_types, 0));
-	SDEBUG("DArray_get(darr_column_types, 1): %s", DArray_get(darr_column_types, 1));
+	
 
 	int_len = DArray_count(darr_column_names);
 	SDEBUG("client_update->str_columns: %s", client_update->str_columns);
@@ -270,7 +268,7 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 			bol_first_u_where = false;
 		} else {
 			SFINISH_SNFCAT(
-				client_update->str_u_where, &int_temp,
+				client_update->str_u_where, &int_u_where_len,
 				" AND ", (size_t)5
 			);
 		}
@@ -667,6 +665,7 @@ bool http_update_step5(EV_P, void *cb_data, DB_result *res) {
 	DArray *darr_data = NULL;
 	DArray *darr_data_length = NULL;
 	size_t int_response_len = 0;
+	size_t int_data_len = 0;
 	SDEFINE_VAR_ALL(str_data, str_temp);
 
 	SFINISH_CHECK(res != NULL, "DB_get_column_types_for_query failed!");
@@ -678,21 +677,40 @@ bool http_update_step5(EV_P, void *cb_data, DB_result *res) {
 	darr_data_length = DB_get_row_lengths(res);
 	maxy = DArray_end(darr_data);
 
-	SFINISH_CAT_CSTR(str_data, "[");
+	SFINISH_SNCAT(
+		str_data, &int_data_len,
+		"[", (size_t)1
+	);
 	for (y = 0; y < maxy; y++) {
 		if ((*(ssize_t *)DArray_get(darr_data_length, y)) == -1) {
-			SFINISH_CAT_APPEND(str_data, (y == 0 ? "" : ","), "null");
+			SFINISH_SNFCAT(
+				str_data, &int_data_len,
+				(y == 0 ? "" : ","), (size_t)(y == 0 ? 0 : 1),
+				"null", (size_t)4
+			);
 		} else {
 			str_temp = jsonify(DArray_get(darr_data, y));
 			SFINISH_CHECK(str_temp != NULL, "jsonify failed");
-			SFINISH_CAT_APPEND(str_data, (y == 0 ? "" : ","), str_temp);
+			SFINISH_SNFCAT(
+				str_data, &int_data_len,
+				(y == 0 ? "" : ","), (size_t)(y == 0 ? 0 : 1),
+				str_temp, strlen(str_temp)
+			);
 			SFREE(str_temp);
 		}
 	}
-	SFINISH_CAT_APPEND(str_data, "]");
+	SFINISH_SNFCAT(
+		str_data, &int_data_len,
+		"]", (size_t)1
+	);
 
-	SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n",
-		"{\"stat\": true, \"dat\": ", str_data, "}");
+	char *str_temp1 = "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{\"stat\": true, \"dat\": ";
+	SFINISH_SNCAT(
+		str_response, &int_response_len,
+		str_temp1, strlen(str_temp1),
+		str_data, int_data_len,
+		"}", (size_t)1
+	);
 	SFREE(str_data);
 
 	DB_free_result(res);

@@ -64,8 +64,6 @@ void http_insert_step1(struct sock_ev_client *client) {
 		ptr_loop = str_data;
 		client_insert->darr_column_values = DArray_create(sizeof(char *), 1);
 		while (ptr_loop[0] != 0) {
-			SFINISH_SNCAT(str_one_col, &int_one_col_len,
-				"", (size_t)0);
 			// DEBUG("while loop start:");
 			// CHECK_FOR_INTERRUPTS();
 			// get keys
@@ -73,17 +71,17 @@ void http_insert_step1(struct sock_ev_client *client) {
 			SFINISH_CHECK(ptr_end != 0, "Badly formed data string. Should be URI encoded 'key=value&key=value'.");
 
 			// get col name
-			int_count = (size_t)(ptr_end - ptr_loop);
-			SFINISH_SREALLOC(str_one_col, int_count + 1);
-			memcpy(str_one_col, ptr_loop, int_count);
-			ptr_loop = ptr_loop + int_count + 1;
-			str_one_col[int_count] = 0;
-			client_insert->int_data_len -= int_count + 1;
+			int_one_col_len = (size_t)(ptr_end - ptr_loop);
+			SFINISH_SALLOC(str_one_col, int_one_col_len + 1);
+			memcpy(str_one_col, ptr_loop, int_one_col_len);
+			ptr_loop = ptr_loop + int_one_col_len + 1;
+			str_one_col[int_one_col_len] = 0;
+			client_insert->int_data_len -= int_one_col_len + 1;
 			// decode if necessary
-			ptr_end = bstrstr(str_one_col, int_count, "%", 1);
+			ptr_end = bstrstr(str_one_col, int_one_col_len, "%", 1);
 			if (ptr_end != NULL) {
 				str_temp = str_one_col;
-				str_one_col = uri_to_cstr(str_one_col, &int_count);
+				str_one_col = uri_to_cstr(str_one_col, &int_one_col_len);
 				SFREE(str_temp);
 			}
 
@@ -114,6 +112,7 @@ void http_insert_step1(struct sock_ev_client *client) {
 		}
 		client_insert->str_return_columns[strlen(client_insert->str_return_columns) - 1] = '\0';
 		SDEBUG("client_insert->str_return_columns: %s", client_insert->str_return_columns);
+		client_insert->int_return_columns_len -= 1;
 	} else {
 		SFINISH("No insert data");
 	}

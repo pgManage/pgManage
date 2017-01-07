@@ -150,6 +150,7 @@ DArray *DB_get_column_names(DB_result *res) {
 	for (i = 0; i < int_num_columns; i++) {
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			PQfname(res->res, i), strlen(PQfname(res->res, i)));
+		SDEBUG("str_temp: %s", str_temp);
 		DArray_push(darr_ret, str_temp);
 		str_temp = NULL;
 	}
@@ -171,7 +172,7 @@ bool DB_get_column_types_for_query2(EV_P, void *cb_data, DB_result *res);
 // The sql does not get run, it gets prepared and then we get the description of the result, not the result.
 // Then we run format_type for each type using DB_exec, then we run the callback with that result.
 bool DB_get_column_types_for_query(EV_P, DB_conn *conn, char *str_sql, void *cb_data, query_cb_t column_type_cb) {
-	SDEBUG("DB_get_column_types_for_query");
+	SDEBUG("DB_get_column_types_for_query: %s", str_sql);
 	DB_result_poll *res_poll = NULL;
 
 	// Put all the stuff we will need for the callback in a struct, we will pull it out later
@@ -347,6 +348,7 @@ bool DB_get_column_types(EV_P, DB_result *res, void *cb_data, query_cb_t column_
 		PQfreemem(str_int_mod);
 		str_int_mod = NULL;
 	}
+	SDEBUG("str_sql: %s", str_sql);
 
 	// Run sql, callback the function the user specified, they will have a result with all the column types
 	SERROR_CHECK(DB_exec(EV_A, res->conn, cb_data, str_sql, column_type_cb) == true, "DB_exec failed");
@@ -642,7 +644,6 @@ void _DB_finish(DB_conn *conn) {
 static void db_query_cb(EV_P, ev_io *w, int revents) {
 	if (revents != 0) {
 	} // get rid of unused parameter warning
-	SDEBUG("db_query_cb");
 	DB_copy_check *db_copy_check = NULL;
 	DB_result_poll *res_poll = (DB_result_poll *)w;
 	DB_result *db_res = NULL;
@@ -672,7 +673,6 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 
 	int_status2 = PQisBusy(conn->conn);
 
-	SDEBUG("int_status2: %d", int_status2);
 	if (int_status2 != 1) {
 		arr_res = DArray_create(1, sizeof(PGresult *));
 		query_cb = res_poll->query_cb;
@@ -685,9 +685,6 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 		//                              we keep getting a COPY result
 		//                      Also note, this will only work if the COPY is the only query
 		while (res != NULL && (int_j == 0 || (result != PGRES_COPY_OUT && result != PGRES_COPY_IN))) {
-			SDEBUG("int_j = %d", int_j);
-			SDEBUG("result == %s", PQresStatus(result));
-			SDEBUG("res = %p", res);
 			DArray_push(arr_res, res);
 			res = PQgetResult(conn->conn);
 			result = PQresultStatus(res);
@@ -708,11 +705,8 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 			int_i = 0;
 			int_len = DArray_end(arr_res);
 			while (int_i < int_len) {
-				SDEBUG("int_i = %d", int_i);
 
 				res = DArray_get(arr_res, int_i);
-				SDEBUG("result == %s", PQresStatus(PQresultStatus(res)));
-				SDEBUG("res = %p", res);
 				if (res != NULL) {
 					PQclear(res);
 				}
@@ -735,11 +729,7 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 			int_i = 0;
 			int_len = DArray_end(arr_res);
 			while (int_i < int_len) {
-				SDEBUG("int_i = %d", int_i);
-
 				res = DArray_get(arr_res, int_i);
-				SDEBUG("result == %s", PQresStatus(PQresultStatus(res)));
-				SDEBUG("res = %p", res);
 				if (res != NULL) {
 					PQclear(res);
 				}
@@ -760,12 +750,8 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 		// Now we loop through the gathered results
 		int_len = DArray_end(arr_res);
 		while (int_i < int_len) {
-			SDEBUG("int_i = %d", int_i);
 			res = DArray_get(arr_res, int_i);
 			result = PQresultStatus(res);
-
-			SDEBUG("result == %s", PQresStatus(result));
-			SDEBUG("res = %p", res);
 
 			// Build a DB_result
 			SERROR_SALLOC(db_res, sizeof(DB_result));
@@ -811,11 +797,7 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 		}
 		// If we break out early, we need to free all of the remaining results
 		while (int_i < int_len) {
-			SDEBUG("int_i = %d", int_i);
-
 			res = DArray_get(arr_res, int_i);
-			SDEBUG("result == %s", PQresStatus(PQresultStatus(res)));
-			SDEBUG("res = %p", res);
 			if (res != NULL) {
 				PQclear(res);
 			}
@@ -831,11 +813,7 @@ error:
 	SFREE_ALL();
 	// Same as above
 	while (int_i < int_len) {
-		SDEBUG("int_i = %d", int_i);
-
 		res = DArray_get(arr_res, int_i);
-		SDEBUG("result == %s", PQresStatus(PQresultStatus(res)));
-		SDEBUG("res = %p", res);
 		if (res != NULL) {
 			PQclear(res);
 		}
@@ -853,7 +831,6 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 	if (revents != 0) {
 	} // get rid of unused parameter warning
 	DB_copy_check *copy_check = (DB_copy_check *)w;
-	SDEBUG("copy_check: %p", copy_check);
 
 	char *str_response = NULL;
 	size_t int_response_len = 0;
@@ -923,14 +900,12 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 
 	bol_error_state = false;
 finish:
-	SDEBUG("finish1");
 	if (bol_error_state == true || int_status == -2 || result == PGRES_FATAL_ERROR) {
 		// client_request_free(client_request);
 		// client_request_free takes care of this
 		// SFREE(client_insert);
 		bol_error_state = false;
 
-		SDEBUG("finish2");
 		str_response = _DB_get_diagnostic(copy_check->conn, res ? res : PQgetResult(copy_check->conn->conn));
 		copy_check->copy_cb(EV_A, false, true, copy_check->cb_data, str_response, strlen(str_response));
 		ev_check_stop(EV_A, &copy_check->check);

@@ -1,9 +1,8 @@
-﻿  util_canonical.c
-  util_file.c
+﻿  http_update.c
   Generating code
-  5 of 515 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
+  1 of 515 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    3 functions had inline decision re-evaluated but remain unchanged
+    2 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.exe
   envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.pdb (Full PDB)

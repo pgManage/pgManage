@@ -1,6 +1,5 @@
 #ifdef ENVELOPE
 
-#define UTIL_DEBUG
 #include "http_select.h"
 
 void http_select_step1(struct sock_ev_client *client) {
