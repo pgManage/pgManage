@@ -28,8 +28,8 @@ void sunny_exec_output_cb(EV_P, ev_check *w, int revents) {
 	if (bol_read_file_success) {
 		// fprintf(stderr, "%c", buf[0]);
 		if (exec_cb_data->str_current_response == NULL) {
-			SERROR_CAT_CSTR(exec_cb_data->str_current_response, "");
-			exec_cb_data->int_current_response_len = 0;
+			SERROR_SNCAT(exec_cb_data->str_current_response, &exec_cb_data->int_current_response_len,
+				"", (size_t)0);
 		}
 		exec_cb_data->int_current_response_len += 1;
 		SERROR_SREALLOC(exec_cb_data->str_current_response, exec_cb_data->int_current_response_len + 1);
@@ -119,6 +119,11 @@ bool s_exec(EV_P, int int_num_args, void *cb_data, exec_callback_t exec_callback
 	SDEBUG("int_num_args: %d", int_num_args);
 	va_list ap;
 	int int_i = 0;
+
+	size_t int_binary_len = 0;
+	size_t int_temp2_len = 0;
+	size_t int_temp3_len = 0;
+
 	SDEFINE_VAR_ALL(str_temp2, str_temp3);
 	exec_cb_data_t *exec_cb_data = NULL;
 #ifdef _WIN32
@@ -138,9 +143,13 @@ bool s_exec(EV_P, int int_num_args, void *cb_data, exec_callback_t exec_callback
 #ifdef _WIN32
 	SFINISH_SALLOC(arr_str_argument, int_num_args * sizeof(char *));
 
-	SFINISH_CAT_CSTR(str_temp2, _str_binary);
+	SFINISH_SNCAT(str_temp2, &int_temp2_len,
+		_str_binary, strlen(_str_binary));
 	SFINISH_REPLACE(str_temp2, "\"", "\\\"", "g");
-	SFINISH_CAT_CSTR(str_binary, "\"", str_temp2, "\"");
+	SFINISH_SNCAT(str_binary, &int_binary_len,
+		"\"", (size_t)1,
+		str_temp2, strlen(str_temp2),
+		"\"", (size_t)1);
 	SFREE(str_temp2);
 #endif
 
@@ -154,18 +163,26 @@ bool s_exec(EV_P, int int_num_args, void *cb_data, exec_callback_t exec_callback
 			if (str_temp[0] == '/' && str_temp[1] == 'C' && str_temp[2] == ':') {
 				SDEBUG("str_temp + 3: %s", str_temp + 3);
 
-				SFINISH_CAT_CSTR(str_temp2, str_temp + 3);
+				SFINISH_SNCAT(str_temp2, &int_temp2_len,
+					str_temp + 3, strlen(str_temp + 3));
 				SDEBUG("str_temp2: %s", str_temp2);
 
 				SFINISH_REPLACE(str_temp2, "\"", "\\\"", "g");
 				SDEBUG("str_temp2: %s", str_temp2);
 
-				SFINISH_CAT_CSTR(str_temp3, " /C:\"", str_temp2, "\"");
+				SFINISH_SNCAT(str_temp3, &int_temp3_len,
+					" /C:\"", (size_t)5,
+					str_temp2, int_temp2_len,
+					"\"", (size_t)1);
 				SDEBUG("str_temp3: %s", str_temp3);
 			} else {
-				SFINISH_CAT_CSTR(str_temp2, str_temp);
+				SFINISH_SNCAT(str_temp2, &int_temp2_len,
+					str_temp, strlen(str_temp));
 				SFINISH_REPLACE(str_temp2, "\"", "\\\"", "g");
-				SFINISH_CAT_CSTR(str_temp3, " \"", str_temp2, "\"");
+				SFINISH_SNCAT(str_temp3, &int_temp3_len,
+					" \"", (size_t)2,
+					str_temp2, int_temp2_len,
+					"\"", (size_t)1);
 			}
 
 			arr_str_argument[int_i] = str_temp3;

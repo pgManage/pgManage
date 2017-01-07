@@ -22,6 +22,7 @@ void notice_root(char *str_file, int int_line_no, char *str_function, char *str_
 }
 
 void warn_root(char *str_file, int int_line_no, char *str_function, char *str_error, ...) {
+	size_t int_global_error_len = 0;
 	char *str_response = NULL;
 
 	va_list va_arg1;
@@ -38,7 +39,13 @@ void warn_root(char *str_file, int int_line_no, char *str_function, char *str_er
 	vsnprintf(str_response, int_len + 1, str_error, va_arg3);
 
 	SFREE(str_global_error);
-	str_global_error = cat_cstr(str_file, ":", str_function, ": ", str_response, "\n");
+	SERROR_SNCAT(str_global_error, &int_global_error_len,
+		str_file, strlen(str_file),
+		":", (size_t)1,
+		str_function, strlen(str_function),
+		": ", (size_t)2,
+		str_response, strlen(str_response),
+		"\n", (size_t)1);
 
 	sunlogf_root(str_file, int_line_no, str_function, 4, str_error, va_arg1);
 	SFREE_PWORD(str_response);
@@ -64,6 +71,7 @@ void var_root(char *str_file, int int_line_no, char *str_function, char *str_err
 }
 
 void error_noresponse_root(char *str_file, int int_line_no, char *str_function, char *str_error, ...) {
+	size_t int_global_error_len = 0;
 	char *str_response = NULL;
 
 	va_list va_arg1;
@@ -80,7 +88,13 @@ void error_noresponse_root(char *str_file, int int_line_no, char *str_function, 
 	vsnprintf(str_response, int_len + 1, str_error, va_arg3);
 
 	SFREE(str_global_error);
-	str_global_error = cat_cstr(str_file, ":", str_function, ": ", str_response, "\n");
+	SERROR_SNCAT(str_global_error, &int_global_error_len,
+		str_file, strlen(str_file),
+		":", (size_t)1,
+		str_function, strlen(str_function),
+		": ", (size_t)2,
+		str_response, strlen(str_response),
+		"\n", (size_t)1);
 
 	sunlogf_root(str_file, int_line_no, str_function, 1, str_error, va_arg1);
 	SFREE_PWORD(str_response);
@@ -93,6 +107,7 @@ error:
 
 char *error_response_root(char *str_file, int int_line_no, char *str_function, char *str_error, ...) {
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 
 	va_list va_arg1;
 	va_start(va_arg1, str_error);
@@ -110,13 +125,18 @@ char *error_response_root(char *str_file, int int_line_no, char *str_function, c
 	char *str_temp = NULL;
 	str_temp = str_response;
 	if (str_global_error == NULL) {
-		str_response = cat_cstr("FATAL\012", str_temp);
+		SERROR_SNCAT(str_response, &int_response_len,
+			"FATAL\012", (size_t)6,
+			str_temp, strlen(str_temp));
 	} else {
-		str_response = cat_cstr("FATAL\012", str_global_error, str_temp);
+		SERROR_SNCAT(str_response, &int_response_len,
+			"FATAL\012", (size_t)6,
+			str_global_error, strlen(str_global_error),
+			str_temp, strlen(str_temp));
 		SFREE(str_global_error);
 	}
 	SFREE(str_temp);
-	SERROR_CHECK(str_response, "CAT_APPEND FAILED");
+	SERROR_CHECK(str_response, "SNFCAT FAILED");
 
 	SDEBUG("str_file >%s<", str_file);
 	SDEBUG("int_line_no >%d<", int_line_no);
@@ -132,6 +152,7 @@ error:
 
 char *warn_response_root(char *str_file, int int_line_no, char *str_function, char *str_error, ...) {
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 
 	va_list va_arg1;
 	va_start(va_arg1, str_error);
@@ -149,13 +170,18 @@ char *warn_response_root(char *str_file, int int_line_no, char *str_function, ch
 	char *str_temp = NULL;
 	str_temp = str_response;
 	if (str_global_error == NULL) {
-		str_response = cat_cstr("FATAL\012", str_temp);
+		SERROR_SNCAT(str_response, &int_response_len,
+			"FATAL\012", (size_t)6,
+			str_temp, strlen(str_temp));
 	} else {
-		str_response = cat_cstr("FATAL\012", str_global_error, str_temp);
+		SERROR_SNCAT(str_response, &int_response_len,
+			"FATAL\012", (size_t)6,
+			str_global_error, strlen(str_global_error),
+			str_temp, strlen(str_temp));
 		SFREE(str_global_error);
 	}
 	SFREE(str_temp);
-	SERROR_CHECK(str_response, "CAT_APPEND FAILED");
+	SERROR_CHECK(str_response, "SNCAT FAILED");
 
 	SDEBUG("str_file >%s<", str_file);
 	SDEBUG("int_line_no >%d<", int_line_no);

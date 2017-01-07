@@ -292,8 +292,6 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 			SFINISH_CHECK(
 				DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_delete_step2), "DB_exec failed");
 		}
-// SFINISH_CAT_CSTR(str_sql, "SELECT TOP 0 ", str_temp_col_list, " INTO ", client_delete->str_temp_table_name, " FROM ",
-//	client_delete->str_real_table_name, ";");
 #endif
 	}
 
@@ -631,7 +629,7 @@ bool ws_delete_step5(EV_P, void *cb_data, DB_result *res) {
 
 	size_t int_response_len = 0;
 	size_t int_sql_len = 0;
-	SFINISH_CAT_CSTR(str_response, &int_response_len,
+	SFINISH_SNCAT(str_response, &int_response_len,
 		"", (size_t)0);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");

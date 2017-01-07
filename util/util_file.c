@@ -14,13 +14,15 @@ bool canonical_recurse_directory(EV_P, char *str_canonical_start, char *str_part
 	rec_data->step_callback = step_callback;
 	rec_data->finish_callback = finish_callback;
 	rec_data->cb_data = cb_data;
-	SERROR_CAT_CSTR(rec_data->str_canonical_start, str_canonical_start);
+	SERROR_SNCAT(rec_data->str_canonical_start, &rec_data->int_canonical_start_len,
+		str_canonical_start, strlen(str_canonical_start));
 
 	rec_data->str_path = canonical(str_canonical_start, str_partial_path, "valid_path");
 	SERROR_CHECK(rec_data->str_path != NULL, "canonical failed");
 
 	if (rec_data->str_path[strlen(rec_data->str_path) - 1] != '/') {
-		SERROR_CAT_APPEND(rec_data->str_path, "/");
+		SERROR_SNFCAT(rec_data->str_path, &rec_data->int_path_len,
+			"/", (size_t)1);
 	}
 
 	rec_data->darr_directory = DArray_create(sizeof(recursive_directory_data *), 10);
@@ -31,8 +33,10 @@ bool canonical_recurse_directory(EV_P, char *str_canonical_start, char *str_part
 #ifdef _WIN32
 	dir_data->h_find = INVALID_HANDLE_VALUE;
 #endif
-	SERROR_CAT_CSTR(dir_data->str_partial_path, "");
-	SERROR_CAT_CSTR(dir_data->str_path, rec_data->str_path);
+	SERROR_SNCAT(dir_data->str_partial_path, &dir_data->int_partial_path_len,
+		"", (size_t)0);
+	SERROR_SNCAT(dir_data->str_path, &dir_data->int_path_len,
+		rec_data->str_path, rec_data->int_path_len);
 
 	ev_check_init(&rec_data->check, canonical_recurse_directory_check_cb);
 	ev_check_start(EV_A, &rec_data->check);
@@ -53,6 +57,12 @@ void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents) {
 	bool bol_res = true;
 	// Get directory we are working on
 	size_t int_i = DArray_end(rec_data->darr_directory);
+
+#ifdef _WIN32
+	size_t int_path_len = 0;
+#endif
+	size_t int_partial_path_len = 0;
+
 	if (int_i == 0) {
 		rec_data->finish_callback(EV_A, rec_data->cb_data, true);
 		decrement_idle(EV_A);
@@ -82,7 +92,9 @@ void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents) {
 #ifdef _WIN32
 	SDEBUG("dir_data->str_partial_path: %s", dir_data->str_partial_path);
 	SDEBUG("dir_data->str_path: %s", dir_data->str_path);
-	SERROR_CAT_CSTR(str_path, dir_data->str_path, "*.*");
+	SERROR_SNCAT(str_path, &int_path_len,
+		dir_data->str_path, dir_data->int_path_len,
+		"*.*", (size_t)3);
 	SERROR_CHECK((dir_data->h_find = FindFirstFileA(str_path, &dir_data->find_data)) != INVALID_HANDLE_VALUE,
 		"path not found: %s", str_path);
 	do {
@@ -96,12 +108,19 @@ void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents) {
 				SERROR_SALLOC(new_dir_data, sizeof(recursive_directory_data));
 				new_dir_data->h_find = INVALID_HANDLE_VALUE;
 				DArray_push(rec_data->darr_directory, new_dir_data);
-				SERROR_CAT_CSTR(new_dir_data->str_partial_path, dir_data->str_partial_path, dir_data->find_data.cFileName, "\\");
-				SERROR_CAT_CSTR(new_dir_data->str_path, rec_data->str_path, new_dir_data->str_partial_path);
+				SERROR_SNCAT(new_dir_data->str_partial_path, &new_dir_data->int_partial_path_len,
+					dir_data->str_partial_path, dir_data->int_partial_path_len,
+					dir_data->find_data.cFileName, strlen(dir_data->find_data.cFileName),
+					"\\", (size_t)1);
+				SERROR_SNCAT(new_dir_data->str_path, &new_dir_data->int_path_len,
+					rec_data->str_path, rec_data->int_path_len,
+					new_dir_data->str_partial_path, new_dir_data->int_partial_path_len);
 
 				SDEBUG("Directory: >%s<", dir_data->find_data.cFileName);
 			} else {
-				SERROR_CAT_CSTR(str_partial_path, dir_data->str_partial_path, dir_data->find_data.cFileName);
+				SERROR_SNCAT(str_partial_path, &int_partial_path_len,
+					dir_data->str_partial_path, dir_data->int_partial_path_len,
+					dir_data->find_data.cFileName, strlen(dir_data->find_data.cFileName));
 				SDEBUG("File: >%s<", str_partial_path);
 				bol_res = rec_data->step_callback(EV_A, rec_data->cb_data, str_partial_path);
 				SFREE(str_partial_path);
@@ -122,7 +141,9 @@ void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents) {
 		if ((dir_data->dp = readdir(dir_data->dirp)) != NULL) {
 			// dir_data->dp->d_name
 			if (strncmp(dir_data->dp->d_name, "..", 3) != 0 && strncmp(dir_data->dp->d_name, ".", 2) != 0) {
-				SERROR_CAT_CSTR(str_partial_path, dir_data->str_partial_path, dir_data->dp->d_name);
+				SERROR_SNCAT(str_partial_path, &int_partial_path_len,
+					dir_data->str_partial_path, dir_data->int_partial_path_len,
+					dir_data->dp->d_name, strlen(dir_data->dp->d_name));
 				str_path = canonical(rec_data->str_path, str_partial_path, "read_file");
 				if (str_path != NULL) {
 					SDEBUG("File: >%s<", str_partial_path);
@@ -134,8 +155,14 @@ void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents) {
 					recursive_directory_data *new_dir_data = NULL;
 					SERROR_SALLOC(new_dir_data, sizeof(recursive_directory_data));
 					DArray_push(rec_data->darr_directory, new_dir_data);
-					SERROR_CAT_CSTR(new_dir_data->str_partial_path, dir_data->str_partial_path, dir_data->dp->d_name, "/");
-					SERROR_CAT_CSTR(new_dir_data->str_path, rec_data->str_path, "/", new_dir_data->str_partial_path);
+					SERROR_SNCAT(new_dir_data->str_partial_path, &new_dir_data->int_partial_path_len,
+						dir_data->str_partial_path, dir_data->int_partial_path_len,
+						dir_data->dp->d_name, strlen(dir_data->dp->d_name),
+						"/", (size_t)1);
+					SERROR_SNCAT(new_dir_data->str_path, &rec_data->int_path_len,
+						rec_data->str_path, rec_data->int_path_len,
+						"/", (size_t)1,
+						new_dir_data->str_partial_path, new_dir_data->int_partial_path_len);
 
 					SDEBUG("Directory: >%s<", dir_data->str_partial_path);
 				}

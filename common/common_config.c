@@ -745,7 +745,7 @@ bool parse_options(int argc, char *const *argv) {
 	SDEBUG("str_global_sql_root: %s", str_global_sql_root);
 	if (str_global_sql_root == NULL) {
 		SERROR_SNCAT(str_global_sql_root, &int_global_len,
-			str_global_data_root, int_global_data_root_len,
+			str_global_data_root, strlen(str_global_data_root),
 			str_global_data_root[strlen(str_global_data_root) - 1] == '/' ? "sql" : "/sql",
 				strlen(str_global_data_root[strlen(str_global_data_root) - 1] == '/' ? "sql" : "/sql"));
 	}

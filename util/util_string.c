@@ -96,9 +96,16 @@ char *breplace(char *str_input, size_t *ptr_int_length, char *str_find_in, char 
 	char *str_return = NULL;
 	SDEFINE_VAR_ALL(str_buffer, str_find, str_replace);
 
-	SERROR_CAT_CSTR(str_return, "");
-	SERROR_CAT_CSTR(str_find, str_find_in);
-	SERROR_CAT_CSTR(str_replace, str_replace_in);
+	size_t int_return_len = 0;
+	size_t int_find_len = 0;
+	size_t int_replace_len = 0;
+
+	SERROR_SNCAT(str_return, &int_return_len,
+		"", (size_t)0);
+	SERROR_SNCAT(str_find, &int_find_len,
+		str_find_in, strlen(str_find_in));
+	SERROR_SNCAT(str_replace, &int_replace_len,
+		str_replace_in, strlen(str_replace_in));
 	if (strchr(str_flags, 'i') != NULL) {
 		str_find = str_tolower(str_find);
 		str_replace = str_tolower(str_replace);
@@ -235,31 +242,31 @@ error:
 }
 */
 // case uri with percent encoded hex to utf-8
-char *uri_to_cstr(char *loop_ptr, size_t *inputstring_len) {
+char *uri_to_cstr(char *ptr_loop, size_t *int_inputstring_len) {
 	char *result_text = NULL;
-	char *result_ptr;
-	size_t result_len;
-	size_t chunk_len;
+	char *ptr_result;
+	size_t int_result_len = 0;
+	size_t int_chunk_len = 0;
 	char *x;
 
 	// Dangerous loops ahead. We could go infinite if we aren't
 	//   careful. So lets check for interrupts.
 	SERROR_SALLOC(result_text, 1);
-	result_len = 0;
+	int_result_len = 0;
 	char buffer[3];
 	buffer[2] = 0;
 
-	while (*inputstring_len > 0) {
-		chunk_len = 1;
+	while (*int_inputstring_len > 0) {
+		int_chunk_len = 1;
 
-		// SDEBUG("loop_ptr: %s, chunk_len: %i, inputlen: %i", loop_ptr, chunk_len,
+		// SDEBUG("ptr_loop: %s, chunk_len: %i, inputlen: %i", ptr_loop, chunk_len,
 		// inputstring_len );
-		// SDEBUG("result_ptr: %s, result_len: %i ", result_ptr, result_len );
+		// SDEBUG("ptr_result: %s, result_len: %i ", ptr_result, result_len );
 
 		// check for % characters
 		//   if found, decode as percent encoded hex
-		if (strncmp(loop_ptr, "%", 1) == 0) {
-			x = loop_ptr + 1;
+		if (strncmp(ptr_loop, "%", 1) == 0) {
+			x = ptr_loop + 1;
 			// SDEBUG("percent detected");
 
 			// check if two digits  00..7F  //SELECT net.uri_to_text(E':%20:') =>
@@ -270,11 +277,11 @@ char *uri_to_cstr(char *loop_ptr, size_t *inputstring_len) {
 					(strncasecmp(x + 1, "a", 1) >= 0 && strncasecmp(x + 1, "f", 1) <= 0))) {
 				// SDEBUG("We have a one byte char. strtol:%ld;", strtol( x, 0, 16)
 				// );
-				SERROR_SREALLOC(result_text, result_len + 1);
+				SERROR_SREALLOC(result_text, int_result_len + 1);
 				memcpy(buffer, x, 2);
-				result_text[result_len] = (char)strtol(buffer, 0, 16);
-				result_len += 1;
-				chunk_len = 3;
+				result_text[int_result_len] = (char)strtol(buffer, 0, 16);
+				int_result_len += 1;
+				int_chunk_len = 3;
 
 				// check if four digits C2..DF  //SELECT
 				// net.uri_to_text(E':%c4%b3'); => combined ij char
@@ -282,26 +289,26 @@ char *uri_to_cstr(char *loop_ptr, size_t *inputstring_len) {
 					   ((strncmp(x + 1, "2", 1) >= 0 && strncmp(x + 1, "9", 1) <= 0) ||
 						   (strncasecmp(x + 1, "a", 1) >= 0 && strncasecmp(x + 1, "f", 1) <= 0))) {
 				// SDEBUG("We have a two byte char 'C' x:%s;", x);
-				SERROR_SREALLOC(result_text, result_len + 2);
+				SERROR_SREALLOC(result_text, int_result_len + 2);
 				memcpy(buffer, x, 2);
-				result_text[result_len] = (char)strtol(buffer, 0, 16);
+				result_text[int_result_len] = (char)strtol(buffer, 0, 16);
 				memcpy(buffer, x + 3, 2);
-				result_text[result_len + 1] = (char)strtol(buffer, 0, 16);
-				result_len += 2;
-				chunk_len = 6;
+				result_text[int_result_len + 1] = (char)strtol(buffer, 0, 16);
+				int_result_len += 2;
+				int_chunk_len = 6;
 
 				// check if four digits C2..DF
 			} else if ((strncasecmp(x, "d", 1) == 0) &&
 					   ((strncmp(x + 1, "0", 1) >= 0 && strncmp(x + 1, "9", 1) <= 0) ||
 						   (strncasecmp(x + 1, "a", 1) >= 0 && strncasecmp(x + 1, "f", 1) <= 0))) {
 				// DEBUG("We have a two byte char 'D'");
-				SERROR_SREALLOC(result_text, result_len + 2);
+				SERROR_SREALLOC(result_text, int_result_len + 2);
 				memcpy(buffer, x, 2);
-				result_text[result_len] = (char)strtol(buffer, 0, 16);
+				result_text[int_result_len] = (char)strtol(buffer, 0, 16);
 				memcpy(buffer, x + 3, 2);
-				result_text[result_len + 1] = (char)strtol(buffer, 0, 16);
-				result_len += 2;
-				chunk_len = 6;
+				result_text[int_result_len + 1] = (char)strtol(buffer, 0, 16);
+				int_result_len += 2;
+				int_chunk_len = 6;
 
 				// check if six digits E0, E1..EC, ED, EE..EF   //SELECT
 				// net.uri_to_text(E':%ef%b9%a0:'); light ampersand
@@ -309,57 +316,57 @@ char *uri_to_cstr(char *loop_ptr, size_t *inputstring_len) {
 					   ((strncmp(x + 1, "0", 1) >= 0 && strncmp(x + 1, "9", 1) <= 0) ||
 						   (strncasecmp(x + 1, "a", 1) >= 0 && strncasecmp(x + 1, "f", 1) <= 0))) {
 				// DEBUG("We have a three byte char.");
-				SERROR_SREALLOC(result_text, result_len + 3);
+				SERROR_SREALLOC(result_text, int_result_len + 3);
 				memcpy(buffer, x, 2);
-				result_text[result_len] = (char)strtol(buffer, 0, 16);
+				result_text[int_result_len] = (char)strtol(buffer, 0, 16);
 				memcpy(buffer, x + 3, 2);
-				result_text[result_len + 1] = (char)strtol(buffer, 0, 16);
+				result_text[int_result_len + 1] = (char)strtol(buffer, 0, 16);
 				memcpy(buffer, x + 6, 2);
-				result_text[result_len + 2] = (char)strtol(buffer, 0, 16);
-				result_len += 3;
-				chunk_len = 9;
+				result_text[int_result_len + 2] = (char)strtol(buffer, 0, 16);
+				int_result_len += 3;
+				int_chunk_len = 9;
 
 				// check if eight digits F0, F1..F3, F4  //SELECT
 				// net.uri_to_text(E':%f0%9d%90%80:'); bold A
 			} else if ((strncasecmp(x, "f", 1) == 0) && ((strncmp(x + 1, "0", 1) >= 0 && strncmp(x + 1, "4", 1) <= 0))) {
 				// SDEBUG("We have a four byte char.");
-				SERROR_SREALLOC(result_text, result_len + 4);
+				SERROR_SREALLOC(result_text, int_result_len + 4);
 				memcpy(buffer, x, 2);
-				result_text[result_len] = (char)strtol(buffer, 0, 16);
+				result_text[int_result_len] = (char)strtol(buffer, 0, 16);
 				memcpy(buffer, x + 3, 2);
-				result_text[result_len + 1] = (char)strtol(buffer, 0, 16);
+				result_text[int_result_len + 1] = (char)strtol(buffer, 0, 16);
 				memcpy(buffer, x + 6, 2);
-				result_text[result_len + 2] = (char)strtol(buffer, 0, 16);
+				result_text[int_result_len + 2] = (char)strtol(buffer, 0, 16);
 				memcpy(buffer, x + 9, 2);
-				result_text[result_len + 3] = (char)strtol(buffer, 0, 16);
-				result_len += 4;
-				chunk_len = 12;
+				result_text[int_result_len + 3] = (char)strtol(buffer, 0, 16);
+				int_result_len += 4;
+				int_chunk_len = 12;
 
 				// not a valid character
 			} else {
 				// SDEBUG("Invalid starting character detected. Returning literal
 				// percent character.");
-				SERROR_SREALLOC(result_text, result_len + chunk_len);
-				result_ptr = result_text + result_len;
-				memcpy(result_ptr, loop_ptr, chunk_len);
-				result_len += chunk_len;
+				SERROR_SREALLOC(result_text, int_result_len + int_chunk_len);
+				ptr_result = result_text + int_result_len;
+				memcpy(ptr_result, ptr_loop, int_chunk_len);
+				int_result_len += int_chunk_len;
 			}
 
 			// in case of + return a space
-		} else if (strncmp(loop_ptr, "+", 1) == 0) {
+		} else if (strncmp(ptr_loop, "+", 1) == 0) {
 			// SDEBUG("plus detected");
-			SERROR_SREALLOC(result_text, result_len + 1);
-			result_ptr = result_text + result_len;
-			memcpy(result_ptr, " ", 1);
-			result_len += 1;
+			SERROR_SREALLOC(result_text, int_result_len + 1);
+			ptr_result = result_text + int_result_len;
+			memcpy(ptr_result, " ", 1);
+			int_result_len += 1;
 
 			// in case of everything else, just add to output as is
 		} else {
-			// SDEBUG("char detected: %s;", loop_ptr);
-			SERROR_SREALLOC(result_text, result_len + chunk_len);
-			result_ptr = result_text + result_len;
-			memcpy(result_ptr, loop_ptr, chunk_len);
-			result_len += chunk_len;
+			// SDEBUG("char detected: %s;", ptr_loop);
+			SERROR_SREALLOC(result_text, int_result_len + int_chunk_len);
+			ptr_result = result_text + int_result_len;
+			memcpy(ptr_result, ptr_loop, int_chunk_len);
+			int_result_len += int_chunk_len;
 		}
 		// to debug: uncomment these three lines at the same time:
 		// SFINISH_SREALLOC(result_text, result_len + 1);
@@ -367,13 +374,13 @@ char *uri_to_cstr(char *loop_ptr, size_t *inputstring_len) {
 		// SDEBUG("result_len: %i, result_text: %s", result_len, result_text );
 
 		// looping
-		loop_ptr += chunk_len;
-		*inputstring_len -= chunk_len;
+		ptr_loop += int_chunk_len;
+		*int_inputstring_len -= int_chunk_len;
 	}
 	// SDEBUG("end");
-	SERROR_SREALLOC(result_text, result_len + 1);
-	result_text[result_len] = '\0';
-	*inputstring_len = result_len;
+	SERROR_SREALLOC(result_text, int_result_len + 1);
+	result_text[int_result_len] = '\0';
+	*int_inputstring_len = int_result_len;
 	return result_text;
 error:
 	SFREE(result_text);
@@ -387,18 +394,20 @@ char *getpar(char *query, char *input_key, size_t int_query_length, size_t *int_
 	char *start = query;
 	char *end;
 	char *str_result = NULL;
-	size_t answer_len;
-	size_t key_len;
+	size_t int_answer_len = 0;
+	size_t int_key_len = 0;
+	size_t int_result_len = 0;
 	SDEFINE_VAR_ALL(key, result);
 
 	// do not change original variable, but lets make a new one with the same name
-	SERROR_CAT_CSTR(key, input_key, "=");
-	key_len = strlen(key);
+	SERROR_SNCAT(key, &int_key_len,
+		input_key, strlen(input_key),
+		"=", (size_t)1);
 
 	do {
 		// SDEBUG("query:%s, key:%s, key_len:%i", query, key, key_len);
-		if (strncmp(query, key, key_len) == 0) {
-			answer = query + key_len;
+		if (strncmp(query, key, int_key_len) == 0) {
+			answer = query + int_key_len;
 
 			// strstr to find answer length.
 			end = bstrstr(answer, int_query_length - (size_t)(answer - start), "&", 1);
@@ -411,13 +420,13 @@ char *getpar(char *query, char *input_key, size_t int_query_length, size_t *int_
 				return str_result;
 			}
 
-			answer_len = (size_t)(end - answer);
+			int_answer_len = (size_t)(end - answer);
 			// SDEBUG("answer_len: %i", answer_len);
-			SERROR_SALLOC(result, answer_len + 1);
-			memcpy(result, answer, answer_len);
-			result[answer_len] = 0;
-			str_result = uri_to_cstr(result, &answer_len);
-			*int_value_length = answer_len;
+			SERROR_SALLOC(result, int_answer_len + 1);
+			memcpy(result, answer, int_answer_len);
+			result[int_answer_len] = 0;
+			str_result = uri_to_cstr(result, &int_answer_len);
+			*int_value_length = int_answer_len;
 			SERROR_CHECK(str_result != NULL, "uri_to_cstr failed");
 			SFREE_PWORD_ALL();
 			return str_result;
@@ -430,7 +439,8 @@ char *getpar(char *query, char *input_key, size_t int_query_length, size_t *int_
 
 	// didn't find anything
 	SFREE(key);
-	SERROR_CAT_CSTR(str_result, "");
+	SERROR_SNCAT(str_result, &int_result_len,
+		"", (size_t)0);
 	SFREE_PWORD_ALL();
 	return str_result;
 error:
@@ -440,84 +450,85 @@ error:
 }
 
 // encode string to JSON
-char *jsonify(char *inputstring) {
-	size_t inputstring_len;
+char *jsonify(char *str_inputstring) {
+	size_t int_inputstring_len;
 	char *str_result = NULL;
-	char *result_ptr;
-	char *loop_ptr;
-	size_t result_len;
-	size_t chunk_len;
+	char *ptr_result;
+	char *ptr_loop;
+	size_t int_result_len;
+	size_t int_chunk_len;
 
-	inputstring_len = strlen(inputstring);
+	int_inputstring_len = strlen(str_inputstring);
 
 	/* return empty array for empty input string */
-	if (inputstring_len < 1) {
-		SERROR_CAT_CSTR(str_result, "\"\"");
+	if (int_inputstring_len < 1) {
+		SERROR_SNCAT(str_result, &int_result_len,
+			"\"\"", (size_t)2);
 		return str_result;
 	}
 
 	// pointer to current location in text input
-	loop_ptr = inputstring; // increments by one character per loop
+	ptr_loop = str_inputstring; // increments by one character per loop
 
 	// Dangerous loops ahead. We could go infinite if we aren't
 	//   careful. So lets check for interrupts.
-	result_len = 1;
+	int_result_len = 1;
 	SERROR_SALLOC(str_result, 1);
 	str_result[0] = '"';
 
-	while (inputstring_len > 0) {
-		chunk_len = 1;
+	while (int_inputstring_len > 0) {
+		int_chunk_len = 1;
 
-		SERROR_SREALLOC(str_result, result_len + 2);
-		result_ptr = str_result + result_len;
+		SERROR_SREALLOC(str_result, int_result_len + 2);
+		ptr_result = str_result + int_result_len;
 
-		SDEBUG("loop_ptr: %s, chunk_len: %i, inputlen: %i", loop_ptr, chunk_len, inputstring_len);
-		SDEBUG("result_ptr: %s, result_len: %i ", result_ptr, result_len);
+		SDEBUG("ptr_loop: %s, int_chunk_len: %i, int_inputstring_len: %i", ptr_loop, int_chunk_len, int_inputstring_len);
+		SDEBUG("ptr_result: %s, int_result_len: %i ", ptr_result, int_result_len);
 
 		// FOUND SLASH:
-		if (strncmp(loop_ptr, "\\", chunk_len) == 0) {
-			memcpy(result_ptr, "\\\\", 2);
-			result_len += 2;
+		if (strncmp(ptr_loop, "\\", int_chunk_len) == 0) {
+			memcpy(ptr_result, "\\\\", 2);
+			int_result_len += 2;
 
 			// FOUND DOUBLE QUOTE:
-		} else if (strncmp(loop_ptr, "\"", chunk_len) == 0) {
-			memcpy(result_ptr, "\\\"", 2);
-			result_len += 2;
+		} else if (strncmp(ptr_loop, "\"", int_chunk_len) == 0) {
+			memcpy(ptr_result, "\\\"", 2);
+			int_result_len += 2;
 
 			// FOUND REV SLASH:
-		} else if (strncmp(loop_ptr, "/", chunk_len) == 0) {
-			memcpy(result_ptr, "\\/", 2);
-			result_len += 2;
+		} else if (strncmp(ptr_loop, "/", int_chunk_len) == 0) {
+			memcpy(ptr_result, "\\/", 2);
+			int_result_len += 2;
 
 			// FOUND CHR(13):
-		} else if (strncmp(loop_ptr, "\015", chunk_len) == 0) {
-			memcpy(result_ptr, "\\r", 2);
-			result_len += 2;
+		} else if (strncmp(ptr_loop, "\015", int_chunk_len) == 0) {
+			memcpy(ptr_result, "\\r", 2);
+			int_result_len += 2;
 
 			// FOUND CHR(10):
-		} else if (strncmp(loop_ptr, "\012", chunk_len) == 0) {
-			memcpy(result_ptr, "\\n", 2);
-			result_len += 2;
+		} else if (strncmp(ptr_loop, "\012", int_chunk_len) == 0) {
+			memcpy(ptr_result, "\\n", 2);
+			int_result_len += 2;
 
 			// FOUND TAB:
-		} else if (strncmp(loop_ptr, "\t", chunk_len) == 0) {
-			memcpy(result_ptr, "\\t", 2);
-			result_len += 2;
+		} else if (strncmp(ptr_loop, "\t", int_chunk_len) == 0) {
+			memcpy(ptr_result, "\\t", 2);
+			int_result_len += 2;
 
 			// FOUND FORMFEED:
-		} else if (strncmp(loop_ptr, "\f", chunk_len) == 0) {
-			memcpy(result_ptr, "\\f", 2);
-			result_len += 2;
+		} else if (strncmp(ptr_loop, "\f", int_chunk_len) == 0) {
+			memcpy(ptr_result, "\\f", 2);
+			int_result_len += 2;
 
 			// FOUNDBACKSPACE:
-		} else if (strncmp(loop_ptr, "\b", chunk_len) == 0) {
-			memcpy(result_ptr, "\\b", 2);
-			result_len += 2;
+		} else if (strncmp(ptr_loop, "\b", int_chunk_len) == 0) {
+			memcpy(ptr_result, "\\b", 2);
+			int_result_len += 2;
 
 		} else {
 			// NORMAL CHAR:
-			memcpy(result_ptr, loop_ptr, chunk_len);
-			result_len += chunk_len;
+			memcpy(ptr_result, ptr_loop, int_chunk_len);
+			int_result_len += int_chunk_len;
 		}
 
 		// to debug: uncomment all three lines at the same time:
@@ -526,13 +537,13 @@ char *jsonify(char *inputstring) {
 		// SDEBUG("result_len: %i, result_text: %s", result_len, result_text);
 
 		// looping
-		loop_ptr += chunk_len;
-		inputstring_len -= chunk_len;
+		ptr_loop += int_chunk_len;
+		int_inputstring_len -= int_chunk_len;
 	}
 	SDEBUG("end");
-	SERROR_SREALLOC(str_result, result_len + 2);
-	str_result[result_len] = 34;	// dbl quote(")
-	str_result[result_len + 1] = 0; // null term(\0)
+	SERROR_SREALLOC(str_result, int_result_len + 2);
+	str_result[int_result_len] = 34;	// dbl quote(")
+	str_result[int_result_len + 1] = 0; // null term(\0)
 	return str_result;
 error:
 	SFREE(str_result);
@@ -614,8 +625,10 @@ error:
 
 char *cstr_to_uri(char *str_input) {
 	char *str_result = NULL;
+	size_t int_result_len = 0;
 
-	SERROR_CAT_CSTR(str_result, "");
+	SERROR_SNCAT(str_result, &int_result_len,
+		"", (size_t)0);
 	char str_temp[10];
 
 	char *ptr_input = str_input;
@@ -628,7 +641,8 @@ char *cstr_to_uri(char *str_input) {
 			str_temp[0] = *ptr_input;
 			str_temp[1] = 0;
 		}
-		SERROR_CAT_APPEND(str_result, str_temp);
+		SERROR_SNFCAT(str_result, &int_result_len,
+			str_temp, strlen(str_temp));
 	}
 	bol_error_state = false;
 	return str_result;

@@ -19,6 +19,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	size_t int_user_agent_len = 0;
 	size_t int_host_len = 0;
 	size_t int_response_len = 0;
+	size_t int_context_data_len = 0;
 #ifdef ENVELOPE
 #else
 	size_t int_conn_index_len = 0;
@@ -357,7 +358,11 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		str_uri_host = cstr_to_uri(str_host);
 		SFINISH_CHECK(str_uri_host != NULL, "cstr_to_uri failed on string \"%s\"", str_host);
 
-		SFINISH_CAT_CSTR(str_context_data, "request_ip_address=", str_uri_ip_address, "&request_host=", str_uri_host);
+		SFINISH_SNCAT(str_context_data, &int_context_data_len,
+			"request_ip_address=", (size_t)19,
+			str_uri_ip_address, strlen(str_uri_ip_address),
+			"&request_host=", (size_t)14,
+			str_uri_host, strlen(str_uri_host));
 
 		client->conn = DB_connect(global_loop, client, str_conn, str_username, int_user_length, str_password, int_password_length,
 			str_context_data, connect_cb);
@@ -413,46 +418,7 @@ finish:
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"You need to login.\012", (size_t)19);
-
-		/*
-		if (conn_info != NULL) {
-			SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
-										   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
-				"Set-Cookie: ", client->str_cookie_name, "="
-														 "; path=/; expires=Tue, 01 Jan 1990 00:00:00 GMT",
-				(bol_tls ? "; secure" : ""), "; HttpOnly\015\012\015\012",
-				"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
-				"\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\012",
-				"<html xmlns=\"http://www.w3.org/1999/xhtml\" "
-				"xml:lang=\"en-GB\">\012");
-#ifdef ENVELOPE
-			SFINISH_CAT_APPEND(str_response, "<head><script>window.open('/index.html?connection=");
-#else
-			SFINISH_CAT_APPEND(str_response, "<head><script>window.open('/postage/index.html?connection=");
-#endif
-			SFINISH_CAT_APPEND(str_response, conn_info->str_connection_name, "&redirect=", str_uri,
-				"', "
-				"'_self');</script></head><body></body></html>");
-		} else {
-			SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
-										   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012",
-				"Set-Cookie: ", client->str_cookie_name, "="
-														 "; path=/; expires=Tue, 01 Jan 1990 00:00:00 GMT",
-				(bol_tls ? "; secure" : ""), "; HttpOnly\015\012\015\012",
-				"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
-				"\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\012",
-				"<html xmlns=\"http://www.w3.org/1999/xhtml\" "
-				"xml:lang=\"en-GB\">\012");
-#ifdef ENVELOPE
-			SFINISH_CAT_APPEND(str_response, "<head><script>window.open('/index.html', ");
-#else
-			SFINISH_CAT_APPEND(str_response, "<head><script>window.open('/postage/index.html', ");
-#endif
-			SFINISH_CAT_APPEND(str_response, "'_self');</script></head><body></body></html>");
-		}
-		*/
 	}
-
 	SFREE_PWORD(str_cookie_encrypted);
 	SFREE_PWORD(str_cookie_decrypted);
 	SFREE_PWORD(str_password);
