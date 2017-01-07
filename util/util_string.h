@@ -154,69 +154,6 @@ char *hexencode(char *str_to_encode, size_t *ptr_int_len);
 // size_t explode(const char *delim, char *str, char **pointers_out, char
 // *bytes_out);
 
-/*
-Use `SERROR_CAT_CSTR` instead of sprintf to combine variables. Like so:
-//str_string = NULL;
-//str_second_line = "The second line\n";
-//str_line_text = "sectence.";
-SERROR_CAT_CSTR(str_string, "First line\n", str_second_line, "Third ",
-str_linetext);
-//str_string = "First line\nThe second line\nThird sentence."
-
-
-`SERROR_CAT_APPEND` takes the same arguments, but it appends to the first
-argument instead of allocating it.
-
-//str_string = "The zeroth sentence.\n";
-//str_second_line = "The second line\n";
-//str_line_text = "sectence.";
-SERROR_CAT_APPEND(str_string, "First line\n", str_second_line, "Third ",
-str_linetext);
-//str_string = "The zeroth sentence.\nFirst line\nThe second line\nThird
-sentence."
-
-
-`SERROR_CAT_CHAR_APPEND` works similar to `ERROR_CAT_APPEND`, except it only
-takes two arguments.
-The second argument is a character instead of a string.
-
-//str_string = "test";
-SERROR_CAT_APPEND(str_string, 'i');
-SERROR_CAT_APPEND(str_string, 'n');
-SERROR_CAT_APPEND(str_string, 'g');
-//str_string = "testing";
-
-
-There are also SFINISH_ equivalents.
-*/
-char *c_cat(size_t args, ...);
-char *c_append(size_t args, ...);
-char *c_char_append(char *str_input, char chr_input);
-#define cat_cstr(...) c_cat(VA_NUM_ARGS(__VA_ARGS__), ##__VA_ARGS__)
-#define SERROR_CAT_CSTR(A, ...) SERROR_CHECK(A = cat_cstr(__VA_ARGS__), "cat_cstr failed")
-#define SFINISH_CAT_CSTR(A, ...) SFINISH_ERROR_CHECK(A = cat_cstr(__VA_ARGS__), "cat_cstr failed")
-
-#define cat_append(...) c_append(VA_NUM_ARGS(__VA_ARGS__), ##__VA_ARGS__)
-#define SERROR_CAT_APPEND(A, ...) SERROR_CHECK(A = cat_append(A, __VA_ARGS__), "cat_append failed")
-#define SFINISH_CAT_APPEND(A, ...) SFINISH_ERROR_CHECK(A = cat_append(A, __VA_ARGS__), "cat_append failed")
-
-#define cat_char_append(A, B) c_char_append(A, B)
-#define SERROR_CAT_CHAR_APPEND(A, B) SERROR_CHECK(A = cat_char_append(A, B), "cat_char_append failed")
-#define SFINISH_CAT_CHAR_APPEND(A, B) SFINISH_ERROR_CHECK(A = cat_char_append(A, B), "cat_char_append failed")
-
-// cat_append is just like cat_cstr except the first argument is free()d
-
-
-
-
-
-
-
-
-
-
-
-
 char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...);
 #define SERROR_SNCAT(value, len_ptr, ...) SERROR_CHECK(value = _sncat(false, VA_NUM_ARGS(__VA_ARGS__), len_ptr, ##__VA_ARGS__), "sncat failed")
 #define SFINISH_SNCAT(value, len_ptr, ...) SFINISH_ERROR_CHECK(value = _sncat(false, VA_NUM_ARGS(__VA_ARGS__), len_ptr, ##__VA_ARGS__), "sncat failed")

@@ -204,7 +204,7 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 		client_update->str_col_data_type, &client_update->int_col_data_type_len,
 		DArray_get(darr_column_types, 0), strlen(DArray_get(darr_column_types, 0))
 	);
-	
+
 
 	int_len = DArray_count(darr_column_names);
 	SDEBUG("client_update->str_columns: %s", client_update->str_columns);
@@ -583,7 +583,7 @@ bool http_update_step4(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
 	size_t int_response_len = 0;
-	size_t int_temp = 0;
+	size_t int_temp_len = 0;
 	SDEFINE_VAR_ALL(str_value_literal);
 
 	SFINISH_CHECK(res != NULL, "DB_get_column_types_for_query failed!");
@@ -591,13 +591,13 @@ bool http_update_step4(EV_P, void *cb_data, DB_result *res) {
 
 	SFREE(client_update->str_sql);
 	SFINISH_SNCAT(
-		client_update->str_sql, &int_temp,
+		client_update->str_sql, &int_temp_len,
 		"SELECT ", (size_t)7,
 		client_update->str_columns, client_update->int_columns_length,
 		" FROM ", (size_t)6,
 		client_update->str_real_table_name, client_update->int_real_table_name_len,
 		" WHERE ", (size_t)7,
-		client_update->str_where, strlen(client_update->str_u_where),
+		client_update->str_where, strlen(client_update->str_where),
 		";", (size_t)1
 	);
 
