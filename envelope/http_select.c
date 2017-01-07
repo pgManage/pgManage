@@ -1,5 +1,6 @@
 #ifdef ENVELOPE
 
+#define UTIL_DEBUG
 #include "http_select.h"
 
 void http_select_step1(struct sock_ev_client *client) {
@@ -8,9 +9,10 @@ void http_select_step1(struct sock_ev_client *client) {
 	SDEFINE_VAR_ALL(str_uri, str_uri_temp, str_action_name, str_temp, str_args, str_sql);
 	char *str_response = NULL;
 	char *ptr_end_uri = NULL;
-	size_t int_uri_length = 0;
-	size_t int_query_length = 0;
+	size_t int_uri_len = 0;
+	size_t int_query_len = 0;
 	size_t int_temp_len = 0;
+	size_t int_response_len = 0;
 
 	client->cur_request =
 		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_select), POSTAGE_REQ_SELECT);
@@ -18,9 +20,9 @@ void http_select_step1(struct sock_ev_client *client) {
 	client_select = (struct sock_ev_client_select *)(client->cur_request->vod_request_data);
 	client->cur_request->parent = client;
 
-	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
+	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_len);
 	SFINISH_CHECK(str_uri != NULL, "str_uri_path() failed");
-	str_args = query(client->str_request, client->int_request_len, &int_query_length);
+	str_args = query(client->str_request, client->int_request_len, &int_query_len);
 	SFINISH_CHECK(str_args != NULL, "query() failed");
 
 	SDEBUG("str_uri: %s", str_uri);
@@ -38,15 +40,15 @@ void http_select_step1(struct sock_ev_client *client) {
 	SDEBUG("str_args: %s", str_args);
 
 	// Get table names and return columns
-	client_select->str_real_table_name = getpar(str_args, "src", int_query_length, &client_select->int_real_table_name_length);
+	client_select->str_real_table_name = getpar(str_args, "src", int_query_len, &client_select->int_real_table_name_len);
 	if (client_select->str_real_table_name == NULL || client_select->str_real_table_name[0] == 0) {
 		SFREE(client_select->str_real_table_name);
 		client_select->str_real_table_name =
-			getpar(str_args, "view", int_query_length, &client_select->int_real_table_name_length);
+			getpar(str_args, "view", int_query_len, &client_select->int_real_table_name_len);
 	}
 	SFINISH_ERROR_CHECK(client_select->str_real_table_name != NULL && client_select->str_real_table_name[0] != 0,
 		"Failed to get table name from query");
-	client_select->str_return_columns = getpar(str_args, "cols", int_query_length, &client_select->int_return_columns_length);
+	client_select->str_return_columns = getpar(str_args, "cols", int_query_len, &client_select->int_return_columns_len);
 	if (client_select->str_return_columns == NULL || strlen(client_select->str_return_columns) == 0) {
 		SFREE(client_select->str_return_columns);
 		SFINISH_SNCAT(client_select->str_return_columns, &client_select->int_return_columns_len,
@@ -70,23 +72,23 @@ void http_select_step1(struct sock_ev_client *client) {
 	}
 	SFREE(str_temp);
 
-	client_select->str_where = getpar(str_args, "where", int_query_length, &client_select->int_where_length);
-	if (client_select->str_where != NULL && client_select->int_where_length == 0) {
+	client_select->str_where = getpar(str_args, "where", int_query_len, &client_select->int_where_len);
+	if (client_select->str_where != NULL && client_select->int_where_len == 0) {
 		SFREE(client_select->str_where);
 	}
-	client_select->str_order_by = getpar(str_args, "order_by", int_query_length, &client_select->int_order_by_length);
-	if (client_select->str_order_by != NULL && client_select->int_order_by_length == 0) {
+	client_select->str_order_by = getpar(str_args, "order_by", int_query_len, &client_select->int_order_by_len);
+	if (client_select->str_order_by != NULL && client_select->int_order_by_len == 0) {
 		SFREE(client_select->str_order_by);
 	}
-	client_select->str_limit = getpar(str_args, "limit", int_query_length, &client_select->int_limit_length);
-	if (client_select->str_limit != NULL && client_select->int_limit_length == 0) {
+	client_select->str_limit = getpar(str_args, "limit", int_query_len, &client_select->int_limit_len);
+	if (client_select->str_limit != NULL && client_select->int_limit_len == 0) {
 		SFREE(client_select->str_limit);
 	}
 	if (client_select->str_limit != NULL && strncmp(client_select->str_limit, "ALL", 4) == 0) {
 		SFREE(client_select->str_limit);
 	}
-	client_select->str_offset = getpar(str_args, "offset", int_query_length, &client_select->int_offset_length);
-	if (client_select->str_offset != NULL && client_select->int_offset_length == 0) {
+	client_select->str_offset = getpar(str_args, "offset", int_query_len, &client_select->int_offset_len);
+	if (client_select->str_offset != NULL && client_select->int_offset_len == 0) {
 		SFREE(client_select->str_offset);
 	}
 
@@ -137,7 +139,26 @@ void http_select_step1(struct sock_ev_client *client) {
 finish:
 	SFREE_ALL();
 	ssize_t int_client_write_len = 0;
-	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (bol_error_state) {
+		bol_error_state = false;
+
+		char *_str_response = str_response;
+		char str_len[51] = { 0 };
+		snprintf(str_len, 50, "%zu", strlen(_str_response));
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_len, strlen(str_len),
+			"\015\012\015\012", (size_t)4,
+			_str_response, strlen(_str_response)
+		);
+		SFREE(_str_response);
+	}
+	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -158,7 +179,6 @@ bool http_select_step2(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	size_t int_i = 0;
 	size_t int_len = 0;
 	SDEFINE_VAR_ALL(str_col, str_temp, str_inner_top);
@@ -295,22 +315,28 @@ finish:
 			client_select->darr_column_types = NULL;
 		}
 
-		_str_response = str_response;
-		SFINISH_SNCAT(str_response, &int_response_len,
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_len[51] = { 0 };
+		snprintf(str_len, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			strlen("HTTP/1.1 500 Internal Server Error\015\012"
-				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_SNFCAT(str_response, &int_response_len,
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_len, strlen(str_len),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
 			":\n", (size_t)2,
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
 	ssize_t int_client_write_len = 0;
-	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -332,11 +358,10 @@ finish:
 bool http_select_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client->cur_request->vod_request_data);
-	char *_str_response = NULL;
 	char *str_response = NULL;
 	size_t int_len = 0, i = 0;
-	SDEFINE_VAR_ALL(str_temp, str_temp1, str_row_count);
-	size_t int_temp_len = 0;
+	SDEFINE_VAR_ALL(str_json_columns, str_json_one_column, str_row_count);
+	size_t int_json_columns_len = 0;
 	struct sock_ev_client_copy_check *client_copy_check = NULL;
 	size_t int_response_len = 0;
 
@@ -351,15 +376,16 @@ bool http_select_step3(EV_P, void *cb_data, DB_result *res) {
 	}
 
 	int_len = DArray_end(client_select->darr_column_names);
-	SFINISH_SNCAT(str_temp, &int_temp_len,
+	SFINISH_SNCAT(str_json_columns, &int_json_columns_len,
 		"", (size_t)0);
 	for (i = 1; i < int_len; i += 1) {
 		// Add the type to the response
-		str_temp1 = DB_escape_identifier(client->conn, DArray_get(client_select->darr_column_names, i), strlen(DArray_get(client_select->darr_column_names, i)));
-		SFINISH_SNFCAT(str_temp, &int_temp_len,
-			str_temp1, strlen(str_temp1),
+		// TODO: jsonify lengths
+		str_json_one_column = jsonify(DArray_get(client_select->darr_column_names, i));
+		SFINISH_SNFCAT(str_json_columns, &int_json_columns_len,
+			str_json_one_column, strlen(str_json_one_column),
 			i < (int_len - 1) ? "," : "", strlen(i < (int_len - 1) ? "," : ""));
-		SFREE(str_temp1);
+		SFREE(str_json_one_column);
 	}
 	DArray_clear_destroy(client_select->darr_column_names);
 	client_select->darr_column_names = NULL;
@@ -375,9 +401,9 @@ bool http_select_step3(EV_P, void *cb_data, DB_result *res) {
 			"Content-Type: application/json; charset=UTF-8\015\012"
 			"\015\012"
 			"{\"stat\": true, \"dat\": {\"arr_column\": ["),
-		str_temp, int_temp_len,
+		str_json_columns, int_json_columns_len,
 		"], \"dat\": [", (size_t)11);
-	SFREE(str_temp);
+	SFREE(str_json_columns);
 
 	client_copy_check->int_response_len = (ssize_t)strlen(client_copy_check->str_response);
 	client_copy_check->client_request = client->cur_request;
@@ -390,28 +416,33 @@ bool http_select_step3(EV_P, void *cb_data, DB_result *res) {
 
 	bol_error_state = false;
 finish:
-	_str_response = str_response;
 	if (bol_error_state) {
-		str_response = NULL;
 		bol_error_state = false;
 
-		SFINISH_SNCAT(str_response, &int_response_len,
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_len[51] = { 0 };
+		snprintf(str_len, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			strlen("HTTP/1.1 500 Internal Server Error\015\012"
-				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_SNFCAT(str_response, &int_response_len,
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_len, strlen(str_len),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
 			":\n", (size_t)2,
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 		DB_free_result(res);
 	}
 	ssize_t int_client_write_len = 0;
 	if (str_response != NULL) {
-		int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response));
+		int_client_write_len = CLIENT_WRITE(client, str_response, int_response_len);
 		SDEBUG("int_client_write_len: %d", int_client_write_len);
 		if (int_client_write_len < 0) {
 			if (bol_tls) {
@@ -440,16 +471,16 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client_request->vod_request_data);
 	DArray *arr_row_values = NULL;
 	DArray *arr_row_lengths = NULL;
-	SDEFINE_VAR_ALL(str_temp, str_temp1, str_row_count);
+	SDEFINE_VAR_ALL(str_rows, str_one_column);
 	char *str_type = NULL;
 	char *str_response = NULL;
 	size_t i = 0, int_len = 0, int_row = 0;
 	struct sock_ev_client_copy_io *client_copy_io = NULL;
-	size_t int_temp_len = 0;
-	size_t int_temp1_len = 0;
+	size_t int_rows_len = 0;
+	size_t int_one_column_len = 0;
 	size_t int_response_len = 0;
 
-	SFINISH_SNCAT(str_temp, &int_temp_len,
+	SFINISH_SNCAT(str_rows, &int_rows_len,
 		"", (size_t)0);
 	DB_fetch_status status;
 	while (int_row < 10 && (status = DB_fetch_row(client_copy_check->res)) != DB_FETCH_END) {
@@ -470,14 +501,14 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 				DArray_get(arr_row_values, 0), strlen(DArray_get(arr_row_values, 0)));
 		}
 
-		SFINISH_SNFCAT(str_temp, &int_temp_len,
+		SFINISH_SNFCAT(str_rows, &int_rows_len,
 			"[", (size_t)1);
 		for (i = 1; i < int_len; i += 1) {
-			ssize_t int_current_length = *(ssize_t *)DArray_get(arr_row_lengths, i);
+			ssize_t int_current_len = *(ssize_t *)DArray_get(arr_row_lengths, i);
 			str_type = DArray_get(client_select->darr_column_types, i);
 			// Get column value and escape it
-			if (int_current_length == -1) {
-				SFINISH_SNCAT(str_temp1, &int_temp1_len,
+			if (int_current_len == -1) {
+				SFINISH_SNCAT(str_one_column, &int_one_column_len,
 					"null", (size_t)4);
 			} else if (strncmp(str_type, "smallint", 8) == 0 || strncmp(str_type, "integer", 7) == 0 ||
 					   (strncmp(str_type, "int", 3) == 0 && strncmp(str_type, "interval", 8) != 0) ||
@@ -485,25 +516,27 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 					   strncmp(str_type, "int2", 4) == 0 || strncmp(str_type, "serial", 6) == 0 ||
 					   strncmp(str_type, "int4", 4) == 0 || strncmp(str_type, "bigserial", 9) == 0 ||
 					   strncmp(str_type, "int8", 4) == 0) {
-				str_temp1 = escape_value(DArray_get(arr_row_values, i));
-				SFINISH_CHECK(str_temp1 != NULL, "escape_value failed");
+				int_one_column_len = int_current_len;
+				str_one_column = bescape_value(DArray_get(arr_row_values, i), &int_one_column_len);
+				SFINISH_CHECK(str_one_column != NULL, "escape_value failed");
 			} else {
 				// SDEBUG("DArray_get(arr_row_values, i): %s", DArray_get(arr_row_values, i));
-				str_temp1 = jsonify(DArray_get(arr_row_values, i));
-				// SDEBUG("str_temp1: %s", str_temp1);
-				SFINISH_CHECK(str_temp1 != NULL, "jsonify failed");
+				str_one_column = jsonify(DArray_get(arr_row_values, i));
+				// SDEBUG("str_one_column: %s", str_one_column);
+				SFINISH_CHECK(str_one_column != NULL, "jsonify failed");
+				int_one_column_len = strlen(str_one_column);
 			}
 			// Add it to the response
-			SFINISH_SNFCAT(str_temp, &int_temp_len,
-				str_temp1, int_temp1_len,
+			SFINISH_SNFCAT(str_rows, &int_rows_len,
+				str_one_column, int_one_column_len,
 				i < (int_len - 1) ? "," : "", strlen(i < (int_len - 1) ? "," : ""));
 
-			SFREE(str_temp1);
+			SFREE(str_one_column);
 		}
 
-		SFINISH_SNFCAT(str_temp, &int_temp_len,
+		SFINISH_SNFCAT(str_rows, &int_rows_len,
 			"],", (size_t)2);
-		// SDEBUG("str_temp: %s", str_temp);
+		// SDEBUG("str_rows: %s", str_rows);
 		int_row++;
 
 		DArray_clear_destroy(arr_row_values);
@@ -513,10 +546,9 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 	}
 
 	SFINISH_SNFCAT(client_copy_check->str_response, (size_t*)&client_copy_check->int_response_len,
-		str_temp, int_temp_len);
-	client_copy_check->int_response_len += (ssize_t)strlen(str_temp);
-	SFREE(str_temp);
-	SFREE(str_row_count);
+		str_rows, int_rows_len);
+	client_copy_check->int_response_len += (ssize_t)strlen(str_rows);
+	SFREE(str_rows);
 
 	if (status == DB_FETCH_END && client_copy_check->str_response[0] != '\0' &&
 		client_copy_check->str_response[client_copy_check->int_response_len - 1] == ',') {
@@ -528,7 +560,6 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 		if (client_select->str_row_count == NULL) {
 			SFINISH_SNCAT(client_select->str_row_count, &client_select->int_row_count_len,
 				"0", (size_t)1);
-			SDEBUG("str_row_count: %s", client_select->str_row_count);
 		}
 		client_copy_check->int_response_len += (ssize_t)strlen(client_select->str_row_count) + 16 + 2;
 		SFINISH_SNFCAT(client_copy_check->str_response, (size_t*)&client_copy_check->int_response_len,
@@ -559,23 +590,28 @@ finish:
 		DArray_clear_destroy(arr_row_lengths);
 		arr_row_lengths = NULL;
 	}
-	char *_str_response = str_response;
 	if (bol_error_state) {
-		str_response = NULL;
 		bol_error_state = false;
 
-		SFINISH_SNCAT(str_response, &int_response_len,
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client_request->parent->conn, client_copy_check->res);
+		char str_len[51] = { 0 };
+		snprintf(str_len, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			strlen("HTTP/1.1 500 Internal Server Error\015\012"
-				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client_request->parent->conn, client_copy_check->res);
-		SFINISH_SNFCAT(str_response, &int_response_len,
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_len, strlen(str_len),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
 			":\n", (size_t)2,
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 		DB_free_result(client_copy_check->res);
 		if (client_copy_check != NULL) {
 			ev_check_stop(EV_A, w);
@@ -589,7 +625,7 @@ finish:
 	}
 	ssize_t int_client_write_len = 0;
 	if (str_response != NULL) {
-		int_client_write_len = CLIENT_WRITE(client_request->parent, str_response, strlen(str_response));
+		int_client_write_len = CLIENT_WRITE(client_request->parent, str_response, int_response_len);
 		SDEBUG("int_client_write_len: %d", int_client_write_len);
 		if (int_client_write_len < 0) {
 			if (bol_tls) {
@@ -617,7 +653,6 @@ void http_select_step5(EV_P, ev_io *w, int revents) {
 	struct sock_ev_client_request *client_request = client_copy_check->client_request;
 	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	size_t int_response_len = 0;
 
 	// SDEBUG("client_copy_check->str_response: %s", client_copy_check->str_response);
@@ -681,7 +716,6 @@ void http_select_step5(EV_P, ev_io *w, int revents) {
 
 	bol_error_state = false;
 finish:
-	_str_response = str_response;
 	if (bol_error_state) {
 		if (client_copy_check != NULL) {
 			ev_io_stop(EV_A, w);
@@ -691,19 +725,29 @@ finish:
 			client_request->parent->client_copy_check = NULL;
 			client_request->parent->client_copy_io = NULL;
 		}
-		str_response = NULL;
 		bol_error_state = false;
 
-		SFINISH_SNCAT(str_response, &int_response_len,
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client_request->parent->conn, client_copy_check->res);
+		char str_len[51] = { 0 };
+		snprintf(str_len, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			strlen("HTTP/1.1 500 Internal Server Error\015\012"
-				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
-			_str_response, strlen(_str_response));
-		SFREE(_str_response);
-	}
-	if (str_response != NULL) {
-		int_client_write_len = CLIENT_WRITE(client_request->parent, str_response, strlen(str_response));
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_len, strlen(str_len),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
+			":\n", (size_t)2,
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
+
+		int_client_write_len = CLIENT_WRITE(client_request->parent, str_response, int_response_len);
 		SDEBUG("int_client_write_len: %d", int_client_write_len);
 		if (int_client_write_len < 0) {
 			if (bol_tls) {
@@ -712,9 +756,8 @@ finish:
 				SERROR_NORESPONSE("write() failed");
 			}
 		}
-	}
-	SFREE(str_response);
-	if (int_client_write_len != 0) {
+		SFREE(str_response);
+
 		ws_select_free(client_select);
 		ev_io_stop(EV_A, &client_request->parent->io);
 		SFREE(client_request->parent->str_request);

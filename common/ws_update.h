@@ -20,7 +20,6 @@ struct sock_ev_client_update {
 	char *str_temp_col_list;
 	char *str_set_col_list;
 	char *str_real_table_name;
-	size_t int_real_table_name_length;
 	char *str_temp_table_name;
 	char *str_sql;
 

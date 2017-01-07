@@ -904,11 +904,6 @@ char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...) {
 	}
 	va_end(ap);
 
-	//for debugging large allocations
-	if (*ptr_int_len > (2048 * 4)) {
-		str_result[0] = 0;
-	}
-
 	// Allocate return
 	if (!bol_free) {
 		SERROR_SALLOC(str_result, (*ptr_int_len) + 1);

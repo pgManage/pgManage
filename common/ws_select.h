@@ -7,9 +7,7 @@
 
 struct sock_ev_client_select {
 	char *str_real_table_name;
-	size_t int_real_table_name_length;
 	char *str_return_columns;
-	size_t int_return_columns_length;
 #ifndef POSTAGE_INTERFACE_LIBPQ
 	char *str_return_escaped_columns;
 	char *str_sql_escaped_return;
@@ -18,13 +16,9 @@ struct sock_ev_client_select {
 	char *str_sql;
 	char *str_row_count;
 	char *str_where;
-	size_t int_where_length;
 	char *str_order_by;
-	size_t int_order_by_length;
 	char *str_limit;
-	size_t int_limit_length;
 	char *str_offset;
-	size_t int_offset_length;
 	DArray *darr_column_types;
 	DArray *darr_column_names;
 
