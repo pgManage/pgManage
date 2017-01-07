@@ -55,7 +55,7 @@ void http_update_step1(struct sock_ev_client *client) {
 
 	SFINISH_SNCAT(
 		client_update->str_type_sql, &int_temp,
-		"SELECT ", (size_t)7, 
+		"SELECT ", (size_t)7,
 		str_col_ident, strlen(str_col_ident)
 	);
 	SFREE(str_col_ident);
@@ -90,7 +90,7 @@ void http_update_step1(struct sock_ev_client *client) {
 		SFINISH_ERROR_CHECK(str_col_ident != NULL, "DB_escape_identifier failed");
 
 		SFINISH_SNFCAT(
-			client_update->str_type_sql, &int_temp, 
+			client_update->str_type_sql, &int_temp,
 			", ", (size_t)2,
 			str_col_ident, strlen(str_col_ident)
 		);
@@ -450,7 +450,8 @@ finish:
 		SFREE(_str_response1);
 		SFREE(_str_response2);
 	}
-	if (str_response != NULL && (int_response_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
+	ssize_t int_client_write_len = 0;
+	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -460,7 +461,7 @@ finish:
 	}
 	SFREE(str_response);
 	DB_free_result(res);
-	if (int_response_len != 0) {
+	if (int_client_write_len != 0) {
 		ws_update_free(client_update);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
@@ -473,7 +474,6 @@ bool http_update_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	DArray *darr_count = NULL;
 	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_value_literal);
@@ -587,7 +587,6 @@ bool http_update_step4(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	size_t int_response_len = 0;
 	size_t int_temp = 0;
 	SDEFINE_VAR_ALL(str_value_literal);
@@ -638,7 +637,8 @@ finish:
 		SFREE(_str_response1);
 		SFREE(_str_response2);
 	}
-	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
+	ssize_t int_client_write_len = 0;
+	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -648,7 +648,7 @@ finish:
 	}
 	SFREE(str_response);
 	DB_free_result(res);
-	if (int_response_len != 0) {
+	if (int_client_write_len != 0) {
 		ws_update_free(client_update);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);

@@ -516,7 +516,7 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 					   strncmp(str_type, "int2", 4) == 0 || strncmp(str_type, "serial", 6) == 0 ||
 					   strncmp(str_type, "int4", 4) == 0 || strncmp(str_type, "bigserial", 9) == 0 ||
 					   strncmp(str_type, "int8", 4) == 0) {
-				int_one_column_len = int_current_len;
+				int_one_column_len = (size_t)int_current_len;
 				str_one_column = bescape_value(DArray_get(arr_row_values, i), &int_one_column_len);
 				SFINISH_CHECK(str_one_column != NULL, "escape_value failed");
 			} else {
