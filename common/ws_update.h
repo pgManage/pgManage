@@ -11,6 +11,7 @@ struct sock_ev_client_update {
 	char *str_return_columns;
 #ifndef POSTAGE_INTERFACE_LIBPQ
 	char *str_return_escaped_columns;
+	size_t int_return_escaped_columns_len;
 	char *str_insert_column_names;
 	char *str_insert_parameter_markers;
 #endif

@@ -17,6 +17,7 @@ struct sock_ev_client_insert {
 	char *str_return_escaped_columns;
 	char *str_insert_column_names;
 	char *str_insert_parameter_markers;
+	size_t int_return_escaped_columns_len;
 #endif
 	DArray *darr_insert_queries;
 	size_t int_current_insert_query;

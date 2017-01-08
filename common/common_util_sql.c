@@ -158,7 +158,7 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query) {
 	SERROR_CHECK(ptr_end_return_columns != NULL, "strstr failed");
 	*ptr_end_return_columns = '\0';
 
-	SERROR_SNCAT(str_temp, int_temp_len, ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
+	SERROR_SNCAT(str_temp, &int_temp_len, ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
 	if (strncmp(str_temp, "*", 2) != 0) {
 		//TODO: SERROR_REPLACE() add lengths
 		SERROR_REPLACE(str_temp, "\"", "\"\"", "");

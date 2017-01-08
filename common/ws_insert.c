@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "ws_insert.h"
 
 char *ws_insert_step1(struct sock_ev_client_request *client_request) {
@@ -44,6 +45,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 							 DB_connection_driver(client_request->parent->conn), client_request->ptr_query)) != NULL,
 		"Failed to get escaped return columns from query");
 	SDEBUG("client_insert->str_return_escaped_columns: %s", client_insert->str_return_escaped_columns);
+	client_insert->int_return_escaped_columns_len = strlen(client_insert->str_return_escaped_columns);
 #endif
 	// DEBUG("client_insert->str_return_columns:  %s",
 	// client_insert->str_return_columns);
@@ -222,19 +224,19 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 			"\"", (size_t)1);
 		SFREE(str_temp1);
 
-		SFINISH_SNFCAT(client_insert->str_insert_column_names, client_insert->int_insert_column_names_len,
+		SFINISH_SNFCAT(client_insert->str_insert_column_names, &client_insert->int_insert_column_names_len,
 			str_col_name, int_col_name_len,
 			ptr_column_names < ptr_end_column_names ? ", " : "",
 			strlen(ptr_column_names < ptr_end_column_names ? ", " : ""));
 		SDEBUG("str_col_name                               : %s", str_col_name);
 
 		if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_SNFCAT(client_insert->str_insert_parameter_markers, client_insert->int_insert_parameter_markers_len,
+			SFINISH_SNFCAT(client_insert->str_insert_parameter_markers, &client_insert->int_insert_parameter_markers_len,
 				"E?", (size_t)2,
 				ptr_column_names < ptr_end_column_names ? ", " : "",
 				strlen(ptr_column_names < ptr_end_column_names ? ", " : ""));
 		} else {
-			SFINISH_SNFCAT(client_insert->str_insert_parameter_markers, client_insert->int_insert_parameter_markers_len,
+			SFINISH_SNFCAT(client_insert->str_insert_parameter_markers, &client_insert->int_insert_parameter_markers_len,
 				"?", (size_t)1,
 				ptr_column_names < ptr_end_column_names ? ", " : "", strlen(ptr_column_names < ptr_end_column_names ? ", " : ""));
 		}
@@ -265,7 +267,8 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
 				"') IS NOT NULL\n\tDROP TABLE ", (size_t)27,
 				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
-				"\nSELECT TOP 0 CAST('' AS timestamp) AS identity_temp_123123123123123, ", (size_t)70, client_insert->str_identity_column_name, client_insert->int_identity_column_len,
+				"\nSELECT TOP 0 CAST('' AS timestamp) AS identity_temp_123123123123123, ", (size_t)70,
+				client_insert->str_identity_column_name, client_insert->int_identity_column_name_len,
 				" AS id_temp123123123, ", (size_t)22,
 				client_insert->str_column_names, client_insert->int_column_names_len,
 				" INTO ", (size_t)6,
@@ -273,6 +276,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 				" FROM ", (size_t)6,
 				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
 				";", (size_t)1);
+			SDEBUG("str_sql: %s", str_sql);
 			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step15_sql_server);
 		} else {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
@@ -286,6 +290,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 				" FROM ", (size_t)6,
 				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
 				";", (size_t)1);
+			SDEBUG("str_sql: %s", str_sql);
 			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step2);
 		}
 #endif
@@ -333,6 +338,7 @@ bool ws_insert_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
 	bool bol_ret = true;
 	char *str_response = NULL;
 	size_t int_response_len = 0;
+	size_t int_sql_len = 0;
 	SDEFINE_VAR_ALL(str_sql);
 	SFINISH_SNCAT(str_response, &int_response_len,
 		"", (size_t)0);
@@ -344,7 +350,7 @@ bool ws_insert_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
 
 	SFINISH_SNCAT(str_sql, &int_sql_len,
 		"ALTER TABLE ", (size_t)12,
-		client_insert->str_temp_table_name, strlen(client_insert->int_temp_table_name_len),
+		client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
 		" DROP COLUMN id_temp123123123;", (size_t)30);
 	SDEBUG("str_sql: %s", str_sql);
 

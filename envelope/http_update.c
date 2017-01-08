@@ -317,7 +317,6 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 			} else {
 				SFINISH_SNFCAT(
 					client_update->str_u_where, &int_u_where_len,
-					str_one_col, strlen(str_one_col),
 					"CAST(NULL AS ", (size_t)13,
 					str_data_type, strlen(str_data_type),
 					")", (size_t)1
@@ -333,7 +332,6 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 				} else {
 					SFINISH_SNFCAT(
 						client_update->str_where, &int_where_len,
-						str_one_col, strlen(str_one_col),
 						"CAST(NULL AS ", (size_t)13,
 						str_data_type, strlen(str_data_type),
 						")", (size_t)1
@@ -352,7 +350,6 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 			} else {
 				SFINISH_SNFCAT(
 					client_update->str_u_where, &int_u_where_len,
-					str_one_col, strlen(str_one_col),
 					"CAST(", (size_t)5,
 					str_one_val_literal, strlen(str_one_val_literal),
 					" AS ", (size_t)4,
@@ -371,7 +368,6 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 				} else {
 					SFINISH_SNFCAT(
 						client_update->str_where, &int_where_len,
-						str_one_col, strlen(str_one_col),
 						"CAST(", (size_t)5,
 						str_one_val_literal, strlen(str_one_val_literal),
 						" AS ", (size_t)4,
@@ -402,13 +398,14 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 	} else {
 		SFINISH_SNCAT(
 			client_update->str_sql, &int_temp,
-			"SELECT CAST(count(*) AS nvarchar(MAX)) FROM ", (size_t)4,
+			"SELECT CAST(count(*) AS nvarchar(MAX)) FROM ", (size_t)44,
 			client_update->str_real_table_name, client_update->int_real_table_name_len,
 			" WHERE ", (size_t)7,
 			client_update->str_u_where, strlen(client_update->str_u_where),
 			";", (size_t)1
 		);
 	}
+	SDEBUG("client_update->str_sql: %s", client_update->str_sql);
 	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_update->str_sql, http_update_step3), "DB_exec failed");
 
 	DB_free_result(res);

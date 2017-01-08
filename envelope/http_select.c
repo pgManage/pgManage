@@ -1,4 +1,3 @@
-
 #include "http_select.h"
 
 void http_select_step1(struct sock_ev_client *client) {
@@ -82,6 +81,7 @@ void http_select_step1(struct sock_ev_client *client) {
 	client_select->str_limit = getpar(str_args, "limit", int_query_len, &client_select->int_limit_len);
 	if (client_select->str_limit != NULL && client_select->int_limit_len == 0) {
 		SFREE(client_select->str_limit);
+		client_select->int_limit_len = 0;
 	}
 	if (client_select->str_limit != NULL && strncmp(client_select->str_limit, "ALL", 4) == 0) {
 		SFREE(client_select->str_limit);
@@ -89,6 +89,7 @@ void http_select_step1(struct sock_ev_client *client) {
 	client_select->str_offset = getpar(str_args, "offset", int_query_len, &client_select->int_offset_len);
 	if (client_select->str_offset != NULL && client_select->int_offset_len == 0) {
 		SFREE(client_select->str_offset);
+		client_select->int_offset_len = 0;
 	}
 
 	SFINISH_SNCAT(client_select->str_sql, &client_select->int_sql_len,
@@ -259,7 +260,7 @@ bool http_select_step2(EV_P, void *cb_data, DB_result *res) {
 
 		SFINISH_SNFCAT(client_select->str_sql, &client_select->int_sql_len,
 			"   FROM (\012		SELECT TOP ", (size_t)23,
-			str_inner_top, &int_inner_top_len,
+			str_inner_top, int_inner_top_len,
 			" CAST(ROW_NUMBER() OVER (ORDER BY ", (size_t)34,
 			client_select->str_order_by, client_select->int_order_by_len,
 			") AS nvarchar(MAX)) AS ", (size_t)23,

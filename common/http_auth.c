@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "http_auth.h"
 
 // response with redirect
@@ -1201,12 +1202,13 @@ void http_auth_change_pw_step2(EV_P, void *cb_data, DB_conn *conn) {
 			str_sql, &int_temp,
 			"ALTER LOGIN ", (size_t)12,
 			str_user_quote, strlen(str_user_quote),
-			" WITH PASSWORD = ", (size_t)18,
+			" WITH PASSWORD = ", (size_t)17,
 			str_new_password_literal, strlen(str_new_password_literal),
-			" OLD_PASSWORD = ", (size_t)17,
+			" OLD_PASSWORD = ", (size_t)16,
 			str_old_password_literal, strlen(str_old_password_literal),
 			";", (size_t)1
 		);
+		SDEBUG("str_sql: %s", str_sql);
 	}
 	SFREE_PWORD(client_auth->str_old_check_password);
 	SFREE(client_auth->str_user);
@@ -1253,7 +1255,7 @@ finish:
 			str_temp, strlen(str_temp),
 			str_length, strlen(str_length),
 			"\015\012\015\012", (size_t)4,
-			_str_response, (int_response_len != 0 ? int_response_len : strlen(_str_response))
+			_str_response, strlen(_str_response)
 		);
 		SFREE(_str_response);
 		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, int_response_len)) < 0) {
@@ -1356,7 +1358,6 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 
 	bol_error_state = false;
 finish:
-	DB_free_result(res);
 
 	SFREE_ALL();
 	http_auth_free(client_auth);
@@ -1365,6 +1366,7 @@ finish:
 		SDEBUG("str_response: %s", str_response);
 		char *_str_response = str_response;
 		str_response = DB_get_diagnostic(client_request->parent->conn, res);
+		int_response_len = strlen(_str_response);
 		SFINISH_SNFCAT(_str_response, &int_response_len, ":\n", (size_t)2, str_response, strlen(str_response));
 		SFREE(str_response);
 		char str_length[50];
@@ -1378,10 +1380,11 @@ finish:
 			str_temp, strlen(str_temp),
 			str_length, strlen(str_length),
 			"\015\012\015\012", (size_t)4,
-			_str_response, (int_response_len != 0 ? int_response_len : strlen(_str_response))
+			_str_response, int_response_len
 		);
 		SFREE(_str_response);
 	}
+	DB_free_result(res);
 
 	if (CLIENT_WRITE(client_request->parent, str_response, int_response_len) < 0) {
 		if (bol_tls) {
