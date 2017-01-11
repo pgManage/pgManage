@@ -10975,37 +10975,57 @@ document.addEventListener('DOMContentLoaded', function () {
                 var strQSAttr;
                 var arrQSParts;
                 var arrAttrParts;
-        
+                var strOperator;
+
                 if (strQSCol.indexOf('=') !== -1) {
                     arrAttrParts = strQSCol.split(',');
                     i = 0;
                     len = arrAttrParts.length;
                     while (i < len) {
                         strQSCol = arrAttrParts[i];
-                        arrQSParts = strQSCol.split('=');
+
+                        if (strQSCol.indexOf('!=') !== -1) {
+                            strOperator = '!=';
+                            arrQSParts = strQSCol.split('!=');
+                        } else {
+                            strOperator = '=';
+                            arrQSParts = strQSCol.split('=');
+                        }
+
                         strQSCol = arrQSParts[0];
                         strQSAttr = arrQSParts[1] || arrQSParts[0];
-        
-                        // if the key is not present: go to the attribute's default or remove it
-                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                            if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                                element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+
+                        // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                        if (strOperator === '!=') {
+                            // if the key is not present: add the attribute
+                            if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                                element.setAttribute(strQSAttr, '');
+                            // else: remove the attribute
                             } else {
                                 element.removeAttribute(strQSAttr);
                             }
-                        // else: set attribute to exact text from QS
                         } else {
-                            element.setAttribute(strQSAttr, (
-                                GS.qryGetVal(strQS, strQSCol) ||
-                                element.internal.defaultAttributes[strQSAttr] ||
-                                ''
-                            ));
+                            // if the key is not present: go to the attribute's default or remove it
+                            if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                                if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                                    element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                                } else {
+                                    element.removeAttribute(strQSAttr);
+                                }
+                            // else: set attribute to exact text from QS
+                            } else {
+                                element.setAttribute(strQSAttr, (
+                                    GS.qryGetVal(strQS, strQSCol) ||
+                                    element.internal.defaultAttributes[strQSAttr] ||
+                                    ''
+                                ));
+                            }
                         }
                         i += 1;
                     }
                 } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
                     strQSValue = GS.qryGetVal(strQS, strQSCol);
-        
+
                     if (element.internal.bolQSFirstRun !== true) {
                         if (strQSValue !== '' || !element.getAttribute('value')) {
                             element.setAttribute('value', strQSValue);
@@ -11014,7 +11034,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.setAttribute('value', strQSValue);
                     }
                 }
-        
+
                 element.internal.bolQSFirstRun = true;
             }
 
@@ -12009,6 +12029,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -12016,24 +12037,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -12442,32 +12482,51 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
             i = 0;
             len = arrAttrParts.length;
             while (i < len) {
-                strQSCol = arrAttrParts[i]
-                arrQSParts = strQSCol.split('=');
+                strQSCol = arrAttrParts[i];
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -14033,6 +14092,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrPopKeys;
         var currentValue;
         var bolRefresh;
+        var strOperator;
 
         if (strQSCol) {
             if (strQSCol.indexOf('=') !== -1) {
@@ -14040,25 +14100,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 i = 0;
                 len = arrAttrParts.length;
                 while (i < len) {
-                    strQSCol = arrAttrParts[i]
-                    arrQSParts = strQSCol.split('=');
+                    strQSCol = arrAttrParts[i];
+    
+                    if (strQSCol.indexOf('!=') !== -1) {
+                        strOperator = '!=';
+                        arrQSParts = strQSCol.split('!=');
+                    } else {
+                        strOperator = '=';
+                        arrQSParts = strQSCol.split('=');
+                    }
+    
                     strQSCol = arrQSParts[0];
                     strQSAttr = arrQSParts[1] || arrQSParts[0];
-
-                    // if the key is not present: go to the attribute's default or remove it
-                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+    
+                    // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                    if (strOperator === '!=') {
+                        // if the key is not present: add the attribute
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            element.setAttribute(strQSAttr, '');
+                        // else: remove the attribute
                         } else {
                             element.removeAttribute(strQSAttr);
                         }
-                    // else: set attribute to exact text from QS
                     } else {
-                        element.setAttribute(strQSAttr, (
-                            GS.qryGetVal(strQS, strQSCol) ||
-                            element.internal.defaultAttributes[strQSAttr] ||
-                            ''
-                        ));
+                        // if the key is not present: go to the attribute's default or remove it
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                                element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                            } else {
+                                element.removeAttribute(strQSAttr);
+                            }
+                        // else: set attribute to exact text from QS
+                        } else {
+                            element.setAttribute(strQSAttr, (
+                                GS.qryGetVal(strQS, strQSCol) ||
+                                element.internal.defaultAttributes[strQSAttr] ||
+                                ''
+                            ));
+                        }
                     }
                     i += 1;
                 }
@@ -14267,7 +14346,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     elementInserted(this);
                     
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    // attribute code
+                    if (strAttrName === 'value' && oldValue !== newValue) {
+                        this.value = newValue;
+                    }
                 }
             }
         },
@@ -14288,7 +14369,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // if we have not yet templated: just stick the value in an attribute
                     if (this.ready === false) {
-                        this.setAttribute('value', newValue);
+                        if (newValue !== this.getAttribute('value')) {
+                            this.setAttribute('value', newValue);
+                        }
                         
                     // else if the value is empty and allow-empty is present
                     } else if (newValue === '' && this.hasAttribute('allow-empty')) {
@@ -16472,6 +16555,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrPopKeys;
         var currentValue;
         var bolRefresh;
+        var strOperator;
 
         if (strQSCol) {
             if (strQSCol.indexOf('=') !== -1) {
@@ -16479,25 +16563,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 i = 0;
                 len = arrAttrParts.length;
                 while (i < len) {
-                    strQSCol = arrAttrParts[i]
-                    arrQSParts = strQSCol.split('=');
+                    strQSCol = arrAttrParts[i];
+    
+                    if (strQSCol.indexOf('!=') !== -1) {
+                        strOperator = '!=';
+                        arrQSParts = strQSCol.split('!=');
+                    } else {
+                        strOperator = '=';
+                        arrQSParts = strQSCol.split('=');
+                    }
+    
                     strQSCol = arrQSParts[0];
                     strQSAttr = arrQSParts[1] || arrQSParts[0];
-
-                    // if the key is not present: go to the attribute's default or remove it
-                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+    
+                    // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                    if (strOperator === '!=') {
+                        // if the key is not present: add the attribute
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            element.setAttribute(strQSAttr, '');
+                        // else: remove the attribute
                         } else {
                             element.removeAttribute(strQSAttr);
                         }
-                    // else: set attribute to exact text from QS
                     } else {
-                        element.setAttribute(strQSAttr, (
-                            GS.qryGetVal(strQS, strQSCol) ||
-                            element.internal.defaultAttributes[strQSAttr] ||
-                            ''
-                        ));
+                        // if the key is not present: go to the attribute's default or remove it
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                                element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                            } else {
+                                element.removeAttribute(strQSAttr);
+                            }
+                        // else: set attribute to exact text from QS
+                        } else {
+                            element.setAttribute(strQSAttr, (
+                                GS.qryGetVal(strQS, strQSCol) ||
+                                element.internal.defaultAttributes[strQSAttr] ||
+                                ''
+                            ));
+                        }
                     }
                     i += 1;
                 }
@@ -18131,31 +18234,51 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
             i = 0;
             len = arrAttrParts.length;
             while (i < len) {
-                strQSCol = arrAttrParts[i]
-                arrQSParts = strQSCol.split('=');
+                strQSCol = arrAttrParts[i];
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -18423,20 +18546,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 i += 1;
             }
         }
-        
+
         return strHTML;
     }
-    
+
     function handleFormat(element, event, bolAlertOnError) {
         var dteValue, strValueToFormat = element.value, tempSelection = GS.getInputSelection(element.control);
-        
+
         // if there is a day of the week in the value: remove it
         if (strValueToFormat.match(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim)) {
             strValueToFormat = strValueToFormat.replace(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim, '')
                                                .replace(/  /gim, ' ')
                                                .trim();
         }
-        
+
+        if (strValueToFormat.indexOf(':') !== -1) {
+            strValueToFormat = strValueToFormat.substring(0, strValueToFormat.indexOf(':'));
+            strValueToFormat = strValueToFormat.substring(0, strValueToFormat.lastIndexOf(' '));
+        }
+
         // if there are only six numbers in the field assume that
         //      the first  two are the month
         //      the second two are the day   and
@@ -18445,7 +18573,6 @@ document.addEventListener('DOMContentLoaded', function () {
             dteValue = new Date(strValueToFormat.substring(0, 2) + '/' +
                                 strValueToFormat.substring(2, 4) + '/' +
                                 strValueToFormat.substring(4, 6));
-            
         } else {
             //console.log(strValueToFormat.replace(/-/, '/').replace(/-/, '/').replace(/-.*/, ''));
             dteValue = new Date(strValueToFormat.replace(/-/, '/').replace(/-/, '/').replace(/-.*/, ''));
@@ -22602,6 +22729,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrPopKeys;
         var currentValue;
         var bolRefresh;
+        var strOperator;
 
         if (strQSCol) {
             if (strQSCol.indexOf('=') !== -1) {
@@ -22609,25 +22737,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 i = 0;
                 len = arrAttrParts.length;
                 while (i < len) {
-                    strQSCol = arrAttrParts[i]
-                    arrQSParts = strQSCol.split('=');
+                    strQSCol = arrAttrParts[i];
+    
+                    if (strQSCol.indexOf('!=') !== -1) {
+                        strOperator = '!=';
+                        arrQSParts = strQSCol.split('!=');
+                    } else {
+                        strOperator = '=';
+                        arrQSParts = strQSCol.split('=');
+                    }
+    
                     strQSCol = arrQSParts[0];
                     strQSAttr = arrQSParts[1] || arrQSParts[0];
-
-                    // if the key is not present: go to the attribute's default or remove it
-                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+    
+                    // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                    if (strOperator === '!=') {
+                        // if the key is not present: add the attribute
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            element.setAttribute(strQSAttr, '');
+                        // else: remove the attribute
                         } else {
                             element.removeAttribute(strQSAttr);
                         }
-                    // else: set attribute to exact text from QS
                     } else {
-                        element.setAttribute(strQSAttr, (
-                            GS.qryGetVal(strQS, strQSCol) ||
-                            element.internal.defaultAttributes[strQSAttr] ||
-                            ''
-                        ));
+                        // if the key is not present: go to the attribute's default or remove it
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                                element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                            } else {
+                                element.removeAttribute(strQSAttr);
+                            }
+                        // else: set attribute to exact text from QS
+                        } else {
+                            element.setAttribute(strQSAttr, (
+                                GS.qryGetVal(strQS, strQSCol) ||
+                                element.internal.defaultAttributes[strQSAttr] ||
+                                ''
+                            ));
+                        }
                     }
                     i += 1;
                 }
@@ -23679,6 +23826,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -23686,24 +23834,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -24216,7 +24383,8 @@ window.addEventListener('design-register-element', function () {
         var strPath = getPath(element)
           , bolFolders = !element.hasAttribute('no-folders')
           , bolFiles = !element.hasAttribute('no-files')
-          , strHeader;
+          , strHeader
+          , intResponseNumber;
         
         element.folderList.innerHTML = '';
         element.fileList.innerHTML = '';
@@ -24237,6 +24405,7 @@ window.addEventListener('design-register-element', function () {
         }
         element.arrFile = [];
         element.arrFolder = [];
+        intResponseNumber = 0;
         GS.requestFromSocket(GS.envSocket, 'FILE\tLIST\t' + GS.encodeForTabDelimited(strPath), function (data, error, errorData) {
             var arrPaths, strName, strType, arrCells, i, len, divElement
               , arrFiles = [], arrFolders = [];
@@ -24244,6 +24413,10 @@ window.addEventListener('design-register-element', function () {
             if (!error && data.trim() && data.indexOf('Failed to get canonical path') === -1) {
                 if (data !== 'TRANSACTION COMPLETED') {
                     arrPaths = GS.trim(data, '\n').split('\n');
+                    if (intResponseNumber === 0) {
+                        element.folderList.innerHTML = '';
+                        element.fileList.innerHTML = '';
+                    }
                     
                     for (i = 0, len = arrPaths.length; i < len; i += 1) {
                         arrCells = arrPaths[i].split('\t');
@@ -24295,6 +24468,8 @@ window.addEventListener('design-register-element', function () {
                     GS.webSocketErrorDialog(errorData);
                 }
             }
+            
+            intResponseNumber += 1;
         });
     }
     
@@ -24384,31 +24559,51 @@ window.addEventListener('design-register-element', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol && strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
             i = 0;
             len = arrAttrParts.length;
             while (i < len) {
-                strQSCol = arrAttrParts[i]
-                arrQSParts = strQSCol.split('=');
+                strQSCol = arrAttrParts[i];
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -24416,6 +24611,7 @@ window.addEventListener('design-register-element', function () {
             strQSValue = GS.qryGetVal(strQS, strQSCol);
 
             if (element.internal.bolQSFirstRun === true && GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+                //console.trace(element, 'test');
                 getData(element);
             }
         }
@@ -24425,6 +24621,7 @@ window.addEventListener('design-register-element', function () {
     
     function bindElement(element) {
         if (element.hasAttribute('qs')) {
+            pushReplacePopHandler(element);
             window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
             window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
             window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
@@ -26261,6 +26458,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrPopKeys;
         var currentValue;
         var bolRefresh;
+        var strOperator;
 
         if (strQSCol) {
             if (strQSCol.indexOf('=') !== -1) {
@@ -26268,25 +26466,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 i = 0;
                 len = arrAttrParts.length;
                 while (i < len) {
-                    strQSCol = arrAttrParts[i]
-                    arrQSParts = strQSCol.split('=');
+                    strQSCol = arrAttrParts[i];
+    
+                    if (strQSCol.indexOf('!=') !== -1) {
+                        strOperator = '!=';
+                        arrQSParts = strQSCol.split('!=');
+                    } else {
+                        strOperator = '=';
+                        arrQSParts = strQSCol.split('=');
+                    }
+    
                     strQSCol = arrQSParts[0];
                     strQSAttr = arrQSParts[1] || arrQSParts[0];
-
-                    // if the key is not present: go to the attribute's default or remove it
-                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+    
+                    // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                    if (strOperator === '!=') {
+                        // if the key is not present: add the attribute
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            element.setAttribute(strQSAttr, '');
+                        // else: remove the attribute
                         } else {
                             element.removeAttribute(strQSAttr);
                         }
-                    // else: set attribute to exact text from QS
                     } else {
-                        element.setAttribute(strQSAttr, (
-                            GS.qryGetVal(strQS, strQSCol) ||
-                            element.internal.defaultAttributes[strQSAttr] ||
-                            ''
-                        ));
+                        // if the key is not present: go to the attribute's default or remove it
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                                element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                            } else {
+                                element.removeAttribute(strQSAttr);
+                            }
+                        // else: set attribute to exact text from QS
+                        } else {
+                            element.setAttribute(strQSAttr, (
+                                GS.qryGetVal(strQS, strQSCol) ||
+                                element.internal.defaultAttributes[strQSAttr] ||
+                                ''
+                            ));
+                        }
                     }
                     i += 1;
                 }
@@ -26331,7 +26548,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
             
-            if (GS.getQueryString() || element.hasAttribute('refresh-on-querystring-change')) {
+            if (GS.getQueryString() || element.hasAttribute('refresh-on-querystring-change') || element.hasAttribute('src')) {
                 bolRefresh = true;
             }
         }
@@ -28584,6 +28801,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -28591,24 +28809,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -29698,11 +29935,13 @@ document.addEventListener('DOMContentLoaded', function () {
         
         //console.log(record);
         
-        // clear previous selection
-        arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
-        
-        for (i = 0, len = arrSelectedTrs.length; i < len; i += 1) {
-            arrSelectedTrs[i].removeAttribute('selected');
+        if (element.tableElement && xtag.queryChildren(element.tableElement, 'tbody')[0]) {
+            // clear previous selection
+            arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
+            
+            for (i = 0, len = arrSelectedTrs.length; i < len; i += 1) {
+                arrSelectedTrs[i].removeAttribute('selected');
+            }
         }
         
         // select/highlight the record that was provided
@@ -29710,24 +29949,30 @@ document.addEventListener('DOMContentLoaded', function () {
             record.setAttribute('selected', '');
         }
     }
-    
+
     // loops through the records and finds a record using the parameter
     function findRecordFromValue(element, searchValue) {
-        var i, len, matchedRecord, arrTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr'),
+        var i, len, matchedRecord, arrTrs, strSearchString;
+
+        if (element.tableElement && xtag.queryChildren(element.tableElement, 'tbody')[0]) {
+            //console.log('1***', element.tableElement);
+            //console.log('2***', xtag.queryChildren(element.tableElement, 'tbody')[0]);
+            //console.log('3***', xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr'));
+            arrTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr');
             strSearchString = String(searchValue);
-        
-        // search exact text and search both the value attribute (if present) and the first td text
-        for (i = 0, len = arrTrs.length; i < len; i += 1) {
-            if (arrTrs[i].getAttribute('value') === strSearchString || xtag.queryChildren(arrTrs[i], 'td')[0].textContent === strSearchString) {
-                matchedRecord = arrTrs[i];
-                
-                break;
+
+            // search exact text and search both the value attribute (if present) and the first td text
+            for (i = 0, len = arrTrs.length; i < len; i += 1) {
+                if (arrTrs[i].getAttribute('value') === strSearchString || xtag.queryChildren(arrTrs[i], 'td')[0].textContent === strSearchString) {
+                    matchedRecord = arrTrs[i];
+                    break;
+                }
             }
         }
-        
+
         return matchedRecord;
     }
-    
+
     function selectRecord(element, handle, bolChange) {
         var record, strRecordValue, strFirstTdText;
         
@@ -29754,7 +29999,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.innerSelectedRecord = record;
                     if (bolChange) {
                         element.hackToPreventScroll = true;
-                        element.setAttribute('value', element.innerValue);
+                        if (element.innerValue !== element.getAttribute('value')) {
+                            element.setAttribute('value', element.innerValue);
+                        }
                         element.hackToPreventScroll = false;
                         element.triggerChange();
                         //console.log('2*** change triggered');
@@ -30172,6 +30419,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrPopKeys;
         var currentValue;
         var bolRefresh;
+        var strOperator;
 
         if (strQSCol) {
             if (strQSCol.indexOf('=') !== -1) {
@@ -30179,25 +30427,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 i = 0;
                 len = arrAttrParts.length;
                 while (i < len) {
-                    strQSCol = arrAttrParts[i]
-                    arrQSParts = strQSCol.split('=');
+                    strQSCol = arrAttrParts[i];
+    
+                    if (strQSCol.indexOf('!=') !== -1) {
+                        strOperator = '!=';
+                        arrQSParts = strQSCol.split('!=');
+                    } else {
+                        strOperator = '=';
+                        arrQSParts = strQSCol.split('=');
+                    }
+    
                     strQSCol = arrQSParts[0];
                     strQSAttr = arrQSParts[1] || arrQSParts[0];
-
-                    // if the key is not present: go to the attribute's default or remove it
-                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+    
+                    // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                    if (strOperator === '!=') {
+                        // if the key is not present: add the attribute
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            element.setAttribute(strQSAttr, '');
+                        // else: remove the attribute
                         } else {
                             element.removeAttribute(strQSAttr);
                         }
-                    // else: set attribute to exact text from QS
                     } else {
-                        element.setAttribute(strQSAttr, (
-                            GS.qryGetVal(strQS, strQSCol) ||
-                            element.internal.defaultAttributes[strQSAttr] ||
-                            ''
-                        ));
+                        // if the key is not present: go to the attribute's default or remove it
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                                element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                            } else {
+                                element.removeAttribute(strQSAttr);
+                            }
+                        // else: set attribute to exact text from QS
+                        } else {
+                            element.setAttribute(strQSAttr, (
+                                GS.qryGetVal(strQS, strQSCol) ||
+                                element.internal.defaultAttributes[strQSAttr] ||
+                                ''
+                            ));
+                        }
                     }
                     i += 1;
                 }
@@ -30349,7 +30616,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     elementInserted(this);
                     
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    // attribute code
+                    if (strAttrName === 'value' && newValue !== oldValue) {
+                        this.value = newValue;
+                    }
                 }
             }
         },
@@ -31026,6 +31295,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -31033,24 +31303,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -31164,6 +31453,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         this.control.lastWidth = this.control.clientWidth;
                         this.control.lastHeight = this.control.clientHeight;
                         this.syncView();
+                    } else if (strAttrName === 'value' && newValue !== oldValue) {
+                        this.value = newValue;
                     }
                 }
             }
@@ -31182,7 +31473,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // set the value of the input and set the value attribute
                 set: function (strNewValue) {
-                    this.setAttribute('value', strNewValue);
+                    if (this.getAttribute('value') !== strNewValue) {
+                        this.setAttribute('value', strNewValue);
+                    }
                     if (this.control) {
                         this.control.value = strNewValue;
                     } else {
@@ -31950,6 +32243,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -31957,24 +32251,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -31996,9 +32309,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // sync control value and resize to text
     function syncView(element) {
         if (element.control) {
-            element.setAttribute('value', element.control.value);
+            if (element.getAttribute('value') !== element.control.value) {
+                element.setAttribute('value', element.control.value);
+            }
         } else {
-            element.setAttribute('value', element.innerHTML);
+            if (element.getAttribute('value') !== element.innerHTML) {
+                element.setAttribute('value', element.innerHTML);
+            }
         }
     }
 
@@ -32290,6 +32607,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
 
                         this.refresh();
+                    } else if (strAttrName === 'value' && newValue !== oldValue) {
+                        this.value = newValue;
                     }
                 }
             }
@@ -32521,54 +32840,57 @@ document.addEventListener('DOMContentLoaded', function () {
         for (i = 0, len = arrTempSelectedOptions.length; i < len; i += 1) {
             arrTempSelectedOptions[i].removeAttribute('tempselect');
         }
-        
+
         // select/highlight the record that was provided
-        option.setAttribute('selected', '');
+        if (option) {
+            option.setAttribute('selected', '');
+        }
     }
-    
+
     // loops through the options and finds a option using the parameter
     function findOptionFromString(element, strSearchString) {
         var i, len, matchedOption, arrOptions = xtag.query(element, 'gs-option');
-        
+
         // search exact text and search both the value attribute (if present) and the text content
         for (i = 0, len = arrOptions.length; i < len; i += 1) {
             if (arrOptions[i].getAttribute('value') === strSearchString || arrOptions[i].textContent === strSearchString) {
                 matchedOption = arrOptions[i];
-                
                 break;
             }
         }
-        
+
         return matchedOption;
     }
-    
+
     function selectOption(element, handle, bolChange) {
         var option, strOptionValue, strOptionText;
-        
+
         if (typeof handle === 'string') {
             option = findOptionFromString(element, handle);
-            
+
             if (!option) {
                 throw 'gs-optionbox Error: value: \'' + handle + '\' not found.';
             }
         } else {
             option = handle;
         }
-        
+
         highlightOption(element, option);
-        
-        strOptionValue = option.getAttribute('value');
-        strOptionText = option.textContent;
-        
+
+        if (option) {
+            strOptionValue = option.getAttribute('value');
+            strOptionText = option.textContent;
+        } else {
+            strOptionValue = '';
+            strOptionText = '';
+        }
+
         if (element.value !== (strOptionValue || strOptionText)) {
             element.innerValue = strOptionValue || strOptionText;
             element.innerSelectedOption = option;
-            
+
             if (bolChange) {
-                xtag.fireEvent(element, 'change', {
-                    bubbles: true,
-                    cancelable: true
-                });
+                xtag.fireEvent(element, 'change', {bubbles: true, cancelable: true});
             }
         }
     }
@@ -32708,6 +33030,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -32715,24 +33038,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -32870,7 +33212,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     elementInserted(this);
                     
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    // attribute code
+                    if (strAttrName === 'value' && newValue !== oldValue) {
+                        selectOption(this, newValue);
+                    }
                 }
             }
         },
@@ -33614,6 +33958,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol && strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -33621,24 +33966,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -33700,18 +34064,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 elementInserted(this);
             },
             attributeChanged: function (strAttrName, oldValue, newValue) {
+                var element = this;
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
-                    elementCreated(this);
-                    elementInserted(this);
+                    elementCreated(element);
+                    elementInserted(element);
 
                 // if "suspend-inserted" has been removed: run inserted code
                 } else if (strAttrName === 'suspend-inserted' && newValue === null) {
-                    elementInserted(this);
+                    elementInserted(element);
 
-                } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                } else if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
                     if (strAttrName === 'disabled') {
-                        this.refresh();
+                        element.refresh();
+                    } else if (strAttrName === 'value' && newValue !== oldValue) {
+                        element.value = newValue;
                     }
                 }
             }
@@ -33816,7 +34183,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // sync control value and resize to text
             syncView: function () {
                 if (this.control) {
-                    this.setAttribute('value', this.control.value);
+                    if (this.getAttribute('value') !== this.control.value) {
+                        this.setAttribute('value', this.control.value);
+                    }
                 } else {
                     this.innerHTML = this.control.value;
                 }
@@ -33965,6 +34334,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -33972,24 +34342,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -34115,7 +34504,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     elementInserted(this);
 
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    // attribute code
+                    if (strAttrName === 'value' && newValue !== oldValue) {
+                        this.value = newValue;
+                    }
                 }
             }
         },
@@ -34178,7 +34569,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
 
                 set: function (newValue) {
-                    this.setAttribute('value', newValue);
+                    if (this.getAttribute('value') !== newValue) {
+                        this.setAttribute('value', newValue);
+                    }
                     this.control.value = newValue;
                 }
             },
@@ -34425,6 +34818,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -34432,24 +34826,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -34957,6 +35370,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrPopKeys;
         var currentValue;
         var bolRefresh = false;
+        var strOperator;
 
         if (strQSCol && strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -34964,24 +35378,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -34989,8 +35422,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // handle "refresh-on-querystring-values" and "refresh-on-querystring-change" attributes
         if (element.internal.bolQSFirstRun === true) {
-            if (element.hasAttribute('refresh-on-querystring-values')) {
-                arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
+            if (element.hasAttribute('refresh-on-querystring-values') || element.hasAttribute('qs')) {
+                if (element.getAttribute('refresh-on-querystring-values')) {
+                    arrPopKeys = element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);
+                } else {
+                    arrPopKeys = [];
+                }
 
                 if (strQSCol) {
                     GS.listAdd(arrPopKeys, strQSCol);
@@ -35492,6 +35929,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -35499,24 +35937,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -36325,6 +36782,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -36332,24 +36790,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -37223,6 +37700,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -37230,24 +37708,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }

@@ -225,31 +225,51 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
             i = 0;
             len = arrAttrParts.length;
             while (i < len) {
-                strQSCol = arrAttrParts[i]
-                arrQSParts = strQSCol.split('=');
+                strQSCol = arrAttrParts[i];
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -517,20 +537,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 i += 1;
             }
         }
-        
+
         return strHTML;
     }
-    
+
     function handleFormat(element, event, bolAlertOnError) {
         var dteValue, strValueToFormat = element.value, tempSelection = GS.getInputSelection(element.control);
-        
+
         // if there is a day of the week in the value: remove it
         if (strValueToFormat.match(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim)) {
             strValueToFormat = strValueToFormat.replace(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim, '')
                                                .replace(/  /gim, ' ')
                                                .trim();
         }
-        
+
+        if (strValueToFormat.indexOf(':') !== -1) {
+            strValueToFormat = strValueToFormat.substring(0, strValueToFormat.indexOf(':'));
+            strValueToFormat = strValueToFormat.substring(0, strValueToFormat.lastIndexOf(' '));
+        }
+
         // if there are only six numbers in the field assume that
         //      the first  two are the month
         //      the second two are the day   and
@@ -539,7 +564,6 @@ document.addEventListener('DOMContentLoaded', function () {
             dteValue = new Date(strValueToFormat.substring(0, 2) + '/' +
                                 strValueToFormat.substring(2, 4) + '/' +
                                 strValueToFormat.substring(4, 6));
-            
         } else {
             //console.log(strValueToFormat.replace(/-/, '/').replace(/-/, '/').replace(/-.*/, ''));
             dteValue = new Date(strValueToFormat.replace(/-/, '/').replace(/-/, '/').replace(/-.*/, ''));

@@ -58,11 +58,11 @@
                     <template for="html" height="17">
                         <gs-switch id="switch">
                             <template for="template-1" style="background-color: #FFE;">
-                                <gs-button onclick="document.getElementById('switch').value = 'template-2';">Go to template 2</gs-button>
+                                <gs-button onclick="document.getElementById('switch').template = 'template-2';">Go to template 2</gs-button>
                                 This is template-1.
                             </template>
                             <template for="template-2" style="background-color: #EFF;">
-                                <gs-button onclick="document.getElementById('switch').value = 'template-1';">Go to template 1</gs-button>
+                                <gs-button onclick="document.getElementById('switch').template = 'template-1';">Go to template 1</gs-button>
                                 This is template-2.<br />
                                 This is template-2.<br />
                                 This is template-2.
@@ -83,7 +83,7 @@
                                 <gs-page>
                                     <gs-header><h3>Page 1 Header</h3></gs-header>
                                     <gs-body padded>
-                                        <gs-button onclick="document.getElementById('switch').value = 'template-2';">Go to page 2</gs-button>
+                                        <gs-button onclick="document.getElementById('switch').template = 'template-2';">Go to page 2</gs-button>
                                     </gs-body>
                                     <gs-footer><h3>Page 1 Footer</h3></gs-footer>
                                 </gs-page>
@@ -92,7 +92,7 @@
                                 <gs-page>
                                     <gs-header><h3>Page 2 Header</h3></gs-header>
                                     <gs-body padded>
-                                        <gs-button onclick="document.getElementById('switch').value = 'template-1';">Go to page 1</gs-button>
+                                        <gs-button onclick="document.getElementById('switch').template = 'template-1';">Go to page 1</gs-button>
                                     </gs-body>
                                     <gs-footer><h3>Page 2 Footer</h3></gs-footer>
                                 </gs-page>
@@ -103,40 +103,99 @@
                 
                 <div class="doc-example-description">
                     <span class="h3">Preset Value Example:</span>
-                    <p>In this example the gs-switch element has the "value" attribute set to "template-2" in the HTML document. As a result, template-2 is shown on load.</p>
+                    <p>In this example the gs-switch element has the "template" attribute set to "template-2" in the HTML document. As a result, template-2 is shown on load.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="17">
-                        <gs-switch id="switch" value="template-2">
+                        <gs-switch id="switch" template="template-2">
                             <template for="template-1">
                                 This is template-1
-                                <gs-button onclick="document.getElementById('switch').value = 'template-2';">Go to template 2</gs-button>
+                                <gs-button onclick="document.getElementById('switch').template = 'template-2';">Go to template 2</gs-button>
                             </template>
                             <template for="template-2">
                                 This is template-2
-                                <gs-button onclick="document.getElementById('switch').value = 'template-1';">Go to template 1</gs-button>
+                                <gs-button onclick="document.getElementById('switch').template = 'template-1';">Go to template 1</gs-button>
                             </template>
                         </gs-switch>
                     </template>
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Simple Query String Attribute Example:</span>
-                    <p>The gs-switch element is able to listen to a key in the URL query string to set which gs-switch template is shown. In this example, we've added the "qs" attribute to our gs-switch element. The "qs" attribute is just a shortcut that connects the gs-switch directly to a URL query string key.</p>
-                    <p>Click the buttons and the template shown will match the value of "page" in the query string. The buttons don't set the gs-switch "value" attribute. Instead, they push a value to the URL query string. The gs-switch element then detects the change and sets the template appropriately.</p>
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span><br />
+                    <p>The name <code>[qs]</code> stands for "querystring". The querystring is the part in the URL after the "?". The <code>[qs]</code> attribute has two formats, each with their own use.</p>
+                    
+                    <ul>
+                        <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). If you need an attribute to be added when a querystring key is not present, replace the "=" with "!=" (for example: qs="<i>key1</i>!=<i>attribute1</i>", attribute1 will only be added if key1 is not in the querystring). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
+                        <li>qs="<i>key</i>". This format will cause the switch element to refresh whenever that particulary key is changed in the querystring.</li>
+                    </ul>
                 </div>
-                <gs-doc-example query-string="page=template-2">
-                    <template for="html" height="17">
-                        <gs-switch qs="page">
+                
+                <gs-doc-example query-string="test1=template-1&test2=template-2">
+                    <template for="html" height="35">
+                        
+                        <gs-switch style="height: 3em; border: 1px solid #000;" qs="test1" template="{{! qs.test1 || 'template-1' }}">
                             <template for="template-1">
-                                This is template-1
-                                <gs-button onclick="GS.pushQueryString('page=template-2')">Go to template 2</gs-button>
+                                Template 1
                             </template>
                             <template for="template-2">
-                                This is template-2
-                                <gs-button onclick="GS.pushQueryString('page=template-1')">Go to template 1</gs-button>
+                                Template 2
                             </template>
                         </gs-switch>
+                        <br />
+                        <gs-switch style="height: 3em; border: 1px solid #000;" qs="test2=template">
+                            <template for="template-1">
+                                Template 1
+                            </template>
+                            <template for="template-2">
+                                Template 2
+                            </template>
+                        </gs-switch>
+                        <br />
+                        <gs-switch style="height: 3em; border: 1px solid #000;" qs="test3=hidden">
+                            <template for="template-1">
+                                Template 1
+                            </template>
+                            <template for="template-2">
+                                Template 2
+                            </template>
+                        </gs-switch>
+                        <br />
+                        <gs-switch style="height: 3em; border: 1px solid #000;" qs="test4!=hidden">
+                            <template for="template-1">
+                                Template 1
+                            </template>
+                            <template for="template-2">
+                                Template 2
+                            </template>
+                        </gs-switch>
+                        <br />
+                        <br />
+                        <gs-grid widths="1,1">
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test1=template-2');">Add "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test1');">Remove "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test2=template-1');">Add "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test2');">Remove "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test3=yes');">Add "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test3');">Remove "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test4=yes');">Add "test4"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test4');">Remove "test4"</gs-button>
+                            </gs-block>
+                        </gs-grid>
                     </template>
                 </gs-doc-example>
                 
@@ -144,12 +203,12 @@
                     <span class="h3">DoT.js Javascript Variable Example</span>
                     <p>In this example we are going to use Dot.js to allow for more complex behavior. </p>  
                     <p>The DoT.js templating engine accepts string content and parses it to find curly braced content "{{! example }}". It then executes anything found within braces as javascript code. For more information, see the <a target="blank" href="http://olado.github.io/doT/">Dot.js documentation</a>.</p>
-                    <p>In the example, the gs-switch element has a Dot.js expression in the value attribute. The expression asks Dot.js to substitue the value of the javascript variable "strTemplateVariable" for the value attribute. In other words, Dot.js converts <span class="cdg">value="{{! strTemplateVariable }}"</span> to <span class="cdg">value="template-1"</span>.</p>
-                    <p>This conversion occurs on load automatically. You can also trigger a gs-switch to refresh using the refresh method or by setting the value attribute. See the next two examples for details.</p>
+                    <p>In the example, the gs-switch element has a Dot.js expression in the template attribute. The expression asks Dot.js to substitue the value of the javascript variable "strTemplateVariable" for the template attribute. In other words, Dot.js converts <span class="cdg">template="{{! strTemplateVariable }}"</span> to <span class="cdg">template="template-1"</span>.</p>
+                    <p>This conversion occurs on load automatically. You can also trigger a gs-switch to refresh using the refresh method or by setting the template attribute. See the next two examples for details.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="12">
-                        <gs-switch value="{{! strTemplateVariable }}">
+                        <gs-switch template="{{! strTemplateVariable }}">
                             <template for="template-1">
                                 This is template-1
                             </template>
@@ -172,7 +231,7 @@
                     <template for="html" height="20">
                         <gs-button onclick="strTemplateVariable='template-2';">Set strTemplateVariable to template-2</gs-button>
                         <gs-button onclick="document.getElementById('switch').refresh();">Refresh the GS-Switch</gs-button>
-                        <gs-switch id= "switch" value="{{! strTemplateVariable }}" style="height: 5em;">
+                        <gs-switch id= "switch" template="{{! strTemplateVariable }}" style="height: 5em;">
                             <template for="template-1">
                                 This is template-1
                             </template>
@@ -188,13 +247,13 @@
                 
                 <div class="doc-example-description">
                     <span class="h3">Trigger A GS-Switch By Setting The Value Attribute:</span>
-                    <p>To get a gs-switch to switch immediately you can set the "value" attribute with javascript. The gs-switch will sense the change and refresh immediately. </p>
-                    <p>In this example, template-1 is the initial template because no value was set in the HTML document. Click the buttons to set the "value" attribute. Note that Javascript provides two ways to do this. </p>
+                    <p>To get a gs-switch to switch immediately you can set the "template" attribute with javascript. The gs-switch will sense the change and refresh immediately. </p>
+                    <p>In this example, template-1 is the initial template because no value was set in the HTML document. Click the buttons to set the "template" attribute. Note that Javascript provides two ways to do this. </p>
                 </div>
                 <gs-doc-example >
                     <template for="html" height="20">
-                        <gs-button onclick="document.getElementById('switch').setAttribute('value','template-2');">Set "value" attribute to template-2</gs-button>
-                        <gs-button onclick="document.getElementById('switch').value = 'template-1';">Set "value" attribute to template-1</gs-button>
+                        <gs-button onclick="document.getElementById('switch').setAttribute('template','template-2');">Set "template" attribute to template-2</gs-button>
+                        <gs-button onclick="document.getElementById('switch').template = 'template-1';">Set "template" attribute to template-1</gs-button>
                         <gs-switch id= "switch" style="height: 5em;">
                             <template for="template-1">
                                 This is template-1
@@ -213,12 +272,12 @@
                     <span class="h3">DoT.js And Query String Example:</span>
                     <p>This example demonstrates a way to get behavior like you get with the "qs" attribute, but enhanced with the ability to set the template with an expression.</p>
                     <p>Our initial query string is set to "template=template-2". Also notice the gs-switch value attribute is set to "{{! qs.template }}". </p>
-                    <p>When our page loads, Dot.js will parse the query string variable "qs", find the value for key "template" and then insert "template-2" into the gs-switch value attribute in place of the braced expression "! qs.template". Next, the gs-switch will initialize and set template-2 as the visible template. </p>
+                    <p>When our page loads, Dot.js will parse the query string variable "qs", find the value for key "template" and then insert "template-2" into the gs-switch template attribute in place of the braced expression "! qs.template". Next, the gs-switch will initialize and set template-2 as the visible template. </p>
                     <p>Notice that if you change the query string below, the template will change but this is only a demonstration of initial page load functionality. We trigger a page reload whenever you type to make the example easy to test. Look to the next two examples to see how enhance this example to change dynamically with the query string.</p>
                 </div>
                 <gs-doc-example query-string="template=2">
                     <template for="html" height="14">
-                        <gs-switch value="{{! 'template-' + qs.template }}">
+                        <gs-switch template="{{! 'template-' + qs.template }}">
                             <template for="template-1">
                                 This is template-{{! qs.template }}.  We also want the other value: {{! strOtherValue }}.
                             </template>
@@ -239,7 +298,7 @@
                 </div>
                 <gs-doc-example query-string="template=2">
                     <template for="html" height="12">
-                        <gs-switch value="{{! 'template-' + qs.template }}" refresh-on-querystring-change>
+                        <gs-switch template="{{! 'template-' + qs.template }}" refresh-on-querystring-change>
                             <template for="template-1">
                                 This is template-{{! qs.template }}.  We also want the other value: {{! strOtherValue }}.
                             </template>
@@ -262,7 +321,7 @@
                 </div>
                 <gs-doc-example query-string="template=template-1">
                     <template for="html" height="12">
-                        <gs-switch value="{{! qs.template }}" refresh-on-querystring-values="template" >
+                        <gs-switch template="{{! qs.template }}" refresh-on-querystring-values="template" >
                             <template for="template-1">
                                 This is {{! qs.template }}. We also want the other value: {{! strOtherValue }}.
                             </template>
@@ -285,7 +344,7 @@
                 </div>
                 <gs-doc-example query-string="template=template-2">
                     <template for="html" height="12">
-                        <gs-switch value="{{! qs.template }}" refresh-on-querystring-values="template" >
+                        <gs-switch template="{{! qs.template }}" refresh-on-querystring-values="template" >
                             <template for="template-1">
                                 This is {{! qs.template }}.  We also want the other value: {{! strOtherValue }}.
                             </template>

@@ -177,56 +177,56 @@
                     <p>The name <code>[qs]</code> stands for "querystring". The querystring is the part in the URL after the "?". The <code>[qs]</code> attribute has two formats, each with their own use.</p>
                     
                     <ul>
-                        <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
+                        <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). If you need an attribute to be added when a querystring key is not present, replace the "=" with "!=" (for example: qs="<i>key1</i>!=<i>attribute1</i>", attribute1 will only be added if key1 is not in the querystring). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
                         <li>qs="<i>key</i>". This format will update the <code>[value]</code> attribute with the querystring whenever the querystring changes.</li>
                     </ul>
                 </div>
                 <gs-doc-example query-string="test1=true&test2=false">
                     <template for="html" height="35">
-                    <gs-optionbox qs="test1">
-                        <gs-option>Option 1</gs-option>
-                        <gs-option>Option 2</gs-option>
-                    </gs-optionbox>
-                    <gs-optionbox qs="test2">
-                        <gs-option>Option 1</gs-option>
-                        <gs-option>Option 2</gs-option>
-                    </gs-optionbox>
-                    <gs-optionbox qs="test3=value">
-                        <gs-option>Option 1</gs-option>
-                        <gs-option>Option 2</gs-option>
-                    </gs-optionbox>
-                    <gs-optionbox qs="test4=hidden">
-                        <gs-option>Option 1</gs-option>
-                        <gs-option>Option 2</gs-option>
-                    </gs-optionbox>
+                        <gs-optionbox qs="test1">
+                            <gs-option>true</gs-option>
+                            <gs-option>false</gs-option>
+                        </gs-optionbox>
+                        <gs-optionbox qs="test2=value">
+                            <gs-option>true</gs-option>
+                            <gs-option>false</gs-option>
+                        </gs-optionbox>
+                        <gs-optionbox qs="test3=hidden">
+                            <gs-option>true</gs-option>
+                            <gs-option>false</gs-option>
+                        </gs-optionbox>
+                        <gs-optionbox qs="test4!=hidden">
+                            <gs-option>true</gs-option>
+                            <gs-option>false</gs-option>
+                        </gs-optionbox>
                         <br />
                         <br />
-                            <gs-grid widths="1,1">
-                                <gs-block>
-                                    <gs-button onclick="GS.pushQueryString('test1=Option 1');">Add "test1"</gs-button>
-                                </gs-block>
-                                <gs-block>
-                                    <gs-button onclick="GS.removeFromQueryString('test1');">Remove "test1"</gs-button>
-                                </gs-block>
-                                <gs-block>
-                                    <gs-button onclick="GS.pushQueryString('test2=Option 2');">Add "test2"</gs-button>
-                                </gs-block>
-                                <gs-block>
-                                    <gs-button onclick="GS.removeFromQueryString('test2');">Remove "test2"</gs-button>
-                                </gs-block>
-                                <gs-block>
-                                    <gs-button onclick="GS.pushQueryString('test3=Option 1');">Add "test3"</gs-button>
-                                </gs-block>
-                                <gs-block>
-                                    <gs-button onclick="GS.removeFromQueryString('test3');">Remove "test3"</gs-button>
-                                </gs-block>
-                                <gs-block>
-                                    <gs-button onclick="GS.pushQueryString('test4=Option 2');">Add "test4"</gs-button>
-                                </gs-block>
-                                <gs-block>
-                                    <gs-button onclick="GS.removeFromQueryString('test4');">Remove "test4"</gs-button>
-                                </gs-block>
-                            </gs-grid>
+                        <gs-grid widths="1,1">
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test1=false');">Add "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test1');">Remove "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test2=true');">Add "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test2');">Remove "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test3=yes');">Add "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test3');">Remove "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test4=yes');">Add "test4"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test4');">Remove "test4"</gs-button>
+                            </gs-block>
+                        </gs-grid>
                     </template>
                 </gs-doc-example>
                     

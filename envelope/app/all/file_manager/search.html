@@ -16,6 +16,8 @@
             /*jslint white:true*/
             var bolWebSockets;
             
+            var intLatestSearchFiles = 0;
+            var intLatestSearchOccurances = 0;
             function parseResults(results, bolClear) {
                 "use strict";
                 var i;
@@ -29,6 +31,11 @@
                 var strCurrentPath;
                 var strCurrentLineNumber;
                 var strCurrentMatchLine;
+
+                if (bolClear) {
+                    intLatestSearchFiles = 0;
+                    intLatestSearchOccurances = 0;
+                }
 
                 var scrollContainer = document.getElementById('results-scroll-container');
                 var bolScrollToEnd = (scrollContainer.scrollHeight === scrollContainer.scrollTop + scrollContainer.offsetHeight);
@@ -93,24 +100,28 @@
                         '</div><br/>';
                 }
                 
-                if (bolClear === true) {
-                    if (strHTML) {
-                        document.getElementById('matches').textContent =
-                            arrPaths.length + ' File' + (arrPaths.length != 1 ? 's' : '') + ', ' + arrLines.length + ' Occurrence' + (arrLines.length != 1 ? 's' : '');
-                    } else {
-                        document.getElementById('matches').textContent = '0 Files, 0 Occurrences';
-                    }
+                //if (bolClear === true) {
+                //    if (strHTML) {
+                //        document.getElementById('matches').textContent =
+                //            arrPaths.length + ' File' + (arrPaths.length != 1 ? 's' : '') + ', ' + arrLines.length + ' Occurrence' + (arrLines.length != 1 ? 's' : '');
+                //    } else {
+                //        document.getElementById('matches').textContent = '0 Files, 0 Occurrences';
+                //    }
     
-                    document.getElementById('results-container').innerHTML = (strHTML || '<center>0 Files, 0 Occurrences</center>');
-                } else {
-                    //var intMatches = parseInt(document.getElementById('matches').textContent || '0', 10) || 0;
+                //    document.getElementById('results-container').innerHTML = (strHTML || '<center>0 Files, 0 Occurrences</center>');
+                //} else {
+                //var intMatches = parseInt(document.getElementById('matches').textContent || '0', 10) || 0;
 
-                    //document.getElementById('matches').textContent = (intMatches + arrLines.length) + ' Matches';
-                    document.getElementById('matches').textContent =
-                        arrPaths.length + ' File' + (arrPaths.length != 1 ? 's' : '') + ', ' + arrLines.length + ' Occurrence' + (arrLines.length != 1 ? 's' : '');
-    
-                    document.getElementById('results-container').innerHTML += (strHTML || '<center>0 Files, 0 Occurrences</center>');
-                }
+                intLatestSearchFiles += arrPaths.length;
+                intLatestSearchOccurances += arrLines.length;
+
+                //document.getElementById('matches').textContent = (intMatches + arrLines.length) + ' Matches';
+                document.getElementById('matches').textContent =
+                    intLatestSearchFiles + ' File' + (intLatestSearchFiles != 1 ? 's' : '') + ', ' +
+                    intLatestSearchOccurances + ' Occurrence' + (intLatestSearchOccurances != 1 ? 's' : '');
+
+                document.getElementById('results-container').innerHTML += (strHTML || '<center>0 Files, 0 Occurrences</center>');
+                //}
                 
                 if (bolScrollToEnd) {
                     scrollContainer.scrollTop = scrollContainer.scrollHeight;
@@ -162,6 +173,7 @@
 
                         var strResults = '';
                         var strPrevLink = '';
+                        var bolFirstLoad = true;
                         addLoaderElements();
                         GS.requestFromSocket(
                             GS.envSocket,
@@ -185,7 +197,8 @@
                                         }
                                         
                                         if (strCurrLink !== strPrevLink) {
-                                            parseResults(strResults, false);
+                                            parseResults(strResults, bolFirstLoad);
+                                            bolFirstLoad = false;
                                             strPrevLink = strCurrLink;
                                             strResults = '';
                                         }
@@ -196,15 +209,10 @@
                                             document.getElementById('matches').textContent = '';
                                             document.getElementById('results-container').innerHTML = '';
                                         }
-                                        parseResults(strResults, false);
+                                        parseResults(strResults, bolFirstLoad);
+                                        bolFirstLoad = false;
                                         removeLoaderElements();
                                     }
-                                    
-                                    //if (data === 'TRANSACTION COMPLETED') {
-                                    //    parseResults(strResults, true);
-                                    //} else {
-                                    //    strResults += (strResults ? '\n' : '') + data;
-                                    //}
                                 } else {
                                     removeLoaderElements();
                                     GS.webSocketErrorDialog(errorData);

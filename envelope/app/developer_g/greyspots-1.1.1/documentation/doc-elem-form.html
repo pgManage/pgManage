@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -143,23 +143,67 @@
                 
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "qs":</span>
-                    <p>The "qs" attribute causes the form the get it's where clause using a column in the querystring.</p>
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span><br />
+                    <p>The name <code>[qs]</code> stands for "querystring". The querystring is the part in the URL after the "?". The <code>[qs]</code> attribute has two formats, each with their own use.</p>
+                    
+                    <ul>
+                        <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). If you need an attribute to be added when a querystring key is not present, replace the "=" with "!=" (for example: qs="<i>key1</i>!=<i>attribute1</i>", attribute1 will only be added if key1 is not in the querystring). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
+                        <li>qs="<i>key</i>". This format will update the <code>[value]</code> attribute with the querystring whenever the querystring changes.</li>
+                    </ul>
                 </div>
-                <gs-doc-example query-string="id=2341&unrelatedparameter=test">
-                    <template for="html" height="20">
-                        <gs-form src="gsdoc.tpeople" qs="id">
+                <gs-doc-example query-string="test1=2342&test2=2342">
+                    <template for="html" height="35">
+                        <gs-form src="gsdoc.tpeople" qs="test1">
                             <template>
-                                <label for="text-id">ID:</label>
-                                <gs-text id="text-id" column="id"></gs-text>
-                                
-                                <label for="text-first_name">First Name:</label>
-                                <gs-text id="text-first_name" column="first_name"></gs-text>
-                                
-                                <label for="text-last_name">Last Name:</label>
-                                <gs-text id="text-last_name" column="last_name"></gs-text>
+                                <gs-text column="first_name"></gs-text>
                             </template>
                         </gs-form>
+                        <br />
+                        <gs-form src="gsdoc.tpeople" qs="test2=value">
+                            <template>
+                                <gs-text column="first_name"></gs-text>
+                            </template>
+                        </gs-form>
+                        <br />
+                        <gs-form src="gsdoc.tpeople" qs="test3=hidden">
+                            <template>
+                                <gs-text column="first_name"></gs-text>
+                            </template>
+                        </gs-form>
+                        <br />
+                        <gs-form src="gsdoc.tpeople" qs="test4!=hidden">
+                            <template>
+                                <gs-text column="first_name"></gs-text>
+                            </template>
+                        </gs-form>
+                        <br />
+                        <br />
+                        <gs-grid widths="1,1">
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test1=2341');">Add "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test1');">Remove "test1"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test2=2341');">Add "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test2');">Remove "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test3=yes');">Add "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test3');">Remove "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test4=yes');">Add "test4"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test4');">Remove "test4"</gs-button>
+                            </gs-block>
+                        </gs-grid>
                     </template>
                 </gs-doc-example>
                 
