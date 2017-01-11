@@ -875,7 +875,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function columnParentsUntilForm(form, element) {
         var intColumnParents = 0, currentElement = element, maxLoops = 50, i = 0;
         
-        while (currentElement !== form && currentElement.parentNode && i < maxLoops) {
+        while (currentElement.parentNode !== form && currentElement.parentNode && i < maxLoops) {
             if (currentElement.parentNode.hasAttribute('column') === true) {
                 intColumnParents += 1;
             }
