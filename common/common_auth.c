@@ -12,6 +12,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	ssize_t int_i = 0;
 	ssize_t int_len = 0;
 	size_t int_conn_index = 0;
+	size_t int_conn_index_len = 0;
 	size_t int_uri_length = 0;
 	size_t int_user_length = 0;
 	size_t int_password_length = 0;
@@ -20,17 +21,11 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	size_t int_host_len = 0;
 	size_t int_response_len = 0;
 	size_t int_context_data_len = 0;
-#ifdef ENVELOPE
-#else
-	size_t int_conn_index_len = 0;
-#endif
 	ListNode *other_client_node = NULL;
 
 	str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
 	SFINISH_CHECK(str_uri_temp != NULL, "str_uri_path failed");
 #ifdef ENVELOPE
-	SFINISH_SNCAT(client->str_cookie_name, &int_cookie_len,
-		"envelope", (size_t)8);
 #else
 	char *ptr_slash = strchr(str_uri_temp + 9, '/');
 	SFINISH_CHECK(ptr_slash != NULL, "strchr failed!");
@@ -38,9 +33,6 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	SFINISH_SNCAT(str_conn_index, &int_conn_index_len,
 		str_uri_temp + 9, strlen(str_uri_temp + 9));
 	int_conn_index = (size_t)strtol(str_conn_index, NULL, 10);
-	SFINISH_SNCAT(client->str_cookie_name, &int_cookie_len,
-		"postage_", (size_t)8,
-		str_conn_index, strlen(str_conn_index));
 #endif
 
 	////DECRYPT

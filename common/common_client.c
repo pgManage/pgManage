@@ -87,6 +87,8 @@ void _send_notices(struct sock_ev_client *client) {
 		WS_sendFrame(global_loop, client, true, 0x01, str_response, strlen(str_response));
 		if (client->cur_request != NULL) {
 			DArray_push(client->cur_request->arr_response, str_response);
+		} else {
+			SFREE(str_response);
 		}
 		str_response = NULL;
 		SDEBUG("notices sent");
@@ -218,10 +220,12 @@ void client_notify_cb(EV_P, ev_io *w, int revents) {
 	SDEFINE_VAR_ALL(str_conninfo);
 	if (client->conn == NULL) {
 		ev_io_stop(EV_A, w);
+		SFREE_ALL();
 		return;
 	}
 	if (socket_is_open(PQsocket(client->conn->conn)) == false) {
 		client_close(client);
+		SFREE_ALL();
 		return;
 	}
 	if (client->cur_request == NULL) {
@@ -281,13 +285,19 @@ void client_cb(EV_P, ev_io *w, int revents) {
 	ssize_t int_len = 0;
 	size_t int_content_length = 0;
 	size_t int_response_len = 0;
+	size_t int_uri_length = 0;
+	size_t int_cookie_name_len = 0;
+#ifdef ENVELOPE
+#else
+	size_t int_conn_index_len = 0;
+#endif
 
 	char *ptr_session_id = NULL;
 #ifdef _WIN32
 	char *str_temp = NULL;
 #endif
 	SDEFINE_VAR_ALL(
-		str_response, str_conninfo, str_query, str_session_id, str_client_cookie, str_session_client_cookie, str_upper_request);
+		str_response, str_conninfo, str_query, str_session_id, str_client_cookie, str_session_client_cookie, str_upper_request, str_conn_index, str_uri_temp);
 	SERROR_SALLOC(str_buffer, MAX_BUFFER + 1);
 
 	SDEBUG("revents: %x", revents);
@@ -480,6 +490,23 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				bstr_toupper(str_upper_request, client->int_request_len);
 			}
 			if (bstrstr(str_upper_request, client->int_request_len, "SEC-WEBSOCKET-KEY", strlen("SEC-WEBSOCKET-KEY")) != NULL) {
+				str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
+				SERROR_CHECK(str_uri_temp != NULL, "str_uri_path failed");
+#ifdef ENVELOPE
+				SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
+					"envelope", (size_t)8);
+#else
+				char *ptr_slash = strchr(str_uri_temp + 9, '/');
+				if (ptr_slash != NULL) {
+					*ptr_slash = 0;
+					SERROR_SNCAT(str_conn_index, &int_conn_index_len,
+						str_uri_temp + 9, strlen(str_uri_temp + 9));
+					SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
+						"postage_", (size_t)8,
+						str_conn_index, strlen(str_conn_index));
+				}
+#endif
+
 				SDEBUG("websocket request");
 				size_t int_query_length = 0, int_session_id_length = 0;
 				str_query = query(client->str_request, client->int_request_len, &int_query_length);
@@ -639,6 +666,22 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				}
 
 			} else {
+				str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
+				SERROR_CHECK(str_uri_temp != NULL, "str_uri_path failed");
+#ifdef ENVELOPE
+				SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
+					"envelope", (size_t)8);
+#else
+				char *ptr_slash = strchr(str_uri_temp + 9, '/');
+				if (ptr_slash != NULL) {
+					*ptr_slash = 0;
+					SERROR_SNCAT(str_conn_index, &int_conn_index_len,
+						str_uri_temp + 9, strlen(str_uri_temp + 9));
+					SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
+						"postage_", (size_t)8,
+						str_conn_index, strlen(str_conn_index));
+				}
+#endif
 				SDEBUG("http request");
 				ev_io_stop(EV_A, &client->io);
 				SBFREE_PWORD(str_upper_request, client->int_request_len);
@@ -1570,6 +1613,9 @@ bool _close_client_if_needed(struct sock_ev_client *client, ev_watcher *watcher,
 	SDEBUG("Client %p->int_sock == %d", client, client->_int_sock);
 	if (client->bol_is_open == false || !socket_is_open(client->_int_sock)) {
 		SDEBUG("Client %p closed", client);
+		if (client->client_paused_request != NULL) {
+			client_paused_request_free(client->client_paused_request);
+		}
 		SERROR_SALLOC(client->client_paused_request, sizeof(struct sock_ev_client_paused_request));
 		client->client_paused_request->watcher = watcher;
 		client->client_paused_request->revents = revents;
@@ -1766,11 +1812,11 @@ void client_close_immediate(struct sock_ev_client *client) {
 	struct WSFrame *frame = NULL;
 	ev_io_stop(global_loop, &client->io);
 
+	if (client->notify_watcher != NULL) {
+		ev_io_stop(global_loop, &client->notify_watcher->io);
+		SFREE(client->notify_watcher);
+	}
 	if (client->conn != NULL) {
-		if (client->notify_watcher != NULL) {
-			ev_io_stop(global_loop, &client->notify_watcher->io);
-			SFREE(client->notify_watcher);
-		}
 		SDEBUG("DB_conn %p closing", client->conn);
 		DB_finish(client->conn);
 	}
