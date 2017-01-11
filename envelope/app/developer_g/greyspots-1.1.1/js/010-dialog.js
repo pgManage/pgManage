@@ -753,8 +753,8 @@ GS.closeDialog = function (dialog, strAnswer) {
             intervalI = 0;
             intervalID = setInterval(function () {
                 if (elem_wait.length === 0 || intervalI >= 30) {
-                    elementReadyCallback();
                     clearInterval(intervalID);
+                    elementReadyCallback();
                 } else {
                     elem_i = 0;
                     elem_len = elem_wait.length;
@@ -1307,8 +1307,8 @@ GS.closeDialog = function (dialog, strAnswer) {
             intervalI = 0;
             intervalID = setInterval(function () {
                 if (elem_wait.length === 0 || intervalI >= 30) {
-                    elementReadyCallback();
                     clearInterval(intervalID);
+                    elementReadyCallback();
                 } else {
                     elem_i = 0;
                     elem_len = elem_wait.length;
