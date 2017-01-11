@@ -11,6 +11,7 @@ struct sock_ev_client_update {
 	char *str_return_columns;
 #ifndef POSTAGE_INTERFACE_LIBPQ
 	char *str_return_escaped_columns;
+	size_t int_return_escaped_columns_len;
 	char *str_insert_column_names;
 	char *str_insert_parameter_markers;
 #endif
@@ -20,7 +21,6 @@ struct sock_ev_client_update {
 	char *str_temp_col_list;
 	char *str_set_col_list;
 	char *str_real_table_name;
-	size_t int_real_table_name_length;
 	char *str_temp_table_name;
 	char *str_sql;
 
@@ -54,6 +54,7 @@ struct sock_ev_client_update {
 	size_t int_hash_where_clause_len;
 	size_t int_set_col_list_len;
 	size_t int_return_columns_len;
+	size_t int_col_data_type_len;
 };
 
 /*

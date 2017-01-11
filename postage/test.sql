@@ -11,6 +11,16 @@ CONSTRAINT rtesting_table_pk PRIMARY KEY (id)
 ) WITH (
 OIDS=FALSE
 );
+CREATE TABLE public.rtesting_table2 (
+  id integer NOT NULL,
+  test_name character varying(150),
+  "select" character varying(150),
+  "test@test" character varying(150),
+  CONSTRAINT rtesting_table2_pk PRIMARY KEY (id)
+) WITH (
+  OIDS=FALSE
+);
+
 CREATE OR REPLACE VIEW ttesting_view AS
  SELECT id, test_name
    FROM (
@@ -21,6 +31,22 @@ CREATE OR REPLACE VIEW ttesting_view AS
 		  ) em1
 	   ) em2
 	 ) em3;
+
+CREATE OR REPLACE VIEW public.ttesting_view2 AS
+ SELECT rtesting_table.id AS id_1, rtesting_table.test_name AS test_name_1,
+    rtesting_table2.id AS id_2, rtesting_table2.test_name AS test_name_2
+   FROM rtesting_table
+     LEFT JOIN rtesting_table2 ON rtesting_table2.id = rtesting_table.id;
+CREATE OR REPLACE RULE ttesting_view2_delete AS
+    ON DELETE TO ttesting_view2 DO INSTEAD  DELETE FROM rtesting_table
+  WHERE old.id_1 = rtesting_table.id;
+CREATE OR REPLACE RULE ttesting_view2_insert AS
+    ON INSERT TO ttesting_view2 DO INSTEAD  INSERT INTO rtesting_table (id, test_name)
+  VALUES (new.id_1, new.test_name_1);
+CREATE OR REPLACE RULE ttesting_view2_update AS
+    ON UPDATE TO ttesting_view2 DO INSTEAD  UPDATE rtesting_table SET test_name = new.test_name_1
+  WHERE old.id_1 = rtesting_table.id;
+
 CREATE OR REPLACE FUNCTION public.accept_testing(str_args text)
 RETURNS text AS
 $BODY$

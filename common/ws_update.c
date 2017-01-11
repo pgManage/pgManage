@@ -47,6 +47,8 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 	SFINISH_ERROR_CHECK((client_update->str_return_escaped_columns = get_return_escaped_columns(
 		DB_connection_driver(client_request->parent->conn), client_request->ptr_query)) != NULL,
 		"Failed to get escaped return columns from query");
+
+	client_update->int_return_escaped_columns_len = strlen(client_update->str_return_escaped_columns);
 #endif
 
 	client_update->str_hash_where_clause = get_hash_columns(client_request->ptr_query);
@@ -118,7 +120,6 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 		"", (size_t)0);
 #ifndef POSTAGE_INTERFACE_LIBPQ
 	SFINISH_SNCAT(client_update->str_insert_column_names, &client_update->int_insert_column_names_len,
-		str_col_name, strlen(str_col_name),
 		"", (size_t)0);
 	SFINISH_SNCAT(client_update->str_insert_parameter_markers, &client_update->int_insert_parameter_markers_len,
 		"", (size_t)0);
@@ -245,17 +246,16 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 			}
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
-			SFINISH_SNFCAT(client_update->str_insert_column_names, &int_insert_column_names_len,
+			SFINISH_SNFCAT(client_update->str_insert_column_names, &client_update->int_insert_column_names_len,
 				client_update->str_temp_table_name, client_update->int_temp_table_name_len,
 				"_hash", (size_t)5,
-				ptr_pk_header < ptr_pk_header_end ? ", " : "",
-				strlen(ptr_pk_header < ptr_pk_header_end ? ", " : ""));
-			SFINISH_SNFCAT(client_update->str_insert_parameter_markers, &int_insert_parameter_markers_len,
+				ptr_pk_header < ptr_pk_header_end ? ", " : "", (size_t)(ptr_pk_header < ptr_pk_header_end ? 2 : 0));
+			SFINISH_SNFCAT(client_update->str_insert_parameter_markers, &client_update->int_insert_parameter_markers_len,
 				"?", (size_t)1,
-				ptr_pk_header < ptr_pk_header_end ? ", " : "",
-				strlen(ptr_pk_header < ptr_pk_header_end ? ", " : ""));
+				ptr_pk_header < ptr_pk_header_end ? ", " : "", (size_t)(ptr_pk_header < ptr_pk_header_end ? 2 : 0));
 #endif
 		} else {
+			size_t int_insert_parameter_markers_len = 0;
 			SFINISH_SNFCAT(client_update->str_temp_col_list, &int_temp_col_list_len,
 				int_i == 0 ? "" : ", ", strlen(int_i == 0 ? "" : ", "),
 				str_col_name, int_col_name_len,
@@ -265,26 +265,20 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 #ifndef POSTAGE_INTERFACE_LIBPQ
 			SFINISH_SNFCAT(client_update->str_insert_column_names, &client_update->int_insert_column_names_len,
 				str_temp, int_temp_len,
-				ptr_pk_header < ptr_pk_header_end ? ", " : "",
-				strlen(ptr_pk_header < ptr_pk_header_end ? ", " : ""));
+				ptr_pk_header < ptr_pk_header_end ? ", " : "", (size_t)(ptr_pk_header < ptr_pk_header_end ? 2 : 0));
 			if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
 				SFINISH_SNFCAT(
 					client_update->str_insert_parameter_markers, &client_update->int_insert_parameter_markers_len,
 					"E?", (size_t)2,
-					ptr_pk_header < ptr_pk_header_end ? ", " : "",
-					strlen(ptr_pk_header < ptr_pk_header_end ? ", " : ""));
+					ptr_pk_header < ptr_pk_header_end ? ", " : "", (size_t)(ptr_pk_header < ptr_pk_header_end ? 2 : 0));
 			} else {
 				SFINISH_SNFCAT(
 					client_update->str_insert_parameter_markers, &client_update->int_insert_parameter_markers_len,
 					"?", (size_t)1,
-					ptr_pk_header < ptr_pk_header_end ? ", " : "",
-					strlen(ptr_pk_header < ptr_pk_header_end ? ", " : ""));
+					ptr_pk_header < ptr_pk_header_end ? ", " : "", (size_t)(ptr_pk_header < ptr_pk_header_end ? 2 : 0));
 			}
 #endif
 		}
-
-#ifndef POSTAGE_INTERFACE_LIBPQ
-#endif
 
 		SFREE(str_temp);
 		SFREE(str_col_name);
@@ -314,6 +308,8 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_update_step2), "DB_exec failed");
 	} else {
 #ifndef POSTAGE_INTERFACE_LIBPQ
+		SDEBUG("client_update->str_insert_column_names: %p", client_update->str_insert_column_names);
+		SDEBUG("client_update->str_insert_column_names: %s", client_update->str_insert_column_names);
 		if (client_update->str_identity_column_name != NULL) {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
 				"IF OBJECT_ID('tempdb..", (size_t)22,
@@ -352,9 +348,8 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 			SFINISH_CHECK(
 				DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_update_step2), "DB_exec failed");
 		}
-// SFINISH_CAT_CSTR(str_sql, "SELECT TOP 0 ", client_update->str_temp_col_list, " INTO ", client_update->str_temp_table_name,
-//	" FROM ", client_update->str_real_table_name, ";");
-
+		SDEBUG("client_update->str_insert_column_names: %p", client_update->str_insert_column_names);
+		SDEBUG("client_update->str_insert_column_names: %s", client_update->str_insert_column_names);
 #endif
 	}
 
@@ -406,7 +401,6 @@ bool ws_update_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
 	char *str_response = NULL;
 	size_t int_response_len = 0;
 	size_t int_sql_len = 0;
-	size_t int_response_len = 0;
 
 	SDEFINE_VAR_ALL(str_sql);
 	SFINISH_SNCAT(str_response, &int_response_len,
@@ -417,7 +411,7 @@ bool ws_update_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
 
 	DB_free_result(res);
 
-	SFINISH_SNCAT(str_sql, int_sql_len,
+	SFINISH_SNCAT(str_sql, &int_sql_len,
 		"ALTER TABLE ", (size_t)12,
 		client_update->str_temp_table_name, client_update->int_temp_table_name_len,
 		" DROP COLUMN id_temp123123123;", (size_t)30);
@@ -491,7 +485,6 @@ bool ws_update_step2(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
 
 	// Start copying into temp table
-	SDEBUG("client_update->str_temp_table_name: %s", client_update->str_temp_table_name);
 #ifdef POSTAGE_INTERFACE_LIBPQ
 	SFINISH_SNCAT(str_sql, &int_sql_len,
 		"COPY ", (size_t)5,
@@ -619,7 +612,7 @@ bool ws_update_step4(EV_P, void *cb_data, DB_result *res) {
 				client_update->str_pk_join_clause, client_update->int_pk_join_clause_len,
 				";", (size_t)1);
 		} else {
-			SFINISH_CAT_CSTR(str_sql, &int_sql_len,
+			SFINISH_SNCAT(str_sql, &int_sql_len,
 				"SELECT CAST(count(*) AS nvarchar(MAX)) FROM ", (size_t)44,
 				client_update->str_temp_table_name, client_update->int_temp_table_name_len,
 				" INNER JOIN ", (size_t)12,
@@ -828,7 +821,7 @@ bool ws_update_step6(EV_P, void *cb_data, DB_result *res) {
 #else
 	SFINISH_SNCAT(str_sql, &int_sql_len,
 		"SELECT ", (size_t)7,
-		client_update->str_return_escaped_columns,
+		client_update->str_return_escaped_columns, client_update->int_return_escaped_columns_len,
 		" FROM ", (size_t)6,
 		client_update->str_real_table_name, client_update->int_real_table_name_len,
 		" LEFT JOIN ", (size_t)11,

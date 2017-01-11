@@ -175,10 +175,11 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 				" AS ", (size_t)4,
 				str_temp, strlen(str_temp));
 #ifndef POSTAGE_INTERFACE_LIBPQ
-			SFINISH_SNFCAT(client_delete->str_insert_column_names, client_delete->int_insert_column_names_len,
+			SFINISH_SNFCAT(
+				client_delete->str_insert_column_names, &client_delete->int_insert_column_names_len,
 				str_temp, strlen(str_temp),
-				ptr_name_header < ptr_name_header_end ? ", " : "",
-				strlen(ptr_name_header < ptr_name_header_end ? ", " : ""));
+				ptr_name_header < ptr_name_header_end ? ", " : "", (size_t)(ptr_name_header < ptr_name_header_end ? 2 : 0)
+			);
 			if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
 				SFINISH_SNFCAT(client_delete->str_insert_parameter_markers, &client_delete->int_insert_parameter_markers_len,
 					"E?", (size_t)2,
@@ -292,8 +293,6 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 			SFINISH_CHECK(
 				DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_delete_step2), "DB_exec failed");
 		}
-// SFINISH_CAT_CSTR(str_sql, "SELECT TOP 0 ", str_temp_col_list, " INTO ", client_delete->str_temp_table_name, " FROM ",
-//	client_delete->str_real_table_name, ";");
 #endif
 	}
 
@@ -556,7 +555,7 @@ bool ws_delete_step4(EV_P, void *cb_data, DB_result *res) {
 				";", (size_t)1);
 		} else {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
-				"SELECT CAST(count(*) AS nvarchar(MAX)) FROM ", (size_t)4,
+				"SELECT CAST(count(*) AS nvarchar(MAX)) FROM ", (size_t)44,
 				client_delete->str_temp_table_name, client_delete->int_temp_table_name_len,
 				" INNER JOIN ", (size_t)12,
 				client_delete->str_real_table_name, client_delete->int_real_table_name_len,
@@ -631,7 +630,7 @@ bool ws_delete_step5(EV_P, void *cb_data, DB_result *res) {
 
 	size_t int_response_len = 0;
 	size_t int_sql_len = 0;
-	SFINISH_CAT_CSTR(str_response, &int_response_len,
+	SFINISH_SNCAT(str_response, &int_response_len,
 		"", (size_t)0);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");

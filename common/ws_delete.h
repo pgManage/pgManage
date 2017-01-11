@@ -10,7 +10,6 @@ struct sock_ev_client_delete {
 	char *str_pk_where_clause;
 	char *str_hash_where_clause;
 	char *str_real_table_name;
-	size_t int_real_table_name_length;
 	char *str_temp_table_name;
 	char *str_sql;
 #ifndef POSTAGE_INTERFACE_LIBPQ
@@ -29,6 +28,7 @@ struct sock_ev_client_delete {
 	size_t int_insert_column_names_len;
 	size_t int_insert_parameter_markers_len;
 	size_t int_identity_column_name_len;
+	size_t int_sql_len;
 };
 
 /*

@@ -480,8 +480,9 @@ finish:
 		SFREE_ALL();
 		bol_sfree_all = false;
 	}
-	if (result == PGRES_FATAL_ERROR) {
+	if (result == PGRES_FATAL_ERROR && res != NULL) {
 		PQclear(res);
+		res = NULL;
 	}
 	if (str_oid_type != NULL) {
 		PQfreemem(str_oid_type);

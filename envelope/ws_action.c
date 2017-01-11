@@ -8,6 +8,9 @@ char *ws_action_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_args = NULL;
 	char *ptr_args_end = NULL;
 	size_t int_request_length = 0;
+	size_t int_action_full_name_len = 0;
+	size_t int_sql_len = 0;
+	size_t int_response_len = 0;
 
 	client_request->arr_response = DArray_create(sizeof(char *), 1);
 	SFINISH_CHECK(client_request->arr_response != NULL, "DArray_create failed");
@@ -56,18 +59,47 @@ char *ws_action_step1(struct sock_ev_client_request *client_request) {
 	SFINISH_CHECK(str_args != NULL, "DB_escape_literal failed");
 
 	if (str_schema != NULL) {
-		SFINISH_CAT_CSTR(str_action_full_name, str_schema, ".", str_action_name);
+		SFINISH_SNCAT(
+			str_action_full_name, &int_action_full_name_len,
+			str_schema, strlen(str_schema),
+			".", (size_t)1,
+			str_action_name, strlen(str_action_name)
+		);
 	} else {
-		SFINISH_CAT_CSTR(str_action_full_name, str_action_name);
+		SFINISH_SNCAT(
+			str_action_full_name, &int_action_full_name_len,
+			str_action_name, strlen(str_action_name)
+		);
 	}
 
 #ifdef POSTAGE_INTERFACE_LIBPQ
-	SFINISH_CAT_CSTR(str_sql, "COPY (SELECT ", str_action_full_name, "(", str_args, ")) TO STDOUT;");
+	SFINISH_SNCAT(
+		str_sql, &int_sql_len,
+		"COPY (SELECT ", (size_t)13,
+		str_action_full_name, strlen(str_action_full_name),
+		"(", (size_t)1,
+		str_args, strlen(str_args),
+		")) TO STDOUT;", (size_t)13
+	);
 #else
 	if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-		SFINISH_CAT_CSTR(str_sql, "SELECT ", str_action_full_name, "(", str_args, ");");
+		SFINISH_SNCAT(
+			str_sql, &int_sql_len,
+			"SELECT ", (size_t)7,
+			str_action_full_name, strlen(str_action_full_name),
+			"(", (size_t)1,
+			str_args, strlen(str_args),
+			");", (size_t)2
+		);
 	} else {
-		SFINISH_CAT_CSTR(str_sql, "EXECUTE ", str_action_full_name, " ", str_args, ";");
+		SFINISH_SNCAT(
+			str_sql, &int_sql_len,
+			"EXECUTE ", (size_t)8,
+			str_action_full_name, strlen(str_action_full_name),
+			" ", (size_t)1,
+			str_args, strlen(str_args),
+			";", (size_t)1
+		);
 	}
 #endif
 
@@ -84,13 +116,20 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 		char *_str_response = str_response;
-		SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012"
-																					   "responsenumber = ",
-			str_temp, "\012");
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_APPEND(str_response, "transactionid = ", client_request->str_transaction_id, "\012");
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
 		}
-		SFINISH_CAT_APPEND(str_response, _str_response);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));

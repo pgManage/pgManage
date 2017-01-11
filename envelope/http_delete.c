@@ -8,22 +8,23 @@ void http_delete_step1(struct sock_ev_client *client) {
 	SDEFINE_VAR_ALL(str_uri, str_uri_temp, str_action_name, str_temp);
 	SDEFINE_VAR_MORE(str_args, str_sql, str_data, str_one_col, str_one_val);
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	char *ptr_end_uri = NULL;
 	char *ptr_data = NULL;
 	char *ptr_data_end = NULL;
 	ssize_t int_len = 0;
-	size_t int_uri_length = 0;
-	size_t int_query_length = 0;
-	size_t int_data_length = 0;
+	size_t int_uri_len = 0;
+	size_t int_query_len = 0;
+	size_t int_data_len = 0;
 
 	client->cur_request =
 		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_delete), POSTAGE_REQ_DELETE);
 	SFINISH_CHECK(client->cur_request != NULL, "create_request failed!");
 	client_delete = (struct sock_ev_client_delete *)(client->cur_request->vod_request_data);
 
-	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
+	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_len);
 	SFINISH_CHECK(str_uri != NULL, "str_uri_path() failed");
-	str_args = query(client->str_request, client->int_request_len, &int_query_length);
+	str_args = query(client->str_request, client->int_request_len, &int_query_len);
 	SFINISH_CHECK(str_args != NULL, "query() failed");
 
 	SDEBUG("str_uri: %s", str_uri);
@@ -41,19 +42,19 @@ void http_delete_step1(struct sock_ev_client *client) {
 	SDEBUG("str_args: %s", str_args);
 
 	// Get table names
-	client_delete->str_real_table_name = getpar(str_args, "src", int_query_length, &client_delete->int_real_table_name_length);
+	client_delete->str_real_table_name = getpar(str_args, "src", int_query_len, &client_delete->int_real_table_name_len);
 	if (client_delete->str_real_table_name == NULL || strlen(client_delete->str_real_table_name) == 0) {
 		SFREE(client_delete->str_real_table_name);
 		client_delete->str_real_table_name =
-			getpar(str_args, "view", int_query_length, &client_delete->int_real_table_name_length);
+			getpar(str_args, "view", int_query_len, &client_delete->int_real_table_name_len);
 	}
 	SFINISH_ERROR_CHECK(client_delete->str_real_table_name != NULL, "Failed to get table name from query");
 
 	// Get return columns
-	str_data = getpar(str_args, "id", int_query_length, &int_data_length);
+	str_data = getpar(str_args, "id", int_query_len, &int_data_len);
 
 	ptr_data = str_data;
-	ptr_data_end = str_data + int_data_length;
+	ptr_data_end = str_data + int_data_len;
 	while (ptr_data < ptr_data_end) {
 		if (*ptr_data != '0' && *ptr_data != '1' && *ptr_data != '2' && *ptr_data != '3' && *ptr_data != '4' &&
 			*ptr_data != '5' && *ptr_data != '6' && *ptr_data != '7' && *ptr_data != '8' && *ptr_data != '9' &&
@@ -63,8 +64,12 @@ void http_delete_step1(struct sock_ev_client *client) {
 		ptr_data++;
 	}
 
-	SFINISH_CAT_CSTR(
-		client_delete->str_sql, "DELETE FROM ", client_delete->str_real_table_name, " WHERE id IN (", str_data, ");");
+	SFINISH_SNCAT(client_delete->str_sql, &client_delete->int_sql_len,
+		"DELETE FROM ", (size_t)12,
+		client_delete->str_real_table_name, client_delete->int_real_table_name_len,
+		" WHERE id IN (", (size_t)14,
+		str_data, int_data_len,
+		");", (size_t)2);
 
 	SDEBUG("client_delete->str_sql: %s", client_delete->str_sql);
 	if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
@@ -78,7 +83,26 @@ void http_delete_step1(struct sock_ev_client *client) {
 	bol_error_state = false;
 finish:
 	SFREE_ALL();
-	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (bol_error_state) {
+		bol_error_state = false;
+
+		char *_str_response = str_response;
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response));
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, strlen(_str_response)
+		);
+		SFREE(_str_response);
+	}
+	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -99,8 +123,8 @@ bool http_delete_step2(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	ssize_t int_len = 0;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_temp);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
@@ -118,16 +142,27 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
-		SFREE(_str_response);
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
+			":\n", (size_t)2,
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
-	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -151,8 +186,8 @@ bool http_delete_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	ssize_t int_len = 0;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_temp);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
@@ -173,16 +208,27 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
-		SFREE(_str_response);
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
+			":\n", (size_t)2,
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
-	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -206,18 +252,20 @@ bool http_delete_step4(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	ssize_t int_len = 0;
+	size_t int_response_len = 0;
 	DArray *arr_row_values = NULL;
-	SDEFINE_VAR_ALL(str_temp);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
 
-	SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\015\012"
-								   "Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
-								   "{\"stat\": true, \"dat\": \"\"}");
-	SFREE(str_temp);
+	char *str_temp = "HTTP/1.1 200 OK\015\012"
+		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+		"{\"stat\": true, \"dat\": \"\"}";
+	SFINISH_SNCAT(
+		str_response, &int_response_len,
+		str_temp, strlen(str_temp)
+	);
 
 	SDEBUG("str_response: %s", str_response);
 
@@ -230,16 +278,27 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
-		SFREE(_str_response);
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
+			":\n", (size_t)2,
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
-	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -255,7 +314,6 @@ finish:
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
 	}
-	SFREE_ALL();
 	return true;
 }
 

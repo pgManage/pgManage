@@ -158,7 +158,7 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query) {
 	SERROR_CHECK(ptr_end_return_columns != NULL, "strstr failed");
 	*ptr_end_return_columns = '\0';
 
-	SERROR_SNCAT(str_temp, int_temp_len, ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
+	SERROR_SNCAT(str_temp, &int_temp_len, ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
 	if (strncmp(str_temp, "*", 2) != 0) {
 		//TODO: SERROR_REPLACE() add lengths
 		SERROR_REPLACE(str_temp, "\"", "\"\"", "");
@@ -243,6 +243,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 	struct sock_ev_client_request *client_request = cb_data;
 	SFREE(str_global_error);
 	SDEBUG("str_response: %s", str_response);
+	size_t int_response_len = 0;
 
 	if (bol_success) {
 		if (client_request->str_current_response == NULL && !bol_last) {
@@ -390,10 +391,19 @@ finish:
 		// Get an error message
 		char *_str_response = str_response;
 		if (client_request->str_transaction_id != NULL) {
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012", "transactionid = ",
-				client_request->str_transaction_id, "\012", _str_response);
+			SFINISH_SNCAT(str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012transactionid = ", (size_t)17,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response));
 		} else {
-			SFINISH_CAT_CSTR(str_response, "messageid = ", client_request->str_message_id, "\012", _str_response);
+			SFINISH_SNCAT(str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response));
 		}
 		SFREE(_str_response);
 
@@ -561,6 +571,7 @@ bool permissions_write_check(EV_P, DB_conn *conn, char *str_path, void *cb_data,
 char *canonical_strip_start(char *str_path) {
 	char *str_return = NULL;
 	char *ptr_path = str_path;
+	size_t int_return_len = 0;
 	if (*ptr_path == '/') {
 		ptr_path++;
 	}
@@ -581,7 +592,7 @@ char *canonical_strip_start(char *str_path) {
 		SERROR("Starting path not recognized.");
 	}
 
-	SERROR_CAT_CSTR(str_return, ptr_path);
+	SERROR_SNCAT(str_return, &int_return_len, ptr_path, strlen(ptr_path));
 
 	return str_return;
 error:
@@ -704,7 +715,7 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 		}
 	} else {
 		if (bol_writeable) {
-			SERROR_CAT_CSTR(str_sql, &int_sql_len,
+			SERROR_SNCAT(str_sql, &int_sql_len,
 				"SELECT CASE WHEN IS_MEMBER(", (size_t)27,
 				str_folder_write_literal, strlen(str_folder_write_literal),
 				") = 1 OR 'all' = lower(", (size_t)23,
@@ -715,7 +726,7 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 				str_folder_literal, strlen(str_folder_literal),
 				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END;", (size_t)53);
 		} else {
-			SERROR_CAT_CSTR(str_sql, &int_sql_len,
+			SERROR_SNCAT(str_sql, &int_sql_len,
 				"SELECT CASE WHEN IS_MEMBER(", (size_t)27,
 				str_folder_literal, strlen(str_folder_literal),
 				") = 1 OR 'all' = lower(", (size_t)23,

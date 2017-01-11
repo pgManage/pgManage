@@ -265,6 +265,7 @@ bool ws_select_step4(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_ERROR_CHECK((client_select->str_return_escaped_columns = get_return_escaped_columns(
 			DB_connection_driver(client_request->parent->conn), client_select->str_sql_escaped_return)) != NULL,
 			"Failed to get escaped return columns from query.");
+		client_select->int_return_escaped_columns_len = strlen(client_select->str_return_escaped_columns);
 		SFREE(client_select->str_sql_escaped_return);
 
 		if (client_select->str_order_by == NULL) {
@@ -334,7 +335,7 @@ bool ws_select_step4(EV_P, void *cb_data, DB_result *res) {
 				client_select->str_offset, client_select->int_offset_len,
 				")", (size_t)1);
 		}
-		SFINISH_SNFCAT(client_select->str_sql_escaped_return, client_select->int_sql_escaped_return_len,
+		SFINISH_SNFCAT(client_select->str_sql_escaped_return, &client_select->int_sql_escaped_return_len,
 			"	ORDER BY ", (size_t)10,
 			client_select->str_order_by, client_select->int_order_by_len,
 			"\012", (size_t)1);

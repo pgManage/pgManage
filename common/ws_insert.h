@@ -17,11 +17,11 @@ struct sock_ev_client_insert {
 	char *str_return_escaped_columns;
 	char *str_insert_column_names;
 	char *str_insert_parameter_markers;
+	size_t int_return_escaped_columns_len;
 #endif
 	DArray *darr_insert_queries;
 	size_t int_current_insert_query;
 	char *str_real_table_name;
-	size_t int_real_table_name_length;
 	char *str_temp_table_name;
 	char *str_sql;
 	// These are for http_file:
@@ -30,8 +30,8 @@ struct sock_ev_client_insert {
 	char *str_sequence_name;
 	char *str_result;
 	char *str_identity_column_name;
-	size_t int_currval_length;
-	size_t int_data_length;
+	size_t int_currval_len;
+	size_t int_data_len;
 
 	//variable lengths
 	size_t int_real_table_name_len;
@@ -43,6 +43,8 @@ struct sock_ev_client_insert {
 	size_t int_pk_where_clause_len;
 	size_t int_identity_column_name_len;
 	size_t int_return_columns_len;
+	size_t int_sql_len;
+	size_t int_result_len;
 };
 
 /*

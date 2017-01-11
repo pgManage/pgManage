@@ -115,7 +115,12 @@ DArray *split_cstr(char *str_to_split, const char *str_delim) {
 	char *ptr_end = NULL;
 	char *ptr_delim_pos = NULL;
 	char *str_temp = NULL;
-	SERROR_CAT_CSTR(str, str_to_split);
+
+	size_t int_len = 0;
+	size_t int_temp_len = 0;
+
+	SERROR_SNCAT(str, &int_len,
+		str_to_split, strlen(str_to_split));
 	ptr_start = str;
 
 	size_t int_length = strlen(str);
@@ -129,7 +134,8 @@ DArray *split_cstr(char *str_to_split, const char *str_delim) {
 		}
 		*ptr_delim_pos = '\0';
 
-		SERROR_CAT_CSTR(str_temp, str);
+		SERROR_SNCAT(str_temp, &int_temp_len,
+			str, int_len);
 		DArray_push(darr_ret, str_temp);
 		str_temp = NULL;
 

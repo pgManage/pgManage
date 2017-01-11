@@ -1,16 +1,16 @@
-#ifdef ENVELOPE
-
 #include "http_update.h"
 
 void http_update_step1(struct sock_ev_client *client) {
 	struct sock_ev_client_update *client_update = NULL;
 	SDEFINE_VAR_ALL(str_action_name, str_temp, str_args, str_sql, str_loop, str_col_ident, str_one_col, str_one_val);
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	char *ptr_loop = NULL;
 	char *ptr_end = NULL;
 	size_t int_count = 0;
 	size_t int_query_length = 0;
 	size_t int_where_length = 0;
+	size_t int_temp = 0;
 
 	client->cur_request =
 		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_update), POSTAGE_REQ_UPDATE);
@@ -25,18 +25,21 @@ void http_update_step1(struct sock_ev_client *client) {
 	client_update->str_columns = getpar(str_args, "cols", int_query_length, &client_update->int_columns_length);
 	if (client_update->str_columns == NULL || client_update->int_columns_length == 0) {
 		SFREE(client_update->str_columns);
-		SFINISH_CAT_CSTR(client_update->str_columns, "*");
+		SFINISH_SNCAT(
+			client_update->str_columns, &client_update->int_columns_length,
+			"*", (size_t)1
+		);
 	}
 
 	SDEBUG("client_update->str_columns: %s", client_update->str_columns);
 
-	client_update->str_real_table_name = getpar(str_args, "src", int_query_length, &client_update->int_real_table_name_length);
-	if (client_update->str_real_table_name == NULL || client_update->int_real_table_name_length == 0) {
+	client_update->str_real_table_name = getpar(str_args, "src", int_query_length, &client_update->int_real_table_name_len);
+	if (client_update->str_real_table_name == NULL || client_update->int_real_table_name_len == 0) {
 		SFREE(client_update->str_real_table_name);
 		client_update->str_real_table_name =
-			getpar(str_args, "view", int_query_length, &client_update->int_real_table_name_length);
+			getpar(str_args, "view", int_query_length, &client_update->int_real_table_name_len);
 	}
-	SFINISH_ERROR_CHECK(client_update->str_real_table_name != NULL && client_update->int_real_table_name_length != 0,
+	SFINISH_ERROR_CHECK(client_update->str_real_table_name != NULL && client_update->int_real_table_name_len != 0,
 		"Failed to get table name from query");
 
 	client_update->str_col = getpar(str_args, "column", int_query_length, &client_update->int_col_length);
@@ -48,7 +51,11 @@ void http_update_step1(struct sock_ev_client *client) {
 	str_col_ident = DB_escape_identifier(client->conn, client_update->str_col, client_update->int_col_length);
 	SFINISH_ERROR_CHECK(str_col_ident != NULL, "DB_escape_identifier failed");
 
-	SFINISH_CAT_CSTR(client_update->str_type_sql, "SELECT ", str_col_ident);
+	SFINISH_SNCAT(
+		client_update->str_type_sql, &int_temp,
+		"SELECT ", (size_t)7,
+		str_col_ident, strlen(str_col_ident)
+	);
 	SFREE(str_col_ident);
 
 	str_loop = getpar(str_args, "where", int_query_length, &int_where_length);
@@ -80,7 +87,11 @@ void http_update_step1(struct sock_ev_client *client) {
 		str_col_ident = DB_escape_identifier(client->conn, str_one_col, strlen(str_one_col));
 		SFINISH_ERROR_CHECK(str_col_ident != NULL, "DB_escape_identifier failed");
 
-		SFINISH_CAT_APPEND(client_update->str_type_sql, ", ", str_col_ident);
+		SFINISH_SNFCAT(
+			client_update->str_type_sql, &int_temp,
+			", ", (size_t)2,
+			str_col_ident, strlen(str_col_ident)
+		);
 		SFREE(str_col_ident);
 		client_update->int_update_columns += 1;
 
@@ -110,8 +121,13 @@ void http_update_step1(struct sock_ev_client *client) {
 		str_one_val = NULL;
 	}
 
-	SFINISH_CAT_APPEND(
-		client_update->str_type_sql, ", ", client_update->str_columns, " FROM ", client_update->str_real_table_name);
+	SFINISH_SNFCAT(
+		client_update->str_type_sql, &int_temp,
+		", ", (size_t)2,
+		client_update->str_columns, client_update->int_columns_length,
+		" FROM ", (size_t)6,
+		client_update->str_real_table_name, client_update->int_real_table_name_len
+	);
 	SDEBUG("client_update->str_type_sql: %s", client_update->str_type_sql);
 
 	SFINISH_CHECK(
@@ -121,8 +137,26 @@ void http_update_step1(struct sock_ev_client *client) {
 	bol_error_state = false;
 finish:
 	SFREE_ALL();
-	ssize_t int_response_len = 0;
-	if (str_response != NULL && (int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (bol_error_state) {
+		bol_error_state = false;
+
+		char *_str_response = str_response;
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response));
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, strlen(_str_response)
+		);
+		SFREE(_str_response);
+	}
+	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -143,12 +177,13 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	size_t int_i = 0, int_len = 0;
 	DArray *darr_column_names = NULL;
 	DArray *darr_column_types = NULL;
 	bool bol_first_where = true;
 	bool bol_first_u_where = true;
+	size_t int_temp = 0;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_one_val_literal, str_col);
 
 	// DO NOT FREE (these are obtained from arrays that are going to be cleared/destroyed)
@@ -165,12 +200,19 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 	darr_column_types = DB_get_row_values(res);
 	SFINISH_CHECK(darr_column_types != NULL, "DB_get_row_values failed");
 
-	SFINISH_CAT_CSTR(client_update->str_col_data_type, DArray_get(darr_column_types, 0));
+	SFINISH_SNCAT(
+		client_update->str_col_data_type, &client_update->int_col_data_type_len,
+		DArray_get(darr_column_types, 0), strlen(DArray_get(darr_column_types, 0))
+	);
+
 
 	int_len = DArray_count(darr_column_names);
 	SDEBUG("client_update->str_columns: %s", client_update->str_columns);
 	SFREE(client_update->str_columns);
-	SFINISH_CAT_CSTR(client_update->str_columns, "");
+	SFINISH_SNCAT(
+		client_update->str_columns, &client_update->int_columns_length,
+		"", (size_t)0
+	);
 	for (int_i = client_update->int_update_columns + 1; int_i < int_len; int_i += 1) {
 		str_data_type = DArray_get(darr_column_types, int_i);
 		if (strchr(str_data_type, ' ') != NULL) {
@@ -181,19 +223,36 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_CHECK(str_col != NULL, "DB_escape_literal failed");
 
 		if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_CAT_APPEND(
-				client_update->str_columns, int_i == (client_update->int_update_columns + 1) ? "" : ", ", str_col, "::varchar");
+			SFINISH_SNFCAT(
+				client_update->str_columns, &client_update->int_columns_length,
+				int_i == (client_update->int_update_columns + 1) ? "" : ", ", (size_t)(int_i == (client_update->int_update_columns + 1) ? 0 : 2),
+				str_col, strlen(str_col),
+				"::varchar", (size_t)9
+			);
 		} else {
-			SFINISH_CAT_APPEND(client_update->str_columns, int_i == (client_update->int_update_columns + 1) ? "" : ", ", "CAST(",
-				str_col, " AS nvarchar(MAX))");
+			SFINISH_SNFCAT(
+				client_update->str_columns, &client_update->int_columns_length,
+				int_i == (client_update->int_update_columns + 1) ? "" : ", ", (size_t)(int_i == (client_update->int_update_columns + 1) ? 0 : 2),
+				"CAST(", (size_t)5,
+				str_col, strlen(str_col),
+				" AS nvarchar(MAX))", (size_t)18
+			);
 		}
 		SDEBUG("client_update->str_columns: %s", client_update->str_columns);
 		SFREE(str_col);
 	}
 	SDEBUG("client_update->str_columns: %s", client_update->str_columns);
 
-	SFINISH_CAT_CSTR(client_update->str_where, "");
-	SFINISH_CAT_CSTR(client_update->str_u_where, "");
+	size_t int_where_len = 0;
+	SFINISH_SNCAT(
+		client_update->str_where, &int_where_len,
+		"", (size_t)0
+	);
+	size_t int_u_where_len = 0;
+	SFINISH_SNCAT(
+		client_update->str_u_where, &int_u_where_len,
+		"", (size_t)0
+	);
 	for (int_i = 0; int_i < client_update->int_update_columns; int_i += 1) {
 		str_data_type = DArray_get(darr_column_types, int_i + 1);
 		if (strchr(str_data_type, ' ') != NULL) {
@@ -205,52 +264,116 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 		if (bol_first_u_where) {
 			bol_first_u_where = false;
 		} else {
-			SFINISH_CAT_APPEND(client_update->str_u_where, " AND ");
+			SFINISH_SNFCAT(
+				client_update->str_u_where, &int_u_where_len,
+				" AND ", (size_t)5
+			);
 		}
 		if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_CAT_APPEND(client_update->str_u_where, str_one_col, " IS NOT DISTINCT FROM ");
+			SFINISH_SNFCAT(
+				client_update->str_u_where, &int_u_where_len,
+				str_one_col, strlen(str_one_col),
+				" IS NOT DISTINCT FROM ", (size_t)22
+			);
 		} else {
-			SFINISH_CAT_APPEND(client_update->str_u_where, str_one_col, " = ");
+			SFINISH_SNFCAT(
+				client_update->str_u_where, &int_u_where_len,
+				str_one_col, strlen(str_one_col),
+				" = ", (size_t)3
+			);
 		}
 
-		if (strlen(str_one_col) != 14 && strncmp(str_one_col, "change_stamp", 12) != 0) {
+		if (strncmp(str_one_col, "change_stamp", 12) != 0) {
 			if (bol_first_where) {
 				bol_first_where = false;
 			} else {
-				SFINISH_CAT_APPEND(client_update->str_where, " AND ");
+				SFINISH_SNFCAT(
+					client_update->str_where, &int_where_len,
+					" AND ", (size_t)5
+				);
 			}
 			if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-				SFINISH_CAT_APPEND(client_update->str_where, str_one_col, " IS NOT DISTINCT FROM ");
+				SFINISH_SNFCAT(
+					client_update->str_where, &int_where_len,
+					str_one_col, strlen(str_one_col),
+					" IS NOT DISTINCT FROM ", (size_t)22
+				);
 			} else {
-				SFINISH_CAT_APPEND(client_update->str_where, str_one_col, " = ");
+				SFINISH_SNFCAT(
+					client_update->str_where, &int_where_len,
+					str_one_col, strlen(str_one_col),
+					" = ", (size_t)3
+				);
 			}
 		}
 
 		if (strncmp(str_one_val, "NULL", 4) == 0) {
 			if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-				SFINISH_CAT_APPEND(client_update->str_u_where, "NULL::", str_data_type);
+				SFINISH_SNFCAT(
+					client_update->str_u_where, &int_u_where_len,
+					"NULL::", (size_t)6,
+					str_data_type, strlen(str_data_type)
+				);
 			} else {
-				SFINISH_CAT_APPEND(client_update->str_u_where, "CAST(NULL AS ", str_data_type, ")");
+				SFINISH_SNFCAT(
+					client_update->str_u_where, &int_u_where_len,
+					"CAST(NULL AS ", (size_t)13,
+					str_data_type, strlen(str_data_type),
+					")", (size_t)1
+				);
 			}
 			if (strlen(str_one_col) != 14 && strncmp(str_one_col, "change_stamp", 12) != 0) {
 				if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-					SFINISH_CAT_APPEND(client_update->str_where, "NULL::", str_data_type);
+					SFINISH_SNFCAT(
+						client_update->str_where, &int_where_len,
+						"NULL::", (size_t)6,
+						str_data_type, strlen(str_data_type)
+					);
 				} else {
-					SFINISH_CAT_APPEND(client_update->str_where, "CAST(NULL AS ", str_data_type, ")");
+					SFINISH_SNFCAT(
+						client_update->str_where, &int_where_len,
+						"CAST(NULL AS ", (size_t)13,
+						str_data_type, strlen(str_data_type),
+						")", (size_t)1
+					);
 				}
 			}
 		} else {
 			str_one_val_literal = DB_escape_literal(client->conn, str_one_val, strlen(str_one_val));
 			if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-				SFINISH_CAT_APPEND(client_update->str_u_where, str_one_val_literal, "::", str_data_type);
+				SFINISH_SNFCAT(
+					client_update->str_u_where, &int_u_where_len,
+					str_one_val_literal, strlen(str_one_val_literal),
+					"::", (size_t)2,
+					str_data_type, strlen(str_data_type)
+				);
 			} else {
-				SFINISH_CAT_APPEND(client_update->str_u_where, "CAST(", str_one_val_literal, " AS ", str_data_type, ")");
+				SFINISH_SNFCAT(
+					client_update->str_u_where, &int_u_where_len,
+					"CAST(", (size_t)5,
+					str_one_val_literal, strlen(str_one_val_literal),
+					" AS ", (size_t)4,
+					str_data_type, strlen(str_data_type),
+					")", (size_t)1
+				);
 			}
-			if (strlen(str_one_col) != 14 && strncmp(str_one_col, "change_stamp", 12) != 0) {
+			if (strncmp(str_one_col, "change_stamp", 12) != 0) {
 				if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-					SFINISH_CAT_APPEND(client_update->str_where, str_one_val_literal, "::", str_data_type);
+					SFINISH_SNFCAT(
+						client_update->str_where, &int_where_len,
+						str_one_val_literal, strlen(str_one_val_literal),
+						"::", (size_t)2,
+						str_data_type, strlen(str_data_type)
+					);
 				} else {
-					SFINISH_CAT_APPEND(client_update->str_where, "CAST(", str_one_val_literal, " AS ", str_data_type, ")");
+					SFINISH_SNFCAT(
+						client_update->str_where, &int_where_len,
+						"CAST(", (size_t)5,
+						str_one_val_literal, strlen(str_one_val_literal),
+						" AS ", (size_t)4,
+						str_data_type, strlen(str_data_type),
+						")", (size_t)1
+					);
 				}
 			}
 			SFREE(str_one_val_literal);
@@ -264,12 +387,25 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 	SDEBUG("client_update->str_u_where: %s", client_update->str_u_where);
 
 	if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-		SFINISH_CAT_CSTR(client_update->str_sql, "SELECT count(*) FROM ", client_update->str_real_table_name, " WHERE ",
-			client_update->str_u_where, ";");
+		SFINISH_SNCAT(
+			client_update->str_sql, &int_temp,
+			"SELECT count(*) FROM ", (size_t)21,
+			client_update->str_real_table_name, client_update->int_real_table_name_len,
+			" WHERE ", (size_t)7,
+			client_update->str_u_where, strlen(client_update->str_u_where),
+			";", (size_t)1
+		);
 	} else {
-		SFINISH_CAT_CSTR(client_update->str_sql, "SELECT CAST(count(*) AS nvarchar(MAX)) FROM ",
-			client_update->str_real_table_name, " WHERE ", client_update->str_u_where, ";");
+		SFINISH_SNCAT(
+			client_update->str_sql, &int_temp,
+			"SELECT CAST(count(*) AS nvarchar(MAX)) FROM ", (size_t)44,
+			client_update->str_real_table_name, client_update->int_real_table_name_len,
+			" WHERE ", (size_t)7,
+			client_update->str_u_where, strlen(client_update->str_u_where),
+			";", (size_t)1
+		);
 	}
+	SDEBUG("client_update->str_sql: %s", client_update->str_sql);
 	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_update->str_sql, http_update_step3), "DB_exec failed");
 
 	DB_free_result(res);
@@ -286,17 +422,28 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
-		SFREE(_str_response);
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
+			":\n", (size_t)2,
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
-	ssize_t int_response_len = 0;
-	if (str_response != NULL && (int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	ssize_t int_client_write_len = 0;
+	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -306,7 +453,7 @@ finish:
 	}
 	SFREE(str_response);
 	DB_free_result(res);
-	if (int_response_len != 0) {
+	if (int_client_write_len != 0) {
 		ws_update_free(client_update);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
@@ -319,8 +466,8 @@ bool http_update_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
 	DArray *darr_count = NULL;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_value_literal);
 
 	SFINISH_CHECK(res != NULL, "DB_get_column_types_for_query failed!");
@@ -332,20 +479,48 @@ bool http_update_step3(EV_P, void *cb_data, DB_result *res) {
 
 	SFINISH_CHECK(strncmp(darr_count->contents[0], "0", 2) != 0, "Someone updated this record before you.");
 
+	size_t int_temp = 0;
+
 	if (strncmp(client_update->str_value, "NULL", 5) == 0) {
-		SFINISH_CAT_CSTR(str_value_literal, "NULL");
+		SFINISH_SNCAT(
+			str_value_literal, &int_temp,
+			"NULL", (size_t)4
+		);
 	} else {
 		str_value_literal = DB_escape_literal(client->conn, client_update->str_value, strlen(client_update->str_value));
 		SFINISH_CHECK(str_value_literal != NULL, "DB_escape_literal failed");
 	}
 	SFREE(client_update->str_sql);
 	if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-		SFINISH_CAT_CSTR(client_update->str_sql, "UPDATE ", client_update->str_real_table_name, " SET ", client_update->str_col,
-			"=", str_value_literal, "::", client_update->str_col_data_type, " WHERE ", client_update->str_u_where, ";");
+		SFINISH_SNCAT(
+			client_update->str_sql, &int_temp,
+			"UPDATE ", (size_t)7,
+			client_update->str_real_table_name, client_update->int_real_table_name_len,
+			" SET ", (size_t)5,
+			client_update->str_col, strlen(client_update->str_col),
+			"=", (size_t)1,
+			str_value_literal, strlen(str_value_literal),
+			"::", (size_t)2,
+			client_update->str_col_data_type, strlen(client_update->str_col_data_type),
+			" WHERE ", (size_t)7,
+			client_update->str_u_where, strlen(client_update->str_u_where),
+			";", (size_t)1
+		);
 	} else {
-		SFINISH_CAT_CSTR(client_update->str_sql, "UPDATE ", client_update->str_real_table_name, " SET ", client_update->str_col,
-			"=CAST(", str_value_literal, " AS ", client_update->str_col_data_type, ")", " WHERE ", client_update->str_u_where,
-			";");
+		SFINISH_SNCAT(
+			client_update->str_sql, &int_temp,
+			"UPDATE ", (size_t)7,
+			client_update->str_real_table_name, client_update->int_real_table_name_len,
+			" SET ", (size_t)5,
+			client_update->str_col, strlen(client_update->str_col),
+			"=CAST(", (size_t)6,
+			str_value_literal, strlen(str_value_literal),
+			" AS ", (size_t)4,
+			client_update->str_col_data_type, strlen(client_update->str_col_data_type),
+			") WHERE ", (size_t)8,
+			client_update->str_u_where, strlen(client_update->str_u_where),
+			";", (size_t)1
+		);
 	}
 	SDEBUG("client_update->str_sql: %s", client_update->str_sql);
 	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_update->str_sql, http_update_step4), "DB_exec failed");
@@ -361,17 +536,27 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
-		SFREE(_str_response);
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
+			":\n", (size_t)2,
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
-	ssize_t int_response_len = 0;
-	if (str_response != NULL && (int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -394,15 +579,24 @@ bool http_update_step4(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
 	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->vod_request_data);
 	char *str_response = NULL;
-	char *_str_response = NULL;
+	size_t int_response_len = 0;
+	size_t int_temp_len = 0;
 	SDEFINE_VAR_ALL(str_value_literal);
 
 	SFINISH_CHECK(res != NULL, "DB_get_column_types_for_query failed!");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "Query failed");
 
 	SFREE(client_update->str_sql);
-	SFINISH_CAT_CSTR(client_update->str_sql, "SELECT ", client_update->str_columns, " FROM ", client_update->str_real_table_name,
-		" WHERE ", client_update->str_where, ";");
+	SFINISH_SNCAT(
+		client_update->str_sql, &int_temp_len,
+		"SELECT ", (size_t)7,
+		client_update->str_columns, client_update->int_columns_length,
+		" FROM ", (size_t)6,
+		client_update->str_real_table_name, client_update->int_real_table_name_len,
+		" WHERE ", (size_t)7,
+		client_update->str_where, strlen(client_update->str_where),
+		";", (size_t)1
+	);
 
 	SDEBUG("client_update->str_sql: %s", client_update->str_sql);
 	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_update->str_sql, http_update_step5), "DB_exec failed");
@@ -415,17 +609,28 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
-		SFREE(_str_response);
-		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
-		SFREE(_str_response);
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
+			":\n", (size_t)2,
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
 	}
-	ssize_t int_response_len = 0;
-	if (str_response != NULL && (int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	ssize_t int_client_write_len = 0;
+	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -435,7 +640,7 @@ finish:
 	}
 	SFREE(str_response);
 	DB_free_result(res);
-	if (int_response_len != 0) {
+	if (int_client_write_len != 0) {
 		ws_update_free(client_update);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
@@ -453,6 +658,8 @@ bool http_update_step5(EV_P, void *cb_data, DB_result *res) {
 	size_t maxy = 0;
 	DArray *darr_data = NULL;
 	DArray *darr_data_length = NULL;
+	size_t int_response_len = 0;
+	size_t int_data_len = 0;
 	SDEFINE_VAR_ALL(str_data, str_temp);
 
 	SFINISH_CHECK(res != NULL, "DB_get_column_types_for_query failed!");
@@ -464,21 +671,40 @@ bool http_update_step5(EV_P, void *cb_data, DB_result *res) {
 	darr_data_length = DB_get_row_lengths(res);
 	maxy = DArray_end(darr_data);
 
-	SFINISH_CAT_CSTR(str_data, "[");
+	SFINISH_SNCAT(
+		str_data, &int_data_len,
+		"[", (size_t)1
+	);
 	for (y = 0; y < maxy; y++) {
 		if ((*(ssize_t *)DArray_get(darr_data_length, y)) == -1) {
-			SFINISH_CAT_APPEND(str_data, (y == 0 ? "" : ","), "null");
+			SFINISH_SNFCAT(
+				str_data, &int_data_len,
+				(y == 0 ? "" : ","), (size_t)(y == 0 ? 0 : 1),
+				"null", (size_t)4
+			);
 		} else {
 			str_temp = jsonify(DArray_get(darr_data, y));
 			SFINISH_CHECK(str_temp != NULL, "jsonify failed");
-			SFINISH_CAT_APPEND(str_data, (y == 0 ? "" : ","), str_temp);
+			SFINISH_SNFCAT(
+				str_data, &int_data_len,
+				(y == 0 ? "" : ","), (size_t)(y == 0 ? 0 : 1),
+				str_temp, strlen(str_temp)
+			);
 			SFREE(str_temp);
 		}
 	}
-	SFINISH_CAT_APPEND(str_data, "]");
+	SFINISH_SNFCAT(
+		str_data, &int_data_len,
+		"]", (size_t)1
+	);
 
-	SFINISH_CAT_CSTR(str_response, "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n",
-		"{\"stat\": true, \"dat\": ", str_data, "}");
+	char *str_temp1 = "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{\"stat\": true, \"dat\": ";
+	SFINISH_SNCAT(
+		str_response, &int_response_len,
+		str_temp1, strlen(str_temp1),
+		str_data, int_data_len,
+		"}", (size_t)1
+	);
 	SFREE(str_data);
 
 	DB_free_result(res);
@@ -495,17 +721,35 @@ finish:
 	if (bol_error_state) {
 		bol_error_state = false;
 
-		_str_response = str_response;
-		str_response = cat_cstr("HTTP/1.1 500 Internal Server Error\015\012"
-								"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012",
-			_str_response);
-		SFREE(_str_response);
+		char *_str_response1 = str_response;
+		char *_str_response2 = DB_get_diagnostic(client->conn, res);
+		char str_length[51] = { 0 };
+		snprintf(str_length, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response1, strlen(_str_response1),
+			":\n", (size_t)2,
+			_str_response2, strlen(_str_response2)
+		);
+		SFREE(_str_response1);
+		SFREE(_str_response2);
+
 		_str_response = DB_get_diagnostic(client->conn, res);
-		SFINISH_CAT_APPEND(str_response, ":\n", _str_response);
+		SFINISH_SNFCAT(
+			str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response)
+		);
 		SFREE(_str_response);
 	}
-	ssize_t int_response_len = 0;
-	if (str_response != NULL && (int_response_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
 		SFREE(str_response);
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -523,5 +767,3 @@ finish:
 	}
 	return true;
 }
-
-#endif

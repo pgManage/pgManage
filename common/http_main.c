@@ -374,31 +374,6 @@ bool http_client_info_cb(EV_P, void *cb_data, DB_result *res) {
 		VERSION, strlen(VERSION),
 		"\"}}", (size_t)3);
 
-	/*
-	SFINISH_CAT_CSTR(str_conn_desc, client->str_connname, "\t",
-		(client->str_conn != NULL ? client->str_conn : get_connection_info(client->str_connname, NULL)));
-	str_conn_desc_enc = escape_value(str_conn_desc);
-	SFINISH_CHECK(str_conn_desc_enc != NULL, "escape_value failed!");
-	SFINISH_CAT_CSTR(str_response, "VERSION\t", VERSION, "\012CONNECTION\t", str_conn_desc_enc, "\012GROUPS\t[");
-
-	while ((status = DB_fetch_row(res)) != DB_FETCH_END) {
-		SFINISH_CHECK(status != DB_FETCH_ERROR, "DB_fetch_row failed");
-
-		arr_values = DB_get_row_values(res);
-		SFINISH_CHECK(arr_values != NULL, "DB_get_row_values failed");
-
-		if (int_i == 0) {
-			SFINISH_CAT_CSTR(str_user, DArray_get(arr_values, 0));
-		} else {
-			SFINISH_CAT_APPEND(str_response, int_i == 1 ? "" : ", ", "\"", DArray_get(arr_values, 0), "\"");
-		}
-
-		DArray_clear_destroy(arr_values);
-		arr_values = NULL;
-		int_i += 1;
-	}
-	SFINISH_CAT_APPEND(str_response, "]\012USER\t", str_user);*/
-
 	bol_error_state = false;
 	bol_ret = true;
 finish:

@@ -67,7 +67,8 @@ void server_cb(EV_P, ev_io *w, int revents) {
 		client->int_boundary_length = 0;
 		client->conn = NULL;
 		client->bol_is_open = true;
-		SERROR_CAT_CSTR(client->str_request, "");
+		SERROR_SNCAT(client->str_request, &client->int_request_len,
+			"", (size_t)0);
 		client->str_response = NULL;
 		client->str_message = NULL;
 		client->str_cookie = NULL;

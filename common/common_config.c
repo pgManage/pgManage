@@ -423,13 +423,7 @@ bool parse_options(int argc, char *const *argv) {
 	//		 abort();
 	// }
 	size_t int_global_len = 0;
-	size_t int_global_data_root_len = 0;
-#ifdef ENVELOPE
-	size_t int_global_app_path_len = 0;
-#endif
-	size_t int_global_role_path_len = 0;
 	size_t int_global_logfile_len = 0;
-	size_t int_global_web_root_len = 0;
 	size_t int_prefix_len = 0;
 	size_t int_temp_len = 0;
 
@@ -582,7 +576,7 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef ENVELOPE
 		} else if (ch == 'y') {
 			SFREE(str_global_app_path);
-			SERROR_SNCAT(str_global_app_path, &int_global_app_path_len,
+			SERROR_SNCAT(str_global_app_path, &int_global_len,
 				optarg, strlen(optarg));
 
 		} else if (ch == 'z') {
@@ -609,7 +603,7 @@ bool parse_options(int argc, char *const *argv) {
 
 		} else if (ch == 'r') {
 			SFREE(str_global_web_root);
-			SERROR_SNCAT(str_global_web_root, &int_global_web_root_len,
+			SERROR_SNCAT(str_global_web_root, &int_global_len,
 				optarg, strlen(optarg));
 
 		} else if (ch == 'a') {
@@ -664,12 +658,12 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef ENVELOPE
 	if (str_global_app_path == NULL) {
 #ifdef _WIN32
-		SERROR_SNCAT(str_global_app_path, &int_global_app_path_len,
+		SERROR_SNCAT(str_global_app_path, &int_global_len,
 			POSTAGE_PREFIX, int_prefix_len,
 			"\\" SUN_PROGRAM_WORD_NAME "\\app",
 				strlen("\\" SUN_PROGRAM_WORD_NAME "\\app"));
 #else
-		SERROR_SNCAT(str_global_app_path, &int_global_app_path_len,
+		SERROR_SNCAT(str_global_app_path, &int_global_len,
 			POSTAGE_PREFIX, int_prefix_len,
 			"/etc/" SUN_PROGRAM_LOWER_NAME "/app",
 				strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/app"));
@@ -678,12 +672,12 @@ bool parse_options(int argc, char *const *argv) {
 
 	if (str_global_role_path == NULL) {
 #ifdef _WIN32
-		SERROR_SNCAT(str_global_role_path, &int_global_role_path_len,
+		SERROR_SNCAT(str_global_role_path, &int_global_len,
 			POSTAGE_PREFIX, int_prefix_len,
 			"\\" SUN_PROGRAM_WORD_NAME "\\role",
 				strlen("\\" SUN_PROGRAM_WORD_NAME "\\role"));
 #else
-		SERROR_SNCAT(str_global_role_path, &int_global_role_path_len,
+		SERROR_SNCAT(str_global_role_path, &int_global_len,
 			POSTAGE_PREFIX, int_prefix_len,
 			"/etc/" SUN_PROGRAM_LOWER_NAME "/role",
 				strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/role"));
@@ -693,12 +687,12 @@ bool parse_options(int argc, char *const *argv) {
 
 	if (str_global_web_root == NULL) {
 #ifdef _WIN32
-		SERROR_SNCAT(str_global_web_root, &int_global_role_path_len,
+		SERROR_SNCAT(str_global_web_root, &int_global_len,
 			POSTAGE_PREFIX, int_prefix_len,
 			"\\" SUN_PROGRAM_WORD_NAME "\\web_root",
 				strlen("\\" SUN_PROGRAM_WORD_NAME "\\web_root"));
 #else
-		SERROR_SNCAT(str_global_web_root, &int_global_role_path_len,
+		SERROR_SNCAT(str_global_web_root, &int_global_len,
 			POSTAGE_PREFIX, int_prefix_len,
 			"/etc/" SUN_PROGRAM_LOWER_NAME "/web_root",
 				strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/web_root"));
@@ -709,7 +703,7 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef _WIN32
 		char *str_app_data = getenv("AppData"); // NULL;
 		SDEBUG("str_app_data: %s", str_app_data);
-		SERROR_SNCAT(str_global_data_root, &int_global_data_root_len,
+		SERROR_SNCAT(str_global_data_root, &int_global_len,
 			((char *)str_app_data) + 2, strlen(((char *)str_app_data) + 2),
 			str_app_data[strlen(str_app_data) - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME,
 				strlen(str_app_data[strlen(str_app_data) - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME));
@@ -725,7 +719,7 @@ bool parse_options(int argc, char *const *argv) {
 		SERROR_SALLOC(str_temp, (size_t)bufsize + 1);
 		getpwuid_r(getuid(), pw, str_temp, (size_t)bufsize, &pw);
 
-		SERROR_SNCAT(str_global_data_root, &int_global_data_root_len,
+		SERROR_SNCAT(str_global_data_root, &int_global_len,
 			pw->pw_dir, strlen(pw->pw_dir),
 			pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME,
 				strlen(pw->pw_dir[strlen(pw->pw_dir) - 1] == '/' ? "." SUN_PROGRAM_LOWER_NAME : "/." SUN_PROGRAM_LOWER_NAME));
@@ -751,7 +745,7 @@ bool parse_options(int argc, char *const *argv) {
 	SDEBUG("str_global_sql_root: %s", str_global_sql_root);
 	if (str_global_sql_root == NULL) {
 		SERROR_SNCAT(str_global_sql_root, &int_global_len,
-			str_global_data_root, int_global_data_root_len,
+			str_global_data_root, strlen(str_global_data_root),
 			str_global_data_root[strlen(str_global_data_root) - 1] == '/' ? "sql" : "/sql",
 				strlen(str_global_data_root[strlen(str_global_data_root) - 1] == '/' ? "sql" : "/sql"));
 	}
@@ -784,12 +778,12 @@ bool parse_options(int argc, char *const *argv) {
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			cwd + 2, strlen(cwd + 2),
 			"/", (size_t)1,
-			str_global_web_root, int_global_web_root_len);
+			str_global_web_root, strlen(str_global_web_root));
 #else
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			cwd, strlen(cwd),
 			"/", (size_t)1,
-			str_global_web_root, int_global_web_root_len);
+			str_global_web_root, strlen(str_global_web_root));
 #endif
 		SDEBUG("str_temp: %s", str_temp);
 		SFREE(str_global_web_root);
@@ -798,8 +792,8 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef _WIN32
 	} else if (str_global_web_root[1] == ':') {
 		str_temp = str_global_web_root;
-		SERROR_SNCAT(str_global_web_root, &int_global_web_root_len,
-			str_global_web_root + 2, int_global_web_root_len - 2);
+		SERROR_SNCAT(str_global_web_root, &int_global_len,
+			str_global_web_root + 2, strlen(str_global_web_root) - 2);
 		SFREE(str_temp);
 	}
 #else
@@ -817,12 +811,12 @@ bool parse_options(int argc, char *const *argv) {
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			cwd + 2, strlen(cwd + 2),
 			"/", (size_t)1,
-			str_global_app_path, int_global_app_path_len);
+			str_global_app_path, strlen(str_global_role_path));
 #else
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			cwd, strlen(cwd),
 			"/", (size_t)1,
-			str_global_app_path, int_global_app_path_len);
+			str_global_app_path, strlen(str_global_role_path));
 #endif // _WIN32
 		SDEBUG("str_temp: %s", str_temp);
 		SFREE(str_global_app_path);
@@ -831,8 +825,8 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef _WIN32
 	} else if (str_global_app_path[1] == ':') {
 		str_temp = str_global_app_path;
-		SERROR_SNCAT(str_global_app_path, &int_global_app_path_len,
-			str_global_app_path + 2, strlen(str_global_app_path + 2));
+		SERROR_SNCAT(str_global_app_path, &int_global_len,
+			str_global_app_path + 2, strlen(str_global_role_path) - 2);
 		SFREE(str_temp);
 	}
 #else
@@ -848,13 +842,13 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef _WIN32
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			cwd + 2, strlen(cwd + 2),
-			"/", (size_t)1,
-			str_global_role_path, int_global_role_path_len);
+			"\\", (size_t)1,
+			str_global_role_path, strlen(str_global_role_path));
 #else
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			cwd, strlen(cwd),
 			"/", (size_t)1,
-			str_global_role_path, int_global_role_path_len);
+			str_global_role_path, strlen(str_global_role_path));
 #endif // _WIN32
 		SDEBUG("str_temp: %s", str_temp);
 		SFREE(str_global_role_path);
@@ -863,14 +857,13 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef _WIN32
 	} else if (str_global_role_path[1] == ':') {
 		str_temp = str_global_role_path;
-		SERROR_SNCAT(str_global_role_path, &int_global_role_path_len,
-			str_global_role_path + 2, int_global_role_path_len - 2);
+		SERROR_SNCAT(str_global_role_path, &int_global_len,
+			str_global_role_path + 2, strlen(str_global_role_path) - 2);
 		SFREE(str_temp);
 	}
 #else
 	}
 #endif // _WIN32
-	SDEBUG("str_global_role_path: %s", str_global_role_path);
 #endif // ENVELOPE
 
 #ifdef _WIN32
