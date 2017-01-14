@@ -145,7 +145,7 @@ bool s_exec(EV_P, int int_num_args, void *cb_data, exec_callback_t exec_callback
 
 	SFINISH_SNCAT(str_temp2, &int_temp2_len,
 		_str_binary, strlen(_str_binary));
-	SFINISH_REPLACE(str_temp2, "\"", "\\\"", "g");
+	SFINISH_BREPLACE(str_temp2, &int_temp2_len, "\"", "\\\"", "g");
 	SFINISH_SNCAT(str_binary, &int_binary_len,
 		"\"", (size_t)1,
 		str_temp2, strlen(str_temp2),
@@ -167,7 +167,7 @@ bool s_exec(EV_P, int int_num_args, void *cb_data, exec_callback_t exec_callback
 					str_temp + 3, strlen(str_temp + 3));
 				SDEBUG("str_temp2: %s", str_temp2);
 
-				SFINISH_REPLACE(str_temp2, "\"", "\\\"", "g");
+				SFINISH_BREPLACE(str_temp2, &int_temp2_len, "\"", "\\\"", "g");
 				SDEBUG("str_temp2: %s", str_temp2);
 
 				SFINISH_SNCAT(str_temp3, &int_temp3_len,
@@ -178,7 +178,7 @@ bool s_exec(EV_P, int int_num_args, void *cb_data, exec_callback_t exec_callback
 			} else {
 				SFINISH_SNCAT(str_temp2, &int_temp2_len,
 					str_temp, strlen(str_temp));
-				SFINISH_REPLACE(str_temp2, "\"", "\\\"", "g");
+				SFINISH_BREPLACE(str_temp2, &int_temp2_len, "\"", "\\\"", "g");
 				SFINISH_SNCAT(str_temp3, &int_temp3_len,
 					" \"", (size_t)2,
 					str_temp2, int_temp2_len,

@@ -148,7 +148,7 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 		*(ptr_pk_header - 1) = 0;
 		SDEBUG("str_pk_header: %s", str_pk_header);
 
-		SFINISH_REPLACE(str_col_name, "\"", "\"\"", "g");
+		SFINISH_BREPLACE(str_col_name, &int_length, "\"", "\"\"", "g");
 		str_temp1 = unescape_value(str_col_name);
 		SFINISH_CHECK(str_temp1 != NULL, "unescape_value failed, malformed request?");
 		SFREE(str_col_name);

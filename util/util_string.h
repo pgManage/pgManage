@@ -68,13 +68,9 @@ g -> Replace all instances
 i -> Case Insensitive
 
 //str_string_to_replace = "Apples are awesome!"
-SERROR_REPLACE(str_string_to_replace, "Apple", "Orange", "g")
+SERROR_BREPLACE(str_string_to_replace, &int_string_to_replace_len, "Apple", "Orange", "g")
 //str_string_to_replace = "Oranges are awesome!"
 */
-char *replace(char *str_input, char *str_find, char *str_replace, char *str_flags);
-
-#define SERROR_REPLACE(A, B, C, D) SERROR_CHECK(A = replace(A, B, C, D), "replace failed")
-#define SFINISH_REPLACE(A, B, C, D) SFINISH_ERROR_CHECK(A = replace(A, B, C, D), "replace failed")
 
 char *breplace(char *str_input, size_t *ptr_int_length, char *str_find, char *str_replace, char *str_flags);
 

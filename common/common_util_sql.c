@@ -26,8 +26,7 @@ char *get_table_name(char *_str_query) {
 	SERROR_SNCAT(str_temp, &int_temp_len,
 		ptr_table_name, ptr_end_table_name - ptr_table_name);
 
-	//TODO: SERROR_REPLACE() lengths
-	SERROR_REPLACE(str_temp, "\"", "\"\"", "");
+	SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
 
 	//TODO: unescape_value() lengths
 	str_temp1 = unescape_value(str_temp);
@@ -48,7 +47,7 @@ char *get_table_name(char *_str_query) {
 
 		SERROR_SNCAT(str_temp, &int_temp_len, ptr_table_name, ptr_end_table_name - ptr_table_name);
 		//TODO: SERROR_REPLACE() lengths
-		SERROR_REPLACE(str_temp, "\"", "\"\"", "");
+		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
 
 		//TODO: unescape_value() lengths
 		str_temp1 = unescape_value(str_temp);
@@ -101,8 +100,8 @@ char *get_return_columns(char *_str_query, char *str_table_name) {
 
 	if (strncmp(str_temp, "*", 2) != 0) {
 		//TODO: SERROR_REPLACE() lengths
-		SERROR_REPLACE(str_temp, "\"", "\"\"", "");
-		SERROR_REPLACE(str_temp, "\t", "\", {{TABLE}}.\"", "g");
+		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
+		SERROR_BREPLACE(str_temp, &int_temp_len, "\t", "\", {{TABLE}}.\"", "g");
 
 		//TODO: unescape_value() lengths
 		str_temp1 = unescape_value(str_temp);
@@ -116,7 +115,7 @@ char *get_return_columns(char *_str_query, char *str_table_name) {
 		SFREE(str_temp1);
 
 		//TODO: SERROR_REPLACE() lengths
-		SERROR_REPLACE(str_return_columns, "{{TABLE}}", str_table_name, "g");
+		SERROR_BREPLACE(str_return_columns, &int_return_columns_len, "{{TABLE}}", str_table_name, "g");
 	} else {
 		//TODO: int_temp_len
 		SERROR_SNCAT(str_return_columns, &int_return_columns_len,

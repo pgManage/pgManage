@@ -81,9 +81,9 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 
 	// Replace double quotes with double double quotes (this allows double quotes
 	// within column names)
-	SFINISH_REPLACE(client_insert->str_column_names, "\"", "\"\"", "g");
+	SFINISH_BREPLACE(client_insert->str_column_names, &client_insert->int_column_names_len, "\"", "\"\"", "g");
 	// Replace tabs with "\",\"" so that we can use them in an sql statement
-	SFINISH_REPLACE(client_insert->str_column_names, "\t", "\",\"", "g");
+	SFINISH_BREPLACE(client_insert->str_column_names, &client_insert->int_column_names_len, "\t", "\",\"", "g");
 	// unescape the column names
 	str_temp = unescape_value(client_insert->str_column_names);
 	SFINISH_CHECK(str_temp != NULL, "unescape_value failed, malformed request?");
@@ -627,7 +627,7 @@ bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
 		".", (size_t)1);
 	SFINISH_SNCAT(str_insert_columns, &int_insert_columns_len,
 		client_insert->str_return_columns, client_insert->int_return_columns_len);
-	SFINISH_REPLACE(str_insert_columns, str_replace_table_name, "", "g");
+	SFINISH_BREPLACE(str_insert_columns, &int_insert_columns_len, str_replace_table_name, "", "g");
 	int_insert_columns_len = strlen(str_insert_columns);
 
 	for (int_i = 0; int_i < client_request->int_num_rows; int_i += 1) {
@@ -853,7 +853,7 @@ bool ws_insert_step7(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_SNCAT(str_temp, &int_temp_len,
 		client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
 		"_2", (size_t)2);
-	SFINISH_REPLACE(client_insert->str_return_columns, client_insert->str_real_table_name, str_temp, "g");
+	SFINISH_BREPLACE(client_insert->str_return_columns, &client_insert->int_return_columns_len, client_insert->str_real_table_name, str_temp, "g");
 	client_insert->int_return_columns_len = strlen(client_insert->str_return_columns);
 
 	DB_free_result(res);
