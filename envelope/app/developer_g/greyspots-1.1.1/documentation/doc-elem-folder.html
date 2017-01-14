@@ -97,14 +97,16 @@
                     <p>The name <code>[qs]</code> stands for "querystring". The querystring is the part in the URL after the "?". The <code>[qs]</code> attribute has two formats, each with their own use.</p>
                     
                     <ul>
-                        <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
+                        <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). If you need an attribute to be added when a querystring key is not present, replace the "=" with "!=" (for example: qs="<i>key1</i>!=<i>attribute1</i>", attribute1 will only be added if key1 is not in the querystring). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
                         <li>qs="<i>key</i>". This format will cause the gs-folder to refresh when a change occurs in the query string and the key is present.</li>
                     </ul>
                 </div>
                 <gs-doc-example query-string="test1=true&test2=false">
                     <template for="html" height="35">
-                        <gs-folder qs="test1=value"></gs-folder>
-                        <gs-folder qs="test2=hidden"></gs-folder>
+                        <gs-folder qs="test1"></gs-folder>
+                        <gs-folder qs="test2=value"></gs-folder>
+                        <gs-folder qs="test3=hidden"></gs-folder>
+                        <gs-folder qs="test4!=hidden"></gs-folder>
                         <br />
                         <br />
                         <gs-grid widths="1,1">
@@ -115,10 +117,22 @@
                                 <gs-button onclick="GS.removeFromQueryString('test1');">Remove "test1"</gs-button>
                             </gs-block>
                             <gs-block>
-                                <gs-button onclick="GS.pushQueryString('test2=');">Add "test2"</gs-button>
+                                <gs-button onclick="GS.pushQueryString('test2=test');">Add "test2"</gs-button>
                             </gs-block>
                             <gs-block>
                                 <gs-button onclick="GS.removeFromQueryString('test2');">Remove "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test3=yes');">Add "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test3');">Remove "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test4=yes');">Add "test4"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test4');">Remove "test4"</gs-button>
                             </gs-block>
                         </gs-grid>
                     </template>

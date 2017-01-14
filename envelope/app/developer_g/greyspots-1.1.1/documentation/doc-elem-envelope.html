@@ -118,32 +118,77 @@
                 </template>
             </gs-doc-example>
             <div class="doc-example-description">
-                <span class="h3">Query String Example:</span>
-                <p>The qs attribute causes the gs-envelope to filter by the key and value of the query string. In this example, the qs attribute is set to listen to the query string key "first_name" and the query string is set to "first_name=Apple", so the gs-envelope will only show items where the first_name is equal to 'Apple'.</p>
-            </div>
-            <gs-doc-example query-string="first_name=Apple">
-                <template for="html" height="31">
-                    <gs-envelope src="gsdoc.texample" qs="first_name">
-                        <template for="table">
-                            <table>
-                                <tbody>
-                                    <tr>
-                                        <th heading="#">
-                                            <gs-static column="row_number"></gs-static>
-                                        </th>
-                                        <td heading="First Name">
-                                            <gs-text mini column="first_name"></gs-text>
-                                        </td>
-                                        <td heading="Last Name">
-                                            <gs-text mini column="last_name"></gs-text>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </template>
-                    </gs-envelope>          
-                </template>
-            </gs-doc-example>
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span><br />
+                    <p>The name <code>[qs]</code> stands for "querystring". The querystring is the part in the URL after the "?". The <code>[qs]</code> attribute has two formats, each with their own use.</p>
+                    
+                    <ul>
+                        <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). If you need an attribute to be added when a querystring key is not present, replace the "=" with "!=" (for example: qs="<i>key1</i>!=<i>attribute1</i>", attribute1 will only be added if key1 is not in the querystring). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
+                        <li>qs="<i>key</i>". This format will update the <code>[where]</code> attribute with the querystring whenever the querystring changes.</li>
+                    </ul>
+                </div>
+                <gs-doc-example query-string="first_name=test2&test2=false">
+                    <template for="html" height="35">
+                        <gs-envelope src="gsdoc.texample" qs="first_name" limit="2" expand-to-content no-hudorderby no-hudlimit no-hudrefresh no-huddelete>
+                            <template for="table">
+                                <table>
+                                    <tbody><tr><td heading="Name">{{! row.first_name }}</td></tr></tbody>
+                                </table>
+                            </template>
+                        </gs-envelope>
+                        <br />
+                        <gs-envelope src="gsdoc.texample" qs="test2=value" limit="2" expand-to-content child-column="first_name" no-hudorderby no-hudlimit no-hudrefresh no-huddelete>
+                            <template for="table">
+                                <table>
+                                    <tbody><tr><td heading="Name">{{! row.first_name }}</td></tr></tbody>
+                                </table>
+                            </template>
+                        </gs-envelope>
+                        <br />
+                        <gs-envelope src="gsdoc.texample" qs="test3=hidden" limit="2" expand-to-content no-hudorderby no-hudlimit no-hudrefresh no-huddelete>
+                            <template for="table">
+                                <table>
+                                    <tbody><tr><td heading="Name">{{! row.first_name }}</td></tr></tbody>
+                                </table>
+                            </template>
+                        </gs-envelope>
+                        <br />
+                        <gs-envelope src="gsdoc.texample" qs="test4!=hidden" limit="2" expand-to-content no-hudorderby no-hudlimit no-hudrefresh no-huddelete>
+                            <template for="table">
+                                <table>
+                                    <tbody><tr><td heading="Name">{{! row.first_name }}</td></tr></tbody>
+                                </table>
+                            </template>
+                        </gs-envelope>
+                        <br />
+                        <br />
+                        <gs-grid widths="1,1">
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('first_name=test1');">Add "first_name"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('first_name');">Remove "first_name"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test2=test2');">Add "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test2');">Remove "test2"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test3=test3');">Add "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test3');">Remove "test3"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.pushQueryString('test4=test4');">Add "test4"</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button onclick="GS.removeFromQueryString('test4');">Remove "test4"</gs-button>
+                            </gs-block>
+                        </gs-grid>
+                    </template>
+                </gs-doc-example>
             <div class="doc-example-description">
                 <span class="h3">Insert Dialog Example:</span>
                 <p>This is an example of an envelope with an insert dialog.</p>

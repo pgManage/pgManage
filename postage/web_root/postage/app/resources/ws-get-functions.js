@@ -132,13 +132,16 @@ function getListsForDump(strQuery, callback) {
 
 function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh) {
     'use strict';
+    var intScrollTop;
+
     if (!bolHomeRefresh) {
         addHomeQuery('', strFinalName, strQuery, strToolbarAddons);
     } else {
+        intScrollTop = homeEditor.getSession().getScrollTop();
         setHomeValue('Loading Script', '\n\nLoading Your Script\n\n', '');
-        
+
         getSingleCellData(strQuery, function (strScript) {
-            
+
             // if "strScript" is empty: Tell the user we couldn't load the object
             if (!strScript) {
                 setHomeValue(strFinalName, '\n-- This object\'s script could not be retrieved...' +
@@ -149,8 +152,10 @@ function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh) {
                     '\n\n\n\n' +
                     '\n\n\n\n' +
                     '\n\n\n\n';
-                
+
                 setHomeValue(strFinalName, strScript, strToolbarAddons);
+                console.log(intScrollTop);
+                homeEditor.getSession().setScrollTop(intScrollTop);
             }
         });
     }

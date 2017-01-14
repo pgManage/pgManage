@@ -170,11 +170,13 @@ document.addEventListener('DOMContentLoaded', function () {
         
         //console.log(record);
         
-        // clear previous selection
-        arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
-        
-        for (i = 0, len = arrSelectedTrs.length; i < len; i += 1) {
-            arrSelectedTrs[i].removeAttribute('selected');
+        if (element.tableElement && xtag.queryChildren(element.tableElement, 'tbody')[0]) {
+            // clear previous selection
+            arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
+            
+            for (i = 0, len = arrSelectedTrs.length; i < len; i += 1) {
+                arrSelectedTrs[i].removeAttribute('selected');
+            }
         }
         
         // select/highlight the record that was provided
@@ -182,24 +184,30 @@ document.addEventListener('DOMContentLoaded', function () {
             record.setAttribute('selected', '');
         }
     }
-    
+
     // loops through the records and finds a record using the parameter
     function findRecordFromValue(element, searchValue) {
-        var i, len, matchedRecord, arrTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr'),
+        var i, len, matchedRecord, arrTrs, strSearchString;
+
+        if (element.tableElement && xtag.queryChildren(element.tableElement, 'tbody')[0]) {
+            //console.log('1***', element.tableElement);
+            //console.log('2***', xtag.queryChildren(element.tableElement, 'tbody')[0]);
+            //console.log('3***', xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr'));
+            arrTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr');
             strSearchString = String(searchValue);
-        
-        // search exact text and search both the value attribute (if present) and the first td text
-        for (i = 0, len = arrTrs.length; i < len; i += 1) {
-            if (arrTrs[i].getAttribute('value') === strSearchString || xtag.queryChildren(arrTrs[i], 'td')[0].textContent === strSearchString) {
-                matchedRecord = arrTrs[i];
-                
-                break;
+
+            // search exact text and search both the value attribute (if present) and the first td text
+            for (i = 0, len = arrTrs.length; i < len; i += 1) {
+                if (arrTrs[i].getAttribute('value') === strSearchString || xtag.queryChildren(arrTrs[i], 'td')[0].textContent === strSearchString) {
+                    matchedRecord = arrTrs[i];
+                    break;
+                }
             }
         }
-        
+
         return matchedRecord;
     }
-    
+
     function selectRecord(element, handle, bolChange) {
         var record, strRecordValue, strFirstTdText;
         
@@ -226,7 +234,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.innerSelectedRecord = record;
                     if (bolChange) {
                         element.hackToPreventScroll = true;
-                        element.setAttribute('value', element.innerValue);
+                        if (element.innerValue !== element.getAttribute('value')) {
+                            element.setAttribute('value', element.innerValue);
+                        }
                         element.hackToPreventScroll = false;
                         element.triggerChange();
                         //console.log('2*** change triggered');
@@ -644,6 +654,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrPopKeys;
         var currentValue;
         var bolRefresh;
+        var strOperator;
 
         if (strQSCol) {
             if (strQSCol.indexOf('=') !== -1) {
@@ -651,25 +662,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 i = 0;
                 len = arrAttrParts.length;
                 while (i < len) {
-                    strQSCol = arrAttrParts[i]
-                    arrQSParts = strQSCol.split('=');
+                    strQSCol = arrAttrParts[i];
+    
+                    if (strQSCol.indexOf('!=') !== -1) {
+                        strOperator = '!=';
+                        arrQSParts = strQSCol.split('!=');
+                    } else {
+                        strOperator = '=';
+                        arrQSParts = strQSCol.split('=');
+                    }
+    
                     strQSCol = arrQSParts[0];
                     strQSAttr = arrQSParts[1] || arrQSParts[0];
-
-                    // if the key is not present: go to the attribute's default or remove it
-                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+    
+                    // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                    if (strOperator === '!=') {
+                        // if the key is not present: add the attribute
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            element.setAttribute(strQSAttr, '');
+                        // else: remove the attribute
                         } else {
                             element.removeAttribute(strQSAttr);
                         }
-                    // else: set attribute to exact text from QS
                     } else {
-                        element.setAttribute(strQSAttr, (
-                            GS.qryGetVal(strQS, strQSCol) ||
-                            element.internal.defaultAttributes[strQSAttr] ||
-                            ''
-                        ));
+                        // if the key is not present: go to the attribute's default or remove it
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                                element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                            } else {
+                                element.removeAttribute(strQSAttr);
+                            }
+                        // else: set attribute to exact text from QS
+                        } else {
+                            element.setAttribute(strQSAttr, (
+                                GS.qryGetVal(strQS, strQSCol) ||
+                                element.internal.defaultAttributes[strQSAttr] ||
+                                ''
+                            ));
+                        }
                     }
                     i += 1;
                 }
@@ -821,7 +851,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     elementInserted(this);
                     
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    // attribute code
+                    if (strAttrName === 'value' && newValue !== oldValue) {
+                        this.value = newValue;
+                    }
                 }
             }
         },

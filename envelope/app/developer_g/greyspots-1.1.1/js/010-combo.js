@@ -1240,6 +1240,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrPopKeys;
         var currentValue;
         var bolRefresh;
+        var strOperator;
 
         if (strQSCol) {
             if (strQSCol.indexOf('=') !== -1) {
@@ -1247,25 +1248,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 i = 0;
                 len = arrAttrParts.length;
                 while (i < len) {
-                    strQSCol = arrAttrParts[i]
-                    arrQSParts = strQSCol.split('=');
+                    strQSCol = arrAttrParts[i];
+    
+                    if (strQSCol.indexOf('!=') !== -1) {
+                        strOperator = '!=';
+                        arrQSParts = strQSCol.split('!=');
+                    } else {
+                        strOperator = '=';
+                        arrQSParts = strQSCol.split('=');
+                    }
+    
                     strQSCol = arrQSParts[0];
                     strQSAttr = arrQSParts[1] || arrQSParts[0];
-
-                    // if the key is not present: go to the attribute's default or remove it
-                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+    
+                    // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                    if (strOperator === '!=') {
+                        // if the key is not present: add the attribute
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            element.setAttribute(strQSAttr, '');
+                        // else: remove the attribute
                         } else {
                             element.removeAttribute(strQSAttr);
                         }
-                    // else: set attribute to exact text from QS
                     } else {
-                        element.setAttribute(strQSAttr, (
-                            GS.qryGetVal(strQS, strQSCol) ||
-                            element.internal.defaultAttributes[strQSAttr] ||
-                            ''
-                        ));
+                        // if the key is not present: go to the attribute's default or remove it
+                        if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                            if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                                element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                            } else {
+                                element.removeAttribute(strQSAttr);
+                            }
+                        // else: set attribute to exact text from QS
+                        } else {
+                            element.setAttribute(strQSAttr, (
+                                GS.qryGetVal(strQS, strQSCol) ||
+                                element.internal.defaultAttributes[strQSAttr] ||
+                                ''
+                            ));
+                        }
                     }
                     i += 1;
                 }
@@ -1474,7 +1494,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     elementInserted(this);
                     
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    // attribute code
+                    if (strAttrName === 'value' && oldValue !== newValue) {
+                        this.value = newValue;
+                    }
                 }
             }
         },
@@ -1495,7 +1517,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // if we have not yet templated: just stick the value in an attribute
                     if (this.ready === false) {
-                        this.setAttribute('value', newValue);
+                        if (newValue !== this.getAttribute('value')) {
+                            this.setAttribute('value', newValue);
+                        }
                         
                     // else if the value is empty and allow-empty is present
                     } else if (newValue === '' && this.hasAttribute('allow-empty')) {

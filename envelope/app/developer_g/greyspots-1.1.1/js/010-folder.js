@@ -87,7 +87,8 @@ window.addEventListener('design-register-element', function () {
         var strPath = getPath(element)
           , bolFolders = !element.hasAttribute('no-folders')
           , bolFiles = !element.hasAttribute('no-files')
-          , strHeader;
+          , strHeader
+          , intResponseNumber;
         
         element.folderList.innerHTML = '';
         element.fileList.innerHTML = '';
@@ -108,6 +109,7 @@ window.addEventListener('design-register-element', function () {
         }
         element.arrFile = [];
         element.arrFolder = [];
+        intResponseNumber = 0;
         GS.requestFromSocket(GS.envSocket, 'FILE\tLIST\t' + GS.encodeForTabDelimited(strPath), function (data, error, errorData) {
             var arrPaths, strName, strType, arrCells, i, len, divElement
               , arrFiles = [], arrFolders = [];
@@ -115,6 +117,10 @@ window.addEventListener('design-register-element', function () {
             if (!error && data.trim() && data.indexOf('Failed to get canonical path') === -1) {
                 if (data !== 'TRANSACTION COMPLETED') {
                     arrPaths = GS.trim(data, '\n').split('\n');
+                    if (intResponseNumber === 0) {
+                        element.folderList.innerHTML = '';
+                        element.fileList.innerHTML = '';
+                    }
                     
                     for (i = 0, len = arrPaths.length; i < len; i += 1) {
                         arrCells = arrPaths[i].split('\t');
@@ -166,6 +172,8 @@ window.addEventListener('design-register-element', function () {
                     GS.webSocketErrorDialog(errorData);
                 }
             }
+            
+            intResponseNumber += 1;
         });
     }
     
@@ -255,31 +263,51 @@ window.addEventListener('design-register-element', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol && strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
             i = 0;
             len = arrAttrParts.length;
             while (i < len) {
-                strQSCol = arrAttrParts[i]
-                arrQSParts = strQSCol.split('=');
+                strQSCol = arrAttrParts[i];
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
@@ -287,6 +315,7 @@ window.addEventListener('design-register-element', function () {
             strQSValue = GS.qryGetVal(strQS, strQSCol);
 
             if (element.internal.bolQSFirstRun === true && GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+                //console.trace(element, 'test');
                 getData(element);
             }
         }
@@ -296,6 +325,7 @@ window.addEventListener('design-register-element', function () {
     
     function bindElement(element) {
         if (element.hasAttribute('qs')) {
+            pushReplacePopHandler(element);
             window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
             window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
             window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });

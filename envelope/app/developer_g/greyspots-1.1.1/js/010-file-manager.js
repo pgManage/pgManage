@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strQSAttr;
         var arrQSParts;
         var arrAttrParts;
+        var strOperator;
 
         if (strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
@@ -82,24 +83,43 @@ document.addEventListener('DOMContentLoaded', function () {
             len = arrAttrParts.length;
             while (i < len) {
                 strQSCol = arrAttrParts[i];
-                arrQSParts = strQSCol.split('=');
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
                 strQSCol = arrQSParts[0];
                 strQSAttr = arrQSParts[1] || arrQSParts[0];
 
-                // if the key is not present: go to the attribute's default or remove it
-                if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
-                    if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
-                        element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
                     } else {
                         element.removeAttribute(strQSAttr);
                     }
-                // else: set attribute to exact text from QS
                 } else {
-                    element.setAttribute(strQSAttr, (
-                        GS.qryGetVal(strQS, strQSCol) ||
-                        element.internal.defaultAttributes[strQSAttr] ||
-                        ''
-                    ));
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
                 }
                 i += 1;
             }
