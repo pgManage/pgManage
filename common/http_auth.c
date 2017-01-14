@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "http_auth.h"
 
 // response with redirect
@@ -292,8 +291,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFREE(str_uri_expiration);
 		SFREE(str_new_cookie);
 
-		client_auth->str_user = str_tolower(client_auth->str_user);
-		SFINISH_CHECK(client_auth->str_user != NULL, "str_tolower(client_auth->str_user) failed");
+		bstr_tolower(client_auth->str_user, client_auth->int_user_length);
 
 		SNOTICE("REQUEST USERNAME: %s", client_auth->str_user);
 
@@ -462,8 +460,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFREE(str_uri_expiration);
 		SFREE(str_new_cookie);
 
-		client_auth->str_user = str_tolower(client_auth->str_user);
-		SFINISH_CHECK(client_auth->str_user != NULL, "str_tolower(client_auth->str_user) failed");
+		bstr_tolower(client_auth->str_user, client_auth->int_user_length);
 
 		SNOTICE("REQUEST USERNAME: %s", client_auth->str_user);
 

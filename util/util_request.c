@@ -68,8 +68,8 @@ char *request_header(char *str_request, char *str_name) {
 	SERROR_SNCAT(str_upper_request, &int_upper_request_len,
 		str_request, strlen(str_request));
 	// str_toupper operates in place
-	str_toupper(str_upper_name);
-	str_toupper(str_upper_request);
+	bstr_toupper(str_upper_name, int_upper_name_len);
+	bstr_toupper(str_upper_request, int_upper_request_len);
 
 	size_t int_name_len = strlen(str_name);
 	size_t int_header_len = 0;

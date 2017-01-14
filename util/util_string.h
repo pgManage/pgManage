@@ -113,8 +113,6 @@ Makes all the characters in a string lowercase.
 TO_LOWER(str_string)
 //str_string = "the string"
 */
-char *str_tolower(char *str);
-#define TO_LOWER(A) A = str_tolower(A);
 char *bstr_tolower(char *str, size_t int_strlen);
 
 /*
@@ -123,8 +121,6 @@ Makes all the characters in a string uppercase.
 TO_UPPER(str_string)
 //str_string = "THE STRING"
 */
-char *str_toupper(char *str);
-#define TO_UPPER(A) A = str_toupper(A);
 char *bstr_toupper(char *str, size_t int_strlen);
 
 /*

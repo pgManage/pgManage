@@ -830,12 +830,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 			*str_temp = 0;
 		}
 
-		SERROR_SNCAT(str_temp, &int_temp_len,
-			str_first_word, int_first_word_len);
-		SFREE(str_first_word);
-		// str_toupper operates in-place
-		str_first_word = str_toupper(str_temp);
-		str_temp = NULL;
+		bstr_toupper(str_first_word, int_first_word_len);
 
 		SDEBUG("str_first_word: >%s<", str_first_word);
 

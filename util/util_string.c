@@ -107,8 +107,8 @@ char *breplace(char *str_input, size_t *ptr_int_length, char *str_find_in, char 
 	SERROR_SNCAT(str_replace, &int_replace_len,
 		str_replace_in, strlen(str_replace_in));
 	if (strchr(str_flags, 'i') != NULL) {
-		str_find = str_tolower(str_find);
-		str_replace = str_tolower(str_replace);
+		str_find = bstr_tolower(str_find, strlen(str_find));
+		str_replace = bstr_tolower(str_replace, strlen(str_replace));
 	}
 
 	size_t int_find_length = strlen(str_find);
@@ -551,14 +551,6 @@ error:
 }
 
 /* upper-cases s in place */
-char *str_toupper(char *str) {
-	char *s = str;
-	while (*s) {
-		*s = (char)toupper(*s);
-		s++;
-	}
-	return str;
-}
 char *bstr_toupper(char *str, size_t int_strlen) {
 	char *s = str;
 	size_t int_i = 0;
@@ -571,14 +563,6 @@ char *bstr_toupper(char *str, size_t int_strlen) {
 }
 
 /* lower-cases s in place */
-char *str_tolower(char *str) {
-	char *s = str;
-	while (*s) {
-		*s = (char)tolower(*s);
-		s++;
-	}
-	return str;
-}
 char *bstr_tolower(char *str, size_t int_strlen) {
 	char *s = str;
 	size_t int_i = 0;

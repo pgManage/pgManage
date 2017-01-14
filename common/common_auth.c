@@ -191,10 +191,14 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		SFINISH_CHECK(str_cookie_decrypted != NULL, "aes_decrypt failed");
 
 		////GET THINGS FOR CONNECTION STRING
-		str_username = str_tolower(getpar(str_cookie_decrypted, "username", int_cookie_len, &int_user_length));
-		SFINISH_CHECK(str_username != NULL, "str_tolower(getpar()) failed");
+		str_username = getpar(str_cookie_decrypted, "username", int_cookie_len, &int_user_length);
+		SFINISH_CHECK(str_username != NULL, "getpar failed");
+		str_username = bstr_tolower(str_username, int_user_length);
+
+		str_database = getpar(str_cookie_decrypted, "dbname", int_cookie_len, &client->int_database_len);
+		SFINISH_CHECK(str_database != NULL, "getpar failed");
+		str_database = bstr_tolower(str_database, client->int_database_len);
 		SNOTICE("REQUEST USERNAME: %s", str_username);
-		str_database = str_tolower(getpar(str_cookie_decrypted, "dbname", int_cookie_len, &client->int_database_len));
 		if (str_database != NULL && strlen(str_database) == 0) {
 			SFREE(str_database);
 		}

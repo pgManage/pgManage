@@ -97,7 +97,7 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 			SDEBUG("str_attr_name : >%s<", str_attr_name);
 			SDEBUG("str_attr_value: >%s<", str_attr_value);
 
-			str_toupper(str_attr_name);
+			bstr_toupper(str_attr_name, int_attr_name_len);
 			if (strncmp(str_attr_name, "WHERE", 5) == 0 || strncmp(str_attr_name, "ORDER BY", 8) == 0 ||
 				strncmp(str_attr_name, "LIMIT", 5) == 0 || strncmp(str_attr_name, "OFFSET", 6) == 0) {
 #ifdef POSTAGE_INTERFACE_LIBPQ

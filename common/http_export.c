@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "http_export.h"
 
 #ifdef POSTAGE_INTERFACE_LIBPQ
@@ -68,6 +69,7 @@ void http_export_step1(struct sock_ev_client *client) {
 		memcpy(str_attr_name, ptr_attr_header, int_attr_header_len);
 		str_attr_name[int_attr_header_len] = '\0';
 		ptr_attr_header += int_attr_header_len + 1;
+		bstr_toupper(str_attr_name, int_attr_header_len);
 
 		// Get attr value
 		int_attr_value_len = strcspn(ptr_attr_values, "\t\012");
@@ -82,13 +84,11 @@ void http_export_step1(struct sock_ev_client *client) {
 		SFINISH_CHECK(str_attr_value != NULL, "unescape_value failed");
 		SFREE(str_temp);
 
-		// TODO: str_toupper lengths
-
 		// Add both to the sql
 		SFINISH_SNFCAT(
 			str_sql, &int_sql_len,
 			"\t\t", (size_t)2,
-			str_toupper(str_attr_name), strlen(str_attr_name),
+			str_attr_name, int_attr_header_len,
 			" ", (size_t)1,
 			str_attr_value, int_attr_value_len,
 			ptr_attr_header < ptr_end_attr_header ? ",\012" : "\012", (size_t)(ptr_attr_header < ptr_end_attr_header ? 2 : 1)

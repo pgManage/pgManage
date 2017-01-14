@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "ws_insert.h"
 
 char *ws_insert_step1(struct sock_ev_client_request *client_request) {
