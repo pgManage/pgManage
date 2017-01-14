@@ -31,9 +31,11 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 
 	size_t int_query_length = 0;
 	size_t int_action_length = 0;
-	size_t int_experation_length = 0;
+	size_t int_expiration_len = 0;
 	size_t int_cookie_len = 0;
 	size_t int_response_len = 0;
+	size_t int_uri_new_password_len = 0;
+	size_t int_uri_expiration_len = 0;
 
 	// get form data
 	str_form_data = query(client_auth->parent->str_request, client_auth->parent->int_request_len, &int_query_length);
@@ -100,15 +102,16 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 
 		str_one_day_expire = str_expire_one_day();
 		SFINISH_CHECK(str_one_day_expire != NULL, "str_expire_one_day failed");
-		str_uri_expires = cstr_to_uri(str_one_day_expire);
+		size_t int_uri_expires_len = 0;
+		str_uri_expires = snuri(str_one_day_expire, strlen(str_one_day_expire), &int_uri_expires_len);
 		SFREE(str_one_day_expire);
-		SFINISH_CHECK(str_uri_expires != NULL, "cstr_to_uri failed");
+		SFINISH_CHECK(snuri != NULL, "snuri failed");
 
 		SFINISH_SNCAT(
 			str_cookie_decrypted, &int_cookie_len,
 			str_form_data, int_query_length,
 			"&expiration=", (size_t)12,
-			str_uri_expires, strlen(str_uri_expires),
+			str_uri_expires, int_uri_expires_len,
 			"&sessionid=", (size_t)11,
 			str_session_id, strlen(str_session_id)
 		);
@@ -228,7 +231,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFREE(client_auth->str_cookie_encrypted);
 		client_auth->str_user = getpar(str_cookie_decrypted, "username", cookie_len, &client_auth->int_user_length);
 		client_auth->str_password = getpar(str_cookie_decrypted, "password", cookie_len, &client_auth->int_password_length);
-		str_expiration = getpar(str_cookie_decrypted, "expiration", cookie_len, &int_experation_length);
+		str_expiration = getpar(str_cookie_decrypted, "expiration", cookie_len, &int_expiration_len);
 
 #ifdef ENVELOPE
 		SFINISH_SNCAT(client_auth->str_connname, &client_auth->int_conn_length, "", (size_t)0);
@@ -253,8 +256,10 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 #endif
 		SFREE_PWORD(str_cookie_decrypted);
 
-		str_uri_new_password = cstr_to_uri(client_auth->str_new_password);
-		str_uri_expiration = cstr_to_uri(str_expiration);
+		str_uri_new_password = snuri(client_auth->str_new_password, client_auth->int_new_password_length, &int_uri_new_password_len);
+		SFINISH_CHECK(str_uri_new_password != NULL, "snuri failed!");
+		str_uri_expiration = snuri(str_expiration, int_expiration_len, &int_uri_expiration_len);
+		SFINISH_CHECK(str_uri_expiration != NULL, "snuri failed!");
 		SFINISH_SNCAT(
 			str_new_cookie, &int_cookie_len,
 			"username=", (size_t)9,
@@ -262,9 +267,9 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			"&connname=", (size_t)10,
 			client_auth->str_connname, client_auth->int_connname_length,
 			"&password=", (size_t)10,
-			str_uri_new_password, strlen(str_uri_new_password), // TODO: cstr_to_uri with lengths
+			str_uri_new_password, int_uri_new_password_len,
 			"&expiration=", (size_t)12,
-			str_uri_expiration, strlen(str_uri_expiration),
+			str_uri_expiration, int_uri_expiration_len,
 			"&dbname=", (size_t)8,
 			client_auth->str_database, client_auth->int_dbname_length,
 			"&sessionid=", (size_t)11,
@@ -399,7 +404,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 
 		client_auth->str_user = getpar(str_cookie_decrypted, "username", cookie_len, &client_auth->int_user_length);
 		client_auth->str_password = getpar(str_cookie_decrypted, "password", cookie_len, &client_auth->int_password_length);
-		str_expiration = getpar(str_cookie_decrypted, "expiration", cookie_len, &int_experation_length);
+		str_expiration = getpar(str_cookie_decrypted, "expiration", cookie_len, &int_expiration_len);
 
 		client_auth->str_connname = getpar(str_cookie_decrypted, "connname", cookie_len, &client_auth->int_connname_length);
 		client_auth->str_conn = getpar(str_cookie_decrypted, "conn", cookie_len, &client_auth->int_conn_length);
@@ -420,8 +425,11 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 																 "to true and restart " SUN_PROGRAM_LOWER_NAME ".");
 		}
 
-		str_uri_expiration = cstr_to_uri(str_expiration);
-		str_uri_new_password = cstr_to_uri(client_auth->str_password);
+
+		str_uri_new_password = snuri(client_auth->str_password, client_auth->int_password_length, &int_uri_new_password_len);
+		SFINISH_CHECK(str_uri_new_password != NULL, "snuri failed!");
+		str_uri_expiration = snuri(str_expiration, int_expiration_len, &int_uri_expiration_len);
+		SFINISH_CHECK(str_uri_expiration != NULL, "snuri failed!");
 		SFINISH_SNCAT(
 			str_new_cookie, &int_cookie_len,
 			"username=", (size_t)9,
@@ -429,9 +437,9 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			"&connname=", (size_t)10,
 			client_auth->str_connname, client_auth->int_connname_length,
 			"&password=", (size_t)10,
-			str_uri_new_password, strlen(str_uri_new_password),
+			str_uri_new_password, int_uri_new_password_len,
 			"&expiration=", (size_t)12,
-			str_uri_expiration, strlen(str_uri_expiration),
+			str_uri_expiration, int_uri_expiration_len,
 			"&dbname=", (size_t)8,
 			client_auth->str_database, client_auth->int_dbname_length,
 			"&sessionid=", (size_t)11,
@@ -1029,27 +1037,27 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		}
 
 		str_temp1 = client_auth->str_user;
-		SFINISH_CHECK((client_auth->str_user = cstr_to_uri(str_temp1)) != NULL, "cstr_to_uri failed");
+		SFINISH_CHECK((client_auth->str_user = snuri(str_temp1, client_auth->int_user_length, &client_auth->int_user_length)) != NULL, "snuri failed");
 		SFREE(str_temp1);
 
 		SFINISH_SNCAT(
 			str_user, &int_temp,
 			client_request->parent->str_connname_folder, strlen(client_request->parent->str_connname_folder),
 			"/", (size_t)1,
-			client_auth->str_user, strlen(client_auth->str_user)
+			client_auth->str_user, client_auth->int_user_length
 		);
 		SFINISH_SNCAT(
 			str_open, &int_temp,
 			client_request->parent->str_connname_folder, strlen(client_request->parent->str_connname_folder),
 			"/", (size_t)1,
-			client_auth->str_user, strlen(client_auth->str_user),
+			client_auth->str_user, client_auth->int_user_length,
 			"/open", (size_t)5
 		);
 		SFINISH_SNCAT(
 			str_closed, &int_temp,
 			client_request->parent->str_connname_folder, strlen(client_request->parent->str_connname_folder),
 			"/", (size_t)1,
-			client_auth->str_user, strlen(client_auth->str_user),
+			client_auth->str_user, client_auth->int_user_length,
 			"/closed", (size_t)7
 		);
 
@@ -1513,27 +1521,27 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 	}
 
 	str_temp1 = client_auth->str_user;
-	SFINISH_CHECK((client_auth->str_user = cstr_to_uri(str_temp1)) != NULL, "cstr_to_uri failed");
+	SFINISH_CHECK((client_auth->str_user = snuri(str_temp1, client_auth->int_user_length, &client_auth->int_user_length)) != NULL, "snuri failed");
 	SFREE(str_temp1);
 
 	SFINISH_SNCAT(
 		str_user, &int_temp,
 		client_auth->parent->str_connname_folder, strlen(client_auth->parent->str_connname_folder),
 		"/", (size_t)1,
-		client_auth->str_user, strlen(client_auth->str_user)
+		client_auth->str_user, client_auth->int_user_length
 	);
 	SFINISH_SNCAT(
 		str_open, &int_temp,
 		client_auth->parent->str_connname_folder, strlen(client_auth->parent->str_connname_folder),
 		"/", (size_t)1,
-		client_auth->str_user, strlen(client_auth->str_user),
+		client_auth->str_user, client_auth->int_user_length,
 		"/open", (size_t)5
 	);
 	SFINISH_SNCAT(
 		str_closed, &int_temp,
 		client_auth->parent->str_connname_folder, strlen(client_auth->parent->str_connname_folder),
 		"/", (size_t)1,
-		client_auth->str_user, strlen(client_auth->str_user),
+		client_auth->str_user, client_auth->int_user_length,
 		"/closed", (size_t)7
 	);
 

@@ -5,8 +5,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	char *str_response = NULL;
 	SDEFINE_VAR_ALL(str_cookie_encrypted, str_cookie_decrypted, str_password, str_uri, str_temp, str_conn_index);
 	SDEFINE_VAR_MORE(str_conn_debug, str_username, str_connname, str_database, str_uri_temp, str_context_data);
-	SDEFINE_VAR_MORE(str_user_agent, str_host);
-	SDEFINE_VAR_MORE(str_uri_user_agent, str_uri_ip_address, str_uri_host);
+	SDEFINE_VAR_MORE(str_host, str_uri_ip_address, str_uri_host);
 	char *str_conn = NULL;
 	bool bol_public = false;
 	ssize_t int_i = 0;
@@ -20,6 +19,9 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	size_t int_host_len = 0;
 	size_t int_response_len = 0;
 	size_t int_context_data_len = 0;
+	size_t int_uri_user_agent_len = 0;
+	size_t int_uri_ip_address_len = 0;
+	size_t int_uri_host_len = 0;
 #ifdef ENVELOPE
 #else
 	size_t int_conn_index_len = 0;
@@ -339,30 +341,25 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	// client_cb sometimes calls this function and doesn't expect need us to
 	// connect to the database (because we are already connected)
 	if (connect_cb != NULL) {
-		str_user_agent = request_header(str_request, "User-Agent");
-		if (str_user_agent == NULL) {
-			SFINISH_SNCAT(str_user_agent, &int_user_agent_len,
-				"", (size_t)0);
-		}
 		str_host = request_header(str_request, "Host");
 		if (str_host == NULL) {
 			SFINISH_SNCAT(str_host, &int_host_len,
 				"", (size_t)0);
+		} else {
+			int_host_len = strlen(str_host);
 		}
-		str_uri_user_agent = cstr_to_uri(str_user_agent);
-		SFINISH_CHECK(str_uri_user_agent != NULL, "cstr_to_uri failed on string \"%s\"", str_user_agent);
+		str_uri_ip_address = snuri(client->str_client_ip, INET_ADDRSTRLEN, &int_uri_ip_address_len);
+		SFINISH_CHECK(str_uri_ip_address != NULL, "snuri failed on string \"%s\"", client->str_client_ip);
 
-		str_uri_ip_address = cstr_to_uri(client->str_client_ip);
-		SFINISH_CHECK(str_uri_ip_address != NULL, "cstr_to_uri failed on string \"%s\"", client->str_client_ip);
-
-		str_uri_host = cstr_to_uri(str_host);
-		SFINISH_CHECK(str_uri_host != NULL, "cstr_to_uri failed on string \"%s\"", str_host);
+		str_uri_host = snuri(str_host, int_host_len, &int_uri_host_len);
+		SFINISH_CHECK(str_uri_host != NULL, "snuri failed on string \"%s\"", str_host);
 
 		SFINISH_SNCAT(str_context_data, &int_context_data_len,
 			"request_ip_address=", (size_t)19,
-			str_uri_ip_address, strlen(str_uri_ip_address),
+			str_uri_ip_address, int_uri_ip_address_len,
 			"&request_host=", (size_t)14,
-			str_uri_host, strlen(str_uri_host));
+			str_uri_host, int_uri_host_len
+		);
 
 		client->conn = DB_connect(global_loop, client, str_conn, str_username, int_user_length, str_password, int_password_length,
 			str_context_data, connect_cb);
@@ -374,7 +371,7 @@ finish:
 		(strstr(str_response, "\012Session expired") != NULL || strstr(str_response, "\012No Cookie") != NULL)) {
 		SFREE(str_response);
 		str_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
-		str_uri = cstr_to_uri(str_temp);
+		str_uri = snuri(str_temp, int_uri_length, &int_uri_length);
 		SFREE(str_temp);
 		struct struct_connection *conn_info = DArray_get(darr_global_connection, int_conn_index);
 
@@ -398,12 +395,13 @@ finish:
 				str_uri, strlen(str_uri),
 				"\015\012\015\012", (size_t)4);
 #else
-			str_temp = cstr_to_uri(conn_info->str_connection_name);
+			size_t int_temp_len = 0;
+			str_temp = snuri(conn_info->str_connection_name, strlen(conn_info->str_connection_name), &int_temp_len);
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"Refresh: 0; url=/postage/index.html?connection=", (size_t)47,
-				str_temp, strlen(str_temp),
+				str_temp, int_temp_len,
 				"&redirect=", (size_t)10,
-				str_uri, strlen(str_uri),
+				str_uri, int_uri_length,
 				"\015\012\015\012", (size_t)4);
 			SFREE(str_temp);
 #endif

@@ -105,7 +105,7 @@ void http_file_step1(struct sock_ev_client *client) {
 #else
 	if (client_http_file->bol_download) {
 		str_temp1 = client_http_file->str_uri_part;
-		SFINISH_CHECK((client_http_file->str_uri_part = cstr_to_uri(str_temp1)) != NULL, "cstr_to_uri failed");
+		SFINISH_CHECK((client_http_file->str_uri_part = snuri(str_temp1, client_http_file->int_uri_part_len, &client_http_file->int_uri_part_len)) != NULL, "snuri failed");
 		SFREE(str_temp1);
 
 		SFINISH_CHECK(client_http_file->str_uri = canonical(str_global_sql_root, client_http_file->str_uri_part, "valid_path"),

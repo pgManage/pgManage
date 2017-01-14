@@ -135,9 +135,9 @@ Since it finds the extension itself, you should just send the whole name over.
 char *contenttype(char *str_filename);
 
 /*
-Encodes a string for use in a URI.
+Encodes a string (with a length) for use in a URI.
 */
-char *cstr_to_uri(char *str_input);
+char *snuri(char *str_input, size_t int_in_len, size_t *ptr_int_out_len);
 
 /*
 Same as the standard function strstr, but you send the lengths too. This makes

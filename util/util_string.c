@@ -623,30 +623,44 @@ error:
 	return NULL;
 }
 
-char *cstr_to_uri(char *str_input) {
+char *snuri(char *str_input, size_t int_in_len, size_t *ptr_int_out_len) {
 	char *str_result = NULL;
-	size_t int_result_len = 0;
-
-	SERROR_SNCAT(str_result, &int_result_len,
-		"", (size_t)0);
-	char str_temp[10];
-
 	char *ptr_input = str_input;
+	*ptr_int_out_len = int_in_len;
+
+	// Calculate actual needed length
 	for (; *ptr_input; ptr_input++) {
 		if (!((*ptr_input >= 'a' && *ptr_input <= 'z') || (*ptr_input >= 'A' && *ptr_input <= 'Z') ||
-				(*ptr_input >= '0' && *ptr_input <= '9') || *ptr_input == '+' || *ptr_input == ',' ||
-				*ptr_input == '.' || *ptr_input == '_' || *ptr_input == '-' || *ptr_input == '/')) {
-			sprintf(str_temp, "%%%02X", *ptr_input);
-		} else {
-			str_temp[0] = *ptr_input;
-			str_temp[1] = 0;
+			(*ptr_input >= '0' && *ptr_input <= '9') || *ptr_input == '+' || *ptr_input == ',' ||
+			*ptr_input == '.' || *ptr_input == '_' || *ptr_input == '-' || *ptr_input == '/')) {
+
+			// Only need to add two chars because there is already space for one.
+			*ptr_int_out_len = (*ptr_int_out_len) + 2;
 		}
-		SERROR_SNFCAT(str_result, &int_result_len,
-			str_temp, strlen(str_temp));
+	}
+
+	SERROR_SALLOC(str_result, (*ptr_int_out_len) + 1);
+
+	ptr_input = str_input;
+	char *ptr_result = str_result;
+
+	for (; *ptr_input; ptr_input++) {
+		if (!((*ptr_input >= 'a' && *ptr_input <= 'z') || (*ptr_input >= 'A' && *ptr_input <= 'Z') ||
+			(*ptr_input >= '0' && *ptr_input <= '9') || *ptr_input == '+' || *ptr_input == ',' ||
+			*ptr_input == '.' || *ptr_input == '_' || *ptr_input == '-' || *ptr_input == '/')) {
+
+			// Insert encoded char right where we need it
+			snprintf(ptr_result, 3, "%%%02X", *ptr_input);
+			ptr_result += 3;
+		} else {
+			ptr_result[0] = *ptr_input;
+			ptr_result += 1;
+		}
 	}
 	bol_error_state = false;
 	return str_result;
 error:
+	*ptr_int_out_len = 0;
 	SFREE(str_result);
 	return NULL;
 }
