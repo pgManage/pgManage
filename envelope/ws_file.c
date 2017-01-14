@@ -19,6 +19,9 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_query = NULL;
 	size_t int_response_len = 0;
 	size_t int_query_len = 0;
+	size_t int_input_path_len = 0;
+	size_t int_input_path_to_len = 0;
+	size_t int_change_stamp_len = 0;
 
 	client_request->int_response_id = 0;
 	client_request->arr_response = DArray_create(sizeof(char *), 1);
@@ -68,8 +71,9 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 		}
 
 		str_temp = client_file->str_input_path;
-		client_file->str_input_path = unescape_value(str_temp);
-		SFINISH_CHECK(client_file->str_input_path != NULL, "unescape_value failed");
+		int_input_path_len = strlen(str_temp);
+		client_file->str_input_path = bunescape_value(str_temp, &int_input_path_len);
+		SFINISH_CHECK(client_file->str_input_path != NULL, "bunescape_value failed");
 
 		SDEBUG("client_file->str_input_path: %s", client_file->str_input_path);
 		if (strncmp(client_file->str_input_path, "/", 2) != 0 && strlen(client_file->str_input_path) > 1) {
@@ -104,8 +108,9 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 		}
 
 		str_temp = client_file->str_input_path;
-		client_file->str_input_path = unescape_value(str_temp);
-		SFINISH_CHECK(client_file->str_input_path != NULL, "unescape_value failed");
+		int_input_path_len = strlen(str_temp);
+		client_file->str_input_path = bunescape_value(str_temp, &int_input_path_len);
+		SFINISH_CHECK(client_file->str_input_path != NULL, "bunescape_value failed");
 
 		client_file->str_canonical_start = canonical_full_start(client_file->str_input_path);
 		SFINISH_CHECK(client_file->str_canonical_start != NULL, "Invalid Path");
@@ -137,11 +142,13 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 			*ptr_query = 0;
 		}
 
-		client_file->str_input_path = unescape_value(str_query);
-		SFINISH_CHECK(client_file->str_input_path != NULL, "unescape_value failed");
+		int_input_path_len = strlen(str_query);
+		client_file->str_input_path = bunescape_value(str_query, &int_input_path_len);
+		SFINISH_CHECK(client_file->str_input_path != NULL, "bunescape_value failed");
 
-		client_file->str_change_stamp = unescape_value(ptr_change_stamp);
-		SFINISH_CHECK(client_file->str_change_stamp != NULL, "unescape_value failed");
+		int_change_stamp_len = strlen(ptr_change_stamp);
+		client_file->str_change_stamp = bunescape_value(ptr_change_stamp, &int_change_stamp_len);
+		SFINISH_CHECK(client_file->str_change_stamp != NULL, "bunescape_value failed");
 
 		client_file->str_canonical_start = canonical_full_start(client_file->str_input_path);
 		SFINISH_CHECK(client_file->str_canonical_start != NULL, "Invalid Path");
@@ -167,8 +174,9 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 			ptr_query = client_file->str_input_path + strlen(client_file->str_input_path);
 		}
 
-		client_file->str_input_path = unescape_value(str_temp);
-		SFINISH_CHECK(client_file->str_input_path != NULL, "unescape_value failed");
+		int_input_path_len = strlen(str_temp);
+		client_file->str_input_path = bunescape_value(str_temp, &int_input_path_len);
+		SFINISH_CHECK(client_file->str_input_path != NULL, "bunescape_value failed");
 
 		str_temp = ptr_query + 1;
 		ptr_query = strstr(str_temp, "\012");
@@ -178,8 +186,9 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 			ptr_query = client_file->str_input_path + strlen(client_file->str_input_path);
 		}
 
-		client_file->str_input_path_to = unescape_value(str_temp);
-		SFINISH_CHECK(client_file->str_input_path_to != NULL, "unescape_value failed");
+		int_input_path_to_len = strlen(str_temp);
+		client_file->str_input_path_to = bunescape_value(str_temp, &int_input_path_to_len);
+		SFINISH_CHECK(client_file->str_input_path_to != NULL, "bunescape_value failed");
 
 		client_file->str_canonical_start = canonical_full_start(client_file->str_input_path);
 		SFINISH_CHECK(client_file->str_canonical_start != NULL, "Invalid Path");
@@ -224,8 +233,9 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 			*ptr_query = 0;
 		}
 
-		client_file->str_input_path = unescape_value(str_temp);
-		SFINISH_CHECK(client_file->str_input_path != NULL, "unescape_value failed");
+		int_input_path_len = strlen(str_temp);
+		client_file->str_input_path = bunescape_value(str_temp, &int_input_path_len);
+		SFINISH_CHECK(client_file->str_input_path != NULL, "bunescape_value failed");
 
 		client_file->str_canonical_start = canonical_full_start(client_file->str_input_path);
 		SFINISH_CHECK(client_file->str_canonical_start != NULL, "Invalid Path");
@@ -251,8 +261,9 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 			*ptr_query = 0;
 		}
 
-		client_file->str_input_path = unescape_value(str_temp);
-		SFINISH_CHECK(client_file->str_input_path != NULL, "unescape_value failed");
+		int_input_path_len = strlen(str_temp);
+		client_file->str_input_path = bunescape_value(str_temp, &int_input_path_len);
+		SFINISH_CHECK(client_file->str_input_path != NULL, "bunescape_value failed");
 
 		client_file->str_canonical_start = canonical_full_start(client_file->str_input_path);
 		SFINISH_CHECK(client_file->str_canonical_start != NULL, "Invalid Path");
@@ -285,8 +296,9 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 		ptr_query += 1;
 		*(ptr_query - 1) = 0;
 
-		client_file->str_input_path = unescape_value(str_temp);
-		SFINISH_CHECK(client_file->str_input_path != NULL, "unescape_value failed");
+		int_input_path_len = strlen(str_temp);
+		client_file->str_input_path = bunescape_value(str_temp, &int_input_path_len);
+		SFINISH_CHECK(client_file->str_input_path != NULL, "bunescape_value failed");
 
 		client_file->str_canonical_start = canonical_full_start(client_file->str_input_path);
 		SFINISH_CHECK(client_file->str_canonical_start != NULL, "Invalid Path");
@@ -305,9 +317,9 @@ char *ws_file_step1(struct sock_ev_client_request *client_request) {
 			ptr_query += 1;
 		}
 
-		// TODO: replace all `unescape_value` calls with `bunescape_value`
-		str_search_temp = unescape_value(str_temp);
-		SFINISH_CHECK(str_search_temp != NULL, "unescape_value failed");
+		int_input_path_to_len = strlen(str_temp);
+		str_search_temp = bunescape_value(str_temp, &int_input_path_to_len);
+		SFINISH_CHECK(str_search_temp != NULL, "bunescape_value failed");
 
 		SFINISH_SNCAT(
 			client_file->str_search, &client_file->int_search_len,
@@ -2612,8 +2624,8 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 					str_line, int_line_length
 				);
 				if (client_file->bol_case_insensitive) {
-					str_toupper(str_line_copy);
-					str_toupper(client_file->str_search);
+					bstr_toupper(str_line_copy, int_line_length);
+					bstr_toupper(client_file->str_search, strlen(client_file->str_search));
 				}
 				bol_match = strstr(str_line_copy, client_file->str_search) != NULL;
 			} else {

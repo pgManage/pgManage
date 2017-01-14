@@ -127,18 +127,18 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 		SDEBUG("str_pk_header: %s", str_pk_header);
 
 		SFINISH_BREPLACE(str_col_name, &int_length, "\"", "\"\"", "g");
-		str_temp1 = unescape_value(str_col_name);
+		str_temp1 = bunescape_value(str_col_name, &int_length);
 		SDEBUG("str_temp1: %s", str_temp1);
-		SFINISH_CHECK(str_temp1 != NULL, "unescape_value failed, malformed request?");
+		SFINISH_CHECK(str_temp1 != NULL, "bunescape_value failed, malformed request?");
 		SFREE(str_col_name);
 		SFINISH_SNCAT(str_col_name, &int_col_name_len,
 			"\"", (size_t)1,
-			str_temp1, strlen(str_temp1),
+			str_temp1, int_length,
 			"\"", (size_t)1);
 		SFINISH_SNCAT(str_temp, &int_temp_len,
 			"\"", (size_t)1,
 			str_pk_header, strlen(str_pk_header),
-			str_temp1, strlen(str_temp1),
+			str_temp1, int_length,
 			"\"", (size_t)1);
 
 		SFREE(str_temp1);

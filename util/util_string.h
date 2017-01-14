@@ -52,13 +52,11 @@ bool check_to_escape(char *str_input, bool bol_as_ident);
 /*
 Escape a string for use in tab delimited data.
 */
-char *escape_value(char *str_input);
 char *bescape_value(char *str_input, size_t *ptr_int_length);
 
 /*
 Unescape a string from tab delimited data.
 */
-char *unescape_value(char *str_input);
 char *bunescape_value(char *str_input, size_t *ptr_int_length);
 
 /*

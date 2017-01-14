@@ -457,6 +457,7 @@ char *_DB_get_diagnostic(DB_conn *conn, PGresult *res) {
 	// DO NOT MESS WITH THE RETURN FORMAT OF THIS FUNCTION WITHOUT UPDATING THE JS
 	char *str_response = NULL;
 	size_t int_response_len = 0;
+	size_t int_temp_len = 0;
 	char *str_temp = NULL;
 
 	// get vars with error stuff
@@ -495,33 +496,39 @@ err_pos: %s\012",
 		return_error, return_detail, return_hint, return_query, return_context, return_err_pos);
 
 	str_temp = return_error;
-	return_error = escape_value(str_temp);
-	SFINISH_CHECK(return_error != NULL, "escape_value failed");
+	int_temp_len = strlen(str_temp);
+	return_error = bescape_value(str_temp, &int_temp_len);
+	SFINISH_CHECK(return_error != NULL, "bescape_value failed");
 	SFREE(str_temp);
 
 	str_temp = return_detail;
-	return_detail = escape_value(str_temp);
-	SFINISH_CHECK(return_detail != NULL, "escape_value failed");
+	int_temp_len = strlen(str_temp);
+	return_detail = bescape_value(str_temp, &int_temp_len);
+	SFINISH_CHECK(return_detail != NULL, "bescape_value failed");
 	SFREE(str_temp);
 
 	str_temp = return_hint;
-	return_hint = escape_value(str_temp);
-	SFINISH_CHECK(return_hint != NULL, "escape_value failed");
+	int_temp_len = strlen(str_temp);
+	return_hint = bescape_value(str_temp, &int_temp_len);
+	SFINISH_CHECK(return_hint != NULL, "bescape_value failed");
 	SFREE(str_temp);
 
 	str_temp = return_query;
-	return_query = escape_value(str_temp);
-	SFINISH_CHECK(return_query != NULL, "escape_value failed");
+	int_temp_len = strlen(str_temp);
+	return_query = bescape_value(str_temp, &int_temp_len);
+	SFINISH_CHECK(return_query != NULL, "bescape_value failed");
 	SFREE(str_temp);
 
 	str_temp = return_context;
-	return_context = escape_value(str_temp);
-	SFINISH_CHECK(return_context != NULL, "escape_value failed");
+	int_temp_len = strlen(str_temp);
+	return_context = bescape_value(str_temp, &int_temp_len);
+	SFINISH_CHECK(return_context != NULL, "bescape_value failed");
 	SFREE(str_temp);
 
 	str_temp = return_err_pos;
-	return_err_pos = escape_value(str_temp);
-	SFINISH_CHECK(return_err_pos != NULL, "escape_value failed");
+	int_temp_len = strlen(str_temp);
+	return_err_pos = bescape_value(str_temp, &int_temp_len);
+	SFINISH_CHECK(return_err_pos != NULL, "bescape_value failed");
 	SFREE(str_temp);
 
 	// build response

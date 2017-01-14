@@ -28,17 +28,18 @@ char *get_table_name(char *_str_query) {
 
 	SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
 
-	//TODO: unescape_value() lengths
-	str_temp1 = unescape_value(str_temp);
-	SERROR_CHECK(str_temp1 != NULL, "unescape_value failed");
+	str_temp1 = bunescape_value(str_temp, &int_temp_len);
+	SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
 	SFREE(str_temp);
+	str_temp = str_temp1;
+	str_temp1 = NULL;
 
 	//TODO: str_temp1 length
 	SERROR_SNCAT(str_table_name, &int_table_name_len,
 		"\"", (size_t)1,
-		str_temp1, strlen(str_temp1),
+		str_temp, int_temp_len,
 		"\"", (size_t)1);
-	SFREE(str_temp1);
+	SFREE(str_temp);
 
 	if (bol_schema) {
 		ptr_table_name = ptr_end_table_name + 1;
@@ -46,19 +47,19 @@ char *get_table_name(char *_str_query) {
 		*ptr_end_table_name = 0;
 
 		SERROR_SNCAT(str_temp, &int_temp_len, ptr_table_name, ptr_end_table_name - ptr_table_name);
-		//TODO: SERROR_REPLACE() lengths
 		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
 
-		//TODO: unescape_value() lengths
-		str_temp1 = unescape_value(str_temp);
-		SERROR_CHECK(str_temp1 != NULL, "unescape_value failed");
+		str_temp1 = bunescape_value(str_temp, &int_temp_len);
+		SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
 		SFREE(str_temp);
+		str_temp = str_temp1;
+		str_temp1 = NULL;
 
 		SERROR_SNFCAT(str_table_name, &int_table_name_len,
 			".\"", (size_t)2,
-			str_temp1, strlen(str_temp1),
+			str_temp, int_temp_len,
 			"\"", (size_t)1);
-		SFREE(str_temp1);
+		SFREE(str_temp);
 	}
 
 	SFREE(str_query);
@@ -99,27 +100,24 @@ char *get_return_columns(char *_str_query, char *str_table_name) {
 		ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
 
 	if (strncmp(str_temp, "*", 2) != 0) {
-		//TODO: SERROR_REPLACE() lengths
 		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
 		SERROR_BREPLACE(str_temp, &int_temp_len, "\t", "\", {{TABLE}}.\"", "g");
 
-		//TODO: unescape_value() lengths
-		str_temp1 = unescape_value(str_temp);
-		SERROR_CHECK(str_temp1 != NULL, "unescape_value failed");
+		str_temp1 = bunescape_value(str_temp, &int_temp_len);
+		SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
 		SFREE(str_temp);
+		str_temp = str_temp1;
+		str_temp1 = NULL;
 
 		SERROR_SNCAT(str_return_columns, &int_return_columns_len,
 			"{{TABLE}}.\"", (size_t)11,
-			str_temp1, strlen(str_temp1),
+			str_temp, int_temp_len,
 			"\"", (size_t)1);
-		SFREE(str_temp1);
+		SFREE(str_temp);
 
-		//TODO: SERROR_REPLACE() lengths
 		SERROR_BREPLACE(str_return_columns, &int_return_columns_len, "{{TABLE}}", str_table_name, "g");
 	} else {
-		//TODO: int_temp_len
-		SERROR_SNCAT(str_return_columns, &int_return_columns_len,
-			str_temp, strlen(str_temp));
+		SERROR_SNCAT(str_return_columns, &int_return_columns_len, str_temp, int_temp_len);
 	}
 	SFREE(str_temp);
 	SFREE(str_query);
@@ -159,37 +157,36 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query) {
 
 	SERROR_SNCAT(str_temp, &int_temp_len, ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
 	if (strncmp(str_temp, "*", 2) != 0) {
-		//TODO: SERROR_REPLACE() add lengths
-		SERROR_REPLACE(str_temp, "\"", "\"\"", "");
+		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
 
-		SERROR_REPLACE(str_temp, "\\t", "TABHERE3141592653589793TABHERE", "g");
-		str_temp1 = unescape_value(str_temp);
-		SERROR_CHECK(str_temp1 != NULL, "unescape_value failed");
+		SERROR_BREPLACE(str_temp, &int_temp_len, "\\t", "TABHERE3141592653589793TABHERE", "g");
+		str_temp1 = bunescape_value(str_temp, &int_temp_len);
+		SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
 		SFREE(str_temp);
+		str_temp = str_temp1;
+		str_temp1 = NULL;
 		if (driver == DB_DRIVER_POSTGRES) {
-			SERROR_REPLACE(str_temp1, "\t", "\"::text, '\\N'), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || E'\\t' || replace(replace(replace(replace(COALESCE(\"", "g");
+			SERROR_BREPLACE(str_temp, &int_temp_len, "\t", "\"::text, '\\N'), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || E'\\t' || replace(replace(replace(replace(COALESCE(\"", "g");
 		} else {
-			SERROR_REPLACE(str_temp1, "\t",
+			SERROR_BREPLACE(str_temp, &int_temp_len, "\t",
 				"\" AS nvarchar(MAX)), CAST('\\N' AS nvarchar(MAX))) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + "
 				"CAST('\t' AS nvarchar(MAX)) + replace(replace(replace(replace(CAST(COALESCE(CAST(\"", "g");
 		}
-		SERROR_REPLACE(str_temp1, "TABHERE3141592653589793TABHERE", "\t", "g");
+		SERROR_BREPLACE(str_temp, &int_temp_len, "TABHERE3141592653589793TABHERE", "\t", "g");
 		if (driver == DB_DRIVER_POSTGRES) {
 			SERROR_SNCAT(str_return_columns, &int_return_columns_len,
 				"replace(replace(replace(replace(COALESCE(\"", (size_t)42,
-				str_temp1, strlen(str_temp1),
+				str_temp, int_temp_len,
 				"\"::text, '\\N'), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || E'\n'", (size_t)81);
 		} else {
 			SERROR_SNCAT(str_return_columns, &int_return_columns_len,
 				"replace(replace(replace(replace(CAST(COALESCE(CAST(\"", (size_t)52,
-				str_temp1, strlen(str_temp1),
+				str_temp, int_temp_len,
 				"\" AS nvarchar(MAX)), CAST('\\N' AS nvarchar(MAX))) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX))", (size_t)162);
 		}
-		SFREE(str_temp1);
+		SFREE(str_temp);
 	} else {
-		//TODO: get length of str_temp
-		SERROR_SNCAT(str_return_columns, &int_return_columns_len,
-			str_temp, strlen(str_temp));
+		SERROR_SNCAT(str_return_columns, &int_return_columns_len, str_temp, int_temp_len);
 	}
 	SFREE(str_temp);
 	SFREE(str_query);

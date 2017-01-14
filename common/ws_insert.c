@@ -85,12 +85,12 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 	// Replace tabs with "\",\"" so that we can use them in an sql statement
 	SFINISH_BREPLACE(client_insert->str_column_names, &client_insert->int_column_names_len, "\t", "\",\"", "g");
 	// unescape the column names
-	str_temp = unescape_value(client_insert->str_column_names);
-	SFINISH_CHECK(str_temp != NULL, "unescape_value failed, malformed request?");
+	str_temp = bunescape_value(client_insert->str_column_names, &client_insert->int_column_names_len);
+	SFINISH_CHECK(str_temp != NULL, "bunescape_value failed, malformed request?");
 	SFREE(client_insert->str_column_names);
 	SFINISH_SNCAT(client_insert->str_column_names, &client_insert->int_column_names_len,
 		"\"", (size_t)1,
-		str_temp, strlen(str_temp),
+		str_temp, client_insert->int_column_names_len,
 		"\"", (size_t)1);
 	SFREE(str_temp);
 
@@ -115,7 +115,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 		ptr_pk += int_col_name_len + 1;
 
 		str_temp1 = DB_escape_identifier(client_request->parent->conn, str_col_name, int_col_name_len);
-		SFINISH_CHECK(str_temp1 != NULL, "unescape_value failed, malformed request?");
+		SFINISH_CHECK(str_temp1 != NULL, "DB_escape_identifier failed, malformed request?");
 		SFREE(str_col_name);
 		str_col_name = str_temp1;
 		int_col_name_len = strlen(str_col_name);
@@ -129,7 +129,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 		ptr_seq += int_col_seq_len + 1;
 
 		str_temp1 = DB_escape_literal(client_request->parent->conn, str_col_seq, int_col_seq_len);
-		SFINISH_CHECK(str_temp1 != NULL, "unescape_value failed, malformed request?");
+		SFINISH_CHECK(str_temp1 != NULL, "DB_escape_literal failed, malformed request?");
 		SFREE(str_col_seq);
 		str_col_seq = str_temp1;
 		int_col_seq_len = strlen(str_col_seq);
@@ -213,9 +213,9 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 		str_col_name[int_col_name_len] = '\0';
 		ptr_column_names += int_col_name_len + 1;
 
-		SFINISH_REPLACE(str_col_name, "\"", "\"\"", "g");
-		str_temp1 = unescape_value(str_col_name);
-		SFINISH_CHECK(str_temp1 != NULL, "unescape_value failed, malformed request?");
+		SFINISH_BREPLACE(str_col_name, &int_col_name_len, "\"", "\"\"", "g");
+		str_temp1 = bunescape_value(str_col_name, &int_col_name_len);
+		SFINISH_CHECK(str_temp1 != NULL, "bunescape_value failed, malformed request?");
 		SFREE(str_col_name);
 		SFINISH_SNCAT(str_col_name, &int_col_name_len,
 			"\"", (size_t)1,

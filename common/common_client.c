@@ -25,7 +25,8 @@ void notice_processor(void *arg, const char *str_notice) {
 		ptr_actual_message += 2;
 		*(ptr_actual_message - 2) = 0;
 	}
-	str_temp = escape_value(ptr_actual_message);
+	size_t int_temp_len = strlen(ptr_actual_message);
+	str_temp = bunescape_value(ptr_actual_message, &int_temp_len);
 	SDEBUG("%s\t%s", str_notice, str_temp);
 	if (client->str_notice != NULL) {
 		int_notice_len = strlen(client->str_notice);
@@ -33,12 +34,12 @@ void notice_processor(void *arg, const char *str_notice) {
 			"\012", (size_t)1,
 			str_notice, strlen(str_notice),
 			"\t", (size_t)1,
-			str_temp, strlen(str_temp));
+			str_temp, int_temp_len);
 	} else {
 		SERROR_SNCAT(client->str_notice, &int_notice_len,
 			str_notice, strlen(str_notice),
 			"\t", (size_t)1,
-			str_temp, strlen(str_temp));
+			str_temp, int_temp_len);
 	}
 	SFREE(str_temp);
 	bol_error_state = false;
@@ -99,8 +100,9 @@ void _send_notices(struct sock_ev_client *client) {
 	while (pg_notify_current != NULL) {
 		memset(str_temp, 0, 101);
 		sprintf(str_temp, "%d", pg_notify_current->be_pid);
-		str_temp2 = escape_value(pg_notify_current->extra != NULL ? pg_notify_current->extra : "");
-		SFINISH_CHECK(str_temp2 != NULL, "escape_value failed");
+		size_t int_temp2_len = pg_notify_current->extra != NULL ? strlen(pg_notify_current->extra) : 0;
+		str_temp2 = bescape_value(pg_notify_current->extra != NULL ? pg_notify_current->extra : "", &int_temp2_len);
+		SFINISH_CHECK(str_temp2 != NULL, "bescape_value failed");
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"NOTIFY\t", (size_t)7,
 			pg_notify_current->relname, strlen(pg_notify_current->relname),
@@ -1346,8 +1348,8 @@ bool ws_client_info_cb(EV_P, void *cb_data, DB_result *res) {
 			get_connection_info(client_request->parent->str_connname, NULL)
 		));
 
-	str_conn_desc_enc = escape_value(str_conn_desc);
-	SFINISH_CHECK(str_conn_desc_enc != NULL, "escape_value failed!");
+	str_conn_desc_enc = bescape_value(str_conn_desc, &int_conn_desc_len);
+	SFINISH_CHECK(str_conn_desc_enc != NULL, "bescape_value failed!");
 	SFINISH_SNCAT(str_response, &int_response_len,
 		"VERSION\t", (size_t)8,
 		VERSION, strlen(VERSION),

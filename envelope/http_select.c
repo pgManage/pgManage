@@ -55,7 +55,7 @@ void http_select_step1(struct sock_ev_client *client) {
 	// If src is in fact a query, not a object name, then wrap with parentheses
 	SFINISH_SNCAT(str_temp, &int_temp_len,
 		client_select->str_real_table_name, client_select->int_real_table_name_len);
-	str_temp = str_toupper(str_temp);
+	bstr_toupper(str_temp, int_temp_len);
 	SDEBUG("str_temp: %s", str_temp);
 	if (strstr(str_temp, "SELECT") != NULL && *client_select->str_real_table_name != '(') {
 		SFREE(str_temp);
@@ -518,7 +518,7 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 					   strncmp(str_type, "int8", 4) == 0) {
 				int_one_column_len = (size_t)int_current_len;
 				str_one_column = bescape_value(DArray_get(arr_row_values, i), &int_one_column_len);
-				SFINISH_CHECK(str_one_column != NULL, "escape_value failed");
+				SFINISH_CHECK(str_one_column != NULL, "bescape_value failed");
 			} else {
 				// SDEBUG("DArray_get(arr_row_values, i): %s", DArray_get(arr_row_values, i));
 				str_one_column = jsonify(DArray_get(arr_row_values, i));

@@ -50,7 +50,7 @@ void http_export_step1(struct sock_ev_client *client) {
 	// This will hold the SQL query becuase we are ending the string right before
 	// the attr headers start
 	str_query = bunescape_value(client->str_request, &int_query_len);
-	SFINISH_CHECK(str_query != NULL, "unescape_value failed");
+	SFINISH_CHECK(str_query != NULL, "bunescape_value failed");
 
 	// Start building SQL
 	SFINISH_SNCAT(
@@ -81,7 +81,7 @@ void http_export_step1(struct sock_ev_client *client) {
 		// Unescape the value
 		str_temp = str_attr_value;
 		str_attr_value = bunescape_value(str_temp, &int_attr_value_len);
-		SFINISH_CHECK(str_attr_value != NULL, "unescape_value failed");
+		SFINISH_CHECK(str_attr_value != NULL, "bunescape_value failed");
 		SFREE(str_temp);
 
 		// Add both to the sql

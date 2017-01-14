@@ -364,9 +364,9 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 
 			SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
 				str_sql, strlen(str_sql));
-			str_escaped_sql = escape_value(str_sql_temp);
+			str_escaped_sql = bescape_value(str_sql_temp, &int_sql_temp_len);
 			SFREE(str_sql_temp);
-			SFINISH_CHECK(str_escaped_sql != NULL, "escape_value failed");
+			SFINISH_CHECK(str_escaped_sql != NULL, "bescape_value failed");
 			int_escaped_sql_len = strlen(str_escaped_sql);
 
 			SFINISH_SNCAT(str_response, &int_response_len,
@@ -743,9 +743,9 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				str_sql = (char *)DArray_get(client_request->arr_query, (size_t)client_request->int_i);
 				SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
 					str_sql, strlen(str_sql));
-				str_escaped_sql = escape_value(str_sql_temp);
+				str_escaped_sql = bescape_value(str_sql_temp, &int_sql_temp_len);
 				SFREE(str_sql_temp);
-				SFINISH_CHECK(str_escaped_sql != NULL, "unescape_value failed");
+				SFINISH_CHECK(str_escaped_sql != NULL, "bescape_value failed");
 
 				SFINISH_SNFCAT(str_response, &int_response_len,
 					"QUERY\t", (size_t)6,
@@ -825,9 +825,9 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 			SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
 				PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column),
 				strlen(PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column)));
-			str_temp1 = escape_value(str_sql_temp);
+			str_temp1 = bescape_value(str_sql_temp, &int_sql_temp_len);
 			SFREE(str_sql_temp);
-			SFINISH_CHECK(str_temp1 != NULL, "escape_value failed");
+			SFINISH_CHECK(str_temp1 != NULL, "bescape_value failed");
 
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				str_temp1, strlen(str_temp1),

@@ -41,11 +41,6 @@ bool check_to_escape(char *str_input, bool bol_as_ident) {
 	return (int_num_quotes % 2) != 0;
 }
 
-char *escape_value(char *str_input) {
-	size_t int_length = strlen(str_input);
-	return bescape_value(str_input, &int_length);
-}
-
 char *bescape_value(char *str_input, size_t *ptr_int_length) {
 	char *str_return = NULL;
 	SERROR_SALLOC(str_return, (*ptr_int_length) + 1);
@@ -62,11 +57,6 @@ error:
 	bol_error_state = false;
 	SFREE(str_return);
 	return NULL;
-}
-
-char *unescape_value(char *str_input) {
-	size_t int_length = strlen(str_input);
-	return bunescape_value(str_input, &int_length);
 }
 
 char *bunescape_value(char *str_input, size_t *ptr_int_length) {
@@ -550,7 +540,6 @@ error:
 	return NULL;
 }
 
-/* upper-cases s in place */
 char *bstr_toupper(char *str, size_t int_strlen) {
 	char *s = str;
 	size_t int_i = 0;
@@ -562,7 +551,6 @@ char *bstr_toupper(char *str, size_t int_strlen) {
 	return str;
 }
 
-/* lower-cases s in place */
 char *bstr_tolower(char *str, size_t int_strlen) {
 	char *s = str;
 	size_t int_i = 0;

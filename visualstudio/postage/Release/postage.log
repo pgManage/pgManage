@@ -1,12 +1,12 @@
 ﻿  common_auth.c
   common_client.c
-..\..\common\common_client.c(243): warning C4022: 'DuplicateHandle': pointer mismatch for actual parameter 2
-..\..\common\common_client.c(243): warning C4047: 'function': 'intptr_t' differs in levels of indirection from 'HANDLE'
-..\..\common\common_client.c(243): warning C4024: '_open_osfhandle': different types for formal and actual parameter 1
-..\..\common\common_client.c(734): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(736): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(747): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(749): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(245): warning C4022: 'DuplicateHandle': pointer mismatch for actual parameter 2
+..\..\common\common_client.c(245): warning C4047: 'function': 'intptr_t' differs in levels of indirection from 'HANDLE'
+..\..\common\common_client.c(245): warning C4024: '_open_osfhandle': different types for formal and actual parameter 1
+..\..\common\common_client.c(736): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(738): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(749): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(751): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
   common_config.c
   common_main.c
 c:\users\nunzio tocci\repos\postage\common\../dependencies/libev/ev.c(205): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition
@@ -61,9 +61,9 @@ c:\users\nunzio tocci\repos\postage\dependencies\libev\ev_select.c(200): warning
   util_sql_split.c
   util_string.c
   Generating code
-  0 of 402 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+  12 of 400 functions ( 3.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    84 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.exe
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)

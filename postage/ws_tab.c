@@ -19,6 +19,9 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_query = NULL;
 	size_t int_response_len = 0;
 	size_t int_query_len = 0;
+	size_t int_path_len = 0;
+	size_t int_path_to_len = 0;
+	size_t int_change_stamp_len = 0;
 
 	client_request->int_response_id = 0;
 	client_request->arr_response = DArray_create(sizeof(char *), 1);
@@ -58,8 +61,9 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 		}
 
 		str_temp = client_tab->str_path;
-		client_tab->str_path = unescape_value(str_temp);
-		SFINISH_CHECK(client_tab->str_path != NULL, "unescape_value failed");
+		int_path_len = strlen(client_tab->str_path);
+		client_tab->str_path = bunescape_value(str_temp, &int_path_len);
+		SFINISH_CHECK(client_tab->str_path != NULL, "bunescape_value failed");
 
 		str_path_temp = client_tab->str_path;
 		client_tab->str_path = canonical(str_local_path_root, str_path_temp, "read_dir");
@@ -76,8 +80,9 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 		}
 
 		str_temp = client_tab->str_path;
-		client_tab->str_path = unescape_value(str_temp);
-		SFINISH_CHECK(client_tab->str_path != NULL, "unescape_value failed");
+		int_path_len = strlen(client_tab->str_path);
+		client_tab->str_path = bunescape_value(str_temp, &int_path_len);
+		SFINISH_CHECK(client_tab->str_path != NULL, "bunescape_value failed");
 
 		str_path_temp = client_tab->str_path;
 		client_tab->str_path = canonical(str_local_path_root, str_path_temp, "read_file");
@@ -102,11 +107,13 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 			*ptr_query = 0;
 		}
 
-		client_tab->str_path = unescape_value(str_query);
-		SFINISH_CHECK(client_tab->str_path != NULL, "unescape_value failed");
+		int_path_len = strlen(str_query);
+		client_tab->str_path = bunescape_value(str_query, &int_path_len);
+		SFINISH_CHECK(client_tab->str_path != NULL, "bunescape_value failed");
 
-		client_tab->str_change_stamp = unescape_value(ptr_change_stamp);
-		SFINISH_CHECK(client_tab->str_change_stamp != NULL, "unescape_value failed");
+		int_change_stamp_len = strlen(ptr_change_stamp);
+		client_tab->str_change_stamp = bunescape_value(ptr_change_stamp, &int_change_stamp_len);
+		SFINISH_CHECK(client_tab->str_change_stamp != NULL, "bunescape_value failed");
 
 		str_path_temp = client_tab->str_path;
 		client_tab->str_path = canonical(str_local_path_root, str_path_temp, "write_file");
@@ -123,8 +130,9 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 			*ptr_query = 0;
 		}
 
-		client_tab->str_path = unescape_value(str_temp);
-		SFINISH_CHECK(client_tab->str_path != NULL, "unescape_value failed");
+		int_path_len = strlen(str_temp);
+		client_tab->str_path = bunescape_value(str_temp, &int_path_len);
+		SFINISH_CHECK(client_tab->str_path != NULL, "bunescape_value failed");
 
 		str_temp = ptr_query + 1;
 		ptr_query = strstr(str_temp, "\012");
@@ -132,8 +140,9 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 			*ptr_query = 0;
 		}
 
-		client_tab->str_path_to = unescape_value(str_temp);
-		SFINISH_CHECK(client_tab->str_path_to != NULL, "unescape_value failed");
+		int_path_to_len = strlen(str_temp);
+		client_tab->str_path_to = bunescape_value(str_temp, &int_path_to_len);
+		SFINISH_CHECK(client_tab->str_path_to != NULL, "bunescape_value failed");
 
 		str_path_temp = client_tab->str_path;
 		client_tab->str_path = canonical(str_local_path_root, str_path_temp, "read_file");

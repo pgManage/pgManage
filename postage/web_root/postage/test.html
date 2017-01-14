@@ -473,32 +473,19 @@ test
 SELECT pg_sleep(5);
 */})],
 			['RAW FAIL 1', 'websocket', '', ml(function () {/*RAW
-DO $$ DECLARE
-BEGIN
-RAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';
-END $$
-*/}),
-			[
-				["QUERY\tDO $$ DECLARE\\nBEGIN\\nRAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';\\nEND $$\\n",
-				"START",
-				"NOTICE\t å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n",
-				"END",
-				"Rows Affected\n0\n",
-				"TRANSACTION COMPLETED"]
-			]],
-			['RAW FAIL 2', 'websocket', '', ml(function () {/*RAW
 å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥
 */}),
-			[
-				"QUERY\tå´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n",
-				"START",
-				"NOTICE\t identifier \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\" will be truncated to \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®\"\\n",
-				"END",
-				"Query failed: FATAL\nerror_text\tERROR:  syntax error at or near \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\"\\nLINE 1: å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆...\\n        ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t1\n"
-			]],
-			['RAW FAIL 3', 'websocket', '', ml(function () {/*RAW*/}),
+				[
+					"QUERY\tå´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n",
+					"START",
+					"NOTICE\t identifier \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\" will be truncated to \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®\"\n",
+					"END",
+					"Query failed: FATAL\nerror_text\tERROR:  syntax error at or near \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\"\\nLINE 1: å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆...\\n        ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t1\n"
+				]
+			],
+			['RAW FAIL 2', 'websocket', '', ml(function () {/*RAW*/}),
 			["Invalid RAW request"]],
-			['RAW', 'websocket', '', ml(function () {/*RAW
+			['RAW 1', 'websocket', '', ml(function () {/*RAW
 SELECT 'This is some test sql';
 */}),
 			[
@@ -510,6 +497,22 @@ SELECT 'This is some test sql';
 				'This is some test sql',
 				'\\.',
 				'TRANSACTION COMPLETED'
+			]],
+			['RAW 2', 'websocket', '', ml(function () {/*RAW
+DO $$ DECLARE
+BEGIN
+RAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';
+END $$
+*/}),
+			[
+				[
+					"QUERY\tDO $$ DECLARE\\nBEGIN\\nRAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';\\nEND $$\\n",
+					"START",
+					"NOTICE\t å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n",
+					"END",
+					"Rows Affected\n0\n",
+					"TRANSACTION COMPLETED"
+				]
 			]],
 			['RAW W/NOTIFY', 'websocket', '', ml(function () {/*RAW
 LISTEN postgres;

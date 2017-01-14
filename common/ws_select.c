@@ -90,8 +90,8 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 
 			// Unescape the value
 			str_temp1 = str_attr_value;
-			str_attr_value = unescape_value(str_temp1);
-			SFINISH_CHECK(str_attr_value != NULL, "unescape_value failed, malformed request?");
+			str_attr_value = bunescape_value(str_temp1, &int_attr_value_len);
+			SFINISH_CHECK(str_attr_value != NULL, "bunescape_value failed, malformed request?");
 			SFREE(str_temp1);
 
 			SDEBUG("str_attr_name : >%s<", str_attr_name);
@@ -346,11 +346,12 @@ bool ws_select_step4(EV_P, void *cb_data, DB_result *res) {
 
 	for (int_column = 0; int_column < int_num_columns; int_column += 1) {
 		// Get column name and escape it
-		str_temp1 = escape_value(DArray_get(arr_column_names, int_column));
-		SFINISH_CHECK(str_temp1 != NULL, "escape_value failed");
+		size_t int_temp1_len = strlen(DArray_get(arr_column_names, int_column));
+		str_temp1 = bescape_value(DArray_get(arr_column_names, int_column), &int_temp1_len);
+		SFINISH_CHECK(str_temp1 != NULL, "bescape_value failed");
 		// Add it to the response
 		SFINISH_SNFCAT(str_response, &int_response_len,
-			str_temp1, strlen(str_temp1),
+			str_temp1, int_temp1_len,
 			int_column < (int_num_columns - 1) ? "\t" : "\012", strlen(int_column < (int_num_columns - 1) ? "\t" : "\012"));
 
 		SFREE(str_temp1);

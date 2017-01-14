@@ -352,7 +352,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		} else {
 			int_host_len = strlen(str_host);
 		}
-		str_uri_ip_address = snuri(client->str_client_ip, INET_ADDRSTRLEN, &int_uri_ip_address_len);
+		str_uri_ip_address = snuri(client->str_client_ip, strlen(client->str_client_ip), &int_uri_ip_address_len);
 		SFINISH_CHECK(str_uri_ip_address != NULL, "snuri failed on string \"%s\"", client->str_client_ip);
 
 		str_uri_host = snuri(str_host, int_host_len, &int_uri_host_len);
