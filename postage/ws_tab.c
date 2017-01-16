@@ -1017,7 +1017,8 @@ void ws_tab_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 		) > 0,
 		"snprintf() failed"
 	);
-		str_response[100] = 0;
+	str_response[100] = 0;
+	int_response_len = strlen(str_response);
 #else
 	SFINISH_SALLOC(statdata, sizeof(struct stat));
 	if (stat(client_tab->str_path, statdata) == 0) {
