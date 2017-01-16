@@ -552,17 +552,21 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				SDEBUG("other_client_node: %p", other_client_node);
 				SDEBUG("client->str_request: %p", client->str_request);
 				if (other_client_node != NULL) {
-					str_client_cookie = str_cookie(client->str_request, client->str_cookie_name);
-					str_session_client_cookie = str_cookie(session_client->str_request, session_client->str_cookie_name);
+					size_t int_current_cookie_len = 0;
+					size_t int_session_cookie_len = 0;
+					str_client_cookie = str_cookie(client->str_request, client->int_request_len, client->str_cookie_name, &int_current_cookie_len);
+					str_session_client_cookie = str_cookie(session_client->str_request, session_client->int_request_len, session_client->str_cookie_name, &int_session_cookie_len);
+
 					SDEBUG("client->str_request: %p", client->str_request);
 					// clang-format off
                     if (str_client_cookie != NULL &&
                         str_session_client_cookie != NULL &&
                         strcmp(str_client_cookie, str_session_client_cookie) == 0 &&
-                        (       (       (       session_client->client_timeout_prepare != NULL &&
-                                                (       (session_client->client_timeout_prepare->close_time + (ev_tstamp)int_global_login_timeout) > ev_now(EV_A) ||
-                                                        session_client->client_timeout_prepare->close_time == 0
-                              ))) || session_client->client_timeout_prepare == NULL)) {
+                        (	(	(		session_client->client_timeout_prepare != NULL
+									&&	(			(session_client->client_timeout_prepare->close_time + (ev_tstamp)int_global_login_timeout) > ev_now(EV_A)
+												||	session_client->client_timeout_prepare->close_time == 0
+							))) || session_client->client_timeout_prepare == NULL)
+						) {
 						// clang-format on
 						client_timeout_prepare_free(session_client->client_timeout_prepare);
 
@@ -622,7 +626,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				if (client->conn == NULL) {
 					SDEBUG("client->str_request: %p", client->str_request);
 					// set_cnxn does its own error handling
-					if (set_cnxn(client, client->str_request, cnxn_cb) == NULL) {
+					if (set_cnxn(client, cnxn_cb) == NULL) {
 						ev_io_stop(EV_A, &client->io);
 						SERROR_CLIENT_CLOSE(client);
 					}
@@ -631,7 +635,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				} else {
 					// The reason for this, is because later functions depend on the
 					// values this function sets
-					if (set_cnxn(client, client->str_request, NULL) == NULL) {
+					if (set_cnxn(client, NULL) == NULL) {
 						ev_io_stop(EV_A, &client->io);
 						SERROR_CLIENT_CLOSE(client);
 					}
@@ -640,7 +644,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				if (client != NULL) {
 					////HANDSHAKE
 					SERROR_CHECK(
-						(str_response = WS_handshakeResponse(client->str_request)) != NULL, "Error getting handshake response");
+						(str_response = WS_handshakeResponse(client->str_request, client->int_request_len)) != NULL, "Error getting handshake response");
 
 					SDEBUG("str_response       : %s", str_response);
 					SDEBUG("client->str_request: %s", client->str_request);

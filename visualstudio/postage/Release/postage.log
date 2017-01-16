@@ -1,8 +1,9 @@
-﻿  ws_tab.c
+﻿  http_auth.c
+  util_request.c
   Generating code
-  4 of 400 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
+  14 of 400 functions ( 3.5%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    3 functions had inline decision re-evaluated but remain unchanged
+    9 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.exe
   postage.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)

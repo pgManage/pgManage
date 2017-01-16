@@ -35,6 +35,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 	size_t int_response_len = 0;
 	size_t int_uri_new_password_len = 0;
 	size_t int_uri_expiration_len = 0;
+	size_t int_referer_len = 0;
 
 	// get form data
 	str_form_data = query(client_auth->parent->str_request, client_auth->parent->int_request_len, &int_query_length);
@@ -205,15 +206,15 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		size_t int_temp = 0;
 		SFINISH_SNCAT(str_cookie_name, &int_temp, "envelope", (size_t)8);
 #else
-		str_referer = request_header(client_auth->parent->str_request, "referer");
+		str_referer = request_header(client_auth->parent->str_request, client_auth->parent->int_request_len, "referer", &int_referer_len);
 		SFINISH_CHECK(str_referer != NULL, "No Referer header");
 		SDEBUG("str_referer: %s", str_referer);
-		ptr_conn = strstr(str_referer, "/postage/");
+		ptr_conn = bstrstr(str_referer, int_referer_len, "/postage/", (size_t)9);
 		SDEBUG("ptr_conn: %s", ptr_conn);
 		SFINISH_CHECK(ptr_conn != NULL, "Invalid Referer header");
 		ptr_conn += strlen("/postage/");
 		SDEBUG("ptr_conn: %s", ptr_conn);
-		ptr_conn_end = strstr(ptr_conn, "/");
+		ptr_conn_end = bstrstr(ptr_conn, int_referer_len - (size_t)(ptr_conn - str_referer), "/", (size_t)1);
 		SFINISH_CHECK(ptr_conn_end != NULL, "Invalid Referer header");
 		*ptr_conn_end = 0;
 		SDEBUG("ptr_conn: %s", ptr_conn);
@@ -223,23 +224,22 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 #endif
 
 		SFREE_PWORD(str_form_data);
-		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, str_cookie_name);
+		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &int_cookie_len);
 		SFINISH_CHECK(client_auth->str_cookie_encrypted != NULL, "str_cookie failed");
-		size_t cookie_len = strlen(client_auth->str_cookie_encrypted);
-		str_cookie_decrypted = aes_decrypt(client_auth->str_cookie_encrypted, &cookie_len);
+		str_cookie_decrypted = aes_decrypt(client_auth->str_cookie_encrypted, &int_cookie_len);
 		SFREE(client_auth->str_cookie_encrypted);
-		client_auth->str_user = getpar(str_cookie_decrypted, "username", cookie_len, &client_auth->int_user_length);
-		client_auth->str_password = getpar(str_cookie_decrypted, "password", cookie_len, &client_auth->int_password_length);
-		str_expiration = getpar(str_cookie_decrypted, "expiration", cookie_len, &int_expiration_len);
+		client_auth->str_user = getpar(str_cookie_decrypted, "username", int_cookie_len, &client_auth->int_user_length);
+		client_auth->str_password = getpar(str_cookie_decrypted, "password", int_cookie_len, &client_auth->int_password_length);
+		str_expiration = getpar(str_cookie_decrypted, "expiration", int_cookie_len, &int_expiration_len);
 
 #ifdef ENVELOPE
 		SFINISH_SNCAT(client_auth->str_connname, &client_auth->int_conn_length, "", (size_t)0);
 #else
-		client_auth->str_database = getpar(str_cookie_decrypted, "dbname", cookie_len, &client_auth->int_dbname_length);
-		client_auth->str_connname = getpar(str_cookie_decrypted, "connname", cookie_len, &client_auth->int_connname_length);
+		client_auth->str_database = getpar(str_cookie_decrypted, "dbname", int_cookie_len, &client_auth->int_dbname_length);
+		client_auth->str_connname = getpar(str_cookie_decrypted, "connname", int_cookie_len, &client_auth->int_connname_length);
 		SFINISH_CHECK(client_auth->str_connname != NULL, "no connection name");
 
-		client_auth->str_conn = getpar(str_cookie_decrypted, "conn", cookie_len, &client_auth->int_conn_length);
+		client_auth->str_conn = getpar(str_cookie_decrypted, "conn", int_cookie_len, &client_auth->int_conn_length);
 		if (client_auth->str_conn != NULL && client_auth->int_conn_length == 0) {
 			SFREE(client_auth->str_conn);
 		} else {
@@ -283,13 +283,15 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE NEW PASSWORD IN THE
 		// CLEAR IN THE LOG!!!!
 		// SDEBUG("str_new_cookie>%s<", str_new_cookie);
+		// SDEBUG("int_cookie_len>%d<", int_cookie_len);
 		// **** WARNING ****
-		cookie_len = strlen(str_new_cookie);
-		client_auth->str_cookie_encrypted = aes_encrypt(str_new_cookie, &cookie_len);
+		client_auth->str_cookie_encrypted = aes_encrypt(str_new_cookie, &int_cookie_len);
+		//SDEBUG("client_auth->str_cookie_encrypted>%s<", client_auth->str_cookie_encrypted);
+		//SDEBUG("int_cookie_len>%d<", int_cookie_len);
 
-		SFREE_PWORD(str_uri_new_password);
+		SBFREE_PWORD(str_uri_new_password, int_uri_new_password_len);
 		SFREE(str_uri_expiration);
-		SFREE(str_new_cookie);
+		SFREE_PWORD(str_new_cookie);
 
 		bstr_tolower(client_auth->str_user, client_auth->int_user_length);
 
@@ -377,15 +379,15 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 
 		SDEBUG("client_auth->parent->str_request: %s", client_auth->parent->str_request);
 
-		str_referer = request_header(client_auth->parent->str_request, "referer");
+		str_referer = request_header(client_auth->parent->str_request, client_auth->parent->int_request_len, "referer", &int_referer_len);
 		SFINISH_CHECK(str_referer != NULL, "No Referer header");
 		SDEBUG("str_referer: %s", str_referer);
-		ptr_conn = strstr(str_referer, "/postage/");
+		ptr_conn = bstrstr(str_referer, int_referer_len, "/postage/", (size_t)9);
 		SDEBUG("ptr_conn: %s", ptr_conn);
 		SFINISH_CHECK(ptr_conn != NULL, "Invalid Referer header");
 		ptr_conn += strlen("/postage/");
 		SDEBUG("ptr_conn: %s", ptr_conn);
-		ptr_conn_end = strstr(ptr_conn, "/");
+		ptr_conn_end = bstrstr(ptr_conn, int_referer_len - (size_t)(ptr_conn - str_referer), "/", (size_t)1);
 		SFINISH_CHECK(ptr_conn_end != NULL, "Invalid Referer header");
 		*ptr_conn_end = 0;
 		SDEBUG("ptr_conn: %s", ptr_conn);
@@ -394,18 +396,17 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_SNCAT(str_cookie_name, &int_temp, "postage_", (size_t)8, ptr_conn, strlen(ptr_conn));
 
 		SFREE_PWORD(str_form_data);
-		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, str_cookie_name);
+		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &int_cookie_len);
 		SFINISH_CHECK(client_auth->str_cookie_encrypted != NULL, "str_cookie failed");
-		size_t cookie_len = strlen(client_auth->str_cookie_encrypted);
-		str_cookie_decrypted = aes_decrypt(client_auth->str_cookie_encrypted, &cookie_len);
+		str_cookie_decrypted = aes_decrypt(client_auth->str_cookie_encrypted, &int_cookie_len);
 		SFREE(client_auth->str_cookie_encrypted);
 
-		client_auth->str_user = getpar(str_cookie_decrypted, "username", cookie_len, &client_auth->int_user_length);
-		client_auth->str_password = getpar(str_cookie_decrypted, "password", cookie_len, &client_auth->int_password_length);
-		str_expiration = getpar(str_cookie_decrypted, "expiration", cookie_len, &int_expiration_len);
+		client_auth->str_user = getpar(str_cookie_decrypted, "username", int_cookie_len, &client_auth->int_user_length);
+		client_auth->str_password = getpar(str_cookie_decrypted, "password", int_cookie_len, &client_auth->int_password_length);
+		str_expiration = getpar(str_cookie_decrypted, "expiration", int_cookie_len, &int_expiration_len);
 
-		client_auth->str_connname = getpar(str_cookie_decrypted, "connname", cookie_len, &client_auth->int_connname_length);
-		client_auth->str_conn = getpar(str_cookie_decrypted, "conn", cookie_len, &client_auth->int_conn_length);
+		client_auth->str_connname = getpar(str_cookie_decrypted, "connname", int_cookie_len, &client_auth->int_connname_length);
+		client_auth->str_conn = getpar(str_cookie_decrypted, "conn", int_cookie_len, &client_auth->int_conn_length);
 
 		SFREE_PWORD(str_cookie_decrypted);
 
@@ -453,8 +454,7 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		// CLEAR IN THE LOG!!!!
 		// DEBUG("str_new_cookie>%s<", str_new_cookie);
 		// **** WARNING ****
-		cookie_len = strlen(str_new_cookie);
-		client_auth->str_cookie_encrypted = aes_encrypt(str_new_cookie, &cookie_len);
+		client_auth->str_cookie_encrypted = aes_encrypt(str_new_cookie, &int_cookie_len);
 
 		SFREE_PWORD(str_uri_new_password);
 		SFREE(str_uri_expiration);
@@ -534,15 +534,15 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_SNCAT(str_cookie_name, &int_temp, "envelope", 8);
 #else
 		SDEBUG("client_auth->parent->str_request: %s", client_auth->parent->str_request);
-		str_referer = request_header(client_auth->parent->str_request, "referer");
+		str_referer = request_header(client_auth->parent->str_request, client_auth->parent->int_request_len, "referer", &int_referer_len);
 		SFINISH_CHECK(str_referer != NULL, "No Referer header");
 		SDEBUG("str_referer: %s", str_referer);
-		ptr_conn = strstr(str_referer, "/postage/");
+		ptr_conn = bstrstr(str_referer, int_referer_len, "/postage/", (size_t)9);
 		SDEBUG("ptr_conn: %s", ptr_conn);
 		SFINISH_CHECK(ptr_conn != NULL, "Invalid Referer header");
 		ptr_conn += strlen("/postage/");
 		SDEBUG("ptr_conn: %s", ptr_conn);
-		ptr_conn_end = strstr(ptr_conn, "/");
+		ptr_conn_end = bstrstr(ptr_conn, int_referer_len - (size_t)(ptr_conn - str_referer), "/", (size_t)1);
 		SFINISH_CHECK(ptr_conn_end != NULL, "Invalid Referer header");
 		*ptr_conn_end = 0;
 		SDEBUG("ptr_conn: %s", ptr_conn);
@@ -551,7 +551,8 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_SNCAT(str_cookie_name, &int_temp, "postage_", (size_t)8, ptr_conn, strlen(ptr_conn));
 #endif
 
-		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, str_cookie_name);
+		size_t cookie_len = 0;
+		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &cookie_len);
 		if (client_auth->str_cookie_encrypted != NULL) {
 			ListNode *node = client_auth->parent->server->list_client->first;
 			for (; node != NULL;) {

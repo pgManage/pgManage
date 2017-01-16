@@ -56,29 +56,30 @@ error:
 	return NULL;
 }
 
-char *request_header(char *str_request, char *str_name) {
+char *request_header(char *str_request, size_t int_request_len, char *str_header_name, size_t *int_header_value_len) {
 	char *str_return = NULL;
-
-	size_t int_upper_name_len = 0;
+	size_t int_upper_header_name_len = 0;
 	size_t int_upper_request_len = 0;
 
-	SDEFINE_VAR_ALL(str_upper_name, str_upper_request);
-	SERROR_SNCAT(str_upper_name, &int_upper_name_len,
-		str_name, strlen(str_name));
-	SERROR_SNCAT(str_upper_request, &int_upper_request_len,
-		str_request, strlen(str_request));
-	// str_toupper operates in place
-	bstr_toupper(str_upper_name, int_upper_name_len);
+	SDEFINE_VAR_ALL(str_upper_header_name, str_upper_request);
+
+	SERROR_SNCAT(
+		str_upper_header_name, &int_upper_header_name_len,
+		str_header_name, strlen(str_header_name)
+	);
+	SERROR_SNCAT(
+		str_upper_request, &int_upper_request_len,
+		str_request, int_request_len
+	);
+
+	bstr_toupper(str_upper_header_name, int_upper_header_name_len);
 	bstr_toupper(str_upper_request, int_upper_request_len);
 
-	size_t int_name_len = strlen(str_name);
-	size_t int_header_len = 0;
-
 	// Find the uppercased header in the uppercased request
-	char *ptr_upper_header = strstr(str_upper_request, str_upper_name);
+	char *ptr_upper_header = bstrstr(str_upper_request, int_upper_request_len, str_upper_header_name, int_upper_header_name_len);
 
-	SWARN_CHECK(ptr_upper_header != NULL, "strstr failed", str_name);
-	ptr_upper_header += int_name_len;
+	SWARN_CHECK(ptr_upper_header != NULL, "bstrstr failed");
+	ptr_upper_header += int_upper_header_name_len;
 
 	// Use the offset of the uppercased header in the uppercased request to find
 	// it in the real
@@ -86,10 +87,10 @@ char *request_header(char *str_request, char *str_name) {
 	char *ptr_header = str_request + (ptr_upper_header - str_upper_request);
 
 	while (*ptr_header != ':' && !isspace(*ptr_header)) {
-		ptr_upper_header = strstr(ptr_upper_header, str_upper_name);
+		ptr_upper_header = bstrstr(ptr_upper_header, (size_t)(int_upper_request_len - (ptr_upper_header - str_upper_request)), str_upper_header_name, int_upper_header_name_len);
 
-		SWARN_CHECK(ptr_upper_header != NULL, "strstr failed", str_name);
-		ptr_upper_header += int_name_len;
+		SWARN_CHECK(ptr_upper_header != NULL, "bstrstr failed");
+		ptr_upper_header += int_upper_header_name_len;
 
 		ptr_header = str_request + (ptr_upper_header - str_upper_request);
 	}
@@ -99,13 +100,15 @@ char *request_header(char *str_request, char *str_name) {
 	while (isspace(*ptr_header)) {
 		ptr_header += 1;
 	}
-	while (ptr_header[int_header_len] != '\015' && ptr_header[int_header_len] != '\012') {
-		int_header_len += 1;
+	while (ptr_header[*int_header_value_len] != '\015' && ptr_header[*int_header_value_len] != '\012') {
+		*int_header_value_len += 1;
 	}
 
-	SERROR_SALLOC(str_return, int_header_len + 1);
-	memcpy(str_return, ptr_header, int_header_len);
-	str_return[int_header_len] = '\0';
+	SERROR_SALLOC(str_return, *int_header_value_len + 1);
+	memcpy(str_return, ptr_header, *int_header_value_len);
+	str_return[*int_header_value_len] = '\0';
+	SDEBUG("str_return: %s", str_return);
+	SDEBUG("*int_header_value_len: %d", *int_header_value_len);
 
 	SFREE_ALL();
 	return str_return;
@@ -116,11 +119,10 @@ error:
 	return NULL;
 }
 
-char *str_cookie(char *str_request, char *str_cookie_name) {
+char *str_cookie(char *str_request, size_t int_request_len, char *str_cookie_name, size_t *int_cookie_value_len) {
 	char *str_return = NULL;
 	char *ptr_cookie_end_semi = NULL;
 	size_t int_cookie_end_semi = 0;
-	size_t int_cookie_len = 0;
 	size_t int_full_cookie_len = 0;
 	SDEFINE_VAR_ALL(str_cookie, str_full_cookie);
 
@@ -133,27 +135,29 @@ char *str_cookie(char *str_request, char *str_cookie_name) {
 	SDEBUG("str_cookie 2");
 
 	// find the cookie
-	str_cookie = request_header(str_request, "Cookie");
+	str_cookie = request_header(str_request, int_request_len, "Cookie", int_cookie_value_len);
 	SWARN_CHECK(str_cookie != NULL, "no cookie found");
-	char *ptr_cookie = strstr(str_cookie, str_full_cookie);
+	char *ptr_cookie = bstrstr(str_cookie, *int_cookie_value_len, str_full_cookie, int_full_cookie_len);
 	SWARN_CHECK(ptr_cookie != NULL, "no cookie found");
-	ptr_cookie = ptr_cookie + strlen(str_full_cookie); // advance cursor past cookie=
+	ptr_cookie = ptr_cookie + int_full_cookie_len; // advance cursor past cookie=
 	SFREE(str_full_cookie);
 
 	SDEBUG("str_cookie 3");
 
 	// get cookie length
-	ptr_cookie_end_semi = strstr(ptr_cookie, ";");
+	ptr_cookie_end_semi = bstrstr(ptr_cookie, (*int_cookie_value_len) - int_full_cookie_len, ";", (size_t)1);
 	int_cookie_end_semi = (size_t)(ptr_cookie_end_semi - ptr_cookie);
-	int_cookie_len = strlen(ptr_cookie);
-	int_cookie_len = ptr_cookie_end_semi != NULL && int_cookie_end_semi < int_cookie_len ? int_cookie_end_semi : int_cookie_len;
+	*int_cookie_value_len = (*int_cookie_value_len) - (size_t)(ptr_cookie - str_cookie);
+	*int_cookie_value_len = ptr_cookie_end_semi != NULL && int_cookie_end_semi < (*int_cookie_value_len) ? int_cookie_end_semi : (*int_cookie_value_len);
 
-	SDEBUG("str_cookie 4 int_cookie_len: %d", int_cookie_len);
+	SDEBUG("str_cookie 4 *int_cookie_value_len: %d", *int_cookie_value_len);
 
 	// return just the cookie
-	SERROR_SALLOC(str_return, int_cookie_len + 1);
-	memcpy(str_return, ptr_cookie, int_cookie_len);
-	str_return[int_cookie_len] = '\0';
+	SERROR_SALLOC(str_return, (*int_cookie_value_len) + 1);
+	memcpy(str_return, ptr_cookie, *int_cookie_value_len);
+	str_return[*int_cookie_value_len] = '\0';
+	SDEBUG("str_return: %s", str_return);
+	SDEBUG("*int_cookie_value_len: %d", *int_cookie_value_len);
 
 	SDEBUG("str_cookie 5");
 

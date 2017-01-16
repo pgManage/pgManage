@@ -240,7 +240,7 @@ void http_main(struct sock_ev_client *client) {
 		// set_cnxn does its own error handling
 		SDEBUG("str_uri: %s", str_uri);
 
-		if ((client->conn = set_cnxn(client, client->str_request, http_main_cnxn_cb)) == NULL) {
+		if ((client->conn = set_cnxn(client, http_main_cnxn_cb)) == NULL) {
 			SFINISH_CLIENT_CLOSE(client);
 		}
 		// DEBUG("str_conninfo: %s", str_conninfo);
@@ -266,7 +266,7 @@ void http_main(struct sock_ev_client *client) {
 		// set_cnxn does its own error handling
 		SDEBUG("str_uri: %s", str_uri);
 
-		if ((client->conn = set_cnxn(client, client->str_request, http_main_cnxn_cb)) == NULL) {
+		if ((client->conn = set_cnxn(client, http_main_cnxn_cb)) == NULL) {
 			SFINISH_CLIENT_CLOSE(client);
 		}
 		// DEBUG("str_conninfo: %s", str_conninfo);
