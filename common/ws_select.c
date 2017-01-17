@@ -37,10 +37,12 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 
 #ifdef POSTAGE_INTERFACE_LIBPQ
 #else
-	SFINISH_ERROR_CHECK((client_select->str_return_escaped_columns = get_return_escaped_columns(
-							 DB_connection_driver(client_request->parent->conn), client_request->ptr_query)) != NULL,
-		"Failed to get escaped return columns from query.");
-	client_select->int_return_escaped_columns_len = strlen(client_select->str_return_escaped_columns);
+	client_select->str_return_escaped_columns = get_return_escaped_columns(
+		DB_connection_driver(client_request->parent->conn),
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_select->int_return_escaped_columns_len
+	);
+	SFINISH_ERROR_CHECK(client_select->str_return_escaped_columns != NULL, "Failed to get escaped return columns from query");
 
 	SFINISH_SNCAT(client_select->str_sql_escaped_return, &client_select->int_sql_escaped_return_len,
 		"SELECT ", (size_t)7,
@@ -275,10 +277,12 @@ bool ws_select_step4(EV_P, void *cb_data, DB_result *res) {
 		}
 		SFINISH_SNFCAT(client_select->str_sql_escaped_return, &client_select->int_sql_escaped_return_len,
 			"\012", (size_t)1);
-		SFINISH_ERROR_CHECK((client_select->str_return_escaped_columns = get_return_escaped_columns(
-			DB_connection_driver(client_request->parent->conn), client_select->str_sql_escaped_return)) != NULL,
-			"Failed to get escaped return columns from query.");
-		client_select->int_return_escaped_columns_len = strlen(client_select->str_return_escaped_columns);
+		client_select->str_return_escaped_columns = get_return_escaped_columns(
+			DB_connection_driver(client_request->parent->conn),
+			client_select->str_sql_escaped_return, client_select->int_sql_escaped_return_len,
+			&client_select->int_return_escaped_columns_len
+		);
+		SFINISH_ERROR_CHECK(client_select->str_return_escaped_columns != NULL, "Failed to get escaped return columns from query");
 		SFREE(client_select->str_sql_escaped_return);
 
 		if (client_select->str_order_by == NULL) {

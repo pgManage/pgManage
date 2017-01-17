@@ -134,7 +134,7 @@ error:
 }
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
-char *get_return_escaped_columns(DB_driver driver, char *_str_query) {
+char *get_return_escaped_columns(DB_driver driver, char *_str_query, size_t int_query_len, size_t *ptr_int_return_columns_len) {
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;
 	char *ptr_return_columns = NULL;
@@ -142,19 +142,18 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query) {
 	char *str_return_columns = NULL;
 	char *str_query = NULL;
 	size_t int_temp_len = 0;
-	size_t int_return_columns_len = 0;
 
-	size_t int_query_len = 0;
-	//TODO: add lengths to get_return_escaped_columns
-	SERROR_SNCAT(str_query, &int_query_len,
-		_str_query, strlen(_str_query));
+	SERROR_SNCAT(
+		str_query, &int_query_len,
+		_str_query, int_query_len
+	);
 
-	ptr_return_columns = strstr(str_query, "RETURN\t");
+	ptr_return_columns = bstrstr(str_query, int_query_len, "RETURN\t", (size_t)7);
 	SERROR_CHECK(ptr_return_columns != NULL, "strstr failed");
 	ptr_return_columns += 7;
-	ptr_end_return_columns = strstr(ptr_return_columns, "\012");
+	ptr_end_return_columns = bstrstr(ptr_return_columns, int_query_len - (size_t)(ptr_return_columns - str_query), "\012", (size_t)1);
 	SERROR_CHECK(ptr_end_return_columns != NULL, "strstr failed");
-	*ptr_end_return_columns = '\0';
+	*ptr_end_return_columns = 0;
 
 	SERROR_SNCAT(str_temp, &int_temp_len, ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
 	if (strncmp(str_temp, "*", 2) != 0) {
@@ -175,19 +174,19 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query) {
 		}
 		SERROR_BREPLACE(str_temp, &int_temp_len, "TABHERE3141592653589793TABHERE", "\t", "g");
 		if (driver == DB_DRIVER_POSTGRES) {
-			SERROR_SNCAT(str_return_columns, &int_return_columns_len,
+			SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len,
 				"replace(replace(replace(replace(COALESCE(\"", (size_t)42,
 				str_temp, int_temp_len,
 				"\"::text, '\\N'), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || E'\n'", (size_t)81);
 		} else {
-			SERROR_SNCAT(str_return_columns, &int_return_columns_len,
+			SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len,
 				"replace(replace(replace(replace(CAST(COALESCE(CAST(\"", (size_t)52,
 				str_temp, int_temp_len,
 				"\" AS nvarchar(MAX)), CAST('\\N' AS nvarchar(MAX))) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX))", (size_t)162);
 		}
 		SFREE(str_temp);
 	} else {
-		SERROR_SNCAT(str_return_columns, &int_return_columns_len, str_temp, int_temp_len);
+		SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len, str_temp, int_temp_len);
 	}
 	SFREE(str_temp);
 	SFREE(str_query);
@@ -197,6 +196,7 @@ error:
 	SFREE(str_temp);
 	SFREE(str_temp1);
 	SFREE(str_query);
+	*ptr_int_return_columns_len = 0;
 
 	SFREE(str_return_columns);
 	return NULL;

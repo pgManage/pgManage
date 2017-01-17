@@ -48,11 +48,12 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 	SFINISH_ERROR_CHECK(client_update->str_return_columns != NULL, "Failed to get return columns from query");
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
-	SFINISH_ERROR_CHECK((client_update->str_return_escaped_columns = get_return_escaped_columns(
-		DB_connection_driver(client_request->parent->conn), client_request->ptr_query)) != NULL,
-		"Failed to get escaped return columns from query");
-
-	client_update->int_return_escaped_columns_len = strlen(client_update->str_return_escaped_columns);
+	client_update->str_return_escaped_columns = get_return_escaped_columns(
+		DB_connection_driver(client_request->parent->conn),
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_update->int_return_escaped_columns_len
+	);
+	SFINISH_ERROR_CHECK(client_update->str_return_escaped_columns != NULL, "Failed to get escaped return columns from query");
 #endif
 
 	client_update->str_hash_where_clause = get_hash_columns(client_request->ptr_query);

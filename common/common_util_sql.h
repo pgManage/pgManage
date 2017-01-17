@@ -24,7 +24,7 @@ char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table
 This function takes a SELECT/INSERT/UPDATE request and returns the return
 columns in a format that concatinates and escapes them
 */
-char *get_return_escaped_columns(DB_driver driver, char *_str_query);
+char *get_return_escaped_columns(DB_driver driver, char *_str_query, size_t int_query_len, size_t *ptr_int_return_columns_len);
 #endif
 
 /*
