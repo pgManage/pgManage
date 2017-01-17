@@ -203,18 +203,17 @@ error:
 }
 #endif
 
-char *get_hash_columns(char *_str_query) {
+char *get_hash_columns(char *_str_query, size_t int_query_len, size_t *ptr_int_hash_columns_len) {
 	char *str_temp1 = NULL;
 	char *ptr_hash_columns = NULL;
 	char *ptr_end_hash_columns = NULL;
 	char *str_hash_columns = NULL;
 	char *str_query = NULL;
-	size_t int_hash_columns_len = 0;
-	size_t int_query_len = 0;
 
-	//TODO: add lengths to get_hash_columns()
-	SERROR_SNCAT(str_query, &int_query_len,
-		_str_query, strlen(_str_query));
+	SERROR_SNCAT(
+		str_query, &int_query_len,
+		_str_query, int_query_len
+	);
 
 	ptr_hash_columns = strstr(str_query, "HASH\t");
 	SERROR_CHECK(ptr_hash_columns != NULL, "strstr failed");
@@ -223,7 +222,7 @@ char *get_hash_columns(char *_str_query) {
 	SERROR_CHECK(ptr_end_hash_columns != NULL, "strstr failed");
 	*ptr_end_hash_columns = 0;
 
-	SERROR_SNCAT(str_hash_columns, &int_hash_columns_len,
+	SERROR_SNCAT(str_hash_columns, ptr_int_hash_columns_len,
 		ptr_hash_columns, ptr_end_hash_columns - ptr_hash_columns);
 	SFREE(str_query);
 
@@ -231,6 +230,7 @@ char *get_hash_columns(char *_str_query) {
 error:
 	SFREE(str_temp1);
 	SFREE(str_query);
+	*ptr_int_hash_columns_len = 0;
 
 	SFREE(str_hash_columns);
 	return NULL;

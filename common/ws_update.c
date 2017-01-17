@@ -56,11 +56,13 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 	SFINISH_ERROR_CHECK(client_update->str_return_escaped_columns != NULL, "Failed to get escaped return columns from query");
 #endif
 
-	client_update->str_hash_where_clause = get_hash_columns(client_request->ptr_query);
+	client_update->str_hash_where_clause = get_hash_columns(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_update->int_hash_where_clause_len
+	);
 	SFREE(str_global_error);
 
 	if (client_update->str_hash_where_clause != NULL) {
-		client_update->int_hash_where_clause_len = strlen(client_update->str_hash_where_clause);
 		SFINISH_BREPLACE(client_update->str_hash_where_clause, &client_update->int_hash_where_clause_len, "\"", "\"\"", "g");
 
 		if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {

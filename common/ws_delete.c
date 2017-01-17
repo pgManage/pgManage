@@ -43,7 +43,10 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 	);
 	SFINISH_ERROR_CHECK(client_delete->str_real_table_name != NULL, "Query failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n");
 
-	client_delete->str_hash_where_clause = get_hash_columns(client_request->ptr_query);
+	client_delete->str_hash_where_clause = get_hash_columns(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_delete->int_hash_where_clause_len
+	);
 	SFREE(str_global_error);
 
 	if (client_delete->str_hash_where_clause != NULL) {

@@ -30,7 +30,7 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query, size_t int_
 /*
 This function takes a INSERT/UPDATE request and returns the hash columns
 */
-char *get_hash_columns(char *_str_query);
+char *get_hash_columns(char *_str_query, size_t int_query_len, size_t *ptr_int_hash_columns_len);
 /*
 This function handles the copy out functionality for websockets.
 */
