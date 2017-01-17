@@ -99,7 +99,7 @@ char *getpar(char *str_query, char *str_key, size_t int_query_length, size_t *in
 /*
 Encodes string into a JSON string.
 */
-char *jsonify(char *inputstring);
+char *jsonify(char *str_inputstring, int *ptr_int_result_len);
 
 /*
 Makes all the characters in a string lowercase.

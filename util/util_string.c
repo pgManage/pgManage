@@ -440,19 +440,17 @@ error:
 }
 
 // encode string to JSON
-char *jsonify(char *str_inputstring) {
-	size_t int_inputstring_len;
+char *jsonify(char *str_inputstring, int *ptr_int_result_len) {
 	char *str_result = NULL;
 	char *ptr_result;
 	char *ptr_loop;
 	size_t int_result_len;
 	size_t int_chunk_len;
-
-	int_inputstring_len = strlen(str_inputstring);
+	size_t int_inputstring_len = *ptr_int_result_len;
 
 	/* return empty array for empty input string */
 	if (int_inputstring_len < 1) {
-		SERROR_SNCAT(str_result, &int_result_len,
+		SERROR_SNCAT(str_result, ptr_int_result_len,
 			"\"\"", (size_t)2);
 		return str_result;
 	}
@@ -534,9 +532,11 @@ char *jsonify(char *str_inputstring) {
 	SERROR_SREALLOC(str_result, int_result_len + 2);
 	str_result[int_result_len] = 34;	// dbl quote(")
 	str_result[int_result_len + 1] = 0; // null term(\0)
+	*ptr_int_result_len = int_result_len + 1;
 	return str_result;
 error:
 	SFREE(str_result);
+	*ptr_int_result_len = 0;
 	return NULL;
 }
 
