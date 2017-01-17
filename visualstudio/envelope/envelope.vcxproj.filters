@@ -370,6 +370,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\envelope\web_root\test.html" />
+    <None Include="..\..\envelope\web_root\test.html">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

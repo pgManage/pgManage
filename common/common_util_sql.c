@@ -69,12 +69,13 @@ error:
 	SFREE(str_temp1);
 	SFREE(str_temp);
 	SFREE(str_query);
+	*ptr_int_table_name_len = 0;
 
 	SFREE(str_table_name);
 	return NULL;
 }
 
-char *get_return_columns(char *_str_query, char *str_table_name) {
+char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table_name, size_t int_table_name_len, size_t *ptr_int_return_columns_len) {
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;
 	char *ptr_return_columns = NULL;
@@ -82,22 +83,19 @@ char *get_return_columns(char *_str_query, char *str_table_name) {
 	char *str_return_columns = NULL;
 	char *str_query = NULL;
 	size_t int_temp_len = 0;
-	size_t int_return_columns_len = 0;
 
-	size_t int_query_len = 0;
-	//TODO: add lengths to get_return_columns
 	SERROR_SNCAT(str_query, &int_query_len,
-		_str_query, strlen(_str_query));
+		_str_query, int_query_len);
 
-	ptr_return_columns = strstr(str_query, "RETURN\t");
+	ptr_return_columns = bstrstr(str_query, int_query_len, "RETURN\t", (size_t)7);
 	SERROR_CHECK(ptr_return_columns != NULL, "strstr failed");
 	ptr_return_columns += 7;
-	ptr_end_return_columns = strstr(ptr_return_columns, "\012");
+	ptr_end_return_columns = bstrstr(ptr_return_columns, int_query_len - (size_t)(ptr_return_columns - str_query), "\012", (size_t)1);
 	SERROR_CHECK(ptr_end_return_columns != NULL, "strstr failed");
 	*ptr_end_return_columns = 0;
 
 	SERROR_SNCAT(str_temp, &int_temp_len,
-		ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
+		ptr_return_columns, (size_t)(ptr_end_return_columns - ptr_return_columns));
 
 	if (strncmp(str_temp, "*", 2) != 0) {
 		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
@@ -109,15 +107,17 @@ char *get_return_columns(char *_str_query, char *str_table_name) {
 		str_temp = str_temp1;
 		str_temp1 = NULL;
 
-		SERROR_SNCAT(str_return_columns, &int_return_columns_len,
+		SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len,
 			"{{TABLE}}.\"", (size_t)11,
 			str_temp, int_temp_len,
 			"\"", (size_t)1);
 		SFREE(str_temp);
 
-		SERROR_BREPLACE(str_return_columns, &int_return_columns_len, "{{TABLE}}", str_table_name, "g");
+		// TODO: don't ignore table length?
+		// This could involve adding a parameter to breplace, or looping through the columns
+		SERROR_BREPLACE(str_return_columns, ptr_int_return_columns_len, "{{TABLE}}", str_table_name, "g");
 	} else {
-		SERROR_SNCAT(str_return_columns, &int_return_columns_len, str_temp, int_temp_len);
+		SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len, str_temp, int_temp_len);
 	}
 	SFREE(str_temp);
 	SFREE(str_query);
@@ -127,6 +127,7 @@ error:
 	SFREE(str_temp);
 	SFREE(str_temp1);
 	SFREE(str_query);
+	*ptr_int_return_columns_len = 0;
 
 	SFREE(str_return_columns);
 	return NULL;

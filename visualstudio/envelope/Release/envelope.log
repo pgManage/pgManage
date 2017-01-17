@@ -1,8 +1,12 @@
-﻿  common_util_sql.c
+﻿  ws_insert.c
+..\..\common\ws_insert.c(446): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+  ws_select.c
+  ws_update.c
+..\..\common\ws_update.c(510): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
   Generating code
-  20 of 506 functions ( 4.0%) were compiled, the rest were copied from previous compilation.
+  14 of 506 functions ( 2.8%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
+    173 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.exe
   envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.pdb (Full PDB)

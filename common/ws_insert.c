@@ -32,15 +32,16 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
 		&client_insert->int_real_table_name_len
 	);
-	SFINISH_ERROR_CHECK(client_insert->str_real_table_name != NULL,
-		"Query failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n");
+	SFINISH_ERROR_CHECK(client_insert->str_real_table_name != NULL, "Query failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n");
 	// DEBUG("client_insert->str_real_table_name: %s",
 	// client_insert->str_real_table_name);
 
-	SFINISH_ERROR_CHECK((client_insert->str_return_columns =
-								get_return_columns(client_request->ptr_query, client_insert->str_real_table_name)) != NULL,
-		"Failed to get return columns from query");
-	client_insert->int_return_columns_len = strlen(client_insert->str_return_columns);
+	client_insert->str_return_columns = get_return_columns(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+		&client_insert->int_return_columns_len
+	);
+	SFINISH_ERROR_CHECK(client_insert->str_return_columns != NULL, "Failed to get return columns from query");
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
 	SFINISH_ERROR_CHECK((client_insert->str_return_escaped_columns = get_return_escaped_columns(
@@ -72,6 +73,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 	}
 	SDEBUG("client_insert->ptr_values: %s", client_insert->ptr_values);
 
+	// TODO: bstrstr here
 	ptr_column_names = client_insert->ptr_values;
 	SFINISH_CHECK(*ptr_column_names != 0, "No column names");
 	ptr_end_column_names = strstr(ptr_column_names, "\012");

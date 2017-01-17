@@ -17,7 +17,7 @@ char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_tab
 This function takes a SELECT/INSERT/UPDATE request and returns the return
 columns
 */
-char *get_return_columns(char *_str_query, char *str_table_name);
+char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table_name, size_t int_table_name_len, size_t *ptr_int_return_columns_len);
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
 /*
