@@ -32,9 +32,12 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 	}
 
 	// Get table names and return columns
-	SFINISH_CHECK((client_update->str_real_table_name = get_table_name(client_request->ptr_query)) != NULL,
-		"Failed to get table name from query");
-	client_update->int_real_table_name_len = strlen(client_update->str_real_table_name);
+	client_update->str_real_table_name = get_table_name(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_update->int_real_table_name_len
+	);
+	SFINISH_ERROR_CHECK(client_update->str_real_table_name != NULL,
+		"Query failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n");
 	// DEBUG("client_update->str_real_table_name: %s",
 	// client_update->str_real_table_name);
 

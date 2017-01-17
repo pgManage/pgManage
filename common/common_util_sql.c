@@ -1,6 +1,6 @@
 #include "common_util_sql.h"
 
-char *get_table_name(char *_str_query) {
+char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_table_name_len) {
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;
 	char *ptr_table_name = NULL;
@@ -8,13 +8,12 @@ char *get_table_name(char *_str_query) {
 	char *str_table_name = NULL;
 	char *str_query = NULL;
 
-	size_t int_query_len = 0;
-	size_t int_table_name_len = 0;
 	size_t int_temp_len = 0;
 
-	//TODO: strlen(_str_query), add length to get_table_name
-	SERROR_SNCAT(str_query, &int_query_len,
-		_str_query, strlen(_str_query));
+	SERROR_SNCAT(
+		str_query, &int_query_len,
+		_str_query, int_query_len
+	);
 
 	ptr_table_name = str_query + 6;
 	SERROR_CHECK(*ptr_table_name == '\t', "Invalid request");
@@ -23,8 +22,10 @@ char *get_table_name(char *_str_query) {
 	bool bol_schema = *ptr_end_table_name == '\t';
 	*ptr_end_table_name = '\0';
 
-	SERROR_SNCAT(str_temp, &int_temp_len,
-		ptr_table_name, ptr_end_table_name - ptr_table_name);
+	SERROR_SNCAT(
+		str_temp, &int_temp_len,
+		ptr_table_name, ptr_end_table_name - ptr_table_name
+	);
 
 	SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
 
@@ -34,8 +35,7 @@ char *get_table_name(char *_str_query) {
 	str_temp = str_temp1;
 	str_temp1 = NULL;
 
-	//TODO: str_temp1 length
-	SERROR_SNCAT(str_table_name, &int_table_name_len,
+	SERROR_SNCAT(str_table_name, ptr_int_table_name_len,
 		"\"", (size_t)1,
 		str_temp, int_temp_len,
 		"\"", (size_t)1);
@@ -55,7 +55,7 @@ char *get_table_name(char *_str_query) {
 		str_temp = str_temp1;
 		str_temp1 = NULL;
 
-		SERROR_SNFCAT(str_table_name, &int_table_name_len,
+		SERROR_SNFCAT(str_table_name, ptr_int_table_name_len,
 			".\"", (size_t)2,
 			str_temp, int_temp_len,
 			"\"", (size_t)1);

@@ -22,9 +22,12 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 		client_request->str_message_id, strlen(client_request->str_message_id));
 
 	// Get table names and return columns
-	SFINISH_ERROR_CHECK((client_select->str_real_table_name = get_table_name(client_request->ptr_query)) != NULL,
+	client_select->str_real_table_name = get_table_name(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_select->int_real_table_name_len
+	);
+	SFINISH_ERROR_CHECK(client_select->str_real_table_name != NULL,
 		"Query failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n");
-	client_select->int_real_table_name_len = strlen(client_select->str_real_table_name);
 
 	SFINISH_ERROR_CHECK((client_select->str_return_columns =
 								get_return_columns(client_request->ptr_query, client_select->str_real_table_name)) != NULL,
@@ -55,6 +58,7 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 		"\012", (size_t)1);
 
 	// Get start of the attr headers
+	// TODO: bstrstr here
 	ptr_attr_header = strstr(client_request->ptr_query, "RETURN");
 	SFINISH_CHECK(ptr_attr_header != NULL, "strstr failed, malformed request?");
 	ptr_attr_header = strstr(ptr_attr_header, "\012");

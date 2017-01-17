@@ -12,7 +12,7 @@
 This function takes a SELECT/INSERT/UPDATE/DELETE request and returns the table
 name
 */
-char *get_table_name(char *_str_query);
+char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_table_name_len);
 /*
 This function takes a SELECT/INSERT/UPDATE request and returns the return
 columns
