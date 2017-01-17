@@ -85,16 +85,24 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 
 	SDEBUG("client_update->str_hash_where_clause: %s", client_update->str_hash_where_clause);
 
-	// TODO: bstrstr here
 	////GET POINTERS SET TO BEGINNING OF HEADERS
 	char *_____str_temp = "HASH";
-	client_update->ptr_query = strstr(client_request->ptr_query, "HASH");
+	client_update->ptr_query = bstrstr(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		"HASH", (size_t)4
+	);
 	if (client_update->ptr_query == NULL) {
-		client_update->ptr_query = strstr(client_request->ptr_query, "RETURN");
+		client_update->ptr_query = bstrstr(
+			client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+			"RETURN", (size_t)6
+		);
 		_____str_temp = "RETURN";
 	}
 	SFINISH_CHECK(client_update->ptr_query != NULL, "Could not find RETURN clause");
-	client_update->ptr_query = strstr(client_update->ptr_query, "\012");
+	client_update->ptr_query = bstrstr(
+		client_update->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_update->ptr_query - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
 	SFINISH_CHECK(client_update->ptr_query != NULL, "Could not find end of %s clause", _____str_temp);
 	client_update->ptr_query += 1;
 	while (*client_update->ptr_query == '\012') {

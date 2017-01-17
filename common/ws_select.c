@@ -59,16 +59,24 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 		"\012", (size_t)1);
 
 	// Get start of the attr headers
-	// TODO: bstrstr here
-	ptr_attr_header = strstr(client_request->ptr_query, "RETURN");
-	SFINISH_CHECK(ptr_attr_header != NULL, "strstr failed, malformed request?");
-	ptr_attr_header = strstr(ptr_attr_header, "\012");
-	SFINISH_CHECK(ptr_attr_header != NULL, "strstr failed, malformed request?");
+	ptr_attr_header = bstrstr(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		"RETURN", (size_t)6
+	);
+	SFINISH_CHECK(ptr_attr_header != NULL, "bstrstr failed, malformed request?");
+	ptr_attr_header = bstrstr(
+		ptr_attr_header, (size_t)(client_request->frame->int_length - (size_t)(ptr_attr_header - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
+	SFINISH_CHECK(ptr_attr_header != NULL, "bstrstr failed, malformed request?");
 	while (*ptr_attr_header == '\012') {
 		ptr_attr_header += 1;
 	}
 	// Get end of headers
-	ptr_end_attr_header = strstr(ptr_attr_header, "\012");
+	ptr_end_attr_header = bstrstr(
+		ptr_attr_header, (size_t)(client_request->frame->int_length - (size_t)(ptr_attr_header - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
 	if (ptr_end_attr_header != NULL) {
 		// Get start of attr values
 		ptr_attr_values = ptr_end_attr_header + 1;

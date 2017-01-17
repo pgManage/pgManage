@@ -74,17 +74,28 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 
 	SDEBUG("client_delete->str_hash_where_clause: %s", client_delete->str_hash_where_clause);
 
-	// TODO: bstrstr here
 	////GET POINTERS SET TO BEGINNING OF HEADERS
-	client_delete->ptr_query = strstr(client_request->ptr_query, "HASH");
+	client_delete->ptr_query = bstrstr(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		"HASH", (size_t)4
+	);
 	if (client_delete->ptr_query == NULL) {
 		client_delete->ptr_query = client_request->ptr_query;
 	}
-	client_delete->ptr_query = strstr(client_delete->ptr_query, "\012");
-	SFINISH_CHECK(client_delete->ptr_query, "strstr failed, malformed request?");
-	client_delete->ptr_query += 2;
+	client_delete->ptr_query = bstrstr(
+		client_delete->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_delete->ptr_query - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
+	SFINISH_CHECK(client_delete->ptr_query, "bstrstr failed, malformed request?");
+	client_delete->ptr_query += 1;
+	while (*client_delete->ptr_query == '\012') {
+		client_delete->ptr_query += 1;
+	}
 	ptr_pk_header = client_delete->ptr_query;
-	ptr_name_header = strchr(ptr_pk_header, '\012');
+	ptr_name_header = bstrstr(
+		ptr_pk_header, (size_t)(client_request->frame->int_length - (size_t)(ptr_pk_header - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
 	SFINISH_CHECK(ptr_name_header, "strchr failed, malformed request?");
 	ptr_name_header += 1;
 	ptr_pk_header_end = ptr_name_header;

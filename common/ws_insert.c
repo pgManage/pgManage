@@ -53,16 +53,28 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 	// DEBUG("client_insert->str_return_columns:  %s",
 	// client_insert->str_return_columns);
 
-	ptr_pk = strstr(client_request->ptr_query, "PK");
+	ptr_pk = bstrstr(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		"PK", (size_t)2
+	);
 	SFINISH_CHECK(ptr_pk != NULL, "could not find \"PK\", malformed request?");
-	ptr_end_pk = strstr(ptr_pk, "\012");
+	ptr_end_pk = bstrstr(
+		ptr_pk, (size_t)(client_request->frame->int_length - (size_t)(ptr_pk - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
 	*ptr_end_pk = 0;
 	ptr_pk += 3;
 	SDEBUG("ptr_pk: %s", ptr_pk);
 
-	ptr_seq = strstr(ptr_end_pk + 1, "SEQ");
+	ptr_seq = bstrstr(
+		ptr_end_pk + 1, (size_t)(client_request->frame->int_length - (size_t)((ptr_end_pk + 1) - client_request->frame->str_message)),
+		"SEQ", (size_t)3
+	);
 	SFINISH_CHECK(ptr_seq != NULL, "could not find \"SEQ\", malformed request?");
-	ptr_end_seq = strstr(ptr_seq, "\012");
+	ptr_end_seq = bstrstr(
+		ptr_seq, (size_t)(client_request->frame->int_length - (size_t)(ptr_seq - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
 	*ptr_end_seq = 0;
 	ptr_seq += 4;
 	SDEBUG("ptr_seq: %s", ptr_seq);
@@ -73,10 +85,12 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 	}
 	SDEBUG("client_insert->ptr_values: %s", client_insert->ptr_values);
 
-	// TODO: bstrstr here
 	ptr_column_names = client_insert->ptr_values;
 	SFINISH_CHECK(*ptr_column_names != 0, "No column names");
-	ptr_end_column_names = strstr(ptr_column_names, "\012");
+	ptr_end_column_names = bstrstr(
+		ptr_column_names, (size_t)(client_request->frame->int_length - (size_t)(ptr_column_names - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
 	SFINISH_CHECK(ptr_end_column_names != NULL, "No insert data");
 	*ptr_end_column_names = 0;
 	client_insert->ptr_values = ptr_end_column_names + 1;
@@ -164,7 +178,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 			}
 
 		} else {
-			if (strstr(client_insert->str_column_names, str_col_name) == NULL) {
+			if (bstrstr(client_insert->str_column_names, client_insert->int_column_names_len, str_col_name, int_col_name_len) == NULL) {
 				int_j += 1;
 				SFINISH_CHECK(int_j == 1, "Only one PK column allowed to not have an unspecified value");
 				if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
