@@ -65,7 +65,6 @@ void http_accept_step1(struct sock_ev_client *client) {
 	}
 
 	str_temp = str_args;
-	// TODO: DB_escape_literal return length
 	str_args = DB_escape_literal(client->conn, str_temp, int_args_len);
 	SFINISH_CHECK(str_args != NULL, "DB_escape_literal failed");
 	int_args_len = strlen(str_args);

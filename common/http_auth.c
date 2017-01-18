@@ -687,7 +687,6 @@ void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 
 	SFINISH_CHECK(conn->int_status == 1, "%s", conn->str_response);
 
-	// TODO: DB_escape_literal return length
 	str_user_literal = DB_escape_literal(client_auth->parent->conn, client_auth->str_user, client_auth->int_user_length);
 	SFINISH_CHECK(str_user_literal != NULL, "PQescapeLiteral failed");
 	int_user_literal_len = strlen(str_user_literal);

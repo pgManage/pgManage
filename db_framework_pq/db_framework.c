@@ -564,6 +564,7 @@ finish:
 	return str_response;
 }
 
+// It isn't practical to return a length for these functions because PQescapeLiteral doesn't
 // Escape string for use in a query
 char *DB_escape_literal(DB_conn *conn, char *str, size_t int_len) {
 	SDEBUG("str: %s", str);

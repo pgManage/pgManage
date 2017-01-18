@@ -1,5 +1,8 @@
 #include "util_string.h"
 
+
+
+
 bool check_to_escape(char *str_input, bool bol_as_ident) {
 	char *ptr_input = str_input;
 	char *ptr_end_input = (str_input + strlen(str_input));

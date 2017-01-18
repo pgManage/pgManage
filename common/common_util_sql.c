@@ -658,7 +658,6 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 	SDEBUG("slash_position: %d", slash_position);
 
 	if (bol_writeable) {
-		//TODO: add lengths to ddl_readable()
 		SERROR_SNCAT(str_folder_write, &int_folder_write_len,
 			ptr_path, strlen(ptr_path));
 		str_folder_write[slash_position - 1] = 'w';
