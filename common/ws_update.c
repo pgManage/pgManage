@@ -146,7 +146,7 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 		SFINISH_CHECK(ptr_name_header < ptr_name_header_end, "Extra column purpose");
 
 		// name
-		int_length = strcspn(ptr_name_header, "\t\012");
+		int_length = strncspn(ptr_name_header, (size_t)(ptr_name_header_end - ptr_name_header), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_col_name, int_length + 1);
 		memcpy(str_col_name, ptr_name_header, int_length);
 		str_col_name[int_length] = '\0';
@@ -160,7 +160,7 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 			str_pk_header = ptr_pk_header;
 		}
 		SDEBUG("ptr_pk_header: %s", ptr_pk_header);
-		ptr_pk_header += strcspn(ptr_pk_header, "\t\012") + 1;
+		ptr_pk_header += strncspn(ptr_pk_header, (size_t)(ptr_pk_header_end - ptr_pk_header), "\t\012", (size_t)2) + 1;
 		*(ptr_pk_header - 1) = 0;
 		SDEBUG("str_pk_header: %s", str_pk_header);
 

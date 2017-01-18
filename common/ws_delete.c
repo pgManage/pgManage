@@ -22,9 +22,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_pk_header = NULL;
 	char *ptr_pk_header_end = NULL;
 	char *ptr_name_header = NULL;
-#ifndef POSTAGE_INTERFACE_LIBPQ
 	char *ptr_name_header_end = NULL;
-#endif
 
 	SDEFINE_VAR_ALL(str_temp_col_list, str_col_name, str_sql, str_where_temp);
 
@@ -104,9 +102,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 	ptr_pk_header_end = ptr_name_header;
 	client_delete->ptr_query = strchr(ptr_name_header, '\012');
 	SFINISH_CHECK(client_delete->ptr_query != NULL, "strchr failed, malformed request?");
-#ifndef POSTAGE_INTERFACE_LIBPQ
 	ptr_name_header_end = client_delete->ptr_query;
-#endif
 	client_delete->ptr_query += 1;
 
 	SDEBUG("ptr_pk_header: %s", ptr_pk_header);
@@ -128,7 +124,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 
 	while (ptr_pk_header < ptr_pk_header_end) {
 		// name
-		int_length = strcspn(ptr_name_header, "\t\012");
+		int_length = strncspn(ptr_name_header, (size_t)(ptr_name_header_end - ptr_name_header), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_col_name, int_length + 1);
 		memcpy(str_col_name, ptr_name_header, int_length);
 		str_col_name[int_length] = '\0';
@@ -138,7 +134,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 			strncmp(ptr_pk_header, "pk", 2) == 0 ? "pk_" : strncmp(ptr_pk_header, "set", 3) == 0 ? "set_" : "hash_";
 		SDEBUG("str_pk_header: %s", str_pk_header);
 		SDEBUG("ptr_pk_header: %s", ptr_pk_header);
-		ptr_pk_header += strcspn(ptr_pk_header, "\t\012") + 1;
+		ptr_pk_header += strncspn(ptr_pk_header, (size_t)(ptr_pk_header_end - ptr_pk_header), "\t\012", (size_t)2) + 1;
 
 		SDEBUG("str_col_name: %s", str_col_name);
 		SDEBUG("str_pk_header: %s", str_pk_header);

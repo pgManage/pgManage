@@ -128,7 +128,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 	size_t int_i = 0, int_j = 0, int_k = 0;
 	while (ptr_pk < ptr_end_pk) {
 		// PK name
-		int_col_name_len = strcspn(ptr_pk, "\t\012");
+		int_col_name_len = strncspn(ptr_pk, (size_t)(ptr_end_pk - ptr_pk), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_col_name, int_col_name_len + 1);
 		memcpy(str_col_name, ptr_pk, int_col_name_len);
 		str_col_name[int_col_name_len] = '\0';
@@ -142,7 +142,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 		str_temp1 = NULL;
 
 		// PK sequence
-		int_col_seq_len = strcspn(ptr_seq, "\t\012");
+		int_col_seq_len = strncspn(ptr_seq, (size_t)(ptr_end_seq - ptr_seq), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_col_seq, int_col_seq_len + 1);
 		memcpy(str_col_seq, ptr_seq, int_col_seq_len);
 		str_col_seq[int_col_seq_len] = '\0';
@@ -227,7 +227,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 #ifndef POSTAGE_INTERFACE_LIBPQ
 	while (ptr_column_names < ptr_end_column_names) {
 		SDEBUG("ptr_column_names                           : %s", ptr_column_names);
-		int_col_name_len = strcspn(ptr_column_names, "\t\012");
+		int_col_name_len = strncspn(ptr_column_names, (size_t)(ptr_end_column_names - ptr_column_names), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_col_name, int_col_name_len + 1);
 		memcpy(str_col_name, ptr_column_names, int_col_name_len);
 		str_col_name[int_col_name_len] = '\0';

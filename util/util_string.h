@@ -46,9 +46,15 @@
 #include "util_salloc.h"
 
 /*
+Check str_search for characters from str_chars
+*/
+size_t strncspn(const char *str_search, size_t int_search_len, const char *str_chars, size_t int_chars_len);
+
+/*
 Check to see if a string needs to be escaped as either an identifier or a literal
 */
 bool check_to_escape(char *str_input, bool bol_as_ident);
+
 /*
 Escape a string for use in tab delimited data.
 */

@@ -874,7 +874,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 
 		SERROR_SNCAT(str_first_word, &int_first_word_len,
 			ptr_query, ptr_end_query - ptr_query);
-		str_temp = str_first_word + strcspn(str_first_word, "\t \012");
+		str_temp = str_first_word + strncspn(str_first_word, int_first_word_len, "\t \012", (size_t)3);
 		if (str_temp) {
 			*str_temp = 0;
 		}

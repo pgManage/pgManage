@@ -1,7 +1,26 @@
 #include "util_string.h"
 
+// This is based on OpenBSD strcspn
+size_t strncspn(const char *str_search, size_t int_search_len, const char *str_chars, size_t int_chars_len) {
+	const char *p, *spanp;
+	char c, sc;
+	size_t int_i = 0;
+	size_t int_j = 0;
 
-
+	// Stop as soon as we find any character from str_chars
+	for (p = str_search; int_i < int_search_len; int_i += 1) {
+		c = *p++;
+		spanp = str_chars;
+		int_j = 0;
+		do {
+			if ((sc = *spanp++) == c) {
+				return (p - 1 - str_search);
+			}
+			int_j += 1;
+		} while (int_j < int_chars_len);
+	}
+	return int_i;
+}
 
 bool check_to_escape(char *str_input, bool bol_as_ident) {
 	char *ptr_input = str_input;

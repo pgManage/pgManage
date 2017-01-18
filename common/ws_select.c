@@ -7,6 +7,7 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_attr_header = NULL;
 	char *ptr_end_attr_header = NULL;
 	char *ptr_attr_values = NULL;
+	char *ptr_end_attr_values = NULL;
 
 	size_t int_attr_name_len = 0;
 	size_t int_attr_value_len = 0;
@@ -82,6 +83,10 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 	if (ptr_end_attr_header != NULL) {
 		// Get start of attr values
 		ptr_attr_values = ptr_end_attr_header + 1;
+		ptr_end_attr_values = bstrstr(
+			ptr_end_attr_header, (size_t)(client_request->frame->int_length - (size_t)(ptr_end_attr_header - client_request->frame->str_message)),
+			"\012", (size_t)1
+		);
 
 		SDEBUG("ptr_attr_header: >%s<", ptr_attr_header);
 		SDEBUG("ptr_attr_values: >%s<", ptr_attr_values);
@@ -89,7 +94,7 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 		// Loop through attributes (SQL clauses)
 		while (ptr_attr_header < ptr_end_attr_header) {
 			// Get attr name
-			int_attr_name_len = strcspn(ptr_attr_header, "\t\012");
+			int_attr_name_len = strncspn(ptr_attr_header, (size_t)(ptr_end_attr_header - ptr_attr_header), "\t\012", (size_t)2);
 
 			SFINISH_SALLOC(str_attr_name, int_attr_name_len + 1);
 			memcpy(str_attr_name, ptr_attr_header, int_attr_name_len);
@@ -97,7 +102,7 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 			ptr_attr_header += int_attr_name_len + 1;
 
 			// Get attr value
-			int_attr_value_len = strcspn(ptr_attr_values, "\t\012");
+			int_attr_value_len = strncspn(ptr_attr_values, (size_t)(ptr_end_attr_values - ptr_attr_values), "\t\012", (size_t)2);
 			SFINISH_SALLOC(str_attr_value, int_attr_value_len + 1);
 			memcpy(str_attr_value, ptr_attr_values, int_attr_value_len);
 			str_attr_value[int_attr_value_len] = '\0';

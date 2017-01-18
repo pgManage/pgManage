@@ -10,6 +10,7 @@ void http_export_step1(struct sock_ev_client *client) {
 	char *ptr_attr_header = NULL;
 	char *ptr_end_attr_header = NULL;
 	char *ptr_attr_values = NULL;
+	char *ptr_end_attr_values = NULL;
 	struct sock_ev_client_request *client_request = NULL;
 	size_t int_query_len = 0;
 	size_t int_sql_len = 0;
@@ -32,7 +33,7 @@ void http_export_step1(struct sock_ev_client *client) {
 	SDEBUG("client->str_request: %s", client->str_request);
 
 	// Get start of the attr headers
-	ptr_attr_header = strstr(client->str_request, "\012");
+	ptr_attr_header = bstrstr(client->str_request, client->int_request_len, "\012", (size_t)1);
 	SFINISH_CHECK(ptr_attr_header != NULL, "could not find start of attr names");
 	ptr_attr_header += 1;
 	*(ptr_attr_header - 1) = 0;
@@ -40,12 +41,14 @@ void http_export_step1(struct sock_ev_client *client) {
 	int_query_len = (size_t)((ptr_attr_header - 1) - client->str_request);
 
 	// Get end of headers
-	ptr_end_attr_header = strstr(ptr_attr_header, "\012");
+	ptr_end_attr_header = bstrstr(ptr_attr_header, client->int_request_len - (size_t)(ptr_attr_header - client->str_request), "\012", (size_t)1);
 	SFINISH_CHECK(ptr_end_attr_header != NULL, "could not find end of attr names");
 
 	// Get start of attr values
 	ptr_attr_values = ptr_end_attr_header + 1;
 	*(ptr_attr_values - 1) = 0;
+
+	ptr_end_attr_values = bstrstr(ptr_attr_values, client->int_request_len - (size_t)(ptr_attr_values - client->str_request), "\012", (size_t)1);
 
 	// This will hold the SQL query becuase we are ending the string right before
 	// the attr headers start
@@ -63,8 +66,7 @@ void http_export_step1(struct sock_ev_client *client) {
 	// Loop through attributes
 	while (ptr_attr_header < ptr_end_attr_header) {
 		// Get attr name
-		// TODO: strcspn lengths
-		int_attr_header_len = strcspn(ptr_attr_header, "\t\012");
+		int_attr_header_len = strncspn(ptr_attr_header, (size_t)(ptr_end_attr_header - ptr_attr_header), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_attr_name, int_attr_header_len + 1);
 		memcpy(str_attr_name, ptr_attr_header, int_attr_header_len);
 		str_attr_name[int_attr_header_len] = '\0';
@@ -72,7 +74,7 @@ void http_export_step1(struct sock_ev_client *client) {
 		bstr_toupper(str_attr_name, int_attr_header_len);
 
 		// Get attr value
-		int_attr_value_len = strcspn(ptr_attr_values, "\t\012");
+		int_attr_value_len = strncspn(ptr_attr_values, (size_t)(ptr_end_attr_values - ptr_attr_values), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_attr_value, int_attr_value_len + 1);
 		memcpy(str_attr_value, ptr_attr_values, int_attr_value_len);
 		str_attr_value[int_attr_value_len] = '\0';
