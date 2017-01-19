@@ -10,6 +10,7 @@ c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\http_main.obj
 c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\http_file.obj
 c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\http_export.obj
 c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\http_ev.obj
+c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\http_auth.obj
 c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\common_websocket.obj
 c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\common_util_sql.obj
 c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\common_server.obj
@@ -54,7 +55,6 @@ c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\util_cookie.ob
 c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\util_canonical.obj
 c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\util_base64.obj
 c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\util_aes.obj
-c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\http_auth.obj
 c:\users\nunzio tocci\repos\postage\visualstudio\envelope\release\vc140.pdb
 c:\users\nunzio tocci\repos\postage\visualstudio\release\envelope.exe
 c:\users\nunzio tocci\repos\postage\visualstudio\release\envelope.ipdb

@@ -56,13 +56,12 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 	if (strcmp(str_request_type, "LIST") == 0) {
 		client_tab->str_path = ptr_query;
 		ptr_query = bstrstr(client_tab->str_path, client_request->frame->int_length - (size_t)(client_tab->str_path - client_request->frame->str_message), "\012", (size_t)1);
-		SFINISH_CHECK(ptr_query != NULL, "bstrstr failed");
 		if (ptr_query != NULL) {
 			*ptr_query = 0;
 		}
 
 		str_temp = client_tab->str_path;
-		int_path_len = (size_t)(ptr_query - client_tab->str_path);
+		int_path_len = ptr_query != NULL ? (size_t)(ptr_query - str_temp) : (client_request->frame->int_length - (size_t)(client_tab->str_path - client_request->frame->str_message));
 		client_tab->str_path = bunescape_value(str_temp, &int_path_len);
 		SFINISH_CHECK(client_tab->str_path != NULL, "bunescape_value failed");
 
@@ -76,13 +75,12 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 	} else if (strcmp(str_request_type, "READ") == 0) {
 		client_tab->str_path = ptr_query;
 		ptr_query = bstrstr(client_tab->str_path, client_request->frame->int_length - (size_t)(client_tab->str_path - client_request->frame->str_message), "\012", (size_t)1);
-		SFINISH_CHECK(ptr_query != NULL, "bstrstr failed");
 		if (ptr_query != NULL) {
 			*ptr_query = 0;
 		}
 
 		str_temp = client_tab->str_path;
-		int_path_len = (size_t)(ptr_query - client_tab->str_path);
+		int_path_len = ptr_query != NULL ? (size_t)(ptr_query - str_temp) : (client_request->frame->int_length - (size_t)(client_tab->str_path - client_request->frame->str_message));
 		client_tab->str_path = bunescape_value(str_temp, &int_path_len);
 		SFINISH_CHECK(client_tab->str_path != NULL, "bunescape_value failed");
 
@@ -110,7 +108,7 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 			*ptr_query = 0;
 		}
 
-		int_path_len = (size_t)(ptr_query - str_query);
+		int_path_len = ptr_query != NULL ? (size_t)(ptr_query - str_query) : int_query_len;
 		client_tab->str_path = bunescape_value(str_query, &int_path_len);
 		SFINISH_CHECK(client_tab->str_path != NULL, "bunescape_value failed");
 
@@ -128,7 +126,6 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 	} else if (strcmp(str_request_type, "MOVE") == 0) {
 		str_temp = ptr_query;
 		ptr_query = bstrstr(str_temp, client_request->frame->int_length - (size_t)(str_temp - client_request->frame->str_message), "\t", (size_t)1);
-		SFINISH_CHECK(ptr_query != NULL, "bstrstr failed");
 		if (ptr_query != NULL) {
 			*ptr_query = 0;
 		}
@@ -145,6 +142,7 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 		}
 
 		int_path_to_len = (size_t)(ptr_query - str_temp);
+		int_path_len = ptr_query != NULL ? (size_t)(ptr_query - str_temp) : (client_request->frame->int_length - (size_t)(str_temp - client_request->frame->str_message));
 		client_tab->str_path_to = bunescape_value(str_temp, &int_path_to_len);
 		SFINISH_CHECK(client_tab->str_path_to != NULL, "bunescape_value failed");
 

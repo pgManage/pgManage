@@ -82,10 +82,13 @@ char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table
 	char *ptr_end_return_columns = NULL;
 	char *str_return_columns = NULL;
 	char *str_query = NULL;
+	char *ptr_table_replace = NULL;
 	size_t int_temp_len = 0;
 
-	SERROR_SNCAT(str_query, &int_query_len,
-		_str_query, int_query_len);
+	SERROR_SNCAT(
+		str_query, &int_query_len,
+		_str_query, int_query_len
+	);
 
 	ptr_return_columns = bstrstr(str_query, int_query_len, "RETURN\t", (size_t)7);
 	SERROR_CHECK(ptr_return_columns != NULL, "strstr failed");
@@ -94,8 +97,10 @@ char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table
 	SERROR_CHECK(ptr_end_return_columns != NULL, "strstr failed");
 	*ptr_end_return_columns = 0;
 
-	SERROR_SNCAT(str_temp, &int_temp_len,
-		ptr_return_columns, (size_t)(ptr_end_return_columns - ptr_return_columns));
+	SERROR_SNCAT(
+		str_temp, &int_temp_len,
+		ptr_return_columns, (size_t)(ptr_end_return_columns - ptr_return_columns)
+	);
 
 	if (strncmp(str_temp, "*", 2) != 0) {
 		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
@@ -107,15 +112,46 @@ char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table
 		str_temp = str_temp1;
 		str_temp1 = NULL;
 
-		SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len,
+		SERROR_SNCAT(
+			str_return_columns, ptr_int_return_columns_len,
 			"{{TABLE}}.\"", (size_t)11,
 			str_temp, int_temp_len,
-			"\"", (size_t)1);
+			"\"", (size_t)1
+		);
 		SFREE(str_temp);
 
-		// TODO: don't ignore table length?
-		// This could involve adding a parameter to breplace, or looping through the columns
-		SERROR_BREPLACE(str_return_columns, ptr_int_return_columns_len, "{{TABLE}}", str_table_name, "g");
+		//SERROR_BREPLACE(str_return_columns, ptr_int_return_columns_len, "{{TABLE}}", str_table_name, "g");
+
+		SERROR_SNCAT(
+			str_temp, &int_temp_len,
+			"", (size_t)0
+		);
+		ptr_table_replace = bstrstr(str_return_columns, *ptr_int_return_columns_len, "{{TABLE}}", (size_t)9);
+		while (ptr_table_replace != NULL) {
+			SERROR_SNFCAT(
+				str_temp, &int_temp_len, 
+				str_table_name, int_table_name_len
+			);
+
+			char *ptr_next_table_replace = bstrstr(ptr_table_replace + 9, (*ptr_int_return_columns_len) - (size_t)((ptr_table_replace + 9) - str_return_columns), "{{TABLE}}", (size_t)9);
+			size_t int_copy_after_len = 0;
+			if (ptr_next_table_replace == NULL) {
+				int_copy_after_len = (*ptr_int_return_columns_len) - ((ptr_table_replace + 9) - str_return_columns);
+			} else {
+				int_copy_after_len = ptr_next_table_replace - (ptr_table_replace + 9);
+			}
+			SERROR_SNFCAT(
+				str_temp, &int_temp_len,
+				ptr_table_replace + 9, int_copy_after_len
+			);
+
+			ptr_table_replace = ptr_next_table_replace;
+		}
+		*ptr_int_return_columns_len = int_temp_len;
+		SFREE(str_return_columns);
+		str_return_columns = str_temp;
+		str_temp = NULL;
+
 	} else {
 		SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len, str_temp, int_temp_len);
 	}
