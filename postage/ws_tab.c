@@ -136,13 +136,11 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 
 		str_temp = ptr_query + 1;
 		ptr_query = bstrstr(str_temp, client_request->frame->int_length - (size_t)(str_temp - client_request->frame->str_message), "\012", (size_t)1);
-		SFINISH_CHECK(ptr_query != NULL, "bstrstr failed");
 		if (ptr_query != NULL) {
 			*ptr_query = 0;
 		}
 
-		int_path_to_len = (size_t)(ptr_query - str_temp);
-		int_path_len = ptr_query != NULL ? (size_t)(ptr_query - str_temp) : (client_request->frame->int_length - (size_t)(str_temp - client_request->frame->str_message));
+		int_path_to_len = ptr_query != NULL ? (size_t)(ptr_query - str_temp) : (client_request->frame->int_length - (size_t)(str_temp - client_request->frame->str_message));
 		client_tab->str_path_to = bunescape_value(str_temp, &int_path_to_len);
 		SFINISH_CHECK(client_tab->str_path_to != NULL, "bunescape_value failed");
 
