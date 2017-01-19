@@ -87,7 +87,7 @@ char *request_header(char *str_request, size_t int_request_len, char *str_header
 	char *ptr_header = str_request + (ptr_upper_header - str_upper_request);
 
 	while (*ptr_header != ':' && !isspace(*ptr_header)) {
-		ptr_upper_header = bstrstr(ptr_upper_header, (size_t)(int_upper_request_len - (ptr_upper_header - str_upper_request)), str_upper_header_name, int_upper_header_name_len);
+		ptr_upper_header = bstrstr(ptr_upper_header, (int_upper_request_len - (size_t)(ptr_upper_header - str_upper_request)), str_upper_header_name, int_upper_header_name_len);
 
 		SWARN_CHECK(ptr_upper_header != NULL, "bstrstr failed");
 		ptr_upper_header += int_upper_header_name_len;
@@ -145,7 +145,7 @@ char *str_cookie(char *str_request, size_t int_request_len, char *str_cookie_nam
 	SDEBUG("str_cookie 3");
 
 	// get cookie length
-	ptr_cookie_end_semi = bstrstr(ptr_cookie, (*int_cookie_value_len) - int_full_cookie_len, ";", (size_t)1);
+	ptr_cookie_end_semi = bstrstr(ptr_cookie, (*int_cookie_value_len) - (size_t)(ptr_cookie - str_cookie), ";", (size_t)1);
 	int_cookie_end_semi = (size_t)(ptr_cookie_end_semi - ptr_cookie);
 	*int_cookie_value_len = (*int_cookie_value_len) - (size_t)(ptr_cookie - str_cookie);
 	*int_cookie_value_len = ptr_cookie_end_semi != NULL && int_cookie_end_semi < (*int_cookie_value_len) ? int_cookie_end_semi : (*int_cookie_value_len);

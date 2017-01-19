@@ -14,12 +14,12 @@ size_t strncspn(const char *str_search, size_t int_search_len, const char *str_c
 		int_j = 0;
 		do {
 			if ((sc = *spanp++) == c) {
-				return (p - 1 - str_search);
+				return (size_t)(p - 1 - str_search);
 			}
 			int_j += 1;
 		} while (int_j < int_chars_len);
 	}
-	return int_i;
+	return int_search_len;
 }
 
 bool check_to_escape(char *str_input, bool bol_as_ident) {
@@ -462,7 +462,7 @@ error:
 }
 
 // encode string to JSON
-char *jsonify(char *str_inputstring, int *ptr_int_result_len) {
+char *jsonify(char *str_inputstring, size_t *ptr_int_result_len) {
 	char *str_result = NULL;
 	char *ptr_result;
 	char *ptr_loop;
@@ -621,9 +621,10 @@ char *snuri(char *str_input, size_t int_in_len, size_t *ptr_int_out_len) {
 	char *str_result = NULL;
 	char *ptr_input = str_input;
 	*ptr_int_out_len = int_in_len;
+	char *ptr_end_input = str_input + (*ptr_int_out_len);
 
 	// Calculate actual needed length
-	for (; *ptr_input; ptr_input++) {
+	for (; ptr_input < ptr_end_input; ptr_input++) {
 		if (!((*ptr_input >= 'a' && *ptr_input <= 'z') || (*ptr_input >= 'A' && *ptr_input <= 'Z') ||
 			(*ptr_input >= '0' && *ptr_input <= '9') || *ptr_input == '+' || *ptr_input == ',' ||
 			*ptr_input == '.' || *ptr_input == '_' || *ptr_input == '-' || *ptr_input == '/')) {
@@ -638,13 +639,13 @@ char *snuri(char *str_input, size_t int_in_len, size_t *ptr_int_out_len) {
 	ptr_input = str_input;
 	char *ptr_result = str_result;
 
-	for (; *ptr_input; ptr_input++) {
+	for (; ptr_input < ptr_end_input; ptr_input++) {
 		if (!((*ptr_input >= 'a' && *ptr_input <= 'z') || (*ptr_input >= 'A' && *ptr_input <= 'Z') ||
 			(*ptr_input >= '0' && *ptr_input <= '9') || *ptr_input == '+' || *ptr_input == ',' ||
 			*ptr_input == '.' || *ptr_input == '_' || *ptr_input == '-' || *ptr_input == '/')) {
 
 			// Insert encoded char right where we need it
-			snprintf(ptr_result, 3, "%%%02X", *ptr_input);
+			snprintf(ptr_result, 4, "%%%02X", *ptr_input);
 			ptr_result += 3;
 		} else {
 			ptr_result[0] = *ptr_input;

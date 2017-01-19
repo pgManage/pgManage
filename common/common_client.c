@@ -672,20 +672,22 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				}
 
 			} else {
-				str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
-				SERROR_CHECK(str_uri_temp != NULL, "str_uri_path failed");
 #ifdef ENVELOPE
 				SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
 					"envelope", (size_t)8);
 #else
-				char *ptr_slash = strchr(str_uri_temp + 9, '/');
-				if (ptr_slash != NULL) {
-					*ptr_slash = 0;
-					SERROR_SNCAT(str_conn_index, &int_conn_index_len,
-						str_uri_temp + 9, strlen(str_uri_temp + 9));
-					SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
-						"postage_", (size_t)8,
-						str_conn_index, strlen(str_conn_index));
+				str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
+				SERROR_CHECK(str_uri_temp != NULL, "str_uri_path failed");
+				if (int_uri_length > 8) {
+					char *ptr_slash = strchr(str_uri_temp + 9, '/');
+					if (ptr_slash != NULL) {
+						*ptr_slash = 0;
+						SERROR_SNCAT(str_conn_index, &int_conn_index_len,
+							str_uri_temp + 9, strlen(str_uri_temp + 9));
+						SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
+							"postage_", (size_t)8,
+							str_conn_index, strlen(str_conn_index));
+					}
 				}
 #endif
 				SDEBUG("http request");
@@ -746,7 +748,6 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 	size_t int_response_confirmed = 0;
 	char *ptr_query = NULL;
 	char *ptr_end_query = NULL;
-	size_t int_temp_len = 0;
 	size_t int_old_length = 0;
 	size_t int_message_id_len = 0;
 	size_t int_transaction_id_len = 0;

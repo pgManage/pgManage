@@ -271,7 +271,6 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 				ptr_pk_header < ptr_pk_header_end ? ", " : "", (size_t)(ptr_pk_header < ptr_pk_header_end ? 2 : 0));
 #endif
 		} else {
-			size_t int_insert_parameter_markers_len = 0;
 			SFINISH_SNFCAT(client_update->str_temp_col_list, &int_temp_col_list_len,
 				int_i == 0 ? "" : ", ", strlen(int_i == 0 ? "" : ", "),
 				str_col_name, int_col_name_len,

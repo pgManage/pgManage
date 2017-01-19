@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "http_export.h"
 
 #ifdef POSTAGE_INTERFACE_LIBPQ
@@ -28,6 +27,8 @@ void http_export_step1(struct sock_ev_client *client) {
 
 	SFREE(client->str_request);
 	client->str_request = str_query;
+	client->int_request_len = int_query_len;
+	int_query_len = 0;
 	str_query = NULL;
 
 	SDEBUG("client->str_request: %s", client->str_request);
@@ -49,6 +50,9 @@ void http_export_step1(struct sock_ev_client *client) {
 	*(ptr_attr_values - 1) = 0;
 
 	ptr_end_attr_values = bstrstr(ptr_attr_values, client->int_request_len - (size_t)(ptr_attr_values - client->str_request), "\012", (size_t)1);
+	if (ptr_end_attr_values == NULL) {
+		ptr_end_attr_values = ptr_attr_values + (client->int_request_len - (size_t)(ptr_attr_values - client->str_request));
+	}
 
 	// This will hold the SQL query becuase we are ending the string right before
 	// the attr headers start

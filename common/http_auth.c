@@ -104,8 +104,12 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_CHECK(str_one_day_expire != NULL, "str_expire_one_day failed");
 		size_t int_uri_expires_len = 0;
 		str_uri_expires = snuri(str_one_day_expire, strlen(str_one_day_expire), &int_uri_expires_len);
+		SDEBUG("int_uri_expires_len; %zu", int_uri_expires_len);
+		SDEBUG("strlen(str_uri_expires); %zu", strlen(str_uri_expires));
+		SDEBUG("str_one_day_expire; %s", str_one_day_expire);
+		SDEBUG("str_uri_expires; %s", str_uri_expires);
 		SFREE(str_one_day_expire);
-		SFINISH_CHECK(snuri != NULL, "snuri failed");
+		SFINISH_CHECK(str_uri_expires != NULL, "snuri failed");
 
 		SFINISH_SNCAT(
 			str_cookie_decrypted, &int_cookie_len,

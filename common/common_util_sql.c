@@ -129,16 +129,16 @@ char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table
 		ptr_table_replace = bstrstr(str_return_columns, *ptr_int_return_columns_len, "{{TABLE}}", (size_t)9);
 		while (ptr_table_replace != NULL) {
 			SERROR_SNFCAT(
-				str_temp, &int_temp_len, 
+				str_temp, &int_temp_len,
 				str_table_name, int_table_name_len
 			);
 
 			char *ptr_next_table_replace = bstrstr(ptr_table_replace + 9, (*ptr_int_return_columns_len) - (size_t)((ptr_table_replace + 9) - str_return_columns), "{{TABLE}}", (size_t)9);
 			size_t int_copy_after_len = 0;
 			if (ptr_next_table_replace == NULL) {
-				int_copy_after_len = (*ptr_int_return_columns_len) - ((ptr_table_replace + 9) - str_return_columns);
+				int_copy_after_len = (*ptr_int_return_columns_len) - (size_t)((ptr_table_replace + 9) - str_return_columns);
 			} else {
-				int_copy_after_len = ptr_next_table_replace - (ptr_table_replace + 9);
+				int_copy_after_len = (size_t)(ptr_next_table_replace - (ptr_table_replace + 9));
 			}
 			SERROR_SNFCAT(
 				str_temp, &int_temp_len,

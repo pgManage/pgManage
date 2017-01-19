@@ -16,11 +16,9 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	size_t int_user_length = 0;
 	size_t int_password_length = 0;
 	size_t int_cookie_len = 0;
-	size_t int_user_agent_len = 0;
 	size_t int_host_len = 0;
 	size_t int_response_len = 0;
 	size_t int_context_data_len = 0;
-	size_t int_uri_user_agent_len = 0;
 	size_t int_uri_ip_address_len = 0;
 	size_t int_uri_host_len = 0;
 	ListNode *other_client_node = NULL;

@@ -420,7 +420,7 @@ test
             ],
 			['WS OPEN W/INFO', 'websocket start', '', '', ''],
 			['TAB LIST FAIL 1', 'websocket', '', 'TAB LIST /open/',
-			['strstr failed', 'TRANSACTION COMPLETED']],
+			['bstrstr failed', 'TRANSACTION COMPLETED']],
 			['TAB LIST FAIL 2', 'websocket', '', 'TAB\tLIST\t/ipen/',
 			[
 				[
@@ -922,7 +922,7 @@ id	test_name
 2	Alice
 3	Eve
 */}),
-			[["..\\..\\common\\common_util_sql.c:get_table_name: Invalid request\nFailed to get table name from query", "../common/common_util_sql.c:get_table_name: Invalid request\nFailed to get table name from query"]]],
+			[["..\\..\\common\\common_util_sql.c:get_table_name: Invalid request\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n", "../common/common_util_sql.c:get_table_name: Invalid request\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n"]]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 			['OK']],
 			['BEGIN 6', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -1246,7 +1246,7 @@ id	test_name
 1	Bobby
 2	Alicia
 */}),
-			[["..\\..\\common\\common_util_sql.c:get_table_name: Invalid request\nFailed to get table name from query", "../common/common_util_sql.c:get_table_name: Invalid request\nFailed to get table name from query"]]],
+			[["..\\..\\common\\common_util_sql.c:get_table_name: Invalid request\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n", "../common/common_util_sql.c:get_table_name: Invalid request\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n"]]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 			['OK']],
 			['BEGIN 19', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -1431,7 +1431,7 @@ id	test_name	hash
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 			['OK']],
 			['UPDATE FAIL 19', 'websocket', '', ml(function () {/*UPDATE*/}),
-			[["..\\..\\common\\common_util_sql.c:get_table_name: Invalid request\nFailed to get table name from query", "../common/common_util_sql.c:get_table_name: Invalid request\nFailed to get table name from query"]]],
+			[["..\\..\\common\\common_util_sql.c:get_table_name: Invalid request\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n", "../common/common_util_sql.c:get_table_name: Invalid request\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n"]]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 			['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -1647,7 +1647,7 @@ id
 2
 3
 */}),
-			[["..\\..\\common\\common_util_sql.c:get_table_name: Invalid request\nFailed to get table name from query", "../common/common_util_sql.c:get_table_name: Invalid request\nFailed to get table name from query"]]],
+			[["..\\..\\common\\common_util_sql.c:get_table_name: Invalid request\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n", "../common/common_util_sql.c:get_table_name: Invalid request\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n"]]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*COMMIT*/ }),
 			['OK']],
 			['BEGIN 39', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -1786,7 +1786,6 @@ id	hash
                 'DELETE FAIL 9',
                 'websocket',
                 '',
-                // no return after HASH columns
                 ml(function () {/*DELETE	public	rtesting_table
 HASH	id	test_name
 pk	hash
@@ -1795,7 +1794,7 @@ id	hash
 2	abc
 3	abc
 */}),
-			    ["Too many hashes"]
+			    ["Someone updated this record before you.:\nFATAL\nerror_text\t\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]
             ],
 			[
                 'ROLLBACK',
@@ -1817,7 +1816,6 @@ id	hash
                 'DELETE FAIL 10',
                 'websocket',
                 '',
-                // no return after HASH columns
                 new Blob([ml(function () {/*DELETE	public	rtesting_table
 HASH	id	test_name
 pk	hash
@@ -1826,7 +1824,7 @@ id	hash
 2	abc
 3	abc
 */})], {type: 'applications/x-binary'}),
-			    ["Too many hashes"]
+			    ["Someone updated this record before you.:\nFATAL\nerror_text\t\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]
             ],
 			[
                 'ROLLBACK',
@@ -2033,7 +2031,7 @@ pk	hash
 id	hash
 1	
 */}),
-			    ["Primary key required"]
+			    ["Too many hashes"]
             ],
 			[
                 'ROLLBACK',
