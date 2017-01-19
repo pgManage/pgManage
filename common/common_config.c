@@ -454,6 +454,8 @@ bool parse_options(int argc, char *const *argv) {
 			"\\Program Files\\Workflow Products", (size_t)32);
 	}
 #endif
+#else
+	int_prefix_len = strlen(POSTAGE_PREFIX);
 #endif
 
 #ifdef _WIN32
