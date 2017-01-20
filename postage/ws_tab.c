@@ -763,6 +763,8 @@ void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 		if (strncmp(client_tab->str_change_stamp, str_change_stamp, strlen(str_change_stamp)) != 0) {
 			SFINISH("Someone updated this file before you.");
 		}
+	}
+	if (client_tab->h_file != INVALID_HANDLE_VALUE) {
 		CloseHandle(client_tab->h_file);
 	}
 #else
