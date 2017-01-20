@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "ws_select.h"
 
 char *ws_select_step1(struct sock_ev_client_request *client_request) {
@@ -84,9 +85,12 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 		// Get start of attr values
 		ptr_attr_values = ptr_end_attr_header + 1;
 		ptr_end_attr_values = bstrstr(
-			ptr_end_attr_header, (size_t)(client_request->frame->int_length - (size_t)(ptr_end_attr_header - client_request->frame->str_message)),
+			ptr_attr_values, (size_t)(client_request->frame->int_length - (size_t)(ptr_attr_values - client_request->frame->str_message)),
 			"\012", (size_t)1
 		);
+		if (ptr_end_attr_values == NULL) {
+			ptr_end_attr_values = client_request->frame->str_message + client_request->frame->int_length;
+		}
 
 		SDEBUG("ptr_attr_header: >%s<", ptr_attr_header);
 		SDEBUG("ptr_attr_values: >%s<", ptr_attr_values);
@@ -118,14 +122,18 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 			SDEBUG("str_attr_value: >%s<", str_attr_value);
 
 			bstr_toupper(str_attr_name, int_attr_name_len);
-			if (strncmp(str_attr_name, "WHERE", 5) == 0 || strncmp(str_attr_name, "ORDER BY", 8) == 0 ||
-				strncmp(str_attr_name, "LIMIT", 5) == 0 || strncmp(str_attr_name, "OFFSET", 6) == 0) {
+			if (strncmp(str_attr_name, "WHERE", 6) == 0 || strncmp(str_attr_name, "ORDER BY", 9) == 0 ||
+				strncmp(str_attr_name, "LIMIT", 6) == 0 || strncmp(str_attr_name, "OFFSET", 7) == 0) {
 #ifdef POSTAGE_INTERFACE_LIBPQ
 				SFINISH_SNFCAT(client_select->str_sql, &client_select->int_sql_len,
 					str_attr_name, int_attr_name_len,
 					" ", (size_t)1,
 					str_attr_value, int_attr_value_len,
 					"\012", (size_t)1);
+				SDEBUG("str_attr_name: %s", str_attr_name);
+				SDEBUG("int_attr_name_len: %zu", int_attr_name_len);
+				SDEBUG("str_attr_value: %s", str_attr_value);
+				SDEBUG("int_attr_value_len: %zu", int_attr_value_len);
 #else
 				if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
 					SFINISH_SNFCAT(client_select->str_sql_escaped_return, &client_select->int_sql_escaped_return_len,
@@ -176,6 +184,8 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 			SFREE(str_attr_value);
 		}
 	}
+
+	SDEBUG("client_select->str_sql: %s", client_select->str_sql);
 
 	SFINISH_CHECK(DB_get_column_types_for_query(
 					  global_loop, client_request->parent->conn, client_select->str_sql, client_request, ws_select_step4),

@@ -97,11 +97,14 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 		ptr_pk_header, (size_t)(client_request->frame->int_length - (size_t)(ptr_pk_header - client_request->frame->str_message)),
 		"\012", (size_t)1
 	);
-	SFINISH_CHECK(ptr_name_header, "strchr failed, malformed request?");
+	SFINISH_CHECK(ptr_name_header, "bstrstr failed, malformed request?");
 	ptr_name_header += 1;
 	ptr_pk_header_end = ptr_name_header;
-	client_delete->ptr_query = strchr(ptr_name_header, '\012');
-	SFINISH_CHECK(client_delete->ptr_query != NULL, "strchr failed, malformed request?");
+	client_delete->ptr_query =  bstrstr(
+		ptr_name_header, (size_t)(client_request->frame->int_length - (size_t)(ptr_name_header - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
+	SFINISH_CHECK(client_delete->ptr_query, "bstrstr failed, malformed request?");
 	ptr_name_header_end = client_delete->ptr_query;
 	client_delete->ptr_query += 1;
 
