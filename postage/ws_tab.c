@@ -723,12 +723,12 @@ void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 	size_t int_response_len = 0;
 
 #ifdef _WIN32
-	if (strncmp(client_tab->str_change_stamp, "0", 2) != 0) {
-		SetLastError(0);
-		client_tab->h_file =
-			CreateFileA(client_tab->str_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	SetLastError(0);
+	client_tab->h_file =
+		CreateFileA(client_tab->str_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	int int_err = GetLastError();
+	if (strncmp(client_tab->str_change_stamp, "0", 2) != 0 && int_err != 0x2) { // 0x2: file not found
 		if (client_tab->h_file == INVALID_HANDLE_VALUE) {
-			int int_err = GetLastError();
 			FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, int_err,
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&strErrorText, 0, NULL);
 
@@ -763,6 +763,8 @@ void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 		if (strncmp(client_tab->str_change_stamp, str_change_stamp, strlen(str_change_stamp)) != 0) {
 			SFINISH("Someone updated this file before you.");
 		}
+	}
+	if (client_tab->h_file != INVALID_HANDLE_VALUE) {
 		CloseHandle(client_tab->h_file);
 	}
 #else
