@@ -341,10 +341,10 @@ function dialogSplash() {
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-body>
-                <iframe class="full-iframe" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}"></iframe>
+                <iframe class="full-iframe" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
             </gs-body>
         </gs-page>
-    */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion);
+    */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
 
     GS.openDialog(templateElement);
 }

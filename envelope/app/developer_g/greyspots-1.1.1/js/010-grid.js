@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         intCurrentWidth += widthIncreaseAmount;
                         strCurrentWidth = String(parseFloat(intCurrentWidth.toFixed(5).toString(), 10));
                         
-                        strCSS += 'gs-grid.width-' + intGridWidth + ' gs-block[width="' + (i + 1) + '"] { width: ' + strCurrentWidth + '%; }\n';
+                        strCSS += 'gs-grid.width-' + intGridWidth + ' > gs-block[width="' + (i + 1) + '"] { width: ' + strCurrentWidth + '%; }\n';
                     }
                     
                     // add col-NUM to the styleElement's "class" attribute

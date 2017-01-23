@@ -33,6 +33,10 @@
                 
                 document.getElementById('user-name-label').textContent = userData.username;
                 
+                if (userData.groups.indexOf('ghi_job_g') !== -1 && userData.groups.indexOf('developer_g') === -1) {
+                    window.location = '/env/app/ghi_job_g/main_menu.html'
+                }
+                
                 arrElements = document.querySelectorAll('*[data-group], *[data-user]');
                 
                 for (i = 0, len = arrElements.length; i < len; i += 1) {
@@ -214,6 +218,25 @@
                             </gs-block>
                         </gs-grid>
                     </div>
+                    
+                    
+                    <br data-group="twi_g" />
+                    <div class="group-container" data-group="twi_g">
+                        <h4><i>Tower Engineering Inc. Demo</i></h4>
+                        <span class="space"></span>
+                        <gs-grid widths="1,1,1" reflow-at="500px" gutter>
+                            <gs-block>
+                                <gs-button data-group="twi_g" target="_self" href="../twi_g/plans.html" jumbo bg-primary>Projects</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button data-group="twi_g" target="_self" href="../twi_g/formula_manager.html" jumbo bg-primary>Formula Manager</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button data-group="twi_g" target="_self" href="../twi_g/dropdown_manager.html" jumbo bg-primary>Dropdown Manager</gs-button>
+                            </gs-block>
+                        </gs-grid>
+                    </div>
+                    
                     
                     <!--
                     <br data-group="ttu_g" />

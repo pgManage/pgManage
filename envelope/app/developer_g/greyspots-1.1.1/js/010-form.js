@@ -156,6 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
             updateFrameData = strID + '\t' + strHash + '\t' + GS.encodeForTabDelimited(newValue);
             
             updateFrameData = (strRoles + '\n' + strColumns + '\n' + updateFrameData);
+            GS.triggerEvent(element, 'before_update');
             
             GS.requestUpdateFromSocket(
                 GS.envSocket, strSchema, strObject
@@ -243,6 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         '&column=' + strColumn +
                         '&value=' +  encodeURIComponent(newValue);
             
+            GS.triggerEvent(element, 'before_update');
             // run ajax
             GS.dataFetch(strLink, true);
             
@@ -596,6 +598,7 @@ document.addEventListener('DOMContentLoaded', function () {
               , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
               , response_i = 0, response_len = 0, arrTotalRecords = [];
             
+            GS.triggerEvent(element, 'before_select');
             GS.requestSelectFromSocket(GS.envSocket, strSchema, strObject, strColumns
                                      , strWhere, strOrd, strLimit, strOffset
                                      , function (data, error) {
@@ -650,7 +653,7 @@ document.addEventListener('DOMContentLoaded', function () {
                            '&order_by=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('ord') || ''))) +
                            '&cols='     + encodeURIComponent(strCols);
                 
-                
+                GS.triggerEvent(element, 'before_select');
                 GS.addLoader('refresh_' + encodeURIComponent(strLink));
                 //if (GS.dataFetch(strLink, bolClearPrevious)) {
                 //    data = GS.dataFetch(strLink, bolClearPrevious);

@@ -24,9 +24,9 @@ function loadHome() {
                 <gs-button id="button-home-open-to-new-tab" onclick="openToTab()" title="Open SQL to new tab" icononly></gs-button>
                 <div id="toolbar-addon-container"></div>
             </div>
-            <iframe id="iframe-news" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}"></iframe>
+            <iframe id="iframe-news" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
         </div>
-    */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion);
+    */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
     
     // create ace
     homeEditor = ace.edit('sql-ace-area-home');
