@@ -1,6 +1,6 @@
 #include "common_util_sql.h"
 
-char *get_table_name(char *_str_query) {
+char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_table_name_len) {
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;
 	char *ptr_table_name = NULL;
@@ -8,23 +8,24 @@ char *get_table_name(char *_str_query) {
 	char *str_table_name = NULL;
 	char *str_query = NULL;
 
-	size_t int_query_len = 0;
-	size_t int_table_name_len = 0;
 	size_t int_temp_len = 0;
 
-	//TODO: strlen(_str_query), add length to get_table_name
-	SERROR_SNCAT(str_query, &int_query_len,
-		_str_query, strlen(_str_query));
+	SERROR_SNCAT(
+		str_query, &int_query_len,
+		_str_query, int_query_len
+	);
 
 	ptr_table_name = str_query + 6;
 	SERROR_CHECK(*ptr_table_name == '\t', "Invalid request");
 	ptr_table_name += 1;
-	ptr_end_table_name = ptr_table_name + strcspn(ptr_table_name, "\t\012");
+	ptr_end_table_name = ptr_table_name + strncspn(ptr_table_name, int_query_len - (size_t)(ptr_table_name - str_query), "\t\012", (size_t)2);
 	bool bol_schema = *ptr_end_table_name == '\t';
 	*ptr_end_table_name = '\0';
 
-	SERROR_SNCAT(str_temp, &int_temp_len,
-		ptr_table_name, ptr_end_table_name - ptr_table_name);
+	SERROR_SNCAT(
+		str_temp, &int_temp_len,
+		ptr_table_name, ptr_end_table_name - ptr_table_name
+	);
 
 	SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
 
@@ -34,8 +35,7 @@ char *get_table_name(char *_str_query) {
 	str_temp = str_temp1;
 	str_temp1 = NULL;
 
-	//TODO: str_temp1 length
-	SERROR_SNCAT(str_table_name, &int_table_name_len,
+	SERROR_SNCAT(str_table_name, ptr_int_table_name_len,
 		"\"", (size_t)1,
 		str_temp, int_temp_len,
 		"\"", (size_t)1);
@@ -55,7 +55,7 @@ char *get_table_name(char *_str_query) {
 		str_temp = str_temp1;
 		str_temp1 = NULL;
 
-		SERROR_SNFCAT(str_table_name, &int_table_name_len,
+		SERROR_SNFCAT(str_table_name, ptr_int_table_name_len,
 			".\"", (size_t)2,
 			str_temp, int_temp_len,
 			"\"", (size_t)1);
@@ -69,35 +69,38 @@ error:
 	SFREE(str_temp1);
 	SFREE(str_temp);
 	SFREE(str_query);
+	*ptr_int_table_name_len = 0;
 
 	SFREE(str_table_name);
 	return NULL;
 }
 
-char *get_return_columns(char *_str_query, char *str_table_name) {
+char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table_name, size_t int_table_name_len, size_t *ptr_int_return_columns_len) {
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;
 	char *ptr_return_columns = NULL;
 	char *ptr_end_return_columns = NULL;
 	char *str_return_columns = NULL;
 	char *str_query = NULL;
+	char *ptr_table_replace = NULL;
 	size_t int_temp_len = 0;
-	size_t int_return_columns_len = 0;
 
-	size_t int_query_len = 0;
-	//TODO: add lengths to get_return_columns
-	SERROR_SNCAT(str_query, &int_query_len,
-		_str_query, strlen(_str_query));
+	SERROR_SNCAT(
+		str_query, &int_query_len,
+		_str_query, int_query_len
+	);
 
-	ptr_return_columns = strstr(str_query, "RETURN\t");
+	ptr_return_columns = bstrstr(str_query, int_query_len, "RETURN\t", (size_t)7);
 	SERROR_CHECK(ptr_return_columns != NULL, "strstr failed");
 	ptr_return_columns += 7;
-	ptr_end_return_columns = strstr(ptr_return_columns, "\012");
+	ptr_end_return_columns = bstrstr(ptr_return_columns, int_query_len - (size_t)(ptr_return_columns - str_query), "\012", (size_t)1);
 	SERROR_CHECK(ptr_end_return_columns != NULL, "strstr failed");
 	*ptr_end_return_columns = 0;
 
-	SERROR_SNCAT(str_temp, &int_temp_len,
-		ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
+	SERROR_SNCAT(
+		str_temp, &int_temp_len,
+		ptr_return_columns, (size_t)(ptr_end_return_columns - ptr_return_columns)
+	);
 
 	if (strncmp(str_temp, "*", 2) != 0) {
 		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
@@ -109,15 +112,48 @@ char *get_return_columns(char *_str_query, char *str_table_name) {
 		str_temp = str_temp1;
 		str_temp1 = NULL;
 
-		SERROR_SNCAT(str_return_columns, &int_return_columns_len,
+		SERROR_SNCAT(
+			str_return_columns, ptr_int_return_columns_len,
 			"{{TABLE}}.\"", (size_t)11,
 			str_temp, int_temp_len,
-			"\"", (size_t)1);
+			"\"", (size_t)1
+		);
 		SFREE(str_temp);
 
-		SERROR_BREPLACE(str_return_columns, &int_return_columns_len, "{{TABLE}}", str_table_name, "g");
+		//SERROR_BREPLACE(str_return_columns, ptr_int_return_columns_len, "{{TABLE}}", str_table_name, "g");
+
+		SERROR_SNCAT(
+			str_temp, &int_temp_len,
+			"", (size_t)0
+		);
+		ptr_table_replace = bstrstr(str_return_columns, *ptr_int_return_columns_len, "{{TABLE}}", (size_t)9);
+		while (ptr_table_replace != NULL) {
+			SERROR_SNFCAT(
+				str_temp, &int_temp_len,
+				str_table_name, int_table_name_len
+			);
+
+			char *ptr_next_table_replace = bstrstr(ptr_table_replace + 9, (*ptr_int_return_columns_len) - (size_t)((ptr_table_replace + 9) - str_return_columns), "{{TABLE}}", (size_t)9);
+			size_t int_copy_after_len = 0;
+			if (ptr_next_table_replace == NULL) {
+				int_copy_after_len = (*ptr_int_return_columns_len) - (size_t)((ptr_table_replace + 9) - str_return_columns);
+			} else {
+				int_copy_after_len = (size_t)(ptr_next_table_replace - (ptr_table_replace + 9));
+			}
+			SERROR_SNFCAT(
+				str_temp, &int_temp_len,
+				ptr_table_replace + 9, int_copy_after_len
+			);
+
+			ptr_table_replace = ptr_next_table_replace;
+		}
+		*ptr_int_return_columns_len = int_temp_len;
+		SFREE(str_return_columns);
+		str_return_columns = str_temp;
+		str_temp = NULL;
+
 	} else {
-		SERROR_SNCAT(str_return_columns, &int_return_columns_len, str_temp, int_temp_len);
+		SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len, str_temp, int_temp_len);
 	}
 	SFREE(str_temp);
 	SFREE(str_query);
@@ -127,13 +163,14 @@ error:
 	SFREE(str_temp);
 	SFREE(str_temp1);
 	SFREE(str_query);
+	*ptr_int_return_columns_len = 0;
 
 	SFREE(str_return_columns);
 	return NULL;
 }
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
-char *get_return_escaped_columns(DB_driver driver, char *_str_query) {
+char *get_return_escaped_columns(DB_driver driver, char *_str_query, size_t int_query_len, size_t *ptr_int_return_columns_len) {
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;
 	char *ptr_return_columns = NULL;
@@ -141,19 +178,18 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query) {
 	char *str_return_columns = NULL;
 	char *str_query = NULL;
 	size_t int_temp_len = 0;
-	size_t int_return_columns_len = 0;
 
-	size_t int_query_len = 0;
-	//TODO: add lengths to get_return_escaped_columns
-	SERROR_SNCAT(str_query, &int_query_len,
-		_str_query, strlen(_str_query));
+	SERROR_SNCAT(
+		str_query, &int_query_len,
+		_str_query, int_query_len
+	);
 
-	ptr_return_columns = strstr(str_query, "RETURN\t");
+	ptr_return_columns = bstrstr(str_query, int_query_len, "RETURN\t", (size_t)7);
 	SERROR_CHECK(ptr_return_columns != NULL, "strstr failed");
 	ptr_return_columns += 7;
-	ptr_end_return_columns = strstr(ptr_return_columns, "\012");
+	ptr_end_return_columns = bstrstr(ptr_return_columns, int_query_len - (size_t)(ptr_return_columns - str_query), "\012", (size_t)1);
 	SERROR_CHECK(ptr_end_return_columns != NULL, "strstr failed");
-	*ptr_end_return_columns = '\0';
+	*ptr_end_return_columns = 0;
 
 	SERROR_SNCAT(str_temp, &int_temp_len, ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
 	if (strncmp(str_temp, "*", 2) != 0) {
@@ -174,19 +210,19 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query) {
 		}
 		SERROR_BREPLACE(str_temp, &int_temp_len, "TABHERE3141592653589793TABHERE", "\t", "g");
 		if (driver == DB_DRIVER_POSTGRES) {
-			SERROR_SNCAT(str_return_columns, &int_return_columns_len,
+			SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len,
 				"replace(replace(replace(replace(COALESCE(\"", (size_t)42,
 				str_temp, int_temp_len,
 				"\"::text, '\\N'), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || E'\n'", (size_t)81);
 		} else {
-			SERROR_SNCAT(str_return_columns, &int_return_columns_len,
+			SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len,
 				"replace(replace(replace(replace(CAST(COALESCE(CAST(\"", (size_t)52,
 				str_temp, int_temp_len,
 				"\" AS nvarchar(MAX)), CAST('\\N' AS nvarchar(MAX))) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX))", (size_t)162);
 		}
 		SFREE(str_temp);
 	} else {
-		SERROR_SNCAT(str_return_columns, &int_return_columns_len, str_temp, int_temp_len);
+		SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len, str_temp, int_temp_len);
 	}
 	SFREE(str_temp);
 	SFREE(str_query);
@@ -196,24 +232,24 @@ error:
 	SFREE(str_temp);
 	SFREE(str_temp1);
 	SFREE(str_query);
+	*ptr_int_return_columns_len = 0;
 
 	SFREE(str_return_columns);
 	return NULL;
 }
 #endif
 
-char *get_hash_columns(char *_str_query) {
+char *get_hash_columns(char *_str_query, size_t int_query_len, size_t *ptr_int_hash_columns_len) {
 	char *str_temp1 = NULL;
 	char *ptr_hash_columns = NULL;
 	char *ptr_end_hash_columns = NULL;
 	char *str_hash_columns = NULL;
 	char *str_query = NULL;
-	size_t int_hash_columns_len = 0;
-	size_t int_query_len = 0;
 
-	//TODO: add lengths to get_hash_columns()
-	SERROR_SNCAT(str_query, &int_query_len,
-		_str_query, strlen(_str_query));
+	SERROR_SNCAT(
+		str_query, &int_query_len,
+		_str_query, int_query_len
+	);
 
 	ptr_hash_columns = strstr(str_query, "HASH\t");
 	SERROR_CHECK(ptr_hash_columns != NULL, "strstr failed");
@@ -222,7 +258,7 @@ char *get_hash_columns(char *_str_query) {
 	SERROR_CHECK(ptr_end_hash_columns != NULL, "strstr failed");
 	*ptr_end_hash_columns = 0;
 
-	SERROR_SNCAT(str_hash_columns, &int_hash_columns_len,
+	SERROR_SNCAT(str_hash_columns, ptr_int_hash_columns_len,
 		ptr_hash_columns, ptr_end_hash_columns - ptr_hash_columns);
 	SFREE(str_query);
 
@@ -230,6 +266,7 @@ char *get_hash_columns(char *_str_query) {
 error:
 	SFREE(str_temp1);
 	SFREE(str_query);
+	*ptr_int_hash_columns_len = 0;
 
 	SFREE(str_hash_columns);
 	return NULL;
@@ -657,7 +694,6 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 	SDEBUG("slash_position: %d", slash_position);
 
 	if (bol_writeable) {
-		//TODO: add lengths to ddl_readable()
 		SERROR_SNCAT(str_folder_write, &int_folder_write_len,
 			ptr_path, strlen(ptr_path));
 		str_folder_write[slash_position - 1] = 'w';

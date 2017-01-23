@@ -32,30 +32,37 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 	}
 
 	// Get table names and return columns
-	SFINISH_CHECK((client_update->str_real_table_name = get_table_name(client_request->ptr_query)) != NULL,
-		"Failed to get table name from query");
-	client_update->int_real_table_name_len = strlen(client_update->str_real_table_name);
+	client_update->str_real_table_name = get_table_name(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_update->int_real_table_name_len
+	);
+	SFINISH_ERROR_CHECK(client_update->str_real_table_name != NULL, "Query failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n");
 	// DEBUG("client_update->str_real_table_name: %s",
 	// client_update->str_real_table_name);
 
-	SFINISH_CHECK((client_update->str_return_columns =
-		get_return_columns(client_request->ptr_query, client_update->str_real_table_name)) != NULL,
-		"Failed to get return columns from query");
-	client_update->int_return_columns_len = strlen(client_update->str_return_columns);
+	client_update->str_return_columns = get_return_columns(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		client_update->str_real_table_name, client_update->int_real_table_name_len,
+		&client_update->int_return_columns_len
+	);
+	SFINISH_ERROR_CHECK(client_update->str_return_columns != NULL, "Failed to get return columns from query");
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
-	SFINISH_ERROR_CHECK((client_update->str_return_escaped_columns = get_return_escaped_columns(
-		DB_connection_driver(client_request->parent->conn), client_request->ptr_query)) != NULL,
-		"Failed to get escaped return columns from query");
-
-	client_update->int_return_escaped_columns_len = strlen(client_update->str_return_escaped_columns);
+	client_update->str_return_escaped_columns = get_return_escaped_columns(
+		DB_connection_driver(client_request->parent->conn),
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_update->int_return_escaped_columns_len
+	);
+	SFINISH_ERROR_CHECK(client_update->str_return_escaped_columns != NULL, "Failed to get escaped return columns from query");
 #endif
 
-	client_update->str_hash_where_clause = get_hash_columns(client_request->ptr_query);
+	client_update->str_hash_where_clause = get_hash_columns(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_update->int_hash_where_clause_len
+	);
 	SFREE(str_global_error);
 
 	if (client_update->str_hash_where_clause != NULL) {
-		client_update->int_hash_where_clause_len = strlen(client_update->str_hash_where_clause);
 		SFINISH_BREPLACE(client_update->str_hash_where_clause, &client_update->int_hash_where_clause_len, "\"", "\"\"", "g");
 
 		if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
@@ -83,13 +90,22 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 
 	////GET POINTERS SET TO BEGINNING OF HEADERS
 	char *_____str_temp = "HASH";
-	client_update->ptr_query = strstr(client_request->ptr_query, "HASH");
+	client_update->ptr_query = bstrstr(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		"HASH", (size_t)4
+	);
 	if (client_update->ptr_query == NULL) {
-		client_update->ptr_query = strstr(client_request->ptr_query, "RETURN");
+		client_update->ptr_query = bstrstr(
+			client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+			"RETURN", (size_t)6
+		);
 		_____str_temp = "RETURN";
 	}
 	SFINISH_CHECK(client_update->ptr_query != NULL, "Could not find RETURN clause");
-	client_update->ptr_query = strstr(client_update->ptr_query, "\012");
+	client_update->ptr_query = bstrstr(
+		client_update->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_update->ptr_query - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
 	SFINISH_CHECK(client_update->ptr_query != NULL, "Could not find end of %s clause", _____str_temp);
 	client_update->ptr_query += 1;
 	while (*client_update->ptr_query == '\012') {
@@ -130,7 +146,7 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 		SFINISH_CHECK(ptr_name_header < ptr_name_header_end, "Extra column purpose");
 
 		// name
-		int_length = strcspn(ptr_name_header, "\t\012");
+		int_length = strncspn(ptr_name_header, (size_t)(ptr_name_header_end - ptr_name_header), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_col_name, int_length + 1);
 		memcpy(str_col_name, ptr_name_header, int_length);
 		str_col_name[int_length] = '\0';
@@ -144,7 +160,7 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 			str_pk_header = ptr_pk_header;
 		}
 		SDEBUG("ptr_pk_header: %s", ptr_pk_header);
-		ptr_pk_header += strcspn(ptr_pk_header, "\t\012") + 1;
+		ptr_pk_header += strncspn(ptr_pk_header, (size_t)(ptr_pk_header_end - ptr_pk_header), "\t\012", (size_t)2) + 1;
 		*(ptr_pk_header - 1) = 0;
 		SDEBUG("str_pk_header: %s", str_pk_header);
 
@@ -255,7 +271,6 @@ char *ws_update_step1(struct sock_ev_client_request *client_request) {
 				ptr_pk_header < ptr_pk_header_end ? ", " : "", (size_t)(ptr_pk_header < ptr_pk_header_end ? 2 : 0));
 #endif
 		} else {
-			size_t int_insert_parameter_markers_len = 0;
 			SFINISH_SNFCAT(client_update->str_temp_col_list, &int_temp_col_list_len,
 				int_i == 0 ? "" : ", ", strlen(int_i == 0 ? "" : ", "),
 				str_col_name, int_col_name_len,

@@ -166,10 +166,10 @@ void _DB_free_result(DB_result *res);
 char *DB_get_diagnostic(DB_conn *conn, DB_result *_res);
 
 // Escape string for use in a query
-char *DB_escape_literal(DB_conn *conn, char *str, size_t int_len); // make sure to copy and do pqfreemem
+char *DB_escape_literal(DB_conn *conn, char *str, size_t int_len);
 
 // Escape object name for use in a query
-char *DB_escape_identifier(DB_conn *conn, char *str, size_t int_len); // make sure to copy and do pqfreemem
+char *DB_escape_identifier(DB_conn *conn, char *str, size_t int_len);
 
 void _DB_finish(DB_conn *conn);
 #define DB_finish(A)                                                                                                             \

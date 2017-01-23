@@ -22,9 +22,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_pk_header = NULL;
 	char *ptr_pk_header_end = NULL;
 	char *ptr_name_header = NULL;
-#ifndef POSTAGE_INTERFACE_LIBPQ
 	char *ptr_name_header_end = NULL;
-#endif
 
 	SDEFINE_VAR_ALL(str_temp_col_list, str_col_name, str_sql, str_where_temp);
 
@@ -37,11 +35,16 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 	}
 
 	// Get table names and return columns
-	SFINISH_ERROR_CHECK((client_delete->str_real_table_name = get_table_name(client_request->ptr_query)) != NULL,
-		"Failed to get table name from query");
-	client_delete->int_real_table_name_len = strlen(client_delete->str_real_table_name);
+	client_delete->str_real_table_name = get_table_name(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_delete->int_real_table_name_len
+	);
+	SFINISH_ERROR_CHECK(client_delete->str_real_table_name != NULL, "Query failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n");
 
-	client_delete->str_hash_where_clause = get_hash_columns(client_request->ptr_query);
+	client_delete->str_hash_where_clause = get_hash_columns(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_delete->int_hash_where_clause_len
+	);
 	SFREE(str_global_error);
 
 	if (client_delete->str_hash_where_clause != NULL) {
@@ -73,23 +76,36 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 	SDEBUG("client_delete->str_hash_where_clause: %s", client_delete->str_hash_where_clause);
 
 	////GET POINTERS SET TO BEGINNING OF HEADERS
-	client_delete->ptr_query = strstr(client_request->ptr_query, "HASH");
+	client_delete->ptr_query = bstrstr(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		"HASH", (size_t)4
+	);
 	if (client_delete->ptr_query == NULL) {
 		client_delete->ptr_query = client_request->ptr_query;
 	}
-	client_delete->ptr_query = strstr(client_delete->ptr_query, "\012");
-	SFINISH_CHECK(client_delete->ptr_query, "strstr failed, malformed request?");
-	client_delete->ptr_query += 2;
+	client_delete->ptr_query = bstrstr(
+		client_delete->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_delete->ptr_query - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
+	SFINISH_CHECK(client_delete->ptr_query, "bstrstr failed, malformed request?");
+	client_delete->ptr_query += 1;
+	while (*client_delete->ptr_query == '\012') {
+		client_delete->ptr_query += 1;
+	}
 	ptr_pk_header = client_delete->ptr_query;
-	ptr_name_header = strchr(ptr_pk_header, '\012');
-	SFINISH_CHECK(ptr_name_header, "strchr failed, malformed request?");
+	ptr_name_header = bstrstr(
+		ptr_pk_header, (size_t)(client_request->frame->int_length - (size_t)(ptr_pk_header - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
+	SFINISH_CHECK(ptr_name_header, "bstrstr failed, malformed request?");
 	ptr_name_header += 1;
 	ptr_pk_header_end = ptr_name_header;
-	client_delete->ptr_query = strchr(ptr_name_header, '\012');
-	SFINISH_CHECK(client_delete->ptr_query != NULL, "strchr failed, malformed request?");
-#ifndef POSTAGE_INTERFACE_LIBPQ
+	client_delete->ptr_query =  bstrstr(
+		ptr_name_header, (size_t)(client_request->frame->int_length - (size_t)(ptr_name_header - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
+	SFINISH_CHECK(client_delete->ptr_query, "bstrstr failed, malformed request?");
 	ptr_name_header_end = client_delete->ptr_query;
-#endif
 	client_delete->ptr_query += 1;
 
 	SDEBUG("ptr_pk_header: %s", ptr_pk_header);
@@ -111,7 +127,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 
 	while (ptr_pk_header < ptr_pk_header_end) {
 		// name
-		int_length = strcspn(ptr_name_header, "\t\012");
+		int_length = strncspn(ptr_name_header, (size_t)(ptr_name_header_end - ptr_name_header), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_col_name, int_length + 1);
 		memcpy(str_col_name, ptr_name_header, int_length);
 		str_col_name[int_length] = '\0';
@@ -121,7 +137,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 			strncmp(ptr_pk_header, "pk", 2) == 0 ? "pk_" : strncmp(ptr_pk_header, "set", 3) == 0 ? "set_" : "hash_";
 		SDEBUG("str_pk_header: %s", str_pk_header);
 		SDEBUG("ptr_pk_header: %s", ptr_pk_header);
-		ptr_pk_header += strcspn(ptr_pk_header, "\t\012") + 1;
+		ptr_pk_header += strncspn(ptr_pk_header, (size_t)(ptr_pk_header_end - ptr_pk_header), "\t\012", (size_t)2) + 1;
 
 		SDEBUG("str_col_name: %s", str_col_name);
 		SDEBUG("str_pk_header: %s", str_pk_header);

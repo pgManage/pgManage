@@ -676,14 +676,16 @@ bool http_update_step5(EV_P, void *cb_data, DB_result *res) {
 		"[", (size_t)1
 	);
 	for (y = 0; y < maxy; y++) {
-		if ((*(ssize_t *)DArray_get(darr_data_length, y)) == -1) {
+		ssize_t sint_temp_len = (*(ssize_t *)DArray_get(darr_data_length, y));
+		if (sint_temp_len == -1) {
 			SFINISH_SNFCAT(
 				str_data, &int_data_len,
 				(y == 0 ? "" : ","), (size_t)(y == 0 ? 0 : 1),
 				"null", (size_t)4
 			);
 		} else {
-			str_temp = jsonify(DArray_get(darr_data, y));
+			size_t int_temp_len = (size_t)sint_temp_len;
+			str_temp = jsonify(DArray_get(darr_data, y), &int_temp_len);
 			SFINISH_CHECK(str_temp != NULL, "jsonify failed");
 			SFINISH_SNFCAT(
 				str_data, &int_data_len,

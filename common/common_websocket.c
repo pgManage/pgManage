@@ -1,6 +1,6 @@
 #include "common_websocket.h"
 
-char *WS_handshakeResponse(char *str_request) {
+char *WS_handshakeResponse(char *str_request, size_t int_request_len) {
 	char *str_response = NULL;
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;
@@ -21,13 +21,12 @@ char *WS_handshakeResponse(char *str_request) {
 	// base64 encoding of the hash.
 
 	// Copy the request
-	str_websocket_key = request_header(str_request, "Sec-WebSocket-Key");
+	size_t int_temp1_len = 0;
+	str_websocket_key = request_header(str_request, int_request_len, "Sec-WebSocket-Key", &int_temp1_len);
 	SERROR_CHECK(str_websocket_key != NULL, "get_header(\"Sec-WebSocket-Key\") failed!");
 
 	// Concat
-	size_t int_temp1_len = 0;
-	//TODO: strlen(str_websocket_key), binary version of request_header
-	SERROR_SNCAT(str_temp1, &int_temp1_len, str_websocket_key, strlen(str_websocket_key), "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", (size_t)36);
+	SERROR_SNCAT(str_temp1, &int_temp1_len, str_websocket_key, int_temp1_len, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", (size_t)36);
 
 	// SHA and b64
 	SERROR_SALLOC(str_websocket_accept, 20);

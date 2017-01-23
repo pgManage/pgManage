@@ -39,8 +39,8 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 	// right after TAB\t
 	str_request_type = client_request->ptr_query + 4;
 	// right after TYPE\t
-	ptr_query = strstr(str_request_type, "\t");
-	SFINISH_CHECK(ptr_query != NULL, "strstr failed");
+	ptr_query = bstrstr(str_request_type, client_request->frame->int_length - (size_t)(str_request_type - client_request->frame->str_message), "\t", (size_t)1);
+	SFINISH_CHECK(ptr_query != NULL, "bstrstr failed");
 	ptr_query += 1;
 	*(ptr_query - 1) = 0;
 
@@ -55,13 +55,13 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 
 	if (strcmp(str_request_type, "LIST") == 0) {
 		client_tab->str_path = ptr_query;
-		ptr_query = strstr(client_tab->str_path, "\012");
+		ptr_query = bstrstr(client_tab->str_path, client_request->frame->int_length - (size_t)(client_tab->str_path - client_request->frame->str_message), "\012", (size_t)1);
 		if (ptr_query != NULL) {
 			*ptr_query = 0;
 		}
 
 		str_temp = client_tab->str_path;
-		int_path_len = strlen(client_tab->str_path);
+		int_path_len = ptr_query != NULL ? (size_t)(ptr_query - str_temp) : (client_request->frame->int_length - (size_t)(client_tab->str_path - client_request->frame->str_message));
 		client_tab->str_path = bunescape_value(str_temp, &int_path_len);
 		SFINISH_CHECK(client_tab->str_path != NULL, "bunescape_value failed");
 
@@ -74,13 +74,13 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 
 	} else if (strcmp(str_request_type, "READ") == 0) {
 		client_tab->str_path = ptr_query;
-		ptr_query = strstr(client_tab->str_path, "\012");
+		ptr_query = bstrstr(client_tab->str_path, client_request->frame->int_length - (size_t)(client_tab->str_path - client_request->frame->str_message), "\012", (size_t)1);
 		if (ptr_query != NULL) {
 			*ptr_query = 0;
 		}
 
 		str_temp = client_tab->str_path;
-		int_path_len = strlen(client_tab->str_path);
+		int_path_len = ptr_query != NULL ? (size_t)(ptr_query - str_temp) : (client_request->frame->int_length - (size_t)(client_tab->str_path - client_request->frame->str_message));
 		client_tab->str_path = bunescape_value(str_temp, &int_path_len);
 		SFINISH_CHECK(client_tab->str_path != NULL, "bunescape_value failed");
 
@@ -92,22 +92,23 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 		ws_tab_read_step2(global_loop, client_request);
 
 	} else if (strcmp(str_request_type, "WRITE") == 0) {
-		// TODO: replace these `strstr` calls with `bstrstr`
-		client_tab->ptr_content = strstr(ptr_query, "\012") + 1;
+		client_tab->ptr_content = bstrstr(ptr_query, client_request->frame->int_length - (size_t)(ptr_query - client_request->frame->str_message), "\012", (size_t)1);
+		SFINISH_CHECK(client_tab->ptr_content != NULL, "bstrstr failed");
+		client_tab->ptr_content += 1;
 		SFINISH_SNCAT(
 			str_query, &int_query_len,
 			ptr_query, (size_t)(client_request->frame->int_length - (size_t)(ptr_query - client_request->frame->str_message))
 		);
-		ptr_query = strstr(str_query, "\t");
+		ptr_query = bstrstr(str_query, int_query_len, "\t", (size_t)1);
 		SFINISH_CHECK(ptr_query != NULL, "strstr failed");
 		*ptr_query = 0;
 		ptr_change_stamp = ptr_query + 1;
-		ptr_query = strstr(ptr_change_stamp, "\012");
+		ptr_query = bstrstr(ptr_change_stamp, int_query_len - (size_t)(ptr_change_stamp - str_query), "\012", (size_t)1);
 		if (ptr_query != NULL) {
 			*ptr_query = 0;
 		}
 
-		int_path_len = strlen(str_query);
+		int_path_len = ptr_query != NULL ? (size_t)(ptr_query - str_query) : int_query_len;
 		client_tab->str_path = bunescape_value(str_query, &int_path_len);
 		SFINISH_CHECK(client_tab->str_path != NULL, "bunescape_value failed");
 
@@ -124,8 +125,7 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 
 	} else if (strcmp(str_request_type, "MOVE") == 0) {
 		str_temp = ptr_query;
-		ptr_query = strstr(str_temp, "\t");
-		SFINISH_CHECK(ptr_query != NULL, "strstr failed");
+		ptr_query = bstrstr(str_temp, client_request->frame->int_length - (size_t)(str_temp - client_request->frame->str_message), "\t", (size_t)1);
 		if (ptr_query != NULL) {
 			*ptr_query = 0;
 		}
@@ -135,12 +135,12 @@ char *ws_tab_step1(struct sock_ev_client_request *client_request) {
 		SFINISH_CHECK(client_tab->str_path != NULL, "bunescape_value failed");
 
 		str_temp = ptr_query + 1;
-		ptr_query = strstr(str_temp, "\012");
+		ptr_query = bstrstr(str_temp, client_request->frame->int_length - (size_t)(str_temp - client_request->frame->str_message), "\012", (size_t)1);
 		if (ptr_query != NULL) {
 			*ptr_query = 0;
 		}
 
-		int_path_to_len = strlen(str_temp);
+		int_path_to_len = ptr_query != NULL ? (size_t)(ptr_query - str_temp) : (client_request->frame->int_length - (size_t)(str_temp - client_request->frame->str_message));
 		client_tab->str_path_to = bunescape_value(str_temp, &int_path_to_len);
 		SFINISH_CHECK(client_tab->str_path_to != NULL, "bunescape_value failed");
 
@@ -723,12 +723,12 @@ void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 	size_t int_response_len = 0;
 
 #ifdef _WIN32
-	if (strncmp(client_tab->str_change_stamp, "0", 2) != 0) {
-		SetLastError(0);
-		client_tab->h_file =
-			CreateFileA(client_tab->str_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	SetLastError(0);
+	client_tab->h_file =
+		CreateFileA(client_tab->str_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	int int_err = GetLastError();
+	if (strncmp(client_tab->str_change_stamp, "0", 2) != 0 && int_err != 0x2) { // 0x2: file not found
 		if (client_tab->h_file == INVALID_HANDLE_VALUE) {
-			int int_err = GetLastError();
 			FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, int_err,
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&strErrorText, 0, NULL);
 
@@ -763,6 +763,8 @@ void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 		if (strncmp(client_tab->str_change_stamp, str_change_stamp, strlen(str_change_stamp)) != 0) {
 			SFINISH("Someone updated this file before you.");
 		}
+	}
+	if (client_tab->h_file != INVALID_HANDLE_VALUE) {
 		CloseHandle(client_tab->h_file);
 	}
 #else

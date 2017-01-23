@@ -68,7 +68,6 @@ static int handler(void *str_user, const char *str_section, const char *str_name
 #define SMATCH(s, n) strcmp(str_section, s) == 0 && strcmp(str_name, n) == 0
 	if (SMATCH("", "connection_file")) {
 		SFREE(str_global_connection_file);
-		//TODO: add lengths to handler()
 		SERROR_SNCAT(str_global_connection_file, &int_len,
 			str_value, strlen(str_value));
 
@@ -455,6 +454,8 @@ bool parse_options(int argc, char *const *argv) {
 			"\\Program Files\\Workflow Products", (size_t)32);
 	}
 #endif
+#else
+	int_prefix_len = strlen(POSTAGE_PREFIX);
 #endif
 
 #ifdef _WIN32

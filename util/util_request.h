@@ -16,12 +16,12 @@ char *query(char *str_request, size_t int_request_length, size_t *int_query_leng
 /*
 Returns the value for a header in the request.
 */
-char *request_header(char *str_request, char *str_header);
+char *request_header(char *str_request, size_t int_request_len, char *str_header_name, size_t *int_header_value_len);
 
 /*
 Returns the value for a cookie in the request.
 */
-char *str_cookie(char *str_request, char *str_cookie_name);
+char *str_cookie(char *str_request, size_t int_request_len, char *str_cookie_name, size_t *int_cookie_value_len);
 
 /*
 Returns the uri for a request.

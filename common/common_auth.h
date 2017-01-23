@@ -19,4 +19,4 @@ This is function will:
 address)
 3. generate a connection string
 */
-DB_conn *set_cnxn(struct sock_ev_client *client, char *request, connect_cb_t connect_cb);
+DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb);

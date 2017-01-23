@@ -1,7 +1,7 @@
 #include "common_auth.h"
 
 // get connection string from cookie
-DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t connect_cb) {
+DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	char *str_response = NULL;
 	SDEFINE_VAR_ALL(str_cookie_encrypted, str_cookie_decrypted, str_password, str_uri, str_temp, str_conn_index);
 	SDEFINE_VAR_MORE(str_conn_debug, str_username, str_connname, str_database, str_uri_temp, str_context_data);
@@ -16,11 +16,9 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	size_t int_user_length = 0;
 	size_t int_password_length = 0;
 	size_t int_cookie_len = 0;
-	size_t int_user_agent_len = 0;
 	size_t int_host_len = 0;
 	size_t int_response_len = 0;
 	size_t int_context_data_len = 0;
-	size_t int_uri_user_agent_len = 0;
 	size_t int_uri_ip_address_len = 0;
 	size_t int_uri_host_len = 0;
 	ListNode *other_client_node = NULL;
@@ -39,8 +37,8 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 
 	////DECRYPT
 	SDEBUG("client->str_cookie_name: %s", client->str_cookie_name);
-	str_cookie_encrypted = str_cookie(str_request, client->str_cookie_name);
-	if (str_cookie_encrypted == NULL || strlen(str_cookie_encrypted) <= 0) {
+	str_cookie_encrypted = str_cookie(client->str_request, client->int_request_len, client->str_cookie_name, &int_cookie_len);
+	if (str_cookie_encrypted == NULL || int_cookie_len <= 0) {
 #ifdef ENVELOPE
 		if (strstr(str_uri_temp, "acceptnc_") != NULL) {
 			char *ptr_dot = strstr(str_uri_temp, ".");
@@ -70,8 +68,6 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 		SFINISH_CHECK(bol_public, "No Cookie.");
 	}
 	if (bol_public == false) {
-		int_cookie_len = strlen(str_cookie_encrypted);
-
 		// Make sure we have the last close time
 		if (client->int_last_activity_i == -1) {
 			// If we don't, then find it
@@ -337,16 +333,16 @@ DB_conn *set_cnxn(struct sock_ev_client *client, char *str_request, connect_cb_t
 	// client_cb sometimes calls this function and doesn't expect need us to
 	// connect to the database (because we are already connected)
 	if (connect_cb != NULL) {
-		str_host = request_header(str_request, "Host");
-		if (str_host == NULL) {
-			SFINISH_SNCAT(str_host, &int_host_len,
-				"", (size_t)0);
-		} else {
-			int_host_len = strlen(str_host);
-		}
 		str_uri_ip_address = snuri(client->str_client_ip, strlen(client->str_client_ip), &int_uri_ip_address_len);
 		SFINISH_CHECK(str_uri_ip_address != NULL, "snuri failed on string \"%s\"", client->str_client_ip);
 
+		str_host = request_header(client->str_request, client->int_request_len, "Host", &int_host_len);
+		if (str_host == NULL) {
+			SFINISH_SNCAT(
+				str_host, &int_host_len,
+				"", (size_t)0
+			);
+		}
 		str_uri_host = snuri(str_host, int_host_len, &int_uri_host_len);
 		SFINISH_CHECK(str_uri_host != NULL, "snuri failed on string \"%s\"", str_host);
 

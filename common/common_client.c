@@ -552,17 +552,21 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				SDEBUG("other_client_node: %p", other_client_node);
 				SDEBUG("client->str_request: %p", client->str_request);
 				if (other_client_node != NULL) {
-					str_client_cookie = str_cookie(client->str_request, client->str_cookie_name);
-					str_session_client_cookie = str_cookie(session_client->str_request, session_client->str_cookie_name);
+					size_t int_current_cookie_len = 0;
+					size_t int_session_cookie_len = 0;
+					str_client_cookie = str_cookie(client->str_request, client->int_request_len, client->str_cookie_name, &int_current_cookie_len);
+					str_session_client_cookie = str_cookie(session_client->str_request, session_client->int_request_len, session_client->str_cookie_name, &int_session_cookie_len);
+
 					SDEBUG("client->str_request: %p", client->str_request);
 					// clang-format off
                     if (str_client_cookie != NULL &&
                         str_session_client_cookie != NULL &&
                         strcmp(str_client_cookie, str_session_client_cookie) == 0 &&
-                        (       (       (       session_client->client_timeout_prepare != NULL &&
-                                                (       (session_client->client_timeout_prepare->close_time + (ev_tstamp)int_global_login_timeout) > ev_now(EV_A) ||
-                                                        session_client->client_timeout_prepare->close_time == 0
-                              ))) || session_client->client_timeout_prepare == NULL)) {
+                        (	(	(		session_client->client_timeout_prepare != NULL
+									&&	(			(session_client->client_timeout_prepare->close_time + (ev_tstamp)int_global_login_timeout) > ev_now(EV_A)
+												||	session_client->client_timeout_prepare->close_time == 0
+							))) || session_client->client_timeout_prepare == NULL)
+						) {
 						// clang-format on
 						client_timeout_prepare_free(session_client->client_timeout_prepare);
 
@@ -622,7 +626,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				if (client->conn == NULL) {
 					SDEBUG("client->str_request: %p", client->str_request);
 					// set_cnxn does its own error handling
-					if (set_cnxn(client, client->str_request, cnxn_cb) == NULL) {
+					if (set_cnxn(client, cnxn_cb) == NULL) {
 						ev_io_stop(EV_A, &client->io);
 						SERROR_CLIENT_CLOSE(client);
 					}
@@ -631,7 +635,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				} else {
 					// The reason for this, is because later functions depend on the
 					// values this function sets
-					if (set_cnxn(client, client->str_request, NULL) == NULL) {
+					if (set_cnxn(client, NULL) == NULL) {
 						ev_io_stop(EV_A, &client->io);
 						SERROR_CLIENT_CLOSE(client);
 					}
@@ -640,7 +644,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				if (client != NULL) {
 					////HANDSHAKE
 					SERROR_CHECK(
-						(str_response = WS_handshakeResponse(client->str_request)) != NULL, "Error getting handshake response");
+						(str_response = WS_handshakeResponse(client->str_request, client->int_request_len)) != NULL, "Error getting handshake response");
 
 					SDEBUG("str_response       : %s", str_response);
 					SDEBUG("client->str_request: %s", client->str_request);
@@ -668,20 +672,22 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				}
 
 			} else {
-				str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
-				SERROR_CHECK(str_uri_temp != NULL, "str_uri_path failed");
 #ifdef ENVELOPE
 				SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
 					"envelope", (size_t)8);
 #else
-				char *ptr_slash = strchr(str_uri_temp + 9, '/');
-				if (ptr_slash != NULL) {
-					*ptr_slash = 0;
-					SERROR_SNCAT(str_conn_index, &int_conn_index_len,
-						str_uri_temp + 9, strlen(str_uri_temp + 9));
-					SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
-						"postage_", (size_t)8,
-						str_conn_index, strlen(str_conn_index));
+				str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
+				SERROR_CHECK(str_uri_temp != NULL, "str_uri_path failed");
+				if (int_uri_length > 8) {
+					char *ptr_slash = strchr(str_uri_temp + 9, '/');
+					if (ptr_slash != NULL) {
+						*ptr_slash = 0;
+						SERROR_SNCAT(str_conn_index, &int_conn_index_len,
+							str_uri_temp + 9, strlen(str_uri_temp + 9));
+						SERROR_SNCAT(client->str_cookie_name, &int_cookie_name_len,
+							"postage_", (size_t)8,
+							str_conn_index, strlen(str_conn_index));
+					}
 				}
 #endif
 				SDEBUG("http request");
@@ -742,7 +748,6 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 	size_t int_response_confirmed = 0;
 	char *ptr_query = NULL;
 	char *ptr_end_query = NULL;
-	size_t int_temp_len = 0;
 	size_t int_old_length = 0;
 	size_t int_message_id_len = 0;
 	size_t int_transaction_id_len = 0;
@@ -870,7 +875,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 
 		SERROR_SNCAT(str_first_word, &int_first_word_len,
 			ptr_query, ptr_end_query - ptr_query);
-		str_temp = str_first_word + strcspn(str_first_word, "\t \012");
+		str_temp = str_first_word + strncspn(str_first_word, int_first_word_len, "\t \012", (size_t)3);
 		if (str_temp) {
 			*str_temp = 0;
 		}

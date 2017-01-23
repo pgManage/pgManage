@@ -235,12 +235,11 @@ void http_main(struct sock_ev_client *client) {
 		client_auth->parent = client;
 
 		str_response = http_auth(client_auth);
-		int_response_len = strlen(str_response);
 	} else if (strncmp(str_uri, "/env", 4) == 0) {
 		// set_cnxn does its own error handling
 		SDEBUG("str_uri: %s", str_uri);
 
-		if ((client->conn = set_cnxn(client, client->str_request, http_main_cnxn_cb)) == NULL) {
+		if ((client->conn = set_cnxn(client, http_main_cnxn_cb)) == NULL) {
 			SFINISH_CLIENT_CLOSE(client);
 		}
 		// DEBUG("str_conninfo: %s", str_conninfo);
@@ -266,7 +265,7 @@ void http_main(struct sock_ev_client *client) {
 		// set_cnxn does its own error handling
 		SDEBUG("str_uri: %s", str_uri);
 
-		if ((client->conn = set_cnxn(client, client->str_request, http_main_cnxn_cb)) == NULL) {
+		if ((client->conn = set_cnxn(client, http_main_cnxn_cb)) == NULL) {
 			SFINISH_CLIENT_CLOSE(client);
 		}
 		// DEBUG("str_conninfo: %s", str_conninfo);
@@ -351,11 +350,11 @@ bool http_client_info_cb(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_SNFCAT(str_groups, &int_groups_len,
 		"]", (size_t)1);
 
-	SFINISH_CHECK((str_json_version = jsonify(str_version)), "jsonify failed");
-	int_json_version_len = strlen(str_json_version);
+	int_json_version_len = int_version_len;
+	SFINISH_CHECK((str_json_version = jsonify(str_version, &int_json_version_len)), "jsonify failed");
 
-	SFINISH_CHECK((str_json_user = jsonify(str_user)), "jsonify failed");
-	int_json_user_len = strlen(str_json_user);
+	int_json_user_len = int_user_len;
+	SFINISH_CHECK((str_json_user = jsonify(str_user, &int_json_user_len)), "jsonify failed");
 
 	SFINISH_SNCAT(str_response, &int_response_len,
 		"{\"stat\": true, \"dat\": {\"username\": ", (size_t)35,

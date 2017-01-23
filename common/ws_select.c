@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "ws_select.h"
 
 char *ws_select_step1(struct sock_ev_client_request *client_request) {
@@ -7,6 +8,7 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_attr_header = NULL;
 	char *ptr_end_attr_header = NULL;
 	char *ptr_attr_values = NULL;
+	char *ptr_end_attr_values = NULL;
 
 	size_t int_attr_name_len = 0;
 	size_t int_attr_value_len = 0;
@@ -22,21 +24,27 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 		client_request->str_message_id, strlen(client_request->str_message_id));
 
 	// Get table names and return columns
-	SFINISH_ERROR_CHECK((client_select->str_real_table_name = get_table_name(client_request->ptr_query)) != NULL,
-		"Query failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n");
-	client_select->int_real_table_name_len = strlen(client_select->str_real_table_name);
+	client_select->str_real_table_name = get_table_name(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_select->int_real_table_name_len
+	);
+	SFINISH_ERROR_CHECK(client_select->str_real_table_name != NULL, "Query failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n");
 
-	SFINISH_ERROR_CHECK((client_select->str_return_columns =
-								get_return_columns(client_request->ptr_query, client_select->str_real_table_name)) != NULL,
-		"Failed to get return columns from query");
-	client_select->int_return_columns_len = strlen(client_select->str_return_columns);
+	client_select->str_return_columns = get_return_columns(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		client_select->str_real_table_name, client_select->int_real_table_name_len,
+		&client_select->int_return_columns_len
+	);
+	SFINISH_ERROR_CHECK(client_select->str_return_columns != NULL, "Failed to get return columns from query");
 
 #ifdef POSTAGE_INTERFACE_LIBPQ
 #else
-	SFINISH_ERROR_CHECK((client_select->str_return_escaped_columns = get_return_escaped_columns(
-							 DB_connection_driver(client_request->parent->conn), client_request->ptr_query)) != NULL,
-		"Failed to get escaped return columns from query.");
-	client_select->int_return_escaped_columns_len = strlen(client_select->str_return_escaped_columns);
+	client_select->str_return_escaped_columns = get_return_escaped_columns(
+		DB_connection_driver(client_request->parent->conn),
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_select->int_return_escaped_columns_len
+	);
+	SFINISH_ERROR_CHECK(client_select->str_return_escaped_columns != NULL, "Failed to get escaped return columns from query");
 
 	SFINISH_SNCAT(client_select->str_sql_escaped_return, &client_select->int_sql_escaped_return_len,
 		"SELECT ", (size_t)7,
@@ -55,18 +63,34 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 		"\012", (size_t)1);
 
 	// Get start of the attr headers
-	ptr_attr_header = strstr(client_request->ptr_query, "RETURN");
-	SFINISH_CHECK(ptr_attr_header != NULL, "strstr failed, malformed request?");
-	ptr_attr_header = strstr(ptr_attr_header, "\012");
-	SFINISH_CHECK(ptr_attr_header != NULL, "strstr failed, malformed request?");
+	ptr_attr_header = bstrstr(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		"RETURN", (size_t)6
+	);
+	SFINISH_CHECK(ptr_attr_header != NULL, "bstrstr failed, malformed request?");
+	ptr_attr_header = bstrstr(
+		ptr_attr_header, (size_t)(client_request->frame->int_length - (size_t)(ptr_attr_header - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
+	SFINISH_CHECK(ptr_attr_header != NULL, "bstrstr failed, malformed request?");
 	while (*ptr_attr_header == '\012') {
 		ptr_attr_header += 1;
 	}
 	// Get end of headers
-	ptr_end_attr_header = strstr(ptr_attr_header, "\012");
+	ptr_end_attr_header = bstrstr(
+		ptr_attr_header, (size_t)(client_request->frame->int_length - (size_t)(ptr_attr_header - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
 	if (ptr_end_attr_header != NULL) {
 		// Get start of attr values
 		ptr_attr_values = ptr_end_attr_header + 1;
+		ptr_end_attr_values = bstrstr(
+			ptr_attr_values, (size_t)(client_request->frame->int_length - (size_t)(ptr_attr_values - client_request->frame->str_message)),
+			"\012", (size_t)1
+		);
+		if (ptr_end_attr_values == NULL) {
+			ptr_end_attr_values = client_request->frame->str_message + client_request->frame->int_length;
+		}
 
 		SDEBUG("ptr_attr_header: >%s<", ptr_attr_header);
 		SDEBUG("ptr_attr_values: >%s<", ptr_attr_values);
@@ -74,7 +98,7 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 		// Loop through attributes (SQL clauses)
 		while (ptr_attr_header < ptr_end_attr_header) {
 			// Get attr name
-			int_attr_name_len = strcspn(ptr_attr_header, "\t\012");
+			int_attr_name_len = strncspn(ptr_attr_header, (size_t)(ptr_end_attr_header - ptr_attr_header), "\t\012", (size_t)2);
 
 			SFINISH_SALLOC(str_attr_name, int_attr_name_len + 1);
 			memcpy(str_attr_name, ptr_attr_header, int_attr_name_len);
@@ -82,7 +106,7 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 			ptr_attr_header += int_attr_name_len + 1;
 
 			// Get attr value
-			int_attr_value_len = strcspn(ptr_attr_values, "\t\012");
+			int_attr_value_len = strncspn(ptr_attr_values, (size_t)(ptr_end_attr_values - ptr_attr_values), "\t\012", (size_t)2);
 			SFINISH_SALLOC(str_attr_value, int_attr_value_len + 1);
 			memcpy(str_attr_value, ptr_attr_values, int_attr_value_len);
 			str_attr_value[int_attr_value_len] = '\0';
@@ -98,14 +122,18 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 			SDEBUG("str_attr_value: >%s<", str_attr_value);
 
 			bstr_toupper(str_attr_name, int_attr_name_len);
-			if (strncmp(str_attr_name, "WHERE", 5) == 0 || strncmp(str_attr_name, "ORDER BY", 8) == 0 ||
-				strncmp(str_attr_name, "LIMIT", 5) == 0 || strncmp(str_attr_name, "OFFSET", 6) == 0) {
+			if (strncmp(str_attr_name, "WHERE", 6) == 0 || strncmp(str_attr_name, "ORDER BY", 9) == 0 ||
+				strncmp(str_attr_name, "LIMIT", 6) == 0 || strncmp(str_attr_name, "OFFSET", 7) == 0) {
 #ifdef POSTAGE_INTERFACE_LIBPQ
 				SFINISH_SNFCAT(client_select->str_sql, &client_select->int_sql_len,
 					str_attr_name, int_attr_name_len,
 					" ", (size_t)1,
 					str_attr_value, int_attr_value_len,
 					"\012", (size_t)1);
+				SDEBUG("str_attr_name: %s", str_attr_name);
+				SDEBUG("int_attr_name_len: %zu", int_attr_name_len);
+				SDEBUG("str_attr_value: %s", str_attr_value);
+				SDEBUG("int_attr_value_len: %zu", int_attr_value_len);
 #else
 				if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
 					SFINISH_SNFCAT(client_select->str_sql_escaped_return, &client_select->int_sql_escaped_return_len,
@@ -156,6 +184,8 @@ char *ws_select_step1(struct sock_ev_client_request *client_request) {
 			SFREE(str_attr_value);
 		}
 	}
+
+	SDEBUG("client_select->str_sql: %s", client_select->str_sql);
 
 	SFINISH_CHECK(DB_get_column_types_for_query(
 					  global_loop, client_request->parent->conn, client_select->str_sql, client_request, ws_select_step4),
@@ -262,10 +292,12 @@ bool ws_select_step4(EV_P, void *cb_data, DB_result *res) {
 		}
 		SFINISH_SNFCAT(client_select->str_sql_escaped_return, &client_select->int_sql_escaped_return_len,
 			"\012", (size_t)1);
-		SFINISH_ERROR_CHECK((client_select->str_return_escaped_columns = get_return_escaped_columns(
-			DB_connection_driver(client_request->parent->conn), client_select->str_sql_escaped_return)) != NULL,
-			"Failed to get escaped return columns from query.");
-		client_select->int_return_escaped_columns_len = strlen(client_select->str_return_escaped_columns);
+		client_select->str_return_escaped_columns = get_return_escaped_columns(
+			DB_connection_driver(client_request->parent->conn),
+			client_select->str_sql_escaped_return, client_select->int_sql_escaped_return_len,
+			&client_select->int_return_escaped_columns_len
+		);
+		SFINISH_ERROR_CHECK(client_select->str_return_escaped_columns != NULL, "Failed to get escaped return columns from query");
 		SFREE(client_select->str_sql_escaped_return);
 
 		if (client_select->str_order_by == NULL) {

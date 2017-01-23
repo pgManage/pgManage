@@ -46,9 +46,15 @@
 #include "util_salloc.h"
 
 /*
+Check str_search for characters from str_chars
+*/
+size_t strncspn(const char *str_search, size_t int_search_len, const char *str_chars, size_t int_chars_len);
+
+/*
 Check to see if a string needs to be escaped as either an identifier or a literal
 */
 bool check_to_escape(char *str_input, bool bol_as_ident);
+
 /*
 Escape a string for use in tab delimited data.
 */
@@ -99,7 +105,7 @@ char *getpar(char *str_query, char *str_key, size_t int_query_length, size_t *in
 /*
 Encodes string into a JSON string.
 */
-char *jsonify(char *inputstring);
+char *jsonify(char *str_inputstring, size_t *ptr_int_result_len);
 
 /*
 Makes all the characters in a string lowercase.

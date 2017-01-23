@@ -28,37 +28,54 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 	client_insert->int_temp_table_name_len = strlen(client_insert->str_temp_table_name);
 
 	// Get table names and return columns
-	SFINISH_ERROR_CHECK((client_insert->str_real_table_name = get_table_name(client_request->ptr_query)) != NULL,
-		"Failed to get table name from query");
+	client_insert->str_real_table_name = get_table_name(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_insert->int_real_table_name_len
+	);
+	SFINISH_ERROR_CHECK(client_insert->str_real_table_name != NULL, "Query failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n");
 	// DEBUG("client_insert->str_real_table_name: %s",
 	// client_insert->str_real_table_name);
-	client_insert->int_real_table_name_len = strlen(client_insert->str_real_table_name);
 
-	SFINISH_ERROR_CHECK((client_insert->str_return_columns =
-								get_return_columns(client_request->ptr_query, client_insert->str_real_table_name)) != NULL,
-		"Failed to get return columns from query");
-	client_insert->int_return_columns_len = strlen(client_insert->str_return_columns);
+	client_insert->str_return_columns = get_return_columns(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		client_insert->str_real_table_name, client_insert->int_real_table_name_len,
+		&client_insert->int_return_columns_len
+	);
+	SFINISH_ERROR_CHECK(client_insert->str_return_columns != NULL, "Failed to get return columns from query");
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
-	SFINISH_ERROR_CHECK((client_insert->str_return_escaped_columns = get_return_escaped_columns(
-							 DB_connection_driver(client_request->parent->conn), client_request->ptr_query)) != NULL,
-		"Failed to get escaped return columns from query");
-	SDEBUG("client_insert->str_return_escaped_columns: %s", client_insert->str_return_escaped_columns);
-	client_insert->int_return_escaped_columns_len = strlen(client_insert->str_return_escaped_columns);
+	client_insert->str_return_escaped_columns = get_return_escaped_columns(
+		DB_connection_driver(client_request->parent->conn),
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		&client_insert->int_return_escaped_columns_len
+	);
+	SFINISH_ERROR_CHECK(client_insert->str_return_escaped_columns != NULL, "Failed to get escaped return columns from query");
 #endif
 	// DEBUG("client_insert->str_return_columns:  %s",
 	// client_insert->str_return_columns);
 
-	ptr_pk = strstr(client_request->ptr_query, "PK");
+	ptr_pk = bstrstr(
+		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
+		"PK", (size_t)2
+	);
 	SFINISH_CHECK(ptr_pk != NULL, "could not find \"PK\", malformed request?");
-	ptr_end_pk = strstr(ptr_pk, "\012");
+	ptr_end_pk = bstrstr(
+		ptr_pk, (size_t)(client_request->frame->int_length - (size_t)(ptr_pk - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
 	*ptr_end_pk = 0;
 	ptr_pk += 3;
 	SDEBUG("ptr_pk: %s", ptr_pk);
 
-	ptr_seq = strstr(ptr_end_pk + 1, "SEQ");
+	ptr_seq = bstrstr(
+		ptr_end_pk + 1, (size_t)(client_request->frame->int_length - (size_t)((ptr_end_pk + 1) - client_request->frame->str_message)),
+		"SEQ", (size_t)3
+	);
 	SFINISH_CHECK(ptr_seq != NULL, "could not find \"SEQ\", malformed request?");
-	ptr_end_seq = strstr(ptr_seq, "\012");
+	ptr_end_seq = bstrstr(
+		ptr_seq, (size_t)(client_request->frame->int_length - (size_t)(ptr_seq - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
 	*ptr_end_seq = 0;
 	ptr_seq += 4;
 	SDEBUG("ptr_seq: %s", ptr_seq);
@@ -71,7 +88,10 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 
 	ptr_column_names = client_insert->ptr_values;
 	SFINISH_CHECK(*ptr_column_names != 0, "No column names");
-	ptr_end_column_names = strstr(ptr_column_names, "\012");
+	ptr_end_column_names = bstrstr(
+		ptr_column_names, (size_t)(client_request->frame->int_length - (size_t)(ptr_column_names - client_request->frame->str_message)),
+		"\012", (size_t)1
+	);
 	SFINISH_CHECK(ptr_end_column_names != NULL, "No insert data");
 	*ptr_end_column_names = 0;
 	client_insert->ptr_values = ptr_end_column_names + 1;
@@ -108,7 +128,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 	size_t int_i = 0, int_j = 0, int_k = 0;
 	while (ptr_pk < ptr_end_pk) {
 		// PK name
-		int_col_name_len = strcspn(ptr_pk, "\t\012");
+		int_col_name_len = strncspn(ptr_pk, (size_t)(ptr_end_pk - ptr_pk), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_col_name, int_col_name_len + 1);
 		memcpy(str_col_name, ptr_pk, int_col_name_len);
 		str_col_name[int_col_name_len] = '\0';
@@ -122,7 +142,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 		str_temp1 = NULL;
 
 		// PK sequence
-		int_col_seq_len = strcspn(ptr_seq, "\t\012");
+		int_col_seq_len = strncspn(ptr_seq, (size_t)(ptr_end_seq - ptr_seq), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_col_seq, int_col_seq_len + 1);
 		memcpy(str_col_seq, ptr_seq, int_col_seq_len);
 		str_col_seq[int_col_seq_len] = '\0';
@@ -159,7 +179,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 			}
 
 		} else {
-			if (strstr(client_insert->str_column_names, str_col_name) == NULL) {
+			if (bstrstr(client_insert->str_column_names, client_insert->int_column_names_len, str_col_name, int_col_name_len) == NULL) {
 				int_j += 1;
 				SFINISH_CHECK(int_j == 1, "Only one PK column allowed to not have an unspecified value");
 				if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
@@ -207,7 +227,7 @@ char *ws_insert_step1(struct sock_ev_client_request *client_request) {
 #ifndef POSTAGE_INTERFACE_LIBPQ
 	while (ptr_column_names < ptr_end_column_names) {
 		SDEBUG("ptr_column_names                           : %s", ptr_column_names);
-		int_col_name_len = strcspn(ptr_column_names, "\t\012");
+		int_col_name_len = strncspn(ptr_column_names, (size_t)(ptr_end_column_names - ptr_column_names), "\t\012", (size_t)2);
 		SFINISH_SALLOC(str_col_name, int_col_name_len + 1);
 		memcpy(str_col_name, ptr_column_names, int_col_name_len);
 		str_col_name[int_col_name_len] = '\0';
