@@ -726,10 +726,9 @@ finish:
 		}
 		bol_error_state = false;
 
-		char *_str_response1 = str_response;
-		char *_str_response2 = DB_get_diagnostic(client_request->parent->conn, client_copy_check->res);
+		char *_str_response = str_response;
 		char str_len[51] = { 0 };
-		snprintf(str_len, 50, "%zu", strlen(_str_response1) + strlen(_str_response2) + 2);
+		snprintf(str_len, 50, "%zu", strlen(_str_response));
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
@@ -739,12 +738,9 @@ finish:
 			str_temp, strlen(str_temp),
 			str_len, strlen(str_len),
 			"\015\012\015\012", (size_t)4,
-			_str_response1, strlen(_str_response1),
-			":\n", (size_t)2,
-			_str_response2, strlen(_str_response2)
+			_str_response, strlen(_str_response)
 		);
-		SFREE(_str_response1);
-		SFREE(_str_response2);
+		SFREE(_str_response);
 
 		int_client_write_len = CLIENT_WRITE(client_request->parent, str_response, int_response_len);
 		SDEBUG("int_client_write_len: %d", int_client_write_len);
