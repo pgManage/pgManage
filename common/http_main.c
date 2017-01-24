@@ -235,7 +235,6 @@ void http_main(struct sock_ev_client *client) {
 		client_auth->parent = client;
 
 		str_response = http_auth(client_auth);
-		int_response_len = strlen(str_response);
 	} else if (strncmp(str_uri, "/env", 4) == 0) {
 		// set_cnxn does its own error handling
 		SDEBUG("str_uri: %s", str_uri);

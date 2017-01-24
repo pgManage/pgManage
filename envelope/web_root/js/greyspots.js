@@ -14410,7 +14410,11 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             
             'getData': function () {
-                getData(this);
+                getData(this, undefined, true);
+            },
+            
+            'refresh': function () {
+                getData(this, undefined, true);
             }
         }
     });
@@ -25665,6 +25669,7 @@ document.addEventListener('DOMContentLoaded', function () {
             updateFrameData = strID + '\t' + strHash + '\t' + GS.encodeForTabDelimited(newValue);
             
             updateFrameData = (strRoles + '\n' + strColumns + '\n' + updateFrameData);
+            GS.triggerEvent(element, 'before_update');
             
             GS.requestUpdateFromSocket(
                 GS.envSocket, strSchema, strObject
@@ -25752,6 +25757,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         '&column=' + strColumn +
                         '&value=' +  encodeURIComponent(newValue);
             
+            GS.triggerEvent(element, 'before_update');
             // run ajax
             GS.dataFetch(strLink, true);
             
@@ -26105,6 +26111,7 @@ document.addEventListener('DOMContentLoaded', function () {
               , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
               , response_i = 0, response_len = 0, arrTotalRecords = [];
             
+            GS.triggerEvent(element, 'before_select');
             GS.requestSelectFromSocket(GS.envSocket, strSchema, strObject, strColumns
                                      , strWhere, strOrd, strLimit, strOffset
                                      , function (data, error) {
@@ -26159,7 +26166,7 @@ document.addEventListener('DOMContentLoaded', function () {
                            '&order_by=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('ord') || ''))) +
                            '&cols='     + encodeURIComponent(strCols);
                 
-                
+                GS.triggerEvent(element, 'before_select');
                 GS.addLoader('refresh_' + encodeURIComponent(strLink));
                 //if (GS.dataFetch(strLink, bolClearPrevious)) {
                 //    data = GS.dataFetch(strLink, bolClearPrevious);
@@ -27179,7 +27186,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         intCurrentWidth += widthIncreaseAmount;
                         strCurrentWidth = String(parseFloat(intCurrentWidth.toFixed(5).toString(), 10));
                         
-                        strCSS += 'gs-grid.width-' + intGridWidth + ' gs-block[width="' + (i + 1) + '"] { width: ' + strCurrentWidth + '%; }\n';
+                        strCSS += 'gs-grid.width-' + intGridWidth + ' > gs-block[width="' + (i + 1) + '"] { width: ' + strCurrentWidth + '%; }\n';
                     }
                     
                     // add col-NUM to the styleElement's "class" attribute
@@ -35006,17 +35013,17 @@ window.addEventListener('design-register-element', function () {
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
         strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        if (selectedElement.hasAttribute('hidden')) { strVisibilityAttribute = 'hidden'; }
+        if (selectedElement.hasAttribute('hide-on-desktop')) { strVisibilityAttribute = 'hide-on-desktop'; }
+        if (selectedElement.hasAttribute('hide-on-tablet')) { strVisibilityAttribute = 'hide-on-tablet'; }
+        if (selectedElement.hasAttribute('hide-on-phone')) { strVisibilityAttribute = 'hide-on-phone'; }
+        if (selectedElement.hasAttribute('show-on-desktop')) { strVisibilityAttribute = 'show-on-desktop'; }
+        if (selectedElement.hasAttribute('show-on-tablet')) { strVisibilityAttribute = 'show-on-tablet'; }
+        if (selectedElement.hasAttribute('show-on-phone')) { strVisibilityAttribute = 'show-on-phone'; }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +

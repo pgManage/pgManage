@@ -17,6 +17,23 @@
             //global GS, window, ml
             //jslint browser:true, white:true, multivar:true, for:true
             var bolCurl = false;
+            
+            function quote_ident(strName) {
+                'use strict';
+                var bolQuote = !Boolean(strName.match(/^[a-z_]{1,}[a-z_0-9]*$/));
+                
+                //_ is safe
+                //0-9 is safe (except when first char)
+                //a-z is safe
+                
+                // if we need to quote: double up double quotes
+                if (bolQuote) {
+                    return '"' + strName.replace(/\"/g, '""') + '"';
+                }
+                
+                return strName;
+            }
+            
             window.addEventListener('load', function () {
                 'use strict'
                 var qs = GS.qryToJSON(GS.getQueryString()), strQuery;
@@ -61,6 +78,15 @@
                         if (data.intCallbackNumber === 0) {
                             arrColumns = data.strMessage.split('\t');
                             
+                            //console.log(arrColumns.slice(0));
+                            //i = 0;
+                            //len = arrColumns.length;
+                            //while (i < len) {
+                            //    arrColumns[i] = quote_ident(arrColumns[i]);
+                            //    i += 1;
+                            //}
+                            //console.log(arrColumns.slice(0));
+                            
                             strPK = GS.decodeFromTabDelimited(arrColumns[0]);
                             
                             strColumns = GS.decodeFromTabDelimited(arrColumns[1]);
@@ -78,7 +104,7 @@
                             
                             if (strPK) {
                                 datasheetElement.setAttribute('pk', strPK);
-                                datasheetElement.setAttribute('ord', strPK + ' DESC');
+                                datasheetElement.setAttribute('ord', quote_ident(strPK) + ' DESC');
                                 
                                 for (i = 0, len = arrSequenceDefaults.length; i < len; i += 1) {
                                     if (arrSequenceDefaults[i].indexOf('nextval') > -1) {

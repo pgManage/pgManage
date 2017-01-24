@@ -460,7 +460,7 @@ void _DB_free_result(DB_result *res) {
 }
 
 char *DB_get_diagnostic(DB_conn *conn, DB_result *res) {
-	char *str_response = _DB_get_diagnostic(conn, res->res);
+	char *str_response = res != NULL ? _DB_get_diagnostic(conn, res->res) : strdup("");
 	return str_response;
 }
 

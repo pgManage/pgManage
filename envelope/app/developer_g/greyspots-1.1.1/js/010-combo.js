@@ -1558,7 +1558,11 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             
             'getData': function () {
-                getData(this);
+                getData(this, undefined, true);
+            },
+            
+            'refresh': function () {
+                getData(this, undefined, true);
             }
         }
     });
