@@ -520,6 +520,7 @@ DROP VIEW IF EXISTS ttesting_view2;
 DROP VIEW IF EXISTS ttesting_view;
 DROP TABLE IF EXISTS rtesting_table2;
 DROP TABLE IF EXISTS rtesting_table;
+DROP TABLE IF EXISTS rtesting_table_with_capital_column_name;
 CREATE TABLE rtesting_table
 (
 id integer,
@@ -527,6 +528,15 @@ test_name character varying(150),
 "select" character varying(150),
 "test@test" character varying(150),
 CONSTRAINT rtesting_table_pk PRIMARY KEY (id)
+) WITH (
+OIDS=FALSE
+);
+CREATE TABLE rtesting_table_with_capital_column_name
+(
+id integer,
+test_name character varying(150),
+"TestName" character varying(150),
+CONSTRAINT rtesting_table_with_capital_column_name_pk PRIMARY KEY (id)
 ) WITH (
 OIDS=FALSE
 );
@@ -590,7 +600,15 @@ NOTIFY postgres, 'testing';
 					"START",
 					"END",
 					"Rows Affected\n0\n",
+					"QUERY\t\\nDROP TABLE IF EXISTS rtesting_table_with_capital_column_name;",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
 					"QUERY\t\\nCREATE TABLE rtesting_table\\n(\\nid integer,\\ntest_name character varying(150),\\n\"select\" character varying(150),\\n\"test@test\" character varying(150),\\nCONSTRAINT rtesting_table_pk PRIMARY KEY (id)\\n) WITH (\\nOIDS=FALSE\\n);",
+					"START",
+					"END",
+					"Rows Affected\n0\n",
+					"QUERY\t\\nCREATE TABLE rtesting_table_with_capital_column_name\\n(\\nid integer,\\ntest_name character varying(150),\\n\"TestName\" character varying(150),\\nCONSTRAINT rtesting_table_with_capital_column_name_pk PRIMARY KEY (id)\\n) WITH (\\nOIDS=FALSE\\n);",
 					"START",
 					"END",
 					"Rows Affected\n0\n",
@@ -843,7 +861,15 @@ RETURN	id	select
                     'id\tselect\ninteger\tcharacter varying(150)\n',
                     'TRANSACTION COMPLETED'
                 ]
-            ],
+			],
+			['SELECT 8', 'websocket', '', ml(function () {/*SELECT	rtesting_table_with_capital_column_name
+RETURN	id	test_name	TestName
+
+ORDER BY
+id DESC
+*/
+			}),
+			['id\ttest_name\tTestName\ninteger\tcharacter varying(150)\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
             
             
 			['BEGIN 1', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -1188,6 +1214,39 @@ id_1	test_name_1
 */}),
 			    [
                     '73\tBob\n',
+                    'TRANSACTION COMPLETED'
+			    ]
+			],
+			[
+                'COMMIT',
+                'websocket',
+                '',
+                ml(function () {/*COMMIT*/ }),
+			    ['OK']
+			],
+
+
+			[
+                'BEGIN',
+                'websocket',
+                '',
+                ml(function () {/*BEGIN*/ }),
+			    ['OK']
+			],
+			[
+                'INSERT 6',
+                'websocket',
+                '',
+                ml(function () {/*INSERT	rtesting_table_with_capital_column_name
+RETURN	id	test_name	TestName
+PK	id
+SEQ	
+
+id	test_name	TestName
+1	Bob	Bob
+*/}),
+			    [
+                    '1\tBob\tBob\n',
                     'TRANSACTION COMPLETED'
 			    ]
 			],
@@ -1578,7 +1637,7 @@ id_1	test_name_1
                 ['OK']
             ],
 			[
-                'UPDATE 6',
+                'UPDATE 7',
                 'websocket',
                 '',
                 ml(function () {/*UPDATE	rtesting_table
@@ -1592,15 +1651,45 @@ id	select
 			    [
                     "1\tBobbie\n2\tAlicia\n",
                     "TRANSACTION COMPLETED"
-                ]
-            ],
+			    ]
+			],
 			[
                 'COMMIT',
                 'websocket',
                 '',
                 ml(function () {/*COMMIT*/ }),
 			    ['OK']
+			],
+            [
+                'BEGIN',
+                'websocket',
+                '',
+                ml(function () {/*BEGIN*/ }),
+                ['OK']
             ],
+			[
+                'UPDATE 8',
+                'websocket',
+                '',
+                ml(function () {/*UPDATE	rtesting_table_with_capital_column_name
+RETURN	id	test_name	TestName
+
+pk	set	set
+id	test_name	TestName
+1	Bobbie	Bobbie
+*/}),
+			    [
+                    "1\tBobbie\tBobbie\n",
+                    "TRANSACTION COMPLETED"
+			    ]
+			],
+			[
+                'COMMIT',
+                'websocket',
+                '',
+                ml(function () {/*COMMIT*/ }),
+			    ['OK']
+			], 
             
             
 			['BEGIN 36', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -2184,6 +2273,34 @@ id
 pk
 id_1
 73
+*/}),
+			    ['Rows Affected\n1\n', 'TRANSACTION COMPLETED']
+			],
+			[
+                'COMMIT',
+                'websocket',
+                '',
+                ml(function () {/*COMMIT*/ }),
+			    ['OK']
+			],
+
+
+			[
+                'BEGIN 55',
+                'websocket',
+                '',
+                ml(function () {/*BEGIN*/ }),
+			    ['OK']
+			],
+			[
+                'DELETE 6',
+                'websocket',
+                '',
+                ml(function () {/*DELETE	rtesting_table_with_capital_column_name
+
+pk
+TestName
+Bobbie
 */}),
 			    ['Rows Affected\n1\n', 'TRANSACTION COMPLETED']
 			],
