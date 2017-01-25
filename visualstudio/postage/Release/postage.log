@@ -1,15 +1,6 @@
-﻿  ws_tab.c
-..\..\postage\ws_tab.c(42): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(58): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(64): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(77): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(83): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(95): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(128): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(138): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(143): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+﻿  http_file.c
   Generating code
-  4 of 401 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
+  1 of 401 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     2 functions had inline decision re-evaluated but remain unchanged
   Finished generating code

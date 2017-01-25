@@ -402,7 +402,7 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 	} else {
 		SERROR_SNCAT(
 			client->str_response, &client_http_file->int_response_len,
-			"HTTP/1.1 200 OK\015\012", (size_t)19,
+			"HTTP/1.1 200 OK\015\012", (size_t)17,
 			str_maybe_download, strlen(str_maybe_download)
 		);
 
