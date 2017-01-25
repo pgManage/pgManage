@@ -414,7 +414,7 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 		} else {
 			SERROR_SNFCAT(
 				client->str_response, &client_http_file->int_response_len,
-				"ETag: \"", (size_t)8,
+				"ETag: \"", (size_t)7,
 				str_etag, strlen(str_etag),
 				"\"\015\012", (size_t)3,
 				"Last-Modified: ", (size_t)15,
