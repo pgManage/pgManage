@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "util_file.h"
 
 void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents);
@@ -52,7 +53,9 @@ error:
 void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents) {
 	if (revents != 0) {
 	} // get rid of unused parameter warning
-	SDEBUG("canonical_recurse_directory_check_cb");
+	SDEBUG("################################################################################################");
+	SDEBUG("################################################ canonical_recurse_directory_check_cb");
+	SDEBUG("################################################################################################");
 	recursive_callback_data *rec_data = (recursive_callback_data *)w;
 	bool bol_res = true;
 	// Get directory we are working on
@@ -149,6 +152,7 @@ void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents) {
 					SDEBUG("File: >%s<", str_partial_path);
 					bol_res = rec_data->step_callback(EV_A, rec_data->cb_data, str_partial_path);
 				} else {
+					SDEBUG("Directory: >%s|%s<", rec_data->str_path, str_partial_path);
 					SFREE(str_global_error);
 					str_path = canonical(rec_data->str_path, str_partial_path, "read_dir");
 					SERROR_CHECK(str_path != NULL, "canonical failed");
@@ -159,12 +163,11 @@ void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents) {
 						dir_data->str_partial_path, dir_data->int_partial_path_len,
 						dir_data->dp->d_name, strlen(dir_data->dp->d_name),
 						"/", (size_t)1);
-					SERROR_SNCAT(new_dir_data->str_path, &rec_data->int_path_len,
+					SERROR_SNCAT(new_dir_data->str_path, &new_dir_data->int_path_len,
 						rec_data->str_path, rec_data->int_path_len,
-						"/", (size_t)1,
 						new_dir_data->str_partial_path, new_dir_data->int_partial_path_len);
 
-					SDEBUG("Directory: >%s<", dir_data->str_partial_path);
+					SDEBUG("Directory: >%s|%s<", new_dir_data->str_path, new_dir_data->str_partial_path);
 				}
 				SFREE(str_path);
 				SFREE(str_partial_path);
