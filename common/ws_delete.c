@@ -1,6 +1,6 @@
 #include "ws_delete.h"
 
-char *ws_delete_step1(struct sock_ev_client_request *client_request) {
+void ws_delete_step1(struct sock_ev_client_request *client_request) {
 	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->vod_request_data);
 	SDEBUG("DELETE BEGIN");
 	char *str_response = NULL;
@@ -343,13 +343,13 @@ finish:
 
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
+		str_response = NULL;
 		ws_delete_free(client_delete);
 		// client_request_free(client_request);
 		// client_request_free takes care of this
 		// SFREE(client_delete);
 	}
 	SFREE_ALL();
-	return str_response;
 }
 #ifndef POSTAGE_INTERFACE_LIBPQ
 bool ws_delete_step15_sql_server(EV_P, void *cb_data, DB_result *res) {

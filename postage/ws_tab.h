@@ -36,7 +36,7 @@ So we are just showing what all of a request's steps look like, then all of the
 functions
 */
 
-char *ws_tab_step1(struct sock_ev_client_request *client_request);
+void ws_tab_step1(struct sock_ev_client_request *client_request);
 
 /*
 ********************************** REQUEST FORMAT

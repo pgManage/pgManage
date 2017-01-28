@@ -644,12 +644,12 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				if (client != NULL) {
 					////HANDSHAKE
 					SERROR_CHECK(
-						(str_response = WS_handshakeResponse(client->str_request, client->int_request_len)) != NULL, "Error getting handshake response");
+						(str_response = WS_handshakeResponse(client->str_request, client->int_request_len, &int_response_len)) != NULL, "Error getting handshake response");
 
 					SDEBUG("str_response       : %s", str_response);
 					SDEBUG("client->str_request: %s", client->str_request);
 					// return handshake response
-					if ((int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
+					if ((int_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
 						ev_io_stop(EV_A, &client->io);
 						SERROR_CLIENT_CLOSE(client);
 						if (bol_tls) {

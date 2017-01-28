@@ -22,7 +22,7 @@ This function will:
 2. split raw into several queries
 3. send begin query
 */
-char *ws_raw_step1(struct sock_ev_client_request *client_request);
+void ws_raw_step1(struct sock_ev_client_request *client_request);
 
 #ifdef POSTAGE_INTERFACE_LIBPQ
 /*

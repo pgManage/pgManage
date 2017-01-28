@@ -1,6 +1,6 @@
 #include "ws_update.h"
 
-char *ws_update_step1(struct sock_ev_client_request *client_request) {
+void ws_update_step1(struct sock_ev_client_request *client_request) {
 	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->vod_request_data);
 	// DEBUG("UPDATE BEGIN");
 	SDEFINE_VAR_ALL(str_col_name, str_sql, str_temp);
@@ -399,13 +399,13 @@ finish:
 
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
+		str_response = NULL;
 		ws_update_free(client_update);
 		// client_request_free(client_request);
 		// client_request_free takes care of this
 		// SFREE(client_update);
 	}
 	SFREE_ALL();
-	return str_response;
 }
 #ifndef POSTAGE_INTERFACE_LIBPQ
 bool ws_update_step15_sql_server(EV_P, void *cb_data, DB_result *res) {

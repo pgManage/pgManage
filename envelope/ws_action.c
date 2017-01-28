@@ -1,6 +1,6 @@
 #include "ws_select.h"
 
-char *ws_action_step1(struct sock_ev_client_request *client_request) {
+void ws_action_step1(struct sock_ev_client_request *client_request) {
 	SDEFINE_VAR_ALL(str_schema, str_action_name, str_action_full_name, str_args, str_sql);
 	char *str_response = NULL;
 	char *ptr_schema = NULL;
@@ -134,7 +134,7 @@ finish:
 
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
+		str_response = NULL;
 	}
 	SFREE_ALL();
-	return str_response;
 }

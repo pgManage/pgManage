@@ -1,14 +1,13 @@
 #include "common_websocket.h"
 
-char *WS_handshakeResponse(char *str_request, size_t int_request_len) {
+char *WS_handshakeResponse(char *str_request, size_t int_request_len, size_t *int_response_len) {
 	char *str_response = NULL;
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;
-	size_t int_response_len = 0;
 
 	SDEFINE_VAR_ALL(str_websocket_key, str_websocket_accept);
 
-	SERROR_SNCAT(str_response, &int_response_len, "HTTP/1.1 101 Switching Protocols\015\012", (size_t)34,
+	SERROR_SNCAT(str_response, int_response_len, "HTTP/1.1 101 Switching Protocols\015\012", (size_t)34,
 		"Upgrade: websocket\015\012", (size_t)20,
 		"Connection: Upgrade\015\012", (size_t)21,
 		"Sec-WebSocket-Accept: ", (size_t)22);
@@ -39,7 +38,7 @@ char *WS_handshakeResponse(char *str_request, size_t int_request_len) {
 	SFREE(str_temp1);
 
 	// Add it to the response
-	SERROR_SNFCAT(str_response, &int_response_len, str_websocket_accept, int_len,
+	SERROR_SNFCAT(str_response, int_response_len, str_websocket_accept, int_len,
 		"\015\012Sec-WebSocket-Version: 13\015\012\015\012", (size_t)31);
 
 	SFREE_ALL();

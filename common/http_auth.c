@@ -1,7 +1,7 @@
 #include "http_auth.h"
 
 // response with redirect
-char *http_auth(struct sock_ev_client_auth *client_auth) {
+void http_auth(struct sock_ev_client_auth *client_auth) {
 	char *str_response = NULL;
 	char *str_session_id_temp = NULL;
 	SDEFINE_VAR_ALL(str_form_data, str_expires);
@@ -345,8 +345,6 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
 
 		SFREE_PWORD(str_form_data);
-		http_auth_free(client_auth);
-		SFREE(client_auth);
 	} else if (strncmp(client_auth->str_action, "list", 16) == 0) {
 		SNOTICE("REQUEST TYPE: Not a valid action.");
 
@@ -357,8 +355,6 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
 
 		SFREE_PWORD(str_form_data);
-		http_auth_free(client_auth);
-		SFREE(client_auth);
 
 	} else if (strncmp(client_auth->str_action, "canadd", 16) == 0) {
 		SNOTICE("REQUEST TYPE: Not a valid action.");
@@ -370,8 +366,6 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
 
 		SFREE_PWORD(str_form_data);
-		http_auth_free(client_auth);
-		SFREE(client_auth);
 #else
 		//////
 		// CHANGE DATABASE, RESET COOKIE
@@ -512,8 +506,6 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			SDEBUG("current_connection->str_connection_name: %s", current_connection->str_connection_name);
 		}
 		SFREE_PWORD(str_form_data);
-		http_auth_free(client_auth);
-		SFREE(client_auth);
 
 	} else if (strncmp(client_auth->str_action, "canadd", 7) == 0) {
 		char *str_temp =
@@ -526,8 +518,6 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 			bol_global_allow_custom_connections ? "true"    : "false",
 			bol_global_allow_custom_connections ? (size_t)4 : (size_t)5
 		);
-		http_auth_free(client_auth);
-		SFREE(client_auth);
 #endif
 
 	} else if (strncmp(client_auth->str_action, "logout", 7) == 0) {
@@ -628,8 +618,6 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 #endif
 		//client_auth->parent->bol_fast_close = true;
 		SFREE_PWORD(str_form_data);
-		http_auth_free(client_auth);
-		SFREE(client_auth);
 	} else {
 		SNOTICE("REQUEST TYPE: Not a valid action.");
 
@@ -640,8 +628,6 @@ char *http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
 
 		SFREE_PWORD(str_form_data);
-		http_auth_free(client_auth);
-		SFREE(client_auth);
 	}
 	bol_error_state = false;
 finish:
@@ -650,14 +636,42 @@ finish:
 		SDEBUG("client_auth->parent: %p", client_auth->parent);
 	}
 
-	if (bol_error_state && str_response != NULL) {
+	ssize_t int_write_len = 0;
+	if (bol_error_state == true) {
+		SDEBUG("str_response: %s", str_response);
 		char *_str_response = str_response;
+		char str_length[50];
+		snprintf(str_length, 50, "%zu", (int_response_len != 0 ? int_response_len : strlen(_str_response)));
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
-		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp), _str_response, strlen(_str_response));
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, (int_response_len != 0 ? int_response_len : strlen(_str_response))
+		);
 		SFREE(_str_response);
 	}
+
+	if (str_response != NULL) {
+		if ((int_write_len = CLIENT_WRITE(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
+			SFREE(str_response);
+			if (bol_tls) {
+				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
+			} else {
+				SERROR_NORESPONSE("write() failed");
+			}
+		}
+		SFREE(str_response);
+
+		SERROR_CLIENT_CLOSE_NORESPONSE(client_auth->parent);
+		http_auth_free(client_auth);
+		SFREE(client_auth);
+	}
+
 	SFREE_PWORD(str_form_data);
 	SFREE_PWORD(str_cookie_decrypted);
 	SFREE_PWORD(str_escape_password);
@@ -668,12 +682,7 @@ finish:
 	SFREE_PWORD(str_new_password_literal);
 	SBFREE_PWORD(str_session_id_temp, 32);
 	SFREE_ALL();
-	if (bol_error_state == true) {
-		http_auth_free(client_auth);
-		SFREE(client_auth);
-	}
 
-	return str_response;
 }
 
 void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {

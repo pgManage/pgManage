@@ -234,7 +234,7 @@ void http_main(struct sock_ev_client *client) {
 		SDEBUG("client_auth: %p", client_auth);
 		client_auth->parent = client;
 
-		str_response = http_auth(client_auth);
+		http_auth(client_auth);
 	} else if (strncmp(str_uri, "/env", 4) == 0) {
 		// set_cnxn does its own error handling
 		SDEBUG("str_uri: %s", str_uri);
@@ -260,7 +260,7 @@ void http_main(struct sock_ev_client *client) {
 		SDEBUG("client_auth: %p", client_auth);
 		client_auth->parent = client;
 
-		str_response = http_auth(client_auth);
+		http_auth(client_auth);
 	} else if (strncmp(str_uri, "/postage", 8) == 0 && isdigit(str_uri[9])) {
 		// set_cnxn does its own error handling
 		SDEBUG("str_uri: %s", str_uri);
@@ -275,7 +275,6 @@ void http_main(struct sock_ev_client *client) {
 #endif
 	SDEBUG("str_response: %s", str_response);
 
-	bol_error_state = false;
 finish:
 	bol_error_state = false;
 	SFREE_PWORD_ALL();
