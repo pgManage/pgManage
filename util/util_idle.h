@@ -1,5 +1,4 @@
 #pragma once
-
 #include <ev.h>
 
 #include "util_error.h"

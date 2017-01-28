@@ -177,11 +177,24 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SDEBUG("client_auth->parent: %p", client_auth->parent);
 		SDEBUG("str_conn: %s", str_conn);
 
+#ifdef ENVELOPE
+		// The only difference here is the callback
+		if (DB_connection_driver(client_auth->parent->conn) == DB_DRIVER_POSTGRES) {
+			SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, NULL,
+				0, NULL, 0, "",
+				http_auth_login_step15)) != NULL,
+				"DB_connect failed");
+		} else {
+#else
 		SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, client_auth->str_user,
-						   client_auth->int_user_length, client_auth->str_password, client_auth->int_password_length, "",
-						   http_auth_login_step2)) != NULL,
+			client_auth->int_user_length, client_auth->str_password, client_auth->int_password_length, "",
+			http_auth_login_step2)) != NULL,
 			"DB_connect failed");
 		SFREE_PWORD(client_auth->str_password);
+#endif
+#ifdef ENVELOPE
+		}
+#endif
 
 		SDEBUG("client_auth: %p", client_auth);
 		SDEBUG("client_auth->parent: %p", client_auth->parent);
@@ -685,6 +698,247 @@ finish:
 
 }
 
+#ifdef ENVELOPE
+
+bool http_auth_login_step2_env(EV_P, void *cb_data, DB_result *res);
+bool http_auth_login_step3_env(EV_P, void *cb_data, DB_result *res);
+
+void http_auth_login_step15(EV_P, void *cb_data, DB_conn *conn) {
+	struct sock_ev_client_auth *client_auth = cb_data;
+	char *str_response = NULL;
+	size_t int_response_len = 0;
+	SDEFINE_VAR_ALL(str_user_ident, str_sql);
+
+	SFINISH_CHECK(conn->int_status == 1, "%s", conn->str_response);
+
+	str_user_ident = DB_escape_identifier(client_auth->parent->conn, client_auth->str_user, client_auth->int_user_length);
+	SFINISH_CHECK(str_user_ident != NULL, "DB_escape_identifier failed");
+	size_t int_temp = 0;
+	char *str_temp1 = "SET SESSION AUTHORIZATION ";
+	SFINISH_SNCAT(
+		str_sql, &int_temp,
+		str_temp1, strlen(str_temp1),
+		str_user_ident, strlen(str_user_ident),
+		";", (size_t)1
+	);
+
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
+	SFINISH_CHECK(DB_exec(EV_A, client_auth->parent->conn, client_auth, str_sql, http_auth_login_step2_env), "DB_exec failed");
+
+	bol_error_state = false;
+finish:
+	SFREE(conn->str_response);
+	ssize_t int_len = 0;
+	if (bol_error_state == true) {
+		SDEBUG("str_response: %s", str_response);
+		char *_str_response = str_response;
+		char str_length[50];
+		snprintf(str_length, 50, "%zu", (int_response_len != 0 ? int_response_len : strlen(_str_response)));
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, (int_response_len != 0 ? int_response_len : strlen(_str_response))
+		);
+		SFREE(_str_response);
+	}
+	if (str_response != NULL) {
+		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
+			SFREE(str_response);
+			if (bol_tls) {
+				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
+			} else {
+				SERROR_NORESPONSE("write() failed");
+			}
+		}
+		SFREE(str_response);
+
+		SERROR_CLIENT_CLOSE_NORESPONSE(client_auth->parent);
+		http_auth_free(client_auth);
+		SFREE(client_auth);
+	}
+	bol_error_state = false;
+	SFREE_ALL();
+}
+
+bool http_auth_login_step2_env(EV_P, void *cb_data, DB_result *res) {
+	struct sock_ev_client_auth *client_auth = cb_data;
+	char *str_response = NULL;
+	size_t int_response_len = 0;
+	size_t int_temp = 0;
+	SDEFINE_VAR_ALL(str_password_temp, str_password_hash, str_password_hash_temp, str_password_hash_literal, str_user_literal, str_diag, str_temp, str_sql);
+	str_diag = DB_get_diagnostic(client_auth->parent->conn, res);
+
+	SFINISH_CHECK(res != NULL, "DB_exec failed");
+	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed: %s", str_diag);
+
+	DB_free_result(res);
+
+	bol_error_state = false;
+
+	SFINISH_SNCAT(
+		str_password_temp, &int_temp,
+		client_auth->str_password, client_auth->int_password_length,
+		client_auth->str_user, client_auth->int_user_length
+	);
+	SFREE_PWORD(client_auth->str_password);
+	SFINISH_SALLOC(str_password_hash_temp, 16);
+	MD5((unsigned char *)str_password_temp, int_temp, (unsigned char *)str_password_hash_temp);
+	SFREE_PWORD(str_password_temp);
+	unsigned char *str_password_hash_temp2 = str_password_hash_temp;
+	size_t int_len = 16;
+	str_password_hash_temp = hexencode(str_password_hash_temp2, &int_len);
+	SFREE(str_password_hash_temp2);
+	SFINISH_CHECK(str_password_hash_temp != NULL, "hexencode failed");
+	SFINISH_SNCAT(
+		str_password_hash, &int_temp,
+		"md5", (size_t)3,
+		str_password_hash_temp, 32
+	);
+	SINFO("client_auth->str_password: %s", client_auth->str_password);
+
+	str_password_hash_literal = DB_escape_literal(client_auth->parent->conn, str_password_hash, int_temp);
+	SFINISH_CHECK(str_password_hash_literal != NULL, "DB_escape_literal failed");
+
+	str_user_literal = DB_escape_literal(client_auth->parent->conn, client_auth->str_user, client_auth->int_user_length);
+	SFINISH_CHECK(str_user_literal != NULL, "DB_escape_literal failed");
+	char *str_temp1 = "SELECT CASE WHEN rolpassword = ";
+	char *str_temp2 = " THEN 'TRUE' ELSE 'FALSE' END FROM pg_authid WHERE rolname = ";
+	SFINISH_SNCAT(
+		str_sql, &int_temp,
+		str_temp1, strlen(str_temp1),
+		str_password_hash_literal, strlen(str_password_hash_literal),
+		str_temp2, strlen(str_temp2),
+		str_user_literal, strlen(str_user_literal),
+		";", (size_t)1
+	);
+
+	SINFO("str_password_hash_literal: %s", str_password_hash_literal);
+
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
+	SFINISH_CHECK(DB_exec(EV_A, client_auth->parent->conn, client_auth, str_sql, http_auth_login_step3_env), "DB_exec failed");
+
+finish:
+	ssize_t int_client_write_len = 0;
+	if (bol_error_state == true) {
+		SDEBUG("str_response: %s", str_response);
+		char *_str_response = str_response;
+		char str_length[50];
+		snprintf(str_length, 50, "%zu", strlen(_str_response));
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, (int_response_len != 0 ? int_response_len : strlen(_str_response))
+		);
+		SFREE(_str_response);
+		if (client_auth->parent->conn->str_response != NULL && client_auth->parent->conn->str_response[0] != 0) {
+			SFINISH_SNFCAT(
+				str_response, &int_response_len,
+				":\n", (size_t)2,
+				client_auth->parent->conn->str_response, strlen(client_auth->parent->conn->str_response)
+			);
+		}
+		SFREE(client_auth->parent->conn->str_response);
+	}
+
+	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client_auth->parent, str_response, strlen(str_response))) < 0) {
+		if (bol_tls) {
+			SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
+		} else {
+			SERROR_NORESPONSE("write() failed");
+		}
+	}
+	SFREE_ALL();
+	DB_free_result(res);
+	bol_error_state = false;
+	return true;
+}
+
+bool http_auth_login_step3_env(EV_P, void *cb_data, DB_result *res) {
+	struct sock_ev_client_auth *client_auth = cb_data;
+	char *str_response = NULL;
+	size_t int_response_len = 0;
+	DArray *arr_row_values = NULL;
+	DArray *arr_row_lengths = NULL;
+	DB_fetch_status status = 0;
+	SDEFINE_VAR_ALL(str_diag);
+	str_diag = DB_get_diagnostic(client_auth->parent->conn, res);
+
+	SFINISH_CHECK(res != NULL, "DB_exec failed");
+	SFINISH_CHECK(res->status == DB_RES_TUPLES_OK, "DB_exec failed");
+
+	SFINISH_CHECK((status = DB_fetch_row(res)) == DB_FETCH_OK, "DB_fetch_row failed");
+	arr_row_values = DB_get_row_values(res);
+	arr_row_lengths = DB_get_row_lengths(res);
+
+	SFINISH_CHECK(strncmp(DArray_get(arr_row_values, 0), "TRUE", *(size_t *)DArray_get(arr_row_lengths, 0)) == 0, "Wrong password");
+	SFINISH_CHECK((status = DB_fetch_row(res)) == DB_FETCH_END, "DB_fetch_row failed");
+
+	DB_free_result(res);
+
+	bol_error_state = false;
+	http_auth_login_step2(EV_A, client_auth, client_auth->parent->conn);
+
+finish:
+	if (arr_row_values != NULL) {
+		DArray_clear_destroy(arr_row_values);
+	}
+	if (arr_row_lengths != NULL) {
+		DArray_clear_destroy(arr_row_lengths);
+	}
+	ssize_t int_len = 0;
+	if (bol_error_state == true) {
+		SDEBUG("str_response: %s", str_response);
+		char *_str_response = str_response;
+		char str_length[50];
+		snprintf(str_length, 50, "%zu", strlen(_str_response));
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: ";
+		SFINISH_SNCAT(
+			str_response, &int_response_len,
+			str_temp, strlen(str_temp),
+			str_length, strlen(str_length),
+			"\015\012\015\012", (size_t)4,
+			_str_response, (int_response_len != 0 ? int_response_len : strlen(_str_response))
+		);
+		SFREE(_str_response);
+		if (client_auth->parent->conn->str_response != NULL && client_auth->parent->conn->str_response[0] != 0) {
+			SFINISH_SNFCAT(
+				str_response, &int_response_len,
+				":\n", (size_t)2,
+				client_auth->parent->conn->str_response, strlen(client_auth->parent->conn->str_response)
+			);
+		}
+		SFREE(client_auth->parent->conn->str_response);
+	}
+
+	if (str_response != NULL && (int_len = CLIENT_WRITE(client_auth->parent, str_response, strlen(str_response))) < 0) {
+		if (bol_tls) {
+			SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
+		} else {
+			SERROR_NORESPONSE("write() failed");
+		}
+	}
+	SFREE_ALL();
+	DB_free_result(res);
+	bol_error_state = false;
+	return true;
+}
+#endif
+
 void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 	struct sock_ev_client_auth *client_auth = cb_data;
 	SDEFINE_VAR_ALL(str_group_literal, str_sql, str_expires, str_temp, str_user_literal, str_int_len);
@@ -701,11 +955,11 @@ void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 	SFINISH_CHECK(conn->int_status == 1, "%s", conn->str_response);
 
 	str_user_literal = DB_escape_literal(client_auth->parent->conn, client_auth->str_user, client_auth->int_user_length);
-	SFINISH_CHECK(str_user_literal != NULL, "PQescapeLiteral failed");
+	SFINISH_CHECK(str_user_literal != NULL, "DB_escape_literal failed");
 	int_user_literal_len = strlen(str_user_literal);
 	if (str_global_login_group != NULL) {
 		str_temp = DB_escape_literal(client_auth->parent->conn, str_global_login_group, strlen(str_global_login_group));
-		SFINISH_CHECK(str_temp != NULL, "PQescapeLiteral failed");
+		SFINISH_CHECK(str_temp != NULL, "DB_escape_literal failed");
 		SFINISH_SNCAT(str_group_literal, &int_group_literal_len, str_temp, strlen(str_temp));
 		SFREE(str_temp);
 		str_temp = NULL;
@@ -1176,7 +1430,6 @@ finish:
 	SFINISH_CLIENT_CLOSE(client);
 
 	bol_error_state = false;
-	// This causes query_callback to stop looping
 	return true;
 }
 

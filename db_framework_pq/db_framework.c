@@ -44,23 +44,28 @@ DB_conn *DB_connect(EV_P, void *cb_data, char *str_connstring, char *str_user,
 	conn->int_sock = -1;
 #endif
 
+	// Envelope uses pg_authid to authenticate
+	if (str_user != NULL && str_password != NULL) {
+		str_escape_username = escape_conninfo_value(str_user, &int_escape_username_len);
+		str_escape_password = escape_conninfo_value(str_password, &int_escape_password_len);
 
-	str_escape_username = escape_conninfo_value(str_user, &int_escape_username_len);
-	str_escape_password = escape_conninfo_value(str_password, &int_escape_password_len);
+		SFINISH_SNCAT(str_conn, &int_conn_len,
+			str_connstring, strlen(str_connstring),
+			//" application_name='"SUN_PROGRAM_WORD_NAME"'", strlen(" application_name='"SUN_PROGRAM_WORD_NAME"'"),
+			" user=", (size_t)6,
+			str_escape_username, int_escape_username_len,
+			" password=", (size_t)10,
+			str_escape_password, int_escape_password_len);
 
-	SFINISH_SNCAT(str_conn, &int_conn_len,
-		str_connstring, strlen(str_connstring),
-		//" application_name='"SUN_PROGRAM_WORD_NAME"'", strlen(" application_name='"SUN_PROGRAM_WORD_NAME"'"),
-		" user=", (size_t)6,
-		str_escape_username, int_escape_username_len,
-		" password=", (size_t)10,
-		str_escape_password, int_escape_password_len);
+		// **** WARNING ****
+		// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE PASSWORD IN THE
+		// CLEAR IN THE LOG!!!!
+		// SDEBUG("str_conn>%s<", str_conn);
+		// **** WARNING ****
+	} else {
+		SFINISH_SNCAT(str_conn, &int_conn_len, str_connstring, strlen(str_connstring));
+	}
 
-	// **** WARNING ****
-	// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE PASSWORD IN THE
-	// CLEAR IN THE LOG!!!!
-	// SDEBUG("str_conn>%s<", str_conn);
-	// **** WARNING ****
 	pg_conn = PQconnectStart(str_conn);
 #ifdef UTIL_DEBUG
 	PQconninfoOption *arr_conn_info = PQconninfo(pg_conn);
