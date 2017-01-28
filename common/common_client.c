@@ -1917,6 +1917,11 @@ void client_close_immediate(struct sock_ev_client *client) {
 		ev_check_stop(global_loop, &client->client_request_watcher->check);
 		SFREE(client->client_request_watcher);
 	}
+	if (client->client_request_watcher_search != NULL) {
+		ev_check_stop(global_loop, &client->client_request_watcher_search->check);
+		decrement_idle(global_loop);
+		SFREE(client->client_request_watcher_search);
+	}
 	if (client->client_copy_check != NULL) {
 		ev_check_stop(global_loop, &client->client_copy_check->check);
 		decrement_idle(global_loop);

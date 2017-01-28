@@ -390,6 +390,10 @@ File already exists.*/})],
 				'FORMAT	DELIMITER	NULL	QUOTE	ESCAPE	HEADER\n' +
 				'\'csv\'	\',\'	\'NULL\'	\'"\'	\'\\\'	TRUE',
 				ml(function () {/*"FATAL\nerror_text\tERROR:  syntax error at or near \"csv\"\\nLINE 4:   FORMAT 'csv',\\n                  ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t50\n"*/ })],
+			['Export Fail 3', 'ajax', 500, '/postage/0/export', 'SELECT \'test\' AS result\n' +
+				'FORMAT	DELIMITER	NULL	QUOTE	ESCAPE	HEADER\n' +
+				'\'csv\'	\',\'	\'NULL\'	\'"\'	\'\\\'	TRUE); DROP TABLE rtesting_table; (SELECT \'test\' AS test',
+				ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })],
 			['Export', 'ajax', 200, '/postage/0/export', 'SELECT \'test\' AS result\n' +
 				'FORMAT	DELIMITER	NULL	QUOTE	ESCAPE	HEADER\n' +
 				'\'csv\'	\',\'	\'NULL\'	\'"\'	\'\\\'	TRUE',

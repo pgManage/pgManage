@@ -2497,6 +2497,7 @@ bool ws_file_search_step4(EV_P, void *cb_data, bool bol_success) {
 
 	SFINISH_SALLOC(client_request_watcher, sizeof(struct sock_ev_client_request_watcher));
 	client_request_watcher->parent = client_request->parent;
+	client_request->parent->client_request_watcher_search = client_request_watcher;
 
 	increment_idle(EV_A);
 	ev_check_init(&client_request_watcher->check, ws_file_search_step5);
@@ -2577,6 +2578,7 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 
 		decrement_idle(EV_A);
 		ev_check_stop(EV_A, w);
+		client_request->parent->client_request_watcher_search = NULL;
 		SFREE(client_request_watcher);
 
 		ws_file_free(client_file);
@@ -2696,6 +2698,7 @@ finish:
 
 		decrement_idle(EV_A);
 		ev_check_stop(EV_A, w);
+		client_request->parent->client_request_watcher_search = NULL;
 		SFREE(client_request_watcher);
 
 		ws_file_free(client_file);

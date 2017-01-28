@@ -9,20 +9,22 @@
 #include "ws_update.h"
 
 /*
-This function takes a SELECT/INSERT/UPDATE/DELETE request and returns the table
-name
+This function splits the query with DArray_sql_split and makes sure there is only one query
+*/
+bool query_is_safe(char *str_query);
+
+/*
+This function takes a SELECT/INSERT/UPDATE/DELETE request and returns the table name
 */
 char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_table_name_len);
 /*
-This function takes a SELECT/INSERT/UPDATE request and returns the return
-columns
+This function takes a SELECT/INSERT/UPDATE request and returns the return columns
 */
 char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table_name, size_t int_table_name_len, size_t *ptr_int_return_columns_len);
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
 /*
-This function takes a SELECT/INSERT/UPDATE request and returns the return
-columns in a format that concatinates and escapes them
+This function takes a SELECT/INSERT/UPDATE request and returns the return columns in a format that concatinates and escapes them
 */
 char *get_return_escaped_columns(DB_driver driver, char *_str_query, size_t int_query_len, size_t *ptr_int_return_columns_len);
 #endif
@@ -36,7 +38,7 @@ This function handles the copy out functionality for websockets.
 */
 bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char *str_response, size_t int_len);
 /*
-This function handles the copy out functionality for html.
+This function handles the copy out functionality for http.
 */
 bool http_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char *str_response, size_t int_len);
 

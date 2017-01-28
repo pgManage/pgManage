@@ -133,6 +133,7 @@ bool http_delete_step2(EV_P, void *cb_data, DB_result *res) {
 	DB_free_result(res);
 
 	SDEBUG("client_delete->str_sql: %s", client_delete->str_sql);
+	SFINISH_CHECK(query_is_safe(client_delete->str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_delete->str_sql, http_delete_step3), "DB_exec failed");
 
 	SDEBUG("str_response: %s", str_response);

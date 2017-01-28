@@ -251,10 +251,12 @@
 */ })],
 			//Custom GS.ajaxText looks for /test.txt?if_modified_since=true
 			//It then sends a If-Modified-Since header
-			['ACCEPTNC FAIL', 'ajax', 500, '/env/public.acceptnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.acceptnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.acceptnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPTNC FAIL 1', 'ajax', 500, '/env/public.acceptnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.acceptnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.acceptnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPTNC FAIL 2', 'ajax', 500, '/env/public.acceptnc_testing;', 'testingnitset', ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })],
 			['ACCEPTNC 1', 'ajax', 200, '/env/public.acceptnc_testing', 'testingnitset', 'testingnitset'],
 			['ACCEPTNC 2', 'ajax', 200, '/env/public.acceptnc_testing/test', 'testingnitset', 'testingnitset&path=/test'],
-			['ACTIONNC FAIL', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTIONNC FAIL 1', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTIONNC FAIL 2', 'ajax', 500, '/env/public.actionnc_testing;', 'testingnitset', ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })],
 			['ACTIONNC', 'ajax', 200, '/env/public.actionnc_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
 			['File Read If-Modified-Since', 'ajax', 304, '/test.txt?if_modified_since=true', '', ''],
 			['List Connections', 'ajax', 500, '/env/auth', 'action=list',
@@ -1164,15 +1166,19 @@ File already exists.*/})],
 */}),
 				["\"\"\n", "TRANSACTION COMPLETED"]],
 
-			['ACCEPT FAIL', 'ajax', 500, '/env/public.accept_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.accept_testing1(unknown) does not exist\\nLINE 1: SELECT public.accept_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPT FAIL 1', 'ajax', 500, '/env/public.accept_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.accept_testing1(unknown) does not exist\\nLINE 1: SELECT public.accept_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPT FAIL 2', 'ajax', 500, '/env/public.accept_testing;', 'testingnitset', ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })],
 			['ACCEPT 1', 'ajax', 200, '/env/public.accept_testing', 'testingnitset', 'testingnitset'],
 			['ACCEPT 2', 'ajax', 200, '/env/public.accept_testing', 'company_name=AA-TULSA&company_name_exact=0&type=Passenger&type_anywhere=-1&engine_mfg=Pratt %26 Whitney&engine_mfg_exact=0&engine_model=J57-P&engine_model_exact=0&country=&country_exact=0&continent=&continent_exact=0&overhaul_center=&overhaul_center_exact=0&on_order=undefined&stored=undefined', 'company_name=AA-TULSA&company_name_exact=0&type=Passenger&type_anywhere=-1&engine_mfg=Pratt %26 Whitney&engine_mfg_exact=0&engine_model=J57-P&engine_model_exact=0&country=&country_exact=0&continent=&continent_exact=0&overhaul_center=&overhaul_center_exact=0&on_order=undefined&stored=undefined'],
 			['ACCEPT 2', 'ajax', 200, '/env/public.accept_testing/test', 'testingnitset', 'testingnitset&path=/test'],
-			['ACCEPTNC FAIL', 'ajax', 500, '/env/public.acceptnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.acceptnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.acceptnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPTNC FAIL 1', 'ajax', 500, '/env/public.acceptnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.acceptnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.acceptnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPTNC FAIL 2', 'ajax', 500, '/env/public.acceptnc_testing;', 'testingnitset', ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })],
 			['ACCEPTNC', 'ajax', 200, '/env/public.acceptnc_testing', 'testingnitset', 'testingnitset'],
-			['ACTION FAIL', 'ajax', 500, '/env/public.action_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.action_testing1(unknown) does not exist\\nLINE 1: SELECT public.action_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTION FAIL 1', 'ajax', 500, '/env/public.action_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.action_testing1(unknown) does not exist\\nLINE 1: SELECT public.action_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTION FAIL 2', 'ajax', 500, '/env/public.action_testing;', 'testingnitset', ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })],
 			['ACTION', 'ajax', 200, '/env/public.action_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
-			['ACTIONNC FAIL', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTIONNC FAIL 1', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTIONNC FAIL 2', 'ajax', 500, '/env/public.actionnc_testing;', 'testingnitset', ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })],
 			['ACTIONNC', 'ajax', 200, '/env/public.actionnc_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
 			['action_info', 'ajax', 200, '/env/action_info', '',
 				function (arg) {
@@ -1191,6 +1197,9 @@ File already exists.*/})],
 */}),
 			["Invalid action name, action function names must begin with \"action_\""]],
 			['ACTION FAIL 4', 'websocket', '', ml(function () {/*ACTION	public actiont_testing1	testingnitset
+*/}),
+			["Invalid action name, action function names must begin with \"action_\""]],
+			['ACTION FAIL 5', 'websocket', '', ml(function () {/*ACTION	public action_testing;	testingnitset
 */}),
 			["Invalid action name, action function names must begin with \"action_\""]],
 			['ACTION', 'websocket', '', ml(function () {/*ACTION	public	action_testing	testingnitset
@@ -1223,7 +1232,7 @@ id	hash
 				[["Some of these records have already been deleted.:\nFATAL\nerror_text\t\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
-			['SELECT FAIL', 'websocket', '', ml(function () {/*SELECT	rtesting_table
+			['SELECT FAIL 1', 'websocket', '', ml(function () {/*SELECT	rtesting_table
 RETURN	id	test_name	test_full
 
 ORDER BY
@@ -1233,6 +1242,19 @@ id DESC
 					[
 						"../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  column rtesting_table.test_full does not exist\\nLINE 1: ...esting_table\".\"id\", \"rtesting_table\".\"test_name\", \"rtesting_...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t61\n",
 						"..\\..\\db_framework_pq\\db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  column rtesting_table.test_full does not exist\\nLINE 1: ...esting_table\".\"id\", \"rtesting_table\".\"test_name\", \"rtesting_...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t61\n"
+					]
+				]
+			],
+			['SELECT FAIL 2', 'websocket', '', ml(function () {/*SELECT	rtesting_table
+RETURN	id	test_name
+
+ORDER BY
+id DESC; DROP TABLE rtesting_table
+*/}),
+				[
+					[
+						"../../common/common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected",
+						"..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"
 					]
 				]
 			],
@@ -1287,6 +1309,22 @@ SEQ
 id	test_name
 */}),
 				["No insert data:\nFATAL\nerror_text\t\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
+			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
+				['OK']],
+			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
+				['OK']],
+			['INSERT FAIL 4', 'websocket', '', ml(function () {/*INSERT	rtesting_table
+RETURN	id	test_name
+PK	id;
+SEQ	
+
+id	test_name
+1	Bob
+*/}),
+				[
+					"DB_exec failed:\nFATAL\nerror_text\tERROR:  column rtesting_table.id; does not exist\\nLINE 3:        FROM \"rtesting_table\"       WHERE \"rtesting_table\".\"i...\\n                                                 ^\\nHINT:  Perhaps you meant to reference the column \"rtesting_table.id\".\\n\nerror_detail\t\nerror_hint\tPerhaps you meant to reference the column \"rtesting_table.id\".\nerror_query\t\nerror_context\t\nerror_position\t147\n"
+				]
+			],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -1421,7 +1459,22 @@ id	test_name
 3	Alicia
 */}),
 				[
-					["DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot update view \"ttesting_view\"\\nDETAIL:  Views that do not select from a single table or view are not automatically updatable.\\nHINT:  To enable updating the view, provide an INSTEAD OF UPDATE trigger or an unconditional ON UPDATE DO INSTEAD rule.\\n\nerror_detail\tViews that do not select from a single table or view are not automatically updatable.\nerror_hint\tTo enable updating the view, provide an INSTEAD OF UPDATE trigger or an unconditional ON UPDATE DO INSTEAD rule.\nerror_query\t\nerror_context\t\nerror_position\t\n"]
+					"DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot update view \"ttesting_view\"\\nDETAIL:  Views that do not select from a single table or view are not automatically updatable.\\nHINT:  To enable updating the view, provide an INSTEAD OF UPDATE trigger or an unconditional ON UPDATE DO INSTEAD rule.\\n\nerror_detail\tViews that do not select from a single table or view are not automatically updatable.\nerror_hint\tTo enable updating the view, provide an INSTEAD OF UPDATE trigger or an unconditional ON UPDATE DO INSTEAD rule.\nerror_query\t\nerror_context\t\nerror_position\t\n"
+				]],
+			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
+				['OK']],
+			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
+				['OK']],
+			['UPDATE FAIL 3', 'websocket', '', ml(function () {/*UPDATE	rtesting_table
+RETURN	id	test_name
+
+pk	set
+id;	test_name
+2	Bobby
+3	Alicia
+*/}),
+				[
+					"DB_exec failed:\nFATAL\nerror_text\tERROR:  column \"id;\" does not exist\\nLINE 1: ...E TEMP TABLE temp_update ON COMMIT DROP AS SELECT \"id;\" AS \"...\\n                                                             ^\\nHINT:  Perhaps you meant to reference the column \"rtesting_table.id\".\\n\nerror_detail\t\nerror_hint\tPerhaps you meant to reference the column \"rtesting_table.id\".\nerror_query\t\nerror_context\t\nerror_position\t56\n"
 				]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
@@ -1467,7 +1520,7 @@ id
 					]
 				]
 			],
-			['ROLLBACK', 'websocket', '', ml(function () {/*COMMIT*/ }),
+			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
@@ -1480,9 +1533,24 @@ id
 4
 */}),
 				[
-					["DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot delete from view \"ttesting_view\"\\nDETAIL:  Views that do not select from a single table or view are not automatically updatable.\\nHINT:  To enable deleting from the view, provide an INSTEAD OF DELETE trigger or an unconditional ON DELETE DO INSTEAD rule.\\n\nerror_detail\tViews that do not select from a single table or view are not automatically updatable.\nerror_hint\tTo enable deleting from the view, provide an INSTEAD OF DELETE trigger or an unconditional ON DELETE DO INSTEAD rule.\nerror_query\t\nerror_context\t\nerror_position\t\n"]
+					"DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot delete from view \"ttesting_view\"\\nDETAIL:  Views that do not select from a single table or view are not automatically updatable.\\nHINT:  To enable deleting from the view, provide an INSTEAD OF DELETE trigger or an unconditional ON DELETE DO INSTEAD rule.\\n\nerror_detail\tViews that do not select from a single table or view are not automatically updatable.\nerror_hint\tTo enable deleting from the view, provide an INSTEAD OF DELETE trigger or an unconditional ON DELETE DO INSTEAD rule.\nerror_query\t\nerror_context\t\nerror_position\t\n"
 				]],
-			['ROLLBACK', 'websocket', '', ml(function () {/*COMMIT*/ }),
+			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
+				['OK']],
+			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
+				['OK']],
+			['DELETE FAIL 3', 'websocket', '', ml(function () {/*DELETE	rtesting_table
+
+pk
+id;
+2
+3
+4
+*/}),
+				[
+					"DB_exec failed:\nFATAL\nerror_text\tERROR:  column \"id;\" does not exist\\nLINE 1: ...E TEMP TABLE temp_delete ON COMMIT DROP AS SELECT \"id;\" AS \"...\\n                                                             ^\\nHINT:  Perhaps you meant to reference the column \"rtesting_table.id\".\\n\nerror_detail\t\nerror_hint\tPerhaps you meant to reference the column \"rtesting_table.id\".\nerror_query\t\nerror_context\t\nerror_position\t56\n"
+				]],
+			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
@@ -1515,12 +1583,13 @@ id
 <head><script>window.open('/', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })]
 				]);
 				Local.tests = JSON.parse(JSON.stringify(Global.tests));
-				Local.tests[35][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'text/plain'});
-				Local.tests[36][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'application/octet-binary'});
-				Local.tests[37][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], { type: 'application/x-binary' });
 				for (i = 0, len = Local.tests.length; i < len; i++) {
 					if (typeof (Global.tests[i][5]) === 'function') {
 						Local.tests[i][5] = Global.tests[i][5];
+					} else if (Global.tests[i][0] === 'Login 2') {
+						Local.tests[i][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], { type: 'text/plain' });
+					} else if (Global.tests[i][0] === 'Login 3') {
+						Local.tests[i][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], { type: 'application/octet-binary' });
 					}
 				}
 				//application/octet-binary

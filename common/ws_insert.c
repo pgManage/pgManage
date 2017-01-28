@@ -277,6 +277,7 @@ void ws_insert_step1(struct sock_ev_client_request *client_request) {
 			" FROM ", (size_t)6,
 			client_insert->str_real_table_name, client_insert->int_real_table_name_len,
 			" LIMIT 0;", (size_t)9);
+		SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 		DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step2);
 	} else {
 #ifndef POSTAGE_INTERFACE_LIBPQ
@@ -296,6 +297,7 @@ void ws_insert_step1(struct sock_ev_client_request *client_request) {
 				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
 				";", (size_t)1);
 			SDEBUG("str_sql: %s", str_sql);
+			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step15_sql_server);
 		} else {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
@@ -310,6 +312,7 @@ void ws_insert_step1(struct sock_ev_client_request *client_request) {
 				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
 				";", (size_t)1);
 			SDEBUG("str_sql: %s", str_sql);
+			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step2);
 		}
 #endif
@@ -373,6 +376,7 @@ bool ws_insert_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
 		" DROP COLUMN id_temp123123123;", (size_t)30);
 	SDEBUG("str_sql: %s", str_sql);
 
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step2), "DB_exec failed");
 
 	bol_error_state = false;
@@ -456,6 +460,8 @@ bool ws_insert_step2(EV_P, void *cb_data, DB_result *res) {
 		")", (size_t)1);
 	SDEBUG("str_sql: %s", str_sql);
 #endif
+
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 
 	int_len_content =
 		client_request->frame->int_length - (size_t)(client_insert->ptr_values - client_request->frame->str_message);
@@ -573,6 +579,7 @@ bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 		}
 	}
 
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step5);
 
 	bol_error_state = false;
@@ -684,6 +691,8 @@ bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
 				";\n", (size_t)2);
 		}
 
+		SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
+
 		DArray_push(client_insert->darr_insert_queries, str_sql);
 		str_sql = NULL;
 
@@ -700,6 +709,8 @@ bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
 				"       WHERE ", (size_t)13,
 				client_insert->str_pk_where_clause, client_insert->int_pk_where_clause_len,
 				";\n\n", (size_t)3);
+
+			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 
 			DArray_push(client_insert->darr_insert_queries, str_sql);
 			str_sql = NULL;
@@ -723,6 +734,8 @@ bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
 			"\n       WHERE ", (size_t)14,
 			client_insert->str_pk_where_clause, client_insert->int_pk_where_clause_len,
 			";\n\n", (size_t)3);
+
+		SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 
 		DArray_push(client_insert->darr_insert_queries, str_sql);
 		str_sql = NULL;
@@ -794,6 +807,7 @@ bool ws_insert_step6(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
 
+	// no need to check these queries for injection, they are already checked in the above step
 	SDEBUG("DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query): %s",
 		DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query));
 	if (client_insert->int_current_insert_query < (DArray_end(client_insert->darr_insert_queries) - 1)) {
@@ -895,6 +909,7 @@ bool ws_insert_step7(EV_P, void *cb_data, DB_result *res) {
 #endif
 	SDEBUG("str_sql: >%s<", str_sql);
 
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(
 		DB_copy_out(EV_A, client_request->parent->conn, client_request, str_sql, ws_copy_check_cb), "DB_copy_out failed!");
 

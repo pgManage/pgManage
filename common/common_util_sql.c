@@ -1,5 +1,16 @@
 #include "common_util_sql.h"
 
+bool query_is_safe(char *str_query) {
+	DArray *arr_sql = DArray_sql_split(str_query);
+	SERROR_CHECK(arr_sql != NULL && DArray_end(arr_sql) == 1, "SQL Injection detected!");
+
+	DArray_clear_destroy(arr_sql);
+	return true;
+error:
+	DArray_clear_destroy(arr_sql);
+	return false;
+}
+
 char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_table_name_len) {
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;

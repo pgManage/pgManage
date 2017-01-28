@@ -185,6 +185,7 @@ void ws_select_step1(struct sock_ev_client_request *client_request) {
 	}
 
 	SDEBUG("client_select->str_sql: %s", client_select->str_sql);
+	SFINISH_CHECK(query_is_safe(client_select->str_sql), "SQL Injection detected");
 
 	SFINISH_CHECK(DB_get_column_types_for_query(
 					  global_loop, client_request->parent->conn, client_select->str_sql, client_request, ws_select_step4),
@@ -436,6 +437,7 @@ bool ws_select_step4(EV_P, void *cb_data, DB_result *res) {
 		client_select->str_sql_escaped_return, client_select->int_sql_escaped_return_len);
 	SDEBUG("client_select->str_sql_escaped_return: %s", client_select->str_sql_escaped_return);
 #endif
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 
 	SFINISH_CHECK(
 		DB_copy_out(EV_A, client_request->parent->conn, client_request, str_sql, ws_copy_check_cb), "DB_copy_out failed!");

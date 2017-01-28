@@ -319,6 +319,7 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 			" LIMIT 0;", (size_t)9);
 
 		SDEBUG("str_sql: %s", str_sql);
+		SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 		SFINISH_CHECK(
 			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_update_step2), "DB_exec failed");
 	} else {
@@ -342,6 +343,7 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 				";", (size_t)1);
 
 			SDEBUG("str_sql: %s", str_sql);
+			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 			SFINISH_CHECK(
 				DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_update_step15_sql_server),
 				"DB_exec failed");
@@ -360,6 +362,7 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 				";", (size_t)1);
 
 			SDEBUG("str_sql: %s", str_sql);
+			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 			SFINISH_CHECK(
 				DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_update_step2), "DB_exec failed");
 		}
@@ -432,6 +435,7 @@ bool ws_update_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
 		" DROP COLUMN id_temp123123123;", (size_t)30);
 	SDEBUG("str_sql: %s", str_sql);
 
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_update_step2), "DB_exec failed");
 
 	bol_error_state = false;
@@ -516,6 +520,8 @@ bool ws_update_step2(EV_P, void *cb_data, DB_result *res) {
 		")", (size_t)1);
 	SDEBUG("str_sql: %s", str_sql);
 #endif
+
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 
 	int_len_content = client_request->frame->int_length - (size_t)(client_update->ptr_query - client_request->frame->str_message);
 	SFINISH_CHECK(int_len_content > 0, "No update data");
@@ -639,6 +645,7 @@ bool ws_update_step4(EV_P, void *cb_data, DB_result *res) {
 	}
 	SDEBUG("str_sql: %s", str_sql);
 
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_update_step5), "DB_exec failed");
 
 	bol_error_state = false;
@@ -750,6 +757,7 @@ bool ws_update_step5(EV_P, void *cb_data, DB_result *res) {
 			";", (size_t)1);
 	}
 
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_update_step6), "DB_exec failed");
 
 	bol_error_state = false;
@@ -849,6 +857,7 @@ bool ws_update_step6(EV_P, void *cb_data, DB_result *res) {
 #endif
 
 	SDEBUG("str_sql: %s", str_sql);
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(
 		DB_copy_out(EV_A, client_request->parent->conn, client_request, str_sql, ws_copy_check_cb), "DB_copy_out failed!");
 

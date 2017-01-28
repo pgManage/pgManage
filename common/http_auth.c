@@ -804,6 +804,7 @@ void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 		create_request(client_auth->parent, NULL, NULL, NULL, NULL, 0, POSTAGE_REQ_AUTH);
 	SFINISH_CHECK(client_request != NULL, "Could not create request data!");
 	client_request->vod_request_data = client_auth;
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client_auth->parent->conn, client_request, str_sql, http_auth_login_step3), "DB_exec failed");
 	SFREE(str_sql);
 
@@ -1244,6 +1245,7 @@ void http_auth_change_pw_step2(EV_P, void *cb_data, DB_conn *conn) {
 	SFINISH_CHECK(client_request != NULL, "Could not create request data!");
 	client_request->vod_request_data = client_auth;
 
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(
 		DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, http_auth_change_pw_step3), "DB_exec failed");
 	SFREE(str_sql);
