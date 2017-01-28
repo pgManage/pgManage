@@ -505,14 +505,39 @@ RAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†�
 END $$
 */}),
 			[
-				[
-					"QUERY\tDO $$ DECLARE\\nBEGIN\\nRAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';\\nEND $$\\n",
-					"START",
-					"NOTICE\t å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n",
-					"END",
-					"Rows Affected\n0\n",
-					"TRANSACTION COMPLETED"
-				]
+				"QUERY\tDO $$ DECLARE\\nBEGIN\\nRAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';\\nEND $$\\n",
+				"START",
+				"NOTICE\t å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\n",
+				"END",
+				"Rows Affected\n0\n",
+				"TRANSACTION COMPLETED"
+			]],
+			['RAW 3', 'websocket', '', ml(function () {/*RAW
+SELECT string_agg('\'::text || 'test', '') as test FROM generate_series(1, 10);SELECT string_agg(E'\\'::text || 'test', '') as test FROM generate_series(1, 10);SELECT string_agg('\'::text || 'test', '') as test FROM generate_series(1, 10);*/
+			}),
+			[
+				"QUERY\tSELECT string_agg('\\\\'::text || 'test', '') as test FROM generate_series(1, 10);",
+				"START",
+				"END",
+				"ROWS\t1",
+				"COLUMNS\ntest\ntext\n",
+				"\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test",
+				"\\.",
+				"QUERY\tSELECT string_agg(E'\\\\\\\\'::text || 'test', '') as test FROM generate_series(1, 10);",
+				"START",
+				"END",
+				"ROWS\t1",
+				"COLUMNS\ntest\ntext\n",
+				"\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test",
+				"\\.",
+				"QUERY\tSELECT string_agg('\\\\'::text || 'test', '') as test FROM generate_series(1, 10);",
+				"START",
+				"END",
+				"ROWS\t1",
+				"COLUMNS\ntest\ntext\n",
+				"\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test",
+				"\\.",
+				"TRANSACTION COMPLETED"
 			]],
 			['RAW W/NOTIFY', 'websocket', '', ml(function () {/*RAW
 LISTEN postgres;
