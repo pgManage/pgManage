@@ -350,7 +350,6 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 			client_auth->int_user_length, client_auth->str_password, client_auth->int_password_length, "",
 			http_auth_change_pw_step2)) != NULL,
 			"DB_connect failed");
-		SFREE_PWORD(client_auth->str_password);
 #ifdef ENVELOPE
 		}
 #endif
