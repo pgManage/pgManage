@@ -3,6 +3,7 @@
 #include "common_client.h"
 #include "util/util_darray.h"
 #include "util/util_error.h"
+#include "util/util_sql_split.h"
 #include "util/util_string.h"
 #include "ws_insert.h"
 #include "ws_select.h"

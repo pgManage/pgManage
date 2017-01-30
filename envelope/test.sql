@@ -1,4 +1,5 @@
 ALTER ROLE postgres PASSWORD 'password';
+CREATE ROLE envelopeuser LOGIN SUPERUSER PASSWORD 'envelopeuserpassword';
 CREATE ROLE test_user LOGIN PASSWORD 'password';
 CREATE ROLE public_user LOGIN PASSWORD 'youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08';
 CREATE ROLE developer_g   NOLOGIN NOCREATEROLE  NOSUPERUSER    INHERIT  NOCREATEDB  NOREPLICATION    CONNECTION LIMIT -1   VALID UNTIL 'infinity';

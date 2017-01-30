@@ -1809,6 +1809,16 @@ void client_close_timeout_prepare_cb(EV_P, ev_prepare *w, int revents) {
 	bol_error_state = false;
 }
 
+
+#ifdef ENVELOPE
+bool client_close_immediate_close_cnxn_cb(EV_P, void *cb_data, DB_result *res) {
+	SINFO("RESET SESSION AUTHORIZATION finished!");
+	DB_conn *conn = cb_data;
+	DB_finish(conn);
+	DB_free_result(res);
+}
+#endif
+
 void client_close_immediate(struct sock_ev_client *client) {
 	SDEBUG("Client %p closing", client);
 	struct WSFrame *frame = NULL;
@@ -1820,7 +1830,15 @@ void client_close_immediate(struct sock_ev_client *client) {
 	}
 	if (client->conn != NULL) {
 		SDEBUG("DB_conn %p closing", client->conn);
-		DB_finish(client->conn);
+#ifdef ENVELOPE
+		if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES && client->bol_public == false) {
+			SERROR_CHECK_NORESPONSE(DB_exec(global_loop, client->conn, client->conn, "RESET SESSION AUTHORIZATION;", client_close_immediate_close_cnxn_cb), "DB_exec failed to reset session authorization");
+		} else {
+#endif
+			DB_finish(client->conn);
+#ifdef ENVELOPE
+		}
+#endif
 	}
 
 	if (client->bol_socket_is_open == true) {

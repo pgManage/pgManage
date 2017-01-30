@@ -1,6 +1,7 @@
 #pragma once
 
 #include "http_main.h"
+#include <openssl/md5.h>
 
 struct sock_ev_client_auth_cnxn {
 	ev_io io;

@@ -11,12 +11,12 @@
     <LocalDebuggerEnvironment>PATH=%PATH%;..\lib\x86</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-l error -o stderr -r ..\..\envelope\web_root -y ..\..\envelope\app -z ..\..\envelope\role -c ..\..\envelope\config\envelope.conf -d ..\..\envelope\config\envelope-connections.conf -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-l info -o stderr -r ..\..\envelope\web_root -y ..\..\envelope\app -z ..\..\envelope\role -c ..\..\envelope\config\envelope.conf -d ..\..\envelope\config\envelope-connections.conf -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerEnvironment>PATH=%PATH%;..\lib\x64</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>-l error -o stderr -r ..\..\envelope\web_root -y ..\..\envelope\app -z ..\..\envelope\role -c ..\..\envelope\config\envelope.conf -d ..\..\envelope\config\envelope-connections.conf -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-l info -o stderr -r ..\..\envelope\web_root -y ..\..\envelope\app -z ..\..\envelope\role -c ..\..\envelope\config\envelope.conf -d ..\..\envelope\config\envelope-connections.conf -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerEnvironment>PATH=%PATH%;..\lib\x64</LocalDebuggerEnvironment>
   </PropertyGroup>

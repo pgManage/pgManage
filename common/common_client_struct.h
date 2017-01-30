@@ -98,6 +98,8 @@ struct sock_ev_client_message {
 struct sock_ev_client {
 	ev_io io;
 
+	connect_cb_t connect_cb;
+
 	bool bol_is_open;
 	bool bol_socket_is_open;
 
@@ -120,6 +122,8 @@ struct sock_ev_client {
 	char str_client_ip[INET_ADDRSTRLEN];
 	bool bol_handshake;
 	bool bol_connected;
+
+	bool bol_public;
 
 	bool bol_upload;
 	char *str_boundary;
