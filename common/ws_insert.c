@@ -548,6 +548,7 @@ bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 
 		SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 		DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step5);
+#ifndef POSTAGE_INTERFACE_LIBPQ
 	} else {
 		if (client_insert->str_identity_column_name != NULL) {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
@@ -584,6 +585,7 @@ bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 			DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step5);
 		}
+#endif
 	}
 
 	bol_error_state = false;
