@@ -89,6 +89,13 @@ allows us to see the effect of defaults, rules and triggers)
 */
 bool ws_insert_step4(EV_P, void *cb_data, DB_result *res);
 
+#ifndef POSTAGE_INTERFACE_LIBPQ
+/*
+This function will drop the identity column we make
+*/
+bool ws_insert_step45_sql_server(EV_P, void *cb_data, DB_result *res);
+#endif
+
 /*
 create second temp table query came back
 This function will generate queries to insert into the actual table, and also insert the values

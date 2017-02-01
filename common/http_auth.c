@@ -177,22 +177,17 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SDEBUG("client_auth->parent: %p", client_auth->parent);
 		SDEBUG("str_conn: %s", str_conn);
 
-#ifdef ENVELOPE
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
 		// The only difference here is the callback and no user/pw
-		if (DB_connection_driver(client_auth->parent->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, NULL,
-				0, NULL, 0, "",
-				http_auth_login_step15)) != NULL,
-				"DB_connect failed");
-		} else {
-#endif
+		SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, NULL,
+			0, NULL, 0, "",
+			http_auth_login_step15)) != NULL,
+			"DB_connect failed");
+#else
 		SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, client_auth->str_user,
 			client_auth->int_user_length, client_auth->str_password, client_auth->int_password_length, "",
 			http_auth_login_step2)) != NULL,
 			"DB_connect failed");
-		SFREE_PWORD(client_auth->str_password);
-#ifdef ENVELOPE
-		}
 #endif
 
 		SDEBUG("client_auth: %p", client_auth);
@@ -337,21 +332,17 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 			snprintf(client_auth->str_int_connection_index, 20, "%zu", client_auth->int_connection_index);
 		}
 
-#ifdef ENVELOPE
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
 		// The only difference here is the callback and no user/pw
-		if (DB_connection_driver(client_auth->parent->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, NULL,
-				0, NULL, 0, "",
-				http_auth_login_step15)) != NULL,
-				"DB_connect failed");
-		} else {
-#endif
+		SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, NULL,
+			0, NULL, 0, "",
+			http_auth_login_step15)) != NULL,
+			"DB_connect failed");
+#else
 		SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, client_auth->str_user,
 			client_auth->int_user_length, client_auth->str_password, client_auth->int_password_length, "",
 			http_auth_change_pw_step2)) != NULL,
 			"DB_connect failed");
-#ifdef ENVELOPE
-		}
 #endif
 
 #ifdef ENVELOPE

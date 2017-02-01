@@ -807,7 +807,7 @@ static bool ddl_readable_done(EV_P, void *cb_data, DB_result *res) {
 	bool bol_result = 0;
 
 	SERROR_CHECK(res != NULL, "Query failed: res == NULL");
-	SERROR_CHECK(res->status == DB_RES_TUPLES_OK, "Query failed: res->status = %d", res->status);
+	SERROR_CHECK(res->status == DB_RES_TUPLES_OK, "Query failed: %s", DB_get_diagnostic(res->conn, res));
 
 	SERROR_CHECK(DB_fetch_row(res) == DB_FETCH_OK, "DB_fetch_row failed: %s", DB_get_diagnostic(res->conn, res));
 	arr_row_values = DB_get_row_values(res);

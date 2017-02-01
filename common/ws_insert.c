@@ -545,6 +545,9 @@ bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 			" FROM ", (size_t)6,
 			client_insert->str_real_table_name, client_insert->int_real_table_name_len,
 			" LIMIT 0;", (size_t)9);
+
+		SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
+		DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step5);
 	} else {
 		if (client_insert->str_identity_column_name != NULL) {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
@@ -560,9 +563,10 @@ bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
 				"_2 FROM ", (size_t)8,
 				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
-				"; ALTER TABLE ", (size_t)14,
-				client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
-				"_2 DROP COLUMN id_temp123123123;", (size_t)32);
+				";", (size_t)1);
+
+			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
+			DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step45_sql_server);
 		} else {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
 				"IF OBJECT_ID('tempdb..", (size_t)22,
@@ -576,11 +580,11 @@ bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 				"_2 FROM ", (size_t)8,
 				client_insert->str_real_table_name, client_insert->int_real_table_name_len,
 				";", (size_t)1);
+
+			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
+			DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step5);
 		}
 	}
-
-	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
-	DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step5);
 
 	bol_error_state = false;
 	bol_ret = true;
@@ -626,6 +630,83 @@ finish:
 	DB_free_result(res);
 	return bol_ret;
 }
+
+#ifndef POSTAGE_INTERFACE_LIBPQ
+bool ws_insert_step45_sql_server(EV_P, void *cb_data, DB_result *res) {
+	struct sock_ev_client_request *client_request = cb_data;
+	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
+	char str_temp[101];
+	bool bol_ret = true;
+	char *str_response = NULL;
+	size_t int_response_len = 0;
+	size_t int_sql_len = 0;
+	SDEFINE_VAR_ALL(str_sql);
+	SFINISH_SNCAT(str_response, &int_response_len,
+		"", (size_t)0);
+
+	SFINISH_CHECK(res != NULL, "DB_exec failed");
+	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
+
+	DB_free_result(res);
+
+	SFINISH_SNCAT(str_sql, &int_sql_len,
+		"ALTER TABLE ", (size_t)12,
+		client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
+		"_2 DROP COLUMN id_temp123123123;", (size_t)32);
+	SDEBUG("str_sql: %s", str_sql);
+
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
+	SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step5), "DB_exec failed");
+
+	bol_error_state = false;
+	bol_ret = false;
+finish:
+	if (bol_error_state == true) {
+		bol_error_state = false;
+		bol_ret = false;
+
+		client_request->int_response_id += 1;
+		memset(str_temp, 0, 101);
+		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
+
+		char *_str_response = str_response;
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
+		if (client_request->str_transaction_id != NULL) {
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
+		}
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
+		SFREE(_str_response);
+		_str_response = DB_get_diagnostic(client_request->parent->conn, res);
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			":\n", (size_t)2,
+			_str_response, strlen(_str_response));
+		SFREE(_str_response);
+
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		DArray_push(client_request->arr_response, str_response);
+
+		ws_insert_free(client_insert);
+		// client_request_free(client_request);
+		// client_request_free takes care of this
+		// SFREE(client_insert);
+	}
+	else {
+		SFREE(str_response);
+	}
+	DB_free_result(res);
+	SFREE_ALL();
+	return bol_ret;
+}
+#endif
 
 bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;

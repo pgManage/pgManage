@@ -1828,15 +1828,23 @@ void client_close_immediate(struct sock_ev_client *client) {
 		ev_io_stop(global_loop, &client->notify_watcher->io);
 		SFREE(client->notify_watcher);
 	}
+	if (client->client_copy_check != NULL) {
+		ev_check_stop(global_loop, &client->client_copy_check->check);
+		decrement_idle(global_loop);
+		DB_free_result(client->client_copy_check->res);
+		SFREE(client->client_copy_check->str_response);
+		SFREE(client->client_copy_check);
+	}
 	if (client->conn != NULL) {
 		SDEBUG("DB_conn %p closing", client->conn);
-#ifdef ENVELOPE
-		if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES && client->bol_public == false) {
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
+		// The only difference here is the callback and no user/pw
+		if (client->bol_public == false) {
 			SERROR_CHECK_NORESPONSE(DB_exec(global_loop, client->conn, client->conn, "RESET SESSION AUTHORIZATION;", client_close_immediate_close_cnxn_cb), "DB_exec failed to reset session authorization");
 		} else {
 #endif
-			DB_finish(client->conn);
-#ifdef ENVELOPE
+		DB_finish(client->conn);
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
 		}
 #endif
 	}
@@ -1939,13 +1947,6 @@ void client_close_immediate(struct sock_ev_client *client) {
 		ev_check_stop(global_loop, &client->client_request_watcher_search->check);
 		decrement_idle(global_loop);
 		SFREE(client->client_request_watcher_search);
-	}
-	if (client->client_copy_check != NULL) {
-		ev_check_stop(global_loop, &client->client_copy_check->check);
-		decrement_idle(global_loop);
-		DB_free_result(client->client_copy_check->res);
-		SFREE(client->client_copy_check->str_response);
-		SFREE(client->client_copy_check);
 	}
 	if (client->client_copy_io != NULL) {
 		ev_io_stop(global_loop, &client->client_copy_io->io);

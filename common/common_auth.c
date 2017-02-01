@@ -360,21 +360,18 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 			str_uri_host, int_uri_host_len
 		);
 
-		
-#ifdef ENVELOPE
+
+
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
 		// The only difference here is the callback and no user/pw
-		if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES && client->bol_public == false) {
-			SDEBUG("SET SESSION CONN");
-			client->connect_cb = connect_cb;
-			client->conn = DB_connect(global_loop, client, str_conn, NULL, 0, NULL, 0,
-				str_context_data, connect_cb_env);
-		} else {
-#endif
+		SDEBUG("SET SESSION CONN");
+		client->connect_cb = connect_cb;
+		client->conn = DB_connect(global_loop, client, str_conn, NULL, 0, NULL, 0,
+			str_context_data, connect_cb_env);
+#else
 		SDEBUG("NORMAL CONN");
 		client->conn = DB_connect(global_loop, client, str_conn, str_username, int_user_length, str_password, int_password_length,
 			str_context_data, connect_cb);
-#ifdef ENVELOPE
-		}
 #endif
 	}
 	SFREE_PWORD(str_password);
