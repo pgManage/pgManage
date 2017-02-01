@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "ws_file.h"
 
 #ifdef ENVELOPE

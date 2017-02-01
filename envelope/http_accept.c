@@ -53,6 +53,7 @@ void http_accept_step1(struct sock_ev_client *client) {
 #endif
 	char *ptr_end_action_name = strchr(str_action_name, '/');
 	if (ptr_end_action_name != NULL) {
+		int_action_name_len = (size_t)(ptr_end_action_name - str_action_name);
 		*ptr_end_action_name = 0;
 		SFINISH_SNCAT(str_temp, &int_temp_len,
 			"/", (size_t)1,
