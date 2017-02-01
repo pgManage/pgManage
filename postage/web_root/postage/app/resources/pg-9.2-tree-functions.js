@@ -29,10 +29,10 @@ function treeStart() {
     // create and configure tree ace
     treeGlobals.ace = ace.edit('object-list-ace');
     treeGlobals.aceSession = treeGlobals.ace.getSession();
-    
+
     treeGlobals.aceSession.setMode('ace/mode/text');
     //treeGlobals.aceSession.setUseWrapMode('free');
-    
+
     treeGlobals.ace.setTheme('ace/theme/pgpanel');
     treeGlobals.ace.getSession().setMode('ace/mode/pgpanel');
     treeGlobals.ace.setShowPrintMargin(false);
@@ -46,12 +46,24 @@ function treeStart() {
     treeGlobals.ace.renderer.setShowGutter(false);
     treeGlobals.ace.renderer.hideCursor();
     treeGlobals.ace.renderer.$cursorLayer.element.style.display = 'none';
-    
+
+    // When we are on a touch device, clicking into an ace editor brings up the
+    //      keyboard. We don't want that to happen in the tree, so if we're on
+    //      a touch device, we disable the ace editor's internal textarea to
+    //      prevent it from getting focus.
+    if (evt.touchDevice) {
+        treeGlobals.ace.renderer.textarea.setAttribute('disabled', '');
+        //treeGlobals.ace.renderer.textarea.addEventListener('focus', function (event) {
+        //    event.preventDefault();
+        //    document.body.focus();
+        //});
+    }
+
     // allow the user to scroll past the bottom of the ace so that when they are
     //      scrolled to the bottom and they close a folder they don't get scrolled
     //      to a different position
     treeGlobals.ace.setOption('scrollPastEnd', true);
-    
+
     // this code has been replaced with the line above
     //// add whitespace to the end of the tree so that when you close a folder the tree does not scroll unexpectedly
     //treeRefreshWhitespace();
@@ -60,14 +72,14 @@ function treeStart() {
     //window.addEventListener('resize', function () {
     //    treeRefreshWhitespace();
     //});
-    
+
     // set ace inital value and selection in the ace
     //treeGlobals.ace.setValue('Schemas\n');
     //treeGlobals.ace.selection.setSelectionRange(new Range(0, 0, 0, 0));
-    
+
     // make nothing initially selected - didn't work
     treeGlobals.ace.setHighlightActiveLine(false);
-    
+
     // create "Roles" and "More" markers
     treeGlobals.rolesMarkerMaster = {
         'level':     0
@@ -85,7 +97,7 @@ function treeStart() {
       , 'real_text': 'More'
       , 'action':    function () {}
     };
-    
+
     // create "Schemas" marker and add it to the tree data
     treeGlobals.schemaMarkerMaster = {
         'level':     0
@@ -96,18 +108,18 @@ function treeStart() {
       , 'action':    function (data, index) {
             if (data.open === false) {
                 data.open = true;
-                
+
                 //treeGlobals.shownItems = [];
                 //treeGlobals.shownObjects = [];
-                
+
                 //treeListLoad(data, listQuery.schemas, function (arrRow) {
                 //    var jsnData;
-                //    
+                //
                 //    if (arrRow[1] !== 'pg_catalog' && arrRow[1] !== 'information_schema') {
                 //        jsnData = {'name': arrRow[1], 'truename': arrRow[1], 'oid': arrRow[0], 'type': 'folder', 'action': treeLoadSchema};
                 //        treeGlobals.shownItems.push(arrRow[1]);
                 //        treeGlobals.shownObjects.push(jsnData);
-                //        
+                //
                 //        return jsnData;
                 //    }
                 //});
@@ -119,7 +131,7 @@ function treeStart() {
     //
     //// open "Schemas"
     //treeGlobals.schemaMarker.action(treeGlobals.schemaMarker, 0);
-    
+
     // prevent double/triple/quad clicks from expanding the selection
     //      double click one of these words to see the effect I am disabling
     //      one of these selects the whole ace, which makes it so that I
@@ -127,7 +139,7 @@ function treeStart() {
     treeGlobals.ace.on('dblclick',    function (e) { e.stop() });
     treeGlobals.ace.on('tripleclick', function (e) { e.stop() });
     treeGlobals.ace.on('quadclick',   function (e) { e.stop() });
-    
+
     // bind click
     treeGlobals.ace.addEventListener('click', function () {
         var intStartRow = treeGlobals.ace.getSelectionRange().start.row
@@ -136,23 +148,21 @@ function treeStart() {
           , intEndColumn = treeGlobals.ace.getSelectionRange().end.column
           , rowData = treeGlobals.data[intStartRow]
           , arrType;
-        
+
         // allow highlight color
         treeGlobals.ace.setHighlightActiveLine(true);
-        
+
         // if we found a row
         if (intStartRow === intEndRow && intStartColumn === intEndColumn && rowData) {
             /*
             // if the current line has an action function
             if (rowData.action) {
                 arrType = rowData.type.split(',');
-                
             */
-            
             treeHandleLineTrigger(intStartRow, intStartColumn);
         }
     });
-    
+
     // on scroll: if we scroll past the last line:
     //      scroll to last line, this way we always have something on the screen
     treeGlobals.ace.session.addEventListener('changeScrollTop', function () {
@@ -160,7 +170,7 @@ function treeStart() {
             treeGlobals.ace.renderer.scrollToLine(treeGlobals.data.length - 1);
         }
     });
-    
+
     // if we're on a touch device: bind focus prevention
     if (evt.touchDevice) {
         treeGlobals.ace.keyListenerElement = xtag.query(treeGlobals.ace.container, '.ace_text-input')[0];
@@ -1586,9 +1596,14 @@ function dataObjectButtons(strType, intOID, strSchema, strName) {
     'use strict';
     var strHTML = '', templateElement = document.createElement('template');
     
+    // de-quote_ident strName because the datasheet page doesn't want it idented
+    if (strName[0] === '"') {
+        strName = strName.substring(1, strName.length - 1).replace(/\"\"/gi, '"');
+    }
+    
     if (strType === 'table' || strType === 'objectTable') {
         strHTML += '<gs-button icononly icon="wrench" title="Design table" ' +
-                        'onclick="newTab(\'design-table\', \'' + strSchema + '.' + strName + '\', '+
+                        'onclick="newTab(\'design-table\', \'' + encodeHTML(strSchema) + '.' + encodeHTML(strName) + '\', '+
                                 '{\'oid\': ' + intOID + '});"></gs-button>';
         
         strType = 'table';
@@ -1596,9 +1611,11 @@ function dataObjectButtons(strType, intOID, strSchema, strName) {
         strType = 'view';
     }
     
+    console.trace(intOID, strSchema, strName, strType);
+    
     strHTML += '<gs-button icononly icon="table" title="Edit the data in this object" ' +
-                    'onclick="newTab(\'datasheet\', \'' + strSchema + '.' + strName + '\', ' +
-                        '{\'queryString\': \'type=' + strType + '&schema=' + strSchema + '&object=' + strName + '\'})"></gs-button>';
+                    'onclick="newTab(\'datasheet\', \'' + encodeHTML(strSchema) + '.' + encodeHTML(strName) + '\', ' +
+                        '{\'queryString\': \'type=' + strType + '&schema=' + encodeHTML(strSchema) + '&object=' + encodeHTML(strName) + '\'})"></gs-button>';
     
     return strHTML;
 }

@@ -154,7 +154,7 @@ function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh) {
                     '\n\n\n\n';
 
                 setHomeValue(strFinalName, strScript, strToolbarAddons);
-                console.log(intScrollTop);
+                //console.log(intScrollTop);
                 homeEditor.getSession().setScrollTop(intScrollTop);
             }
         });

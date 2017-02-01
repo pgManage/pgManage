@@ -965,7 +965,7 @@ function dialogOpenFeed() {
                 </gs-header>
                 <gs-body>
                     <div id="notification-channel-insert" flex-horizontal>
-                        <gs-text id="text-notification-channel-insert" flex autocomplete="off" autocapitalize="off" autocorrect="off" placeholder="Channel Name"></gs-text>
+                        <gs-text id="text-notification-channel-insert" flex autocomplete="off" autocapitalize="off" autocorrect="off" placeholder="Channel" spellcheck="false"></gs-text>
                         <span>&nbsp;</span>
                         <gs-button id="button-notification-channel-insert" icononly icon="plus" no-focus></gs-button>
                     </div>

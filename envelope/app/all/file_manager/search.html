@@ -138,6 +138,9 @@
                 document.getElementById('list-loader').textContent = '';
             }
             
+            var strAll = '';
+            var strTooLong;
+            var intLongest = 0;
             function search() {
                 'use strict';
                 var strQueryString = GS.getQueryString();
@@ -174,6 +177,7 @@
                         var strResults = '';
                         var strPrevLink = '';
                         var bolFirstLoad = true;
+                        var differentLinks = 0;
                         addLoaderElements();
                         GS.requestFromSocket(
                             GS.envSocket,
@@ -188,16 +192,34 @@
 
                                 if (!error) {
                                     if (data !== 'TRANSACTION COMPLETED') {
+                                        if (data.length > 600) {
+                                            if (!strTooLong) {
+                                                strTooLong = data;
+                                            }
+                                            if (data.length > intLongest) {
+                                                intLongest = data.length;
+                                            }
+                                            
+                                            data = data.substring(0,400) + data.substring(data.length - 10);
+                                        }
+                                        strAll += data + '\n';
+
                                         strCurrLink = data.split(':')[0];
 
                                         if (strPrevLink === '') {
+                                            differentLinks = 0;
                                             strPrevLink = strCurrLink;
                                             document.getElementById('matches').textContent = '';
                                             document.getElementById('results-container').innerHTML = '';
                                         }
                                         
                                         if (strCurrLink !== strPrevLink) {
+                                            differentLinks += 1;
+                                        }
+                                        
+                                        if (differentLinks >= 10) {
                                             parseResults(strResults, bolFirstLoad);
+                                            differentLinks = 0;
                                             bolFirstLoad = false;
                                             strPrevLink = strCurrLink;
                                             strResults = '';

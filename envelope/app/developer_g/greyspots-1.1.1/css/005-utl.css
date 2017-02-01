@@ -123,12 +123,23 @@
 /* ######### variable width element ######### */
 
 [flex] {
-    -webkit-box-flex: 1;      /* OLD - iOS 6-, Safari 3.1-6 */
-    -moz-box-flex: 1;         /* OLD - Firefox 19- */
-    width: 100%;              /* For old syntax, otherwise collapses. */
-    -webkit-flex: 1;          /* Chrome */
-    -ms-flex: 1;              /* IE 10 */
-    flex: 1;                  /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    -webkit-box-flex: 1; /* OLD - iOS 6-, Safari 3.1-6 */
+    -moz-box-flex: 1;    /* OLD - Firefox 19- */
+    width: 100%;         /* For old syntax, otherwise collapses. */
+    -webkit-flex: 1;     /* Chrome */
+    -ms-flex: 1;         /* IE 10 */
+    flex: 1;             /* NEW, Spec - Opera 12.1, Firefox 20+ */
+    
+    flex-basis: auto;
+        /* Allows variable height flexed elements to grow or shrink
+                depending on content. This fixed the height issue for
+                the gs-folder. Before, the two lists (files, folders)
+                would increase the height of the gs-folder correctly
+                (the gs-folder height is the some of the heights of
+                the file and folder lists). However, the height wasn't
+                distributed correctly between the two lists. The taller
+                one would be made shorter and the shorter one would
+                be made taller. */
 }
 
 /*

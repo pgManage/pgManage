@@ -5223,7 +5223,7 @@ window.addEventListener('load', function () {
             
             // this is for envelope
             if (location.pathname.indexOf('/v1/') === 0) {
-                strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Home</a></b></center>';
+                strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Main Menu</a></b></center>';
                 strHTML += '<center>' +
                                 '<gs-button target="_self" href="/env/auth/?action=logout" inline>Log out</gs-button><br />' +
                                 '<gs-button onclick="GS.userChangePassword()" inline>Change Password</gs-button>' +
@@ -5232,7 +5232,7 @@ window.addEventListener('load', function () {
                 
             // and this is for the new envelope
             } else if (location.pathname.indexOf('/env/') === 0) {
-                strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Home</a></b></center>';
+                strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Main Menu</a></b></center>';
                 strHTML += '<center>' +
                                 '<gs-button target="_self" href="/env/auth/?action=logout" inline>Log out</gs-button><br />' +
                                 '<gs-button onclick="GS.userChangePassword()" inline>Change Password</gs-button>' +
@@ -8901,6 +8901,31 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
             //console.log('SOCKET REQUEST WHILE CLOSING          ');
             callback.apply(null, ['Socket Is Closing', 'error', webSocketNormalizeError({'reason': 'Socket Is Closing'})]);
         }
+    };
+    
+    
+    GS.requestActionFromSocket = function (socket, strSchema, strObject, strArgs, finalCallback) {
+        var strMessage = 'ACTION\t' + encodeForTabDelimited(strSchema) + '\t' + encodeForTabDelimited(strObject) +
+                            '\t' + encodeForTabDelimited(strArgs) + '\n',
+            intResponse = 0, strRet;
+        
+        //console.log(strMessage);
+        
+        GS.requestFromSocket(socket, strMessage, function (data, error, errorData) {
+            var arrLines, i, len;
+            if (!error) {
+                if (intResponse === 0) {
+                    strRet = data;
+                    
+                } else {
+                    finalCallback(strRet, error);
+                }
+                
+            } else {
+                finalCallback(errorData, error);
+            }
+            intResponse += 1;
+        });
     };
     
     // abstraction function for ease of use of the RAW format
@@ -16401,7 +16426,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // make table template
         recordElement = xtag.query(tableTemplateElement.content, 'tbody tr')[0];
-        recordElement.setAttribute('data-index', '{{= row_number - 1 }}');
+        recordElement.setAttribute('data-index', '{{= i }}');
         strHTML = GS.templateColumnToValue(tableTemplateElement.innerHTML);
         tempTemplateElement = document.createElement('template');
         tempTemplateElement.innerHTML = strHTML;

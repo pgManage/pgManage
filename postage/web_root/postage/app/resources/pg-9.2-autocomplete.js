@@ -1,3 +1,4 @@
+var popup_instruct_top;
 var autocompleteLoaded = true
   , autocompleteGlobals = {
         'popupOpen':       false
@@ -26,7 +27,7 @@ function autocompleteBindEditor(tabElement, editor) {
             // create popup element
             autocompleteGlobals.popupElement = document.createElement('div');
             autocompleteGlobals.popupElement.setAttribute('id', 'autocomplete-popup');
-            autocompleteGlobals.popupElement.innerHTML = '<div id="autocomplete-popup-instruction">Press Tab to Autocomplete</div><div id="autocomplete-popup-ace"></div>';
+            autocompleteGlobals.popupElement.innerHTML = '<div id="autocomplete-popup-instruction">Press Tab to Autocomplete&nbsp;</div><div id="autocomplete-popup-ace"></div>';
             
             // create and configure popup ace
             autocompleteGlobals.popupAce = ace.edit(autocompleteGlobals.popupElement.children[1]);
@@ -395,6 +396,9 @@ function autocompletePopupSearch(editor, strMode) {
     
     // refresh popup height
     autocompletePopupHeightRefresh();
+    popup_instruct_top = document.getElementById('autocomplete-popup').style.height + document.getElementById('autocomplete-popup-instruction').style.height;
+    document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
+    console.log(document.getElementById('autocomplete-popup-instruction').style.top, popup_instruct_top);
     
     //// search to select
     //for (i = 0, len = autocompleteGlobals.arrSearch.length; i < len; i += 1) {

@@ -1688,7 +1688,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // make table template
         recordElement = xtag.query(tableTemplateElement.content, 'tbody tr')[0];
-        recordElement.setAttribute('data-index', '{{= row_number - 1 }}');
+        recordElement.setAttribute('data-index', '{{= i }}');
         strHTML = GS.templateColumnToValue(tableTemplateElement.innerHTML);
         tempTemplateElement = document.createElement('template');
         tempTemplateElement.innerHTML = strHTML;

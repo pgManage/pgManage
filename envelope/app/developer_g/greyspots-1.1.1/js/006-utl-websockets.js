@@ -536,6 +536,31 @@
         }
     };
     
+    
+    GS.requestActionFromSocket = function (socket, strSchema, strObject, strArgs, finalCallback) {
+        var strMessage = 'ACTION\t' + encodeForTabDelimited(strSchema) + '\t' + encodeForTabDelimited(strObject) +
+                            '\t' + encodeForTabDelimited(strArgs) + '\n',
+            intResponse = 0, strRet;
+        
+        //console.log(strMessage);
+        
+        GS.requestFromSocket(socket, strMessage, function (data, error, errorData) {
+            var arrLines, i, len;
+            if (!error) {
+                if (intResponse === 0) {
+                    strRet = data;
+                    
+                } else {
+                    finalCallback(strRet, error);
+                }
+                
+            } else {
+                finalCallback(errorData, error);
+            }
+            intResponse += 1;
+        });
+    };
+    
     // abstraction function for ease of use of the RAW format
     GS.requestRawFromSocket = function (socket, strQuery, callback) {
         var intResponsePart = 0, intQueryNumber = 0, intCallbackNumber = 0, intCallbackNumberThisQuery = 0
