@@ -85,8 +85,8 @@ var pgPanelCSSText = ml(function () {/*
     }
     
     .ace-pgpanel .ace_bullet { color: #000; }
-    .ace-pgpanel .ace_arrowdown { color: #000; }
-    .ace-pgpanel .ace_arrowright { color: #000; }
+    .ace-pgpanel .ace_arrowdown { color: #000; font-size: 1em;}
+    .ace-pgpanel .ace_arrowright { color: #000; font-size: 0.8em;}
     
     .ace-pgpanel .ace_ag,
     .ace-pgpanel .ace_cl,

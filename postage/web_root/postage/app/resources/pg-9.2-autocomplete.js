@@ -58,13 +58,37 @@ function autocompleteBindEditor(tabElement, editor) {
             autocompleteLoadTypes();
         }
         
+        
         // bind change event
         editor.addEventListener('change', function (event) {
+            
+            /*//console.log(event);
+            var last_char_is_space = false;
+            var eventlinelength = event.lines[0].length;
+            //console.log(event.lines[0].length);
+            //console.log(event.lines[0].substring(eventlinelength - 1, eventlinelength));
+            if (event.lines[0].substring(eventlinelength - 1, eventlinelength) === ' ') {
+                last_char_is_space = true;
+                console.log(last_char_is_space);
+            } else {
+                last_char_is_space = false;
+                console.log(last_char_is_space);
+            }*/
+                
+                //var cursorPos = editor.getCursorPosition();
+                //var cursorPosCol = cursorPos.column;
+                //var cursorPosRow = cursorPos.row;
+                //console.log(cursorPos, cursorPosRow, cursorPosCol);
+                //console.log(editor.currentQueryRange.text.substring(cursorPosCol, cursorPosCol)); //(cursorPosRow, cursorPosCol, cursorPosRow, cursorPosCol));
+            
+            
             //console.log('test 1', editor.currentQueryRange);
             if (editor.ignoreChange !== true
                 && event.action === 'insert'
                 && autocompleteGlobals.bolInserting === false
                 && editor.currentQueryRange) {
+                    
+                    
                 
                 try {
                     // this function is in pg-9.2-autocomplete-logic.js
@@ -74,6 +98,8 @@ function autocompleteBindEditor(tabElement, editor) {
                 }
             }
         });
+        
+        
         //editor.container.addEventListener('range-update', function (event) {
         //    console.log('test 2', editor.currentQueryRange, event);
         //});
@@ -171,7 +197,6 @@ function autocompletePopupLoad(editor, arrQueries) {
             
             for (i = 0, len = arrRows.length, strText = ''; i < len; i += 1) {
                 strCurrent = arrRows[i][0];
-                
                 // create a search string (normalize to double quoted and lowercase)
                 strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
                 
@@ -398,7 +423,7 @@ function autocompletePopupSearch(editor, strMode) {
     autocompletePopupHeightRefresh();
     popup_instruct_top = document.getElementById('autocomplete-popup').style.height + document.getElementById('autocomplete-popup-instruction').style.height;
     document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
-    console.log(document.getElementById('autocomplete-popup-instruction').style.top, popup_instruct_top);
+    //console.log(document.getElementById('autocomplete-popup-instruction').style.top, popup_instruct_top);
     
     //// search to select
     //for (i = 0, len = autocompleteGlobals.arrSearch.length; i < len; i += 1) {
@@ -776,7 +801,6 @@ function autocompleteGetPrefix(strScript, cursorPosition) {
       , i, arrFinds
       , int_chunk_start = 0, intLastChunkType, arrStrings
       , current_chunk_type, calculated_chunk_type, arrChunks = [];
-    
     // quote status (int_qs) values:
     //      0 => no quotes
     //      2 => dollar tag
@@ -1017,3 +1041,5 @@ function autocompleteGetPrefix(strScript, cursorPosition) {
     
     return {'start': arrFinds[0].chunkStart, 'end': arrFinds[arrFinds.length - 1].chunkEnd, 'arrStrings': arrStrings};
 }
+
+

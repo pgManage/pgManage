@@ -149,6 +149,8 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             bolPreviousCharReturn     = (strScript[intCursorPosition - 1] === '\n');
             bolCurrentCharReturn      = (strScript[intCursorPosition] === '\n');
             
+            
+            
             bolCurrentCharPeriod      = (strScript[intCursorPosition] === '.');
             bolCurrentCharValidStart  = (/[a-z0-9\"]/gi).test(strScript[intCursorPosition]);
             bolAfterComma             = (strPreviousWord[strPreviousWord.length - 1] === ',');
@@ -158,6 +160,15 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             bolPreviousCharCloseParen = (strScript[intCursorPosition - 1] === ')');
             
             bolFirstSpace = bolCurrentCharWhitespace && !bolPreviousCharWhitespace;
+            
+            
+            if (strScript[intCursorPosition] === ' ') {
+                bolCurrentCharWhitespace = true;
+                //console.log(bolCurrentCharWhitespace);
+            } else {
+                bolCurrentCharWhitespace = false;
+                //console.log(bolCurrentCharWhitespace);
+            }
             
             // type autocomplete
             if (strScript[intCursorPosition] === ':' && strScript[intCursorPosition - 1] === ':') {
@@ -185,6 +196,9 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 // CO  <- comparison operator  |  CD  <- comparison delimiter (AND/OR)
                 // CON <- constraints
                 
+            if (bolCurrentCharWhitespace == false) {
+
+                
                 // insert
                 if ((/^INSERT/gi).test(strSearchQuery)) {
                     // INSERT INTO < s> AS alias
@@ -195,56 +209,56 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     //         ON CONSTRAINT <(CON)>
                     //         DO UPDATE SET <(c)c> = <(c)c> WHERE <(c)c> < CO> <(c)c> < CD> <(c)c> < CO> <(c)c>
                     //     RETURNING <(ctv)cs>, <(ctv)cs>;
-                    
-                    // after INTO: schemas, tables and views
-                    if (strPreviousWord === 'INTO') {
-                        arrQueries = [autocompleteQuery.schemas];
                         
-                    // after RETURNING: columns, schemas
-                    } else if (strPreviousKeyWord === 'RETURNING' && (bolAfterComma)) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                        
-                    // word after COLLATE: collations
-                    } else if (strPreviousWord === 'COLLATE' ) {
-                        arrQueries = [autocompleteQuery.collations];
-                        
-                    // word after COLLATE: operator classes
-                    } else if (strPreviousKeyWord === 'COLLATE' ) {
-                        arrQueries = [autocompleteQuery.opclass];
-                        
-                    // after WHERE: columns, schemas
-                    } else if ((/(WHERE|AND|OR)/gi).test(strPreviousKeyWord) ) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                        
-                    // after CONSTRAINT: constraints
-                    } else if (strPreviousKeyWord === 'CONSTRAINT' ) {
-                        arrQueries = [autocompleteQuery.constraints];
-                        
-                    // after SET: columns
-                    } else if (strPreviousKeyWord === 'SET' && (bolAfterComma)) {
-                        arrQueries = [autocompleteQuery.allcolumns];
-                        
-                    // paren after CONFLICT: columns
-                    } else if (strPreviousKeyWord === 'CONFLICT' && (bolAfterComma || bolCurrentCharOpenParen)) {
-                        arrQueries = [autocompleteQuery.allcolumns];
-                        
-                    // paren after VALUES: schemas
-                    } else if (strPreviousKeyWord === 'VALUES' && (bolAfterComma || bolCurrentCharOpenParen)) {
-                        arrQueries = [autocompleteQuery.schemas]; //, autocompleteQuery.functions
-                        
-                    // paren after INTO: columns
-                    } else if (strPreviousKeyWord === 'INTO' && ((bolAfterComma ) || bolCurrentCharOpenParen)) {
-                        arrQueries = [autocompleteQuery.allcolumns];
-                    }
+                        // after INTO: schemas, tables and views
+                        if (strPreviousWord === 'INTO') {
+                            arrQueries = [autocompleteQuery.schemas];
+                            
+                        // after RETURNING: columns, schemas
+                        } else if (strPreviousKeyWord === 'RETURNING' && (bolAfterComma)) {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                            
+                        // word after COLLATE: collations
+                        } else if (strPreviousWord === 'COLLATE') {
+                            arrQueries = [autocompleteQuery.collations];
+                            
+                        // word after COLLATE: operator classes
+                        } else if (strPreviousKeyWord === 'COLLATE') {
+                            arrQueries = [autocompleteQuery.opclass];
+                            
+                        // after WHERE: columns, schemas
+                        } else if ((/(WHERE|AND|OR)/gi).test(strPreviousKeyWord)) {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                            
+                        // after CONSTRAINT: constraints
+                        } else if (strPreviousKeyWord === 'CONSTRAINT') {
+                            arrQueries = [autocompleteQuery.constraints];
+                            
+                        // after SET: columns
+                        } else if (strPreviousKeyWord === 'SET' && (bolAfterComma)) {
+                            arrQueries = [autocompleteQuery.allcolumns];
+                            
+                        // paren after CONFLICT: columns
+                        } else if (strPreviousKeyWord === 'CONFLICT' && (bolAfterComma || bolCurrentCharOpenParen)) {
+                            arrQueries = [autocompleteQuery.allcolumns];
+                            
+                        // paren after VALUES: schemas
+                        } else if (strPreviousKeyWord === 'VALUES' && (bolAfterComma || bolCurrentCharOpenParen)) {
+                            arrQueries = [autocompleteQuery.schemas]; //, autocompleteQuery.functions
+                            
+                        // paren after INTO: columns
+                        } else if (strPreviousKeyWord === 'INTO' && ((bolAfterComma ) || bolCurrentCharOpenParen)) {
+                            arrQueries = [autocompleteQuery.allcolumns];
+                        }
                     
                 // table
                 } else if ((/^TABLE/gi).test(strSearchQuery)) {
                     // after TABLE or ONLY: schemas
-                    if (strPreviousWord === 'TABLE' || strPreviousWord === 'ONLY') {
-                        arrQueries = [autocompleteQuery.schemas];
-                    }
+                        if (strPreviousWord === 'TABLE' || strPreviousWord === 'ONLY') {
+                            arrQueries = [autocompleteQuery.schemas];
+                        }
                     
                 // select
                 } else if ((/^SELECT/gi).test(strSearchQuery)) {
@@ -303,62 +317,63 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     // SELECT <(ctv)ctvs>
                     //   FROM ( SELECT * FROM < s> LIMIT 30 ) "av";
                     
-                    // after OF:
-                    if (strPreviousKeyWord === 'OF' && bolCurrentCharWhitespace) {
-                        //arrQueries = [];
-                        arrContextLists = ['tables'];
-                        
-                    // after ORDER BY: columns and schemas
-                    } else if (arrPreviousKeyWords[1] === 'ORDER' && strPreviousKeyWord === 'BY' && bolCurrentCharWhitespace) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                        
-                    // after PARTITION BY: columns and schemas
-                    } else if (arrPreviousKeyWords[1] === 'PARTITION' && strPreviousKeyWord === 'BY' && bolCurrentCharWhitespace) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                        
-                    // after HAVING: columns and schemas
-                    } else if (strPreviousKeyWord === 'HAVING' && bolCurrentCharWhitespace) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                        
-                    // after GROUP BY: columns and schemas
-                    } else if (arrPreviousKeyWords[1] === 'GROUP' && strPreviousKeyWord === 'BY' && bolCurrentCharWhitespace) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                        
-                    // after WHERE: columns and schemas
-                    } else if (strPreviousKeyWord === 'WHERE' && bolCurrentCharWhitespace) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                        
-                    // after USING comma/open paren: columns
-                    } else if (strPreviousKeyWord === 'USING' && (bolAfterComma || bolCurrentCharOpenParen)) {
-                        arrQueries = [autocompleteQuery.allcolumns];
-                        
-                    // after ON: columns and schemas
-                    } else if (strPreviousKeyWord === 'ON' && bolCurrentCharWhitespace) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                        
-                    // after JOIN: schemas
-                    } else if (strPreviousKeyWord === 'JOIN' && bolCurrentCharWhitespace) {
-                        arrQueries = [autocompleteQuery.schemas];
-                        
-                    // after FROM or FROM comma: schemas
-                    } else if (strPreviousKeyWord === 'FROM' && (bolAfterComma || (bolFirstSpace))) {
-                        arrQueries = [autocompleteQuery.schemas];
-                    // after INTO: schemas
-                    } else if (strPreviousKeyWord === 'INTO' && bolFirstSpace) {
-                        arrQueries = [autocompleteQuery.schemas];
-                        
-                    // after SELECT, ALL or DISTINCT:
-                    } else if (((/(SELECT|ALL|DISTINCT)/gi).test(strPreviousWord) && bolFirstSpace) ||
-                                ((/(SELECT|ALL|DISTINCT)/gi).test(strPreviousKeyWord) && bolAfterComma)) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                    }
+                        // after OF:
+                        if (strPreviousKeyWord === 'OF') {
+                            //arrQueries = [];
+                            arrContextLists = ['tables'];
+                            
+                        // after ORDER BY: columns and schemas
+                        } else if (arrPreviousKeyWords[1] === 'ORDER' && strPreviousKeyWord === 'BY') {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                            
+                        // after PARTITION BY: columns and schemas
+                        } else if (arrPreviousKeyWords[1] === 'PARTITION' && strPreviousKeyWord === 'BY') {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                            
+                        // after HAVING: columns and schemas
+                        } else if (strPreviousKeyWord === 'HAVING') {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                            
+                        // after GROUP BY: columns and schemas
+                        } else if (arrPreviousKeyWords[1] === 'GROUP' && strPreviousKeyWord === 'BY') {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                            
+                        // after WHERE: columns and schemas
+                        } else if (strPreviousKeyWord === 'WHERE') {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                            
+                        // after USING comma/open paren: columns
+                        } else if (strPreviousKeyWord === 'USING' && (bolAfterComma || bolCurrentCharOpenParen)) {
+                            arrQueries = [autocompleteQuery.allcolumns];
+                            
+                        // after ON: columns and schemas
+                        } else if (strPreviousKeyWord === 'ON') {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                            
+                        // after JOIN: schemas
+                        } else if (strPreviousKeyWord === 'JOIN') {
+                            arrQueries = [autocompleteQuery.schemas];
+                            
+                        // after FROM or FROM comma: schemas
+                        } else if (strPreviousKeyWord === 'FROM') {
+                            arrQueries = [autocompleteQuery.schemas];
+                            
+                        // after INTO: schemas
+                        } else if (strPreviousKeyWord === 'INTO') {
+                            arrQueries = [autocompleteQuery.schemas];
+                            
+                        // after SELECT, ALL or DISTINCT:
+                        } else if (((/(SELECT|ALL|DISTINCT)/gi).test(strPreviousWord)) ||
+                                    ((/(SELECT|ALL|DISTINCT)/gi).test(strPreviousKeyWord) && bolAfterComma)) {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                        }
                     
                 // update
                 } else if ((/^UPDATE/gi).test(strSearchQuery)) {
@@ -368,28 +383,28 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     //       WHERE <(ctv)cs> < CO> <(ctv)cs> < CD> <(ctv)cs> < CO> <(ctv)cs>
                     //   RETURNING <(ctv)cs>, <(ctv)cs>;
                     
-                    // after RETURNING: columns and schemas
-                    if (strPreviousKeyWord === 'RETURNING' && (bolAfterComma || bolCurrentCharWhitespace)) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
+                        // after RETURNING: columns and schemas
+                        if (strPreviousKeyWord === 'RETURNING' && (bolAfterComma)) {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                            
+                        // after WHERE: columns and schemas
+                        } else if (strPreviousKeyWord === 'WHERE') {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
                         
-                    // after WHERE: columns and schemas
-                    } else if (strPreviousKeyWord === 'WHERE' && bolCurrentCharWhitespace) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                    
-                    // after FROM or FROM comma: schemas
-                    } else if (strPreviousKeyWord === 'FROM' && (bolAfterComma || (bolFirstSpace))) {
-                        arrQueries = [autocompleteQuery.schemas];
-                        
-                    // after SET or SET comma: columns
-                    } else if (strPreviousKeyWord === 'SET' && (bolAfterComma || bolCurrentCharWhitespace)) {
-                        arrQueries = [autocompleteQuery.allcolumns];
-                        
-                    // after UPDATE or ONLY: schemas
-                    } else if ((/(UPDATE|ONLY)/gi).test(strPreviousWord) && (bolFirstSpace)) {
-                        arrQueries = [autocompleteQuery.schemas];
-                    }
+                        // after FROM or FROM comma: schemas
+                        } else if (strPreviousKeyWord === 'FROM') {
+                            arrQueries = [autocompleteQuery.schemas];
+                            
+                        // after SET or SET comma: columns
+                        } else if (strPreviousKeyWord === 'SET' && (bolAfterComma)) {
+                            arrQueries = [autocompleteQuery.allcolumns];
+                            
+                        // after UPDATE or ONLY: schemas
+                        } else if ((/(UPDATE|ONLY)/gi).test(strPreviousWord)) {
+                            arrQueries = [autocompleteQuery.schemas];
+                        }
                     
                 // delete
                 } else if ((/^DELETE/gi).test(strSearchQuery)) {
@@ -398,24 +413,24 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     //            WHERE <(ctv)cs> < CO> <(ctv)cs> < CD> <(ctv)cs> < CO> <(ctv)cs>
                     //        RETURNING <(ctv)cs>, <(ctv)cs>;
                     
-                    // after RETURNING: columns
-                    if (strPreviousKeyWord === 'RETURNING' && (bolAfterComma || bolCurrentCharWhitespace)) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                        
-                    // after WHERE: columns and schemas
-                    } else if ((/(WHERE|AND|OR)/gi).test(strPreviousKeyWord) && bolCurrentCharWhitespace) {
-                        arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
-                        arrContextLists = ['tables', 'views'];
-                        
-                    // after USING: schemas, tables and views
-                    } else if (strPreviousKeyWord === 'USING' && (bolCurrentCharWhitespace || bolAfterComma)) {
-                        arrQueries = [autocompleteQuery.schemas];
-                        
-                    // after FROM or ONLY: schemas, tables and views
-                    } else if ((strPreviousWord === 'FROM' || strPreviousWord === 'ONLY') && bolCurrentCharWhitespace) {
-                        arrQueries = [autocompleteQuery.schemas];
-                    }
+                        // after RETURNING: columns
+                        if (strPreviousKeyWord === 'RETURNING' && (bolAfterComma)) {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                            
+                        // after WHERE: columns and schemas
+                        } else if ((/(WHERE|AND|OR)/gi).test(strPreviousKeyWord)) {
+                            arrQueries = [autocompleteQuery.allcolumns, autocompleteQuery.schemas];
+                            arrContextLists = ['tables', 'views'];
+                            
+                        // after USING: schemas, tables and views
+                        } else if (strPreviousKeyWord === 'USING' || bolAfterComma) {
+                            arrQueries = [autocompleteQuery.schemas];
+                            
+                        // after FROM or ONLY: schemas, tables and views
+                        } else if ((strPreviousWord === 'FROM' || strPreviousWord === 'ONLY')) {
+                            arrQueries = [autocompleteQuery.schemas];
+                        }
                     
                 } else if ((/^(BEGIN|START\s*TRANSACTION|SET\s*TRANSACTION|SET\s*SESSION\s*CHARACTERISTICS\s*AS\s*TRANSACTION)/gi).test(strSearchQuery)) {
                     if ((strPreviousKeyWord === 'BEGIN' && bolCurrentCharWhitespace) || (bolAfterComma) ||
@@ -3076,6 +3091,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                             }
                         });
                     }
+                }
                 }
             }
         }
