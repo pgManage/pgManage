@@ -1,8 +1,9 @@
-﻿  http_accept.c
+﻿  ws_file.c
+  util_file.c
   Generating code
-  4 of 509 functions ( 0.8%) were compiled, the rest were copied from previous compilation.
+  35 of 507 functions ( 6.9%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
+    152 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.exe
-  envelope.vcxproj -> C:\Users\Nunzio Tocci\Repos\postage\visualstudio\Release\envelope.pdb (Full PDB)
+  envelope.vcxproj -> C:\Users\nunzio\Repos\postage_master\visualstudio\Release\envelope.exe
+  envelope.vcxproj -> C:\Users\nunzio\Repos\postage_master\visualstudio\Release\envelope.pdb (Full PDB)

@@ -278,6 +278,8 @@ finish:
 				SERROR_NORESPONSE("write() failed");
 			}
 		}
+		decrement_idle(EV_A);
+		ev_check_stop(EV_A, &client_upload->check);
 		http_upload_free(client_upload);
 		SFREE(str_response);
 		SFINISH_CLIENT_CLOSE(client);

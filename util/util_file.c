@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "util_file.h"
 
 void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents);
