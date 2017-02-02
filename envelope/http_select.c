@@ -616,6 +616,7 @@ finish:
 		DB_free_result(client_copy_check->res);
 		if (client_copy_check != NULL) {
 			ev_check_stop(EV_A, w);
+			decrement_idle(EV_A);
 			SFREE(client_copy_check->str_response);
 			SFREE(client_copy_check);
 			SFREE(client_copy_io);
