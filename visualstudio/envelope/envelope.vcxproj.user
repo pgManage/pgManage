@@ -6,7 +6,7 @@
     <LocalDebuggerEnvironment>PATH=%PATH%;..\lib\x86</LocalDebuggerEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommandArguments>-l info -o stderr -r ..\..\envelope\web_root -y ..\..\envelope\app -z ..\..\envelope\role -c ..\..\envelope\config\envelope.conf -d ..\..\envelope\config\envelope-connections.conf -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-l info -o stderr -r ..\..\envelope\web_root -y ..\..\envelope\app -z ..\..\envelope\role -c ..\..\envelope\config\envelope.conf -d ..\..\envelope\config\envelope-connections.conf -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08  -j ..\..\ssl\self.crt -k ..\..\ssl\self.key</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerEnvironment>PATH=%PATH%;..\lib\x86</LocalDebuggerEnvironment>
   </PropertyGroup>
