@@ -7,6 +7,7 @@
 ..\..\common\common_client.c(786): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
 ..\..\common\common_client.c(797): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
 ..\..\common\common_client.c(799): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+  common_config.c
   common_main.c
 c:\users\nunzio\repos\postage\common\../dependencies/libev/ev.c(205): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition
   c:\users\nunzio\repos\postage\common\../dependencies/libev/ev.c(205): note: command-line arguments:  see previous definition of 'WIN32_LEAN_AND_MEAN'
@@ -37,6 +38,14 @@ c:\users\nunzio\repos\postage\dependencies\libev\ev_select.c(200): warning C4244
   ws_select.c
   ws_update.c
 ..\..\common\ws_update.c(526): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+  db_framework.c
+..\..\db_framework_pq\db_framework.c(87): warning C4022: 'DuplicateHandle': pointer mismatch for actual parameter 2
+..\..\db_framework_pq\db_framework.c(87): warning C4047: 'function': 'intptr_t' differs in levels of indirection from 'HANDLE'
+..\..\db_framework_pq\db_framework.c(87): warning C4024: '_open_osfhandle': different types for formal and actual parameter 1
+  bsd-asprintf.c
+  posix_win.c
+..\..\dependencies\libressl\crypto\compat\posix_win.c(59): warning C4133: 'function': incompatible types - from 'const char *' to 'LPCWSTR'
+  Compiling...
   postage_callback.c
   ws_raw.c
   ws_tab.c
@@ -49,10 +58,25 @@ c:\users\nunzio\repos\postage\dependencies\libev\ev_select.c(200): warning C4244
 ..\..\postage\ws_tab.c(128): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
 ..\..\postage\ws_tab.c(138): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
 ..\..\postage\ws_tab.c(143): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+  util_aes.c
+  util_base64.c
+  util_canonical.c
+  util_cookie.c
+  util_darray.c
+  util_error.c
+  util_exec.c
+  util_file.c
+  util_getopt.c
+  util_idle.c
+  util_ini.c
+  util_list.c
+  util_request.c
+  util_salloc.c
+  util_sql_split.c
+  util_string.c
+  util_strptime.c
   Generating code
-  20 of 400 functions ( 5.0%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    34 functions had inline decision re-evaluated but remain unchanged
+  All 400 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   postage.vcxproj -> C:\Users\nunzio\Repos\postage\visualstudio\Release\postage.exe
   postage.vcxproj -> C:\Users\nunzio\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)
