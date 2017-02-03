@@ -63,6 +63,7 @@ void http_accept_step1(struct sock_ev_client *client) {
 		SFINISH_SNFCAT(str_args, &int_args_len,
 			"&path=", (size_t)6,
 			str_uri_temp, int_temp_len);
+		SFREE(str_temp);
 	}
 
 	str_temp = str_args;
@@ -102,6 +103,7 @@ finish:
 			strlen("HTTP/1.1 500 Internal Server Error\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
 			_str_response, strlen(_str_response));
+		SFREE(_str_response);
 	}
 	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
 		SFREE(str_response);

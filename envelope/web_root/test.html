@@ -1279,6 +1279,21 @@ id DESC; DROP TABLE rtesting_table
 					]
 				]
 			],
+			['SELECT FAIL 3', 'websocket', '', ml(function () {/*SELECT	public	rtesting_table*/}),
+				[
+					[
+						"../common/common_util_sql.c:get_table_name: bstrstr failed\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n",
+						"..\\..\\common\\common_util_sql.c:get_table_name: bstrstr failed\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n"
+					]
+				]
+			],
+			['SELECT FAIL 4', 'websocket', '', ml(function () {/*SELECT	ttesting_extra_large_view_generate_series
+RETURN	*
+
+
+
+*/}),
+				["generate_series\ttest1\ttest2\nbigint\tunknown\tunknown\n","FATAL\nerror_text\tERROR:  could not write to tuplestore temporary file: No space left on device\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table

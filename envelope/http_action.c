@@ -87,6 +87,7 @@ finish:
 			strlen("HTTP/1.1 500 Internal Server Error\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
 			_str_response, strlen(_str_response));
+		SFREE(_str_response);
 	}
 	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
 		SFREE(str_response);

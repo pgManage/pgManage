@@ -636,6 +636,28 @@ error:
 	return NULL;
 }
 
+char *DB_cancel_query(DB_conn *conn) {
+	char str_temp1[256] = { 0 };
+	PGcancel *cancel_request = PQgetCancel(conn->conn);
+	int int_ret_val = PQcancel(cancel_request, str_temp1, 255);
+	PQfreeCancel(cancel_request);
+	if (int_ret_val != 1) {
+		return SERROR_RESPONSE("PQcancel failed: %s", str_temp1);
+	}
+	if (conn->copy_check != NULL) {
+		decrement_idle(conn->EV_A);
+		ev_check_stop(conn->EV_A, &conn->copy_check->check);
+		PQclear(conn->copy_check->res);
+		SFREE(conn->copy_check);
+	}
+	if (conn->res_poll != NULL) {
+		ev_io_stop(conn->EV_A, &conn->res_poll->io);
+		DB_res_poll_free(conn->res_poll);
+	}
+
+	return NULL;
+}
+
 void _DB_finish(DB_conn *conn) {
 #ifdef _WIN32
 	if (conn->int_sock != -1) {
@@ -878,22 +900,20 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 
 			// fail
 		} else if (int_status == -2) {
-			decrement_idle(EV_A);
-
 			SFINISH("Copy statement failed: %s", PQerrorMessage(copy_check->conn->conn));
 
 			// success, end of data
 		} else if (int_status == -1) {
 			res = PQgetResult(copy_check->conn->conn);
 			result = PQresultStatus(res);
-			if (result == PGRES_FATAL_ERROR) {
-				SFINISH("Failed to copy query: %s", PQerrorMessage(copy_check->conn->conn));
-			}
 			PQclear(res);
 			res = PQgetResult(copy_check->conn->conn);
 			while (res != NULL) {
 				PQclear(res);
 				res = PQgetResult(copy_check->conn->conn);
+			}
+			if (result == PGRES_FATAL_ERROR) {
+				SFINISH("Failed to copy query: %s", PQerrorMessage(copy_check->conn->conn));
 			}
 
 			void *cb_data = copy_check->cb_data;
@@ -932,7 +952,9 @@ finish:
 
 		str_response = _DB_get_diagnostic(copy_check->conn, res ? res : PQgetResult(copy_check->conn->conn));
 		copy_check->copy_cb(EV_A, false, true, copy_check->cb_data, str_response, strlen(str_response));
+		decrement_idle(EV_A);
 		ev_check_stop(EV_A, &copy_check->check);
+		copy_check->conn->copy_check = NULL;
 		SFREE(copy_check);
 	}
 	SFREE(str_response);

@@ -54,7 +54,8 @@ char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_tab
 
 	if (bol_schema) {
 		ptr_table_name = ptr_end_table_name + 1;
-		ptr_end_table_name = strstr(ptr_table_name, "\012");
+		ptr_end_table_name = bstrstr(ptr_table_name, int_query_len - (size_t)(ptr_table_name - str_query), "\012", (size_t)1);
+		SERROR_CHECK(ptr_end_table_name != NULL, "bstrstr failed");
 		*ptr_end_table_name = 0;
 
 		SERROR_SNCAT(str_temp, &int_temp_len, ptr_table_name, ptr_end_table_name - ptr_table_name);

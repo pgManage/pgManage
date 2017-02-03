@@ -1770,6 +1770,11 @@ error:
 	return false;
 }
 
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
+void client_close_cancel_query_cb(EV_P, ev_io *w, int revents);
+bool client_close_close_cnxn_cb(EV_P, void *cb_data, DB_result *res);
+#endif
+
 void client_close_timeout_prepare_cb(EV_P, ev_prepare *w, int revents) {
 	if (revents != 0) {
 	} // get rid of unused parameter warning
@@ -1802,20 +1807,64 @@ void client_close_timeout_prepare_cb(EV_P, ev_prepare *w, int revents) {
 			SDEBUG("`client->client_timeout_prepare` == %p", client->client_timeout_prepare);
 		}
 
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
+		if (client->bol_public == false) {
+			char *err = DB_cancel_query(client->conn);
+			if (err == NULL) {
+				ev_io_init(&client->io, client_close_cancel_query_cb, client->conn->int_sock, EV_READ);
+				ev_io_start(EV_A, &client->io);
+			} else {
+				SFREE(err);
+				SERROR_CHECK_NORESPONSE(DB_exec(global_loop, client->conn, client, "RESET SESSION AUTHORIZATION;", client_close_close_cnxn_cb), "DB_exec failed to reset session authorization");
+			}
+		} else {
+#endif
 		SDEBUG("BEFORE client_close_immediate(%p)", client);
 		client_close_immediate(client);
 		SDEBUG("AFTER  client_close_immediate(%p)", client);
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
+		}
+#endif
 	}
 	bol_error_state = false;
 }
 
 
-#ifdef ENVELOPE
-bool client_close_immediate_close_cnxn_cb(EV_P, void *cb_data, DB_result *res) {
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
+void client_close_cancel_query_cb(EV_P, ev_io *w, int revents) {
+	struct sock_ev_client *client = (struct sock_ev_client *)w;
+	int int_status = PQconsumeInput(client->cnxn);
+	if (int_status != 1) {
+		SERROR_NORESPONSE("PQconsumeInput failed %s", PQerrorMessage(client->cnxn));
+		ev_io_stop(EV_A, w);
+		SERROR_CHECK_NORESPONSE(DB_exec(global_loop, client->conn, client, "RESET SESSION AUTHORIZATION;", client_close_close_cnxn_cb), "DB_exec failed to reset session authorization");
+		return;
+	}
+
+	int int_status2 = PQisBusy(client->cnxn);
+	if (int_status2 != 1) {
+		ev_io_stop(EV_A, w);
+		PGresult *res = PQgetResult(client->cnxn);
+		while (res != NULL) {
+			if (PQresultStatus(res) == PGRES_COPY_OUT) {
+				char **buffer_ptr_ptr = salloc(sizeof(char *));
+				int_status = PQgetCopyData(client->cnxn, buffer_ptr_ptr, 0);
+				PQfreemem(*buffer_ptr_ptr);
+				SFREE(buffer_ptr_ptr);
+			}
+			PQclear(res);
+			res = PQgetResult(client->cnxn);
+		}
+		SERROR_CHECK_NORESPONSE(DB_exec(global_loop, client->conn, client, "RESET SESSION AUTHORIZATION;", client_close_close_cnxn_cb), "DB_exec failed to reset session authorization");
+	}
+}
+bool client_close_close_cnxn_cb(EV_P, void *cb_data, DB_result *res) {
 	SINFO("RESET SESSION AUTHORIZATION finished!");
-	DB_conn *conn = cb_data;
-	DB_finish(conn);
+	struct sock_ev_client *client = cb_data;
+	DB_finish(client->conn);
+	client->conn = NULL;
 	DB_free_result(res);
+	client_close_immediate(client);
 }
 #endif
 
@@ -1838,10 +1887,7 @@ void client_close_immediate(struct sock_ev_client *client) {
 	if (client->conn != NULL) {
 		SDEBUG("DB_conn %p closing", client->conn);
 #if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
-		// The only difference here is the callback and no user/pw
-		if (client->bol_public == false) {
-			SERROR_CHECK_NORESPONSE(DB_exec(global_loop, client->conn, client->conn, "RESET SESSION AUTHORIZATION;", client_close_immediate_close_cnxn_cb), "DB_exec failed to reset session authorization");
-		} else {
+		if (client->conn) {
 #endif
 		DB_finish(client->conn);
 #if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)

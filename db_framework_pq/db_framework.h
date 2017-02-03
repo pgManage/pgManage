@@ -171,6 +171,8 @@ char *DB_escape_literal(DB_conn *conn, char *str, size_t int_len);
 // Escape object name for use in a query
 char *DB_escape_identifier(DB_conn *conn, char *str, size_t int_len);
 
+char *DB_cancel_query(DB_conn *conn);
+
 void _DB_finish(DB_conn *conn);
 #define DB_finish(A)                                                                                                             \
 	_DB_finish(A);                                                                                                               \
