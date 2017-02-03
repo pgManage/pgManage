@@ -226,6 +226,16 @@ var pgpanelHighlightRules = function(options) {
             
             {
                 token: "end",
+                regex: " "//,
+                //next: "no_regex"
+            }
+        ],
+        "string.bullet_under_arrow": [
+            { token: "tb", regex: "TB" },
+            { token: "vw", regex: "VW" },
+            
+            {
+                token: "end",
                 regex: " ",
                 next: "no_regex"
             }

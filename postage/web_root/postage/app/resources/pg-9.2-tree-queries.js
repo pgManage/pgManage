@@ -399,7 +399,7 @@ titleRefreshQuery.objectViewList = titleRefreshQuery.viewNumber = ml(function ()
 
 
 listQuery.objectTableList = ml(function () {/*
-      SELECT pg_class.oid, quote_ident(relname) AS name, pg_namespace.nspname AS schema_name, 'TB' AS bullet
+      SELECT pg_class.oid, 'TB ' || quote_ident(relname) AS name, pg_namespace.nspname AS schema_name --, 'TB' AS bullet
         FROM pg_class
    LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
        WHERE relkind IN ('r','s','t') AND pg_class.relnamespace = {{INTOID}}
@@ -433,7 +433,7 @@ listQuery.objectType = listQuery.types = ml(function () {/*
 
 
 listQuery.objectViewList = listQuery.views = ml(function () {/*
-      SELECT c.oid, quote_ident(c.relname) AS name, pg_namespace.nspname AS schema_name, 'VW' AS bullet
+      SELECT c.oid, 'VW ' || quote_ident(c.relname) AS name, pg_namespace.nspname AS schema_name--, 'VW' AS bullet
         FROM pg_class c
    LEFT JOIN pg_namespace ON pg_namespace.oid = c.relnamespace
        WHERE ((c.relhasrules AND

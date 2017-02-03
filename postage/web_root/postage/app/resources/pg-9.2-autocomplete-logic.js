@@ -347,7 +347,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                         arrQueries = [autocompleteQuery.schemas];
                         
                     // after FROM or FROM comma: schemas
-                    } else if (strPreviousKeyWord === 'FROM' && (bolAfterComma || (bolFirstSpace))) {
+                    } else if (strPreviousKeyWord === 'FROM' && strPreviousWord === 'FROM' && (bolAfterComma || (bolFirstSpace))) {
                         arrQueries = [autocompleteQuery.schemas];
                     // after INTO: schemas
                     } else if (strPreviousKeyWord === 'INTO' && bolFirstSpace) {
