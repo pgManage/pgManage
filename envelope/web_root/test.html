@@ -1236,6 +1236,13 @@ id DESC
 					]
 				]
 			],
+			['SELECT FAIL 4', 'websocket', '', ml(function () {/*SELECT	ttesting_extra_large_view_generate_series
+RETURN	*
+
+
+
+*/}),
+				["generate_series\ttest1\ttest2\nbigint\tunknown\tunknown\n","FATAL\nerror_text\tERROR:  could not write to tuplestore temporary file: No space left on device\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table
