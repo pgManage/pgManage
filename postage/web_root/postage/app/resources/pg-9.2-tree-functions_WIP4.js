@@ -31,12 +31,9 @@ function treeStart() {
     // create and configure tree ace
     treeGlobals.ace = ace.edit('object-list-ace');
     treeGlobals.aceSession = treeGlobals.ace.getSession();
-  
+    var ghost;    
         
     // get and save state
-    var dragstartcursorX, dragstartcursorY;
-    var strName;
-    var ghost;
     var bolMousedown = false;
     var intSelectionTriggered = 0;
     var intSelectionRow;
@@ -46,62 +43,25 @@ function treeStart() {
         var stateEndFunction;
         bolMousedown = true;
         intSelectionTriggered = 0;
-        var currentcursorX, currentcursorY;
-        var startcursorX, startcursorY;
-        
-        // save origin point so you can cancel if it doesn't move enough
-        startcursorX = event.clientX;
-    	startcursorY = event.clientY;
-    	// save origin point so you can cancel selection of tree view
-        dragstartcursorX = event.clientX;
-    	dragstartcursorY = event.clientY;
-        //console.log(event);
-        //console.log(GS.mousePosition(event));
 
         // this handles mouseup out of the window by running
         //      the end function if the mouse moves while it is up
         stateMoveFunction = function (event) {
             //event.preventDefault();
             //event.stopPropagation();
-            if (!evt.touchDevice) {
-                // if there is a editor tab open:
-                if (xtag.query(document.body, '.current-tab')[0] !== undefined){
-                    // focus to editor
-                    xtag.query(document.body, '.current-tab')[0].relatedEditor.focus();
-                }
-            }
             // IF mouse is up AND we're not on a touch device
             if (event.which === 0 && !evt.touchDevice) {
-                stateEndFunction(event);
+                stateEndFunction();
             }
         };
 
         stateEndFunction = function (event) {
-            // get current cursor position
-            currentcursorX = (window.Event) ? event.pageX : event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-            currentcursorY = (window.Event) ? event.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
             bolMousedown = false;
             bolSelectionTriggered = 0;
             //event.preventDefault();
             //event.stopPropagation();
-            
-            
-            //console.log(currentcursorX, currentcursorY, startcursorX, startcursorY)
-            // if cursor has moved at least ten pixels in any direction
-            if (currentcursorX <= (startcursorX - 20) || currentcursorX >= (startcursorX + 20) || (currentcursorY <= startcursorY - 20) || currentcursorY >= (startcursorY + 20)) {
-                // if there is a editor tab open:
-                if (xtag.query(document.body, '.current-tab')[0] !== undefined){
-                    // insert snippet text
-                    xtag.query(document.body, '.current-tab')[0].relatedEditor.insert(strName);
-                }
-            }
-            
-            // remove ghost if appended
-            if (ghost.parentNode && ghost.parentNode.nodeName === 'BODY') {
-                ghost.parentNode.removeChild(ghost);
-            }
-            
-        // unbind mousemove and mouseup
+
+            // unbind mousemove and mouseup
         document.body.removeEventListener(evt.mousemove, stateMoveFunction);
         document.body.removeEventListener(evt.mouseup, stateEndFunction);
         };
@@ -113,8 +73,8 @@ function treeStart() {
     // start drag on changeSelection
     treeGlobals.ace.addEventListener('changeSelection', function (event) {
         var jsnSelection;
+        var strName;
         var jsnData;
-        var subStrEnd;
 
         // only listen to selection change on the second trigger
     if (intSelectionTriggered === 0) {
@@ -126,8 +86,7 @@ function treeStart() {
             jsnData = treeGlobals.data[intSelectionRow];
 
             //console.log(bolMousedown, intSelectionRow, treeGlobals.data[intSelectionRow]);
-            //console.log(jsnData);
-            
+
             // tables
             if (jsnData.query === 'objectTable') {
                 strName = jsnData.schemaName + '.' + jsnData.name.substring(3);
@@ -140,14 +99,8 @@ function treeStart() {
             // schemas
             } else if (!jsnData.schemaName && jsnData.oid) { // schemas use .name for their name, not .schemaName
                 strName = jsnData.name;
-            // columns
-            }if (jsnData.type === '') {
-                strName = jsnData.name;
-                // substring column type off of column name
-                subStrEnd = strName.lastIndexOf(' (');
-                strName = strName.substring(0, subStrEnd);
             }
-            
+
             if (strName) {
                 ghost = document.createElement('p')
                 ghost.style.minHeight = '0px';
@@ -158,47 +111,219 @@ function treeStart() {
                 ghost.style.width = strName.length + '.99em';
                 ghost.style.height =  '1.5em';
                 ghost.innerHTML += '' + strName + '';
-                ghost.style.pointerEvents = 'none';
                 
                 //ghost = '<p style="minHeight: 0px; padding: 0.25em; position: absolute; zIndex: 9001; opacity: 0.5; width: ' + strName.length + '.99em; height: 1.5em; ">' + strName + '</p>';
-                //console.log(ghost);
+                console.log(ghost);
                 // if ghost is not appended yet: append to body
                 if (!ghost.parentNode || ghost.parentNode.nodeName !== 'BODY') {
                     document.body.appendChild(ghost);
+                    console.log('appending');
                     var cursorX, cursorY;
-                    
-                    
-                    // on mousemove:
+                    ghost.style.pointerEvents = 'none';
                     document.body.addEventListener('mousemove', function (event) {
-                        // get cursor position (x/y)
                         cursorX = (window.Event) ? event.pageX : event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
                     	cursorY = (window.Event) ? event.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
                     	//console.log(cursorX);
                     	//console.log(cursorY);
-                    	// set ghost position to cursor position (x/y) with changes to center it
-                        ghost.style.left = (cursorX - ((strName.length * 3) + 5)) + 'px';
+                        ghost.style.left = (cursorX - (strName.length * 3)) + 'px';
                         ghost.style.top = (cursorY - 10) + 'px';
-                        
-                        
-                        //console.log(cursorX, cursorX, dragstartcursorX, dragstartcursorY);
-                        // after moving ten pixels:
-                        if (cursorX <= (dragstartcursorX - 10) || cursorX >= (dragstartcursorX + 10) || (cursorY <= dragstartcursorY - 10) || cursorY >= (dragstartcursorY + 10)) {
-                            // clear selection
-                            treeGlobals.ace.getSession().selection.clearSelection();
-                        }
                     });
                     //intCurrentLeft = jsnMousePos.left;
                     //intCurrentTop = jsnMousePos.top;
                 }
+
+                // add snippet text to editor
+                if (xtag.query(document.body, '.current-tab')[0] !== undefined){
+                    xtag.query(document.body, '.current-tab')[0].relatedEditor.insert(strName);
+                }
+                //console.log(ace.edit('sql-ace-area-3'));
                 
-                
-                //document.body.addEventListener('mouseup', dragEndFunction(strName));
+                // if we are not on a touch device: focus into editor
+                //if (!evt.touchDevice) {
+                //    xtag.query(document.body, '.current-tab')[0].relatedEditor.focus();
+                //}
             }
             
         }
     });
 
+    /*
+    var tree_object_name;
+    treeGlobals.ace.addEventListener('mousedown', function (event) {
+        setTimeout(function(){
+            tree_object_name = treeGlobals.data[treeGlobals.ace.getSelectionRange().start.row].name;
+            dragStartFunction(event, tree_object_name, treeGlobals.data[treeGlobals.ace.getSelectionRange().start.row]);
+            console.log(tree_object_name);
+        }, 50);
+    });
 
+    
+    var container = document.getElementById('left-panel-body'), dragStartFunction, dragMoveFunction, dragEndFunction;
+    
+    
+    // how the drag functionality works:
+    //      the target element is bound on mousedown to do five things:
+    //          create ghost element (
+    //              this is feedback for the user that they are dragging something,
+    //              it also reminds the user what they are dragging
+    //          )
+    //          save origin point (
+    //              this is a generally useful data point,
+    //              you can say "if i'm with N pixels of the origin when I mouseup: cancel action"
+    //          )
+    //          calculate drag offset (
+    //              when you drag an element,
+    //              you don't drag it from the very top-left corner,
+    //              the offset is the X/Y of the element minus the X/Y of the mouse inside the element
+    //          )
+    //          bind mousemove (
+    //              it's bound to the body,
+    //              this is because when you drag,
+    //              you may go outside the drag area,
+    //              but you don't won't the user to get confused when their ghost won't move (because you're outside the drag area)
+    //          )
+    //          bind mouseup (
+    //              it's bound to the body,
+    //              this is so that the user can cancel the drag by dropping outside the drag area,
+    //              this also unbinds mousemove and mouseup
+    //          )
+    //      mousemove and mouseup are bound on mousedown and unbound in a couple cases:
+    //          mouseup on the body
+    //          mouse not down during mousemove (
+    //              this takes care of the case where the user lets go of the mouse off of the window,
+    //              this only applies to non-touch devices because you can't leave the screen on a touch device without triggering a mouseup
+    //          )
+    //      the reason we bind/unbind mousemove/mouseup dynamically is because we don't want that code slowing down the page if it isn't doing anything
+    //      the mousemove/mouseup event code is defined as a function so that we can bind and unbind with one line and so that we can run the mouseup function if the user triggers mousemove when the mouse isn't down
+    
+
+    
+    var ghost, ghostXOffset, ghostYOffset
+      , intStartLeft, intStartTop, intCurrentLeft, intCurrentTop
+      , dragStarted, mousedownEvent, startScrollLeft, startScrollTop;
+    
+    dragStartFunction = function (event, tree_name, tree_target) {
+        if (evt.touchDevice === false) {
+            
+            var jsnMousePos = GS.mousePosition(event);
+              //, ghostPos = GS.getElementPositionData(event.target);
+            
+            
+            mousedownEvent = event;
+            dragStarted = false;
+            intStartLeft = jsnMousePos.left;
+            intStartTop = jsnMousePos.top;
+            startScrollLeft = container.scrollLeft;
+            startScrollTop = container.scrollTop;
+            
+            console.log(tree_target);
+            
+            ghost = '<p style="minHeight: 0px; padding: 0.25em; position: absolute; zIndex: 9001; opacity: 0.5; width: ' + tree_target.real_text.length + '.99em; height:' + tree_target.real_text.length + '.99em; ">' + tree_name + '</p>';//event.target.cloneNode(true);
+            console.log(ghost);
+            
+            //ghost.style.minHeight = '0px';
+            //ghost.style.padding = '0.25em';
+            //ghost.style.position = 'absolute';
+            //ghost.style.zIndex = '9001';
+            //ghost.style.opacity = '0.5';
+            //ghost.style.width = event.target.offsetWidth + 'px';
+            //ghost.style.height = event.target.offsetHeight + 'px';
+            
+            //ghostXOffset = intStartLeft - ghostPos.intElementLeft;
+            //ghostYOffset = intStartTop - ghostPos.intElementTop;
+            
+            document.body.addEventListener(evt.mousemove, dragMoveFunction(mousedownEvent, tree_name));
+            document.body.addEventListener(evt.mouseup, dragEndFunction(mousedownEvent, tree_name));
+        }
+    };
+    
+    // because on a phone, you might want to scroll: in the direction of the scrolling we make it so that
+    //      you can't trigger the ghost in the scroll direction (by making the threshold so high that you
+    //      can't really expect to cross over it)
+
+    var scrollDirection = 'vertical';
+
+    var leftPlay = (evt.touchDevice && scrollDirection === 'horizontal' ? 9999999999 : 3)
+      , topPlay = (evt.touchDevice && scrollDirection === 'vertical' ? 9999999999 : 3);
+    dragMoveFunction = function (event, tree_object_name) {
+        var jsnMousePos;
+        
+        if (event.which === 0 && !evt.touchDevice) {
+            event.preventDefault();
+            event.stopPropagation();
+            dragEndFunction();
+            
+        } else {
+            jsnMousePos = GS.mousePosition(event);
+            intCurrentLeft = jsnMousePos.left;
+            intCurrentTop = jsnMousePos.top;
+            
+            if (dragStarted === false &&
+                (
+                    (scrollDirection === 'horizontal' && container.scrollLeft === startScrollLeft) ||
+                    (scrollDirection === 'vertical' && container.scrollTop === startScrollTop)
+                ) &&
+                (
+                    Math.abs(intCurrentLeft - intStartLeft) > leftPlay
+                 || Math.abs(intCurrentTop - intStartTop) > topPlay
+                )) {
+                dragStarted = true;
+                
+                // if ghost is not appended yet: append to body
+                if (!ghost.parentNode || ghost.parentNode.nodeName !== 'BODY') {
+                    document.body.appendChild(ghost);
+                }
+                
+                GS.triggerEvent(container, 'ribbon-drag-start');
+            }
+            
+            if (dragStarted) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // style ghost
+                ghost.style.left = (intCurrentLeft) + 'px';
+                ghost.style.top = (intCurrentTop) + 'px';
+                
+                // move ace cursor
+                editor.selection.moveToPosition(editor.renderer.screenToTextCoordinates(intCurrentLeft, intCurrentTop));
+            }
+        }
+    };
+    
+    dragEndFunction = function (event, tree_object_name) {
+        //var editorPos = GS.getElementPositionData(document.getElementById('container'));
+        
+        // remove ghost
+        if (ghost.parentNode && ghost.parentNode.nodeName === 'BODY') {
+            ghost.parentNode.removeChild(ghost);
+        }
+        
+        // unbind mousemove and mouseup
+        document.body.removeEventListener(evt.mousemove, dragMoveFunction);
+        document.body.removeEventListener(evt.mouseup, dragEndFunction);
+        
+        // insert text to location (if the location is in the editor)
+        if (
+                dragStarted// &&
+                        // if mouse pos (x and y) is greater than the top left of the editor (x and y)
+                //intCurrentLeft > editorPos.intElementLeft &&
+                ///intCurrentTop > editorPos.intElementTop &&
+                        // and if mouse pos (x and y) is less than the bottom right of the editor (x and y)
+                ///intCurrentLeft < (editorPos.intElementLeft + editorPos.intElementWidth) &&
+                ///intCurrentTop < (editorPos.intElementTop + editorPos.intElementHeight)
+            ) {
+            
+            // add snippet text to editor
+            autocompleteGlobals.popupAce.insert(tree_object_name);
+            console.log(autocompleteGlobals.popupAce);
+            
+            // if we are not on a touch device: focus into editor
+            if (!evt.touchDevice) {
+                editor.focus();
+            }
+        }
+    };*/
 
     treeGlobals.aceSession.setMode('ace/mode/text');
     //treeGlobals.aceSession.setUseWrapMode('free');
@@ -229,11 +354,12 @@ function treeStart() {
         //});
     }
     
-    //treeGlobals.ace.renderer.setStyle("disabled", true);
+    treeGlobals.ace.renderer.setStyle("disabled", true);
     
-    //treeGlobals.ace.getSession().selection.on('changeSelection', function (e) {
-    //    treeGlobals.ace.getSession().selection.clearSelection();
-    //});
+        treeGlobals.ace.getSession().selection.on('changeSelection', function (e)
+    {
+        treeGlobals.ace.getSession().selection.clearSelection();
+    });
     
 
     // allow the user to scroll past the bottom of the ace so that when they are

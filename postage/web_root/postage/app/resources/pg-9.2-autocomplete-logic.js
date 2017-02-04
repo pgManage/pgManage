@@ -32,6 +32,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
         intStart           = rowAndColumnToIndex(strScript, currentQueryRange.start.row, currentQueryRange.start.column);
         strScript          = strScript.substring(intStart, intEndCursorPosition); //intCursorPosition + 1
         intCursorPosition -= intStart;
+
         
         // remove comments from the current query
         strScript = consumeComments(strScript);
@@ -158,6 +159,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             bolPreviousCharCloseParen = (strScript[intCursorPosition - 1] === ')');
             
             bolFirstSpace = bolCurrentCharWhitespace && !bolPreviousCharWhitespace;
+        
             
             // type autocomplete
             if (strScript[intCursorPosition] === ':' && strScript[intCursorPosition - 1] === ':') {
