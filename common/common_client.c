@@ -1808,7 +1808,7 @@ void client_close_timeout_prepare_cb(EV_P, ev_prepare *w, int revents) {
 		}
 
 #if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
-		if (client->bol_public == false) {
+		if (client->bol_public == false && bol_global_set_user == true) {
 			char *err = DB_cancel_query(client->conn);
 			if (err == NULL) {
 				ev_io_init(&client->io, client_close_cancel_query_cb, client->conn->int_sock, EV_READ);

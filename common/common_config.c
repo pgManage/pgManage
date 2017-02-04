@@ -17,6 +17,7 @@ char *str_global_public_username = NULL;
 char *str_global_public_password = NULL;
 
 DArray *darr_global_connection = NULL;
+bool bol_global_set_user = false;
 
 #ifdef ENVELOPE
 char *str_global_app_path = NULL;
@@ -326,6 +327,8 @@ bool parse_connection_file() {
 // Else, we check if it is user or password and
 // remove those (postage only) and keep the others
 #ifdef ENVELOPE
+					} else if (strncmp(ptr_temp, "user", 4) == 0) {
+						bol_global_set_user = true;
 #else
 					} else if (strncmp(ptr_temp, "user", 4) == 0 || strncmp(ptr_temp, "password", 8) == 0 ||
 							   strncmp(ptr_temp, "dbname", 6) == 0) {

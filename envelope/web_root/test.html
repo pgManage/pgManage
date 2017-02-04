@@ -272,20 +272,35 @@
 			['Login', 'ajax', 200, '/env/auth', 'action=login&connname=doesntexist&username=postgres&password=password',
 				ml(function () {/*{"stat": true, "dat": "/env/app/all/index.html"}*/ })],
 			['Login Fail 2', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=doesntexist&password=password',
-				ml(function () {/*"FATAL\nUser \"doesntexist\" does not exist."*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"doesntexist\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"doesntexist\"\n"*/ })
+			}],
 			['Login Fail 3', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=' + encodeURIComponent('test"test') +
 						'&password=' + encodeURIComponent('asdfasdfasdfasdfasdf'),
-							ml(function () {/*"FATAL\nUser \"test\"\"test\" does not exist."*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"test\"\"test\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test\"test\"\n"*/ })
+			}],
 			['Login Fail 4', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=' + encodeURIComponent('test"tes\'t2') +
 						'&password=' + encodeURIComponent('asdfasdfasdfasdfasdf'),
-							ml(function () {/*"FATAL\nUser \"test\"\"tes't2\" does not exist."*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"test\"\"tes't2\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test\"tes't2\"\n"*/ })
+			}],
 			['Login Fail 5', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=' + encodeURIComponent('test"test3') +
 						'&password=' + encodeURIComponent('asdfasdf\'asdf"asdfasdf'),
-				ml(function () {/*"FATAL\nUser \"test\"\"test3\" does not exist."*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"test\"\"test3\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test\"test3\"\n"*/ })
+			}],
 			['Login Fail 6', 'ajax', 500, '/env/auth', 'action=login&connname=test&password=' + encodeURIComponent('asdfasdf\'asdf"asdfasdf'),
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 7', 'ajax', 500, '/env/auth', 'action=login&connname=&username=password=asdfasdfasdfasdf',
-				 ml(function () {/*"FATAL\nUser \"password=asdfasdfasdfasdf\" does not exist."*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"password=asdfasdfasdfasdf\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:escape_conninfo_value: escape_conninfo_value: strlen = 0\nConnect failed: fe_sendauth: no password supplied\n"*/ })
+			}],
 			['Login Fail 8', 'ajax', 500, '/env/auth', 'action=login&connname=&username=&password=',
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 9', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=&password=',
@@ -295,25 +310,50 @@
 			['Login Fail 11', 'ajax', 500, '/env/auth', 'action=login',
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 12', 'ajax', 500, '/env/auth', 'action=login&connname=asdfadsf&username=postgres&password=fasdf',
-				ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })],
+			function (arg) {
+				console.warn('test2');
+				return arg === ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/ })
+			}],
 			['Login Fail 13 *', 'ajax spam', 500, '/env/auth', 'action=login&connname=test&username=postgres&password=fasdf',
-				ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/ })
+			}],
 			['Login Fail 14', 'ajax', 500, '/env/auth', 'action=login&connname=ip%20example&username=postgres&password=fasdf',
-				ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/ })
+			}],
 			['Login Fail 15', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=postgres&password=' + encodeURIComponent('test!@#$%^&*()|<>?,./:+-*/=ƒ©˙∆test'),
-				ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/ })
+			}],
 			['Login Fail 16', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=' + encodeURIComponent('test!@#$%^&*()|<>?,./:+-/*=ƒ©˙∆test') + '&password=testtest',
-				ml(function () {/*"FATAL\nUser \"test!@#$%^&*()|<>?,./:+-/*=ƒ©˙∆test\" does not exist."*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"test!@#$%^&*()|<>?,./:+-/*=ƒ©˙∆test\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test!@#$%^&*()|<>?,./:+-/*=ƒ©˙∆test\"\n"*/ })
+			}],
 			['Login Fail 17', 'ajax', 500, '/env/auth', 'action=' + encodeURIComponent('loginπ'),
 				ml(function () {/*"Not a valid action."*/ })],
 			['Login Fail 18', 'ajax', 500, '/env/auth', 'action=loginbasdf',
 				ml(function () {/*"Not a valid action."*/ })],
 			['Login Fail 19', 'ajax', 500, '/env/auth', 'action=login&connection=' + encodeURIComponent('π') + '&username=' + encodeURIComponent('π') + '&password=' + encodeURIComponent('π'),
-				ml(function () {/*"FATAL\nUser \"π\" does not exist."*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"π\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"π\"\n"*/ })
+			}],
 			['Login Fail 20', 'ajax', 500, '/env/auth', 'action=login&connection=' + encodeURIComponent('π\'π') + '&username=' + encodeURIComponent('π\'π') + '&password=' + encodeURIComponent('π'),
-				ml(function () {/*"FATAL\nUser \"π'π\" does not exist."*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"π'π\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"π'π\"\n"*/ })
+			}],
 			['Login Fail 21', 'ajax', 404, '/env/authasdf', '',
-				ml(function () {/*"The file you are requesting is not here."*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"The file you are requesting is not here."*/ })
+					|| arg === ml(function () {/*"FATAL\nFATAL\nConnect failed: fe_sendauth: no password supplied\n"*/ })
+			}],
 			['Login Fail 22', 'ajax', 500, '/env/auth', 'test=test&a@&#=te=st',
 				ml(function () {/*"Not a valid action."*/ })],
 			['Logout before login *', 'ajax spam', 200, '/env/auth', 'action=logout', ''],
@@ -339,10 +379,7 @@
 				ml(function () {/*{"stat": true, "dat": "/env/app/all/index.html"}*/ })],
 			
 			['File Read Fail 5', 'ajax', 500, '/env/0//index.html', '',
-				function (arg) {
-					return arg === ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0//index.html is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
-						|| arg === ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: 0\\\\index.html is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
-				}
+				ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0//index.html is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
 			],
 			['File Read Fail 6', 'ajax', 404, '/env/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/index.html', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
@@ -353,8 +390,8 @@
 			['File Read Fail 9', 'ajax', 500, '/env/0/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/index.html', '',
 				function (arg) {
 					console.warn('test2');
-					return ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/AS\nBad file path"*/ })
-						|| ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: 0\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\AS\nBad file path"*/ })
+					return arg === ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/index.html is a bad path. Path exceeds maximum length.\n\nBad file path"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: 0\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\AS\nBad file path"*/ })
 				}
 			],
 			['File Read 2', 'ajax', 200, '/test.txt', '',
@@ -1293,7 +1330,7 @@ RETURN	*
 
 
 */}),
-				["generate_series\ttest1\ttest2\nbigint\tunknown\tunknown\n","FATAL\nerror_text\tERROR:  could not write to tuplestore temporary file: No space left on device\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
+				["generate_series\ttest1\ttest2\nbigint\ttext\ttext\n","FATAL\nerror_text\tERROR:  could not write to tuplestore temporary file: No space left on device\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table

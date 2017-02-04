@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "http_auth.h"
 
 // response with redirect
@@ -178,16 +179,21 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SDEBUG("str_conn: %s", str_conn);
 
 #if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
-		// The only difference here is the callback and no user/pw
-		SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, NULL,
-			0, NULL, 0, "",
-			http_auth_login_step15)) != NULL,
-			"DB_connect failed");
-#else
+		SDEBUG("bol_global_set_user: %s", bol_global_set_user ? "true" : "false");
+		if (bol_global_set_user) {
+			// The only difference here is the callback and no user/pw
+			SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, NULL,
+				0, NULL, 0, "",
+				http_auth_login_step15)) != NULL,
+				"DB_connect failed");
+		} else {
+#endif
 		SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, client_auth->str_user,
 			client_auth->int_user_length, client_auth->str_password, client_auth->int_password_length, "",
 			http_auth_login_step2)) != NULL,
 			"DB_connect failed");
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
+		}
 #endif
 
 		SDEBUG("client_auth: %p", client_auth);
@@ -333,16 +339,20 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		}
 
 #if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
-		// The only difference here is the callback and no user/pw
-		SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, NULL,
-			0, NULL, 0, "",
-			http_auth_login_step15)) != NULL,
-			"DB_connect failed");
-#else
+		if (bol_global_set_user) {
+			// The only difference here is the callback and no user/pw
+			SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, NULL,
+				0, NULL, 0, "",
+				http_auth_login_step15)) != NULL,
+				"DB_connect failed");
+		} else {
+#endif
 		SFINISH_CHECK((client_auth->parent->conn = DB_connect(global_loop, client_auth, str_conn, client_auth->str_user,
 			client_auth->int_user_length, client_auth->str_password, client_auth->int_password_length, "",
 			http_auth_change_pw_step2)) != NULL,
 			"DB_connect failed");
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
+		}
 #endif
 
 #ifdef ENVELOPE
