@@ -32,10 +32,10 @@ function treeStart() {
     treeGlobals.ace = ace.edit('object-list-ace');
     treeGlobals.aceSession = treeGlobals.ace.getSession();
   
-    
+        
     // get and save state
     var elemPos = GS.getElementPositionData(document.getElementById('left-panel-body'));
-    //console.log(elemPos);
+    console.log(elemPos);
     var dragstartcursorX, dragstartcursorY;
     var strName;
     var ghost;
@@ -43,15 +43,6 @@ function treeStart() {
     var intSelectionTriggered = 0;
     var intSelectionRow;
     var bolSelectionTriggered;
-    var mouseMoveFunction;
-    
-
-        //document.addEventListener('mouseover', function (event) {
-        //    document.addEventListener('mousemove', function (event) {
-        //        console.log(xtag.query(document.body, '.current-tab')[0].relatedEditor.renderer.screenToTextCoordinates());
-        //        xtag.query(document.body, '.current-tab')[0].relatedEditor.moveCursorTo(xtag.query(document.body, '.current-tab')[0].relatedEditor.renderer.screenToTextCoordinates());
-        //    });
-        //});
     treeGlobals.ace.addEventListener('mousedown', function (event) {
         var stateMoveFunction;
         var stateEndFunction;
@@ -69,35 +60,6 @@ function treeStart() {
         //console.log(event);
         //console.log(GS.mousePosition(event));
 
-
-
-    mouseMoveFunction = function (event) {
-        var cursorX, cursorY;
-        // get cursor position (x/y)
-        cursorX = event.clientX;
-    	cursorY = event.clientY;
-    	
-    	if (xtag.query(document.body, '.current-tab')[0] !== undefined){
-            // move ace cursor
-            xtag.query(document.body, '.current-tab')[0].relatedEditor.selection.moveToPosition(xtag.query(document.body, '.current-tab')[0].relatedEditor.renderer.screenToTextCoordinates(cursorX, cursorY));
-    	}
-    	//console.log(cursorX);
-    	//console.log(cursorY);
-    	// set ghost position to cursor position (x/y) with changes to center it
-        ghost.style.left = (cursorX - ((strName.length * 3) + 5)) + 'px';
-        ghost.style.top = (cursorY - 10) + 'px';
-        
-        
-        //console.log(cursorX, cursorX, dragstartcursorX, dragstartcursorY);
-        // after moving ten pixels:
-        if (cursorX <= (dragstartcursorX - 10) || cursorX >= (dragstartcursorX + 10) || (cursorY <= dragstartcursorY - 10) || cursorY >= (dragstartcursorY + 10)) {
-            // clear selection
-            treeGlobals.ace.getSession().selection.clearSelection();
-        }
-    }
-
-
-        
         // this handles mouseup out of the window by running
         //      the end function if the mouse moves while it is up
         stateMoveFunction = function (event) {
@@ -138,17 +100,13 @@ function treeStart() {
             }
             
             // remove ghost if appended
-            if (ghost && ghost.parentNode && ghost.parentNode.nodeName === 'BODY') {
+            if (ghost.parentNode && ghost.parentNode.nodeName === 'BODY') {
                 ghost.parentNode.removeChild(ghost);
             }
             
-            
-        strName = '';
         // unbind mousemove and mouseup
         document.body.removeEventListener(evt.mousemove, stateMoveFunction);
         document.body.removeEventListener(evt.mouseup, stateEndFunction);
-        //console.log('1');
-        document.body.removeEventListener('mousemove', mouseMoveFunction);
         };
 
         document.body.addEventListener(evt.mousemove, stateMoveFunction);
@@ -172,29 +130,25 @@ function treeStart() {
 
             //console.log(bolMousedown, intSelectionRow, treeGlobals.data[intSelectionRow]);
             //console.log(jsnData);
+            
             // tables
-            if (jsnData) {
-                if (jsnData.query === 'objectTable') {
-                    strName = jsnData.schemaName + '.' + jsnData.name.substring(3);
-                // views
-                } else if (jsnData.query === 'objectView') {
-                    strName = jsnData.schemaName + '.' + jsnData.name.substring(3);
-                // non-schema objects (functions, sequences, etc...)
-                } else if (jsnData.schemaName && jsnData.schemaOID && jsnData.oid !== jsnData.schemaOID) {
-                    strName = jsnData.schemaName + '.' + jsnData.name;
-                // schemas
-                } else if (!jsnData.schemaName && jsnData.oid) { // schemas use .name for their name, not .schemaName
-                    strName = jsnData.name;
-                // columns
-                }if (jsnData.type === '') {
-                    strName = jsnData.name;
-                    // substring column type off of column name
-                    subStrEnd = strName.lastIndexOf(' (');
-                    strName = strName.substring(0, subStrEnd);
-                }
-                if (strName) {
-                    document.body.addEventListener('mousemove', mouseMoveFunction);
-                }
+            if (jsnData.query === 'objectTable') {
+                strName = jsnData.schemaName + '.' + jsnData.name.substring(3);
+            // views
+            } else if (jsnData.query === 'objectView') {
+                strName = jsnData.schemaName + '.' + jsnData.name.substring(3);
+            // non-schema objects (functions, sequences, etc...)
+            } else if (jsnData.schemaName && jsnData.schemaOID && jsnData.oid !== jsnData.schemaOID) {
+                strName = jsnData.schemaName + '.' + jsnData.name;
+            // schemas
+            } else if (!jsnData.schemaName && jsnData.oid) { // schemas use .name for their name, not .schemaName
+                strName = jsnData.name;
+            // columns
+            }if (jsnData.type === '') {
+                strName = jsnData.name;
+                // substring column type off of column name
+                subStrEnd = strName.lastIndexOf(' (');
+                strName = strName.substring(0, subStrEnd);
             }
             
             if (strName) {
@@ -214,9 +168,31 @@ function treeStart() {
                 // if ghost is not appended yet: append to body
                 if (!ghost.parentNode || ghost.parentNode.nodeName !== 'BODY') {
                     document.body.appendChild(ghost);
+                    var cursorX, cursorY;
+                    
+                    
+                    // on mousemove:
+                    document.body.addEventListener('mousemove', function (event) {
+                        // get cursor position (x/y)
+                        cursorX = (window.Event) ? event.pageX : event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
+                    	cursorY = (window.Event) ? event.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+                    	//console.log(cursorX);
+                    	//console.log(cursorY);
+                    	// set ghost position to cursor position (x/y) with changes to center it
+                        ghost.style.left = (cursorX - ((strName.length * 3) + 5)) + 'px';
+                        ghost.style.top = (cursorY - 10) + 'px';
+                        
+                        
+                        //console.log(cursorX, cursorX, dragstartcursorX, dragstartcursorY);
+                        // after moving ten pixels:
+                        if (cursorX <= (dragstartcursorX - 10) || cursorX >= (dragstartcursorX + 10) || (cursorY <= dragstartcursorY - 10) || cursorY >= (dragstartcursorY + 10)) {
+                            // clear selection
+                            treeGlobals.ace.getSession().selection.clearSelection();
+                        }
+                    });
+                    //intCurrentLeft = jsnMousePos.left;
+                    //intCurrentTop = jsnMousePos.top;
                 }
-                //intCurrentLeft = jsnMousePos.left;
-                //intCurrentTop = jsnMousePos.top;
                 
                 
                 //document.body.addEventListener('mouseup', dragEndFunction(strName));
