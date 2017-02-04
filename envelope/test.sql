@@ -84,7 +84,7 @@ CREATE VIEW ttesting_large_view AS
 		LEFT JOIN rtesting_large_table AS rtesting_large_table1 ON rtesting_large_table0.test1 = rtesting_large_table1.test1
 		WHERE rtesting_large_table0.id < 50;
 
-INSERT INTO rtesting_large_table (id, test1, test2) 
+INSERT INTO rtesting_large_table (id, test1, test2)
 	SELECT generate_series, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg', ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj'
 		FROM generate_series(1, 1000);
 
@@ -93,6 +93,6 @@ INSERT INTO rtesting_large_table (id, test1, test2)
 
 
 
-
-
-
+CREATE VIEW ttesting_extra_large_view_generate_series AS
+	SELECT generate_series, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg' AS test1, ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj' AS test2
+		FROM generate_series(1, 10000000000);
