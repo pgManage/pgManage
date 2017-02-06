@@ -851,15 +851,15 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                         tabElement.innerRenameControl.oldValue = tabElement.innerRenameControl.value;
 
                         // update href of download script button (we want to use an anchor for that button because it's native)
-						if (window.process && window.process.type === 'renderer') {
-							tabElement.relatedDownloadButton.setAttribute('data-filename', tabElement.filePath);
-							tabElement.relatedDownloadButton2.setAttribute('data-filename', tabElement.filePath);
-						} else {
-	                        tabElement.relatedDownloadButton.setAttribute(
-	                            'href',
-	                            '/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/')
-	                        );
-						}
+                        if (window.process && window.process.type === 'renderer') {
+                            tabElement.relatedDownloadButton.setAttribute('data-filename', tabElement.filePath);
+                            tabElement.relatedDownloadButton2.setAttribute('data-filename', tabElement.filePath);
+                        } else {
+                            tabElement.relatedDownloadButton.setAttribute(
+                                'href',
+                                '/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/')
+                            );
+                        }
 
                     }
 

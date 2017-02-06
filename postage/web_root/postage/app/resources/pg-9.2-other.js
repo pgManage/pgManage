@@ -128,6 +128,7 @@ function startPanelResize(target) {
     };
 
     dragEndFunction = function (event) {
+        elemPos = GS.getElementPositionData(document.getElementById('left-panel-body'));
         // save new width to cookie
         localStorage.leftPanelWidth = target.style.width;
 

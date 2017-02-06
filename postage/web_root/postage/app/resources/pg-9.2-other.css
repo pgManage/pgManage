@@ -489,6 +489,7 @@ gs-button.button-save-as .save-as-pencil {
     background-color: #f9f8f8;
     margin-bottom: 0.25em;
     padding: 0.25em;
+    white-space: pre-wrap;
 }
 
 .notify-message:not(.text-right) .notify-message-inner {

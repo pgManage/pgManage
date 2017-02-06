@@ -1474,6 +1474,7 @@ window.addEventListener('load', function () {
                                 });
                                 
                                 // because there is a lot to bind for the ribbon choices (and we bind the ribbon buttons
+
                                 //      in multiple places), we call this function to do the dirty work
                                 bindRibbonChoices('ribbon-dialog-content', 'vertical');
                             });
@@ -1486,6 +1487,42 @@ window.addEventListener('load', function () {
                         function bindRibbonChoices(strContainerID, scrollDirection) {
                             var container = document.getElementById(strContainerID)
                               , dragStartFunction, dragMoveFunction, dragEndFunction;
+                            
+                            
+                            // how the drag functionality works:
+                            //      the target element is bound on mousedown to do five things:
+                            //          create ghost element (
+                            //              this is feedback for the user that they are dragging something,
+                            //              it also reminds the user what they are dragging
+                            //          )
+                            //          save origin point (
+                            //              this is a generally useful data point,
+                            //              you can say "if i'm with N pixels of the origin when I mouseup: cancel action"
+                            //          )
+                            //          calculate drag offset (
+                            //              when you drag an element,
+                            //              you don't drag it from the very top-left corner,
+                            //              the offset is the X/Y of the element minus the X/Y of the mouse inside the element
+                            //          )
+                            //          bind mousemove (
+                            //              it's bound to the body,
+                            //              this is because when you drag,
+                            //              you may go outside the drag area,
+                            //              but you don't won't the user to get confused when their ghost won't move (because you're outside the drag area)
+                            //          )
+                            //          bind mouseup (
+                            //              it's bound to the body,
+                            //              this is so that the user can cancel the drag by dropping outside the drag area,
+                            //              this also unbinds mousemove and mouseup
+                            //          )
+                            //      mousemove and mouseup are bound on mousedown and unbound in a couple cases:
+                            //          mouseup on the body
+                            //          mouse not down during mousemove (
+                            //              this takes care of the case where the user lets go of the mouse off of the window,
+                            //              this only applies to non-touch devices because you can't leave the screen on a touch device without triggering a mouseup
+                            //          )
+                            //      the reason we bind/unbind mousemove/mouseup dynamically is because we don't want that code slowing down the page if it isn't doing anything
+                            //      the mousemove/mouseup event code is defined as a function so that we can bind and unbind with one line and so that we can run the mouseup function if the user triggers mousemove when the mouse isn't down
                             
                             var ghost, ghostXOffset, ghostYOffset
                               , intStartLeft, intStartTop, intCurrentLeft, intCurrentTop

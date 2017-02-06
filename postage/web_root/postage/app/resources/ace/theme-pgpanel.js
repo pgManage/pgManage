@@ -14,7 +14,7 @@ var pgPanelCSSText = ml(function () {/*
     .ace-pgpanel .ace_cursor {
         color: #000000
     }
-    .ace-pgpanel .ace_marker-layer .ace_selection {
+    .XLD_ace-pgpanel .XLD_ace_marker-layer .XLD_ace_selection {
         background: #BDD5FC
     }
     .ace-pgpanel.ace_multiselect .ace_selection.ace_start {
