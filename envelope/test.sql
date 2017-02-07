@@ -102,8 +102,4 @@ $BODY$ LANGUAGE plpgsql VOLATILE;
 
 CREATE VIEW ttesting_large_view2 AS
 	SELECT generate_series AS id, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg'::text AS test1, ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj'::text AS test2
-		FROM generate_series(1, 1000);
-
-CREATE VIEW ttesting_extra_large_view_generate_series AS
-	SELECT generate_series, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg'::text AS test1, ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj'::text AS test2
-		FROM generate_series(1, 10000000000);
+		FROM generate_series(1, 5000);

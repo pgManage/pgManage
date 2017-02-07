@@ -1324,13 +1324,6 @@ id DESC; DROP TABLE rtesting_table
 					]
 				]
 			],
-			['SELECT FAIL 4', 'websocket', '', ml(function () {/*SELECT	ttesting_extra_large_view_generate_series
-RETURN	*
-
-
-
-*/}),
-				["generate_series\ttest1\ttest2\nbigint\ttext\ttext\n","FATAL\nerror_text\tERROR:  could not write to tuplestore temporary file: No space left on device\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table
@@ -1648,6 +1641,7 @@ id
 				['Rows Affected\n2\n', 'TRANSACTION COMPLETED']],
 			['COMMIT', 'websocket', '', ml(function () {/*COMMIT*/ }),
 				['OK']],
+			['WEBSOCKET SEND FROM', 'websocket send from', '', '', ''],
 			['WEBSOCKET CLOSE', 'websocket end', '', '', ''],
 
 			['Logout', 'ajax', 200, '/env/auth', 'action=logout',
@@ -2071,6 +2065,22 @@ id
 							}
 							i += 1;
 						});
+					} else if (strType === 'websocket send from') {
+						change_status(intCurrent, 'waiting', 'running');
+						GS.closeSocket(GS.envSocket);
+						GS.envSocket = GS.openSocket('env');
+						i = 0;
+						GS.requestFromSocket(GS.envSocket, 'SELECT\tpublic\tttesting_large_view2\nRETURN\t*\n\n\n', function (data) {
+							i += 1;
+							if (i % 50 == 0) {
+								GS.envSocket.close();
+							}
+							if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+								change_status(intCurrent, 'running', 'pass');
+								run_test(intCurrent + 1);
+							}
+						});
+						
 					} else if (strType === 'websocket end') {
 						change_status(intCurrent, 'waiting', 'running');
 						var i = 0;
@@ -2079,7 +2089,7 @@ id
 							if (i === 3) {
 
 								GS.closeSocket(GS.envSocket);
-
+								
 								GS.envSocket = GS.openSocket('/env/1/env');
 								var j = 0;
 								GS.requestFromSocket(GS.envSocket, 'INFO\n', function (data, error, errorData) {

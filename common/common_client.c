@@ -305,6 +305,8 @@ void client_cb(EV_P, ev_io *w, int revents) {
 	SDEBUG("revents: %x", revents);
 	SDEBUG("EV_READ: %s", revents & EV_READ ? "true" : "false");
 	SDEBUG("EV_WRITE: %s", revents & EV_WRITE ? "true" : "false");
+	SDEBUG("client->bol_handshake: %s", client->bol_handshake ? "true" : "false");
+	SDEBUG("client->bol_connected: %s", client->bol_connected ? "true" : "false");
 
 	// we haven't done the handshake yet
 	if (client->bol_handshake == false) {
@@ -575,7 +577,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 							client->cur_request->parent = client;
 						}
 						session_client->cur_request = NULL;
-						SDEBUG("client->str_request: %p", client->str_request);
+						SDEBUG("client->cur_request: %p", client->cur_request);
 
 						client->que_request = session_client->que_request;
 						session_client->que_request = NULL;
@@ -620,7 +622,8 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				SDEBUG("client->str_request: %p", client->str_request);
 
 				if (client->conn != NULL) {
-					DB_finish(client->conn);
+					//DB_finish(client->conn);
+					client->bol_connected = true;
 				}
 
 				if (client->conn == NULL) {
@@ -1019,7 +1022,9 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 			SFREE(str_transaction_id);
 
 		} else if (strcmp(str_first_word, "SEND") == 0) {
+			SDEBUG("client->cur_request: %p", client->cur_request);
 			if (client->cur_request != NULL) {
+				SDEBUG("client->cur_request->arr_response: %p", client->cur_request->arr_response);
 				if (client->cur_request->arr_response != NULL) {
 					client_copy_check = NULL;
 					SERROR_SALLOC(client_copy_check, sizeof(struct sock_ev_client_copy_check));
@@ -1029,9 +1034,12 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 					client_copy_check->int_len = DArray_end(client->cur_request->arr_response) + 1;
 					SDEBUG("client_copy_check->int_i  : %d", client_copy_check->int_i);
 					SDEBUG("client_copy_check->int_len: %d", client_copy_check->int_len);
+					SDEBUG("client_request            : %p", client_request);
 					client_copy_check->client_request = client->cur_request;
 					ev_check_init(&client_copy_check->check, client_send_from_cb);
 					ev_check_start(EV_A, &client_copy_check->check);
+					increment_idle(EV_A);
+					client->client_copy_check = client_copy_check;
 				}
 			}
 
@@ -1116,9 +1124,14 @@ void client_send_from_cb(EV_P, ev_check *w, int revents) {
 				ev_io_start(EV_A, (ev_io *)client->client_paused_request->watcher);
 			}
 			ev_feed_event(EV_A, client->client_paused_request->watcher, client->client_paused_request->revents);
-			client->client_paused_request = NULL;
+			if (client->client_paused_request->bol_is_db_framework) {
+				increment_idle(EV_A);
+			}
+			SFREE(client->client_paused_request);
 		}
 		ev_check_stop(EV_A, w);
+		decrement_idle(EV_A);
+		client->client_copy_check = NULL;
 		SFREE(client_copy_check);
 	}
 }
@@ -1613,6 +1626,7 @@ bool _close_client_if_needed(struct sock_ev_client *client, ev_watcher *watcher,
 	SDEBUG("close_client_if_needed(client: %p, watcher: %p, revents: %d)", client, watcher, revents);
 	SDEBUG("Client %p->bol_is_open == %s", client, client->bol_is_open ? "true" : "false");
 	SDEBUG("Client %p->int_sock == %d", client, client->_int_sock);
+	SDEBUG("client->cur_request: %p", client->cur_request);
 	if (client->bol_is_open == false || !socket_is_open(client->_int_sock)) {
 		SDEBUG("Client %p closed", client);
 		if (client->client_paused_request != NULL) {
@@ -1621,6 +1635,7 @@ bool _close_client_if_needed(struct sock_ev_client *client, ev_watcher *watcher,
 		SERROR_SALLOC(client->client_paused_request, sizeof(struct sock_ev_client_paused_request));
 		client->client_paused_request->watcher = watcher;
 		client->client_paused_request->revents = revents;
+		client->bol_fast_close = false;
 		client_close(client);
 		bol_error_state = false;
 		return true;
@@ -1750,9 +1765,11 @@ bool client_close(struct sock_ev_client *client) {
 	if (client_node != NULL && (client->bol_handshake == true || client->bol_is_open == true)) {
 		client->bol_is_open = false;
 		if (client->bol_handshake == false || bol_authorized == false) {
+			SDEBUG("client_close_immediate");
 			client_close_immediate(client);
 		} else {
 			if (client->client_timeout_prepare == NULL) {
+				SDEBUG("delay client_close_immediate");
 				SINFO("test1: %p", client);
 				SERROR_SALLOC(client->client_timeout_prepare, sizeof(struct sock_ev_client_timeout_prepare));
 				client->client_timeout_prepare->close_time = ev_now(global_loop);
@@ -1791,6 +1808,7 @@ void client_close_timeout_prepare_cb(EV_P, ev_prepare *w, int revents) {
 	// DEBUG("ev_now(EV_A)                                                 : %f",
 	// ev_now(EV_A));
 
+	SDEBUG("client->bol_fast_close: %s", client->bol_fast_close ? "true" : "false");
 	ev_io_stop(EV_A, &client_timeout_prepare->parent->io);
 	if ((client_timeout_prepare->close_time + 10) <= ev_now(EV_A) ||
 		(client->bol_fast_close && (client->que_message == NULL || client->que_message->first == NULL))) {
@@ -1883,6 +1901,9 @@ void client_close_immediate(struct sock_ev_client *client) {
 		DB_free_result(client->client_copy_check->res);
 		SFREE(client->client_copy_check->str_response);
 		SFREE(client->client_copy_check);
+	}
+	if (client->client_paused_request != NULL && client->client_paused_request->bol_is_db_framework) {
+		client->client_paused_request->watcher = NULL;
 	}
 	if (client->conn != NULL) {
 		SDEBUG("DB_conn %p closing", client->conn);

@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "db_framework.h"
 
 const char *const WONT_GUESS = "____GS_YOU_WONT_GUESS_THIS_DATA_JHDFKSHDFURIHKSDJFHUIRSDJHF____";
@@ -897,7 +896,9 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 		int_status = PQgetCopyData(copy_check->conn->conn, buffer_ptr_ptr, 0);
 		// continue copying
 		if (int_status > 0) {
-			copy_check->copy_cb(EV_A, true, false, copy_check->cb_data, *buffer_ptr_ptr, strlen(*buffer_ptr_ptr));
+			if (copy_check->copy_cb(EV_A, true, false, copy_check->cb_data, *buffer_ptr_ptr, strlen(*buffer_ptr_ptr)) == false) {
+				break;
+			}
 
 			// fail
 		} else if (int_status == -2) {

@@ -290,6 +290,13 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 	SDEBUG("str_response: %s", str_response);
 	size_t int_response_len = 0;
 
+	if (close_client_if_needed(client_request->parent, (ev_watcher *)&client_request->parent->conn->copy_check->check, EV_CHECK)) {
+		ev_check_stop(EV_A, &client_request->parent->conn->copy_check->check);
+		client_request->parent->client_paused_request->bol_is_db_framework = true;
+		decrement_idle(EV_A);
+		return false;
+	}
+
 	if (bol_success) {
 		if (client_request->str_current_response == NULL && !bol_last) {
 			SDEBUG("Build Message Headers...");
