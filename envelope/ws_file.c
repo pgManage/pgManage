@@ -551,28 +551,44 @@ finish:
 		client_request->int_response_id = (ssize_t)DArray_end(client_request->arr_response) + 1;
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-		char *_str_response = NULL;
-		SFINISH_SNCAT(
-			str_response, &int_response_len,
-			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
-			"\012responsenumber = ", (size_t)18,
-			str_temp, strlen(str_temp),
-			"\012FATAL\012", (size_t)7,
-			"Failed to list directory ", (size_t)25,
-			client_file->str_path, strlen(client_file->str_path),
-			": ", (size_t)2,
-			strerror(errno), strlen(strerror(errno))
-		);
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, _str_response, int_response_len);
-		DArray_push(client_request->arr_response, _str_response);
+		if (errno != 0) {
+			SFREE(str_response);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012FATAL\012", (size_t)7,
+				"Failed to list directory ", (size_t)25,
+				client_file->str_path, strlen(client_file->str_path),
+				": ", (size_t)2,
+				strerror(errno), strlen(strerror(errno))
+			);
+		} else {
+			char *_str_response = str_response;
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp, strlen(str_temp),
+				"\012", (size_t)1,
+				_str_response, strlen(_str_response)
+			);
+			SFREE(_str_response);
+		}
+
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
+		DArray_push(client_request->arr_response, str_response);
 
 		if (client_file->arr_contents != NULL) {
 			DArray_clear_destroy(client_file->arr_contents);
 			client_file->arr_contents = NULL;
 		}
+	} else {
+		SFREE(str_response);
 	}
-	SFREE(str_response);
 	ws_file_free(client_file);
 	return true;
 }

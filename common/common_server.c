@@ -56,7 +56,6 @@ void server_cb(EV_P, ev_io *w, int revents) {
 		client->_int_sock = int_client_sock;
 		client->int_sock = (int)int_client_sock;
 		client->server = server;
-		client->bol_fast_close = false;
 		client->int_last_activity_i = -1;
 		client->node = server->list_client->last;
 		client->bol_handshake = false;

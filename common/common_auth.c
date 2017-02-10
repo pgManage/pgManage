@@ -202,6 +202,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	}
 
 	if (client->bol_public) {
+		SFREE(str_username);
 		SFINISH_SNCAT(str_username, &client->int_username_len,
 			str_global_public_username, strlen(str_global_public_username));
 		int_user_length = strlen(str_global_public_username);

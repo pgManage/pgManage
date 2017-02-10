@@ -89,17 +89,6 @@ INSERT INTO rtesting_large_table (id, test1, test2)
 	SELECT generate_series, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg', ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj'
 		FROM generate_series(1, 1000);
 
-
-
-CREATE OR REPLACE FUNCTION public.sleep()
-RETURNS text AS
-$BODY$
-BEGIN
-PERFORM pg_sleep(1);
-RETURN '1';
-END
-$BODY$ LANGUAGE plpgsql VOLATILE;
-
 CREATE VIEW ttesting_large_view2 AS
 	SELECT generate_series AS id, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg'::text AS test1, ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj'::text AS test2
-		FROM generate_series(1, 5000);
+		FROM generate_series(1, 200);

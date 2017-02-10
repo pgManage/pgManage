@@ -111,6 +111,7 @@ struct sock_ev_client {
 	char *str_conn;
 	char *str_cookie;
 	char *str_cookie_name;
+	char *str_session_id;
 
 	size_t int_username_len;
 	size_t int_database_len;
@@ -138,9 +139,9 @@ struct sock_ev_client {
 	int int_sock;
 	struct sock_ev_serv *server;
 	struct tls *tls_postage_io_context;
-	bool bol_fast_close;
 
 	char *str_message;
+	size_t int_message_len;
 	char *str_notice;
 
 	Queue *que_message;

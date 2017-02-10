@@ -547,6 +547,23 @@ File already exists.*/})],
 					"TRANSACTION COMPLETED"
 				]
 			],
+			['Logout', 'ajax', 200, '/env/auth', 'action=logout',
+				ml(function () {/*<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<head><script>window.open('/', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })],
+			['Login 5', 'ajax', 200, '/env/auth', 'action=login&connname=test&username=test_user&password=password',
+				ml(function () {/*{"stat": true, "dat": "/env/app/all/index.html"}*/ })],
+			['WEBSOCKET OPEN W/INFO ACTION', 'websocket start', '', '', ''],
+			['APP FILE LIST FAIL 14', 'websocket', '', 'FILE\tLIST\t/app/thisgroupdoesntexist_g',
+				["You don't have the necessary permissions for this folder."]
+			],
+			['Logout', 'ajax', 200, '/env/auth', 'action=logout',
+				ml(function () {/*<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<head><script>window.open('/', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })],
+			['Login 6', 'ajax', 200, '/env/auth', 'action=login&connname=test&username=postgres&password=password',
+				ml(function () {/*{"stat": true, "dat": "/env/app/all/index.html"}*/ })],
+			['WEBSOCKET OPEN W/INFO ACTION', 'websocket start', '', '', ''],
 			['APP FILE LIST', 'websocket', '', 'FILE\tLIST\t/',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE LIST', 'websocket', '', 'FILE\tLIST\t/app',
@@ -2070,14 +2087,52 @@ id
 						GS.closeSocket(GS.envSocket);
 						GS.envSocket = GS.openSocket('env');
 						i = 0;
+						var test_data = '';
 						GS.requestFromSocket(GS.envSocket, 'SELECT\tpublic\tttesting_large_view2\nRETURN\t*\n\n\n', function (data) {
+							test_data += data;
 							i += 1;
-							if (i % 50 == 0) {
+							if (i < 10 || i % 50 == 0) {
 								GS.envSocket.close();
 							}
 							if (data.indexOf('TRANSACTION COMPLETED') > -1) {
-								change_status(intCurrent, 'running', 'pass');
-								run_test(intCurrent + 1);
+								test_data = test_data.split('\n');
+								test_data.shift();
+								test_data.shift();
+								test_data.pop();
+								test_data = 'id\ttest_name\ttest_name2\n' + '1' + test_data.join('\n1');
+								i = 0;
+								GS.requestBegin(GS.envSocket, function (transactionid) {
+									GS.requestFromSocket(GS.envSocket, 'INSERT\tpublic\trtesting_table\nRETURN\tid\ttest_name\ttest_name2\nPK\tid\nSEQ\t\n\n' + test_data + '\n', function (data) {
+										i += 1;
+										if (i < 10 || i % 50 == 0) {
+											GS.envSocket.close();
+										}
+										if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+											i = 0;
+											GS.requestFromSocket(GS.envSocket, 'UPDATE\tpublic\trtesting_table\nRETURN\tid\ttest_name\ttest_name2\n\npk\tset\tset\n' + test_data + '\n', function (data) {
+												i += 1;
+												if (i < 10 || i % 50 == 0) {
+													GS.envSocket.close();
+												}
+												if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+													i = 0;
+													GS.requestFromSocket(GS.envSocket, 'DELETE\tpublic\trtesting_table\n\npk\tpk\tpk\n' + test_data, function (data) {
+														i += 1;
+														if (i < 2) {
+															GS.envSocket.close();
+														}
+														if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+															GS.requestRollback(GS.envSocket, transactionid, function () {
+																change_status(intCurrent, 'running', 'pass');
+																run_test(intCurrent + 1);
+															});
+														}
+													});
+												}
+											});
+										}
+									});
+								});
 							}
 						});
 						

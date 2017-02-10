@@ -554,6 +554,7 @@ CREATE TABLE rtesting_table
 (
 id integer,
 test_name character varying(150),
+test_name2 character varying(150),
 "select" character varying(150),
 "test@test" character varying(150),
 CONSTRAINT rtesting_table_pk PRIMARY KEY (id)
@@ -633,7 +634,7 @@ NOTIFY postgres, 'testing';
 					"START",
 					"END",
 					"Rows Affected\n0\n",
-					"QUERY\t\\nCREATE TABLE rtesting_table\\n(\\nid integer,\\ntest_name character varying(150),\\n\"select\" character varying(150),\\n\"test@test\" character varying(150),\\nCONSTRAINT rtesting_table_pk PRIMARY KEY (id)\\n) WITH (\\nOIDS=FALSE\\n);",
+					"QUERY\t\\nCREATE TABLE rtesting_table\\n(\\nid integer,\\ntest_name character varying(150),\\ntest_name2 character varying(150),\\n\"select\" character varying(150),\\n\"test@test\" character varying(150),\\nCONSTRAINT rtesting_table_pk PRIMARY KEY (id)\\n) WITH (\\nOIDS=FALSE\\n);",
 					"START",
 					"END",
 					"Rows Affected\n0\n",
@@ -2335,6 +2336,7 @@ Bobbie
 			],
 			['COMMIT', 'websocket', '', ml(function () {/*COMMIT*/ }),
 			['OK']],
+			['WEBSOCKET SEND FROM', 'websocket send from', '', '', ''],
 			['WEBSOCKET CLOSE', 'websocket end', '', '', ''],
 			['Logout', 'ajax', 200, '/postage/auth', 'action=logout',
 				ml(function () {/*<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -2782,6 +2784,68 @@ Bobbie
 						}
 					}
 				});
+			} else if (strType === 'websocket send from') {
+				change_status(intCurrent, 'waiting', 'running');
+				GS.closeSocket(GS.envSocket);
+				GS.envSocket = GS.openSocket('env');
+				i = 0;
+				var test_data = '';
+				GS.requestFromSocket(GS.envSocket, 'SELECT\tpublic\tttesting_large_view2\nRETURN\t*\n\n\n', function (data) {
+					test_data += data;
+					i += 1;
+					if (i < 10 || i % 50 == 0) {
+						GS.envSocket.close();
+					}
+					if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+						test_data = test_data.split('\n');
+						test_data.shift();
+						test_data.shift();
+						test_data.pop();
+						test_data = 'id\ttest_name\ttest_name2\n' + '1' + test_data.join('\n1');
+						i = 0;
+						GS.requestBegin(GS.envSocket, function (transactionid) {
+							GS.requestFromSocket(GS.envSocket, 'INSERT\tpublic\trtesting_table\nRETURN\tid\ttest_name\ttest_name2\nPK\tid\nSEQ\t\n\n' + test_data + '\n', function (data) {
+								i += 1;
+								if (i < 10 || i % 50 == 0) {
+									GS.envSocket.close();
+								}
+								if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+									i = 0;
+									GS.requestFromSocket(GS.envSocket, 'UPDATE\tpublic\trtesting_table\nRETURN\tid\ttest_name\ttest_name2\n\npk\tset\tset\n' + test_data + '\n', function (data) {
+										i += 1;
+										if (i < 10 || i % 50 == 0) {
+											GS.envSocket.close();
+										}
+										if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+											i = 0;
+											GS.requestFromSocket(GS.envSocket, 'DELETE\tpublic\trtesting_table\n\npk\tpk\tpk\n' + test_data, function (data) {
+												i += 1;
+												if (i < 2) {
+													GS.envSocket.close();
+												}
+												if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+													GS.requestRollback(GS.envSocket, transactionid, function () {
+														GS.requestFromSocket(GS.envSocket, 'RAW\nSELECT *\n\tFROM public.rtesting_table', function (data) {
+															i += 1;
+															if (i < 10 || i % 50 == 0) {
+																GS.envSocket.close();
+															}
+															if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+																change_status(intCurrent, 'running', 'pass');
+																run_test(intCurrent + 1);
+															}
+														});
+													});
+												}
+											});
+										}
+									});
+								}
+							});
+						});
+					}
+				});
+				
 			} else if (strType === 'websocket cancel') {
 				arrCurrent[3] = arrCurrent[3].replace(/\r\n/gi, '\n');
 				strArgs = arrCurrent[3];

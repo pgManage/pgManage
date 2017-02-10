@@ -51,6 +51,7 @@ extern char *str_global_role_path;
 #else
 extern char *str_global_sql_root;
 #endif
+extern uint64_t int_global_session_id;
 
 extern char cwd[1024];
 #ifdef _WIN32

@@ -578,7 +578,6 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 						strcmp(other_client->str_cookie, client_auth->str_cookie_encrypted) == 0 &&
 						strcmp(other_client->str_client_ip, client_auth->parent->str_client_ip) == 0) {
 						client_timeout_prepare_free(other_client->client_timeout_prepare);
-						other_client->bol_fast_close = true;
 						SDEBUG("node->next: %p", node->next);
 						node = node->next;
 						client_close_immediate(other_client);
@@ -634,7 +633,6 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 			"\015\012\015\012", (size_t)4
 		);
 #endif
-		//client_auth->parent->bol_fast_close = true;
 		SFREE_PWORD(str_form_data);
 	} else {
 		SNOTICE("REQUEST TYPE: Not a valid action.");
