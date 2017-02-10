@@ -47,13 +47,7 @@ function treeStart() {
     var strNameOpt;
     var cursorX, cursorY;
     
-        //document.addEventListener('mouseover', function (event) {
-        //    document.addEventListener('mousemove', function (event) {
-        //        console.log(xtag.query(document.body, '.current-tab')[0].relatedEditor.renderer.screenToTextCoordinates());
-        //        xtag.query(document.body, '.current-tab')[0].relatedEditor.moveCursorTo(xtag.query(document.body, '.current-tab')[0].relatedEditor.renderer.screenToTextCoordinates());
-        //    });
-        //});
-        
+
     document.addEventListener('keydown', function (event) {
         if (event.keyCode === 18) {
             bolOptionPressed = true;
@@ -87,13 +81,10 @@ function treeStart() {
     	// save origin point so you can cancel selection of tree view
         dragstartcursorX = event.clientX;
     	dragstartcursorY = event.clientY;
-        //console.log(event);
-        //console.log(GS.mousePosition(event));
 
 
 
     mouseMoveFunction = function (event) {
-        // console.log(event.clientX);
         // get cursor position (x/y)
         cursorX = event.clientX;
     	cursorY = event.clientY;
@@ -102,8 +93,7 @@ function treeStart() {
             // move ace cursor
             xtag.query(document.body, '.current-tab')[0].relatedEditor.selection.moveToPosition(xtag.query(document.body, '.current-tab')[0].relatedEditor.renderer.screenToTextCoordinates(cursorX, cursorY));
     	}
-    	//console.log(cursorX);
-    	//console.log(cursorY);
+    	
     	// set ghost position to cursor position (x/y) with changes to center it
         ghost.style.left = (cursorX - ((ghost.innerHTML.length * 3) + 5)) + 'px';
         ghost.style.top = (cursorY - 15) + 'px';
@@ -122,8 +112,6 @@ function treeStart() {
         // this handles mouseup out of the window by running
         //      the end function if the mouse moves while it is up
         stateMoveFunction = function (event) {
-            //event.preventDefault();
-            //event.stopPropagation();
             if (!evt.touchDevice) {
                 // if there is a editor tab open:
                 if (xtag.query(document.body, '.current-tab')[0] !== undefined){
@@ -143,15 +131,10 @@ function treeStart() {
             currentcursorY = (window.Event) ? event.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
             bolMousedown = false;
             bolSelectionTriggered = 0;
-            //event.preventDefault();
-            //event.stopPropagation();
             
             
-            //console.log(currentcursorX, currentcursorY, startcursorX, startcursorY)
-            // if cursor has moved at least ten pixels in any direction
-            //if (currentcursorX <= (startcursorX - 20) || currentcursorX >= (startcursorX + 20) || (currentcursorY <= startcursorY - 20) || currentcursorY >= (startcursorY + 20)) {
-            if (currentcursorX > (elemPos.intElementWidth + 60)) {//treeGlobals.ace)
-                //console.log(elemPos);
+            // if cursor has moved off of treeview to the editor ace
+            if (currentcursorX > (elemPos.intElementWidth + 60)) {
                 // if there is a editor tab open:
                 if (xtag.query(document.body, '.current-tab')[0] !== undefined){
                     // insert snippet text
@@ -170,7 +153,6 @@ function treeStart() {
         // unbind mousemove and mouseup
         document.body.removeEventListener(evt.mousemove, stateMoveFunction);
         document.body.removeEventListener(evt.mouseup, stateEndFunction);
-        //console.log('1');
         document.body.removeEventListener('mousemove', mouseMoveFunction);
         };
 
@@ -193,8 +175,7 @@ function treeStart() {
             intSelectionRow = jsnSelection.start.row;
             jsnData = treeGlobals.data[intSelectionRow];
 
-            //console.log(bolMousedown, intSelectionRow, treeGlobals.data[intSelectionRow]);
-            //console.log(jsnData);
+
             if (jsnData) {
                 // tables
                 if (jsnData.query === 'objectTable') {
@@ -214,24 +195,20 @@ function treeStart() {
                     strNameOpt = jsnData.name;
                 // columns
                 }if (jsnData.type === '') {
-                    //strName = jsnData.name;
-                    //console.log(jsnData);
+                    
                     // substring column type off of column name
                     subStrEnd = strName.lastIndexOf(' (');
                     strName = strName.substring(0, subStrEnd);
                     
                     // go up a record until you find a table/view
                     for (var intI = intSelectionRow; intI >= 0; intI -= 1) {
-                        //console.log(intI);
-                        //console.log(treeGlobals.data[intI]);
                         if (treeGlobals.data[intI].query === 'objectTable') {
+                            
                             strNameOpt = treeGlobals.data[intI].name.substring(3) + '.' + strName.substring(0, subStrEnd);
-                            //console.log(strNameOpt);
                             //set intI to  0 to cancel the loop
                             intI = 0;
                         } else if (treeGlobals.data[intI].query === 'objectView') {
                             strNameOpt = treeGlobals.data[intI].name.substring(3) + '.' + strName.substring(0, subStrEnd);
-                            //console.log(strNameOpt);
                             //set intI to  0 to cancel the loop
                             intI = 0;
                         }
@@ -254,17 +231,12 @@ function treeStart() {
                 ghost.innerHTML += '' + strName + '';
                 ghost.style.pointerEvents = 'none';
                 
-                //ghost = '<p style="minHeight: 0px; padding: 0.25em; position: absolute; zIndex: 9001; opacity: 0.5; width: ' + strName.length + '.99em; height: 1.5em; ">' + strName + '</p>';
-                //console.log(ghost);
                 // if ghost is not appended yet: append to body
                 if (!ghost.parentNode || ghost.parentNode.nodeName !== 'BODY') {
                     document.body.appendChild(ghost);
                 }
-                //intCurrentLeft = jsnMousePos.left;
-                //intCurrentTop = jsnMousePos.top;
                 
                 
-                //document.body.addEventListener('mouseup', dragEndFunction(strName));
             }
             
         }
@@ -560,6 +532,13 @@ function treeListLoad(parent, strQuery, functionData) {
                     }
                     //else if (jsnData.type.indexOf('note') !== -1) {
                     //} else if (jsnData.type.indexOf('button') !== -1) { }
+                }
+                
+                //console.log(jsnData);
+                
+                if (jsnData.separate_bullet) {
+                    //console.log(strLineText, jsnData);
+                    strLineText += jsnData.separate_bullet + ' ';
                 }
                 
                 strLineText += jsnData.name;
@@ -1491,6 +1470,9 @@ function treeLoad(data, index, intColumn) {
                     if (arrRow[3]) {
                         jsnRow.bullet = arrRow[3];
                     }
+                    if (arrRow[4]) {
+                        jsnRow.separate_bullet = arrRow[4];
+                    }
                     
                     if (data.query === 'objectSchema') {
                         jsnRow.schemaName = (data.truename || data.name);
@@ -1524,6 +1506,9 @@ function treeLoad(data, index, intColumn) {
                     
                     if (arrRow[3]) {
                         jsnRow.bullet = arrRow[3];
+                    }
+                    if (arrRow[4]) {
+                        jsnRow.separate_bullet = arrRow[4];
                     }
                     
                     if (data.query === 'objectSchema') {

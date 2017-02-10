@@ -747,7 +747,7 @@ function autocompleteGetList(arrQueries, callback) {
     }
     
     strQuery = 'SELECT * FROM (\n' + arrQueries.join('\n     UNION ALL\n') + '\n' + ') em;';
-    
+    console.log(strQuery);
     // if the autocomplete query is still running: cancel it
     if (autocompleteGlobals.strQueryID) {
         GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
@@ -756,14 +756,14 @@ function autocompleteGetList(arrQueries, callback) {
     // make the request
     autocompleteGlobals.strQueryID = GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
         var arrRows, i, len;
-        
         if (!error) {
+            //console.log(data);
             if (data.strMessage !== '\\.' && data.strMessage !== '') {
                 arrRows = data.strMessage.split('\n');
-                
                 for (i = 0, len = arrRows.length; i < len; i += 1) {
                     arrRows[i] = arrRows[i].split('\t');
                     arrRows[i][0] = GS.decodeFromTabDelimited(arrRows[i][0]);
+                    //console.log(arrRows[i][0]);
                 }
                 
                 callback(false, arrRows);

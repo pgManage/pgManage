@@ -286,7 +286,7 @@
             strConn = strLoc.substring(intUrlStart, strLoc.substring(intUrlStart).indexOf('/') + intUrlStart);
         var socket = new WebSocket(
                             (window.location.protocol.toLowerCase().indexOf('https') === 0 ? 'wss' : 'ws') +
-                            '://' + (window.location.host || window.location.hostname) + (window.location.toString().indexOf('/postage/'( !== -1 ? ('/postage/' + strConn + '/') : '/') + strLink +
+                            '://' + (window.location.host || window.location.hostname) + '/postage/' + strConn + '/' + strLink +
                             (relinkSessionID ? '?sessionid=' + relinkSessionID : '')); //nunzio.wfprod.com
         
         if (relinkSessionID) {
@@ -322,6 +322,8 @@
                             jsnMessage.session === socket.GSSessionID ||
                             jsnMessage.session === socket.oldSessionID
                         ) && jsnMessage.bolFinished === false) {
+                        
+                        jsnMessage.session = socket.GSSessionID;
                         
                         startFrom = 1;
                         for (i = 0, len = jsnMessage.arrResponseNumbers.length; i < len; i += 1) {

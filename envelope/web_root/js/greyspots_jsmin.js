@@ -1319,7 +1319,7 @@ GS.webSocketErrorDialog=function(jsnError,tryAgainCallback,cancelCallback){var t
 (relinkSessionID?'?sessionid='+relinkSessionID:''));if(relinkSessionID){socket.GSSessionID=relinkSessionID;socket.oldSessionID=relinkSessionID;}
 if(relinkSessionNotifications){socket.notifications=relinkSessionNotifications;}else{socket.notifications=[];}
 socket.onmessage=function(event){var message=event.data,messageID,responseNumber,key,strError,arrLines,i,len,jsnMessage,startFrom;if(typeof(message)==='object'){var buf=message;message=String.fromCharCode.apply(null,new Uint8Array(buf));}
-if(message.indexOf('sessionid = ')===0){socket.GSSessionID=message.substring('sessionid = '.length,message.indexOf('\n'));GS.triggerEvent(window,'socket-connect');for(key in jsnMessages){jsnMessage=jsnMessages[key];if((jsnMessage.session===socket.GSSessionID||jsnMessage.session===socket.oldSessionID)&&jsnMessage.bolFinished===false){startFrom=1;for(i=0,len=jsnMessage.arrResponseNumbers.length;i<len;i+=1){if(startFrom!==jsnMessage.arrResponseNumbers[i]){break;}
+if(message.indexOf('sessionid = ')===0){socket.GSSessionID=message.substring('sessionid = '.length,message.indexOf('\n'));GS.triggerEvent(window,'socket-connect');for(key in jsnMessages){jsnMessage=jsnMessages[key];if((jsnMessage.session===socket.GSSessionID||jsnMessage.session===socket.oldSessionID)&&jsnMessage.bolFinished===false){jsnMessage.session=socket.GSSessionID;startFrom=1;for(i=0,len=jsnMessage.arrResponseNumbers.length;i<len;i+=1){if(startFrom!==jsnMessage.arrResponseNumbers[i]){break;}
 startFrom+=1;}
 GS.requestFromSocket(socket,'SEND FROM\t'+startFrom,'',jsnMessage.id);}}
 for(i=0,len=arrWaitingCalls.length;i<len;i+=1){arrWaitingCalls[0]();arrWaitingCalls.splice(0,1);}}else{messageID=message.substring('messageid = '.length,message.indexOf('\n'));message=message.substring(message.indexOf('\n')+1);jsnMessage=jsnMessages[messageID];if(jsnMessage){arrLines=message.split('\n');if(message.indexOf('responsenumber = ')===-1||(message.indexOf('responsenumber = ')===0&&(arrLines[1]==='TRANSACTION COMPLETED'||arrLines[2]==='OK'))){jsnMessage.bolFinished=true;}
@@ -3302,7 +3302,7 @@ function newFile(element,target){'use strict';var templateElement=document.creat
             </gs-body>
         */});GS.openDialogToElement(target,templateElement,'down','',function(event,strAnswer){var strPath;var strName=document.getElementById('gs-file-manager-text-file-name').value||'';if(strAnswer==='Create'&&strName){strPath=getPath(element)+strName;if(document.getElementById('gs-file-manager-text-file-name').value.trim()){GS.requestFromSocket(GS.envSocket,'FILE\tCREATE_FILE\t'+GS.encodeForTabDelimited(strPath)+'\n',function(data,error,errorData){if(!error&&data.trim()&&data.indexOf('Failed to get canonical path')===-1){if(data==='TRANSACTION COMPLETED'){getData(element);}}else if(error){GS.webSocketErrorDialog(errorData);}});}}});}
 function fileOpen(element,target){'use strict';var lineElement=GS.findParentElement(target,'.file-line');window.open(location.protocol+'//'+location.host+getRealPath(element)+''+lineElement.getAttribute('data-name'));}
-function fileUpload(element,target){var templateElement=document.createElement('template');templateElement.innerHTML=ml(function(){/*
+function fileUpload(element,target){var templateElement=document.createElement('template');var strHTML;strHTML=ml(function(){/*
             <gs-page>
                 <gs-header><center><h3>Upload a File</h3></center></gs-header>
                 <gs-body padded>
@@ -3310,10 +3310,14 @@ function fileUpload(element,target){var templateElement=document.createElement('
                                 enctype="multipart/form-data">
                         <label>File:</label>
                         <gs-text class="upload-file" name="file_content" type="file"></gs-text>
-                        <br hidden />
-                        <label hidden>File Name:</label>
+                    */});if(element.hasAttribute('upload-choose-file-name')){strHTML+=ml(function(){/*
+                        <br />
+                        <label>File Name:</label>
+                        <gs-text class="upload-name" disabled autocorrect="off" autocapitalize="off" autocomplete="off" spellcheck="false"></gs-text>
+            */});}else{strHTML+=ml(function(){/*
                         <gs-text class="upload-name" hidden></gs-text>
-                        
+            */});}
+strHTML+=ml(function(){/*
                         <input class="upload-path" name="file_name" hidden />
                     </form>
                     <iframe class="upload-frame" name="upload_response_gs_folder" hidden></iframe>
@@ -3325,7 +3329,7 @@ function fileUpload(element,target){var templateElement=document.createElement('
                     </gs-grid>
                 </gs-footer>
             </gs-page>
-        */});GS.openDialog(templateElement,function(){var dialog=this,formElement=xtag.query(dialog,'.upload-form')[0],fileControl=xtag.query(dialog,'.upload-file')[0],nameControl=xtag.query(dialog,'.upload-name')[0],pathControl=xtag.query(dialog,'.upload-path')[0],uploadButton=xtag.query(dialog,'.upload-button')[0],responseFrame=xtag.query(dialog,'.upload-frame')[0];uploadButton.addEventListener('click',function(event){var strFile=fileControl.value,strName=nameControl.value;pathControl.setAttribute('value',getPath(element)+nameControl.value);if(strName===''&&strFile===''){GS.msgbox('Error','No values in form. Please fill in the form.','okonly');}else if(strFile===''){GS.msgbox('Error','No file selected. Please select a file using the file input.','okonly');}else if(strName===''){GS.msgbox('Error','No value in file path textbox. Please fill in file name textbox.','okonly');}else{responseFrame.loadListen=true;formElement.submit();GS.addLoader('file-upload','Uploading file...');}});fileControl.addEventListener('change',function(event){var strValue=this.value;nameControl.value=strValue.substring(strValue.lastIndexOf('\\')+1);nameControl.focus();});nameControl.addEventListener('keydown',function(event){if(event.keyCode===13){GS.triggerEvent('click',uploadButton);}});responseFrame.addEventListener('load',function(event){var strResponseText=responseFrame.contentWindow.document.body.textContent,jsnResponse,strResponse,bolError,strError;if(responseFrame.loadListen===true){try{jsnResponse=JSON.parse(strResponseText);}catch(err){strResponse=strResponseText;}
+        */});templateElement.innerHTML=strHTML;GS.openDialog(templateElement,function(){var dialog=this,formElement=xtag.query(dialog,'.upload-form')[0],fileControl=xtag.query(dialog,'.upload-file')[0],nameControl=xtag.query(dialog,'.upload-name')[0],pathControl=xtag.query(dialog,'.upload-path')[0],uploadButton=xtag.query(dialog,'.upload-button')[0],responseFrame=xtag.query(dialog,'.upload-frame')[0];uploadButton.addEventListener('click',function(event){var strFile=fileControl.value,strName=nameControl.value;pathControl.setAttribute('value',getPath(element)+nameControl.value);if(strName===''&&strFile===''){GS.msgbox('Error','No values in form. Please fill in the form.','okonly');}else if(strFile===''){GS.msgbox('Error','No file selected. Please select a file using the file input.','okonly');}else if(strName===''){GS.msgbox('Error','No value in file path textbox. Please fill in file name textbox.','okonly');}else{responseFrame.loadListen=true;formElement.submit();GS.addLoader('file-upload','Uploading file...');}});fileControl.addEventListener('change',function(event){var strValue=this.value;nameControl.removeAttribute('disabled');nameControl.value=strValue.substring(strValue.lastIndexOf('\\')+1);nameControl.focus();});nameControl.addEventListener('keydown',function(event){if(event.keyCode===13){GS.triggerEvent('click',uploadButton);}});responseFrame.addEventListener('load',function(event){var strResponseText=responseFrame.contentWindow.document.body.textContent,jsnResponse,strResponse,bolError,strError;if(responseFrame.loadListen===true){try{jsnResponse=JSON.parse(strResponseText);}catch(err){strResponse=strResponseText;}
 if(strResponse.trim()==='Upload Succeeded'){GS.closeDialog(dialog,'cancel');}else{if(jsnResponse){if(jsnResponse.stat===true){bolError=false;}else{bolError=true;if(jsnResponse.dat&&jsnResponse.dat.error){strError=jsnResponse.dat.error;}else{strError=jsnResponse.dat;}}}else{bolError=true;strError=strResponse;}
 if(!bolError){GS.closeDialog(dialog,'cancel');}else{GS.msgbox('Error',strError,'okonly');}}
 getData(element);GS.removeLoader('file-upload');}});});}
