@@ -101,8 +101,13 @@ The following options can be specified on the command line or in the configurati
 .P
 Postage requires at least one PostgreSQL server be listed in the postage\-connections\.conf file\. This version of Postage doesn't allow you to specify a server from the command line\. Enter only one PostgreSQL server per line\.
 .P
-\fBThe format of a connection string is:\fR
-       \fB[server name]\fP: \fB[standard PostgreSQL connection string]\fP
+\fBThe format of a connection string is:\fR  
+.P
+.RS 2
+.nf
+[server name]: [standard PostgreSQL connection string]
+.fi
+.RE
 .P
 Detailed information about PostgreSQL connection strings is available at: http://www\.postgresql\.org/docs/current/static/libpq\-connect\.html
 .P

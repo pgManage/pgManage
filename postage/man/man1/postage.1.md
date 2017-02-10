@@ -89,8 +89,10 @@ The following options can be specified on the command line or in the configurati
 
 Postage requires at least one PostgreSQL server be listed in the postage-connections.conf file. This version of Postage doesn't allow you to specify a server from the command line. Enter only one PostgreSQL server per line.
 
-**The format of a connection string is:**
-       `[server name]`: `[standard PostgreSQL connection string]`
+**The format of a connection string is:**  
+```
+[server name]: [standard PostgreSQL connection string]
+```
 
 Detailed information about PostgreSQL connection strings is available at: http://www.postgresql.org/docs/current/static/libpq-connect.html
 
