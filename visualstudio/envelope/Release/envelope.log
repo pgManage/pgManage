@@ -3,10 +3,13 @@
 ..\..\common\common_client.c(249): warning C4022: 'DuplicateHandle': pointer mismatch for actual parameter 2
 ..\..\common\common_client.c(249): warning C4047: 'function': 'intptr_t' differs in levels of indirection from 'HANDLE'
 ..\..\common\common_client.c(249): warning C4024: '_open_osfhandle': different types for formal and actual parameter 1
-..\..\common\common_client.c(784): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(786): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(797): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(799): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(653): warning C4477: '_snprintf' : format string '%08zx' requires an argument of type 'unsigned int', but variadic argument 1 has type 'uint64_t'
+  ..\..\common\common_client.c(653): note: consider using '%llx' in the format string
+  ..\..\common\common_client.c(653): note: consider using '%I64x' in the format string
+..\..\common\common_client.c(770): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(772): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(783): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(785): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
   common_config.c
   common_main.c
 c:\users\nunzio\repos\postage\common\../dependencies/libev/ev.c(205): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition
@@ -20,11 +23,11 @@ c:\users\nunzio\repos\postage\dependencies\libev\ev_select.c(200): warning C4244
   common_server.c
   common_util_sql.c
   common_websocket.c
-..\..\common\common_websocket.c(174): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_websocket.c(184): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_websocket.c(296): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_websocket.c(326): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_websocket.c(380): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_websocket.c(178): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_websocket.c(189): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_websocket.c(305): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_websocket.c(335): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_websocket.c(389): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
   http_auth.c
   http_ev.c
   http_export.c
@@ -42,51 +45,25 @@ c:\users\nunzio\repos\postage\dependencies\libev\ev_select.c(200): warning C4244
 ..\..\db_framework_pq\db_framework.c(87): warning C4022: 'DuplicateHandle': pointer mismatch for actual parameter 2
 ..\..\db_framework_pq\db_framework.c(87): warning C4047: 'function': 'intptr_t' differs in levels of indirection from 'HANDLE'
 ..\..\db_framework_pq\db_framework.c(87): warning C4024: '_open_osfhandle': different types for formal and actual parameter 1
-  bsd-asprintf.c
-  posix_win.c
-..\..\dependencies\libressl\crypto\compat\posix_win.c(59): warning C4133: 'function': incompatible types - from 'const char *' to 'LPCWSTR'
-  Compiling...
-  regcomp.c
-  regerror.c
-  regexec.c
-  tre-ast.c
-  tre-compile.c
-  tre-filter.c
-  tre-match-backtrack.c
-  tre-match-parallel.c
-  tre-mem.c
-  tre-parse.c
-  tre-stack.c
-  xmalloc.c
   http_accept.c
   http_action.c
+  Compiling...
   http_delete.c
   http_insert.c
   http_select.c
   http_update.c
   ws_action.c
   ws_file.c
-  Compiling...
-  util_aes.c
   util_base64.c
-  util_canonical.c
   util_cookie.c
-  util_darray.c
-  util_error.c
   util_exec.c
   util_file.c
-  util_getopt.c
   util_idle.c
-  util_ini.c
-  util_list.c
-  util_request.c
-  util_salloc.c
-  util_sql_split.c
-  util_string.c
-  util_strptime.c
   Generating code
-c:\users\nunzio\repos\postage\common\common_client.c(1819): warning C4716: 'client_close_immediate_close_cnxn_cb': must return a value
-  All 515 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+c:\users\nunzio\repos\postage\common\common_client.c(1866): warning C4716: 'client_close_close_cnxn_cb': must return a value
+  155 of 519 functions (29.9%) were compiled, the rest were copied from previous compilation.
+    3 functions were new in current compilation
+    61 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   envelope.vcxproj -> C:\Users\nunzio\Repos\postage\visualstudio\Release\envelope.exe
   envelope.vcxproj -> C:\Users\nunzio\Repos\postage\visualstudio\Release\envelope.pdb (Full PDB)

@@ -33,7 +33,7 @@ function spawnPostage() {
 			'-r', app.getAppPath() + path.normalize('/postage/web_root'),
 			'-x', 't',
 			'-p', int_postage_port
-		], {
+		].concat((process.platform == 'win32' ? ['-o', 'stderr'] : [])), {
 			detached: true
 		}
 	);

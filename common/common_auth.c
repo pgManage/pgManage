@@ -454,7 +454,6 @@ finish:
 			} else {
 				SERROR_NORESPONSE("write() failed");
 			}
-			ev_io_stop(global_loop, &client->io);
 			SFINISH_CLIENT_CLOSE(client);
 		}
 		SFREE_PWORD(str_response);

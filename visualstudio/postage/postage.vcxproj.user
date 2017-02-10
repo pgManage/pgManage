@@ -8,7 +8,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerEnvironment>PATH=%PATH%;..\lib\x86</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-l info -o stderr -r ..\..\postage\web_root -c ..\..\postage\config\postage.conf -d ..\..\postage\config\postage-connections.conf -j ..\..\ssl\self.crt -k ..\..\ssl\self.key</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-l info -o stderr -r ..\..\postage\web_root -c ..\..\postage\config\postage.conf -d ..\..\postage\config\postage-connections.conf</LocalDebuggerCommandArguments>
+    <RemoteDebuggerServerName>192.168.44.119:4020</RemoteDebuggerServerName>
+    <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerEnvironment>PATH=%PATH%;..\lib\x64</LocalDebuggerEnvironment>
