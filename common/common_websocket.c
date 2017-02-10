@@ -111,6 +111,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 			// Silently ignore it, it will be taken care of below
 			goto error;
 		}
+		SDEBUG("int_request_len    : %d", int_request_len);
 		SERROR_CHECK(int_request_len == WEBSOCKET_HEADER_LENGTH, "FAILED TO READ WEBSOCKET HEADER");
 
 		// clang-format off
@@ -134,6 +135,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 			// Silently ignore it, it will be taken care of below
 			goto error;
 		}
+		SDEBUG("int_request_len    : %d", int_request_len);
 		SERROR_CHECK(int_request_len == 2, "Could not read from client");
 
 		frame->int_length = (((uint64_t)buf[0]) << 8) | (((uint64_t)buf[1]) << 0);
@@ -145,6 +147,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 			// Silently ignore it
 			goto error;
 		}
+		SDEBUG("int_request_len    : %d", int_request_len);
 		SERROR_CHECK(int_request_len == 8, "Could not read from client");
 
 		frame->int_length = (((uint64_t)buf[0]) << 56) | (((uint64_t)buf[1]) << 48) | (((uint64_t)buf[2]) << 40) |
@@ -162,6 +165,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 			// Silently ignore it, it will be taken care of below
 			goto error;
 		}
+		SDEBUG("int_request_len    : %d", int_request_len);
 		SERROR_CHECK(int_request_len == 4, "Could not read from client");
 
 		SERROR_SALLOC(frame->str_mask, 4);
@@ -181,13 +185,19 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 	// read into buf min(BUF_LEN, int_temp_length) bytes
 	uint64_t int_expected_length = BUF_LEN < int_temp_length ? BUF_LEN : int_temp_length;
 
-	int_request_len = CLIENT_READ(frame->parent, buf, int_expected_length);
-	if (int_request_len < -1) {
-		// This is a state where we want to read (or write) but can't
-		// Silently ignore it, it will be taken care of below
-		goto error;
+	if (int_expected_length > 0) {
+		int_request_len = CLIENT_READ(frame->parent, buf, int_expected_length);
+		if (int_request_len < -1) {
+			// This is a state where we want to read (or write) but can't
+			// Silently ignore it, it will be taken care of below
+			goto error;
+		}
+		SDEBUG("int_request_len    : %d", int_request_len);
+		SDEBUG("int_expected_length: %d", int_expected_length);
+		SERROR_CHECK((uint64_t)int_request_len <= int_expected_length, "Could not read from client");
+	} else {
+		int_request_len = 0;
 	}
-	SERROR_CHECK((uint64_t)int_request_len <= int_expected_length, "Could not read from client");
 
 	buf[int_request_len] = 0;
 	// Copy to the heap
@@ -258,7 +268,6 @@ error:
 		WS_client_message_free(client_message);
 		WS_freeFrame(frame);
 
-		ev_io_stop(EV_A, &client->io);
 		SERROR_CLIENT_CLOSE_NORESPONSE(client);
 		bol_error_state = false;
 		errno = 0;
@@ -424,6 +433,8 @@ void WS_sendFrame_step2(EV_P, ev_io *w, int revents) {
 	}
 
 error:
+	SERROR_NORESPONSE("errno: %d", errno);
+	SERROR_NORESPONSE("EAGAIN: %d", EAGAIN);
 	if (errno == EAGAIN) {
 		SERROR_NORESPONSE("should never get to EAGAIN with libev");
 		SFREE(str_global_error);
@@ -439,7 +450,6 @@ error:
 		WS_client_message_free(client_message);
 		WS_freeFrame(frame);
 
-		ev_io_stop(EV_A, &client->io);
 		SERROR_CLIENT_CLOSE(client);
 		bol_error_state = false;
 	}

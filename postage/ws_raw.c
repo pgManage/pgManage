@@ -100,6 +100,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 	client_request->int_i = -1;
 	client_request->int_len = (ssize_t)DArray_end(client_request->arr_query);
 
+	SINFO("client_request->parent: %p", client_request->parent);
 	int_status = PQsendQuery(client_request->parent->cnxn, "BEGIN");
 	if (int_status != 1) {
 		SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));

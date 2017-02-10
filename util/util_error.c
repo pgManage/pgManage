@@ -268,6 +268,7 @@ void sunlogf_root(
 	) {
 #ifdef _WIN32
 		FILE *fp = NULL;
+		int old_errno = errno;
 		if (strcmp(str_global_logfile, "stderr") != 0 || str_global_logfile == NULL) {
 			fp = fopen(str_global_logfile, "a");
 		}
@@ -277,6 +278,7 @@ void sunlogf_root(
 		} else {
 			vfprintf(stderr, str_new_format, va_arg1);
 		}
+		errno = old_errno;
 #else
 		vfprintf(stderr, str_new_format, va_arg1);
 #endif

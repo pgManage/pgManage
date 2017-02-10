@@ -261,7 +261,6 @@ void client_notify_cb(EV_P, ev_io *w, int revents) {
 	bol_error_state = false;
 error:
 	if (bol_error_state && int_status != 1) {
-		ev_io_stop(EV_A, &client->io);
 		client_close(client);
 	}
 	bol_error_state = false;
@@ -468,16 +467,13 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					SBFREE_PWORD(str_upper_request, client->int_request_len);
 
 					if ((int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
-						ev_io_stop(EV_A, &client->io);
-						SERROR_CLIENT_CLOSE(client);
 						if (bol_tls) {
 							SERROR_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 						} else {
-							SERROR("write() failed");
+							SERROR_NORESPONSE("write() failed");
 						}
 					}
 
-					ev_io_stop(EV_A, &client->io);
 					SERROR_CLIENT_CLOSE(client);
 
 					SFREE(str_request);
@@ -568,8 +564,17 @@ void client_cb(EV_P, ev_io *w, int revents) {
 						session_client->cur_request = NULL;
 						SINFO("client->cur_request: %p", client->cur_request);
 
+						SINFO("client: %p", client);
 						client->que_request = session_client->que_request;
 						session_client->que_request = NULL;
+						if (client->que_request != NULL) {
+							QUEUE_FOREACH(client->que_request, node) {
+								struct sock_ev_client_request *client_request = (struct sock_ev_client_request *)node->value;
+								client_request->parent = client;
+								SINFO("client: %p", client);
+								SINFO("client_request->parent: %p", client_request->parent);
+							}
+						}
 
 						client->que_message = session_client->que_message;
 						session_client->que_message = NULL;
@@ -614,7 +619,6 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					SDEBUG("client->str_request: %p", client->str_request);
 					// set_cnxn does its own error handling
 					if (set_cnxn(client, cnxn_cb) == NULL) {
-						ev_io_stop(EV_A, &client->io);
 						SERROR_CLIENT_CLOSE(client);
 					}
 					// set_cnxn has started a connection to the database, now we are done
@@ -623,7 +627,6 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					// The reason for this, is because later functions depend on the
 					// values this function sets
 					if (set_cnxn(client, NULL) == NULL) {
-						ev_io_stop(EV_A, &client->io);
 						SERROR_CLIENT_CLOSE(client);
 					}
 				}
@@ -637,7 +640,6 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					SDEBUG("client->str_request: %s", client->str_request);
 					// return handshake response
 					if ((int_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
-						ev_io_stop(EV_A, &client->io);
 						SERROR_CLIENT_CLOSE(client);
 						if (bol_tls) {
 							SERROR_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
@@ -708,7 +710,6 @@ error:
 		struct sock_ev_client *_client = client;
 		client = NULL;
 
-		ev_io_stop(EV_A, &_client->io);
 		SERROR_CLIENT_CLOSE(_client);
 	}
 	SFREE(str_request);
@@ -753,7 +754,6 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 	// The specification requires that we disconnect if the client sends an
 	// unmasked message
 	if (frame->int_opcode == 0x01 && frame->bol_mask == false) {
-		ev_io_stop(EV_A, &client->io);
 		SERROR_CLIENT_CLOSE(client);
 
 		WS_freeFrame(frame);
@@ -798,6 +798,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 	// opcode 0x08 is never more than one frame and is always less than 126
 	// characters
 	if (frame->int_opcode == 0x08) {
+		SINFO("Got  close frame", client);
 #ifdef UTIL_DEBUG
 		if (frame->int_length > 2) {
 			unsigned short int_close_code =
@@ -806,6 +807,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 		}
 #endif // UTIL_DEBUG
 		while (client->que_message->first != NULL) {
+			SINFO("client->que_message->first: %p", client->que_message->first);
 			struct sock_ev_client_message *client_message = client->que_message->first->value;
 			ev_io_stop(EV_A, &client_message->io);
 			WSFrame *frame_temp = client_message->frame;
@@ -815,9 +817,8 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 			WS_freeFrame(frame_temp);
 		}
 
-		SDEBUG("Got  close frame", client);
 		SERROR_CHECK(WS_sendFrame(EV_A, client, true, 0x08, frame->str_message, frame->int_length), "Failed to send message");
-		SDEBUG("Sent close frame", client);
+		SINFO("Sent close frame", client);
 
 		client->bol_is_open = false;
 
@@ -1004,8 +1005,9 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 			SFREE(str_transaction_id);
 
 		} else if (strcmp(str_first_word, "SEND") == 0) {
+			SINFO("client: %p", client);
 			SINFO("client->cur_request: %p", client->cur_request);
-			if (client->cur_request != NULL) {
+			if (client->cur_request != NULL && client->client_copy_check == NULL && strncmp(client->cur_request->str_message_id, str_message_id, strlen(str_message_id)) == 0) {
 				SINFO("client->cur_request->arr_response: %p", client->cur_request->arr_response);
 				if (client->cur_request->arr_response != NULL) {
 					client_copy_check = NULL;
@@ -1069,7 +1071,6 @@ error:
 		struct sock_ev_client *_client = client;
 		client = NULL;
 
-		ev_io_stop(EV_A, &_client->io);
 		SERROR_CLIENT_CLOSE(_client);
 	}
 }
