@@ -33,12 +33,15 @@ All log output is pushed to stderr, if you are pushing that to a file, then you 
 .SH OPTIONS
 .P
 \fB\-h\fP or \fB\-\-help\fP
+.br
        Print usage and exit
 .P
 \fB\-v\fP or \fB\-\-version\fP
+.br
        Print version information and exit
 .P
 \fB\-c\fP or \fB\-\-config\-file=\fP
+.br
        \fBString;\fP defaults to @prefix@/etc/postage/postage\.conf
 .br
        You can use this option to tell Postage where to look for the configuration file\. A sample configuration file is provided in @prefix@/etc/postage\. If there is no file specified Postage will look in the current directory for a config file\. If no config file is found Postage will proceed with default values\.
@@ -48,6 +51,7 @@ The following options can be specified on the command line or in the configurati
 \fB[command line short]\fP or \fB[command line long]\fP or \fB[config file]\fP
 .P
 \fB\-d\fP or \fB\-\-connection\-file=\fP or \fBconnection_file=\fP
+.br
        \fBString;\fP defaults to /usr/local/etc/postage/postage\-connections\.conf
 .br
        When you install Postage, the Makefile will generate a path to the sample postage\-connections\.conf file and put it in the sample config file\. Use this option to tell Postage where your connection list is located\.
@@ -55,32 +59,39 @@ The following options can be specified on the command line or in the configurati
        If not specified, Postage looks in the same folder as the config file for a file named postage\-connections\.conf\. If Postage can't find a connection file, it will error\.
 .P
 \fB\-s\fP or \fB\-\-super\-only=\fP or \fBsuper_only=\fP
+.br
        \fBBoolean;\fP defaults to true
 .br
        This tells Postage whether or not to only allow super users to login\. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through Postage\. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser\.  
 .P
 \fB\-g\fP or \fB\-\-login\-group=\fP or \fBlogin_group=\fP
+.br
        \fBString;\fP no default
 .br
        This tells Postage to only allow users in a certain PostgreSQL group to login to Postage\. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group\.
 .P
 \fB\-r\fP or \fB\-\-web\-root=\fP or \fBweb_root=\fP
+.br
        \fBString;\fP Defaults to /usr/local/etc/postage/web_root
 .br
-       `This tells Postage where the HTML files have been installed to\.
+       This tells Postage where the HTML files have been installed to\.
 .P
 \fB\-a\fP or \fB\-\-data\-root=\fP or \fBdata_root=\fP
+.br
        \fBString;\fP defaults to ~/\.postage/
 .br
        This tells Postage where to put the SQL file history\. All tabs are saved to this location so that if you get disconnected from Postage you don't lose your work\.
 .P
 \fB\-p\fP or \fB\-\-postage\-port=\fP or \fBpostage_port=\fP
+.br
        \fBInteger;\fP defaults to 8080
 .br
        This tells Postage what port to listen on for browser requests\.
 .P
 \fB\-j\fP or \fB\-\-tls\-cert=\fP or \fBtls_cert=\fP
+.br
 \fB\-k\fP or \fB\-\-tls\-key=\fP or \fBtls_key=\fP
+.br
        \fBString;\fP no defaults
 .br
        These options tell Postage where the TLS Certificate and Key files reside\. If you use these options then you'll only be able to access Postage through a secure TLS connection\.
@@ -88,16 +99,19 @@ The following options can be specified on the command line or in the configurati
        These options are only necessary if you wish to connect directly to Postage using a secure TLS connection\. As an alternative, you can set up Postage in a reverse proxy configuration\. This allows your web server to terminate the secure connection and pass on the request to Postage\. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution\.
 .P
 \fB\-n\fP or \fB\-\-allow\-custom\-connections=\fP or \fBallow_custom_connections=\fP
+.br
        \fBBoolean;\fP defaults to false
 .br
        This tells Postage whether or not to allow anyone to use a custom connection from the login screen\.
 .P
 \fB\-l\fP or \fB\-\-log\-level=\fP or \fBlog_level=\fP
+.br
        \fBString;\fP defaults to error
 .br
        This option regulates the frequency and verbosity of log messages\. Possible values are none, error, warn, notice and info\.
 .P
 \fB\-t\fP or \fB\-\-login\-timeout=\fP or \fBlogin\-timeout=\fP
+.br
        \fBInteger;\fP defaults to 1200
 .br
        This option regulates the timeout after the last page is closed\.
