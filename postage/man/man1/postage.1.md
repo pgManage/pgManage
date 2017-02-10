@@ -5,7 +5,8 @@ postage(1) -- PostgreSQL Administration for the web
 This instance of postage was installed as `@prefix@/sbin/postage` (Usually `/usr/local/sbin/postage`)
 
 ## SYNOPSIS
-`postage`
+```
+postage
        [-h | --help]
        [-v | --version]
        [-c <config-file> | --config-file=<config-file>]
@@ -20,6 +21,7 @@ This instance of postage was installed as `@prefix@/sbin/postage` (Usually `/usr
        [-l <log-level> | --log-level=<log-level>]
        [-n <allow_custom_connections> | --allow-custom-connections=<allow-custom-connections>]
        [-t <login-timeout> | --login-timeout=<login-timeout>]
+```
 
 ## DESCRIPTION
 The `postage` utility is  a tool to make managing your PostgreSQL database fast and easy. It provides web access and can be used on a tablet, or even on a phone.

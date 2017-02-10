@@ -6,7 +6,9 @@
 This instance of postage was installed as \fB@prefix@/sbin/postage\fP (Usually \fB/usr/local/sbin/postage\fP)
 .SH SYNOPSIS
 .P
-\fBpostage\fP
+.RS 2
+.nf
+postage
        [\-h | \-\-help]
        [\-v | \-\-version]
        [\-c <config\-file> | \-\-config\-file=<config\-file>]
@@ -21,6 +23,8 @@ This instance of postage was installed as \fB@prefix@/sbin/postage\fP (Usually \
        [\-l <log\-level> | \-\-log\-level=<log\-level>]
        [\-n <allow_custom_connections> | \-\-allow\-custom\-connections=<allow\-custom\-connections>]
        [\-t <login\-timeout> | \-\-login\-timeout=<login\-timeout>]
+.fi
+.RE
 .SH DESCRIPTION
 .P
 The \fBpostage\fP utility is  a tool to make managing your PostgreSQL database fast and easy\. It provides web access and can be used on a tablet, or even on a phone\.
