@@ -353,10 +353,18 @@ function autocompletePopupSearch(editor, strMode) {
       , intSearchStringStart = (autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset)
       , intSearchStringEnd = autocompleteGlobals.intSearchEnd
       , strSearch = strScript.substring(intSearchStringStart, intSearchStringEnd)
-      , choices, match, i, len, strCurrentMasterSearch, strCurrentMasterValue, strNewValue;
+      , choices, match, i, len, strCurrentMasterSearch, strCurrentMasterValue, strNewValue, strAdded;
     
     // normalize strSearch
-    strSearch = (strSearch[0] === '"' ? strSearch.toLowerCase() : '"' + strSearch.toLowerCase());
+    //strSearch = (strSearch[0] === '"' ? strSearch.toLowerCase() : '"' + strSearch.toLowerCase());
+    if (strSearch[0] === '"') {
+        strSearch = strSearch.toLowerCase();
+        strAdded = false;
+    } else {
+        strSearch = '"' + strSearch.toLowerCase();
+        strAdded = true;
+    }
+    
     
     // default strMode to 'filter', the only other option is 'expand'
     strMode = strMode || 'filter';
@@ -406,13 +414,20 @@ function autocompletePopupSearch(editor, strMode) {
         autocompleteGlobals.popupAce.setValue(strNewValue.substring(1));
     }
     
-    // if no items are left after the filter or expand AND the popup is not already asleep: put popup to sleep
-    if (autocompleteGlobals.arrValues.length === 0 && autocompleteGlobals.popupAsleep === false) {
-        autocompletePopupSleep(editor);
-        
-    // else if items are in the popup AND the popup is asleep: wake up the popup
-    } else if (autocompleteGlobals.arrValues.length > 0 && autocompleteGlobals.popupAsleep === true) {
-        autocompletePopupWake(editor);
+        //console.log(autocompleteGlobals.arrValues.length, autocompleteGlobals.arrValues[0], strSearch);
+        //console.log(autocompleteGlobals.arrValues.length, autocompleteGlobals.arrValues[0] === strSearch);
+    
+    if (strAdded === true) {
+        strSearch = strSearch.substring(1, strSearch.length);
+        //console.log(strSearch);
+        // if no items are left after the filter or expand AND the popup is not already asleep: put popup to sleep
+        if ((autocompleteGlobals.arrValues.length === 0 && autocompleteGlobals.popupAsleep === false) || (autocompleteGlobals.arrValues.length === 1 && autocompleteGlobals.arrValues[0] === strSearch)) {
+            autocompletePopupSleep(editor);
+        // else if items are in the popup AND the popup is asleep: wake up the popup
+        } else if (autocompleteGlobals.arrValues.length > 0 && autocompleteGlobals.popupAsleep === true) {
+            autocompletePopupWake(editor);
+        }
+        strSearch = '"' + strSearch.toLowerCase();
     }
     
     // select first line
@@ -747,7 +762,7 @@ function autocompleteGetList(arrQueries, callback) {
     }
     
     strQuery = 'SELECT * FROM (\n' + arrQueries.join('\n     UNION ALL\n') + '\n' + ') em;';
-    console.log(strQuery);
+//    console.log(strQuery);
     // if the autocomplete query is still running: cancel it
     if (autocompleteGlobals.strQueryID) {
         GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);

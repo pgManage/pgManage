@@ -37,9 +37,22 @@
             });
 
             var reconnectNumber = 0;
+            var reconnectCheckTimer;
             window.addEventListener('socket-connect', function (event) {
                 "use strict";
-                reconnectNumber = 0;
+                var intCurrConnectNumber = reconnectNumber;
+                
+                if (reconnectCheckTimer) {
+                    clearTimeout(reconnectCheckTimer);
+                    reconnectCheckTimer = null;
+                }
+                
+                // if we can remain connected for 5 seconds: reset countdown
+                reconnectCheckTimer = setTimeout(function () {
+                    if (intCurrConnectNumber === reconnectNumber) {
+                        reconnectNumber = 0;
+                    }
+                }, 5000);
             });
             window.addEventListener('socket-reconnect', function (event) {
                 "use strict";
