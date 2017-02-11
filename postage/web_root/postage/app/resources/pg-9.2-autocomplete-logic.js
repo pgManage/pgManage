@@ -105,7 +105,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
       , intOpenParen, intCloseParen, intVersion = parseFloat(contextData.minorVersionNumber, 10);
     
     // if the popup isn't already open or it's open but it's asleep
-    //console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
+    // console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
     if (autocompleteGlobals.popupOpen === false || autocompleteGlobals.popupAsleep === true) {
         // get current query range
         currentQueryRange = editor.currentQueryRange;
@@ -281,7 +281,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             
             
             //console.log(strPreviousKeyWord);
-            if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && bolPreviousCharWhitespace && !bolCurrentCharWhitespace) {
+            if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && (bolPreviousCharWhitespace || bolPreviousCharOpenParen) && !bolCurrentCharWhitespace) {
                 //console.log(strScript[intCursorPosition]);
                 if (arrPreviousKeyWords[1] === 'INSERT' && strPreviousKeyWord === 'INTO') {
                     //console.log('schema');
@@ -292,13 +292,13 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 } else if ((/(UPDATE|VIEW|SEQUENCE|FUNCTION|AGGREGATE|COLLATION|CONVERSION|DOMAIN|INDEX|CLASS|FAMILY|OPERATOR|CONFIGURATION|DICTIONARY|PARSER|TEMPLATE|TYPE|WHEN|SCHEMA|HANDLER|VALIDATOR)/i).test(strPreviousKeyWord)) {
                     //console.log('schemas');
                     bolSchemas = true;
-                } else if (strPreviousKeyWord === 'FROM') {
-                    //console.log('schemas');
-                    bolSchemas = true;
                 } else if (arrPreviousKeyWords[4] === 'REVOKE' && strPreviousKeyWord === 'FROM') {
                     //console.log('groups, users');
                     bolGroups = true;
                     bolUsers = true;
+                } else if (strPreviousKeyWord === 'FROM') {
+                    //console.log('schemas');
+                    bolSchemas = true;
                 } else if (arrPreviousKeyWords[4] === 'REVOKE' && strPreviousKeyWord === 'ON') {
                     //console.log('schema');
                     bolSchemas = true;
@@ -373,18 +373,18 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 } else if (strPreviousKeyWord === 'LANGUAGE') {
                     //console.log('language');
                     bolLanguages =true;
-                } else if (strPreviousKeyWord === 'CAST' && strScript[intCursorPosition - (strPreviousWord.length + 1)] === '(' || bolPreviousCharOpenParen) {
+                } else if (strPreviousKeyWord === 'CAST') {
                     //console.log('types');
                     bolTypes = true;
                 } else if (arrPreviousKeyWords[1] === 'CAST' && strPreviousKeyWord === 'AS') {
                     //console.log('types');
                     bolTypes = true;
-                } else if (strPreviousKeyWord === 'VALUES' && strScript[intCursorPosition - (strPreviousWord.length + 1)] === '(' || bolPreviousCharOpenParen) {
+                } else if (strPreviousKeyWord === 'VALUES') {
                     //console.log('columns, functions');
                     bolCols = true;
                     bolBuiltins = true;
                 }
-                
+                console.log(strPreviousKeyWord);
             
 
                  if (bolCols) {
@@ -433,9 +433,9 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     }
                 } if (bolTypes) {
                     if (arrQueries) {
-                       arrQueries.push(autocompleteQuery.types); 
+                       arrQueries.push(autocompleteQuery.types2); 
                     } else {
-                       arrQueries = [autocompleteQuery.types]; 
+                       arrQueries = [autocompleteQuery.types2]; 
                     }
                 } if (bolLanguages) {
                     if (arrQueries) {
@@ -923,8 +923,11 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 }
             // typecasting:
             } else if (strScript[intCursorPosition] === ':' && strScript[intCursorPosition - 1] === ':') {
+                // console.log('running');
                 autocompleteGlobals.intSearchOffset = 1;
                 arrQueries = [autocompleteQuery.types];
+                
+                // console.log(arrQueries);
                 
                 
                 // if we've found queries: open the popup
@@ -932,6 +935,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     autocompleteGlobals.intSearchStart = intEndCursorPosition - 1;
                     autocompleteGlobals.intSearchEnd = intEndCursorPosition;
                     autocompletePopupOpen(editor, arrQueries);
+                    // console.log(autocompleteGlobals);
                 }
             }
         }

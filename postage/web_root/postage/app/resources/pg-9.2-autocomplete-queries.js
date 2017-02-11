@@ -788,7 +788,7 @@ autocompleteQuery.views = ml(function () {/*
     ) list_views
 */});
 
-autocompleteQuery.types = ml(function () {/*
+autocompleteQuery.types2 = ml(function () {/*
     SELECT * FROM (
         SELECT pg_type.typname AS obj_name, 'Type'::text AS obj_meta
           FROM pg_catalog.pg_type
@@ -797,9 +797,20 @@ autocompleteQuery.types = ml(function () {/*
            AND (NOT EXISTS (SELECT TRUE FROM pg_catalog.pg_type elem WHERE elem.oid = pg_type.typelem AND elem.typarray = pg_type.oid))
            AND (pg_type.typtype <> 'd') AND pg_type.typname LIKE '{{searchStr}}'
       ORDER BY pg_type.typname
-    ) list_types
+    ) list_types2
 */});
 
+autocompleteQuery.types = ml(function () {/*
+    SELECT * FROM (
+        SELECT pg_type.typname AS obj_name, 'Type'::text AS obj_meta
+          FROM pg_catalog.pg_type
+     LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+         WHERE (pg_type.typrelid = 0 OR (SELECT pg_class.relkind = 'c' FROM pg_catalog.pg_class WHERE pg_class.oid = pg_type.typrelid))
+           AND (NOT EXISTS (SELECT TRUE FROM pg_catalog.pg_type elem WHERE elem.oid = pg_type.typelem AND elem.typarray = pg_type.oid))
+           AND (pg_type.typtype <> 'd')
+      ORDER BY pg_type.typname
+    ) list_types--this is working
+*/});
 
 autocompleteQuery.schemas = ml(function () {/*
     SELECT * FROM (

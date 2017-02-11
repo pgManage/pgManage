@@ -377,7 +377,7 @@ function autocompletePopupSearch(editor, strMode) {
         strSearch = '"' + strSearch.toLowerCase();
         strAdded = true;
     }
-    
+
     if (strSearch === '"' && (strScript.substring(intSearchStringStart - 1, intSearchStringEnd) !== '.') || strSearchFixed === true) {
         strSearchFixed = true;
         //console.log(strSearchFixed);
@@ -394,6 +394,13 @@ function autocompletePopupSearch(editor, strMode) {
         //console.log(strSearchFixed);
     }
     
+    if (strSearch === ':') {
+        strSearch = '';
+    } else if (strSearch === '":') {
+        strSearch = '"';
+        strSearchFixed = false;
+    }
+    
     
     // default strMode to 'filter', the only other option is 'expand'
     strMode = strMode || 'filter';
@@ -404,15 +411,20 @@ function autocompletePopupSearch(editor, strMode) {
         autocompleteGlobals.popupAce.setValue('');
         //console.log(autocompleteGlobals.arrSearch);
         //console.log(strSearch);
+        // console.log(autocompleteGlobals.arrSearch);
+        // console.log(autocompleteGlobals.arrValues);
+        // console.log(strSearch);
         for (i = 0, len = autocompleteGlobals.arrSearch.length, strNewValue = ''; i < len; i += 1) {
             // if the current item doesn't match: remove from ace, arrSearch and arrValues
             if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
                 autocompleteGlobals.arrSearch.splice(i, 1);
                 autocompleteGlobals.arrValues.splice(i, 1);
+                // console.log('reject', i);
                 
                 i -= 1;
                 len -= 1;
             } else {
+                // console.log('match', i);
                 strNewValue += '\n';
                 strNewValue += autocompleteGlobals.arrValues[i];
             }
@@ -451,6 +463,7 @@ function autocompletePopupSearch(editor, strMode) {
         strSearch = strSearch.substring(1, strSearch.length);
         //console.log(strSearch);
         // if no items are left after the filter or expand AND the popup is not already asleep: put popup to sleep
+        // console.log(autocompleteGlobals.arrValues);
         if ((autocompleteGlobals.arrValues.length === 0 && autocompleteGlobals.popupAsleep === false) || (autocompleteGlobals.arrValues.length === 1 && autocompleteGlobals.arrValues[0] === strSearch)) {
             autocompletePopupSleep(editor);
         // else if items are in the popup AND the popup is asleep: wake up the popup
