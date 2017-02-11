@@ -178,6 +178,12 @@ static void cnxn_reset_cb(EV_P, ev_io *w, int revents) {
 		ev_io_stop(EV_A, &client_cnxn->io);
 		client_cnxn->parent->conn->int_status = 1;
 		cnxn_cb(EV_A, client_cnxn->parent, client_cnxn->parent->conn);
+		if (client_cnxn->parent->client_reconnect_timer != NULL) {
+			ev_prepare_stop(EV_A, &client_cnxn->parent->client_reconnect_timer->prepare);
+			SFREE(client_cnxn->parent->client_reconnect_timer);
+
+			decrement_idle(EV_A);
+		}
 
 	} else if (status == PGRES_POLLING_FAILED) {
 		// Connection failed
@@ -212,6 +218,22 @@ finish:
 	}
 }
 
+void client_reconnect_timer_cb(EV_P, ev_prepare *w, int revents) {
+	struct sock_ev_client_reconnect_timer *client_reconnect_timer = (struct sock_ev_client_reconnect_timer *)w;
+
+	if ((client_reconnect_timer->close_time + 10) < ev_now(EV_A)) {
+		ev_io_stop(EV_A, &client_reconnect_timer->parent->reconnect_watcher->io);
+		DB_finish(client_reconnect_timer->parent->conn);
+
+		ev_prepare_stop(EV_A, &client_reconnect_timer->parent->client_reconnect_timer->prepare);
+		SFREE(client_reconnect_timer->parent->client_reconnect_timer);
+
+		decrement_idle(EV_A);
+
+		client_close(client_reconnect_timer->parent);
+	}
+}
+
 void client_notify_cb(EV_P, ev_io *w, int revents) {
 	if (revents != 0) {
 	} // get rid of unused parameter warning
@@ -243,7 +265,15 @@ void client_notify_cb(EV_P, ev_io *w, int revents) {
 			SFREE(client->reconnect_watcher);
 			SERROR_SALLOC(client_cnxn, sizeof(struct sock_ev_client_cnxn));
 			client_cnxn->parent = client;
+			client_cnxn->parent->conn->int_status = 0;
 			client->reconnect_watcher = client_cnxn;
+
+			SERROR_SALLOC(client->client_reconnect_timer, sizeof(struct sock_ev_client_reconnect_timer));
+			ev_prepare_init(&client->client_reconnect_timer->prepare, client_reconnect_timer_cb);
+			ev_prepare_start(EV_A, &client->client_reconnect_timer->prepare);
+			client->client_reconnect_timer->parent = client;
+			client->client_reconnect_timer->close_time = ev_now(EV_A);
+			increment_idle(EV_A);
 
 			// set up cnxn socket
 			SERROR_SET_CONN_PQ_SOCKET(client->conn);
@@ -1692,6 +1722,12 @@ bool client_close(struct sock_ev_client *client) {
 	if (client->notify_watcher != NULL) {
 		ev_io_stop(global_loop, &client->notify_watcher->io);
 		SFREE(client->notify_watcher);
+	}
+
+	if (client->client_reconnect_timer != NULL) {
+		ev_prepare_stop(global_loop, &client->client_reconnect_timer->prepare);
+		SFREE(client->client_reconnect_timer);
+		decrement_idle(global_loop);
 	}
 
 	LIST_FOREACH(client->server->list_client, first, next, node) {

@@ -42,6 +42,14 @@ struct sock_ev_client_cnxn {
 	struct sock_ev_client *parent;
 };
 
+struct sock_ev_client_reconnect_timer {
+	ev_prepare prepare;
+
+	ev_tstamp close_time;
+
+	struct sock_ev_client *parent;
+};
+
 struct sock_ev_client_timeout_prepare {
 	ev_prepare prepare;
 
@@ -148,6 +156,7 @@ struct sock_ev_client {
 
 	struct sock_ev_client_timeout_prepare *client_timeout_prepare;
 	struct sock_ev_client_paused_request *client_paused_request;
+	struct sock_ev_client_reconnect_timer *client_reconnect_timer;
 
 	DB_conn *conn;
 
