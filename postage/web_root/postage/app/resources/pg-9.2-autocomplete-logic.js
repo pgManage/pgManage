@@ -288,8 +288,8 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                    FROM pg_proc p
                    LEFT JOIN pg_type ON pg_type.oid = prorettype
             */
-            
-            //console.log(arrPreviousKeyWords);
+            console.log(strPreviousKeyWord);
+//            console.log(arrPreviousKeyWords);
             //console.log((/[A-Z\"]/gim).test(strScript[intCursorPosition]), strScript[intCursorPosition])
             if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && bolPreviousCharWhitespace && !bolCurrentCharWhitespace) {
                 //strPreviousKeyWord.toUpperCase();
@@ -362,13 +362,6 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 } else if (strScript[intCursorPosition - (strPreviousWord.length + 2)] === ',' || bolAfterComma) {
                     bolSchemas = true;
                     //arrQueries = [autocompleteQuery.schemas];
-                } else if ((/^SELECT/gi).test(strSearchQuery)) {////
-                    //console.log('columns, tables, builtins');
-                    bolCols = true;
-                    bolTables = true;
-                    bolBuiltins = true;
-                    //arrQueries = [autocompleteQuery.columns, autocompleteQuery.tables, autocompleteQuery.views]; //, autocompleteQuery.builtIns];
-                    //console.log(arrQueries);
                 } else if (arrPreviousKeyWords[2] === 'ALL' && arrPreviousKeyWords[1] === 'ON' && strPreviousKeyWord === 'FUNCTION') {
                     //console.log('schemas');
                     bolSchemas = true;
@@ -382,6 +375,13 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     bolTables = true;
                     bolTableFuncs = true;
                     //arrQueries = [autocompleteQuery.tables, autocompleteQuery.views]; //, table functions
+                } else if ((/^SELECT/gi).test(strSearchQuery)) {////
+                    //console.log('columns, tables, builtins');
+                    bolCols = true;
+                    bolTables = true;
+                    bolBuiltins = true;
+                    //arrQueries = [autocompleteQuery.columns, autocompleteQuery.tables, autocompleteQuery.views]; //, autocompleteQuery.builtIns];
+                    //console.log(arrQueries);
                 } else if (strPreviousKeyWord === 'TABLE') {
                     //console.log('schemas');
                     bolSchemas = true;
@@ -394,7 +394,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     //console.log('groups');
                     bolGroups = true;
                     //arrQueries = [autocompleteQuery.groups];
-                } else if (strPreviousKeyWord === 'WHERE') {//////
+                } else if (strPreviousKeyWord === 'WHERE') {
                     //console.log('tables, columns, builtins');
                     bolTables = true;
                     bolCols = true;
@@ -462,9 +462,9 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     }
                 } if (bolTableFuncs) {
                     if (arrQueries) {
-                       arrQueries.push(autocompleteQuery.builtIns);// needs query 
+                       arrQueries.push(autocompleteQuery.tableFunctions);
                     } else {
-                       arrQueries = [autocompleteQuery.builtIns];// needs query 
+                       arrQueries = [autocompleteQuery.tableFunctions];
                     }
                 } if (bolBuiltins) {
                     if (arrQueries) {
@@ -517,8 +517,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     }
                 }
 
-
-                //console.log(arrQueries);
+                console.log(arrQueries);
                 //console.log(editor);
                 // if we've found queries: open the popup
                 if (arrQueries && arrQueries.length > 0) {

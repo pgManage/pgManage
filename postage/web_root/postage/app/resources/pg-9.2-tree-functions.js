@@ -179,12 +179,12 @@ function treeStart() {
             if (jsnData) {
                 // tables
                 if (jsnData.query === 'objectTable') {
-                    strName = jsnData.name.substring(3);
-                    strNameOpt = jsnData.schemaName + '.' + jsnData.name.substring(3)
+                    strName = jsnData.name;
+                    strNameOpt = jsnData.schemaName + '.' + jsnData.name
                 // views
                 } else if (jsnData.query === 'objectView') {
-                    strName = jsnData.name.substring(3);
-                    strNameOpt = jsnData.schemaName + '.' + jsnData.name.substring(3);
+                    strName = jsnData.name;
+                    strNameOpt = jsnData.schemaName + '.' + jsnData.name;
                 // non-schema objects (functions, sequences, etc...)
                 } else if (jsnData.schemaName && jsnData.schemaOID && jsnData.oid !== jsnData.schemaOID) {
                     strName = jsnData.name;
@@ -1867,7 +1867,7 @@ function dataObjectButtons(strType, intOID, strSchema, strName) {
 
 
 function dumpButton(strOid, strName) {
-    return '<gs-button icononly icon="edit" no-focus title="Dump schema objects"'
+    return '<gs-button icononly icon="edit" no-focus title="Dump schema to tab"'
                     + ' onclick="dialogSchemaSurgery(\'' + strOid + '\', \'' + strName + '\')"></gs-button>';
 }
 
@@ -1884,7 +1884,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-header>
-                <center><h3>Dump Schema Objects</h3></center>
+                <center><h3>Dump schema to tab</h3></center>
             </gs-header>
             <gs-body padded>
                 <center>What code do you want for the schema: "<span id="dialog-sql-dump-schema"></span>"?</center>
@@ -1972,6 +1972,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             bolTriggerFunctions, bolSequences, bolTables, bolViews, strQuery, handleListResults, arrQuery;
         
         if (strAnswer === 'Open Script') {
+            console.log(document.getElementById('checkbox-schema-dump-drop-statements').value);
             bolDropStatments    = document.getElementById('checkbox-schema-dump-drop-statements').value   === 'true';
             bolSchema           = document.getElementById('checkbox-schema-dump-schema').value            === 'true';
             bolFunctions        = document.getElementById('checkbox-schema-dump-functions').value         === 'true';
@@ -1987,6 +1988,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             arrQuery = [];
             
             if (bolFunctions) {
+                console.log(bolFunctions);
                 arrQuery.push('\n\n SELECT oid, name, schema_name, \'Function\' AS objType, 1 AS order_no FROM (' +
                     listQuery.functions.replace(/\{\{INTOID\}\}/gim,  intSchemaOid).replace(';', '') +
                 ') em ');
@@ -2021,7 +2023,9 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     listQuery.views.replace(/\{\{INTOID\}\}/gim,      intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            strQuery = arrQuery.join(' UNION ALL ') + '\n\nORDER BY order_no, 1';
+            if (bolFunctions || bolTriggerFunctions || bolOperators || bolAggregates || bolSequences || bolTables || bolViews) {
+                strQuery = arrQuery.join(' UNION ALL ') + '\n\nORDER BY order_no, 1';
+            }
             
             // function to handle the query results
             handleListResults = function (arrResult) {
@@ -2029,6 +2033,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                 
                 // drop statements (reverse order of schema then listed objects)
                 if (bolDropStatments) {
+                    GS.addLoader('loader-drop', 'Creating DROP Statements');
                     for (i = arrResult.length - 1; i >= 0; i -= 1) {
                         strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase() + ' ' + quote_ident(strSchemaName) + '.' + quote_ident(arrResult[i][1]) + ';\n';
                     }
@@ -2036,6 +2041,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     if (bolSchema) {
                         strDumpQuery += 'DROP SCHEMA ' + strSchemaName + ';\n\n\n';
                     }
+                    GS.removeLoader('loader-drop');
                 }
                 
                 // load querys for:
@@ -2047,7 +2053,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                 // For some there is an extra result at the beginning?
                 // I'm not sure why, but I get back (bolSchema ? 2 : 1) more script results than list results
                 var j = 0, len1 = arrResult.length + (bolSchema ? 2 : 1);
-                
+                console.log(arrResult);
                 for (i = 0, len = arrResult.length; i < len; i += 1) {
                     strQuery += '\n\n' +
                         (
@@ -2060,7 +2066,6 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                 handleScriptResults = function (arrResult) {
                     var i, len;
                     
-                    //console.log(arrResult);
                     
                     arrResult.splice(0, 1);
                     
@@ -2070,14 +2075,16 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     }
                     j += len;
                     
-                    //console.log((j + 1), len1); //, strDumpQuery
+                    console.log((j + 1), len1, arrResult.length, (bolSchema ? 2 : 1)); //, strDumpQuery
                     
                     if ((j + 1) === len1) {
                         newTab('sql', strSchemaName, {'strContent': strDumpQuery});
+                        GS.removeLoader('loader-script');
                     }
                 };
                 
-                //console.log(strQuery);
+                
+                GS.addLoader('loader-script', 'Creating Script');
                 if (strQuery) {
                     getListsForDump(strQuery, handleScriptResults);
                 } else {
@@ -2093,7 +2100,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     handleListResults(arrResults);
                 });
             } else {
-                handleListResults({});
+                handleListResults([]);
             }
         }
     });

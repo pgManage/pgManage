@@ -106,6 +106,16 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
 
     intNeedle = intSearchFromPos;
     strChar = strScript[intNeedle];
+    
+    //if (!strChar) {
+    //    intNeedle -= 1;
+    //    intSearchFromPos -= 1;
+    //    strChar = strScript[intNeedle];
+    //}
+    
+    //if (!strScript[intNeedle + 1]) {
+    //    strChar = '\n';
+    //}
 
     // if the current char is in the alphabet
     if ((/[a-z]/gi).test(strChar)) {
@@ -125,7 +135,7 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
             intNeedle += 1;
         }
     }
-
+    //console.log(intNeedle, strChar);
     // move the needle backward until we run into a character that's not in the alphabet
     while (intNeedle >= 0) {
         strChar = strScript[intNeedle];
@@ -137,7 +147,6 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
             if (bolEnder) {
                 strWord = strScript.substring(intNeedle + 1, intWordPoint + 1);
                 intQueryStart = (intNeedle + 1);
-
             } else if (intNeedle === 0) {
                 strWord = '';
                 if (typeof intWordPoint === 'number') {
@@ -154,7 +163,7 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
                     bolWord = true;
                     strWord = strWord.toUpperCase();
                 }
-
+                    
                 // if we found a word
                 //          and it's a dangerous starting word
                 //          and we haven't started an extra search
@@ -186,7 +195,7 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
                     });
                     intStartingWordsToFind -= 1;
                 }
-
+                    
                 // if we've started an extra search
                 //          and (
                 //              we've found our last extra word
@@ -197,7 +206,7 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
                         intNeedle === 0
                     )) {
                     // deduce the real starting word
-
+                    
                     // if we run into a TO or FROM, query starts at first found word
                     // if we run into a GRANT or REVOKE, query starts there
                     //// if we run into a WITH immediatly before SELECT,INSERT,UPDATE,DELETE, query starts there
@@ -309,7 +318,7 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
 
     // special mention:
     //      intParenLevel is the number of parenthesis we are deep
-
+    
     // if we found the query start: move forward with query split to find the end of the query
     if (bolFoundStart) {
         intParenLevel = 0;
@@ -479,8 +488,14 @@ function selectionFindRange(tabElement, editor) {
         'TO', 'FROM', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'
     ];
 
-    jsnQuery = positionFindRange(strScript, intSearchPos, arrQueryStartKeywords, arrDangerousQueryStartKeywords, arrExtraSearchKeywords);
 
+    
+    jsnQuery = positionFindRange(strScript, intSearchPos, arrQueryStartKeywords, arrDangerousQueryStartKeywords, arrExtraSearchKeywords);
+    // this solves #108
+    if (intCursorPos === strScript.length) {
+        intCursorPos -= 1;
+    }
+    
     // if the cursor is not in the selection: search higher
     if (intCursorPos > jsnQuery.intQueryEnd) {
         // there are only some queries that can wrap around other queries. that's

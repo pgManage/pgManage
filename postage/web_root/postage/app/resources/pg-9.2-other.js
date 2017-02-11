@@ -1674,7 +1674,7 @@ function getCurrentQuery() {
             intEndRow      = arrLines.length - 1;
             intEndColumn   = arrLines[arrLines.length - 1].length - 1;
 
-            strRunQuery = strQuery;
+            strRunQuery = (strQuery || ' ');
         }
     }
 

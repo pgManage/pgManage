@@ -137,13 +137,11 @@ function setHomeValue(strName, strText, strToolbarAddons) {
 function openToTab() {
     var editorSelectionRange = homeEditor.getSelectionRange()
       , strQuery = homeEditor.getValue() , intStart = 0
-      , intEnd = 0, i, len, arrLines, newQuery;
+      , intEnd = 0, i, len, arrLines, newQuery, intCommentStart;
     
     if (editorSelectionRange.start.row !== editorSelectionRange.end.row ||
         editorSelectionRange.start.column !== editorSelectionRange.end.column) {
-        
         arrLines = strQuery.split('\n');
-        
         for (i = 0, len = arrLines.length; i < len; i += 1) {
             if (i < editorSelectionRange.start.row) {
                 intStart += arrLines[i].length + 1;
@@ -165,7 +163,12 @@ function openToTab() {
         
         newQuery = strQuery.substring(intStart, intEnd);
     } else {
-        newQuery = strQuery;
+        arrLines = strQuery.split('\n');
+        intCommentStart = strQuery.lastIndexOf('/*');
+        //intCommentEnd = strQuery.lastIndexOf('*/');
+        console.log(intCommentStart);
+        
+        newQuery = strQuery.substring(0, intCommentStart);
     }
     
     newTab('sql', (homeEditor.currentTabName || ''), {'strContent': (newQuery || '-- Nothing to open\n\n\n')});
