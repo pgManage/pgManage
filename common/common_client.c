@@ -219,6 +219,8 @@ finish:
 }
 
 void client_reconnect_timer_cb(EV_P, ev_prepare *w, int revents) {
+	if (revents != 0) {
+	} // get rid of unused parameter warning
 	struct sock_ev_client_reconnect_timer *client_reconnect_timer = (struct sock_ev_client_reconnect_timer *)w;
 
 	if ((client_reconnect_timer->close_time + 10) < ev_now(EV_A)) {
@@ -323,7 +325,6 @@ void client_cb(EV_P, ev_io *w, int revents) {
 	size_t int_conn_index_len = 0;
 #endif
 
-	char *ptr_session_id = NULL;
 #ifdef _WIN32
 	char *str_temp = NULL;
 #endif
@@ -680,7 +681,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					SFREE(str_response);
 
 					SERROR_SALLOC(client->str_session_id, 10 + 1);
-					snprintf(client->str_session_id, 11, "0x%08zx", int_global_session_id++);
+					snprintf(client->str_session_id, 11, "0x%08llx", int_global_session_id++);
 					SERROR_SNCAT(str_response, &int_response_len, "sessionid = ", (size_t)12, client->str_session_id, (size_t)10, "\n", (size_t)1);
 
 					SERROR_CHECK(

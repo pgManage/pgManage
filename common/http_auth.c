@@ -21,7 +21,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 	SFINISH_SALLOC(str_session_id_temp, 32);
 	SFINISH_CHECK(RAND_bytes((unsigned char *)str_session_id_temp, 32), "RAND_bytes failed");
 	size_t int_len = 32;
-	str_session_id = hexencode(str_session_id_temp, &int_len);
+	str_session_id = hexencode((unsigned char *)str_session_id_temp, &int_len);
 	SFINISH_CHECK(str_session_id != NULL, "hexencode failed");
 
 	char str_buf[101] = {0};
