@@ -26,5 +26,5 @@ removes the idle watcher.
 */
 void _decrement_idle(EV_P);
 #define decrement_idle(A) \
-	debug_root(__FILE__, __LINE__, (char *)__func__, "increment_idle: %d", int_idle_count); \
+	debug_root(__FILE__, __LINE__, (char *)__func__, "decrement_idle: %d", int_idle_count); \
 	_decrement_idle(A);

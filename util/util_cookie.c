@@ -30,7 +30,7 @@ char *str_expire_one_day() {
 	struct tm *tm_return_time = gmtime(&return_time_t);
 
 	// convert to string
-	strftime(str_return, 50, "%a, %d %b %Y %H:%M:%S %Z", tm_return_time);
+	strftime(str_return, 50, "%a, %d %b %Y %H:%M:%S GMT", tm_return_time);
 
 	// HARK YE ONLOOKER: GOOGLE CHROME DOES NOT UNDERSTAND ANYTHING BUT GMT TIME
 	// ZONES! DO NOT USE OTHER TIME ZONES!

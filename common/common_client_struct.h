@@ -42,6 +42,14 @@ struct sock_ev_client_cnxn {
 	struct sock_ev_client *parent;
 };
 
+struct sock_ev_client_reconnect_timer {
+	ev_prepare prepare;
+
+	ev_tstamp close_time;
+
+	struct sock_ev_client *parent;
+};
+
 struct sock_ev_client_timeout_prepare {
 	ev_prepare prepare;
 
@@ -57,6 +65,7 @@ void _client_timeout_prepare_free(struct sock_ev_client_timeout_prepare *client_
 struct sock_ev_client_paused_request {
 	ev_watcher *watcher;
 	int revents;
+	bool bol_is_db_framework;
 };
 void client_paused_request_free(struct sock_ev_client_paused_request *client_paused_request);
 
@@ -98,6 +107,8 @@ struct sock_ev_client_message {
 struct sock_ev_client {
 	ev_io io;
 
+	connect_cb_t connect_cb;
+
 	bool bol_is_open;
 	bool bol_socket_is_open;
 
@@ -108,6 +119,7 @@ struct sock_ev_client {
 	char *str_conn;
 	char *str_cookie;
 	char *str_cookie_name;
+	char *str_session_id;
 
 	size_t int_username_len;
 	size_t int_database_len;
@@ -121,6 +133,8 @@ struct sock_ev_client {
 	bool bol_handshake;
 	bool bol_connected;
 
+	bool bol_public;
+
 	bool bol_upload;
 	char *str_boundary;
 	size_t int_boundary_length;
@@ -133,21 +147,23 @@ struct sock_ev_client {
 	int int_sock;
 	struct sock_ev_serv *server;
 	struct tls *tls_postage_io_context;
-	bool bol_fast_close;
 
 	char *str_message;
+	size_t int_message_len;
 	char *str_notice;
 
 	Queue *que_message;
 
 	struct sock_ev_client_timeout_prepare *client_timeout_prepare;
 	struct sock_ev_client_paused_request *client_paused_request;
+	struct sock_ev_client_reconnect_timer *client_reconnect_timer;
 
 	DB_conn *conn;
 
 	struct sock_ev_client_request *cur_request;
 	Queue *que_request;
 	struct sock_ev_client_request_watcher *client_request_watcher;
+	struct sock_ev_client_request_watcher *client_request_watcher_search;
 	struct sock_ev_client_copy_check *client_copy_check;
 	struct sock_ev_client_copy_io *client_copy_io;
 	bool bol_request_in_progress;

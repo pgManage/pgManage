@@ -8,7 +8,7 @@ static const char *str_time_format = "%H:%M:%S";
 
 extern char *_DB_get_diagnostic(DB_conn *conn, PGresult *res);
 
-char *ws_raw_step1(struct sock_ev_client_request *client_request) {
+void ws_raw_step1(struct sock_ev_client_request *client_request) {
 	char *ptr_query = NULL;
 	char *str_response = NULL;
 	client_request->arr_query = NULL;
@@ -100,6 +100,7 @@ char *ws_raw_step1(struct sock_ev_client_request *client_request) {
 	client_request->int_i = -1;
 	client_request->int_len = (ssize_t)DArray_end(client_request->arr_query);
 
+	SINFO("client_request->parent: %p", client_request->parent);
 	int_status = PQsendQuery(client_request->parent->cnxn, "BEGIN");
 	if (int_status != 1) {
 		SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
@@ -139,7 +140,6 @@ finish:
 		ws_raw_step3(global_loop, NULL, 0, client_request);
 	}
 	bol_error_state = false;
-	return str_response;
 }
 
 bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_client_request *client_request) {

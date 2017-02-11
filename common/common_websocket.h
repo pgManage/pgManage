@@ -19,7 +19,7 @@
 /*
 This function generates a websocket handshake response based on the request
 */
-char *WS_handshakeResponse(char *str_request, size_t int_request_len);
+char *WS_handshakeResponse(char *str_request, size_t int_request_len, size_t *int_response_len);
 
 /*
 This function prepares a client_message structure for the incoming data, then

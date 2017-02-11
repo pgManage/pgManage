@@ -67,7 +67,7 @@ So we are just showing what all of a request's steps look like, then all of the
 functions
 */
 
-char *ws_file_step1(struct sock_ev_client_request *client_request);
+void ws_file_step1(struct sock_ev_client_request *client_request);
 
 /*
 ********************************** REQUEST FORMAT

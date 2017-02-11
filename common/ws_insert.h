@@ -66,7 +66,7 @@ This function will:
 1. parse request into variables
 2. create first temp table to hold data the client sent
 */
-char *ws_insert_step1(struct sock_ev_client_request *client_request);
+void ws_insert_step1(struct sock_ev_client_request *client_request);
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
 /*
@@ -88,6 +88,13 @@ This function will create second temp table to hold the inserted rows (this
 allows us to see the effect of defaults, rules and triggers)
 */
 bool ws_insert_step4(EV_P, void *cb_data, DB_result *res);
+
+#ifndef POSTAGE_INTERFACE_LIBPQ
+/*
+This function will drop the identity column we make
+*/
+bool ws_insert_step45_sql_server(EV_P, void *cb_data, DB_result *res);
+#endif
 
 /*
 create second temp table query came back

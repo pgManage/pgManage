@@ -1,6 +1,7 @@
 #pragma once
 
 #include "http_main.h"
+#include <openssl/md5.h>
 
 struct sock_ev_client_auth_cnxn {
 	ev_io io;
@@ -55,10 +56,12 @@ initiate a postgresql connection
 In all other cases:
 This function will gather what the client wants, then just send it
 */
-char *http_auth(struct sock_ev_client_auth *client_auth);
+void http_auth(struct sock_ev_client_auth *client_auth);
 
 /*
-These two functions handle the steps of login after authentication
+These three functions handle the steps of login after authentication
+
+http_auth_login_step15 (only in envelope) will set the session user
 
 http_auth_login_step2 will initiate a query to:
 1. check if they are a super user
@@ -71,6 +74,9 @@ http_auth_login_step3 will:
 there)
 3. finally, it will tell the browser what url to go to
 */
+#ifdef ENVELOPE
+void http_auth_login_step15(EV_P, void *cb_data, DB_conn *conn);
+#endif
 void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn);
 bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res);
 

@@ -130,6 +130,7 @@ void http_select_step1(struct sock_ev_client *client) {
 	}
 
 	SDEBUG("client_select->str_sql: %s", client_select->str_sql);
+	SFINISH_CHECK(query_is_safe(client_select->str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_get_column_types_for_query(global_loop, client->conn, client_select->str_sql, client, http_select_step2),
 		"DB_get_column_types_for_query failed");
 
@@ -300,6 +301,7 @@ bool http_select_step2(EV_P, void *cb_data, DB_result *res) {
 	DB_free_result(res);
 	// Use the sql we generated earlier to send all the data to the socket
 	SDEBUG("client_select->str_sql: %s", client_select->str_sql);
+	SFINISH_CHECK(query_is_safe(client_select->str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_select->str_sql, http_select_step3), "DB_exec failed");
 
 	SDEBUG("str_response: %s", str_response);

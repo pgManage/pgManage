@@ -9,7 +9,7 @@ struct custom_check_callback {
 	struct sock_ev_client_request *client_request;
 };
 
-char *ws_tab_step1(struct sock_ev_client_request *client_request) {
+void ws_tab_step1(struct sock_ev_client_request *client_request) {
 	SDEFINE_VAR_ALL(str_path_temp, str_local_path_root, str_change_stamp, str_query);
 	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
 	char *str_response = NULL;
@@ -216,8 +216,8 @@ finish:
 		);
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
+		str_response = NULL;
 	}
-	return str_response;
 }
 
 // **************************************************************************************

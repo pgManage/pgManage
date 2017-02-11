@@ -1,5 +1,10 @@
 #include "common_auth.h"
 
+#ifdef ENVELOPE
+void connect_cb_env(EV_P, void *cb_data, DB_conn *conn);
+bool connect_cb_env_step2(EV_P, void *cb_data, DB_result *res);
+#endif
+
 // get connection string from cookie
 DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	char *str_response = NULL;
@@ -7,7 +12,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	SDEFINE_VAR_MORE(str_conn_debug, str_username, str_connname, str_database, str_uri_temp, str_context_data);
 	SDEFINE_VAR_MORE(str_host, str_uri_ip_address, str_uri_host);
 	char *str_conn = NULL;
-	bool bol_public = false;
+	client->bol_public = false;
 	ssize_t int_i = 0;
 	ssize_t int_len = 0;
 	size_t int_conn_index = 0;
@@ -49,7 +54,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 				) ||
 				strncmp(str_uri_temp, "/env/acceptnc_", 14) == 0
 			) {
-				bol_public = true;
+				client->bol_public = true;
 			}
 		} else if (strstr(str_uri_temp, "actionnc_") != NULL) {
 			char *ptr_dot = strstr(str_uri_temp, ".");
@@ -60,14 +65,14 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 				) ||
 				strncmp(str_uri_temp, "/env/actionnc_", 14) == 0
 			) {
-				bol_public = true;
+				client->bol_public = true;
 			}
 		}
-		SDEBUG("bol_public: %s", bol_public ? "true" : "false");
+		SDEBUG("client->bol_public: %s", client->bol_public ? "true" : "false");
 #endif
-		SFINISH_CHECK(bol_public, "No Cookie.");
+		SFINISH_CHECK(client->bol_public, "No Cookie.");
 	}
-	if (bol_public == false) {
+	if (client->bol_public == false) {
 		// Make sure we have the last close time
 		if (client->int_last_activity_i == -1) {
 			// If we don't, then find it
@@ -149,7 +154,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 					) ||
 					strncmp(str_uri_temp, "/env/acceptnc_", 14) == 0
 				) {
-					bol_public = true;
+					client->bol_public = true;
 				}
 			} else if (strstr(str_uri_temp, "actionnc_") != NULL) {
 				char *ptr_dot = strstr(str_uri_temp, ".");
@@ -160,13 +165,13 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 					) ||
 					strncmp(str_uri_temp, "/env/actionnc_", 14) == 0
 				) {
-					bol_public = true;
+					client->bol_public = true;
 				}
 			}
 #endif
-			SFINISH_CHECK(bol_public, "Session expired");
+			SFINISH_CHECK(client->bol_public, "Session expired");
 		}
-		SDEBUG("bol_public: %s", bol_public ? "true" : "false");
+		SDEBUG("client->bol_public: %s", client->bol_public ? "true" : "false");
 
 		str_cookie_decrypted = aes_decrypt(str_cookie_encrypted, &int_cookie_len);
 
@@ -194,7 +199,10 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 			SNOTICE("REQUEST DATABASE: %s", str_database);
 		}
 
-	} else {
+	}
+
+	if (client->bol_public) {
+		SFREE(str_username);
 		SFINISH_SNCAT(str_username, &client->int_username_len,
 			str_global_public_username, strlen(str_global_public_username));
 		int_user_length = strlen(str_global_public_username);
@@ -277,8 +285,8 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 			"restart " SUN_PROGRAM_LOWER_NAME "");
 	}
 
-	SDEBUG("bol_public: %s", bol_public ? "true" : "false");
-	if (bol_public == false) {
+	SDEBUG("client->bol_public: %s", client->bol_public ? "true" : "false");
+	if (client->bol_public == false) {
 		str_password = getpar(str_cookie_decrypted, "password", int_cookie_len, &int_password_length);
 		SFINISH_CHECK(str_password != NULL, "getpar failed");
 
@@ -353,8 +361,22 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 			str_uri_host, int_uri_host_len
 		);
 
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
+		SDEBUG("bol_global_set_user: %s", bol_global_set_user ? "true" : "false");
+		if (bol_global_set_user) {
+			// The only difference here is the callback and no user/pw
+			SDEBUG("SET SESSION CONN");
+			client->connect_cb = connect_cb;
+			client->conn = DB_connect(global_loop, client, str_conn, NULL, 0, NULL, 0,
+				str_context_data, connect_cb_env);
+		} else {
+#endif
+		SDEBUG("NORMAL CONN");
 		client->conn = DB_connect(global_loop, client, str_conn, str_username, int_user_length, str_password, int_password_length,
 			str_context_data, connect_cb);
+#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
+		}
+#endif
 	}
 	SFREE_PWORD(str_password);
 	bol_error_state = false;
@@ -432,7 +454,6 @@ finish:
 			} else {
 				SERROR_NORESPONSE("write() failed");
 			}
-			ev_io_stop(global_loop, &client->io);
 			SFINISH_CLIENT_CLOSE(client);
 		}
 		SFREE_PWORD(str_response);
@@ -440,3 +461,68 @@ finish:
 	bol_error_state = false;
 	return client->conn;
 }
+
+#ifdef ENVELOPE
+
+void connect_cb_env(EV_P, void *cb_data, DB_conn *conn) {
+	SDEBUG("connect_cb_env");
+	struct sock_ev_client *client = cb_data;
+	char *str_response = NULL;
+	size_t int_response_len = 0;
+	size_t int_temp = 0;
+	SDEFINE_VAR_ALL(str_user_ident, str_diag, str_sql);
+
+	SFINISH_CHECK(conn->int_status == 1, "%s", conn->str_response);
+
+	str_user_ident = DB_escape_identifier(client->conn, client->str_username, client->int_username_len);
+	SFINISH_CHECK(str_user_ident != NULL, "DB_escape_identifier failed");
+
+	char *str_temp1 = "SET SESSION AUTHORIZATION ";
+	SFINISH_SNCAT(
+		str_sql, &int_temp,
+		str_temp1, strlen(str_temp1),
+		str_user_ident, strlen(str_user_ident),
+		";", (size_t)1
+	);
+
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
+	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, str_sql, connect_cb_env_step2), "DB_exec failed");
+
+	bol_error_state = false;
+finish:
+	if (bol_error_state == true) {
+		SFREE(conn->str_response);
+		conn->str_response = str_response;
+		conn->int_status = -1;
+		client->connect_cb(EV_A, client, conn);
+	}
+	bol_error_state = false;
+	SFREE_ALL();
+}
+
+bool connect_cb_env_step2(EV_P, void *cb_data, DB_result *res) {
+	SDEBUG("connect_cb_env_step2");
+	struct sock_ev_client *client = cb_data;
+	char *str_response = NULL;
+	size_t int_response_len = 0;
+	SDEFINE_VAR_ALL(str_diag);
+	str_diag = DB_get_diagnostic(client->conn, res);
+
+	SFINISH_CHECK(res != NULL, "DB_exec failed");
+	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed: %s", str_diag);
+
+	client->connect_cb(EV_A, client, client->conn);
+
+finish:
+	DB_free_result(res);
+	if (bol_error_state == true) {
+		SFREE(client->conn->str_response);
+		client->conn->str_response = str_response;
+		client->conn->int_status = -1;
+		client->connect_cb(EV_A, client, client->conn);
+	}
+	bol_error_state = false;
+	SFREE_ALL();
+	return true;
+}
+#endif

@@ -52,7 +52,7 @@ This function will:
 2. build select sql
 3. prepare statement so that we can get the column types from it
 */
-char *ws_select_step1(struct sock_ev_client_request *client_request);
+void ws_select_step1(struct sock_ev_client_request *client_request);
 
 /*
 results of second query came back

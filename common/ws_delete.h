@@ -49,7 +49,7 @@ This function will:
 (optional) and pk)
 2. create temp table to hold data the client sent
 */
-char *ws_delete_step1(struct sock_ev_client_request *client_request);
+void ws_delete_step1(struct sock_ev_client_request *client_request);
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
 /*

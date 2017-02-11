@@ -130,6 +130,7 @@ void http_update_step1(struct sock_ev_client *client) {
 	);
 	SDEBUG("client_update->str_type_sql: %s", client_update->str_type_sql);
 
+	SFINISH_CHECK(query_is_safe(client_update->str_type_sql), "SQL Injection detected");
 	SFINISH_CHECK(
 		DB_get_column_types_for_query(global_loop, client->conn, client_update->str_type_sql, client, http_update_step2),
 		"DB_get_column_types_for_query failed");
@@ -406,6 +407,7 @@ bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 		);
 	}
 	SDEBUG("client_update->str_sql: %s", client_update->str_sql);
+	SFINISH_CHECK(query_is_safe(client_update->str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_update->str_sql, http_update_step3), "DB_exec failed");
 
 	DB_free_result(res);
@@ -523,6 +525,7 @@ bool http_update_step3(EV_P, void *cb_data, DB_result *res) {
 		);
 	}
 	SDEBUG("client_update->str_sql: %s", client_update->str_sql);
+	SFINISH_CHECK(query_is_safe(client_update->str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_update->str_sql, http_update_step4), "DB_exec failed");
 
 	DB_free_result(res);
@@ -599,6 +602,7 @@ bool http_update_step4(EV_P, void *cb_data, DB_result *res) {
 	);
 
 	SDEBUG("client_update->str_sql: %s", client_update->str_sql);
+	SFINISH_CHECK(query_is_safe(client_update->str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_update->str_sql, http_update_step5), "DB_exec failed");
 
 	DB_free_result(res);
