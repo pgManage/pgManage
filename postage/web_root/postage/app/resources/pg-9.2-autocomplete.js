@@ -81,7 +81,8 @@ function autocompleteBindEditor(tabElement, editor) {
                 //console.log(cursorPos, cursorPosRow, cursorPosCol);
                 //console.log(editor.currentQueryRange.text.substring(cursorPosCol, cursorPosCol)); //(cursorPosRow, cursorPosCol, cursorPosRow, cursorPosCol));
             
-            
+//            console.log(editor.ignoreChange !== true && event.action === 'insert' && autocompleteGlobals.bolInserting === false && editor.currentQueryRange);
+//            console.log(editor.ignoreChange, event.action,  autocompleteGlobals.bolInserting, editor.currentQueryRange);
             //console.log('test 1', editor.currentQueryRange);
             if (editor.ignoreChange !== true
                 && event.action === 'insert'

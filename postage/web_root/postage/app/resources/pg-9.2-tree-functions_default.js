@@ -1893,7 +1893,7 @@ function dataObjectButtons(strType, intOID, strSchema, strName) {
 
 
 function dumpButton(strOid, strName) {
-    return '<gs-button icononly icon="edit" no-focus title="Dump schema objects"'
+    return '<gs-button icononly icon="edit" no-focus title="Dump schema to tab"'
                     + ' onclick="dialogSchemaSurgery(\'' + strOid + '\', \'' + strName + '\')"></gs-button>';
 }
 
@@ -1910,7 +1910,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-header>
-                <center><h3>Dump Schema Objects</h3></center>
+                <center><h3>Dump schema to tab</h3></center>
             </gs-header>
             <gs-body padded>
                 <center>What code do you want for the schema: "<span id="dialog-sql-dump-schema"></span>"?</center>

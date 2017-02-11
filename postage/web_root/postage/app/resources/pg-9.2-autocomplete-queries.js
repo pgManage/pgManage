@@ -17,6 +17,7 @@ autocompleteSearchQuery.table = ml(function () {/*
              AND relname = $NAMETOKEN${{NAME}}$NAMETOKEN$ {{ADDITIONALWHERE}}
     ) list_tables
 */});
+
 autocompleteSearchQuery.view = ml(function () {/*
     SELECT * FROM (
           SELECT c.oid, c.relname, 'view'::text
@@ -39,6 +40,15 @@ autocompleteQuery.operators = ml(function () {/*
     ) list_operators
 */});
 
+autocompleteQuery.tableFunctions = ml(function () {/*
+    SELECT * FROM (
+        SELECT p.proname AS funcname, 'tableFunction'::text AS obj_meta
+            FROM pg_proc p
+            LEFT JOIN pg_type ON pg_type.oid = prorettype
+            WHERE pg_type.typname = 'record'
+            ORDER BY funcname
+    ) list_tables_functions
+*/});
 
 autocompleteQuery.encodings = ml(function () {/*
     SELECT * FROM (
@@ -64,7 +74,7 @@ autocompleteQuery.returnTypes = ml(function () {/*
         SELECT DISTINCT pg_type.typname
            FROM pg_proc p
            LEFT JOIN pg_type ON pg_type.oid = prorettype
-    ) list_returnTypes
+    ) list_return_types
 */});
 
 
