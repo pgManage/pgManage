@@ -711,8 +711,9 @@ window.addEventListener('design-register-element', function () {
     
     function fileUpload(element, target) {
         var templateElement = document.createElement('template');
+        var strHTML;
         
-        templateElement.innerHTML = ml(function () {/*
+        strHTML = ml(function () {/*
             <gs-page>
                 <gs-header><center><h3>Upload a File</h3></center></gs-header>
                 <gs-body padded>
@@ -720,10 +721,21 @@ window.addEventListener('design-register-element', function () {
                                 enctype="multipart/form-data">
                         <label>File:</label>
                         <gs-text class="upload-file" name="file_content" type="file"></gs-text>
-                        <br hidden />
-                        <label hidden>File Name:</label>
+                    */});
+        
+        if (element.hasAttribute('upload-choose-file-name')) {
+            strHTML += ml(function () {/*
+                        <br />
+                        <label>File Name:</label>
+                        <gs-text class="upload-name" disabled autocorrect="off" autocapitalize="off" autocomplete="off" spellcheck="false"></gs-text>
+            */});
+        } else {
+            strHTML += ml(function () {/*
                         <gs-text class="upload-name" hidden></gs-text>
-                        
+            */});
+        }
+        
+        strHTML +=  ml(function () {/*
                         <input class="upload-path" name="file_name" hidden />
                     </form>
                     <iframe class="upload-frame" name="upload_response_gs_folder" hidden></iframe>
@@ -736,7 +748,9 @@ window.addEventListener('design-register-element', function () {
                 </gs-footer>
             </gs-page>
         */});
-        
+
+        templateElement.innerHTML = strHTML;
+
         GS.openDialog(templateElement, function () {
             var dialog = this,
                 formElement = xtag.query(dialog, '.upload-form')[0],
@@ -773,6 +787,7 @@ window.addEventListener('design-register-element', function () {
             fileControl.addEventListener('change', function(event) {
                 var strValue = this.value;
                 
+                nameControl.removeAttribute('disabled');
                 nameControl.value = strValue.substring(strValue.lastIndexOf('\\') + 1);
                 nameControl.focus();
             });

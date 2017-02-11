@@ -323,6 +323,8 @@
                             jsnMessage.session === socket.oldSessionID
                         ) && jsnMessage.bolFinished === false) {
                         
+                        jsnMessage.session = socket.GSSessionID;
+                        
                         startFrom = 1;
                         for (i = 0, len = jsnMessage.arrResponseNumbers.length; i < len; i += 1) {
                             // if there is a difference between the current response number and the
@@ -534,6 +536,31 @@
             //console.log('SOCKET REQUEST WHILE CLOSING          ');
             callback.apply(null, ['Socket Is Closing', 'error', webSocketNormalizeError({'reason': 'Socket Is Closing'})]);
         }
+    };
+    
+    
+    GS.requestActionFromSocket = function (socket, strSchema, strObject, strArgs, finalCallback) {
+        var strMessage = 'ACTION\t' + encodeForTabDelimited(strSchema) + '\t' + encodeForTabDelimited(strObject) +
+                            '\t' + encodeForTabDelimited(strArgs) + '\n',
+            intResponse = 0, strRet;
+        
+        //console.log(strMessage);
+        
+        GS.requestFromSocket(socket, strMessage, function (data, error, errorData) {
+            var arrLines, i, len;
+            if (!error) {
+                if (intResponse === 0) {
+                    strRet = data;
+                    
+                } else {
+                    finalCallback(strRet, error);
+                }
+                
+            } else {
+                finalCallback(errorData, error);
+            }
+            intResponse += 1;
+        });
     };
     
     // abstraction function for ease of use of the RAW format

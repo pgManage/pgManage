@@ -34,6 +34,10 @@
 <b>GS.requestFromSocket</b>(
     socket, strMessage, callback
 );
+<b>GS.requestActionFromSocket</b>(
+    socket, strSchema, strObject, strArgs,
+    finalCallback
+);
 <b>GS.requestSelectFromSocket</b>(
     socket, strSchema, strObject, strReturnCols,
     strWhere, strOrd, strLimit, strOffset,
@@ -154,6 +158,43 @@
                                     document.getElementById('results').innerHTML += '<br /><hr />' + encodeHTML(data);
                                 } else {
                                     GS.webSocketErrorDialog(errorData);
+                                }
+                            });
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3"><code>GS.requestActionFromSocket</code> Example:</span><br />
+                    <p>The "<code>GS.requestActionFromSocket</code>" function is for getting data from the database via the Envelope Engine's "ACTION" API. This function calls it's callback once with the action data.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="8">
+                        <gs-button onclick="actionData()">Perform a ACTION API call</gs-button>
+                    </template>
+                    <template for="js" height="30">
+                        window.addEventListener('load', function () {
+                            GS.envSocket = GS.openSocket('env');
+                        });
+                        
+                        function actionData() {
+                            var strSchema = 'gsdoc'
+                              , strObject = 'action_test'
+                              , strArgs = 'test=test';
+                            
+                            GS.requestActionFromSocket(
+                                    GS.envSocket
+                                  , strSchema
+                                  , strObject
+                                  , strArgs
+                                  , function (data, error) {
+                                
+                                // typical command structure for handling results:
+                                
+                                if (!error) {
+                                    console.log(data);
+                                } else {
+                                    GS.webSocketErrorDialog(data);
                                 }
                             });
                         }

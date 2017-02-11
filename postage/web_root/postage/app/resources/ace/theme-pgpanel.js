@@ -14,7 +14,7 @@ var pgPanelCSSText = ml(function () {/*
     .ace-pgpanel .ace_cursor {
         color: #000000
     }
-    .ace-pgpanel .ace_marker-layer .ace_selection {
+    .XLD_ace-pgpanel .XLD_ace_marker-layer .XLD_ace_selection {
         background: #BDD5FC
     }
     .ace-pgpanel.ace_multiselect .ace_selection.ace_start {
@@ -85,8 +85,8 @@ var pgPanelCSSText = ml(function () {/*
     }
     
     .ace-pgpanel .ace_bullet { color: #000; }
-    .ace-pgpanel .ace_arrowdown { color: #000; }
-    .ace-pgpanel .ace_arrowright { color: #000; }
+    .ace-pgpanel .ace_arrowdown { color: #000; font-size: 1em;}
+    .ace-pgpanel .ace_arrowright { color: #000; font-size: 0.8em;}
     
     .ace-pgpanel .ace_ag,
     .ace-pgpanel .ace_cl,

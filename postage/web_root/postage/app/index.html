@@ -4,10 +4,19 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui, shrink-to-fit=no, user-scalable=no" />
+        <meta name="HandheldFriendly" content="true" />
+
+        <style>
+            html {
+                -webkit-text-size-adjust: none
+            }
+        </style>
 
         <title>Postage</title>
 
+
+        
         <script>
             //jslint white:true multivar:true
             var bolPropertyPanelOpen = false, bolCurl = false;
@@ -28,9 +37,22 @@
             });
 
             var reconnectNumber = 0;
+            var reconnectCheckTimer;
             window.addEventListener('socket-connect', function (event) {
                 "use strict";
-                reconnectNumber = 0;
+                var intCurrConnectNumber = reconnectNumber;
+                
+                if (reconnectCheckTimer) {
+                    clearTimeout(reconnectCheckTimer);
+                    reconnectCheckTimer = null;
+                }
+                
+                // if we can remain connected for 5 seconds: reset countdown
+                reconnectCheckTimer = setTimeout(function () {
+                    if (intCurrConnectNumber === reconnectNumber) {
+                        reconnectNumber = 0;
+                    }
+                }, 5000);
             });
             window.addEventListener('socket-reconnect', function (event) {
                 "use strict";
@@ -406,7 +428,17 @@
             #grid-panel-buttons gs-block:last-child gs-button {
                 border-right: 0 none;
             }
-        
+            #left-panel-body:HOVER {
+                cursor: wait !important;
+            }
+            .ace_line {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
         </style>
     </head>
     <body>

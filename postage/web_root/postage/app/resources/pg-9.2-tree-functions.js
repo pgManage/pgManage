@@ -1,9 +1,10 @@
+var elemPos = GS.getElementPositionData(document.getElementById('left-panel-body'));
 var bolTreeFunctionsLoaded = true
   , treeGlobals = {
         'ace':          null
       , 'aceSession':   null
       , 'data':         []
-      , 'folderPlus':   (window.navigator.userAgent.indexOf('CrOS') === -1 ? '▶' : '►')
+      , 'folderPlus':   '▶' //(window.navigator.userAgent.indexOf('CrOS') === -1 ? '▶' : '►')
       , 'folderMinus':  '▼'
       , 'scriptMarker': '•' // sometimes not used for a script in favor of a 2 character object-type specific code
       , 'padString':    ' '
@@ -25,14 +26,227 @@ var bolTreeFunctionsLoaded = true
 
 // initalize tree
 function treeStart() {
+    
+    //var ace_lines = document.getElementsByClassName('ace_line');
     'use strict';
     // create and configure tree ace
     treeGlobals.ace = ace.edit('object-list-ace');
     treeGlobals.aceSession = treeGlobals.ace.getSession();
+  
     
+    // get and save state
+    var dragstartcursorX, dragstartcursorY;
+    var strName;
+    var ghost;
+    var bolMousedown = false;
+    var intSelectionTriggered = 0;
+    var intSelectionRow;
+    var bolSelectionTriggered;
+    var mouseMoveFunction;
+    var bolOptionPressed;
+    var strNameOpt;
+    var cursorX, cursorY;
+    
+
+    document.addEventListener('keydown', function (event) {
+        if (event.keyCode === 18) {
+            bolOptionPressed = true;
+            if (ghost) {
+                ghost.innerHTML = strNameOpt;
+                ghost.style.left = (cursorX - ((ghost.innerHTML.length * 3) + 5)) + 'px';
+            }
+        }
+    });
+    document.addEventListener('keyup', function (event) {
+        if (bolOptionPressed) {
+            bolOptionPressed = false;
+            if (ghost) {
+                ghost.innerHTML = strName;
+                ghost.style.left = (cursorX - ((ghost.innerHTML.length * 3) + 5)) + 'px';
+            }
+        }
+    });
+        
+    treeGlobals.ace.addEventListener('mousedown', function (event) {
+        var stateMoveFunction;
+        var stateEndFunction;
+        bolMousedown = true;
+        intSelectionTriggered = 0;
+        var currentcursorX, currentcursorY;
+        var startcursorX, startcursorY;
+        
+        // save origin point so you can cancel if it doesn't move enough
+        startcursorX = event.clientX;
+    	startcursorY = event.clientY;
+    	// save origin point so you can cancel selection of tree view
+        dragstartcursorX = event.clientX;
+    	dragstartcursorY = event.clientY;
+
+
+
+    mouseMoveFunction = function (event) {
+        // get cursor position (x/y)
+        cursorX = event.clientX;
+    	cursorY = event.clientY;
+    	
+    	if (xtag.query(document.body, '.current-tab')[0] !== undefined){
+            // move ace cursor
+            xtag.query(document.body, '.current-tab')[0].relatedEditor.selection.moveToPosition(xtag.query(document.body, '.current-tab')[0].relatedEditor.renderer.screenToTextCoordinates(cursorX, cursorY));
+    	}
+    	
+    	// set ghost position to cursor position (x/y) with changes to center it
+        ghost.style.left = (cursorX - ((ghost.innerHTML.length * 3) + 5)) + 'px';
+        ghost.style.top = (cursorY - 15) + 'px';
+        
+        
+        //console.log(cursorX, cursorX, dragstartcursorX, dragstartcursorY);
+        // after moving ten pixels:
+        if (cursorX <= (dragstartcursorX - 10) || cursorX >= (dragstartcursorX + 10) || (cursorY <= dragstartcursorY - 10) || cursorY >= (dragstartcursorY + 10)) {
+            // clear selection
+            treeGlobals.ace.getSession().selection.clearSelection();
+        }
+    }
+
+
+        
+        // this handles mouseup out of the window by running
+        //      the end function if the mouse moves while it is up
+        stateMoveFunction = function (event) {
+            if (!evt.touchDevice) {
+                // if there is a editor tab open:
+                if (xtag.query(document.body, '.current-tab')[0] !== undefined){
+                    // focus to editor
+                    xtag.query(document.body, '.current-tab')[0].relatedEditor.focus();
+                }
+            }
+            // IF mouse is up AND we're not on a touch device
+            if (event.which === 0 && !evt.touchDevice) {
+                stateEndFunction(event);
+            }
+        };
+
+        stateEndFunction = function (event) {
+            // get current cursor position
+            currentcursorX = (window.Event) ? event.pageX : event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
+            currentcursorY = (window.Event) ? event.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+            bolMousedown = false;
+            bolSelectionTriggered = 0;
+            
+            
+            // if cursor has moved off of treeview to the editor ace
+            if (currentcursorX > (elemPos.intElementWidth + 60)) {
+                // if there is a editor tab open:
+                if (xtag.query(document.body, '.current-tab')[0] !== undefined){
+                    // insert snippet text
+                    xtag.query(document.body, '.current-tab')[0].relatedEditor.insert(ghost.innerHTML);
+                }
+            }
+            
+            
+            // remove ghost if appended
+            if (ghost && ghost.parentNode && ghost.parentNode.nodeName === 'BODY') {
+                ghost.parentNode.removeChild(ghost);
+            }
+            
+            
+        strName = '';
+        // unbind mousemove and mouseup
+        document.body.removeEventListener(evt.mousemove, stateMoveFunction);
+        document.body.removeEventListener(evt.mouseup, stateEndFunction);
+        document.body.removeEventListener('mousemove', mouseMoveFunction);
+        };
+
+        document.body.addEventListener(evt.mousemove, stateMoveFunction);
+        document.body.addEventListener(evt.mouseup, stateEndFunction);
+    });
+
+    // start drag on changeSelection
+    treeGlobals.ace.addEventListener('changeSelection', function (event) {
+        var jsnSelection;
+        var jsnData;
+        var subStrEnd;
+
+        // only listen to selection change on the second trigger
+    if (intSelectionTriggered === 0) {
+            intSelectionTriggered += 1;
+        } else if (bolMousedown && intSelectionTriggered === 1) {
+            intSelectionTriggered += 1;
+            jsnSelection = treeGlobals.ace.getSelectionRange();
+            intSelectionRow = jsnSelection.start.row;
+            jsnData = treeGlobals.data[intSelectionRow];
+
+
+            if (jsnData) {
+                // tables
+                if (jsnData.query === 'objectTable') {
+                    strName = jsnData.name.substring(3);
+                    strNameOpt = jsnData.schemaName + '.' + jsnData.name.substring(3)
+                // views
+                } else if (jsnData.query === 'objectView') {
+                    strName = jsnData.name.substring(3);
+                    strNameOpt = jsnData.schemaName + '.' + jsnData.name.substring(3);
+                // non-schema objects (functions, sequences, etc...)
+                } else if (jsnData.schemaName && jsnData.schemaOID && jsnData.oid !== jsnData.schemaOID) {
+                    strName = jsnData.name;
+                    strNameOpt = jsnData.schemaName + '.' + jsnData.name;
+                // schemas
+                } else if (!jsnData.schemaName && jsnData.oid) { // schemas use .name for their name, not .schemaName
+                    strName = jsnData.name;
+                    strNameOpt = jsnData.name;
+                // columns
+                }if (jsnData.type === '') {
+                    
+                    // substring column type off of column name
+                    subStrEnd = strName.lastIndexOf(' (');
+                    strName = strName.substring(0, subStrEnd);
+                    
+                    // go up a record until you find a table/view
+                    for (var intI = intSelectionRow; intI >= 0; intI -= 1) {
+                        if (treeGlobals.data[intI].query === 'objectTable') {
+                            
+                            strNameOpt = treeGlobals.data[intI].name.substring(3) + '.' + strName.substring(0, subStrEnd);
+                            //set intI to  0 to cancel the loop
+                            intI = 0;
+                        } else if (treeGlobals.data[intI].query === 'objectView') {
+                            strNameOpt = treeGlobals.data[intI].name.substring(3) + '.' + strName.substring(0, subStrEnd);
+                            //set intI to  0 to cancel the loop
+                            intI = 0;
+                        }
+                    }
+                }
+                if (strName) {
+                    document.body.addEventListener('mousemove', mouseMoveFunction);
+                }
+            }
+            
+            if (strName) {
+                ghost = document.createElement('p')
+                ghost.style.minHeight = '0px';
+                ghost.style.padding = '0.25em';
+                ghost.style.position = 'absolute';
+                ghost.style.zIndex = '999999999999';
+                ghost.style.opacity = '0.5';
+                ghost.style.width = strName.length + '.99em';
+                ghost.style.height =  '1.5em';
+                ghost.innerHTML += '' + strName + '';
+                ghost.style.pointerEvents = 'none';
+                
+                // if ghost is not appended yet: append to body
+                if (!ghost.parentNode || ghost.parentNode.nodeName !== 'BODY') {
+                    document.body.appendChild(ghost);
+                }
+                
+                
+            }
+            
+        }
+    });
+
+
+
     treeGlobals.aceSession.setMode('ace/mode/text');
     //treeGlobals.aceSession.setUseWrapMode('free');
-    
+
     treeGlobals.ace.setTheme('ace/theme/pgpanel');
     treeGlobals.ace.getSession().setMode('ace/mode/pgpanel');
     treeGlobals.ace.setShowPrintMargin(false);
@@ -46,12 +260,31 @@ function treeStart() {
     treeGlobals.ace.renderer.setShowGutter(false);
     treeGlobals.ace.renderer.hideCursor();
     treeGlobals.ace.renderer.$cursorLayer.element.style.display = 'none';
+
+    // When we are on a touch device, clicking into an ace editor brings up the
+    //      keyboard. We don't want that to happen in the tree, so if we're on
+    //      a touch device, we disable the ace editor's internal textarea to
+    //      prevent it from getting focus.
+    if (evt.touchDevice) {
+        treeGlobals.ace.renderer.textarea.setAttribute('disabled', '');
+        //treeGlobals.ace.renderer.textarea.addEventListener('focus', function (event) {
+        //    event.preventDefault();
+        //    document.body.focus();
+        //});
+    }
     
+    //treeGlobals.ace.renderer.setStyle("disabled", true);
+    
+    //treeGlobals.ace.getSession().selection.on('changeSelection', function (e) {
+    //    treeGlobals.ace.getSession().selection.clearSelection();
+    //});
+    
+
     // allow the user to scroll past the bottom of the ace so that when they are
     //      scrolled to the bottom and they close a folder they don't get scrolled
     //      to a different position
     treeGlobals.ace.setOption('scrollPastEnd', true);
-    
+
     // this code has been replaced with the line above
     //// add whitespace to the end of the tree so that when you close a folder the tree does not scroll unexpectedly
     //treeRefreshWhitespace();
@@ -60,14 +293,14 @@ function treeStart() {
     //window.addEventListener('resize', function () {
     //    treeRefreshWhitespace();
     //});
-    
+
     // set ace inital value and selection in the ace
     //treeGlobals.ace.setValue('Schemas\n');
     //treeGlobals.ace.selection.setSelectionRange(new Range(0, 0, 0, 0));
-    
+
     // make nothing initially selected - didn't work
     treeGlobals.ace.setHighlightActiveLine(false);
-    
+
     // create "Roles" and "More" markers
     treeGlobals.rolesMarkerMaster = {
         'level':     0
@@ -85,7 +318,7 @@ function treeStart() {
       , 'real_text': 'More'
       , 'action':    function () {}
     };
-    
+
     // create "Schemas" marker and add it to the tree data
     treeGlobals.schemaMarkerMaster = {
         'level':     0
@@ -96,18 +329,18 @@ function treeStart() {
       , 'action':    function (data, index) {
             if (data.open === false) {
                 data.open = true;
-                
+
                 //treeGlobals.shownItems = [];
                 //treeGlobals.shownObjects = [];
-                
+
                 //treeListLoad(data, listQuery.schemas, function (arrRow) {
                 //    var jsnData;
-                //    
+                //
                 //    if (arrRow[1] !== 'pg_catalog' && arrRow[1] !== 'information_schema') {
                 //        jsnData = {'name': arrRow[1], 'truename': arrRow[1], 'oid': arrRow[0], 'type': 'folder', 'action': treeLoadSchema};
                 //        treeGlobals.shownItems.push(arrRow[1]);
                 //        treeGlobals.shownObjects.push(jsnData);
-                //        
+                //
                 //        return jsnData;
                 //    }
                 //});
@@ -119,7 +352,7 @@ function treeStart() {
     //
     //// open "Schemas"
     //treeGlobals.schemaMarker.action(treeGlobals.schemaMarker, 0);
-    
+
     // prevent double/triple/quad clicks from expanding the selection
     //      double click one of these words to see the effect I am disabling
     //      one of these selects the whole ace, which makes it so that I
@@ -127,7 +360,19 @@ function treeStart() {
     treeGlobals.ace.on('dblclick',    function (e) { e.stop() });
     treeGlobals.ace.on('tripleclick', function (e) { e.stop() });
     treeGlobals.ace.on('quadclick',   function (e) { e.stop() });
-    
+
+    //treeGlobals.ace.on('all',   function (e) { console.log('test'); });
+    //treeGlobals.ace.on('startSelect', function (e) { console.log('1***'); });
+    //treeGlobals.ace.on('startDrag',   function (e) { console.log('2***'); });
+    //treeGlobals.ace.on('selectstart', function (e) { console.log('3***'); });
+    //treeGlobals.ace.on('dragstart',   function (e) { console.log('4***'); });
+    //treeGlobals.ace.on('cursorEnter',   function (e) { console.log('4***'); });
+    //treeGlobals.ace.onDragStart = function () { console.log('5***'); };
+    //treeGlobals.ace.cancelDrag = true;
+    //treeGlobals.ace.onCursorChange = function () { console.log('6***'); };
+    //treeGlobals.ace.onSelectionChange = function () { console.log('7***'); };
+
+
     // bind click
     treeGlobals.ace.addEventListener('click', function () {
         var intStartRow = treeGlobals.ace.getSelectionRange().start.row
@@ -136,31 +381,29 @@ function treeStart() {
           , intEndColumn = treeGlobals.ace.getSelectionRange().end.column
           , rowData = treeGlobals.data[intStartRow]
           , arrType;
-        
+
         // allow highlight color
         treeGlobals.ace.setHighlightActiveLine(true);
-        
+
         // if we found a row
         if (intStartRow === intEndRow && intStartColumn === intEndColumn && rowData) {
             /*
             // if the current line has an action function
             if (rowData.action) {
                 arrType = rowData.type.split(',');
-                
             */
-            
             treeHandleLineTrigger(intStartRow, intStartColumn);
         }
     });
-    
+
     // on scroll: if we scroll past the last line:
     //      scroll to last line, this way we always have something on the screen
     treeGlobals.ace.session.addEventListener('changeScrollTop', function () {
         if (treeGlobals.ace.renderer.scrollTop === (treeGlobals.data.length * treeGlobals.ace.renderer.lineHeight)) {
-            treeGlobals.ace.renderer.scrollToLine(treeGlobals.data.length - 1);
+            treeGlobals.ace.renderer.scrollToLine(treeGlobals.data.length);
         }
     });
-    
+
     // if we're on a touch device: bind focus prevention
     if (evt.touchDevice) {
         treeGlobals.ace.keyListenerElement = xtag.query(treeGlobals.ace.container, '.ace_text-input')[0];
@@ -195,8 +438,6 @@ function treeStart() {
         });
     }
 }
-
-
 
 
 
@@ -253,6 +494,7 @@ function treeHandleLineTrigger(intRow, intColumn) {
 // if something can change while a tree is loading: send the parent data instead of the parent line so that the line will be dynamically calculated.
 function treeListLoad(parent, strQuery, functionData) {
     'use strict';
+
     getListData(strQuery, document.getElementById('left-panel-body'), function (arrList) {
         var intParentLine;
         
@@ -290,6 +532,13 @@ function treeListLoad(parent, strQuery, functionData) {
                     }
                     //else if (jsnData.type.indexOf('note') !== -1) {
                     //} else if (jsnData.type.indexOf('button') !== -1) { }
+                }
+                
+                //console.log(jsnData);
+                
+                if (jsnData.separate_bullet) {
+                    //console.log(strLineText, jsnData);
+                    strLineText += jsnData.separate_bullet + ' ';
                 }
                 
                 strLineText += jsnData.name;
@@ -1221,6 +1470,9 @@ function treeLoad(data, index, intColumn) {
                     if (arrRow[3]) {
                         jsnRow.bullet = arrRow[3];
                     }
+                    if (arrRow[4]) {
+                        jsnRow.separate_bullet = arrRow[4];
+                    }
                     
                     if (data.query === 'objectSchema') {
                         jsnRow.schemaName = (data.truename || data.name);
@@ -1254,6 +1506,9 @@ function treeLoad(data, index, intColumn) {
                     
                     if (arrRow[3]) {
                         jsnRow.bullet = arrRow[3];
+                    }
+                    if (arrRow[4]) {
+                        jsnRow.separate_bullet = arrRow[4];
                     }
                     
                     if (data.query === 'objectSchema') {
@@ -1586,9 +1841,14 @@ function dataObjectButtons(strType, intOID, strSchema, strName) {
     'use strict';
     var strHTML = '', templateElement = document.createElement('template');
     
+    // de-quote_ident strName because the datasheet page doesn't want it idented
+    if (strName[0] === '"') {
+        strName = strName.substring(1, strName.length - 1).replace(/\"\"/gi, '"');
+    }
+    
     if (strType === 'table' || strType === 'objectTable') {
         strHTML += '<gs-button icononly icon="wrench" title="Design table" ' +
-                        'onclick="newTab(\'design-table\', \'' + strSchema + '.' + strName + '\', '+
+                        'onclick="newTab(\'design-table\', \'' + encodeHTML(strSchema) + '.' + encodeHTML(strName) + '\', '+
                                 '{\'oid\': ' + intOID + '});"></gs-button>';
         
         strType = 'table';
@@ -1596,9 +1856,11 @@ function dataObjectButtons(strType, intOID, strSchema, strName) {
         strType = 'view';
     }
     
+    //console.trace(intOID, strSchema, strName, strType);
+    
     strHTML += '<gs-button icononly icon="table" title="Edit the data in this object" ' +
-                    'onclick="newTab(\'datasheet\', \'' + strSchema + '.' + strName + '\', ' +
-                        '{\'queryString\': \'type=' + strType + '&schema=' + strSchema + '&object=' + strName + '\'})"></gs-button>';
+                    'onclick="newTab(\'datasheet\', \'' + encodeHTML(strSchema) + '.' + encodeHTML(strName) + '\', ' +
+                        '{\'queryString\': \'type=' + strType + '&schema=' + encodeHTML(strSchema) + '&object=' + encodeHTML(strName) + '\'})"></gs-button>';
     
     return strHTML;
 }
@@ -1836,4 +2098,13 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
         }
     });
 }
+
+
+
+
+
+
+
+
+
 

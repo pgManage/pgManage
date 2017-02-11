@@ -59,6 +59,13 @@ autocompleteQuery.collates = ml(function () {/*
     ) list_collates
 */});
 
+autocompleteQuery.returnTypes = ml(function () {/*
+    SELECT * FROM (
+        SELECT DISTINCT pg_type.typname
+           FROM pg_proc p
+           LEFT JOIN pg_type ON pg_type.oid = prorettype
+    ) list_returnTypes
+*/});
 
 
 autocompleteQuery.policies = ml(function () {/*
@@ -725,7 +732,7 @@ autocompleteQuery.casts = ml(function () {/*
 
 autocompleteQuery.tables = ml(function () {/*
     SELECT * FROM (
-          SELECT quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) AS obj_name,
+          SELECT quote_ident(pg_class.relname) AS obj_name,
                  'Table'::text AS obj_meta
             FROM pg_class
        LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -755,7 +762,7 @@ autocompleteQuery.allcolumns = ml(function () {/*
 
 autocompleteQuery.views = ml(function () {/*
     SELECT * FROM (
-          SELECT quote_ident(pg_namespace.nspname) || '.' || quote_ident(c.relname) AS obj_name,
+          SELECT quote_ident(c.relname) AS obj_name,
                  'View'::text AS obj_meta
             FROM pg_class c
        LEFT JOIN pg_namespace ON pg_namespace.oid = c.relnamespace
@@ -835,6 +842,16 @@ autocompleteQuery.tablespace = ml(function () {/*
             FROM pg_catalog.pg_tablespace
         ORDER BY spcname ASC
     ) list_tablespaces
+*/});
+
+autocompleteQuery.builtIns = ml(function () {/*
+    SELECT * FROM (
+        SELECT p.proname AS obj_name, 'builtIns'::text AS obj_meta
+            FROM pg_proc p
+            LEFT JOIN pg_namespace n ON n.oid = p.pronamespace
+            WHERE n.nspname = 'pg_catalog'
+            ORDER BY p.proname
+    ) list_builtIns
 */});
 
 autocompleteQuery.policies = ml(function () {/*

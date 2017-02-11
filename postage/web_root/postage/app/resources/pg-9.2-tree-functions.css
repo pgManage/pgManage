@@ -8,8 +8,10 @@
 }
 
 #object-list-ace > .ace_scroller {
-    cursor: pointer;
+    cursor: default;
 }
+
+
 /*
 #object-list-container {
     padding-left: 0.1em;

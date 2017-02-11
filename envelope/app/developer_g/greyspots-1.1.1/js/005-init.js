@@ -451,7 +451,7 @@ window.addEventListener('load', function () {
             
             // this is for envelope
             if (location.pathname.indexOf('/v1/') === 0) {
-                strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Home</a></b></center>';
+                strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Main Menu</a></b></center>';
                 strHTML += '<center>' +
                                 '<gs-button target="_self" href="/env/auth/?action=logout" inline>Log out</gs-button><br />' +
                                 '<gs-button onclick="GS.userChangePassword()" inline>Change Password</gs-button>' +
@@ -460,7 +460,7 @@ window.addEventListener('load', function () {
                 
             // and this is for the new envelope
             } else if (location.pathname.indexOf('/env/') === 0) {
-                strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Home</a></b></center>';
+                strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Main Menu</a></b></center>';
                 strHTML += '<center>' +
                                 '<gs-button target="_self" href="/env/auth/?action=logout" inline>Log out</gs-button><br />' +
                                 '<gs-button onclick="GS.userChangePassword()" inline>Change Password</gs-button>' +

@@ -32,9 +32,13 @@
     width: 100%;
     font-size: 0.65em;
     position: absolute;
-    top: -1.4em;
-    right: 0.2em;
+    /*top: -1.4em;
+    padding-right: 0.2em;*/
+    left: -1px;
     height: 1.5em;
+    padding-top: 0.2em;
+    background-color: #FFFFFF;
+    border: 1px solid #AAAAAA;
 }
 
 /*

@@ -6,7 +6,7 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
         
-        <title class="title">Home</title>
+        <title class="title">Main Menu</title>
         
         <script src="/js/greyspots.js" type="text/javascript"></script>
         <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
@@ -182,7 +182,7 @@
         <gs-page>
             <gs-header>
                 <div flex-horizontal>
-                    <h3 class="title" flex>Home</h3>
+                    <h3 class="title" flex>Main Menu</h3>
                     <gs-button id="button-logout-user" href="/env/auth/?action=logout" title="Sign out" icononly icon="sign-out" iconrotatedown target="_self"></gs-button>
                 </div>
             </gs-header>
@@ -203,6 +203,10 @@
                 <br />-->
                 <div id="user-app-list-container">
                     
+                    
+                    
+                    <gs-button target="_blank" data-group="normal_g" href="https://www.sunnyserve.com/env/app/all/upload.html" jumbo bg-primary>Upload</gs-button>
+                    <br />
                     <gs-button target="_blank" data-user="joseph@wfprod.com" href="../wiki_g/index.html?page_id=63243"><b>MENU</b></gs-button>
                     
                     <div class="group-container" data-group="trc_g">
@@ -314,6 +318,7 @@
                             <gs-button jumbo target="_blank" data-user="jen@tocci.org" href="../all/backups.html">Backup Status</gs-button>
                             <gs-button jumbo target="_blank" data-group="cal2_g" href="../cal2_g/calendar.html">Calendar</gs-button>
                             <gs-button jumbo target="_blank" data-group="days_g" href="../days_g/index.html">Countdown</gs-button>
+                            <gs-button jumbo target="_blank" data-group="adr_g" href="../adr_g/clist/index.html">Craigslist ads</gs-button>
                             <gs-form src="post.rptdownload_new">
                                 <template>
                                     <gs-button jumbo target="_blank" data-group="tocci_g" href="../all/downloadcount.html">
@@ -331,6 +336,7 @@
                             <gs-button jumbo target="_blank" data-group="trkng_g" href="../trkng_g/index.html">Packages</gs-button>
                             <gs-button jumbo target="_blank" data-group="shop_g" href="../shop_g/index.html">TEMP</gs-button>
                             <gs-button jumbo target="_blank" data-group="wtkv2_g" href="../wtkv2_g/index.html">Timekeeping</gs-button>
+                            <gs-button jumbo target="_blank" data-group="wtkv2_g" href="../wtkv2_g/productivity.html">Timekeeping Productivity</gs-button>
                             <gs-button jumbo target="_blank" data-group="days_g" href="../days_g/toccical.html">TocciCal</gs-button>
                             <gs-button jumbo target="_blank" data-group="days_g" href="../todo_g/todo.html">Todo</gs-button>
                             <gs-button jumbo target="_blank" data-group="trn_g" href="../trn_g/index.html">Turns</gs-button>
