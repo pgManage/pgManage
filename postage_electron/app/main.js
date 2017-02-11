@@ -316,6 +316,8 @@ function openWindow() {
 }
 
 function appStart() {
+	electron.session.defaultSession = electron.session.fromPartition('persist:postage-session123', { cache: false });
+
 	mainWindowState = windowStateKeeper({
 		defaultWidth: 1024,
 		defaultHeight: 768,
