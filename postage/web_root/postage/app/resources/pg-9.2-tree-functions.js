@@ -204,11 +204,11 @@ function treeStart() {
                     for (var intI = intSelectionRow; intI >= 0; intI -= 1) {
                         if (treeGlobals.data[intI].query === 'objectTable') {
                             
-                            strNameOpt = treeGlobals.data[intI].name.substring(3) + '.' + strName.substring(0, subStrEnd);
+                            strNameOpt = treeGlobals.data[intI].name + '.' + strName.substring(0, subStrEnd);
                             //set intI to  0 to cancel the loop
                             intI = 0;
                         } else if (treeGlobals.data[intI].query === 'objectView') {
-                            strNameOpt = treeGlobals.data[intI].name.substring(3) + '.' + strName.substring(0, subStrEnd);
+                            strNameOpt = treeGlobals.data[intI].name + '.' + strName.substring(0, subStrEnd);
                             //set intI to  0 to cancel the loop
                             intI = 0;
                         }
@@ -1867,7 +1867,7 @@ function dataObjectButtons(strType, intOID, strSchema, strName) {
 
 
 function dumpButton(strOid, strName) {
-    return '<gs-button icononly icon="edit" no-focus title="Dump schema to tab"'
+    return '<gs-button icononly icon="edit" no-focus title="Dump schema to script"'
                     + ' onclick="dialogSchemaSurgery(\'' + strOid + '\', \'' + strName + '\')"></gs-button>';
 }
 
@@ -1884,7 +1884,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-header>
-                <center><h3>Dump schema to tab</h3></center>
+                <center><h3>Dump schema to script</h3></center>
             </gs-header>
             <gs-body padded>
                 <center>What code do you want for the schema: "<span id="dialog-sql-dump-schema"></span>"?</center>
@@ -1972,7 +1972,6 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             bolTriggerFunctions, bolSequences, bolTables, bolViews, strQuery, handleListResults, arrQuery;
         
         if (strAnswer === 'Open Script') {
-            console.log(document.getElementById('checkbox-schema-dump-drop-statements').value);
             bolDropStatments    = document.getElementById('checkbox-schema-dump-drop-statements').value   === 'true';
             bolSchema           = document.getElementById('checkbox-schema-dump-schema').value            === 'true';
             bolFunctions        = document.getElementById('checkbox-schema-dump-functions').value         === 'true';
@@ -1988,7 +1987,6 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             arrQuery = [];
             
             if (bolFunctions) {
-                console.log(bolFunctions);
                 arrQuery.push('\n\n SELECT oid, name, schema_name, \'Function\' AS objType, 1 AS order_no FROM (' +
                     listQuery.functions.replace(/\{\{INTOID\}\}/gim,  intSchemaOid).replace(';', '') +
                 ') em ');
@@ -2053,7 +2051,6 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                 // For some there is an extra result at the beginning?
                 // I'm not sure why, but I get back (bolSchema ? 2 : 1) more script results than list results
                 var j = 0, len1 = arrResult.length + (bolSchema ? 2 : 1);
-                console.log(arrResult);
                 for (i = 0, len = arrResult.length; i < len; i += 1) {
                     strQuery += '\n\n' +
                         (
@@ -2075,7 +2072,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     }
                     j += len;
                     
-                    console.log((j + 1), len1, arrResult.length, (bolSchema ? 2 : 1)); //, strDumpQuery
+                    //console.log((j + 1), len1, arrResult.length, (bolSchema ? 2 : 1)); //, strDumpQuery
                     
                     if ((j + 1) === len1) {
                         newTab('sql', strSchemaName, {'strContent': strDumpQuery});
