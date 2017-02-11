@@ -683,7 +683,7 @@ char *bstrstr(char *buff1, size_t len1, char *buff2, size_t len2) {
 	return (char *)NULL;
 }
 
-char *hexencode(char *str_to_encode, size_t *ptr_int_len) {
+char *hexencode(unsigned char *str_to_encode, size_t *ptr_int_len) {
 	size_t int_i, int_in_len = *ptr_int_len, int_out_len = *ptr_int_len * 2;
 	char *str_out = NULL;
 	char str_temp[3];

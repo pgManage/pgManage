@@ -71,3 +71,7 @@ ALTER SEQUENCE rtesting_table_id_seq RESTART;
 RETURN '""';
 END
 $BODY$ LANGUAGE plpgsql VOLATILE;
+
+CREATE VIEW ttesting_large_view2 AS
+	SELECT generate_series AS id, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg'::text AS test1, ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj'::text AS test2
+		FROM generate_series(1, 200);

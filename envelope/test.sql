@@ -1,4 +1,5 @@
 ALTER ROLE postgres PASSWORD 'password';
+CREATE ROLE envelopeuser LOGIN SUPERUSER PASSWORD 'envelopeuserpassword';
 CREATE ROLE test_user LOGIN PASSWORD 'password';
 CREATE ROLE public_user LOGIN PASSWORD 'youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08';
 CREATE ROLE developer_g   NOLOGIN NOCREATEROLE  NOSUPERUSER    INHERIT  NOCREATEDB  NOREPLICATION    CONNECTION LIMIT -1   VALID UNTIL 'infinity';
@@ -88,11 +89,6 @@ INSERT INTO rtesting_large_table (id, test1, test2)
 	SELECT generate_series, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg', ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj'
 		FROM generate_series(1, 1000);
 
-
-
-
-
-
-CREATE VIEW ttesting_extra_large_view_generate_series AS
-	SELECT generate_series, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg' AS test1, ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj' AS test2
-		FROM generate_series(1, 10000000000);
+CREATE VIEW ttesting_large_view2 AS
+	SELECT generate_series AS id, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg'::text AS test1, ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj'::text AS test2
+		FROM generate_series(1, 200);

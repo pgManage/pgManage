@@ -8,7 +8,7 @@ struct custom_check_callback {
 	struct sock_ev_client_request *client_request;
 };
 
-char *ws_file_step1(struct sock_ev_client_request *client_request) {
+void ws_file_step1(struct sock_ev_client_request *client_request) {
 	SDEFINE_VAR_ALL(str_path_temp, str_path, str_connstring, str_local_path_root, str_temp_connstring, str_change_stamp,
 		str_query, str_search_temp);
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
@@ -403,8 +403,8 @@ finish:
 		);
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
+		str_response = NULL;
 	}
-	return str_response;
 }
 
 // **************************************************************************************
@@ -2513,6 +2513,7 @@ bool ws_file_search_step4(EV_P, void *cb_data, bool bol_success) {
 
 	SFINISH_SALLOC(client_request_watcher, sizeof(struct sock_ev_client_request_watcher));
 	client_request_watcher->parent = client_request->parent;
+	client_request->parent->client_request_watcher_search = client_request_watcher;
 
 	increment_idle(EV_A);
 	ev_check_init(&client_request_watcher->check, ws_file_search_step5);
@@ -2593,6 +2594,7 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 
 		decrement_idle(EV_A);
 		ev_check_stop(EV_A, w);
+		client_request->parent->client_request_watcher_search = NULL;
 		SFREE(client_request_watcher);
 
 		ws_file_free(client_file);
@@ -2712,6 +2714,7 @@ finish:
 
 		decrement_idle(EV_A);
 		ev_check_stop(EV_A, w);
+		client_request->parent->client_request_watcher_search = NULL;
 		SFREE(client_request_watcher);
 
 		ws_file_free(client_file);

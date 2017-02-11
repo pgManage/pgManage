@@ -72,6 +72,7 @@ void http_action_step1(struct sock_ev_client *client) {
 			str_args, int_args_len,
 			";", (size_t)1);
 	}
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(global_loop, client->conn, client, str_sql, http_action_step2), "DB_exec failed");
 	SDEBUG("str_sql: %s", str_sql);
 
@@ -86,6 +87,7 @@ finish:
 			strlen("HTTP/1.1 500 Internal Server Error\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"),
 			_str_response, strlen(_str_response));
+		SFREE(_str_response);
 	}
 	if (str_response != NULL && (int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
 		SFREE(str_response);

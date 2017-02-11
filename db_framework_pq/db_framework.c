@@ -44,23 +44,28 @@ DB_conn *DB_connect(EV_P, void *cb_data, char *str_connstring, char *str_user,
 	conn->int_sock = -1;
 #endif
 
+	// Envelope uses pg_authid to authenticate
+	if (str_user != NULL && str_password != NULL) {
+		str_escape_username = escape_conninfo_value(str_user, &int_escape_username_len);
+		str_escape_password = escape_conninfo_value(str_password, &int_escape_password_len);
 
-	str_escape_username = escape_conninfo_value(str_user, &int_escape_username_len);
-	str_escape_password = escape_conninfo_value(str_password, &int_escape_password_len);
+		SFINISH_SNCAT(str_conn, &int_conn_len,
+			str_connstring, strlen(str_connstring),
+			//" application_name='"SUN_PROGRAM_WORD_NAME"'", strlen(" application_name='"SUN_PROGRAM_WORD_NAME"'"),
+			" user=", (size_t)6,
+			str_escape_username, int_escape_username_len,
+			" password=", (size_t)10,
+			str_escape_password, int_escape_password_len);
 
-	SFINISH_SNCAT(str_conn, &int_conn_len,
-		str_connstring, strlen(str_connstring),
-		//" application_name='"SUN_PROGRAM_WORD_NAME"'", strlen(" application_name='"SUN_PROGRAM_WORD_NAME"'"),
-		" user=", (size_t)6,
-		str_escape_username, int_escape_username_len,
-		" password=", (size_t)10,
-		str_escape_password, int_escape_password_len);
+		// **** WARNING ****
+		// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE PASSWORD IN THE
+		// CLEAR IN THE LOG!!!!
+		// SDEBUG("str_conn>%s<", str_conn);
+		// **** WARNING ****
+	} else {
+		SFINISH_SNCAT(str_conn, &int_conn_len, str_connstring, strlen(str_connstring));
+	}
 
-	// **** WARNING ****
-	// DO NOT UNCOMMENT THE NEXT LINE! THAT WILL PUT THE PASSWORD IN THE
-	// CLEAR IN THE LOG!!!!
-	// SDEBUG("str_conn>%s<", str_conn);
-	// **** WARNING ****
 	pg_conn = PQconnectStart(str_conn);
 #ifdef UTIL_DEBUG
 	PQconninfoOption *arr_conn_info = PQconninfo(pg_conn);
@@ -631,6 +636,28 @@ error:
 	return NULL;
 }
 
+char *DB_cancel_query(DB_conn *conn) {
+	char str_temp1[256] = { 0 };
+	PGcancel *cancel_request = PQgetCancel(conn->conn);
+	int int_ret_val = PQcancel(cancel_request, str_temp1, 255);
+	PQfreeCancel(cancel_request);
+	if (int_ret_val != 1) {
+		return SERROR_RESPONSE("PQcancel failed: %s", str_temp1);
+	}
+	if (conn->copy_check != NULL) {
+		decrement_idle(conn->EV_A);
+		ev_check_stop(conn->EV_A, &conn->copy_check->check);
+		PQclear(conn->copy_check->res);
+		SFREE(conn->copy_check);
+	}
+	if (conn->res_poll != NULL) {
+		ev_io_stop(conn->EV_A, &conn->res_poll->io);
+		DB_res_poll_free(conn->res_poll);
+	}
+
+	return NULL;
+}
+
 void _DB_finish(DB_conn *conn) {
 #ifdef _WIN32
 	if (conn->int_sock != -1) {
@@ -869,7 +896,10 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 		int_status = PQgetCopyData(copy_check->conn->conn, buffer_ptr_ptr, 0);
 		// continue copying
 		if (int_status > 0) {
-			copy_check->copy_cb(EV_A, true, false, copy_check->cb_data, *buffer_ptr_ptr, strlen(*buffer_ptr_ptr));
+			if (copy_check->copy_cb(EV_A, true, false, copy_check->cb_data, *buffer_ptr_ptr, strlen(*buffer_ptr_ptr)) == false) {
+				PQfreemem(*buffer_ptr_ptr);
+				break;
+			}
 
 			// fail
 		} else if (int_status == -2) {

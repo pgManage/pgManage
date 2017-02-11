@@ -146,7 +146,7 @@ Encode a string to hex.
 Send the pointer to the integer variable containing the original length.
 That length will be changed to reflect the new variable.
 */
-char *hexencode(char *str_to_encode, size_t *ptr_int_len);
+char *hexencode(unsigned char *str_to_encode, size_t *ptr_int_len);
 // size_t explode(const char *delim, char *str, char **pointers_out, char
 // *bytes_out);
 

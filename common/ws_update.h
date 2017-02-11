@@ -76,7 +76,7 @@ This function will:
 and pk)
 2. create first temp table to hold data the client sent
 */
-char *ws_update_step1(struct sock_ev_client_request *client_request);
+void ws_update_step1(struct sock_ev_client_request *client_request);
 
 #ifndef POSTAGE_INTERFACE_LIBPQ
 /*

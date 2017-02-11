@@ -1,5 +1,16 @@
 #include "common_util_sql.h"
 
+bool query_is_safe(char *str_query) {
+	DArray *arr_sql = DArray_sql_split(str_query);
+	SERROR_CHECK(arr_sql != NULL && DArray_end(arr_sql) == 1, "SQL Injection detected!");
+
+	DArray_clear_destroy(arr_sql);
+	return true;
+error:
+	DArray_clear_destroy(arr_sql);
+	return false;
+}
+
 char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_table_name_len) {
 	char *str_temp = NULL;
 	char *str_temp1 = NULL;
@@ -43,7 +54,8 @@ char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_tab
 
 	if (bol_schema) {
 		ptr_table_name = ptr_end_table_name + 1;
-		ptr_end_table_name = strstr(ptr_table_name, "\012");
+		ptr_end_table_name = bstrstr(ptr_table_name, int_query_len - (size_t)(ptr_table_name - str_query), "\012", (size_t)1);
+		SERROR_CHECK(ptr_end_table_name != NULL, "bstrstr failed");
 		*ptr_end_table_name = 0;
 
 		SERROR_SNCAT(str_temp, &int_temp_len, ptr_table_name, ptr_end_table_name - ptr_table_name);
@@ -277,6 +289,14 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 	SFREE(str_global_error);
 	SDEBUG("str_response: %s", str_response);
 	size_t int_response_len = 0;
+
+	if (close_client_if_needed(client_request->parent, (ev_watcher *)&client_request->parent->conn->copy_check->check, EV_CHECK)) {
+		ev_check_stop(EV_A, &client_request->parent->conn->copy_check->check);
+		client_request->parent->client_paused_request->bol_is_db_framework = true;
+		SDEBUG("client_request->parent->cur_request: %p", client_request->parent->cur_request);
+		decrement_idle(EV_A);
+		return false;
+	}
 
 	if (bol_success) {
 		if (client_request->str_current_response == NULL && !bol_last) {
@@ -796,7 +816,7 @@ static bool ddl_readable_done(EV_P, void *cb_data, DB_result *res) {
 	bool bol_result = 0;
 
 	SERROR_CHECK(res != NULL, "Query failed: res == NULL");
-	SERROR_CHECK(res->status == DB_RES_TUPLES_OK, "Query failed: res->status = %d", res->status);
+	SERROR_CHECK(res->status == DB_RES_TUPLES_OK, "Query failed: %s", DB_get_diagnostic(res->conn, res));
 
 	SERROR_CHECK(DB_fetch_row(res) == DB_FETCH_OK, "DB_fetch_row failed: %s", DB_get_diagnostic(res->conn, res));
 	arr_row_values = DB_get_row_values(res);

@@ -251,10 +251,20 @@
 */ })],
 			//Custom GS.ajaxText looks for /test.txt?if_modified_since=true
 			//It then sends a If-Modified-Since header
-			['ACCEPTNC FAIL', 'ajax', 500, '/env/public.acceptnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.acceptnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.acceptnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPTNC FAIL 1', 'ajax', 500, '/env/public.acceptnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.acceptnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.acceptnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPTNC FAIL 2', 'ajax', 500, '/env/public.acceptnc_testing;', 'testingnitset', function (arg) {
+				console.warn('test1');
+				return arg === ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+					|| arg === ml(function () {/*"FATAL\n../common/common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+			}],
 			['ACCEPTNC 1', 'ajax', 200, '/env/public.acceptnc_testing', 'testingnitset', 'testingnitset'],
 			['ACCEPTNC 2', 'ajax', 200, '/env/public.acceptnc_testing/test', 'testingnitset', 'testingnitset&path=/test'],
-			['ACTIONNC FAIL', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTIONNC FAIL 1', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTIONNC FAIL 2', 'ajax', 500, '/env/public.actionnc_testing;', 'testingnitset', function (arg) {
+				console.warn('test1');
+				return arg === ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+					|| arg === ml(function () {/*"FATAL\n../common/common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+			}],
 			['ACTIONNC', 'ajax', 200, '/env/public.actionnc_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
 			['File Read If-Modified-Since', 'ajax', 304, '/test.txt?if_modified_since=true', '', ''],
 			['List Connections', 'ajax', 500, '/env/auth', 'action=list',
@@ -262,23 +272,35 @@
 			['Login', 'ajax', 200, '/env/auth', 'action=login&connname=doesntexist&username=postgres&password=password',
 				ml(function () {/*{"stat": true, "dat": "/env/app/all/index.html"}*/ })],
 			['Login Fail 2', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=doesntexist&password=password',
-				ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"doesntexist\"\n"*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"doesntexist\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"doesntexist\"\n"*/ })
+			}],
 			['Login Fail 3', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=' + encodeURIComponent('test"test') +
 						'&password=' + encodeURIComponent('asdfasdfasdfasdfasdf'),
-							ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test\"test\"\n"*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"test\"\"test\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test\"test\"\n"*/ })
+			}],
 			['Login Fail 4', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=' + encodeURIComponent('test"tes\'t2') +
 						'&password=' + encodeURIComponent('asdfasdfasdfasdfasdf'),
-							ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test\"tes't2\"\n"*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"test\"\"tes't2\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test\"tes't2\"\n"*/ })
+			}],
 			['Login Fail 5', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=' + encodeURIComponent('test"test3') +
 						'&password=' + encodeURIComponent('asdfasdf\'asdf"asdfasdf'),
-				ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test\"test3\"\n"*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"test\"\"test3\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test\"test3\"\n"*/ })
+			}],
 			['Login Fail 6', 'ajax', 500, '/env/auth', 'action=login&connname=test&password=' + encodeURIComponent('asdfasdf\'asdf"asdfasdf'),
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 7', 'ajax', 500, '/env/auth', 'action=login&connname=&username=password=asdfasdfasdfasdf',
-				function (arg) {
-					return arg === ml(function () {/*"FATAL\n..\\..\\db_framework_pq\\db_framework.c:escape_conninfo_value: escape_conninfo_value: strlen = 0\nConnect failed: fe_sendauth: no password supplied\n"*/})
-					|| arg === ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:escape_conninfo_value: escape_conninfo_value: strlen = 0\nConnect failed: fe_sendauth: no password supplied\n"*/})
-				}],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"password=asdfasdfasdfasdf\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\n../db_framework_pq/db_framework.c:escape_conninfo_value: escape_conninfo_value: strlen = 0\nConnect failed: fe_sendauth: no password supplied\n"*/ })
+			}],
 			['Login Fail 8', 'ajax', 500, '/env/auth', 'action=login&connname=&username=&password=',
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 9', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=&password=',
@@ -288,25 +310,50 @@
 			['Login Fail 11', 'ajax', 500, '/env/auth', 'action=login',
 				ml(function () {/*"FATAL\nno username"*/ })],
 			['Login Fail 12', 'ajax', 500, '/env/auth', 'action=login&connname=asdfadsf&username=postgres&password=fasdf',
-				ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/})],
+			function (arg) {
+				console.warn('test2');
+				return arg === ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/ })
+			}],
 			['Login Fail 13 *', 'ajax spam', 500, '/env/auth', 'action=login&connname=test&username=postgres&password=fasdf',
-				ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/})],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/ })
+			}],
 			['Login Fail 14', 'ajax', 500, '/env/auth', 'action=login&connname=ip%20example&username=postgres&password=fasdf',
-				ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/})],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/ })
+			}],
 			['Login Fail 15', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=postgres&password=' + encodeURIComponent('test!@#$%^&*()|<>?,./:+-*/=ƒ©˙∆test'),
-				ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nBad password for user \"postgres\""*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"postgres\"\n"*/ })
+			}],
 			['Login Fail 16', 'ajax', 500, '/env/auth', 'action=login&connname=test&username=' + encodeURIComponent('test!@#$%^&*()|<>?,./:+-/*=ƒ©˙∆test') + '&password=testtest',
-				ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test!@#$%^&*()|<>?,./:+-/*=ƒ©˙∆test\"\n"*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"test!@#$%^&*()|<>?,./:+-/*=ƒ©˙∆test\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"test!@#$%^&*()|<>?,./:+-/*=ƒ©˙∆test\"\n"*/ })
+			}],
 			['Login Fail 17', 'ajax', 500, '/env/auth', 'action=' + encodeURIComponent('loginπ'),
 				ml(function () {/*"Not a valid action."*/ })],
 			['Login Fail 18', 'ajax', 500, '/env/auth', 'action=loginbasdf',
 				ml(function () {/*"Not a valid action."*/ })],
 			['Login Fail 19', 'ajax', 500, '/env/auth', 'action=login&connection=' + encodeURIComponent('π') + '&username=' + encodeURIComponent('π') + '&password=' + encodeURIComponent('π'),
-				ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"π\"\n"*/ })],
-			['Login Fail 20', 'ajax', 500, '/env/auth', 'action=login&connection=' + encodeURIComponent('π\'π') + '&username=' + encodeURIComponent('π') + '&password=' + encodeURIComponent('π'),
-				ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"π\"\n"*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"π\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"π\"\n"*/ })
+			}],
+			['Login Fail 20', 'ajax', 500, '/env/auth', 'action=login&connection=' + encodeURIComponent('π\'π') + '&username=' + encodeURIComponent('π\'π') + '&password=' + encodeURIComponent('π'),
+			function (arg) {
+				return arg === ml(function () {/*"FATAL\nUser \"π'π\" does not exist."*/ })
+					|| arg === ml(function () {/*"FATAL\nConnect failed: FATAL:  password authentication failed for user \"π'π\"\n"*/ })
+			}],
 			['Login Fail 21', 'ajax', 404, '/env/authasdf', '',
-				ml(function () {/*"The file you are requesting is not here."*/ })],
+			function (arg) {
+				return arg === ml(function () {/*"The file you are requesting is not here."*/ })
+					|| arg === ml(function () {/*"FATAL\nFATAL\nConnect failed: fe_sendauth: no password supplied\n"*/ })
+			}],
 			['Login Fail 22', 'ajax', 500, '/env/auth', 'test=test&a@&#=te=st',
 				ml(function () {/*"Not a valid action."*/ })],
 			['Logout before login *', 'ajax spam', 200, '/env/auth', 'action=logout', ''],
@@ -332,10 +379,7 @@
 				ml(function () {/*{"stat": true, "dat": "/env/app/all/index.html"}*/ })],
 			
 			['File Read Fail 5', 'ajax', 500, '/env/0//index.html', '',
-				function (arg) {
-					return arg === ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0//index.html is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
-						|| arg === ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: 0\\\\index.html is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
-				}
+				ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0//index.html is a bad path. Path contains invalid characters.\n\nBad file path"*/ })
 			],
 			['File Read Fail 6', 'ajax', 404, '/env/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/asdf/index.html', '',
 				ml(function () {/*"The file you are requesting is not here."*/ })],
@@ -346,8 +390,8 @@
 			['File Read Fail 9', 'ajax', 500, '/env/0/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/index.html', '',
 				function (arg) {
 					console.warn('test2');
-					return ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/AS\nBad file path"*/ })
-						|| ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: 0\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\AS\nBad file path"*/ })
+					return arg === ml(function () {/*"FATAL\n../util/util_canonical.c:canonical: 0/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/ASDF/index.html is a bad path. Path exceeds maximum length.\n\nBad file path"*/ })
+						|| arg === ml(function () {/*"FATAL\n..\\..\\util\\util_canonical.c:canonical: 0\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\ASDF\\AS\nBad file path"*/ })
 				}
 			],
 			['File Read 2', 'ajax', 200, '/test.txt', '',
@@ -503,6 +547,23 @@ File already exists.*/})],
 					"TRANSACTION COMPLETED"
 				]
 			],
+			['Logout', 'ajax', 200, '/env/auth', 'action=logout',
+				ml(function () {/*<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<head><script>window.open('/', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })],
+			['Login 5', 'ajax', 200, '/env/auth', 'action=login&connname=test&username=test_user&password=password',
+				ml(function () {/*{"stat": true, "dat": "/env/app/all/index.html"}*/ })],
+			['WEBSOCKET OPEN W/INFO ACTION', 'websocket start', '', '', ''],
+			['APP FILE LIST FAIL 14', 'websocket', '', 'FILE\tLIST\t/app/thisgroupdoesntexist_g',
+				["You don't have the necessary permissions for this folder."]
+			],
+			['Logout', 'ajax', 200, '/env/auth', 'action=logout',
+				ml(function () {/*<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<head><script>window.open('/', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })],
+			['Login 6', 'ajax', 200, '/env/auth', 'action=login&connname=test&username=postgres&password=password',
+				ml(function () {/*{"stat": true, "dat": "/env/app/all/index.html"}*/ })],
+			['WEBSOCKET OPEN W/INFO ACTION', 'websocket start', '', '', ''],
 			['APP FILE LIST', 'websocket', '', 'FILE\tLIST\t/',
 				['ANYTHING', 'TRANSACTION COMPLETED']],
 			['APP FILE LIST', 'websocket', '', 'FILE\tLIST\t/app',
@@ -529,7 +590,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<",
-						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<",
+						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\app|all/test.txtπ<",
 						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|all/test.txtπ<"
 					],
 					"TRANSACTION COMPLETED"
@@ -543,7 +604,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<",
-						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<",
+						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\app|all/test.txtπ<",
 						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|all/test.txtπ<"
 					],
 					"TRANSACTION COMPLETED"
@@ -553,7 +614,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|all/test.txtπ<",
-						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|all/test.txtπ<",
+						"..\\..\\util\\util_canonical.c:canonical: all\\test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\app|all/test.txtπ<",
 						"../util/util_canonical.c:canonical: all/test.txtπ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|all/test.txtπ<"
 					],
 					"TRANSACTION COMPLETED"
@@ -608,7 +669,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/test.txt > /role/trusted_g/test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/test.txt > /role/trusted_g/test2.txt<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.txt > \\role\\trusted_g\\test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/test.txt > /role/trusted_g/test2.txt<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.txt > \\role\\trusted_g\\test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\role|trusted_g/test.txt > /role/trusted_g/test2.txt<",
 						"../util/util_canonical.c:canonical: trusted_g/test.txt > /role/trusted_g/test2.txt is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/test.txt > /role/trusted_g/test2.txt<"
 					],
 					"TRANSACTION COMPLETED"
@@ -740,7 +801,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g/test-test--test-test<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g/test-test--test-test<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\app|trusted_g/test-test--test-test<",
 						"../util/util_canonical.c:canonical: trusted_g/test-test--test-test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trusted_g/test-test--test-test<"
 					]
 				]
@@ -753,7 +814,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/////// is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g///////<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\\\\\\\\\\\\\ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g///////<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\\\\\\\\\\\\\ is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\app|trusted_g///////<",
 						"../util/util_canonical.c:canonical: trusted_g/////// is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trusted_g///////<"
 					],
 					"TRANSACTION COMPLETED"
@@ -763,7 +824,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/ > /opt/test<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\ > \\opt\\test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/ > /opt/test<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\ > \\opt\\test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\role|trusted_g/ > /opt/test<",
 						"../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/ > /opt/test<"
 					],
 					"TRANSACTION COMPLETED"
@@ -773,7 +834,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/ > /opt/test<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\ > \\opt\\test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/ > /opt/test<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\ > \\opt\\test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\role|trusted_g/ > /opt/test<",
 						"../util/util_canonical.c:canonical: trusted_g/ > /opt/test is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/ > /opt/test<"
 					],
 					"TRANSACTION COMPLETED"
@@ -783,7 +844,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/role|trusted_g/π<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\role|trusted_g/π<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\role|trusted_g/π<",
 						"../util/util_canonical.c:canonical: trusted_g/π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/role|trusted_g/π<"
 					],
 					"TRANSACTION COMPLETED"
@@ -848,7 +909,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: trusted_g/test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trusted_g/test.π<",
-						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trusted_g/test.π<",
+						"..\\..\\util\\util_canonical.c:canonical: trusted_g\\test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\app|trusted_g/test.π<",
 						"../util/util_canonical.c:canonical: trusted_g/test.π is a bad path. Path contains invalid characters.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trusted_g/test.π<"
 					],
 					"TRANSACTION COMPLETED"
@@ -932,7 +993,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: read_dir: /home/super/Repos/postage/envelope/app/|nonexisitant/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|nonexisitant/<",
-						"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app\\|nonexisitant\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|nonexisitant/<",
+						"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\nunzio\\Repos\\postage\\envelope\\app\\|nonexisitant\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\app|nonexisitant/<",
 						"../util/util_canonical.c:canonical: read_dir: /Users/joseph/Repos/postage/envelope/app/|nonexisitant/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|nonexisitant/<"
 					]
 				]
@@ -946,7 +1007,7 @@ File already exists.*/})],
 				[
 					[
 						"../util/util_canonical.c:canonical: read_dir: /home/super/Repos/postage/envelope/app/|trust_g/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/home/super/Repos/postage/envelope/app|trust_g/<",
-						"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app\\|trust_g\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\Nunzio Tocci\\Repos\\postage\\envelope\\app|trust_g/<",
+						"..\\..\\util\\util_canonical.c:canonical: read_dir: \\Users\\nunzio\\Repos\\postage\\envelope\\app\\|trust_g\\ is a bad path. Path does not exist.\n\nFailed to get canonical path: >\\Users\\nunzio\\Repos\\postage\\envelope\\app|trust_g/<",
 						"../util/util_canonical.c:canonical: read_dir: /Users/joseph/Repos/postage/envelope/app/|trust_g/ is a bad path. Path does not exist.\n\nFailed to get canonical path: >/Users/joseph/Repos/postage/envelope/app|trust_g/<"
 					]
 				]
@@ -1164,20 +1225,40 @@ File already exists.*/})],
 */}),
 				["\"\"\n", "TRANSACTION COMPLETED"]],
 
-			['ACCEPT FAIL', 'ajax', 500, '/env/public.accept_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.accept_testing1(unknown) does not exist\\nLINE 1: SELECT public.accept_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPT FAIL 1', 'ajax', 500, '/env/public.accept_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.accept_testing1(unknown) does not exist\\nLINE 1: SELECT public.accept_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPT FAIL 2', 'ajax', 500, '/env/public.accept_testing;', 'testingnitset', function (arg) {
+				console.warn('test1');
+				return arg === ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+					|| arg === ml(function () {/*"FATAL\n../common/common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+			}],
 			['ACCEPT 1', 'ajax', 200, '/env/public.accept_testing', 'testingnitset', 'testingnitset'],
 			['ACCEPT 2', 'ajax', 200, '/env/public.accept_testing', 'company_name=AA-TULSA&company_name_exact=0&type=Passenger&type_anywhere=-1&engine_mfg=Pratt %26 Whitney&engine_mfg_exact=0&engine_model=J57-P&engine_model_exact=0&country=&country_exact=0&continent=&continent_exact=0&overhaul_center=&overhaul_center_exact=0&on_order=undefined&stored=undefined', 'company_name=AA-TULSA&company_name_exact=0&type=Passenger&type_anywhere=-1&engine_mfg=Pratt %26 Whitney&engine_mfg_exact=0&engine_model=J57-P&engine_model_exact=0&country=&country_exact=0&continent=&continent_exact=0&overhaul_center=&overhaul_center_exact=0&on_order=undefined&stored=undefined'],
 			['ACCEPT 2', 'ajax', 200, '/env/public.accept_testing/test', 'testingnitset', 'testingnitset&path=/test'],
-			['ACCEPTNC FAIL', 'ajax', 500, '/env/public.acceptnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.acceptnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.acceptnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPTNC FAIL 1', 'ajax', 500, '/env/public.acceptnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.acceptnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.acceptnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACCEPTNC FAIL 2', 'ajax', 500, '/env/public.acceptnc_testing;', 'testingnitset', function (arg) {
+				console.warn('test1');
+				return arg === ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+					|| arg === ml(function () {/*"FATAL\n../common/common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+			}],
 			['ACCEPTNC', 'ajax', 200, '/env/public.acceptnc_testing', 'testingnitset', 'testingnitset'],
-			['ACTION FAIL', 'ajax', 500, '/env/public.action_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.action_testing1(unknown) does not exist\\nLINE 1: SELECT public.action_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTION FAIL 1', 'ajax', 500, '/env/public.action_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.action_testing1(unknown) does not exist\\nLINE 1: SELECT public.action_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTION FAIL 2', 'ajax', 500, '/env/public.action_testing;', 'testingnitset', function (arg) {
+				console.warn('test1');
+				return arg === ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+					|| arg === ml(function () {/*"FATAL\n../common/common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+			}],
 			['ACTION', 'ajax', 200, '/env/public.action_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
-			['ACTIONNC FAIL', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTIONNC FAIL 1', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
+			['ACTIONNC FAIL 2', 'ajax', 500, '/env/public.actionnc_testing;', 'testingnitset', function (arg) {
+				console.warn('test1');
+				return arg === ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+					|| arg === ml(function () {/*"FATAL\n../common/common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
+			}],
 			['ACTIONNC', 'ajax', 200, '/env/public.actionnc_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
 			['action_info', 'ajax', 200, '/env/action_info', '',
 				function (arg) {
 					return arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.5 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 6.2.1 20160916 (Red Hat 6.2.1-2), 64-bit","envelope": "3.2.0"}}*/ })
-						|| arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.2, compiled by Visual C++ build 1800, 64-bit","envelope": "3.2.0"}}*/ })
+						|| arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.5.5, compiled by Visual C++ build 1800, 64-bit","envelope": "3.2.0"}}*/ })
 						|| arg === ml(function () {/*{"stat": true, "dat": {"username": "postgres", "session_user": "postgres", "current_user": "postgres", "groups": ["developer_g"], "port": 8888, "database_version": "PostgreSQL 9.6.1 on x86_64-apple-darwin15.6.0, compiled by Apple LLVM version 8.0.0 (clang-800.0.42.1), 64-bit","envelope": "3.2.0"}}*/ })
 				}
 			],
@@ -1191,6 +1272,9 @@ File already exists.*/})],
 */}),
 			["Invalid action name, action function names must begin with \"action_\""]],
 			['ACTION FAIL 4', 'websocket', '', ml(function () {/*ACTION	public actiont_testing1	testingnitset
+*/}),
+			["Invalid action name, action function names must begin with \"action_\""]],
+			['ACTION FAIL 5', 'websocket', '', ml(function () {/*ACTION	public action_testing;	testingnitset
 */}),
 			["Invalid action name, action function names must begin with \"action_\""]],
 			['ACTION', 'websocket', '', ml(function () {/*ACTION	public	action_testing	testingnitset
@@ -1223,7 +1307,7 @@ id	hash
 				[["Some of these records have already been deleted.:\nFATAL\nerror_text\t\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
-			['SELECT FAIL', 'websocket', '', ml(function () {/*SELECT	rtesting_table
+			['SELECT FAIL 1', 'websocket', '', ml(function () {/*SELECT	rtesting_table
 RETURN	id	test_name	test_full
 
 ORDER BY
@@ -1236,13 +1320,27 @@ id DESC
 					]
 				]
 			],
-			['SELECT FAIL 4', 'websocket', '', ml(function () {/*SELECT	ttesting_extra_large_view_generate_series
-RETURN	*
+			['SELECT FAIL 2', 'websocket', '', ml(function () {/*SELECT	rtesting_table
+RETURN	id	test_name
 
-
-
+ORDER BY
+id DESC; DROP TABLE rtesting_table
 */}),
-				["generate_series\ttest1\ttest2\nbigint\tunknown\tunknown\n","FATAL\nerror_text\tERROR:  could not write to tuplestore temporary file: No space left on device\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
+				[
+					[
+						"../common/common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected",
+						"..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"
+					]
+				]
+			],
+			['SELECT FAIL 3', 'websocket', '', ml(function () {/*SELECT	public	rtesting_table*/}),
+				[
+					[
+						"../common/common_util_sql.c:get_table_name: bstrstr failed\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n",
+						"..\\..\\common\\common_util_sql.c:get_table_name: bstrstr failed\nQuery failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n"
+					]
+				]
+			],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
 			['SELECT', 'websocket', '', ml(function () {/*SELECT	rtesting_table
@@ -1294,6 +1392,22 @@ SEQ
 id	test_name
 */}),
 				["No insert data:\nFATAL\nerror_text\t\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
+			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
+				['OK']],
+			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
+				['OK']],
+			['INSERT FAIL 4', 'websocket', '', ml(function () {/*INSERT	rtesting_table
+RETURN	id	test_name
+PK	id;
+SEQ	
+
+id	test_name
+1	Bob
+*/}),
+				[
+					"DB_exec failed:\nFATAL\nerror_text\tERROR:  column rtesting_table.id; does not exist\\nLINE 3:        FROM \"rtesting_table\"       WHERE \"rtesting_table\".\"i...\\n                                                 ^\\nHINT:  Perhaps you meant to reference the column \"rtesting_table.id\".\\n\nerror_detail\t\nerror_hint\tPerhaps you meant to reference the column \"rtesting_table.id\".\nerror_query\t\nerror_context\t\nerror_position\t147\n"
+				]
+			],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
@@ -1428,7 +1542,22 @@ id	test_name
 3	Alicia
 */}),
 				[
-					["DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot update view \"ttesting_view\"\\nDETAIL:  Views that do not select from a single table or view are not automatically updatable.\\nHINT:  To enable updating the view, provide an INSTEAD OF UPDATE trigger or an unconditional ON UPDATE DO INSTEAD rule.\\n\nerror_detail\tViews that do not select from a single table or view are not automatically updatable.\nerror_hint\tTo enable updating the view, provide an INSTEAD OF UPDATE trigger or an unconditional ON UPDATE DO INSTEAD rule.\nerror_query\t\nerror_context\t\nerror_position\t\n"]
+					"DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot update view \"ttesting_view\"\\nDETAIL:  Views that do not select from a single table or view are not automatically updatable.\\nHINT:  To enable updating the view, provide an INSTEAD OF UPDATE trigger or an unconditional ON UPDATE DO INSTEAD rule.\\n\nerror_detail\tViews that do not select from a single table or view are not automatically updatable.\nerror_hint\tTo enable updating the view, provide an INSTEAD OF UPDATE trigger or an unconditional ON UPDATE DO INSTEAD rule.\nerror_query\t\nerror_context\t\nerror_position\t\n"
+				]],
+			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
+				['OK']],
+			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
+				['OK']],
+			['UPDATE FAIL 3', 'websocket', '', ml(function () {/*UPDATE	rtesting_table
+RETURN	id	test_name
+
+pk	set
+id;	test_name
+2	Bobby
+3	Alicia
+*/}),
+				[
+					"DB_exec failed:\nFATAL\nerror_text\tERROR:  column \"id;\" does not exist\\nLINE 1: ...E TEMP TABLE temp_update ON COMMIT DROP AS SELECT \"id;\" AS \"...\\n                                                             ^\\nHINT:  Perhaps you meant to reference the column \"rtesting_table.id\".\\n\nerror_detail\t\nerror_hint\tPerhaps you meant to reference the column \"rtesting_table.id\".\nerror_query\t\nerror_context\t\nerror_position\t56\n"
 				]],
 			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
@@ -1474,7 +1603,7 @@ id
 					]
 				]
 			],
-			['ROLLBACK', 'websocket', '', ml(function () {/*COMMIT*/ }),
+			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
@@ -1487,9 +1616,24 @@ id
 4
 */}),
 				[
-					["DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot delete from view \"ttesting_view\"\\nDETAIL:  Views that do not select from a single table or view are not automatically updatable.\\nHINT:  To enable deleting from the view, provide an INSTEAD OF DELETE trigger or an unconditional ON DELETE DO INSTEAD rule.\\n\nerror_detail\tViews that do not select from a single table or view are not automatically updatable.\nerror_hint\tTo enable deleting from the view, provide an INSTEAD OF DELETE trigger or an unconditional ON DELETE DO INSTEAD rule.\nerror_query\t\nerror_context\t\nerror_position\t\n"]
+					"DB_exec failed:\nFATAL\nerror_text\tERROR:  cannot delete from view \"ttesting_view\"\\nDETAIL:  Views that do not select from a single table or view are not automatically updatable.\\nHINT:  To enable deleting from the view, provide an INSTEAD OF DELETE trigger or an unconditional ON DELETE DO INSTEAD rule.\\n\nerror_detail\tViews that do not select from a single table or view are not automatically updatable.\nerror_hint\tTo enable deleting from the view, provide an INSTEAD OF DELETE trigger or an unconditional ON DELETE DO INSTEAD rule.\nerror_query\t\nerror_context\t\nerror_position\t\n"
 				]],
-			['ROLLBACK', 'websocket', '', ml(function () {/*COMMIT*/ }),
+			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
+				['OK']],
+			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
+				['OK']],
+			['DELETE FAIL 3', 'websocket', '', ml(function () {/*DELETE	rtesting_table
+
+pk
+id;
+2
+3
+4
+*/}),
+				[
+					"DB_exec failed:\nFATAL\nerror_text\tERROR:  column \"id;\" does not exist\\nLINE 1: ...E TEMP TABLE temp_delete ON COMMIT DROP AS SELECT \"id;\" AS \"...\\n                                                             ^\\nHINT:  Perhaps you meant to reference the column \"rtesting_table.id\".\\n\nerror_detail\t\nerror_hint\tPerhaps you meant to reference the column \"rtesting_table.id\".\nerror_query\t\nerror_context\t\nerror_position\t56\n"
+				]],
+			['ROLLBACK', 'websocket', '', ml(function () {/*ROLLBACK*/ }),
 				['OK']],
 			['BEGIN', 'websocket', '', ml(function () {/*BEGIN*/ }),
 				['OK']],
@@ -1514,6 +1658,7 @@ id
 				['Rows Affected\n2\n', 'TRANSACTION COMPLETED']],
 			['COMMIT', 'websocket', '', ml(function () {/*COMMIT*/ }),
 				['OK']],
+			['WEBSOCKET SEND FROM', 'websocket send from', '', '', ''],
 			['WEBSOCKET CLOSE', 'websocket end', '', '', ''],
 
 			['Logout', 'ajax', 200, '/env/auth', 'action=logout',
@@ -1522,12 +1667,13 @@ id
 <head><script>window.open('/', '_self');</scr*/}) + ml(function () {/*ipt></head><body></body></html>*/ })]
 				]);
 				Local.tests = JSON.parse(JSON.stringify(Global.tests));
-				Local.tests[35][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'text/plain'});
-				Local.tests[36][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], {type: 'application/octet-binary'});
-				Local.tests[37][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], { type: 'application/x-binary' });
 				for (i = 0, len = Local.tests.length; i < len; i++) {
 					if (typeof (Global.tests[i][5]) === 'function') {
 						Local.tests[i][5] = Global.tests[i][5];
+					} else if (Global.tests[i][0] === 'Login 2') {
+						Local.tests[i][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], { type: 'text/plain' });
+					} else if (Global.tests[i][0] === 'Login 3') {
+						Local.tests[i][4] = new Blob(['action=login&connname=test&username=postgres&password=password'], { type: 'application/octet-binary' });
 					}
 				}
 				//application/octet-binary
@@ -1936,6 +2082,60 @@ id
 							}
 							i += 1;
 						});
+					} else if (strType === 'websocket send from') {
+						change_status(intCurrent, 'waiting', 'running');
+						GS.closeSocket(GS.envSocket);
+						GS.envSocket = GS.openSocket('env');
+						i = 0;
+						var test_data = '';
+						GS.requestFromSocket(GS.envSocket, 'SELECT\tpublic\tttesting_large_view2\nRETURN\t*\n\n\n', function (data) {
+							test_data += data;
+							i += 1;
+							if (i < 10 || i % 50 == 0) {
+								GS.envSocket.close();
+							}
+							if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+								test_data = test_data.split('\n');
+								test_data.shift();
+								test_data.shift();
+								test_data.pop();
+								test_data = 'id\ttest_name\ttest_name2\n' + '1' + test_data.join('\n1');
+								i = 0;
+								GS.requestBegin(GS.envSocket, function (transactionid) {
+									GS.requestFromSocket(GS.envSocket, 'INSERT\tpublic\trtesting_table\nRETURN\tid\ttest_name\ttest_name2\nPK\tid\nSEQ\t\n\n' + test_data + '\n', function (data) {
+										i += 1;
+										if (i < 10 || i % 50 == 0) {
+											GS.envSocket.close();
+										}
+										if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+											i = 0;
+											GS.requestFromSocket(GS.envSocket, 'UPDATE\tpublic\trtesting_table\nRETURN\tid\ttest_name\ttest_name2\n\npk\tset\tset\n' + test_data + '\n', function (data) {
+												i += 1;
+												if (i < 10 || i % 50 == 0) {
+													GS.envSocket.close();
+												}
+												if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+													i = 0;
+													GS.requestFromSocket(GS.envSocket, 'DELETE\tpublic\trtesting_table\n\npk\tpk\tpk\n' + test_data, function (data) {
+														i += 1;
+														if (i < 2) {
+															GS.envSocket.close();
+														}
+														if (data.indexOf('TRANSACTION COMPLETED') > -1) {
+															GS.requestRollback(GS.envSocket, transactionid, function () {
+																change_status(intCurrent, 'running', 'pass');
+																run_test(intCurrent + 1);
+															});
+														}
+													});
+												}
+											});
+										}
+									});
+								});
+							}
+						});
+						
 					} else if (strType === 'websocket end') {
 						change_status(intCurrent, 'waiting', 'running');
 						var i = 0;
@@ -1944,7 +2144,7 @@ id
 							if (i === 3) {
 
 								GS.closeSocket(GS.envSocket);
-
+								
 								GS.envSocket = GS.openSocket('/env/1/env');
 								var j = 0;
 								GS.requestFromSocket(GS.envSocket, 'INFO\n', function (data, error, errorData) {

@@ -116,6 +116,7 @@ void http_export_step1(struct sock_ev_client *client) {
 	SFINISH_SALLOC(client->str_response, 1);
 	client->str_response[0] = 0;
 
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(
 		DB_copy_out(global_loop, client_request->parent->conn, client_request, str_sql, http_copy_check_cb), "DB_exec failed");
 	SFREE(str_sql);

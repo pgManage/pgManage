@@ -1,6 +1,6 @@
 #include "ws_delete.h"
 
-char *ws_delete_step1(struct sock_ev_client_request *client_request) {
+void ws_delete_step1(struct sock_ev_client_request *client_request) {
 	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->vod_request_data);
 	SDEBUG("DELETE BEGIN");
 	char *str_response = NULL;
@@ -267,6 +267,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 			" LIMIT 0;", (size_t)9);
 
 		SDEBUG("str_sql: %s", str_sql);
+		SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 		SFINISH_CHECK(
 			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_delete_step2), "DB_exec failed");
 	} else {
@@ -288,6 +289,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 				";", (size_t)1);
 
 			SDEBUG("str_sql: %s", str_sql);
+			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 			SFINISH_CHECK(
 				DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_delete_step15_sql_server),
 				"DB_exec failed");
@@ -306,6 +308,7 @@ char *ws_delete_step1(struct sock_ev_client_request *client_request) {
 				";", (size_t)1);
 
 			SDEBUG("str_sql: %s", str_sql);
+			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 			SFINISH_CHECK(
 				DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_delete_step2), "DB_exec failed");
 		}
@@ -343,13 +346,13 @@ finish:
 
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
+		str_response = NULL;
 		ws_delete_free(client_delete);
 		// client_request_free(client_request);
 		// client_request_free takes care of this
 		// SFREE(client_delete);
 	}
 	SFREE_ALL();
-	return str_response;
 }
 #ifndef POSTAGE_INTERFACE_LIBPQ
 bool ws_delete_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
@@ -376,6 +379,7 @@ bool ws_delete_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
 		" DROP COLUMN id_temp123123123;", (size_t)30);
 	SDEBUG("str_sql: %s", str_sql);
 
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_delete_step2), "DB_exec failed");
 
 	bol_error_state = false;
@@ -461,6 +465,8 @@ bool ws_delete_step2(EV_P, void *cb_data, DB_result *res) {
 		")", (size_t)1);
 	SDEBUG("str_sql: %s", str_sql);
 #endif
+
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 
 	SDEBUG("client_delete->ptr_query: %s", client_delete->ptr_query);
 	int_len_content = client_request->frame->int_length - (size_t)(client_delete->ptr_query - client_request->frame->str_message);
@@ -583,6 +589,7 @@ bool ws_delete_step4(EV_P, void *cb_data, DB_result *res) {
 
 	SDEBUG("str_sql: %s", str_sql);
 
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_delete_step5), "DB_exec failed");
 
 	bol_error_state = false;
@@ -691,6 +698,7 @@ bool ws_delete_step5(EV_P, void *cb_data, DB_result *res) {
 	}
 	SFREE(client_delete->str_pk_where_clause);
 
+	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_delete_step6), "DB_exec failed");
 
 	bol_error_state = false;

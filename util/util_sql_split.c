@@ -12,6 +12,7 @@
 DArray *DArray_sql_split(char *str_form_data) {
 	size_t int_inputstring_len;
 	size_t int_qs = 0; // quote status
+	size_t int_E_quote = 0; // for single quotes and backslash skipping
 	size_t int_ps = 0; // parenthesis level
 	size_t int_element_len = 0;
 	size_t int_chunk_len = 0;
@@ -87,9 +88,8 @@ DArray *DArray_sql_split(char *str_form_data) {
 			// whole. Trying to get rid of SQL with
 			// only comments in them is going to require a re-write
 
-			// FOUND SLASH:  we don't skip slashed chars within dollar tags, double
-			// quotes and comments.
-		} else if (strncmp(ptr_loop, "\\", int_chunk_len) == 0 && int_qs != 4 && int_qs != 2 && int_qs != 5 && int_qs != 6) {
+			// FOUND SLASH:  we don't skip slashed chars within dollar tags, double or single quotes and comments.
+		} else if (strncmp(ptr_loop, "\\", int_chunk_len) == 0 && int_qs != 4 && (int_qs != 3 || int_E_quote == 1) && int_qs != 2 && int_qs != 5 && int_qs != 6) {
 			// skip next character
 			ptr_loop = ptr_loop + int_chunk_len;
 			int_inputstring_len -= int_chunk_len;
@@ -100,11 +100,13 @@ DArray *DArray_sql_split(char *str_form_data) {
 			// FOUND SINGLE QUOTE:
 		} else if (int_qs == 0 && strncmp(ptr_loop, "'", int_chunk_len) == 0) {
 			int_qs = 3;
+			int_E_quote = (*(ptr_loop - 1)) == 'E';
 			SDEBUG("found single quote");
 
 			// ENDING SINGLE QUOTE
 		} else if (int_qs == 3 && strncmp(ptr_loop, "'", int_chunk_len) == 0) {
 			int_qs = 0;
+			int_E_quote = 0;
 			SDEBUG("found end of single quote");
 
 			// FOUND DOUBLE QUOTE:
@@ -139,7 +141,7 @@ DArray *DArray_sql_split(char *str_form_data) {
 				ptr_test_loop += 1;
 			}
 
-			if (strncmp(ptr_test_loop, "$", 1) == 0) {
+			if (*ptr_test_loop == '$') {
 				int_tag = (size_t)(ptr_test_loop - (ptr_loop - 1));
 				SDEBUG("int_tag: %i", int_tag);
 				SERROR_SREALLOC(str_tag, int_tag + 1);

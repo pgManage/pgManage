@@ -8,6 +8,9 @@
 
 envelope/app
 !envelope/app/developer_g
+!envelope/app/thisgroupdoesntexist_g
+!envelope/role/thisgroupdoesntexist_g
+!envelope/web_root/thisgroupdoesntexist_g
 !envelope/app/all/file_manager
 !envelope/app/all/index.in.html
 envelope/role
