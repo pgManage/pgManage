@@ -259,7 +259,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
         strPreviousKeyWord = arrPreviousKeyWords[0];
         strPreviousWord = arrPreviousWords[0];
     
-        //console.log(strPreviousWord);
+    
         // waterfall to get the autocomplete list type
         if (strPreviousWord) {
             bolPreviousCharWhitespace = (!(strScript[intCursorPosition - 1] || '').trim());
@@ -277,82 +277,57 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             var noComma;
             var bolCols = false, bolTables = false, bolSchemas = false, bolTableFuncs = false, bolBuiltins = false, bolGroups = false, bolUsers = false, bolReturnTypes = false, bolTypes = false, bolLanguages = false, bolRules = false, bolTablespace = false;
             bolFirstSpace = bolCurrentCharWhitespace && !bolPreviousCharWhitespace;
-            /*
-            LANGUAGE LIST query
-                SELECT e.name
-                    FROM pg_available_extensions() e(name, default_version, comment)
-                    LEFT JOIN pg_extension x ON e.name = x.extname;
-                     
-            RETURN TYPE LIST query
-               SELECT DISTINCT pg_type.typname
-                   FROM pg_proc p
-                   LEFT JOIN pg_type ON pg_type.oid = prorettype
-            */
-            console.log(strPreviousKeyWord);
-//            console.log(arrPreviousKeyWords);
-            //console.log((/[A-Z\"]/gim).test(strScript[intCursorPosition]), strScript[intCursorPosition])
+            
+            
+            
+            //console.log(strPreviousKeyWord);
             if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && bolPreviousCharWhitespace && !bolCurrentCharWhitespace) {
-                //strPreviousKeyWord.toUpperCase();
-                //if (arrPreviousKeyWords[2] === 'ON') {
+                //console.log(strScript[intCursorPosition]);
                 if (arrPreviousKeyWords[1] === 'INSERT' && strPreviousKeyWord === 'INTO') {
                     //console.log('schema');
                     bolSchemas = true;
-                    //arrQueries = [autocompleteQuery.schemas];
                 } else if ((/^INSERT/gi).test(strSearchQuery) && strPreviousKeyWord === 'TO') {
                     //console.log('schema');
                     bolSchemas = true;
-                    //arrQueries = [autocompleteQuery.schemas];
                 } else if ((/(UPDATE|VIEW|SEQUENCE|FUNCTION|AGGREGATE|COLLATION|CONVERSION|DOMAIN|INDEX|CLASS|FAMILY|OPERATOR|CONFIGURATION|DICTIONARY|PARSER|TEMPLATE|TYPE|WHEN|SCHEMA|HANDLER|VALIDATOR)/i).test(strPreviousKeyWord)) {
                     //console.log('schemas');
                     bolSchemas = true;
-                    //arrQueries = [autocompleteQuery.schemas];
                 } else if (strPreviousKeyWord === 'FROM') {
                     //console.log('schemas');
                     bolSchemas = true;
-                    //arrQueries = [autocompleteQuery.schemas];
                 } else if (arrPreviousKeyWords[4] === 'REVOKE' && strPreviousKeyWord === 'FROM') {
                     //console.log('groups, users');
                     bolGroups = true;
                     bolUsers = true;
-                    //arrQueries = [autocompleteQuery.groups, autocompleteQuery.logins];
                 } else if (arrPreviousKeyWords[4] === 'REVOKE' && strPreviousKeyWord === 'ON') {
                     //console.log('schema');
                     bolSchemas = true;
-                    //arrQueries = [autocompleteQuery.schemas];
                 } else if (arrPreviousKeyWords[1] === 'UPDATE' || arrPreviousKeyWords[1] === 'DELETE' && strPreviousKeyWord === 'TO') {
                     //console.log('schemas');
                     bolSchemas = true;
-                    //arrQueries = [autocompleteQuery.schemas];
                 } else if (strPreviousKeyWord === 'TABLESPACE') {
                     //console.log('tablespace');
                     bolTablespace = true;
-                    //arrQueries = [autocompleteQuery.tablespace];
                 } else if (arrPreviousKeyWords[1] === 'ORDER' && strPreviousKeyWord === 'BY') {
                     //console.log('tables');
                     bolTables = true;
-                    //arrQueries = [autocompleteQuery.tables, autocompleteQuery.views];
                 } else if (arrPreviousKeyWords[1] === 'OWNER' && strPreviousKeyWord === 'TO') {
                     //console.log('groups, users');
                     bolGroups = true;
                     bolUsers = true;
-                    //arrQueries = [autocompleteQuery.groups, autocompleteQuery.logins];
                 } else if (arrPreviousKeyWords[2] === 'ON' && strPreviousKeyWord === 'TO') {
                     //console.log('groups, users');
                     bolGroups = true;
                     bolUsers = true;
-                    //arrQueries = [autocompleteQuery.groups, autocompleteQuery.logins];
                 } else if (strPreviousKeyWord === 'JOIN' && !bolAfterComma && strScript[intCursorPosition - (strPreviousWord.length + 2)] !== ',') {
                     //console.log('schemas');
                     bolSchemas = true;
-                    //arrQueries = [autocompleteQuery.schemas];
-                } else if (strPreviousKeyWord === 'SET') {////
+                } else if (strPreviousKeyWord === 'SET') {
                     //console.log('columns');
                     bolCols = true;
-                    //arrQueries = [autocompleteQuery.columns];
                 } else if (strScript[intCursorPosition - (strPreviousWord.length + 2)] === ',' || bolAfterComma && strPreviousKeyWord === 'VALUES') {
                     bolCols = true;
                     bolBuiltins = true;
-                    //arrQueries = [autocompleteQuery.columns, autocompleteQuery.qualified_functions];
                 } else if (strScript[intCursorPosition - (strPreviousWord.length + 2)] === ',' || bolAfterComma && strPreviousKeyWord === 'SET') {
                     bolCols = true;
                 } else if (strScript[intCursorPosition - (strPreviousWord.length + 2)] === ',' || bolAfterComma && strPreviousKeyWord === 'SELECT') {
@@ -361,31 +336,25 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     bolBuiltins = true;
                 } else if (strScript[intCursorPosition - (strPreviousWord.length + 2)] === ',' || bolAfterComma) {
                     bolSchemas = true;
-                    //arrQueries = [autocompleteQuery.schemas];
                 } else if (arrPreviousKeyWords[2] === 'ALL' && arrPreviousKeyWords[1] === 'ON' && strPreviousKeyWord === 'FUNCTION') {
                     //console.log('schemas');
                     bolSchemas = true;
-                    //arrQueries = [autocompleteQuery.schemas];
                 } else if (arrPreviousKeyWords[1] === 'ALL' && strPreviousKeyWord === 'ON') {
                     //console.log('schemas');
                     bolSchemas = true;
-                    //arrQueries = [autocompleteQuery.schemas];
                 } else if (strPreviousKeyWord === 'ON') {
                     //console.log('tables, table-functions');
                     bolTables = true;
                     bolTableFuncs = true;
-                    //arrQueries = [autocompleteQuery.tables, autocompleteQuery.views]; //, table functions
-                } else if ((/^SELECT/gi).test(strSearchQuery)) {////
+                } else if ((/^SELECT/gi).test(strSearchQuery)) {
                     //console.log('columns, tables, builtins');
                     bolCols = true;
                     bolTables = true;
                     bolBuiltins = true;
-                    //arrQueries = [autocompleteQuery.columns, autocompleteQuery.tables, autocompleteQuery.views]; //, autocompleteQuery.builtIns];
                     //console.log(arrQueries);
                 } else if (strPreviousKeyWord === 'TABLE') {
                     //console.log('schemas');
                     bolSchemas = true;
-                    //arrQueries = [autocompleteQuery.schemas];
                 } else if (strPreviousKeyWord === 'RULE') {
                     //console.log('rules');
                     bolRules = true;
@@ -393,58 +362,30 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 } else if (strPreviousKeyWord === 'GRANT') {
                     //console.log('groups');
                     bolGroups = true;
-                    //arrQueries = [autocompleteQuery.groups];
                 } else if (strPreviousKeyWord === 'WHERE') {
                     //console.log('tables, columns, builtins');
                     bolTables = true;
                     bolCols = true;
                     bolBuiltins = true;
-                    //arrQueries = [autocompleteQuery.columns, autocompleteQuery.tables]; //, autocompleteQuery.builtIns];
                 } else if (strPreviousKeyWord === 'RETURNS') {
                     //console.log('returntypes');
                     bolReturnTypes = true;
-                    //arrQueries = [autocompleteQuery.returnTypes];
                 } else if (strPreviousKeyWord === 'LANGUAGE') {
                     //console.log('language');
                     bolLanguages =true;
-                    //arrQueries = [autocompleteQuery.language];
                 } else if (strPreviousKeyWord === 'CAST' && strScript[intCursorPosition - (strPreviousWord.length + 1)] === '(' || bolPreviousCharOpenParen) {
                     //console.log('types');
                     bolTypes = true;
-                    //arrQueries = [autocompleteQuery.types];
                 } else if (arrPreviousKeyWords[1] === 'CAST' && strPreviousKeyWord === 'AS') {
                     //console.log('types');
                     bolTypes = true;
-                    //arrQueries = [autocompleteQuery.types];
                 } else if (strPreviousKeyWord === 'VALUES' && strScript[intCursorPosition - (strPreviousWord.length + 1)] === '(' || bolPreviousCharOpenParen) {
                     //console.log('columns, functions');
-                    //arrQueries = [autocompleteQuery.columns, autocompleteQuery.qualified_functions];
                     bolCols = true;
                     bolBuiltins = true;
                 }
                 
-                
-                
-                
-                /*
-                arrQueries = [autocompleteQuery.casts];
-                arrQueries = [autocompleteQuery.collations];
-                arrQueries = [autocompleteQuery.constraints];
-                arrQueries = [autocompleteQuery.databases];
-                arrQueries = [autocompleteQuery.event_triggers];
-                arrQueries = [autocompleteQuery.extension];
-                arrQueries = [autocompleteQuery.foreign_data_wrapper];
-                arrQueries = [autocompleteQuery.groups];
-                arrQueries = [autocompleteQuery.language];
-                arrQueries = [autocompleteQuery.policies];
-                arrQueries = [autocompleteQuery.roles];
-                arrQueries = [autocompleteQuery.rules];
-                arrQueries = [autocompleteQuery.schemas];
-                arrQueries = [autocompleteQuery.servers];
-                arrQueries = [autocompleteQuery.tablespace];
-                arrQueries = [autocompleteQuery.triggers];
-                arrQueries = [autocompleteQuery.logins]; 
-*/
+            
 
                  if (bolCols) {
                    arrQueries = [autocompleteQuery.allcolumns]; 
@@ -516,8 +457,16 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                        arrQueries = [autocompleteQuery.tablespace];
                     }
                 }
+                //console.log(arrQueries);
+                for (var i = 0, len = arrQueries.length; i < len; i++) {
+                    //console.log(arrQueries[i]);
+                    arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strScript[intCursorPosition] + '%');
 
-                console.log(arrQueries);
+                }
+                //console.log(arrQueries);
+                
+
+                //console.log(arrQueries);
                 //console.log(editor);
                 // if we've found queries: open the popup
                 if (arrQueries && arrQueries.length > 0) {
@@ -977,13 +926,6 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 autocompleteGlobals.intSearchOffset = 1;
                 arrQueries = [autocompleteQuery.types];
                 
-                
-            // query specific autocomplete
-            
-                
-                
-                // do something with arrContextLists
-                // order when autocompleteQuery.allcolumns is in arrQueries
                 
                 // if we've found queries: open the popup
                 if (arrQueries && arrQueries.length > 0) {

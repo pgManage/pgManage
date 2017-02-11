@@ -45,7 +45,7 @@ autocompleteQuery.tableFunctions = ml(function () {/*
         SELECT p.proname AS funcname, 'tableFunction'::text AS obj_meta
             FROM pg_proc p
             LEFT JOIN pg_type ON pg_type.oid = prorettype
-            WHERE pg_type.typname = 'record' AND p.proname LIKE '{{searchStr}}'
+            WHERE pg_type.typname = 'record'
             ORDER BY funcname
     ) list_tables_functions
 */});
@@ -71,10 +71,9 @@ autocompleteQuery.collates = ml(function () {/*
 
 autocompleteQuery.returnTypes = ml(function () {/*
     SELECT * FROM (
-        SELECT DISTINCT pg_type.typname as obj_name, 'returnType' AS obj_meta
+        SELECT DISTINCT pg_type.typname
            FROM pg_proc p
            LEFT JOIN pg_type ON pg_type.oid = prorettype
-           WHERE pg_type.typname LIKE '{{searchStr}}'
     ) list_return_types
 */});
 
@@ -749,7 +748,7 @@ autocompleteQuery.tables = ml(function () {/*
        LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
            WHERE relkind IN ('r','s','t')
              AND pg_class.relnamespace <> {{CATALOG}}
-             AND pg_class.relnamespace <> {{TOAST}} AND quote_ident(pg_class.relname) LIKE '{{searchStr}}'
+             AND pg_class.relnamespace <> {{TOAST}}
         ORDER BY pg_namespace.nspname ASC, pg_class.relname ASC
     ) list_tables
 */});
@@ -766,7 +765,7 @@ autocompleteQuery.allcolumns = ml(function () {/*
     SELECT * FROM (
           SELECT DISTINCT quote_ident(attname) AS obj_name, 'Column'::text AS obj_meta
             FROM pg_attribute
-           WHERE quote_ident(attname) NOT ILIKE '"........%' AND quote_ident(attname) LIKE '{{searchStr}}'
+           WHERE quote_ident(attname) NOT ILIKE '"........%'
         ORDER BY quote_ident(attname) ASC
     ) list_allcolumns
 */});
@@ -783,7 +782,7 @@ autocompleteQuery.views = ml(function () {/*
                              WHERE ((r.ev_class = c.oid)
                                AND (bpchar(r.ev_type) = '1'::bpchar)) ))) OR (c.relkind = 'v'::char))
              AND c.relnamespace <> {{CATALOG}}
-             AND c.relnamespace <> {{TOAST}} AND quote_ident(c.relname) LIKE '{{searchStr}}'
+             AND c.relnamespace <> {{TOAST}}
         ORDER BY pg_namespace.nspname ASC, c.relname ASC
     ) list_views
 */});
@@ -795,7 +794,7 @@ autocompleteQuery.types = ml(function () {/*
      LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
          WHERE (pg_type.typrelid = 0 OR (SELECT pg_class.relkind = 'c' FROM pg_catalog.pg_class WHERE pg_class.oid = pg_type.typrelid))
            AND (NOT EXISTS (SELECT TRUE FROM pg_catalog.pg_type elem WHERE elem.oid = pg_type.typelem AND elem.typarray = pg_type.oid))
-           AND (pg_type.typtype <> 'd') AND pg_type.typname LIKE '{{searchStr}}'
+           AND (pg_type.typtype <> 'd')
       ORDER BY pg_type.typname
     ) list_types
 */});
@@ -806,7 +805,7 @@ autocompleteQuery.schemas = ml(function () {/*
         SELECT pg_namespace.nspname AS obj_name, 'Schema'::text AS obj_meta
           FROM pg_catalog.pg_namespace
          WHERE nspname NOT ILIKE 'pg_toast%'
-           AND nspname NOT ILIKE 'pg_temp%' AND pg_namespace.nspname LIKE '{{searchStr}}'
+           AND nspname NOT ILIKE 'pg_temp%'
            --AND nspname <> 'pg_catalog'
            --AND nspname <> 'information_schema'
       ORDER BY pg_namespace.nspname
@@ -843,7 +842,6 @@ autocompleteQuery.language = ml(function () {/*
     SELECT * FROM (
           SELECT lanname AS obj_name, 'Language'::text AS obj_meta
             FROM pg_catalog.pg_language
-            WHERE lanname LIKE '{{searchStr}}'
         ORDER BY lanname ASC
     ) list_languages
 */});
@@ -852,7 +850,6 @@ autocompleteQuery.tablespace = ml(function () {/*
     SELECT * FROM (
           SELECT spcname AS obj_name, 'Tablespace'::text AS obj_meta
             FROM pg_catalog.pg_tablespace
-            WHERE spcname LIKE '{{searchStr}}'
         ORDER BY spcname ASC
     ) list_tablespaces
 */});
@@ -862,7 +859,7 @@ autocompleteQuery.builtIns = ml(function () {/*
         SELECT p.proname AS obj_name, 'builtIns'::text AS obj_meta
             FROM pg_proc p
             LEFT JOIN pg_namespace n ON n.oid = p.pronamespace
-            WHERE n.nspname = 'pg_catalog' AND p.proname LIKE '{{searchStr}}'
+            WHERE n.nspname = 'pg_catalog'
             ORDER BY p.proname
     ) list_builtIns
 */});
@@ -904,7 +901,7 @@ autocompleteQuery.logins = ml(function () {/*
     SELECT * FROM (
         SELECT quote_ident(pg_roles.rolname) AS obj_name, 'Role'::text AS obj_meta
           FROM pg_catalog.pg_roles
-         WHERE rolcanlogin = TRUE AND pg_roles.rolname LIKE '{{searchStr}}'
+         WHERE rolcanlogin = TRUE
       ORDER BY pg_roles.rolname
     ) list_logins
 */});
@@ -912,7 +909,7 @@ autocompleteQuery.groups = ml(function () {/*
     SELECT * FROM (
         SELECT pg_roles.rolname AS obj_name, 'Role'::text AS obj_meta
           FROM pg_catalog.pg_roles
-         WHERE rolcanlogin = FALSE AND pg_roles.rolname LIKE '{{searchStr}}'
+         WHERE rolcanlogin = FALSE
       ORDER BY pg_roles.rolname
     ) list_groups
 */});
