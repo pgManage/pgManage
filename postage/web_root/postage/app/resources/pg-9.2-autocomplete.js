@@ -16,7 +16,7 @@ var autocompleteLoaded = true
       , 'jsnKeywords':     {} // <-- filled in by the "autocompleteLoadKeywords" function
       , 'arrTypes':        [] // <-- filled in by the "autocompleteLoadTypes" function
     };
-
+var strSearchFixed;
 function autocompleteStart() { 'use strict'; }
 
 // this is called on every code tab's editor
@@ -93,6 +93,7 @@ function autocompleteBindEditor(tabElement, editor) {
                 
                 try {
                     // this function is in pg-9.2-autocomplete-logic.js
+                    //console.log(tabElement, editor, event);
                     autocompleteChangeHandler(tabElement, editor, event);
                 } catch (e) {
                     console.error('Caught Autocomplete Error:', e);
@@ -279,6 +280,7 @@ function autocompletePopupOpen(editor, arrQueries) {
 // this function removes, empties and unbinds the autocomplete popup
 function autocompletePopupClose(editor) {
     'use strict';
+    strSearchFixed = false;
     // if the autocomplete query is still running: cancel it
     if (autocompleteGlobals.strQueryID) {
         GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
@@ -324,18 +326,28 @@ function autocompleteComplete(editor) {
           , 'end': indexToRowAndColumn(strScript, intSearchStringEnd)
         };
         
-        // set selection using replace range
-        editor.getSelection().setSelectionRange(new Range(
-            jsnSearchStringRange.start.row,
-            jsnSearchStringRange.start.column,
-            jsnSearchStringRange.end.row,
-            jsnSearchStringRange.end.column
-        ));
+        if (strSearchFixed === true) {
+            editor.getSelection().setSelectionRange(new Range(
+                jsnSearchStringRange.start.row,
+                jsnSearchStringRange.start.column - 1,
+                jsnSearchStringRange.end.row,
+                jsnSearchStringRange.end.column
+            ));
+        } else {
+            // set selection using replace range
+            editor.getSelection().setSelectionRange(new Range(
+                jsnSearchStringRange.start.row,
+                jsnSearchStringRange.start.column,
+                jsnSearchStringRange.end.row,
+                jsnSearchStringRange.end.column
+            ));
+        }
         
         // replace the range with the selected choice's text
         autocompleteGlobals.bolInserting = true;
         editor.insert(autocompleteGlobals.arrValues[intFocusedLine]);
         autocompleteGlobals.bolInserting = false;
+        //console.log(autocompleteGlobals.arrValues[intFocusedLine]);
     }
     
     // close the autocomplete popup
@@ -366,6 +378,22 @@ function autocompletePopupSearch(editor, strMode) {
         strAdded = true;
     }
     
+    if (strSearch === '"' && (strScript.substring(intSearchStringStart - 1, intSearchStringEnd) !== '.') || strSearchFixed === true) {
+        strSearchFixed = true;
+        //console.log(strSearchFixed);
+        strSearch = strScript.substring(intSearchStringStart - 1, intSearchStringEnd);
+        if (strSearch[0] === '"') {
+            strSearch = strSearch.toLowerCase();
+            strAdded = false;
+        } else {
+            strSearch = '"' + strSearch.toLowerCase();
+            strAdded = true;
+        }
+    } else {
+        strSearchFixed = false;
+        //console.log(strSearchFixed);
+    }
+    
     
     // default strMode to 'filter', the only other option is 'expand'
     strMode = strMode || 'filter';
@@ -374,7 +402,8 @@ function autocompletePopupSearch(editor, strMode) {
     //      any items that don't match
     if (strMode === 'filter') {
         autocompleteGlobals.popupAce.setValue('');
-        
+        //console.log(autocompleteGlobals.arrSearch);
+        //console.log(strSearch);
         for (i = 0, len = autocompleteGlobals.arrSearch.length, strNewValue = ''; i < len; i += 1) {
             // if the current item doesn't match: remove from ace, arrSearch and arrValues
             if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
@@ -388,7 +417,7 @@ function autocompletePopupSearch(editor, strMode) {
                 strNewValue += autocompleteGlobals.arrValues[i];
             }
         }
-        
+
         autocompleteGlobals.popupAce.setValue(strNewValue.substring(1));
         
     // else if mode is expand: take the autocompleteGlobals.arrSearchMaster and fill

@@ -1,245 +1,182 @@
-.TH ENVELOPE 1 "August 29, 2016" GREYSPOTS "Envelope Manual"
-.SH NAME
-.P
-.I envelope
-- PostgreSQL Interface for the web
+.TH "ENVELOPE" "1" "February 2017" "" ""
+.SH "NAME"
+\fBenvelope\fR \- PostgreSQL Administration for the web
 .SH FULL PATH
 .P
-This instance of envelope was installed as
-.B @prefix@/sbin/envelope
-(Usually
-.B /usr/local/sbin/envelope
-)
+This instance of envelope was installed as \fB@prefix@/sbin/envelope\fP (Usually \fB/usr/local/sbin/envelope\fP)
 .SH SYNOPSIS
 .P
-.B envelope
-.RS
-.br
-[-h | --help]
-.br
-[-v | --version]
-.br
-[-c <config-file> | --config-file=<config-file>]
-.br
-[-d <connection-file> | --connection-file=<connection-file>]
-.br
-[-y <app-path> | --app-path=<app-path>]
-.br
-[-z <role-path> | --role-path=<role-path>]
-.br
-[-r <web-root> | --web-root=<web-root>]
-.br
-[-p <port> | --envelope-port=<port>]
-.br
-[-j <tls-cert> | --tls-cert=<tls-cert>]
-.br
-[-k <tls-key> | --tls-key=<tls-key>]
-.br
-[-l <log-level> | --log-level=<log-level>]
-.br
-[-n <allow_custom_connections> | --allow-custom-connections=<allow-custom-connections>]
-.br
-[-t <login-timeout> | --login-timeout=<login-timeout>]
+.RS 2
+.nf
+envelope
+       [\-h | \-\-help]
+       [\-v | \-\-version]
+       [\-c <config\-file> | \-\-config\-file=<config\-file>]
+       [\-d <connection\-file> | \-\-connection\-file=<connection\-file>]
+       [\-s <super\-only> | \-\-super\-only=<super\-only>]
+       [\-g <login\-group> | \-\-login\-group=<login\-group>]
+       [\-r <web\-root> | \-\-web\-root=<web\-root>]
+       [\-a <data\-root> | \-\-data\-root=<data\-root>]
+       [\-p <port> | \-\-envelope\-port=<port>]
+       [\-j <tls\-cert> | \-\-tls\-cert=<tls\-cert>]
+       [\-k <tls\-key> | \-\-tls\-key=<tls\-key>]
+       [\-l <log\-level> | \-\-log\-level=<log\-level>]
+       [\-n <allow_custom_connections> | \-\-allow\-custom\-connections=<allow\-custom\-connections>]
+       [\-t <login\-timeout> | \-\-login\-timeout=<login\-timeout>]
+.fi
 .RE
 .SH DESCRIPTION
 .P
-The
-.B envelope
-utility is a tool to make using your PostgreSQL database fast and easy. It provides web access and can be used on a tablet, or even on a phone.
+The \fBenvelope\fP utility is  a tool to make managing your PostgreSQL database fast and easy\. It provides web access and can be used on a tablet, or even on a phone\.
 .P
-All log output is pushed to stderr, if you are pushing that to a file, then you must handle rotating the file yourself or it will get large and slow
-.B envelope
-down.
+All log output is pushed to stderr, if you are pushing that to a file, then you must handle rotating the file yourself or it will get large and slow \fBenvelope\fP down\.
 .SH OPTIONS
 .P
-.B -h
-or
-.B --help
+\fB\-h\fP or \fB\-\-help\fP
 .br
-.RS
-Print usage and exit
-.RE
+       Print usage and exit
 .P
-.B -v
-or
-.B --version
+\fB\-v\fP or \fB\-\-version\fP
 .br
-.RS
-Print version information and exit
-.RE
+       Print version information and exit
 .P
-.B -c
-or
-.B --config-file=
+\fB\-c\fP or \fB\-\-config\-file=\fP
 .br
-.RS
-.B String;
-defaults to @prefix@/etc/envelope/envelope.conf
+       \fBString;\fP defaults to @prefix@/etc/envelope/envelope\.conf
 .br
-You can use this option to tell Envelope where to look for the configuration file. A sample configuration file is provided in @prefix@/etc/envelope.
-If there is no file specified Envelope will look in the current directory for a config file. If no config file is found Envelope will proceed with default values.
-.RE
+       You can use this option to tell Envelope where to look for the configuration file\. A sample configuration file is provided in @prefix@/etc/envelope\. If there is no file specified Envelope will look in the current directory for a config file\. If no config file is found Envelope will proceed with default values\.
 .P
-The following options can be specified on the command line or in the configuration file. In the event a value is specified on the command line and in the config file, Envelope will always use the command line option. Note that if no option is specified then some options will be set to a default value.
+The following options can be specified on the command line or in the configuration file\. In the event a value is specified on the command line and in the config file, Envelope will always use the command line option\. Note that if no option is specified then some options will be set to a default value\.
 .P
-.B [command line short]
-or
-.B [command line long]
-or
-.B [config file]
+\fB[command line short]\fP or \fB[command line long]\fP or \fB[config file]\fP
 .P
-.B -d
-or
-.B --connection-file=
-or
-.B connection_file=
+\fB\-d\fP or \fB\-\-connection\-file=\fP or \fBconnection_file=\fP
 .br
-.RS
-.B String;
-defaults to @prefix@/etc/envelope/envelope-connections.conf
+       \fBString;\fP defaults to /usr/local/etc/envelope/envelope\-connections\.conf
 .br
-When you install Envelope, the Makefile will generate a path to the sample envelope-connections.conf file and put it in the sample config file. Use this option to tell Envelope where your connection list is located. Note, only the first connection is used. The others are ignored.
+       When you install Envelope, the Makefile will generate a path to the sample envelope\-connections\.conf file and put it in the sample config file\. Use this option to tell Envelope where your connection list is located\.
 .br
-If not specified, Envelope looks in the same folder as the config file for a file named envelope-connections.conf.
-If Envelope can't find a connection file, it will error.
-.RE
+       If not specified, Envelope looks in the same folder as the config file for a file named envelope\-connections\.conf\. If Envelope can't find a connection file, it will error\.
 .P
-.B -y
-or
-.B --app-path=
-or
-.B app_path=
+\fB\-s\fP or \fB\-\-super\-only=\fP or \fBsuper_only=\fP
 .br
-.RS
-.B String;
-Defaults to @prefix@/etc/envelope/app
+       \fBBoolean;\fP defaults to true
 .br
-This tells Envelope where the app HTML files have been installed to.
-.RE
+       This tells Envelope whether or not to only allow super users to login\. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through Envelope\. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser\.  
 .P
-.B -z
-or
-.B --role-path=
-or
-.B role_path=
+\fB\-g\fP or \fB\-\-login\-group=\fP or \fBlogin_group=\fP
 .br
-.RS
-.B String;
-Defaults to @prefix@/etc/envelope/role
+       \fBString;\fP no default
 .br
-This tells Envelope where the role DATA files have been installed to.
-.RE
+       This tells Envelope to only allow users in a certain PostgreSQL group to login to Envelope\. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group\.
 .P
-.B -r
-or
-.B --web-root=
-or
-.B web_root=
+\fB\-r\fP or \fB\-\-web\-root=\fP or \fBweb_root=\fP
 .br
-.RS
-.B String;
-Defaults to @prefix@/etc/envelope/web_root
+       \fBString;\fP Defaults to /usr/local/etc/envelope/web_root
 .br
-This tells Envelope where the HTML files have been installed to.
-.RE
+       This tells Envelope where the HTML files have been installed to\.
 .P
-.B -p
-or
-.B --envelope-port=
-or
-.B envelope_port=
+\fB\-a\fP or \fB\-\-data\-root=\fP or \fBdata_root=\fP
 .br
-.RS
-.B Integer;
-defaults to 8080
+       \fBString;\fP defaults to ~/\.envelope/
 .br
-This tells Envelope what port to listen on for browser requests.
-.RE
+       This tells Envelope where to put the SQL file history\. All tabs are saved to this location so that if you get disconnected from Envelope you don't lose your work\.
 .P
-.B -j
-or
-.B --tls-cert=
-or
-.B tls_cert=
+\fB\-p\fP or \fB\-\-envelope\-port=\fP or \fBenvelope_port=\fP
 .br
-.B -k
-or
-.B --tls-key=
-or
-.B tls_key=
-.RS
-.B String;
-no defaults
+       \fBInteger;\fP defaults to 8080
 .br
-These options tell Envelope where the TLS Certificate and Key files reside. If you use these options then you'll only be able to access Envelope through a secure TLS connection.
-.br
-These options are only necessary if you wish to connect directly to Envelope using a secure TLS connection. As an alternative, you can set up Envelope in a reverse proxy configuration. This allows your web server to terminate the secure connection and pass on the request to Envelope. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution.
-.RE
+       This tells Envelope what port to listen on for browser requests\.
 .P
-.B -l
-or
-.B --log-level=
-or
-.B log_level=
+\fB\-j\fP or \fB\-\-tls\-cert=\fP or \fBtls_cert=\fP
 .br
-.RS
-.B String;
-defaults to error
+\fB\-k\fP or \fB\-\-tls\-key=\fP or \fBtls_key=\fP
 .br
-This option regulates the frequency and verbosity of log messages. Possible values are none, error, warn, notice and info.
-.RE
+       \fBString;\fP no defaults
+.br
+       These options tell Envelope where the TLS Certificate and Key files reside\. If you use these options then you'll only be able to access Envelope through a secure TLS connection\.
+.br
+       These options are only necessary if you wish to connect directly to Envelope using a secure TLS connection\. As an alternative, you can set up Envelope in a reverse proxy configuration\. This allows your web server to terminate the secure connection and pass on the request to Envelope\. You can find help to set up this configuration in the INSTALL_NGINX file that came with your distribution\.
 .P
-.B -t
-or
-.B --login-timeout=
-or
-.B login-timeout=
+\fB\-n\fP or \fB\-\-allow\-custom\-connections=\fP or \fBallow_custom_connections=\fP
 .br
-.RS
-.B Integer;
-defaults to 1200
+       \fBBoolean;\fP defaults to false
 .br
-This option regulates the login timeout (in seconds) after the last request is made.
-.RE
+       This tells Envelope whether or not to allow anyone to use a custom connection from the login screen\.
+.P
+\fB\-l\fP or \fB\-\-log\-level=\fP or \fBlog_level=\fP
+.br
+       \fBString;\fP defaults to error
+.br
+       This option regulates the frequency and verbosity of log messages\. Possible values are none, error, warn, notice and info\.
+.P
+\fB\-t\fP or \fB\-\-login\-timeout=\fP or \fBlogin\-timeout=\fP
+.br
+       \fBInteger;\fP defaults to 1200
+.br
+       This option regulates the timeout after the last page is closed\.
 .SH SETTING UP A CONNECTION TO A POSTGRESQL SERVER
 .P
-Envelope requires at least one PostgreSQL server be listed in the envelope-connections.conf file (if there is more than one, it uses the first). This version of Envelope doesn't allow you to specify a server from the command line. Enter only one PostgreSQL server per line. For envelope, only the first server is used.
+Envelope requires at least one PostgreSQL server be listed in the envelope\-connections\.conf file\. This version of Envelope doesn't allow you to specify a server from the command line\. Enter only one PostgreSQL server per line\. For envelope, only the first server is user\.
 .P
-.B The format of a connection string is:
-.RS
-[server_name]: [standard PostgreSQL connection string]
+\fBThe format of a connection string is:\fR  
+.P
+.RS 2
+.nf
+[server name]: [standard PostgreSQL connection string]
+.fi
 .RE
 .P
-Detailed information about PostgreSQL connection strings is available at: http://www.postgresql.org/docs/current/static/libpq-connect.html
+Detailed information about PostgreSQL connection strings is available at: http://www\.postgresql\.org/docs/current/static/libpq\-connect\.html
 .P
-Note that you do not enter your user name or password in this file. That information will be entered on the login screen. If you put a username or password in this file, it will be removed by Envelope before attempting to connect to a database.
-
-.B EXAMPLE CONNECTION STRINGS:
-.RS
-nuc-server: hostaddr=192.168.0.100 port=5432 dbname=postgres
+If you put a username in this connection string, Envelope will connect as that user (using \.pgpass or whatever other means of authentication you set up), then check the password against pg_authid, then SET SESSION AUTHORIZATION afterwards\.
+.P
+It is recommended to have a superuser in your database specifically for envelope\.
 .br
-mini-server: hostaddr=127.0.0.1 port=5432 dbname=postgres sslmode=require
+The recommended script for creating this user is:  
+.P
+.RS 2
+.nf
+CREATE ROLE <username> LOGIN SUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION PASSWORD '<password>'
+.fi
 .RE
-
+.P
+Of course, you should choose a name and password that doesn't have 'envelope' in it, otherwise the people who try to break into your database can make that assumption\.
+.SS EXAMPLE CONNECTION STRINGS:
+.P
+.RS 2
+.nf
+nuc\-server: hostaddr=192\.168\.0\.100 port=5432 dbname=postgres
+mini\-server: hostaddr=127\.0\.0\.1 port=5432 dbname=postgres sslmode=require
+.fi
+.RE
 .SH EXAMPLES
 .P
-Run Envelope (short argument):
-.RS
-@prefix@/sbin/envelope -c @prefix@/etc/envelope/envelope.conf -d @prefix@/etc/envelope/envelope-connections.conf
+Run \fBenvelope\fP (short argument):
+.P
+.RS 2
+.nf
+/usr/local/sbin/envelope \-c /usr/local/etc/envelope/envelope\.conf \-d /usr/local/etc/envelope/envelope\-connections\.conf
+.fi
 .RE
 .P
-Run Envelope (long argument):
-.RS
-@prefix@/sbin/envelope --config-file=@prefix@/etc/envelope/envelope.conf --connection-file @prefix@/etc/envelope/envelope-connections.conf
+Run \fBenvelope\fP (long argument):
+.P
+.RS 2
+.nf
+/usr/local/sbin/envelope \-\-config\-file=/usr/local/etc/envelope/envelope\.conf \-\-connection\-file /usr/local/etc/envelope/envelope\-connections\.conf
+.fi
 .RE
-
 .SH TROUBLESHOOTING
-Try accessing your database through psql. If you can, double check your connection string parameters. If you can't connect, you may have a firewall problem.
-
+.P
+Try accessing your database through psql\. If you can, double check your connection string parameters\. If you can't connect, you may have a firewall problem\.
 .SH AUTHOR
 .P
-Copyright (c) 2016 Workflow Products, LLC
-.br
+Copyright (c) 2017 Workflow Products, LLC
+.P
 Created by Annunziato Tocci
+.P
+Report bugs to https://github\.com/workflowproducts/envelope/issues
 .br
-Report bugs to nunzio@wfprod.com. Send us feedback! Current contact information can be found at workflowproducts.com.
+Send us feedback! Current contact information can be found at workflowproducts\.com  
+
