@@ -105,7 +105,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
       , intOpenParen, intCloseParen, intVersion = parseFloat(contextData.minorVersionNumber, 10);
     
     // if the popup isn't already open or it's open but it's asleep
-    // console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
+    console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
     if (autocompleteGlobals.popupOpen === false || autocompleteGlobals.popupAsleep === true) {
         // get current query range
         currentQueryRange = editor.currentQueryRange;
@@ -281,7 +281,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             
             
             //console.log(strPreviousKeyWord);
-            if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && (bolPreviousCharWhitespace || bolPreviousCharOpenParen) && !bolCurrentCharWhitespace) {
+            if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && !bolCurrentCharWhitespace) {
                 //console.log(strScript[intCursorPosition]);
                 if (arrPreviousKeyWords[1] === 'INSERT' && strPreviousKeyWord === 'INTO') {
                     //console.log('schema');
@@ -457,11 +457,12 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                        arrQueries = [autocompleteQuery.tablespace];
                     }
                 }
-                //console.log(arrQueries);
-                for (var i = 0, len = arrQueries.length; i < len; i++) {
-                    //console.log(arrQueries[i]);
-                    arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strScript[intCursorPosition] + '%');
-
+                if (arrQueries) {
+                    for (var i = 0, len = arrQueries.length; i < len; i++) {
+                        //console.log(arrQueries[i]);
+                        arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strScript[intCursorPosition] + '%');
+    
+                    }
                 }
                 //console.log(arrQueries);
                 
