@@ -105,7 +105,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
       , intOpenParen, intCloseParen, intVersion = parseFloat(contextData.minorVersionNumber, 10);
     
     // if the popup isn't already open or it's open but it's asleep
-    console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
+    //console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
     if (autocompleteGlobals.popupOpen === false || autocompleteGlobals.popupAsleep === true) {
         // get current query range
         currentQueryRange = editor.currentQueryRange;
@@ -280,8 +280,8 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             
             
             
-            //console.log(strPreviousKeyWord);
-            if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && !bolCurrentCharWhitespace) {
+            console.log(arrPreviousWords);
+            if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && (bolPreviousCharWhitespace || bolPreviousCharOpenParen) && !bolCurrentCharWhitespace) {
                 //console.log(strScript[intCursorPosition]);
                 if (arrPreviousKeyWords[1] === 'INSERT' && strPreviousKeyWord === 'INTO') {
                     //console.log('schema');
@@ -384,7 +384,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     bolCols = true;
                     bolBuiltins = true;
                 }
-                console.log(strPreviousKeyWord);
+                //console.log(strPreviousKeyWord);
             
 
                  if (bolCols) {
