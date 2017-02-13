@@ -279,10 +279,8 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             bolFirstSpace = bolCurrentCharWhitespace && !bolPreviousCharWhitespace;
             
             
+            if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && !bolCurrentCharWhitespace && (bolPreviousCharWhitespace || bolPreviousCharOpenParen || strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_')) {
             
-            console.log(arrPreviousWords);
-            if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && (bolPreviousCharWhitespace || bolPreviousCharOpenParen) && !bolCurrentCharWhitespace) {
-                //console.log(strScript[intCursorPosition]);
                 if (arrPreviousKeyWords[1] === 'INSERT' && strPreviousKeyWord === 'INTO') {
                     //console.log('schema');
                     bolSchemas = true;
@@ -386,7 +384,17 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 }
                 //console.log(strPreviousKeyWord);
             
-
+            
+                var strCurrWord = '';
+                for (var i = 0, len = strPreviousWord.length; i <= len; i++) {
+                    if (strScript[intCursorPosition - i] !== '.') {
+                        strCurrWord = strScript[intCursorPosition - i] + strCurrWord;
+                        bolTables = true;
+                    } else {
+                        break;
+                    }
+                }
+            
                  if (bolCols) {
                    arrQueries = [autocompleteQuery.allcolumns]; 
                 } if (bolTables) {
@@ -457,22 +465,35 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                        arrQueries = [autocompleteQuery.tablespace];
                     }
                 }
+                
+                
+                console.log(strCurrWord);
+                
                 if (arrQueries) {
                     for (var i = 0, len = arrQueries.length; i < len; i++) {
-                        //console.log(arrQueries[i]);
-                        arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strScript[intCursorPosition] + '%');
+                        if (strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_') {
+                            arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strCurrWord + '%');
+                        } else {
+                            arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strScript[intCursorPosition - 1] + '%');
+                        }
     
                     }
                 }
-                //console.log(arrQueries);
                 
-
-                //console.log(arrQueries);
-                //console.log(editor);
+                console.log(strPreviousWord);
                 // if we've found queries: open the popup
                 if (arrQueries && arrQueries.length > 0) {
-                    autocompleteGlobals.intSearchStart = intEndCursorPosition - 1;
-                    autocompleteGlobals.intSearchEnd = intEndCursorPosition;
+                    if (strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_') {
+                        //console.log(strCurrWord, intEndCursorPosition - strCurrWord.length);
+                        autocompleteGlobals.intSearchStart = intEndCursorPosition - strCurrWord.length - autocompleteGlobals.intSearchOffset;
+                        autocompleteGlobals.intSearchEnd = intEndCursorPosition;
+                        
+                    } else {
+                        autocompleteGlobals.intSearchStart = intEndCursorPosition - 1;
+                        autocompleteGlobals.intSearchEnd = intEndCursorPosition;
+                    }
+                    //console.log(strScript.substring(autocompleteGlobals.intSearchStart, autocompleteGlobals.intSearchEnd));
+                    
                     autocompletePopupOpen(editor, arrQueries);
                     //console.log('test');
                 }

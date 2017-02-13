@@ -172,9 +172,9 @@ function autocompletePopupLoad(editor, arrQueries) {
     autocompleteGlobals.arrSearchMaster = [];
     autocompleteGlobals.arrValuesMaster = [];
     
+    
     autocompleteGetList(arrQueries, function (bolLast, arrRows) {
         var i, len, strText, strSearch, element, strCurrent;
-        
         if (bolLast === true) {
             // set state variable
             autocompleteGlobals.popupLoading = false;
@@ -213,6 +213,7 @@ function autocompletePopupLoad(editor, arrQueries) {
                 autocompleteGlobals.arrValuesMaster.push(strCurrent);
             }
             
+            
             // append text (the substring is to remove the trailing \n)
             autocompleteGlobals.popupAceSession.insert({
                 'row': autocompleteGlobals.popupAceSession.getLength(),
@@ -220,6 +221,7 @@ function autocompletePopupLoad(editor, arrQueries) {
             }, (intResult === 1 ? strText.substring(1) : strText));
         }
     });
+    
 }
 
 // this function appends, positions and binds the autocomplete popup
@@ -371,6 +373,8 @@ function autocompletePopupSearch(editor, strMode) {
       , strSearch = strScript.substring(intSearchStringStart, intSearchStringEnd)
       , choices, match, i, len, strCurrentMasterSearch, strCurrentMasterValue, strNewValue, strAdded;
     
+    //console.log(autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset);
+    //console.log(autocompleteGlobals.intSearchEnd);
     // normalize strSearch
     //strSearch = (strSearch[0] === '"' ? strSearch.toLowerCase() : '"' + strSearch.toLowerCase());
     if (strSearch[0] === '"') {
@@ -404,7 +408,7 @@ function autocompletePopupSearch(editor, strMode) {
         strSearchFixed = false;
     }
     
-    
+    console.log(strSearch);
     // default strMode to 'filter', the only other option is 'expand'
     strMode = strMode || 'filter';
     

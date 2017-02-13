@@ -175,9 +175,6 @@ function openToTab() {
     } else {
         arrLines = strQuery.split('\n');
         newQuery = strQuery;
-        
-        console.log(newQuery);
-        console.log(strQuery);
     }
     
     
