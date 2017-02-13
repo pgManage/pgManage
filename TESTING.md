@@ -31,6 +31,8 @@ exit
 On your desktop computer's browser go to:
 http://\<ip>:8080/postage/test.html
 
+Make sure to kill the PostgreSQL process from `make test-common` before moving on.
+
 Back in FreeBSD:
 ```
 su -
@@ -109,6 +111,8 @@ exit
 On your desktop computer's browser go to:
 http://\<ip>:8080/postage/test.html
 
+Make sure to kill the PostgreSQL process from `make test-common` before moving on.
+
 Back in OpenBSD:
 ```
 su -
@@ -183,6 +187,8 @@ make test-common
 In your browser:
 Go to the Postage testing page: http://127.0.0.1:8080/postage/test.html
 
+Make sure to kill the PostgreSQL process from `make test-common` before moving on.
+
 To uninstall:
 ```
 sudo su -
@@ -249,6 +255,8 @@ make test-common
 ```
 In your browser:
 Go to the Postage testing page: http://127.0.0.1:8080/postage/test.html
+
+Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
 To uninstall:
 ```
@@ -318,6 +326,8 @@ make test-common
 
 In your browser:
 Go to the Postage testing page: http://127.0.0.1:8080/test.html
+
+Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
 To uninstall:
 ```
