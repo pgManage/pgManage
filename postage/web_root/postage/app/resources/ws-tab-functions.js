@@ -1122,7 +1122,10 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                         '<gs-button icononly class="button-explain" icon="play-circle-o" onclick="explain()" ' +
                                     'title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter">E</span></gs-button>' +
                         '<gs-button icononly class="button-explain" icon="play" onclick="explain(true)" ' +
-                                    'title="Query explanation. Note that the query will run, meaning that you\'ll get run times." remove-top><span class="explain-letter" no-focus>E</span></gs-button>' +
+                                    'title="Query explanation. Note that the query will run, meaning that you\'ll get run times." ' +
+                                    'remove-top no-focus>' +
+                            '<span class="explain-letter">E</span>' +
+                        '</gs-button>' +
                         '<gs-button icononly class="button-csv" icon="file-text" onclick="exportCSV()" ' +
                                     'title="Download a single query\'s results as a file" remove-all no-focus></gs-button>' +
                         '<gs-button icononly class="button-ace-info" onclick="dialogAceInfo()" ' +
@@ -1132,7 +1135,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                         '</gs-button>' +
                         '<gs-button hidden id="sql-property-' + intTabNumber + '-button" icononly ' +
                                     'icon="wrench" onclick="propertyWindowDialog()" disabled  ' + //hidden
-                                    'title="Edit the current query\'s properties [CMD][.] or [CTRL][.]" remove-top></gs-button>' +
+                                    'title="Edit the current query\'s properties [CMD][.] or [CTRL][.]" remove-top no-focus></gs-button>' +
                     '</div>' +
                 '</div>' +
                 '<div id="sql-doc-links-' + intTabNumber + '" style="text-align: center; height: 0;">' +

@@ -84,19 +84,22 @@ function autocompleteBindEditor(tabElement, editor) {
 //            console.log(editor.ignoreChange !== true && event.action === 'insert' && autocompleteGlobals.bolInserting === false && editor.currentQueryRange);
 //            console.log(editor.ignoreChange, event.action,  autocompleteGlobals.bolInserting, editor.currentQueryRange);
             //console.log('test 1', editor.currentQueryRange);
-            if (editor.ignoreChange !== true
-                && event.action === 'insert'
-                && autocompleteGlobals.bolInserting === false
-                && editor.currentQueryRange) {
+            //console.log(event.lines[0].length !== 0 && event.lines[0].length > 1);
+            //console.log(event.lines[0].length !== 0, event.lines);
+            if (event.lines[0].length !== 0 && event.lines[0].length >= 1) {
+                if (editor.ignoreChange !== true
+                    && event.action === 'insert'
+                    && autocompleteGlobals.bolInserting === false
+                    && editor.currentQueryRange) {
+                        
+                        
                     
-                    
-                
-                try {
-                    // this function is in pg-9.2-autocomplete-logic.js
-                    //console.log(tabElement, editor, event);
-                    autocompleteChangeHandler(tabElement, editor, event);
-                } catch (e) {
-                    console.error('Caught Autocomplete Error:', e);
+                    try {
+                        // this function is in pg-9.2-autocomplete-logic.js
+                        autocompleteChangeHandler(tabElement, editor, event);
+                    } catch (e) {
+                        console.error('Caught Autocomplete Error:', e);
+                    }
                 }
             }
         });

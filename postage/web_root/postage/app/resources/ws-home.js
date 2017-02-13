@@ -162,14 +162,24 @@ function openToTab() {
         }
         
         newQuery = strQuery.substring(intStart, intEnd);
-    } else {
+        console.log(newQuery);
+    /* If you're going to do this in the future you have to do this the right way
+       
+    
+    } else if (strQuery.lastIndexOf('/*') > 0) {
         arrLines = strQuery.split('\n');
         intCommentStart = strQuery.lastIndexOf('/*');
-        //intCommentEnd = strQuery.lastIndexOf('*/');
         console.log(intCommentStart);
         
-        newQuery = strQuery.substring(0, intCommentStart);
+        newQuery = strQuery.substring(0, intCommentStart);*/
+    } else {
+        arrLines = strQuery.split('\n');
+        newQuery = strQuery;
+        
+        console.log(newQuery);
+        console.log(strQuery);
     }
+    
     
     newTab('sql', (homeEditor.currentTabName || ''), {'strContent': (newQuery || '-- Nothing to open\n\n\n')});
 }
