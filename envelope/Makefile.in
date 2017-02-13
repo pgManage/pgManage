@@ -159,8 +159,8 @@ test: test-common
 	./$(BINARY) $(CONFIGS) -d config/envelope-connections.conf $(WEBROOTS) -l info -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08 || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 
-test-no-set-user: test-common
-	./$(BINARY) $(CONFIGS) -d config/envelope-connections-no-set-user.conf $(WEBROOTS) -l info -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08 || \
+test-set-user: test-common
+	./$(BINARY) $(CONFIGS) -d config/envelope-connections-set-user.conf $(WEBROOTS) -l info -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08 || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 
 test-ssl: test-common
@@ -173,9 +173,9 @@ gdb: test-common
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_gdb_commands
 
-gdb-no-set-user: test-common
+gdb-set-user: test-common
 	echo "run" > temp_gdb_commands
-	gdb -x temp_gdb_commands --args ./$(BINARY) $(CONFIGS) -d config/envelope-connections-no-set-user.conf $(WEBROOTS) -l info -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08 || \
+	gdb -x temp_gdb_commands --args ./$(BINARY) $(CONFIGS) -d config/envelope-connections-set-user.conf $(WEBROOTS) -l info -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08 || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_gdb_commands
 
@@ -191,9 +191,9 @@ lldb: test-common
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_lldb_commands
 
-lldb-no-set-user: test-common
+lldb-set-user: test-common
 	echo "run" > temp_lldb_commands
-	lldb -s temp_lldb_commands -- ./$(BINARY) $(CONFIGS) -d config/envelope-connections-no-set-user.conf $(WEBROOTS) -l info -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08 || \
+	lldb -s temp_lldb_commands -- ./$(BINARY) $(CONFIGS) -d config/envelope-connections-set-user.conf $(WEBROOTS) -l info -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08 || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_lldb_commands
 
@@ -203,8 +203,8 @@ lldb-ssl: test-common
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 	rm temp_lldb_commands
 
-valgrind-no-set-user: test-common
-	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) -d config/envelope-connections-no-set-user.conf $(WEBROOTS) -l error -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08 || \
+valgrind-set-user: test-common
+	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) -d config/envelope-connections-set-user.conf $(WEBROOTS) -l error -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08 || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 
 valgrind: test-common
