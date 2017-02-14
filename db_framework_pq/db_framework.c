@@ -954,10 +954,11 @@ finish:
 		bol_error_state = false;
 
 		str_response = _DB_get_diagnostic(copy_check->conn, res ? res : PQgetResult(copy_check->conn->conn));
-		copy_check->copy_cb(EV_A, false, true, copy_check->cb_data, str_response, strlen(str_response));
+		copy_cb_t copy_cb = copy_check->copy_cb;
 		decrement_idle(EV_A);
 		ev_check_stop(EV_A, &copy_check->check);
 		copy_check->conn->copy_check = NULL;
+		copy_cb(EV_A, false, true, copy_check->cb_data, str_response, strlen(str_response));
 		SFREE(copy_check);
 	}
 	SFREE(str_response);

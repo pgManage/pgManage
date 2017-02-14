@@ -290,7 +290,8 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 	SDEBUG("str_response: %s", str_response);
 	size_t int_response_len = 0;
 
-	if (close_client_if_needed(client_request->parent, (ev_watcher *)&client_request->parent->conn->copy_check->check, EV_CHECK)) {
+	// If copy_check is null, that means we are on the last message of the request
+	if (client_request->parent->conn->copy_check != NULL && close_client_if_needed(client_request->parent, (ev_watcher *)&client_request->parent->conn->copy_check->check, EV_CHECK)) {
 		ev_check_stop(EV_A, &client_request->parent->conn->copy_check->check);
 		client_request->parent->client_paused_request->bol_is_db_framework = true;
 		SDEBUG("client_request->parent->cur_request: %p", client_request->parent->cur_request);
