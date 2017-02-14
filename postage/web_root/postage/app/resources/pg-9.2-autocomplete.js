@@ -408,7 +408,6 @@ function autocompletePopupSearch(editor, strMode) {
         strSearchFixed = false;
     }
     
-    console.log(strSearch);
     // default strMode to 'filter', the only other option is 'expand'
     strMode = strMode || 'filter';
     
