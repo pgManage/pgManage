@@ -382,21 +382,28 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     bolCols = true;
                     bolBuiltins = true;
                 }
-                //console.log(strPreviousKeyWord);
             
             
                 var strCurrWord = '';
                 for (var i = 0, len = strPreviousWord.length; i <= len; i++) {
-                    if (strScript[intCursorPosition - i] !== '.') {
+                    if (strScript[intCursorPosition - i] == ' ' &&
+                        strScript[intCursorPosition - i] == ',' &&
+                        strScript[intCursorPosition - i] == ';' &&
+                        strScript[intCursorPosition - i] == '"' &&
+                        strScript[intCursorPosition - i] == "'") {
+                        break;
+                    } else if (strScript[intCursorPosition - i] !== '.') {
                         strCurrWord = strScript[intCursorPosition - i] + strCurrWord;
-                        bolTables = true;
+                        if (strScript[intCursorPosition] === '_') {
+                            bolTables = true;
+                        }
                     } else {
                         break;
                     }
                 }
             
                  if (bolCols) {
-                   arrQueries = [autocompleteQuery.allcolumns]; 
+                   arrQueries = [autocompleteQuery.allcolumns];
                 } if (bolTables) {
                     if (arrQueries) {
                        arrQueries.push(autocompleteQuery.tables.replace(/\{\{CATALOG}\}/gi, CATALOG_id).replace(/\{\{TOAST}\}/gi, TOAST_id), autocompleteQuery.views.replace(/\{\{CATALOG}\}/gi, CATALOG_id).replace(/\{\{TOAST}\}/gi, TOAST_id)); 
@@ -467,35 +474,30 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 }
                 
                 
-                console.log(strCurrWord);
                 
                 if (arrQueries) {
                     for (var i = 0, len = arrQueries.length; i < len; i++) {
                         if (strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_') {
                             arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strCurrWord + '%');
                         } else {
-                            arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strScript[intCursorPosition - 1] + '%');
+                            arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strScript[intCursorPosition] + '%');
                         }
     
                     }
                 }
                 
-                console.log(strPreviousWord);
                 // if we've found queries: open the popup
                 if (arrQueries && arrQueries.length > 0) {
                     if (strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_') {
-                        //console.log(strCurrWord, intEndCursorPosition - strCurrWord.length);
                         autocompleteGlobals.intSearchStart = intEndCursorPosition - strCurrWord.length - autocompleteGlobals.intSearchOffset;
                         autocompleteGlobals.intSearchEnd = intEndCursorPosition;
                         
                     } else {
                         autocompleteGlobals.intSearchStart = intEndCursorPosition - 1;
                         autocompleteGlobals.intSearchEnd = intEndCursorPosition;
+                        
                     }
-                    //console.log(strScript.substring(autocompleteGlobals.intSearchStart, autocompleteGlobals.intSearchEnd));
-                    
                     autocompletePopupOpen(editor, arrQueries);
-                    //console.log('test');
                 }
                 
                 arrQueries = [];
@@ -945,11 +947,8 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 }
             // typecasting:
             } else if (strScript[intCursorPosition] === ':' && strScript[intCursorPosition - 1] === ':') {
-                // console.log('running');
                 autocompleteGlobals.intSearchOffset = 1;
                 arrQueries = [autocompleteQuery.types];
-                
-                // console.log(arrQueries);
                 
                 
                 // if we've found queries: open the popup
