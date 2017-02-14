@@ -222,17 +222,19 @@ void client_reconnect_timer_cb(EV_P, ev_prepare *w, int revents) {
 	if (revents != 0) {
 	} // get rid of unused parameter warning
 	struct sock_ev_client_reconnect_timer *client_reconnect_timer = (struct sock_ev_client_reconnect_timer *)w;
+	struct sock_ev_client *client = client_reconnect_timer->parent;
 
 	if ((client_reconnect_timer->close_time + 10) < ev_now(EV_A)) {
-		ev_io_stop(EV_A, &client_reconnect_timer->parent->reconnect_watcher->io);
-		DB_finish(client_reconnect_timer->parent->conn);
+		ev_io_stop(EV_A, &client->reconnect_watcher->io);
+		DB_finish(client->conn);
 
-		ev_prepare_stop(EV_A, &client_reconnect_timer->parent->client_reconnect_timer->prepare);
-		SFREE(client_reconnect_timer->parent->client_reconnect_timer);
+		ev_prepare_stop(EV_A, &client_reconnect_timer->prepare);
+		SFREE(client->client_reconnect_timer);
+		client_reconnect_timer = NULL;
 
 		decrement_idle(EV_A);
 
-		client_close(client_reconnect_timer->parent);
+		client_close(client);
 	}
 }
 
