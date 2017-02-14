@@ -480,10 +480,6 @@ finish:
 		SFREE_ALL();
 		bol_sfree_all = false;
 	}
-	if (result == PGRES_FATAL_ERROR && res != NULL) {
-		PQclear(res);
-		res = NULL;
-	}
 	if (str_oid_type != NULL) {
 		PQfreemem(str_oid_type);
 		str_oid_type = NULL;
@@ -521,11 +517,19 @@ finish:
 		client_request->int_i = client_request->int_len + 10;
 		int_status = PQsendQuery(client_request->parent->cnxn, "ROLLBACK");
 		if (int_status != 1) {
-			SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
+			SERROR_NORESPONSE("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
+			ws_raw_step3(EV_A, NULL, 0, client_request);
+			ev_feed_event(EV_A, &client_request->parent->notify_watcher->io, EV_READ);
+			// we return here on purpose, otherwise we get called again and crash
+			return false;
 		}
 		query_callback(EV_A, client_request, ws_raw_step3);
 	} else {
 		SFREE(str_response);
+	}
+	if (result == PGRES_FATAL_ERROR && res != NULL) {
+		PQclear(res);
+		res = NULL;
 	}
 	return true;
 }

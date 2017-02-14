@@ -250,45 +250,44 @@ void client_notify_cb(EV_P, ev_io *w, int revents) {
 		return;
 	}
 	if (socket_is_open(PQsocket(client->conn->conn)) == false) {
-		client_close(client);
+		int_status = -1;
+	} else if (client->cur_request == NULL) {
+		int_status = PQconsumeInput(client->conn->conn);
+		if (int_status == 1) {
+			send_notices(notify_watcher->parent);
+
+			PQisBusy(notify_watcher->parent->cnxn);
+			send_notices(notify_watcher->parent);
+		}
+	}
+	if (int_status != 1) {
+		SERROR_NORESPONSE("Lost postgresql connection:\012%s", PQerrorMessage(client->cnxn));
+
+		SERROR_CHECK(PQresetStart(client->conn->conn) == 1, "PQresetStart failed");
+
+		ev_io_stop(EV_A, &client->notify_watcher->io);
+		SFREE(client->notify_watcher);
+
+		SFREE(client->reconnect_watcher);
+		SERROR_SALLOC(client_cnxn, sizeof(struct sock_ev_client_cnxn));
+		client_cnxn->parent = client;
+		client_cnxn->parent->conn->int_status = 0;
+		client->reconnect_watcher = client_cnxn;
+
+		SERROR_SALLOC(client->client_reconnect_timer, sizeof(struct sock_ev_client_reconnect_timer));
+		ev_prepare_init(&client->client_reconnect_timer->prepare, client_reconnect_timer_cb);
+		ev_prepare_start(EV_A, &client->client_reconnect_timer->prepare);
+		client->client_reconnect_timer->parent = client;
+		client->client_reconnect_timer->close_time = ev_now(EV_A);
+		increment_idle(EV_A);
+
+		// set up cnxn socket
+		SERROR_SET_CONN_PQ_SOCKET(client->conn);
+		ev_io_init(&client_cnxn->io, cnxn_reset_cb, GET_CLIENT_PQ_SOCKET(client), EV_WRITE);
+		ev_io_start(EV_A, &client_cnxn->io);
+
 		SFREE_ALL();
 		return;
-	}
-	if (client->cur_request == NULL) {
-		int_status = PQconsumeInput(client->conn->conn);
-		if (int_status != 1) {
-			SERROR_NORESPONSE("Lost postgresql connection:\012%s", PQerrorMessage(client->cnxn));
-
-			SERROR_CHECK(PQresetStart(client->conn->conn) == 1, "PQresetStart failed");
-
-			ev_io_stop(EV_A, &client->notify_watcher->io);
-			SFREE(client->notify_watcher);
-
-			SFREE(client->reconnect_watcher);
-			SERROR_SALLOC(client_cnxn, sizeof(struct sock_ev_client_cnxn));
-			client_cnxn->parent = client;
-			client_cnxn->parent->conn->int_status = 0;
-			client->reconnect_watcher = client_cnxn;
-
-			SERROR_SALLOC(client->client_reconnect_timer, sizeof(struct sock_ev_client_reconnect_timer));
-			ev_prepare_init(&client->client_reconnect_timer->prepare, client_reconnect_timer_cb);
-			ev_prepare_start(EV_A, &client->client_reconnect_timer->prepare);
-			client->client_reconnect_timer->parent = client;
-			client->client_reconnect_timer->close_time = ev_now(EV_A);
-			increment_idle(EV_A);
-
-			// set up cnxn socket
-			SERROR_SET_CONN_PQ_SOCKET(client->conn);
-			ev_io_init(&client_cnxn->io, cnxn_reset_cb, GET_CLIENT_PQ_SOCKET(client), EV_WRITE);
-			ev_io_start(EV_A, &client_cnxn->io);
-
-			SFREE_ALL();
-			return;
-		}
-		send_notices(notify_watcher->parent);
-
-		PQisBusy(notify_watcher->parent->cnxn);
-		send_notices(notify_watcher->parent);
 	}
 	bol_error_state = false;
 error:
