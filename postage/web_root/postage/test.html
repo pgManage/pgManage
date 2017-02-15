@@ -552,6 +552,7 @@ SELECT pg_terminate_backend(pid)
 	FROM pg_catalog.pg_stat_activity;*/
 			}),
 			["QUERY\tSELECT pg_terminate_backend(pid)\\n\\tFROM pg_catalog.pg_stat_activity;", "START", "END", "Query failed: FATAL\nerror_text\tserver closed the connection unexpectedly\\n\\tThis probably means the server terminated abnormally\\n\\tbefore or while processing the request.\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"]],
+            ['WAIT', 'wait'],
 			['RAW W/NOTIFY', 'websocket', '', ml(function () {/*RAW
 LISTEN postgres;
 DROP VIEW IF EXISTS ttesting_view2;
@@ -2909,7 +2910,7 @@ error_position
 				setTimeout(function () {
 					change_status(intCurrent, 'running', 'pass');
 					run_test(intCurrent + 1);
-				}, 31000);
+				}, 1000);
 			}
 		}
 	</script>
