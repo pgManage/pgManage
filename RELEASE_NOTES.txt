@@ -1,4 +1,114 @@
-Changes since 3.1.0 and 2.2.1:
+Changes since 3.1.3:
+Postage:
+- Redesigned autocomplete experience
+- Fix hang when running a query to kill the current backend process
+- Fixed autocomplete not opening correctly when there is an underline in the middle of a word
+- Fixed autocomplete opening incorrectly
+- Make electron not cache
+- Fixed dump schema to tab
+- Fix sql_split to allow a single backslash in a non-E string
+- Show version number of PostgreSQL on splash page
+- Include libpq on macOS electron version
+- Fixed issue where removing a listener didn't mark all of it's notifications as read
+- Because we moved the tabs each to their own websocket, the notification center couldn't find the notifications, this has been fixed
+- Fixed issue where notification system could read the messages of a channel you were no longer listening to
+- When login error occurs, we now popup the error
+- Changing the custom connection details no longer clears username field
+- Make "Download Schema" say " Dump Schema Objects"
+- The "TB" initials have been added back to the tables in the tree
+- Clicking on a column in the tree no longer refreshes the tab
+- In the tree, views are now able to show the column list within
+- Change super_only error to say what to do if you aren't a superuser
+
+Envelope:
+- Fix crash in ws_file.c when LIST step 2 fails
+- Fix accept_ with path
+- Fix http_select crash when step 5 fails
+- Fixed issue where sub grids could have their reflow point determined by a parent grid
+- Added "before_select" event to gs-form
+- Added "before_update" event to gs-form
+- Fixed issue where gs-form wouldn't update because the form has a "column" attribute
+- Fixed dialog issue where error in after open callback would prevent non-registerElement browsers from killing the initialized check interval
+- Added QS docs to: buttons/toggle, envelope, form, listbox, static, switch
+- gs-date: fixed issue where "2017-01-09 00:00:00+00" evaluated to the day before the actual date
+- Added new QS operator "!=" to: gs-button, gs-toggle, gs-checkbox, gs-combo, gs-date, gs-envelope, gs-file-manager, gs-form, gs-listbox, gs-memo, gs-number, gs-static, gs-switch, gs-time, gs-text, gs-folder, gs-datasheet, gs-interval
+- Fixed an issue with the gs-combo, gs-listbox, gs-memo, gs-number, gs-optionbox, gs-search and gs-select elements where setting the value attribute didn't set the value of the control
+- Fixed an issue with the gs-optionbox element where clearing the value attribute resulted in a javascript error
+- Updated the documentation for the gs-switch to use the new "template" attribute
+- Restored the qs="key" behavior for the gs-switch
+- Fixed an issue for the gs-folder where two refreshes in immediate sequence resulted in a copy of the results
+- Added new QS operator "!=" to docs for: button/toggle, checkbox, combobox, date, envelope, form, listbox, memo, number, optionbox, search, select, static, switch, text, time, folder, interval and datasheet elements
+- Added "qs" and "readonly" attribute documentation to gs-button elements
+- Added "qs" and "readonly" attribute documentation to gs-toggle
+- Added "qs" and "readonly" attribute documentation to gs-optionbox
+- Added "qs" and "readonly" attribute documentation to gs-select
+- Added "qs" and "readonly" docs to: gs-number, gs-optionbox, gs-search, gs-text and gs-time
+- Fixed header copy for GS.makeTableSelectable
+- Update INSTALL_LIBPQ.md
+- fixed issue where GS.openDialogToElement ran it's after open callback twice
+- Created and documented GS.removeFromQueryString
+- Added "readonly" to passthrough attributes on control elements
+- Fix querystring input on documentation pages to always be 2ems tall
+- Added no-insert/no-update to gs-envelope
+- Added template attribute to gs-envelope
+
+Both:
+- Fix crash when closing a websocket in the middle of a SELECT
+- Markdown versions of man pages
+- Close websocket ten seconds after postgresql connection is lost
+- Fix SEND FROM and add tests
+- Fix 100% cpu when copy out fails
+- New version of LibreSSL
+- Check for SQL Injection attacks
+- Fix default login timeout
+- Fix a couple of crashes having to do with postgresql server processes being killed
+- Fix logout redirect
+- Fix missing decrement_idle()s
+- Fix a few error cases to use strlen when needed
+- Fix ws_* requests to return void in the first step
+- Fix http_auth to handle sending responses in the first step itself
+- Fix `DB_get_diagnostic` to handle a null result
+- Fix common_config.c on linux to have a non-zero prefix length
+
+Replaced these functions:
+- `strcspn` -> `strncspn`
+- `strstr` -> `bstrstr`
+- `unescape_value` -> `bunescape_value`
+- `escape_value` -> `bescape_value`
+- `replace` -> `breplace`
+- `str_tolower` -> `bstr_tolower`
+- `str_toupper` -> `bstr_toupper`
+- `cstr_to_uri` -> `snuri`
+- `cat_cstr` -> `sncat`
+- `cat_append` -> `snfcat`
+
+Added lengths to these functions:
+- `get_hash_columns`
+- `get_return_escaped_columns`
+- `get_return_columns`
+- `get_table_name`
+- `jsonify`
+- `request_header`
+- `str_cookie`
+
+
+Changes since 3.1.2:
+Fixed column comments missing the column name
+Fixed query detection inside of a CREATE FUNCTION statement
+Added a highlight to the first word of the detected query
+Fixed issue with autocomplete where a backslashed character prevented autocomplete from getting the correct prefixes
+made it so that query detection was aware of how parenthesis can end a query
+re-write explain graph (closes workflowproducts/postage#77)
+Fix explain graph clicking
+Fix custom connection bug related to workflowproducts/postage#83
+Add category to Linux packages
+Fix DMG background to not have notice about no code-signing
+added a `gs-interval` element
+Make DB_get_row_lengths return `ssize_t`
+Allow no password when logging in (for PostgresApp/PostgresApp#365)
+Add listen-for-return to default dialog buttons (closes workflowproducts/postage#85)
+
+Changes since 3.1.1 and 2.2.1:
 Fix version number inconsistency (closes workflowproducts/postage#62)
 Fix inconsistency in checkbox type handling
 Error messages had extra slashes (closes workflowproducts/postage#76)
