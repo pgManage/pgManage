@@ -488,6 +488,7 @@ finish:
 		PQfreemem(str_int_mod);
 		str_int_mod = NULL;
 	}
+	// This is duplicated below
 	if (bol_error_state == true) {
 		bol_error_state = false;
 		char *_str_response = str_response;
@@ -564,10 +565,14 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 	SFINISH_SALLOC(client_copy_check, sizeof(struct sock_ev_client_copy_check));
 	client_copy_check->client_request = client_request;
 	size_t int_response_len = 0;
+	int int_status = 0;
 
 	client_request->int_response_id += 1;
 	memset(str_temp, 0, 101);
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
+
+	SFINISH_CHECK(res != NULL, "Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
+	SFINISH_CHECK(result == PGRES_TUPLES_OK, "Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
 
 	if (close_client_if_needed(client_request->parent, (ev_watcher *)&client_request->check, EV_READ)) {
 		SDEBUG("Client %p closed", client_request->parent);
@@ -639,11 +644,46 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 	ev_check_start(EV_A, &client_copy_check->check);
 	bol_error_state = false;
 finish:
+	// This is duplicated above
 	if (bol_error_state == true) {
 		bol_error_state = false;
-		// client_request_free(client_request);
+		char *_str_response = str_response;
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
+		if (client_request->str_transaction_id != NULL) {
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
+		}
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			_str_response, strlen(_str_response));
+		SDEBUG("       str_response : %s", str_response);
+		SDEBUG("strlen(str_response): %d", strlen(str_response));
+		SDEBUG("       _str_response : %s", _str_response);
+		SDEBUG("strlen(_str_response): %d", strlen(_str_response));
+		SFREE(_str_response);
+
+		client_request->str_current_response = str_response;
+		str_response = NULL;
+
+		client_request->int_i = client_request->int_len + 10;
+		int_status = PQsendQuery(client_request->parent->cnxn, "ROLLBACK");
+		if (int_status != 1) {
+			SERROR_NORESPONSE("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
+			ws_raw_step3(EV_A, NULL, 0, client_request);
+			ev_feed_event(EV_A, &client_request->parent->notify_watcher->io, EV_READ);
+			// we return here on purpose, otherwise we get called again and crash
+			return false;
+		}
+		query_callback(EV_A, client_request, ws_raw_step3);
+	} else {
+		SFREE(str_response);
 	}
-	SFREE(str_response);
 	return true;
 }
 

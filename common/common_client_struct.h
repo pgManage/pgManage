@@ -209,7 +209,7 @@ struct sock_ev_client_request {
 	DArray *arr_response;
 	ssize_t int_i;
 	ssize_t int_len;
-#ifdef POSTAGE_INTERFACE_LIBPQ
+#ifndef ENVELOPE
 	PGresult *res;
 #endif
 
