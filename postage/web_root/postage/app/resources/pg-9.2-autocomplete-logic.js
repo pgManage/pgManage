@@ -383,7 +383,6 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     bolBuiltins = true;
                 }
             
-            
                 var strCurrWord = '';
                 for (var i = 0, len = strPreviousWord.length; i <= len; i++) {
                     if (strScript[intCursorPosition - i] == ' ' &&
@@ -474,6 +473,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 }
                 
                 
+                console.log(arrQueries);
                 
                 if (arrQueries) {
                     for (var i = 0, len = arrQueries.length; i < len; i++) {

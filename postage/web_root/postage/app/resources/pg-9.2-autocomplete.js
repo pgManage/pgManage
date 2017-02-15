@@ -15,6 +15,9 @@ var autocompleteLoaded = true
       , 'strQueryID':      null
       , 'jsnKeywords':     {} // <-- filled in by the "autocompleteLoadKeywords" function
       , 'arrTypes':        [] // <-- filled in by the "autocompleteLoadTypes" function
+      , 'loadId':          0
+      //, 'currentLoadId':   0
+      , 'arrCancelledIds': []
     };
 var strSearchFixed;
 function autocompleteStart() { 'use strict'; }
@@ -28,7 +31,7 @@ function autocompleteBindEditor(tabElement, editor) {
             autocompleteGlobals.popupElement = document.createElement('div');
             autocompleteGlobals.popupElement.setAttribute('id', 'autocomplete-popup');
             autocompleteGlobals.popupElement.innerHTML = '<div id="autocomplete-popup-instruction">Press Tab to Autocomplete&nbsp;</div><div id="autocomplete-popup-ace"></div>';
-            
+
             // create and configure popup ace
             autocompleteGlobals.popupAce = ace.edit(autocompleteGlobals.popupElement.children[1]);
             autocompleteGlobals.popupAce.setTheme('ace/theme/clouds'); //eclipse
@@ -45,60 +48,36 @@ function autocompleteBindEditor(tabElement, editor) {
             autocompleteGlobals.popupAce.renderer.hideCursor();
             autocompleteGlobals.popupAce.renderer.$cursorLayer.element.style.display = 'none';
             autocompleteGlobals.popupAceSession = autocompleteGlobals.popupAce.getSession();
-            
+
             // hide the popup and append it to the DOM (fixes first load problem)
             autocompleteGlobals.popupElement.style.left = '-500px';
             autocompleteGlobals.popupElement.style.top = '-500px';
             document.body.appendChild(autocompleteGlobals.popupElement);
             autocompleteGlobals.popupAce.setValue('test');
             autocompleteGlobals.popupAce.resize();
-            
+
             // load autocomplete keywords and types
             autocompleteLoadKeywords();
             autocompleteLoadTypes();
         }
-        
-        
+
         // bind change event
         editor.addEventListener('change', function (event) {
-            
-            /*//console.log(event);
-            var last_char_is_space = false;
-            var eventlinelength = event.lines[0].length;
-            //console.log(event.lines[0].length);
-            //console.log(event.lines[0].substring(eventlinelength - 1, eventlinelength));
-            if (event.lines[0].substring(eventlinelength - 1, eventlinelength) === ' ') {
-                last_char_is_space = true;
-                console.log(last_char_is_space);
+            if (autocompleteGlobals.popupLoading === true) {
+                autocompleteGlobals.arrCancelledIds.push(autocompleteGlobals.loadId);
+                autocompletePopupClose(editor);
             } else {
-                last_char_is_space = false;
-                console.log(last_char_is_space);
-            }*/
-                
-                //var cursorPos = editor.getCursorPosition();
-                //var cursorPosCol = cursorPos.column;
-                //var cursorPosRow = cursorPos.row;
-                //console.log(cursorPos, cursorPosRow, cursorPosCol);
-                //console.log(editor.currentQueryRange.text.substring(cursorPosCol, cursorPosCol)); //(cursorPosRow, cursorPosCol, cursorPosRow, cursorPosCol));
-            
-//            console.log(editor.ignoreChange !== true && event.action === 'insert' && autocompleteGlobals.bolInserting === false && editor.currentQueryRange);
-//            console.log(editor.ignoreChange, event.action,  autocompleteGlobals.bolInserting, editor.currentQueryRange);
-            //console.log('test 1', editor.currentQueryRange);
-            //console.log(event.lines[0].length !== 0 && event.lines[0].length > 1);
-            //console.log(event.lines[0].length !== 0, event.lines);
-            if (event.lines[0].length !== 0 && event.lines[0].length >= 1) {
-                if (editor.ignoreChange !== true
-                    && event.action === 'insert'
-                    && autocompleteGlobals.bolInserting === false
-                    && editor.currentQueryRange) {
-                        
-                        
-                    
-                    try {
-                        // this function is in pg-9.2-autocomplete-logic.js
-                        autocompleteChangeHandler(tabElement, editor, event);
-                    } catch (e) {
-                        console.error('Caught Autocomplete Error:', e);
+                if (event.lines[0].length !== 0 && event.lines[0].length >= 1) {
+                    if (editor.ignoreChange !== true
+                            && event.action === 'insert'
+                            && autocompleteGlobals.bolInserting === false
+                            && editor.currentQueryRange) {
+                        try {
+                            // this function is in pg-9.2-autocomplete-logic.js
+                            autocompleteChangeHandler(tabElement, editor, event);
+                        } catch (e) {
+                            console.error('Caught Autocomplete Error:', e);
+                        }
                     }
                 }
             }
@@ -165,7 +144,11 @@ function autocompleteBindEditor(tabElement, editor) {
 function autocompletePopupLoad(editor, arrQueries) {
     'use strict';
     var bolResults = false, intResult = 0;
+    var intLoadId;
     
+    autocompleteGlobals.loadId += 1;
+    intLoadId = autocompleteGlobals.loadId;
+    //autocompleteGlobals.currentLoadId = intLoadId;
     autocompleteGlobals.popupAce.setValue('');
     autocompleteGlobals.arrSearch = [];
     autocompleteGlobals.arrValues = [];
@@ -175,50 +158,57 @@ function autocompletePopupLoad(editor, arrQueries) {
     
     autocompleteGetList(arrQueries, function (bolLast, arrRows) {
         var i, len, strText, strSearch, element, strCurrent;
-        if (bolLast === true) {
-            // set state variable
-            autocompleteGlobals.popupLoading = false;
-            
-            // refresh popup height
-            autocompletePopupHeightRefresh();
-            
-            // if there was no results: close the popup
-            if (!bolResults) {
-                autocompletePopupClose(editor);
+        if (autocompleteGlobals.arrCancelledIds.indexOf(intLoadId) === -1) {
+            if (bolLast === true) {
+                // set state variable
+                autocompleteGlobals.popupLoading = false;
                 
-            // else: search the popup
+                // refresh popup height
+                autocompletePopupHeightRefresh();
+                //// select first line
+                //autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
+                //autocompleteGlobals.popupAce.scrollToLine(0);
+                
+                // if there was no results: close the popup
+                if (!bolResults) {
+                    autocompletePopupClose(editor);
+                    
+                // else: search the popup
+                } else {
+                    // bind popup
+                    autocompleteBind(editor);
+                    
+                    autocompletePopupSearch(editor, 'filter');
+                }
             } else {
-                autocompletePopupSearch(editor, 'filter');
-            }
-        } else {
-            intResult += 1;
-            if (!bolResults) {
-                bolResults = true;
+                intResult += 1;
+                if (!bolResults) {
+                    bolResults = true;
+                    
+                    // unhide the popup
+                    autocompleteGlobals.popupElement.removeAttribute('hidden');
+                    autocompleteGlobals.popupAce.resize();
+                }
                 
-                // unhide the popup
-                autocompleteGlobals.popupElement.removeAttribute('hidden');
-                autocompleteGlobals.popupAce.resize();
-            }
-            
-            for (i = 0, len = arrRows.length, strText = ''; i < len; i += 1) {
-                strCurrent = arrRows[i][0];
-                // create a search string (normalize to double quoted and lowercase)
-                strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
+                for (i = 0, len = arrRows.length, strText = ''; i < len; i += 1) {
+                    strCurrent = arrRows[i][0];
+                    // create a search string (normalize to double quoted and lowercase)
+                    strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
+                    
+                    strText += '\n' + strCurrent;
+                    
+                    autocompleteGlobals.arrSearch.push(strSearch);
+                    autocompleteGlobals.arrValues.push(strCurrent);
+                    autocompleteGlobals.arrSearchMaster.push(strSearch);
+                    autocompleteGlobals.arrValuesMaster.push(strCurrent);
+                }
                 
-                strText += '\n' + strCurrent;
-                
-                autocompleteGlobals.arrSearch.push(strSearch);
-                autocompleteGlobals.arrValues.push(strCurrent);
-                autocompleteGlobals.arrSearchMaster.push(strSearch);
-                autocompleteGlobals.arrValuesMaster.push(strCurrent);
+                // append text (the substring is to remove the trailing \n)
+                autocompleteGlobals.popupAceSession.insert({
+                    'row': autocompleteGlobals.popupAceSession.getLength(),
+                    'column': 0
+                }, (intResult === 1 ? strText.substring(1) : strText));
             }
-            
-            
-            // append text (the substring is to remove the trailing \n)
-            autocompleteGlobals.popupAceSession.insert({
-                'row': autocompleteGlobals.popupAceSession.getLength(),
-                'column': 0
-            }, (intResult === 1 ? strText.substring(1) : strText));
         }
     });
     
@@ -232,7 +222,7 @@ function autocompletePopupOpen(editor, arrQueries) {
       , intLeft = jsnPosition.pageX
       , intTop = jsnPosition.pageY
       , intLineHeight = editor.renderer.$textLayer.getLineHeight();
-    
+
     // if autocomplete is open: close it first
     if (autocompleteGlobals.popupOpen === true) {
         if (autocompleteGlobals.popupAsleep === true) {
@@ -240,20 +230,17 @@ function autocompletePopupOpen(editor, arrQueries) {
         }
         autocompletePopupClose(editor);
     }
-    
+
     // hide and append the popup
     autocompleteGlobals.popupElement.setAttribute('hidden', '');
     document.body.appendChild(autocompleteGlobals.popupElement);
-    
-    // bind popup
-    autocompleteBind(editor);
-    
+
     // set state variables
     autocompleteGlobals.popupLoading = true;
     autocompleteGlobals.popupOpen = true;
-    
+
     // position the autocomplete popup
-    
+
     // handle horizontal window collision (302 -> popup width)
     if ((intLeft + 302) > window.innerWidth) {
         autocompleteGlobals.popupElement.style.right = '1px';
@@ -289,6 +276,7 @@ function autocompletePopupClose(editor) {
     // if the autocomplete query is still running: cancel it
     if (autocompleteGlobals.strQueryID) {
         GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
+        autocompleteGlobals.popupLoading = false;
     }
     
     // if popup is asleep: wake up
@@ -305,8 +293,10 @@ function autocompletePopupClose(editor) {
     //autocompleteGlobals.popupElement.innerHTML = '';
     autocompleteGlobals.popupAce.setValue('');
     
-    // unbind the editor
-    autocompleteUnbind(editor);
+    // only unbind the editor if there isn't a query running
+    if (!autocompleteGlobals.strQueryID) {
+        autocompleteUnbind(editor);
+    }
     
     // set popupOpen to false
     autocompleteGlobals.popupOpen = false;
@@ -325,33 +315,35 @@ function autocompleteComplete(editor) {
     if (intFocusedLine !== undefined && intFocusedLine !== null && intSearchStringStart && intSearchStringEnd) {//selectedChoice
         strScript = editor.getValue();
         
-        // get autocomplete replace range
-        jsnSearchStringRange = {
-            'start': indexToRowAndColumn(strScript, intSearchStringStart)
-          , 'end': indexToRowAndColumn(strScript, intSearchStringEnd)
-        };
-        
-        if (strSearchFixed === true) {
-            editor.getSelection().setSelectionRange(new Range(
-                jsnSearchStringRange.start.row,
-                jsnSearchStringRange.start.column - 1,
-                jsnSearchStringRange.end.row,
-                jsnSearchStringRange.end.column
-            ));
-        } else {
-            // set selection using replace range
-            editor.getSelection().setSelectionRange(new Range(
-                jsnSearchStringRange.start.row,
-                jsnSearchStringRange.start.column,
-                jsnSearchStringRange.end.row,
-                jsnSearchStringRange.end.column
-            ));
+        if (autocompleteGlobals.arrValues[intFocusedLine]) {
+            // get autocomplete replace range
+            jsnSearchStringRange = {
+                'start': indexToRowAndColumn(strScript, intSearchStringStart)
+              , 'end': indexToRowAndColumn(strScript, intSearchStringEnd)
+            };
+            
+            if (strSearchFixed === true) {
+                editor.getSelection().setSelectionRange(new Range(
+                    jsnSearchStringRange.start.row,
+                    jsnSearchStringRange.start.column - 1,
+                    jsnSearchStringRange.end.row,
+                    jsnSearchStringRange.end.column
+                ));
+            } else {
+                // set selection using replace range
+                editor.getSelection().setSelectionRange(new Range(
+                    jsnSearchStringRange.start.row,
+                    jsnSearchStringRange.start.column,
+                    jsnSearchStringRange.end.row,
+                    jsnSearchStringRange.end.column
+                ));
+            }
+            
+            // replace the range with the selected choice's text
+            autocompleteGlobals.bolInserting = true;
+            editor.insert(autocompleteGlobals.arrValues[intFocusedLine]);
+            autocompleteGlobals.bolInserting = false;
         }
-        
-        // replace the range with the selected choice's text
-        autocompleteGlobals.bolInserting = true;
-        editor.insert(autocompleteGlobals.arrValues[intFocusedLine]);
-        autocompleteGlobals.bolInserting = false;
         //console.log(autocompleteGlobals.arrValues[intFocusedLine]);
     }
     
@@ -372,23 +364,11 @@ function autocompletePopupSearch(editor, strMode) {
       , intSearchStringEnd = autocompleteGlobals.intSearchEnd
       , strSearch = strScript.substring(intSearchStringStart, intSearchStringEnd)
       , choices, match, i, len, strCurrentMasterSearch, strCurrentMasterValue, strNewValue, strAdded;
-    
-    //console.log(autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset);
-    //console.log(autocompleteGlobals.intSearchEnd);
-    // normalize strSearch
-    //strSearch = (strSearch[0] === '"' ? strSearch.toLowerCase() : '"' + strSearch.toLowerCase());
-    if (strSearch[0] === '"') {
-        strSearch = strSearch.toLowerCase();
-        strAdded = false;
-    } else {
-        strSearch = '"' + strSearch.toLowerCase();
-        strAdded = true;
-    }
-
-    if (strSearch === '"' && (strScript.substring(intSearchStringStart - 1, intSearchStringEnd) !== '.') || strSearchFixed === true) {
-        strSearchFixed = true;
-        //console.log(strSearchFixed);
-        strSearch = strScript.substring(intSearchStringStart - 1, intSearchStringEnd);
+    if (autocompleteGlobals.popupOpen === true) {
+        //console.log(autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset);
+        //console.log(autocompleteGlobals.intSearchEnd);
+        // normalize strSearch
+        //strSearch = (strSearch[0] === '"' ? strSearch.toLowerCase() : '"' + strSearch.toLowerCase());
         if (strSearch[0] === '"') {
             strSearch = strSearch.toLowerCase();
             strAdded = false;
@@ -396,97 +376,111 @@ function autocompletePopupSearch(editor, strMode) {
             strSearch = '"' + strSearch.toLowerCase();
             strAdded = true;
         }
-    } else {
-        strSearchFixed = false;
-        //console.log(strSearchFixed);
-    }
     
-    if (strSearch === ':') {
-        strSearch = '';
-    } else if (strSearch === '":') {
-        strSearch = '"';
-        strSearchFixed = false;
-    }
-    
-    // default strMode to 'filter', the only other option is 'expand'
-    strMode = strMode || 'filter';
-    
-    // if mode is filter: take the current autocompleteGlobals.arrSearch and remove
-    //      any items that don't match
-    if (strMode === 'filter') {
-        autocompleteGlobals.popupAce.setValue('');
-        //console.log(autocompleteGlobals.arrSearch);
-        //console.log(strSearch);
-        // console.log(autocompleteGlobals.arrSearch);
-        // console.log(autocompleteGlobals.arrValues);
-        // console.log(strSearch);
-        for (i = 0, len = autocompleteGlobals.arrSearch.length, strNewValue = ''; i < len; i += 1) {
-            // if the current item doesn't match: remove from ace, arrSearch and arrValues
-            if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
-                autocompleteGlobals.arrSearch.splice(i, 1);
-                autocompleteGlobals.arrValues.splice(i, 1);
-                // console.log('reject', i);
-                
-                i -= 1;
-                len -= 1;
+        if (strSearch === '"' && (strScript.substring(intSearchStringStart - 1, intSearchStringEnd) !== '.') || strSearchFixed === true) {
+            strSearchFixed = true;
+            //console.log(strSearchFixed);
+            strSearch = strScript.substring(intSearchStringStart - 1, intSearchStringEnd);
+            if (strSearch[0] === '"') {
+                strSearch = strSearch.toLowerCase();
+                strAdded = false;
             } else {
-                // console.log('match', i);
-                strNewValue += '\n';
-                strNewValue += autocompleteGlobals.arrValues[i];
+                strSearch = '"' + strSearch.toLowerCase();
+                strAdded = true;
             }
+        } else {
+            strSearchFixed = false;
+            //console.log(strSearchFixed);
         }
-
-        autocompleteGlobals.popupAce.setValue(strNewValue.substring(1));
         
-    // else if mode is expand: take the autocompleteGlobals.arrSearchMaster and fill
-    //      autocompleteGlobals.arrSearch with all matching items
-    } else if (strMode === 'expand') {
-        autocompleteGlobals.popupAce.setValue('');
-        autocompleteGlobals.arrSearch = [];
-        autocompleteGlobals.arrValues = [];
+        if (strSearch === ':') {
+            strSearch = '';
+        } else if (strSearch === '":') {
+            strSearch = '"';
+            strSearchFixed = false;
+        }
         
-        for (i = 0, len = autocompleteGlobals.arrSearchMaster.length, strNewValue = ''; i < len; i += 1) {
-            strCurrentMasterSearch = autocompleteGlobals.arrSearchMaster[i];
-            // if the current item doesn't match: remove from ace, arrSearch and arrValues
-            if (strCurrentMasterSearch.indexOf(strSearch) === 0) {
-                strCurrentMasterValue = autocompleteGlobals.arrValuesMaster[i];
-                
-                autocompleteGlobals.arrSearch.push(strCurrentMasterSearch);
-                autocompleteGlobals.arrValues.push(strCurrentMasterValue);
-                
-                strNewValue += '\n';
-                strNewValue += strCurrentMasterValue;
+        // default strMode to 'filter', the only other option is 'expand'
+        strMode = strMode || 'filter';
+        
+        // if mode is filter: take the current autocompleteGlobals.arrSearch and remove
+        //      any items that don't match
+        if (strMode === 'filter') {
+            autocompleteGlobals.popupAce.setValue('');
+            //console.log(autocompleteGlobals.arrSearch);
+            //console.log(strSearch);
+            // console.log(autocompleteGlobals.arrSearch);
+            // console.log(autocompleteGlobals.arrValues);
+            // console.log(strSearch);
+            for (i = 0, len = autocompleteGlobals.arrSearch.length, strNewValue = ''; i < len; i += 1) {
+                // if the current item doesn't match: remove from ace, arrSearch and arrValues
+                if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
+                    autocompleteGlobals.arrSearch.splice(i, 1);
+                    autocompleteGlobals.arrValues.splice(i, 1);
+                    // console.log('reject', i);
+                    
+                    i -= 1;
+                    len -= 1;
+                } else {
+                    // console.log('match', i);
+                    strNewValue += '\n';
+                    strNewValue += autocompleteGlobals.arrValues[i];
+                }
             }
+    
+            autocompleteGlobals.popupAce.setValue(strNewValue.substring(1));
+            
+        // else if mode is expand: take the autocompleteGlobals.arrSearchMaster and fill
+        //      autocompleteGlobals.arrSearch with all matching items
+        } else if (strMode === 'expand') {
+            autocompleteGlobals.popupAce.setValue('');
+            autocompleteGlobals.arrSearch = [];
+            autocompleteGlobals.arrValues = [];
+            
+            for (i = 0, len = autocompleteGlobals.arrSearchMaster.length, strNewValue = ''; i < len; i += 1) {
+                strCurrentMasterSearch = autocompleteGlobals.arrSearchMaster[i];
+                // if the current item doesn't match: remove from ace, arrSearch and arrValues
+                if (strCurrentMasterSearch.indexOf(strSearch) === 0) {
+                    strCurrentMasterValue = autocompleteGlobals.arrValuesMaster[i];
+                    
+                    autocompleteGlobals.arrSearch.push(strCurrentMasterSearch);
+                    autocompleteGlobals.arrValues.push(strCurrentMasterValue);
+                    
+                    strNewValue += '\n';
+                    strNewValue += strCurrentMasterValue;
+                }
+            }
+            
+            autocompleteGlobals.popupAce.setValue(strNewValue.substring(1));
         }
         
-        autocompleteGlobals.popupAce.setValue(strNewValue.substring(1));
-    }
-    
-        //console.log(autocompleteGlobals.arrValues.length, autocompleteGlobals.arrValues[0], strSearch);
-        //console.log(autocompleteGlobals.arrValues.length, autocompleteGlobals.arrValues[0] === strSearch);
-    
-    if (strAdded === true) {
-        strSearch = strSearch.substring(1, strSearch.length);
-        //console.log(strSearch);
-        // if no items are left after the filter or expand AND the popup is not already asleep: put popup to sleep
-        // console.log(autocompleteGlobals.arrValues);
-        if ((autocompleteGlobals.arrValues.length === 0 && autocompleteGlobals.popupAsleep === false) || (autocompleteGlobals.arrValues.length === 1 && autocompleteGlobals.arrValues[0] === strSearch)) {
-            autocompletePopupSleep(editor);
-        // else if items are in the popup AND the popup is asleep: wake up the popup
-        } else if (autocompleteGlobals.arrValues.length > 0 && autocompleteGlobals.popupAsleep === true) {
-            autocompletePopupWake(editor);
+            //console.log(autocompleteGlobals.arrValues.length, autocompleteGlobals.arrValues[0], strSearch);
+            //console.log(autocompleteGlobals.arrValues.length, autocompleteGlobals.arrValues[0] === strSearch);
+        
+        if (strAdded === true) {
+            strSearch = strSearch.substring(1, strSearch.length);
+            //console.log(strSearch);
+            // if no items are left after the filter or expand AND the popup is not already asleep: put popup to sleep
+            // console.log(autocompleteGlobals.arrValues);
+            if ((autocompleteGlobals.arrValues.length === 0 && autocompleteGlobals.popupAsleep === false) || (autocompleteGlobals.arrValues.length === 1 && autocompleteGlobals.arrValues[0] === strSearch)) {
+                //autocompletePopupSleep(editor);  this may have been causing a bug where the list would only have one option and then would put the popup to sleep but still had the keys bound
+                autocompletePopupClose(editor);
+            // else if items are in the popup AND the popup is asleep: wake up the popup
+            } else if (autocompleteGlobals.arrValues.length > 0 && autocompleteGlobals.popupAsleep === true) {
+                autocompletePopupWake(editor);
+            }
+            strSearch = '"' + strSearch.toLowerCase();
         }
-        strSearch = '"' + strSearch.toLowerCase();
+        
+        // select first line
+        autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
+        autocompleteGlobals.popupAce.scrollToLine(0);
+        
+        // refresh popup height
+        autocompletePopupHeightRefresh();
+        popup_instruct_top = document.getElementById('autocomplete-popup').style.height + document.getElementById('autocomplete-popup-instruction').style.height;
+        document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
     }
-    
-    // select first line
-    autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
-    autocompleteGlobals.popupAce.scrollToLine(0);
-    
-    // refresh popup height
-    autocompletePopupHeightRefresh();
-    popup_instruct_top = document.getElementById('autocomplete-popup').style.height + document.getElementById('autocomplete-popup-instruction').style.height;
-    document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
     //console.log(document.getElementById('autocomplete-popup-instruction').style.top, popup_instruct_top);
     
     //// search to select
@@ -546,43 +540,43 @@ function autocompletePopupWake(editor) {
     autocompleteBind(editor);
 }
 
-// bind keyboard
+// bind keyboard (temporary. binds to sql editor, not autocomplete popup)
 function autocompleteBind(editor) {
     'use strict';
     editor.standardGoLineDownExec = editor.commands.commands.golinedown.exec;
     editor.standardGoLineUpExec   = editor.commands.commands.golineup.exec;
     editor.standardIndentExec     = editor.commands.commands.indent.exec;
-    
+
     editor.commands.commands.golinedown.exec = function () {
         var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
           , intLastLine = autocompleteGlobals.arrValues.length - 1;
-        
+
         if (intCurrentLine !== intLastLine) {
             autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine + 1), 0, (intCurrentLine + 1), 0));
         } else {
             autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
         }
-        
+
         autocompleteGlobals.popupAce.scrollToLine(autocompleteGlobals.popupAce.getSelectionRange().start.row);
     };
     editor.commands.commands.golineup.exec = function () {
         var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
           , intLastLine = autocompleteGlobals.arrValues.length - 1;
-        
+
         if (intCurrentLine !== 0) {
             autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine - 1), 0, (intCurrentLine - 1), 0));
         } else {
             autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(intLastLine, 0, intLastLine, 0));
         }
-        
+
         autocompleteGlobals.popupAce.scrollToLine(autocompleteGlobals.popupAce.getSelectionRange().start.row);
     };
-    
+
     editor.commands.commands.indent.exec = function () {
         autocompleteComplete(editor);
         return;
     };
-    
+
     editor.commands.addCommand({
         name: 'hideautocomplete',
         bindKey: 'Esc',
@@ -590,7 +584,7 @@ function autocompleteBind(editor) {
             autocompletePopupClose(editor);
         }
     });
-    
+
     editor.commands.addCommand({
         name: 'autocomplete',
         bindKey: 'Return',
