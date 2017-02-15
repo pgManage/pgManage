@@ -214,7 +214,14 @@ finish:
 		SFREE(client_cnxn->parent->conn->str_response);
 		client_cnxn->parent->conn->str_response = strdup(str_response + 6);
 		SFREE(str_response);
+
 		cnxn_cb(EV_A, client_cnxn->parent, client_cnxn->parent->conn);
+
+		ev_prepare_stop(EV_A, &client_cnxn->parent->client_reconnect_timer->prepare);
+		SFREE(client_cnxn->parent->client_reconnect_timer);
+		decrement_idle(EV_A);
+		client_cnxn->parent->reconnect_watcher = NULL;
+		SFREE(client_cnxn);
 	}
 }
 
