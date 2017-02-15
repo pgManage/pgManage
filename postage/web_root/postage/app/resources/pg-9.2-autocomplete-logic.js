@@ -473,7 +473,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 }
                 
                 
-                console.log(arrQueries);
+                //console.log(arrQueries);
                 
                 if (arrQueries) {
                     for (var i = 0, len = arrQueries.length; i < len; i++) {

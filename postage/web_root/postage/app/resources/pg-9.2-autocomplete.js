@@ -364,6 +364,7 @@ function autocompletePopupSearch(editor, strMode) {
       , intSearchStringEnd = autocompleteGlobals.intSearchEnd
       , strSearch = strScript.substring(intSearchStringStart, intSearchStringEnd)
       , choices, match, i, len, strCurrentMasterSearch, strCurrentMasterValue, strNewValue, strAdded;
+
     if (autocompleteGlobals.popupOpen === true) {
         //console.log(autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset);
         //console.log(autocompleteGlobals.intSearchEnd);
@@ -376,7 +377,7 @@ function autocompletePopupSearch(editor, strMode) {
             strSearch = '"' + strSearch.toLowerCase();
             strAdded = true;
         }
-    
+
         if (strSearch === '"' && (strScript.substring(intSearchStringStart - 1, intSearchStringEnd) !== '.') || strSearchFixed === true) {
             strSearchFixed = true;
             //console.log(strSearchFixed);
@@ -392,17 +393,17 @@ function autocompletePopupSearch(editor, strMode) {
             strSearchFixed = false;
             //console.log(strSearchFixed);
         }
-        
+
         if (strSearch === ':') {
             strSearch = '';
         } else if (strSearch === '":') {
             strSearch = '"';
             strSearchFixed = false;
         }
-        
+
         // default strMode to 'filter', the only other option is 'expand'
         strMode = strMode || 'filter';
-        
+
         // if mode is filter: take the current autocompleteGlobals.arrSearch and remove
         //      any items that don't match
         if (strMode === 'filter') {
@@ -471,18 +472,22 @@ function autocompletePopupSearch(editor, strMode) {
             }
             strSearch = '"' + strSearch.toLowerCase();
         }
-        
+
         // select first line
         autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
         autocompleteGlobals.popupAce.scrollToLine(0);
-        
+
         // refresh popup height
         autocompletePopupHeightRefresh();
-        popup_instruct_top = document.getElementById('autocomplete-popup').style.height + document.getElementById('autocomplete-popup-instruction').style.height;
-        document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
+
+        if (document.getElementById('autocomplete-popup')) {
+            popup_instruct_top = document.getElementById('autocomplete-popup').style.height +
+                                 document.getElementById('autocomplete-popup-instruction').style.height;
+            document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
+        }
     }
     //console.log(document.getElementById('autocomplete-popup-instruction').style.top, popup_instruct_top);
-    
+
     //// search to select
     //for (i = 0, len = autocompleteGlobals.arrSearch.length; i < len; i += 1) {
     //    if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === 0) {
