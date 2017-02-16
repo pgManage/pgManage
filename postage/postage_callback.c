@@ -49,6 +49,7 @@ void query_callback_handler(EV_P, ev_io *w, int revents) {
 		// I don't know why, but this works
 		ev_io_stop(EV_A, &cb_data->io);
 		cb_data->callback(EV_A, NULL, 0, cb_data->client_request);
+		cb_data->client_request->cb_data = NULL;
 		SFREE(cb_data);
 		return;
 	}

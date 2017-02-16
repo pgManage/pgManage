@@ -278,7 +278,7 @@ void ws_insert_step1(struct sock_ev_client_request *client_request) {
 			client_insert->str_real_table_name, client_insert->int_real_table_name_len,
 			" LIMIT 0;", (size_t)9);
 		SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
-		DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step2);
+		SFINISH_CHECK(DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step2), "DB_exec failed");
 	} else {
 #ifndef POSTAGE_INTERFACE_LIBPQ
 		if (client_insert->str_identity_column_name != NULL) {
@@ -298,7 +298,7 @@ void ws_insert_step1(struct sock_ev_client_request *client_request) {
 				";", (size_t)1);
 			SDEBUG("str_sql: %s", str_sql);
 			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
-			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step15_sql_server);
+			SFINISH_CHECK(DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step15_sql_server), "DB_exec failed");
 		} else {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
 				"IF OBJECT_ID('tempdb..", (size_t)22,
@@ -313,7 +313,7 @@ void ws_insert_step1(struct sock_ev_client_request *client_request) {
 				";", (size_t)1);
 			SDEBUG("str_sql: %s", str_sql);
 			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
-			DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step2);
+			SFINISH_CHECK(DB_exec(global_loop, client_request->parent->conn, client_request, str_sql, ws_insert_step2), "DB_exec failed");
 		}
 #endif
 	}
@@ -466,8 +466,8 @@ bool ws_insert_step2(EV_P, void *cb_data, DB_result *res) {
 	int_len_content =
 		client_request->frame->int_length - (size_t)(client_insert->ptr_values - client_request->frame->str_message);
 	SFINISH_CHECK(int_len_content > 0, "No insert data");
-	DB_copy_in(
-		EV_A, client_request->parent->conn, client_request, client_insert->ptr_values, int_len_content, str_sql, ws_insert_step4);
+	SFINISH_CHECK(DB_copy_in(
+		EV_A, client_request->parent->conn, client_request, client_insert->ptr_values, int_len_content, str_sql, ws_insert_step4), "DB_copy_in failed");
 
 	DB_free_result(res);
 
@@ -547,7 +547,7 @@ bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 			" LIMIT 0;", (size_t)9);
 
 		SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
-		DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step5);
+		SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step5), "DB_exec failed");
 #ifndef POSTAGE_INTERFACE_LIBPQ
 	} else {
 		if (client_insert->str_identity_column_name != NULL) {
@@ -567,7 +567,7 @@ bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 				";", (size_t)1);
 
 			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
-			DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step45_sql_server);
+			SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step45_sql_server), "DB_exec failed");
 		} else {
 			SFINISH_SNCAT(str_sql, &int_sql_len,
 				"IF OBJECT_ID('tempdb..", (size_t)22,
@@ -583,7 +583,7 @@ bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 				";", (size_t)1);
 
 			SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
-			DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step5);
+			SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request, str_sql, ws_insert_step5), "DB_exec failed");
 		}
 #endif
 	}
@@ -827,8 +827,8 @@ bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
 	SDEBUG("INSERTING...");
 	SDEBUG("DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query): %s",
 		DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query));
-	DB_exec(EV_A, client_request->parent->conn, client_request,
-		DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query++), ws_insert_step6);
+	SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request,
+		DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query++), ws_insert_step6), "DB_exec failed");
 
 	bol_error_state = false;
 	bol_ret = true;
@@ -894,11 +894,11 @@ bool ws_insert_step6(EV_P, void *cb_data, DB_result *res) {
 	SDEBUG("DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query): %s",
 		DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query));
 	if (client_insert->int_current_insert_query < (DArray_end(client_insert->darr_insert_queries) - 1)) {
-		DB_exec(EV_A, client_request->parent->conn, client_request,
-			DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query++), ws_insert_step6);
+		SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request,
+			DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query++), ws_insert_step6), "DB_exec failed");
 	} else {
-		DB_exec(EV_A, client_request->parent->conn, client_request,
-			DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query), ws_insert_step7);
+		SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request,
+			DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query), ws_insert_step7), "DB_exec failed");
 	}
 
 	bol_error_state = false;

@@ -574,6 +574,7 @@ bool http_insert_step6(EV_P, void *cb_data, DB_result *res) {
 		arr_row_values = DB_get_row_values(res);
 		SFINISH_CHECK(arr_row_values != NULL, "DB_get_row_values failed");
 
+		SFREE(client_insert->str_result);
 		SFINISH_SNCAT(client_insert->str_result, &client_insert->int_result_len,
 			DArray_get(arr_row_values, 0), strlen(DArray_get(arr_row_values, 0)));
 		DArray_clear_destroy(arr_row_values);

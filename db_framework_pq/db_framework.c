@@ -150,6 +150,7 @@ bool _DB_exec(
 
 	return true;
 error:
+	conn->res_poll = NULL;
 	DB_res_poll_free(res_poll);
 	return false;
 }
@@ -222,6 +223,7 @@ bool DB_get_column_types_for_query(EV_P, DB_conn *conn, char *str_sql, void *cb_
 
 	return true;
 error:
+	conn->res_poll = NULL;
 	DB_res_poll_free(res_poll);
 	if (res_poll_child != NULL) {
 		SFREE(res_poll_child->str_query);
@@ -261,6 +263,7 @@ bool DB_get_column_types_for_query2(EV_P, void *cb_data, DB_result *res) {
 	return true;
 error:
 	res_poll_child->query_cb(EV_A, res_poll_child->cb_data, res);
+	res_poll_child->conn->res_poll = NULL;
 	DB_res_poll_free(res_poll);
 	if (res_poll_child != NULL) {
 		SFREE(res_poll_child->str_query);
@@ -293,6 +296,7 @@ bool DB_get_column_types_for_query3(EV_P, void *cb_data, DB_result *res) {
 	return true;
 error:
 	SFREE_ALL();
+	res_poll_child->conn->res_poll = NULL;
 	res_poll_child->query_cb(EV_A, res_poll_child->cb_data, res);
 	DB_free_result(res);
 	SFREE(res_poll_child->str_query);
@@ -310,6 +314,7 @@ bool DB_get_column_types_for_query4(EV_P, void *cb_data, DB_result *res) {
 	DB_free_result(res_poll_child->res);
 	DB_free_result(res);
 	SFREE(res_poll_child->str_query);
+	res_poll_child->conn->res_poll = NULL;
 	DB_res_poll_free(res_poll_child);
 	return true;
 error:
@@ -317,6 +322,7 @@ error:
 	DB_free_result(res_poll_child->res);
 	DB_free_result(res);
 	SFREE(res_poll_child->str_query);
+	res_poll_child->conn->res_poll = NULL;
 	DB_res_poll_free(res_poll_child);
 	return false;
 }

@@ -235,11 +235,12 @@ void client_reconnect_timer_cb(EV_P, ev_prepare *w, int revents) {
 		ev_io_stop(EV_A, &client->reconnect_watcher->io);
 		DB_finish(client->conn);
 
-		ev_prepare_stop(EV_A, &client_reconnect_timer->prepare);
-		SFREE(client->client_reconnect_timer);
-		client_reconnect_timer = NULL;
+		if (client->client_reconnect_timer != NULL) {
+			ev_prepare_stop(EV_A, &client->client_reconnect_timer->prepare);
+			SFREE(client->client_reconnect_timer);
 
-		decrement_idle(EV_A);
+			decrement_idle(EV_A);
+		}
 
 		client_close(client);
 	}
@@ -1234,8 +1235,10 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 	struct sock_ev_client_request_watcher *client_request_watcher = (struct sock_ev_client_request_watcher *)w;
 	struct sock_ev_client *client = client_request_watcher->parent;
 	char *str_query = NULL;
+	char *str_response = NULL;
 	int int_len = Queue_count(client->que_request);
 	size_t int_query_len = 0;
+	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_sql);
 
 	if (int_len > 0) {
@@ -1275,7 +1278,7 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 				client_request->arr_response = DArray_create(sizeof(char *), 1);
 				if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
 					//clang-format off
-					SERROR_SNCAT(str_query, &int_query_len,
+					SFINISH_SNCAT(str_query, &int_query_len,
 						client_request->int_req_type == POSTAGE_REQ_BEGIN ? "BEGIN;" :
 						client_request->int_req_type == POSTAGE_REQ_COMMIT ? "COMMIT;" :
 						client_request->int_req_type == POSTAGE_REQ_ROLLBACK ? "ROLLBACK;" : "",
@@ -1287,7 +1290,7 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 					//clang-format on
 				} else {
 					//clang-format off
-					SERROR_SNCAT(str_query, &int_query_len,
+					SFINISH_SNCAT(str_query, &int_query_len,
 						client_request->int_req_type == POSTAGE_REQ_BEGIN ? "BEGIN TRANSACTION;" :
 						client_request->int_req_type == POSTAGE_REQ_COMMIT ? "COMMIT TRANSACTION;" :
 						client_request->int_req_type == POSTAGE_REQ_ROLLBACK ? "ROLLBACK TRANSACTION;" : "",
@@ -1299,7 +1302,7 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 		  			//clang-format on
 				}
 
-				SERROR_CHECK(
+				SFINISH_CHECK(
 					DB_exec(EV_A, client_request->parent->conn, client_request, str_query, client_cmd_cb), "DB_exec failed");
 
 				SFREE(str_query);
@@ -1330,7 +1333,7 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 
 				size_t int_sql_len = 0;
 				if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-					SERROR_SNCAT(str_sql, &int_sql_len,
+					SFINISH_SNCAT(str_sql, &int_sql_len,
 						"SELECT SESSION_USER::text " //26
 						"UNION ALL " //10
 						"SELECT g.rolname" //16
@@ -1340,7 +1343,7 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 						"	WHERE g.rolcanlogin = FALSE AND u.rolname = SESSION_USER::text AND g.rolname IS NOT NULL",
 						(size_t)282); //89
 				} else {
-					SERROR_SNCAT(str_sql, &int_sql_len,
+					SFINISH_SNCAT(str_sql, &int_sql_len,
 						"SELECT CAST(SYSTEM_USER AS nvarchar(MAX)) AS user_group_name, '1' AS srt " //73
 						"UNION ALL " //10
 						"SELECT CAST([name] AS nvarchar(MAX)) AS user_group_name, '2' AS srt " //68
@@ -1353,12 +1356,28 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 						(size_t)281); //14
 				}
 
-				SERROR_CHECK(DB_exec(EV_A, client->conn, client_request, str_sql, ws_client_info_cb), "DB_exec failed");
+				SFINISH_CHECK(DB_exec(EV_A, client->conn, client_request, str_sql, ws_client_info_cb), "DB_exec failed");
 
 				break;
 		}
 	}
-error:
+finish:
+	int_response_len = 0;
+
+	if (str_response != NULL) {
+		char *_str_response = str_response;
+		size_t _int_response_len = strlen(str_response);
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client->cur_request->str_message_id, strlen(client->cur_request->str_message_id),
+			"\012responsenumber = 1\012", (size_t)20,
+			_str_response, _int_response_len);
+
+		WS_sendFrame(EV_A, client->cur_request->parent, true, 0x01, str_response, int_response_len);
+		DArray_push(client->cur_request->arr_response, str_response);
+		str_response = NULL;
+	}
+
 	SFREE_ALL();
 	bol_error_state = false;
 	return;
@@ -1554,7 +1573,7 @@ finish:
 	snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
 	char *_str_response = str_response;
-	size_t _int_response_len = int_response_len;
+	size_t _int_response_len = (bol_error_state ? strlen(str_response) : int_response_len);
 	SFINISH_SNCAT(str_response, &int_response_len,
 		"messageid = ", (size_t)12,
 		client_request->str_message_id, strlen(client_request->str_message_id),
@@ -1578,7 +1597,7 @@ finish:
 		SFREE(client_request->parent->conn->str_response);
 	}
 
-	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 	DArray_push(client_request->arr_response, str_response);
 	str_response = NULL;
 
