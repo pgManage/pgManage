@@ -67,7 +67,7 @@ void _WS_readFrame(EV_P, struct sock_ev_client *client, void (*cb)(EV_P, WSFrame
 	ev_io_stop(EV_A, &client->io);
 
 	Queue_send(client->que_message, client_message);
-	ev_io_init(&client_message->io, WS_readFrame_step2, client->io.fd, EV_READ | (bol_tls ? EV_WRITE : 0));
+	ev_io_init(&client_message->io, WS_readFrame_step2, GET_CLIENT_SOCKET(client), EV_READ | (bol_tls ? EV_WRITE : 0));
 	ev_io_start(EV_A, &client_message->io);
 	if (bol_tls) {
 		ev_feed_event(EV_A, &client_message->io, EV_READ | EV_WRITE);
@@ -345,7 +345,7 @@ bool WS_sendFrame(EV_P, struct sock_ev_client *client, bool bol_fin, int int_opc
 	str_response = NULL;
 
 	Queue_send(client->que_message, client_message);
-	ev_io_init(&client_message->io, WS_sendFrame_step2, client->io.fd, EV_WRITE | (bol_tls ? EV_READ : 0));
+	ev_io_init(&client_message->io, WS_sendFrame_step2, GET_CLIENT_SOCKET(client), EV_WRITE | (bol_tls ? EV_READ : 0));
 	ev_io_start(EV_A, &client_message->io);
 	SDEBUG("waiting for writable on client %p", client);
 
