@@ -258,7 +258,7 @@ error:
 		}
 	}
 
-	if (int_request_len == 0 || errno != EAGAIN) {
+	if (client_message->bol_have_header == false || int_request_len == 0 || errno != EAGAIN) {
 		SERROR_NORESPONSE("disconnect");
 		SFREE(str_global_error);
 
