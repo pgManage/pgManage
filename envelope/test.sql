@@ -92,3 +92,38 @@ INSERT INTO rtesting_large_table (id, test1, test2)
 CREATE VIEW ttesting_large_view2 AS
 	SELECT generate_series AS id, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg'::text AS test1, ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj'::text AS test2
 		FROM generate_series(1, 200);
+
+-- DROP FUNCTION public.accept_testing_return_null(str_args text);
+
+CREATE OR REPLACE FUNCTION public.accept_testing_return_null(str_args text)
+  RETURNS text AS
+$BODY$
+BEGIN
+RETURN NULL;
+END
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+ALTER FUNCTION public.accept_testing_return_null(str_args text) OWNER TO postgres;
+REVOKE ALL ON FUNCTION public.accept_testing_return_null(str_args text) FROM public;
+
+--SELECT public.accept_testing_return_null(str_args text);
+
+-- DROP FUNCTION public.action_testing_return_null(str_args text);
+
+CREATE OR REPLACE FUNCTION public.action_testing_return_null(str_args text)
+  RETURNS text AS
+$BODY$
+BEGIN
+RETURN NULL;
+END
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+ALTER FUNCTION public.action_testing_return_null(str_args text) OWNER TO postgres;
+GRANT EXECUTE ON FUNCTION public.action_testing_return_null(str_args text) TO postgres;
+REVOKE ALL ON FUNCTION public.action_testing_return_null(str_args text) FROM public;
+
+--SELECT public.action_testing_return_null(str_args text);

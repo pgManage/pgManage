@@ -31,6 +31,30 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
 	SFINISH_CHECK(str_uri_temp != NULL, "str_uri_path failed");
 #ifdef ENVELOPE
+	if (strstr(str_uri_temp, "acceptnc_") != NULL) {
+		char *ptr_dot = strstr(str_uri_temp, ".");
+		if (
+			(
+				ptr_dot != NULL &&
+				strncmp(ptr_dot + 1, "acceptnc_", 9) == 0
+				) ||
+			strncmp(str_uri_temp, "/env/acceptnc_", 14) == 0
+			) {
+			client->bol_public = true;
+		}
+	} else if (strstr(str_uri_temp, "actionnc_") != NULL) {
+		char *ptr_dot = strstr(str_uri_temp, ".");
+		if (
+			(
+				ptr_dot != NULL &&
+				strncmp(ptr_dot + 1, "actionnc_", 9) == 0
+				) ||
+			strncmp(str_uri_temp, "/env/actionnc_", 14) == 0
+			) {
+			client->bol_public = true;
+		}
+	}
+	SDEBUG("client->bol_public: %s", client->bol_public ? "true" : "false");
 #else
 	char *ptr_slash = strchr(str_uri_temp + 9, '/');
 	SFINISH_CHECK(ptr_slash != NULL, "strchr failed!");
@@ -44,32 +68,6 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	SDEBUG("client->str_cookie_name: %s", client->str_cookie_name);
 	str_cookie_encrypted = str_cookie(client->str_request, client->int_request_len, client->str_cookie_name, &int_cookie_len);
 	if (str_cookie_encrypted == NULL || int_cookie_len <= 0) {
-#ifdef ENVELOPE
-		if (strstr(str_uri_temp, "acceptnc_") != NULL) {
-			char *ptr_dot = strstr(str_uri_temp, ".");
-			if (
-				(
-					ptr_dot != NULL &&
-					strncmp(ptr_dot + 1, "acceptnc_", 9) == 0
-				) ||
-				strncmp(str_uri_temp, "/env/acceptnc_", 14) == 0
-			) {
-				client->bol_public = true;
-			}
-		} else if (strstr(str_uri_temp, "actionnc_") != NULL) {
-			char *ptr_dot = strstr(str_uri_temp, ".");
-			if (
-				(
-					ptr_dot != NULL &&
-					strncmp(ptr_dot + 1, "actionnc_", 9) == 0
-				) ||
-				strncmp(str_uri_temp, "/env/actionnc_", 14) == 0
-			) {
-				client->bol_public = true;
-			}
-		}
-		SDEBUG("client->bol_public: %s", client->bol_public ? "true" : "false");
-#endif
 		SFINISH_CHECK(client->bol_public, "No Cookie.");
 	}
 	if (client->bol_public == false) {

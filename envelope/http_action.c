@@ -113,6 +113,7 @@ bool http_action_step2(EV_P, void *cb_data, DB_result *res) {
 	char *_str_response = NULL;
 	ssize_t int_len = 0;
 	size_t int_response_len = 0;
+	size_t _int_response_len = 0;
 	DArray *arr_row_values = NULL;
 	DArray *arr_row_lengths = NULL;
 
@@ -126,6 +127,10 @@ bool http_action_step2(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_CHECK(arr_row_lengths != NULL, "DB_get_row_lengths failed");
 
 	_str_response = DArray_get(arr_row_values, 0);
+	_int_response_len = (size_t)(*(ssize_t *)DArray_get(arr_row_lengths, 0));
+	if (_str_response == NULL) {
+		SFINISH_SNCAT(_str_response, &_int_response_len, "null", 4);
+	}
 	SFINISH_SNCAT(str_response, &int_response_len,
 		"HTTP/1.1 200 OK\015\012"
 		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
@@ -135,7 +140,7 @@ bool http_action_step2(EV_P, void *cb_data, DB_result *res) {
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 			"Content-Type: application/json; charset=UTF-8\015\012\015\012"
 			"{\"stat\":true, \"dat\": "),
-		_str_response, (*(ssize_t *)DArray_get(arr_row_lengths, 0)),
+		_str_response, _int_response_len,
 		"}", (size_t)1);
 	SFREE(_str_response);
 	SDEBUG("str_response: %s", str_response);

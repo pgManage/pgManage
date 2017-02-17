@@ -152,6 +152,7 @@ bool http_accept_step2(EV_P, void *cb_data, DB_result *res) {
 	str_response = NULL;
 	client_copy_check->int_response_len = (*(ssize_t *)DArray_get(arr_row_lengths, 0));
 	client_copy_check->client_request = client->cur_request;
+	SFINISH_CHECK(client_copy_check->int_response_len > -1, "Function returned null");
 
 	SFINISH_SALLOC(client_copy_io, sizeof(struct sock_ev_client_copy_io));
 

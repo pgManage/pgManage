@@ -1233,7 +1233,8 @@ File already exists.*/})],
 			}],
 			['ACCEPT 1', 'ajax', 200, '/env/public.accept_testing', 'testingnitset', 'testingnitset'],
 			['ACCEPT 2', 'ajax', 200, '/env/public.accept_testing', 'company_name=AA-TULSA&company_name_exact=0&type=Passenger&type_anywhere=-1&engine_mfg=Pratt %26 Whitney&engine_mfg_exact=0&engine_model=J57-P&engine_model_exact=0&country=&country_exact=0&continent=&continent_exact=0&overhaul_center=&overhaul_center_exact=0&on_order=undefined&stored=undefined', 'company_name=AA-TULSA&company_name_exact=0&type=Passenger&type_anywhere=-1&engine_mfg=Pratt %26 Whitney&engine_mfg_exact=0&engine_model=J57-P&engine_model_exact=0&country=&country_exact=0&continent=&continent_exact=0&overhaul_center=&overhaul_center_exact=0&on_order=undefined&stored=undefined'],
-			['ACCEPT 2', 'ajax', 200, '/env/public.accept_testing/test', 'testingnitset', 'testingnitset&path=/test'],
+			['ACCEPT 3', 'ajax', 200, '/env/public.accept_testing/test', 'testingnitset', 'testingnitset&path=/test'],
+			['ACCEPT 4', 'ajax', 500, '/env/public.accept_testing_return_null', '', "FATAL\nFunction returned null:\nFATAL\nerror_text\t\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"],
 			['ACCEPTNC FAIL 1', 'ajax', 500, '/env/public.acceptnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed:\nFATAL\nerror_text\tERROR:  function public.acceptnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.acceptnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
 			['ACCEPTNC FAIL 2', 'ajax', 500, '/env/public.acceptnc_testing;', 'testingnitset', function (arg) {
 				console.warn('test1');
@@ -1247,7 +1248,8 @@ File already exists.*/})],
 				return arg === ml(function () {/*"FATAL\n..\\..\\common\\common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
 					|| arg === ml(function () {/*"FATAL\n../common/common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"*/ })
 			}],
-			['ACTION', 'ajax', 200, '/env/public.action_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
+			['ACTION 1', 'ajax', 200, '/env/public.action_testing', 'testingnitset', '{"stat":true, "dat": "testingnitset"}'],
+			['ACTION 2', 'ajax', 200, '/env/public.action_testing_return_null', 'testingnitset', '{"stat":true, "dat": null}'],
 			['ACTIONNC FAIL 1', 'ajax', 500, '/env/public.actionnc_testing1', 'testingnitset', ml(function () {/*"FATAL\nDB_exec failed, res->status == 5:\nFATAL\nerror_text\tERROR:  function public.actionnc_testing1(unknown) does not exist\\nLINE 1: SELECT public.actionnc_testing1('testingnitset');\\n               ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t8\n"*/ })],
 			['ACTIONNC FAIL 2', 'ajax', 500, '/env/public.actionnc_testing;', 'testingnitset', function (arg) {
 				console.warn('test1');
