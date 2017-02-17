@@ -622,6 +622,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 							QUEUE_FOREACH(client->que_message, node) {
 								struct sock_ev_client_message *client_message = (struct sock_ev_client_message *)node->value;
 								client_message->frame->parent = client;
+								ev_io_set(&client_message->io, GET_CLIENT_SOCKET(client), EV_READ);
 								ev_io_start(EV_A, &client_message->io);
 							}
 						}
