@@ -615,7 +615,8 @@ void client_cb(EV_P, ev_io *w, int revents) {
 								SINFO("client_request->parent: %p", client_request->parent);
 							}
 						}
-
+						/*
+						// This could be causing trouble
 						client->que_message = session_client->que_message;
 						session_client->que_message = NULL;
 						if (client->que_message != NULL) {
@@ -627,6 +628,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 								ev_io_start(EV_A, &client_message->io);
 							}
 						}
+						*/
 
 						client->bol_request_in_progress = session_client->bol_request_in_progress;
 
