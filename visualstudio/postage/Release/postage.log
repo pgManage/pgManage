@@ -2,16 +2,14 @@
 ..\..\common\common_client.c(295): warning C4022: 'DuplicateHandle': pointer mismatch for actual parameter 2
 ..\..\common\common_client.c(295): warning C4047: 'function': 'intptr_t' differs in levels of indirection from 'HANDLE'
 ..\..\common\common_client.c(295): warning C4024: '_open_osfhandle': different types for formal and actual parameter 1
-..\..\common\common_client.c(626): error C2065: '_ws_readFrame_step2': undeclared identifier
-..\..\common\common_client.c(626): warning C4047: '==': 'void (__cdecl *)(ev_loop *,ev_io *,int)' differs in levels of indirection from 'int'
-..\..\common\common_client.c(627): error C2065: 'WS_frame': undeclared identifier
-..\..\common\common_client.c(627): error C2065: 'frame': undeclared identifier
-..\..\common\common_client.c(627): warning C4047: '=': 'int' differs in levels of indirection from 'WSFrame *'
-..\..\common\common_client.c(627): error C2106: '=': left operand must be l-value
-..\..\common\common_client.c(629): error C2065: 'frame': undeclared identifier
-..\..\common\common_client.c(629): warning C4047: 'function': 'WSFrame *' differs in levels of indirection from 'int'
-..\..\common\common_client.c(629): warning C4024: 'WS_freeFrame': different types for formal and actual parameter 1
-..\..\common\common_client.c(818): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(820): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(831): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(833): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(801): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(803): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(814): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(816): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+  Generating code
+  13 of 401 functions ( 3.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    37 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  postage.vcxproj -> C:\Users\nunzio\Repos\postage\visualstudio\Release\postage.exe
+  postage.vcxproj -> C:\Users\nunzio\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)

@@ -615,20 +615,6 @@ void client_cb(EV_P, ev_io *w, int revents) {
 								SINFO("client_request->parent: %p", client_request->parent);
 							}
 						}
-						/*
-						// This could be causing trouble
-						client->que_message = session_client->que_message;
-						session_client->que_message = NULL;
-						if (client->que_message != NULL) {
-							QUEUE_FOREACH(client->que_message, node) {
-								struct sock_ev_client_message *client_message = (struct sock_ev_client_message *)node->value;
-								SINFO("client_message: %p", client_message);
-								client_message->frame->parent = client;
-								ev_io_set(&client_message->io, GET_CLIENT_SOCKET(client), client_message->io.events);
-								ev_io_start(EV_A, &client_message->io);
-							}
-						}
-						*/
 
 						client->bol_request_in_progress = session_client->bol_request_in_progress;
 
