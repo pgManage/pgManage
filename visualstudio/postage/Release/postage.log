@@ -2,14 +2,14 @@
 ..\..\common\common_client.c(295): warning C4022: 'DuplicateHandle': pointer mismatch for actual parameter 2
 ..\..\common\common_client.c(295): warning C4047: 'function': 'intptr_t' differs in levels of indirection from 'HANDLE'
 ..\..\common\common_client.c(295): warning C4024: '_open_osfhandle': different types for formal and actual parameter 1
-..\..\common\common_client.c(812): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(814): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(825): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(827): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(813): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(815): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(826): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(828): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
   Generating code
-  1 of 401 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+  13 of 401 functions ( 3.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+    37 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   postage.vcxproj -> C:\Users\nunzio\Repos\postage\visualstudio\Release\postage.exe
   postage.vcxproj -> C:\Users\nunzio\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)
