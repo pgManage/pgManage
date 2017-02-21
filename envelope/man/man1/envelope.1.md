@@ -1,4 +1,4 @@
-envelope(1) -- PostgreSQL Administration for the web
+envelope(1) -- PostgreSQL Interface for the web
 ===================================================
 
 ## FULL PATH
@@ -11,20 +11,20 @@ envelope
        [-v | --version]
        [-c <config-file> | --config-file=<config-file>]
        [-d <connection-file> | --connection-file=<connection-file>]
-       [-s <super-only> | --super-only=<super-only>]
-       [-g <login-group> | --login-group=<login-group>]
+       [-y <app-path> | --app-path=<app-path>]
+       [-z <role-path> | --role-path=<role-path>]
        [-r <web-root> | --web-root=<web-root>]
-       [-a <data-root> | --data-root=<data-root>]
        [-p <port> | --envelope-port=<port>]
        [-j <tls-cert> | --tls-cert=<tls-cert>]
        [-k <tls-key> | --tls-key=<tls-key>]
        [-l <log-level> | --log-level=<log-level>]
-       [-n <allow_custom_connections> | --allow-custom-connections=<allow-custom-connections>]
        [-t <login-timeout> | --login-timeout=<login-timeout>]
+       [-u <public-username> | --public-username=<public-username>]
+       [-w <public-password> | --public-password=<public-password>]
 ```
 
 ## DESCRIPTION
-The `envelope` utility is  a tool to make managing your PostgreSQL database fast and easy. It provides web access and can be used on a tablet, or even on a phone.
+The `envelope` utility is  a tool to make using your PostgreSQL database fast and easy. It provides web access and can be used on a tablet, or even on a phone.
 
 All log output is pushed to stderr, if you are pushing that to a file, then you must handle rotating the file yourself or it will get large and slow `envelope` down.
 
@@ -45,7 +45,7 @@ The following options can be specified on the command line or in the configurati
 `[command line short]` or `[command line long]` or `[config file]`
 
 `-d` or `--connection-file=` or `connection_file=`  
-       `String;` defaults to /usr/local/etc/envelope/envelope-connections.conf  
+       `String;` defaults to @prefix@/etc/envelope/envelope-connections.conf  
        When you install Envelope, the Makefile will generate a path to the sample envelope-connections.conf file and put it in the sample config file. Use this option to tell Envelope where your connection list is located.  
        If not specified, Envelope looks in the same folder as the config file for a file named envelope-connections.conf. If Envelope can't find a connection file, it will error.
 
@@ -58,12 +58,16 @@ The following options can be specified on the command line or in the configurati
        This tells Envelope to only allow users in a certain PostgreSQL group to login to Envelope. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group.
 
 `-r` or `--web-root=` or `web_root=`  
-       `String;` Defaults to /usr/local/etc/envelope/web_root  
+       `String;` Defaults to @prefix@/etc/envelope/web_root  
        This tells Envelope where the HTML files have been installed to.
 
-`-a` or `--data-root=` or `data_root=`  
-       `String;` defaults to ~/.envelope/  
-       This tells Envelope where to put the SQL file history. All tabs are saved to this location so that if you get disconnected from Envelope you don't lose your work.
+`-y` or `--app-path=` or `app_path=`  
+       `String;` defaults to @prefix@/etc/envelope/app  
+       This tells Envelope where the app HTML files have been installed to.
+
+`-z` or `--role-path=` or `role_path=`  
+       `String;` defaults to @prefix@/etc/envelope/role  
+       This tells Envelope where the role DATA files have been installed to.
 
 `-p` or `--envelope-port=` or `envelope_port=`  
        `Integer;` defaults to 8080  
@@ -87,9 +91,14 @@ The following options can be specified on the command line or in the configurati
        `Integer;` defaults to 1200  
        This option regulates the timeout after the last page is closed.
 
+`-u` or `--public-username=` or `public_username=`  
+`-w` or `--public-password=` or `public_password=`  
+       `String;` no defaults
+       This option tells `envelope` than public actions should use these credentials, if they are unset, then public actions are disabled.
+
 ## SETTING UP A CONNECTION TO A POSTGRESQL SERVER
 
-Envelope requires at least one PostgreSQL server be listed in the envelope-connections.conf file. This version of Envelope doesn't allow you to specify a server from the command line. Enter only one PostgreSQL server per line. For envelope, only the first server is user.
+Envelope requires at least one PostgreSQL server be listed in the envelope-connections.conf file. This version of Envelope doesn't allow you to specify a server from the command line. Enter only one PostgreSQL server per line. For envelope, only the first server is used.
 
 **The format of a connection string is:**  
 ```
@@ -117,12 +126,12 @@ mini-server: hostaddr=127.0.0.1 port=5432 dbname=postgres sslmode=require
 ## EXAMPLES
 Run `envelope` (short argument):
 ```
-/usr/local/sbin/envelope -c /usr/local/etc/envelope/envelope.conf -d /usr/local/etc/envelope/envelope-connections.conf
+@prefix@/sbin/envelope -c @prefix@/etc/envelope/envelope.conf -d @prefix@/etc/envelope/envelope-connections.conf
 ```
 
 Run `envelope` (long argument):
 ```
-/usr/local/sbin/envelope --config-file=/usr/local/etc/envelope/envelope.conf --connection-file /usr/local/etc/envelope/envelope-connections.conf
+@prefix@/sbin/envelope --config-file=@prefix@/etc/envelope/envelope.conf --connection-file @prefix@/etc/envelope/envelope-connections.conf
 ```
 
 ## TROUBLESHOOTING
