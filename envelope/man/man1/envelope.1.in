@@ -1,6 +1,6 @@
 .TH "ENVELOPE" "1" "February 2017" "" ""
 .SH "NAME"
-\fBenvelope\fR \- PostgreSQL Administration for the web
+\fBenvelope\fR \- PostgreSQL Interface for the web
 .SH FULL PATH
 .P
 This instance of envelope was installed as \fB@prefix@/sbin/envelope\fP (Usually \fB/usr/local/sbin/envelope\fP)
@@ -13,21 +13,21 @@ envelope
        [\-v | \-\-version]
        [\-c <config\-file> | \-\-config\-file=<config\-file>]
        [\-d <connection\-file> | \-\-connection\-file=<connection\-file>]
-       [\-s <super\-only> | \-\-super\-only=<super\-only>]
-       [\-g <login\-group> | \-\-login\-group=<login\-group>]
+       [\-y <app\-path> | \-\-app\-path=<app\-path>]
+       [\-z <role\-path> | \-\-role\-path=<role\-path>]
        [\-r <web\-root> | \-\-web\-root=<web\-root>]
-       [\-a <data\-root> | \-\-data\-root=<data\-root>]
        [\-p <port> | \-\-envelope\-port=<port>]
        [\-j <tls\-cert> | \-\-tls\-cert=<tls\-cert>]
        [\-k <tls\-key> | \-\-tls\-key=<tls\-key>]
        [\-l <log\-level> | \-\-log\-level=<log\-level>]
-       [\-n <allow_custom_connections> | \-\-allow\-custom\-connections=<allow\-custom\-connections>]
        [\-t <login\-timeout> | \-\-login\-timeout=<login\-timeout>]
+       [\-u <public\-username> | \-\-public\-username=<public\-username>]
+       [\-w <public\-password> | \-\-public\-password=<public\-password>]
 .fi
 .RE
 .SH DESCRIPTION
 .P
-The \fBenvelope\fP utility is  a tool to make managing your PostgreSQL database fast and easy\. It provides web access and can be used on a tablet, or even on a phone\.
+The \fBenvelope\fP utility is  a tool to make using your PostgreSQL database fast and easy\. It provides web access and can be used on a tablet, or even on a phone\.
 .P
 All log output is pushed to stderr, if you are pushing that to a file, then you must handle rotating the file yourself or it will get large and slow \fBenvelope\fP down\.
 .SH OPTIONS
@@ -52,7 +52,7 @@ The following options can be specified on the command line or in the configurati
 .P
 \fB\-d\fP or \fB\-\-connection\-file=\fP or \fBconnection_file=\fP
 .br
-       \fBString;\fP defaults to /usr/local/etc/envelope/envelope\-connections\.conf
+       \fBString;\fP defaults to @prefix@/etc/envelope/envelope\-connections\.conf
 .br
        When you install Envelope, the Makefile will generate a path to the sample envelope\-connections\.conf file and put it in the sample config file\. Use this option to tell Envelope where your connection list is located\.
 .br
@@ -72,15 +72,21 @@ The following options can be specified on the command line or in the configurati
 .P
 \fB\-r\fP or \fB\-\-web\-root=\fP or \fBweb_root=\fP
 .br
-       \fBString;\fP Defaults to /usr/local/etc/envelope/web_root
+       \fBString;\fP Defaults to @prefix@/etc/envelope/web_root
 .br
        This tells Envelope where the HTML files have been installed to\.
 .P
-\fB\-a\fP or \fB\-\-data\-root=\fP or \fBdata_root=\fP
+\fB\-y\fP or \fB\-\-app\-path=\fP or \fBapp_path=\fP
 .br
-       \fBString;\fP defaults to ~/\.envelope/
+       \fBString;\fP defaults to @prefix@/etc/envelope/app
 .br
-       This tells Envelope where to put the SQL file history\. All tabs are saved to this location so that if you get disconnected from Envelope you don't lose your work\.
+       This tells Envelope where the app HTML files have been installed to\.
+.P
+\fB\-z\fP or \fB\-\-role\-path=\fP or \fBrole_path=\fP
+.br
+       \fBString;\fP defaults to @prefix@/etc/envelope/role
+.br
+       This tells Envelope where the role DATA files have been installed to\.
 .P
 \fB\-p\fP or \fB\-\-envelope\-port=\fP or \fBenvelope_port=\fP
 .br
@@ -115,9 +121,16 @@ The following options can be specified on the command line or in the configurati
        \fBInteger;\fP defaults to 1200
 .br
        This option regulates the timeout after the last page is closed\.
+.P
+\fB\-u\fP or \fB\-\-public\-username=\fP or \fBpublic_username=\fP
+.br
+\fB\-w\fP or \fB\-\-public\-password=\fP or \fBpublic_password=\fP
+.br
+       \fBString;\fP no defaults
+       This option tells \fBenvelope\fP than public actions should use these credentials, if they are unset, then public actions are disabled\.
 .SH SETTING UP A CONNECTION TO A POSTGRESQL SERVER
 .P
-Envelope requires at least one PostgreSQL server be listed in the envelope\-connections\.conf file\. This version of Envelope doesn't allow you to specify a server from the command line\. Enter only one PostgreSQL server per line\. For envelope, only the first server is user\.
+Envelope requires at least one PostgreSQL server be listed in the envelope\-connections\.conf file\. This version of Envelope doesn't allow you to specify a server from the command line\. Enter only one PostgreSQL server per line\. For envelope, only the first server is used\.
 .P
 \fBThe format of a connection string is:\fR  
 .P
@@ -156,7 +169,7 @@ Run \fBenvelope\fP (short argument):
 .P
 .RS 2
 .nf
-/usr/local/sbin/envelope \-c /usr/local/etc/envelope/envelope\.conf \-d /usr/local/etc/envelope/envelope\-connections\.conf
+@prefix@/sbin/envelope \-c @prefix@/etc/envelope/envelope\.conf \-d @prefix@/etc/envelope/envelope\-connections\.conf
 .fi
 .RE
 .P
@@ -164,7 +177,7 @@ Run \fBenvelope\fP (long argument):
 .P
 .RS 2
 .nf
-/usr/local/sbin/envelope \-\-config\-file=/usr/local/etc/envelope/envelope\.conf \-\-connection\-file /usr/local/etc/envelope/envelope\-connections\.conf
+@prefix@/sbin/envelope \-\-config\-file=@prefix@/etc/envelope/envelope\.conf \-\-connection\-file @prefix@/etc/envelope/envelope\-connections\.conf
 .fi
 .RE
 .SH TROUBLESHOOTING

@@ -45,7 +45,7 @@ The following options can be specified on the command line or in the configurati
 `[command line short]` or `[command line long]` or `[config file]`
 
 `-d` or `--connection-file=` or `connection_file=`  
-       `String;` defaults to /usr/local/etc/postage/postage-connections.conf  
+       `String;` defaults to @prefix@/etc/postage/postage-connections.conf  
        When you install Postage, the Makefile will generate a path to the sample postage-connections.conf file and put it in the sample config file. Use this option to tell Postage where your connection list is located.  
        If not specified, Postage looks in the same folder as the config file for a file named postage-connections.conf. If Postage can't find a connection file, it will error.
 
@@ -58,7 +58,7 @@ The following options can be specified on the command line or in the configurati
        This tells Postage to only allow users in a certain PostgreSQL group to login to Postage. Note that a connection will be made to PostgreSQL in order to test if the user is a member of the login group.
 
 `-r` or `--web-root=` or `web_root=`  
-       `String;` Defaults to /usr/local/etc/postage/web_root  
+       `String;` Defaults to @prefix@/etc/postage/web_root  
        This tells Postage where the HTML files have been installed to.
 
 `-a` or `--data-root=` or `data_root=`  
@@ -109,12 +109,12 @@ mini-server: hostaddr=127.0.0.1 port=5432 dbname=postgres sslmode=require
 ## EXAMPLES
 Run `postage` (short argument):
 ```
-/usr/local/sbin/postage -c /usr/local/etc/postage/postage.conf -d /usr/local/etc/postage/postage-connections.conf
+@prefix@/sbin/postage -c @prefix@/etc/postage/postage.conf -d @prefix@/etc/postage/postage-connections.conf
 ```
 
 Run `postage` (long argument):
 ```
-/usr/local/sbin/postage --config-file=/usr/local/etc/postage/postage.conf --connection-file /usr/local/etc/postage/postage-connections.conf
+@prefix@/sbin/postage --config-file=@prefix@/etc/postage/postage.conf --connection-file @prefix@/etc/postage/postage-connections.conf
 ```
 
 ## TROUBLESHOOTING
