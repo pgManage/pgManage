@@ -21,7 +21,7 @@ window.addEventListener('design-register-element', function () {
                                                          '    <gs-footer>${2}</gs-footer>\n' +
                                                          '</gs-page>');
     
-    designRegisterElement('gs-page', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
+    designRegisterElement('gs-page', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
     
     window.designElementProperty_GSPAGE = function (selectedElement) {
         // TITLE attribute

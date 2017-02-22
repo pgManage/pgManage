@@ -7,7 +7,7 @@ window.addEventListener('design-register-element', function () {
             'label for="${1:text-insert-last_name}">${2:Last Name}:</label>\n' +
             '<gs-text id="${1:text-insert-last_name}" column="${3:last_name}"></gs-text>');
 
-    designRegisterElement('gs-text', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-text.html');
+    designRegisterElement('gs-text', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-text.html');
 
     window.designElementProperty_GSTEXT = function (selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {

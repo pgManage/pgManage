@@ -74,7 +74,7 @@ window.addEventListener('design-register-element', function () {
                     
                     GS.ajaxJSON(
                         location.pathname.indexOf('/env/') === 0 ? 
-                        '/env/auth' : ((location.pathname.indexOf('/v1/') === 0 ? '/v1/' + strLink : '') + '/postage/auth'), parameters, function (data, error) {
+                        '/env/auth' : '/postage/auth', parameters, function (data, error) {
                         if (!error) {
                             GS.pushMessage('Password Successfully Changed', 1000);
                             GS.closeDialog(dialog, 'change');
@@ -98,108 +98,6 @@ window.addEventListener('design-register-element', function () {
     //};
 })();
 
-//// check if the user is logged in as a superuser
-//// if there is no login dialog create it then open it
-//GS.superUserLogin = function (loggedInCallback, strOldError) {
-//    'use strict';
-//    GS.removeAllLoaders();
-//    
-//    if (!window.superLogin) {
-//        window.superLogin = true;
-//        // this action checks to see if we are logged in as a super user
-//        // if not, open a login dialog
-//        GS.ajaxJSON('/env/action_info', '', function (data, error) {
-//            var templateElement = document.createElement('template');
-//            
-//            if (!error && data.dat && data.dat.superusername) {
-//                if (typeof loggedInCallback === 'function') {
-//                    loggedInCallback(data.dat);
-//                }
-//            } else {
-//                templateElement.innerHTML = ml(function () {/*
-//                    <gs-page>
-//                        <gs-header><center><h3>Login as a Superuser</h3></center></gs-header>
-//                        <gs-body padded>
-//                            You are not currently logged in as a superuser, please fill in the login form below.
-//                            <br /><br />
-//                            <label for="postage-uname">Username:</label>
-//                            <gs-text id="postage-uname" autocapitalize="off" autocomplete="off" autocorrect="off"></gs-text>
-//                            <label for="postage-pword">Password:</label>
-//                            <gs-text id="postage-pword" type="password"></gs-text>
-//                            {{ERROR}}
-//                        </gs-body>
-//                        <gs-footer>
-//                            <gs-grid>
-//                                <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
-//                                <gs-block><gs-button id="postage-login">Log In</gs-button></gs-block>
-//                            </gs-grid>
-//                        </gs-footer>
-//                    </gs-page>
-//                */}).replace('{{ERROR}}', (strOldError ? '<br /><div style="color: #FF0000">' + strOldError + '</div>' : ''));
-//                
-//                if (GS.getCookie('postage_uname')) {
-//                    xtag.query(templateElement.content, '#postage-uname')[0].setAttribute('value', decodeURIComponent(GS.getCookie//('postage_uname')));
-//                    xtag.query(templateElement.content, '#postage-pword')[0].setAttribute('autofocus', '');
-//                } else {
-//                    xtag.query(templateElement.content, '#postage-uname')[0].setAttribute('autofocus', '');
-//                }
-//                
-//                GS.openDialog(templateElement, function () {
-//                    var dialog = this;
-//                    
-//                    document.getElementById('postage-pword').addEventListener('keydown', function (event) {
-//                        var intKeyCode = event.which || event.keyCode;
-//                        
-//                        if (intKeyCode === 13) {
-//                            GS.triggerEvent(document.getElementById('postage-login'), 'click');
-//                        }
-//                        //if (this.value) {
-//                        //    document.getElementById('postage-login').removeAttribute('disabled');
-//                        //} else {
-//                        //    document.getElementById('postage-login').setAttribute('disabled', '');
-//                        //}
-//                    });
-//                    
-//                    //document.getElementById('postage-pword').addEventListener('keyup', function () {
-//                    //    if (this.value) {
-//                    //        document.getElementById('postage-login').removeAttribute('disabled');
-//                    //    } else {
-//                    //        document.getElementById('postage-login').setAttribute('disabled', '');
-//                    //    }
-//                    //});
-//                    
-//                    document.getElementById('postage-login').addEventListener('click', function () {
-//                        var strUserName = document.getElementById('postage-uname').value;
-//                        
-//                        if (document.getElementById('postage-pword').value) {
-//                            GS.addLoader('super-log-in', 'Logging In...');
-//                            
-//                            GS.ajaxJSON('/v1/postage/auth/', 'action=login&session_user=' + encodeURIComponent(GS.getCookie('greyspots_uname')) +
-//                                                                          '&superusername=' + encodeURIComponent(strUserName) +
-//                                                                          '&superpassword=' + encodeURIComponent(document.getElementById('postage//-pword').value), function (data, error) {
-//                                GS.removeLoader('super-log-in');
-//                                GS.closeDialog(dialog, '');
-//                                window.superLogin = false;
-//                                
-//                                if (!error) {
-//                                    GS.setCookie('postage_uname', strUserName, 30);
-//                                    
-//                                    if (typeof loggedInCallback === 'function') {
-//                                        GS.superUserLogin(loggedInCallback);
-//                                    }
-//                                    
-//                                } else {
-//                                    GS.superUserLogin(loggedInCallback, data.error_text);
-//                                }
-//                            });
-//                        }
-//                    });
-//                });
-//            }
-//        });
-//    }
-//};
-
 // check if the user is logged in as a normal user
 // if there is no login dialog create it then open it
 GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomain) {
@@ -211,7 +109,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         
         // this action checks to see if we are logged in as a super user
         // if not, open a login dialog
-        GS.ajaxJSON((location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + 'env/action_info', '', function (data, error) {
+        GS.ajaxJSON('/env/action_info', '', function (data, error) {
             var templateElement = document.createElement('template');
             
             if (!error && data.dat) {
@@ -276,7 +174,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                         if (document.getElementById('normal-pword').value) {
                             GS.addLoader('log-in', 'Logging In...');
                             
-                            GS.ajaxJSON((location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + 'env/auth', 'action=login' +
+                            GS.ajaxJSON('/env/auth', 'action=login' +
                                                        '&username=' + encodeURIComponent(document.getElementById('normal-uname').value) +
                                                        '&password=' + encodeURIComponent(document.getElementById('normal-pword').value),
                                                        function (data, error) {

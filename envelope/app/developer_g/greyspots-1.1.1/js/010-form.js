@@ -8,7 +8,7 @@ window.addEventListener('design-register-element', function () {
                                                     '    </template>\n' +
                                                     '</gs-form>');
     
-    designRegisterElement('gs-form', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-form.html');
+    designRegisterElement('gs-form', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-form.html');
     
     window.designElementProperty_GSFORM = function (selectedElement) {
         addProp('Source', true, '<gs-memo class="target" value="' + encodeHTML(decodeURIComponent(selectedElement.getAttribute('src') ||
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') ||
                                                                         element.getAttribute('source') || ''));
             
-            strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-update') || 'env/action_update') + '?src=' + encodeURIComponent(strSource);
+            strLink = '/' + (element.getAttribute('action-update') || 'env/action_update') + '?src=' + encodeURIComponent(strSource);
             
             parentRecordElement = GS.findParentElement(updateElement, '.form-record');
             
@@ -484,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if (element.bolCurrentlySaving === false && !element.bolErrorOpen) {
                 strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') || element.getAttribute('source') || ''));
-                strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-update') || 'env/action_update');
+                strLink = '/' + (element.getAttribute('action-update') || 'env/action_update');
                 
                 functionUpdateRecord = function (strID, strColumn, recordIndex, strParameters) {
                     element.bolCurrentlySaving = true;
@@ -645,7 +645,7 @@ document.addEventListener('DOMContentLoaded', function () {
             //}
             
             if (element.getAttribute('where') !== 'false') {
-                strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
+                strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
                 
                 strLink += '&where='    + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('where') || ''))) +
                            '&limit='    + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('limit') || '1'))) +

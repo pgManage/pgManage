@@ -4,11 +4,7 @@ window.addEventListener('design-register-element', function () {
                                                               '    <gs-option value="${2}">${3}</gs-option>\n' +
                                                               '</gs-optionbox>');
     
-    designRegisterElement('gs-optionbox', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html');
-    
-    /*registerDesignSnippet('<gs-option>', '<gs-option>', 'gs-option value="${1}">${2}</gs-option>');
-    
-    designRegisterElement('gs-option', '/v1/dev/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html');*/
+    designRegisterElement('gs-optionbox', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html');
     
     window.designElementProperty_GSOPTIONBOX = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {

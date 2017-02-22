@@ -3,7 +3,7 @@ window.addEventListener('design-register-element', function () {
                                                         '    <option>${0}</option>\n' +
                                                         '</gs-select>');
 
-    designRegisterElement('gs-select', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-select.html');
+    designRegisterElement('gs-select', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-select.html');
 
     window.designElementProperty_GSSELECT = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {

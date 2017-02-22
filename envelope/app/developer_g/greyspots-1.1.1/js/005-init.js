@@ -263,55 +263,6 @@ window.addEventListener('click', function (event) {
 });
 
 
-// ##############################################################
-// ########### PINK BACKGROUND WHEN NOT IN PRODUCTION ###########
-// ##############################################################
-/*
-window.addEventListener('load', function () {
-    var strPostageUserName = GS.getCookie('postage_uname'), styleElement, helperElement, helperFunction;
-    
-    if (strPostageUserName &&
-        window.location.host.indexOf(strPostageUserName) === 0 &&
-        window.location.pathname !== '/env/app/all/index.html' &&
-        window.location.pathname.indexOf('/v1/dev') !== 0) {
-        
-        styleElement = document.createElement('style');
-        styleElement.innerHTML = 'body, body gs-panel, body gs-panel gs-header, body gs-panel gs-body, ' +
-                                 'body gs-page, body gs-page gs-header, body gs-page gs-body {\n' +
-                                 '    background-color: #FFBBBB;\n' +
-                                 '}';
-        
-        document.head.appendChild(styleElement);
-        
-        helperFunction = function () {
-            if (helperElement.parentNode === document.body) {
-                helperElement.innerHTML = 'Width: ' + window.innerWidth + '<br />' +
-                                          'Height: ' + window.innerHeight + '<br />' +
-                                          (window.innerWidth >= 768 && window.innerWidth < 992 ? 'small/sml' : '') +
-                                          (window.innerWidth >= 992 && window.innerWidth < 1200 ? 'medium/med' : '') +
-                                          (window.innerWidth >= 1200 ? 'large/lrg' : '');
-            }
-        };
-        
-        
-        helperElement = document.createElement('div');
-        helperElement.setAttribute('id', 'window-size-helper');
-        
-        document.body.appendChild(helperElement);
-        
-        helperFunction();
-        
-        helperElement.addEventListener('click', function () {
-            document.body.removeChild(helperElement);
-        });
-        
-        window.addEventListener('resize', function () {
-            helperFunction();
-        });
-    }
-});
-*/
-
 // #############################################################
 // ######################### PAGE CURL #########################
 // #############################################################
@@ -450,16 +401,7 @@ window.addEventListener('load', function () {
             menuElement.setAttribute('style', 'height: 0px;');
             
             // this is for envelope
-            if (location.pathname.indexOf('/v1/') === 0) {
-                strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Main Menu</a></b></center>';
-                strHTML += '<center>' +
-                                '<gs-button target="_self" href="/env/auth/?action=logout" inline>Log out</gs-button><br />' +
-                                '<gs-button onclick="GS.userChangePassword()" inline>Change Password</gs-button>' +
-                            '</center>';
-                intMaxHeight += 4.8;
-                
-            // and this is for the new envelope
-            } else if (location.pathname.indexOf('/env/') === 0) {
+            if (location.pathname.indexOf('/env/') === 0) {
                 strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Main Menu</a></b></center>';
                 strHTML += '<center>' +
                                 '<gs-button target="_self" href="/env/auth/?action=logout" inline>Log out</gs-button><br />' +
@@ -482,8 +424,7 @@ window.addEventListener('load', function () {
             strHTML += '<center><gs-button onclick="window.location.reload(true);" inline>Update Software</gs-button></center>';
             intMaxHeight += 1.9;
             
-            if (location.pathname.indexOf('/v1/') === 0 ||
-                location.pathname.indexOf('/env/') === 0) {
+            if (location.pathname.indexOf('/env/') === 0) {
                 strHTML += '<center><gs-button id="gs-button-about" inline>About</gs-button></center>';
                 intMaxHeight += 1.9;
             }
@@ -493,8 +434,7 @@ window.addEventListener('load', function () {
             menuElement.innerHTML = '<div id="gs-document-menu-link-container" style="height: ' + intMaxHeight + 'em;">' + strHTML + '</div>';
             document.body.appendChild(menuElement);
             
-            if (location.pathname.indexOf('/v1/') === 0 ||
-                location.pathname.indexOf('/env/') === 0) {
+            if (location.pathname.indexOf('/env/') === 0) {
                 document.getElementById('gs-button-about').addEventListener('click', aboutDialog);
             }
             

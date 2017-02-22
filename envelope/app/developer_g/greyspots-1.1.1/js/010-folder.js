@@ -34,7 +34,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-folder>', '<gs-folder>', 'gs-folder path="${0:/}" folder="${1:role}"></gs-folder>');
     
-    designRegisterElement('gs-folder', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-folder.html');
+    designRegisterElement('gs-folder', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-folder.html');
 });
 
 (function () {

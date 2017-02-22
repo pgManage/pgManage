@@ -4,7 +4,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-combo>', '<gs-combo>', 'gs-combo src="${1:test.tpeople}" column="${2}"></gs-combo>');
     
-    designRegisterElement('gs-combo', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-combo.html');
+    designRegisterElement('gs-combo', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-combo.html');
     
     window.designElementProperty_GSCOMBO = function (selectedElement) {
         addProp('Source', true,
@@ -892,11 +892,11 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // if there is a initial query and this is the inital load: prepare the parameters for a fetch that would use the initial query
             if (strInitalize && bolInitalLoad) {
-                strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strInitalize);
+                strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strInitalize);
                 
             // else: use the source query and prepare the parameters for a fetch that would use the source query
             } else {
-                strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
+                strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
             }
             
             //console.log(strLink);

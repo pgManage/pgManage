@@ -278,7 +278,6 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             var bolCols = false, bolTables = false, bolSchemas = false, bolTableFuncs = false, bolBuiltins = false, bolGroups = false, bolUsers = false, bolReturnTypes = false, bolTypes = false, bolLanguages = false, bolRules = false, bolTablespace = false;
             bolFirstSpace = bolCurrentCharWhitespace && !bolPreviousCharWhitespace;
             
-            
             if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && !bolCurrentCharWhitespace && (bolPreviousCharWhitespace || bolPreviousCharOpenParen || strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_')) {
             
                 if (arrPreviousKeyWords[1] === 'INSERT' && strPreviousKeyWord === 'INTO') {
@@ -356,7 +355,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 } else if (strPreviousKeyWord === 'RULE') {
                     //console.log('rules');
                     bolRules = true;
-                    arrQueries = [autocompleteQuery.rules];
+                    //arrQueries = [autocompleteQuery.rules];
                 } else if (strPreviousKeyWord === 'GRANT') {
                     //console.log('groups');
                     bolGroups = true;
@@ -423,9 +422,9 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     }
                 } if (bolBuiltins) {
                     if (arrQueries) {
-                       arrQueries.push(autocompleteQuery.builtIns);
+                       arrQueries.push(autocompleteQuery.funcSnippets);//builtIns);
                     } else {
-                       arrQueries = [autocompleteQuery.builtIns];
+                       arrQueries = [autocompleteQuery.funcSnippets];//builtIns];
                     }
                 } if (bolGroups) {
                     if (arrQueries) {
@@ -473,7 +472,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 }
                 
                 
-                //console.log(arrQueries);
+                console.log(arrQueries);
                 
                 if (arrQueries) {
                     for (var i = 0, len = arrQueries.length; i < len; i++) {
@@ -502,7 +501,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 
                 arrQueries = [];
                 
-//                console.log(' bolCols: ' + bolCols + ' bolTables: ' + bolTables + ' bolSchemas: ' + bolSchemas + ' bolTableFuncs: ' + bolTableFuncs + ' bolBuiltins: ' + bolBuiltins + ' bolGroups: ' + bolGroups + ' bolUsers: ' + bolUsers + ' bolReturnTypes: ' + bolReturnTypes + ' bolTypes: ' + bolTypes + ' bolLanguages: ' + bolLanguages + ' bolRules: ' + bolRules + ' bolTablespace: ' + bolTablespace);
+                //console.log(' bolCols: ' + bolCols + ' bolTables: ' + bolTables + ' bolSchemas: ' + bolSchemas + ' bolTableFuncs: ' + bolTableFuncs + ' bolBuiltins: ' + bolBuiltins + ' bolGroups: ' + bolGroups + ' bolUsers: ' + bolUsers + ' bolReturnTypes: ' + bolReturnTypes + ' bolTypes: ' + bolTypes + ' bolLanguages: ' + bolLanguages + ' bolRules: ' + bolRules + ' bolTablespace: ' + bolTablespace);
                 
                 bolCols = false;
                 bolTables = false;

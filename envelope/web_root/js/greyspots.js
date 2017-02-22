@@ -5035,55 +5035,6 @@ window.addEventListener('click', function (event) {
 });
 
 
-// ##############################################################
-// ########### PINK BACKGROUND WHEN NOT IN PRODUCTION ###########
-// ##############################################################
-/*
-window.addEventListener('load', function () {
-    var strPostageUserName = GS.getCookie('postage_uname'), styleElement, helperElement, helperFunction;
-    
-    if (strPostageUserName &&
-        window.location.host.indexOf(strPostageUserName) === 0 &&
-        window.location.pathname !== '/env/app/all/index.html' &&
-        window.location.pathname.indexOf('/v1/dev') !== 0) {
-        
-        styleElement = document.createElement('style');
-        styleElement.innerHTML = 'body, body gs-panel, body gs-panel gs-header, body gs-panel gs-body, ' +
-                                 'body gs-page, body gs-page gs-header, body gs-page gs-body {\n' +
-                                 '    background-color: #FFBBBB;\n' +
-                                 '}';
-        
-        document.head.appendChild(styleElement);
-        
-        helperFunction = function () {
-            if (helperElement.parentNode === document.body) {
-                helperElement.innerHTML = 'Width: ' + window.innerWidth + '<br />' +
-                                          'Height: ' + window.innerHeight + '<br />' +
-                                          (window.innerWidth >= 768 && window.innerWidth < 992 ? 'small/sml' : '') +
-                                          (window.innerWidth >= 992 && window.innerWidth < 1200 ? 'medium/med' : '') +
-                                          (window.innerWidth >= 1200 ? 'large/lrg' : '');
-            }
-        };
-        
-        
-        helperElement = document.createElement('div');
-        helperElement.setAttribute('id', 'window-size-helper');
-        
-        document.body.appendChild(helperElement);
-        
-        helperFunction();
-        
-        helperElement.addEventListener('click', function () {
-            document.body.removeChild(helperElement);
-        });
-        
-        window.addEventListener('resize', function () {
-            helperFunction();
-        });
-    }
-});
-*/
-
 // #############################################################
 // ######################### PAGE CURL #########################
 // #############################################################
@@ -5222,16 +5173,7 @@ window.addEventListener('load', function () {
             menuElement.setAttribute('style', 'height: 0px;');
             
             // this is for envelope
-            if (location.pathname.indexOf('/v1/') === 0) {
-                strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Main Menu</a></b></center>';
-                strHTML += '<center>' +
-                                '<gs-button target="_self" href="/env/auth/?action=logout" inline>Log out</gs-button><br />' +
-                                '<gs-button onclick="GS.userChangePassword()" inline>Change Password</gs-button>' +
-                            '</center>';
-                intMaxHeight += 4.8;
-                
-            // and this is for the new envelope
-            } else if (location.pathname.indexOf('/env/') === 0) {
+            if (location.pathname.indexOf('/env/') === 0) {
                 strHTML += '<center><b><a target="_self" href="/env/app/all/index.html">Back To Main Menu</a></b></center>';
                 strHTML += '<center>' +
                                 '<gs-button target="_self" href="/env/auth/?action=logout" inline>Log out</gs-button><br />' +
@@ -5254,8 +5196,7 @@ window.addEventListener('load', function () {
             strHTML += '<center><gs-button onclick="window.location.reload(true);" inline>Update Software</gs-button></center>';
             intMaxHeight += 1.9;
             
-            if (location.pathname.indexOf('/v1/') === 0 ||
-                location.pathname.indexOf('/env/') === 0) {
+            if (location.pathname.indexOf('/env/') === 0) {
                 strHTML += '<center><gs-button id="gs-button-about" inline>About</gs-button></center>';
                 intMaxHeight += 1.9;
             }
@@ -5265,8 +5206,7 @@ window.addEventListener('load', function () {
             menuElement.innerHTML = '<div id="gs-document-menu-link-container" style="height: ' + intMaxHeight + 'em;">' + strHTML + '</div>';
             document.body.appendChild(menuElement);
             
-            if (location.pathname.indexOf('/v1/') === 0 ||
-                location.pathname.indexOf('/env/') === 0) {
+            if (location.pathname.indexOf('/env/') === 0) {
                 document.getElementById('gs-button-about').addEventListener('click', aboutDialog);
             }
             
@@ -8132,7 +8072,7 @@ window.addEventListener('design-register-element', function () {
                     
                     GS.ajaxJSON(
                         location.pathname.indexOf('/env/') === 0 ? 
-                        '/env/auth' : ((location.pathname.indexOf('/v1/') === 0 ? '/v1/' + strLink : '') + '/postage/auth'), parameters, function (data, error) {
+                        '/env/auth' : '/postage/auth', parameters, function (data, error) {
                         if (!error) {
                             GS.pushMessage('Password Successfully Changed', 1000);
                             GS.closeDialog(dialog, 'change');
@@ -8156,108 +8096,6 @@ window.addEventListener('design-register-element', function () {
     //};
 })();
 
-//// check if the user is logged in as a superuser
-//// if there is no login dialog create it then open it
-//GS.superUserLogin = function (loggedInCallback, strOldError) {
-//    'use strict';
-//    GS.removeAllLoaders();
-//    
-//    if (!window.superLogin) {
-//        window.superLogin = true;
-//        // this action checks to see if we are logged in as a super user
-//        // if not, open a login dialog
-//        GS.ajaxJSON('/env/action_info', '', function (data, error) {
-//            var templateElement = document.createElement('template');
-//            
-//            if (!error && data.dat && data.dat.superusername) {
-//                if (typeof loggedInCallback === 'function') {
-//                    loggedInCallback(data.dat);
-//                }
-//            } else {
-//                templateElement.innerHTML = ml(function () {/*
-//                    <gs-page>
-//                        <gs-header><center><h3>Login as a Superuser</h3></center></gs-header>
-//                        <gs-body padded>
-//                            You are not currently logged in as a superuser, please fill in the login form below.
-//                            <br /><br />
-//                            <label for="postage-uname">Username:</label>
-//                            <gs-text id="postage-uname" autocapitalize="off" autocomplete="off" autocorrect="off"></gs-text>
-//                            <label for="postage-pword">Password:</label>
-//                            <gs-text id="postage-pword" type="password"></gs-text>
-//                            {{ERROR}}
-//                        </gs-body>
-//                        <gs-footer>
-//                            <gs-grid>
-//                                <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
-//                                <gs-block><gs-button id="postage-login">Log In</gs-button></gs-block>
-//                            </gs-grid>
-//                        </gs-footer>
-//                    </gs-page>
-//                */}).replace('{{ERROR}}', (strOldError ? '<br /><div style="color: #FF0000">' + strOldError + '</div>' : ''));
-//                
-//                if (GS.getCookie('postage_uname')) {
-//                    xtag.query(templateElement.content, '#postage-uname')[0].setAttribute('value', decodeURIComponent(GS.getCookie//('postage_uname')));
-//                    xtag.query(templateElement.content, '#postage-pword')[0].setAttribute('autofocus', '');
-//                } else {
-//                    xtag.query(templateElement.content, '#postage-uname')[0].setAttribute('autofocus', '');
-//                }
-//                
-//                GS.openDialog(templateElement, function () {
-//                    var dialog = this;
-//                    
-//                    document.getElementById('postage-pword').addEventListener('keydown', function (event) {
-//                        var intKeyCode = event.which || event.keyCode;
-//                        
-//                        if (intKeyCode === 13) {
-//                            GS.triggerEvent(document.getElementById('postage-login'), 'click');
-//                        }
-//                        //if (this.value) {
-//                        //    document.getElementById('postage-login').removeAttribute('disabled');
-//                        //} else {
-//                        //    document.getElementById('postage-login').setAttribute('disabled', '');
-//                        //}
-//                    });
-//                    
-//                    //document.getElementById('postage-pword').addEventListener('keyup', function () {
-//                    //    if (this.value) {
-//                    //        document.getElementById('postage-login').removeAttribute('disabled');
-//                    //    } else {
-//                    //        document.getElementById('postage-login').setAttribute('disabled', '');
-//                    //    }
-//                    //});
-//                    
-//                    document.getElementById('postage-login').addEventListener('click', function () {
-//                        var strUserName = document.getElementById('postage-uname').value;
-//                        
-//                        if (document.getElementById('postage-pword').value) {
-//                            GS.addLoader('super-log-in', 'Logging In...');
-//                            
-//                            GS.ajaxJSON('/v1/postage/auth/', 'action=login&session_user=' + encodeURIComponent(GS.getCookie('greyspots_uname')) +
-//                                                                          '&superusername=' + encodeURIComponent(strUserName) +
-//                                                                          '&superpassword=' + encodeURIComponent(document.getElementById('postage//-pword').value), function (data, error) {
-//                                GS.removeLoader('super-log-in');
-//                                GS.closeDialog(dialog, '');
-//                                window.superLogin = false;
-//                                
-//                                if (!error) {
-//                                    GS.setCookie('postage_uname', strUserName, 30);
-//                                    
-//                                    if (typeof loggedInCallback === 'function') {
-//                                        GS.superUserLogin(loggedInCallback);
-//                                    }
-//                                    
-//                                } else {
-//                                    GS.superUserLogin(loggedInCallback, data.error_text);
-//                                }
-//                            });
-//                        }
-//                    });
-//                });
-//            }
-//        });
-//    }
-//};
-
 // check if the user is logged in as a normal user
 // if there is no login dialog create it then open it
 GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomain) {
@@ -8269,7 +8107,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         
         // this action checks to see if we are logged in as a super user
         // if not, open a login dialog
-        GS.ajaxJSON((location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + 'env/action_info', '', function (data, error) {
+        GS.ajaxJSON('/env/action_info', '', function (data, error) {
             var templateElement = document.createElement('template');
             
             if (!error && data.dat) {
@@ -8334,7 +8172,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                         if (document.getElementById('normal-pword').value) {
                             GS.addLoader('log-in', 'Logging In...');
                             
-                            GS.ajaxJSON((location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + 'env/auth', 'action=login' +
+                            GS.ajaxJSON('/env/auth', 'action=login' +
                                                        '&username=' + encodeURIComponent(document.getElementById('normal-uname').value) +
                                                        '&password=' + encodeURIComponent(document.getElementById('normal-pword').value),
                                                        function (data, error) {
@@ -10596,7 +10434,7 @@ window.addEventListener('design-register-element', function () {
                                                     '    $0\n' +
                                                     '</gs-body>');
     
-    designRegisterElement('gs-body', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
+    designRegisterElement('gs-body', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -10612,7 +10450,7 @@ document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
     function defineButton(strTagName, strDocLink, arrDisableWhenEmptyAttributes, designAdditionalFunction, clickFunction) {
-        strDocLink = strDocLink || (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html';
+        strDocLink = strDocLink || '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html';
         designAdditionalFunction = designAdditionalFunction || function () {};
         clickFunction = clickFunction || function () {};
 
@@ -11369,7 +11207,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     
     defineButton('gs-delete-button',
-                 (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-delete-button.html',
+                 '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-delete-button.html',
                  ['value', 'src'],
                  function (selectedElement) {
         addProp('Source', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('src') || '') + '" mini></gs-text>', function () {
@@ -11483,7 +11321,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (strAnswer === 'Yes') {
                         GS.addLoader('gs-delete', 'Deleting Record...');
                         
-                        GS.ajaxJSON((location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-delete') || 'env/action_delete'),
+                        GS.ajaxJSON('/' + (element.getAttribute('action-delete') || 'env/action_delete'),
                                     'src=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src')))) +
                                     '&id=' + element.getAttribute('value'),
                                     function (data, error) {
@@ -11506,13 +11344,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     
     defineButton('gs-option',
-                 (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html',
+                 '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html',
                  [],
                  function (selectedElement) {},
                  function (element) {});
     
     defineButton('gs-dialog-button',
-        (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-dialog-button.html',
+        '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-dialog-button.html',
         [],
         function (selectedElement) { // design code
             addProp('Template', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('template') || '') + '" mini></gs-text>', function () {
@@ -11631,7 +11469,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-button>', '<gs-button>', 'gs-button>${1}</gs-button>');
     
-    designRegisterElement('gs-button', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html');
+    designRegisterElement('gs-button', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html');
     
     window.designElementProperty_GSBUTTON = function(selectedElement) {
         var strIconPos, strIconRotation;
@@ -12296,7 +12134,7 @@ window.addEventListener('design-register-element', function () {
                     '<gs-checkbox id="${1:date-insert-ready_to_ship}" type="smallint" column="${3:ready_to_ship}"></gs-checkbox>');
 
     designRegisterElement('gs-checkbox',
-                            (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-checkbox.html');
+                            '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-checkbox.html');
 
     window.designElementProperty_GSCHECKBOX = function(selectedElement) {
         var strVisibilityAttribute;
@@ -12883,7 +12721,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-combo>', '<gs-combo>', 'gs-combo src="${1:test.tpeople}" column="${2}"></gs-combo>');
     
-    designRegisterElement('gs-combo', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-combo.html');
+    designRegisterElement('gs-combo', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-combo.html');
     
     window.designElementProperty_GSCOMBO = function (selectedElement) {
         addProp('Source', true,
@@ -13771,11 +13609,11 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // if there is a initial query and this is the inital load: prepare the parameters for a fetch that would use the initial query
             if (strInitalize && bolInitalLoad) {
-                strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strInitalize);
+                strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strInitalize);
                 
             // else: use the source query and prepare the parameters for a fetch that would use the source query
             } else {
-                strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
+                strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
             }
             
             //console.log(strLink);
@@ -14453,7 +14291,7 @@ window.addEventListener('design-register-element', function () {
                                                                 '    ${0}\n' +
                                                                 '</gs-container>');
     
-    designRegisterElement('gs-container', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-container-jumbo.html');
+    designRegisterElement('gs-container', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-container-jumbo.html');
     
     window.designElementProperty_GSCONTAINER = function(selectedElement) {
         var strVisibilityAttribute;
@@ -14759,7 +14597,7 @@ window.addEventListener('design-register-element', function (event) {
             '    <template for="insert"></template>\n' +
             '</gs-datasheet>');
     
-    designRegisterElement('gs-datasheet', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-datasheet.html');
+    designRegisterElement('gs-datasheet', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-datasheet.html');
     
     window.designElementProperty_GSDATASHEET = function (selectedElement) {
         addProp('Source', true,
@@ -18045,7 +17883,7 @@ document.addEventListener('DOMContentLoaded', function () {
     registerDesignSnippet('<gs-date> With Label', '<gs-date>', 'label for="${1:date-insert-start_date}">${2:Start Date}:</label>\n' +
                                                                '<gs-date id="${1:date-insert-start_date}" column="${3:start_date}"></gs-date>');
     
-    designRegisterElement('gs-date', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-date.html');
+    designRegisterElement('gs-date', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-date.html');
     
     window.designElementProperty_GSDATE = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
@@ -19068,6 +18906,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             
                             // if shift, command and option keys are not down
                             if (!event.shiftKey && !event.metaKey && !event.ctrlKey) {
+                                event.stopPropagation();
                                 
                                 jsnState = getControlState(this)
                                 jsnTextSelection =      jsnState.jsnTextSelection
@@ -21225,7 +21064,7 @@ GS.closeDialog = function (dialog, strAnswer) {
                                                             '    <template for="insert"></template>\n' +
                                                             '</gs-envelope>');
     
-    designRegisterElement('gs-envelope', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-envelope.html');
+    designRegisterElement('gs-envelope', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-envelope.html');
     
     window.designElementProperty_GSENVELOPE = function (selectedElement) {
         var intIdNumber = (Math.floor(Math.random() * 1000)) + (Math.floor(new Date().getTime() / (Math.random() * 100000)));
@@ -21542,7 +21381,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                                                     element.getAttribute('source') || '')),
             strCols = GS.templateWithQuerystring(element.getAttribute('cols') || ''), callbackFunction, i, len;
         
-        strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
+        strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
         
         // if there is a column attribute on element element: combine the where attribute with a where generated by value
         if ((element.getAttribute('column') || element.getAttribute('qs')) && element.value) {
@@ -21752,7 +21591,7 @@ document.addEventListener('DOMContentLoaded', function () {
             strWhere = strWhere + element.arrWhereColumns[i] + '=' + record.getAttribute('data-' + element.arrWhereColumns[i]);
         }
         
-        strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-update') || 'env/action_update') + '?src=' + encodeURIComponent(strSource);
+        strLink = '/' + (element.getAttribute('action-update') || 'env/action_update') + '?src=' + encodeURIComponent(strSource);
         
         strLink +=  '&where=' +  encodeURIComponent(strWhere) +
                     '&column=' + strColumn +
@@ -21914,7 +21753,7 @@ document.addEventListener('DOMContentLoaded', function () {
             strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') ||
                                                                        element.getAttribute('source') || ''));
         
-        strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-delete') || 'env/action_delete') +
+        strLink = '/' + (element.getAttribute('action-delete') || 'env/action_delete') +
                                     '?src=' + encodeURIComponent(strSource) + '&id=' + strIDs;
         
         addLoader(element, 'Deleting Record...');
@@ -21982,7 +21821,7 @@ document.addEventListener('DOMContentLoaded', function () {
             strInsertString += (strInsertString ? '&' : '') + (element.getAttribute('child-column') || element.getAttribute('column') || element.getAttribute('qs')) + '=' + (element.value);
         }
         
-        strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-insert') || 'env/action_insert') + '?src=' + encodeURIComponent(strSource) +
+        strLink = '/' + (element.getAttribute('action-insert') || 'env/action_insert') + '?src=' + encodeURIComponent(strSource) +
                                                                                         '&data=' + encodeURIComponent(strInsertString);
         
         addLoader(element, 'Inserting Record...');
@@ -23808,7 +23647,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-file-manager>', '<gs-file-manager>', 'gs-file-manager path="${0:/}" folder="${1:role}"></gs-file-manager>');
     
-    designRegisterElement('gs-file-manager', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-file-manager.html');
+    designRegisterElement('gs-file-manager', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-file-manager.html');
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -24160,6 +23999,7 @@ document.addEventListener('DOMContentLoaded', function () {
             editFile: function (strPath) {
                 var element = this, strFolder = this.getAttribute('folder'), strLink;
                 
+                /*
                 //console.log('editFile: ', strPath);
                 if (strFolder === 'dev') {
                     strLink = '/v1/dev/developer_g/greyspots-' + GS.version() + '/tools/file_manager/file_edit.html';
@@ -24170,6 +24010,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     strLink = '/v1/dev/developer_g/greyspots-' + GS.version() + '/tools/file_manager/file_edit.html';
                 }
+                */
+                strLink = '/env/app/all/file_manager/file_edit.html';
                 
                 GS.msgbox('Update File',
                           '<gs-button jumbo dialogclose>Rename File</gs-button>' +
@@ -24361,7 +24203,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-folder>', '<gs-folder>', 'gs-folder path="${0:/}" folder="${1:role}"></gs-folder>');
     
-    designRegisterElement('gs-folder', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-folder.html');
+    designRegisterElement('gs-folder', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-folder.html');
 });
 
 (function () {
@@ -25234,7 +25076,7 @@ window.addEventListener('design-register-element', function () {
                                                     '    ${0}\n' +
                                                     '</gs-font>');
     
-    designRegisterElement('gs-font', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-font.html');
+    designRegisterElement('gs-font', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-font.html');
     
     window.designElementProperty_GSFONT = function (selectedElement) {
         addProp('Min-Width Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('min-width') || '') + '" mini></gs-text>', function () {
@@ -25486,7 +25328,7 @@ window.addEventListener('design-register-element', function () {
     'use strict';
     registerDesignSnippet('<gs-footer>', '<gs-footer>', 'gs-footer>$0</gs-footer>');
 
-    designRegisterElement('gs-footer', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
+    designRegisterElement('gs-footer', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
 
     window.designElementProperty_GSFOOTER = function (selectedElement) {
         // visibility attributes
@@ -25563,7 +25405,7 @@ window.addEventListener('design-register-element', function () {
                                                     '    </template>\n' +
                                                     '</gs-form>');
     
-    designRegisterElement('gs-form', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-form.html');
+    designRegisterElement('gs-form', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-form.html');
     
     window.designElementProperty_GSFORM = function (selectedElement) {
         addProp('Source', true, '<gs-memo class="target" value="' + encodeHTML(decodeURIComponent(selectedElement.getAttribute('src') ||
@@ -25786,7 +25628,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') ||
                                                                         element.getAttribute('source') || ''));
             
-            strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-update') || 'env/action_update') + '?src=' + encodeURIComponent(strSource);
+            strLink = '/' + (element.getAttribute('action-update') || 'env/action_update') + '?src=' + encodeURIComponent(strSource);
             
             parentRecordElement = GS.findParentElement(updateElement, '.form-record');
             
@@ -26039,7 +25881,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if (element.bolCurrentlySaving === false && !element.bolErrorOpen) {
                 strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') || element.getAttribute('source') || ''));
-                strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-update') || 'env/action_update');
+                strLink = '/' + (element.getAttribute('action-update') || 'env/action_update');
                 
                 functionUpdateRecord = function (strID, strColumn, recordIndex, strParameters) {
                     element.bolCurrentlySaving = true;
@@ -26200,7 +26042,7 @@ document.addEventListener('DOMContentLoaded', function () {
             //}
             
             if (element.getAttribute('where') !== 'false') {
-                strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
+                strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
                 
                 strLink += '&where='    + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('where') || ''))) +
                            '&limit='    + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('limit') || '1'))) +
@@ -26896,7 +26738,7 @@ window.addEventListener('design-register-element', function () {
                                                     '    <gs-block>${2}</gs-block>\n' +
                                                     '</gs-grid>');
     
-    designRegisterElement('gs-grid', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
+    designRegisterElement('gs-grid', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
     
     window.designElementProperty_GSGRID = function(selectedElement) {
         addProp('Min-Width Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('min-width') || '') + '" mini></gs-text>', function () {
@@ -26983,7 +26825,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-block>', '<gs-block>', 'gs-block>${2}</gs-block>');
     
-    designRegisterElement('gs-block', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
+    designRegisterElement('gs-block', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
     
     window.designElementProperty_GSBLOCK = function(selectedElement) {
         addProp('Width:', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('width') || '') + '" mini></gs-text>', function () {
@@ -27760,7 +27602,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('Header', '<gs-header>', '<gs-header><h3>$0</h3></gs-header>');
     registerDesignSnippet('<gs-header>', '<gs-header>', 'gs-header><h3>$0</h3></gs-header>');
     
-    designRegisterElement('gs-header', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
+    designRegisterElement('gs-header', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
     
     window.designElementProperty_GSHEADER = function(selectedElement) {
         // TITLE attribute
@@ -27838,7 +27680,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-img>', '<gs-img>', 'gs-img src="${1}"></gs-img>');
     
-    designRegisterElement('gs-img', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-image.html');
+    designRegisterElement('gs-img', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-image.html');
     
     window.designElementProperty_GSIMG = function(selectedElement) {
         addProp('Min-Width Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('min-width') || '') + '" mini></gs-text>', function () {
@@ -28136,7 +27978,7 @@ window.addEventListener('design-register-element', function () {
                                                         '    ${2}\n' +
                                                         '</gs-insert>');
     
-    designRegisterElement('gs-insert', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-insert.html');
+    designRegisterElement('gs-insert', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-insert.html');
     
     window.designElementProperty_GSINSERT = function(selectedElement) {
         addProp('Source&nbsp;Query', true,
@@ -28330,7 +28172,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         strParameters += '&currval=' + element.getAttribute('seq');
                     }
                     
-                    strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') +
+                    strLink = '/' +
                               (element.getAttribute('action-insert') || 'env/action_insert');
                     
                     // add a loader to the page
@@ -29762,7 +29604,7 @@ window.addEventListener('design-register-element', function () {
                                                                 '    ${0}\n' +
                                                                 '</gs-jumbo>');
     
-    designRegisterElement('gs-jumbo', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-container-jumbo.html');
+    designRegisterElement('gs-jumbo', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-container-jumbo.html');
     
     window.designElementProperty_GSJUMBO = function(selectedElement) {
         // TITLE attribute
@@ -29839,7 +29681,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('Dynamic Template <gs-listbox>', '<gs-listbox>', 'gs-listbox src="${1:test.tpeople}"></gs-listbox>');
     registerDesignSnippet('<gs-listbox>', '<gs-listbox>', 'gs-listbox src="${1:test.tpeople}"></gs-listbox>');
     
-    designRegisterElement('gs-listbox', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-listbox.html');
+    designRegisterElement('gs-listbox', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-listbox.html');
     
     window.designElementProperty_GSLISTBOX = function(selectedElement) {
         addProp('Source', true, '<gs-memo class="target" value="' + encodeHTML(decodeURIComponent(selectedElement.getAttribute('src') ||
@@ -30220,7 +30062,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') ||
                                                                    element.getAttribute('source') || ''));
             
-            strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-select') || 'env/action_select') +
+            strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') +
                     '?src=' + encodeURIComponent(strSource) +
                     '&where='    + encodeURIComponent(GS.templateWithQuerystring(element.getAttribute('where') || '')) +
                     '&limit='    + encodeURIComponent(GS.templateWithQuerystring(element.getAttribute('limit') || '')) +
@@ -31065,7 +30907,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-memo> With Label', '<gs-memo>', 'label for="${1:memo-insert-note}">${2:Notes}:</label>\n' +
                                                                '<gs-memo id="${1:memo-insert-note}" column="${3:note}"></gs-memo>');
     
-    designRegisterElement('gs-memo', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-memo.html');
+    designRegisterElement('gs-memo', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-memo.html');
     
     window.designElementProperty_GSMEMO = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
@@ -31668,7 +31510,7 @@ window.addEventListener('design-register-element', function () {
                                                         '    </gs-scroller-inner>\n' +
                                                         '</gs-scroller>');
     
-    designRegisterElement('gs-scroller', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-scroller.html');
+    designRegisterElement('gs-scroller', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-scroller.html');
     
     window.designElementProperty_GSSCROLLER = function (selectedElement) {
         // TITLE attribute
@@ -32124,7 +31966,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-number> With Label', '<gs-number>', 'label for="${1:number-insert-qty}">${2:Quantity}:</label>\n' +
                                                                    '<gs-number id="${1:number-insert-qty}" column="${3:qty}"></gs-number>');
     
-    designRegisterElement('gs-number', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-number.html');
+    designRegisterElement('gs-number', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-number.html');
     
     window.designElementProperty_GSNUMBER = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
@@ -32770,11 +32612,7 @@ window.addEventListener('design-register-element', function () {
                                                               '    <gs-option value="${2}">${3}</gs-option>\n' +
                                                               '</gs-optionbox>');
     
-    designRegisterElement('gs-optionbox', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html');
-    
-    /*registerDesignSnippet('<gs-option>', '<gs-option>', 'gs-option value="${1}">${2}</gs-option>');
-    
-    designRegisterElement('gs-option', '/v1/dev/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html');*/
+    designRegisterElement('gs-optionbox', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html');
     
     window.designElementProperty_GSOPTIONBOX = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
@@ -33356,7 +33194,7 @@ window.addEventListener('design-register-element', function () {
                                                          '    <gs-footer>${2}</gs-footer>\n' +
                                                          '</gs-page>');
     
-    designRegisterElement('gs-page', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
+    designRegisterElement('gs-page', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
     
     window.designElementProperty_GSPAGE = function (selectedElement) {
         // TITLE attribute
@@ -33521,7 +33359,7 @@ window.addEventListener('design-register-element', function () {
                                                       '    </gs-page>\n' +
                                                       '</gs-panel>');
     
-    designRegisterElement('gs-panel', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-panel.html');
+    designRegisterElement('gs-panel', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-panel.html');
     
     window.designElementProperty_GSPANEL = function(selectedElement) {
         // no-shadow-dismiss attribute
@@ -33858,7 +33696,7 @@ document.addEventListener('DOMContentLoaded', function () {
 window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-search>', '<gs-search>', 'gs-search id="${1}"></gs-search>');
 
-    designRegisterElement('gs-search', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-search.html');
+    designRegisterElement('gs-search', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-search.html');
 
     window.designElementProperty_GSSEARCH = function(selectedElement) {
         addProp('Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('placeholder') || '') + '" mini></gs-text>', function () {
@@ -34246,7 +34084,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                                         '    <option>${0}</option>\n' +
                                                         '</gs-select>');
 
-    designRegisterElement('gs-select', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-select.html');
+    designRegisterElement('gs-select', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-select.html');
 
     window.designElementProperty_GSSELECT = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
@@ -34729,7 +34567,7 @@ window.addEventListener('design-register-element', function () {
 
     registerDesignSnippet('<gs-static>', '<gs-static>', 'gs-static column="${1:name}"></gs-static>');
 
-    designRegisterElement('gs-static', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-static.html');
+    designRegisterElement('gs-static', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-static.html');
 
     window.designElementProperty_GSSTATIC = function (selectedElement) {
         addProp('Formatted&nbsp;Text', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('pre')) + '" mini></gs-checkbox>', function () {
@@ -35027,7 +34865,7 @@ window.addEventListener('design-register-element', function () {
                                                         '    </gs-sticky-inner>\n' +
                                                         '</gs-sticky>');
     
-    designRegisterElement('gs-sticky', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-sticky.html');
+    designRegisterElement('gs-sticky', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-sticky.html');
     
     window.designElementProperty_GSSTICKY = function (selectedElement) {
         addProp('Direction', true,  '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('direction') || '') + '" mini>' +
@@ -35235,7 +35073,7 @@ window.addEventListener('design-register-element', function () {
                                                         '    <template for="${2:detail}"></template>\n' +
                                                         '</gs-switch>');
 
-    designRegisterElement('gs-switch', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-switch.html');
+    designRegisterElement('gs-switch', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-switch.html');
 
     window.designElementProperty_GSSWITCH = function (selectedElement) {
 
@@ -35793,7 +35631,7 @@ window.addEventListener('design-register-element', function () {
             'label for="${1:text-insert-last_name}">${2:Last Name}:</label>\n' +
             '<gs-text id="${1:text-insert-last_name}" column="${3:last_name}"></gs-text>');
 
-    designRegisterElement('gs-text', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-text.html');
+    designRegisterElement('gs-text', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-text.html');
 
     window.designElementProperty_GSTEXT = function (selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
@@ -36270,7 +36108,7 @@ document.addEventListener('DOMContentLoaded', function () {
     registerDesignSnippet('<gs-time> With Label', '<gs-time>', 'label for="${1:time-insert-start_time}">${2:Start Time}:</label>\n' +
                                                                '<gs-time id="${1:time-insert-start_time}" column="${3:start_time}"></gs-time>');
 
-    designRegisterElement('gs-time', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-time.html');
+    designRegisterElement('gs-time', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-time.html');
 
     window.designElementProperty_GSTIME = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
@@ -37383,7 +37221,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-toggle>', '<gs-toggle>', 'gs-toggle column="${1}">${2}</gs-toggle>');
     
-    designRegisterElement('gs-toggle', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html');
+    designRegisterElement('gs-toggle', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html');
     
     window.designElementProperty_GSTOGGLE = function(selectedElement) {
         addProp('Icon', true, '<div flex-horizontal>' +
@@ -37973,8 +37811,7 @@ window.addEventListener('design-register-element', function () {
     
     //registerDesignSnippet('<gs-checkbox>', '<gs-checkbox>', 'gs-checkbox value="0" column="${1:ready_to_ship}">${2}</gs-checkbox>');
     
-    designRegisterElement('gs-tutorial',
-                            (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-tutorial.html');
+    designRegisterElement('gs-tutorial', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-tutorial.html');
     
     window.designElementProperty_GSTUTORIAL = function (selectedElement) {
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {

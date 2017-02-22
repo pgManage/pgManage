@@ -4,8 +4,7 @@ window.addEventListener('design-register-element', function () {
     
     //registerDesignSnippet('<gs-checkbox>', '<gs-checkbox>', 'gs-checkbox value="0" column="${1:ready_to_ship}">${2}</gs-checkbox>');
     
-    designRegisterElement('gs-tutorial',
-                            (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-tutorial.html');
+    designRegisterElement('gs-tutorial', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-tutorial.html');
     
     window.designElementProperty_GSTUTORIAL = function (selectedElement) {
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {

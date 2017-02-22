@@ -5,7 +5,7 @@ window.addEventListener('design-register-element', function () {
                                                     '    <gs-block>${2}</gs-block>\n' +
                                                     '</gs-grid>');
     
-    designRegisterElement('gs-grid', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
+    designRegisterElement('gs-grid', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
     
     window.designElementProperty_GSGRID = function(selectedElement) {
         addProp('Min-Width Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('min-width') || '') + '" mini></gs-text>', function () {
@@ -92,7 +92,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-block>', '<gs-block>', 'gs-block>${2}</gs-block>');
     
-    designRegisterElement('gs-block', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
+    designRegisterElement('gs-block', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
     
     window.designElementProperty_GSBLOCK = function(selectedElement) {
         addProp('Width:', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('width') || '') + '" mini></gs-text>', function () {

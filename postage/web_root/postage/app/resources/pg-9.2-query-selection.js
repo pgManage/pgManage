@@ -529,13 +529,12 @@ function selectionFindRange(tabElement, editor) {
 
     // clear selection range storage
     editor.currentQueryRange = null;
-
+    
     // if we found a query
     if (jsnQuery.intQueryStart !== jsnQuery.intQueryEnd) {
         // resolve query positions to jsn
         jsnQueryStart = indexToRowAndColumn(strScript, jsnQuery.intQueryStart);
         jsnQueryEnd = indexToRowAndColumn(strScript, jsnQuery.intQueryEnd);
-
         // set current range in the editor
         editor.currentQueryRange = {
             'start': jsnQueryStart,

@@ -6,7 +6,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-memo> With Label', '<gs-memo>', 'label for="${1:memo-insert-note}">${2:Notes}:</label>\n' +
                                                                '<gs-memo id="${1:memo-insert-note}" column="${3:note}"></gs-memo>');
     
-    designRegisterElement('gs-memo', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-memo.html');
+    designRegisterElement('gs-memo', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-memo.html');
     
     window.designElementProperty_GSMEMO = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {

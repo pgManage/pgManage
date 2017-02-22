@@ -10,7 +10,7 @@ window.addEventListener('design-register-element', function () {
                                                       '    </gs-page>\n' +
                                                       '</gs-panel>');
     
-    designRegisterElement('gs-panel', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-panel.html');
+    designRegisterElement('gs-panel', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-panel.html');
     
     window.designElementProperty_GSPANEL = function(selectedElement) {
         // no-shadow-dismiss attribute

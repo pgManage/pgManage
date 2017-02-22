@@ -4,7 +4,7 @@
     'use strict';
 
     function defineButton(strTagName, strDocLink, arrDisableWhenEmptyAttributes, designAdditionalFunction, clickFunction) {
-        strDocLink = strDocLink || (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html';
+        strDocLink = strDocLink || '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html';
         designAdditionalFunction = designAdditionalFunction || function () {};
         clickFunction = clickFunction || function () {};
 
@@ -761,7 +761,7 @@
     });
     
     defineButton('gs-delete-button',
-                 (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-delete-button.html',
+                 '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-delete-button.html',
                  ['value', 'src'],
                  function (selectedElement) {
         addProp('Source', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('src') || '') + '" mini></gs-text>', function () {
@@ -875,7 +875,7 @@
                     if (strAnswer === 'Yes') {
                         GS.addLoader('gs-delete', 'Deleting Record...');
                         
-                        GS.ajaxJSON((location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-delete') || 'env/action_delete'),
+                        GS.ajaxJSON('/' + (element.getAttribute('action-delete') || 'env/action_delete'),
                                     'src=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src')))) +
                                     '&id=' + element.getAttribute('value'),
                                     function (data, error) {
@@ -898,13 +898,13 @@
     });
     
     defineButton('gs-option',
-                 (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html',
+                 '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-optionbox.html',
                  [],
                  function (selectedElement) {},
                  function (element) {});
     
     defineButton('gs-dialog-button',
-        (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-dialog-button.html',
+        '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-dialog-button.html',
         [],
         function (selectedElement) { // design code
             addProp('Template', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('template') || '') + '" mini></gs-text>', function () {
@@ -1023,7 +1023,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-button>', '<gs-button>', 'gs-button>${1}</gs-button>');
     
-    designRegisterElement('gs-button', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html');
+    designRegisterElement('gs-button', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html');
     
     window.designElementProperty_GSBUTTON = function(selectedElement) {
         var strIconPos, strIconRotation;

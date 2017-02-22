@@ -4,7 +4,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('Header', '<gs-header>', '<gs-header><h3>$0</h3></gs-header>');
     registerDesignSnippet('<gs-header>', '<gs-header>', 'gs-header><h3>$0</h3></gs-header>');
     
-    designRegisterElement('gs-header', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
+    designRegisterElement('gs-header', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-page.html');
     
     window.designElementProperty_GSHEADER = function(selectedElement) {
         // TITLE attribute

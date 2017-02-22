@@ -2,7 +2,7 @@
 window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-search>', '<gs-search>', 'gs-search id="${1}"></gs-search>');
 
-    designRegisterElement('gs-search', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-search.html');
+    designRegisterElement('gs-search', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-search.html');
 
     window.designElementProperty_GSSEARCH = function(selectedElement) {
         addProp('Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('placeholder') || '') + '" mini></gs-text>', function () {

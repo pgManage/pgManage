@@ -4,7 +4,7 @@ window.addEventListener('design-register-element', function () {
                                                         '    ${2}\n' +
                                                         '</gs-insert>');
     
-    designRegisterElement('gs-insert', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-insert.html');
+    designRegisterElement('gs-insert', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-insert.html');
     
     window.designElementProperty_GSINSERT = function(selectedElement) {
         addProp('Source&nbsp;Query', true,
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         strParameters += '&currval=' + element.getAttribute('seq');
                     }
                     
-                    strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') +
+                    strLink = '/' +
                               (element.getAttribute('action-insert') || 'env/action_insert');
                     
                     // add a loader to the page

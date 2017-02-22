@@ -50,6 +50,19 @@ autocompleteQuery.tableFunctions = ml(function () {/*
     ) list_tables_functions
 */});
 
+autocompleteQuery.funcSnippets = ml(function () {/*
+    SELECT * FROM (
+        SELECT DISTINCT quote_ident(pr.proname) || '(' || COALESCE(pg_get_function_arguments(pr.oid), '') || ')' AS obj_name, 'funcSnippet'::text AS obj_meta
+            FROM pg_proc pr
+            JOIN pg_type typ ON typ.oid = pr.prorettype
+        LEFT JOIN pg_namespace ON pg_namespace.oid = pr.pronamespace
+            WHERE typname <> 'trigger'
+            AND pr.proname LIKE '{{searchStr}}'
+            AND COALESCE(pg_get_function_arguments(pr.oid), '') NOT ILIKE '%internal%'
+    ORDER BY obj_name
+    ) list_funcSnippets
+*/});
+
 autocompleteQuery.encodings = ml(function () {/*
     SELECT * FROM (
         SELECT encoding_name AS obj_name, 'Encoding' AS obj_meta

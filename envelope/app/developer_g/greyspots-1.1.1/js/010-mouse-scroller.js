@@ -8,7 +8,7 @@ window.addEventListener('design-register-element', function () {
                                                         '    </gs-scroller-inner>\n' +
                                                         '</gs-scroller>');
     
-    designRegisterElement('gs-scroller', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-scroller.html');
+    designRegisterElement('gs-scroller', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-scroller.html');
     
     window.designElementProperty_GSSCROLLER = function (selectedElement) {
         // TITLE attribute

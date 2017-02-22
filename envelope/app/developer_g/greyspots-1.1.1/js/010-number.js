@@ -5,7 +5,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-number> With Label', '<gs-number>', 'label for="${1:number-insert-qty}">${2:Quantity}:</label>\n' +
                                                                    '<gs-number id="${1:number-insert-qty}" column="${3:qty}"></gs-number>');
     
-    designRegisterElement('gs-number', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-number.html');
+    designRegisterElement('gs-number', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-number.html');
     
     window.designElementProperty_GSNUMBER = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {

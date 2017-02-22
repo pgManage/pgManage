@@ -8,7 +8,7 @@ window.addEventListener('design-register-element', function () {
                     '<gs-checkbox id="${1:date-insert-ready_to_ship}" type="smallint" column="${3:ready_to_ship}"></gs-checkbox>');
 
     designRegisterElement('gs-checkbox',
-                            (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-checkbox.html');
+                            '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-checkbox.html');
 
     window.designElementProperty_GSCHECKBOX = function(selectedElement) {
         var strVisibilityAttribute;

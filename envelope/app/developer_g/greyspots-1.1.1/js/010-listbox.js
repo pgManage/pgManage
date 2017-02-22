@@ -25,7 +25,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('Dynamic Template <gs-listbox>', '<gs-listbox>', 'gs-listbox src="${1:test.tpeople}"></gs-listbox>');
     registerDesignSnippet('<gs-listbox>', '<gs-listbox>', 'gs-listbox src="${1:test.tpeople}"></gs-listbox>');
     
-    designRegisterElement('gs-listbox', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-listbox.html');
+    designRegisterElement('gs-listbox', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-listbox.html');
     
     window.designElementProperty_GSLISTBOX = function(selectedElement) {
         addProp('Source', true, '<gs-memo class="target" value="' + encodeHTML(decodeURIComponent(selectedElement.getAttribute('src') ||
@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') ||
                                                                    element.getAttribute('source') || ''));
             
-            strLink = (location.pathname.indexOf('/v1/') === 0 ? '/v1/' : '/') + (element.getAttribute('action-select') || 'env/action_select') +
+            strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') +
                     '?src=' + encodeURIComponent(strSource) +
                     '&where='    + encodeURIComponent(GS.templateWithQuerystring(element.getAttribute('where') || '')) +
                     '&limit='    + encodeURIComponent(GS.templateWithQuerystring(element.getAttribute('limit') || '')) +

@@ -455,31 +455,8 @@ ALTER FUNCTION gsdoc.accept_test(text) OWNER TO postgres;
 GRANT ALL ON FUNCTION gsdoc.accept_test(text) TO normal_g;
 REVOKE ALL ON FUNCTION gsdoc.accept_test(text) FROM public;
 
-CREATE OR REPLACE FUNCTION gsdoc.actionnc_test(str_args text)
-    RETURNS text AS
-$BODY$
-BEGIN
-    --In public requests you can get the user-agent, ip address and host fields from the request. This is not possible on regular requests with a cookie. Since you don't know who logged in you can use these headers to determine who is who, but not as reliably as a cookie.
-    RETURN
-        '{"user_agent": "' || current_setting('envelope.request_user_agent') ||
-        '", "ip": "' || current_setting('envelope.request_ip') ||
-        '", "host": "' || current_setting('envelope.request_host') || '"}';
-    --try all of these
-    --RETURN '123';
-    --RETURN array_to_json(ARRAY[[str_args]]::text[][]);
-    --RETURN '"test"';
-    --RETURN '{"test": "test", "test2": 123}';
-END;
-
-$BODY$
-LANGUAGE plpgsql VOLATILE
-COST 100;
-ALTER FUNCTION gsdoc.actionnc_test(text) OWNER TO postgres;
-GRANT ALL ON FUNCTION gsdoc.actionnc_test(text) TO public_g;
-REVOKE ALL ON FUNCTION gsdoc.actionnc_test(text) FROM public;
-
 CREATE OR REPLACE FUNCTION gsdoc.acceptnc_test(str_args text)
-    RETURNS text AS
+  RETURNS text AS
 $BODY$
 BEGIN
     RETURN E'HTTP/1.1 200 OK\r\n' ||
@@ -491,11 +468,36 @@ BEGIN
 END;
 
 $BODY$
-LANGUAGE plpgsql VOLATILE
-COST 100;
-ALTER FUNCTION gsdoc.acceptnc_test(text) OWNER TO postgres;
-GRANT ALL ON FUNCTION gsdoc.acceptnc_test(text) TO normal_g;
-REVOKE ALL ON FUNCTION gsdoc.acceptnc_test(text) FROM public;
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+ALTER FUNCTION gsdoc.acceptnc_test(str_args text) OWNER TO postgres;
+GRANT EXECUTE ON FUNCTION gsdoc.acceptnc_test(str_args text) TO public_g;
+GRANT EXECUTE ON FUNCTION gsdoc.acceptnc_test(str_args text) TO postgres;
+REVOKE ALL ON FUNCTION gsdoc.acceptnc_test(str_args text) FROM public;
+
+CREATE OR REPLACE FUNCTION gsdoc.actionnc_test(str_args text)
+  RETURNS text AS
+$BODY$
+BEGIN
+    --In public requests you can get the ip address and host fields from the request. This is not possible on regular requests with a cookie. Since you don't know who logged in you can use these headers to determine who is who, but not as reliably as a cookie.
+    RETURN
+        '{"context_info": "' || current_setting('sunny.context_info') || '"}';
+    --try all of these
+    --RETURN '123';
+    --RETURN array_to_json(ARRAY[[str_args]]::text[][]);
+    --RETURN '"test"';
+    --RETURN '{"test": "test", "test2": 123}';
+END;
+
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+ALTER FUNCTION gsdoc.actionnc_test(str_args text) OWNER TO postgres;
+GRANT EXECUTE ON FUNCTION gsdoc.actionnc_test(str_args text) TO postgres;
+GRANT EXECUTE ON FUNCTION gsdoc.actionnc_test(str_args text) TO public_g;
+REVOKE ALL ON FUNCTION gsdoc.actionnc_test(str_args text) FROM public;
 
 -- ###########################################
 -- ###### gsdoc.action_select ######
@@ -802,7 +804,7 @@ GRANT ALL ON FUNCTION gsdoc.action_ajax_test_timeout(text) TO normal_g;*/
                     <gs-button href="doc-api-auth.html">Authentication Actions</gs-button>
                     <gs-button href="doc-api-database.html">Database Actions</gs-button>
                     <gs-button href="doc-api-envelope.html">Envelope Actions</gs-button>
-                    <!--<gs-button href="doc-api-public.html">Public Actions</gs-button>-->
+                    <gs-button href="doc-api-public.html">Public Actions</gs-button>
                 </gs-block>
                 <gs-block>
                     <center><h3>WebSocket API</h3></center>

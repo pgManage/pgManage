@@ -3,7 +3,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-toggle>', '<gs-toggle>', 'gs-toggle column="${1}">${2}</gs-toggle>');
     
-    designRegisterElement('gs-toggle', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html');
+    designRegisterElement('gs-toggle', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-buttons-toggle.html');
     
     window.designElementProperty_GSTOGGLE = function(selectedElement) {
         addProp('Icon', true, '<div flex-horizontal>' +

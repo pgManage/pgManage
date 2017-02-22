@@ -157,10 +157,9 @@ function autocompletePopupLoad(editor, arrQueries) {
     autocompleteGlobals.arrSearchMaster = [];
     autocompleteGlobals.arrValuesMaster = [];
     
-    var strText = '', autocompleteTempList = [];
     
     autocompleteGetList(arrQueries, function (bolLast, arrRows) {
-        var i, len, strSearch, element, strCurrent, strNext, strNextMeta, strCurrentMeta;
+        var i, len, strText, strSearch, element, strCurrent, strNext, strNextMeta, strCurrentMeta, autocompleteTempList = [];
         if (autocompleteGlobals.arrCancelledIds.indexOf(intLoadId) === -1) {
             if (bolLast === true) {
                 // set state variable
@@ -171,90 +170,6 @@ function autocompletePopupLoad(editor, arrQueries) {
                 //// select first line
                 //autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
                 //autocompleteGlobals.popupAce.scrollToLine(0);
-                console.log(autocompleteTempList);
-                console.log(autocompleteTempList.length);
-                
-                var nextItem;
-                var bolIsFunction = false;
-                var bolFinalRecord = false;
-                
-                for (var i = 0, len = autocompleteTempList.length; i < len; i++) {
-                    //console.log((strNext && strNextMeta === 'funcSnippet' && strCurrentMeta === 'funcSnippet') && nextItem.substring(0, nextItem.lastIndexOf('{')) === strNext.substring(0, strNext.lastIndexOf('(')));
-                    console.log(autocompleteTempList[i]);
-                    console.log(i);
-                    strCurrent = autocompleteTempList[i][0]
-                    strCurrentMeta = autocompleteTempList[i][1];
-                    if (i + 1 < autocompleteTempList.length) {
-                        strNext = autocompleteTempList[i + 1][0];
-                        strNextMeta = autocompleteTempList[i + 1][1];
-                        i += 1;
-                    }
-                    nextItem = '' + strCurrent.substring(0, strCurrent.lastIndexOf('(')) + '{';
-                    nextItem = nextItem + '(' + strCurrent.substring(parseInt(strCurrent.indexOf('('), 10) + 1, strCurrent.lastIndexOf(')')) + ')';
-                    while ((strNext && strNextMeta === 'funcSnippet' && strCurrentMeta === 'funcSnippet') && nextItem.substring(0, nextItem.lastIndexOf('{')) === strNext.substring(0, strNext.lastIndexOf('('))) {
-                        bolIsFunction = true;
-                        nextItem = nextItem + ', ' + strNext.substring(strNext.lastIndexOf('('), strNext.lastIndexOf(')')) + ')';
-                        if (i < autocompleteTempList.length) {
-                            i += 1;
-                            strNext = autocompleteTempList[i][0];
-                            strNextMeta = autocompleteTempList[i][1];
-                        } else {
-                            break;
-                        }
-                    }
-                    nextItem += '}';
-                    
-                    if (i + 1 === len) {
-                    } else {
-                        i -= 1;
-                    }
-                    
-                    if (bolIsFunction) {
-                        nextItem = nextItem.replace('{', '(').replace('}',  ')');
-                        // create a search string (normalize to double quoted and lowercase)
-                        strSearch = (nextItem[0] === '"' ? nextItem.toLowerCase() : '"' + nextItem.toLowerCase() + '"');
-                        
-                        strText += '\n' + nextItem;
-                        autocompleteGlobals.arrSearch.push(strSearch);
-                        autocompleteGlobals.arrValues.push(nextItem);
-                        autocompleteGlobals.arrSearchMaster.push(strSearch);
-                        autocompleteGlobals.arrValuesMaster.push(nextItem);
-                        bolIsFunction = false;
-                    } else {
-                        if (autocompleteTempList[i + 1]) {
-                            //i -= 1;
-                        } else {
-                            if (bolFinalRecord === false) {
-                                i -= 1;
-                            }
-                            bolFinalRecord = true
-                        }
-                        // create a search string (normalize to double quoted and lowercase)
-                        strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
-                        
-                        strText += '\n' + strCurrent;
-                        autocompleteGlobals.arrSearch.push(strSearch);
-                        autocompleteGlobals.arrValues.push(strCurrent);
-                        autocompleteGlobals.arrSearchMaster.push(strSearch);
-                        autocompleteGlobals.arrValuesMaster.push(strCurrent);
-                    }
-                    
-                    //console.log(strText);
-                    
-                    if ((i % 20) === 0) {
-                        autocompleteGlobals.popupAceSession.insert({
-                            'row': autocompleteGlobals.popupAceSession.getLength(),
-                            'column': 0
-                        }, (intResult === 1 ? strText.substring(1) : strText));
-                        strText = '';
-                    }
-                }
-                                
-                // append text (the substring is to remove the trailing \n)
-                autocompleteGlobals.popupAceSession.insert({
-                    'row': autocompleteGlobals.popupAceSession.getLength(),
-                    'column': 0
-                }, (intResult === 1 ? strText.substring(1) : strText));
                 
                 // if there was no results: close the popup
                 if (!bolResults) {
@@ -278,10 +193,10 @@ function autocompletePopupLoad(editor, arrQueries) {
                 }
                 
                 for (i = 0, len = arrRows.length, strText = ''; i < len; i += 1) {
-                    autocompleteTempList.push(arrRows[i]);
-                    //if (arrRows[i][1] === 'funcSnippet') {
-                    //    console.log(arrRows[i][0]);
-                    //}
+                    strCurrent = arrRows[i][0];
+                    
+                    
+                    autocompleteTempList.push(strCurrent);
                     
                     /*// create a search string (normalize to double quoted and lowercase)
                     strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
@@ -293,6 +208,43 @@ function autocompletePopupLoad(editor, arrQueries) {
                     autocompleteGlobals.arrValuesMaster.push(strCurrent);
                     strNext = '';*/
                 }
+                
+                strCurrent = arrRows[0][0]
+                strCurrentMeta = arrRows[-][1];
+                strNext = arrRows[1][0];
+                strNextMeta = arrRows[1][1];
+                var nextItem;
+                
+                for (var i = 0, len = autocompleteTempList.length; i < len; i++) {
+                    nextItem = '' + strCurrent.substring(0, strCurrent.lastIndexOf('(')) + '{';
+                    nextItem = nextItem + '(' + strCurrent.substring(parseInt(strCurrent.indexOf('('), 10) + 1, strCurrent.lastIndexOf(')')) + ')';
+                    while ((strNext && strNextMeta === 'funcSnippet' && strCurrentMeta === 'funcSnippet') && nextItem.substring(0, nextItem.lastIndexOf('{')) === strNext.substring(0, strNext.lastIndexOf('('))) {
+                        nextItem = nextItem + ', ' + strNext.substring(strNext.lastIndexOf('('), strNext.lastIndexOf(')')) + ')';
+                        i += 1;
+                        
+                        if (arrRows[i + 1]) {
+                            strNext = arrRows[i + 1][0];
+                            strNextMeta = arrRows[i + 1][1];
+                        }
+                    }
+                    // create a search string (normalize to double quoted and lowercase)
+                    strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
+                    
+                    strText += '\n' + strCurrent;
+                    autocompleteGlobals.arrSearch.push(strSearch);
+                    autocompleteGlobals.arrValues.push(strCurrent);
+                    autocompleteGlobals.arrSearchMaster.push(strSearch);
+                    autocompleteGlobals.arrValuesMaster.push(strCurrent);
+                }
+                
+                
+                
+                // append text (the substring is to remove the trailing \n)
+                autocompleteGlobals.popupAceSession.insert({
+                    'row': autocompleteGlobals.popupAceSession.getLength(),
+                    'column': 0
+                }, (intResult === 1 ? strText.substring(1) : strText));
+                
             }
         }
     });
@@ -427,14 +379,6 @@ function autocompleteComplete(editor) {
             // replace the range with the selected choice's text
             autocompleteGlobals.bolInserting = true;
             editor.insert(autocompleteGlobals.arrValues[intFocusedLine]);
-            if (autocompleteGlobals.arrValues[intFocusedLine].indexOf('(') !== -1 && autocompleteGlobals.arrValues[intFocusedLine].lastIndexOf(')') !== -1) {
-            editor.getSelection().setSelectionRange(new Range(
-                    jsnSearchStringRange.start.row,
-                    jsnSearchStringRange.start.column + autocompleteGlobals.arrValues[intFocusedLine].indexOf('(') + 1,
-                    jsnSearchStringRange.start.row,
-                    jsnSearchStringRange.start.column + autocompleteGlobals.arrValues[intFocusedLine].lastIndexOf(')')
-                ));
-            }
             autocompleteGlobals.bolInserting = false;
         }
         //console.log(autocompleteGlobals.arrValues[intFocusedLine]);
@@ -919,7 +863,7 @@ function autocompleteGetList(arrQueries, callback) {
                 for (i = 0, len = arrRows.length; i < len; i += 1) {
                     arrRows[i] = arrRows[i].split('\t');
                     arrRows[i][0] = GS.decodeFromTabDelimited(arrRows[i][0]);
-                    //console.log(arrRows[i]);
+                    //console.log(arrRows[i][0]);
                 }
                 
                 callback(false, arrRows);

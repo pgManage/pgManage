@@ -26,7 +26,7 @@ window.addEventListener('design-register-element', function () {
     
     registerDesignSnippet('<gs-file-manager>', '<gs-file-manager>', 'gs-file-manager path="${0:/}" folder="${1:role}"></gs-file-manager>');
     
-    designRegisterElement('gs-file-manager', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-file-manager.html');
+    designRegisterElement('gs-file-manager', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-file-manager.html');
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -378,6 +378,7 @@ document.addEventListener('DOMContentLoaded', function () {
             editFile: function (strPath) {
                 var element = this, strFolder = this.getAttribute('folder'), strLink;
                 
+                /*
                 //console.log('editFile: ', strPath);
                 if (strFolder === 'dev') {
                     strLink = '/v1/dev/developer_g/greyspots-' + GS.version() + '/tools/file_manager/file_edit.html';
@@ -388,6 +389,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     strLink = '/v1/dev/developer_g/greyspots-' + GS.version() + '/tools/file_manager/file_edit.html';
                 }
+                */
+                strLink = '/env/app/all/file_manager/file_edit.html';
                 
                 GS.msgbox('Update File',
                           '<gs-button jumbo dialogclose>Rename File</gs-button>' +

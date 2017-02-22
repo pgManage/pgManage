@@ -19,7 +19,7 @@ window.addEventListener('design-register-element', function (event) {
             '    <template for="insert"></template>\n' +
             '</gs-datasheet>');
     
-    designRegisterElement('gs-datasheet', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-datasheet.html');
+    designRegisterElement('gs-datasheet', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-datasheet.html');
     
     window.designElementProperty_GSDATASHEET = function (selectedElement) {
         addProp('Source', true,

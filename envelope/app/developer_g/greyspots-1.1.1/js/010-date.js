@@ -5,7 +5,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-date> With Label', '<gs-date>', 'label for="${1:date-insert-start_date}">${2:Start Date}:</label>\n' +
                                                                '<gs-date id="${1:date-insert-start_date}" column="${3:start_date}"></gs-date>');
     
-    designRegisterElement('gs-date', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-date.html');
+    designRegisterElement('gs-date', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-date.html');
     
     window.designElementProperty_GSDATE = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
@@ -1028,6 +1028,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             
                             // if shift, command and option keys are not down
                             if (!event.shiftKey && !event.metaKey && !event.ctrlKey) {
+                                event.stopPropagation();
                                 
                                 jsnState = getControlState(this)
                                 jsnTextSelection =      jsnState.jsnTextSelection

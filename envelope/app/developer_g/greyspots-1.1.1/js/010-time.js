@@ -4,7 +4,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-time> With Label', '<gs-time>', 'label for="${1:time-insert-start_time}">${2:Start Time}:</label>\n' +
                                                                '<gs-time id="${1:time-insert-start_time}" column="${3:start_time}"></gs-time>');
 
-    designRegisterElement('gs-time', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-time.html');
+    designRegisterElement('gs-time', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-time.html');
 
     window.designElementProperty_GSTIME = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {

@@ -4,7 +4,7 @@ window.addEventListener('design-register-element', function () {
 
     registerDesignSnippet('<gs-static>', '<gs-static>', 'gs-static column="${1:name}"></gs-static>');
 
-    designRegisterElement('gs-static', (location.pathname.indexOf('/v1/') === 0 ? '/v1/dev/' : '/env/app/') + 'developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-static.html');
+    designRegisterElement('gs-static', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-static.html');
 
     window.designElementProperty_GSSTATIC = function (selectedElement) {
         addProp('Formatted&nbsp;Text', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('pre')) + '" mini></gs-checkbox>', function () {
