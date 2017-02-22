@@ -81,8 +81,46 @@ RETURNS --<returntypes>
 LANGUAGE --<languages>
 CAST (--<types> AS <types>
 SET --<cols> , <cols>
+VACUUM --<schemas>
+ANALYZE --<schemas>
+ABORT --<schemas>
+CHECKPOINT --<schemas>
+CLOSE --<schemas>
+CLUSTER --<schemas>
+COMMENT --<schemas>
+COMMIT --<schemas>
+COPY --<schemas>
+CREATE --<schemas>
+DEALLOCATE --<schemas>
+DELETE --<schemas>
+DISCARD --<schemas>
+DO --<schemas>
+DROP --<schemas>
+EXECUTE --<schemas>
+EXPLAIN --<schemas>
+FETCH --<schemas>
+INSERT --<schemas>
+LISTEN --<schemas>
+LOAD --<schemas>
+LOCK --<schemas>
+MOVE --<schemas>
+NOTIFY --<schemas>
+PREPARE --<schemas>
+REASSIGN --<schemas>
+REFRESH --<schemas>
+REINDEX --<schemas>
+RELEASE --<schemas>
+RESET --<schemas>
+ROLLBACK --<schemas>
+SAVEPOINT --<schemas>
+SECURITY --<schemas>
+SHOW --<schemas>
+START --<schemas>
+TRUNCATE --<schemas>
+UNLISTEN --<schemas>
+REVOKE --<schemas>
+ALTER --<schemas>
 */
-
 
 
 
@@ -286,13 +324,19 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 } else if ((/^INSERT/gi).test(strSearchQuery) && strPreviousKeyWord === 'TO') {
                     //console.log('schema');
                     bolSchemas = true;
-                } else if ((/(UPDATE|VIEW|SEQUENCE|FUNCTION|AGGREGATE|COLLATION|CONVERSION|DOMAIN|INDEX|CLASS|FAMILY|OPERATOR|CONFIGURATION|DICTIONARY|PARSER|TEMPLATE|TYPE|WHEN|SCHEMA|HANDLER|VALIDATOR)/i).test(strPreviousKeyWord)) {
+                } else if ((/(UPDATE|VIEW|SEQUENCE|FUNCTION|AGGREGATE|COLLATION|CONVERSION|DOMAIN|INDEX|CLASS|FAMILY|OPERATOR|CONFIGURATION|DICTIONARY|PARSER|TEMPLATE|TYPE|ANALYZE|VACUUM|WHEN|SCHEMA|HANDLER|VALIDATOR|ABORT|CHECKPOINT|CLOSE|CLUSTER|COMMENT|COMMIT|COPY|CREATE|DEALLOCATE|DELETE|DISCARD|DO|DROP|EXECUTE|EXPLAIN|FETCH|INSERT|LISTEN|LOAD|LOCK|MOVE|NOTIFY|PREPARE|REASSIGN|REFRESH|REINDEX|RELEASE|RESET|ROLLBACK|SAVEPOINT|SECURITY|SHOW|START|TRUNCATE|UNLISTEN)/i).test(strPreviousKeyWord)) {
                     //console.log('schemas');
                     bolSchemas = true;
                 } else if (arrPreviousKeyWords[4] === 'REVOKE' && strPreviousKeyWord === 'FROM') {
                     //console.log('groups, users');
                     bolGroups = true;
                     bolUsers = true;
+                } else if (arrPreviousKeyWords[1] === 'ALTER') {
+                    //console.log('schemas');
+                    bolSchemas = true;
+                } else if (strPreviousKeyWord === 'REVOKE') {
+                    //console.log('groups');
+                    bolGroups = true;
                 } else if (strPreviousKeyWord === 'FROM') {
                     //console.log('schemas');
                     bolSchemas = true;
@@ -380,6 +424,9 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     //console.log('columns, functions');
                     bolCols = true;
                     bolBuiltins = true;
+                } else {
+                    //console.log('schemas');
+                    bolSchemas = true;
                 }
             
                 var strCurrWord = '';
@@ -472,7 +519,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 }
                 
                 
-                console.log(arrQueries);
+                //console.log(arrQueries);
                 
                 if (arrQueries) {
                     for (var i = 0, len = arrQueries.length; i < len; i++) {
