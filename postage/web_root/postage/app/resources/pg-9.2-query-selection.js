@@ -459,7 +459,6 @@ function selectionFindRange(tabElement, editor) {
     var arrQueryStartKeywords;
     var arrDangerousQueryStartKeywords;
     var arrExtraSearchKeywords;
-
     // ######################
     //      known issues
     //      in a query that looks like this: "EXPLAIN ANALYZE ..." the ANALYZE is found
@@ -546,6 +545,7 @@ function selectionFindRange(tabElement, editor) {
         //console.log(JSON.stringify(editor.currentQueryRange));
         //console.log(editor.currentQueryRange.text);
     }
+    editor.currentSelections = editor.getSelection().getAllRanges().slice(0);
 
     highlightCurrentQuery(
         tabElement,

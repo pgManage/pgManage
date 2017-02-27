@@ -1,14 +1,4 @@
 var bolAutocompleteLogicLoaded = true;
-/*var CATALOG_id = getListData(ml(function () {/*SELECT DISTINCT c.relnamespace
-            FROM pg_class c
-       LEFT JOIN pg_namespace ON pg_namespace.oid = c.relnamespace
-           WHERE pg_namespace.nspname = 'pg_catalog'*//*}), loaderTarget, callback, socket);
-var TOAST_id = getListData(ml(function () {/*SELECT DISTINCT c.relnamespace
-            FROM pg_class c
-       LEFT JOIN pg_namespace ON pg_namespace.oid = c.relnamespace
-           WHERE pg_namespace.nspname = 'pg_toast'*//*}), loaderTarget, callback, socket);
-
-*/
 var TOAST_id, CATALOG_id;
 
 getListData(ml(function () {/*SELECT DISTINCT c.relnamespace
@@ -141,67 +131,66 @@ function autocompleteChangeHandler(tabElement, editor, event) {
       , intStartCursorPosition, arrFirstWords, strCurrentWord, strCurrentLine
       , bolPreviousCharReturn, bolCurrentCharReturn, bolFirstSpace
       , intOpenParen, intCloseParen, intVersion = parseFloat(contextData.minorVersionNumber, 10);
-    
     // if the popup isn't already open or it's open but it's asleep
     //console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
     if (autocompleteGlobals.popupOpen === false || autocompleteGlobals.popupAsleep === true) {
         // get current query range
         currentQueryRange = editor.currentQueryRange;
-        
+
         // get full script
         strScript = editor.getValue();
-        
+
         // get event cursor position start/end
         intStartCursorPosition = rowAndColumnToIndex(strScript, event.start.row, event.start.column);
         intEndCursorPosition = rowAndColumnToIndex(strScript, event.end.row, event.end.column);
         intCursorPosition = intStartCursorPosition;
-        
+
         // extract the current query and subtract from intCursorPosition (because the script will get smaller)
         intStart           = rowAndColumnToIndex(strScript, currentQueryRange.start.row, currentQueryRange.start.column);
         strScript          = strScript.substring(intStart, intEndCursorPosition); //intCursorPosition + 1
         intCursorPosition -= intStart;
 
-        
+
         // remove comments from the current query
         strScript = consumeComments(strScript);
-        
+
         // make a search query by trimming it the current query and uppercasing it
         strSearchQuery = strScript.trim().toUpperCase();
-        
+
         // get parenthesis level of cursor
         intParenLevel = currentQueryRange.intParenLevel;
-        
+
         // get number of parenthesis
         intOpenParen = (strScript.match(/\(/gi) || []).length;
         intCloseParen = (strScript.match(/\)/gi) || []).length;
-        
+
         // get from cursor to beginning of current line
         i = ((intEndCursorPosition - intStart) - 1);
         strCurrentLine = '';
-        
+
         // get the current line text
         while (i > -1) {
             if (strScript[i] === '\n') { break; }
             strCurrentLine = (strScript[i] + strCurrentLine);
             i -= 1;
         }
-        
+
         // get the previous keywords and the previous word
         i = (intCursorPosition - 1);
         intStart = null;
         intEnd = null;
         arrPreviousWords = [];
         arrPreviousKeyWords = [];
-        
+
         // while we don't have 5 previous keywords and i is greater than the current query start
         while (arrPreviousKeyWords.length < 6 && i > -1) {
             strChar = strScript[i] || '';
-            
+
             // if we havn't found the previous word end yet and the current character is not whitespace or null
             if (intEnd === null && strChar.trim() !== '') {
                 // we've found the previous word end: save it
                 intEnd = i + 1;
-                
+
             // if we've found the previous word end but not the start and the current character is whitespace or null
             } else if (intStart === null && intEnd !== null && (strChar.trim() === '' || strScript[i] === '(')) {
                 // we've found the previous word start: save it
@@ -296,8 +285,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
         
         strPreviousKeyWord = arrPreviousKeyWords[0];
         strPreviousWord = arrPreviousWords[0];
-    
-    
+        
         // waterfall to get the autocomplete list type
         if (strPreviousWord) {
             bolPreviousCharWhitespace = (!(strScript[intCursorPosition - 1] || '').trim());
@@ -317,7 +305,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             bolFirstSpace = bolCurrentCharWhitespace && !bolPreviousCharWhitespace;
             
             if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && !bolCurrentCharWhitespace && (bolPreviousCharWhitespace || bolPreviousCharOpenParen || strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_')) {
-            
+                
                 if (arrPreviousKeyWords[1] === 'INSERT' && strPreviousKeyWord === 'INTO') {
                     //console.log('schema');
                     bolSchemas = true;
@@ -428,7 +416,10 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     //console.log('schemas');
                     bolSchemas = true;
                 }
-            
+                
+                autocompleteGlobals.bolSnippets = true;
+                autocompleteGlobals.lastKeyWord = strPreviousKeyWord;
+                
                 var strCurrWord = '';
                 for (var i = 0, len = strPreviousWord.length; i <= len; i++) {
                     if (strScript[intCursorPosition - i] == ' ' &&
@@ -524,9 +515,9 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 if (arrQueries) {
                     for (var i = 0, len = arrQueries.length; i < len; i++) {
                         if (strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_') {
-                            arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strCurrWord + '%');
+                            arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strCurrWord.toLowerCase() + '%');
                         } else {
-                            arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strScript[intCursorPosition] + '%');
+                            arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strScript[intCursorPosition].toLowerCase() + '%');
                         }
     
                     }
@@ -1105,3 +1096,45 @@ function autocompleteSearchBackForWord(strScript, intCursorPosition, strWord) {
     
     return false;
 }
+
+
+
+
+
+
+
+
+
+
+var snippetHandler = function (lines, event, editor) {
+    if (autocompleteGlobals.popupOpen === false || autocompleteGlobals.popupAsleep === true) {
+        autocompleteGlobals.bolSnippets = true;
+        arrQueries = [autocompleteQuery.schemas];
+        arrQueries[0] = arrQueries[0].replace((/\{\{searchStr}\}/gi), lines.toLowerCase() + '%');
+        
+        var strScript = editor.getValue();
+        var intEndCursorPosition = rowAndColumnToIndex(strScript, event.end.row, event.end.column);
+        // if we've found queries: open the popup
+        if (arrQueries && arrQueries.length > 0) {
+            autocompleteGlobals.intSearchStart = intEndCursorPosition - 1;
+            autocompleteGlobals.intSearchEnd = intEndCursorPosition;
+            autocompletePopupOpen(editor, arrQueries);
+            // console.log(autocompleteGlobals);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

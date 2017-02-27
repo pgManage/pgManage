@@ -1396,6 +1396,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function refreshAnchor(element) {
         var strLink = element.getAttribute('href') || element.getAttribute('value');
         
+        if (element.anchorElement) {
+            element.removeChild(element.anchorElement);
+        }
         if (strLink) {
             element.anchorElement = document.createElement('a');
             element.anchorElement.setAttribute('gs-dynamic', '');
@@ -1412,8 +1415,6 @@ document.addEventListener('DOMContentLoaded', function () {
             
             element.appendChild(element.anchorElement);
             
-        } else if (element.anchorElement) {
-            element.removeChild(element.anchorElement);
         }
     }
     

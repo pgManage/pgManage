@@ -37,6 +37,19 @@
                     window.location = '/env/app/ghi_job_g/main_menu.html'
                 }
                 
+                if (userData.groups.indexOf('twi_g') !== -1) {
+                    var search_button = document.getElementById('prospect_search'),
+                        href = search_button.getAttribute('href');
+                    document.getElementById('prospect_status').addEventListener('change', function () {
+                        href = '../twi_g/prospects.html?' + GS.qrySetVal(href.substring(href.indexOf('?') + 1), 'status=' + this.value);
+                        search_button.setAttribute('href', href);
+                    });
+                    document.getElementById('prospect_type').addEventListener('change', function () {
+                        href = '../twi_g/prospects.html?' + GS.qrySetVal(href.substring(href.indexOf('?') + 1), 'type=' + this.value);
+                        search_button.setAttribute('href', href);
+                    });
+                }
+                
                 arrElements = document.querySelectorAll('*[data-group], *[data-user]');
                 
                 for (i = 0, len = arrElements.length; i < len; i += 1) {
@@ -209,6 +222,7 @@
                     <br />
                     <gs-button target="_blank" data-user="joseph@wfprod.com" href="../wiki_g/index.html?page_id=63243"><b>MENU</b></gs-button>
                     
+                    <br data-group="trc_g" />
                     <div class="group-container" data-group="trc_g">
                         <h4><i>Trawick Construction</i></h4>
                         <span class="space"></span>
@@ -223,6 +237,7 @@
                         </gs-grid>
                     </div>
                     
+                    <br data-group="ftc_g" />
                     <div class="group-container" data-group="ftc_g">
                         <h4><i>Four Thirds Creative</i></h4>
                         <span class="space"></span>
@@ -237,19 +252,63 @@
                     
                     <br data-group="twi_g" />
                     <div class="group-container" data-group="twi_g">
-                        <h4><i>Tower Engineering Inc. Demo</i></h4>
+                        <h4><i>Tower Engineering Inc</i></h4>
                         <span class="space"></span>
-                        <gs-grid widths="1,1,1" reflow-at="500px" gutter>
-                            <gs-block>
-                                <gs-button data-group="twi_g" target="_self" href="../twi_g/plans.html" jumbo bg-primary>Projects</gs-button>
-                            </gs-block>
-                            <gs-block>
-                                <gs-button data-group="twi_g" target="_self" href="../twi_g/formula_manager.html" jumbo bg-primary>Formula Manager</gs-button>
-                            </gs-block>
-                            <gs-block>
-                                <gs-button data-group="twi_g" target="_self" href="../twi_g/dropdown_manager.html" jumbo bg-primary>Dropdown Manager</gs-button>
-                            </gs-block>
-                        </gs-grid>
+                        
+                        <style>
+                            .twi-prospect-status {
+                                height: 4em;
+                                line-height: 3.1em;
+                                vertical-align: middle;
+                            }
+                            .twi-prospect-type {
+                                height: 3em;
+                                line-height: 2.1em;
+                                vertical-align: middle;
+                            }
+                        </style>
+                        <!-- don't forget to copy js above -->
+                        <div class="group-container grey">
+                            <h5><i>Prospects</i></h5>
+                            <gs-grid widths="1,1" reflow-at="500px">
+                                <gs-block>
+                                    <gs-optionbox mini no-target value="current" id="prospect_status">
+                                        <gs-option class="twi-prospect-status" value="all" remove-bottom remove-right>All Prospects</gs-option>
+                                        <gs-option remove-all class="twi-prospect-status" value="current">Current Prospects</gs-option>
+                                        <gs-option remove-all class="twi-prospect-status" value="dead">Dead Prospects</gs-option>
+                                    </gs-optionbox>
+                                </gs-block>
+                                <gs-block>
+                                    <gs-optionbox mini no-target value="all" id="prospect_type">
+                                        <gs-option class="twi-prospect-type" value="all" remove-bottom remove-left>All Prospects</gs-option>
+                                        <gs-option remove-all class="twi-prospect-type" value="new">New Construction Prospects</gs-option>
+                                        <gs-option remove-all class="twi-prospect-type" value="re">Reconstruction/Repair/Upgrade Prospects</gs-option>
+                                        <gs-option remove-all class="twi-prospect-type" value="spare">Spare Parts Prospects</gs-option>
+                                    </gs-optionbox>
+                                </gs-block>
+                            </gs-grid>
+                            <gs-button id="prospect_search" target="_self" href="../twi_g/prospects.html?status=current&type=all" jumbo bg-primary remove-top>Go</gs-button>
+                            <br />
+                            
+                            <gs-button target="_self" href="../twi_g/prospect_dropdown_manager.html" jumbo bg-primary>Dropdown Manager</gs-button>
+                        </div>
+                        
+                        <br />
+                        
+                        <div class="group-container grey">
+                            <h5><i>Demo Prototype</i></h5>
+                            <gs-grid widths="1,1,1" reflow-at="500px" gutter>
+                                <gs-block>
+                                    <gs-button target="_self" href="../twi_g/plans.html" jumbo bg-primary>Projects</gs-button>
+                                </gs-block>
+                                <gs-block>
+                                    <gs-button target="_self" href="../twi_g/formula_manager.html" jumbo bg-primary>Formula Manager</gs-button>
+                                </gs-block>
+                                <gs-block>
+                                    <gs-button target="_self" href="../twi_g/dropdown_manager.html" jumbo bg-primary>Dropdown Manager</gs-button>
+                                </gs-block>
+                            </gs-grid>
+                        </div>
                     </div>
                     
                     
