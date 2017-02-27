@@ -247,14 +247,17 @@ bool parse_connection_file() {
 	size_t int_line_length = 0;
 	ssize_t int_ftell = 0;
 	size_t int_length = 0;
+#ifdef ENVELOPE
+#else
 	size_t int_param_len = 0;
 	size_t int_equals_len = 0;
+	size_t int_temp1_len = 0;
+#endif
 	size_t int_i = 0;
 	size_t int_len = 0;
 	size_t int_chunk_len = 0;
 
 	size_t int_connection_info_len = 0;
-	size_t int_temp1_len = 0;
 
 	FILE *fp = NULL;
 	SDEFINE_VAR_ALL(str_content, str_temp, str_temp1);

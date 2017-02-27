@@ -204,7 +204,10 @@ void http_main(struct sock_ev_client *client) {
 	char *str_response = NULL;
 	char *ptr_end_uri = NULL;
 	size_t int_uri_len = 0;
+#ifdef ENVELOPE
+#else
 	size_t int_response_len = 0;
+#endif
 	// get path
 	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_len);
 	SFINISH_CHECK(str_uri, "str_uri_path failed");
