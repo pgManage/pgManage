@@ -2206,6 +2206,7 @@ finish:
 bool ws_file_create_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
 	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	SDEFINE_VAR_ALL(str_path_temp);
 
 	char *str_response = NULL;
 	size_t int_response_len = 0;
@@ -2214,9 +2215,11 @@ bool ws_file_create_step2(EV_P, void *cb_data, bool bol_group) {
 
 	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
 
+	str_path_temp = canonical(client_file->str_canonical_start, client_file->str_partial_path, "create_dir");
+	SFINISH_CHECK(str_path_temp != NULL, "canonical failed");
 	SFREE(client_file->str_path);
-	client_file->str_path = canonical(client_file->str_canonical_start, client_file->str_partial_path, "create_dir");
-	SFINISH_CHECK(client_file->str_path != NULL, "canonical failed");
+	client_file->str_path = str_path_temp;
+	str_path_temp = NULL;
 
 	stat(client_file->str_path, &statbuf);
 
@@ -2228,6 +2231,7 @@ bool ws_file_create_step2(EV_P, void *cb_data, bool bol_group) {
 
 	bol_error_state = false;
 finish:
+	SFREE_ALL();
 	if (bol_error_state) {
 		bol_error_state = false;
 		client_request->int_response_id = (ssize_t)DArray_end(client_request->arr_response) + 1;
@@ -2242,7 +2246,7 @@ finish:
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012FATAL\012", (size_t)7,
-				"Failed to stat file ", (size_t)16,
+				"Failed to create file ", (size_t)22,
 				client_file->str_path, strlen(client_file->str_path),
 				": ", (size_t)2,
 				strerror(errno), strlen(strerror(errno))
