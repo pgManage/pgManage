@@ -2033,7 +2033,14 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                 if (bolDropStatments) {
                     GS.addLoader('loader-drop', 'Creating DROP Statements');
                     for (i = arrResult.length - 1; i >= 0; i -= 1) {
-                        strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase() + ' ' + quote_ident(strSchemaName) + '.' + quote_ident(arrResult[i][1]) + ';\n';
+                        //strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase() + ' ' + quote_ident(strSchemaName) + '.' + quote_ident(arrResult[i][1]) + ';\n';
+                        //console.log(arrResult[i][3].toUpperCase() === 'FUNCTION');
+                        
+                        if (arrResult[i][3].toUpperCase() === 'FUNCTION' || arrResult[i][1].indexOf('"') !== -1) {
+                            strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase() + ' ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                        } else {
+                            strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase() + ' ' + quote_ident(strSchemaName) + '.' + quote_ident(arrResult[i][1]) + ';\n';
+                        }
                     }
                     
                     if (bolSchema) {
@@ -2051,13 +2058,21 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                 // For some there is an extra result at the beginning?
                 // I'm not sure why, but I get back (bolSchema ? 2 : 1) more script results than list results
                 var j = 0, len1 = arrResult.length + (bolSchema ? 2 : 1);
+                var resName;
+                
                 for (i = 0, len = arrResult.length; i < len; i += 1) {
+                    if (arrResult[i][1].indexOf('"') === -1) {
+                        resName = quote_ident(arrResult[i][1]);
+                    } else {
+                        resName = arrResult[i][1];
+                    }
+                    
                     strQuery += '\n\n' +
                         (
                             scriptQuery['object' + GS.strToTitle(arrResult[i][3])]
                         )
                         .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
-                        .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + quote_ident(arrResult[i][1]));
+                        .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
                 }
                 
                 handleScriptResults = function (arrResult) {
