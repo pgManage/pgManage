@@ -556,6 +556,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 
             // autocomplete after dot
             } else if (bolCurrentCharPeriod) {
+                autocompleteGlobals.bolSnippets = false;
                 // get prefixes
                 jsnPrefix = autocompleteGetPrefix(strScript, intCursorPosition + 1);
                 arrPrefix = jsnPrefix.arrStrings;
@@ -984,6 +985,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 }
             // typecasting:
             } else if (strScript[intCursorPosition] === ':' && strScript[intCursorPosition - 1] === ':') {
+                autocompleteGlobals.bolSnippets = false;
                 autocompleteGlobals.intSearchOffset = 1;
                 arrQueries = [autocompleteQuery.types];
                 
