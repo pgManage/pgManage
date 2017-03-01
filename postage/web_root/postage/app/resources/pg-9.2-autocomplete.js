@@ -83,17 +83,24 @@ function autocompleteBindEditor(tabElement, editor) {
                             && event.action === 'insert'
                             && autocompleteGlobals.bolInserting === false
                             && editor.currentQueryRange) {
+                                
+                        
                         try {
                             // this function is in pg-9.2-autocomplete-logic.js
                             
                             var selectionRanges = editor.currentSelections[0];
-                            
-                            if (
-                                selectionRanges.start.row === event.start.row &&
-                                selectionRanges.start.column === event.start.column &&
-                                selectionRanges.end.row === event.end.row &&
-                                selectionRanges.end.column + 1 === event.end.column
-                            ) {
+                            console.log(selectionRanges);
+                            console.log(event);
+                            if (editor.currentSelections.length > 1) {
+                                if (
+                                    selectionRanges.start.row === event.start.row &&
+                                    selectionRanges.start.column === event.start.column &&
+                                    selectionRanges.end.row === event.end.row &&
+                                    selectionRanges.end.column + 1 === event.end.column
+                                ) {
+                                    autocompleteChangeHandler(tabElement, editor, event);
+                                }
+                            } else {
                                 autocompleteChangeHandler(tabElement, editor, event);
                             }
                             
@@ -104,12 +111,16 @@ function autocompleteBindEditor(tabElement, editor) {
                             && event.action === 'insert'
                             && autocompleteGlobals.bolInserting === false) {
                         var selectionRanges = editor.currentSelections[0];
-                        if (
-                            selectionRanges.start.row === event.start.row &&
-                            selectionRanges.start.column === event.start.column &&
-                            selectionRanges.end.row === event.end.row &&
-                            selectionRanges.end.column + 1 === event.end.column
-                        ) {
+                        if (editor.currentSelections.length > 1) {
+                            if (
+                                selectionRanges.start.row === event.start.row &&
+                                selectionRanges.start.column === event.start.column &&
+                                selectionRanges.end.row === event.end.row &&
+                                selectionRanges.end.column + 1 === event.end.column
+                            ) {
+                                snippetHandler(event.lines[0], event, editor);
+                            }
+                        } else {
                             snippetHandler(event.lines[0], event, editor);
                         }
                         
@@ -220,23 +231,7 @@ function autocompletePopupLoad(editor, arrQueries) {
                     autocompleteGlobals.arrSearchMaster.push(strSearch);
                     autocompleteGlobals.arrValuesMaster.push(strCurrent);
                 } else {
-                    var currSnippet;
-                    if (autocompleteGlobals.bolSnippets) {
-                        for (var i = 0, len = snippets.length; i < len; i++) {
-                            currSnippet = snippets[i];
-                            strCurrent = currSnippet[2] + ' (Snippet)';
-                            
-                            // create a search string (normalize to double quoted and lowercase)
-                            strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
-                            
-                            strText += '\n' + strCurrent;
-                            autocompleteGlobals.arrSearch.push(strSearch);
-                            autocompleteGlobals.arrValues.push(strCurrent);
-                            autocompleteGlobals.arrSearchMaster.push(strSearch);
-                            autocompleteGlobals.arrValuesMaster.push(strCurrent);
-                            
-                        }
-                    }
+                    
                     
                     for (var i = 0, len = autocompleteTempList.length; i < len; i++) {
                         strCurrent = autocompleteTempList[i][0]
@@ -308,6 +303,25 @@ function autocompletePopupLoad(editor, arrQueries) {
                         }
                     }
                 }
+                
+                var currSnippet;
+                if (autocompleteGlobals.bolSnippets) {
+                    for (var i = 0, len = snippets.length; i < len; i++) {
+                        currSnippet = snippets[i];
+                        strCurrent = currSnippet[2] + ' (Snippet)';
+                        
+                        // create a search string (normalize to double quoted and lowercase)
+                        strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
+                        
+                        strText += '\n' + strCurrent;
+                        autocompleteGlobals.arrSearch.push(strSearch);
+                        autocompleteGlobals.arrValues.push(strCurrent);
+                        autocompleteGlobals.arrSearchMaster.push(strSearch);
+                        autocompleteGlobals.arrValuesMaster.push(strCurrent);
+                        
+                    }
+                }
+                
                                 
                 // append text (the substring is to remove the trailing \n)
                 autocompleteGlobals.popupAceSession.insert({
