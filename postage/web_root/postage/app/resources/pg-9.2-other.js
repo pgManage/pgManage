@@ -2189,7 +2189,7 @@ function executeScript() {
                     }
 
                     divElement = document.createElement('div');
-                    divElement.innerHTML = '<h4>Query #' + (intQuery) + ' Error:</h4>' + warningHTML +
+                    divElement.innerHTML = '<h4 id="error' + intQuery + '">Query #' + (intQuery) + ' Error:</h4>' + warningHTML +
                                             '<pre>' + encodeHTML(GS.decodeFromTabDelimited(data.error_text)) + '</pre>'; //strError ||
                     resultsContainer.appendChild(divElement);
                     resultsContainer.appendChild(document.createElement('br'));
