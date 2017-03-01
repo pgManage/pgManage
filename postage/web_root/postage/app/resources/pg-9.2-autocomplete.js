@@ -19,7 +19,7 @@ var autocompleteLoaded = true
       //, 'currentLoadId':   0
       , 'arrCancelledIds': []
       , 'bolSnippets':     false
-      , 'lastKeyWord':     ''
+      , 'bolBound':        false
     };
 var strSearchFixed;
 function autocompleteStart() { 'use strict'; }
@@ -437,10 +437,8 @@ function autocompletePopupClose(editor) {
     //autocompleteGlobals.popupElement.innerHTML = '';
     autocompleteGlobals.popupAce.setValue('');
     
-    // only unbind the editor if there isn't a query running
-    if (!autocompleteGlobals.strQueryID) {
-        autocompleteUnbind(editor);
-    }
+    // bind function only unbinds the editor if popup is currently bound
+    autocompleteUnbind(editor);
     
     // set popupOpen to false
     autocompleteGlobals.popupOpen = false;
@@ -728,114 +726,124 @@ function autocompleteBind(editor) {
     editor.standardGoLineUpExec   = editor.commands.commands.golineup.exec;
     editor.standardIndentExec     = editor.commands.commands.indent.exec;
 
-    editor.commands.commands.golinedown.exec = function () {
-        var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
-          , intLastLine = autocompleteGlobals.arrValues.length - 1;
 
-        if (intCurrentLine !== intLastLine) {
-            autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine + 1), 0, (intCurrentLine + 1), 0));
-        } else {
-            autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
-        }
-
-        autocompleteGlobals.popupAce.scrollToLine(autocompleteGlobals.popupAce.getSelectionRange().start.row);
-    };
-    editor.commands.commands.golineup.exec = function () {
-        var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
-          , intLastLine = autocompleteGlobals.arrValues.length - 1;
-
-        if (intCurrentLine !== 0) {
-            autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine - 1), 0, (intCurrentLine - 1), 0));
-        } else {
-            autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(intLastLine, 0, intLastLine, 0));
-        }
-
-        autocompleteGlobals.popupAce.scrollToLine(autocompleteGlobals.popupAce.getSelectionRange().start.row);
-    };
-
-    editor.commands.commands.indent.exec = function () {
-        autocompleteComplete(editor);
-        return;
-    };
-
-    editor.commands.addCommand({
-        name: 'hideautocomplete',
-        bindKey: 'Esc',
-        exec: function () {
+    if (!autocompleteGlobals.bolBound) {
+    
+        editor.commands.commands.golinedown.exec = function () {
+            var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
+              , intLastLine = autocompleteGlobals.arrValues.length - 1;
+    
+            if (intCurrentLine !== intLastLine) {
+                autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine + 1), 0, (intCurrentLine + 1), 0));
+            } else {
+                autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
+            }
+    
+            autocompleteGlobals.popupAce.scrollToLine(autocompleteGlobals.popupAce.getSelectionRange().start.row);
+        };
+        editor.commands.commands.golineup.exec = function () {
+            var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
+              , intLastLine = autocompleteGlobals.arrValues.length - 1;
+    
+            if (intCurrentLine !== 0) {
+                autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine - 1), 0, (intCurrentLine - 1), 0));
+            } else {
+                autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(intLastLine, 0, intLastLine, 0));
+            }
+    
+            autocompleteGlobals.popupAce.scrollToLine(autocompleteGlobals.popupAce.getSelectionRange().start.row);
+        };
+    
+        editor.commands.commands.indent.exec = function () {
+            autocompleteComplete(editor);
+            return;
+        };
+    
+        editor.commands.addCommand({
+            name: 'hideautocomplete',
+            bindKey: 'Esc',
+            exec: function () {
+                autocompletePopupClose(editor);
+            }
+        });
+    
+        editor.commands.addCommand({
+            name: 'autocomplete',
+            bindKey: 'Return',
+            exec: function () {
+                autocompletePopupClose(editor);
+                editor.insert('\n');
+                //autocompleteComplete(editor);
+                //return;
+            }
+        });
+        
+        // bind keydown
+        editor.keyListenerElement = xtag.query(editor.container, '.ace_text-input')[0];
+        editor.keyListenerFunction = function (event) {
+            if (   event.keyCode === 37  // left arrow
+                || event.keyCode === 39  // right arrow
+                || event.keyCode === 110 // .
+                || event.keyCode === 190 // decimal point
+                || event.keyCode === 32  // space
+                || (event.shiftKey && (event.keyCode === 38 || event.keyCode === 40))) {
+                autocompletePopupClose(editor);
+            }
+        };
+        
+        editor.keyListenerElement.addEventListener('keydown', editor.keyListenerFunction);
+        
+        // bind mousedown
+        editor.mousedownFunction = function (event) {
             autocompletePopupClose(editor);
-        }
-    });
-
-    editor.commands.addCommand({
-        name: 'autocomplete',
-        bindKey: 'Return',
-        exec: function () {
+        };
+        
+        editor.container.addEventListener('mousedown', editor.mousedownFunction);
+        
+        // bind focusout
+        editor.focusoutFunction = function (event) {
+            // if the element that stole the focus is not the popup ace: close the popup
+            if (event.relatedTarget !== autocompleteGlobals.popupAce.focusElement) {
+                //autocompletePopupClose(editor);
+            }
+        };
+        
+        editor.container.addEventListener('focusout', editor.focusoutFunction);
+        
+        autocompleteGlobals.popupAce.focusElement = xtag.query(autocompleteGlobals.popupAce.container, '.ace_text-input')[0];
+        autocompleteGlobals.popupAce.focusFunction = function (event) {
+            autocompleteComplete(editor);
             autocompletePopupClose(editor);
-            editor.insert('\n');
-            //autocompleteComplete(editor);
-            //return;
-        }
-    });
-    
-    // bind keydown
-    editor.keyListenerElement = xtag.query(editor.container, '.ace_text-input')[0];
-    editor.keyListenerFunction = function (event) {
-        if (   event.keyCode === 37  // left arrow
-            || event.keyCode === 39  // right arrow
-            || event.keyCode === 110 // .
-            || event.keyCode === 190 // decimal point
-            || event.keyCode === 32  // space
-            || (event.shiftKey && (event.keyCode === 38 || event.keyCode === 40))) {
-            autocompletePopupClose(editor);
-        }
-    };
-    
-    editor.keyListenerElement.addEventListener('keydown', editor.keyListenerFunction);
-    
-    // bind mousedown
-    editor.mousedownFunction = function (event) {
-        autocompletePopupClose(editor);
-    };
-    
-    editor.container.addEventListener('mousedown', editor.mousedownFunction);
-    
-    // bind focusout
-    editor.focusoutFunction = function (event) {
-        // if the element that stole the focus is not the popup ace: close the popup
-        if (event.relatedTarget !== autocompleteGlobals.popupAce.focusElement) {
-            //autocompletePopupClose(editor);
-        }
-    };
-    
-    editor.container.addEventListener('focusout', editor.focusoutFunction);
-    
-    autocompleteGlobals.popupAce.focusElement = xtag.query(autocompleteGlobals.popupAce.container, '.ace_text-input')[0];
-    autocompleteGlobals.popupAce.focusFunction = function (event) {
-        autocompleteComplete(editor);
-        autocompletePopupClose(editor);
-        editor.focus();
-    };
-    
+            editor.focus();
+        };
+        
+    }
+    autocompleteGlobals.bolBound = true;
     autocompleteGlobals.popupAce.focusElement.addEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
+    
 }
 
 // unbind keyboard
 function autocompleteUnbind(editor) {
     'use strict';
-    editor.commands.commands.golinedown.exec = editor.standardGoLineDownExec;
-    editor.commands.commands.golineup.exec = editor.standardGoLineUpExec;
-    editor.commands.commands.indent.exec = editor.standardIndentExec;
-    editor.commands.removeCommand('hideautocomplete');
-    editor.commands.removeCommand('autocomplete');
-    autocompleteGlobals.popupElement.removeEventListener('change', autocompleteGlobals.popupElement.clickFunction);
-
-    if (editor.keyListenerElement) {
-        editor.keyListenerElement.removeEventListener('keydown', editor.keyListenerFunction);
+    if (autocompleteGlobals.bolBound) {
+        editor.commands.commands.golinedown.exec = editor.standardGoLineDownExec;
+        editor.commands.commands.golineup.exec = editor.standardGoLineUpExec;
+        editor.commands.commands.indent.exec = editor.standardIndentExec;
+        editor.commands.removeCommand('hideautocomplete');
+        editor.commands.removeCommand('autocomplete');
+        autocompleteGlobals.popupElement.removeEventListener('change', autocompleteGlobals.popupElement.clickFunction);
+    
+        if (editor.keyListenerElement) {
+            editor.keyListenerElement.removeEventListener('keydown', editor.keyListenerFunction);
+        }
+    
+        editor.container.removeEventListener('mousedown', editor.mousedownFunction);
+        editor.container.removeEventListener('focusout', editor.focusoutFunction);
+        autocompleteGlobals.popupAce.focusElement.removeEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
     }
-
-    editor.container.removeEventListener('mousedown', editor.mousedownFunction);
-    editor.container.removeEventListener('focusout', editor.focusoutFunction);
-    autocompleteGlobals.popupAce.focusElement.removeEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
+    
+    autocompleteGlobals.bolBound = false;
 }
 
 
