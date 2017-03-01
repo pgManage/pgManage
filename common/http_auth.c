@@ -16,6 +16,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 #else
 	char *ptr_conn = NULL;
 	char *ptr_conn_end = NULL;
+	size_t int_referer_len = 0;
 #endif
 
 	SFINISH_SALLOC(str_session_id_temp, 32);
@@ -35,7 +36,6 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 	size_t int_response_len = 0;
 	size_t int_uri_new_password_len = 0;
 	size_t int_uri_expiration_len = 0;
-	size_t int_referer_len = 0;
 
 	// get form data
 	str_form_data = query(client_auth->parent->str_request, client_auth->parent->int_request_len, &int_query_length);
@@ -724,7 +724,7 @@ void http_auth_login_step15(EV_P, void *cb_data, DB_conn *conn) {
 	SFINISH_SALLOC(str_password_hash_temp, 16);
 	MD5((unsigned char *)str_password_temp, int_temp, (unsigned char *)str_password_hash_temp);
 	SFREE_PWORD(str_password_temp);
-	unsigned char *str_password_hash_temp2 = str_password_hash_temp;
+	unsigned char *str_password_hash_temp2 = (unsigned char *)str_password_hash_temp;
 	size_t int_len = 16;
 	str_password_hash_temp = hexencode(str_password_hash_temp2, &int_len);
 	SFREE(str_password_hash_temp2);

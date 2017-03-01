@@ -1885,6 +1885,8 @@ void client_close_timeout_prepare_cb(EV_P, ev_prepare *w, int revents) {
 
 #if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
 void client_close_cancel_query_cb(EV_P, ev_io *w, int revents) {
+	if (revents != 0) {
+	} // get rid of unused parameter warning
 	struct sock_ev_client *client = (struct sock_ev_client *)w;
 	int int_status = PQconsumeInput(client->cnxn);
 	if (int_status != 1) {

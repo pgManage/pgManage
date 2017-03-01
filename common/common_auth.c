@@ -16,7 +16,10 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	ssize_t int_i = 0;
 	ssize_t int_len = 0;
 	size_t int_conn_index = 0;
+#ifdef ENVELOPE
+#else
 	size_t int_conn_index_len = 0;
+#endif
 	size_t int_uri_length = 0;
 	size_t int_user_length = 0;
 	size_t int_password_length = 0;
@@ -466,7 +469,6 @@ void connect_cb_env(EV_P, void *cb_data, DB_conn *conn) {
 	SDEBUG("connect_cb_env");
 	struct sock_ev_client *client = cb_data;
 	char *str_response = NULL;
-	size_t int_response_len = 0;
 	size_t int_temp = 0;
 	SDEFINE_VAR_ALL(str_user_ident, str_diag, str_sql);
 
@@ -502,7 +504,6 @@ bool connect_cb_env_step2(EV_P, void *cb_data, DB_result *res) {
 	SDEBUG("connect_cb_env_step2");
 	struct sock_ev_client *client = cb_data;
 	char *str_response = NULL;
-	size_t int_response_len = 0;
 	SDEFINE_VAR_ALL(str_diag);
 	str_diag = DB_get_diagnostic(client->conn, res);
 
