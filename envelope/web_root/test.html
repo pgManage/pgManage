@@ -10,16 +10,273 @@
 
 	<script src="/js/greyspots.js" type="text/javascript"></script>
 	<link href="/css/greyspots.css" rel="stylesheet" type="text/css" />
-	<link href="/css/postage.css" rel="stylesheet" type="text/css" />
 
 	<script>
-		document.addEventListener('load', function () {
-			GS.ajaxJSON('/env/tst.actionnc_test', 'action=begin&user_agent=' +
+		var Global = {};
+		
+		Global.i = 0;
+		
+		Global.arrStrPages = [
+			'doc-api-auth.html',
+			'doc-api-database.html',
+			'doc-api-envelope.html',
+			'doc-api-file.html',
+			'doc-api-public.html',
+			'doc-attr-flex.html',
+			'doc-attr-text-selection.html',
+			'doc-attr-visibility.html',
+			'doc-elem-buttons-toggle.html',
+			'doc-elem-checkbox.html',
+			'doc-elem-combo.html',
+			'doc-elem-container-jumbo.html',
+			'doc-elem-datasheet.html',
+			'doc-elem-date.html',
+			'doc-elem-delete-button.html',
+			'doc-elem-dialog-button.html',
+			'doc-elem-envelope.html',
+			'doc-elem-file-manager.html',
+			'doc-elem-folder.html',
+			'doc-elem-font.html',
+			'doc-elem-form.html',
+			'doc-elem-grid.html',
+			'doc-elem-group.html',
+			'doc-elem-img.html',
+			'doc-elem-insert.html',
+			'doc-elem-listbox.html',
+			'doc-elem-memo.html',
+			'doc-elem-number.html',
+			'doc-elem-optionbox.html',
+			'doc-elem-page.html',
+			'doc-elem-panel.html',
+			'doc-elem-scroller.html',
+			'doc-elem-search.html',
+			'doc-elem-select.html',
+			'doc-elem-static.html',
+			'doc-elem-sticky.html',
+			'doc-elem-switch.html',
+			'doc-elem-text.html',
+			'doc-elem-time.html',
+			'doc-elem-typography.html',
+			'doc-ins-getting-started.html',
+			'doc-jslib-account.html',
+			'doc-jslib-ajax-error-dialog.html',
+			'doc-jslib-animate-style.html',
+			'doc-jslib-beforeunload.html',
+			'doc-jslib-clone-element.html',
+			'doc-jslib-cookie.html',
+			'doc-jslib-dialog.html',
+			'doc-jslib-duplicate-safe-ajax.html',
+			'doc-jslib-element-position.html',
+			'doc-jslib-get-cell.html',
+			'doc-jslib-get-style.html',
+			'doc-jslib-get-text-height.html',
+			'doc-jslib-guid.html',
+			'doc-jslib-icon-list.html',
+			'doc-jslib-input-selection.html',
+			'doc-jslib-insert-element-after.html',
+			'doc-jslib-is-element-focusable.html',
+			'doc-jslib-keycode-functions.html',
+			'doc-jslib-list-add.html',
+			'doc-jslib-loader.html',
+			'doc-jslib-lorem-text.html',
+			'doc-jslib-make-table-selectable.html',
+			'doc-jslib-mouse-position.html',
+			'doc-jslib-padding.html',
+			'doc-jslib-parent-finding.html',
+			'doc-jslib-pushmessage.html',
+			'doc-jslib-px-em-conversion.html',
+			'doc-jslib-query-string.html',
+			'doc-jslib-safe-uri-decode.html',
+			'doc-jslib-scrolling.html',
+			'doc-jslib-search-to-where.html',
+			'doc-jslib-show-shimmed.html',
+			'doc-jslib-standard-ajax.html',
+			'doc-jslib-str-to-title.html',
+			'doc-jslib-string-to-element.html',
+			'doc-jslib-trigger-event.html',
+			'doc-jslib-trim.html',
+			'doc-jslib-url-state.html',
+			'doc-jslib-version.html',
+			'doc-jslib-websocket.html',
+			'doc-lib-script-so.html',
+			'doc-library/css-test-1.html',
+			'doc-library/css-test-2.html',
+			'doc-library/doc-target.html',
+			'doc-permissions.html'
+		];
+		
+		function iframeLoaded(strCurrentHTML, i) {
+			Global.iframeLen--;
+			
+			//console.log(strHTML);
+			var strFile = Global.arrStrPages[Global.i];
+			
+			strFile.replace('.html', '-' + i + '.html');
+			
+			var strMessage =
+				'FILE\tREAD\t' +
+				'/role/all/tests/' + strFile;
+			
+			GS.requestFromSocket(GS.envSocket, strMessage, function (data, error, errorData) {
+				if (!error) {
+					if (data !== 'TRANSACTION COMPLETED') {
+						var lastModified = data.substring(0, data.indexOf('\n'));
+						var strTestContent = data.substring(data.indexOf('\n') + 1);
+						
+						//console.log('strCurrentHTML', strCurrentHTML);
+						//console.log('strTestContent', strTestContent);
+						
+						if (strTestContent === strCurrentHTML) {
+							GS.ajaxJSON('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=success&id=' + Global.intID,
+							function (data, error) {
+								// if there was no error
+								if (!error) {
+									if (Global.iframeLen === 0) {
+										Global.i++;
+										
+										pageLoad();
+									}
+									
+								// else there was no error
+								} else {
+									GS.ajaxErrorDialog(data);
+								}
+							});
+						} else {
+							GS.ajaxJSON('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=fail&fail_name=' + encodeURIComponent(strFile) +
+								'&id=' + Global.intID,
+							function (data, error) {
+								// if there was no error
+								if (!error) {
+									document.getElementById('iframe_old').src =
+										'/env/role/all/tests/' + Global.arrStrPages[Global.i];
+									
+									document.getElementById('pre_current').innerText = strCurrentHTML;
+									document.getElementById('pre_old').innerText = strTestContent;
+									
+									GS.msgbox('Error', 'Test Failed!');
+									
+								// else there was no error
+								} else {
+									GS.ajaxErrorDialog(data);
+								}
+							});
+						}
+					}
+				} else {
+					strMessage =
+						'FILE\tWRITE\t' +
+						'/role/all/tests/' + strFile + '\t' +
+						GS.encodeForTabDelimited(lastModified) + '\n' +
+						strCurrentHTML;
+					
+					GS.ajaxJSON('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=save&id=' + Global.intID,
+						function (data, error) {
+						// if there was no error
+						if (!error) {
+							GS.requestFromSocket(GS.envSocket, strMessage, function (data, error, errorData) {
+								if (!error) {
+									if (data !== 'TRANSACTION COMPLETED') {
+										if (Global.iframeLen === 0) {
+											Global.i++;
+											
+											pageLoad();
+										}
+									}
+									
+								} else {
+									GS.webSocketErrorDialog(errorData);
+								}
+							});
+							
+						// else there was no error
+						} else {
+							GS.ajaxErrorDialog(data);
+						}
+					});
+					
+				}
+			});
+		}
+		
+		function iframeFinished(objIFrame, i) {
+			console.log('iframeFinished');
+			parent.iframeLoaded(objIFrame.document.body.outerHTML, i);
+		}
+		
+		function pageLoad() {
+			if (Global.i < Global.arrStrPages.length) {
+				document.getElementById('iframe_current').src =
+					'/env/app/developer_g/greyspots-1.1.1/documentation/' + Global.arrStrPages[Global.i];
+				document.getElementById('iframe_current').onload = function () {
+					var arrIFrameTag = document.getElementById('iframe_current').
+						contentWindow.document.querySelectorAll('gs-doc-example');
+					Global.iframeLen = arrIFrameTag.length;
+					
+					
+					for (var i = 0, len = arrIFrameTag.length; i < len; i += 1) {
+						arrIFrameTag[i].i = i;
+					}
+					
+					console.log('set load event');
+					document.getElementById('iframe_current').
+						contentWindow.document.body.addEventListener('load', function (event) {
+						console.log('got load event');
+						var MutationObserver = event.target.contentWindow.MutationObserver;
+						var objMutant = new MutationObserver(
+							function () {
+							clearTimeout(event.target.timeout);
+							arrIFrameTag[i].timeout = setTimeout(iframeFinished, 3000, event.target, event.target.i);
+						}, true);
+						
+						objMutant.observe(document.getElementById('iframe_current').
+							contentWindow.document.body,
+							{
+								childList: true,
+								attributes: true,
+								characterData: true,
+								subtree: true,
+								attributeOldValue: true,
+								truecharacterDataOldValue: true
+							});
+						
+						event.target.timeout = setTimeout(iframeFinished, 3000, event.target, event.target.i);
+					});
+				};
+			} else {
+				GS.ajaxJSON('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + Global.intID,
+				function (data, error) {
+					// if there was no error
+					if (!error) {
+						GS.msgbox('Done', 'Test Succeeded!');
+						
+					// else there was no error
+					} else {
+						GS.ajaxErrorDialog(data);
+					}
+				});
+			}
+		}
+		
+		window.addEventListener('load', function () {
+			GS.ajaxJSON('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=begin&program_name=envelope&user_agent=' +
 				encodeURIComponent(navigator.userAgent), function (data, error) {
 				// if there was no error
 				if (!error) {
-					// do stuff here
+					Global.intID = data;
 					
+					GS.ajaxJSON('/env/auth', 'action=login&connname=doesntexist&username=postgres&password=password',
+					function (data, error) {
+						// if there was no error
+						if (!error) {
+							// first page
+							pageLoad();
+							
+						// else there was no error
+						} else {
+							GS.ajaxErrorDialog(data);
+						}
+					});
 					
 				// else there was no error
 				} else {
@@ -51,8 +308,14 @@
 			<h3>Testing Envelope UI</h3>
 		</gs-header>
 		<gs-body padded>
-			<iframe id="iframe_current">
+			<iframe id="iframe_current" style="width: 500px; height: 500px;">
 			</iframe>
+			<iframe id="iframe_old" style="width: 500px; height: 500px;">
+			</iframe>
+			<pre id="pre_current" style="width: 500px; height: 500px;">
+			</pre>
+			<pre id="pre_old" style="width: 500px; height: 500px;">
+			</pre>
 		</gs-body>
 	</gs-page>
 </body>
