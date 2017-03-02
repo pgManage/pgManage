@@ -102,7 +102,11 @@
     <ClInclude Include="..\..\util\util_strptime.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\postage\web_root\postage\test.html" />
+    <None Include="..\..\postage\web_root\postage\test\test-lib.js" />
+    <None Include="..\..\postage\web_root\postage\test\test-lists.js" />
+    <None Include="..\..\postage\web_root\postage\test\test.css" />
+    <None Include="..\..\postage\web_root\postage\test\index.html" />
+    <None Include="..\..\postage\web_root\postage\test\test.js" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{610DEA50-50E1-48A6-BF11-78F555E5EF51}</ProjectGuid>

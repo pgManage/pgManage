@@ -1,0 +1,66 @@
+body {
+    padding: 0;
+    margin: 0 auto;
+    max-width: 81em;
+    height: auto;
+    box-sizing: border-box;
+    font-family: 'Courier New', monospace;
+}
+
+#checkboxes {
+    margin: 0;
+    box-sizing: border-box;
+    padding: 0.25em;
+}
+#checkboxes div {
+    display: inline-block;
+    padding: 0.5em;
+}
+#checkboxes div input {
+    margin: 0 1em;
+}
+
+h3 {
+    font-size: 1.5em;
+}
+
+small {
+    font-size: 0.75em;
+}
+
+.test-list {
+    margin: 1em;
+    max-width: 25em;
+    min-width: 20em;
+    float: left;
+}
+.disabled {
+    opacity: 0.3;
+}
+
+.test-block {
+    margin: 0;
+    box-sizing: border-box;
+    padding: 0.25em;
+}
+
+.test-list label,
+.test-list input,
+.test-list textarea {
+    width: 100%;
+}
+
+.waiting {
+	background-color: #0000FF;
+	color: #FFFFFF;
+}
+.running {
+	background-color: #FFFF00;
+}
+.fail {
+	background-color: #FF0000;
+	color: #FFFFFF;
+}
+.pass {
+	background-color: #00FF00;
+}
