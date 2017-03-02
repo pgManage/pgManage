@@ -1,30 +1,31 @@
 //global window, GS, document
-var bolZoomLoaded = true;
 
 // if you're new to this page, you should start at the bottom of the file. the
 //      function that starts everything off is there.
 
 
 
+var bolZoomLoaded = true;
+var zoomGlobals = {
+    "intMin": 0,
+    "intMax": 0,
+    "intDefault": 0
+};
 
-// we need to be able to set the zoom cookie, we also don't want to depend on the
-//      zoom cookie's name in multiple places.
-function zoomSetCookie(newValue) {
+
+
+// we need to be able to get the font size of the body (in pixels). we need this because
+function zoomGetBodyFontSize() {
     "use strict";
-    GS.setCookie('postage-zoom', newValue, 9999999);
+    return GS.getTextHeight(document.body, true);
 }
 
 // we need to be able to get the zoom cookie, we also don't want to depend on the
 //      zoom cookie's name in multiple places.
 function zoomGetCookie() {
     "use strict";
-    return GS.getCookie('postage-zoom');
-}
-
-// we need to be able to get the font size of the body (in pixels). we need this because
-function zoomBodyFontSize() {
-    "use strict";
-    return GS.getCookie('postage-zoom');
+    // the zoom number must be integer type, may move this to float at some point
+    return parseInt(GS.getCookie('postage-zoom'), 10);
 }
 
 // we need to be able to take the zoom cookie and set the body font-size from it
@@ -36,7 +37,36 @@ function zoomLoadCookie() {
     // we only want to set the body's font-size if the postage zoom has been set
     if (!isNaN(intZoomPixels)) {
         document.body.style.fontSize = (intZoomPixels + 'px');
+
+        // some elements depend on dimensions that were set with EMs and must be alerted to a
+        //      change of size. thankfully, such items need to listen for window resizes
+        //      already. so, we'll just trigger a window resize of our own. I might be wrong,
+        //      but I think that this is what Google Chrome does after they zoom.
+        GS.triggerEvent(window, 'resize');
     }
+}
+
+// we need to be able to set the zoom cookie, we also don't want to depend on the
+//      zoom cookie's name in multiple places.
+function zoomSetCookie(newValue) {
+    "use strict";
+    var intValue = parseInt(newValue, 10);
+
+    // we don't want the new value going under the min zoom
+    if (intValue < zoomGlobals.intMin) {
+        intValue = zoomGlobals.intMin;
+    }
+
+    // we don't want the new value going over the max zoom
+    if (intValue > zoomGlobals.intMax) {
+        intValue = zoomGlobals.intMax;
+    }
+
+    // we want the new setting to persist across sessions
+    GS.setCookie('postage-zoom', intValue, 9999999);
+
+    // we want the body's font-size to be updated
+    zoomLoadCookie();
 }
 
 
@@ -62,6 +92,12 @@ function zoomStart() {
     //      this is the case, set the body's font-size.
     zoomLoadCookie();
 
+    // for convienence and easy configuration, we'll save the max and min zooms
+    //      as variables
+    zoomGlobals.intMin = 12;
+    zoomGlobals.intDefault = zoomGetBodyFontSize();
+    zoomGlobals.intMax = 30;
+
     // we need to listen for shortcuts that involve zooming, namely:
     //      CMD/CTRL-PLUS
     //      CMD/CTRL-MINUS
@@ -74,10 +110,15 @@ function zoomStart() {
         // cargo cult way of getting keycode
         var keyCode = (event.keyCode || event.which);
 
-        // shortcut and same convention as variables above
+        // we'll make the shiftkey have a shortcut and have the same convention as
+        //      variables above
         var shiftKey = (event.shiftKey);
 
-        console.log('keydown', metaKey, keyCode, shiftKey);
+        // we need a place to store the zoom temporarily while we make modifications
+        //      to it
+        var intZoom;
+
+        //console.log('keydown', metaKey, keyCode, shiftKey);
 
         // if the user presses any of these:
         //      CMD/CTRL-PLUS
@@ -96,11 +137,21 @@ function zoomStart() {
             // we need to prevent the browser from zooming the page.
             event.preventDefault();
             event.stopPropagation();
-            
+
             // we need to get the current zoom so that we can increment it
-            
+            intZoom = zoomGetCookie();
+
             // sometimes, the zoom has not been set yet, if so, assume that the
             //      font-size of the browser is the starting point
+            if (!intZoom) {
+                intZoom = zoomGetBodyFontSize();
+            }
+
+            // we need to modify the zoom level before we save it
+            intZoom += 1;
+
+            // we need to remember the new zoom across sessions
+            zoomSetCookie(intZoom);
 
         // if the user presses any of these:
         //      CMD/CTRL-MINUS
@@ -119,16 +170,26 @@ function zoomStart() {
             // we need to prevent the browser from zooming the page.
             event.preventDefault();
             event.stopPropagation();
-            
+
             // we need to get the current zoom so that we can increment it
-            
+            intZoom = zoomGetCookie();
+
             // sometimes, the zoom has not been set yet, if so, assume that the
             //      font-size of the browser is the starting point
+            if (!intZoom) {
+                intZoom = zoomGetBodyFontSize();
+            }
+
+            // we need to modify the zoom level before we save it
+            intZoom -= 1;
+
+            // we need to remember the new zoom across sessions
+            zoomSetCookie(intZoom);
         }
     });
 
     window.addEventListener('mousewheel', function (event) {
-        console.log('mousewheel');
+        console.log('mousewheel', event);
     });
 }
 

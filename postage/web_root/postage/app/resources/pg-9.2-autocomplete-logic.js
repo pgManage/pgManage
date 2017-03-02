@@ -147,7 +147,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
 
         // extract the current query and subtract from intCursorPosition (because the script will get smaller)
         intStart           = rowAndColumnToIndex(strScript, currentQueryRange.start.row, currentQueryRange.start.column);
-        strScript          = strScript.substring(intStart, intEndCursorPosition); //intCursorPosition + 1
+        strScript          = strScript.substring(intStart, intEndCursorPosition + 1); //intCursorPosition + 1
         intCursorPosition -= intStart;
 
 
@@ -286,7 +286,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
         strPreviousWord = arrPreviousWords[0];
         
         // waterfall to get the autocomplete list type
-        if (strPreviousWord && (/[A-Z\"]/gim).test(strScript[intCursorPosition + 1]) === false) {
+        if (strPreviousWord && (/[A-Z\"]/gim).test(strScript[parseInt(intCursorPosition, 10) + 1]) !== true) {
             bolPreviousCharWhitespace = (!(strScript[intCursorPosition - 1] || '').trim());
             bolCurrentCharWhitespace  = (!(strScript[intCursorPosition] || '').trim());
             bolPreviousCharReturn     = (strScript[intCursorPosition - 1] === '\n');
