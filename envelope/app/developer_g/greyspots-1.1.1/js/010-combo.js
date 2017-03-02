@@ -394,6 +394,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         element.currentDropDownContainer = dropDownContainer;
         
+        //console.log(element.currentDropDownContainer);
         //console.log(element.dropDownTable);
         
         // fill dropdown with content
@@ -632,7 +633,7 @@ document.addEventListener('DOMContentLoaded', function () {
             window.removeEventListener('resize', closeDropDownHandler);
             window.removeEventListener('orientationchange', closeDropDownHandler);
             window.removeEventListener('mousewheel', wheelHandler);
-            window.removeEventListener('click', closeDropDownHandler);
+            document.body.removeEventListener('click', closeDropDownHandler);
         };
         
         // handle record click
@@ -656,7 +657,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.addEventListener('resize', closeDropDownHandler);
         window.addEventListener('orientationchange', closeDropDownHandler);
         window.addEventListener('mousewheel', wheelHandler);
-        window.addEventListener('click', closeDropDownHandler);
+        document.body.addEventListener('click', closeDropDownHandler);
     }
     
     // remove dropdown from screen

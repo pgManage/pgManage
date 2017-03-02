@@ -131,6 +131,7 @@
                     autocompleteStart();
                     loadHeaderText();
                     loadTabsFromServer();
+                    //zoomStart();
 
                     // load state from query string
                     handleLoad();
@@ -224,6 +225,7 @@
                 console.log('bolTabFunctionsLoaded:       ', window.bolTabFunctionsLoaded);
                 console.log('bolExplainLoaded:            ', window.bolExplainLoaded);
                 console.log('bolD3Loaded:                 ', window.bolD3Loaded);
+                console.log('bolZoomLoaded:               ', window.bolZoomLoaded);
 
                 // if a file didn't load: popup an error (execute orderSixtySix)
                 if (!window.bolAutocompleteLogicLoaded
@@ -238,7 +240,8 @@
                  || !window.bolHomeLoaded
                  || !window.bolTabFunctionsLoaded
                  || !window.bolExplainLoaded
-                 || !window.bolD3Loaded) {
+                 || !window.bolD3Loaded
+                 || !window.bolZoomLoaded) {
                     orderSixtySix();
                 }
             });
@@ -550,6 +553,7 @@
         <script src="resources/pg-9.2-other.js" type="text/javascript"></script>
         <script src="resources/pg-9.2-query-selection.js" type="text/javascript"></script>
         <script src="resources/pg-9.2-explain.js" type="text/javascript"></script>
+        <script src="resources/pg-9.2-zoom.js" type="text/javascript"></script>
         <script src="../js/d3.js" type="text/javascript"></script>
     </body>
 </html>

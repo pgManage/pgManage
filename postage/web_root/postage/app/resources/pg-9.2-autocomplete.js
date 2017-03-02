@@ -89,8 +89,7 @@ function autocompleteBindEditor(tabElement, editor) {
                             // this function is in pg-9.2-autocomplete-logic.js
                             
                             var selectionRanges = editor.currentSelections[0];
-                            console.log(selectionRanges);
-                            console.log(event);
+                            
                             if (editor.currentSelections.length > 1) {
                                 if (
                                     selectionRanges.start.row === event.start.row &&

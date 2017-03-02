@@ -282,12 +282,11 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             
             i += 1;
         }
-        
         strPreviousKeyWord = arrPreviousKeyWords[0];
         strPreviousWord = arrPreviousWords[0];
         
         // waterfall to get the autocomplete list type
-        if (strPreviousWord) {
+        if (strPreviousWord && (/[A-Z\"]/gim).test(strScript[intCursorPosition + 1]) === false) {
             bolPreviousCharWhitespace = (!(strScript[intCursorPosition - 1] || '').trim());
             bolCurrentCharWhitespace  = (!(strScript[intCursorPosition] || '').trim());
             bolPreviousCharReturn     = (strScript[intCursorPosition - 1] === '\n');
@@ -1114,10 +1113,14 @@ var snippetHandler = function (lines, event, editor) {
         arrQueries = [autocompleteQuery.schemas];
         arrQueries[0] = arrQueries[0].replace((/\{\{searchStr}\}/gi), lines.toLowerCase() + '%');
         
+        
         var strScript = editor.getValue();
+        intStartCursorPosition = rowAndColumnToIndex(strScript, event.start.row, event.start.column);
+        intCursorPosition = intStartCursorPosition;
+        
         var intEndCursorPosition = rowAndColumnToIndex(strScript, event.end.row, event.end.column);
         // if we've found queries: open the popup
-        if (arrQueries && arrQueries.length > 0) {
+        if (arrQueries && arrQueries.length > 0  && (/[A-Z\"]/gim).test(strScript[intCursorPosition + 1]) === false) {
             autocompleteGlobals.intSearchStart = intEndCursorPosition - 1;
             autocompleteGlobals.intSearchEnd = intEndCursorPosition;
             autocompletePopupOpen(editor, arrQueries);
