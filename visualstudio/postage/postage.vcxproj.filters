@@ -22,6 +22,9 @@
     <Filter Include="Source Files\util">
       <UniqueIdentifier>{5e338d7f-2a3b-448b-bea5-5a7853dc1115}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\test">
+      <UniqueIdentifier>{25fae25d-bae0-42d4-a64f-f4cb5e7f5f80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\postage\ws_tab.c">
@@ -265,8 +268,20 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\postage\web_root\postage\test.html">
-      <Filter>Resource Files</Filter>
+    <None Include="..\..\postage\web_root\postage\test\test.css">
+      <Filter>Resource Files\test</Filter>
+    </None>
+    <None Include="..\..\postage\web_root\postage\test\test.js">
+      <Filter>Resource Files\test</Filter>
+    </None>
+    <None Include="..\..\postage\web_root\postage\test\test-lib.js">
+      <Filter>Resource Files\test</Filter>
+    </None>
+    <None Include="..\..\postage\web_root\postage\test\index.html">
+      <Filter>Resource Files\test</Filter>
+    </None>
+    <None Include="..\..\postage\web_root\postage\test\test-lists.js">
+      <Filter>Resource Files\test</Filter>
     </None>
   </ItemGroup>
 </Project>
