@@ -23,6 +23,8 @@ struct sock_ev_client_update {
 	char *str_real_table_name;
 	char *str_temp_table_name;
 	char *str_sql;
+	char *str_return_order_by;
+	size_t int_return_order_by_len;
 
 	char *str_columns;
 	size_t int_columns_length;
@@ -58,10 +60,11 @@ struct sock_ev_client_update {
 };
 
 /*
-********************************** REQUEST FORMAT
-************************************
+********************************** REQUEST FORMAT ************************************
 UPDATE\t[<schemaname>\t]<tablename>
+HARH\t(<tabseperatedcolumns>|*)
 RETURN\t(<tabseperatedcolumns>|*)
+[ORDER BY\t<returnorderby>]
 
 (pk|hash|set)[\t(pk|hash|set)[...]]
 <columnname>[\t<columnname>[...]]
