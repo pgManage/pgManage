@@ -19,6 +19,8 @@
         <script src="../resources/pg-9.2-tree-functions.js" type="text/javascript"></script>
         <script src="../resources/pg-9.2-tree-queries.js" type="text/javascript"></script>
         
+        <script src="../../js/page-zoom.js" type="text/javascript"></script>
+
         <script>
             var strTableName, strSchemaName, strHasOids, strConstraints, arrConstraint, strGrantsEtc, arrColumn = [], strRelOptions;
             
@@ -820,6 +822,11 @@
                         }
                     });
                 });
+            });
+            
+            window.addEventListener('load', function () {
+                "use strict";
+                zoomStart();
             });
         </script>
         

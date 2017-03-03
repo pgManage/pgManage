@@ -29,6 +29,13 @@ var zoomGlobals = {
 //      function that starts everything off is there.
 
 
+// we want to be able to use this file on multiple pages and have the zoom levels be different
+//      so, we'll use the file path to differentiate
+function zoomGetPageName() {
+    "use strict";
+    return window.location.pathname;
+}
+
 // we need to be able to get the font size of the body (in pixels). we need this because
 function zoomGetBodyFontSize() {
     "use strict";
@@ -40,7 +47,7 @@ function zoomGetBodyFontSize() {
 function zoomGet() {
     "use strict";
     // the zoom number must be integer type, may move this to float at some point
-    return parseInt(localStorage.postageZoom, 10);
+    return parseInt(localStorage['postageZoom' + zoomGetPageName()], 10);
 }
 
 // we need to be able to take the zoom property and set the body font-size from it
@@ -77,7 +84,7 @@ function zoomSet(newValue) {
     }
 
     // we want the new setting to persist across sessions
-    localStorage.postageZoom = intValue;
+    localStorage['postageZoom' + zoomGetPageName()] = intValue;
 
     // we want the body's font-size to be updated
     // on MS Edge, the gs-page responding to the window resize slows down the browser,
@@ -118,6 +125,13 @@ function zoomStart() {
         // we need to make sure the focus isn't in the iframe
         if (document.getElementById('focus-stealer')) {
             document.getElementById('focus-stealer').focus();
+        }
+
+        // if there is a news iframe, focus the focus stealer on load
+        if (document.getElementById('iframe-news')) {
+            document.getElementById('iframe-news').addEventListener('load', function () {
+                document.getElementById('focus-stealer').focus();
+            });
         }
 
         // for convienence and easy configuration, we'll save the max and min zooms

@@ -12,6 +12,8 @@
         <link href="../../css/postage.css" type="text/css" rel="stylesheet" />
         <script src="datagrid.js" type="text/javascript"></script>
         <link href="datagrid.css" type="text/css" rel="stylesheet" />
+        <script src="../../js/page-zoom.js" type="text/javascript"></script>
+
         
         <script>
             //global GS, window, ml
@@ -37,7 +39,9 @@
             window.addEventListener('load', function () {
                 'use strict'
                 var qs = GS.qryToJSON(GS.getQueryString()), strQuery;
-                
+
+                zoomStart();
+
                 GS.addLoader('getting_info');
                 // get pk if possible (else use whole column list)
                 strQuery = ml(function () {/*

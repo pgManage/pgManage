@@ -66,181 +66,191 @@ function treeStart() {
             }
         }
     });
-        
-    treeGlobals.ace.addEventListener('mousedown', function (event) {
-        var stateMoveFunction;
-        var stateEndFunction;
-        bolMousedown = true;
-        intSelectionTriggered = 0;
-        var currentcursorX, currentcursorY;
-        var startcursorX, startcursorY;
-        
-        // save origin point so you can cancel if it doesn't move enough
-        startcursorX = event.clientX;
-    	startcursorY = event.clientY;
-    	// save origin point so you can cancel selection of tree view
-        dragstartcursorX = event.clientX;
-    	dragstartcursorY = event.clientY;
 
-
-
-    mouseMoveFunction = function (event) {
-        // get cursor position (x/y)
-        cursorX = event.clientX;
-    	cursorY = event.clientY;
-    	
-    	if (xtag.query(document.body, '.current-tab')[0] !== undefined){
-            // move ace cursor
-            xtag.query(document.body, '.current-tab')[0].relatedEditor.selection.moveToPosition(xtag.query(document.body, '.current-tab')[0].relatedEditor.renderer.screenToTextCoordinates(cursorX, cursorY));
-    	}
-    	
-    	// set ghost position to cursor position (x/y) with changes to center it
-        ghost.style.left = (cursorX - ((ghost.innerHTML.length * 3) + 5)) + 'px';
-        ghost.style.top = (cursorY - 15) + 'px';
-        
-        
-        //console.log(cursorX, cursorX, dragstartcursorX, dragstartcursorY);
-        // after moving ten pixels:
-        if (cursorX <= (dragstartcursorX - 10) || cursorX >= (dragstartcursorX + 10) || (cursorY <= dragstartcursorY - 10) || cursorY >= (dragstartcursorY + 10)) {
-            // clear selection
-            treeGlobals.ace.getSession().selection.clearSelection();
-        }
-    }
-
-
-        
-        // this handles mouseup out of the window by running
-        //      the end function if the mouse moves while it is up
-        stateMoveFunction = function (event) {
-            if (!evt.touchDevice) {
-                // if there is a editor tab open:
-                if (xtag.query(document.body, '.current-tab')[0] !== undefined){
-                    // focus to editor
-                    xtag.query(document.body, '.current-tab')[0].relatedEditor.focus();
+    if (!evt.touchDevice) {
+        treeGlobals.ace.addEventListener('mousedown', function (event) {
+            var stateMoveFunction;
+            var stateEndFunction;
+            var currentcursorX;
+            var currentcursorY;
+            var startcursorX;
+            var startcursorY;
+            var currentTab = xtag.query(document.body, '.current-tab')[0];
+    
+            bolMousedown = true;
+            intSelectionTriggered = 0;
+    
+            // save origin point so you can cancel if it doesn't move enough
+            startcursorX = event.clientX;
+            startcursorY = event.clientY;
+    
+            // save origin point so you can cancel selection of tree view
+            dragstartcursorX = event.clientX;
+            dragstartcursorY = event.clientY;
+    
+            mouseMoveFunction = function (event) {
+                // get cursor position (x/y)
+                cursorX = event.clientX;
+                cursorY = event.clientY;
+    
+                if (currentTab !== undefined){
+                    // move ace cursor
+                    currentTab.relatedEditor.selection.moveToPosition(
+                        currentTab.relatedEditor.renderer.screenToTextCoordinates(cursorX, cursorY)
+                    );
                 }
-            }
-            // IF mouse is up AND we're not on a touch device
-            if (event.which === 0 && !evt.touchDevice) {
-                stateEndFunction(event);
-            }
-        };
-
-        stateEndFunction = function (event) {
-            // get current cursor position
-            currentcursorX = (window.Event) ? event.pageX : event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-            currentcursorY = (window.Event) ? event.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
-            bolMousedown = false;
-            bolSelectionTriggered = 0;
-            
-            
-            // if cursor has moved off of treeview to the editor ace
-            if (currentcursorX > (elemPos.intElementWidth + 60)) {
-                // if there is a editor tab open:
-                if (xtag.query(document.body, '.current-tab')[0] !== undefined){
-                    // insert snippet text
-                    xtag.query(document.body, '.current-tab')[0].relatedEditor.insert(ghost.innerHTML);
+    
+                // set ghost position to cursor position (x/y) with changes to center it
+                ghost.style.left = (cursorX - ((ghost.innerHTML.length * 3) + 5)) + 'px';
+                ghost.style.top = (cursorY - 15) + 'px';
+    
+                //console.log(cursorX, cursorX, dragstartcursorX, dragstartcursorY);
+    
+                // after moving ten pixels:
+                if (
+                    cursorX <= (dragstartcursorX - 10) ||
+                    cursorX >= (dragstartcursorX + 10) ||
+                    cursorY <= (dragstartcursorY - 10) ||
+                    cursorY >= (dragstartcursorY + 10)
+                ) {
+                    // clear selection
+                    treeGlobals.ace.getSession().selection.clearSelection();
                 }
-            }
-            
-            
-            // remove ghost if appended
-            if (ghost && ghost.parentNode && ghost.parentNode.nodeName === 'BODY') {
-                ghost.parentNode.removeChild(ghost);
-            }
-            
-            
-        strName = '';
-        // unbind mousemove and mouseup
-        document.body.removeEventListener(evt.mousemove, stateMoveFunction);
-        document.body.removeEventListener(evt.mouseup, stateEndFunction);
-        document.body.removeEventListener('mousemove', mouseMoveFunction);
-        };
-
-        document.body.addEventListener(evt.mousemove, stateMoveFunction);
-        document.body.addEventListener(evt.mouseup, stateEndFunction);
-    });
-
-    // start drag on changeSelection
-    treeGlobals.ace.addEventListener('changeSelection', function (event) {
-        var jsnSelection;
-        var jsnData;
-        var subStrEnd;
-
-        // only listen to selection change on the second trigger
-    if (intSelectionTriggered === 0) {
-            intSelectionTriggered += 1;
-        } else if (bolMousedown && intSelectionTriggered === 1) {
-            intSelectionTriggered += 1;
-            jsnSelection = treeGlobals.ace.getSelectionRange();
-            intSelectionRow = jsnSelection.start.row;
-            jsnData = treeGlobals.data[intSelectionRow];
-
-
-            if (jsnData) {
-                // tables
-                if (jsnData.query === 'objectTable') {
-                    strName = jsnData.name;
-                    strNameOpt = jsnData.schemaName + '.' + jsnData.name
-                // views
-                } else if (jsnData.query === 'objectView') {
-                    strName = jsnData.name;
-                    strNameOpt = jsnData.schemaName + '.' + jsnData.name;
-                // non-schema objects (functions, sequences, etc...)
-                } else if (jsnData.schemaName && jsnData.schemaOID && jsnData.oid !== jsnData.schemaOID) {
-                    strName = jsnData.name;
-                    strNameOpt = jsnData.schemaName + '.' + jsnData.name;
-                // schemas
-                } else if (!jsnData.schemaName && jsnData.oid) { // schemas use .name for their name, not .schemaName
-                    strName = jsnData.name;
-                    strNameOpt = jsnData.name;
-                // columns
-                }if (jsnData.type === '') {
-                    
-                    // substring column type off of column name
-                    subStrEnd = strName.lastIndexOf(' (');
-                    strName = strName.substring(0, subStrEnd);
-                    
-                    // go up a record until you find a table/view
-                    for (var intI = intSelectionRow; intI >= 0; intI -= 1) {
-                        if (treeGlobals.data[intI].query === 'objectTable') {
-                            
-                            strNameOpt = treeGlobals.data[intI].name + '.' + strName.substring(0, subStrEnd);
-                            //set intI to  0 to cancel the loop
-                            intI = 0;
-                        } else if (treeGlobals.data[intI].query === 'objectView') {
-                            strNameOpt = treeGlobals.data[intI].name + '.' + strName.substring(0, subStrEnd);
-                            //set intI to  0 to cancel the loop
-                            intI = 0;
-                        }
+            };
+    
+            // this handles mouseup out of the window by running
+            //      the end function if the mouse moves while it is up
+            stateMoveFunction = function (event) {
+                if (!evt.touchDevice) {
+                    // if there is a editor tab open:
+                    if (xtag.query(document.body, '.current-tab')[0] !== undefined){
+                        // focus to editor
+                        xtag.query(document.body, '.current-tab')[0].relatedEditor.focus();
                     }
                 }
+                // IF mouse is up AND we're not on a touch device
+                if (event.which === 0 && !evt.touchDevice) {
+                    stateEndFunction(event);
+                }
+            };
+    
+            stateEndFunction = function (event) {
+                // get current cursor position
+                currentcursorX = (window.Event) ? event.pageX : event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
+                currentcursorY = (window.Event) ? event.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+                bolMousedown = false;
+                bolSelectionTriggered = 0;
+                
+                
+                // if cursor has moved off of treeview to the editor ace
+                if (currentcursorX > (elemPos.intElementWidth + 60)) {
+                    // if there is a editor tab open:
+                    if (xtag.query(document.body, '.current-tab')[0] !== undefined){
+                        // insert snippet text
+                        xtag.query(document.body, '.current-tab')[0].relatedEditor.insert(ghost.innerHTML);
+                    }
+                }
+                
+                
+                // remove ghost if appended
+                if (ghost && ghost.parentNode && ghost.parentNode.nodeName === 'BODY') {
+                    ghost.parentNode.removeChild(ghost);
+                }
+                
+                
+            strName = '';
+            // unbind mousemove and mouseup
+            document.body.removeEventListener(evt.mousemove, stateMoveFunction);
+            document.body.removeEventListener(evt.mouseup, stateEndFunction);
+            document.body.removeEventListener('mousemove', mouseMoveFunction);
+            };
+    
+            document.body.addEventListener(evt.mousemove, stateMoveFunction);
+            document.body.addEventListener(evt.mouseup, stateEndFunction);
+        });
+    
+        // start drag on changeSelection
+        treeGlobals.ace.addEventListener('changeSelection', function (event) {
+            var jsnSelection;
+            var jsnData;
+            var subStrEnd;
+    
+            // only listen to selection change on the second trigger
+        if (intSelectionTriggered === 0) {
+                intSelectionTriggered += 1;
+            } else if (bolMousedown && intSelectionTriggered === 1) {
+                intSelectionTriggered += 1;
+                jsnSelection = treeGlobals.ace.getSelectionRange();
+                intSelectionRow = jsnSelection.start.row;
+                jsnData = treeGlobals.data[intSelectionRow];
+    
+    
+                if (jsnData) {
+                    // tables
+                    if (jsnData.query === 'objectTable') {
+                        strName = jsnData.name;
+                        strNameOpt = jsnData.schemaName + '.' + jsnData.name
+                    // views
+                    } else if (jsnData.query === 'objectView') {
+                        strName = jsnData.name;
+                        strNameOpt = jsnData.schemaName + '.' + jsnData.name;
+                    // non-schema objects (functions, sequences, etc...)
+                    } else if (jsnData.schemaName && jsnData.schemaOID && jsnData.oid !== jsnData.schemaOID) {
+                        strName = jsnData.name;
+                        strNameOpt = jsnData.schemaName + '.' + jsnData.name;
+                    // schemas
+                    } else if (!jsnData.schemaName && jsnData.oid) { // schemas use .name for their name, not .schemaName
+                        strName = jsnData.name;
+                        strNameOpt = jsnData.name;
+                    // columns
+                    }if (jsnData.type === '') {
+                        
+                        // substring column type off of column name
+                        subStrEnd = strName.lastIndexOf(' (');
+                        strName = strName.substring(0, subStrEnd);
+                        
+                        // go up a record until you find a table/view
+                        for (var intI = intSelectionRow; intI >= 0; intI -= 1) {
+                            if (treeGlobals.data[intI].query === 'objectTable') {
+                                
+                                strNameOpt = treeGlobals.data[intI].name + '.' + strName.substring(0, subStrEnd);
+                                //set intI to  0 to cancel the loop
+                                intI = 0;
+                            } else if (treeGlobals.data[intI].query === 'objectView') {
+                                strNameOpt = treeGlobals.data[intI].name + '.' + strName.substring(0, subStrEnd);
+                                //set intI to  0 to cancel the loop
+                                intI = 0;
+                            }
+                        }
+                    }
+                    if (strName) {
+                        document.body.addEventListener('mousemove', mouseMoveFunction);
+                    }
+                }
+                
                 if (strName) {
-                    document.body.addEventListener('mousemove', mouseMoveFunction);
-                }
-            }
-            
-            if (strName) {
-                ghost = document.createElement('p')
-                ghost.style.minHeight = '0px';
-                ghost.style.padding = '0.25em';
-                ghost.style.position = 'absolute';
-                ghost.style.zIndex = '999999999999';
-                ghost.style.opacity = '0.5';
-                ghost.style.width = strName.length + '.99em';
-                ghost.style.height =  '1.5em';
-                ghost.innerHTML += '' + strName + '';
-                ghost.style.pointerEvents = 'none';
-                
-                // if ghost is not appended yet: append to body
-                if (!ghost.parentNode || ghost.parentNode.nodeName !== 'BODY') {
-                    document.body.appendChild(ghost);
+                    ghost = document.createElement('p')
+                    ghost.style.minHeight = '0px';
+                    ghost.style.padding = '0.25em';
+                    ghost.style.position = 'absolute';
+                    ghost.style.zIndex = '999999999999';
+                    ghost.style.opacity = '0.5';
+                    ghost.style.width = strName.length + '.99em';
+                    ghost.style.height =  '1.5em';
+                    ghost.innerHTML += '' + strName + '';
+                    ghost.style.pointerEvents = 'none';
+                    
+                    // if ghost is not appended yet: append to body
+                    if (!ghost.parentNode || ghost.parentNode.nodeName !== 'BODY') {
+                        document.body.appendChild(ghost);
+                    }
+                    
+                    
                 }
                 
-                
             }
-            
-        }
-    });
+        });
+    }
 
 
 
