@@ -24,6 +24,21 @@ try {
 	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync(app.getAppPath() + '/postage/config/postage-connections.conf', 'utf8'), 'utf8');
 }
 
+if (process.platform == 'win32') {
+	try {
+		fs.statSync(process.env.APPDATA + '\\postgresql\\pgpass.conf');
+	} catch (e) {
+		fs.writeFileSync(process.env.APPDATA + '\\postgresql\\pgpass.conf', '\n', 'utf8');
+	}
+} else {
+	try {
+		fs.statSync(os.homedir() + '/.pgpass');
+	} catch (e) {
+		fs.writeFileSync(os.homedir() + '/.pgpass', '\n', 'utf8');
+		fs.chmodSync(os.homedir() + '/.pgpass', 0600);
+	}
+}
+
 function spawnPostage() {
 	proc = child_process.spawn(
 		path.normalize(app.getAppPath() + '/postage/postage' + (process.platform == 'win32' ? '.exe' : '')),
