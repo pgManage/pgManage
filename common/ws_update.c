@@ -108,6 +108,17 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 	);
 	SFINISH_CHECK(client_update->ptr_query != NULL, "Could not find end of %s clause", _____str_temp);
 	client_update->ptr_query += 1;
+	if (strncmp(client_update->ptr_query, "ORDER BY", 8) == 0) {
+		char *str_temp = client_update->ptr_query + 9;
+		client_update->ptr_query = bstrstr(
+			client_update->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_update->ptr_query - client_request->frame->str_message)),
+			"\012", (size_t)1
+		);
+		SFINISH_CHECK(client_update->ptr_query != NULL, "Could not find end of ORDER BY clause");
+		size_t int_temp_len = (size_t)(client_update->ptr_query - str_temp);
+		SFINISH_SNCAT(client_update->str_return_order_by, &client_update->int_return_order_by_len, str_temp, int_temp_len);
+	}
+	client_update->ptr_query += 1;
 	while (*client_update->ptr_query == '\012') {
 		client_update->ptr_query += 1;
 	}
@@ -839,7 +850,17 @@ bool ws_update_step6(EV_P, void *cb_data, DB_result *res) {
 		" ON ", (size_t)4,
 		client_update->str_pk_join_clause, client_update->int_pk_join_clause_len,
 		" WHERE ", (size_t)7,
-		client_update->str_pk_where_clause, client_update->int_pk_where_clause_len,
+		client_update->str_pk_where_clause, client_update->int_pk_where_clause_len
+	);
+
+	if (client_update->str_return_order_by != NULL) {
+		SFINISH_SNFCAT(str_sql, &int_sql_len,
+			" ORDER BY ", (size_t)10,
+			client_update->str_return_order_by, client_update->int_return_order_by_len
+		);
+	}
+
+	SFINISH_SNFCAT(str_sql, &int_sql_len,
 		") TO STDOUT;", (size_t)12);
 #else
 	SFINISH_SNCAT(str_sql, &int_sql_len,
@@ -853,7 +874,8 @@ bool ws_update_step6(EV_P, void *cb_data, DB_result *res) {
 		client_update->str_pk_join_clause, client_update->int_pk_join_clause_len,
 		" WHERE ", (size_t)7,
 		client_update->str_pk_where_clause, client_update->int_pk_where_clause_len,
-		";", (size_t)1);
+		";", (size_t)1
+	);
 #endif
 
 	SDEBUG("str_sql: %s", str_sql);
