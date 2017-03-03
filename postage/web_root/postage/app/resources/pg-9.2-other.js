@@ -170,14 +170,6 @@ function menuTools(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-    if (window.process && window.process.type === 'renderer' && window.opn === undefined) {
-        var electron = require('electron');
-        var path = require('path');
-        window.opn = require(path.normalize(electron.remote.app.getAppPath() + '/node_modules/opn'));
-    } else {
-        window.opn = window.open;
-    }
-
     templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
@@ -210,9 +202,9 @@ function menuTools(target) {
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft onclick="window.location.reload(true);" icon="refresh">Clear Cache</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft target="_blank"
-                            href="javascript:opn('https://github.com/workflowproducts/postage/')" icon="github">Postage On Github</gs-button>
+                            href="https://github.com/workflowproducts/postage/" icon="github">Postage On Github</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft target="_blank"
-                            href="javascript:opn('https://github.com/workflowproducts/postage/issues')" icon="bug">Report An Issue</gs-button>
+                            href="https://github.com/workflowproducts/postage/issues" icon="bug">Report An Issue</gs-button>
             </gs-body>
         </gs-page>
     */});
@@ -2111,7 +2103,7 @@ function executeScript() {
                                     } else {
                                         trElement = document.createElement('tr');
                                         arrCells = arrRecords[rec_i].split('\t');
-                                        
+
                                         //console.log(
                                         //    '4***',
                                         //    arrCells

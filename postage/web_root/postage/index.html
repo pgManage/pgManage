@@ -243,11 +243,15 @@ window.addEventListener('load', function () {
     //if we are in electron, then add a button to edit the connection file
     if (window.process && window.process.type === 'renderer') {
         document.getElementById('buttonNewConnections').removeAttribute('hidden');
+        document.getElementById('buttonPGPASS').removeAttribute('hidden');
 
-        const electron = require('electron');
-        const ipcRenderer = electron.ipcRenderer;
+        var electron = require('electron');
+        var ipcRenderer = electron.ipcRenderer;
 		document.getElementById('buttonNewConnections').addEventListener('click', function () {
 			ipcRenderer.send('postage', 'edit connections');
+		});
+		document.getElementById('buttonPGPASS').addEventListener('click', function () {
+			ipcRenderer.send('postage', 'edit PGPASS');
 		});
     }
 
@@ -329,7 +333,8 @@ window.addEventListener('load', function () {
                             <div class="style-bracket-left"></div>
                             <div class="style-bracket-right"></div>
 
-                            <gs-button id="buttonNewConnections" hidden style="float: right;" inline bg-primary remove-bottom>Edit postage-connections.conf</gs-button>
+							<gs-button id="buttonNewConnections" hidden style="float: right;" inline bg-primary remove-bottom remove-left>Edit postage-connections.conf</gs-button>
+							<gs-button id="buttonPGPASS" hidden style="float: right;" inline bg-primary remove-bottom remove-right>Edit PGPASS</gs-button>
 
                             <div id="predefined-option-container" style="clear: both;"></div>
                         </div>

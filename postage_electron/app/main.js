@@ -24,6 +24,21 @@ try {
 	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync(app.getAppPath() + '/postage/config/postage-connections.conf', 'utf8'), 'utf8');
 }
 
+if (process.platform == 'win32') {
+	try {
+		fs.statSync(process.env.APPDATA + '\\postgresql\\pgpass.conf');
+	} catch (e) {
+		fs.writeFileSync(process.env.APPDATA + '\\postgresql\\pgpass.conf', '\n', 'utf8');
+	}
+} else {
+	try {
+		fs.statSync(os.homedir() + '/.pgpass');
+	} catch (e) {
+		fs.writeFileSync(os.homedir() + '/.pgpass', '\n', 'utf8');
+		fs.chmodSync(os.homedir() + '/.pgpass', 0600);
+	}
+}
+
 function spawnPostage() {
 	proc = child_process.spawn(
 		path.normalize(app.getAppPath() + '/postage/postage' + (process.platform == 'win32' ? '.exe' : '')),
@@ -50,6 +65,13 @@ function spawnPostage() {
 	proc.on('close', function (code) {
 		console.log(proc.pid + ' closed with code ' + code);
 	});
+}
+
+function handleRedirect(e, url) {
+	if (url.indexOf('http://127.0.0.1:' + int_postage_port) === -1) {
+		e.preventDefault()
+		electron.shell.openExternal(url);
+	}
 }
 
 var int_postage_port = null;
@@ -93,9 +115,11 @@ require('electron-context-menu')({});
 let mainWindows = [];
 let configWindow = null;
 let connectionWindow = null;
+let pgpassWindow = null;
 let mainWindowState = null;
 let configWindowState = null;
 let connectionWindowState = null;
+let pgpassWindowState = null;
 
 ipcMain.on('postage', function (event, arg) {
 	if (arg === 'restart') {
@@ -113,6 +137,17 @@ ipcMain.on('postage', function (event, arg) {
 		});
 		connectionWindowState.manage(connectionWindow);
 		connectionWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
+	} else if (arg === 'edit PGPASS') {
+		pgpassWindow = new BrowserWindow({
+			'x': pgpassWindowState.x,
+			'y': pgpassWindowState.y,
+			'width': pgpassWindowState.width,
+			'height': pgpassWindowState.height
+		});
+		pgpassWindowState.manage(pgpassWindow);
+		pgpassWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
+		pgpassWindow.webContents.on('will-navigate', handleRedirect);
+		pgpassWindow.webContents.on('new-window', handleRedirect);
 	}
 })
 
@@ -155,6 +190,21 @@ function setMenu() {
 						});
 						connectionWindowState.manage(connectionWindow);
 						connectionWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
+					}
+				},
+				{
+					label: 'Edit PGPASS',
+					click: function () {
+						pgpassWindow = new BrowserWindow({
+							'x': pgpassWindowState.x,
+							'y': pgpassWindowState.y,
+							'width': pgpassWindowState.width,
+							'height': pgpassWindowState.height
+						});
+						pgpassWindowState.manage(pgpassWindow);
+						pgpassWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
+						pgpassWindow.webContents.on('will-navigate', handleRedirect);
+						pgpassWindow.webContents.on('new-window', handleRedirect);
 					}
 				},
 				{
@@ -313,6 +363,9 @@ function openWindow() {
 	curWindow.on('closed', function () {
 		mainWindows.splice(mainWindows.indexOf(curWindow), 1);
 	});
+
+	curWindow.webContents.on('will-navigate', handleRedirect);
+	curWindow.webContents.on('new-window', handleRedirect);
 }
 
 function appStart() {
@@ -337,6 +390,13 @@ function appStart() {
 		defaultHeight: 768,
 		path: os.homedir() + '/.postage/',
 		file: 'connection-window-state.json'
+	});
+
+	pgpassWindowState = windowStateKeeper({
+		defaultWidth: 1024,
+		defaultHeight: 768,
+		path: os.homedir() + '/.postage/',
+		file: 'pgpass-window-state.json'
 	});
 
 	openWindow();

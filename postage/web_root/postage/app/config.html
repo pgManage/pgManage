@@ -5,9 +5,9 @@
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
-        
+
         <title>Postage Configuration editor</title>
-        
+
 		<script src="../js/greyspots.js" type="text/javascript"></script>
         <script src="resources/ace/ace.js" data-ace-base="resources/ace/" type="text/javascript" charset="utf-8"></script>
         <script src="resources/ace/ext-language_tools.js" type="text/javascript"></script>
@@ -15,26 +15,40 @@
 		<link href="resources/pg-9.2-other.css" rel="stylesheet" type="text/css" />
 		<link href="../css/greyspots.css" rel="stylesheet" type="text/css" />
         <link href="../css/postage.css" rel="stylesheet" type="text/css" />
-        
+
         <script>
 			const os = require('os');
 			const fs = require('fs');
-			const ipcRenderer = require('electron').ipcRenderer;
+			const path = require('path');
+			const electron = require('electron');
+			const ipcRenderer = electron.ipcRenderer;
 			window.Range = require('ace/range').Range;
 			const file = GS.qryGetVal(GS.getQueryString(), 'file');
-			
+
+			function getPGPASSLoc() {
+				if (process.platform == 'win32') {
+					return path.normalize(process.env.APPDATA + '/postgresql/pgpass.conf');
+				} else {
+					return os.homedir() + '/.pgpass';
+				}
+			}
+			const filePath = (file === 'PGPASS' ? getPGPASSLoc() : os.homedir() + '/.postage/' + file);
+
 			document.title = file;
-			
+
 			function restartPostage() {
 				ipcRenderer.send('postage', 'restart');
 			}
-			
+
 			document.addEventListener('DOMContentLoaded', function () {
 				var 	indicator = document.getElementById('conf-indicator')
 					,	editor;
-				
+
 				document.getElementById('header-text-container').textContent = file;
-				
+				if (file === 'PGPASS') {
+					document.getElementById('pgpass_docs').removeAttribute('hidden');
+				}
+
 				editor = ace.edit('conf-editor');
 				editor.setTheme('ace/theme/eclipse');
 				editor.getSession().setMode('ace/mode/ini');
@@ -46,8 +60,8 @@
 				editor.$blockScrolling = Infinity;
 
 				editor.ignoreChange = true;
-				 
-				fs.readFile(os.homedir() + '/.postage/' + file, 'utf8', function readCallback(err, strValue) {
+
+				fs.readFile(filePath, 'utf8', function readCallback(err, strValue) {
 					if (err) {
 						var templateElement = document.createElement('template');
 						templateElement.innerHTML = ml(function () {/*
@@ -61,30 +75,30 @@
 								</gs-footer>
 							</gs-page>
 						*/}).replace(/\{\{desc\}\}/, err.message);
-						
+
 						GS.openDialog(templateElement, function () {
 							indicator.textContent = '';
-							
+
 						}, function (event) {
-							fs.readFile(os.homedir() + '/.postage/' + file, 'utf8', readCallback);
+							fs.readFile(filePath, 'utf8', readCallback);
 						});
 					} else {
 				        editor.setValue(strValue);
-				        
+
 				        editor.ignoreChange = false;
-				        
+
 				        editor.session.selection.setRange(new Range(0, 0, 0, 0));
 				        editor.resize(true);
-				        
+
 				        // reset undo stack so that we can't undo to empty
 				        //      (last time I tried to do this without the timer and didn't find a solution)
 				        setTimeout(function () {
 				            editor.getSession().getUndoManager().reset();
 				        }, 1);
-						
+
 						editor.on('change', function save() {
 							indicator.textContent = 'Saving...';
-							fs.writeFile(os.homedir() + '/.postage/' + file, editor.getValue(), 'utf8', function (err) {
+							fs.writeFile(filePath, editor.getValue(), 'utf8', function (err) {
 								if (err) {
 									var templateElement = document.createElement('template');
 		                            templateElement.innerHTML = ml(function () {/*
@@ -98,10 +112,10 @@
 		                                    </gs-footer>
 		                                </gs-page>
 		                            */}).replace(/\{\{desc\}\}/, err.message);
-		                            
+
 		                            GS.openDialog(templateElement, function () {
 										indicator.textContent = '';
-		                                
+
 		                            }, function (event, strAnswer) {
 		                                save();
 		                            });
@@ -121,20 +135,20 @@
 			    height: 100%;
 				position: relative;
 			}
-			
+
 			#tab-buttons {
 			    width: 100%;
 			}
 
 			.indicator {
 			    position: absolute;
-			    
+
 			    top: 0.2em;
 			    left: 50%;
 			    margin-left: -125px;
 			    width: 250px;
 			    text-align: center;
-			    
+
 			    z-index: 50;
 			}
         </style>
@@ -144,6 +158,7 @@
 			<gs-header>
 				<div flex-horizontal>
 					<div id="header-text-container" flex>Configuration Editor</div>
+					<gs-button inline class="header-button-text" hidden href="https://www.postgresql.org/docs/current/static/libpq-pgpass.html" target="_blank" id="pgpass_docs">PGPASS Documentation</gs-button>
 					<gs-button inline class="header-button-text" onclick="restartPostage();">Reload Postage</gs-button>
 				</div>
 			</gs-header>
