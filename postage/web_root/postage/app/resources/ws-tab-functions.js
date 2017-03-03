@@ -810,7 +810,10 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 
     // bind rename control key events to resize the control
     tabElement.innerRenameControl.addEventListener('input', function () {
-        this.style.width = GS.getTextWidth(tabElement, this.value, true) + 'px';
+        tabElement.innerRenameControl.style.width = GS.getTextWidth(tabElement, tabElement.innerRenameControl.value, true) + 'px';
+    });
+    window.addEventListener('resize', function () {
+        tabElement.innerRenameControl.style.width = GS.getTextWidth(tabElement, tabElement.innerRenameControl.value, true) + 'px';
     });
     //tabElement.innerRenameControl.addEventListener('keydown', function () { // event
     //    //console.log(this.value + String.fromCharCode(event.keyCode));

@@ -94,7 +94,7 @@ function startPanelResize(target) {
     target.classList.add('panel-resizable');
     target.appendChild(resizeBarElement);
 
-    localStorage.leftPanelWidth
+    //localStorage.leftPanelWidth
 
     // load old width from cookie
     if (parseInt(localStorage.leftPanelWidth, 10)) {
@@ -148,7 +148,7 @@ function menuUser(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '150px');
+    templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -171,14 +171,14 @@ function menuTools(target) {
     var templateElement = document.createElement('template');
 
     if (window.process && window.process.type === 'renderer' && window.opn === undefined) {
-        const electron = require('electron');
-        const path = require('path');
+        var electron = require('electron');
+        var path = require('path');
         window.opn = require(path.normalize(electron.remote.app.getAppPath() + '/node_modules/opn'));
     } else {
         window.opn = window.open;
     }
 
-    templateElement.setAttribute('data-max-width', '150px');
+    templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -226,7 +226,7 @@ function menuTab(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '150px');
+    templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
 	if (window.process && window.process.type === 'renderer') {
 	    templateElement.innerHTML = ml(function () {/*
@@ -356,7 +356,7 @@ function dialogSwitchDatabase(target) {
     'use strict';
     var templateElement = document.createElement('template'), afterOpen, beforeClose;
 
-    templateElement.setAttribute('data-max-width', '150px');
+    templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -414,7 +414,7 @@ function dialogLocks() {
         GS.postageProcessDialogSocket = GS.openSocket('env');
     }
 
-    templateElement.setAttribute('data-max-width', '1000px');
+    templateElement.setAttribute('data-max-width', '90em');
     templateElement.setAttribute('data-overlay-close', 'true');
     if (evt.touchDevice) {
         templateElement.setAttribute('data-mode', 'full');
@@ -562,7 +562,7 @@ function dialogLocks() {
 function dialogPreparedTransactions() {
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '1000px');
+    templateElement.setAttribute('data-max-width', '90em');
     templateElement.setAttribute('data-overlay-close', 'true');
     if (evt.touchDevice) {
         templateElement.setAttribute('data-mode', 'full');
@@ -627,7 +627,7 @@ function dialogSettings() {
     'use strict';
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '1000px');
+    templateElement.setAttribute('data-max-width', '90em');
     templateElement.setAttribute('data-overlay-close', 'true');
     if (evt.touchDevice) {
         templateElement.setAttribute('data-mode', 'full');
@@ -956,7 +956,7 @@ function dialogOpenFeed() {
     }
 
     templateElement.setAttribute('data-overlay-close', 'true');
-    templateElement.setAttribute('data-max-width', '1700px');
+    templateElement.setAttribute('data-max-width', '120em');
     templateElement.innerHTML = ml(function () {/*
         <gs-panel id="notification-panel" dismissible>
             <gs-page id="channel-bar" style="width: 17em; min-width: 17em;">
@@ -1407,7 +1407,7 @@ function dialogConnData(target) {
                 '<b>Database:</b>' +     '<br />&nbsp;' + encodeHTML(contextData.databaseName) + '<br />' +
                 '<b>Connection:</b>' +   '<br />&nbsp;' + encodeHTML(contextData.connectionName);
 
-    templateElement.setAttribute('data-max-width', '200px');
+    templateElement.setAttribute('data-max-width', '15em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = '<gs-page><gs-body padded>' + strHTML + '</gs-body></gs-page>';
 

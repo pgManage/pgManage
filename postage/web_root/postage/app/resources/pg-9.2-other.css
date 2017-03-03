@@ -44,7 +44,7 @@ div#header-text-container {
 /* declaring the font size with EMs makes it so that the
         ace can change it's font size in response to Postage's
         zoom code */
-.ace-area {
+.ace_editor {
     font-size: 0.8em;
 }
 

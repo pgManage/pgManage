@@ -131,7 +131,7 @@
                     autocompleteStart();
                     loadHeaderText();
                     loadTabsFromServer();
-                    //zoomStart();
+                    zoomStart();
 
                     // load state from query string
                     handleLoad();
@@ -195,7 +195,7 @@
 
                     if (strMessage !== '') {
 						if (window.process && window.process.type === 'renderer') {
-							const remote = require('electron').remote;
+							var remote = require('electron').remote;
 							var choice = remote.dialog.showMessageBox(
 									remote.getCurrentWindow(),
 									{
@@ -474,6 +474,12 @@
                 font-family: Helvetica,Arial,sans-serif;
             }
         </style>
+        
+        <!-- we use this to steal the focus from the home iframe, because it's from a
+                    different origin and that prevents key events from bubbling up if
+                    the focus is in there-->
+        <input id="focus-stealer" style="position:absolute; top:-50px;" type="text" />
+        
         <gs-panel id="panel" dismissible>
             <gs-page id="left-bar" style="width: 17em; min-width: 17em;">
                 <gs-header flex-horizontal>
