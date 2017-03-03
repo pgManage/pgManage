@@ -1,6 +1,13 @@
 //jslint white:true multivar:true
 var bolExplainLoaded = true;
-
+  
+document.addEventListener('keydown', function (){
+    if (event.keyCode === 118 && event.shiftKey === false) {
+        explain();
+    } else if (event.keyCode === 118 && event.shiftKey === true) {
+        explain(true);
+    }
+})
 
 function explain(bolRun) {
     'use strict';
