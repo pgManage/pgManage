@@ -13,7 +13,6 @@
 
 void notice_processor(void *arg, const char *str_notice) {
 	struct sock_ev_client *client = (struct sock_ev_client *)arg;
-	char *str_temp = NULL;
 	SDEBUG("%s", str_notice);
 	char *ptr_actual_message = strstr(str_notice, ": ");
 	size_t int_notice_len = 0;
@@ -26,22 +25,19 @@ void notice_processor(void *arg, const char *str_notice) {
 		*(ptr_actual_message - 2) = 0;
 	}
 	size_t int_temp_len = strlen(ptr_actual_message);
-	str_temp = bunescape_value(ptr_actual_message, &int_temp_len);
-	SDEBUG("%s\t%s", str_notice, str_temp);
 	if (client->str_notice != NULL) {
 		int_notice_len = strlen(client->str_notice);
 		SERROR_SNFCAT(client->str_notice, &int_notice_len,
 			"\012", (size_t)1,
 			str_notice, strlen(str_notice),
 			"\t", (size_t)1,
-			str_temp, int_temp_len);
+			ptr_actual_message, int_temp_len);
 	} else {
 		SERROR_SNCAT(client->str_notice, &int_notice_len,
 			str_notice, strlen(str_notice),
 			"\t", (size_t)1,
-			str_temp, int_temp_len);
+			ptr_actual_message, int_temp_len);
 	}
-	SFREE(str_temp);
 	bol_error_state = false;
 	return;
 
