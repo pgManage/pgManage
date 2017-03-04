@@ -330,10 +330,11 @@ function dialogSplash() {
     var templateElement = document.createElement('template'), afterOpen, beforeClose;
     templateElement.setAttribute('data-mode', 'constrained');
     templateElement.setAttribute('data-overlay-close', 'true');
+    templateElement.setAttribute('id', 'dialog-template-version-news');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-body>
-                <iframe class="full-iframe" src="https://news1.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
+                <iframe class="full-iframe" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
             </gs-body>
         </gs-page>
     */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
@@ -343,11 +344,11 @@ function dialogSplash() {
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             if (xhr.status !== 200) {
-                GS.closeDialog(templateElement, 'Ok');
+                GS.closeDialog('dialog-template-version-news', 'Ok');
                 templateElement.innerHTML = ml(function () {/*
                     <gs-page>
                         <gs-body>
-                            <gs-container>
+                            <gs-container padded>
                                 <h2>Postage Version Information & News could not load.</h2>
                                 <h3><a href="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}">https://news.workflowproducts.com/splash/postage.html</a></h3>
                                 <h3>This may be an issue with your firewall. Does it block SSL-enabled websites?</h3>
