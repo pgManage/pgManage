@@ -1906,6 +1906,50 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
     'use strict';
     var templateElement = document.createElement('template');
     
+    /*
+    listQuery.objectAggregate
+    listQuery.objectCollation
+    listQuery.objectConversion
+    listQuery.objectDomain
+    listQuery.objectForeignTable
+    listQuery.objectFunction
+    listQuery.objectIndex
+    listQuery.objectOperatorClass
+    listQuery.objectOperatorFamily
+    listQuery.objectOperator
+    listQuery.objectSequence
+    listQuery.objectTable
+    listQuery.objectTriggerFunction
+    listQuery.objectTextSearchConfiguration
+    listQuery.objectTextSearchDictionary
+    listQuery.objectTextSearchParser
+    listQuery.objectTextSearchTemplate
+    listQuery.objectType
+    listQuery.objectView
+    
+    
+    <gs-checkbox value="true" id="checkbox-schema-dump-Aggregate"><label>Aggregate</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-Collation"><label>Collation</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-Conversion"><label>Conversion</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-Domain"><label>Domain</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-ForeignTable"><label>ForeignTable</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-Function"><label>Function</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-Index"><label>Index</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-OperatorClass"><label>OperatorClass</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-OperatorFamily"><label>OperatorFamily</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-Operator"><label>Operator</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-Sequence"><label>Sequence</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-Table"><label>Table</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-TriggerFunction"><label>TriggerFunction</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-TextSearchConfiguration"><label>TextSearchConfiguration</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-TextSearchDictionary"><label>TextSearchDictionary</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-TextSearchParser"><label>TextSearchParser</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-TextSearchTemplate"><label>TextSearchTemplate</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-Type"><label>Type</lebel></gs-checkbox>
+    <gs-checkbox value="true" id="checkbox-schema-dump-View"><label>View</lebel></gs-checkbox>
+    */
+
+    
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-header>
@@ -1950,6 +1994,26 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                         <gs-checkbox value="true" id="checkbox-schema-dump-views"></gs-checkbox>
                         <label for="checkbox-schema-dump-views">Views</label>
                     </div>
+                    
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Aggregate"><label flex>Aggregate</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Collation"><label flex>Collation</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Conversion"><label flex>Conversion</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Domain"><label flex>Domain</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-ForeignTable"><label flex>ForeignTable</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Function"><label flex>Function</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Index"><label flex>Index</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-OperatorClass"><label flex>OperatorClass</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-OperatorFamily"><label flex>OperatorFamily</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Operator"><label flex>Operator</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Sequence"><label flex>Sequence</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Table"><label flex>Table</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TriggerFunction"><label flex>TriggerFunction</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchConfiguration"><label flex>TextSearchConfiguration</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchDictionary"><label flex>TextSearchDictionary</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchParser"><label flex>TextSearchParser</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchTemplate"><label flex>TextSearchTemplate</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Type"><label flex>Type</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-View"><label flex>View</lebel></gs-checkbox>
                 </div>
             </gs-body>
             <gs-footer>

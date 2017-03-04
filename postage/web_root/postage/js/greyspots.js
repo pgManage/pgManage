@@ -8862,35 +8862,35 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                             intRows = parseInt(GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1)), 10);
                             
                         // if mode is DEBUG: add DEBUG to array
-                        } else if (strMode === 'DEBUG') {
+                        } else if (strMode === 'DEBUG' && arrLine[i] !== '') {
                             arrMessages.push({
                                 'level': 'DEBUG',
                                 'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
                             });
                             
                         // if mode is LOG: add LOG to array
-                        } else if (strMode === 'LOG') {
+                        } else if (strMode === 'LOG' && arrLine[i] !== '') {
                             arrMessages.push({
                                 'level': 'LOG',
                                 'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
                             });
                             
                         // if mode is INFO: add INFO to array
-                        } else if (strMode === 'INFO') {
+                        } else if (strMode === 'INFO' && arrLine[i] !== '') {
                             arrMessages.push({
                                 'level': 'INFO',
                                 'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
                             });
                             
                         // if mode is NOTICE: add NOTICE to array
-                        } else if (strMode === 'NOTICE') {
+                        } else if (strMode === 'NOTICE' && arrLine[i] !== '') {
                             arrMessages.push({
                                 'level': 'NOTICE',
                                 'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
                             });
                             
                         // if mode is WARNING: add WARNING to array
-                        } else if (strMode === 'WARNING') {
+                        } else if (strMode === 'WARNING' && arrLine[i] !== '') {
                             arrMessages.push({
                                 'level': 'WARNING',
                                 'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
@@ -11842,6 +11842,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function refreshAnchor(element) {
         var strLink = element.getAttribute('href') || element.getAttribute('value');
         
+        if (element.anchorElement) {
+            element.removeChild(element.anchorElement);
+        }
         if (strLink) {
             element.anchorElement = document.createElement('a');
             element.anchorElement.setAttribute('gs-dynamic', '');
@@ -11858,8 +11861,6 @@ document.addEventListener('DOMContentLoaded', function () {
             
             element.appendChild(element.anchorElement);
             
-        } else if (element.anchorElement) {
-            element.removeChild(element.anchorElement);
         }
     }
     
@@ -13111,6 +13112,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         element.currentDropDownContainer = dropDownContainer;
         
+        //console.log(element.currentDropDownContainer);
         //console.log(element.dropDownTable);
         
         // fill dropdown with content
@@ -13349,7 +13351,7 @@ document.addEventListener('DOMContentLoaded', function () {
             window.removeEventListener('resize', closeDropDownHandler);
             window.removeEventListener('orientationchange', closeDropDownHandler);
             window.removeEventListener('mousewheel', wheelHandler);
-            window.removeEventListener('click', closeDropDownHandler);
+            document.body.removeEventListener('click', closeDropDownHandler);
         };
         
         // handle record click
@@ -13373,7 +13375,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.addEventListener('resize', closeDropDownHandler);
         window.addEventListener('orientationchange', closeDropDownHandler);
         window.addEventListener('mousewheel', wheelHandler);
-        window.addEventListener('click', closeDropDownHandler);
+        document.body.addEventListener('click', closeDropDownHandler);
     }
     
     // remove dropdown from screen
@@ -21478,6 +21480,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // if there is a limit button
             if (element.limitButtonElement) {
                 element.limitButtonElement.textContent = data.dat.length + ' of ' + data.row_count;
+                element.limitButtonElement.setAttribute('class', 'row_count_btn');
             }
             
             //console.log(tableTemplateElement, element.tableTemplate, theadElement, tbodyElement);
@@ -21771,6 +21774,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 for (i = 0, len = arrRecord.length; i < len; i += 1) {
                     arrRecord[i].parentNode.removeChild(arrRecord[i]);
                 }
+
+                
+                /*if (element.limitButtonElement) {
+                    var btn_text_content = element.limitButtonElement.textContent;
+                    var row_num1, row_num2;
+                    
+                    row_num1 = btn_text_content.substring(0, btn_text_content.indexOf(' '));
+                    row_num2 = btn_text_content.substring(btn_text_content.lastIndexOf(' '), btn_text_content.length);
+                    element.limitButtonElement.innerHTML = (row_num1 - arrRecord.length) + ' of ' + (row_num2 - arrRecord.length);
+                    
+                    console.log(element.limitButtonElement, element.limitButtonElement.textContent);
+                }*/
                 
                 idColIndex = element.lastSuccessData.arr_column.indexOf('id');
                 
@@ -21796,6 +21811,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             break;
                         }
                     }
+                    // this updates the second row count number
+                    element.lastSuccessData.row_count = element.lastSuccessData.row_count - arrRecord.length;
                     
                     handleData(element, element.lastSuccessData);
                 }

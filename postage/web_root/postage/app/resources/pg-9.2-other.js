@@ -328,13 +328,31 @@ function dialogRotateLog() {
 function dialogSplash() {
     'use strict';
     var templateElement = document.createElement('template'), afterOpen, beforeClose;
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status !== 200) {
+                templateElement.innerHTML = ml(function () {/*
+                    <gs-page>
+                        <gs-body>
+                            <h2>Postage Version Information & News could not load.</h2>
+                            <h3>(https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}})</h3>
+                            <h3>This may be an issue with your firewall. Does it block SSL-enabled websites?</h3>
+                        </gs-body>
+                    </gs-page>
+                */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
+            };
+        };
+    };
+    xhr.open('HEAD', url);
+    xhr.send();
 
     templateElement.setAttribute('data-mode', 'constrained');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-body>
-                <iframe class="full-iframe" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
+                <iframe class="full-iframe" src="https://news1.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
             </gs-body>
         </gs-page>
     */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
@@ -1869,7 +1887,7 @@ function executeScript() {
                                 warningHTML += '<i>' +
                                                     '<b>' + data.arrMessages[i].level + ':</b> ' +
                                                     encodeHTML(data.arrMessages[i].content) +
-                                                '</i>';
+                                                '</i><br/>';
                             }
 
                             strHTML = '<div flex-horizontal>' +
@@ -1912,7 +1930,7 @@ function executeScript() {
                                 warningHTML += '<i>' +
                                                     '<b>' + data.arrMessages[i].level + ':</b> ' +
                                                     encodeHTML(data.arrMessages[i].content) +
-                                                '</i>';
+                                                '</i><br/>';
                             }
 
                             strHTML = '<div flex-horizontal>' +
@@ -1960,7 +1978,7 @@ function executeScript() {
                                     warningHTML += '<i>' +
                                                         '<b>' + data.arrMessages[i].level + ':</b> ' +
                                                         encodeHTML(data.arrMessages[i].content) +
-                                                    '</i>';
+                                                    '</i><br/>';
                                 }
 
                                 strHTML = '<div flex-horizontal>' +
@@ -2162,7 +2180,7 @@ function executeScript() {
                         warningHTML += '<i>' +
                                             '<b>' + data.arrMessages[i].level + ':</b> ' +
                                             encodeHTML(data.arrMessages[i].content) +
-                                        '</i>';
+                                        '</i><br/>';
                     }
 
                     // handle putting the error response in the results pane
