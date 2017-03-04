@@ -16016,59 +16016,6 @@ gs-text[readonly] {
     opacity: 0.9;
     border-color: #E6E6E6;
     cursor: default;
-}
-
-/* ###################################################################################### */
-/* ##################################### BORDER RADIUS ################################## */
-/* ###################################################################################### */
-
-gs-text[remove-top],
-gs-memo[remove-top] {
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-}
-
-gs-text[remove-bottom],
-gs-memo[remove-bottom] {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-gs-text[remove-left],
-gs-memo[remove-left] {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-gs-text[remove-right],
-gs-memo[remove-right] {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-gs-text[remove-top-left],
-gs-memo[remove-top-left] {
-    border-top-left-radius: 0;
-}
-
-gs-text[remove-top-right],
-gs-memo[remove-top-right] {
-    border-top-right-radius: 0;
-}
-
-gs-text[remove-bottom-left],
-gs-memo[remove-bottom-left] {
-    border-bottom-left-radius: 0;
-}
-
-gs-text[remove-bottom-right],
-gs-memo[remove-bottom-right]  {
-    border-bottom-right-radius: 0;
-}
-
-gs-text[remove-all],
-gs-memo[remove-all] {
-    border-radius: 0;
 }gs-time {
     position: relative;
     display: block;

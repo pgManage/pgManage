@@ -657,35 +657,35 @@
                             intRows = parseInt(GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1)), 10);
                             
                         // if mode is DEBUG: add DEBUG to array
-                        } else if (strMode === 'DEBUG') {
+                        } else if (strMode === 'DEBUG' && arrLines[i] !== '') {
                             arrMessages.push({
                                 'level': 'DEBUG',
                                 'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
                             });
                             
                         // if mode is LOG: add LOG to array
-                        } else if (strMode === 'LOG') {
+                        } else if (strMode === 'LOG' && arrLines[i] !== '') {
                             arrMessages.push({
                                 'level': 'LOG',
                                 'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
                             });
                             
                         // if mode is INFO: add INFO to array
-                        } else if (strMode === 'INFO') {
+                        } else if (strMode === 'INFO' && arrLines[i] !== '') {
                             arrMessages.push({
                                 'level': 'INFO',
                                 'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
                             });
                             
                         // if mode is NOTICE: add NOTICE to array
-                        } else if (strMode === 'NOTICE') {
+                        } else if (strMode === 'NOTICE' && arrLines[i] !== '') {
                             arrMessages.push({
                                 'level': 'NOTICE',
                                 'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
                             });
                             
                         // if mode is WARNING: add WARNING to array
-                        } else if (strMode === 'WARNING') {
+                        } else if (strMode === 'WARNING' && arrLines[i] !== '') {
                             arrMessages.push({
                                 'level': 'WARNING',
                                 'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))

@@ -328,18 +328,39 @@ function dialogRotateLog() {
 function dialogSplash() {
     'use strict';
     var templateElement = document.createElement('template'), afterOpen, beforeClose;
-
     templateElement.setAttribute('data-mode', 'constrained');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-body>
-                <iframe class="full-iframe" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
+                <iframe class="full-iframe" src="https://news1.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
             </gs-body>
         </gs-page>
     */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
-
     GS.openDialog(templateElement);
+
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status !== 200) {
+                GS.closeDialog(templateElement, 'Ok');
+                templateElement.innerHTML = ml(function () {/*
+                    <gs-page>
+                        <gs-body>
+                            <gs-container>
+                                <h2>Postage Version Information & News could not load.</h2>
+                                <h3><a href="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}">https://news.workflowproducts.com/splash/postage.html</a></h3>
+                                <h3>This may be an issue with your firewall. Does it block SSL-enabled websites?</h3>
+                            </gs-container>
+                        </gs-body>
+                    </gs-page>
+                */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
+                GS.openDialog(templateElement);
+            };
+        };
+    };
+    xhr.open('HEAD', "https://news.workflowproducts.com/splash/postage.html?app=postage");
+    xhr.send();
 }
 
 
@@ -1869,7 +1890,7 @@ function executeScript() {
                                 warningHTML += '<i>' +
                                                     '<b>' + data.arrMessages[i].level + ':</b> ' +
                                                     encodeHTML(data.arrMessages[i].content) +
-                                                '</i>';
+                                                '</i><br/>';
                             }
 
                             strHTML = '<div flex-horizontal>' +
@@ -1912,7 +1933,7 @@ function executeScript() {
                                 warningHTML += '<i>' +
                                                     '<b>' + data.arrMessages[i].level + ':</b> ' +
                                                     encodeHTML(data.arrMessages[i].content) +
-                                                '</i>';
+                                                '</i><br/>';
                             }
 
                             strHTML = '<div flex-horizontal>' +
@@ -1960,7 +1981,7 @@ function executeScript() {
                                     warningHTML += '<i>' +
                                                         '<b>' + data.arrMessages[i].level + ':</b> ' +
                                                         encodeHTML(data.arrMessages[i].content) +
-                                                    '</i>';
+                                                    '</i><br/>';
                                 }
 
                                 strHTML = '<div flex-horizontal>' +
@@ -2162,7 +2183,7 @@ function executeScript() {
                         warningHTML += '<i>' +
                                             '<b>' + data.arrMessages[i].level + ':</b> ' +
                                             encodeHTML(data.arrMessages[i].content) +
-                                        '</i>';
+                                        '</i><br/>';
                     }
 
                     // handle putting the error response in the results pane
