@@ -47,6 +47,10 @@ function loadHome() {
         'enableLiveAutocompletion' : true
     });
     
+    homeEditor.addEventListener('mousewheel', function () {
+        currTab = ['home', homeEditor.getFirstVisibleRow()];
+    });
+    
     // if we're on a touch device: make the ace grow with it's content
     if (evt.touchDevice) {
         homeEditor.setOptions({
@@ -108,7 +112,7 @@ function openHome() {
 var strPreviousScript;
 function setQSToHome() {
     'use strict';
-    GS.pushQueryString('view=' + (strPreviousScript || 'home'))
+    GS.pushQueryString('view=' + (strPreviousScript || 'home'));
 }
 
 function addHomeQuery(target, strName, strQuery, strToolbarAddons) {
