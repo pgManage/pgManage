@@ -1937,106 +1937,75 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             <gs-body padded>
                 <center>What code do you want for the schema: "<span id="dialog-sql-dump-schema"></span>"?</center>
                 <div id="schema-dump-change-event-catcher">
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-drop-statements"></gs-checkbox>
-                        <label for="checkbox-schema-dump-drop-statements">Drop Statements</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-schema"></gs-checkbox>
-                        <label for="checkbox-schema-dump-schema">Schema</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-functions"></gs-checkbox>
-                        <label for="checkbox-schema-dump-functions">Functions</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-operators"></gs-checkbox>
-                        <label for="checkbox-schema-dump-operators">Operators</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-aggregates"></gs-checkbox>
-                        <label for="checkbox-schema-dump-aggregates">Aggregates</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-trigger-functions"></gs-checkbox>
-                        <label for="checkbox-schema-dump-trigger-functions">Trigger Functions</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-sequences"></gs-checkbox>
-                        <label for="checkbox-schema-dump-sequences">Sequences</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-tables"></gs-checkbox>
-                        <label for="checkbox-schema-dump-tables">Tables (Without Data)</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-views"></gs-checkbox>
-                        <label for="checkbox-schema-dump-views">Views</label>
-                    </div>
-                    
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Aggregate">
+                    <gs-checkbox remove-bottom flex-horizontal value="true" id="checkbox-schema-dump-drop-statements">
+                        <label style="text-align: left;" flex>&nbsp;Drop Statements</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-schema">
+                        <label style="text-align: left;" flex>&nbsp;Schema</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-Aggregate">
                         <label style="text-align: left;" flex>&nbsp;Aggregates</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Collation">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-Collation">
                         <label style="text-align: left;" flex>&nbsp;Collations</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Conversion">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-Conversion">
                         <label style="text-align: left;" flex>&nbsp;Conversions</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Domain">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-Domain">
                         <label style="text-align: left;" flex>&nbsp;Domains</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-ForeignTable">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-ForeignTable">
                         <label style="text-align: left;" flex>&nbsp;Foreign Tables</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Function">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-Function">
                         <label style="text-align: left;" flex>&nbsp;Functions</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Index">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-Index">
                         <label style="text-align: left;" flex>&nbsp;Indexes</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-OperatorClass">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-OperatorClass">
                         <label style="text-align: left;" flex>&nbsp;Operatoe Classes</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-OperatorFamily">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-OperatorFamily">
                         <label style="text-align: left;" flex>&nbsp;Operator Familys</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Operator">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-Operator">
                         <label style="text-align: left;" flex>&nbsp;Operators</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Sequence">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-Sequence">
                         <label style="text-align: left;" flex>&nbsp;Sequences</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Table">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-Table">
                         <label style="text-align: left;" flex>&nbsp;Tables</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TriggerFunction">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-TriggerFunction">
                         <label style="text-align: left;" flex>&nbsp;TriggerFunctions</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchConfiguration">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-TextSearchConfiguration">
                         <label style="text-align: left;" flex>&nbsp;Text Search Configurations</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchDictionary">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-TextSearchDictionary">
                         <label style="text-align: left;" flex>&nbsp;Text Search Dictionarys</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchParser">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-TextSearchParser">
                         <label style="text-align: left;" flex>&nbsp;Text Search Parsers</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchTemplate">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-TextSearchTemplate">
                         <label style="text-align: left;" flex>&nbsp;Text Search Template<s/label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Type">
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-Type">
                         <label style="text-align: left;" flex>&nbsp;Types</label>
                     </gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-View">
+                    <gs-checkbox remove-top flex-horizontal value="true" id="checkbox-schema-dump-View">
                         <label style="text-align: left;" flex>&nbsp;Views</label>
                     </gs-checkbox>
                 </div>
             </gs-body>
             <gs-footer>
                 <gs-grid>
-                    <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
-                    <gs-block><gs-button id="button-schema-dump" dialogclose>Open Script</gs-button></gs-block>
+                    <gs-block><gs-button remove-all dialogclose>Cancel</gs-button></gs-block>
+                    <gs-block><gs-button remove-all id="button-schema-dump" dialogclose>Open Script</gs-button></gs-block>
                 </gs-grid>
             </gs-footer>
         </gs-page>
