@@ -1926,27 +1926,6 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
     listQuery.objectTextSearchTemplate
     listQuery.objectType
     listQuery.objectView
-    
-    
-    <gs-checkbox value="true" id="checkbox-schema-dump-Aggregate"><label>Aggregate</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-Collation"><label>Collation</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-Conversion"><label>Conversion</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-Domain"><label>Domain</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-ForeignTable"><label>ForeignTable</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-Function"><label>Function</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-Index"><label>Index</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-OperatorClass"><label>OperatorClass</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-OperatorFamily"><label>OperatorFamily</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-Operator"><label>Operator</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-Sequence"><label>Sequence</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-Table"><label>Table</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-TriggerFunction"><label>TriggerFunction</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-TextSearchConfiguration"><label>TextSearchConfiguration</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-TextSearchDictionary"><label>TextSearchDictionary</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-TextSearchParser"><label>TextSearchParser</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-TextSearchTemplate"><label>TextSearchTemplate</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-Type"><label>Type</lebel></gs-checkbox>
-    <gs-checkbox value="true" id="checkbox-schema-dump-View"><label>View</lebel></gs-checkbox>
     */
 
     
@@ -1995,25 +1974,63 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                         <label for="checkbox-schema-dump-views">Views</label>
                     </div>
                     
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Aggregate"><label flex>Aggregate</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Collation"><label flex>Collation</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Conversion"><label flex>Conversion</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Domain"><label flex>Domain</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-ForeignTable"><label flex>ForeignTable</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Function"><label flex>Function</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Index"><label flex>Index</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-OperatorClass"><label flex>OperatorClass</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-OperatorFamily"><label flex>OperatorFamily</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Operator"><label flex>Operator</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Sequence"><label flex>Sequence</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Table"><label flex>Table</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TriggerFunction"><label flex>TriggerFunction</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchConfiguration"><label flex>TextSearchConfiguration</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchDictionary"><label flex>TextSearchDictionary</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchParser"><label flex>TextSearchParser</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchTemplate"><label flex>TextSearchTemplate</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Type"><label flex>Type</lebel></gs-checkbox>
-                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-View"><label flex>View</lebel></gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Aggregate">
+                        <label style="text-align: left;" flex>Aggregate</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Collation">
+                        <label style="text-align: left;" flex>Collation</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Conversion">
+                        <label style="text-align: left;" flex>Conversion</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Domain">
+                        <label style="text-align: left;" flex>Domain</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-ForeignTable">
+                        <label style="text-align: left;" flex>ForeignTable</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Function">
+                        <label style="text-align: left;" flex>Function</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Index">
+                        <label style="text-align: left;" flex>Index</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-OperatorClass">
+                        <label style="text-align: left;" flex>OperatorClass</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-OperatorFamily">
+                        <label style="text-align: left;" flex>OperatorFamily</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Operator">
+                        <label style="text-align: left;" flex>Operator</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Sequence">
+                        <label style="text-align: left;" flex>Sequence</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Table">
+                        <label style="text-align: left;" flex>Table</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TriggerFunction">
+                        <label style="text-align: left;" flex>TriggerFunction</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchConfiguration">
+                        <label style="text-align: left;" flex>TextSearchConfiguration</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchDictionary">
+                        <label style="text-align: left;" flex>TextSearchDictionary</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchParser">
+                        <label style="text-align: left;" flex>TextSearchParser</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-TextSearchTemplate">
+                        <label style="text-align: left;" flex>TextSearchTemplate</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-Type">
+                        <label style="text-align: left;" flex>Type</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-View">
+                        <label style="text-align: left;" flex>View</label>
+                    </gs-checkbox>
                 </div>
             </gs-body>
             <gs-footer>

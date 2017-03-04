@@ -344,7 +344,7 @@ function dialogSplash() {
             };
         };
     };
-    xhr.open('HEAD', url);
+    xhr.open('HEAD', "https://news.workflowproducts.com/splash/postage.html?app=postage");
     xhr.send();
 
     templateElement.setAttribute('data-mode', 'constrained');
