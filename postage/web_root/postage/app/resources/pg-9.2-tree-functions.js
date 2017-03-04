@@ -1926,6 +1926,47 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
     listQuery.objectTextSearchTemplate
     listQuery.objectType
     listQuery.objectView
+    
+    
+    bolAggregate
+    bolCollation
+    bolConversion
+    bolDomain
+    bolForeignTable
+    bolFunction
+    bolIndex
+    bolOperatorClass
+    bolOperatorFamily
+    bolOperator
+    bolSequence
+    bolTable
+    bolTriggerFunction
+    bolTextSearchConfiguration
+    bolTextSearchDictionary
+    bolTextSearchParser
+    bolTextSearchTemplate
+    bolType
+    bolView
+    
+    checkbox-schema-dump-aggregate
+    checkbox-schema-dump-collation
+    checkbox-schema-dump-conversion
+    checkbox-schema-dump-domain
+    checkbox-schema-dump-foreign-table
+    checkbox-schema-dump-function
+    checkbox-schema-dump-index
+    checkbox-schema-dump-operator-class
+    checkbox-schema-dump-operator-family
+    checkbox-schema-dump-operator
+    checkbox-schema-dump-sequence
+    checkbox-schema-dump-table
+    checkbox-schema-dump-trigger-function
+    checkbox-schema-dump-text-search-configuration
+    checkbox-schema-dump-text-search-dictionary
+    checkbox-schema-dump-text-search-parser
+    checkbox-schema-dump-text-search-template
+    checkbox-schema-dump-type
+    checkbox-schema-dump-view
     */
 
     
@@ -2023,81 +2064,182 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
         document.getElementById('dialog-sql-dump-schema').textContent = strSchemaName;
         
         document.getElementById('schema-dump-change-event-catcher').addEventListener('change', function () {
-            var bolSchema, bolFunctions, bolOperators, bolAggregates,
-                bolTriggerFunctions, bolSequences, bolTables, bolViews;
+            var bolSchema, bolAggregate, bolCollation, bolConversion,
+                bolDomain, bolForeignTable, bolFunction, bolIndex,
+                bolOperatorClass, bolOperatorFamily, bolOperator,
+                bolSequence, bolTable, bolTriggerFunction,
+                bolTextSearchConfiguration, bolTextSearchDictionary,
+                bolTextSearchParser, bolTextSearchTemplate, bolType,
+                bolView;
             
-            bolSchema           = document.getElementById('checkbox-schema-dump-schema').value            === 'true';
-            bolFunctions        = document.getElementById('checkbox-schema-dump-functions').value         === 'true';
-            bolOperators        = document.getElementById('checkbox-schema-dump-operators').value         === 'true';
-            bolAggregates       = document.getElementById('checkbox-schema-dump-aggregates').value        === 'true';
-            bolTriggerFunctions = document.getElementById('checkbox-schema-dump-trigger-functions').value === 'true';
-            bolSequences        = document.getElementById('checkbox-schema-dump-sequences').value         === 'true';
-            bolTables           = document.getElementById('checkbox-schema-dump-tables').value            === 'true';
-            bolViews            = document.getElementById('checkbox-schema-dump-views').value             === 'true';
+            bolSchema                       = document.getElementById('checkbox-schema-dump-schema').value                      === 'true';
+            bolAggregate                    = document.getElementById('checkbox-schema-dump-aggregate').value                   === 'true';
+            bolCollation                    = document.getElementById('checkbox-schema-dump-collation').value                   === 'true';
+            bolConversion                   = document.getElementById('checkbox-schema-dump-conversion').value                  === 'true';
+            bolDomain                       = document.getElementById('checkbox-schema-dump-domain').value                      === 'true';
+            bolForeignTable                 = document.getElementById('checkbox-schema-dump-foreign-table').value               === 'true';
+            bolFunction                     = document.getElementById('checkbox-schema-dump-function').value                    === 'true';
+            bolIndex                        = document.getElementById('checkbox-schema-dump-index').value                       === 'true';
+            bolOperatorClass                = document.getElementById('checkbox-schema-dump-operator-class').value              === 'true';
+            bolOperatorFamily               = document.getElementById('checkbox-schema-dump-operator-family').value             === 'true';
+            bolOperator                     = document.getElementById('checkbox-schema-dump-operator').value                    === 'true';
+            bolSequence                     = document.getElementById('checkbox-schema-dump-sequence').value                    === 'true';
+            bolTable                        = document.getElementById('checkbox-schema-dump-table').value                       === 'true';
+            bolTriggerFunction              = document.getElementById('checkbox-schema-dump-trigger-function').value            === 'true';
+            bolTextSearchConfiguration      = document.getElementById('checkbox-schema-dump-text-search-configuration').value   === 'true';
+            bolTextSearchDictionary         = document.getElementById('checkbox-schema-dump-text-search-dictionary').value      === 'true';
+            bolTextSearchParser             = document.getElementById('checkbox-schema-dump-text-search-parser').value          === 'true';
+            bolTextSearchTemplate           = document.getElementById('checkbox-schema-dump-text-search-template').value        === 'true';
+            bolType                         = document.getElementById('checkbox-schema-dump-type').value                        === 'true';
+            bolView                         = document.getElementById('checkbox-schema-dump-view').value                        === 'true';
             
-            if (!bolSchema && !bolFunctions && !bolOperators && !bolAggregates &&
-                !bolTriggerFunctions && !bolSequences && !bolTables && !bolViews) {
+            if (   !bolschema && !bolAggregate && !bolCollation && !bolConversion && !bolDomain
+                && !bolForeignTable && !bolFunction && !bolIndex && !bolOperatorClass
+                && !bolOperatorFamily && !bolOperator && !bolSequence && !bolTable
+                && !bolTriggerFunction && !bolTextSearchConfiguration && !bolTextSearchDictionary
+                && !bolTextSearchParser && !bolTextSearchTemplate && !bolType && !bolView) {
                 document.getElementById('button-schema-dump').setAttribute('disabled', '');
             } else {
                 document.getElementById('button-schema-dump').removeAttribute('disabled');
             }
         });
     }, function (event, strAnswer) {
-        var bolDropStatments, bolSchema, bolFunctions, bolOperators, bolAggregates,
-            bolTriggerFunctions, bolSequences, bolTables, bolViews, strQuery, handleListResults, arrQuery;
+        var bolDropStatments, bolSchema, bolAggregate, bolCollation, bolConversion,
+            bolDomain, bolForeignTable, bolFunction, bolIndex,
+            bolOperatorClass, bolOperatorFamily, bolOperator,
+            bolSequence, bolTable, bolTriggerFunction,
+            bolTextSearchConfiguration, bolTextSearchDictionary,
+            bolTextSearchParser, bolTextSearchTemplate, bolType,
+            bolView, strQuery, arrQuery, handleListResults;
         
         if (strAnswer === 'Open Script') {
-            bolDropStatments    = document.getElementById('checkbox-schema-dump-drop-statements').value   === 'true';
-            bolSchema           = document.getElementById('checkbox-schema-dump-schema').value            === 'true';
-            bolFunctions        = document.getElementById('checkbox-schema-dump-functions').value         === 'true';
-            bolOperators        = document.getElementById('checkbox-schema-dump-operators').value         === 'true';
-            bolAggregates       = document.getElementById('checkbox-schema-dump-aggregates').value        === 'true';
-            bolTriggerFunctions = document.getElementById('checkbox-schema-dump-trigger-functions').value === 'true';
-            bolSequences        = document.getElementById('checkbox-schema-dump-sequences').value         === 'true';
-            bolTables           = document.getElementById('checkbox-schema-dump-tables').value            === 'true';
-            bolViews            = document.getElementById('checkbox-schema-dump-views').value             === 'true';
+            bolDropStatments                = document.getElementById('checkbox-schema-dump-drop-statements').value             === 'true';
+            bolSchema                       = document.getElementById('checkbox-schema-dump-schema').value                      === 'true';
+            bolAggregate                    = document.getElementById('checkbox-schema-dump-aggregate').value                   === 'true';
+            bolCollation                    = document.getElementById('checkbox-schema-dump-collation').value                   === 'true';
+            bolConversion                   = document.getElementById('checkbox-schema-dump-conversion').value                  === 'true';
+            bolDomain                       = document.getElementById('checkbox-schema-dump-domain').value                      === 'true';
+            bolForeignTable                 = document.getElementById('checkbox-schema-dump-foreign-table').value               === 'true';
+            bolFunction                     = document.getElementById('checkbox-schema-dump-function').value                    === 'true';
+            bolIndex                        = document.getElementById('checkbox-schema-dump-index').value                       === 'true';
+            bolOperatorClass                = document.getElementById('checkbox-schema-dump-operator-class').value              === 'true';
+            bolOperatorFamily               = document.getElementById('checkbox-schema-dump-operator-family').value             === 'true';
+            bolOperator                     = document.getElementById('checkbox-schema-dump-operator').value                    === 'true';
+            bolSequence                     = document.getElementById('checkbox-schema-dump-sequence').value                    === 'true';
+            bolTable                        = document.getElementById('checkbox-schema-dump-table').value                       === 'true';
+            bolTriggerFunction              = document.getElementById('checkbox-schema-dump-trigger-function').value            === 'true';
+            bolTextSearchConfiguration      = document.getElementById('checkbox-schema-dump-text-search-configuration').value   === 'true';
+            bolTextSearchDictionary         = document.getElementById('checkbox-schema-dump-text-search-dictionary').value      === 'true';
+            bolTextSearchParser             = document.getElementById('checkbox-schema-dump-text-search-parser').value          === 'true';
+            bolTextSearchTemplate           = document.getElementById('checkbox-schema-dump-text-search-template').value        === 'true';
+            bolType                         = document.getElementById('checkbox-schema-dump-type').value                        === 'true';
+            bolView                         = document.getElementById('checkbox-schema-dump-view').value                        === 'true';
             
             // build query for getting all of the lists of objects
             strQuery = '';
             arrQuery = [];
             
-            if (bolFunctions) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Function\' AS objType, 1 AS order_no FROM (' +
-                    listQuery.functions.replace(/\{\{INTOID\}\}/gim,  intSchemaOid).replace(';', '') +
+            if (bolAggregate) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Aggregate\' AS objType FROM (' +
+                    listQuery.objectAggregate.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolTriggerFunctions) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Function\' AS objType, 1 AS order_no FROM (' +
-                    listQuery.triggers.replace(/\{\{INTOID\}\}/gim,   intSchemaOid).replace(';', '') +
+            if (bolCollation) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Collation\' AS objType FROM (' +
+                    listQuery.objectCollation.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolOperators) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Operator\' AS objType, 2 AS order_no FROM (' +
-                    listQuery.operators.replace(/\{\{INTOID\}\}/gim,  intSchemaOid).replace(';', '') +
+            if (bolConversion) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Conversion\' AS objType FROM (' +
+                    listQuery.objectConversion.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolAggregates) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Aggregate\' AS objType, 3 AS order_no FROM (' +
-                    listQuery.aggregates.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+            if (bolDomain) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Domain\' AS objType FROM (' +
+                    listQuery.objectDomain.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolSequences) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Sequence\' AS objType, 4 AS order_no FROM (' +
-                    listQuery.sequences.replace(/\{\{INTOID\}\}/gim,  intSchemaOid).replace(';', '') +
+            if (bolForeignTable) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'ForeignTable\' AS objType FROM (' +
+                    listQuery.objectForeignTable.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolTables) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Table\' AS objType, 5 AS order_no FROM (' +
-                    listQuery.objectTableList.replace(/\{\{INTOID\}\}/gim,     intSchemaOid).replace(';', '') +
+            if (bolFunction) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Function\' AS objType FROM (' +
+                    listQuery.objectFunction.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolViews) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'View\' AS objType, 6 AS order_no FROM (' +
-                    listQuery.views.replace(/\{\{INTOID\}\}/gim,      intSchemaOid).replace(';', '') +
+            if (bolIndex) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Index\' AS objType FROM (' +
+                    listQuery.objectIndex.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolFunctions || bolTriggerFunctions || bolOperators || bolAggregates || bolSequences || bolTables || bolViews) {
-                strQuery = arrQuery.join(' UNION ALL ') + '\n\nORDER BY order_no, 1';
+            if (bolOperatorClass) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'OperatorClass\' AS objType FROM (' +
+                    listQuery.objectOperatorClass.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolOperatorFamily) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'OperatorFamily\' AS objType FROM (' +
+                    listQuery.objectOperatorFamily.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolOperator) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Operator\' AS objType FROM (' +
+                    listQuery.objectOperator.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolSequence) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Sequence\' AS objType FROM (' +
+                    listQuery.objectSequence.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTable) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Table\' AS objType FROM (' +
+                    listQuery.objectTableList.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTriggerFunction) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'TriggerFunction\' AS objType FROM (' +
+                    listQuery.objectTriggerFunction.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTextSearchConfiguration) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'TextSearchConfiguration\' AS objType FROM (' +
+                    listQuery.objectTextSearchConfiguration.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTextSearchDictionary) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'TextSearchDictionary\' AS objType FROM (' +
+                    listQuery.objectTextSearchDictionary.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTextSearchParser) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'TextSearchParser\' AS objType FROM (' +
+                    listQuery.objectTextSearchParser.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTextSearchTemplate) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'TextSearchTemplate\' AS objType FROM (' +
+                    listQuery.objectTextSearchTemplate.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolType) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Type\' AS objType FROM (' +
+                    listQuery.objectType.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolView) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'View\' AS objType FROM (' +
+                    listQuery.objectViewList.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            
+            if (   bolAggregate || bolCollation || bolConversion || bolDomain || bolForeignTable || bolFunction
+                || bolIndex || bolOperatorClass || bolOperatorFamily || bolOperator || bolSequence || bolTable
+                || bolTriggerFunction || bolTextSearchConfiguration || bolTextSearchDictionary
+                || bolTextSearchParser || bolTextSearchTemplate || bolType || bolView) {
+                strQuery = arrQuery.join(' UNION ALL ') + '\n\nORDER BY 1';
             }
             
             // function to handle the query results

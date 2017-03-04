@@ -1201,7 +1201,7 @@ scriptQuery.objectCollation = ml(function () {/*
       LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_collation.collnamespace
       LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_collation.oid
           WHERE pg_collation.oid = {{INTOID}}::oid -- OR (nspname || '.' || collname) = '{{STRNAME}}'
-                                                    ), '')
+                                                    ), '');
     */});
           //WHERE pg_collation.oid = {{INTOID}}::oid) ||
           //WHERE pg_collation.oid = {{INTOID}}::oid OR (nspname || '.' || collname) = '{{STRNAME}}') ||
@@ -1246,7 +1246,7 @@ SELECT
            FROM pg_catalog.pg_conversion
       LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_conversion.connamespace
       LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_conversion.oid
-          WHERE pg_conversion.oid = {{INTOID}}::oid), '')
+          WHERE pg_conversion.oid = {{INTOID}}::oid), '');
 */});
 
 

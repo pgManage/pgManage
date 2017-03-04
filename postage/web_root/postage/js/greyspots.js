@@ -8862,38 +8862,38 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                             intRows = parseInt(GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1)), 10);
                             
                         // if mode is DEBUG: add DEBUG to array
-                        } else if (strMode === 'DEBUG' && arrLine[i] !== '') {
+                        } else if (strMode === 'DEBUG') {
                             arrMessages.push({
                                 'level': 'DEBUG',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is LOG: add LOG to array
-                        } else if (strMode === 'LOG' && arrLine[i] !== '') {
+                        } else if (strMode === 'LOG') {
                             arrMessages.push({
                                 'level': 'LOG',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is INFO: add INFO to array
-                        } else if (strMode === 'INFO' && arrLine[i] !== '') {
+                        } else if (strMode === 'INFO') {
                             arrMessages.push({
                                 'level': 'INFO',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is NOTICE: add NOTICE to array
-                        } else if (strMode === 'NOTICE' && arrLine[i] !== '') {
+                        } else if (strMode === 'NOTICE') {
                             arrMessages.push({
                                 'level': 'NOTICE',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is WARNING: add WARNING to array
-                        } else if (strMode === 'WARNING' && arrLine[i] !== '') {
+                        } else if (strMode === 'WARNING') {
                             arrMessages.push({
                                 'level': 'WARNING',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is COLUMNS: get COLUMNS
