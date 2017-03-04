@@ -328,6 +328,17 @@ function dialogRotateLog() {
 function dialogSplash() {
     'use strict';
     var templateElement = document.createElement('template'), afterOpen, beforeClose;
+    templateElement.setAttribute('data-mode', 'constrained');
+    templateElement.setAttribute('data-overlay-close', 'true');
+    templateElement.innerHTML = ml(function () {/*
+        <gs-page>
+            <gs-body>
+                <iframe class="full-iframe" src="https://news1.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
+            </gs-body>
+        </gs-page>
+    */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
+    GS.openDialog(templateElement);
+
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
@@ -341,23 +352,13 @@ function dialogSplash() {
                         </gs-body>
                     </gs-page>
                 */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
+                
+                GS.openDialog(templateElement);
             };
         };
     };
     xhr.open('HEAD', "https://news.workflowproducts.com/splash/postage.html?app=postage");
     xhr.send();
-
-    templateElement.setAttribute('data-mode', 'constrained');
-    templateElement.setAttribute('data-overlay-close', 'true');
-    templateElement.innerHTML = ml(function () {/*
-        <gs-page>
-            <gs-body>
-                <iframe class="full-iframe" src="https://news1.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
-            </gs-body>
-        </gs-page>
-    */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
-
-    GS.openDialog(templateElement);
 }
 
 
