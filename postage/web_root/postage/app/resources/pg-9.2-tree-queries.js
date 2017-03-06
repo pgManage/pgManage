@@ -1362,120 +1362,19 @@ scriptQuery.objectSequence = ml(function () {/*
 
 associatedButtons.objectTable = ['propertyButton', 'dependButton', 'statButton', 'dataObjectButtons'];
 scriptQuery.objectTable = ml(function () {/*
-   -- SELECT 
-   --     -- ######### top comments #########
-   --     (SELECT '-- Table: ' || (quote_ident(nspname) || '.' || quote_ident(relname)) || E';\n\n' ||
-   --             '-- DROP TABLE ' || (quote_ident(nspname) || '.' || quote_ident(relname)) || E';\n\n'
-   --        FROM pg_catalog.pg_class
-   --   LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-   --       WHERE pg_class.oid = {{INTOID}}::oid) ||
-   --     
-   --     -- ############ CREATE ############
-   --     (SELECT 'CREATE TABLE ' || (quote_ident(nspname) || '.' || quote_ident(relname)) || E' (\n'
-   --        FROM pg_catalog.pg_class
-   --   LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-   --       WHERE pg_class.oid = {{INTOID}}::oid) ||
-   --     
-   --     -- ############ COLUMNS ############
-   --     
-   --     
-   --     
-   --     
-   --     -- ########### CHECK CONSTRAINTS ###########
-   --     
-   --     
-   --     
-   --     
-   --     -- ######## FOREIGN KEY CONSTRAINTS ########
-   --     
-   --     
-   --     
-   --     
-   --     -- ######## PRIMARY KEY CONSTRAINTS ########
-   --     
-   --     
-   --     
-   --     
-   --     -- ########## UNIQUE CONSTRAINTS ##########
-   --     
-   --     
-   --     
-   --     
-   --     -- ########## CONSTRAINT TRIGGERS ##########
-   --     
-   --     
-   --     
-   --     
-   --     -- ######### EXCLUSION CONSTRAINTS #########
-   --     
-   --     
-   --     
-   --     
-   --     -- ######### LIKE #########
-   --     
-   --     
-   --     
-   --     
-   --     -- ############# CLOSE #############
-   --     
-   --     (SELECT E'\n)'::text) ||
-   --     
-   --     -- ############## INHERITS ##############
-   --     
-   --     
-   --     
-   --     -- ############## WITH ##############
-   --     
-   --     (SELECT E' WITH (\n  ' || array_to_string(
-   --                                     ((CASE WHEN pg_class.relhasoids THEN 'OIDS=TRUE' ELSE 'OIDS=FALSE' END) || reloptions),
-   --                                     E',\n  '
-   --                                 ) ||
-   --                                 E'\n);\n\n'
-   --        FROM pg_catalog.pg_class
-   --       WHERE pg_class.oid = {{INTOID}}::oid) ||
-   --     
-   --     -- ############# OWNER #############
-   --     (SELECT 'ALTER TABLE ' || (quote_ident(nspname) || '.' || quote_ident(relname)) ||
-   --                                     ' OWNER TO ' || rolname || E';\n'
-   --        FROM pg_catalog.pg_class
-   --   LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-   --   LEFT JOIN pg_catalog.pg_roles ON pg_roles.oid = pg_class.relowner
-   --       WHERE pg_class.oid = {{INTOID}}::oid) ||
-   -- 
-   --     -- ########### COMMENT ###########
-   --     COALESCE(
-   --         (SELECT E'\nCOMMENT ON TABLE ' || (quote_ident(nspname) || '.' || quote_ident(relname)) ||
-   --                                     ' IS ' || quote_literal(description) || E';\n\n'
-   --        FROM pg_catalog.pg_class
-   --   LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-   --   LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_class.oid
-   --       WHERE pg_class.oid = {{INTOID}}::oid), '')
-   --     
-   --     
-   --     
-   --     -- ############ GRANT ############
-   --     
-   --     
-   --     
-   --     -- ########### REVOKE ###########
-   --     
-   --     
-   --     
-   --     -- ########### TRIGGERS ###########
-   --     
-   --     
-   --     
-   --     -- ########### INDEXES ###########
-   --     
-   --     
-   --     
-   --     -- ########### SAMPLE QUERIES ###########
-   --     
-   --     
-   --     
-   
-    SELECT (SELECT '-- Table: ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-            E'\n\n-- DROP TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
+           
+           
+    SELECT (SELECT '-- Table: ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || E';\n' ||
+    (SELECT '-- Estimated Rows ' || (COALESCE(reltuples, 0)::BIGINT) || E';\n' ||
+                    '-- Last Vacuum: ' || CASE WHEN last_vacuum is not null THEN to_char(last_vacuum, 'mm/dd/yyyy HH:MM AM') ELSE 'N/A' END
+                        || ', Last AutoVacuum: ' || CASE WHEN last_autovacuum is not null THEN to_char(last_autovacuum, 'mm/dd/yyyy HH:MM AM') ELSE 'N/A' END || E';\n' ||
+                    '-- Last Analyze: ' || CASE WHEN last_analyze is not null THEN to_char(last_analyze, 'mm/dd/yyyy HH:MM AM') ELSE 'N/A' END
+                        || ', Last AutoAnalyze: ' || CASE WHEN last_autoanalyze is not null THEN to_char(last_autoanalyze, 'mm/dd/yyyy HH:MM AM') ELSE 'N/A' END || E';\n'
+                    FROM pg_catalog.pg_class
+              LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+              LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
+                   WHERE pg_class.oid = {{INTOID}}) ||
+            E'\n-- DROP TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
             E';\n\nCREATE TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
             E' (\n' ||
                     COALESCE(
@@ -1600,6 +1499,7 @@ scriptQuery.objectTable = ml(function () {/*
         -- back to the unknown program
          JOIN pg_roles ON pg_roles.oid = pg_class.relowner
          JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
         WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRNAME}}'
         GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relacl,
                 pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions) --pg_description.description
@@ -1750,6 +1650,125 @@ scriptQuery.objectTable = ml(function () {/*
                                        WHERE pg_class.oid = {{INTOID}} ) ||
                 E'\n      WHERE -CONDITIONS-;\n*' || '/'
         );
+        
+        
+           -- SELECT 
+   --     -- ######### top comments #########
+   --     (SELECT '-- Table: ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname)) || E';\n' ||
+   --         '-- Estimated Rows ' || (COALESCE(reltuples, 0)::BIGINT) || E';\n' ||
+   --         '-- Last Vacuum: ' || CASE WHEN last_vacuum is not null THEN to_char(last_vacuum, 'mm/dd/yyyy HH:MM AM') ELSE ' N/A, Last AutoVacuum: ' END 
+   --             || CASE WHEN last_autovacuum is not null THEN to_char(last_autovacuum, 'mm/dd/yyyy HH:MM AM') ELSE ' N/A' END || E';\n' ||
+   --         '-- Last Analyze: ' || CASE WHEN last_analyze is not null THEN to_char(last_analyze, 'mm/dd/yyyy HH:MM AM') ELSE ' N/A, Last AutoAnalyze: ' END
+   --             || CASE WHEN last_autoanalyze is not null THEN to_char(last_autoanalyze, 'mm/dd/yyyy HH:MM AM') ELSE ' N/A' END || E';\n' ||
+   --         '-- DROP TABLE ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname)) || E';\n\n'
+   --         FROM pg_catalog.pg_class
+   --   LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+   --   LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
+   --        WHERE pg_class.oid = {{INTOID}}::oid ||) ||
+   --     
+   --     -- ############ CREATE ############
+   --     (SELECT 'CREATE TABLE ' || (quote_ident(nspname) || '.' || quote_ident(relname)) || E' (\n'
+   --        FROM pg_catalog.pg_class
+   --   LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+   --       WHERE pg_class.oid = {{INTOID}}::oid) ||
+   --     
+   --     -- ############ COLUMNS ############
+   --     
+   --     
+   --     
+   --     
+   --     -- ########### CHECK CONSTRAINTS ###########
+   --     
+   --     
+   --     
+   --     
+   --     -- ######## FOREIGN KEY CONSTRAINTS ########
+   --     
+   --     
+   --     
+   --     
+   --     -- ######## PRIMARY KEY CONSTRAINTS ########
+   --     
+   --     
+   --     
+   --     
+   --     -- ########## UNIQUE CONSTRAINTS ##########
+   --     
+   --     
+   --     
+   --     
+   --     -- ########## CONSTRAINT TRIGGERS ##########
+   --     
+   --     
+   --     
+   --     
+   --     -- ######### EXCLUSION CONSTRAINTS #########
+   --     
+   --     
+   --     
+   --     
+   --     -- ######### LIKE #########
+   --     
+   --     
+   --     
+   --     
+   --     -- ############# CLOSE #############
+   --     
+   --     (SELECT E'\n)'::text) ||
+   --     
+   --     -- ############## INHERITS ##############
+   --     
+   --     
+   --     
+   --     -- ############## WITH ##############
+   --     
+   --     (SELECT E' WITH (\n  ' || array_to_string(
+   --                                     ((CASE WHEN pg_class.relhasoids THEN 'OIDS=TRUE' ELSE 'OIDS=FALSE' END) || reloptions),
+   --                                     E',\n  '
+   --                                 ) ||
+   --                                 E'\n);\n\n'
+   --        FROM pg_catalog.pg_class
+   --       WHERE pg_class.oid = {{INTOID}}::oid) ||
+   --     
+   --     -- ############# OWNER #############
+   --     (SELECT 'ALTER TABLE ' || (quote_ident(nspname) || '.' || quote_ident(relname)) ||
+   --                                     ' OWNER TO ' || rolname || E';\n'
+   --        FROM pg_catalog.pg_class
+   --   LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+   --   LEFT JOIN pg_catalog.pg_roles ON pg_roles.oid = pg_class.relowner
+   --       WHERE pg_class.oid = {{INTOID}}::oid) ||
+   -- 
+   --     -- ########### COMMENT ###########
+   --     COALESCE(
+   --         (SELECT E'\nCOMMENT ON TABLE ' || (quote_ident(nspname) || '.' || quote_ident(relname)) ||
+   --                                     ' IS ' || quote_literal(description) || E';\n\n'
+   --        FROM pg_catalog.pg_class
+   --   LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+   --   LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_class.oid
+   --       WHERE pg_class.oid = {{INTOID}}::oid), '')
+   --     
+   --     
+   --     
+   --     -- ############ GRANT ############
+   --     
+   --     
+   --     
+   --     -- ########### REVOKE ###########
+   --     
+   --     
+   --     
+   --     -- ########### TRIGGERS ###########
+   --     
+   --     
+   --     
+   --     -- ########### INDEXES ###########
+   --     
+   --     
+   --     
+   --     -- ########### SAMPLE QUERIES ###########
+   --     
+   --     
+   -- 
     */});
 
 associatedButtons.objectForeignTable = ['propertyButton', 'dependButton'];
