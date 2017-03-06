@@ -290,15 +290,6 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 	SDEBUG("str_response: %s", str_response);
 	size_t int_response_len = 0;
 
-	// If copy_check is null, that means we are on the last message of the request
-	if (client_request->parent->conn->copy_check != NULL && close_client_if_needed(client_request->parent, (ev_watcher *)&client_request->parent->conn->copy_check->check, EV_CHECK)) {
-		ev_check_stop(EV_A, &client_request->parent->conn->copy_check->check);
-		client_request->parent->client_paused_request->bol_is_db_framework = true;
-		SDEBUG("client_request->parent->cur_request: %p", client_request->parent->cur_request);
-		decrement_idle(EV_A);
-		return false;
-	}
-
 	if (bol_success) {
 		if (client_request->str_current_response == NULL && !bol_last) {
 			SDEBUG("Build Message Headers...");
@@ -338,6 +329,15 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 			DArray_push(client_request->arr_response, client_request->str_current_response);
 			client_request->str_current_response = NULL;
 			client_request->int_current_response_length = 0;
+		}
+
+		// If copy_check is null, that means we are on the last message of the request
+		if (client_request->parent->conn->copy_check != NULL && close_client_if_needed(client_request->parent, (ev_watcher *)&client_request->parent->conn->copy_check->check, EV_CHECK)) {
+			ev_check_stop(EV_A, &client_request->parent->conn->copy_check->check);
+			client_request->parent->client_paused_request->bol_is_db_framework = true;
+			SDEBUG("client_request->parent->cur_request: %p", client_request->parent->cur_request);
+			decrement_idle(EV_A);
+			return false;
 		}
 
 		if (bol_last) {

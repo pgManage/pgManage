@@ -33,6 +33,9 @@ struct sock_ev_client_insert {
 	size_t int_currval_len;
 	size_t int_data_len;
 
+	char *str_return_order_by;
+	size_t int_return_order_by_len;
+
 	//variable lengths
 	size_t int_real_table_name_len;
 	size_t int_temp_table_name_len;
@@ -54,6 +57,7 @@ INSERT\t[<schemaname>\t]<tablename>
 RETURN\t(<tabseperatedcolumns>|*)
 PK\t(<tabseperatedcolumns>|*)
 SEQ\t<tabseperatedsequencenames>
+[ORDER BY\t<returnorderby>]
 
 <columnname>[\t<columnname>[...]]
 <columnvalue>[\t<columnvalue>[...]]

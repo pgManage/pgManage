@@ -1143,6 +1143,7 @@ void client_send_from_cb(EV_P, ev_check *w, int revents) {
 				ev_io_start(EV_A, (ev_io *)client->client_paused_request->watcher);
 			}
 			ev_feed_event(EV_A, client->client_paused_request->watcher, client->client_paused_request->revents);
+			SINFO("client->client_paused_request->bol_is_db_framework: %s", client->client_paused_request->bol_is_db_framework ? "true" : "false");
 			if (client->client_paused_request->bol_is_db_framework) {
 				increment_idle(EV_A);
 			}
