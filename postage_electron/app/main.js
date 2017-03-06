@@ -98,26 +98,28 @@ function pickNewPort() {
 		if (!taken) {
 			spawnPostage();
 
-			var localStoragePath = path.normalize(app.getPath('appData') + '/postage/Local Storage');
-			fs.readdir(localStoragePath, function(err, items) {
-				var i, len;
-				if (err) {
-					electron.dialog.showErrorBox('Error', err.message);
-					app.quit();
-				}
-
-				for (i = 0, len = items.length; i < len; i++) {
-					if (/^http_127\.0\.0\.1_([0-9]+)\.localstorage/gi.test(items[i])) {
-						console.log(items[i]);
-						var oldPath = path.normalize(localStoragePath + '/' + items[i]);
-						var newPath = path.normalize(localStoragePath + '/' + items[i].replace(/([0-9]+)\.localstorage/gi, function (match) {
-							return int_postage_port.toString() + match.substring(match.indexOf('.'));
-						}));
-						fs.renameSync(oldPath, newPath);
-						console.log(newPath);
+			var localStoragePath = path.normalize(app.getPath('userData') + '/Local Storage');
+			if (fs.existsSync(localStoragePath)) {
+				fs.readdir(localStoragePath, function(err, items) {
+					var i, len;
+					if (err) {
+						electron.dialog.showErrorBox('Error', err.message);
+						app.quit();
 					}
-				}
-			});
+
+					for (i = 0, len = items.length; i < len; i++) {
+						if (/^http_127\.0\.0\.1_([0-9]+)\.localstorage/gi.test(items[i])) {
+							console.log(items[i]);
+							var oldPath = path.normalize(localStoragePath + '/' + items[i]);
+							var newPath = path.normalize(localStoragePath + '/' + items[i].replace(/([0-9]+)\.localstorage/gi, function (match) {
+								return int_postage_port.toString() + match.substring(match.indexOf('.'));
+							}));
+							fs.renameSync(oldPath, newPath);
+							console.log(newPath);
+						}
+					}
+				});
+			}
 		} else {
 			int_postage_port = parseInt(Math.random().toString().substring(2), 10) % (65535 - 1024) + 1024;
 			tcpPortUsed.check(int_postage_port, '127.0.0.1').then(this_callback, function (err) {
