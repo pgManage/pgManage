@@ -335,7 +335,7 @@ function dialogSplash() {
         <gs-page>
             <gs-body>
                 <div id="splash">
-                    <iframe class="full-iframe" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
+                    <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" class="full-iframe" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
                 </div>
             </gs-body>
         </gs-page>
@@ -2203,7 +2203,10 @@ function executeScript() {
                                             '<pre>' + encodeHTML(GS.decodeFromTabDelimited(data.error_text)) + '</pre>'; //strError ||
                     resultsContainer.appendChild(divElement);
                     resultsContainer.appendChild(document.createElement('br'));
-                    resultsContainer.scrollTop = resultsContainer.scrollHeight + resultsContainer.offsetHeight;
+                    //resultsContainer.scrollTop = resultsContainer.scrollHeight + resultsContainer.offsetHeight;
+                    console.log(resultsContainer.scrollTop = document.getElementById('error' + intQuery));
+                    resultsContainer.scrollTop = document.getElementById('error' + intQuery).offsetTop - 40;
+                    //resultsContainer.scrollTop = document.getElementById('error' + intQuery).offset().top;
                     resultsHeaderElement.classList.add('error');
 
                     //console.log(intLine, jsnCurrentQuery.start_row, intErrorStartLine);

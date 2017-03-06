@@ -316,17 +316,23 @@
                             strOID        = arrParts[1];
                             strSchema     = arrParts[2];
                             strObjectName = arrParts[3];
+                            
+
 
                             // get tab name
                             if (strSchema && strObjectName) {
                                 // "strObjectName" should already be quote_ident in the listQuery
-                                strFinalName = quote_ident(strSchema) + '.' + strObjectName;
+                                if (arrParts[0] === 'objectColumn') {
+                                    strFinalName = strObjectName;
+                                } else {
+                                    strFinalName = quote_ident(strSchema) + '.' + strObjectName;
+                                }
                             } else if (!strSchema) {
                                 strFinalName = quote_ident(strObjectName);
                             } else {
                                 strFinalName = quote_ident(strSchema);
                             }
-
+                            
                             strScript = treePrepareQuery(scriptQuery[arrParts[0]], strOID, strFinalName, strFinalName);
 
                             // get toolbar

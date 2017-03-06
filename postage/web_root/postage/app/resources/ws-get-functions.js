@@ -139,6 +139,7 @@ function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh) {
     } else {
         intScrollTop = homeEditor.getSession().getScrollTop();
         setHomeValue('Loading Script', '\n\nLoading Your Script\n\n', '');
+        
 
         getSingleCellData(strQuery, function (strScript) {
 

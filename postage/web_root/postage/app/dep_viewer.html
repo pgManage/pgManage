@@ -835,7 +835,6 @@ SELECT *
                   .replace('compositeType', 'type')
                   .replace('trigger', 'function');
                 
-                console.log(objectType);
                 
                 getListData(propQuery['prop_' + objectType].replace(/\{\{INTOID\}\}/g, d.oid)
                                                            .replace(/\{\{STRNAME\}\}/g, d.name)
