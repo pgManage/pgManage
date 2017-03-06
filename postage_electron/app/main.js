@@ -11,6 +11,18 @@ const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+let mainWindows = [];
+let configWindow = null;
+let connectionWindow = null;
+let pgpassWindow = null;
+let mainWindowState = null;
+let configWindowState = null;
+let connectionWindowState = null;
+let pgpassWindowState = null;
+let bolPostageIsReady = false;
+
 try {
 	fs.statSync(os.homedir() + '/.postage/');
 	fs.statSync(os.homedir() + '/.postage/postage.conf');
@@ -57,6 +69,10 @@ function spawnPostage() {
 		console.log('got data:\n' + data);
 		if (data.toString().indexOf('in your web browser') > -1) {
 			fs.writeFileSync(path.normalize(os.homedir() + '/.postage/postage_port'), int_postage_port.toString());
+			if (mainWindows.length === 0) {
+				openWindow();
+			}
+			bolPostageIsReady = true;
 		}
 	});
 	proc.stderr.on('data', function (data) {
@@ -76,23 +92,32 @@ function handleRedirect(e, url) {
 
 var int_postage_port = null;
 
-try {
-	int_postage_port = parseInt(fs.readFileSync(path.normalize(os.homedir() + '/.postage/postage_port')), 10);
-	tcpPortUsed.check(int_postage_port, '127.0.0.1').then(function (taken) {
-		if (!taken) {
-			spawnPostage();
-		} else {
-			electron.dialog.showErrorBox('Error', 'The port that postage was going to use is taken.');
-			app.quit();
-		}
-	}, function (err) {
-	    throw err;
-	});
-} catch (e) {
+function pickNewPort() {
 	int_postage_port = parseInt(Math.random().toString().substring(2), 10) % (65535 - 1024) + 1024;
 	tcpPortUsed.check(int_postage_port, '127.0.0.1').then(function this_callback(taken) {
 		if (!taken) {
 			spawnPostage();
+
+			var localStoragePath = path.normalize(process.env.APPDATA + '/postage/Local Storage');
+			fs.readdir(localStoragePath, function(err, items) {
+				var i, len;
+				if (err) {
+					electron.dialog.showErrorBox('Error', err.message);
+					app.quit();
+				}
+
+				for (i = 0, len = items.length; i < len; i++) {
+					if (/^http_127\.0\.0\.1_([0-9]+)\.localstorage/gi.test(items[i])) {
+						console.log(items[i]);
+						var oldPath = path.normalize(localStoragePath + '/' + items[i]);
+						var newPath = path.normalize(localStoragePath + '/' + items[i].replace(/([0-9]+)\.localstorage/gi, function (match) {
+							return int_postage_port.toString() + match.substring(match.indexOf('.'));
+						}));
+						fs.renameSync(oldPath, newPath);
+						console.log(newPath);
+					}
+				}
+			});
 		} else {
 			int_postage_port = parseInt(Math.random().toString().substring(2), 10) % (65535 - 1024) + 1024;
 			tcpPortUsed.check(int_postage_port, '127.0.0.1').then(this_callback, function (err) {
@@ -105,21 +130,25 @@ try {
 	});
 }
 
+try {
+	int_postage_port = parseInt(fs.readFileSync(path.normalize(os.homedir() + '/.postage/postage_port')), 10);
+	tcpPortUsed.check(int_postage_port, '127.0.0.1').then(function (taken) {
+		if (!taken) {
+			spawnPostage();
+		} else {
+			pickNewPort();
+		}
+	}, function (err) {
+	    throw err;
+	});
+} catch (e) {
+	pickNewPort();
+}
+
 const child_process = require('child_process');
 var proc = null;
 
 require('electron-context-menu')({});
-
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindows = [];
-let configWindow = null;
-let connectionWindow = null;
-let pgpassWindow = null;
-let mainWindowState = null;
-let configWindowState = null;
-let connectionWindowState = null;
-let pgpassWindowState = null;
 
 ipcMain.on('postage', function (event, arg) {
 	if (arg === 'restart') {
@@ -399,7 +428,9 @@ function appStart() {
 		file: 'pgpass-window-state.json'
 	});
 
-	openWindow();
+	if (bolPostageIsReady) {
+		openWindow();
+	}
 
 	setMenu();
 }
