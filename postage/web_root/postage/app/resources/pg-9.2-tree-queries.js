@@ -1358,7 +1358,7 @@ scriptQuery.objectSequence = ml(function () {/*
         WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRNAME}}')),'');
     */});
 
-associatedButtons.objectColumn = ['propertyButton', 'dependButton'];
+associatedButtons.objectColumn = ['dependButton'];
 scriptQuery.objectColumn = ml(function () {/*
 SELECT '-- Column: ' || attname || E';\n\n' ||
     COALESCE((SELECT COALESCE('-- Null Fraction: ' || null_frac || E';\n', E'-- No null fraction found\n') || 

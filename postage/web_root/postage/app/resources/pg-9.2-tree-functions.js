@@ -1982,7 +1982,10 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             <gs-body padded>
                 <center>What code do you want for the schema: "<span id="dialog-sql-dump-schema"></span>"?</center>
                 <div id="schema-dump-change-event-catcher">
-                    <gs-checkbox remove-bottom flex-horizontal value="true" id="checkbox-schema-dump-drop-statements">
+                    <gs-checkbox remove-bottom flex-horizontal value="true" id="checkbox-all">
+                        <label style="text-align: left;" flex>&nbsp;All</label>
+                    </gs-checkbox>
+                    <gs-checkbox flex-horizontal value="true" id="checkbox-schema-dump-drop-statements" remove-all>
                         <label style="text-align: left;" flex>&nbsp;Drop Statements</label>
                     </gs-checkbox>
                     <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-schema">
@@ -2066,6 +2069,29 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
     
     GS.openDialog(templateElement, function () {
         document.getElementById('dialog-sql-dump-schema').textContent = strSchemaName;
+        document.getElementById('checkbox-all').addEventListener('change', function () {
+            document.getElementById('checkbox-schema-dump-drop-statements').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-schema').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-aggregate').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-collation').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-conversion').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-domain').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-foreign-table').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-function').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-index').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-operator-class').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-operator-family').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-operator').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-sequence').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-table').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-trigger-function').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-text-search-configuration').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-text-search-dictionary').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-text-search-parser').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-text-search-template').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-type').value = document.getElementById('checkbox-all').value;
+            document.getElementById('checkbox-schema-dump-view').value = document.getElementById('checkbox-all').value;
+        });
         
         document.getElementById('schema-dump-change-event-catcher').addEventListener('change', function () {
             var bolSchema, bolAggregate, bolCollation, bolConversion,
