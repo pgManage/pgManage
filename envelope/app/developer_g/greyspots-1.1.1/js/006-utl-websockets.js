@@ -660,35 +660,35 @@
                         } else if (strMode === 'DEBUG') {
                             arrMessages.push({
                                 'level': 'DEBUG',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is LOG: add LOG to array
                         } else if (strMode === 'LOG') {
                             arrMessages.push({
                                 'level': 'LOG',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is INFO: add INFO to array
                         } else if (strMode === 'INFO') {
                             arrMessages.push({
                                 'level': 'INFO',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is NOTICE: add NOTICE to array
                         } else if (strMode === 'NOTICE') {
                             arrMessages.push({
                                 'level': 'NOTICE',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is WARNING: add WARNING to array
                         } else if (strMode === 'WARNING') {
                             arrMessages.push({
                                 'level': 'WARNING',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is COLUMNS: get COLUMNS

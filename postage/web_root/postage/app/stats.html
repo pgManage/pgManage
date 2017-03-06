@@ -38,6 +38,20 @@
         <script>
 /*jslint browser*/
 /*global xtag, window, GS, d3, console, ml*/
+
+
+
+/*window.addEventListener('resize', function () {
+    var master_elements = document.getElementsByClassName('master_g');
+    for (var i = 0, len = master_elements.length; i < len; i += 1) {
+        var element = master_elements[i].parentNode.parentNode.parentNode;
+        //master_elements[i].offsetWidth
+        //master_elements[i].setAttribute("transform", "translate(" + elementforresize.margin.left + "," + elementforresize.margin.top + ")");
+    }
+});*/
+
+
+
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
     function pushReplacePopHandler(element) {
@@ -218,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //
     function elementInserted(element) {
         // if this is the first time inserted has been run: continue
+        
         if (!element.inserted) {
             element.inserted = true;
 
@@ -241,7 +256,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             //add g element
             element.g = element.svg.append("g").attr("transform", "translate(" + element.margin.left + "," + element.margin.top + ")")
-                .attr("id", "master_g");
+                .attr("id", "master_g")
+                .attr("class", "master_g");
+
+
 
             //set x and y variable
             element.x = d3.scaleLinear()
@@ -249,6 +267,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
             element.y = d3.scaleLinear()
                 .rangeRound([element.height, 0]);
+
+
+            window.addEventListener('resize', function () {
+                var rect = element.svg.node().getBoundingClientRect();
+
+                element.width = +rect.width - element.margin.left - element.margin.right;
+                element.height = +rect.height - element.margin.top - element.margin.bottom;
+
+                //set x and y variable
+                element.x = d3.scaleLinear()
+                    .rangeRound([0, element.width]);
+
+                element.y = d3.scaleLinear()
+                    .rangeRound([element.height, 0]);
+            });
 
             //create line functions using the x and y variables
             element.line_f = d3.line()
@@ -352,6 +385,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     );
                 }, 1000);
+                
+                
+                document.getElementById('stop').addEventListener('click', function () {
+                    clearInterval(element.interval);
+                });
 
             //if src="" is set
             } else if (element.hasAttribute('src')) {
@@ -614,11 +652,33 @@ window.addEventListener('load', function () {
     GS.envSocket = GS.openSocket('env');
 });
         </script>
+        <style type="text/css" media="all">
+            #stop {
+                text-align: left;
+                color: white;
+                 /* Fallback for web browsers that doesn't support RGBa */
+                background: rgb(0, 0, 0) transparent;
+                /* RGBa with 0.6 opacity */
+                background: rgba(0, 0, 0, 0);
+                /* For IE 5.5 - 7*/
+                filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+                /* For IE 8*/
+                -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+                float: left;
+                padding: 0.25em;
+                -webkit-border-radius: 0.25em;
+                -moz-border-radius: 0.25em;
+                -ms-border-radius: 0.25em;
+                -o-border-radius: 0.25em;
+                border-radius: 0.25em;
+                border: none;
+            }
+        </style>
     </head>
     <body>
         <gs-page>
             <gs-header>
-                <center><h3>Activity Statistics</h3></center>
+                <center><button id="stop" type="submit"><h4>Stop Chart</h4></button><h3>Activity Statistics</h3></center>
             </gs-header>
             <gs-body padded>
                 <gs-grid widths="1,1">

@@ -1,5 +1,6 @@
 var bolTabFunctionsLoaded = true, intTabNumber = 0, intNumberOfTabs = 0, bolStillInSetPosition, //arrTabOrder, tabListChangeStamp = '0',
-    bolSetPositionFor, bolCurrentlyScriptTab = false, bolAutoOpenPropertyList = true;
+    bolSetPositionFor, bolCurrentlyScriptTab = false, bolAutoOpenPropertyList = true, currTab = [];
+
 
 // this function encodes tab names so that they can pass as canonical file names
 function encodeTabNameForFileName(strName) {
@@ -704,7 +705,6 @@ function fillTab(tabElement, jsnParameters) {
 
     if (tabElement.tabType === 'sql') {
         tabElement.relatedEditor.ignoreChange = true;
-
         strValue = jsnParameters.strContent || '\n\n\n\n\n\n\n\n\n';
         tabElement.relatedEditor.setValue(strValue);
 

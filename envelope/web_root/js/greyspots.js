@@ -8865,35 +8865,35 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                         } else if (strMode === 'DEBUG') {
                             arrMessages.push({
                                 'level': 'DEBUG',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is LOG: add LOG to array
                         } else if (strMode === 'LOG') {
                             arrMessages.push({
                                 'level': 'LOG',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is INFO: add INFO to array
                         } else if (strMode === 'INFO') {
                             arrMessages.push({
                                 'level': 'INFO',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is NOTICE: add NOTICE to array
                         } else if (strMode === 'NOTICE') {
                             arrMessages.push({
                                 'level': 'NOTICE',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is WARNING: add WARNING to array
                         } else if (strMode === 'WARNING') {
                             arrMessages.push({
                                 'level': 'WARNING',
-                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1))
+                                'content': GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1).replace(/\\n$/,''))
                             });
                             
                         // if mode is COLUMNS: get COLUMNS
@@ -21480,6 +21480,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // if there is a limit button
             if (element.limitButtonElement) {
                 element.limitButtonElement.textContent = data.dat.length + ' of ' + data.row_count;
+                element.limitButtonElement.setAttribute('class', 'row_count_btn');
             }
             
             //console.log(tableTemplateElement, element.tableTemplate, theadElement, tbodyElement);
@@ -21773,6 +21774,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 for (i = 0, len = arrRecord.length; i < len; i += 1) {
                     arrRecord[i].parentNode.removeChild(arrRecord[i]);
                 }
+
+                
+                /*if (element.limitButtonElement) {
+                    var btn_text_content = element.limitButtonElement.textContent;
+                    var row_num1, row_num2;
+                    
+                    row_num1 = btn_text_content.substring(0, btn_text_content.indexOf(' '));
+                    row_num2 = btn_text_content.substring(btn_text_content.lastIndexOf(' '), btn_text_content.length);
+                    element.limitButtonElement.innerHTML = (row_num1 - arrRecord.length) + ' of ' + (row_num2 - arrRecord.length);
+                    
+                    console.log(element.limitButtonElement, element.limitButtonElement.textContent);
+                }*/
                 
                 idColIndex = element.lastSuccessData.arr_column.indexOf('id');
                 
@@ -21798,6 +21811,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             break;
                         }
                     }
+                    // this updates the second row count number
+                    element.lastSuccessData.row_count = element.lastSuccessData.row_count - arrRecord.length;
                     
                     handleData(element, element.lastSuccessData);
                 }

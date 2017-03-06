@@ -1,7 +1,7 @@
 //jslint white:true multivar:true
 var bolExplainLoaded = true;
   
-document.addEventListener('keydown', function (){
+document.addEventListener('keydown', function (event) {
     if (event.keyCode === 118 && event.shiftKey === false) {
         explain();
     } else if (event.keyCode === 118 && event.shiftKey === true) {
@@ -384,8 +384,10 @@ function handleExplain(explainJSON, target, bolRun) {
     node.append('foreignObject')
         .attr("y", -95)
         .attr("x", -95)
+        .attr('width', 195)
+        .attr('height', 270)
             .html(function (d) {
-                var strHTML = '';
+                var strHTML = '<body xmlns="http://www.w3.org/1999/xhtml">';
                 
                 strHTML += '<div class="explain-node-container" style="width: 190px">';
                 strHTML += '<h3 style="margin: 0; margin-bottom: 2px;">' + d.data.data['Node Type'] + '</h3>'
@@ -488,7 +490,7 @@ function handleExplain(explainJSON, target, bolRun) {
                                 '</div>';
                 }
                 
-                strHTML += '</div>';
+                strHTML += '</div></body>';
                 
                 return strHTML;
             });

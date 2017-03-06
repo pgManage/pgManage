@@ -154,8 +154,12 @@ function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh) {
                     '\n\n\n\n';
 
                 setHomeValue(strFinalName, strScript, strToolbarAddons);
+                
                 //console.log(intScrollTop);
                 homeEditor.getSession().setScrollTop(intScrollTop);
+                if (currTab[1]) {
+                    homeEditor.scrollToLine(parseInt(currTab[1], 10) + 5);
+                }
             }
         });
     }

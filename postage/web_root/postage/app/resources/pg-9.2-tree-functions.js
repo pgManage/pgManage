@@ -26,48 +26,45 @@ var bolTreeFunctionsLoaded = true
 
 // initalize tree
 function treeStart() {
-    
-    //var ace_lines = document.getElementsByClassName('ace_line');
     'use strict';
     // create and configure tree ace
     treeGlobals.ace = ace.edit('object-list-ace');
     treeGlobals.aceSession = treeGlobals.ace.getSession();
-  
-    
-    // get and save state
-    var dragstartcursorX, dragstartcursorY;
-    var strName;
-    var ghost;
-    var bolMousedown = false;
-    var intSelectionTriggered = 0;
-    var intSelectionRow;
-    var bolSelectionTriggered;
-    var mouseMoveFunction;
-    var bolOptionPressed;
-    var strNameOpt;
-    var cursorX, cursorY;
-    
-
-    document.addEventListener('keydown', function (event) {
-        if (event.keyCode === 18) {
-            bolOptionPressed = true;
-            if (ghost) {
-                ghost.innerHTML = strNameOpt;
-                ghost.style.left = (cursorX - ((ghost.innerHTML.length * 3) + 5)) + 'px';
-            }
-        }
-    });
-    document.addEventListener('keyup', function (event) {
-        if (bolOptionPressed) {
-            bolOptionPressed = false;
-            if (ghost) {
-                ghost.innerHTML = strName;
-                ghost.style.left = (cursorX - ((ghost.innerHTML.length * 3) + 5)) + 'px';
-            }
-        }
-    });
 
     if (!evt.touchDevice) {
+        // get and save state
+        var dragstartcursorX, dragstartcursorY;
+        var strName;
+        var ghost;
+        var bolMousedown = false;
+        var intSelectionTriggered = 0;
+        var intSelectionRow;
+        var bolSelectionTriggered;
+        var mouseMoveFunction;
+        var bolOptionPressed;
+        var strNameOpt;
+        var cursorX, cursorY;
+
+        document.addEventListener('keydown', function (event) {
+            if (event.keyCode === 18) {
+                bolOptionPressed = true;
+                if (ghost) {
+                    ghost.innerHTML = strNameOpt;
+                    ghost.style.left = (cursorX - ((ghost.innerHTML.length * 3) + 5)) + 'px';
+                }
+            }
+        });
+
+        document.addEventListener('keyup', function (event) {
+            if (bolOptionPressed) {
+                bolOptionPressed = false;
+                if (ghost) {
+                    ghost.innerHTML = strName;
+                    ghost.style.left = (cursorX - ((ghost.innerHTML.length * 3) + 5)) + 'px';
+                }
+            }
+        });
+
         treeGlobals.ace.addEventListener('mousedown', function (event) {
             var stateMoveFunction;
             var stateEndFunction;
@@ -76,36 +73,36 @@ function treeStart() {
             var startcursorX;
             var startcursorY;
             var currentTab = xtag.query(document.body, '.current-tab')[0];
-    
+
             bolMousedown = true;
             intSelectionTriggered = 0;
-    
+
             // save origin point so you can cancel if it doesn't move enough
             startcursorX = event.clientX;
             startcursorY = event.clientY;
-    
+
             // save origin point so you can cancel selection of tree view
             dragstartcursorX = event.clientX;
             dragstartcursorY = event.clientY;
-    
+
             mouseMoveFunction = function (event) {
                 // get cursor position (x/y)
                 cursorX = event.clientX;
                 cursorY = event.clientY;
-    
+
                 if (currentTab !== undefined){
                     // move ace cursor
                     currentTab.relatedEditor.selection.moveToPosition(
                         currentTab.relatedEditor.renderer.screenToTextCoordinates(cursorX, cursorY)
                     );
                 }
-    
+
                 // set ghost position to cursor position (x/y) with changes to center it
                 ghost.style.left = (cursorX - ((ghost.innerHTML.length * 3) + 5)) + 'px';
                 ghost.style.top = (cursorY - 15) + 'px';
-    
+
                 //console.log(cursorX, cursorX, dragstartcursorX, dragstartcursorY);
-    
+
                 // after moving ten pixels:
                 if (
                     cursorX <= (dragstartcursorX - 10) ||
@@ -117,105 +114,123 @@ function treeStart() {
                     treeGlobals.ace.getSession().selection.clearSelection();
                 }
             };
-    
+
             // this handles mouseup out of the window by running
             //      the end function if the mouse moves while it is up
             stateMoveFunction = function (event) {
-                if (!evt.touchDevice) {
-                    // if there is a editor tab open:
-                    if (xtag.query(document.body, '.current-tab')[0] !== undefined){
-                        // focus to editor
-                        xtag.query(document.body, '.current-tab')[0].relatedEditor.focus();
-                    }
+                // if there is a editor tab open:
+                if (currentTab !== undefined){
+                    // focus to editor
+                    currentTab.relatedEditor.focus();
                 }
+
                 // IF mouse is up AND we're not on a touch device
                 if (event.which === 0 && !evt.touchDevice) {
                     stateEndFunction(event);
                 }
             };
-    
+
             stateEndFunction = function (event) {
                 // get current cursor position
-                currentcursorX = (window.Event) ? event.pageX : event.clientX + (document.documentElement.scrollLeft ? document.documentElement.scrollLeft : document.body.scrollLeft);
-                currentcursorY = (window.Event) ? event.pageY : event.clientY + (document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop);
+                currentcursorX = (
+                    (window.Event)
+                        ? event.pageX
+                        : event.clientX + (
+                                document.documentElement.scrollLeft
+                                    ? document.documentElement.scrollLeft
+                                    : document.body.scrollLeft
+                        )
+                );
+                currentcursorY = (
+                    (window.Event)
+                        ? event.pageY
+                        : event.clientY + (
+                                document.documentElement.scrollTop
+                                    ? document.documentElement.scrollTop
+                                    : document.body.scrollTop
+                        )
+                );
                 bolMousedown = false;
                 bolSelectionTriggered = 0;
-                
-                
+
                 // if cursor has moved off of treeview to the editor ace
                 if (currentcursorX > (elemPos.intElementWidth + 60)) {
                     // if there is a editor tab open:
-                    if (xtag.query(document.body, '.current-tab')[0] !== undefined){
+                    if (currentTab !== undefined){
                         // insert snippet text
-                        xtag.query(document.body, '.current-tab')[0].relatedEditor.insert(ghost.innerHTML);
+                        currentTab.relatedEditor.insert(ghost.innerHTML);
                     }
                 }
-                
-                
+
                 // remove ghost if appended
                 if (ghost && ghost.parentNode && ghost.parentNode.nodeName === 'BODY') {
                     ghost.parentNode.removeChild(ghost);
                 }
-                
-                
-            strName = '';
-            // unbind mousemove and mouseup
-            document.body.removeEventListener(evt.mousemove, stateMoveFunction);
-            document.body.removeEventListener(evt.mouseup, stateEndFunction);
-            document.body.removeEventListener('mousemove', mouseMoveFunction);
+
+                strName = '';
+
+                // unbind mousemove and mouseup
+                document.body.removeEventListener(evt.mousemove, stateMoveFunction);
+                document.body.removeEventListener(evt.mouseup, stateEndFunction);
+                document.body.removeEventListener(evt.mousemove, mouseMoveFunction);
             };
-    
+
             document.body.addEventListener(evt.mousemove, stateMoveFunction);
             document.body.addEventListener(evt.mouseup, stateEndFunction);
         });
-    
+
         // start drag on changeSelection
         treeGlobals.ace.addEventListener('changeSelection', function (event) {
             var jsnSelection;
             var jsnData;
             var subStrEnd;
-    
+            var intI;
+
             // only listen to selection change on the second trigger
-        if (intSelectionTriggered === 0) {
+            if (intSelectionTriggered === 0) {
                 intSelectionTriggered += 1;
+
             } else if (bolMousedown && intSelectionTriggered === 1) {
                 intSelectionTriggered += 1;
                 jsnSelection = treeGlobals.ace.getSelectionRange();
                 intSelectionRow = jsnSelection.start.row;
                 jsnData = treeGlobals.data[intSelectionRow];
-    
-    
+
                 if (jsnData) {
                     // tables
                     if (jsnData.query === 'objectTable') {
                         strName = jsnData.name;
                         strNameOpt = jsnData.schemaName + '.' + jsnData.name
+
                     // views
                     } else if (jsnData.query === 'objectView') {
                         strName = jsnData.name;
                         strNameOpt = jsnData.schemaName + '.' + jsnData.name;
+
                     // non-schema objects (functions, sequences, etc...)
                     } else if (jsnData.schemaName && jsnData.schemaOID && jsnData.oid !== jsnData.schemaOID) {
                         strName = jsnData.name;
                         strNameOpt = jsnData.schemaName + '.' + jsnData.name;
+
                     // schemas
                     } else if (!jsnData.schemaName && jsnData.oid) { // schemas use .name for their name, not .schemaName
                         strName = jsnData.name;
                         strNameOpt = jsnData.name;
+                    }
+
                     // columns
-                    }if (jsnData.type === '') {
-                        
+                    if (jsnData.type === '') {
                         // substring column type off of column name
                         subStrEnd = strName.lastIndexOf(' (');
                         strName = strName.substring(0, subStrEnd);
-                        
+
                         // go up a record until you find a table/view
-                        for (var intI = intSelectionRow; intI >= 0; intI -= 1) {
+                        for (intI = intSelectionRow; intI >= 0; intI -= 1) {
                             if (treeGlobals.data[intI].query === 'objectTable') {
-                                
                                 strNameOpt = treeGlobals.data[intI].name + '.' + strName.substring(0, subStrEnd);
                                 //set intI to  0 to cancel the loop
                                 intI = 0;
+
                             } else if (treeGlobals.data[intI].query === 'objectView') {
                                 strNameOpt = treeGlobals.data[intI].name + '.' + strName.substring(0, subStrEnd);
                                 //set intI to  0 to cancel the loop
@@ -223,13 +238,14 @@ function treeStart() {
                             }
                         }
                     }
+
                     if (strName) {
                         document.body.addEventListener('mousemove', mouseMoveFunction);
                     }
                 }
-                
+
                 if (strName) {
-                    ghost = document.createElement('p')
+                    ghost = document.createElement('div')
                     ghost.style.minHeight = '0px';
                     ghost.style.padding = '0.25em';
                     ghost.style.position = 'absolute';
@@ -239,15 +255,14 @@ function treeStart() {
                     ghost.style.height =  '1.5em';
                     ghost.innerHTML += '' + strName + '';
                     ghost.style.pointerEvents = 'none';
-                    
+                    ghost.style.top = '-500px';
+                    ghost.style.left = '-500px';
+
                     // if ghost is not appended yet: append to body
                     if (!ghost.parentNode || ghost.parentNode.nodeName !== 'BODY') {
                         document.body.appendChild(ghost);
                     }
-                    
-                    
                 }
-                
             }
         });
     }
@@ -1891,6 +1906,70 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
     'use strict';
     var templateElement = document.createElement('template');
     
+    /*
+    listQuery.objectAggregate
+    listQuery.objectCollation
+    listQuery.objectConversion
+    listQuery.objectDomain
+    listQuery.objectForeignTable
+    listQuery.objectFunction
+    listQuery.objectIndex
+    listQuery.objectOperatorClass
+    listQuery.objectOperatorFamily
+    listQuery.objectOperator
+    listQuery.objectSequence
+    listQuery.objectTable
+    listQuery.objectTriggerFunction
+    listQuery.objectTextSearchConfiguration
+    listQuery.objectTextSearchDictionary
+    listQuery.objectTextSearchParser
+    listQuery.objectTextSearchTemplate
+    listQuery.objectType
+    listQuery.objectView
+    
+    
+    bolAggregate
+    bolCollation
+    bolConversion
+    bolDomain
+    bolForeignTable
+    bolFunction
+    bolIndex
+    bolOperatorClass
+    bolOperatorFamily
+    bolOperator
+    bolSequence
+    bolTable
+    bolTriggerFunction
+    bolTextSearchConfiguration
+    bolTextSearchDictionary
+    bolTextSearchParser
+    bolTextSearchTemplate
+    bolType
+    bolView
+    
+    checkbox-schema-dump-aggregate
+    checkbox-schema-dump-collation
+    checkbox-schema-dump-conversion
+    checkbox-schema-dump-domain
+    checkbox-schema-dump-foreign-table
+    checkbox-schema-dump-function
+    checkbox-schema-dump-index
+    checkbox-schema-dump-operator-class
+    checkbox-schema-dump-operator-family
+    checkbox-schema-dump-operator
+    checkbox-schema-dump-sequence
+    checkbox-schema-dump-table
+    checkbox-schema-dump-trigger-function
+    checkbox-schema-dump-text-search-configuration
+    checkbox-schema-dump-text-search-dictionary
+    checkbox-schema-dump-text-search-parser
+    checkbox-schema-dump-text-search-template
+    checkbox-schema-dump-type
+    checkbox-schema-dump-view
+    */
+
+    
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-header>
@@ -1899,48 +1978,75 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             <gs-body padded>
                 <center>What code do you want for the schema: "<span id="dialog-sql-dump-schema"></span>"?</center>
                 <div id="schema-dump-change-event-catcher">
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-drop-statements"></gs-checkbox>
-                        <label for="checkbox-schema-dump-drop-statements">Drop Statements</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-schema"></gs-checkbox>
-                        <label for="checkbox-schema-dump-schema">Schema</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-functions"></gs-checkbox>
-                        <label for="checkbox-schema-dump-functions">Functions</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-operators"></gs-checkbox>
-                        <label for="checkbox-schema-dump-operators">Operators</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-aggregates"></gs-checkbox>
-                        <label for="checkbox-schema-dump-aggregates">Aggregates</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-trigger-functions"></gs-checkbox>
-                        <label for="checkbox-schema-dump-trigger-functions">Trigger Functions</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-sequences"></gs-checkbox>
-                        <label for="checkbox-schema-dump-sequences">Sequences</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-tables"></gs-checkbox>
-                        <label for="checkbox-schema-dump-tables">Tables (Without Data)</label>
-                    </div>
-                    <div flex-horizontal>
-                        <gs-checkbox value="true" id="checkbox-schema-dump-views"></gs-checkbox>
-                        <label for="checkbox-schema-dump-views">Views</label>
-                    </div>
+                    <gs-checkbox remove-bottom flex-horizontal value="true" id="checkbox-schema-dump-drop-statements">
+                        <label style="text-align: left;" flex>&nbsp;Drop Statements</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-schema">
+                        <label style="text-align: left;" flex>&nbsp;Schema</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-aggregate">
+                        <label style="text-align: left;" flex>&nbsp;Aggregates</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-collation">
+                        <label style="text-align: left;" flex>&nbsp;Collations</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-conversion">
+                        <label style="text-align: left;" flex>&nbsp;Conversions</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-domain">
+                        <label style="text-align: left;" flex>&nbsp;Domains</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-foreign-table">
+                        <label style="text-align: left;" flex>&nbsp;Foreign Tables</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-function">
+                        <label style="text-align: left;" flex>&nbsp;Functions</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-index">
+                        <label style="text-align: left;" flex>&nbsp;Indexes</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-operator-class">
+                        <label style="text-align: left;" flex>&nbsp;Operator Classes</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-operator-family">
+                        <label style="text-align: left;" flex>&nbsp;Operator Families</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-operator">
+                        <label style="text-align: left;" flex>&nbsp;Operators</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-sequence">
+                        <label style="text-align: left;" flex>&nbsp;Sequences</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-table">
+                        <label style="text-align: left;" flex>&nbsp;Tables</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-trigger-function">
+                        <label style="text-align: left;" flex>&nbsp;Trigger Functions</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-text-search-configuration">
+                        <label style="text-align: left;" flex>&nbsp;Text Search Configurations</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-text-search-dictionary">
+                        <label style="text-align: left;" flex>&nbsp;Text Search Dictionarys</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-text-search-parser">
+                        <label style="text-align: left;" flex>&nbsp;Text Search Parsers</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-text-search-template">
+                        <label style="text-align: left;" flex>&nbsp;Text Search Template</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-all flex-horizontal value="true" id="checkbox-schema-dump-type">
+                        <label style="text-align: left;" flex>&nbsp;Types</label>
+                    </gs-checkbox>
+                    <gs-checkbox remove-top flex-horizontal value="true" id="checkbox-schema-dump-view">
+                        <label style="text-align: left;" flex>&nbsp;Views</label>
+                    </gs-checkbox>
                 </div>
             </gs-body>
             <gs-footer>
                 <gs-grid>
-                    <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
-                    <gs-block><gs-button id="button-schema-dump" dialogclose>Open Script</gs-button></gs-block>
+                    <gs-block><gs-button remove-all dialogclose>Cancel</gs-button></gs-block>
+                    <gs-block><gs-button remove-all id="button-schema-dump" dialogclose>Open Script</gs-button></gs-block>
                 </gs-grid>
             </gs-footer>
         </gs-page>
@@ -1958,81 +2064,182 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
         document.getElementById('dialog-sql-dump-schema').textContent = strSchemaName;
         
         document.getElementById('schema-dump-change-event-catcher').addEventListener('change', function () {
-            var bolSchema, bolFunctions, bolOperators, bolAggregates,
-                bolTriggerFunctions, bolSequences, bolTables, bolViews;
+            var bolSchema, bolAggregate, bolCollation, bolConversion,
+                bolDomain, bolForeignTable, bolFunction, bolIndex,
+                bolOperatorClass, bolOperatorFamily, bolOperator,
+                bolSequence, bolTable, bolTriggerFunction,
+                bolTextSearchConfiguration, bolTextSearchDictionary,
+                bolTextSearchParser, bolTextSearchTemplate, bolType,
+                bolView;
             
-            bolSchema           = document.getElementById('checkbox-schema-dump-schema').value            === 'true';
-            bolFunctions        = document.getElementById('checkbox-schema-dump-functions').value         === 'true';
-            bolOperators        = document.getElementById('checkbox-schema-dump-operators').value         === 'true';
-            bolAggregates       = document.getElementById('checkbox-schema-dump-aggregates').value        === 'true';
-            bolTriggerFunctions = document.getElementById('checkbox-schema-dump-trigger-functions').value === 'true';
-            bolSequences        = document.getElementById('checkbox-schema-dump-sequences').value         === 'true';
-            bolTables           = document.getElementById('checkbox-schema-dump-tables').value            === 'true';
-            bolViews            = document.getElementById('checkbox-schema-dump-views').value             === 'true';
+            bolSchema                       = document.getElementById('checkbox-schema-dump-schema').value                      === 'true';
+            bolAggregate                    = document.getElementById('checkbox-schema-dump-aggregate').value                   === 'true';
+            bolCollation                    = document.getElementById('checkbox-schema-dump-collation').value                   === 'true';
+            bolConversion                   = document.getElementById('checkbox-schema-dump-conversion').value                  === 'true';
+            bolDomain                       = document.getElementById('checkbox-schema-dump-domain').value                      === 'true';
+            bolForeignTable                 = document.getElementById('checkbox-schema-dump-foreign-table').value               === 'true';
+            bolFunction                     = document.getElementById('checkbox-schema-dump-function').value                    === 'true';
+            bolIndex                        = document.getElementById('checkbox-schema-dump-index').value                       === 'true';
+            bolOperatorClass                = document.getElementById('checkbox-schema-dump-operator-class').value              === 'true';
+            bolOperatorFamily               = document.getElementById('checkbox-schema-dump-operator-family').value             === 'true';
+            bolOperator                     = document.getElementById('checkbox-schema-dump-operator').value                    === 'true';
+            bolSequence                     = document.getElementById('checkbox-schema-dump-sequence').value                    === 'true';
+            bolTable                        = document.getElementById('checkbox-schema-dump-table').value                       === 'true';
+            bolTriggerFunction              = document.getElementById('checkbox-schema-dump-trigger-function').value            === 'true';
+            bolTextSearchConfiguration      = document.getElementById('checkbox-schema-dump-text-search-configuration').value   === 'true';
+            bolTextSearchDictionary         = document.getElementById('checkbox-schema-dump-text-search-dictionary').value      === 'true';
+            bolTextSearchParser             = document.getElementById('checkbox-schema-dump-text-search-parser').value          === 'true';
+            bolTextSearchTemplate           = document.getElementById('checkbox-schema-dump-text-search-template').value        === 'true';
+            bolType                         = document.getElementById('checkbox-schema-dump-type').value                        === 'true';
+            bolView                         = document.getElementById('checkbox-schema-dump-view').value                        === 'true';
             
-            if (!bolSchema && !bolFunctions && !bolOperators && !bolAggregates &&
-                !bolTriggerFunctions && !bolSequences && !bolTables && !bolViews) {
+            if (   !bolschema && !bolAggregate && !bolCollation && !bolConversion && !bolDomain
+                && !bolForeignTable && !bolFunction && !bolIndex && !bolOperatorClass
+                && !bolOperatorFamily && !bolOperator && !bolSequence && !bolTable
+                && !bolTriggerFunction && !bolTextSearchConfiguration && !bolTextSearchDictionary
+                && !bolTextSearchParser && !bolTextSearchTemplate && !bolType && !bolView) {
                 document.getElementById('button-schema-dump').setAttribute('disabled', '');
             } else {
                 document.getElementById('button-schema-dump').removeAttribute('disabled');
             }
         });
     }, function (event, strAnswer) {
-        var bolDropStatments, bolSchema, bolFunctions, bolOperators, bolAggregates,
-            bolTriggerFunctions, bolSequences, bolTables, bolViews, strQuery, handleListResults, arrQuery;
+        var bolDropStatments, bolSchema, bolAggregate, bolCollation, bolConversion,
+            bolDomain, bolForeignTable, bolFunction, bolIndex,
+            bolOperatorClass, bolOperatorFamily, bolOperator,
+            bolSequence, bolTable, bolTriggerFunction,
+            bolTextSearchConfiguration, bolTextSearchDictionary,
+            bolTextSearchParser, bolTextSearchTemplate, bolType,
+            bolView, strQuery, arrQuery, handleListResults;
         
         if (strAnswer === 'Open Script') {
-            bolDropStatments    = document.getElementById('checkbox-schema-dump-drop-statements').value   === 'true';
-            bolSchema           = document.getElementById('checkbox-schema-dump-schema').value            === 'true';
-            bolFunctions        = document.getElementById('checkbox-schema-dump-functions').value         === 'true';
-            bolOperators        = document.getElementById('checkbox-schema-dump-operators').value         === 'true';
-            bolAggregates       = document.getElementById('checkbox-schema-dump-aggregates').value        === 'true';
-            bolTriggerFunctions = document.getElementById('checkbox-schema-dump-trigger-functions').value === 'true';
-            bolSequences        = document.getElementById('checkbox-schema-dump-sequences').value         === 'true';
-            bolTables           = document.getElementById('checkbox-schema-dump-tables').value            === 'true';
-            bolViews            = document.getElementById('checkbox-schema-dump-views').value             === 'true';
+            bolDropStatments                = document.getElementById('checkbox-schema-dump-drop-statements').value             === 'true';
+            bolSchema                       = document.getElementById('checkbox-schema-dump-schema').value                      === 'true';
+            bolAggregate                    = document.getElementById('checkbox-schema-dump-aggregate').value                   === 'true';
+            bolCollation                    = document.getElementById('checkbox-schema-dump-collation').value                   === 'true';
+            bolConversion                   = document.getElementById('checkbox-schema-dump-conversion').value                  === 'true';
+            bolDomain                       = document.getElementById('checkbox-schema-dump-domain').value                      === 'true';
+            bolForeignTable                 = document.getElementById('checkbox-schema-dump-foreign-table').value               === 'true';
+            bolFunction                     = document.getElementById('checkbox-schema-dump-function').value                    === 'true';
+            bolIndex                        = document.getElementById('checkbox-schema-dump-index').value                       === 'true';
+            bolOperatorClass                = document.getElementById('checkbox-schema-dump-operator-class').value              === 'true';
+            bolOperatorFamily               = document.getElementById('checkbox-schema-dump-operator-family').value             === 'true';
+            bolOperator                     = document.getElementById('checkbox-schema-dump-operator').value                    === 'true';
+            bolSequence                     = document.getElementById('checkbox-schema-dump-sequence').value                    === 'true';
+            bolTable                        = document.getElementById('checkbox-schema-dump-table').value                       === 'true';
+            bolTriggerFunction              = document.getElementById('checkbox-schema-dump-trigger-function').value            === 'true';
+            bolTextSearchConfiguration      = document.getElementById('checkbox-schema-dump-text-search-configuration').value   === 'true';
+            bolTextSearchDictionary         = document.getElementById('checkbox-schema-dump-text-search-dictionary').value      === 'true';
+            bolTextSearchParser             = document.getElementById('checkbox-schema-dump-text-search-parser').value          === 'true';
+            bolTextSearchTemplate           = document.getElementById('checkbox-schema-dump-text-search-template').value        === 'true';
+            bolType                         = document.getElementById('checkbox-schema-dump-type').value                        === 'true';
+            bolView                         = document.getElementById('checkbox-schema-dump-view').value                        === 'true';
             
             // build query for getting all of the lists of objects
             strQuery = '';
             arrQuery = [];
             
-            if (bolFunctions) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Function\' AS objType, 1 AS order_no FROM (' +
-                    listQuery.functions.replace(/\{\{INTOID\}\}/gim,  intSchemaOid).replace(';', '') +
+            if (bolAggregate) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Aggregate\' AS objType FROM (' +
+                    listQuery.objectAggregate.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolTriggerFunctions) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Function\' AS objType, 1 AS order_no FROM (' +
-                    listQuery.triggers.replace(/\{\{INTOID\}\}/gim,   intSchemaOid).replace(';', '') +
+            if (bolCollation) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Collation\' AS objType FROM (' +
+                    listQuery.objectCollation.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolOperators) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Operator\' AS objType, 2 AS order_no FROM (' +
-                    listQuery.operators.replace(/\{\{INTOID\}\}/gim,  intSchemaOid).replace(';', '') +
+            if (bolConversion) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Conversion\' AS objType FROM (' +
+                    listQuery.objectConversion.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolAggregates) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Aggregate\' AS objType, 3 AS order_no FROM (' +
-                    listQuery.aggregates.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+            if (bolDomain) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Domain\' AS objType FROM (' +
+                    listQuery.objectDomain.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolSequences) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Sequence\' AS objType, 4 AS order_no FROM (' +
-                    listQuery.sequences.replace(/\{\{INTOID\}\}/gim,  intSchemaOid).replace(';', '') +
+            if (bolForeignTable) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'ForeignTable\' AS objType FROM (' +
+                    listQuery.objectForeignTable.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolTables) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Table\' AS objType, 5 AS order_no FROM (' +
-                    listQuery.objectTableList.replace(/\{\{INTOID\}\}/gim,     intSchemaOid).replace(';', '') +
+            if (bolFunction) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Function\' AS objType FROM (' +
+                    listQuery.objectFunction.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolViews) {
-                arrQuery.push('\n\n SELECT oid, name, schema_name, \'View\' AS objType, 6 AS order_no FROM (' +
-                    listQuery.views.replace(/\{\{INTOID\}\}/gim,      intSchemaOid).replace(';', '') +
+            if (bolIndex) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Index\' AS objType FROM (' +
+                    listQuery.objectIndex.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
                 ') em ');
             }
-            if (bolFunctions || bolTriggerFunctions || bolOperators || bolAggregates || bolSequences || bolTables || bolViews) {
-                strQuery = arrQuery.join(' UNION ALL ') + '\n\nORDER BY order_no, 1';
+            if (bolOperatorClass) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'OperatorClass\' AS objType FROM (' +
+                    listQuery.objectOperatorClass.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolOperatorFamily) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'OperatorFamily\' AS objType FROM (' +
+                    listQuery.objectOperatorFamily.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolOperator) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Operator\' AS objType FROM (' +
+                    listQuery.objectOperator.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolSequence) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Sequence\' AS objType FROM (' +
+                    listQuery.objectSequence.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTable) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Table\' AS objType FROM (' +
+                    listQuery.objectTableList.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTriggerFunction) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'TriggerFunction\' AS objType FROM (' +
+                    listQuery.objectTriggerFunction.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTextSearchConfiguration) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'TextSearchConfiguration\' AS objType FROM (' +
+                    listQuery.objectTextSearchConfiguration.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTextSearchDictionary) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'TextSearchDictionary\' AS objType FROM (' +
+                    listQuery.objectTextSearchDictionary.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTextSearchParser) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'TextSearchParser\' AS objType FROM (' +
+                    listQuery.objectTextSearchParser.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolTextSearchTemplate) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'TextSearchTemplate\' AS objType FROM (' +
+                    listQuery.objectTextSearchTemplate.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolType) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'Type\' AS objType FROM (' +
+                    listQuery.objectType.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            if (bolView) {
+                arrQuery.push('\n\n SELECT oid, name, schema_name, \'View\' AS objType FROM (' +
+                    listQuery.objectViewList.replace(/\{\{INTOID\}\}/gim, intSchemaOid).replace(';', '') +
+                ') em ');
+            }
+            
+            if (   bolAggregate || bolCollation || bolConversion || bolDomain || bolForeignTable || bolFunction
+                || bolIndex || bolOperatorClass || bolOperatorFamily || bolOperator || bolSequence || bolTable
+                || bolTriggerFunction || bolTextSearchConfiguration || bolTextSearchDictionary
+                || bolTextSearchParser || bolTextSearchTemplate || bolType || bolView) {
+                strQuery = arrQuery.join(' UNION ALL ') + '\n\nORDER BY 1';
             }
             
             // function to handle the query results

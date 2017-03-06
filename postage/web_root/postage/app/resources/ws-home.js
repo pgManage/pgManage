@@ -24,7 +24,9 @@ function loadHome() {
                 <gs-button id="button-home-open-to-new-tab" onclick="openToTab()" title="Open SQL to new tab" icononly></gs-button>
                 <div id="toolbar-addon-container"></div>
             </div>
-            <iframe id="iframe-news" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
+            <div style="width: 100%; height: 100%;" id="iframe-news">
+                <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
+            </div>
         </div>
     */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
     
@@ -47,6 +49,10 @@ function loadHome() {
         'enableLiveAutocompletion' : true
     });
     
+    homeEditor.addEventListener('mousewheel', function () {
+        currTab = ['home', homeEditor.getFirstVisibleRow()];
+    });
+    
     // if we're on a touch device: make the ace grow with it's content
     if (evt.touchDevice) {
         homeEditor.setOptions({
@@ -59,6 +65,24 @@ function loadHome() {
     } else {
         document.getElementById('sql-ace-area-home').style.height = '100%';
     }
+    
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status !== 200) {
+                document.getElementById('iframe-news').innerHTML = ml(function () {/*
+                    <gs-container padded>
+                        <h2>Postage Version Information & News could not load.</h2>
+                        <h3><a href="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}">https://news.workflowproducts.com/splash/postage.html</a></h3>
+                        <h3>This may be an issue with your firewall. Does it block SSL-enabled websites?</h3>
+                    </gs-container>
+                */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
+            };
+        };
+    };
+    xhr.open('HEAD', "https://news.workflowproducts.com/splash/postage.html?app=postage");
+    xhr.send();
+    
 }
 
 
@@ -108,7 +132,7 @@ function openHome() {
 var strPreviousScript;
 function setQSToHome() {
     'use strict';
-    GS.pushQueryString('view=' + (strPreviousScript || 'home'))
+    GS.pushQueryString('view=' + (strPreviousScript || 'home'));
 }
 
 function addHomeQuery(target, strName, strQuery, strToolbarAddons) {

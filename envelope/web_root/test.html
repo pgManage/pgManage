@@ -106,12 +106,14 @@
 		];
 		
 		function iframeLoaded(strCurrentHTML, i) {
-			Global.iframeLen--;
+			//console.log('iframeLoaded');
 			
 			//console.log(strHTML);
 			var strFile = Global.arrStrPages[Global.i];
 			
-			strFile.replace('.html', '-' + i + '.html');
+			//console.log('strFile', strFile);
+			strFile = strFile.replace('.html', '-' + i + '.html');
+			//console.log('strFile', strFile);
 			
 			var strMessage =
 				'FILE\tREAD\t' +
@@ -131,14 +133,21 @@
 							function (data, error) {
 								// if there was no error
 								if (!error) {
-									if (Global.iframeLen === 0) {
+									Global.iframeI++;
+									console.log('Global.iframeI: ' + Global.iframeI + '/' + Global.iframeLen);
+									
+									console.log('pass: ' + strFile);
+									if ((Global.iframeI === Global.iframeLen) && (Global.testFailed !== true)) {
 										Global.i++;
 										
+										//console.log('pageLoad');
 										pageLoad();
 									}
 									
 								// else there was no error
 								} else {
+									Global.testFailed = true;
+									console.log('testFailed set');
 									GS.ajaxErrorDialog(data);
 								}
 							});
@@ -149,15 +158,19 @@
 								// if there was no error
 								if (!error) {
 									document.getElementById('iframe_old').src =
-										'/env/role/all/tests/' + Global.arrStrPages[Global.i];
+										'/env/role/all/tests/' + strFile;
 									
 									document.getElementById('pre_current').innerText = strCurrentHTML;
 									document.getElementById('pre_old').innerText = strTestContent;
 									
+									Global.testFailed = true;
+									console.log('testFailed set');
 									GS.msgbox('Error', 'Test Failed!');
 									
 								// else there was no error
 								} else {
+									Global.testFailed = true;
+									console.log('testFailed set');
 									GS.ajaxErrorDialog(data);
 								}
 							});
@@ -177,20 +190,29 @@
 							GS.requestFromSocket(GS.envSocket, strMessage, function (data, error, errorData) {
 								if (!error) {
 									if (data !== 'TRANSACTION COMPLETED') {
-										if (Global.iframeLen === 0) {
+										Global.iframeI++;
+										console.log('Global.iframeI: ' + Global.iframeI + '/' + Global.iframeLen);
+										
+										console.log('save: ' + strFile);
+										if ((Global.iframeI === Global.iframeLen) && (Global.testFailed !== true)) {
 											Global.i++;
 											
+											//console.log('pageLoad');
 											pageLoad();
 										}
 									}
 									
 								} else {
+									Global.testFailed = true;
+									console.log('testFailed set');
 									GS.webSocketErrorDialog(errorData);
 								}
 							});
 							
 						// else there was no error
 						} else {
+							Global.testFailed = true;
+							console.log('testFailed set');
 							GS.ajaxErrorDialog(data);
 						}
 					});
@@ -199,49 +221,38 @@
 			});
 		}
 		
-		function iframeFinished(objIFrame, i) {
-			console.log('iframeFinished');
-			parent.iframeLoaded(objIFrame.document.body.outerHTML, i);
+		function iframeFinished(objIFrame) {
+			//console.log('iframeFinished');
+			
+			var arrIFrame = document.getElementById('iframe_current').contentWindow.document.body.querySelectorAll('iframe');
+			
+			Global.iframeLen = arrIFrame.length;
+			
+			//console.log('objIFrame', objIFrame);
+			
+			for (var i = 0, len = arrIFrame.length; i < len; i += 1) {
+				arrIFrame[i].i = i;
+				//console.log('arrIFrame[i]', arrIFrame[i]);
+				if (arrIFrame[i] === objIFrame) {
+					parent.iframeLoaded(objIFrame.contentWindow.document.body.parentNode.outerHTML, i);
+					//parent.iframeLoaded(objIFrame.contentWindow.document.body.outerHTML, i);
+				}
+			}
 		}
 		
 		function pageLoad() {
 			if (Global.i < Global.arrStrPages.length) {
+				Global.iframeI = 0;
 				document.getElementById('iframe_current').src =
 					'/env/app/developer_g/greyspots-1.1.1/documentation/' + Global.arrStrPages[Global.i];
-				document.getElementById('iframe_current').onload = function () {
-					var arrIFrameTag = document.getElementById('iframe_current').
-						contentWindow.document.querySelectorAll('gs-doc-example');
-					Global.iframeLen = arrIFrameTag.length;
+				document.getElementById('iframe_current').onload = function (event) {
+					var arrDocExamples = document.getElementById('iframe_current').contentWindow.document.body.querySelectorAll('gs-doc-example');
 					
-					
-					for (var i = 0, len = arrIFrameTag.length; i < len; i += 1) {
-						arrIFrameTag[i].i = i;
+					if (arrDocExamples.length === 0) {
+						Global.i++;
+						
+						pageLoad();
 					}
-					
-					console.log('set load event');
-					document.getElementById('iframe_current').
-						contentWindow.document.body.addEventListener('load', function (event) {
-						console.log('got load event');
-						var MutationObserver = event.target.contentWindow.MutationObserver;
-						var objMutant = new MutationObserver(
-							function () {
-							clearTimeout(event.target.timeout);
-							arrIFrameTag[i].timeout = setTimeout(iframeFinished, 3000, event.target, event.target.i);
-						}, true);
-						
-						objMutant.observe(document.getElementById('iframe_current').
-							contentWindow.document.body,
-							{
-								childList: true,
-								attributes: true,
-								characterData: true,
-								subtree: true,
-								attributeOldValue: true,
-								truecharacterDataOldValue: true
-							});
-						
-						event.target.timeout = setTimeout(iframeFinished, 3000, event.target, event.target.i);
-					});
 				};
 			} else {
 				GS.ajaxJSON('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + Global.intID,

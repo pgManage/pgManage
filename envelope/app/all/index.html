@@ -252,44 +252,49 @@
                     </div>
                     
                     
+                    <br data-group="pgi_g" />
+                    <div class="group-container" data-group="pgi_g">
+                        <h4><i>Precious Gemco Inc.</i></h4>
+                        <span class="space"></span>
+                        
+                        <gs-grid widths="1,1" reflow-at="500px" gutter>
+                            <gs-block>
+                                <gs-button target="_self" jumbo data-group="pgi_g" href="../pgi_g/item_master.html" bg-primary>PGI Item Master</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button target="_self" jumbo data-group="pgi_g" href="../pgi_g/production.html" bg-primary>PGI Production</gs-button>
+                            </gs-block>
+                        </gs-grid>
+                    </div>
+                    <br data-group="pgi_g" />
+                    
                     <br data-group="twi_g" />
                     <div class="group-container" data-group="twi_g">
                         <h4><i>Tower Engineering Inc</i></h4>
                         <span class="space"></span>
                         
-                        <style>
-                            .twi-prospect-status {
-                                height: 4em;
-                                line-height: 3.1em;
-                                vertical-align: middle;
-                            }
-                            .twi-prospect-type {
-                                height: 3em;
-                                line-height: 2.1em;
-                                vertical-align: middle;
-                            }
-                        </style>
                         <!-- don't forget to copy js above -->
                         <div class="group-container grey">
                             <h5><i>Prospects</i></h5>
                             <gs-grid widths="1,1" reflow-at="500px">
                                 <gs-block>
-                                    <gs-optionbox mini no-target value="current" id="prospect_status">
+                                    <gs-optionbox mini no-target value="other" id="prospect_status">
                                         <gs-option class="twi-prospect-status" value="all" remove-bottom remove-right>All Prospects</gs-option>
-                                        <gs-option remove-all class="twi-prospect-status" value="current">Current Prospects</gs-option>
-                                        <gs-option remove-all class="twi-prospect-status" value="dead">Dead Prospects</gs-option>
+                                        <gs-option remove-all value="other">Other Prospects</gs-option>
+                                        <gs-option remove-all value="lost">Lost Prospects</gs-option>
+                                        <gs-option remove-all value="order">Ordered Prospects</gs-option>
                                     </gs-optionbox>
                                 </gs-block>
                                 <gs-block>
                                     <gs-optionbox mini no-target value="all" id="prospect_type">
                                         <gs-option class="twi-prospect-type" value="all" remove-bottom remove-left>All Prospects</gs-option>
-                                        <gs-option remove-all class="twi-prospect-type" value="new">New Construction Prospects</gs-option>
-                                        <gs-option remove-all class="twi-prospect-type" value="re">Reconstruction/Repair/Upgrade Prospects</gs-option>
-                                        <gs-option remove-all class="twi-prospect-type" value="spare">Spare Parts Prospects</gs-option>
+                                        <gs-option remove-all value="new">New Construction Prospects</gs-option>
+                                        <gs-option remove-all value="re">Reconstruction/Repair/Upgrade Prospects</gs-option>
+                                        <gs-option remove-all value="spare">Spare Parts Prospects</gs-option>
                                     </gs-optionbox>
                                 </gs-block>
                             </gs-grid>
-                            <gs-button id="prospect_search" target="_self" href="../twi_g/prospects.html?status=current&type=all" jumbo bg-primary remove-top>Go</gs-button>
+                            <gs-button id="prospect_search" target="_self" href="../twi_g/prospects.html?status=other&type=all" jumbo bg-primary remove-top>Go</gs-button>
                             <br />
                             
                             <gs-button target="_self" href="../twi_g/prospect_dropdown_manager.html" jumbo bg-primary>Dropdown Manager</gs-button>
