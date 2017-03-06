@@ -1562,6 +1562,10 @@ function treeLoad(data, index, intColumn) {
         }
     }
     
+    if (data.bullet == 'CL' && data.name !== '' && data.name.indexOf(' ') !== -1) {
+        data.name = data.name.substring(0, data.name.indexOf(' '));
+    }
+    console.log(data);
     if (arrType.indexOf('script') !== -1 &&
         (
             //If object is not a schema folder or a table folder then continue
@@ -2254,9 +2258,9 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                         //console.log(arrResult[i][3].toUpperCase() === 'FUNCTION');
                         
                         if (arrResult[i][3].toUpperCase() === 'FUNCTION' || arrResult[i][1].indexOf('"') !== -1) {
-                            strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase() + ' ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
+                            strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase().replace('TRIGGERFUNCTION', 'FUNCTION') + ' ' + quote_ident(strSchemaName) + '.' + arrResult[i][1] + ';\n';
                         } else {
-                            strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase() + ' ' + quote_ident(strSchemaName) + '.' + quote_ident(arrResult[i][1]) + ';\n';
+                            strDumpQuery += 'DROP ' + arrResult[i][3].toUpperCase().replace('TRIGGERFUNCTION', 'FUNCTION') + ' ' + quote_ident(strSchemaName) + '.' + quote_ident(arrResult[i][1]) + ';\n';
                         }
                     }
                     

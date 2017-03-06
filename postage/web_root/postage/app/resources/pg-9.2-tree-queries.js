@@ -72,7 +72,7 @@ var treeStructure = [
             [3, 'script', 'objectSequence'],
         [2, 'folder,refresh', 'objectTableList'],
             [3, 'folder,script', 'objectTable'],
-                [4, '', ''], //'script', 'objectTable'
+                [4, 'script', 'objectColumn'], //'script', 'objectTable'
         [2, 'folder,refresh', 'objectTriggerFunction'],
             [3, 'script', 'objectFunction'],
         [2, 'folder,refresh', 'objectType'],
@@ -82,7 +82,6 @@ var treeStructure = [
             [3, 'folder,script', 'objectView'],
                 [4, '', ''], //'script', 'objectView'
 ];
-
 
 
 
@@ -1359,7 +1358,21 @@ scriptQuery.objectSequence = ml(function () {/*
         WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRNAME}}')),'');
     */});
 
-
+associatedButtons.objectColumn = ['propertyButton', 'dependButton'];
+scriptQuery.objectColumn = ml(function () {/*
+SELECT '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' DROP COLUMN IF EXISTS ' || attname || E';\n' ||
+    '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' ADD COLUMN IF NOT EXISTS ' || attname || ' ' || (
+        SELECT COALESCE(format_type(atttypid, atttypmod),'') FROM pg_catalog.pg_attribute
+            WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = {{INTOID}} AND attname = '{{STRNAME}}'
+            ORDER BY attnum ASC
+            LIMIT 1) || E';\n'||
+    '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' ALTER COLUMN ' || attname || E' SET DATA TYPE <data_type>;\n'
+        FROM pg_attribute
+        LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = attrelid
+        WHERE attrelid = {{INTOID}} AND attname = '{{STRNAME}}'
+    */});
+    
+    
 associatedButtons.objectTable = ['propertyButton', 'dependButton', 'statButton', 'dataObjectButtons'];
 scriptQuery.objectTable = ml(function () {/*
            
