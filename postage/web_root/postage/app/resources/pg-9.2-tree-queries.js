@@ -787,7 +787,7 @@ scriptQuery.objectTrigger = ml(function () {/*
 
 
 
-associatedButtons.objectFunction = ['propertyButton', 'dependButton', 'statButton'];
+associatedButtons.objectFunction = ['propertyButton', 'dependButton'];
 scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () {/*
     -- DROP statement
     SELECT (SELECT  '-- DROP FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' || E';\n\n'
@@ -896,7 +896,7 @@ scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () 
     */});
 
 
-associatedButtons.objectIndex = ['propertyButton', 'dependButton', 'statButton'];
+associatedButtons.objectIndex = ['propertyButton', 'dependButton'];
 scriptQuery.objectIndex = ml(function () {/*
     SELECT '-- Index: ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname)) || E';\n\n' ||
            '-- DROP INDEX ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname)) || E';\n\n' ||
