@@ -16,6 +16,16 @@ static void db_query_cb(EV_P, ev_io *w, int revents);
 static void db_copy_out_check_cb(EV_P, ev_check *w, int revents);
 static void db_cnxn_cb(EV_P, ev_io *w, int revents);
 
+#ifdef ENVELOPE
+#define SUN_PROGRAM_LOWER_NAME "envelope"
+#define SUN_PROGRAM_WORD_NAME "Envelope"
+#define SUN_PROGRAM_UPPER_NAME "ENVELOPE"
+#else
+#define SUN_PROGRAM_LOWER_NAME "postage"
+#define SUN_PROGRAM_WORD_NAME "Postage"
+#define SUN_PROGRAM_UPPER_NAME "POSTAGE"
+#endif
+
 void db_conn_error_cb(EV_P, ev_check *w, int revents) {
 	if (revents != 0) {
 	} // get rid of unused parameter warning
@@ -50,8 +60,10 @@ DB_conn *DB_connect(EV_P, void *cb_data, char *str_connstring, char *str_user,
 		str_escape_password = escape_conninfo_value(str_password, &int_escape_password_len);
 
 		SFINISH_SNCAT(str_conn, &int_conn_len,
+			" fallback_application_name='", (size_t)28,
+			SUN_PROGRAM_WORD_NAME, strlen(SUN_PROGRAM_WORD_NAME),
+			"'", (size_t)1,
 			str_connstring, strlen(str_connstring),
-			//" application_name='"SUN_PROGRAM_WORD_NAME"'", strlen(" application_name='"SUN_PROGRAM_WORD_NAME"'"),
 			" user=", (size_t)6,
 			str_escape_username, int_escape_username_len,
 			" password=", (size_t)10,
