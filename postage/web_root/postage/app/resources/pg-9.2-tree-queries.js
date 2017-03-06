@@ -1360,7 +1360,21 @@ scriptQuery.objectSequence = ml(function () {/*
 
 associatedButtons.objectColumn = ['propertyButton', 'dependButton'];
 scriptQuery.objectColumn = ml(function () {/*
-SELECT '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' DROP COLUMN IF EXISTS ' || attname || E';\n' ||
+SELECT '-- Column: ' || attname || E';\n\n' ||
+    COALESCE((SELECT COALESCE('-- Null Fraction: ' || null_frac || E';\n', E'-- No null fraction found\n') || 
+        COALESCE('-- Average Width: ' || avg_width || E';\n', E'-- No average width found\n') || 
+        COALESCE('-- Distinct Values: ' || n_distinct::text || E';\n', E'-- No distinct values found\n') || 
+        COALESCE('-- Most Common Values:' || most_common_vals::text || E';\n', E'-- No common values found\n') || 
+        COALESCE('-- Most Common Frequencies: ' || most_common_freqs::text || E';\n', E'-- No common frequencies found\n') || 
+        COALESCE('-- Histogram Bounds: ' || histogram_bounds::text || E';\n', E'-- No histogram bounds found\n') || 
+        COALESCE('-- Correlation: ' || correlation::text || E';\n\n', E'-- No correlation found\n')
+            FROM pg_stats
+            LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.schemaname = pg_stats.schemaname AND pg_stat_user_tables.relname = pg_stats.tablename
+            WHERE pg_stat_user_tables.relid = {{INTOID}}
+            AND attname = '{{STRNAME}}'
+            ORDER BY relid DESC
+            LIMIT 1), E'-- No statistics found\n\n') ||
+    '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' DROP COLUMN IF EXISTS ' || attname || E';\n' ||
     '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' ADD COLUMN IF NOT EXISTS ' || attname || ' ' || (
         SELECT COALESCE(format_type(atttypid, atttypmod),'') FROM pg_catalog.pg_attribute
             WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = {{INTOID}} AND attname = '{{STRNAME}}'
