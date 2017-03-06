@@ -226,6 +226,8 @@ window.addEventListener('load', function () {
         }
     });
 
+	// fixes bug where the string `null` would be sent as the password the first time you click login if you haven't entered a password
+	document.getElementById('text-password').value = '';
     // bind keydown for the "text-password" field
     document.getElementById('text-password').addEventListener('keydown', function (event) {
         if (event.keyCode === 13 && document.getElementById('text-username').value) {
