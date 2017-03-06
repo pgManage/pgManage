@@ -98,7 +98,7 @@ function pickNewPort() {
 		if (!taken) {
 			spawnPostage();
 
-			var localStoragePath = path.normalize(process.env.APPDATA + '/postage/Local Storage');
+			var localStoragePath = path.normalize(app.getPath('appData') + '/postage/Local Storage');
 			fs.readdir(localStoragePath, function(err, items) {
 				var i, len;
 				if (err) {
