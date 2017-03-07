@@ -133,6 +133,11 @@ function autocompleteChangeHandler(tabElement, editor, event) {
       , intOpenParen, intCloseParen, intVersion = parseFloat(contextData.minorVersionNumber, 10);
     // if the popup isn't already open or it's open but it's asleep
     //console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
+    if (event.action === 'remove') {
+        if (autocompleteGlobals.popupOpen === true) {
+            autocompletePopupClose(editor);
+        }
+    }
     if (autocompleteGlobals.popupOpen === false || autocompleteGlobals.popupAsleep === true) {
         // get current query range
         currentQueryRange = editor.currentQueryRange;
@@ -222,6 +227,8 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             i -= 1;
         }
         
+    
+        
         /*
         
         GS.rightPad(test_window, 'stringToPadWith', lengthToPadTo);
@@ -303,7 +310,10 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             var bolCols = false, bolTables = false, bolSchemas = false, bolTableFuncs = false, bolBuiltins = false, bolGroups = false, bolUsers = false, bolReturnTypes = false, bolTypes = false, bolLanguages = false, bolRules = false, bolTablespace = false;
             bolFirstSpace = bolCurrentCharWhitespace && !bolPreviousCharWhitespace;
             
-            if ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && !bolCurrentCharWhitespace && (bolPreviousCharWhitespace || bolPreviousCharOpenParen || strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_')) {
+            
+            
+            if (event.action === 'remove' && (/[A-Z\"]/gim).test(strScript[intCursorPosition - 1]) || ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && !bolCurrentCharWhitespace && (bolPreviousCharWhitespace || bolPreviousCharOpenParen || strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_'))) {
+                
                 
                 if (arrPreviousKeyWords[1] === 'INSERT' && strPreviousKeyWord === 'INTO') {
                     //console.log('schema');
@@ -325,8 +335,12 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     //console.log('groups');
                     bolGroups = true;
                 } else if (strPreviousKeyWord === 'FROM') {
-                    //console.log('schemas');
-                    bolSchemas = true;
+                    if (strScript.indexOf('.') > strScript.indexOf('FROM')) {
+                        bolTables = true;
+                    } else {
+                        //console.log('schemas');
+                        bolSchemas = true;
+                    }
                 } else if (arrPreviousKeyWords[4] === 'REVOKE' && strPreviousKeyWord === 'ON') {
                     //console.log('schema');
                     bolSchemas = true;
@@ -412,7 +426,6 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     bolCols = true;
                     bolBuiltins = true;
                 } else {
-                    //console.log('schemas');
                     bolSchemas = true;
                 }
                 
@@ -509,9 +522,15 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 }
                 
                 
-                //console.log(arrQueries);
+                //console.log(strCurrWord);
                 
-                if (arrQueries) {
+                
+                
+                if (event.action === 'remove' && (/[A-Z\"]/gim).test(strScript[intCursorPosition - 1])) {
+                    for (var i = 0, len = arrQueries.length; i < len; i++) {
+                        arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strCurrWord.substring(0, strCurrWord.length - 1).toLowerCase() + '%');
+                    }
+                } else if (arrQueries) {
                     for (var i = 0, len = arrQueries.length; i < len; i++) {
                         if (strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_') {
                             arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strCurrWord.toLowerCase() + '%');
@@ -522,17 +541,37 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     }
                 }
                 
+                console.log(arrQueries);
                 // if we've found queries: open the popup
                 if (arrQueries && arrQueries.length > 0) {
+                    var strScript2 = editor.getValue()
+                          , intSearchStringStart = (autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset)
+                          , intSearchStringEnd = autocompleteGlobals.intSearchEnd
+                          , strSearch = strScript2.substring(intSearchStringStart, intSearchStringEnd);
+                          
+                          
                     if (strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_') {
                         autocompleteGlobals.intSearchStart = intEndCursorPosition - strCurrWord.length - autocompleteGlobals.intSearchOffset;
                         autocompleteGlobals.intSearchEnd = intEndCursorPosition;
+                        
+                    } else if (event.action === 'remove') {
+                        
+                        autocompleteGlobals.intSearchStart = intEndCursorPosition - strCurrWord.length;
+                        autocompleteGlobals.intSearchEnd = intEndCursorPosition;
+                        if (strScript2.substring(intSearchStringStart - 1, intSearchStringEnd).substring(0, 1) !== (' ' || '.' || '"' || "'")) {
+                            autocompleteGlobals.intSearchStart = intEndCursorPosition - strCurrWord.length - 1;
+                            autocompleteGlobals.intSearchEnd = intEndCursorPosition;
+                        } else {
+                            autocompleteGlobals.intSearchStart = intEndCursorPosition - strCurrWord.length;
+                            autocompleteGlobals.intSearchEnd = intEndCursorPosition;
+                        }
                         
                     } else {
                         autocompleteGlobals.intSearchStart = intEndCursorPosition - 1;
                         autocompleteGlobals.intSearchEnd = intEndCursorPosition;
                         
                     }
+
                     autocompletePopupOpen(editor, arrQueries);
                 }
                 
