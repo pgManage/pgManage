@@ -1814,6 +1814,11 @@ function statDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {
         </gs-page>
     */}).replace(/\{\{STRNAME\}\}/g, strName);
     
+    if (strQuery === statQuery.objectColumn) {
+        strSafeName = strSafeName.substring(strSafeName.indexOf('.') + 1, strSafeName.length);
+    }
+
+
     GS.openDialog(templateElement, function () {
         getListData(strQuery.replace(/\{\{INTOID\}\}/g, intOid)
                             .replace(/\{\{STRNAME\}\}/g, strSafeName)
