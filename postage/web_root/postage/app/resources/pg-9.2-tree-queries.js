@@ -1358,7 +1358,7 @@ scriptQuery.objectSequence = ml(function () {/*
         WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRNAME}}')),'');
     */});
 
-associatedButtons.objectColumn = ['dependButton'];
+associatedButtons.objectColumn = ['dependButton', 'statButton'];
 scriptQuery.objectColumn = ml(function () {/*
 SELECT '-- Column: ' || attname || E';\n\n' ||
     COALESCE((SELECT COALESCE('-- Null Fraction: ' || null_frac || E';\n', E'-- No null fraction found\n') || 
@@ -2912,6 +2912,34 @@ statQuery.one_database = ml(function () {/*
  LEFT JOIN pg_stat_database_conflicts ON pg_stat_database.datid = pg_stat_database_conflicts.datid
      WHERE pg_stat_database.datname = CURRENT_DATABASE();
 */});
+
+
+//change in pg-9.2-tree-functions.js
+
+statQuery.objectColumn = ml(function () {/*
+SELECT 1 AS sort,
+    'Null Fraction',
+    'Average Width',
+    'Distinct Values',
+    'Most Common Values',
+    'Most Common Frequencies',
+    'Histogram Bounds',
+    'Correlation'
+UNION ALL
+    SELECT 2 AS sort,
+        null_frac::text,
+        avg_width::text,
+        n_distinct::text,
+        most_common_vals::text,
+        most_common_freqs::text,
+        histogram_bounds::text,
+        correlation::text
+    FROM pg_stats
+    LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.schemaname = pg_stats.schemaname AND pg_stat_user_tables.relname = pg_stats.tablename
+    WHERE pg_stat_user_tables.relid = {{INTOID}}
+    AND attname = '{{STRNAME}}'
+    ORDER BY sort ASC;
+    */});
 
 statQuery.objectTable = ml(function () {/*
  SELECT 1 AS sort,
