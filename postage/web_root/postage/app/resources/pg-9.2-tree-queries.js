@@ -897,8 +897,8 @@ scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () 
 
 associatedButtons.objectIndex = ['propertyButton', 'dependButton'];
 scriptQuery.objectIndex = ml(function () {/*
-    SELECT '-- Index: ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname)) || E';\n\n' ||
-           '-- DROP INDEX ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname)) || E';\n\n' ||
+    SELECT '-- Index: ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_index_class.relname)) || E';\n\n' ||
+           '-- DROP INDEX ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_index_class.relname)) || E';\n\n' ||
            CASE WHEN pg_index.indisvalid THEN '' ELSE E'-- INVALID INDEX. Postgres ignores this index when you query the index''s target, but it still adds overhead to updates.\n' END || pg_get_indexdef(pg_index.indexrelid) || E';\n'
     FROM pg_catalog.pg_class
     LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
