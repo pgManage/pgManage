@@ -81,6 +81,17 @@ void ws_insert_step1(struct sock_ev_client_request *client_request) {
 	SDEBUG("ptr_seq: %s", ptr_seq);
 
 	client_insert->ptr_values = ptr_end_seq + 1;
+	if (strncmp(client_insert->ptr_values, "ORDER BY", 8) == 0) {
+		char *str_temp = client_insert->ptr_values + 9;
+		client_insert->ptr_values = bstrstr(
+			client_insert->ptr_values, (size_t)(client_request->frame->int_length - (size_t)(client_insert->ptr_values - client_request->frame->str_message)),
+			"\012", (size_t)1
+		);
+		SFINISH_CHECK(client_insert->ptr_values != NULL, "Could not find end of ORDER BY clause");
+		size_t int_temp_len = (size_t)(client_insert->ptr_values - str_temp);
+		SFINISH_SNCAT(client_insert->str_return_order_by, &client_insert->int_return_order_by_len, str_temp, int_temp_len);
+	}
+	client_insert->ptr_values += 1;
 	while (*client_insert->ptr_values == '\012') {
 		client_insert->ptr_values += 1;
 	}
@@ -981,7 +992,19 @@ bool ws_insert_step7(EV_P, void *cb_data, DB_result *res) {
 		client_insert->str_return_columns, client_insert->int_return_columns_len,
 		" FROM ", (size_t)6,
 		client_insert->str_temp_table_name, client_insert->int_temp_table_name_len,
-		"_2) TO STDOUT;", (size_t)14);
+		"_2", (size_t)2
+	);
+
+	if (client_insert->str_return_order_by != NULL) {
+		SFINISH_SNFCAT(str_sql, &int_sql_len,
+			" ORDER BY ", (size_t)10,
+			client_insert->str_return_order_by, client_insert->int_return_order_by_len
+		);
+	}
+
+	SFINISH_SNFCAT(str_sql, &int_sql_len,
+		") TO STDOUT;", (size_t)12
+	);
 #else
 	SFINISH_SNCAT(str_sql, &int_sql_len,
 		"SELECT ", (size_t)7,
@@ -1062,6 +1085,7 @@ void ws_insert_free(struct sock_ev_client_insert *to_free) {
 	SFREE(to_free->str_temp_table_name);
 	SFREE(to_free->str_sequence_name);
 	SFREE(to_free->str_sql);
+	SFREE(to_free->str_return_order_by);
 	if (to_free->darr_column_types != NULL) {
 		DArray_clear_destroy(to_free->darr_column_types);
 		to_free->darr_column_types = NULL;

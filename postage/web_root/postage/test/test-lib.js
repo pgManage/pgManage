@@ -32,13 +32,7 @@ var $ = {
         return request;
     },
     runTests: function (key) {
-        if ($.tests[key].bolAuth) {
-            $.ajax('/postage/auth', 'action=login&username=postgres&password=password&connname=test', 'POST', function (data) {
-                $.runTest(key, 0);
-            });
-        } else {
-            $.runTest(key, 0);
-        }
+        $.runTest(key, 0);
     },
     bolRun: false,
     test_random: parseInt(Math.random().toString().substring(2, 7), 10).toString(),
