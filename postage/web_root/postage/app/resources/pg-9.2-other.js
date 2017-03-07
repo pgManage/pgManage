@@ -1728,6 +1728,7 @@ function executeScript() {
       , resultsContainer     = currentTab.relatedResultsArea
       , resultsTallyElement  = currentTab.relatedResultsTallyElement
       , resultsHeaderElement = currentTab.relatedResultsHeaderElement
+      , bolAutocommit        = currentTab.relatedAutocommitCheckbox.value === 'true'
       , jsnCurrentQuery, startExecute, endExecute, startLoading, endLoading, updateTally
       , stopLoadingHandler, bolIgnoreMessages = false, cancelSignalHandler
       , messageID, currentTargetTbody, intRecordsThisQuery, intError, intQuery
@@ -2229,7 +2230,7 @@ function executeScript() {
                     //);
                 }
             }
-        });
+        }, bolAutocommit);
     }
 }
 

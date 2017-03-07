@@ -1132,10 +1132,11 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                         '<gs-button icononly class="button-csv" icon="file-text" onclick="exportCSV()" ' +
                                     'title="Download a single query\'s results as a file" remove-all no-focus></gs-button>' +
                         '<gs-button icononly class="button-ace-info" onclick="dialogAceInfo()" ' +
-                                    'title="Information and tips about the Editor" remove-top no-focus>' +
+                                    'title="Information and tips about the Editor" remove-all no-focus>' +
                             '<span class="ace-suit">&#9824;</span>' + //&#9830;
                             '<span class="ace-letter">A</span>' +
                         '</gs-button>' +
+						'<gs-checkbox style="border-top-right-radius: 0; border-top-left-radius: 0; border: 1px solid #ccc;" mini id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"></gs-checkbox>' +
                         '<gs-button hidden id="sql-property-' + intTabNumber + '-button" icononly ' +
                                     'icon="wrench" onclick="propertyWindowDialog()" disabled  ' + //hidden
                                     'title="Edit the current query\'s properties [CMD][.] or [CTRL][.]" remove-top no-focus></gs-button>' +
@@ -1192,12 +1193,13 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         tabElement.relatedAcePositionContainer = document.getElementById('ace-container-position-container-' + intTabNumber);
         tabElement.relatedDocLinksContainer = document.getElementById('sql-doc-links-' + intTabNumber);
         tabElement.bolAutoOpenPropertyList = true;
-        
+
 
         tabElement.relatedStopButton = document.getElementById('sql-results-stop-' + intTabNumber);
         tabElement.relatedClearButton = document.getElementById('sql-results-clear-' + intTabNumber);
         tabElement.relatedCopyOptionsButton = document.getElementById('sql-results-copy-options-' + intTabNumber);
         tabElement.relatedStopLoadingButton = document.getElementById('sql-results-stop-loading-' + intTabNumber);
+        tabElement.relatedAutocommitCheckbox = document.getElementById('checkbox-autocommit-' + intTabNumber);
 
         if (window.process && window.process.type === 'renderer') {
             tabElement.relatedDownloadButton = document.getElementById('button-tab-' + intTabNumber + '-save');
