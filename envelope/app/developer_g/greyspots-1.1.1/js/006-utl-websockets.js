@@ -564,12 +564,12 @@
     };
     
     // abstraction function for ease of use of the RAW format
-    GS.requestRawFromSocket = function (socket, strQuery, callback) {
+    GS.requestRawFromSocket = function (socket, strQuery, callback, bolAutocommit) {
         var intResponsePart = 0, intQueryNumber = 0, intCallbackNumber = 0, intCallbackNumberThisQuery = 0
           , intResponseNumberThisQuery = 0, arrMessages, arrColumnNames, arrColumnTypes
           , arrStart, dteStart, arrEnd, dteEnd, intRows;
         
-        return GS.requestFromSocket(socket, 'RAW\n' + strQuery, function (data, error, errorData) {
+        return GS.requestFromSocket(socket, 'RAW' + (bolAutocommit ? '\tAUTOCOMMIT\n' : '\n') + strQuery, function (data, error, errorData) {
             var arrRecords, arrLines, i, len, strMode;
             
             if (!error) {
