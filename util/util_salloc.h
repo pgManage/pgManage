@@ -268,18 +268,18 @@ SFREE_ALL();
 #define __SUN__EVAL4(...) __SUN__EVAL5(__SUN__EVAL5(__SUN__EVAL5(__VA_ARGS__)))
 #define __SUN__EVAL5(...) __VA_ARGS__
 
-#ifdef _WIN32
+/*#ifdef _WIN32
 #define __SUN__REPEAT(count, macro, A, ...)                                                                                      \
 	__SUN__WHEN(count)                                                                                                           \
 	(__SUN__EXPAND__(__SUN__OBSTRUCT(__SUN__REPEAT_INDIRECT)()(__SUN__DEC(count), macro, __VA_ARGS__))                           \
 			__SUN__OBSTRUCT(macro)(__SUN__DEC(count), A))
 #define __SUN__REPEAT_INDIRECT() __SUN__REPEAT
-#else
+#else*/
 #define __SUN__REPEAT(count, macro, A, ...)                                                                                      \
 	__SUN__WHEN(count)                                                                                                           \
 	(__SUN__OBSTRUCT(__SUN__REPEAT_INDIRECT)()(__SUN__DEC(count), macro, __VA_ARGS__)__SUN__OBSTRUCT(macro)(__SUN__DEC(count), A))
 #define __SUN__REPEAT_INDIRECT() __SUN__REPEAT
-#endif
+//#endif
 
 #define SSTR_VALUE(arg) #arg
 #define SDEFINE_ADDRESSOF_REPEAT(A, B)                                                                                           \

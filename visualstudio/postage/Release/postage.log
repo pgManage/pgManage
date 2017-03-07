@@ -1,12 +1,22 @@
 ﻿  common_auth.c
+..\..\common\common_auth.c(11): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\common_auth.c(12): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\common_auth.c(13): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   common_client.c
+..\..\common\common_client.c(261): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
 ..\..\common\common_client.c(300): warning C4022: 'DuplicateHandle': pointer mismatch for actual parameter 2
 ..\..\common\common_client.c(300): warning C4047: 'function': 'intptr_t' differs in levels of indirection from 'HANDLE'
 ..\..\common\common_client.c(300): warning C4024: '_open_osfhandle': different types for formal and actual parameter 1
-..\..\common\common_client.c(806): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(808): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(819): warning C4244: '+=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_client.c(821): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_client.c(346): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\common_client.c(783): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\common_client.c(806): warning C4244: '+=': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\common\common_client.c(808): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\common\common_client.c(819): warning C4244: '+=': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\common\common_client.c(821): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\common\common_client.c(1239): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\common_client.c(1435): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+  common_config.c
+..\..\common\common_config.c(263): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   common_main.c
 c:\users\nunzio\repos\postage\common\../dependencies/libev/ev.c(205): warning C4005: 'WIN32_LEAN_AND_MEAN': macro redefinition
   c:\users\nunzio\repos\postage\common\../dependencies/libev/ev.c(205): note: command-line arguments:  see previous definition of 'WIN32_LEAN_AND_MEAN'
@@ -18,41 +28,136 @@ c:\users\nunzio\repos\postage\common\../dependencies/libev/ev.c(2476): warning C
 c:\users\nunzio\repos\postage\dependencies\libev\ev_select.c(200): warning C4244: 'initializing': conversion from 'ev_tstamp' to 'unsigned long', possible loss of data
   common_server.c
   common_util_sql.c
+..\..\common\common_util_sql.c(491): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\common_util_sql.c(696): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   common_websocket.c
-..\..\common\common_websocket.c(178): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_websocket.c(189): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_websocket.c(305): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_websocket.c(335): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\common\common_websocket.c(389): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\common_websocket.c(8): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\common_websocket.c(178): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\common\common_websocket.c(189): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\common\common_websocket.c(305): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\common\common_websocket.c(335): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\common\common_websocket.c(389): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
   http_auth.c
+..\..\common\http_auth.c(7): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(8): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(9): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(10): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(11): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(12): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(13): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(14): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(977): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(1142): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(1143): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(1144): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(1471): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(1590): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_auth.c(1713): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   http_ev.c
+..\..\common\http_ev.c(67): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   http_export.c
+..\..\common\http_export.c(6): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   http_file.c
+..\..\common\http_file.c(16): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_file.c(299): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   http_main.c
+..\..\common\http_main.c(203): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_main.c(312): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   http_upload.c
+..\..\common\http_upload.c(7): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\http_upload.c(112): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   ws_delete.c
-..\..\common\ws_delete.c(472): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\ws_delete.c(27): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_delete.c(443): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_delete.c(472): warning C4244: '=': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\common\ws_delete.c(533): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_delete.c(645): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_delete.c(763): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   ws_insert.c
-..\..\common\ws_insert.c(478): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\ws_insert.c(5): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_insert.c(446): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_insert.c(478): warning C4244: '=': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\common\ws_insert.c(535): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_insert.c(731): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_insert.c(894): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_insert.c(971): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   ws_select.c
+..\..\common\ws_select.c(15): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_select.c(249): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   ws_update.c
-..\..\common\ws_update.c(537): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\common\ws_update.c(6): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_update.c(510): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_update.c(537): warning C4244: '=': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\common\ws_update.c(595): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_update.c(710): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\common\ws_update.c(833): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+  db_framework.c
+..\..\db_framework_pq\db_framework.c(50): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\db_framework_pq\db_framework.c(99): warning C4022: 'DuplicateHandle': pointer mismatch for actual parameter 2
+..\..\db_framework_pq\db_framework.c(99): warning C4047: 'function': 'intptr_t' differs in levels of indirection from 'HANDLE'
+..\..\db_framework_pq\db_framework.c(99): warning C4024: '_open_osfhandle': different types for formal and actual parameter 1
+..\..\db_framework_pq\db_framework.c(292): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\db_framework_pq\db_framework.c(346): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\db_framework_pq\db_framework.c(726): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+  bsd-asprintf.c
+  posix_win.c
+..\..\dependencies\libressl\crypto\compat\posix_win.c(59): warning C4133: 'function': incompatible types - from 'const char *' to 'LPCWSTR'
+  Compiling...
   postage_callback.c
   ws_raw.c
+..\..\postage\ws_raw.c(177): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\postage\ws_raw.c(733): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
   ws_tab.c
-..\..\postage\ws_tab.c(42): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(58): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(64): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(77): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(83): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(95): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(128): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(138): warning C4244: 'function': conversion from 'uint64_t' to 'std::size_t', possible loss of data
-..\..\postage\ws_tab.c(143): warning C4244: '=': conversion from 'uint64_t' to 'std::size_t', possible loss of data
+..\..\postage\ws_tab.c(13): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\postage\ws_tab.c(42): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\postage\ws_tab.c(58): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\postage\ws_tab.c(64): warning C4244: '=': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\postage\ws_tab.c(77): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\postage\ws_tab.c(83): warning C4244: '=': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\postage\ws_tab.c(95): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\postage\ws_tab.c(128): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\postage\ws_tab.c(138): warning C4244: 'function': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\postage\ws_tab.c(143): warning C4244: '=': conversion from 'uint64_t' to '::size_t', possible loss of data
+..\..\postage\ws_tab.c(245): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+  util_aes.c
+..\..\util\util_aes.c(11): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\util\util_aes.c(71): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+  util_base64.c
+  util_canonical.c
+..\..\util\util_canonical.c(43): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+  util_cookie.c
+  util_darray.c
+  util_error.c
+  util_exec.c
+..\..\util\util_exec.c(127): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\util\util_exec.c(133): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+  util_file.c
+..\..\util\util_file.c(77): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\util\util_file.c(206): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\util\util_file.c(226): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\util\util_file.c(256): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\util\util_file.c(294): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\util\util_file.c(333): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+  util_getopt.c
+  util_idle.c
+  util_ini.c
+  util_list.c
+  util_request.c
+..\..\util\util_request.c(5): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\util\util_request.c(64): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\util\util_request.c(127): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\util\util_request.c(211): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+  util_salloc.c
+  util_sql_split.c
+..\..\util\util_sql_split.c(22): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+  util_string.c
+..\..\util\util_string.c(109): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+..\..\util\util_string.c(412): warning C4003: not enough actual parameters for macro '__SUN__REPEAT'
+  util_strptime.c
   Generating code
-  17 of 401 functions ( 4.2%) were compiled, the rest were copied from previous compilation.
+  399 of 401 functions (99.5%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    8 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   postage.vcxproj -> C:\Users\nunzio\Repos\postage\visualstudio\Release\postage.exe
   postage.vcxproj -> C:\Users\nunzio\Repos\postage\visualstudio\Release\postage.pdb (Full PDB)

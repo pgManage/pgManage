@@ -1,5 +1,7 @@
 *.o
 
+/visualstudio/.vs
+
 /envelope/envelope
 /envelope/data_test
 /envelope/Makefile
