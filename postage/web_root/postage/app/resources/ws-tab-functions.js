@@ -1096,50 +1096,53 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         frameElement.innerHTML =
             '<div id="frame-' + intTabNumber + '-indicator" class="frame-indicator"></div>' +
             '<div id="script-window-container-' + intTabNumber + '" class="script-window-container" flex-vertical flex-fill>' +
+				'<div class="ace-toolbar" id="sql-ace-toolbar-' + intTabNumber + '">' +
+					'<gs-button inline remove-all icon="play" onclick="executeScript()" ' +
+								'title="Execute Script [F5]" remove-bottom no-focus>Run</gs-button>' +
+					'<gs-button inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
+								'title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span> Toggle Comment</gs-button>' +
+					'<gs-button inline remove-all icon="indent" onclick="indentScript()" ' +
+								'title="Indent the selected text [TAB]" remove-all no-focus>Indent</gs-button>' +
+					'<gs-button inline remove-all icon="outdent" onclick="outdentScript()" ' +
+								'title="Dedent the selected text [SHIFT][TAB]" remove-all no-focus>Dedent</gs-button>' +
+					(
+						window.process && window.process.type === 'renderer' ?
+						'<gs-button inline remove-all id="button-tab-' + intTabNumber + '-save" icon="save" data-filename="' + tabElement.filePath + '" ' +
+								'title="Save" remove-all no-focus>Save</gs-button>' +
+						'<gs-button inline remove-all id="button-tab-' + intTabNumber + '-save-as" class="button-save-as" data-filename="' + tabElement.filePath + '" ' +
+								'title="Save As..." remove-all no-focus>' +
+						'<span class="save-as-floppy">&#xf0c7;</span>' + //&#9830;
+						'<span class="save-as-pencil">&#xf040;</span>' +
+					'Save As...</gs-button>'
+						:
+						'<gs-button inline remove-all id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
+								'title="Download as a file" remove-all no-focus>Download</gs-button>'
+					) +
+					'<gs-button inline remove-all class="button-explain" onclick="explain()" ' +
+								'title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span> Explain</gs-button>' +
+					'<gs-button inline remove-all class="button-explain" onclick="explain(true)" ' +
+								'title="Query explanation. Note that the query will run, meaning that you\'ll get run times." ' +
+								'remove-top no-focus>' +
+						'<span class="explain-letter" icon="play">E</span> Explain Analyze' +
+					'</gs-button>' +
+					'<gs-button inline remove-all class="button-csv" icon="file-text" onclick="exportCSV()" ' +
+								'title="Download a single query\'s results as a file" remove-all no-focus>Export</gs-button>' +
+					'<gs-button inline remove-all class="button-ace-info" onclick="dialogAceInfo()" ' +
+								'title="Information and tips about the Editor" remove-all no-focus>' +
+							'<span class="ace-icon-container">' +
+								'<span class="ace-suit">&#9824;</span>' + //&#9830;
+								'<span class="ace-letter">A</span>' +
+							'</span>' +
+						'<span>Ace Tips</span>' +
+					'</gs-button>' +
+					'<gs-checkbox inline style="border-radius: 0; border: 1px solid #ccc;" id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"><label>Autocommit</label></gs-checkbox>' +
+					'<gs-button hidden id="sql-property-' + intTabNumber + '-button" icononly ' +
+								'icon="wrench" onclick="propertyWindowDialog()" disabled  ' + //hidden
+								'title="Edit the current query\'s properties [CMD][.] or [CTRL][.]" remove-top no-focus></gs-button>' +
+				'</div>' +
                 '<div id="ace-container-position-container-' + intTabNumber + '" class="ace-container-position-container" flex>' +
                     '<div class="ace-container">' +
                     '    <div id="sql-ace-area-' + intTabNumber + '" class="ace-area"></div>' +
-                    '</div>' +
-                    '<div class="ace-toolbar" id="sql-ace-toolbar-' + intTabNumber + '">' +
-                        '<gs-button icononly icon="play" onclick="executeScript()" ' +
-                                    'title="Execute Script [F5]" remove-bottom no-focus></gs-button>' +
-                        '<gs-button class="button-toggle-comments" onclick="toggleCommentScript()" ' +
-                                    'title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span></gs-button>' +
-                        '<gs-button icononly icon="indent" onclick="indentScript()" ' +
-                                    'title="Indent the selected text [TAB]" remove-all no-focus></gs-button>' +
-                        '<gs-button icononly icon="outdent" onclick="outdentScript()" ' +
-                                    'title="Outdent the selected text [SHIFT][TAB]" remove-all no-focus></gs-button>' +
-                        (
-							window.process && window.process.type === 'renderer' ?
-							'<gs-button icononly id="button-tab-' + intTabNumber + '-save" icon="save" data-filename="' + tabElement.filePath + '" ' +
-                                    'title="Save" remove-all no-focus></gs-button>' +
-							'<gs-button icononly id="button-tab-' + intTabNumber + '-save-as" class="button-save-as" data-filename="' + tabElement.filePath + '" ' +
-                                    'title="Save As..." remove-all no-focus>' +
-                            '<span class="save-as-floppy">&#xf0c7;</span>' + //&#9830;
-                            '<span class="save-as-pencil">&#xf040;</span>' +
-                        '</gs-button>'
-							:
-							'<gs-button icononly id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
-                                    'title="Download as a file" remove-all no-focus></gs-button>'
-						) +
-                        '<gs-button icononly class="button-explain" icon="play-circle-o" onclick="explain()" ' +
-                                    'title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter">E</span></gs-button>' +
-                        '<gs-button icononly class="button-explain" icon="play" onclick="explain(true)" ' +
-                                    'title="Query explanation. Note that the query will run, meaning that you\'ll get run times." ' +
-                                    'remove-top no-focus>' +
-                            '<span class="explain-letter">E</span>' +
-                        '</gs-button>' +
-                        '<gs-button icononly class="button-csv" icon="file-text" onclick="exportCSV()" ' +
-                                    'title="Download a single query\'s results as a file" remove-all no-focus></gs-button>' +
-                        '<gs-button icononly class="button-ace-info" onclick="dialogAceInfo()" ' +
-                                    'title="Information and tips about the Editor" remove-all no-focus>' +
-                            '<span class="ace-suit">&#9824;</span>' + //&#9830;
-                            '<span class="ace-letter">A</span>' +
-                        '</gs-button>' +
-						'<gs-checkbox style="border-top-right-radius: 0; border-top-left-radius: 0; border: 1px solid #ccc;" mini id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"></gs-checkbox>' +
-                        '<gs-button hidden id="sql-property-' + intTabNumber + '-button" icononly ' +
-                                    'icon="wrench" onclick="propertyWindowDialog()" disabled  ' + //hidden
-                                    'title="Edit the current query\'s properties [CMD][.] or [CTRL][.]" remove-top no-focus></gs-button>' +
                     '</div>' +
                 '</div>' +
                 '<div id="sql-doc-links-' + intTabNumber + '" style="text-align: center; height: 0;">' +

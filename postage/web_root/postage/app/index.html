@@ -16,7 +16,7 @@
         <title>Postage</title>
 
 
-        
+
         <script>
             //jslint white:true multivar:true
             var bolPropertyPanelOpen = false, bolCurl = false;
@@ -41,12 +41,12 @@
             window.addEventListener('socket-connect', function (event) {
                 "use strict";
                 var intCurrConnectNumber = reconnectNumber;
-                
+
                 if (reconnectCheckTimer) {
                     clearTimeout(reconnectCheckTimer);
                     reconnectCheckTimer = null;
                 }
-                
+
                 // if we can remain connected for 5 seconds: reset countdown
                 reconnectCheckTimer = setTimeout(function () {
                     if (intCurrConnectNumber === reconnectNumber) {
@@ -316,7 +316,7 @@
                             strOID        = arrParts[1];
                             strSchema     = arrParts[2];
                             strObjectName = arrParts[3];
-                            
+
 
 
                             // get tab name
@@ -332,7 +332,7 @@
                             } else {
                                 strFinalName = quote_ident(strSchema);
                             }
-                            
+
                             strScript = treePrepareQuery(scriptQuery[arrParts[0]], strOID, strFinalName, strFinalName);
 
                             // get toolbar
@@ -480,12 +480,12 @@
                 font-family: Helvetica,Arial,sans-serif;
             }
         </style>
-        
+
         <!-- we use this to steal the focus from the home iframe, because it's from a
                     different origin and that prevents key events from bubbling up if
                     the focus is in there-->
         <input id="focus-stealer" style="position:absolute; top:-50px;" type="text" />
-        
+
         <gs-panel id="panel" dismissible>
             <gs-page id="left-bar" style="width: 17em; min-width: 17em;">
                 <gs-header flex-horizontal>
