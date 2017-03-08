@@ -2667,6 +2667,11 @@ function exportCSV() {
     }
 }
 
+function openInNewWindow() {
+    var currentTab = document.getElementsByClassName('current-tab')[0];
+	window.open('index.html?leftpanel=false&view=tab:' + encodeURIComponent(currentTab.filePath), Math.random().toString(), 'left=' + (window.screenX + 100) + ',width=' + window.innerWidth + ',height=' + window.innerHeight);
+}
+
 function docButtonForQuery(strQuery) {
     'use strict';
     var strPrefix = 'http://www.postgresql.org/docs/' + contextData.minorVersionNumber + '/static/', strDocButton;

@@ -1114,9 +1114,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 								'title="Save" remove-all no-focus>Save</gs-button>' +
 						'<gs-button inline remove-all id="button-tab-' + intTabNumber + '-save-as" class="button-save-as" data-filename="' + tabElement.filePath + '" ' +
 								'title="Save As..." remove-all no-focus>' +
-						'<span class="save-as-floppy">&#xf0c7;</span>' + //&#9830;
-						'<span class="save-as-pencil">&#xf040;</span>' +
-					'Save As...</gs-button>'
+								'<span class="save-as-floppy" icon="pencil">&#xf0c7;</span> Save As...</gs-button>'
 						:
 						'<gs-button inline remove-all id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
 								'title="Download as a file" remove-all no-focus>Download</gs-button>'
@@ -1139,6 +1137,8 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 						'<span>Ace Tips</span>' +
 					'</gs-button>' +
 					'<gs-checkbox inline style="border-radius: 0; border: 1px solid #ccc;" id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"><label>Autocommit</label></gs-checkbox>' +
+					'<gs-button inline remove-all icon="external-link" onclick="openInNewWindow()" ' +
+								'title="Open this tab in a new window" remove-all no-focus>New Window</gs-button>' +
 					'<gs-button hidden id="sql-property-' + intTabNumber + '-button" icononly ' +
 								'icon="wrench" onclick="propertyWindowDialog()" disabled  ' + //hidden
 								'title="Edit the current query\'s properties [CMD][.] or [CTRL][.]" remove-top no-focus></gs-button>' +

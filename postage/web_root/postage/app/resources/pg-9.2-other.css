@@ -245,7 +245,7 @@ gs-button.button-save-as {
     left: 0.05em !important;
 }
 
-gs-button.button-save-as .save-as-floppy {
+/*gs-button.button-save-as .save-as-floppy {
     font-family: fontawesome;
     display: inline-block;
 	top: 0.65em;
@@ -277,6 +277,40 @@ gs-button.button-save-as .save-as-pencil {
     text-indent: 0;
     line-height: 1.25;
     font-size: 1.4em;
+}*/
+
+.ace-toolbar gs-button.button-save-as {
+    text-indent: 0;
+    line-height: 1em;
+    padding: 0.05em;
+	padding-right: 0.65em;
+    text-align: left;
+}
+
+.ace-toolbar gs-button.button-save-as .save-as-floppy {
+	font-size: 1.4em;
+    line-height: 1.55em;
+	margin-left: 0.3em;
+	margin-right: 0.3em;
+	font-family: fontawesome;
+}
+
+.ace-toolbar gs-button.button-save-as .save-as-floppy:after {
+    position: absolute;
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    text-align: center;
+    font-size: 1em;
+    font-weight: 900;
+    line-height: 1em;
+	left: 0.6em;
+	top: 0.65em;
+	font-family: fontawesome;
+}
+
+.ace-toolbar gs-button.button-save-as .save-as-floppy[icon="pencil"]:after {
+	content: '\f040';
 }
 
 
