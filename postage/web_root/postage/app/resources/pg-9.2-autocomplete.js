@@ -225,6 +225,7 @@ function autocompletePopupLoad(editor, arrQueries) {
     intLoadId = autocompleteGlobals.loadId;
     //autocompleteGlobals.currentLoadId = intLoadId;
     autocompleteGlobals.popupAce.setValue('');
+    
     autocompleteGlobals.arrSearch = [];
     autocompleteGlobals.arrValues = [];
     autocompleteGlobals.arrSearchMaster = [];
@@ -481,6 +482,7 @@ function autocompletePopupClose(editor) {
     autocompleteGlobals.popupAce.setValue('');
     
     // bind function only unbinds the editor if popup is currently bound
+    autocompleteUnbind(editor);
     autocompleteUnbind(editor);
     
     // set popupOpen to false
