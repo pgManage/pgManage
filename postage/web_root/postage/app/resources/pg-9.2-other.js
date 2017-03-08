@@ -178,7 +178,7 @@ function menuTools(target) {
                 <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft icon="line-chart" target="_blank"
                             href="stats.html">Activity Statistics</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
-                            no-focus iconleft icon="tasks" onclick="dialogProcesses()">Process Manager</gs-button>
+                            no-focus iconleft icon="tasks" onclick="newTab('processes', 'Process Manager')">Process Manager</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft icon="lock" onclick="dialogLocks()">Transaction Locks</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose

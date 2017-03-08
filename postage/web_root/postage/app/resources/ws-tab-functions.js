@@ -198,7 +198,7 @@ function loadTabsFromServer(bolChooseFirst) {
                 arrFiles[i] = decodeFileNameForTabName(arrFiles[i]);
                 fileExtension = arrFiles[i].substring(arrFiles[i].lastIndexOf('.') + 1);
 
-                if (fileExtension !== 'sql' && fileExtension !== 'design-table' && fileExtension !== 'datasheet') {
+                if (fileExtension !== 'sql' && fileExtension !== 'design-table' && fileExtension !== 'datasheet' && fileExtension !== 'processes') {
                     arrFiles.splice(i, 1);
                     i -= 1;
                     len -= 1;
@@ -732,6 +732,9 @@ function fillTab(tabElement, jsnParameters) {
     } else if (tabElement.tabType === 'datasheet') {
         tabElement.relatedFrame.innerHTML =
                 '<iframe class="full-iframe" src="frames/frame-datasheet.html?' + jsnParameters.queryString + '"></iframe>';
+    } else if (tabElement.tabType === 'processes') {
+        tabElement.relatedFrame.innerHTML =
+                '<iframe class="full-iframe" src="frames/frame-processes.html"></iframe>';
     }
 }
 
@@ -1617,6 +1620,15 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         if (!jsnIsEmpty(jsnParameters)) {
             fillTab(tabElement, jsnParameters);
         }
+
+        if (!bolLoadedFromServer) {
+            GS.addLoader(tabElement.relatedFrame, 'Saving...');
+            saveFile(tabElement, tabElement.filePath, tabElement.changeStamp, jsnParameters.queryString, function () {
+                GS.removeLoader(tabElement.relatedFrame);
+            });
+        }
+    } else if (strType === 'processes') {
+        fillTab(tabElement, jsnParameters);
 
         if (!bolLoadedFromServer) {
             GS.addLoader(tabElement.relatedFrame, 'Saving...');
