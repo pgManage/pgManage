@@ -19,6 +19,7 @@ var bolTutorial = false;
 var ajxCurrent;
 
 function appendError(data) {
+    "use strict";
     var errorContainer = document.getElementById('container-error');
 
     data = data.original_response.substring(data.original_response.indexOf('\n') + 1);
@@ -26,7 +27,6 @@ function appendError(data) {
     if (errorContainer.textContent) {
         errorContainer.appendChild(document.createElement('br'));
     }
-
     errorContainer.appendChild(document.createTextNode(data));
 }
 

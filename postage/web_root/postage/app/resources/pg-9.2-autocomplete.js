@@ -107,6 +107,23 @@ function autocompleteBindEditor(tabElement, editor) {
                             console.error('Caught Autocomplete Error:', e);
                         }
                     } else if (editor.ignoreChange !== true
+                            && event.action === 'insert'
+                            && autocompleteGlobals.bolInserting === false) {
+                        var selectionRanges = editor.currentSelections[0];
+                        if (editor.currentSelections.length > 1) {
+                            if (
+                                selectionRanges.start.row === event.start.row &&
+                                selectionRanges.start.column === event.start.column &&
+                                selectionRanges.end.row === event.end.row &&
+                                selectionRanges.end.column + 1 === event.end.column
+                            ) {
+                                snippetHandler(event.lines[0], event, editor);
+                            }
+                        } else {
+                            snippetHandler(event.lines[0], event, editor);
+                        }
+                        
+                    } else if (editor.ignoreChange !== true
                             && event.action === 'remove'
                             && autocompleteGlobals.bolInserting === false
                             && editor.currentQueryRange) {
@@ -135,23 +152,6 @@ function autocompleteBindEditor(tabElement, editor) {
                         } catch (e) {
                             console.error('Caught Autocomplete Error:', e);
                         }
-                    } else if (editor.ignoreChange !== true
-                            && event.action === 'insert'
-                            && autocompleteGlobals.bolInserting === false) {
-                        var selectionRanges = editor.currentSelections[0];
-                        if (editor.currentSelections.length > 1) {
-                            if (
-                                selectionRanges.start.row === event.start.row &&
-                                selectionRanges.start.column === event.start.column &&
-                                selectionRanges.end.row === event.end.row &&
-                                selectionRanges.end.column + 1 === event.end.column
-                            ) {
-                                snippetHandler(event.lines[0], event, editor);
-                            }
-                        } else {
-                            snippetHandler(event.lines[0], event, editor);
-                        }
-                        
                     }
                 }
             }
@@ -181,6 +181,7 @@ function autocompleteBindEditor(tabElement, editor) {
             if (event.action === 'insert') {
                 autocompleteGlobals.intSearchEnd = rowAndColumnToIndex(editor.getValue(), event.end.row, event.end.column);
             } else if (event.action === 'remove') {
+                //autocompleteGlobals.intSearchEnd = rowAndColumnToIndex(editor.getValue(), event.start.row, event.start.column);
                 autocompleteGlobals.intSearchEnd = rowAndColumnToIndex(editor.getValue(), event.start.row, event.start.column);
             }
             
@@ -224,6 +225,7 @@ function autocompletePopupLoad(editor, arrQueries) {
     intLoadId = autocompleteGlobals.loadId;
     //autocompleteGlobals.currentLoadId = intLoadId;
     autocompleteGlobals.popupAce.setValue('');
+    
     autocompleteGlobals.arrSearch = [];
     autocompleteGlobals.arrValues = [];
     autocompleteGlobals.arrSearchMaster = [];
@@ -481,9 +483,15 @@ function autocompletePopupClose(editor) {
     
     // bind function only unbinds the editor if popup is currently bound
     autocompleteUnbind(editor);
+    autocompleteUnbind(editor);
     
     // set popupOpen to false
     autocompleteGlobals.popupOpen = false;
+    
+    autocompleteGlobals.arrSearch = [];
+    autocompleteGlobals.arrValues = [];
+    autocompleteGlobals.arrSearchMaster = [];
+    autocompleteGlobals.arrValuesMaster = [];
 }
 
 // complete using the selected choice in the autocomplete popup
@@ -886,6 +894,10 @@ function autocompleteUnbind(editor) {
     }
     
     autocompleteGlobals.bolBound = false;
+    
+    
+    
+    
 }
 
 
