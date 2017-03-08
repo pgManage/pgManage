@@ -132,7 +132,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
       , bolPreviousCharReturn, bolCurrentCharReturn, bolFirstSpace
       , intOpenParen, intCloseParen, intVersion = parseFloat(contextData.minorVersionNumber, 10);
     // if the popup isn't already open or it's open but it's asleep
-    //console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
+    console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
     if (event.action === 'remove') {
         if (autocompleteGlobals.popupOpen === true) {
             autocompletePopupClose(editor);
@@ -309,7 +309,6 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             var noComma;
             var bolCols = false, bolTables = false, bolSchemas = false, bolTableFuncs = false, bolBuiltins = false, bolGroups = false, bolUsers = false, bolReturnTypes = false, bolTypes = false, bolLanguages = false, bolRules = false, bolTablespace = false;
             bolFirstSpace = bolCurrentCharWhitespace && !bolPreviousCharWhitespace;
-            
             
             
             if (event.action === 'remove' && (/[A-Z\"]/gim).test(strScript[intCursorPosition - 1]) || ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && !bolCurrentCharWhitespace && (bolPreviousCharWhitespace || bolPreviousCharOpenParen || strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_'))) {
@@ -525,7 +524,6 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 //console.log(strCurrWord);
                 
                 
-                
                 if (event.action === 'remove' && (/[A-Z\"]/gim).test(strScript[intCursorPosition - 1])) {
                     for (var i = 0, len = arrQueries.length; i < len; i++) {
                         arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strCurrWord.substring(0, strCurrWord.length - 1).toLowerCase() + '%');
@@ -541,7 +539,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     }
                 }
                 
-                console.log(arrQueries);
+                //console.log(arrQueries);
                 // if we've found queries: open the popup
                 if (arrQueries && arrQueries.length > 0) {
                     var strScript2 = editor.getValue()
@@ -1033,7 +1031,6 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                     autocompleteGlobals.intSearchStart = intEndCursorPosition - 1;
                     autocompleteGlobals.intSearchEnd = intEndCursorPosition;
                     autocompletePopupOpen(editor, arrQueries);
-                    // console.log(autocompleteGlobals);
                 }
             }
         }
@@ -1151,7 +1148,6 @@ var snippetHandler = function (lines, event, editor) {
         autocompleteGlobals.bolSnippets = true;
         arrQueries = [autocompleteQuery.schemas];
         arrQueries[0] = arrQueries[0].replace((/\{\{searchStr}\}/gi), lines.toLowerCase() + '%');
-        
         
         var strScript = editor.getValue();
         intStartCursorPosition = rowAndColumnToIndex(strScript, event.start.row, event.start.column);
