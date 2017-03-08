@@ -55,6 +55,8 @@
 				var autorefreshCheckbox = document.getElementById('autorefresh');
 				var autorefreshIntervalInput = document.getElementById('autorefresh_interval');
 				var interval = undefined;
+				var orderbyColumn = document.getElementById('orderby_column');
+				var orderbyDirection = document.getElementById('orderby_direction');
 
 				var resetInterval = function () {
 					console.log('resetInterval');
@@ -66,10 +68,17 @@
 							document.getElementById('datasheet-processes').refresh();
 						}, parseFloat(autorefreshIntervalInput.value) * 1000);
 					}
-				}
+				};
 				autorefreshCheckbox.addEventListener('change', function () { resetInterval(); });
 				autorefreshIntervalInput.addEventListener('keyup', function () { resetInterval(); });
 				resetInterval();
+
+				var setOrderBy = function () {
+					document.getElementById('datasheet-processes').setAttribute('ord', orderbyColumn.value + ' ' + orderbyDirection.value);
+					document.getElementById('datasheet-processes').refresh();
+				};
+				orderbyColumn.addEventListener('change', function () { setOrderBy(); });
+				orderbyDirection.addEventListener('change', function () { setOrderBy(); });
 			});
         </script>
 
@@ -128,6 +137,34 @@
 				<gs-checkbox id="autorefresh" value="true" flex-horizontal><label style="text-align: left;" flex>&nbsp;Autorefresh</label></gs-checkbox>
 				<label for="autorefresh_interval">Autorefresh Interval:</label>
 				<gs-text id="autorefresh_interval" value="5"></gs-text>
+				<br />
+				<label>Order by:</label>
+				<gs-grid widths="1,1">
+					<gs-block>
+						<gs-select id="orderby_column" value="pid">
+							<option value="datname">Database</option>
+							<option value="pid">Process ID</option>
+							<option value="usename">Username</option>
+							<option value="waiting">Waiting</option>
+							<option value="state">State</option>
+							<option value="query">Query</option>
+							<option value="application_name">Application Name</option>
+							<option value="client_addr">Client Address</option>
+							<option value="client_hostname">Client Host</option>
+							<option value="client_port">Client Port</option>
+							<option value="backend_start">Backend Start</option>
+							<option value="xact_start">Transaction Start</option>
+							<option value="query_start">Query Start</option>
+							<option value="state_change">Last State Change</option>
+						</gs-select>
+					</gs-block>
+					<gs-block>
+						<gs-select id="orderby_direction">
+							<option value="ASC">Ascending</option>
+							<option value="DESC">Descending</option>
+						</gs-select>
+					</gs-block>
+				</gs-grid>
 				<br />
 				<gs-datasheet flex id="datasheet-processes" src="pg_catalog.pg_stat_activity"
                             pk="pid" lock="pid" socket="postageProcessDialogSocket" no-filter
