@@ -1137,6 +1137,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 							'</span>' +
 						'<span>Ace Tips</span>' +
 					'</gs-button>' +
+					'<gs-button inline remove-all icon="black-tie" onclick="beautifySQL()" ' + 'title="Beautify the Current SQL" no-focus>Beautify</gs-button>' +
 					'<gs-button inline remove-all icon="external-link" onclick="openInNewWindow()" ' +
 								'title="Open this tab in a new window" remove-all no-focus>New Window</gs-button>' +
 					'<gs-button hidden id="sql-property-' + intTabNumber + '-button" icononly ' +
@@ -2025,6 +2026,19 @@ function indexToRowAndColumn(strText, intIndex) {
     //console.log(intIndex, intRows, intColumns);
 
     return {'row': intRows, 'column': intColumns};
+}
+
+function beautifySQL() {
+    'use strict';
+    var editor = document.getElementsByClassName('current-tab')[0].relatedEditor;
+    var jsnCurrentQuery = getCurrentQuery();
+    var strFormattedSQL = formatSql.formatQuery(jsnCurrentQuery.strQuery);
+    
+    if (jsnCurrentQuery.strQuery === editor.getValue()) {
+        editor.setValue(strFormattedSQL);
+    } else {
+        editor.insert(strFormattedSQL);
+    }
 }
 
 function indentScript() {
