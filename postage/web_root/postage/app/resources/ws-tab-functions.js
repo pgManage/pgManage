@@ -1099,9 +1099,10 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         frameElement.innerHTML =
             '<div id="frame-' + intTabNumber + '-indicator" class="frame-indicator"></div>' +
             '<div id="script-window-container-' + intTabNumber + '" class="script-window-container" flex-vertical flex-fill>' +
-				'<div class="ace-toolbar" id="sql-ace-toolbar-' + intTabNumber + '">' +
+				'<div class="ace-toolbar" style="background-color: #cccccc; width: 100%; padding-top: 1px; padding-bottom: 2px;" id="sql-ace-toolbar-' + intTabNumber + '">' +
 					'<gs-button inline remove-all icon="play" onclick="executeScript()" ' +
 								'title="Execute Script [F5]" remove-bottom no-focus>Run</gs-button>' +
+					'<gs-checkbox inline style="border-radius: 0; border: 1px solid #ccc; padding-bottom: 0px;" id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"><label>Autocommit</label></gs-checkbox>' +
 					'<gs-button inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
 								'title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span> Toggle Comment</gs-button>' +
 					'<gs-button inline remove-all icon="indent" onclick="indentScript()" ' +
@@ -1119,9 +1120,9 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 						'<gs-button inline remove-all id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
 								'title="Download as a file" remove-all no-focus>Download</gs-button>'
 					) +
-					'<gs-button inline remove-all class="button-explain" onclick="explain()" ' +
+					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain()" ' +
 								'title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span> Explain</gs-button>' +
-					'<gs-button inline remove-all class="button-explain" onclick="explain(true)" ' +
+					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" ' +
 								'title="Query explanation. Note that the query will run, meaning that you\'ll get run times." ' +
 								'remove-top no-focus>' +
 						'<span class="explain-letter" icon="play">E</span> Explain Analyze' +
@@ -1136,7 +1137,6 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 							'</span>' +
 						'<span>Ace Tips</span>' +
 					'</gs-button>' +
-					'<gs-checkbox inline style="border-radius: 0; border: 1px solid #ccc;" id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"><label>Autocommit</label></gs-checkbox>' +
 					'<gs-button inline remove-all icon="external-link" onclick="openInNewWindow()" ' +
 								'title="Open this tab in a new window" remove-all no-focus>New Window</gs-button>' +
 					'<gs-button hidden id="sql-property-' + intTabNumber + '-button" icononly ' +

@@ -16,7 +16,7 @@ function loadHome() {
 
     // fill home
     document.getElementById('home-frame').innerHTML = ml(function () {/*
-		<div id="home-ace-toolbar" hidden>
+		<div id="home-ace-toolbar" hidden style="background-color: #cccccc; width: 100%; padding-top: 2px; padding-bottom: 2px;" >
 			<gs-button id="button-home-open-to-new-tab" onclick="openToTab()" title="Open SQL to new tab" inline remove-all>Open SQL to new tab</gs-button><div id="toolbar-addon-container"></div>
 			<gs-button id="button-home-back" icononly icon="times" hidden title="Back" style="float: right;" inline remove-all>Back</gs-button>
 		</div>
