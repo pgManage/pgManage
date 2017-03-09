@@ -9,7 +9,7 @@ document.addEventListener('keydown', function (event) {
     }
 })
 
-function explain(bolRun) {
+function explain(bolRun, bolText) {
     'use strict';
     var currentTab           = document.getElementsByClassName('current-tab')[0]
       , editor               = currentTab.relatedEditor
@@ -130,11 +130,17 @@ function explain(bolRun) {
         // get the current query
         strRunQuery = jsnCurrentQuery.strQuery;
 
+        var explainFormat = 'JSON';
+        if (bolText) {
+            explainFormat = 'TEXT';
+            resultsContainer.innerHTML = '<pre></pre>';
+        }
+
         // append explain-specific delarations depending on wheather or not we are going to run the actual code
         if (bolRun) {
-            strRunQuery = 'EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) ' + strRunQuery;
+            strRunQuery = 'EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT ' + explainFormat + ') ' + strRunQuery;
         } else {
-            strRunQuery = 'EXPLAIN (FORMAT JSON, VERBOSE) ' + strRunQuery;
+            strRunQuery = 'EXPLAIN (FORMAT ' + explainFormat + ', VERBOSE) ' + strRunQuery;
         }
 
         // begin
@@ -146,8 +152,11 @@ function explain(bolRun) {
               , warningHTML, buttonContainerElement, strCSS
               , styleElement;
 
+            console.log('bolIgnoreMessages', bolIgnoreMessages);
             if (bolIgnoreMessages === false) {
+                console.log('error', error);
                 if (!error) {
+                    console.log('data', data);
                     if (data.intCallbackNumber === 0) {
                         endExecute();
                         startLoading();
@@ -159,14 +168,23 @@ function explain(bolRun) {
                         intErrorStartLine += (data.strQuery.match(/\n/gim) || []).length;
                     }
 
+                    console.log('strMessage', data.strMessage);
+                    
                     // if not end query, therefore: results
                     if (data.strMessage !== '\\.') {
                         //console.log('1***', data.intCallbackNumber, data.intCallbackNumberThisQuery, data.strMessage);
 
-                        if (data.intCallbackNumber === 0) {
-                            resultsContainer.innerHTML = '<div style="width: 100%; height: 100%;"></div>';
+                        if (bolText) {
+                            console.log('testAdd');
+                            resultsContainer.firstElementChild.innerHTML +=
+                                encodeHTML(GS.decodeFromTabDelimited(data.strMessage));
+                        } else {
+                            if (data.intCallbackNumber === 0) {
     
-                            handleExplain(JSON.parse(GS.decodeFromTabDelimited(data.strMessage)), resultsContainer.children[0], bolRun);
+                                resultsContainer.innerHTML = '<div style="width: 100%; height: 100%;"></div>';
+                                
+                                handleExplain(JSON.parse(GS.decodeFromTabDelimited(data.strMessage)), resultsContainer.children[0], bolRun);
+                            }
                         }
 
                     // else if end message

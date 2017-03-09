@@ -1127,6 +1127,13 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 								'remove-top no-focus>' +
 						'<span class="explain-letter" icon="play">E</span> Explain Analyze' +
 					'</gs-button>' +
+					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(false, true)" ' +
+								'title="Query explanation. Text format. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span> Explain (Text)</gs-button>' +
+					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(true, true)" ' +
+								'title="Query explanation. Text format. Note that the query will run, meaning that you\'ll get run times." ' +
+								'remove-top no-focus>' +
+						'<span class="explain-letter" icon="play">E</span> Explain Analyze (Text)' +
+					'</gs-button>' +
 					'<gs-button inline remove-all class="button-csv" icon="file-text" onclick="exportCSV()" ' +
 								'title="Download a single query\'s results as a file" remove-all no-focus>Export</gs-button>' +
 					'<gs-button inline remove-all class="button-ace-info" onclick="dialogAceInfo()" ' +
