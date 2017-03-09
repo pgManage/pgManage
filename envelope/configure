@@ -1,5 +1,21 @@
 #!/bin/sh
 
+usage() { echo "Usage: $0 [-p <install-prefix>]" 1>&2; exit 1; }
+
+PREFIX="/usr/local"
+
+while getopts ":p:" o; do
+    case "${o}" in
+        p)
+            PREFIX=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
 printf "checking for compiler..."
 echo "int main() {" > test.c
 echo "    return 0;" >> test.c
@@ -292,7 +308,7 @@ sed -e "s/@sock_dir_parameter@/$directory_parameter/g" \
 	-e "s/@LDFLAGS@/$LDFLAGS/g" \
 	-e "s/@CPPFLAGS@/$CPPFLAGS/g" \
 	-e "s/@BUILD_DEPS@/$BUILD_DEPS/g" \
-	-e "s/@prefix@/\/usr\/local/g" \
+	-e "s|@prefix@|$PREFIX|g" \
 	-e "s/@MANDIR@/$MANDIR/g" \
 	-e "s/@libev_CPPFLAGS@/$libev_CPPFLAGS/g" \
 	-e "s/@libtre_CPPFLAGS@/$libtre_CPPFLAGS/g" \

@@ -178,7 +178,7 @@ function menuTools(target) {
                 <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft icon="line-chart" target="_blank"
                             href="stats.html">Activity Statistics</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
-                            no-focus iconleft icon="tasks" onclick="dialogProcesses()">Process Manager</gs-button>
+                            no-focus iconleft icon="tasks" onclick="newTab('processes', 'Process Manager')">Process Manager</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft icon="lock" onclick="dialogLocks()">Transaction Locks</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
@@ -2665,6 +2665,11 @@ function exportCSV() {
             GS.msgbox('Error', '<center>You need to select a query.</center>', ['Ok']);
         }
     }
+}
+
+function openInNewWindow() {
+    var currentTab = document.getElementsByClassName('current-tab')[0];
+	window.open('index.html?leftpanel=false&view=tab:' + encodeURIComponent(currentTab.filePath), Math.random().toString(), 'left=' + (window.screenX + 100) + ',width=' + window.innerWidth + ',height=' + window.innerHeight);
 }
 
 function docButtonForQuery(strQuery) {

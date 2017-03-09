@@ -90,7 +90,7 @@ function treeStart() {
                 cursorX = event.clientX;
                 cursorY = event.clientY;
 
-                if (currentTab !== undefined){
+                if (currentTab !== undefined && currentTab.relatedEditor !== undefined) {
                     // move ace cursor
                     currentTab.relatedEditor.selection.moveToPosition(
                         currentTab.relatedEditor.renderer.screenToTextCoordinates(cursorX, cursorY)
@@ -119,7 +119,7 @@ function treeStart() {
             //      the end function if the mouse moves while it is up
             stateMoveFunction = function (event) {
                 // if there is a editor tab open:
-                if (currentTab !== undefined){
+                if (currentTab !== undefined && currentTab.relatedEditor !== undefined) {
                     // focus to editor
                     currentTab.relatedEditor.focus();
                 }
@@ -156,7 +156,7 @@ function treeStart() {
                 // if cursor has moved off of treeview to the editor ace
                 if (currentcursorX > (elemPos.intElementWidth + 60)) {
                     // if there is a editor tab open:
-                    if (currentTab !== undefined){
+                    if (currentTab !== undefined && currentTab.relatedEditor !== undefined) {
                         // insert snippet text
                         currentTab.relatedEditor.insert(ghost.innerHTML);
                     }
