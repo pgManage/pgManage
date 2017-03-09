@@ -133,7 +133,7 @@ function explain(bolRun, bolText) {
         var explainFormat = 'JSON';
         if (bolText) {
             explainFormat = 'TEXT';
-            resultsContainer.innerHTML = '<pre></pre>';
+            resultsContainer.innerHTML = '<pre style="white-space: pre;"></pre>';
         }
 
         // append explain-specific delarations depending on wheather or not we are going to run the actual code
@@ -152,9 +152,7 @@ function explain(bolRun, bolText) {
               , warningHTML, buttonContainerElement, strCSS
               , styleElement;
 
-            console.log('bolIgnoreMessages', bolIgnoreMessages);
             if (bolIgnoreMessages === false) {
-                console.log('error', error);
                 if (!error) {
                     console.log('data', data);
                     if (data.intCallbackNumber === 0) {
@@ -167,15 +165,12 @@ function explain(bolRun, bolText) {
                     if (data.intCallbackNumberThisQuery === 0) {
                         intErrorStartLine += (data.strQuery.match(/\n/gim) || []).length;
                     }
-
-                    console.log('strMessage', data.strMessage);
                     
                     // if not end query, therefore: results
                     if (data.strMessage !== '\\.') {
                         //console.log('1***', data.intCallbackNumber, data.intCallbackNumberThisQuery, data.strMessage);
 
                         if (bolText) {
-                            console.log('testAdd');
                             resultsContainer.firstElementChild.innerHTML +=
                                 encodeHTML(GS.decodeFromTabDelimited(data.strMessage));
                         } else {
