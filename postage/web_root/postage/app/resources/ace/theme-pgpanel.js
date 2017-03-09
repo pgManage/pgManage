@@ -106,10 +106,16 @@ var pgPanelCSSText = ml(function () {/*
     .ace-pgpanel .ace_tb,
     .ace-pgpanel .ace_tf,
     .ace-pgpanel .ace_ty,
+    .ace-pgpanel .ace_pk,
+    .ace-pgpanel .ace_rl,
+    .ace-pgpanel .ace_tr,
     .ace-pgpanel .ace_vw {
         font-size: 0.75em;
         font-weight: 900;
     }
+            
+            
+            
     
     .ace-pgpanel .ace_ag { color: #CF4F19; }
     .ace-pgpanel .ace_cl { color: #8A3F00; }
@@ -119,6 +125,9 @@ var pgPanelCSSText = ml(function () {/*
     .ace-pgpanel .ace_tc { color: #2D2390; }
     .ace-pgpanel .ace_td { color: #20338D; }
     .ace-pgpanel .ace_tp { color: #1B4689; }
+    .ace-pgpanel .ace_pk { color: #00BBBB; }
+    .ace-pgpanel .ace_rl { color: #19b74a; }
+    .ace-pgpanel .ace_tr { color: #dcb33e; }
     .ace-pgpanel .ace_tt { color: #175984; }
     .ace-pgpanel .ace_fn { color: #4fb977; }
     .ace-pgpanel .ace_in { color: #819C00; }

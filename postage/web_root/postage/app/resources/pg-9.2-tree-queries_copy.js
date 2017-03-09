@@ -77,7 +77,7 @@ var treeStructure = [
                 [4, 'folder', 'objectConstraintList'],
                     [5, 'script', 'objectConstraint'],
                 [4, 'folder', 'objectIndexList'],
-                    [5, 'script', 'objectIndex'],
+                    [5, 'script', 'objectIndex2'],
                 [4, 'folder', 'objectKeyList'],
                     [5, 'script', 'objectKey'],
                 [4, 'folder', 'objectRuleList'],
@@ -89,19 +89,9 @@ var treeStructure = [
         [2, 'folder,refresh', 'objectType'],
             [3, 'script', 'objectType'],
         [2, 'folder,refresh', 'objectViewList'],
+            //[3, 'script', 'objectView']
             [3, 'folder,script', 'objectView'],
-                [4, 'folder', 'objectColumnList'],
-                    [5, 'script', 'objectColumn'],
-                [4, 'folder', 'objectConstraintList'],
-                    [5, 'script', 'objectConstraint'],
-                [4, 'folder', 'objectIndexList'],
-                    [5, 'script', 'objectIndex'],
-                [4, 'folder', 'objectKeyList'],
-                    [5, 'script', 'objectKey'],
-                [4, 'folder', 'objectRuleList'],
-                    [5, 'script', 'objectRule'],
-                [4, 'folder', 'objectTriggerList'],
-                    [5, 'script', 'objectTrigger'],
+                [4, '', ''], //'script', 'objectView'
 ];
 
 
@@ -299,76 +289,22 @@ SELECT {{INTOID}} AS oid, 'Columns (' || COUNT(attname) || ')' AS caption, 'obje
             HAVING COUNT(drp) > 0
     ORDER BY caption*/});
 
-// listQuery.objectView = ml(function () {/*
-//     SELECT {{INTOID}} AS oid,
-//             COALESCE(attname,'') ||
-//                 ' (' ||
-//                     COALESCE(format_type(atttypid, atttypmod),'') ||
-//                 ')',
-//             '' AS schema_name,
-//             'CL' AS bullet
-//       FROM pg_catalog.pg_attribute
-//      WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0
-//       AND attrelid = {{INTOID}}
-//   ORDER BY attnum ASC;
-// */});
-
-
-
 listQuery.objectView = ml(function () {/*
+    SELECT {{INTOID}} AS oid,
+            COALESCE(attname,'') ||
+                ' (' ||
+                    COALESCE(format_type(atttypid, atttypmod),'') ||
+                ')',
+            '' AS schema_name,
+            'CL' AS bullet
+      FROM pg_catalog.pg_attribute
+     WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0
+       AND attrelid = {{INTOID}}
+  ORDER BY attnum ASC;
+*/});
 
-SELECT {{INTOID}} AS oid, 'Columns (' || COUNT(attname) || ')' AS caption, 'objectColumnList' AS obj_query
-    FROM pg_attribute
-    LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = attrelid
-    WHERE attrelid = {{INTOID}} AND attname NOT LIKE '...%' AND attname NOT LIKE 'cmin' AND attname NOT LIKE 'cmax' AND attname NOT LIKE 'xmin' AND attname NOT LIKE 'xmax' AND attname NOT LIKE 'ctid' AND attname NOT LIKE 'tableoid'
-        HAVING COUNT(attname) > 0
-    UNION
-    SELECT {{INTOID}} AS oid, 'Indexes (' || COUNT(clidx.relname) || ')' AS caption, 'objectIndexList' AS obj_query
-    FROM pg_class cl 
-    JOIN pg_index idx ON cl.oid = idx.indrelid 
-    JOIN pg_class clidx ON clidx.oid = idx.indexrelid 
-    LEFT JOIN pg_namespace nsp ON nsp.oid = cl.relnamespace 
-    WHERE (cl.oid = {{INTOID}} OR cl.relname = '{{STRNAME}}')
-      AND (SELECT count(*) FROM pg_constraint con WHERE con.conindid = clidx.oid) = 0
-        HAVING COUNT(clidx.relname) > 0
-    UNION
-    SELECT {{INTOID}} AS oid, 'Triggers (' || COUNT(pg_trigger.tgname) || ')' AS caption, 'objectTriggerList' AS obj_query
-    FROM pg_class 
-    JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
-    JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-    WHERE pg_class.oid = {{INTOID}} AND pg_trigger.tgisinternal != TRUE
-    HAVING COUNT(pg_trigger.tgname) > 0
-    UNION
-    SELECT {{INTOID}} AS oid, 'Constraints (' || COUNT(conname) || ')' AS caption, 'objectConstraintList' AS obj_query
-         FROM 
-            (SELECT oid, *
-               FROM pg_constraint
-              WHERE pg_constraint.conrelid = {{INTOID}}
-           ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
-                          WHEN contype = 'c' THEN 3 WHEN contype = 'f' THEN 4
-                          WHEN contype = 't' THEN 5 WHEN contype = 'x' THEN 6 END) ASC,
-                    pg_constraint.conname ASC) AS constrain
-                    HAVING COUNT(conname) > 0
-    UNION
-    SELECT {{INTOID}} AS oid, 'Keys (' || COUNT(conname || ' ' || pg_get_constraintdef(oid, true)) || ')' AS caption, 'objectKeyList' AS obj_query
-         FROM 
-            (SELECT oid, *
-               FROM pg_constraint
-              WHERE pg_constraint.conrelid = {{INTOID}} AND pg_get_constraintdef(oid, true) ILIKE '%key%'
-           ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
-                          WHEN contype = 'c' THEN 3 WHEN contype = 'f' THEN 4
-                          WHEN contype = 't' THEN 5 WHEN contype = 'x' THEN 6 END) ASC,
-                    pg_constraint.conname ASC) AS constrain
-                    HAVING COUNT(conname || ' ' || pg_get_constraintdef(oid, true)) > 0
-    UNION
-    SELECT {{INTOID}} AS oid, 'Rules (' ||COUNT(drp) || ')' AS caption, 'objectRuleList' AS obj_query
-        FROM ( SELECT pg_rewrite.rulename as drp
-            FROM pg_class c
-            LEFT JOIN pg_rewrite ON c.oid=pg_rewrite.ev_class
-            LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-            WHERE c.oid = {{INTOID}}) AS rules
-            HAVING COUNT(drp) > 0
-    ORDER BY caption*/});
+
+
 
 
 
@@ -587,7 +523,7 @@ SELECT {{INTOID}}, quote_ident(pg_trigger.tgname) AS name, '{{SCHEMA}}' AS schem
 */});
 
 listQuery.objectRuleList = ml(function () {/*
-SELECT {{INTOID}}, quote_ident(drp) AS name, '{{SCHEMA}}' AS schema_name, 'RL' AS bullet
+SELECT {{INTOID}}, quote_ident(array_to_string(array_agg(drp),E'\n')) AS name, '{{SCHEMA}}' AS schema_name, 'RL' AS bullet
         	FROM ( SELECT pg_rewrite.rulename as drp
           FROM pg_class c
         LEFT JOIN pg_rewrite ON c.oid=pg_rewrite.ev_class
@@ -975,7 +911,7 @@ scriptQuery.objectTrigger = ml(function () {/*
                 SELECT  '-- Trigger: ' ||
                                 quote_ident(pg_trigger.tgname) || ' ON ' ||
                                 quote_ident(pg_namespace.nspname) || '.' ||
-                                quote_ident(pg_class.relname) || E';\n\n' || 
+                                quote_ident(pg_class.relname) || E';\n' || 
                         '-- DROP TRIGGER ' ||
                                 quote_ident(pg_trigger.tgname) || ' ON ' ||
                                 quote_ident(pg_namespace.nspname) || '.' ||
@@ -1128,21 +1064,21 @@ scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () 
     */});
 
 
-// associatedButtons.objectIndex = ['propertyButton', 'dependButton'];
-// scriptQuery.objectIndex = ml(function () {/*
-//     SELECT '-- Index: ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_index_class.relname)) || E';\n\n' ||
-//           '-- DROP INDEX ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_index_class.relname)) || E';\n\n' ||
-//           CASE WHEN pg_index.indisvalid THEN '' ELSE E'-- INVALID INDEX. Postgres ignores this index when you query the index''s target, but it still adds overhead to updates.\n' END || pg_get_indexdef(pg_index.indexrelid) || E';\n'
-//     FROM pg_catalog.pg_class
-//     LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-//     LEFT JOIN pg_catalog.pg_index ON pg_index.indrelid = pg_class.oid
-//     LEFT JOIN pg_catalog.pg_class pg_index_class ON pg_index.indexrelid = pg_index_class.oid
-//     LEFT JOIN pg_catalog.pg_namespace pg_index_class_namespace ON pg_index_class_namespace.oid = pg_index_class.relnamespace
-//     WHERE pg_index_class.relkind = 'i' AND pg_index_class.oid = {{INTOID}};
-// */});
-
 associatedButtons.objectIndex = ['propertyButton', 'dependButton'];
 scriptQuery.objectIndex = ml(function () {/*
+    SELECT '-- Index: ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_index_class.relname)) || E';\n\n' ||
+           '-- DROP INDEX ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_index_class.relname)) || E';\n\n' ||
+           CASE WHEN pg_index.indisvalid THEN '' ELSE E'-- INVALID INDEX. Postgres ignores this index when you query the index''s target, but it still adds overhead to updates.\n' END || pg_get_indexdef(pg_index.indexrelid) || E';\n'
+    FROM pg_catalog.pg_class
+    LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+    LEFT JOIN pg_catalog.pg_index ON pg_index.indrelid = pg_class.oid
+    LEFT JOIN pg_catalog.pg_class pg_index_class ON pg_index.indexrelid = pg_index_class.oid
+    LEFT JOIN pg_catalog.pg_namespace pg_index_class_namespace ON pg_index_class_namespace.oid = pg_index_class.relnamespace
+    WHERE pg_index_class.relkind = 'i' AND pg_index_class.oid = {{INTOID}};
+*/});
+
+associatedButtons.objectIndex2 = ['propertyButton', 'dependButton'];
+scriptQuery.objectIndex2 = ml(function () {/*
 SELECT '-- Index: ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_index_class.relname)) || E';\n\n' ||
            '-- DROP INDEX ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_index_class.relname)) || E';\n\n' ||
            CASE WHEN pg_index.indisvalid THEN '' ELSE E'-- INVALID INDEX. Postgres ignores this index when you query the index''s target, but it still adds overhead to updates.\n' END || pg_get_indexdef(pg_index.indexrelid) || E';\n'
@@ -1631,13 +1567,13 @@ SELECT E'-- DROP RULE ' || quote_ident(pg_rewrite.rulename) ||
         FROM pg_class
         LEFT JOIN pg_rewrite ON pg_class.oid=pg_rewrite.ev_class
         LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_namespace.nspname || '.' || quote_ident(pg_rewrite.rulename) = '{{STRNAME}}'
+        WHERE pg_rewrite.rulename <> '_RETURN' AND (pg_class.oid = {{INTOID}})
     */});
 
 associatedButtons.objectColumn = ['dependButton', 'statButton'];
 scriptQuery.objectColumn = ml(function () {/*
 SELECT '-- Column: ' || attname || E';\n\n' ||
-    COALESCE(COALESCE((SELECT COALESCE('-- Null Fraction: ' || null_frac || E';\n', E'-- No null fraction found\n') || 
+    COALESCE((SELECT COALESCE('-- Null Fraction: ' || null_frac || E';\n', E'-- No null fraction found\n') || 
         COALESCE('-- Average Width: ' || avg_width || E';\n', E'-- No average width found\n') || 
         COALESCE('-- Distinct Values: ' || n_distinct::text || E';\n', E'-- No distinct values found\n') || 
         COALESCE('-- Most Common Values:' || most_common_vals::text || E';\n', E'-- No common values found\n') || 
@@ -1654,14 +1590,13 @@ SELECT '-- Column: ' || attname || E';\n\n' ||
     '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' ADD COLUMN IF NOT EXISTS ' || attname || ' ' || (
         SELECT COALESCE(format_type(atttypid, atttypmod),'') FROM pg_catalog.pg_attribute
             WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = {{INTOID}} AND attname = '{{STRNAME}}'
-          --  ORDER BY attnum ASC
+            ORDER BY attnum ASC
             LIMIT 1) || E';\n'||
-    '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' ALTER COLUMN ' || attname || E' SET DATA TYPE <data_type>;\n', '')
+    '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' ALTER COLUMN ' || attname || E' SET DATA TYPE <data_type>;\n'
         FROM pg_attribute
         LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = attrelid
         WHERE attrelid = {{INTOID}} AND attname = '{{STRNAME}}'
-*/});
-    
+    */});
     
 associatedButtons.objectConstraint = ['dependButton'];
 scriptQuery.objectConstraint = ml(function () {/*
@@ -3232,7 +3167,6 @@ UNION ALL
     AND attname = '{{STRNAME}}'
     ORDER BY sort ASC;
     */});
-    
 
 statQuery.objectTable = ml(function () {/*
  SELECT 1 AS sort,

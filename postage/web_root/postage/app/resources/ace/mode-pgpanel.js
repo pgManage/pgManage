@@ -206,6 +206,9 @@ var pgpanelHighlightRules = function(options) {
             
             { token: "ag", regex: "AG" },
             { token: "cl", regex: "CL" },
+            { token: "pk", regex: "PK" },
+            { token: "rl", regex: "RL" },
+            { token: "tr", regex: "TR" },
             { token: "cn", regex: "CN" },
             { token: "do", regex: "DO" },
             { token: "ft", regex: "FT" },

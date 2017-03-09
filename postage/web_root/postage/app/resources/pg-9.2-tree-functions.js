@@ -219,7 +219,7 @@ function treeStart() {
                     }
 
                     // columns
-                    if (jsnData.type === '') {
+                    if (jsnData.query === 'objectColumn') {
                         // substring column type off of column name
                         subStrEnd = strName.lastIndexOf(' (');
                         strName = strName.substring(0, subStrEnd);
@@ -227,6 +227,7 @@ function treeStart() {
                         // go up a record until you find a table/view
                         for (intI = intSelectionRow; intI >= 0; intI -= 1) {
                             if (treeGlobals.data[intI].query === 'objectTable') {
+                                console.log(treeGlobals.data[intI]);
                                 strNameOpt = treeGlobals.data[intI].name + '.' + strName.substring(0, subStrEnd);
                                 //set intI to  0 to cancel the loop
                                 intI = 0;
@@ -550,6 +551,7 @@ function treeListLoad(parent, strQuery, functionData) {
                 if (jsnData.bullet) {
                     strLineText += jsnData.bullet + ' ';
                 } else {
+                    //console.log(jsnData);
                     if (jsnData.type.indexOf('folder') !== -1) {
                         strLineText += treeGlobals.folderPlus + ' ';
                     } else if (jsnData.type.indexOf('script') !== -1) {
@@ -715,10 +717,15 @@ function treeRemoveLine(intRow) {
 // this function replaces tokens in the sql queries
 function treePrepareQuery(strQuery, oid, strName, sqlSafeName) {
     'use strict';
+    var schemaName = strName.substring(0, strName.indexOf('.'));
+    var relName = strName.substring(parseInt(strName.indexOf('.'), 10) + 1, strName.length);
+    //console.log(strQuery);
     return strQuery
                 .replace(/{{INTOID}}/gi, oid)
                 .replace(/{{STRNAME}}/gi, strName)
-                .replace(/{{STRSQLSAFENAME}}/gi, sqlSafeName);
+                .replace(/{{STRSQLSAFENAME}}/gi, sqlSafeName)
+                .replace(/{{SCHEMA}}/gi, schemaName)
+                .replace(/{{STRRELNAME}}/gi, relName);
 }
 
 //// this function adds or removes blank lines to/from the tree
@@ -1565,7 +1572,7 @@ function treeLoad(data, index, intColumn) {
     if (data.bullet == 'CL' && data.name !== '' && data.name.indexOf(' ') !== -1) {
         data.name = data.name.substring(0, data.name.indexOf(' '));
     }
-    console.log(data);
+    //console.log(data);
     if (arrType.indexOf('script') !== -1 &&
         (
             //If object is not a schema folder or a table folder then continue
