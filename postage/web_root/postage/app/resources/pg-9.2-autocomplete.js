@@ -123,6 +123,35 @@ function autocompleteBindEditor(tabElement, editor) {
                             snippetHandler(event.lines[0], event, editor);
                         }
                         
+                    } else if (editor.ignoreChange !== true
+                            && event.action === 'remove'
+                            && autocompleteGlobals.bolInserting === false
+                            && editor.currentQueryRange) {
+                                
+                        
+                        try {
+                            // this function is in pg-9.2-autocomplete-logic.js
+                            
+                            var selectionRanges = editor.currentSelections[0];
+                            
+                            if (editor.currentSelections.length > 1) {
+                                if (
+                                    selectionRanges.start.row === event.start.row &&
+                                    selectionRanges.start.column === event.start.column &&
+                                    selectionRanges.end.row === event.end.row &&
+                                    selectionRanges.end.column + 1 === event.end.column
+                                ) {
+                                    autocompleteChangeHandler(tabElement, editor, event);
+                                }
+                            } else {
+                                autocompleteChangeHandler(tabElement, editor, event);
+                            }
+                            
+                            
+                            
+                        } catch (e) {
+                            console.error('Caught Autocomplete Error:', e);
+                        }
                     }
                 }
             }
@@ -152,6 +181,7 @@ function autocompleteBindEditor(tabElement, editor) {
             if (event.action === 'insert') {
                 autocompleteGlobals.intSearchEnd = rowAndColumnToIndex(editor.getValue(), event.end.row, event.end.column);
             } else if (event.action === 'remove') {
+                //autocompleteGlobals.intSearchEnd = rowAndColumnToIndex(editor.getValue(), event.start.row, event.start.column);
                 autocompleteGlobals.intSearchEnd = rowAndColumnToIndex(editor.getValue(), event.start.row, event.start.column);
             }
             
@@ -195,6 +225,7 @@ function autocompletePopupLoad(editor, arrQueries) {
     intLoadId = autocompleteGlobals.loadId;
     //autocompleteGlobals.currentLoadId = intLoadId;
     autocompleteGlobals.popupAce.setValue('');
+    
     autocompleteGlobals.arrSearch = [];
     autocompleteGlobals.arrValues = [];
     autocompleteGlobals.arrSearchMaster = [];
@@ -320,8 +351,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                         
                     }
                 }
+
                 
-                                
                 // append text (the substring is to remove the trailing \n)
                 autocompleteGlobals.popupAceSession.insert({
                     'row': autocompleteGlobals.popupAceSession.getLength(),
@@ -452,9 +483,15 @@ function autocompletePopupClose(editor) {
     
     // bind function only unbinds the editor if popup is currently bound
     autocompleteUnbind(editor);
+    autocompleteUnbind(editor);
     
     // set popupOpen to false
     autocompleteGlobals.popupOpen = false;
+    
+    autocompleteGlobals.arrSearch = [];
+    autocompleteGlobals.arrValues = [];
+    autocompleteGlobals.arrSearchMaster = [];
+    autocompleteGlobals.arrValuesMaster = [];
 }
 
 // complete using the selected choice in the autocomplete popup
@@ -546,7 +583,7 @@ function autocompletePopupSearch(editor, strMode) {
       , intSearchStringEnd = autocompleteGlobals.intSearchEnd
       , strSearch = strScript.substring(intSearchStringStart, intSearchStringEnd)
       , choices, match, i, len, strCurrentMasterSearch, strCurrentMasterValue, strNewValue, strAdded;
-
+    
     if (autocompleteGlobals.popupOpen === true) {
         //console.log(autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset);
         //console.log(autocompleteGlobals.intSearchEnd);
@@ -632,7 +669,6 @@ function autocompletePopupSearch(editor, strMode) {
                     
                     autocompleteGlobals.arrSearch.push(strCurrentMasterSearch);
                     autocompleteGlobals.arrValues.push(strCurrentMasterValue);
-                    
                     strNewValue += '\n';
                     strNewValue += strCurrentMasterValue;
                 }
@@ -671,6 +707,7 @@ function autocompletePopupSearch(editor, strMode) {
                                  document.getElementById('autocomplete-popup-instruction').style.height;
             document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
         }
+        //console.log(strSearch);
     }
     //console.log(document.getElementById('autocomplete-popup-instruction').style.top, popup_instruct_top);
 
@@ -857,6 +894,10 @@ function autocompleteUnbind(editor) {
     }
     
     autocompleteGlobals.bolBound = false;
+    
+    
+    
+    
 }
 
 

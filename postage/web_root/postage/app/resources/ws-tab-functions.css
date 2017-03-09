@@ -33,7 +33,7 @@
 .tab-bar-toolbar > gs-button {
     /*height: 100%;*/
     background-color: #EEEEEE;
-    
+
     border-radius: 20%;
     border: 1px solid #AAAAAA;
     margin-left: 1px;
@@ -83,7 +83,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    
+
     height: 2em;
 }
 
@@ -96,7 +96,7 @@
     height: 2em;
     line-height: 1.8em;
     /*float: left; <- this causes the buttons to wrap, which makes it seem like you have less tabs than you actually do */
-    
+
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
@@ -137,10 +137,10 @@
     border: 0 none;
     margin: 0;
     padding: 0;
-    
+
     background-color: transparent;
     pointer-events: none;
-    
+
     -webkit-appearance: none;
     -moz-appearance: none;
     -webkit-border-radius: inherit;
@@ -253,13 +253,13 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
 
 .frame-indicator {
     position: absolute;
-    
+
     top: 0.2em;
     left: 50%;
     margin-left: -125px;
     width: 250px;
     text-align: center;
-    
+
     z-index: 50;
 }
 
@@ -270,17 +270,11 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     right: 1em;
 }
 
-.ace-toolbar {
-    position: absolute;
-    left: 1px;
-    top: 1px;
-    z-index: 10;
+.ace-toolbar > gs-checkbox {
+	box-shadow: none !important;
 }
-
-/* minimum width on number gutter */
-.tab-frame .ace-container .ace_gutter-layer,
-.home-frame .ace-container .ace_gutter-layer {
-    min-width: 4.2em; /*50px*/
+.ace-toolbar > gs-checkbox > label {
+	display: inline;
 }
 
 /* move "x" annotation so that it's never under the ace-toolbar */
@@ -294,15 +288,14 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
 /* ############ ACE TAB TOGGLE COMMENT BUTTON ############ */
 /* ####################################################### */
 
-.button-toggle-comments {
-    width: 2.35em;
-    height: 2.35em;
-    padding: 0.1em 0em;
-    font-weight: 900;
-}
 .button-toggle-comments span {
-    font-size: 1.3em;
-}
+	font-weight: 900 !important;
+	font-size: 2em;
+	line-height: 0;
+	position: relative;
+	top: 0.1em;
+	overflow: none;
+5
 
 
 /* ###################################################### */
@@ -324,7 +317,7 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     z-index: 90;
     background-color: #AAAAAA;*/
     cursor: ns-resize;
-    
+
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -340,7 +333,7 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     padding: 0 0.25em; /*padding: 0.25em;*/
     /*border-top: 1px solid #CCCCCC;*/
     white-space: pre-wrap;
-    
+
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
@@ -372,7 +365,7 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     border: 3px dashed #000000;
     text-align: center;
     cursor: pointer;
-    
+
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -399,4 +392,3 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     -moz-animation: error-pulsate 1100ms linear infinite;
     animation: error-pulsate 1100ms linear infinite;
 }
-

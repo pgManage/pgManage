@@ -9,6 +9,7 @@ static const char *str_time_format = "%H:%M:%S";
 extern char *_DB_get_diagnostic(DB_conn *conn, PGresult *res);
 
 void ws_raw_step1(struct sock_ev_client_request *client_request) {
+	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->vod_request_data;
 	char *ptr_query = NULL;
 	char *str_response = NULL;
 	client_request->arr_query = NULL;
@@ -18,11 +19,18 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 	size_t int_response_len = 0;
 
 	client_request->arr_response = DArray_create(sizeof(char *), 1);
+	client_raw->bol_autocommit = false;
 
 	ptr_query = client_request->ptr_query + 3;
 	SFINISH_CHECK(*ptr_query != 0, "Invalid RAW request");
-	ptr_query++;
-	SFINISH_CHECK(*ptr_query != 0, "Invalid RAW request");
+	if (strncmp(ptr_query, "\tAUTOCOMMIT\n", 12) == 0) {
+		ptr_query += 12;
+		client_raw->bol_autocommit = true;
+		SINFO("AUTOCOMMIT");
+	} else {
+		ptr_query++;
+		SFINISH_CHECK(*ptr_query != 0, "Invalid RAW request");
+	}
 
 	client_request->arr_query = DArray_sql_split(ptr_query);
 	memset(str_temp, 0, 101);
@@ -97,16 +105,21 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		str_response = NULL;
 		goto finish;
 	}
-	client_request->int_i = -1;
+	client_request->int_i = (client_raw->bol_autocommit  ? 0 : -1);
 	client_request->int_len = (ssize_t)DArray_end(client_request->arr_query);
 
-	SINFO("client_request->parent: %p", client_request->parent);
-	int_status = PQsendQuery(client_request->parent->cnxn, "BEGIN");
+	if (client_raw->bol_autocommit) {
+		char *str_sql = (char *)DArray_get(client_request->arr_query, (size_t)client_request->int_i);
+		int_status = PQsendQuery(client_request->parent->cnxn, str_sql);
+	} else {
+		SINFO("client_request->parent: %p", client_request->parent);
+		int_status = PQsendQuery(client_request->parent->cnxn, "BEGIN");
+	}
 	if (int_status != 1) {
 		SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
 	}
 
-	client_request->int_response_id = -1;
+	client_request->int_response_id = 0;
 
 	query_callback(global_loop, client_request, ws_raw_step2);
 
@@ -143,6 +156,7 @@ finish:
 }
 
 bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_client_request *client_request) {
+	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->vod_request_data;
 	SDEBUG("ws_raw_step2");
 	char *str_response = NULL;
 	char *str_sql = NULL;
@@ -162,7 +176,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 	size_t int_escaped_sql_len = 0;
 	SDEFINE_VAR_ALL(str_escaped_sql, str_sql_temp, str_sql_column_types, str_error);
 
-	if (client_request->int_i >= 0 && client_request->int_i < client_request->int_len) {
+	if ((client_request->int_i >= 0 && client_request->int_i < client_request->int_len) || client_raw->bol_autocommit) {
 		client_request->int_response_id += 1;
 		memset(str_temp, 0, 101);
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
@@ -300,7 +314,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 
 		} else if (result == PGRES_TUPLES_OK) {
 			SDEBUG("PGRES_TUPLES_OK");
-			client_request->res = res;
+			client_raw->res = res;
 			SFINISH_SNCAT(str_sql_column_types, &int_sql_column_types_len,
 				"SELECT ", 7);
 
@@ -438,14 +452,14 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 				SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
 			}
 			query_callback(EV_A, client_request, ws_raw_step2);
-		} else if (client_request->int_i == client_request->int_len) {
+		} else if (client_request->int_i == client_request->int_len && !client_raw->bol_autocommit) {
 			client_request->int_response_id -= 1;
 			int_status = PQsendQuery(client_request->parent->cnxn, "COMMIT");
 			if (int_status != 1) {
 				SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
 			}
 			query_callback(EV_A, client_request, ws_raw_step2);
-		} else if (client_request->int_i > client_request->int_len) {
+		} else if (client_request->int_i > client_request->int_len || (client_request->int_i == client_request->int_len && client_raw->bol_autocommit)) {
 			SFINISH_SNCAT(str_response, &int_response_len,
 				"messageid = ", (size_t)12,
 				client_request->str_message_id, strlen(client_request->str_message_id),
@@ -516,15 +530,23 @@ finish:
 		str_response = NULL;
 
 		client_request->int_i = client_request->int_len + 10;
-		int_status = PQsendQuery(client_request->parent->cnxn, "ROLLBACK");
-		if (int_status != 1) {
-			SERROR_NORESPONSE("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
-			ws_raw_step3(EV_A, NULL, 0, client_request);
-			ev_feed_event(EV_A, &client_request->parent->notify_watcher->io, EV_READ);
-			// we return here on purpose, otherwise we get called again and crash
-			return false;
+		if (client_raw->bol_autocommit && PQtransactionStatus(client_request->parent->cnxn) != PQTRANS_INERROR) {
+			WS_sendFrame(EV_A, client_request->parent, true, 0x01, client_request->str_current_response, strlen(client_request->str_current_response));
+			DArray_push(client_request->arr_response, client_request->str_current_response);
+			client_request->str_current_response = NULL;
+			SDEBUG("client_request->arr_response->end: %d", client_request->arr_response->end);
+			SDEBUG("client_request->arr_response->contents[client_request->arr_response->end - 1]: %s", (char *)client_request->arr_response->contents[client_request->arr_response->end - 1]);
+		} else {
+			int_status = PQsendQuery(client_request->parent->cnxn, "ROLLBACK");
+			if (int_status != 1) {
+				SERROR_NORESPONSE("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
+				ws_raw_step3(EV_A, NULL, 0, client_request);
+				ev_feed_event(EV_A, &client_request->parent->notify_watcher->io, EV_READ);
+				// we return here on purpose, otherwise we get called again and crash
+				return false;
+			}
+			query_callback(EV_A, client_request, ws_raw_step3);
 		}
-		query_callback(EV_A, client_request, ws_raw_step3);
 	} else {
 		SFREE(str_response);
 	}
@@ -556,6 +578,7 @@ bool ws_raw_step3(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 }
 
 bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_client_request *client_request) {
+	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->vod_request_data;
 	if (result != 0) {
 	} // get rid of unused parameter warning
 	SDEBUG("_raw_tuples_callback");
@@ -592,7 +615,7 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 			"\012", (size_t)1);
 	}
 	memset(str_temp, 0, 101);
-	snprintf(str_temp, 100, "%d", PQntuples(client_request->res));
+	snprintf(str_temp, 100, "%d", PQntuples(client_raw->res));
 	SFINISH_SNFCAT(str_response, &int_response_len,
 		"ROWS\t", (size_t)5,
 		str_temp, strlen(str_temp));
@@ -618,11 +641,11 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 	SFINISH_SNFCAT(str_response, &int_response_len,
 		"COLUMNS\012", (size_t)8);
 
-	int int_num_columns = PQnfields(client_request->res);
+	int int_num_columns = PQnfields(client_raw->res);
 	int int_column;
 	for (int_column = 0; int_column < int_num_columns; int_column += 1) {
 		SFINISH_SNFCAT(str_response, &int_response_len,
-			PQfname(client_request->res, int_column), strlen(PQfname(client_request->res, int_column)),
+			PQfname(client_raw->res, int_column), strlen(PQfname(client_raw->res, int_column)),
 			int_column < (int_num_columns - 1) ? "\t" : "\012", (size_t)1);
 	}
 	for (int_column = 0; int_column < int_num_columns; int_column += 1) {
@@ -694,8 +717,9 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 	SDEBUG("_raw_tuples_check_callback");
 	struct sock_ev_client_copy_check *client_copy_check = (struct sock_ev_client_copy_check *)w;
 	struct sock_ev_client_request *client_request = client_copy_check->client_request;
+	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->vod_request_data;
 	struct sock_ev_client *client = client_request->parent;
-	PGresult *res = client_request->res;
+	PGresult *res = client_raw->res;
 
 	char *str_sql_temp = NULL;
 	char *str_sql = NULL;
@@ -848,7 +872,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 					SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
 				}
 				query_callback(EV_A, client_request, ws_raw_step2);
-			} else if (client_request->int_i == client_request->int_len) {
+			} else if (client_request->int_i == client_request->int_len && !client_raw->bol_autocommit) {
 				client_request->int_response_id -= 1;
 				SFREE(str_response);
 				int_status = PQsendQuery(client_request->parent->cnxn, "COMMIT");
@@ -856,7 +880,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 					SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
 				}
 				query_callback(EV_A, client_request, ws_raw_step2);
-			} else if (client_request->int_i > client_request->int_len) {
+			} else if (client_request->int_i > client_request->int_len || (client_request->int_i == client_request->int_len && client_raw->bol_autocommit)) {
 				SFINISH_SNFCAT(str_response, &int_response_len,
 					"TRANSACTION COMPLETED", (size_t)21);
 			}

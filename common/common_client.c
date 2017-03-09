@@ -944,7 +944,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 #ifdef ENVELOPE
 #else
 		} else if (strcmp(str_first_word, "RAW") == 0) {
-			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query, 0, POSTAGE_REQ_RAW);
+			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query, sizeof(struct sock_ev_client_raw), POSTAGE_REQ_RAW);
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 #endif
 #ifdef ENVELOPE
@@ -1006,9 +1006,12 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 						if (el != NULL) {
 							bool bol_last_confirm = false;
 							char *ptr_message = (char *)el;
+							SDEBUG("ptr_message: %s", ptr_message);
 							ptr_message = strstr(ptr_message, "\012responsenumber");
+							SDEBUG("ptr_message: %s", ptr_message);
 							if (ptr_message != NULL) {
 								ptr_message = strstr(ptr_message + 1, "\012") + 1;
+								SDEBUG("ptr_message: %s", ptr_message);
 
 								bol_last_confirm =
 									((strncmp(ptr_message, "TRANSACTION COMPLETED", 12) == 0) ||
@@ -1143,6 +1146,7 @@ void client_send_from_cb(EV_P, ev_check *w, int revents) {
 				ev_io_start(EV_A, (ev_io *)client->client_paused_request->watcher);
 			}
 			ev_feed_event(EV_A, client->client_paused_request->watcher, client->client_paused_request->revents);
+			SINFO("client->client_paused_request->bol_is_db_framework: %s", client->client_paused_request->bol_is_db_framework ? "true" : "false");
 			if (client->client_paused_request->bol_is_db_framework) {
 				increment_idle(EV_A);
 			}
@@ -1238,9 +1242,8 @@ void client_request_queue_cb(EV_P, ev_check *w, int revents) {
 	SDEFINE_VAR_ALL(str_sql);
 
 	if (int_len > 0) {
-		// SDEBUG("Queue_count(client->que_request): %d", int_len);
-		// SDEBUG("client->bol_request_in_progress: %s",
-		// client->bol_request_in_progress ? "true" : "false");
+		// SDEBUG("Queue_count(%p->que_request): %d", client, int_len);
+		// SDEBUG("%p->bol_request_in_progress: %s", client, client->bol_request_in_progress ? "true" : "false");
 	}
 	if (client->bol_request_in_progress == false && int_len > 0) {
 		struct sock_ev_client_request *client_request = (struct sock_ev_client_request *)Queue_recv(client->que_request);

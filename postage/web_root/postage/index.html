@@ -19,6 +19,7 @@ var bolTutorial = false;
 var ajxCurrent;
 
 function appendError(data) {
+    "use strict";
     var errorContainer = document.getElementById('container-error');
 
     data = data.original_response.substring(data.original_response.indexOf('\n') + 1);
@@ -26,7 +27,6 @@ function appendError(data) {
     if (errorContainer.textContent) {
         errorContainer.appendChild(document.createElement('br'));
     }
-
     errorContainer.appendChild(document.createTextNode(data));
 }
 
@@ -226,6 +226,8 @@ window.addEventListener('load', function () {
         }
     });
 
+	// fixes bug where the string `null` would be sent as the password the first time you click login if you haven't entered a password
+	document.getElementById('text-password').value = '';
     // bind keydown for the "text-password" field
     document.getElementById('text-password').addEventListener('keydown', function (event) {
         if (event.keyCode === 13 && document.getElementById('text-username').value) {

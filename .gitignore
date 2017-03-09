@@ -1,5 +1,11 @@
 *.o
 
+/visualstudio/.vs
+/visualstudio/Release
+/visualstudio/Debug
+/visualstudio/*/Release
+/visualstudio/*/Debug
+
 /envelope/envelope
 /envelope/data_test
 /envelope/Makefile

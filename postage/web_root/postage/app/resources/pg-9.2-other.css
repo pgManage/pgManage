@@ -245,7 +245,7 @@ gs-button.button-save-as {
     left: 0.05em !important;
 }
 
-gs-button.button-save-as .save-as-floppy {
+/*gs-button.button-save-as .save-as-floppy {
     font-family: fontawesome;
     display: inline-block;
 	top: 0.65em;
@@ -277,6 +277,40 @@ gs-button.button-save-as .save-as-pencil {
     text-indent: 0;
     line-height: 1.25;
     font-size: 1.4em;
+}*/
+
+.ace-toolbar gs-button.button-save-as {
+    text-indent: 0;
+    line-height: 1em;
+    padding: 0.05em;
+	padding-right: 0.65em;
+    text-align: left;
+}
+
+.ace-toolbar gs-button.button-save-as .save-as-floppy {
+	font-size: 1.4em;
+    line-height: 1.55em;
+	margin-left: 0.3em;
+	margin-right: 0.3em;
+	font-family: fontawesome;
+}
+
+.ace-toolbar gs-button.button-save-as .save-as-floppy:after {
+    position: absolute;
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    text-align: center;
+    font-size: 1em;
+    font-weight: 900;
+    line-height: 1em;
+	left: 0.6em;
+	top: 0.65em;
+	font-family: fontawesome;
+}
+
+.ace-toolbar gs-button.button-save-as .save-as-floppy[icon="pencil"]:after {
+	content: '\f040';
 }
 
 
@@ -287,26 +321,36 @@ gs-button.button-save-as .save-as-pencil {
 .ace-toolbar gs-button.button-explain {
     text-indent: 0;
     line-height: 1em;
-    padding: 0;
+    padding: 0.05em;
+	padding-right: 0.65em;
     text-align: left;
 }
 
 .ace-toolbar gs-button.button-explain .explain-letter {
     font-size: 2em;
     line-height: 1.1em;
+	margin-right: 0.5em;
 }
 
-.ace-toolbar gs-button.button-explain:after {
+.ace-toolbar gs-button.button-explain .explain-letter:after {
     position: absolute;
     display: inline-block;
     height: 1em;
     width: 1em;
     text-align: center;
-    font-size: 0.8em;
+    font-size: 0.5em;
     font-weight: 900;
     line-height: 1em;
-    left: 80%;
-    top: 85%;
+    left: 1.25em;
+    top: 1.125em;
+	font-family: fontawesome;
+}
+
+.ace-toolbar gs-button.button-explain .explain-letter[icon="play-circle-o"]:after {
+	content: '\f01d';
+}
+.ace-toolbar gs-button.button-explain .explain-letter[icon="play"]:after {
+	content: '\f04b';
 }
 
 
@@ -315,11 +359,18 @@ gs-button.button-save-as .save-as-pencil {
 /* ##################################################### */
 
 .ace-toolbar gs-button.button-ace-info {
-    position: relative;
-    line-height: 1em;
     text-indent: 0;
+    line-height: 1em;
     padding: 0;
-    overflow: hidden;
+	padding-right: 0.65em;
+    text-align: left;
+}
+.ace-toolbar gs-button.button-ace-info .ace-icon-container {
+    display: inline-block;
+	position: relative;
+	left: 0.5em;
+	width: 2.38em;
+	height: 1.568em;
 }
 
 .ace-toolbar gs-button.button-ace-info .ace-suit {
@@ -338,7 +389,7 @@ gs-button.button-save-as .save-as-pencil {
     position: absolute;
     height: 100%;
     width: 100%;
-    left: 0;
+    left: 0.55em;
     top: 0;
     font-size: 1em;
     line-height: 2em;

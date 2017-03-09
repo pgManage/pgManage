@@ -72,7 +72,7 @@ var treeStructure = [
             [3, 'script', 'objectSequence'],
         [2, 'folder,refresh', 'objectTableList'],
             [3, 'folder,script', 'objectTable'],
-                [4, '', ''], //'script', 'objectTable'
+                [4, 'script', 'objectColumn'], //'script', 'objectTable'
         [2, 'folder,refresh', 'objectTriggerFunction'],
             [3, 'script', 'objectFunction'],
         [2, 'folder,refresh', 'objectType'],
@@ -82,7 +82,6 @@ var treeStructure = [
             [3, 'folder,script', 'objectView'],
                 [4, '', ''], //'script', 'objectView'
 ];
-
 
 
 
@@ -787,7 +786,7 @@ scriptQuery.objectTrigger = ml(function () {/*
 
 
 
-associatedButtons.objectFunction = ['propertyButton', 'dependButton', 'statButton'];
+associatedButtons.objectFunction = ['propertyButton', 'dependButton'];
 scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () {/*
     -- DROP statement
     SELECT (SELECT  '-- DROP FUNCTION ' || quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_arguments(pg_proc.oid), '') || ')' || E';\n\n'
@@ -896,10 +895,10 @@ scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () 
     */});
 
 
-associatedButtons.objectIndex = ['propertyButton', 'dependButton', 'statButton'];
+associatedButtons.objectIndex = ['propertyButton', 'dependButton'];
 scriptQuery.objectIndex = ml(function () {/*
-    SELECT '-- Index: ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname)) || E';\n\n' ||
-           '-- DROP INDEX ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname)) || E';\n\n' ||
+    SELECT '-- Index: ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_index_class.relname)) || E';\n\n' ||
+           '-- DROP INDEX ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_index_class.relname)) || E';\n\n' ||
            CASE WHEN pg_index.indisvalid THEN '' ELSE E'-- INVALID INDEX. Postgres ignores this index when you query the index''s target, but it still adds overhead to updates.\n' END || pg_get_indexdef(pg_index.indexrelid) || E';\n'
     FROM pg_catalog.pg_class
     LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -1359,7 +1358,35 @@ scriptQuery.objectSequence = ml(function () {/*
         WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRNAME}}')),'');
     */});
 
-
+associatedButtons.objectColumn = ['dependButton', 'statButton'];
+scriptQuery.objectColumn = ml(function () {/*
+SELECT '-- Column: ' || attname || E';\n\n' ||
+    COALESCE((SELECT COALESCE('-- Null Fraction: ' || null_frac || E';\n', E'-- No null fraction found\n') || 
+        COALESCE('-- Average Width: ' || avg_width || E';\n', E'-- No average width found\n') || 
+        COALESCE('-- Distinct Values: ' || n_distinct::text || E';\n', E'-- No distinct values found\n') || 
+        COALESCE('-- Most Common Values:' || most_common_vals::text || E';\n', E'-- No common values found\n') || 
+        COALESCE('-- Most Common Frequencies: ' || most_common_freqs::text || E';\n', E'-- No common frequencies found\n') || 
+        COALESCE('-- Histogram Bounds: ' || histogram_bounds::text || E';\n', E'-- No histogram bounds found\n') || 
+        COALESCE('-- Correlation: ' || correlation::text || E';\n\n', E'-- No correlation found\n')
+            FROM pg_stats
+            LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.schemaname = pg_stats.schemaname AND pg_stat_user_tables.relname = pg_stats.tablename
+            WHERE pg_stat_user_tables.relid = {{INTOID}}
+            AND attname = '{{STRNAME}}'
+            ORDER BY relid DESC
+            LIMIT 1), E'-- No statistics found\n\n') ||
+    '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' DROP COLUMN IF EXISTS ' || attname || E';\n' ||
+    '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' ADD COLUMN IF NOT EXISTS ' || attname || ' ' || (
+        SELECT COALESCE(format_type(atttypid, atttypmod),'') FROM pg_catalog.pg_attribute
+            WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = {{INTOID}} AND attname = '{{STRNAME}}'
+            ORDER BY attnum ASC
+            LIMIT 1) || E';\n'||
+    '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' ALTER COLUMN ' || attname || E' SET DATA TYPE <data_type>;\n'
+        FROM pg_attribute
+        LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = attrelid
+        WHERE attrelid = {{INTOID}} AND attname = '{{STRNAME}}'
+    */});
+    
+    
 associatedButtons.objectTable = ['propertyButton', 'dependButton', 'statButton', 'dataObjectButtons'];
 scriptQuery.objectTable = ml(function () {/*
            
@@ -2885,6 +2912,34 @@ statQuery.one_database = ml(function () {/*
  LEFT JOIN pg_stat_database_conflicts ON pg_stat_database.datid = pg_stat_database_conflicts.datid
      WHERE pg_stat_database.datname = CURRENT_DATABASE();
 */});
+
+
+//change in pg-9.2-tree-functions.js
+
+statQuery.objectColumn = ml(function () {/*
+SELECT 1 AS sort,
+    'Null Fraction',
+    'Average Width',
+    'Distinct Values',
+    'Most Common Values',
+    'Most Common Frequencies',
+    'Histogram Bounds',
+    'Correlation'
+UNION ALL
+    SELECT 2 AS sort,
+        null_frac::text,
+        avg_width::text,
+        n_distinct::text,
+        most_common_vals::text,
+        most_common_freqs::text,
+        histogram_bounds::text,
+        correlation::text
+    FROM pg_stats
+    LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.schemaname = pg_stats.schemaname AND pg_stat_user_tables.relname = pg_stats.tablename
+    WHERE pg_stat_user_tables.relid = {{INTOID}}
+    AND attname = '{{STRNAME}}'
+    ORDER BY sort ASC;
+    */});
 
 statQuery.objectTable = ml(function () {/*
  SELECT 1 AS sort,

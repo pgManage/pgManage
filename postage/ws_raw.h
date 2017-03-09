@@ -8,11 +8,15 @@
 #include "postage_callback.h"
 #include "util/util_sql_split.h"
 
+struct sock_ev_client_raw {
+	bool bol_autocommit;
+	PGresult *res;
+};
+
 /*
 ********************************** REQUEST FORMAT
 ************************************
-RAW
-
+RAW[\tAUTOCOMMIT]\n
 <sql>
 */
 
@@ -20,7 +24,7 @@ RAW
 This function will:
 1. parse request into variables
 2. split raw into several queries
-3. send begin query
+3. send begin (or first query if autocommit) query
 */
 void ws_raw_step1(struct sock_ev_client_request *client_request);
 
