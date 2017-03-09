@@ -195,7 +195,7 @@ function treeStart() {
                 jsnSelection = treeGlobals.ace.getSelectionRange();
                 intSelectionRow = jsnSelection.start.row;
                 jsnData = treeGlobals.data[intSelectionRow];
-
+                console.log(jsnData);
                 if (jsnData) {
                     // tables
                     if (jsnData.query === 'objectTable') {
@@ -221,13 +221,14 @@ function treeStart() {
                     // columns
                     if (jsnData.query === 'objectColumn') {
                         // substring column type off of column name
-                        subStrEnd = strName.lastIndexOf(' (');
-                        strName = strName.substring(0, subStrEnd);
+                        if (strName.indexOf('(') !== -1) {
+                            subStrEnd = strName.lastIndexOf(' (');
+                            strName = strName.substring(0, subStrEnd);
+                        }
 
                         // go up a record until you find a table/view
                         for (intI = intSelectionRow; intI >= 0; intI -= 1) {
                             if (treeGlobals.data[intI].query === 'objectTable') {
-                                console.log(treeGlobals.data[intI]);
                                 strNameOpt = treeGlobals.data[intI].name + '.' + strName.substring(0, subStrEnd);
                                 //set intI to  0 to cancel the loop
                                 intI = 0;

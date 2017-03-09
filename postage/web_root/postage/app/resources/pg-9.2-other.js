@@ -1605,7 +1605,7 @@ function dialogAbout() {
             <gs-header><center><h3>About Postage Version: {{POSTAGE}}</h3></center></gs-header>
             <gs-body padded>
 
-                Postage is a web-based PostgreSQL database developement and administration tool.<br />
+                Postage is a web-based PostgreSQL database development and administration tool.<br />
                 Postage utilizes these technologies:<br />
                 <ul>
                     <li>doT.js Version 1.0.3 (<a href="http://olado.github.io/doT/" target="_blank">Link</a>)</li>

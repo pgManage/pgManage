@@ -571,11 +571,18 @@ titleRefreshQuery.objectViewList = titleRefreshQuery.viewNumber = ml(function ()
 
 
 listQuery.objectColumnList = ml(function () {/*
-SELECT {{INTOID}}, quote_ident(attname) AS name, schemaname AS schema_name, 'CL' AS bullet
-        FROM pg_attribute
-        LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = attrelid
-        WHERE attrelid = {{INTOID}} AND attname NOT LIKE '...%' AND attname NOT LIKE 'cmin' AND attname NOT LIKE 'cmax' AND attname NOT LIKE 'xmin' AND attname NOT LIKE 'xmax' AND attname NOT LIKE 'ctid' AND attname NOT LIKE 'tableoid'
-        ORDER BY attnum;
+--SELECT {{INTOID}}, quote_ident(attname) AS name, schemaname AS schema_name, 'CL' AS bullet
+--        FROM pg_attribute
+--        LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = attrelid
+--        WHERE attrelid = {{INTOID}} AND attname NOT LIKE '...%' AND attname NOT LIKE 'cmin' AND attname NOT LIKE 'cmax' AND attname NOT LIKE 'xmin' AND attname NOT LIKE 'xmax' AND attname NOT LIKE 'ctid' AND attname NOT LIKE 'tableoid'
+--        ORDER BY attnum;
+        
+        
+SELECT {{INTOID}} AS oid, COALESCE(attname,'') || ' (' || COALESCE(format_type(atttypid, atttypmod),'') || ')', '{{SCHEMA}}' AS schema_name, 'CL' AS bullet
+       FROM pg_catalog.pg_attribute
+      WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0
+       AND attrelid = {{INTOID}}
+   ORDER BY attnum ASC;
 */});
 
 listQuery.objectTriggerList = ml(function () {/*
