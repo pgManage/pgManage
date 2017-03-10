@@ -2056,7 +2056,7 @@ function beautifySQL() {
     var editor = document.getElementsByClassName('current-tab')[0].relatedEditor;
     var jsnCurrentQuery = getCurrentQuery();
     var strFormattedSQL = formatSql.formatQuery(jsnCurrentQuery.strQuery);
-    
+
     if (jsnCurrentQuery.strQuery === editor.getValue()) {
         editor.setValue(strFormattedSQL);
     } else {

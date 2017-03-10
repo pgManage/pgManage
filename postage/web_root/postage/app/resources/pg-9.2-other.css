@@ -232,7 +232,7 @@ table.table-dep th {
 /* ################### SAVE AS BUTTON ################## */
 /* ##################################################### */
 
-gs-button.button-save-as {
+#button-tab-current-save-as {
     position: relative;
     line-height: 1em;
     text-indent: 0;
@@ -240,12 +240,7 @@ gs-button.button-save-as {
     overflow: hidden;
 }
 
-#button-tab-current-save-as:after {
-    top: 0.65em !important;
-    left: 0.05em !important;
-}
-
-/*gs-button.button-save-as .save-as-floppy {
+#button-tab-current-save-as .save-as-floppy {
     font-family: fontawesome;
     display: inline-block;
 	top: 0.65em;
@@ -262,13 +257,13 @@ gs-button.button-save-as {
     font-size: 1.4em;
 }
 
-gs-button.button-save-as .save-as-pencil {
+#button-tab-current-save-as .save-as-pencil {
     font-family: fontawesome;
     display: inline-block;
 	top: 1em;
 	left: 1em;
-	margin-top: -0.57em;
-	margin-left: -0.56em;
+	margin-top: -0.37em;
+	margin-left: -0.35em;
 	position: absolute;
     display: block;
     width: 1.12em;
@@ -277,14 +272,13 @@ gs-button.button-save-as .save-as-pencil {
     text-indent: 0;
     line-height: 1.25;
     font-size: 1.4em;
-}*/
+}
 
 .ace-toolbar gs-button.button-save-as {
     text-indent: 0;
     line-height: 1em;
     padding: 0.05em;
 	padding-right: 0.65em;
-    text-align: left;
 }
 
 .ace-toolbar gs-button.button-save-as .save-as-floppy {
