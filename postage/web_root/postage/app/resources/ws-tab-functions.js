@@ -750,7 +750,23 @@ function jsnIsEmpty(jsn) {
 
     return true;
 }
+var bolControlPressed = false;
+document.addEventListener('keydown', function (event) {
+    if (bolControlPressed && event.keyCode === 79) {
+    event.preventDefault();
+    event.stopPropagation();
+        newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'});
+    }
+    if (event.keyCode === 17) {
+        bolControlPressed = true;
+    }
+});
 
+document.addEventListener('keyup', function (event) {
+    if (event.keyCode === 17) {
+        bolControlPressed = false;
+    }
+});
 
 var afterDeleteSelectionDirections = [];
 function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFilePath, bolAutoSelect) {
@@ -1102,7 +1118,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 				'<div class="ace-toolbar" style="background-color: #cccccc; width: 100%; padding-top: 1px; padding-bottom: 2px;" id="sql-ace-toolbar-' + intTabNumber + '">' +
 					'<gs-button inline remove-all icon="play" onclick="executeScript()" ' +
 								'title="Execute Script [F5]" remove-bottom no-focus>Run</gs-button>' +
-					'<gs-checkbox inline style="border-radius: 0; border: 1px solid #ccc; padding-bottom: 0px;" id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"><label>Autocommit</label></gs-checkbox>' +
+					'<gs-checkbox inline style="border-radius: 0; border: 1px solid #ccc; height: 2.35em" id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"><label>Autocommit</label></gs-checkbox>' +
 					'<gs-button inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
 								'title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span> Toggle Comment</gs-button>' +
 					'<gs-button inline remove-all icon="indent" onclick="indentScript()" ' +
@@ -1127,9 +1143,16 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 								'remove-top no-focus>' +
 						'<span class="explain-letter" icon="play">E</span> Explain Analyze' +
 					'</gs-button>' +
+					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(false, true)" ' +
+								'title="Query explanation. Text format. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span> Explain (Text)</gs-button>' +
+					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(true, true)" ' +
+								'title="Query explanation. Text format. Note that the query will run, meaning that you\'ll get run times." ' +
+								'remove-top no-focus>' +
+						'<span class="explain-letter" icon="play">E</span> Explain Analyze (Text)' +
+					'</gs-button>' +
 					'<gs-button inline remove-all class="button-csv" icon="file-text" onclick="exportCSV()" ' +
 								'title="Download a single query\'s results as a file" remove-all no-focus>Export</gs-button>' +
-					'<gs-button inline remove-all class="button-ace-info" onclick="dialogAceInfo()" ' +
+					'<gs-button inline style="height: 2.35em" remove-all class="button-ace-info" onclick="dialogAceInfo()" ' +
 								'title="Information and tips about the Editor" remove-all no-focus>' +
 							'<span class="ace-icon-container">' +
 								'<span class="ace-suit">&#9824;</span>' + //&#9830;
@@ -1137,6 +1160,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 							'</span>' +
 						'<span>Ace Tips</span>' +
 					'</gs-button>' +
+					'<gs-button inline remove-all icon="black-tie" onclick="beautifySQL()" ' + 'title="Beautify the Current SQL" no-focus>Beautify</gs-button>' +
 					'<gs-button inline remove-all icon="external-link" onclick="openInNewWindow()" ' +
 								'title="Open this tab in a new window" remove-all no-focus>New Window</gs-button>' +
 					'<gs-button hidden id="sql-property-' + intTabNumber + '-button" icononly ' +
@@ -2025,6 +2049,19 @@ function indexToRowAndColumn(strText, intIndex) {
     //console.log(intIndex, intRows, intColumns);
 
     return {'row': intRows, 'column': intColumns};
+}
+
+function beautifySQL() {
+    'use strict';
+    var editor = document.getElementsByClassName('current-tab')[0].relatedEditor;
+    var jsnCurrentQuery = getCurrentQuery();
+    var strFormattedSQL = formatSql.formatQuery(jsnCurrentQuery.strQuery);
+    
+    if (jsnCurrentQuery.strQuery === editor.getValue()) {
+        editor.setValue(strFormattedSQL);
+    } else {
+        editor.insert(strFormattedSQL);
+    }
 }
 
 function indentScript() {
