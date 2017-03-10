@@ -752,7 +752,7 @@ function jsnIsEmpty(jsn) {
 }
 var bolControlPressed = false;
 document.addEventListener('keydown', function (event) {
-    if (bolControlPressed && event.keyCode === 83) {
+    if (bolControlPressed && event.keyCode === 79) {
     event.preventDefault();
     event.stopPropagation();
         newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'});
@@ -1118,7 +1118,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 				'<div class="ace-toolbar" style="background-color: #cccccc; width: 100%; padding-top: 1px; padding-bottom: 2px;" id="sql-ace-toolbar-' + intTabNumber + '">' +
 					'<gs-button inline remove-all icon="play" onclick="executeScript()" ' +
 								'title="Execute Script [F5]" remove-bottom no-focus>Run</gs-button>' +
-					'<gs-checkbox inline style="border-radius: 0; border: 1px solid #ccc; padding-bottom: 0px;" id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"><label>Autocommit</label></gs-checkbox>' +
+					'<gs-checkbox inline style="border-radius: 0; border: 1px solid #ccc; height: 2.35em" id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"><label>Autocommit</label></gs-checkbox>' +
 					'<gs-button inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
 								'title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span> Toggle Comment</gs-button>' +
 					'<gs-button inline remove-all icon="indent" onclick="indentScript()" ' +
@@ -1152,7 +1152,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 					'</gs-button>' +
 					'<gs-button inline remove-all class="button-csv" icon="file-text" onclick="exportCSV()" ' +
 								'title="Download a single query\'s results as a file" remove-all no-focus>Export</gs-button>' +
-					'<gs-button inline remove-all class="button-ace-info" onclick="dialogAceInfo()" ' +
+					'<gs-button inline style="height: 2.35em" remove-all class="button-ace-info" onclick="dialogAceInfo()" ' +
 								'title="Information and tips about the Editor" remove-all no-focus>' +
 							'<span class="ace-icon-container">' +
 								'<span class="ace-suit">&#9824;</span>' + //&#9830;
