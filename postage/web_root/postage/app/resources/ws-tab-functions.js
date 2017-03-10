@@ -750,7 +750,23 @@ function jsnIsEmpty(jsn) {
 
     return true;
 }
+var bolControlPressed = false;
+document.addEventListener('keydown', function (event) {
+    if (bolControlPressed && event.keyCode === 83) {
+    event.preventDefault();
+    event.stopPropagation();
+        newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'});
+    }
+    if (event.keyCode === 17) {
+        bolControlPressed = true;
+    }
+});
 
+document.addEventListener('keyup', function (event) {
+    if (event.keyCode === 17) {
+        bolControlPressed = false;
+    }
+});
 
 var afterDeleteSelectionDirections = [];
 function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFilePath, bolAutoSelect) {
