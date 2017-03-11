@@ -5,13 +5,13 @@
 		"mac": {
 			"category": "public.app-category.developer-tools"
 		},
-    "win": {
-      "target": "nsis"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    },
+		"win": {
+			"target": "nsis"
+		},
+		"nsis": {
+			"oneClick": false,
+			"allowToChangeInstallationDirectory": true
+		},
 		"linux": {
 			"category": "Development",
 			"target": [
