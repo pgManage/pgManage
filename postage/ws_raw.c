@@ -103,9 +103,10 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
+		SINFO("TRANSACTION COMPLETED");
 		goto finish;
 	}
-	client_request->int_i = (client_raw->bol_autocommit  ? 0 : -1);
+	client_request->int_i = (client_raw->bol_autocommit ? 0 : -1);
 	client_request->int_len = (ssize_t)DArray_end(client_request->arr_query);
 
 	if (client_raw->bol_autocommit) {
@@ -119,7 +120,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
 	}
 
-	client_request->int_response_id = 0;
+	client_request->int_response_id = (client_raw->bol_autocommit ? 0 : -1);
 
 	query_callback(global_loop, client_request, ws_raw_step2);
 
@@ -477,6 +478,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
+			SINFO("TRANSACTION COMPLETED");
 			// client_request_free(client_request);
 		}
 	} else {
@@ -883,6 +885,10 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 			} else if (client_request->int_i > client_request->int_len || (client_request->int_i == client_request->int_len && client_raw->bol_autocommit)) {
 				SFINISH_SNFCAT(str_response, &int_response_len,
 					"TRANSACTION COMPLETED", (size_t)21);
+				WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len);
+				DArray_push(client_request->arr_response, str_response);
+				str_response = NULL;
+				SINFO("TRANSACTION COMPLETED");
 			}
 
 			ev_check_stop(EV_A, &client_copy_check->check);
