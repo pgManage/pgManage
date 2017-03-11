@@ -20,8 +20,11 @@ var autocompleteLoaded = true
       , 'arrCancelledIds': []
       , 'bolSnippets':     false
       , 'bolBound':        false
+      , 'searchString':    ''
     };
 var strSearchFixed;
+var curr_run_up = 0;
+var curr_run_down = 0;
 function autocompleteStart() { 'use strict'; }
 
 // this is called on every code tab's editor
@@ -146,7 +149,6 @@ function autocompleteBindEditor(tabElement, editor) {
                             } else {
                                 autocompleteChangeHandler(tabElement, editor, event);
                             }
-                            
                             
                             
                         } catch (e) {
@@ -548,7 +550,41 @@ function autocompleteComplete(editor) {
             } else {
                 
                 //insertToMultipleCursors(editor, editor.currentSelections, autocompleteGlobals.arrValues[intFocusedLine]);
-                editor.insert(autocompleteGlobals.arrValues[intFocusedLine]);
+                //editor.insert(autocompleteGlobals.arrValues[intFocusedLine]);
+                
+                autocompleteBind(editor);
+                var insertObj = {};
+                var insertText;
+                var oldSelectionRanges = editor.currentSelections;
+                editor.clearSelection();
+                //console.log(editor.currentSelections.length);
+                for (var i = 0, len = editor.currentSelections.length; i < len; i += 1) {
+                    if (autocompleteGlobals.searchString[0] === '"') {
+                        autocompleteGlobals.searchString = autocompleteGlobals.searchString.substring(1, autocompleteGlobals.searchString.length);
+                    }
+                    insertText = autocompleteGlobals.arrValues[intFocusedLine].trim().substring(autocompleteGlobals.searchString.length, autocompleteGlobals.arrValues[intFocusedLine].trim().length);
+                    insertObj = {
+                        row: editor.currentSelections[i].start.row,
+                        column: editor.currentSelections[i].start.column
+                    };
+                    
+                    editor.moveCursorToPosition(insertObj);
+                    
+                    editor.env.document.insert(insertObj, insertText);
+                }
+                
+                
+                //editor.currentSelections = oldSelectionRanges;
+                
+                // editor.currentSelections.length > 1
+                // console.log(editor.currentSelections.length);
+                // if (editor.currentSelections.length > 1) {
+                //     editor.forEachSelection({exec: function() {
+                //         editor.insert('testing');
+                //     }})
+                // } else {
+                //     editor.insert('testing');
+                // }
                 
                 
             }
@@ -708,6 +744,7 @@ function autocompletePopupSearch(editor, strMode) {
             document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
         }
         //console.log(strSearch);
+        autocompleteGlobals.searchString = strSearch;
     }
     //console.log(document.getElementById('autocomplete-popup-instruction').style.top, popup_instruct_top);
 
@@ -782,11 +819,26 @@ function autocompleteBind(editor) {
         editor.commands.commands.golinedown.exec = function () {
             var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
               , intLastLine = autocompleteGlobals.arrValues.length - 1;
-    
-            if (intCurrentLine !== intLastLine) {
-                autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine + 1), 0, (intCurrentLine + 1), 0));
+            if (editor.currentSelections.length > 1) {
+                if (curr_run_down > 0) {
+                    curr_run_down += 1;
+                } else {
+                    if (intCurrentLine !== intLastLine) {
+                        autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine + 1), 0, (intCurrentLine + 1), 0));
+                    } else {
+                        autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
+                    }
+                    curr_run_down = 1;
+                }
+                if (curr_run_down === editor.currentSelections.length) {
+                    curr_run_down = 0;
+                }
             } else {
-                autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
+                if (intCurrentLine !== intLastLine) {
+                    autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine + 1), 0, (intCurrentLine + 1), 0));
+                } else {
+                    autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
+                }
             }
     
             autocompleteGlobals.popupAce.scrollToLine(autocompleteGlobals.popupAce.getSelectionRange().start.row);
@@ -794,11 +846,27 @@ function autocompleteBind(editor) {
         editor.commands.commands.golineup.exec = function () {
             var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
               , intLastLine = autocompleteGlobals.arrValues.length - 1;
-    
-            if (intCurrentLine !== 0) {
-                autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine - 1), 0, (intCurrentLine - 1), 0));
+            if (editor.currentSelections.length > 1) {
+                if (curr_run_up > 0) {
+                    curr_run_up += 1;
+                } else {
+                    if (intCurrentLine !== 0) {
+                        autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine - 1), 0, (intCurrentLine - 1), 0));
+                    } else {
+                        autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(intLastLine, 0, intLastLine, 0));
+                    }
+                    curr_run_up = 1;
+                }
+                if (curr_run_up === editor.currentSelections.length) {
+                    curr_run_up = 0;
+                }
             } else {
-                autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(intLastLine, 0, intLastLine, 0));
+            //console.log(intCurrentLine);
+                if (intCurrentLine !== 0) {
+                    autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine - 1), 0, (intCurrentLine - 1), 0));
+                } else {
+                    autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(intLastLine, 0, intLastLine, 0));
+                }
             }
     
             autocompleteGlobals.popupAce.scrollToLine(autocompleteGlobals.popupAce.getSelectionRange().start.row);
