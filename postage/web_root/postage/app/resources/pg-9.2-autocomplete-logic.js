@@ -113,10 +113,6 @@ ALTER --<schemas>
 */
 
 
-
-
-
-
 // this function opens the autocomplete popup if it's time
 function autocompleteChangeHandler(tabElement, editor, event) {
     'use strict';
@@ -132,7 +128,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
       , bolPreviousCharReturn, bolCurrentCharReturn, bolFirstSpace
       , intOpenParen, intCloseParen, intVersion = parseFloat(contextData.minorVersionNumber, 10);
     // if the popup isn't already open or it's open but it's asleep
-    console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
+    //console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.popupAsleep);
     if (event.action === 'remove') {
         if (autocompleteGlobals.popupOpen === true) {
             autocompletePopupClose(editor);

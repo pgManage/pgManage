@@ -68,6 +68,27 @@ evt.mouseout  = evt.touchDevice ? 'touchleave': 'mouseout';
 evt.mouseup   = evt.touchDevice ? 'touchend'  : 'mouseup';
 evt.click     = 'click';
 
+// ##############################################################
+// ########### PINK BACKGROUND WHEN NOT IN PRODUCTION ###########
+// ##############################################################
+/*
+//DO NOT UNCOMMENT
+//To use:
+//Add this javascript to the test.sh file
+//Append to greyspots.js after the rsync of the web_root files
+window.addEventListener('load', function () {
+    var styleElement, helperElement, helperFunction;
+    
+    styleElement = document.createElement('style');
+    styleElement.innerHTML = 'body, body gs-panel, body gs-panel gs-header, body gs-panel gs-body, ' +
+                             'body gs-page, body gs-page gs-header, body gs-page gs-body {\n' +
+                             '    background-color: #FFBBBB;\n' +
+                             '}';
+    
+    document.head.appendChild(styleElement);
+});
+*/
+
 // #############################################################
 // #################### DEFINE GS NAMESPACE ####################
 // #############################################################
