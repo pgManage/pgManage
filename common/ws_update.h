@@ -16,7 +16,9 @@ struct sock_ev_client_update {
 	char *str_insert_parameter_markers;
 #endif
 	char *str_pk_join_clause;
+	char *str_pk_return_join_clause;
 	char *str_pk_where_clause;
+	char *str_pk_return_where_clause;
 	char *str_hash_where_clause;
 	char *str_temp_col_list;
 	char *str_set_col_list;
@@ -52,7 +54,9 @@ struct sock_ev_client_update {
 	size_t int_insert_column_names_len;
 	size_t int_insert_parameter_markers_len;
 	size_t int_pk_join_clause_len;
+	size_t int_pk_return_join_clause_len;
 	size_t int_pk_where_clause_len;
+	size_t int_pk_return_where_clause_len;
 	size_t int_hash_where_clause_len;
 	size_t int_set_col_list_len;
 	size_t int_return_columns_len;

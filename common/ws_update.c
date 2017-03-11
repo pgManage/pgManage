@@ -233,14 +233,36 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 					client_update->str_real_table_name, client_update->int_real_table_name_len,
 					".", (size_t)1,
 					str_col_name, int_col_name_len);
-
-				if (client_update->str_identity_column_name == NULL) {
-					SFINISH_SNCAT(client_update->str_identity_column_name, &int_identity_column_name_len,
-						str_col_name, int_col_name_len);
-				}
+			}
+			if (client_update->str_identity_column_name == NULL) {
+				SFINISH_SNCAT(client_update->str_identity_column_name, &int_identity_column_name_len,
+					str_col_name, int_col_name_len);
 			}
 			int_x++;
 		} else if (strncmp(str_pk_header, "set", 3) == 0) {
+			if (client_update->str_identity_column_name != NULL && int_col_name_len == int_identity_column_name_len &&
+				strncmp(client_update->str_identity_column_name, str_col_name, int_identity_column_name_len) == 0) {
+				SFINISH_SNFCAT(client_update->str_pk_return_join_clause, &client_update->int_pk_return_join_clause_len,
+					client_update->str_temp_table_name, client_update->int_temp_table_name_len,
+					".", (size_t)1,
+					str_temp, strlen(str_temp),
+					" IS NOT DISTINCT FROM ", (size_t)22,
+					client_update->str_real_table_name, client_update->int_real_table_name_len,
+					".", (size_t)1,
+					str_col_name, int_col_name_len);
+				SFINISH_SNFCAT(client_update->str_pk_return_where_clause, &client_update->int_pk_return_where_clause_len,
+					client_update->str_real_table_name, client_update->int_real_table_name_len,
+					".", (size_t)1,
+					str_col_name, int_col_name_len,
+					" = ANY(array(SELECT ", (size_t)20,
+					client_update->str_temp_table_name, client_update->int_temp_table_name_len,
+					".", (size_t)1,
+					str_temp, strlen(str_temp),
+					" FROM ", (size_t)6,
+					client_update->str_temp_table_name, client_update->int_temp_table_name_len,
+					"))", (size_t)2);
+			}
+
 			SFINISH_SNFCAT(client_update->str_set_col_list, &client_update->int_set_col_list_len,
 				int_y == 0 ? "" : ", ", strlen(int_y == 0 ? "" : ", "),
 				str_col_name, int_col_name_len,
@@ -840,6 +862,19 @@ bool ws_update_step6(EV_P, void *cb_data, DB_result *res) {
 	DB_free_result(res);
 // Start copying into temp table
 #ifdef POSTAGE_INTERFACE_LIBPQ
+	if (client_update->str_pk_return_where_clause != NULL) {
+		SFREE(client_update->str_pk_where_clause);
+		client_update->str_pk_where_clause = client_update->str_pk_return_where_clause;
+		client_update->str_pk_return_where_clause = NULL;
+		client_update->int_pk_where_clause_len = client_update->int_pk_return_where_clause_len;
+
+
+		SFREE(client_update->str_pk_join_clause);
+		client_update->str_pk_join_clause = client_update->str_pk_return_join_clause;
+		client_update->str_pk_return_join_clause = NULL;
+		client_update->int_pk_join_clause_len = client_update->int_pk_return_join_clause_len;
+	}
+
 	SFINISH_SNCAT(str_sql, &int_sql_len,
 		"COPY (SELECT ", (size_t)13,
 		client_update->str_return_columns, client_update->int_return_columns_len,
@@ -862,6 +897,8 @@ bool ws_update_step6(EV_P, void *cb_data, DB_result *res) {
 
 	SFINISH_SNFCAT(str_sql, &int_sql_len,
 		") TO STDOUT;", (size_t)12);
+
+	SINFO("str_sql: %s", str_sql);
 #else
 	SFINISH_SNCAT(str_sql, &int_sql_len,
 		"SELECT ", (size_t)7,
