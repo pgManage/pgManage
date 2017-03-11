@@ -6,17 +6,18 @@
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        
+
         <link rel="apple-touch-startup-image" href="/public/images/el_portrait.png" />
         <link rel="apple-touch-icon" href="/public/images/el_touch_icon.png" />
-        
+
         <script src="/js/greyspots.js" type="text/javascript"></script>
         <link href="/css/greyspots.css" type="text/css" rel="stylesheet">
-        
-        <link href="../css/postage.css" type="text/css" rel="stylesheet" />
-        
+
+		<link href="../css/postage.css" type="text/css" rel="stylesheet" />
+		<link href="resources/pg-9.2-other.css" type="text/css" rel="stylesheet" />
+
         <script src="/js/d3.js"></script>
-        
+
         <title>Statistics</title>
         <style>
         /*
@@ -29,7 +30,7 @@
                 width: 100%;
                 height: 100%;
             }
-            
+
             gs-chart-line .line {
                 fill: none;
                 stroke-width: 1.5px;
@@ -66,14 +67,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+	var _parseTime = d3.timeParse('%Y-%m-%dT%H:%M:%S'), dateFormat = d3.timeFormat('%Y-%m-%dT'),
+		parseTime = function (strTime) {
+			var d = new Date();
+			var strDate = dateFormat(d);
+
+			return _parseTime(strDate + strTime);
+		};
+
     function elementInterval(element) {
+		var discard = document.getElementById('discard');
+		if (discard) {
+			var intDiscard = parseInt(discard.value, 10) * 1000, d = new Date();
+			while (element.rowData[0] && (d.getTime() - parseTime(element.rowData[0][0].substring(0, 8)).getTime()) > intDiscard) {
+				element.rowData.shift();
+			}
+		}
+
         var d3_element = d3.select(element);
 
         //prepare arr_d3_data with data in format that lines will understand
         var x_len = element.rowData.length;
         var x = 0;
         var i_len = element.rowData[0].length;
-        var i = 0;
+        var i = 1; //first column is time
 
         //console.log('element.rowData', element.rowData);
         //console.log('i_len', i_len);
@@ -81,12 +98,15 @@ document.addEventListener('DOMContentLoaded', function () {
         //fill array of d3 data
         element.arr_d3_data = [];
         while (i < i_len) {
-            element.arr_d3_data[i] = [];
+            element.arr_d3_data[i - 1] = [];
 
             x = 0;
             while (x < x_len) {
-                element.arr_d3_data[i].push({
-                    x: x,
+				//console.log(parseTime);
+				//console.log(element.rowData[x][0].substring(0, 8));
+				//console.log(parseTime(element.rowData[x][0].substring(0, 8)));
+                element.arr_d3_data[i - 1].push({
+                    x: parseTime(element.rowData[x][0].substring(0, 8)),
                     y: element.rowData[x][i]
                 });
 
@@ -98,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //console.log('element.arr_d3_data', element.arr_d3_data);
 
-        //set max and min of axis's
+        //set max and min of axes
         //console.log('element.extent_x', element.extent_x);
         element.x.domain(element.extent_x);
         //console.log('element.extent_y', element.extent_y);
@@ -106,7 +126,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //reset x axis
         element.axis_x
-            .call(d3.axisBottom(element.x));
+            .call(d3.axisBottom(element.x).ticks(10).tickFormat(d3.timeFormat('%H:%M:%S')))
+			.selectAll("text")
+		        .style("text-anchor", "end")
+		        .attr("dx", "-.8em")
+		        .attr("dy", ".15em")
+                .style("font-size", "16px")
+		        .attr("transform", "rotate(-65)");
         element.axis_x.enter();
         element.axis_x.exit();
 
@@ -147,12 +173,14 @@ document.addEventListener('DOMContentLoaded', function () {
         i_len = d3_element.selectAll("path.line").size();
         var objCurrentLine;
 
-        while (i < element.arr_column.length) {
+        while (i < (element.arr_column.length - 1)) {
             if (i < i_len) {
                 objCurrentLine = element.g.select("#line_" + element.arr_column[i]);
             } else {
                 objCurrentLine = element.g.append("path");
             }
+			//console.log(element.line_f);
+			//console.log(i, element.arr_d3_data[i]);
             objCurrentLine
                 .attr("id", "line_" + element.arr_column[i])
                 .attr("class", "line line_" + element.arr_column[i])
@@ -174,9 +202,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (element.lastRowData) {
                 var arrCur = data.dat[0];
                 var arrPrev = element.lastRowData;
-                var arrDiff = [];
+                var arrDiff = [arrCur[0]];
 
-                var i = 0;
+				// the first column is the time
+                var i = 1;
                 var len = data.dat[0].length;
                 while (i < len) {
                     arrDiff[i] = arrCur[i] - arrPrev[i];
@@ -191,6 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 //add to beginning of array the difference between the last two records
                 element.rowData.push(arrDiff);
+				//console.log(data);
 
                 element.arr_column = data.arr_column;
 
@@ -199,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.rowData.shift();
                 }
 
-                console.log('element.rowData', element.rowData);
+                // console.log('element.rowData', element.rowData);
 
                 //run interval function
                 elementInterval(element);
@@ -211,6 +241,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             //add to beginning of array the new record
             element.rowData.push(data.dat[0]);
+			//console.log(data);
 
             element.arr_column = data.arr_column;
 
@@ -222,32 +253,88 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.rowData.shift();
             }
 
-            console.log('element.rowData', element.rowData);
+            // console.log('element.rowData', element.rowData);
 
             //run interval function
             elementInterval(element);
         }
     }
 
+	function rawIntervalFunction(element) {
+		var arrTotalRecords = [];
+		GS.requestRawFromSocket(GS.envSocket,
+			element.getAttribute('raw'),
+			function (data, error) {
+				if (!error) {
+					if (data.strMessage !== '\\.') {
+						var arrRecords = GS.trim(data.strMessage, '\n').split('\n');
+
+						var cell_i;
+						var cell_len;
+						var arrCells;
+
+						var i = 0;
+						var len = arrRecords.length;
+						while (i < len) {
+							arrCells = arrRecords[i].split('\t');
+
+							cell_i = 0;
+							cell_len = arrCells.length;
+							while (cell_i < cell_len) {
+								arrCells[cell_i] = GS.decodeFromTabDelimited(arrCells[cell_i]);
+								cell_i += 1;
+							}
+
+							arrTotalRecords.push(arrCells);
+							i += 1;
+						}
+					} else {
+						// console.log('data', data);
+						// console.log('arrTotalRecords', arrTotalRecords);
+						element.arrColumns = data.arrColumnNames;
+
+						handleData(element, {
+							"arr_column": data.arrColumnNames
+						  , "dat": arrTotalRecords
+						  , "row_count": arrTotalRecords.length
+						});
+					}
+
+				} else {
+					GS.ajaxErrorDialog(data);
+				}
+			}
+		);
+	}
+
     //
     function elementInserted(element) {
         // if this is the first time inserted has been run: continue
-        
+
         if (!element.inserted) {
             element.inserted = true;
+
+			//console.log('test');
+			element.strIntervalInputID = 'refresh_interval' + Math.random().toString().substring(2);
 
             //fill gs-chart-line with svg
             element.innerHTML = ml(function () {/*
     <div class="root">
-        <svg width="100%" height="100%">
-        </svg>
-    </div>*/});
+		<div flex-horizontal>
+			<div style="width: 2em;"></div>
+			<div flex>
+				<label for="{{ID}}">Interval (seconds):</label>
+				<gs-text id="{{ID}}" value="1" class="refresh_interval"></gs-text>
+			</div>
+		</div>
+        <svg width="100%" height="100%"></svg>
+    </div>*/}).replace(/\{\{ID\}\}/g, element.strIntervalInputID);
 
             //prepare svg
             element.d3_element = d3.select(element);
             element.svg = element.d3_element.select("svg");
 
-            element.margin = {top: 20, right: 20, bottom: 30, left: 60};
+            element.margin = {top: 20, right: 20, bottom: 85, left: 60};
 
             var rect = element.svg.node().getBoundingClientRect();
 
@@ -262,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             //set x and y variable
-            element.x = d3.scaleLinear()
+            element.x = d3.scaleTime()
                 .rangeRound([0, element.width]);
 
             element.y = d3.scaleLinear()
@@ -276,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.height = +rect.height - element.margin.top - element.margin.bottom;
 
                 //set x and y variable
-                element.x = d3.scaleLinear()
+                element.x = d3.scaleTime()
                     .rangeRound([0, element.width]);
 
                 element.y = d3.scaleLinear()
@@ -286,7 +373,8 @@ document.addEventListener('DOMContentLoaded', function () {
             //create line functions using the x and y variables
             element.line_f = d3.line()
                 .x(function (d) {
-                    return element.x(d.x);
+					//console.log(d, element.x(new Date(d.x)));
+                    return element.x(new Date(d.x));
                 })
                 .y(function (d) {
                     return element.y(d.y);
@@ -339,105 +427,20 @@ document.addEventListener('DOMContentLoaded', function () {
             //if raw="" is set
             if (element.hasAttribute('raw')) {
                 //then set an interval to get the data every second
-                element.interval = setInterval(function () {
-                    var arrTotalRecords = [];
-                    GS.requestRawFromSocket(GS.envSocket,
-                        element.getAttribute('raw'),
-                        function (data, error) {
-                            if (!error) {
-                                if (data.strMessage !== '\\.') {
-                                    var arrRecords = GS.trim(data.strMessage, '\n').split('\n');
+                element.interval = setInterval(rawIntervalFunction, 1000, element);
 
-                                    var cell_i;
-                                    var cell_len;
-                                    var arrCells;
+				document.getElementById(element.strIntervalInputID).addEventListener('keyup', function () {
+					clearInterval(element.interval);
+	                element.interval = setInterval(rawIntervalFunction, parseFloat(this.value, 1) * 1000, element);
+				});
+				document.getElementById(element.strIntervalInputID).addEventListener('change', function () {
+					clearInterval(element.interval);
+	                element.interval = setInterval(rawIntervalFunction, parseFloat(this.value, 1) * 1000, element);
+				});
 
-                                    var i = 0;
-                                    var len = arrRecords.length;
-                                    while (i < len) {
-                                        arrCells = arrRecords[i].split('\t');
-
-                                        cell_i = 0;
-                                        cell_len = arrCells.length;
-                                        while (cell_i < cell_len) {
-                                            arrCells[cell_i] = GS.decodeFromTabDelimited(arrCells[cell_i]);
-                                            cell_i += 1;
-                                        }
-
-                                        arrTotalRecords.push(arrCells);
-                                        i += 1;
-                                    }
-                                } else {
-                                    console.log('data', data);
-                                    console.log('arrTotalRecords', arrTotalRecords);
-                                    element.arrColumns = data.arrColumnNames;
-
-                                    handleData(element, {
-                                        "arr_column": data.arrColumnNames
-                                      , "dat": arrTotalRecords
-                                      , "row_count": arrTotalRecords.length
-                                    });
-                                }
-
-                            } else {
-                                GS.ajaxErrorDialog(data);
-                            }
-                        }
-                    );
-                }, 1000);
-                
-                
-                document.getElementById('stop').addEventListener('click', function () {
-                    clearInterval(element.interval);
-                });
-
-            //if src="" is set
-            } else if (element.hasAttribute('src')) {
-                //then set an interval to get the data every second
-                element.interval = setInterval(function () {
-                    var arrSRC = element.getAttribute('src').split('.');
-                    var arrTotalRecords;
-                    GS.ajaxJSON(
-                        '/env/action_select'
-                      , 'src=' + encodeURIComponent(element.getAttribute('src') || '') +
-                        '&limit=' + encodeURIComponent(element.getAttribute('limit') || '') +
-                        '&offset=' + encodeURIComponent(element.getAttribute('offset') || '') +
-                        '&order_by=' + encodeURIComponent(element.getAttribute('ord') || '') +
-                        '&where=' + encodeURIComponent(element.getAttribute('where') || '') +
-                        '&cols=' + encodeURIComponent(element.getAttribute('cols') || '')
-                      , function (data, error) {
-                            if (!error) {
-                                handleData(element, data.dat);
-
-                            } else {
-                                GS.ajaxErrorDialog(data);
-                            }
-                        }
-                    );
-                }, 1000);
-
-            // use externally supplied rowdata (currently unused and untested)
-            } else {
-                element.addEventListener('rowdata_updated', function () {
-                    //add to beginning of array the new record
-                    element.rowData.unshift(element.data.dat.dat[0]);
-
-                    element.arr_column = element.data.dat.arr_column;
-
-                    //console.log('element.extent_x', element.extent_x);
-                    //console.log('element.extent_x_diff', element.extent_x_diff);
-
-                    //remove and extraneous records
-                    while (element.rowData.length > element.extent_x_diff + 1) {
-                        element.rowData.pop();
-                    }
-
-                    //console.log('element.rowData', element.rowData);
-
-                    //run interval function
-                    elementInterval(element);
-                });
-            }
+			} else {
+				console.error('raw attribute not set');
+			}
         }
     }
 
@@ -495,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         return x_arr;
                     } else {
-                        //get the minimum and maximum all the lines and set the minimum and maximum of the chart
+						//get the minimum and maximum all the lines and set the minimum and maximum of the chart
                         var extent_i = 0;
                         var extent_len = this.arr_d3_data.length;
                         var curExtent = [];
@@ -504,16 +507,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         while (extent_i < extent_len) {
                             curExtent = d3.extent(this.arr_d3_data[extent_i], function (d) {
-                                return parseInt(d.x, 10);
+                                return d.x.getTime();
                             });
+							//console.log(curExtent);
 
                             if (oldExtent) {
-                                extent[0] = Math.min(curExtent[0], oldExtent[0], curExtent[1], oldExtent[1], 0);
-                                extent[1] = Math.max(curExtent[0], oldExtent[0], curExtent[1], oldExtent[1], 0);
+                                extent[0] = new Date(Math.min(curExtent[0], oldExtent[0], curExtent[1], oldExtent[1]));
+                                extent[1] = new Date(Math.max(curExtent[0], oldExtent[0], curExtent[1], oldExtent[1]));
                             } else {
-                                extent[0] = Math.min(curExtent[0], curExtent[1], 0);
-                                extent[1] = Math.max(curExtent[0], curExtent[1], 0);
+                                extent[0] = new Date(Math.min(curExtent[0], curExtent[1]));
+                                extent[1] = new Date(Math.max(curExtent[0], curExtent[1]));
                             }
+							//console.log(extent);
 
                             oldExtent = extent;
 
@@ -596,11 +601,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             curExtent = d3.extent(this.arr_d3_data[extent_i], function (d) {
                                 return parseInt(d.y, 10);
                             });
-                            
-                            if (this.getAttribute('chart_caption') === 'Connections') console.log('this.arr_d3_data[extent_i]:', this.arr_d3_data[extent_i]);
-                            
-                            if (this.getAttribute('chart_caption') === 'Connections') console.log('partial:', curExtent);
-                            
+
+                            // if (this.getAttribute('chart_caption') === 'Connections') console.log('this.arr_d3_data[extent_i]:', this.arr_d3_data[extent_i]);
+
+                            // if (this.getAttribute('chart_caption') === 'Connections') console.log('partial:', curExtent);
+
                             if (oldExtent) {
                                 extent[0] = Math.min(curExtent[0], oldExtent[0], curExtent[1], oldExtent[1], 0);
                                 extent[1] = Math.max(curExtent[0], oldExtent[0], curExtent[1], oldExtent[1], 0);
@@ -619,7 +624,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             extent[0] = extent[1];
                             extent[1] = temp;
                         }
-                        if (this.getAttribute('chart_caption') === 'Connections') console.log('full:', extent);
+                        // if (this.getAttribute('chart_caption') === 'Connections') console.log('full:', extent);
 
                         return extent;
                     }
@@ -649,55 +654,53 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 window.addEventListener('load', function () {
-    GS.envSocket = GS.openSocket('env');
+	document.getElementById('set_all_intervals').addEventListener('keyup', function () {
+		var newValue = this.value;
+		var arrElement = document.getElementsByClassName('refresh_interval');
+		for (var i = 0, len = arrElement.length; i < len; i += 1) {
+			arrElement[i].value = newValue;
+			GS.triggerEvent(arrElement[i], 'change');
+		}
+	});
 });
         </script>
-        <style type="text/css" media="all">
-            #stop {
-                text-align: left;
-                color: white;
-                 /* Fallback for web browsers that doesn't support RGBa */
-                background: rgb(0, 0, 0) transparent;
-                /* RGBa with 0.6 opacity */
-                background: rgba(0, 0, 0, 0);
-                /* For IE 5.5 - 7*/
-                filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
-                /* For IE 8*/
-                -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
-                float: left;
-                padding: 0.25em;
-                -webkit-border-radius: 0.25em;
-                -moz-border-radius: 0.25em;
-                -ms-border-radius: 0.25em;
-                -o-border-radius: 0.25em;
-                border-radius: 0.25em;
-                border: none;
-            }
-        </style>
     </head>
     <body>
         <gs-page>
             <gs-header>
-                <center><button id="stop" type="submit"><h4>Stop Chart</h4></button><h3>Activity Statistics</h3></center>
+                <center><h3>Activity Statistics</h3></center>
             </gs-header>
             <gs-body padded>
+				<label for="discard">Discard data older than (seconds):</label>
+				<gs-text id="discard" value="3600"></gs-text>
+				<br />
+				<br />
+				<label for="set_all_intervals">Set all intervals:</label>
+				<gs-text id="set_all_intervals" value="1"></gs-text>
+				<br />
+				<br />
+
                 <gs-grid widths="1,1">
                     <gs-block>
-                        <gs-chart-line chart_caption="Connections" type="live" line_captions="Total,Active,Idle" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT count(*) AS total_connections, sum(CASE WHEN state = 'active' THEN 1 ELSE 0 END) AS active_connections, sum(CASE WHEN state = 'active' THEN 0 ELSE 1 END) AS inactive_connections FROM pg_catalog.pg_stat_activity" style="height: 300px;"></gs-chart-line>
+                        <gs-chart-line chart_caption="Connections (point in time)" type="live" line_captions="Total,Active,Idle" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT current_time::time, count(*) AS total_connections, sum(CASE WHEN state = 'active' THEN 1 ELSE 0 END) AS active_connections, sum(CASE WHEN state = 'active' THEN 0 ELSE 1 END) AS inactive_connections FROM pg_catalog.pg_stat_activity" style="height: 400px;"></gs-chart-line>
+						<br />
+						<br />
                     </gs-block>
                     <gs-block>
-                        <gs-chart-line chart_caption="Transactions" type="live" append line_captions="Total,Commits,Rollback" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT sum(xact_commit) + sum(xact_rollback) AS total_transactions, sum(xact_commit) AS commit_transactions, sum(xact_rollback) AS rollback_transactions FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+                        <gs-chart-line chart_caption="Transactions (per X seconds)" type="live" append line_captions="Total,Commits,Rollback" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT current_time::time, sum(xact_commit) + sum(xact_rollback) AS total_transactions, sum(xact_commit) AS commit_transactions, sum(xact_rollback) AS rollback_transactions FROM pg_catalog.pg_stat_database" style="height: 400px;"></gs-chart-line>
+						<br />
+						<br />
                     </gs-block>
                 </gs-grid>
                 <gs-grid widths="1,1,1">
                     <gs-block>
-                        <gs-chart-line chart_caption="Tuples" type="live" append line_captions="Inserted,Updated,Deleted" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT sum(tup_inserted) AS total_inserted, sum(tup_updated) AS total_updated, sum(tup_deleted) AS total_deleted FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+                        <gs-chart-line chart_caption="Tuples (per X seconds)" type="live" append line_captions="Inserted,Updated,Deleted" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT current_time::time, sum(tup_inserted) AS total_inserted, sum(tup_updated) AS total_updated, sum(tup_deleted) AS total_deleted FROM pg_catalog.pg_stat_database" style="height: 400px;"></gs-chart-line>
                     </gs-block>
                     <gs-block>
-                        <gs-chart-line chart_caption="Tuples" type="live" append line_captions="Fetched,Returned" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT sum(tup_fetched) AS total_fetched, sum(tup_returned) AS total_returned FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+                        <gs-chart-line chart_caption="Tuples (per X seconds)" type="live" append line_captions="Fetched,Returned" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT current_time::time, sum(tup_fetched) AS total_fetched, sum(tup_returned) AS total_returned FROM pg_catalog.pg_stat_database" style="height: 400px;"></gs-chart-line>
                     </gs-block>
                     <gs-block>
-                        <gs-chart-line chart_caption="Block IO" type="live" append line_captions="Read,Hit" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT sum(blks_read) AS total_read, sum(blks_hit) AS total_hit FROM pg_catalog.pg_stat_database" style="height: 300px;"></gs-chart-line>
+                        <gs-chart-line chart_caption="Block IO (per X seconds)" type="live" append line_captions="Read,Hit" line_colors="#6CC644,#1776B6,#D8241F" raw="SELECT current_time::time, sum(blks_read) AS total_read, sum(blks_hit) AS total_hit FROM pg_catalog.pg_stat_database" style="height: 400px;"></gs-chart-line>
                     </gs-block>
                 </gs-grid>
             </gs-body>

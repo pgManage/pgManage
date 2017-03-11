@@ -221,6 +221,11 @@ function menuTab(target) {
     templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
 	if (window.process && window.process.type === 'renderer') {
+		var app = require('electron').remote.app;
+		var path = require('path');
+		if (window.opn === undefined) {
+			window.opn = require(path.normalize(app.getAppPath() + '/node_modules/opn'));
+		}
 	    templateElement.innerHTML = ml(function () {/*
 	        <gs-page>
 	            <gs-body>
@@ -244,9 +249,16 @@ function menuTab(target) {
 	                <gs-button class="postage-menu-item-button" dialogclose iconleft
 	                        onclick="dialogClosedTabs()" no-focus icon="clock-o"
 	                        title="All closed tabs">View All Closed Tabs</gs-button>
+	                <gs-button class="postage-menu-item-button" dialogclose
+	                        onclick="window.opn('{{TABPATH}}')" no-focus
+	                        title="Open tab Folder">Open tab Folder</gs-button>
 	            </gs-body>
 	        </gs-page>
-	    */});
+	    */}).replace(/\{\{TABPATH\}\}/gi,
+				  process.platform === 'win32'
+				? path.normalize(app.getPath('userData') + '\\sql\\').replace(/\\/g, '\\\\')
+				: path.normalize(app.getPath('home') + '/.postage/sql/').replace(/\\/g, '\\\\')
+			);
 	} else {
 	    templateElement.innerHTML = ml(function () {/*
 	        <gs-page>
