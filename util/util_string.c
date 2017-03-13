@@ -614,7 +614,7 @@ char *contenttype(char *str_filename) {
                 "text/plain";
 // clang-format on
 error:
-	return NULL;
+	return "text/plain";
 }
 
 char *snuri(char *str_input, size_t int_in_len, size_t *ptr_int_out_len) {

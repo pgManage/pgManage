@@ -35,6 +35,8 @@ Then it opens the file.
 */
 void http_file_step1(struct sock_ev_client *client);
 
+void http_file_step15_envelope(EV_P, void *cb_data, bool bol_group);
+
 /*
 This function is run once when the file is opened and has data ready for us
 

@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "http_file.h"
 
 static const char *str_date_format = "%a, %d %b %Y %H:%M:%S GMT";
@@ -5,15 +6,16 @@ static const char *str_date_format = "%a, %d %b %Y %H:%M:%S GMT";
 void http_file_step1(struct sock_ev_client *client) {
 	SDEBUG("http_file_step1");
 	char *str_response = NULL;
+	size_t int_response_len = 0;
 	char *ptr_end_uri = NULL;
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
 #endif
-	size_t int_response_len = 0;
 
 	struct sock_ev_client_copy_check *client_copy_check = NULL;
 	struct sock_ev_client_http_file *client_http_file = NULL;
-	SDEFINE_VAR_ALL(str_temp, str_temp1, str_uri_temp, str_canonical_start);
+	SDEFINE_VAR_ALL(str_temp, str_temp1, str_uri_temp, str_canonical_start, str_uri_for_permission_check);
+	size_t int_uri_for_permission_check_len = 0;
 
 	SFINISH_SALLOC(client_http_file, sizeof(struct sock_ev_client_http_file));
 	client_http_file->parent = client;
@@ -116,29 +118,32 @@ void http_file_step1(struct sock_ev_client *client) {
 	str_uri_temp = client_http_file->str_uri_part;
 	SDEBUG("str_uri_temp: %s", str_uri_temp);
 	client_http_file->str_uri_part = NULL;
+	bool bol_permission_check = false;
 	if (strncmp(str_uri_temp, "/env/app/", 9) == 0) {
 		str_canonical_start = canonical_full_start("/app/");
 		SFINISH_CHECK(str_canonical_start != NULL, "canonical_full_start failed");
 		SFINISH_SNCAT(
+			str_uri_for_permission_check, &int_uri_for_permission_check_len,
+			str_uri_temp + 4, client_http_file->int_uri_part_len - 4
+		);
+		SFINISH_SNCAT(
 			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
 			str_uri_temp + 9, client_http_file->int_uri_part_len - 9
 		);
+		bol_permission_check = true;
 
 	} else if (strncmp(str_uri_temp, "/env/role/", 10) == 0) {
 		str_canonical_start = canonical_full_start("/role/");
 		SFINISH_CHECK(str_canonical_start != NULL, "canonical_full_start failed");
 		SFINISH_SNCAT(
+			str_uri_for_permission_check, &int_uri_for_permission_check_len,
+			str_uri_temp + 4, client_http_file->int_uri_part_len - 4
+		);
+		SFINISH_SNCAT(
 			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
 			str_uri_temp + 10, client_http_file->int_uri_part_len - 10
 		);
-
-	} else if (strncmp(str_uri_temp, "/env/", 5) == 0) {
-		str_canonical_start = canonical_full_start("/web_root/");
-		SFINISH_CHECK(str_canonical_start != NULL, "canonical_full_start failed");
-		SFINISH_SNCAT(
-			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
-			str_uri_temp + 5, client_http_file->int_uri_part_len - 5
-		);
+		bol_permission_check = true;
 
 	} else {
 		str_canonical_start = canonical_full_start("/web_root/");
@@ -201,6 +206,124 @@ void http_file_step1(struct sock_ev_client *client) {
 	}
 #endif
 	SDEBUG("client_http_file->str_uri: %s", client_http_file->str_uri);
+
+#ifdef ENVELOPE
+	if (bol_permission_check == true) {
+		SINFO("client_http_file->str_uri_part: %s", client_http_file->str_uri_part);
+		SFINISH_CHECK(permissions_check(global_loop, client_http_file->parent->conn, str_uri_for_permission_check,
+			client_http_file, http_file_step15_envelope),
+			"permissions_check() failed");
+	} else {
+#endif
+#ifdef _WIN32
+		SetLastError(0);
+		client_http_file->h_file =
+			CreateFileA(client_http_file->str_uri, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (client_http_file->h_file == INVALID_HANDLE_VALUE) {
+			int int_err = GetLastError();
+			if (int_err == ERROR_FILE_NOT_FOUND || int_err == ERROR_PATH_NOT_FOUND) {
+				SFREE(str_response);
+				SERROR_NORESPONSE("CreateFileA failed!");
+				SFREE(str_global_error);
+				char *str_temp =
+					"HTTP/1.1 404 Not Found\015\012"
+					"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+					"Content-Length: 40\015\012"
+					"Content-Type: text/plain\015\012"
+					"\015\012"
+					"The file you are requesting is not here.";
+				SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
+				bol_error_state = false;
+				goto finish;
+			}
+			FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, int_err,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&strErrorText, 0, NULL);
+
+			if (strErrorText != NULL) {
+				SFINISH_ERROR("CreateFile failed: 0x%X (%s)", int_err, strErrorText);
+			}
+		}
+#else
+	client_http_file->int_file_fd = open(client_http_file->str_uri, O_RDONLY | O_NONBLOCK);
+	if (client_http_file->int_file_fd == -1) {
+		SFREE(str_response);
+		SERROR_NORESPONSE("open failed! %d (%s)", errno, strerror(errno));
+		SFREE(str_global_error);
+		char *str_temp =
+			"HTTP/1.1 404 Not Found\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Content-Length: 40\015\012"
+			"Content-Type: text/plain\015\012"
+			"\015\012"
+			"The file you are requesting is not here.";
+		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
+		bol_error_state = false;
+		goto finish;
+	}
+#endif
+		SFINISH_SALLOC(client_copy_check, sizeof(struct sock_ev_client_copy_check));
+		client_copy_check->client_request = (struct sock_ev_client_request *)client_http_file;
+
+		increment_idle(global_loop);
+		ev_check_init(&client_copy_check->check, http_file_step2);
+		ev_check_start(global_loop, &client_copy_check->check);
+#ifdef ENVELOPE
+	}
+#endif
+	bol_error_state = false;
+finish:
+	if (strErrorText != NULL) {
+		LocalFree(strErrorText);
+		strErrorText = NULL;
+	}
+
+	SFREE_ALL();
+	if (bol_error_state) {
+		bol_error_state = false;
+		http_file_free(client_http_file);
+		client_http_file = NULL;
+
+		char *str_temp =
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
+		char *_str_response = str_response;
+		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp), _str_response, strlen(_str_response));
+		SFREE(_str_response);
+	}
+	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
+		SFREE(str_response);
+		http_file_free(client_http_file);
+		client_http_file = NULL;
+		if (bol_tls) {
+			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
+		} else {
+			SERROR_NORESPONSE("write() failed");
+		}
+	}
+	SFREE(str_response);
+	if (int_response_len != 0) {
+		http_file_free(client_http_file);
+		client_http_file = NULL;
+		ev_io_stop(global_loop, &client->io);
+		SFREE(client->str_request);
+		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
+	}
+}
+
+#ifdef ENVELOPE
+void http_file_step15_envelope(EV_P, void *cb_data, bool bol_group) {
+	  // SDEBUG("http_file_step3");
+	struct sock_ev_client_copy_check *client_copy_check = NULL;
+	struct sock_ev_client_http_file *client_http_file = cb_data;
+	struct sock_ev_client *client = client_http_file->parent;
+	char *str_response = NULL;
+	size_t int_response_len = 0;
+#ifdef _WIN32
+	LPTSTR strErrorText = NULL;
+#endif
+
+	SFINISH_CHECK(bol_group, "You don't have the necessary permissions for this folder.");
+
 #ifdef _WIN32
 	SetLastError(0);
 	client_http_file->h_file =
@@ -247,17 +370,22 @@ void http_file_step1(struct sock_ev_client *client) {
 		goto finish;
 	}
 #endif
-
 	SFINISH_SALLOC(client_copy_check, sizeof(struct sock_ev_client_copy_check));
 	client_copy_check->client_request = (struct sock_ev_client_request *)client_http_file;
 
 	increment_idle(global_loop);
 	ev_check_init(&client_copy_check->check, http_file_step2);
 	ev_check_start(global_loop, &client_copy_check->check);
+
 	bol_error_state = false;
 finish:
-	SFREE_ALL();
-	SDEBUG("test1");
+#ifdef _WIN32
+	if (strErrorText != NULL) {
+		LocalFree(strErrorText);
+		strErrorText = NULL;
+	}
+#endif
+
 	if (bol_error_state) {
 		bol_error_state = false;
 		http_file_free(client_http_file);
@@ -276,11 +404,11 @@ finish:
 		client_http_file = NULL;
 		if (bol_tls) {
 			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		} else {
+		}
+		else {
 			SERROR_NORESPONSE("write() failed");
 		}
 	}
-	SDEBUG("test3");
 	SFREE(str_response);
 	if (int_response_len != 0) {
 		http_file_free(client_http_file);
@@ -289,8 +417,8 @@ finish:
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
 	}
-	SDEBUG("test4");
 }
+#endif
 
 void http_file_step2(EV_P, ev_check *w, int revents) {
 	if (revents != 0) {
