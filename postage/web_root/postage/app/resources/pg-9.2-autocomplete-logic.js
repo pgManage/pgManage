@@ -565,10 +565,9 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                         autocompleteGlobals.intSearchEnd = intEndCursorPosition;
                         
                     }
-
                     autocompletePopupOpen(editor, arrQueries);
                 }
-                
+                //console.log(arrQueries);
                 arrQueries = [];
                 
                 //console.log(' bolCols: ' + bolCols + ' bolTables: ' + bolTables + ' bolSchemas: ' + bolSchemas + ' bolTableFuncs: ' + bolTableFuncs + ' bolBuiltins: ' + bolBuiltins + ' bolGroups: ' + bolGroups + ' bolUsers: ' + bolUsers + ' bolReturnTypes: ' + bolReturnTypes + ' bolTypes: ' + bolTypes + ' bolLanguages: ' + bolLanguages + ' bolRules: ' + bolRules + ' bolTablespace: ' + bolTablespace);

@@ -128,13 +128,39 @@ div#header-text-container {
     right: 0.25em !important
 }
 
-
 .results-header {
     padding: 0 !important;
     height: 2.422em;
+    font-family: Helvetica,Arial,sans-serif;
 }
 .results-header .header-button-text {
     padding-top: 0.7em;
+    font-family: Helvetica,Arial,sans-serif;
+}
+.sql-results-area {
+    font-family: "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
+    font-feature-settings: normal;
+    font-kerning: auto;
+    font-language-override: normal;
+    font-size: 11.2px;
+    font-size-adjust: none;
+    font-stretch: normal;
+    font-style: normal;
+    font-synthesis: weight style;
+    font-variant: normal;
+    font-variant-alternates: normal;
+    font-variant-caps: normal;
+    font-variant-east-asian: normal;
+    font-variant-ligatures: normal;
+    font-variant-numeric: normal;
+    font-variant-position: normal;
+    font-weight: 400;
+    
+    /*
+    font-family: InconsolataGo,Courier New,Courier,monospace;
+    font-family: Courier New,Courier,monospace;
+    font-family: "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
+    */
 }
 
 .postage-menu-item-button {
