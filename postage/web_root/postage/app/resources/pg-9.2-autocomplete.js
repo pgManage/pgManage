@@ -21,8 +21,10 @@ var autocompleteLoaded = true
       , 'bolSnippets':     false
       , 'bolBound':        false
       , 'searchString':    ''
+      , 'searchLength':    0
     };
 var strSearchFixed;
+var curr_run_search = 0;
 var curr_run_up = 0;
 var curr_run_down = 0;
 function autocompleteStart() { 'use strict'; }
@@ -101,6 +103,7 @@ function autocompleteBindEditor(tabElement, editor) {
                                     selectionRanges.end.column + 1 === event.end.column
                                 ) {
                                     autocompleteChangeHandler(tabElement, editor, event);
+                                    //console.log('running');
                                 }
                             } else {
                                 autocompleteChangeHandler(tabElement, editor, event);
@@ -267,6 +270,7 @@ function autocompletePopupLoad(editor, arrQueries) {
                     
                     for (var i = 0, len = autocompleteTempList.length; i < len; i++) {
                         strCurrent = autocompleteTempList[i][0]
+                        
                         strCurrentMeta = autocompleteTempList[i][1];
                         if (i + 1 < autocompleteTempList.length) {
                             strNext = autocompleteTempList[i + 1][0];
@@ -494,6 +498,8 @@ function autocompletePopupClose(editor) {
     autocompleteGlobals.arrValues = [];
     autocompleteGlobals.arrSearchMaster = [];
     autocompleteGlobals.arrValuesMaster = [];
+    autocompleteGlobals.searchLength = 0;
+    
 }
 
 // complete using the selected choice in the autocomplete popup
@@ -559,10 +565,15 @@ function autocompleteComplete(editor) {
                 editor.clearSelection();
                 //console.log(editor.currentSelections.length);
                 for (var i = 0, len = editor.currentSelections.length; i < len; i += 1) {
-                    if (autocompleteGlobals.searchString[0] === '"') {
-                        autocompleteGlobals.searchString = autocompleteGlobals.searchString.substring(1, autocompleteGlobals.searchString.length);
-                    }
-                    insertText = autocompleteGlobals.arrValues[intFocusedLine].trim().substring(autocompleteGlobals.searchString.length, autocompleteGlobals.arrValues[intFocusedLine].trim().length);
+                    // if (autocompleteGlobals.searchString[0] === '"') {
+                    //     autocompleteGlobals.searchString = autocompleteGlobals.searchString.substring(1, autocompleteGlobals.searchString.length);
+                    // }
+                    //console.log(autocompleteGlobals.searchString);
+                    //console.log(autocompleteGlobals.searchString.length);
+                    //console.log(autocompleteGlobals.arrValues[intFocusedLine].trim().length);
+                    //console.log(autocompleteGlobals.arrValues[intFocusedLine].trim());
+                    //console.log(insertText);
+                    insertText = autocompleteGlobals.arrValues[intFocusedLine].trim().substring(autocompleteGlobals.searchLength, autocompleteGlobals.arrValues[intFocusedLine].trim().length);
                     insertObj = {
                         row: editor.currentSelections[i].start.row,
                         column: editor.currentSelections[i].start.column
@@ -619,7 +630,40 @@ function autocompletePopupSearch(editor, strMode) {
       , intSearchStringEnd = autocompleteGlobals.intSearchEnd
       , strSearch = strScript.substring(intSearchStringStart, intSearchStringEnd)
       , choices, match, i, len, strCurrentMasterSearch, strCurrentMasterValue, strNewValue, strAdded;
-    
+    //console.log(strScript);
+    if (editor.currentSelections.length > 1) {
+        if (autocompleteGlobals.searchLength !== 0) {
+            if (curr_run_search > 0) {
+                curr_run_search += 1;
+            } else {
+                //console.log(strMode);
+                if (strMode === 'filter') {
+                    autocompleteGlobals.searchLength += 1;
+                } else if (strMode === 'expand') {
+                    autocompleteGlobals.searchLength -= 1;
+                } else {
+                    autocompleteGlobals.searchLength += 1;
+                }
+                curr_run_search = 1;
+            }
+            if (curr_run_search === editor.currentSelections.length) {
+                curr_run_search = 0;
+            }
+        } else {
+            if (strMode === 'filter') {
+                autocompleteGlobals.searchLength += 1;
+            } else if (strMode === 'expand') {
+                autocompleteGlobals.searchLength -= 1;
+            } else {
+                autocompleteGlobals.searchLength += 1;
+            }
+        }
+        //console.log(autocompleteGlobals.arrSearchMaster);
+        //console.log(autocompleteGlobals.arrValuesMaster);
+        //console.log(autocompleteGlobals.searchLength);
+        strSearch = strSearch.substring(strSearch.length - autocompleteGlobals.searchLength, strSearch.length);
+        //console.log(autocompleteGlobals);
+    }
     if (autocompleteGlobals.popupOpen === true) {
         //console.log(autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset);
         //console.log(autocompleteGlobals.intSearchEnd);
@@ -655,7 +699,7 @@ function autocompletePopupSearch(editor, strMode) {
             strSearch = '"';
             strSearchFixed = false;
         }
-        
+        strSearch = strSearch.replace(/(\r\n|\n|\r)/gm,"");
         
         // default strMode to 'filter', the only other option is 'expand'
         strMode = strMode || 'filter';
@@ -743,8 +787,7 @@ function autocompletePopupSearch(editor, strMode) {
                                  document.getElementById('autocomplete-popup-instruction').style.height;
             document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
         }
-        //console.log(strSearch);
-        autocompleteGlobals.searchString = strSearch;
+        
     }
     //console.log(document.getElementById('autocomplete-popup-instruction').style.top, popup_instruct_top);
 
