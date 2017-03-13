@@ -272,10 +272,12 @@ void http_file_step1(struct sock_ev_client *client) {
 #endif
 	bol_error_state = false;
 finish:
+#ifdef _WIN32
 	if (strErrorText != NULL) {
 		LocalFree(strErrorText);
 		strErrorText = NULL;
 	}
+#endif
 
 	SFREE_ALL();
 	if (bol_error_state) {
@@ -311,7 +313,7 @@ finish:
 }
 
 #ifdef ENVELOPE
-void http_file_step15_envelope(EV_P, void *cb_data, bool bol_group) {
+bool http_file_step15_envelope(EV_P, void *cb_data, bool bol_group) {
 	  // SDEBUG("http_file_step3");
 	struct sock_ev_client_copy_check *client_copy_check = NULL;
 	struct sock_ev_client_http_file *client_http_file = cb_data;
@@ -417,6 +419,7 @@ finish:
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
 	}
+	return true;
 }
 #endif
 
