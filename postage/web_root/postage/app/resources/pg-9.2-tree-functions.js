@@ -195,7 +195,7 @@ function treeStart() {
                 jsnSelection = treeGlobals.ace.getSelectionRange();
                 intSelectionRow = jsnSelection.start.row;
                 jsnData = treeGlobals.data[intSelectionRow];
-                console.log(jsnData);
+                //console.log(jsnData);
                 if (jsnData) {
                     // tables
                     if (jsnData.query === 'objectTable') {

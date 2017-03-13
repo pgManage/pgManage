@@ -205,6 +205,8 @@ function menuTools(target) {
                             href="https://github.com/workflowproducts/postage/" icon="github">Postage On Github</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft target="_blank"
                             href="https://github.com/workflowproducts/postage/issues" icon="bug">Report An Issue</gs-button>
+                <gs-button class="postage-menu-item-button" dialogclose
+                            no-focus iconleft onclick="dialogOptions();" icon="refresh">Postage Options</gs-button>
             </gs-body>
         </gs-page>
     */});
@@ -690,6 +692,167 @@ function dialogSettings() {
                     '</tbody>' +
                 '</table>';
         });
+    });
+}
+
+// Postage Options in localStorage
+function dialogOptions() {
+    'use strict';
+    var templateElement = document.createElement('template');
+
+    //build zoom page list
+    var strZoom = '';
+    var i, len;
+    for (i=0,len=localStorage.length;i < len;i++) {
+        var strProp = localStorage.key(i);
+        console.log(strProp);
+        if (strProp =~ (/^postageZoom/)) {
+            strZoom = strZoom + '<tr>' +
+                    '<td>Zoom ' + toString(strProp).replace(/^postageZoom/,'') + '</td>' +
+                    '<td><gs-text id="postage-options-left-panel-' + toString(strProp).replace(/^postageZoom/,'') + '"></gs-text></td>' +
+                    '<td>Width in pixels of the panel on the left</td>' +
+                '</tr>';
+        }
+    }
+
+    templateElement.setAttribute('data-max-width', '90em');
+    templateElement.setAttribute('data-overlay-close', 'true');
+    if (evt.touchDevice) {
+        templateElement.setAttribute('data-mode', 'full');
+    }
+    templateElement.innerHTML = ml(function () {/*
+        <gs-page>
+            <gs-header><center><h3>Postage Options</h3></center></gs-header>
+            <gs-body padded>
+                <div id="options-container" style="position: relative; min-height: 10em;">
+                    <table class="simple-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 17em;">Setting Name</th>
+                                <th>Setting Value</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Left Panel Width</td>
+                                <td><gs-text id="postage-options-left-panel"></gs-text></td>
+                                <td>Width in pixels of the panel on the left</td>
+                            </tr>
+                            {{ZOOM}}
+                        </tbody>
+                    </table>
+                </div>
+                <gs-grid widths="1,1" gutter>
+                    <gs-block>
+                        <gs-optionbox id="clip-options-quote-which" style="padding: 0 0.25em 0.25em 0.25em;">
+                                <label>Quote:</label>
+                                <gs-option value="none">Nothing</gs-option>
+                                <gs-option value="strings">Strings</gs-option>
+                                <gs-option value="all">All Fields</gs-option>
+                        </gs-optionbox>
+                    </gs-block>
+                    <gs-block>
+                        <gs-optionbox id="clip-options-column-names" style="padding: 0 0.25em 0.25em 0.25em;">
+                                <label>Column Names:</label>
+                                <gs-option value="true">Always</gs-option>
+                                <gs-option value="false">Only When Selected</gs-option>
+                        </gs-optionbox>
+                    </gs-block>
+                </gs-grid>
+                <div flex-horizontal>
+                    <label for="clip-options-quote-char" style="min-width: 7.25em;">Quote Char:</label>
+                    <gs-combo id="clip-options-quote-char" flex>
+                        <template>
+                            <table>
+                                <tbody>
+                                    <tr value="&#34;"><td>(Double Quote)</td></tr>
+                                    <tr value="&#39;"><td>(Single Quote)</td></tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-combo>
+                </div>
+                <div flex-horizontal>
+                    <label for="clip-options-field-delimiter" style="min-width: 7.25em;">Field Delimiter:</label>
+                    <gs-combo id="clip-options-field-delimiter" flex>
+                        <template>
+                            <table>
+                                <tbody>
+                                    <tr value="&#9;"><td>(Tab)</td></tr>
+                                    <tr value="&#44;"><td>(Comma)</td></tr>
+                                    <tr value="&#124;"><td>(Vertical Bar)</td></tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-combo>
+                </div>
+                <div flex-horizontal>
+                    <label for="clip-options-null-values" style="min-width: 7.25em;">Null Values:</label>
+                    <gs-combo id="clip-options-null-values" flex>
+                        <template>
+                            <table>
+                                <tbody>
+                                    <tr value="&lt;NULL&gt;"><td>&lt;NULL&gt;</td></tr>
+                                    <tr value="NULL"><td>NULL</td></tr>
+                                    <tr value=""><td>(Nothing)</td></tr>
+                                </tbody>
+                            </table>
+                        </template>
+                    </gs-combo>
+                </div>
+            </gs-body>
+            <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
+        </gs-page>
+    */}).replace('{{ZOOM}}', strZoom);
+
+    GS.openDialog(templateElement, function () {
+        //left panel
+        document.getElementById('postage-options-left-panel').value = localStorage.leftPanelWidth;
+        document.getElementById('postage-options-left-panel').addEventListener('change', function () {
+            localStorage.leftPanelWidth = document.getElementById('postage-options-left-panel').value;
+        });
+        
+        //zoom
+        /*
+        document.getElementById('postage-options-zoom').value = window.location.pathname;
+        document.getElementById('postage-options-zoom').addEventListener('change', function () {
+            localStorage.leftPanelWidth = document.getElementById('postage-options-zoom').value;
+        });
+        */
+        
+        /*
+        var savedSettings = JSON.parse(localStorage.clip_settings || '{}');
+        
+        savedSettings = {
+            "quoteType":      (savedSettings.quoteType || "strings"),
+            "quoteChar":      (savedSettings.quoteChar || "'"),
+            "fieldDelimiter": (savedSettings.fieldDelimiter || "\t"),
+            "nullValues":     (savedSettings.nullValues || "NULL"),
+            "columnNames":    (savedSettings.columnNames || "true")
+        };
+        
+        return savedSettings[propertyName];
+        */
+        
+        /*
+        // we want to be able to use this file on multiple pages and have the zoom levels be different
+        //      so, we'll use the file path to differentiate
+        function zoomGetPageName() {
+            "use strict";
+            return window.location.pathname;
+        }
+        
+        // we need to be able to get the zoom property, we also don't want to depend on the
+        //      zoom property's name in multiple places.
+        function zoomGet() {
+            "use strict";
+            // the zoom number must be integer type, may move this to float at some point
+            return parseInt(localStorage['postageZoom' + zoomGetPageName()], 10);
+        }
+        */
+        
+        //localStorage.leftPanelWidth
     });
 }
 

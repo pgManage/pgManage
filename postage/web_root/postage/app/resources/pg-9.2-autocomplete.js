@@ -148,6 +148,13 @@ function autocompleteBindEditor(tabElement, editor) {
                                     selectionRanges.end.column + 1 === event.end.column
                                 ) {
                                     autocompleteChangeHandler(tabElement, editor, event);
+                                } else if (
+                                    selectionRanges.start.row === event.start.row &&
+                                    selectionRanges.start.column === event.start.column + 1 &&
+                                    selectionRanges.end.row === event.end.row &&
+                                    selectionRanges.end.column === event.end.column
+                                ) {
+                                    autocompleteChangeHandler(tabElement, editor, event);
                                 }
                             } else {
                                 autocompleteChangeHandler(tabElement, editor, event);
@@ -225,7 +232,6 @@ function autocompletePopupLoad(editor, arrQueries) {
     'use strict';
     var bolResults = false, intResult = 0;
     var intLoadId;
-    
     autocompleteGlobals.loadId += 1;
     intLoadId = autocompleteGlobals.loadId;
     //autocompleteGlobals.currentLoadId = intLoadId;
@@ -561,29 +567,33 @@ function autocompleteComplete(editor) {
                 autocompleteBind(editor);
                 var insertObj = {};
                 var insertText;
-                var oldSelectionRanges = editor.currentSelections;
-                editor.clearSelection();
-                //console.log(editor.currentSelections.length);
-                for (var i = 0, len = editor.currentSelections.length; i < len; i += 1) {
-                    // if (autocompleteGlobals.searchString[0] === '"') {
-                    //     autocompleteGlobals.searchString = autocompleteGlobals.searchString.substring(1, autocompleteGlobals.searchString.length);
-                    // }
-                    //console.log(autocompleteGlobals.searchString);
-                    //console.log(autocompleteGlobals.searchString.length);
-                    //console.log(autocompleteGlobals.arrValues[intFocusedLine].trim().length);
-                    //console.log(autocompleteGlobals.arrValues[intFocusedLine].trim());
-                    //console.log(insertText);
-                    insertText = autocompleteGlobals.arrValues[intFocusedLine].trim().substring(autocompleteGlobals.searchLength, autocompleteGlobals.arrValues[intFocusedLine].trim().length);
-                    insertObj = {
-                        row: editor.currentSelections[i].start.row,
-                        column: editor.currentSelections[i].start.column
-                    };
-                    
-                    editor.moveCursorToPosition(insertObj);
-                    
-                    editor.env.document.insert(insertObj, insertText);
+                if (editor.currentSelections.length > 1) {
+                    editor.clearSelection();
+                    for (var i = 0, len = editor.currentSelections.length; i < len; i += 1) {
+                        // if (autocompleteGlobals.searchString[0] === '"') {
+                        //     autocompleteGlobals.searchString = autocompleteGlobals.searchString.substring(1, autocompleteGlobals.searchString.length);
+                        // }
+                        //console.log(autocompleteGlobals.searchString.length);
+                        //console.log(autocompleteGlobals.arrValues[intFocusedLine].trim().length);
+                        //console.log(autocompleteGlobals.arrValues[intFocusedLine].trim());
+                        //console.log(insertText);
+                        if (autocompleteGlobals.searchLength !== 1) {
+                            insertText = autocompleteGlobals.arrValues[intFocusedLine].trim().substring(autocompleteGlobals.searchLength - 1, autocompleteGlobals.arrValues[intFocusedLine].trim().length);
+                        } else {
+                            insertText = autocompleteGlobals.arrValues[intFocusedLine].trim().substring(autocompleteGlobals.searchLength, autocompleteGlobals.arrValues[intFocusedLine].trim().length);
+                        }
+                        insertObj = {
+                            row: editor.currentSelections[i].start.row,
+                            column: editor.currentSelections[i].start.column
+                        };
+                        
+                        editor.moveCursorToPosition(insertObj);
+                        
+                        editor.env.document.insert(insertObj, insertText);
+                    }
+                } else {
+                    editor.insert(autocompleteGlobals.arrValues[intFocusedLine]);
                 }
-                
                 
                 //editor.currentSelections = oldSelectionRanges;
                 
@@ -630,9 +640,9 @@ function autocompletePopupSearch(editor, strMode) {
       , intSearchStringEnd = autocompleteGlobals.intSearchEnd
       , strSearch = strScript.substring(intSearchStringStart, intSearchStringEnd)
       , choices, match, i, len, strCurrentMasterSearch, strCurrentMasterValue, strNewValue, strAdded;
-    //console.log(strScript);
+
     if (editor.currentSelections.length > 1) {
-        if (autocompleteGlobals.searchLength !== 0) {
+        if (autocompleteGlobals.searchLength !== 0 && autocompleteGlobals.searchLength !== 1) {
             if (curr_run_search > 0) {
                 curr_run_search += 1;
             } else {
@@ -661,7 +671,12 @@ function autocompletePopupSearch(editor, strMode) {
         //console.log(autocompleteGlobals.arrSearchMaster);
         //console.log(autocompleteGlobals.arrValuesMaster);
         //console.log(autocompleteGlobals.searchLength);
-        strSearch = strSearch.substring(strSearch.length - autocompleteGlobals.searchLength, strSearch.length);
+        if (strSearch.indexOf('\n') !== -1) {
+            strSearch = strSearch.substring(strSearch.length - autocompleteGlobals.searchLength, strSearch.length);
+        } else {
+            autocompleteGlobals.searchLength = strSearch.length + 1;
+        }
+        
         //console.log(autocompleteGlobals);
     }
     if (autocompleteGlobals.popupOpen === true) {
@@ -754,9 +769,9 @@ function autocompletePopupSearch(editor, strMode) {
                 }
             }
             
+
             autocompleteGlobals.popupAce.setValue(strNewValue.substring(1));
         }
-        
             //console.log(autocompleteGlobals.arrValues.length, autocompleteGlobals.arrValues[0], strSearch);
             //console.log(autocompleteGlobals.arrValues.length, autocompleteGlobals.arrValues[0] === strSearch);
         
@@ -787,6 +802,7 @@ function autocompletePopupSearch(editor, strMode) {
                                  document.getElementById('autocomplete-popup-instruction').style.height;
             document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
         }
+        
         
     }
     //console.log(document.getElementById('autocomplete-popup-instruction').style.top, popup_instruct_top);
