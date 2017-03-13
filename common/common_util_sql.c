@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "common_util_sql.h"
 
 bool query_is_safe(char *str_query) {
@@ -591,7 +592,11 @@ bool permissions_check(EV_P, DB_conn *conn, char *str_path, void *cb_data, reada
 	} else if (strncmp(ptr_path, "web_root/", 9) == 0 || strncmp(ptr_path, "web_root", 9) == 0) {
 		return ddl_readable(EV_A, conn, "developer_g", false, cb_data, readable_cb);
 	} else if (strncmp(ptr_path, "app/", 4) == 0 || strncmp(ptr_path, "app", 4) == 0) {
-		return ddl_readable(EV_A, conn, "developer_g", false, cb_data, readable_cb);
+		if (strlen(ptr_path) > 4) {
+			return ddl_readable(EV_A, conn, ptr_path + 3, false, cb_data, readable_cb);
+		} else {
+			return readable_cb(EV_A, cb_data, true);
+		}
 	} else {
 		return false;
 	}
@@ -614,7 +619,11 @@ bool permissions_write_check(EV_P, DB_conn *conn, char *str_path, void *cb_data,
 	} else if (strncmp(ptr_path, "web_root/", 9) == 0 || strncmp(ptr_path, "web_root", 9) == 0) {
 		return ddl_readable(EV_A, conn, "developer_g", false, cb_data, readable_cb);
 	} else if (strncmp(ptr_path, "app/", 4) == 0 || strncmp(ptr_path, "app", 4) == 0) {
-		return ddl_readable(EV_A, conn, "developer_g", false, cb_data, readable_cb);
+		if (strlen(ptr_path) > 4) {
+			return ddl_readable(EV_A, conn, ptr_path + 3, false, cb_data, readable_cb);
+		} else {
+			return readable_cb(EV_A, cb_data, true);
+		}
 	} else {
 		return false;
 	}
@@ -709,9 +718,9 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 	} else {
 		slash_position = (size_t)(ptr_slash - ptr_path);
 	}
-	SDEBUG("str_path      : %p", str_path);
-	SDEBUG("ptr_path      : %p", ptr_path);
-	SDEBUG("ptr_slash     : %p", ptr_slash);
+	SDEBUG("str_path      : %p (%s)", str_path, str_path);
+	SDEBUG("ptr_path      : %p (%s)", ptr_path, ptr_path);
+	SDEBUG("ptr_slash     : %p (%s)", ptr_slash, ptr_slash);
 	SDEBUG("slash_position: %d", slash_position);
 
 	if (bol_writeable) {

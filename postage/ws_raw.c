@@ -10,6 +10,7 @@ extern char *_DB_get_diagnostic(DB_conn *conn, PGresult *res);
 
 void ws_raw_step1(struct sock_ev_client_request *client_request) {
 	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->vod_request_data;
+	SDEFINE_VAR_ALL(str_escaped_sql, str_sql_temp);
 	char *ptr_query = NULL;
 	char *str_response = NULL;
 	client_request->arr_query = NULL;
@@ -17,6 +18,8 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 	char str_temp[101];
 	int int_status = 1;
 	size_t int_response_len = 0;
+	size_t int_sql_temp_len = 0;
+	size_t int_escaped_sql_len = 0;
 
 	client_request->arr_response = DArray_create(sizeof(char *), 1);
 	client_raw->bol_autocommit = false;
@@ -103,13 +106,95 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
+		SINFO("TRANSACTION COMPLETED");
 		goto finish;
 	}
-	client_request->int_i = (client_raw->bol_autocommit  ? 0 : -1);
+	client_request->int_i = (client_raw->bol_autocommit ? 0 : -1);
 	client_request->int_len = (ssize_t)DArray_end(client_request->arr_query);
+
+	client_request->int_response_id = (client_raw->bol_autocommit ? 0 : -1);
 
 	if (client_raw->bol_autocommit) {
 		char *str_sql = (char *)DArray_get(client_request->arr_query, (size_t)client_request->int_i);
+
+		SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
+			str_sql, strlen(str_sql));
+		str_escaped_sql = bescape_value(str_sql_temp, &int_sql_temp_len);
+		SFREE(str_sql_temp);
+		SFINISH_CHECK(str_escaped_sql != NULL, "bescape_value failed");
+		int_escaped_sql_len = strlen(str_escaped_sql);
+
+		client_request->int_response_id += 1;
+		memset(str_temp, 0, 101);
+		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
+
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
+		if (client_request->str_transaction_id != NULL) {
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
+		}
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"QUERY\t", (size_t)6,
+			str_escaped_sql, int_escaped_sql_len);
+		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		DArray_push(client_request->arr_response, str_response);
+
+		client_request->int_response_id += 1;
+		memset(str_temp, 0, 101);
+		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
+
+		SFINISH_SNCAT(str_response, &int_response_len,
+			"messageid = ", (size_t)12,
+			client_request->str_message_id, strlen(client_request->str_message_id),
+			"\012responsenumber = ", (size_t)18,
+			str_temp, strlen(str_temp),
+			"\012", (size_t)1);
+		if (client_request->str_transaction_id != NULL) {
+			SFINISH_SNFCAT(str_response, &int_response_len,
+				"transactionid = ", (size_t)16,
+				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				"\012", (size_t)1);
+		}
+
+		struct tm tm_time;
+		struct timeval tv_time;
+		memset(str_temp, 0, 101);
+		SFINISH_CHECK(gettimeofday(&tv_time, NULL) == 0, "gettimeofday failed");
+		SDEBUG("tv_time.tv_sec: %d", tv_time.tv_sec);
+#ifdef _WIN32
+		SFINISH_CHECK((errno = _gmtime32_s(&tm_time, &tv_time.tv_sec)) == 0, "_gmtime32_s failed");
+#else
+		gmtime_r(&tv_time.tv_sec, &tm_time);
+#endif
+		SDEBUG("tm_time.tm_mon: %d", tm_time.tm_mon);
+		SFINISH_CHECK(strftime(str_temp, 100, str_date_format, &tm_time) != 0, "strftime() failed");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"START\t", (size_t)6,
+			str_temp, strlen(str_temp));
+
+		memset(str_temp, 0, 101);
+		SFINISH_CHECK(strftime(str_temp, 100, str_time_format, &tm_time) != 0, "strftime() failed");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"\t", (size_t)1,
+			str_temp, strlen(str_temp));
+
+		memset(str_temp, 0, 101);
+		SFINISH_CHECK(snprintf(str_temp, 100, "%ld", (unsigned long)tv_time.tv_usec) != 0, "snprintf() failed");
+		SFINISH_SNFCAT(str_response, &int_response_len,
+			"\t", (size_t)1,
+			str_temp, strlen(str_temp));
+
+		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		DArray_push(client_request->arr_response, str_response);
+		str_response = NULL;
+
 		int_status = PQsendQuery(client_request->parent->cnxn, str_sql);
 	} else {
 		SINFO("client_request->parent: %p", client_request->parent);
@@ -119,16 +204,15 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		SFINISH("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
 	}
 
-	client_request->int_response_id = 0;
-
 	query_callback(global_loop, client_request, ws_raw_step2);
 
 	bol_error_state = false;
 finish:
+	SFREE_ALL();
 	if (str_response != NULL) {
 		bol_error_state = false;
 		memset(str_temp, 0, 101);
-		client_request->int_response_id += 1;
+		client_request->int_response_id = client_request->int_response_id > 0 ? client_request->int_response_id + 1 : 1;
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		char *_str_response = str_response;
 		SFINISH_SNCAT(str_response, &int_response_len,
@@ -477,6 +561,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
+			SINFO("TRANSACTION COMPLETED");
 			// client_request_free(client_request);
 		}
 	} else {
@@ -883,6 +968,10 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 			} else if (client_request->int_i > client_request->int_len || (client_request->int_i == client_request->int_len && client_raw->bol_autocommit)) {
 				SFINISH_SNFCAT(str_response, &int_response_len,
 					"TRANSACTION COMPLETED", (size_t)21);
+				WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len);
+				DArray_push(client_request->arr_response, str_response);
+				str_response = NULL;
+				SINFO("TRANSACTION COMPLETED");
 			}
 
 			ev_check_stop(EV_A, &client_copy_check->check);

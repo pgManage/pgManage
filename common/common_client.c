@@ -1928,6 +1928,7 @@ bool client_close_close_cnxn_cb(EV_P, void *cb_data, DB_result *res) {
 	client->conn = NULL;
 	DB_free_result(res);
 	client_close_immediate(client);
+	return false;
 }
 #endif
 
