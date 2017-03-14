@@ -21,6 +21,7 @@ envelope
        [-t <login-timeout> | --login-timeout=<login-timeout>]
        [-u <public-username> | --public-username=<public-username>]
        [-w <public-password> | --public-password=<public-password>]
+       [-x <local-only> | --local-only=<local-only>]
 ```
 
 ## DESCRIPTION
@@ -95,6 +96,10 @@ The following options can be specified on the command line or in the configurati
 `-w` or `--public-password=` or `public_password=`  
        `String;` no defaults
        This option tells `envelope` than public actions should use these credentials, if they are unset, then public actions are disabled.
+
+`-x` or `--local-only=` or `local-only=`  
+       `Boolean;` defaults to false  
+       This tells Postage whether or not to set the listening socket to local addresses only.
 
 ## SETTING UP A CONNECTION TO A POSTGRESQL SERVER
 

@@ -10,20 +10,21 @@ char *str_global_tls_key = NULL;
 char *str_global_port = NULL;
 bool bol_global_local_only = false;
 bool bol_global_super_only = true;
-bool bol_global_allow_custom_connections = false;
 size_t int_global_login_timeout = 3600;
 size_t int_global_custom_connection_number = 0;
-char *str_global_public_username = NULL;
-char *str_global_public_password = NULL;
 uint64_t int_global_session_id = 0;
 
 DArray *darr_global_connection = NULL;
-bool bol_global_set_user = false;
 
 #ifdef ENVELOPE
+char *str_global_public_username = NULL;
+char *str_global_public_password = NULL;
+bool bol_global_set_user = false;
+
 char *str_global_app_path = NULL;
 char *str_global_role_path = NULL;
 #else
+bool bol_global_allow_custom_connections = false;
 char *str_global_sql_root = NULL;
 #endif
 
