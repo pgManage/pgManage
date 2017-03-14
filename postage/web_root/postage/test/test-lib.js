@@ -1,5 +1,16 @@
 var WS = {};
 
+var rightPad = function (str, padString, padToLength) {
+    'use strict';
+    str = String(str);
+
+    while (str.length < padToLength) {
+        str = str + padString;
+    }
+
+    return str;
+};
+
 var $ = {
     ajax: function (strLink, strParams, strMethod, callback) {
         'use strict';
@@ -34,8 +45,8 @@ var $ = {
     runTests: function (key) {
         $.runTest(key, 0);
     },
-    bolRun: false,
-    test_random: parseInt(Math.random().toString().substring(2, 7), 10).toString(),
+    intRun: 10,
+    test_random: rightPad(parseInt(Math.random().toString().substring(2, 7), 10).toString(), '0', 5),
     test_change_stamp: (function () {
         var test_change_stamp = new Date();
         test_change_stamp.setMinutes(test_change_stamp.getMinutes());
@@ -47,9 +58,9 @@ var $ = {
         objLabel.classList.remove(strOldClass);
         objLabel.classList.add(strNewClass);
         if (strNewClass === 'fail') {
-            document.getElementById('status-note-' + key).textContent = ' (ERROR)';
+            document.getElementById('status-note-' + key).textContent = '(ERROR)';
         } else {
-            document.getElementById('status-note-' + key).textContent = ' (RUNNING)';
+            document.getElementById('status-note-' + key).textContent = '(RUNNING)';
         }
         objLabel.strStatus = strStatus;
         objLabel.strErrorText = strErrorText;
@@ -59,14 +70,21 @@ var $ = {
         // console.log('run_test:', intCurrent);
         var arrCurrent = $.tests[key].tests[intCurrent];
         if (arrCurrent === undefined) {
-            if ($.bolRun) {
-                var i, len;
-                $.test_random = Math.random().toString().substring(2);
+			if ($.tests[key].intRun === undefined) {
+				$.tests[key].intRun = 1;
+			}
+            if ($.tests[key].intRun < $.intRun) {
+				$.tests[key].intRun += 1;
+                var i = 0, len = $.tests[key].tests.length;
+				for (; i < len; i += 1) {
+					$.changeStatus(key, i, 'pass', 'waiting');
+				}
+
                 $.runTest(key, 0);
             } else {
                 document.getElementById('status-note-' + key).textContent = ' (STOPPED)';
             }
-                
+
             var num = parseInt(document.getElementById('iterations-' + key).innerText, 10);
             document.getElementById('iterations-' + key).innerText = num + 1;
             return;
@@ -208,8 +226,14 @@ var $ = {
                     return;
                 }
                 //console.log(i, data);
-                data = data.replace(/..\\..\\/gi, '../');
-                data = data.replace(/\\(?![rnt])/gi, '/');
+				if (data !== '\\.') {
+	                data = data.replace(/\.\.\\\.\.\\/g, '../');
+	                data = data.replace(/\\(?![rnt])/g, '/');
+					data = data.replace(/\/Users\\nunzio\/AppData\/Roaming\//g, '/home/super/.');
+					data = data.replace(/\/Users\/joseph\//g, '/home/super/');
+					data = data.replace(/\\test/g, '/test');
+	                data = data.replace(/\/\//g, '\\\\');
+				}
                 arrStrActualOutput.push(data.replace(/transactionid = .*\n/gim, ''));
                 i += 1;
                 if (i === arrStrExpectedOutput.length || data === 'TRANSACTION COMPLETED' || error) {
@@ -265,7 +289,7 @@ var $ = {
             var bolIsWrite = strArgs.substring ? strArgs.substring(0, 10) === 'FILE\tWRITE' : false;
             //// console.log('strArgs: ' + strArgs);
             WS.requestFromSocket($.tests[key].socket, key, strArgs, function (data, error, errorData) {
-                if (i < 10 || i % 50 == 0) {
+                if (i < 3 || i % 50 == 0) {
                     $.tests[key].socket.stayClosed = false;
                     $.tests[key].socket.close();
                 }
@@ -331,19 +355,12 @@ var $ = {
                         // console.log(data);
                     });
                 } else if (i === 2 && data.indexOf('END') === 0) {
-                } else if (i === 3 && data === ml(function () {/*Query failed: FATAL
-    error_text	ERROR:  canceling statement due to user request\n
-    error_detail	
-    error_hint	
-    error_query	
-    error_context	
-    error_position	
-    */})) {
+                } else if (i === 3 && JSON.stringify(data) === ml(function() {/*"Query failed: FATAL\nerror_text\tERROR:  canceling statement due to user request\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"*/})) {
                     $.changeStatus(key, intCurrent, 'running', 'pass');
                     $.runTest(key, intCurrent + 1);
                 } else {
                     document.getElementById('actual-status-' + key).value = i;
-                    document.getElementById('actual-output-' + key).value = data;
+                    document.getElementById('actual-output-' + key).value = JSON.stringify(data);
                     $.changeStatus(key, intCurrent, 'running', 'fail');
                 }
                 i += 1;
@@ -474,9 +491,9 @@ function pushQueryString(QS) {
 
 function ml(func) {
     'use strict';
-    
+
     func = func.toString();
-    
+
     return func.substring(func.indexOf('/*') + 2, func.indexOf('*/'));
 }
 
@@ -1085,4 +1102,3 @@ WS.decodeFromTabDelimited = function (strValue, nullValue) {
     //               .replace(/\\t/g, '\t')
     //               .replace(/\\N/g, 'NULL');
 };
-

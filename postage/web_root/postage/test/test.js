@@ -7,7 +7,7 @@ document.addEventListener('change', function (event) {
         var value = checkbox.checked.toString();
         pushQueryString(key + '=' + value);
         qs[key] = value;
-        
+
         var list = document.getElementById('test-list-' + key);
         list.classList.toggle('disabled');
         if (qs[key] === 'true') {
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     list.innerHTML =
                         '<h3>' +
                         key + '<br />' +
-                        '<small><b id="iterations-' + key + '">0</b> Successful Iterations<b id="status-note-' + key + '"></b></small>' +
+                        '<small><b id="iterations-' + key + '">0</b> Successful Iterations<br /><b id="status-note-' + key + '"></b></small>' +
                         '</h3>' +
                         strHTML +
                         '<label for="actual-status-' + key + '">Actual Status</label>' +

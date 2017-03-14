@@ -1,9 +1,6 @@
 body {
     padding: 0;
-    margin: 0 auto;
-    max-width: 108em;
-    height: auto;
-    box-sizing: border-box;
+    margin: 0;
     font-family: 'Courier New', monospace;
 }
 
@@ -28,12 +25,24 @@ small {
     font-size: 0.75em;
 }
 
-.test-list {
-    margin: 1em;
-    max-width: 25em;
-    min-width: 20em;
-    float: left;
+#tests {
+	width: 100%;
+    display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	align-items: flex-start;
 }
+
+#tests > .test-list {
+	padding: 0.5em;
+	box-sizing: border-box;
+	flex: 1;
+    flex-basis: auto;
+	min-width: 13em;
+	max-width: 16em;
+}
+
 .disabled {
     opacity: 0.3;
 }
