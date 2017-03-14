@@ -822,8 +822,10 @@ void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 		}
 	}
 #else
+	// if this is uncommented, then a > 0 file descriptor check will fail badly
+	//close(0);
 	client_tab->int_fd = open(client_tab->str_path, O_TRUNC | O_WRONLY | O_CREAT, 0770);
-	SFINISH_CHECK(client_tab->int_fd > 0, "open() failed!");
+	SFINISH_CHECK(client_tab->int_fd >= 0, "open() failed!");
 #endif
 
 	ev_check_init(&client_request->check, ws_tab_write_step3);

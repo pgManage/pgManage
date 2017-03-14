@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "common_util_sql.h"
 
 bool query_is_safe(char *str_query) {
