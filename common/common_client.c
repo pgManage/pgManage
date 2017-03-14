@@ -277,6 +277,7 @@ void client_notify_cb(EV_P, ev_io *w, int revents) {
 	}
 	if (int_status != 1) {
 		SERROR_NORESPONSE("Lost postgresql connection:\012%s", PQerrorMessage(client->cnxn));
+		SFREE(str_global_error);
 
 		SERROR_CHECK(PQresetStart(client->conn->conn) == 1, "PQresetStart failed");
 
@@ -1950,6 +1951,9 @@ void client_close_immediate(struct sock_ev_client *client) {
 	}
 	if (client->client_paused_request != NULL && client->client_paused_request->bol_is_db_framework) {
 		client->client_paused_request->watcher = NULL;
+
+		// this won't effect the event loop, because DB_finish will have the decrement_idle
+		increment_idle(global_loop);
 	}
 	if (client->conn != NULL) {
 		SDEBUG("DB_conn %p closing", client->conn);
@@ -1982,7 +1986,7 @@ void client_close_immediate(struct sock_ev_client *client) {
 				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_close() failed");
 			}
 			tls_free(client->tls_postage_io_context);
-			// The documentation (poorly) states that IF tls_close is called on a
+			// The documentation states that IF tls_close is called on a
 			// CLIENT context, it will close the socket, but
 			// it won't on a server context
 			close(client->int_sock);

@@ -934,6 +934,7 @@ finish:
 #endif
 	if (bol_error_state) {
 		ev_check_stop(EV_A, &client_request->check);
+		decrement_idle(EV_A);
 		bol_error_state = false;
 		client_request->int_response_id = (ssize_t)DArray_end(client_request->arr_response) + 1;
 		char str_temp[101] = {0};
