@@ -28,6 +28,7 @@ void _increment_idle(EV_P) {
 void _decrement_idle(EV_P) {
 	if (int_idle_count == 0) {
 		SERROR_NORESPONSE("Cannot decrement idle any further.");
+		return;
 	}
 	if (int_idle_count == 1) {
 		ev_idle_stop(EV_A, &idle_watcher);

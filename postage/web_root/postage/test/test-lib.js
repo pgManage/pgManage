@@ -59,6 +59,7 @@ var $ = {
         objLabel.classList.add(strNewClass);
         if (strNewClass === 'fail') {
             document.getElementById('status-note-' + key).textContent = '(ERROR)';
+			$.tests[key].error = true;
         } else {
             document.getElementById('status-note-' + key).textContent = '(RUNNING)';
         }
@@ -70,11 +71,24 @@ var $ = {
         // console.log('run_test:', intCurrent);
         var arrCurrent = $.tests[key].tests[intCurrent];
         if (arrCurrent === undefined) {
-			if ($.tests[key].intRun === undefined) {
-				$.tests[key].intRun = 1;
+			var minRuns = Infinity, error = false;
+			for (var key2 in $.tests) {
+				if ($.tests.hasOwnProperty(key2)) {
+					var runs = 0;
+					if ($.tests[key2].intRun !== undefined) {
+						runs = $.tests[key2].intRun;
+					}
+					if (runs < minRuns) {
+						minRuns = runs;
+					}
+					error = error || $.tests[key2].error || false;
+				}
 			}
-            if ($.tests[key].intRun < $.intRun) {
-				$.tests[key].intRun += 1;
+			if ($.tests[key].intRun === undefined) {
+				$.tests[key].intRun = 0;
+			}
+			$.tests[key].intRun += 1;
+            if ((minRuns + 1) < $.intRun && !error) {
                 var i = 0, len = $.tests[key].tests.length;
 				for (; i < len; i += 1) {
 					$.changeStatus(key, i, 'pass', 'waiting');
@@ -183,7 +197,10 @@ var $ = {
             request.send(formData);
         } else if (strType === 'websocket start') {
             $.changeStatus(key, intCurrent, 'waiting', 'running');
-            $.tests[key].socket = WS.openSocket('env', key);
+			if ($.tests[key].socket) {
+				WS.closeSocket($.tests[key].socket);
+			}
+            $.tests[key].socket = WS.openSocket(key, key);
             var i = 0;
             WS.requestFromSocket($.tests[key].socket, key, 'INFO', function (data, error, errorData) {
                 if (i === -1) {

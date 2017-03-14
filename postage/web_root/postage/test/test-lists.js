@@ -1413,7 +1413,9 @@ WHERE id::text ILIKE '2{{test_random}}%';
 			['INSERT RECORDS 2', 'websocket', '', ml(function () {/*INSERT	rtesting_table
 RETURN	id	test_name	test_name2
 PK	id
-SEQ
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id DESC
 
 id	test_name	test_name2
 */
