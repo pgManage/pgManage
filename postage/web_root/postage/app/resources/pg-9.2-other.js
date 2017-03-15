@@ -694,6 +694,8 @@ function dialogSettings() {
     });
 }
 
+var customCSSText;
+
 // Postage Options in localStorage
 function dialogOptions() {
     'use strict';
@@ -802,21 +804,17 @@ function dialogOptions() {
                         </tbody>
                     </table>
                 </div>
-                <gs-grid widths="1,2" gutter>
-                    <gs-block>
-                        <label for="button-options" style="min-width: 20">SQL Toolbar Buttons</label>
-                        <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
-                                <label>Button Style:</label>
-                                <gs-option value="true">Labeled</gs-option>
-                                <gs-option value="false">Unlabeled</gs-option>
-                        </gs-optionbox>
-                    </gs-block>
-                    <gs-block style="min-height: 15em;">
-                        <label for="customCSSAce" style="min-width: 20">Custom CSS Stylesheet</label>
-                        <div id="customCSSAce"></div>
-                        <div><p>This Ace is stored in your local storage. Because this can get emptied it's recommended to save a copy.</p><div>
-                    </gs-block>
-                </gs-grid>
+                
+                <h3>SQL Toolbar Buttons</h3>
+                <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
+                        <label>Button Style:</label>
+                        <gs-option value="true">Labeled</gs-option>
+                        <gs-option value="false">Unlabeled</gs-option>
+                </gs-optionbox>
+                
+                <h3>Custom CSS Stylesheet</h3>
+                <div id="customCSSAce"></div>
+                <div><p>This Ace is stored in your local storage. Because this can get emptied it's recommended to save a copy.</p><div>
             </gs-body>
             <gs-footer><gs-button dialogclose id="settingsClose">Done</gs-button></gs-footer>
         </gs-page>
@@ -878,8 +876,8 @@ function dialogOptions() {
             refreshButtons(document.getElementById('button-options').value);
             //console.log(document.getElementById('button-options').value);
         });
-        document.getElementById('settingsClose').addEventListener('click', function () {
-            refreshCustomCSS(CSSEditor.getValue());
+        CSSEditor.addEventListener('change', function () {
+            customCSSText = CSSEditor.getValue();
         });
         document.getElementById('clip-options-quote-char').addEventListener('change', setAllClipSettings);
         document.getElementById('clip-options-field-delimiter').addEventListener('change', setAllClipSettings);
@@ -928,6 +926,8 @@ function dialogOptions() {
                 });
             }
         }
+    }, function () {
+        refreshCustomCSS(customCSSText);
     });
 }
 
@@ -2090,7 +2090,7 @@ function executeScript() {
             resultsTallyElement.innerHTML = ' (<b>Pass: ' + (intQuery - intError) + '</b>, <b>Fail: ' + (intError) + '</b>)';
             //resultsTallyElement.innerHTML = ' (<b>Success: ' + (intQuery - intError) + '</b>, <b>Error: ' + (intError) + '</b>)';
         };
-
+        
         // begin
         startExecute();
         messageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
@@ -2099,8 +2099,18 @@ function executeScript() {
               , intLine, i, len, col_i, col_len, rec_i, rec_len
               , warningHTML, buttonContainerElement, strCSS
               , styleElement;
-
+            
             if (bolIgnoreMessages === false) {
+                // get name of query if applicable
+                var strQueryName = "";
+                if (data.strQuery) {
+                    var arrStrMatches = data.strQuery.match(/\-\-[ \t]*Name\:(.*)$/im);
+                    
+                    if (arrStrMatches && arrStrMatches.length > 1) {
+                    	strQueryName = ", " + arrStrMatches[1].trim();
+                    }
+                }
+                
                 if (!error) {
                     if (data.intCallbackNumber === 0) {
                         endExecute();
@@ -2141,8 +2151,9 @@ function executeScript() {
                                                 '</i><br/>';
                             }
 
+                            
                             strHTML = '<div flex-horizontal>' +
-                                            '<h5 flex>Query #' + (data.intQueryNumber + 1) + ':</h5>' +
+                                            '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
                                             '<div>';
 
                             if (data.dteStart && data.dteEnd && !isNaN(data.dteStart.getTime()) && !isNaN(data.dteEnd.getTime())) {
@@ -2185,7 +2196,7 @@ function executeScript() {
                             }
 
                             strHTML = '<div flex-horizontal>' +
-                                            '<h5 flex>Query #' + (data.intQueryNumber + 1) + ':</h5>' +
+                                            '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
                                             '<div>';
 
                             if (data.dteStart && data.dteEnd && !isNaN(data.dteStart.getTime()) && !isNaN(data.dteEnd.getTime())) {
@@ -2233,7 +2244,7 @@ function executeScript() {
                                 }
 
                                 strHTML = '<div flex-horizontal>' +
-                                                '<h5 flex>Query #' + (data.intQueryNumber + 1) + ':</h5>' +
+                                                '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
                                                 '<div>';
 
                                 if (data.dteStart && data.dteEnd && !isNaN(data.dteStart.getTime()) && !isNaN(data.dteEnd.getTime())) {
@@ -2450,12 +2461,12 @@ function executeScript() {
                     }
 
                     divElement = document.createElement('div');
-                    divElement.innerHTML = '<h4 id="error' + intQuery + '">Query #' + (intQuery) + ' Error:</h4>' + warningHTML +
+                    divElement.innerHTML = '<h4 id="error' + intQuery + '">Query #' + (intQuery) + strQueryName + ' Error:</h4>' + warningHTML +
                                             '<pre>' + encodeHTML(GS.decodeFromTabDelimited(data.error_text)) + '</pre>'; //strError ||
                     resultsContainer.appendChild(divElement);
                     resultsContainer.appendChild(document.createElement('br'));
                     //resultsContainer.scrollTop = resultsContainer.scrollHeight + resultsContainer.offsetHeight;
-                    console.log(resultsContainer.scrollTop = document.getElementById('error' + intQuery));
+                    //console.log(resultsContainer.scrollTop = document.getElementById('error' + intQuery));
                     resultsContainer.scrollTop = document.getElementById('error' + intQuery).offsetTop - 40;
                     //resultsContainer.scrollTop = document.getElementById('error' + intQuery).offset().top;
                     resultsHeaderElement.classList.add('error');
