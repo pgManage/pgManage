@@ -59,7 +59,7 @@
                 reconnectNumber -= 1;
 
                 if (reconnectNumber <= -6) {
-                    window.location = '/postage/auth?action=logout';
+                    window.location = '/postage/auth?action=logout?error=Connection%20timed%20out';
                 }
             });
 
@@ -226,6 +226,7 @@
                 console.log('bolExplainLoaded:            ', window.bolExplainLoaded);
                 console.log('bolD3Loaded:                 ', window.bolD3Loaded);
                 console.log('bolZoomLoaded:               ', window.bolZoomLoaded);
+                console.log('bolSettingsLoaded:           ', window.bolSettingsLoaded);
 
                 // if a file didn't load: popup an error (execute orderSixtySix)
                 if (!window.bolAutocompleteLogicLoaded
@@ -241,7 +242,8 @@
                  || !window.bolTabFunctionsLoaded
                  || !window.bolExplainLoaded
                  || !window.bolD3Loaded
-                 || !window.bolZoomLoaded) {
+                 || !window.bolZoomLoaded
+                 || !window.bolSettingsLoaded) {
                     orderSixtySix();
                 }
             });
@@ -569,5 +571,8 @@
         <script src="resources/pg-9.2-explain.js" type="text/javascript"></script>
         <script src="../js/page-zoom.js" type="text/javascript"></script>
         <script src="../js/d3.js" type="text/javascript"></script>
+        
+        <script src="../js/settings.js" type="text/javascript"></script>
+        <style id="customCss"></style>
     </body>
 </html>

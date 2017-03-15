@@ -152,6 +152,15 @@
 			    z-index: 50;
 			}
         </style>
+        <script src="../js/settings.js" type="text/javascript"></script>
+        <script>
+            if (window.parent) {
+                window.parent.addEventListener('resize', function () {
+                    document.getElementById('customCss').innerHTML = localStorage.customCSS;
+                });
+            }
+        </script>
+        <style id="customCss"></style>
     </head>
     <body>
         <gs-page>

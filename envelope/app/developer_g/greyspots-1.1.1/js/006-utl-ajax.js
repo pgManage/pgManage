@@ -179,7 +179,7 @@ window.addEventListener('design-register-element', function () {
             // if expired cookie: go to login page
             if (request.readyState === 4) {
                 if (request.status === 440) {
-                    window.location = '/index.html?redirect=' + encodeURIComponent(window.location.pathname);
+                    window.location = '/index.html?error=Connection%20timed%20out&redirect=' + encodeURIComponent(window.location.pathname);
                 } else {
                     try {
                         request.responseJSON = JSON.parse(request.responseText || request.response);
@@ -241,7 +241,7 @@ window.addEventListener('design-register-element', function () {
                     callback(request.responseText);
                     
                 } else if (request.status === 440) {
-                    window.location = '/index.html?redirect=' + encodeURIComponent(window.location.pathname);
+                    window.location = '/index.html?error=Connection%20timed%20out&redirect=' + encodeURIComponent(window.location.pathname);
                     
                 } else {
                     normalizedError = ajaxNormalizeError(request);

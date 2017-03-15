@@ -878,6 +878,17 @@
                 overflow: hidden;
             }
         </style>
+        <script src="../../js/settings.js" type="text/javascript"></script>
+        <script>
+            if (window.parent) {
+                window.parent.addEventListener('resize', function () {
+                    if (localStorage && localStorage.customCSS && document.getElementById('customCss')) {
+                        document.getElementById('customCss').innerHTML = localStorage.customCSS;
+                    }
+                });
+            }
+        </script>
+        <style id="customCss"></style>
     </head>
     <body>
         <gs-page>

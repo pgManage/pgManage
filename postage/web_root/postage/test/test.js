@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('tests').appendChild(list);
 
                     if (qs[key] === 'true') {
+						pushState({}, 'Postage Test Backend', '/postage/0/index.html' + window.location.search);
                         $.runTests(key);
                     } else {
                         list.classList.add('disabled');

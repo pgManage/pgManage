@@ -85,7 +85,6 @@ function zoomSet(newValue) {
 
     // we want the new setting to persist across sessions
     localStorage['postageZoom' + zoomGetPageName()] = intValue;
-
     // we want the body's font-size to be updated
     // on MS Edge, the gs-page responding to the window resize slows down the browser,
     //      so, we'll throttle to 10ms
