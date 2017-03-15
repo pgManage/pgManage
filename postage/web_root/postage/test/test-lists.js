@@ -1993,8 +1993,5 @@ $.ajax('/postage/auth', 'action=login&username=postgres&password=password&connna
                 $.tests.http_file.tests[i][5] = data;
             }
         }
-        $.ajax('/postage/auth', 'action=logout', 'POST', function (data) {
-
-        });
     });
 });

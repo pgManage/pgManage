@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "http_upload.h"
 
 void http_upload_step1(struct sock_ev_client *client) {
@@ -86,7 +87,7 @@ finish:
 			_str_response, strlen(_str_response));
 
 		SFREE(_str_response);
-		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
+		if (CLIENT_WRITE(client, str_response, int_response_len) < int_response_len) {
 			if (bol_tls) {
 				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {
@@ -175,7 +176,7 @@ finish:
 			_str_response, strlen(_str_response));
 
 		SFREE(_str_response);
-		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
+		if (CLIENT_WRITE(client, str_response, int_response_len) < int_response_len) {
 			if (bol_tls) {
 				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {
@@ -238,7 +239,7 @@ void http_upload_step3(EV_P, ev_check *w, int revents) {
 				"Content-Length: 17\015\012"
 				"\015\012"
 				"Upload Succeeded\012"));
-		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
+		if (CLIENT_WRITE(client, str_response, int_response_len) < int_response_len) {
 			if (bol_tls) {
 				SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {

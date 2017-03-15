@@ -100,12 +100,11 @@ var $ = {
                 $.runTest(key, 0);
             } else {
                 document.getElementById('status-note-' + key).textContent = ' (STOPPED)';
-				pushState({}, 'Postage Test Backend', '/postage/test/index.html' + window.location.search);
 				if (key[0] === '_') {
+					pushState({}, 'Postage Test Backend', '/postage/test/index.html' + window.location.search);
 		            for (var key2 in $.tests) {
 		                if ($.tests.hasOwnProperty(key2) && key2 !== key) {
 		                    if (qs[key2] === 'true') {
-								pushState({}, 'Postage Test Backend', '/postage/0/index.html' + window.location.search);
 		                        $.runTests(key2);
 		                    }
 		                }

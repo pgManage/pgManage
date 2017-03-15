@@ -6,6 +6,7 @@ bool http_client_info_cb(EV_P, void *cb_data, DB_result *res);
 All this function does is check the database connection, then call a callback
 */
 void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
+	SDEBUG("http_main_cnxn_cb");
 	struct sock_ev_client *client = cb_data;
 	char *str_response = NULL;
 	char *_str_response = NULL;
@@ -176,7 +177,7 @@ finish:
 			"\015\012\015\012", (size_t)4,
 			_str_response, strlen(_str_response));
 		SFREE(_str_response);
-		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
+		if (CLIENT_WRITE(client, str_response, int_response_len) < int_response_len) {
 			if (bol_tls) {
 				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
 			} else {
