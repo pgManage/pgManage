@@ -274,13 +274,13 @@ bool DB_get_column_types_for_query2(EV_P, void *cb_data, DB_result *res) {
 
 	return true;
 error:
-	res_poll_child->query_cb(EV_A, res_poll_child->cb_data, res);
 	res_poll_child->conn->res_poll = NULL;
 	DB_res_poll_free(res_poll);
 	if (res_poll_child != NULL) {
 		SFREE(res_poll_child->str_query);
 		DB_res_poll_free(res_poll_child);
 	}
+	res_poll_child->query_cb(EV_A, cb_data, res);
 	return true;
 }
 
