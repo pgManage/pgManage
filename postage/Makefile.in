@@ -171,9 +171,9 @@ lldb-ssl: test-common
 	rm temp_lldb_commands
 
 valgrind: test-common
-	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) $(WEBROOTS) -l error || \
+	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) $(WEBROOTS) -l none || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }
 
 valgrind-ssl: test-common
-	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) $(WEBROOTS) -j ../ssl/self.crt -k ../ssl/self.key -l error || \
+	valgrind --leak-check=full --track-fds=yes --track-origins=yes --show-reachable=yes --suppressions=../valgrind/mac_suppressions.txt --num-callers=100 ./$(BINARY) $(CONFIGS) $(WEBROOTS) -j ../ssl/self.crt -k ../ssl/self.key -l none || \
 	{ kill `cat postgres.pid`; rm postgres.pid; rm -rf data_test; exit 1; }

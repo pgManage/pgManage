@@ -18,6 +18,7 @@ extern const char *const WONT_GUESS;
 bool DB_init_framework();
 
 typedef struct DB_conn *DB_connp;
+typedef struct DB_poll *DB_pollp;
 typedef struct DB_result_poll *DB_result_pollp;
 typedef struct DB_copy_check *DB_copy_checkp;
 
@@ -32,6 +33,8 @@ typedef struct DB_conn {
 	EV_P;
 
 	PGconn *conn;
+
+	DB_pollp conn_poll;
 
 	DB_copy_checkp copy_check;
 	DB_result_pollp res_poll;
@@ -68,7 +71,7 @@ typedef struct DB_conn {
 	size_t int_response_len;
 } DB_conn;
 
-typedef struct {
+typedef struct DB_poll {
 	ev_io io;
 	DB_conn *conn;
 	void *cb_data;

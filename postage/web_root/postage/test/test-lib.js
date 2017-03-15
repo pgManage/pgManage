@@ -76,7 +76,7 @@ var $ = {
         if (arrCurrent === undefined) {
 			var minRuns = Infinity, error = false;
 			for (var key2 in $.tests) {
-				if ($.tests.hasOwnProperty(key2)) {
+				if ($.tests.hasOwnProperty(key2) && key2[0] !== '_') {
 					var runs = 0;
 					if ($.tests[key2].intRun !== undefined) {
 						runs = $.tests[key2].intRun;
@@ -91,7 +91,7 @@ var $ = {
 				$.tests[key].intRun = 0;
 			}
 			$.tests[key].intRun += 1;
-            if (key[0] !== '_' && (minRuns + 1) < $.intRun && !error) {
+            if (key[0] !== '_' && $.tests[key].intRun < 50 && (minRuns + 1) < $.intRun && !error) {
                 var i = 0, len = $.tests[key].tests.length;
 				for (; i < len; i += 1) {
 					$.changeStatus(key, i, 'pass', 'waiting');
@@ -417,7 +417,7 @@ var $ = {
             setTimeout(function () {
                 $.changeStatus(key, intCurrent, 'running', 'pass');
                 $.runTest(key, intCurrent + 1);
-            }, 1000);
+            }, 5000);
         }
     }
 };
@@ -985,7 +985,7 @@ function ml(func) {
                 setTimeout(function () {
                     console.log('ATTEMPTING SOCKET RE-OPEN', socket);
                     var key = socketKey;
-                    $.tests[key].socket = WS.openSocket('env', key, $.tests[key].socket.WSSessionID, $.tests[key].socket.notifications);
+                    $.tests[key].socket = WS.openSocket(key, key, $.tests[key].socket.WSSessionID, $.tests[key].socket.notifications);
                 }, 1000);
             } else {
                 if (socket.bolError) {
@@ -1005,7 +1005,7 @@ function ml(func) {
         if (!socket || socket.readyState === socket.CLOSED) {
             if (!$.tests[key].socket || $.tests[key].socket.readyState === socket.CLOSED) {
                 //console.trace('ATTEMPTING SOCKET RE-OPEN 2');
-                $.tests[key].socket = WS.openSocket('env', key);
+                $.tests[key].socket = WS.openSocket(key, key);
             }
             socket = $.tests[key].socket;
         }
