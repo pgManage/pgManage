@@ -133,7 +133,9 @@ struct sock_ev_client {
 	bool bol_handshake;
 	bool bol_connected;
 
+#ifdef ENVELOPE
 	bool bol_public;
+#endif
 
 	bool bol_upload;
 	char *str_boundary;
