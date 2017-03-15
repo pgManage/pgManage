@@ -21,6 +21,7 @@ postage
        [-l <log-level> | --log-level=<log-level>]
        [-n <allow_custom_connections> | --allow-custom-connections=<allow-custom-connections>]
        [-t <login-timeout> | --login-timeout=<login-timeout>]
+       [-x <local-only> | --local-only=<local-only>]
 ```
 
 ## DESCRIPTION
@@ -86,6 +87,10 @@ The following options can be specified on the command line or in the configurati
 `-t` or `--login-timeout=` or `login-timeout=`  
        `Integer;` defaults to 1200  
        This option regulates the timeout after the last page is closed.
+
+`-x` or `--local-only=` or `local-only=`  
+       `Boolean;` defaults to false  
+       This tells Postage whether or not to set the listening socket to local addresses only.
 
 ## SETTING UP A CONNECTION TO A POSTGRESQL SERVER
 

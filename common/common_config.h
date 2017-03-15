@@ -36,19 +36,20 @@ extern char *str_global_tls_key;
 extern char *str_global_port;
 extern bool bol_global_local_only;
 extern bool bol_global_super_only;
-extern bool bol_global_allow_custom_connections;
-extern char *str_global_public_username;
-extern char *str_global_public_password;
 
 extern DArray *darr_global_connection;
 extern size_t int_global_login_timeout;
 extern size_t int_global_custom_connection_number;
-extern bool bol_global_set_user;
 
 #ifdef ENVELOPE
+extern char *str_global_public_username;
+extern char *str_global_public_password;
+extern bool bol_global_set_user;
+
 extern char *str_global_app_path;
 extern char *str_global_role_path;
 #else
+extern bool bol_global_allow_custom_connections;
 extern char *str_global_sql_root;
 #endif
 extern uint64_t int_global_session_id;

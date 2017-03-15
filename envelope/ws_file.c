@@ -1058,7 +1058,7 @@ bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 	}
 #else
 	client_file->int_fd = open(client_file->str_path, O_TRUNC | O_WRONLY | O_CREAT, 0770);
-	SFINISH_CHECK(client_file->int_fd > 0, "open() failed!");
+	SFINISH_CHECK(client_file->int_fd >= 0, "open() failed!");
 #endif
 
 	ev_check_init(&client_request->check, ws_file_write_step3);

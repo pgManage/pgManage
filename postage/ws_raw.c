@@ -445,6 +445,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 
 	if (result != PGRES_TUPLES_OK) {
 		PQclear(res);
+		res = NULL;
 		if (str_response != NULL && client_request->int_i != 0) {
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 			DArray_push(client_request->arr_response, str_response);
@@ -877,6 +878,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 			memset(str_temp, 0, 101);
 			snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
+			ev_check_stop(EV_A, &client_copy_check->check);
 			decrement_idle(EV_A);
 
 			SFINISH_SNCAT(str_response, &int_response_len,
@@ -974,7 +976,6 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				SINFO("TRANSACTION COMPLETED");
 			}
 
-			ev_check_stop(EV_A, &client_copy_check->check);
 			SFREE(client_copy_check);
 			break;
 		}

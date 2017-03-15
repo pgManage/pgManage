@@ -138,7 +138,7 @@ bool http_upload_step2(EV_P, void *cb_data, bool bol_group) {
 	}
 #else
 	client_upload->int_fd = open(str_temp, O_TRUNC | O_WRONLY | O_CREAT, 0770);
-	SFINISH_CHECK(client_upload->int_fd > 0, "open() failed!");
+	SFINISH_CHECK(client_upload->int_fd >= 0, "open() failed!");
 #endif
 
 	increment_idle(EV_A);
