@@ -59,7 +59,7 @@
                 reconnectNumber -= 1;
 
                 if (reconnectNumber <= -6) {
-                    window.location = '/postage/auth?action=logout';
+                    window.location = '/postage/auth?action=logout?error=Connection%20timed%20out';
                 }
             });
 
