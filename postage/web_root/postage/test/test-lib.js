@@ -29,7 +29,6 @@ var $ = {
         };
 
         request.open(strMethod, strLink, true);
-        request.setRequestHeader('Referrer', 'http://127.0.0.1:8080/postage/0/index.html');
         request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
         if (strLink === '/test.txt?if_modified_since=true') {
             request.setRequestHeader('If-Modified-Since', 'Mon, 1 Aug 2050 21:12:11 GMT');
@@ -46,7 +45,7 @@ var $ = {
         $.runTest(key, 0);
     },
     intRun: 10,
-    test_random: rightPad(parseInt(Math.random().toString().substring(2, 7), 10).toString(), '0', 5),
+	test_random: rightPad(parseInt(Math.random().toString().substring(2, 7), 10).toString(), '0', 5),
     test_change_stamp: (function () {
         var test_change_stamp = new Date();
         test_change_stamp.setMinutes(test_change_stamp.getMinutes());
@@ -60,6 +59,7 @@ var $ = {
         if (strNewClass === 'fail') {
             document.getElementById('status-note-' + key).textContent = '(ERROR)';
 			$.tests[key].error = true;
+			pushState({}, 'Postage Test Backend', '/postage/test/index.html' + window.location.search);
         } else {
             document.getElementById('status-note-' + key).textContent = '(RUNNING)';
         }
@@ -69,6 +69,9 @@ var $ = {
     runTest: function (key, intCurrent) {
         'use strict';
         // console.log('run_test:', intCurrent);
+		if (intCurrent === 0) {
+			$.tests[key].test_random = rightPad(parseInt(Math.random().toString().substring(2, 7), 10).toString(), '0', 5);
+		}
         var arrCurrent = $.tests[key].tests[intCurrent];
         if (arrCurrent === undefined) {
 			var minRuns = Infinity, error = false;
@@ -88,7 +91,7 @@ var $ = {
 				$.tests[key].intRun = 0;
 			}
 			$.tests[key].intRun += 1;
-            if ((minRuns + 1) < $.intRun && !error) {
+            if (key[0] !== '_' && (minRuns + 1) < $.intRun && !error) {
                 var i = 0, len = $.tests[key].tests.length;
 				for (; i < len; i += 1) {
 					$.changeStatus(key, i, 'pass', 'waiting');
@@ -97,6 +100,17 @@ var $ = {
                 $.runTest(key, 0);
             } else {
                 document.getElementById('status-note-' + key).textContent = ' (STOPPED)';
+				pushState({}, 'Postage Test Backend', '/postage/test/index.html' + window.location.search);
+				if (key[0] === '_') {
+		            for (var key2 in $.tests) {
+		                if ($.tests.hasOwnProperty(key2) && key2 !== key) {
+		                    if (qs[key2] === 'true') {
+								pushState({}, 'Postage Test Backend', '/postage/0/index.html' + window.location.search);
+		                        $.runTests(key2);
+		                    }
+		                }
+		            }
+				}
             }
 
             var num = parseInt(document.getElementById('iterations-' + key).innerText, 10);
@@ -106,12 +120,12 @@ var $ = {
         var strType = arrCurrent[1], intStatusCode, strLink, strArgs, strExpectedOutput, i, arrStrActualOutput, expectedOutput;
         if (strType === 'ajax') {
             // console.log('ASDFASDFASDFASDF');
-            if (typeof (arrCurrent[5]) === 'string') {
+            if (typeof (arrCurrent[5]) === 'string' && arrCurrent[0] != 'Download') {
                 arrCurrent[5] = arrCurrent[5].replace(/\r\n/gi, '\n');
             }
 
             var intStatusCode = arrCurrent[2];
-            var strLink = arrCurrent[3];
+            var strLink = arrCurrent[3].replace(/\{\{test_random\}\}/g, $.test_random).replace(/\{\{test_random1\}\}/g, $.tests[key].test_random);
             var strArgs = arrCurrent[4];
             var strExpectedOutput = arrCurrent[5];
             $.changeStatus(key, intCurrent, 'waiting', 'running');
@@ -119,13 +133,17 @@ var $ = {
             var ajax = $.ajax(strLink, strArgs, 'POST', function (data) {
                 if (data.indexOf('<!DOCTYPE html>') !== 0) {
                     data = data.replace(/..\\..\\/gi, '../');
-                    data = data.replace(/\\/gi, '/');
+                    data = data.replace(/\\(?![rnt])/gi, '/');
+					data = data.replace(' (0x0000274D/10061)', '');
                 }
 
                 if (strExpectedOutput === data && intStatusCode === ajax.status) {
                     $.changeStatus(key, intCurrent, 'running', 'pass');
                     $.runTest(key, intCurrent + 1);
                 } else {
+				console.log(strExpectedOutput.length, strExpectedOutput.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
+					console.log(data.length, data.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
+
                     document.getElementById('actual-status-' + key).value = ajax.status;
                     document.getElementById('actual-output-' + key).value = data;
                     $.changeStatus(key, intCurrent, 'running', 'fail', ajax.status, data);
@@ -137,34 +155,34 @@ var $ = {
             }
 
             intStatusCode = arrCurrent[2];
-            strLink = arrCurrent[3];
-            strArgs = arrCurrent[4];
+            var strLink = arrCurrent[3].replace(/\{\{test_random\}\}/g, $.test_random);
+            var strArgs = arrCurrent[4];
             strExpectedOutput = arrCurrent[5];
             $.changeStatus(key, intCurrent, 'waiting', 'running');
 
-            var arrAjax = new Array(100), intNumFailures = 0, intNumFinished = 0;
-            i = 1, len = 100;
-            while (i <= len) {
+			var i = 0, len = 100;
+            var arrAjax = new Array(len), intNumFailures = 0, intNumFinished = 0;
+            while (i < len) {
                 (function (i) {
                     arrAjax[i] = $.ajax(strLink, strArgs, 'POST', function (data) {
-                        if (data === strExpectedOutput && intStatusCode === ajax.status && intNumFailures === 0) {
-                            if (i == 100) {
-                                $.changeStatus(key, intCurrent, 'running', 'pass');
-                            }
+                        if (data === strExpectedOutput && intStatusCode === arrAjax[i].status) {
+
                         } else {
                             intNumFailures += 1;
                             //// console.log('>' + intCurrent + '|' + data + '|' + error + '<');
                             // console.log(ajax.status, data);
                             // console.log(intStatusCode, strExpectedOutput);
                             // console.log(data.error_text);
-                            $.changeStatus(key, intCurrent, 'running', 'fail', i, JSON.stringify(data));
-                            document.getElementById('actual-status-' + key).value = i;
-                            document.getElementById('actual-output-' + key).value = JSON.stringify(data);
+                            document.getElementById('actual-status-' + key).value = intNumFailures;
+                            document.getElementById('actual-output-' + key).value = data;
                         }
                         intNumFinished += 1;
-                        if (intNumFinished == 100 && intNumFailures === 0) {
+                        if (intNumFinished == len && intNumFailures === 0) {
+							$.changeStatus(key, intCurrent, 'running', 'pass');
                             $.runTest(key, intCurrent + 1);
-                        }
+                        } else if (intNumFinished == len) {
+							$.changeStatus(key, intCurrent, 'running', 'fail', i, data);
+						}
                     });
                 })(i)
                 i += 1;
@@ -173,7 +191,7 @@ var $ = {
             arrCurrent[5] = arrCurrent[5].replace(/\r\n/gi, '\n');
             var intStatusCode = arrCurrent[2];
             var strLink = arrCurrent[3];
-            var strArgs = arrCurrent[4];
+            var strArgs = arrCurrent[4].replace(/\{\{test_random\}\}/g, $.test_random).replace(/\{\{test_random1\}\}/g, $.tests[key].test_random);
             var strExpectedOutput = arrCurrent[5];
             $.changeStatus(key, intCurrent, 'waiting', 'running');
             var formData = new FormData();
@@ -183,14 +201,14 @@ var $ = {
             var request = new XMLHttpRequest();
             request.open('POST', strLink);
             request.onload = function () {
-                request.response = request.response.replace(/\r\n/gi, '\n');
-                if (request.response === strExpectedOutput && intStatusCode === request.status) {
-                    $.changeStatus(key, intCurrent, 'running', 'pass', request.status, request.response);
+                var response = request.response.replace(/\r\n/gi, '\n');
+                if (response === strExpectedOutput && intStatusCode === request.status) {
+                    $.changeStatus(key, intCurrent, 'running', 'pass', request.status, response);
                     $.runTest(key, intCurrent + 1);
                 } else {
-                    $.changeStatus(key, intCurrent, 'running', 'fail', request.status, request.response);
+                    $.changeStatus(key, intCurrent, 'running', 'fail', request.status, response);
                     document.getElementById('actual-status-' + key).value = request.status;
-                    document.getElementById('actual-output-' + key).value = request.response;
+                    document.getElementById('actual-output-' + key).value = response;
                     $.runTest(key, intCurrent + 1);
                 }
             };

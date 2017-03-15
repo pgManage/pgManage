@@ -202,6 +202,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 
 	}
 
+#ifdef ENVELOPE
 	if (client->bol_public) {
 		SFREE(str_username);
 		SFINISH_SNCAT(str_username, &client->int_username_len,
@@ -210,7 +211,6 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 		SINFO("str_username: %s", str_username);
 	}
 
-#ifdef ENVELOPE
 	SFINISH_SNCAT(str_connname, &client->int_connname_len,
 		"", (size_t)0);
 #else
@@ -286,6 +286,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 			"restart " SUN_PROGRAM_LOWER_NAME "");
 	}
 
+#ifdef ENVELOPE
 	SDEBUG("client->bol_public: %s", client->bol_public ? "true" : "false");
 	if (client->bol_public == false) {
 		str_password = getpar(str_cookie_decrypted, "password", int_cookie_len, &int_password_length);
@@ -300,6 +301,10 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	SDEBUG("client->str_conn: %s", client->str_conn);
 	SDEBUG("str_connname: %s", str_connname);
 	SDEBUG("str_database: %s", str_database);
+#else
+	str_password = getpar(str_cookie_decrypted, "password", int_cookie_len, &int_password_length);
+	SFINISH_CHECK(str_password != NULL, "getpar failed");
+#endif
 
 	SFINISH_CHECK(
 		client->str_conn != NULL || exists_connection_info(str_connname), "There is no connection info with that name.");

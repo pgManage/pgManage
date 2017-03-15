@@ -65,6 +65,7 @@ small {
 }
 .running {
 	background-color: #FFFF00;
+	color: #000000;
 }
 .fail {
 	background-color: #FF0000;
@@ -72,4 +73,5 @@ small {
 }
 .pass {
 	background-color: #00FF00;
+	color: #000000;
 }

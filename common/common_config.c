@@ -491,14 +491,14 @@ bool parse_options(int argc, char *const *argv) {
 #ifdef ENVELOPE
 	SERROR_SNCAT(str_global_port, &int_global_len,
 		"8888", (size_t)4);
-#else
-	SERROR_SNCAT(str_global_port, &int_global_len,
-		"8080", (size_t)4);
-#endif
 	SERROR_SNCAT(str_global_public_username, &int_global_len,
 		"", (size_t)0);
 	SERROR_SNCAT(str_global_public_password, &int_global_len,
 		"", (size_t)0);
+#else
+	SERROR_SNCAT(str_global_port, &int_global_len,
+		"8080", (size_t)4);
+#endif
 
 	// options descriptor
 	// clang-format off
