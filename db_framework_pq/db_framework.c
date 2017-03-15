@@ -1074,8 +1074,8 @@ static void db_cnxn_cb(EV_P, ev_io *w, int revents) {
 			DB_exec(EV_A, conn, conn_poll, str_sql, db_conn_cb_context_data);
 		} else {
 			conn->int_status = 1;
-			conn_poll->connect_cb(EV_A, conn_poll->cb_data, conn);
 			conn->conn_poll = NULL;
+			conn_poll->connect_cb(EV_A, conn_poll->cb_data, conn);
 			SFREE(conn_poll);
 		}
 
@@ -1109,10 +1109,10 @@ finish:
 		SFREE(conn->str_response);
 		conn->str_response = strdup(str_response + 6);
 		SFREE(str_response);
+		conn->conn_poll = NULL;
 		conn_poll->connect_cb(EV_A, conn_poll->cb_data, conn);
 		// This is because the callback is required to call DB_finish
 		// DB_finish(conn);
-		conn->conn_poll = NULL;
 		SFREE(conn_poll);
 	}
 }
