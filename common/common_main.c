@@ -85,6 +85,8 @@ void program_exit() {
 		SFREE(str_global_connection_file);
 		SFREE(str_global_login_group);
 #ifdef ENVELOPE
+		SFREE(str_global_public_username);
+		SFREE(str_global_public_password);
 		SFREE(str_global_app_path);
 		SFREE(str_global_role_path);
 		SFREE(str_global_public_username);

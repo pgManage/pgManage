@@ -141,8 +141,11 @@ static int handler(void *str_user, const char *str_section, const char *str_name
 		SERROR_SNCAT(str_global_log_level, &int_len,
 			str_value, strlen(str_value));
 
+#ifdef ENVELOPE
+#else
 	} else if (SMATCH("", "allow_custom_connections")) {
 		bol_global_allow_custom_connections = *str_value == 'T' || *str_value == 't';
+#endif
 
 	} else if (SMATCH("", "login_timeout")) {
 		int_global_login_timeout = (size_t)strtol(str_value, NULL, 10);
@@ -489,12 +492,13 @@ bool parse_options(int argc, char *const *argv) {
 			strlen("/etc/" SUN_PROGRAM_LOWER_NAME "/" SUN_PROGRAM_LOWER_NAME "-connections.conf"));
 #endif
 #ifdef ENVELOPE
-	SERROR_SNCAT(str_global_port, &int_global_len,
-		"8888", (size_t)4);
 	SERROR_SNCAT(str_global_public_username, &int_global_len,
 		"", (size_t)0);
 	SERROR_SNCAT(str_global_public_password, &int_global_len,
 		"", (size_t)0);
+
+	SERROR_SNCAT(str_global_port, &int_global_len,
+		"8888", (size_t)4);
 #else
 	SERROR_SNCAT(str_global_port, &int_global_len,
 		"8080", (size_t)4);
