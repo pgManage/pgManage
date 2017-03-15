@@ -14,7 +14,9 @@ void http_file_step1(struct sock_ev_client *client) {
 	struct sock_ev_client_copy_check *client_copy_check = NULL;
 	struct sock_ev_client_http_file *client_http_file = NULL;
 	SDEFINE_VAR_ALL(str_temp, str_temp1, str_uri_temp, str_canonical_start, str_uri_for_permission_check);
+#ifdef ENVELOPE
 	size_t int_uri_for_permission_check_len = 0;
+#endif
 
 	SFINISH_SALLOC(client_http_file, sizeof(struct sock_ev_client_http_file));
 	client_http_file->parent = client;

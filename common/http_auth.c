@@ -12,6 +12,10 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 	SDEFINE_VAR_MORE(str_uri_new_password, str_uri_expiration);
 	SDEFINE_VAR_MORE(str_new_cookie, str_user_quote, str_new_password_literal);
 	SDEFINE_VAR_MORE(str_uri_timeout, str_one_day_expire, str_cookie_name, str_session_id);
+	SDEFINE_VAR_MORE(str_error, str_error_uri);
+	size_t int_error_len = 0;
+	size_t int_error_uri_len = 0;
+
 #ifdef ENVELOPE
 #else
 	char *ptr_conn = NULL;
@@ -541,6 +545,9 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 	} else if (strncmp(client_auth->str_action, "logout", 7) == 0) {
 		SNOTICE("REQUEST TYPE: LOGOUT " SUN_PROGRAM_LOWER_NAME "");
 
+		str_error = getpar(str_form_data, "error", int_query_length, &int_error_len);
+		str_error_uri = snuri(str_error, int_error_len, &int_error_uri_len);
+
 #ifdef ENVELOPE
 		size_t int_temp = 0;
 		SFINISH_SNCAT(str_cookie_name, &int_temp, "envelope", 8);
@@ -601,15 +608,19 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		char *str_temp2 =
 			"; path=/; expires=Tue, 01 Jan 1990 00:00:00 GMT"
 			"; HttpOnly\015\012"
-			"Location: /index.html\015\012\015\012";
+			"Location: /index.html";
 		size_t int_temp2 = strlen(str_temp2);
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
 			str_temp1, int_temp1,
 			(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8: 0),
-			str_temp2, int_temp2
+			str_temp2, int_temp2,
+			int_error_uri_len > 0 ? "?error=" : "", int_error_uri_len > 0 ? (size_t)7 : (size_t)0,
+			int_error_uri_len > 0 ? str_error_uri : "", int_error_uri_len,
+			"\015\012\015\012", (size_t)4
 		);
 #else
+		//int_error_len > 0
 		char *str_temp1 =
 			"HTTP/1.1 303 See Other\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
@@ -630,6 +641,8 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 			(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
 			str_temp2, int_temp2,
 			(current_connection != NULL ? current_connection->str_connection_name : "custom"), (current_connection != NULL ? strlen(current_connection->str_connection_name) : (size_t)6),
+			int_error_uri_len > 0 ? "&error=" : "", int_error_uri_len > 0 ? (size_t)7 : (size_t)0,
+			int_error_uri_len > 0 ? str_error_uri : "", int_error_uri_len,
 			"\015\012\015\012", (size_t)4
 		);
 #endif

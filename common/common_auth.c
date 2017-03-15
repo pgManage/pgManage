@@ -12,11 +12,11 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	SDEFINE_VAR_MORE(str_conn_debug, str_username, str_connname, str_database, str_uri_temp, str_context_data);
 	SDEFINE_VAR_MORE(str_host, str_uri_ip_address, str_uri_host);
 	char *str_conn = NULL;
-	client->bol_public = false;
 	ssize_t int_i = 0;
 	ssize_t int_len = 0;
 	size_t int_conn_index = 0;
 #ifdef ENVELOPE
+	client->bol_public = false;
 #else
 	size_t int_conn_index_len = 0;
 #endif
@@ -71,9 +71,15 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	SDEBUG("client->str_cookie_name: %s", client->str_cookie_name);
 	str_cookie_encrypted = str_cookie(client->str_request, client->int_request_len, client->str_cookie_name, &int_cookie_len);
 	if (str_cookie_encrypted == NULL || int_cookie_len <= 0) {
+#ifdef ENVELOPE
 		SFINISH_CHECK(client->bol_public, "No Cookie.");
-	}
+#else
+		SFINISH("No Cookie.");
+#endif
+}
+#ifdef ENVELOPE
 	if (client->bol_public == false) {
+#endif
 		// Make sure we have the last close time
 		if (client->int_last_activity_i == -1) {
 			// If we don't, then find it
@@ -169,8 +175,10 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 					client->bol_public = true;
 				}
 			}
-#endif
 			SFINISH_CHECK(client->bol_public, "Session expired");
+#else
+			SFINISH("Session expired");
+#endif
 		}
 		SDEBUG("client->bol_public: %s", client->bol_public ? "true" : "false");
 
@@ -200,8 +208,11 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 			SNOTICE("REQUEST DATABASE: %s", str_database);
 		}
 
-	}
+#ifdef ENVELOPE
+	} //this closing brace connects to a bol_public check, which only exists in envelope
+#endif
 
+#ifdef ENVELOPE
 	if (client->bol_public) {
 		SFREE(str_username);
 		SFINISH_SNCAT(str_username, &client->int_username_len,
@@ -210,7 +221,6 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 		SINFO("str_username: %s", str_username);
 	}
 
-#ifdef ENVELOPE
 	SFINISH_SNCAT(str_connname, &client->int_connname_len,
 		"", (size_t)0);
 #else
@@ -279,13 +289,17 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 
 	SFREE_PWORD(str_cookie_encrypted);
 
+#ifdef ENVELOPE
+#else
 	if (bol_global_allow_custom_connections == false) {
 		SFINISH_CHECK(client->str_conn == NULL,
 			"Cannot specify a custom connection string with current configuration,"
 			"if you wish to do this, change allow_custom_connections to true and "
 			"restart " SUN_PROGRAM_LOWER_NAME "");
 	}
+#endif
 
+#ifdef ENVELOPE
 	SDEBUG("client->bol_public: %s", client->bol_public ? "true" : "false");
 	if (client->bol_public == false) {
 		str_password = getpar(str_cookie_decrypted, "password", int_cookie_len, &int_password_length);
@@ -296,10 +310,15 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 			str_global_public_password, strlen(str_global_public_password));
 		SINFO("str_password: %s", str_password);
 	}
-
+#else
 	SDEBUG("client->str_conn: %s", client->str_conn);
 	SDEBUG("str_connname: %s", str_connname);
 	SDEBUG("str_database: %s", str_database);
+
+	str_password = getpar(str_cookie_decrypted, "password", int_cookie_len, &int_password_length);
+	SFINISH_CHECK(str_password != NULL, "getpar failed");
+#endif
+
 
 	SFINISH_CHECK(
 		client->str_conn != NULL || exists_connection_info(str_connname), "There is no connection info with that name.");
@@ -406,14 +425,14 @@ finish:
 		if (conn_info != NULL) {
 #ifdef ENVELOPE
 			SFINISH_SNFCAT(str_response, &int_response_len,
-				"Refresh: 0; url=/index.html?redirect=", (size_t)37,
+				"Refresh: 0; url=/index.html?error=Connection%20timed%20out&redirect=", (size_t)68,
 				str_uri, strlen(str_uri),
 				"\015\012\015\012", (size_t)4);
 #else
 			size_t int_temp_len = 0;
 			str_temp = snuri(conn_info->str_connection_name, strlen(conn_info->str_connection_name), &int_temp_len);
 			SFINISH_SNFCAT(str_response, &int_response_len,
-				"Refresh: 0; url=/postage/index.html?connection=", (size_t)47,
+				"Refresh: 0; url=/postage/index.html?error=Connection%20timed%20out&connection=", (size_t)78,
 				str_temp, int_temp_len,
 				"&redirect=", (size_t)10,
 				str_uri, int_uri_length,

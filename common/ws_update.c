@@ -991,6 +991,8 @@ void ws_update_free(struct sock_ev_client_update *to_free) {
 	SFREE(to_free->str_where);
 	SFREE(to_free->str_return_order_by);
 	SFREE(to_free->str_identity_column_name);
+	SFREE(to_free->str_pk_return_join_clause);
+	SFREE(to_free->str_pk_return_where_clause);
 	if (to_free->darr_where_column != NULL) {
 		DArray_clear_destroy(to_free->darr_where_column);
 		to_free->darr_where_column = NULL;

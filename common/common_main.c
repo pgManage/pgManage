@@ -85,8 +85,12 @@ void program_exit() {
 		SFREE(str_global_connection_file);
 		SFREE(str_global_login_group);
 #ifdef ENVELOPE
+		SFREE(str_global_public_username);
+		SFREE(str_global_public_password);
 		SFREE(str_global_app_path);
 		SFREE(str_global_role_path);
+		SFREE(str_global_public_username);
+		SFREE(str_global_public_password);
 #else
 		SFREE(str_global_sql_root);
 #endif
@@ -95,8 +99,6 @@ void program_exit() {
 		SFREE(str_global_tls_cert);
 		SFREE(str_global_tls_key);
 		SFREE(str_global_log_level);
-		SFREE(str_global_public_username);
-		SFREE(str_global_public_password);
 #ifdef _WIN32
 
 		SFREE(POSTAGE_PREFIX);

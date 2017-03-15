@@ -53,6 +53,7 @@ DB_conn *DB_connect(EV_P, void *cb_data, char *str_connstring, char *str_user,
 #ifdef _WIN32
 	conn->int_sock = -1;
 #endif
+	conn->EV_A = EV_A;
 
 	// Envelope uses pg_authid to authenticate
 	if (str_user != NULL && str_password != NULL) {
@@ -107,6 +108,7 @@ DB_conn *DB_connect(EV_P, void *cb_data, char *str_connstring, char *str_user,
 	}
 
 	SFINISH_SALLOC(conn_poll, sizeof(DB_poll));
+	conn->conn_poll = conn_poll;
 	conn_poll->conn = conn;
 	conn_poll->cb_data = cb_data;
 	conn_poll->connect_cb = connect_cb;
@@ -144,7 +146,6 @@ bool _DB_exec(
 
 	SERROR_SALLOC(res_poll, sizeof(DB_result_poll));
 
-	conn->EV_A = EV_A;
 	conn->res_poll = res_poll;
 
 	res_poll->conn = conn;
@@ -274,13 +275,15 @@ bool DB_get_column_types_for_query2(EV_P, void *cb_data, DB_result *res) {
 
 	return true;
 error:
-	res_poll_child->query_cb(EV_A, res_poll_child->cb_data, res);
 	res_poll_child->conn->res_poll = NULL;
 	DB_res_poll_free(res_poll);
+	query_cb_t query_cb = res_poll_child->query_cb;
+	cb_data = res_poll_child->cb_data;
 	if (res_poll_child != NULL) {
 		SFREE(res_poll_child->str_query);
 		DB_res_poll_free(res_poll_child);
 	}
+	query_cb(EV_A, cb_data, res);
 	return true;
 }
 
@@ -698,6 +701,10 @@ void _DB_finish(DB_conn *conn) {
 		ev_io_stop(conn->EV_A, &conn->res_poll->io);
 		DB_res_poll_free(conn->res_poll);
 	}
+	if (conn->conn_poll != NULL) {
+		ev_io_stop(conn->EV_A, &conn->conn_poll->io);
+		SFREE(conn->conn_poll);
+	}
 
 	SFREE(conn->str_response);
 	SFREE(conn->str_literal_context_data);
@@ -991,6 +998,7 @@ bool db_conn_cb_context_data(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "failed to set context data, res->status = %d: %s", res->status, res->conn->str_response);
 
 	conn->int_status = 1;
+	conn->conn_poll = NULL;
 	conn_poll->connect_cb(EV_A, conn_poll->cb_data, conn);
 	SFREE(conn_poll);
 finish:
@@ -999,6 +1007,7 @@ finish:
 		SFREE(conn->str_response);
 		conn->str_response = strdup(str_response + 6);
 		SFREE(str_response);
+		conn->conn_poll = NULL;
 		conn_poll->connect_cb(EV_A, conn_poll->cb_data, conn);
 		// This is because the callback is required to call DB_finish
 		// DB_finish(conn);
@@ -1065,6 +1074,7 @@ static void db_cnxn_cb(EV_P, ev_io *w, int revents) {
 			DB_exec(EV_A, conn, conn_poll, str_sql, db_conn_cb_context_data);
 		} else {
 			conn->int_status = 1;
+			conn->conn_poll = NULL;
 			conn_poll->connect_cb(EV_A, conn_poll->cb_data, conn);
 			SFREE(conn_poll);
 		}
@@ -1099,6 +1109,7 @@ finish:
 		SFREE(conn->str_response);
 		conn->str_response = strdup(str_response + 6);
 		SFREE(str_response);
+		conn->conn_poll = NULL;
 		conn_poll->connect_cb(EV_A, conn_poll->cb_data, conn);
 		// This is because the callback is required to call DB_finish
 		// DB_finish(conn);

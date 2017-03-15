@@ -1,15 +1,15 @@
 ALTER ROLE postgres PASSWORD 'password';
 CREATE ROLE developer_g   NOLOGIN NOCREATEROLE  NOSUPERUSER    INHERIT  NOCREATEDB  NOREPLICATION    CONNECTION LIMIT -1   VALID UNTIL 'infinity';
 GRANT developer_g TO postgres;
-CREATE TABLE IF NOT EXISTS rtesting_table
-(
-id serial,
-test_name character varying(150),
-test_name2 character varying(150),
-change_stamp timestamp NOT NULL DEFAULT '2016-07-12 05:13:00',
-CONSTRAINT rtesting_table_pk PRIMARY KEY (id)
+CREATE TABLE public.rtesting_table (
+  id integer NOT NULL,
+  test_name character varying(150),
+  test_name2 character varying(150),
+  "select" character varying(150),
+  "test@test" character varying(150),
+  CONSTRAINT rtesting_table_pk PRIMARY KEY (id)
 ) WITH (
-OIDS=FALSE
+  OIDS=FALSE
 );
 CREATE TABLE public.rtesting_table2 (
   id integer NOT NULL,
@@ -17,6 +17,14 @@ CREATE TABLE public.rtesting_table2 (
   "select" character varying(150),
   "test@test" character varying(150),
   CONSTRAINT rtesting_table2_pk PRIMARY KEY (id)
+) WITH (
+  OIDS=FALSE
+);
+CREATE TABLE public.rtesting_table_with_capital_column_name (
+  id integer NOT NULL,
+  test_name character varying(150),
+  "TestName" character varying(150),
+  CONSTRAINT rtesting_table_with_capital_column_name_pk PRIMARY KEY (id)
 ) WITH (
   OIDS=FALSE
 );
