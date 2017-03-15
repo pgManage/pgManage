@@ -297,6 +297,9 @@ table.table-dep th {
 	font-family: fontawesome;
 }
 
+.ace-toolbar gs-button.button-explain .explain-letter[icon="chevron-down"]:after {
+	content: '\f078';
+}
 .ace-toolbar gs-button.button-explain .explain-letter[icon="play-circle-o"]:after {
 	content: '\f01d';
 }

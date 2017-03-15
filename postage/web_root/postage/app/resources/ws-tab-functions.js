@@ -1138,6 +1138,8 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     						'<gs-button inline remove-all id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
     								'title="Download as a file" remove-all no-focus>Download</gs-button>'
     					) +
+    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="menuExplain(event.target)" ' + 'title="Explain menu." no-focus><span class="explain-letter" icon="chevron-down">E</span> Explain</gs-button>' +
+    					/* XLD
     					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain()" ' +
     								'title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span> Explain</gs-button>' +
     					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" ' +
@@ -1146,12 +1148,13 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     						'<span class="explain-letter" icon="play">E</span> Explain Analyze' +
     					'</gs-button>' +
     					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(false, true)" ' +
-    								'title="Query explanation. Text format. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span> Explain (Text)</gs-button>' +
+    								'title="Query explanation. Text format. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">T</span> Explain (Text)</gs-button>' +
     					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(true, true)" ' +
     								'title="Query explanation. Text format. Note that the query will run, meaning that you\'ll get run times." ' +
     								'remove-top no-focus>' +
-    						'<span class="explain-letter" icon="play">E</span> Explain Analyze (Text)' +
+    						'<span class="explain-letter" icon="play">T</span> Explain Analyze (Text)' +
     					'</gs-button>' +
+    					*/
     					'<gs-button inline remove-all class="button-csv" icon="file-text" onclick="exportCSV()" ' +
     								'title="Download a single query\'s results as a file" remove-all no-focus>Export</gs-button>' +
     					'<gs-button inline style="height: 2.35em" remove-all class="button-ace-info" onclick="dialogAceInfo()" ' +
@@ -1200,11 +1203,11 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     						'<span class="explain-letter" icon="play">E</span>' +
     					'</gs-button>' +
     					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(false, true)" ' +
-    								'title="Query explanation. Text format. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span></gs-button>' +
+    								'title="Query explanation. Text format. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">T</span></gs-button>' +
     					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(true, true)" ' +
     								'title="Query explanation. Text format. Note that the query will run, meaning that you\'ll get run times." ' +
     								'remove-top no-focus>' +
-    						'<span class="explain-letter" icon="play">E</span>' +
+    						'<span class="explain-letter" icon="play">T</span>' +
     					'</gs-button>' +
     					'<gs-button style="padding-right: 0.25em;" inline icononly remove-all class="button-csv" icon="file-text" onclick="exportCSV()" ' +
     								'title="Download a single query\'s results as a file" remove-all no-focus></gs-button>' +
@@ -2116,6 +2119,38 @@ function beautifySQL() {
     }
 }
 
+function menuExplain(target) {
+    'use strict';
+    var templateElement = document.createElement('template');
+
+    templateElement.setAttribute('data-max-width', '11em');
+    templateElement.setAttribute('data-overlay-close', 'true');
+    templateElement.innerHTML = ml(function () {/*
+        <gs-page>
+            <gs-body class="ace-toolbar">
+                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain()" title="Query explanation. This does not run the query." remove-all no-focus>
+                    <span class="explain-letter" icon="play-circle-o">E</span>
+                    Explain
+                </gs-button>
+                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" title="Query explanation. Note that the query will run, meaning that you\'ll get run times." remove-top no-focus>
+                	<span class="explain-letter" icon="play">E</span>
+                	Explain Analyze
+                </gs-button>
+                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(false, true)" title="Query explanation. Text format. This does not run the query." remove-all no-focus>
+                    <span class="explain-letter" icon="play-circle-o">T</span>
+                    Explain (Text)
+                    </gs-button>
+                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true, true)" title="Query explanation. Text format. Note that the query will run, meaning that you\'ll get run times." remove-top no-focus>
+                	<span class="explain-letter" icon="play">T</span>
+                	Explain Analyze (Text)
+                </gs-button>
+            </gs-body>
+        </gs-page>
+    */});
+
+    GS.openDialogToElement(target, templateElement, 'down');
+}
+
 function indentScript() {
     'use strict';
     document.getElementsByClassName('current-tab')[0].relatedEditor.blockIndent();
@@ -2137,6 +2172,4 @@ function toggleCommentScript() {
 function downloadScript() {
     'use strict';
     var currentTab = document.getElementsByClassName('current-tab')[0];
-
-
 }

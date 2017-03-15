@@ -1,6 +1,7 @@
 //jslint white:true multivar:true
 var bolExplainLoaded = true;
-  
+var rowCount = [], intRowCount = 0;
+
 document.addEventListener('keydown', function (event) {
     if (event.keyCode === 118 && event.shiftKey === false) {
         explain();
@@ -154,7 +155,7 @@ function explain(bolRun, bolText) {
 
             if (bolIgnoreMessages === false) {
                 if (!error) {
-                    console.log('data', data);
+                    //console.log('data', data);
                     if (data.intCallbackNumber === 0) {
                         endExecute();
                         startLoading();
@@ -186,6 +187,40 @@ function explain(bolRun, bolText) {
                     } else if (data.strMessage === '\\.') {
                         // set part number to 0 and add one to the query number
                         intQuery += 1;
+                        
+                        if (rowCount) {
+                            console.log(rowCount);
+                            var distinctRowCount = [];
+                            for (var i = 0, len = rowCount.length; i < len; i++) {
+                                if (distinctRowCount.indexOf(rowCount[i]) === -1) {
+                                    distinctRowCount.push(rowCount[i]);
+                                }
+                            }
+                            console.log(distinctRowCount);
+                            function sortNumber(a,b) {
+                                return a - b;
+                            }
+                            distinctRowCount.sort(sortNumber);
+                            console.log(distinctRowCount);
+                            var linkElemsByClass;
+                            for (i = 0 + 1, len = distinctRowCount.length + 1; i < len; i++) {
+                                if (distinctRowCount[i]) {
+                                    linkElemsByClass = document.getElementsByClassName('rows-' + distinctRowCount[i]);
+                                    //console.log(linkElemsByClass);
+                                    //console.log(distinctRowCount[i]);
+                                    for (var i2 = 0, len2 = linkElemsByClass.length; i2 < len2; i2++) {
+                                        if (linkElemsByClass[i2]) {
+                                            if (i * 1.5 < 30) {
+                                                linkElemsByClass[i2].style['stroke-width'] = i * 1.5;
+                                            } else {
+                                                 linkElemsByClass[i2].style['stroke-width'] = 30;
+                                            }
+                                        }
+                                    }
+                                    //HTMLstyleText += '.rows-' + distinctRowCount[i] + '{ stroke-width: ' + i * 2 + 'px; }' + '\n';
+                                }
+                            }
+                        }
 
                         // update the success and error tally
                         updateTally(intQuery, intError);
@@ -245,7 +280,23 @@ function explain(bolRun, bolText) {
     }
 }
 
-
+function roundToFactor (int) {
+    if (int && int.toString().length === 1) {
+        return 1;
+    } else if (int) {
+        if (int.toString()[1] >= 5) {
+            var resultInt = '' + (parseInt(int.toString()[0], 10) + 1) + '';
+        } else {
+            var resultInt = int.toString()[0];
+        }
+        for (var i = 0, len = int.toString().length - 1; i < len; i++) {
+            resultInt += '0';
+        }
+        return parseInt(resultInt, 10);
+    } else {
+        return 0;
+    }
+}
 
 function handleExplain(explainJSON, target, bolRun) {
     'use strict';
@@ -337,7 +388,7 @@ function handleExplain(explainJSON, target, bolRun) {
     
     var tree = d3.tree().nodeSize([210, 300]);
     root = tree(root);
-    console.log(root);
+    //console.log(root);
     
     var svg = d3.select(target).append('svg')
                         .attr("width", "100%")
@@ -365,7 +416,9 @@ function handleExplain(explainJSON, target, bolRun) {
     var link = g.selectAll(".explain-link")
         .data(root.descendants().slice(1))
         .enter().append("path")
-            .attr("class", "explain-link")
+            .attr("class", function(d) {
+                    return "explain-link rows-" + roundToFactor(d.data.data['Actual Rows']) + "";
+                })
             .attr("d", function(d) {
                 return "M" + d.x + "," + d.y
                      + "C" + d.x + "," + (d.y + d.parent.y) / 2
@@ -380,7 +433,6 @@ function handleExplain(explainJSON, target, bolRun) {
             .attr("class", "explain-node")
             .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
             .on('click', function (d) {
-                console.log(d);
                 return dialogExplainPlan(d.data);
             }, true);;
     
@@ -471,7 +523,12 @@ function handleExplain(explainJSON, target, bolRun) {
                                 '</div>';
                 }
                 
+                //console.log(rowCount);
                 if (d.data.data['Actual Rows'] !== undefined) {
+                    intRowCount += 1;
+                    rowCount[intRowCount] = roundToFactor(Math.round(d.data.data['Actual Rows']).toString());
+                    //console.log(rowCount[intRowCount], intRowCount);
+                    //link.attr("id", "rows-" + intRowCount + "");
                     var strBarHTML = (d.data.data['Actual Rows'] < 1 ? '<div class="explain-bar-0">0</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Actual Rows']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
                     strHTML +=  
                                 '<div flex-horizontal flex-fill>' +

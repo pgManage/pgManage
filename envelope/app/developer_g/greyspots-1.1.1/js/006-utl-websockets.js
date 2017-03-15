@@ -736,6 +736,54 @@
                 }
                 
             } else {
+                // if QUERY is found: reset response part to 0
+                if (data.indexOf('QUERY\n') === 0) {
+                    //console.log('Per Query Reset');
+                    intResponsePart = 0;
+                    intCallbackNumberThisQuery = 0;
+                }
+                
+                if (intResponsePart === 0) {
+                    //console.log('2***');
+                    // split lines
+                    arrLines = data.split('\n');
+                    
+                    // loop through lines
+                    for (i = 0, len = arrLines.length; i < len; i += 1) {
+                        // if mode line: set mode
+                        if (arrLines[i].indexOf('QUERY\t') === 0 ||
+                            arrLines[i].indexOf('START\t') === 0 ||
+                            arrLines[i].indexOf('END\t') === 0 ||
+                            arrLines[i].indexOf('ROWS\t') === 0 ||
+                            arrLines[i].indexOf('DEBUG\t') === 0 ||
+                            arrLines[i].indexOf('LOG\t') === 0 ||
+                            arrLines[i].indexOf('INFO\t') === 0 ||
+                            arrLines[i].indexOf('NOTICE\t') === 0 ||
+                            arrLines[i].indexOf('WARNING\t') === 0 ||
+                            arrLines[i] === 'COLUMNS') {
+                            
+                            if (arrLines[i] === 'COLUMNS') {
+                                strMode = arrLines[i];
+                            } else {
+                                strMode = arrLines[i].substring(0, arrLines[i].indexOf('\t'));
+                            }
+                        }
+                        
+                        //console.log(strMode, arrLines[i]);
+                        
+                        // if mode is QUERY: save query
+                        if (strMode === 'QUERY') {
+                            strQuery = GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t') + 1));
+                            //console.log(arrLines[i], strQuery);
+                            
+                        // if mode is COLUMNS: get COLUMNS
+                        } else if (strMode === 'COLUMNS') {
+                            break;
+                        }
+                    }
+                }
+                
+                errorData.strQuery = strQuery;
                 errorData.arrMessages = arrMessages
                 if (typeof callback === 'function') {
                     callback(errorData, error);
