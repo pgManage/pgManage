@@ -167,7 +167,7 @@ ipcMain.on('postage', function (event, arg) {
 			'height': connectionWindowState.height
 		});
 		connectionWindowState.manage(connectionWindow);
-		connectionWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
+		connectionWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/config.html?file=postage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
 	} else if (arg === 'edit PGPASS') {
 		pgpassWindow = new BrowserWindow({
 			'x': pgpassWindowState.x,
@@ -176,7 +176,7 @@ ipcMain.on('postage', function (event, arg) {
 			'height': pgpassWindowState.height
 		});
 		pgpassWindowState.manage(pgpassWindow);
-		pgpassWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
+		pgpassWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
 		pgpassWindow.webContents.on('will-navigate', handleRedirect);
 		pgpassWindow.webContents.on('new-window', handleRedirect);
 	}
@@ -207,7 +207,7 @@ function setMenu() {
 							'height': configWindowState.height
 						});
 						configWindowState.manage(configWindow);
-						configWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
+						configWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/config.html?file=postage.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
 					}
 				},
 				{
@@ -220,7 +220,7 @@ function setMenu() {
 							'height': connectionWindowState.height
 						});
 						connectionWindowState.manage(connectionWindow);
-						connectionWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=postage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
+						connectionWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/config.html?file=postage-connections.conf',  { 'extraHeaders': 'pragma: no-cache\n' });
 					}
 				},
 				{
@@ -233,7 +233,7 @@ function setMenu() {
 							'height': pgpassWindowState.height
 						});
 						pgpassWindowState.manage(pgpassWindow);
-						pgpassWindow.loadURL('file://' + app.getAppPath() + '/postage/web_root/postage/app/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
+						pgpassWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/config.html?file=PGPASS',  { 'extraHeaders': 'pragma: no-cache\n' });
 						pgpassWindow.webContents.on('will-navigate', handleRedirect);
 						pgpassWindow.webContents.on('new-window', handleRedirect);
 					}

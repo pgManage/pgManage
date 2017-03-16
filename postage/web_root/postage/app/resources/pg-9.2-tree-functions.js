@@ -6,7 +6,7 @@ if (document.getElementById('left-panel-body')) {
             var elemPos = GS.getElementPositionData(document.getElementById('left-panel-body'));
             clearInterval(elemPosInterval);
         }
-    }, 1000); 
+    }, 1000);
 }
 var bolTreeFunctionsLoaded = true
   , treeGlobals = {

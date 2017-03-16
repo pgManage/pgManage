@@ -5,18 +5,10 @@
     z-index: 4;
 }
 
-div#header-text-container {
-    padding: 0 0.5em;
-}
-#header-text-container {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
 #menu-button-new-tab {
     position: relative;
 }
+
 #menu-button-new-tab-plus {
     position: absolute;
     display: inline-block;
@@ -31,11 +23,9 @@ div#header-text-container {
     margin-top: -0.5em;
 }
 
-
 .panel-resizable {
     position: relative;
 }
-
 
 /* ####################################################### */
 /* ############### ACE RELATIVE  FONT SIZE ############### */
@@ -75,92 +65,6 @@ div#header-text-container {
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
-}
-
-/* ###################################################### */
-/* ################### HEADER BUTTONS ################### */
-/* ###################################################### */
-
-.header-button, .footer-button {
-    /*font-size: 0.7em;*/
-
-    border: 0;
-    color: #FFF;
-    background: transparent;
-    padding: 0;
-    margin: 0;
-    font-size: 0.8em;
-}
-
-.header-button-text {
-    /*font-size: 0.7em;*/
-
-    border: 0;
-    color: #FFF;
-    background: transparent;
-    padding: 0;
-    margin: 0;
-    font-size: 0.8em;
-
-    padding-top: 0.5em;
-    /*padding-top: 0.7em; /*0.45em;*/
-    padding-left: 0.75em; /*0.25em;*/
-    padding-right: 0.75em; /*0.25em;*/
-
-    /*text-decoration: underline;*/
-}
-
-.header-button-text[icon]:not([iconright]) {
-    padding-left: 2em !important;
-}
-.header-button-text[icon][iconright] {
-    padding-right: 2em !important;
-}
-
-.header-button-text[icon]:not([iconright]):after {
-    top: 50% !important;
-    margin-top: -0.6em;
-    left: 0.25em !important
-}
-.header-button-text[icon][iconright]:after {
-    top: 50% !important;
-    margin-top: -0.6em;
-    right: 0.25em !important
-}
-
-.results-header {
-    padding: 0 !important;
-    height: 2.422em;
-    font-family: Helvetica,Arial,sans-serif;
-}
-.results-header .header-button-text {
-    padding-top: 0.7em;
-    font-family: Helvetica,Arial,sans-serif;
-}
-.sql-results-area {
-    font-family: "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
-    font-feature-settings: normal;
-    font-kerning: auto;
-    font-language-override: normal;
-    font-size: 11.2px;
-    font-size-adjust: none;
-    font-stretch: normal;
-    font-style: normal;
-    font-synthesis: weight style;
-    font-variant: normal;
-    font-variant-alternates: normal;
-    font-variant-caps: normal;
-    font-variant-east-asian: normal;
-    font-variant-ligatures: normal;
-    font-variant-numeric: normal;
-    font-variant-position: normal;
-    font-weight: 400;
-    
-    /*
-    font-family: InconsolataGo,Courier New,Courier,monospace;
-    font-family: Courier New,Courier,monospace;
-    font-family: "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
-    */
 }
 
 .postage-menu-item-button {
@@ -366,6 +270,9 @@ table.table-dep th {
 	font-family: fontawesome;
 }
 
+.ace-toolbar gs-button.button-explain .explain-letter[icon="chevron-down"]:after {
+	content: '\f078';
+}
 .ace-toolbar gs-button.button-explain .explain-letter[icon="play-circle-o"]:after {
 	content: '\f01d';
 }

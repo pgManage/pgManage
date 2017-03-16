@@ -54,13 +54,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('tests').appendChild(list);
 
                     if (qs[key] === 'true') {
-						pushState({}, 'Postage Test Backend', '/postage/0/index.html' + window.location.search);
-                        $.runTests(key);
+						if (qs._http_auth !== 'true') {
+	                        $.runTests(key);
+						}
                     } else {
                         list.classList.add('disabled');
                     }
                 }
             }
+			if (qs._http_auth === 'true') {
+				pushState({}, 'Postage Test Backend', '/postage/0/index.html' + window.location.search);
+				$.runTests('_http_auth');
+			}
         });
     });
 });

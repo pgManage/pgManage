@@ -59,7 +59,7 @@
                 reconnectNumber -= 1;
 
                 if (reconnectNumber <= -6) {
-                    window.location = '/postage/auth?action=logout?error=Connection%20timed%20out';
+                    window.location = '/postage/auth?action=logout&error=Connection%20timed%20out';
                 }
             });
 
@@ -571,7 +571,7 @@
         <script src="resources/pg-9.2-explain.js" type="text/javascript"></script>
         <script src="../js/page-zoom.js" type="text/javascript"></script>
         <script src="../js/d3.js" type="text/javascript"></script>
-        
+
         <script src="../js/settings.js" type="text/javascript"></script>
         <style id="customCss"></style>
     </body>
