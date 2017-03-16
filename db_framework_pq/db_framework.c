@@ -80,15 +80,6 @@ DB_conn *DB_connect(EV_P, void *cb_data, char *str_connstring, char *str_user,
 	}
 
 	pg_conn = PQconnectStart(str_conn);
-#ifdef UTIL_DEBUG
-	PQconninfoOption *arr_conn_info = PQconninfo(pg_conn);
-	size_t int_cur = 0;
-	while (arr_conn_info[int_cur].keyword != NULL) {
-		SDEBUG("arr_conn_info[int_cur].keyword: %s", arr_conn_info[int_cur].keyword);
-		SDEBUG("arr_conn_info[int_cur].val: %s", arr_conn_info[int_cur].val);
-		int_cur += 1;
-	}
-#endif
 
 
 	SFINISH_CHECK(PQstatus(pg_conn) != CONNECTION_BAD, "cannot start connect: %s\012", PQerrorMessage(pg_conn));

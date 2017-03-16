@@ -180,7 +180,6 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 			SFINISH("Session expired");
 #endif
 		}
-		SDEBUG("client->bol_public: %s", client->bol_public ? "true" : "false");
 
 		str_cookie_decrypted = aes_decrypt(str_cookie_encrypted, &int_cookie_len);
 
