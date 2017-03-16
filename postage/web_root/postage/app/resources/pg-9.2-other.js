@@ -729,7 +729,7 @@ function dialogOptions() {
                     <label for="postage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
                     <gs-text id="postage-options-left-panel" flex></gs-text>
                 </div>
-                
+
                 <h3>Clip Options</h3>
                 <gs-grid widths="1,1" gutter>
                     <gs-block>
@@ -789,7 +789,7 @@ function dialogOptions() {
                         </template>
                     </gs-combo>
                 </div>
-                
+
                 <h3>Page Zoom Levels</h3>
                 <div id="options-container" style="position: relative; min-height: 10em;">
                     <table class="simple-table">
@@ -804,14 +804,14 @@ function dialogOptions() {
                         </tbody>
                     </table>
                 </div>
-                
+
                 <h3>SQL Toolbar Buttons</h3>
                 <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
                         <label>Button Style:</label>
                         <gs-option value="true">Labeled</gs-option>
                         <gs-option value="false">Unlabeled</gs-option>
                 </gs-optionbox>
-                
+
                 <h3>Custom CSS Stylesheet</h3>
                 <div id="customCSSAce"></div>
                 <div><p>This Ace is stored in your local storage. Because this can get emptied it's recommended to save a copy.</p><div>
@@ -826,7 +826,7 @@ function dialogOptions() {
         document.getElementById('postage-options-left-panel').addEventListener('change', function () {
             localStorage.leftPanelWidth = document.getElementById('postage-options-left-panel').value;
         });
-  
+
         var CSSEditor = ace.edit('customCSSAce');
         CSSEditor.setTheme('ace/theme/eclipse');
         CSSEditor.getSession().setMode('ace/mode/css');
@@ -836,13 +836,13 @@ function dialogOptions() {
         CSSEditor.session.setUseWrapMode('free');
         CSSEditor.setBehavioursEnabled(false);
         CSSEditor.$blockScrolling = Infinity; // <== blocks a warning
-    
+
         CSSEditor.setOptions({
             'enableBasicAutocompletion': true,
             'enableSnippets'           : true,
             'enableLiveAutocompletion' : true
         });
-    
+
         // if we're on a touch device: make the ace grow with it's content
         if (evt.touchDevice) {
             CSSEditor.setOptions({
@@ -850,18 +850,18 @@ function dialogOptions() {
             });
             document.getElementById('customCSSAce').classList.add('childrenneedsclick');
             document.getElementById('customCSSAce').style.borderBottom = '1px solid #AAAAAA';
-    
+
         // else: full height
         } else {
             document.getElementById('customCSSAce').style.height = '15em';
         }
-        
+
 
         CSSEditor.setValue(localStorage.customCSS);
         CSSEditor.focus();
         CSSEditor.selection.setSelectionRange(new Range(0, 0, 0, 0));
-        
-        
+
+
         // set control values
         document.getElementById('clip-options-quote-which').value = getClipSetting("quoteType");
         document.getElementById('button-options').value = localStorage.labeledButtons;
@@ -869,8 +869,8 @@ function dialogOptions() {
         document.getElementById('clip-options-field-delimiter').value = getClipSetting("fieldDelimiter");
         document.getElementById('clip-options-null-values').value = getClipSetting("nullValues");
         document.getElementById('clip-options-column-names').value = getClipSetting("columnNames");
-        
-        
+
+
         document.getElementById('clip-options-quote-which').addEventListener('change', setAllClipSettings);
         document.getElementById('button-options').addEventListener('change', function () {
             refreshButtons(document.getElementById('button-options').value);
@@ -883,20 +883,20 @@ function dialogOptions() {
         document.getElementById('clip-options-field-delimiter').addEventListener('change', setAllClipSettings);
         document.getElementById('clip-options-null-values').addEventListener('change', setAllClipSettings);
         document.getElementById('clip-options-column-names').addEventListener('change', setAllClipSettings);
-        
+
         function setAllClipSettings() {
             var arrElements, i, len;
-            
+
             // save clip settings
             setClipSetting("quoteType", document.getElementById('clip-options-quote-which').value);
             setClipSetting("quoteChar", document.getElementById('clip-options-quote-char').value);
             setClipSetting("fieldDelimiter", document.getElementById('clip-options-field-delimiter').value);
             setClipSetting("nullValues", document.getElementById('clip-options-null-values').value);
             setClipSetting("columnNames", document.getElementById('clip-options-column-names').value);
-    
+
             // set all the table elements clip setting attributes
             arrElements = xtag.query(document.getElementsByClassName('current-tab')[0].relatedResultsArea, 'table.results-table');
-    
+
             for (i = 0, len = arrElements.length; i < len; i += 1) {
                 arrElements[i].setAttribute('quote-type', getClipSetting("quoteType"));
                 arrElements[i].setAttribute('quote-char', getClipSetting("quoteChar"));
@@ -905,8 +905,8 @@ function dialogOptions() {
                 arrElements[i].setAttribute('column-names', getClipSetting("columnNames"));
             }
         }
-        
-        
+
+
         var i, len;
         for (i=0,len=localStorage.length;i < len;i++) {
             var strProp = localStorage.key(i);
@@ -916,10 +916,10 @@ function dialogOptions() {
                 console.log('strLink:' + strLink);
                 var objZoom = document.getElementById('postage-options-left-panel-' + strLink);
                 console.log('objZoom', objZoom);
-                
-                
+
+
                 objZoom.value = localStorage[strProp];
-                
+
                 objZoom.addEventListener('change', function (event) {
                     localStorage['postageZoom' + event.target.getAttribute('id').replace(/^postage\-options\-left\-panel\-/,'')] =
                         event.target.value;
@@ -2090,7 +2090,7 @@ function executeScript() {
             resultsTallyElement.innerHTML = ' (<b>Pass: ' + (intQuery - intError) + '</b>, <b>Fail: ' + (intError) + '</b>)';
             //resultsTallyElement.innerHTML = ' (<b>Success: ' + (intQuery - intError) + '</b>, <b>Error: ' + (intError) + '</b>)';
         };
-        
+
         // begin
         startExecute();
         messageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
@@ -2099,18 +2099,18 @@ function executeScript() {
               , intLine, i, len, col_i, col_len, rec_i, rec_len
               , warningHTML, buttonContainerElement, strCSS
               , styleElement;
-            
+
             if (bolIgnoreMessages === false) {
                 // get name of query if applicable
                 var strQueryName = "";
                 if (data.strQuery) {
                     var arrStrMatches = data.strQuery.match(/\-\-[ \t]*Name\:(.*)$/im);
-                    
+
                     if (arrStrMatches && arrStrMatches.length > 1) {
                     	strQueryName = ", " + arrStrMatches[1].trim();
                     }
                 }
-                
+
                 if (!error) {
                     if (data.intCallbackNumber === 0) {
                         endExecute();
@@ -2151,7 +2151,7 @@ function executeScript() {
                                                 '</i><br/>';
                             }
 
-                            
+
                             strHTML = '<div flex-horizontal>' +
                                             '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
                                             '<div>';
