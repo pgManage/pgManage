@@ -148,6 +148,7 @@ static int handler(void *str_user, const char *str_section, const char *str_name
 #endif
 
 	} else if (SMATCH("", "login_timeout")) {
+		SINFO("str_value: %s", str_value);
 		int_global_login_timeout = (size_t)strtol(str_value, NULL, 10);
 
 	} else if (SMATCH("", "log_file")) {

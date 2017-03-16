@@ -137,6 +137,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 		}
 		// Check to see if we have another client, if we don't check to see if the
 		// session has expired
+		SDEBUG("int_global_login_timeout: %d", int_global_login_timeout);
 		if (
 			!(
 				(
