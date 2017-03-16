@@ -438,9 +438,15 @@ function handleExplain(explainJSON, target, bolRun) {
     var link = g.selectAll(".explain-link")
         .data(root.descendants().slice(1))
         .enter().append("path")
-            .attr("class", function(d) {
-                    return "explain-link rows-" + roundToFactor(d.data.data['Actual Rows']) + "";
-                })
+            .attr('style', function (d) {
+                var costLow = parseInt(d.data.data['Startup Cost'], 10);
+                var costHigh = parseInt(d.data.data['Total Cost'], 10);
+                return 'stroke-width: ' + Math.max(3, Math.min(10, Math.log((costHigh - costLow) / 2 + costLow)) * 3) + 'px;';
+            })
+            .attr('class', 'explain-link')
+            //.attr("class", function(d) {
+            //        return "explain-link rows-" + roundToFactor(d.data.data['Actual Rows']) + "";
+            //    })
             .attr("d", function(d) {
                 return "M" + d.x + "," + d.y
                      + "C" + d.x + "," + (d.y + d.parent.y) / 2
@@ -516,6 +522,8 @@ function handleExplain(explainJSON, target, bolRun) {
                 }
                 
                 if (d.data.data['Node Cost'] !== undefined) {
+                    intRowCount += 1;
+                    rowCount[intRowCount] = roundToFactor(Math.round(d.data.data['Node Cost']).toString().replace('..', ',').split(',')[1]);
                     var strBarHTML = (d.data.data['Node Cost'] < 1 ? '<div class="explain-bar-0">0</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Node Cost']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
                     strHTML +=  
                                 '<div flex-horizontal flex-fill>' +
@@ -547,8 +555,8 @@ function handleExplain(explainJSON, target, bolRun) {
                 
                 //console.log(rowCount);
                 if (d.data.data['Actual Rows'] !== undefined) {
-                    intRowCount += 1;
-                    rowCount[intRowCount] = roundToFactor(Math.round(d.data.data['Actual Rows']).toString());
+                    //////intRowCount += 1;
+                    //////rowCount[intRowCount] = roundToFactor(Math.round(d.data.data['Actual Rows']).toString());
                     //console.log(rowCount[intRowCount], intRowCount);
                     //link.attr("id", "rows-" + intRowCount + "");
                     var strBarHTML = (d.data.data['Actual Rows'] < 1 ? '<div class="explain-bar-0">0</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Actual Rows']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
