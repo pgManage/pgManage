@@ -79,6 +79,30 @@
 				orderbyColumn.addEventListener('change', function () { setOrderBy(); });
 				orderbyDirection.addEventListener('change', function () { setOrderBy(); });
 			});
+
+            function cancelProcess(intPID) {
+                GS.msgbox('Are you sure...',
+                            'Are you sure you want to cancel this query?',
+                            ['No', 'Yes'],
+                            function (strAnswer) {
+                    if (strAnswer === 'Yes') {
+                        GS.addLoader(document.getElementById('process-table-container'), 'Cancelling Process...');
+                        GS.requestFromSocket(GS.postageProcessDialogSocket,
+                                            'RAW\nSELECT pg_cancel_backend(' + intPID + ');',
+                                            function (response, error) {
+                            if (!error) {
+                                if (response === 'TRANSACTION COMPLETED') {
+                                    document.getElementById('datasheet-processes').refresh();
+                                    GS.removeLoader(document.getElementById('process-table-container'));
+                                }
+                            } else {
+                                GS.removeLoader(document.getElementById('process-table-container'));
+                                GS.ajaxErrorDialog(response);
+                            }
+                        });
+                    }
+                });
+            }
         </script>
 
         <style>
