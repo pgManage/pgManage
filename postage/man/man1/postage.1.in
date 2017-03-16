@@ -1,4 +1,4 @@
-.TH "POSTAGE" "1" "February 2017" "" ""
+.TH "POSTAGE" "1" "March 2017" "" ""
 .SH "NAME"
 \fBpostage\fR \- PostgreSQL Administration for the web
 .SH FULL PATH
@@ -23,6 +23,7 @@ postage
        [\-l <log\-level> | \-\-log\-level=<log\-level>]
        [\-n <allow_custom_connections> | \-\-allow\-custom\-connections=<allow\-custom\-connections>]
        [\-t <login\-timeout> | \-\-login\-timeout=<login\-timeout>]
+       [\-x <local\-only> | \-\-local\-only=<local\-only>]
 .fi
 .RE
 .SH DESCRIPTION
@@ -115,6 +116,12 @@ The following options can be specified on the command line or in the configurati
        \fBInteger;\fP defaults to 1200
 .br
        This option regulates the timeout after the last page is closed\.
+.P
+\fB\-x\fP or \fB\-\-local\-only=\fP or \fBlocal\-only=\fP
+.br
+       \fBBoolean;\fP defaults to false
+.br
+       This tells Postage whether or not to set the listening socket to local addresses only\.
 .SH SETTING UP A CONNECTION TO A POSTGRESQL SERVER
 .P
 Postage requires at least one PostgreSQL server be listed in the postage\-connections\.conf file\. This version of Postage doesn't allow you to specify a server from the command line\. Enter only one PostgreSQL server per line\.
