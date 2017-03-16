@@ -8,6 +8,7 @@
 #menu-button-new-tab {
     position: relative;
 }
+
 #menu-button-new-tab-plus {
     position: absolute;
     display: inline-block;
@@ -22,37 +23,9 @@
     margin-top: -0.5em;
 }
 
-
 .panel-resizable {
     position: relative;
 }
-
-.sql-results-area {
-    font-family: "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
-    font-feature-settings: normal;
-    font-kerning: auto;
-    font-language-override: normal;
-    font-size: 11.2px;
-    font-size-adjust: none;
-    font-stretch: normal;
-    font-style: normal;
-    font-synthesis: weight style;
-    font-variant: normal;
-    font-variant-alternates: normal;
-    font-variant-caps: normal;
-    font-variant-east-asian: normal;
-    font-variant-ligatures: normal;
-    font-variant-numeric: normal;
-    font-variant-position: normal;
-    font-weight: 400;
-
-    /*
-    font-family: InconsolataGo,Courier New,Courier,monospace;
-    font-family: Courier New,Courier,monospace;
-    font-family: "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
-    */
-}
-
 
 /* ####################################################### */
 /* ############### ACE RELATIVE  FONT SIZE ############### */

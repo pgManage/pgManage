@@ -853,13 +853,14 @@ function dialogOptions() {
 
         // else: full height
         } else {
-            document.getElementById('customCSSAce').style.height = '15em';
+            document.getElementById('customCSSAce').style.height = '30em';
         }
 
 
         CSSEditor.setValue(localStorage.customCSS);
         CSSEditor.focus();
         CSSEditor.selection.setSelectionRange(new Range(0, 0, 0, 0));
+        GS.triggerEvent(document.getElementById('customCSSAce'), 'resize');
 
 
         // set control values

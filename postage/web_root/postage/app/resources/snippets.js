@@ -83,8 +83,8 @@ snippets.push([ml(function () {/*SELECT ${1:columns}
 	WHERE ${3:where};
 */}), 'SQLSnippet', 'SELECT_SIMPLE']);
 
-snippets.push([ml(function () {/*--Name: ${14:query_name}
-    WITH ${14:with}
+snippets.push([ml(function () {/*--Name: ${14:name}
+    WITH ${15:with}
 	SELECT ${1:columns}
 	INTO ${2:into}
 	FROM ${3:columns}
