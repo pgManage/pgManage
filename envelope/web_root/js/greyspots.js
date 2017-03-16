@@ -25013,7 +25013,8 @@ window.addEventListener('design-register-element', function () {
                 nameControl = xtag.query(dialog, '.upload-name')[0],
                 pathControl = xtag.query(dialog, '.upload-path')[0],
                 uploadButton = xtag.query(dialog, '.upload-button')[0],
-                responseFrame = xtag.query(dialog, '.upload-frame')[0];
+                responseFrame = xtag.query(dialog, '.upload-frame')[0],
+                strFileExtension;
             
             // upload existing file
             uploadButton.addEventListener('click', function(event) {
@@ -25021,7 +25022,7 @@ window.addEventListener('design-register-element', function () {
                   , strName = nameControl.value;
                 
                 //console.log(element.innerPath + nameControl.value);
-                pathControl.setAttribute('value', getPath(element) + nameControl.value);
+                pathControl.setAttribute('value', getPath(element) + nameControl.value + '.' + strFileExtension);
                 
                 if (strName === '' && strFile === '') { // no values (no file and no file name)
                     GS.msgbox('Error', 'No values in form. Please fill in the form.', 'okonly');
@@ -25042,8 +25043,10 @@ window.addEventListener('design-register-element', function () {
             fileControl.addEventListener('change', function(event) {
                 var strValue = this.value;
                 
+                strFileExtension = strValue.substring(strValue.lastIndexOf('.') + 1);
+                
                 nameControl.removeAttribute('disabled');
-                nameControl.value = strValue.substring(strValue.lastIndexOf('\\') + 1);
+                nameControl.value = strValue.substring(strValue.lastIndexOf('\\') + 1, strValue.lastIndexOf('.')) || 'filename';
                 nameControl.focus();
             });
             

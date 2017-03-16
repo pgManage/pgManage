@@ -189,19 +189,19 @@ function explain(bolRun, bolText) {
                         intQuery += 1;
                         
                         if (rowCount) {
-                            console.log(rowCount);
+                            //console.log(rowCount);
                             var distinctRowCount = [];
                             for (var i = 0, len = rowCount.length; i < len; i++) {
                                 if (distinctRowCount.indexOf(rowCount[i]) === -1) {
                                     distinctRowCount.push(rowCount[i]);
                                 }
                             }
-                            console.log(distinctRowCount);
+                            //console.log(distinctRowCount);
                             function sortNumber(a,b) {
                                 return a - b;
                             }
                             distinctRowCount.sort(sortNumber);
-                            console.log(distinctRowCount);
+                            //console.log(distinctRowCount);
                             var linkElemsByClass;
                             for (i = 0 + 1, len = distinctRowCount.length + 1; i < len; i++) {
                                 if (distinctRowCount[i]) {
@@ -210,17 +210,39 @@ function explain(bolRun, bolText) {
                                     //console.log(distinctRowCount[i]);
                                     for (var i2 = 0, len2 = linkElemsByClass.length; i2 < len2; i2++) {
                                         if (linkElemsByClass[i2]) {
-                                            if (i * 1.5 < 30) {
-                                                linkElemsByClass[i2].style['stroke-width'] = i * 1.5;
+                                            if (len > 10) {
+                                                if (i === 0) {
+                                                    linkElemsByClass[i2].style['stroke-width'] = 1.5;
+                                                } else if (i * (distinctRowCount[i] / (i *distinctRowCount[i].toString().length * 100)) + 1 < 1) {
+                                                    linkElemsByClass[i2].style['stroke-width'] = 1.5;
+                                                    //console.log(1.5, distinctRowCount[i]);
+                                                } else if (i * (distinctRowCount[i] / (i * distinctRowCount[i].toString().length * 100)) + 1 < 30) {
+                                                    linkElemsByClass[i2].style['stroke-width'] = i * (distinctRowCount[i] / (i * distinctRowCount[i].toString().length * 100)) + 1;//i * 1.5;
+                                                    //console.log(Math.round((distinctRowCount[i] / distinctRowCount[0]) / (distinctRowCount[i].toString().length * 10 * (distinctRowCount[i].toString().length / 0.75 * 2))) + 0.5, distinctRowCount[i]);
+                                                } else {
+                                                     linkElemsByClass[i2].style['stroke-width'] = 30;
+                                                }
                                             } else {
-                                                 linkElemsByClass[i2].style['stroke-width'] = 30;
+                                                if (i === 0) {
+                                                    linkElemsByClass[i2].style['stroke-width'] = 1.5;
+                                                } else if (Math.round((distinctRowCount[i] / distinctRowCount[0]) / ((i / distinctRowCount[i].toString().length * 10) * (distinctRowCount[i].toString().length / 0.75 * 2))) + 0.5 < 1) {
+                                                    linkElemsByClass[i2].style['stroke-width'] = 1.5;
+                                                    //console.log(1.5, distinctRowCount[i]);
+                                                } else if (Math.round((distinctRowCount[i] / distinctRowCount[0]) / ((i / distinctRowCount[i].toString().length * 10) * (distinctRowCount[i].toString().length / 0.75 * 2))) + 0.5 < 30) {
+                                                    linkElemsByClass[i2].style['stroke-width'] = Math.round((distinctRowCount[i] / distinctRowCount[0]) / ((i / distinctRowCount[i].toString().length * 10) * (distinctRowCount[i].toString().length / 0.75 * 2))) + 0.5;//i * 1.5;
+                                                    //console.log(Math.round((distinctRowCount[i] / distinctRowCount[0]) / ((i / distinctRowCount[i].toString().length * 10) * (distinctRowCount[i].toString().length / 0.75 * 2))) + 0.5, distinctRowCount[i]);
+                                                } else {
+                                                     linkElemsByClass[i2].style['stroke-width'] = 30;
+                                                }
                                             }
                                         }
                                     }
                                     //HTMLstyleText += '.rows-' + distinctRowCount[i] + '{ stroke-width: ' + i * 2 + 'px; }' + '\n';
                                 }
                             }
+                            rowCount = [];
                         }
+                        
 
                         // update the success and error tally
                         updateTally(intQuery, intError);
@@ -459,15 +481,15 @@ function handleExplain(explainJSON, target, bolRun) {
                 
                 if (d.data.costliest) {
                     strHTML +=  '<div class="costliest-label">costliest</div>';
-                    console.log(strHTML);
+                    //console.log(strHTML);
                 }
                 if (d.data.largest) {
                     strHTML +=  '<div class="largest-label">largest</div>';
-                    console.log(strHTML);
+                    //console.log(strHTML);
                 }
                 if (d.data.slowest) {
                     strHTML +=  '<div class="slowest-label">slowest</div>';
-                    console.log(strHTML);
+                    //console.log(strHTML);
                 }
                 
                 if (d.data.data['Node Type'] === 'Hash Join') {
