@@ -629,7 +629,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		char *str_temp2 =
 			"; path=/; expires=Tue, 01 Jan 1990 00:00:00 GMT"
 			"; HttpOnly\015\012"
-			"Location: /index.html?connection=";
+			"Location: /postage/index.html?connection=";
 		size_t int_temp2 = strlen(str_temp2);
 		size_t i = (size_t)strtol(ptr_conn, NULL, 10);
 		struct struct_connection *current_connection = DArray_get(darr_global_connection, i);

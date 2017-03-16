@@ -202,9 +202,14 @@ void http_main(struct sock_ev_client *client) {
 	SDEBUG("http_main %p", client);
 	client->bol_request_in_progress = true;
 	SDEFINE_VAR_ALL(str_uri, str_conninfo);
+#ifdef ENVELOPE
+#else
+	SDEFINE_VAR_MORE(str_full_uri);
+#endif
 	char *str_response = NULL;
 	char *ptr_end_uri = NULL;
 	size_t int_uri_len = 0;
+	size_t int_full_uri_len = 0;
 #ifdef ENVELOPE
 #else
 	size_t int_response_len = 0;
@@ -212,6 +217,11 @@ void http_main(struct sock_ev_client *client) {
 	// get path
 	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_len);
 	SFINISH_CHECK(str_uri, "str_uri_path failed");
+
+#ifdef ENVELOPE
+#else
+	SFINISH_SNCAT(str_full_uri, &int_full_uri_len, str_uri, int_uri_len);
+#endif
 
 	ptr_end_uri = strchr(str_uri, '?');
 	if (ptr_end_uri != NULL) {
@@ -254,7 +264,7 @@ void http_main(struct sock_ev_client *client) {
 	if (strncmp(str_uri, "/postage", 8) != 0) {
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 303 See Other\015\012Location: /postage", (size_t)42,
-			str_uri, int_uri_len,
+			str_full_uri, int_full_uri_len,
 			"\015\012\015\012", (size_t)4);
 	} else if (strncmp(str_uri, "/postage/auth", 14) == 0) {
 		SDEBUG("str_uri: %s", str_uri);
