@@ -1492,13 +1492,24 @@ finish:
 void cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 	struct sock_ev_client *client = cb_data;
 	char *str_response = NULL;
+	SDEFINE_VAR_ALL(str_temp, str_temp_escape);
 	size_t int_response_len = 0;
+	size_t int_temp_len = 0;
 
+	SDEBUG("TESTING CNXN_CB");
 	if (conn->int_status != 1) {
 		SERROR_NORESPONSE("%s", conn->str_response);
+
+		int_temp_len = conn->int_response_len > 0 ? conn->int_response_len : strlen(conn->str_response);
+		//str_temp = bunescape_value(conn->str_response, &int_temp_len);
+		//SDEBUG("%s\t%s", conn->str_response, str_temp);
+		str_temp_escape = bescape_value(conn->str_response, &int_temp_len);
+		SDEBUG(">%s|%s<", conn->str_response, str_temp_escape);
+
 		SERROR_SNCAT(str_response, &int_response_len,
-			"messageid = NULL\012", (size_t)17,
-			conn->str_response, strlen(conn->str_response));
+			"messageid = NULL\012ERROR\t", (size_t)23,
+			str_temp_escape, int_temp_len,
+			"\012", (size_t)1);
 		WS_sendFrame(EV_A, client, 0x01, true, str_response, strlen(str_response));
 	}
 
@@ -1513,6 +1524,7 @@ void cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 	client->notify_watcher->parent = client;
 #endif
 error:
+	SFREE_ALL();
 	SFREE(conn->str_response);
 	SFREE(str_response);
 	return;

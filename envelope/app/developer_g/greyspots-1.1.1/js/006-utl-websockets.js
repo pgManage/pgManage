@@ -1,6 +1,5 @@
 //jslint white:true
 
-
 (function () {
     'use strict';
     
@@ -42,6 +41,7 @@
             
             GS.openDialog(templateElement, '', function (event, strAnswer) {
                 if (strAnswer === 'Try to reconnect') {
+                    GS.closeSocket(GS.envSocket);
                     GS.envSocket = GS.openSocket('env', socket.GSSessionID, socket.notifications);
                 } else {
                     bolPreventErrors = true;
@@ -279,6 +279,15 @@
         }
     };
     
+    GS.websockets = new Array();
+
+    GS.closeAllSockets = function () {
+        var i, len = GS.websockets.length;
+        for (i = 0;i < len;i++) {
+            GS.closeSocket(GS.websockets[i]);
+        }
+    };
+    
     var sequence = 0, jsnMessages = {}, arrWaitingCalls = [];
     GS.openSocket = function (strLink, relinkSessionID, relinkSessionNotifications) {
         var strLoc = window.location.toString(),
@@ -288,6 +297,8 @@
                             (window.location.protocol.toLowerCase().indexOf('https') === 0 ? 'wss' : 'ws') +
                             '://' + (window.location.host || window.location.hostname) + '/postage/' + strConn + '/' + strLink +
                             (relinkSessionID ? '?sessionid=' + relinkSessionID : '')); //nunzio.wfprod.com
+        
+        GS.websockets.push(socket);
         
         if (relinkSessionID) {
             socket.GSSessionID = relinkSessionID;
@@ -464,6 +475,7 @@
                 setTimeout(function() {
                     console.log('ATTEMPTING SOCKET RE-OPEN', socket);
                     GS.triggerEvent(window, 'socket-reconnect');
+                    GS.closeSocket(GS.envSocket);
                     GS.envSocket = GS.openSocket('env', GS.envSocket.GSSessionID, GS.envSocket.notifications);
                 }, 1000);
             } else {

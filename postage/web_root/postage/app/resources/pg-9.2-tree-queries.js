@@ -5,6 +5,97 @@ var bolTreeQueriesLoaded = true, listQuery = {}, titleRefreshQuery = {}
   , scriptQuery = {}, infoQuery = {}, statQuery = {}, propQuery = {}
   , detailQuery = {}, associatedButtons = {};
 
+function handleQueryVersionDifferences (versionNum) {
+    
+    
+    //console.log(parseFloat(versionNum, 10) >= 9.5);
+    //propQuery.prop_role:
+    if (parseFloat(versionNum, 10) >= 9.5) {
+        propQuery.prop_role = propQuery.objectRole = ml(function () {/*
+          SELECT 1 AS sort,
+                 'Name',
+                 'OID',
+                 'Expires',
+                 'Can Login?',
+                 'Superuser?',
+                 'Can Create Databases?',
+                 'Can Create Roles?',
+                 --'Can Update Catalogs?',
+                 'Bypasses row level security?',
+                 'Inherits?',
+                 'Replication?',
+                 'Connection Limit',
+                 'Comment'
+        UNION ALL
+          SELECT 2 AS sort,
+                  pg_roles.rolname::text,
+                  pg_roles.oid::text,
+                  (CASE WHEN pg_roles.rolvaliduntil IS NULL
+                          OR length(pg_roles.rolvaliduntil::date::text) = 0 
+                          OR pg_roles.rolvaliduntil = 'infinity'
+                            THEN 'Never' ELSE to_char(pg_roles.rolvaliduntil::date, 'YYYY-MM-dd FMHH:MI:SSPM (TZ)') END)::text,
+                  (CASE WHEN pg_roles.rolcanlogin    THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolsuper       THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolcreatedb    THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolcreaterole  THEN 'Yes' ELSE 'No' END)::text,
+                  --(CASE WHEN pg_roles.rolcatupdate   THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolbypassrls     THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolinherit     THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolreplication THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolconnlimit > -1 THEN pg_roles.rolconnlimit::text ELSE 'No Limit' END)::text,
+                  (description::text)::text
+             FROM pg_roles
+        LEFT JOIN pg_auth_members ON pg_roles.oid = pg_auth_members.member 
+        LEFT JOIN pg_roles owner_role ON owner_role.oid = pg_auth_members.roleid 
+        LEFT JOIN pg_description ON pg_roles.oid = pg_description.objoid
+            WHERE pg_roles.oid = '{{INTOID}}'
+         ORDER BY sort;
+        */});
+    } else {
+        propQuery.prop_role = propQuery.objectRole = ml(function () {/*
+          SELECT 1 AS sort,
+                 'Name',
+                 'OID',
+                 'Expires',
+                 'Can Login?',
+                 'Superuser?',
+                 'Can Create Databases?',
+                 'Can Create Roles?',
+                 'Can Update Catalogs?',
+                 --'Bypasses row level security?',
+                 'Inherits?',
+                 'Replication?',
+                 'Connection Limit',
+                 'Comment'
+        UNION ALL
+          SELECT 2 AS sort,
+                  pg_roles.rolname::text,
+                  pg_roles.oid::text,
+                  (CASE WHEN pg_roles.rolvaliduntil IS NULL
+                          OR length(pg_roles.rolvaliduntil::date::text) = 0 
+                          OR pg_roles.rolvaliduntil = 'infinity'
+                            THEN 'Never' ELSE to_char(pg_roles.rolvaliduntil::date, 'YYYY-MM-dd FMHH:MI:SSPM (TZ)') END)::text,
+                  (CASE WHEN pg_roles.rolcanlogin    THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolsuper       THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolcreatedb    THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolcreaterole  THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolcatupdate   THEN 'Yes' ELSE 'No' END)::text,
+                  --(CASE WHEN pg_roles.rolbypassrls     THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolinherit     THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolreplication THEN 'Yes' ELSE 'No' END)::text,
+                  (CASE WHEN pg_roles.rolconnlimit > -1 THEN pg_roles.rolconnlimit::text ELSE 'No Limit' END)::text,
+                  (description::text)::text
+             FROM pg_roles
+        LEFT JOIN pg_auth_members ON pg_roles.oid = pg_auth_members.member 
+        LEFT JOIN pg_roles owner_role ON owner_role.oid = pg_auth_members.roleid 
+        LEFT JOIN pg_description ON pg_roles.oid = pg_description.objoid
+            WHERE pg_roles.oid = '{{INTOID}}'
+         ORDER BY sort;
+        */});
+    }
+    
+}
+
 
 var treeStructure = [
     // role
@@ -3664,44 +3755,47 @@ LEFT JOIN pg_description ON pg_description.objoid = pg_class.oid AND pg_descript
     WHERE pg_class.oid = '{{INTOID}}';
 */});
 
-propQuery.prop_role = propQuery.objectRole = ml(function () {/*
-  SELECT 1 AS sort,
-         'Name',
-         'OID',
-         'Expires',
-         'Can Login?',
-         'Superuser?',
-         'Can Create Databases?',
-         'Can Create Roles?',
-         'Can Update Catalogs?',
-         'Inherits?',
-         'Replication?',
-         'Connection Limit',
-         'Comment'
-UNION ALL
-   SELECT 2 AS sort,
-          pg_roles.rolname::text,
-          pg_roles.oid::text,
-          (CASE WHEN pg_roles.rolvaliduntil IS NULL
-                  OR length(pg_roles.rolvaliduntil::date::text) = 0 
-                  OR pg_roles.rolvaliduntil = 'infinity'
-                    THEN 'Never' ELSE to_char(pg_roles.rolvaliduntil::date, 'YYYY-MM-dd FMHH:MI:SSPM (TZ)') END)::text,
-          (CASE WHEN pg_roles.rolcanlogin    THEN 'Yes' ELSE 'No' END)::text,
-          (CASE WHEN pg_roles.rolsuper       THEN 'Yes' ELSE 'No' END)::text,
-          (CASE WHEN pg_roles.rolcreatedb    THEN 'Yes' ELSE 'No' END)::text,
-          (CASE WHEN pg_roles.rolcreaterole  THEN 'Yes' ELSE 'No' END)::text,
-          (CASE WHEN pg_roles.rolcatupdate   THEN 'Yes' ELSE 'No' END)::text,
-          (CASE WHEN pg_roles.rolinherit     THEN 'Yes' ELSE 'No' END)::text,
-          (CASE WHEN pg_roles.rolreplication THEN 'Yes' ELSE 'No' END)::text,
-          (CASE WHEN pg_roles.rolconnlimit > -1 THEN pg_roles.rolconnlimit::text ELSE 'No Limit' END)::text,
-          (description::text)::text
-     FROM pg_roles
-LEFT JOIN pg_auth_members ON pg_roles.oid = pg_auth_members.member 
-LEFT JOIN pg_roles owner_role ON owner_role.oid = pg_auth_members.roleid 
-LEFT JOIN pg_description ON pg_roles.oid = pg_description.objoid
-    WHERE pg_roles.oid = '{{INTOID}}'
- ORDER BY sort;
-*/});
+// this is now set in the handleQueryVersionDifferences function due to version differences in available properties
+// propQuery.prop_role = propQuery.objectRole = ml(function () {/*
+//   SELECT 1 AS sort,
+//          'Name',
+//          'OID',
+//          'Expires',
+//          'Can Login?',
+//          'Superuser?',
+//          'Can Create Databases?',
+//          'Can Create Roles?',
+//          --'Can Update Catalogs?',
+//          --'Bypasses row level security?',
+//          'Inherits?',
+//          'Replication?',
+//          'Connection Limit',
+//          'Comment'
+// UNION ALL
+//   SELECT 2 AS sort,
+//           pg_roles.rolname::text,
+//           pg_roles.oid::text,
+//           (CASE WHEN pg_roles.rolvaliduntil IS NULL
+//                   OR length(pg_roles.rolvaliduntil::date::text) = 0 
+//                   OR pg_roles.rolvaliduntil = 'infinity'
+//                     THEN 'Never' ELSE to_char(pg_roles.rolvaliduntil::date, 'YYYY-MM-dd FMHH:MI:SSPM (TZ)') END)::text,
+//           (CASE WHEN pg_roles.rolcanlogin    THEN 'Yes' ELSE 'No' END)::text,
+//           (CASE WHEN pg_roles.rolsuper       THEN 'Yes' ELSE 'No' END)::text,
+//           (CASE WHEN pg_roles.rolcreatedb    THEN 'Yes' ELSE 'No' END)::text,
+//           (CASE WHEN pg_roles.rolcreaterole  THEN 'Yes' ELSE 'No' END)::text,
+//           --(CASE WHEN pg_roles.rolcatupdate   THEN 'Yes' ELSE 'No' END)::text,
+//           --(CASE WHEN pg_roles.rolbypassrls     THEN 'Yes' ELSE 'No' END)::text,
+//           (CASE WHEN pg_roles.rolinherit     THEN 'Yes' ELSE 'No' END)::text,
+//           (CASE WHEN pg_roles.rolreplication THEN 'Yes' ELSE 'No' END)::text,
+//           (CASE WHEN pg_roles.rolconnlimit > -1 THEN pg_roles.rolconnlimit::text ELSE 'No Limit' END)::text,
+//           (description::text)::text
+//      FROM pg_roles
+// LEFT JOIN pg_auth_members ON pg_roles.oid = pg_auth_members.member 
+// LEFT JOIN pg_roles owner_role ON owner_role.oid = pg_auth_members.roleid 
+// LEFT JOIN pg_description ON pg_roles.oid = pg_description.objoid
+//     WHERE pg_roles.oid = '{{INTOID}}'
+//  ORDER BY sort;
+// */});
 
 propQuery.prop_language = propQuery.objectLanguage = ml(function () {/*
    SELECT 1 AS sort,

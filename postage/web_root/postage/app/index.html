@@ -116,6 +116,20 @@
                 GS.triggerEvent(window, 'notification-received', {'message': event.message, 'jsnMessage': jsnMessage});
             });
             
+			var bolPreventErrors = false;
+			/*
+			function buttonReloadWindow() {
+				GS.envSocket.close();
+				GS.postageProcessDialogSocket.close();
+				GS.querySocket.clost();
+				if (window.process && window.process.type === 'renderer') {
+					var electron = require('electron');
+					electron.remote.getCurrentWindow().webContents.reload();
+				} else {
+					window.location.reload(true);
+				}
+			}
+			*/
             // open dialog and show server settings
             function webSocketConnectionErrorDialog(addinText) {
                 if (!document.getElementById('dialog-from-dialog-ws-conn-error') && bolPreventErrors === false) {
@@ -134,7 +148,7 @@
                             </gs-body>
                             <gs-footer>
                                 <gs-grid gutter reflow-at="420">
-                                    <gs-block><gs-button dialogclose>Try to reconnect</gs-button></gs-block>
+                                    <gs-block><gs-button onclick="buttonReloadWindow();">Reload Postage</gs-button></gs-block>
                                     <gs-block><gs-button dialogclose>Dismiss so I can copy my progress</gs-button></gs-block>
                                 </gs-grid>
                             </gs-footer>
@@ -142,13 +156,10 @@
                     */}).replace('{{ADDIN}}', (addinText ? '\n\n' + addinText : ''));
                     
                     GS.openDialog(templateElement, '', function (event, strAnswer) {
-                        if (strAnswer === 'Try to reconnect') {
-                            // open socket for postage
-                            GS.envSocket = GS.openSocket('env', GS.envSocket.GSSessionID, GS.envSocket.notifications);
-            
-                            // open socket for query execution
-                            GS.querySocket = GS.openSocket('env', GS.querySocket.GSSessionID, GS.querySocket.notifications);
-                        }
+                        if (strAnswer === 'Reload Postage') {
+                        } else {
+							bolPreventErrors = true;
+						}
                     });
                 }
             }
@@ -170,10 +181,10 @@
                 // open socket for query execution
                 GS.querySocket = GS.openSocket('env');
 
-
                 // load context info
                 loadContextData(function () {
                     // time to get things started
+                    handleQueryVersionDifferences(contextData.minorVersionNumber);
                     treeStart();
                     startTabContainer();
                     autocompleteStart();
@@ -294,6 +305,7 @@
                  || !window.bolSettingsLoaded) {
                     orderSixtySix();
                 }
+                
             });
 
             function orderSixtySix() {
@@ -433,9 +445,11 @@
                     }
                 }
             })();
-
+            
+                
             function handleLoad() {
                 'use strict';
+                GS.pushQueryString(localStorage.shownObjects);
                 var strQueryString = GS.getQueryString(), strView;
 
                 qsLoadLeftPanel(strQueryString);
