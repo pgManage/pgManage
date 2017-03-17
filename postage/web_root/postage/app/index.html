@@ -170,7 +170,6 @@
                 // open socket for query execution
                 GS.querySocket = GS.openSocket('env');
 
-
                 // load context info
                 loadContextData(function () {
                     // time to get things started
@@ -295,6 +294,7 @@
                  || !window.bolSettingsLoaded) {
                     orderSixtySix();
                 }
+                
             });
 
             function orderSixtySix() {
@@ -434,9 +434,11 @@
                     }
                 }
             })();
-
+            
+                
             function handleLoad() {
                 'use strict';
+                GS.pushQueryString(localStorage.shownObjects);
                 var strQueryString = GS.getQueryString(), strView;
 
                 qsLoadLeftPanel(strQueryString);
