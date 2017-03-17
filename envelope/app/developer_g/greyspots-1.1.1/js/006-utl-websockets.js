@@ -1,7 +1,5 @@
 //jslint white:true
 
-GS.websockets = [];
-
 (function () {
     'use strict';
     
@@ -281,6 +279,8 @@ GS.websockets = [];
         }
     };
     
+    GS.websockets = new Array();
+
     GS.closeAllSockets = function () {
         var i, len = GS.websockets.length;
         for (i = 0;i < len;i++) {
