@@ -69,7 +69,7 @@
             window.addEventListener('notification', function (event) {
                 'use strict';
                 var strBatch = event.message, arrBatch = strBatch.split('\n'), i, len
-                  , strMessage, strType, strChannel, strPID, strPayload, jsnMessage;
+                  , strMessage, strType, strChannel, strPID, strPayload, jsnMessage, bolHasBeenRead = false;
 
                 // remove extra \n
                 arrBatch.pop();
@@ -79,15 +79,24 @@
                     strType = strMessage.substring(0, strMessage.indexOf('\t'));
                     strMessage = strMessage.substring(strMessage.indexOf('\t') + 1);
 
-                    if (strType !== 'WARNING') {
+                    if (strType !== 'WARNING' && strType !== 'ERROR') {
                         strChannel = strMessage.substring(0, strMessage.indexOf('\t'));
                         strMessage = strMessage.substring(strMessage.indexOf('\t') + 1);
 
                         strPID = strMessage.substring(0, strMessage.indexOf('\t'));
                         strMessage = strMessage.substring(strMessage.indexOf('\t') + 1);
                     }
-
-                    strPayload = GS.decodeFromTabDelimited(strMessage);
+                    
+                    if (strType === 'ERROR') {
+                        strPayload = GS.decodeFromTabDelimited(strMessage);
+                        
+                        webSocketConnectionErrorDialog(strPayload);
+                        
+                        bolHasBeenRead = true;
+                        
+                    } else {
+                        strPayload = GS.decodeFromTabDelimited(strMessage);
+                    }
 
                     jsnMessage = {
                         'strType': strType || '',
@@ -95,7 +104,7 @@
                         'strChannel': strChannel || '',
                         'strPayload': strPayload || '',
                         'strPID': strPID || '',
-                        'hasBeenRead': false
+                        'hasBeenRead': bolHasBeenRead
                     };
 
                     arrNotification.push(jsnMessage);
@@ -106,7 +115,44 @@
 
                 GS.triggerEvent(window, 'notification-received', {'message': event.message, 'jsnMessage': jsnMessage});
             });
-
+            
+            // open dialog and show server settings
+            function webSocketConnectionErrorDialog(addinText) {
+                if (!document.getElementById('dialog-from-dialog-ws-conn-error') && bolPreventErrors === false) {
+                    var templateElement = document.createElement('template');
+                    
+                    GS.removeAllLoaders();
+                    
+                    templateElement.setAttribute('id', 'dialog-ws-conn-error');
+                    templateElement.setAttribute('data-theme', 'error');
+                    templateElement.innerHTML = ml(function () {/*
+                        <gs-page>
+                            <gs-header><center><h3>There was an error!</h3></center></gs-header>
+                            <gs-body padded>
+                                <pre style="white-space: pre-wrap;">
+            There has been an error with the Database connection.{{ADDIN}}</pre>
+                            </gs-body>
+                            <gs-footer>
+                                <gs-grid gutter reflow-at="420">
+                                    <gs-block><gs-button dialogclose>Try to reconnect</gs-button></gs-block>
+                                    <gs-block><gs-button dialogclose>Dismiss so I can copy my progress</gs-button></gs-block>
+                                </gs-grid>
+                            </gs-footer>
+                        </gs-page>
+                    */}).replace('{{ADDIN}}', (addinText ? '\n\n' + addinText : ''));
+                    
+                    GS.openDialog(templateElement, '', function (event, strAnswer) {
+                        if (strAnswer === 'Try to reconnect') {
+                            // open socket for postage
+                            GS.envSocket = GS.openSocket('env', GS.envSocket.GSSessionID, GS.envSocket.notifications);
+            
+                            // open socket for query execution
+                            GS.querySocket = GS.openSocket('env', GS.querySocket.GSSessionID, GS.querySocket.notifications);
+                        }
+                    });
+                }
+            }
+            
             window.addEventListener('load', function () {
                 'use strict';
                 // load ace range constructor so that we can select text programatically
