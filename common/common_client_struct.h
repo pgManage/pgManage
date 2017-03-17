@@ -178,23 +178,23 @@ struct sock_ev_client {
 
 enum {
 	POSTAGE_REQ_SELECT = 0,
-	POSTAGE_REQ_INSERT,
-	POSTAGE_REQ_UPDATE,
-	POSTAGE_REQ_DELETE,
-	POSTAGE_REQ_BEGIN,
-	POSTAGE_REQ_COMMIT,
-	POSTAGE_REQ_ROLLBACK,
-	POSTAGE_REQ_RAW,
+	POSTAGE_REQ_INSERT = 1,
+	POSTAGE_REQ_UPDATE = 2,
+	POSTAGE_REQ_DELETE = 3,
+	POSTAGE_REQ_BEGIN = 4,
+	POSTAGE_REQ_COMMIT = 5,
+	POSTAGE_REQ_ROLLBACK = 6,
+	POSTAGE_REQ_RAW = 7,
 #ifdef ENVELOPE
-	POSTAGE_REQ_FILE,
+	POSTAGE_REQ_FILE = 8,
 #else
-	POSTAGE_REQ_TAB,
+	POSTAGE_REQ_TAB = 8,
 #endif
-	POSTAGE_REQ_INFO,
-	POSTAGE_REQ_ACTION,
-	POSTAGE_REQ_ACCEPT,
-	POSTAGE_REQ_AUTH,
-	POSTAGE_REQ_STANDARD
+	POSTAGE_REQ_INFO = 9,
+	POSTAGE_REQ_ACTION = 10,
+	POSTAGE_REQ_ACCEPT = 11,
+	POSTAGE_REQ_AUTH = 12,
+	POSTAGE_REQ_STANDARD = 13
 };
 
 struct sock_ev_client_request {
@@ -211,6 +211,8 @@ struct sock_ev_client_request {
 	DArray *arr_response;
 	ssize_t int_i;
 	ssize_t int_len;
+
+	bool bol_cancel_return;
 
 	void *vod_request_data;
 	size_t int_req_type;

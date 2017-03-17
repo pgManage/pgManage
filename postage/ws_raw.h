@@ -11,6 +11,7 @@
 struct sock_ev_client_raw {
 	bool bol_autocommit;
 	PGresult *res;
+	struct sock_ev_client_copy_check *copy_check;
 };
 
 /*
