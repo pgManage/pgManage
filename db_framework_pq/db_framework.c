@@ -907,8 +907,8 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 		// continue copying
 		if (int_status > 0) {
 			bool bol_ret = copy_check->copy_cb(EV_A, true, false, copy_check->cb_data, *buffer_ptr_ptr, strlen(*buffer_ptr_ptr));
-			PQfreemem(*buffer_ptr_ptr);
 			if (bol_ret == false) {
+				PQfreemem(*buffer_ptr_ptr);
 				break;
 			}
 
