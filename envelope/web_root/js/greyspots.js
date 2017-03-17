@@ -8226,6 +8226,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
 };
 //jslint white:true
 
+GS.websockets = [];
 
 (function () {
     'use strict';
@@ -8506,6 +8507,13 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         }
     };
     
+    GS.closeAllSockets = function () {
+        var i, len = GS.websockets.length;
+        for (i = 0;i < len;i++) {
+            GS.closeSocket(GS.websockets[i]);
+        }
+    };
+    
     var sequence = 0, jsnMessages = {}, arrWaitingCalls = [];
     GS.openSocket = function (strLink, relinkSessionID, relinkSessionNotifications) {
         var strLoc = window.location.toString(),
@@ -8515,6 +8523,8 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                             (window.location.protocol.toLowerCase().indexOf('https') === 0 ? 'wss' : 'ws') +
                             '://' + (window.location.host || window.location.hostname) + '/postage/' + strConn + '/' + strLink +
                             (relinkSessionID ? '?sessionid=' + relinkSessionID : '')); //nunzio.wfprod.com
+        
+        GS.websockets.push(socket);
         
         if (relinkSessionID) {
             socket.GSSessionID = relinkSessionID;
