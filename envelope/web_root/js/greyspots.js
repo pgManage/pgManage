@@ -8268,6 +8268,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
             
             GS.openDialog(templateElement, '', function (event, strAnswer) {
                 if (strAnswer === 'Try to reconnect') {
+                    GS.closeSocket(GS.envSocket);
                     GS.envSocket = GS.openSocket('env', socket.GSSessionID, socket.notifications);
                 } else {
                     bolPreventErrors = true;
@@ -8690,6 +8691,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                 setTimeout(function() {
                     console.log('ATTEMPTING SOCKET RE-OPEN', socket);
                     GS.triggerEvent(window, 'socket-reconnect');
+                    GS.closeSocket(GS.envSocket);
                     GS.envSocket = GS.openSocket('env', GS.envSocket.GSSessionID, GS.envSocket.notifications);
                 }, 1000);
             } else {

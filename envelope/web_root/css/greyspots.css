@@ -2581,7 +2581,11 @@ gs-dialog-button[bg-danger].down.hover {
     background-color: #ac2925;
     border-color: #761c19;
 }
+/*
 
+<gs-button></gs-button>
+
+*/
 /* # DISABLED # */
 gs-button[bg-danger][disabled],
 gs-toggle[bg-danger][disabled],
