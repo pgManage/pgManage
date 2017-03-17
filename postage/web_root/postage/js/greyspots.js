@@ -8226,7 +8226,6 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
 };
 //jslint white:true
 
-
 (function () {
     'use strict';
     
@@ -8268,6 +8267,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
             
             GS.openDialog(templateElement, '', function (event, strAnswer) {
                 if (strAnswer === 'Try to reconnect') {
+                    GS.closeSocket(GS.envSocket);
                     GS.envSocket = GS.openSocket('env', socket.GSSessionID, socket.notifications);
                 } else {
                     bolPreventErrors = true;
@@ -8505,6 +8505,15 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         }
     };
     
+    GS.websockets = new Array();
+
+    GS.closeAllSockets = function () {
+        var i, len = GS.websockets.length;
+        for (i = 0;i < len;i++) {
+            GS.closeSocket(GS.websockets[i]);
+        }
+    };
+    
     var sequence = 0, jsnMessages = {}, arrWaitingCalls = [];
     GS.openSocket = function (strLink, relinkSessionID, relinkSessionNotifications) {
         var strLoc = window.location.toString(),
@@ -8514,6 +8523,8 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                             (window.location.protocol.toLowerCase().indexOf('https') === 0 ? 'wss' : 'ws') +
                             '://' + (window.location.host || window.location.hostname) + '/postage/' + strConn + '/' + strLink +
                             (relinkSessionID ? '?sessionid=' + relinkSessionID : '')); //nunzio.wfprod.com
+        
+        GS.websockets.push(socket);
         
         if (relinkSessionID) {
             socket.GSSessionID = relinkSessionID;
@@ -8690,6 +8701,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                 setTimeout(function() {
                     console.log('ATTEMPTING SOCKET RE-OPEN', socket);
                     GS.triggerEvent(window, 'socket-reconnect');
+                    GS.closeSocket(GS.envSocket);
                     GS.envSocket = GS.openSocket('env', GS.envSocket.GSSessionID, GS.envSocket.notifications);
                 }, 1000);
             } else {
@@ -25013,7 +25025,8 @@ window.addEventListener('design-register-element', function () {
                 nameControl = xtag.query(dialog, '.upload-name')[0],
                 pathControl = xtag.query(dialog, '.upload-path')[0],
                 uploadButton = xtag.query(dialog, '.upload-button')[0],
-                responseFrame = xtag.query(dialog, '.upload-frame')[0];
+                responseFrame = xtag.query(dialog, '.upload-frame')[0],
+                strFileExtension;
             
             // upload existing file
             uploadButton.addEventListener('click', function(event) {
@@ -25021,7 +25034,7 @@ window.addEventListener('design-register-element', function () {
                   , strName = nameControl.value;
                 
                 //console.log(element.innerPath + nameControl.value);
-                pathControl.setAttribute('value', getPath(element) + nameControl.value);
+                pathControl.setAttribute('value', getPath(element) + nameControl.value + '.' + strFileExtension);
                 
                 if (strName === '' && strFile === '') { // no values (no file and no file name)
                     GS.msgbox('Error', 'No values in form. Please fill in the form.', 'okonly');
@@ -25042,8 +25055,10 @@ window.addEventListener('design-register-element', function () {
             fileControl.addEventListener('change', function(event) {
                 var strValue = this.value;
                 
+                strFileExtension = strValue.substring(strValue.lastIndexOf('.') + 1);
+                
                 nameControl.removeAttribute('disabled');
-                nameControl.value = strValue.substring(strValue.lastIndexOf('\\') + 1);
+                nameControl.value = strValue.substring(strValue.lastIndexOf('\\') + 1, strValue.lastIndexOf('.')) || 'filename';
                 nameControl.focus();
             });
             
