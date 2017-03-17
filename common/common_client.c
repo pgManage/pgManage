@@ -568,7 +568,7 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				if (str_session_id != NULL) {
 					LIST_FOREACH(client->server->list_client, first, next, node) {
 						struct sock_ev_client *other_client = node->value;
-						SINFO("other_client->str_session_id: %s", other_client->str_session_id);
+						SDEBUG("other_client->str_session_id: %s", other_client->str_session_id);
 						if (other_client != client && other_client->str_session_id != NULL && strncmp(str_session_id, other_client->str_session_id, 11) == 0) {
 							other_client_node = node;
 							session_client = other_client;
@@ -576,8 +576,8 @@ void client_cb(EV_P, ev_io *w, int revents) {
 						}
 					}
 				}
-				SINFO("other_client_node: %p", other_client_node);
-				SINFO("str_session_id: %s", str_session_id);
+				SDEBUG("other_client_node: %p", other_client_node);
+				SDEBUG("str_session_id: %s", str_session_id);
 				if (other_client_node != NULL) {
 					size_t int_current_cookie_len = 0;
 					size_t int_session_cookie_len = 0;
@@ -776,6 +776,8 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 	size_t int_message_id_len = 0;
 	size_t int_transaction_id_len = 0;
 	size_t int_first_word_len = 0;
+	char *str_response = NULL;
+	size_t int_response_len = 0;
 
 #ifdef POSTAGE_INTERFACE_LIBPQ
 	PGcancel *cancel_request = NULL;
@@ -973,7 +975,10 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 #ifdef POSTAGE_INTERFACE_LIBPQ
 		} else if (strcmp(str_first_word, "CANCEL") == 0) {
 			int int_ret_val = 0;
-			SDEBUG("==============================================CANCEL==============================================");
+			SINFO("==============================================CANCEL==============================================");
+			SDEBUG("client->conn->copy_check: %p", client->conn->copy_check);
+			SDEBUG("client->cur_request: %p", client->cur_request);
+
 			cancel_request = PQgetCancel(client->cnxn);
 			SERROR_SALLOC(str_temp1, 256);
 			int_ret_val = PQcancel(cancel_request, str_temp1, 256);
@@ -985,10 +990,104 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 			}
 			SFREE(str_temp1);
 
+			if (client->conn->copy_check != NULL) {
+				SINFO("copy_check branch");
+				struct sock_ev_client_request *client_request = client->conn->copy_check->cb_data;
+
+				client_request->bol_cancel_return = true;
+
+				char str_temp[101] = { 0 };
+				client_request->int_response_id += 1;
+				snprintf(str_temp, 100, "%zd", client_request->int_response_id);
+
+				SFREE(client_request->str_current_response);
+
+				char *_str_response = "FATAL\nQuery failed: FATAL\nerror_text\tERROR:  canceling statement due to user request\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n";
+				if (client_request->str_transaction_id != NULL) {
+					SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
+						"messageid = ", (size_t)12,
+						client_request->str_message_id, strlen(client_request->str_message_id),
+						"\012responsenumber = ", (size_t)18,
+						str_temp, strlen(str_temp),
+						"\012transactionid = ", (size_t)17,
+						client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+						"\012", (size_t)1,
+						_str_response, strlen(_str_response));
+				} else {
+					SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
+						"messageid = ", (size_t)12,
+						client_request->str_message_id, strlen(client_request->str_message_id),
+						"\012responsenumber = ", (size_t)18,
+						str_temp, strlen(str_temp),
+						"\012", (size_t)1,
+						_str_response, strlen(_str_response));
+				}
+
+			} else if (client->cur_request != NULL) {
+				SINFO("cur_request branch");
+				struct sock_ev_client_request *client_request = client->cur_request;
+
+				if (client_request->int_req_type == POSTAGE_REQ_RAW) {
+					struct sock_ev_client_raw *client_raw = client_request->vod_request_data;
+
+					char str_temp[101] = { 0 };
+					client_request->int_response_id += 1;
+					snprintf(str_temp, 100, "%zd", client_request->int_response_id);
+
+					char *_str_response = "FATAL\nQuery failed: FATAL\nerror_text\tERROR:  canceling statement due to user request\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n";
+					if (client_request->str_transaction_id != NULL) {
+						SERROR_SNCAT(str_response, &int_response_len,
+							"messageid = ", (size_t)12,
+							client_request->str_message_id, strlen(client_request->str_message_id),
+							"\012responsenumber = ", (size_t)18,
+							str_temp, strlen(str_temp),
+							"\012transactionid = ", (size_t)17,
+							client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+							"\012", (size_t)1,
+							_str_response, strlen(_str_response));
+					} else {
+						SERROR_SNCAT(str_response, &int_response_len,
+							"messageid = ", (size_t)12,
+							client_request->str_message_id, strlen(client_request->str_message_id),
+							"\012responsenumber = ", (size_t)18,
+							str_temp, strlen(str_temp),
+							"\012", (size_t)1,
+							_str_response, strlen(_str_response));
+					}
+
+					SDEBUG("str_response: %s", str_response);
+					WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len);
+					DArray_push(client_request->arr_response, str_response);
+					str_response = NULL;
+
+					if (client_raw->copy_check != NULL) {
+						decrement_idle(EV_A);
+						ev_check_stop(EV_A, &client_raw->copy_check->check);
+						SFREE(client_raw->copy_check);
+					}
+					if (client_raw->res != NULL) {
+						PQclear(client_raw->res);
+					}
+					if (client_request->cb_data != NULL) {
+						ev_io_stop(EV_A, &client_request->cb_data->io);
+						SFREE(client_request->cb_data);
+					}
+
+					int int_status = PQsendQuery(client_request->parent->cnxn, "ROLLBACK");
+					if (int_status != 1) {
+						SERROR_NORESPONSE("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
+					} else {
+						query_callback(EV_A, client_request, ws_raw_step3);
+					}
+
+					SFREE(client_request->vod_request_data);
+				}
+			}
+
 			WS_freeFrame(frame);
 			SFREE(str_message_id);
 			SFREE(str_transaction_id);
-			SDEBUG("==============================================CANCEL==============================================");
+			SINFO("==============================================CANCEL==============================================");
 #endif
 
 		} else if (strcmp(str_first_word, "CONFIRM") == 0) {
@@ -1104,6 +1203,7 @@ error:
 	WS_freeFrame(frame);
 	SFREE(str_message_id);
 	SFREE(str_transaction_id);
+	SFREE(str_response);
 
 	bol_error_state = false;
 	if (client) {

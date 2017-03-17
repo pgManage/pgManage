@@ -838,18 +838,12 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 			if (res_poll->copy_cb != NULL) {
 				str_error = _DB_get_diagnostic(conn, res);
 				bol_result = res_poll->copy_cb(EV_A, false, true, res_poll->cb_data, str_error, strlen(str_error));
-				if (bol_result) {
-					SWARN_NORESPONSE("copy_cb failed");
-					SFREE(str_global_error);
-				}
+				SFREE(str_global_error);
 				SFREE(str_error);
 				DB_free_result(db_res);
 			} else if (query_cb != NULL) {
 				bol_result = query_cb(EV_A, res_poll->cb_data, db_res);
-				if (bol_result) {
-					SWARN_NORESPONSE("query_cb failed");
-					SFREE(str_global_error);
-				}
+				SFREE(str_global_error);
 			} else {
 				DB_free_result(db_res);
 				bol_result = true;
@@ -912,7 +906,8 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 		int_status = PQgetCopyData(copy_check->conn->conn, buffer_ptr_ptr, 0);
 		// continue copying
 		if (int_status > 0) {
-			if (copy_check->copy_cb(EV_A, true, false, copy_check->cb_data, *buffer_ptr_ptr, strlen(*buffer_ptr_ptr)) == false) {
+			bool bol_ret = copy_check->copy_cb(EV_A, true, false, copy_check->cb_data, *buffer_ptr_ptr, strlen(*buffer_ptr_ptr));
+			if (bol_ret == false) {
 				PQfreemem(*buffer_ptr_ptr);
 				break;
 			}

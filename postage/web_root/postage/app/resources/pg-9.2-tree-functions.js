@@ -8,6 +8,9 @@ if (document.getElementById('left-panel-body')) {
         }
     }, 1000);
 }
+
+var querystringShownObj;
+
 var bolTreeFunctionsLoaded = true
   , treeGlobals = {
         'ace':          null
@@ -1386,10 +1389,35 @@ function dialogAddSchema(target) {
                 strSchema = arrSchema.join(',');
             }
 
+            querystringShownObj = 'schemas=' + (strSchema || '') +
+                              '&schemas-all=' + strSchemaAll +
+                              '&show=' + arrShown.join(',');
+
+            // console.log(GS.qryGetVal(querystringShownObj, 'schema'));
+            // console.log(GS.qryGetVal(GS.getQueryString(), 'schema'));
+            // console.log(GS.qryGetVal(querystringShownObj, 'schemas-all'));
+            // console.log(GS.qryGetVal(GS.getQueryString(), 'schemas-all'));
+            // console.log(GS.qryGetVal(querystringShownObj, 'show'));
+            // console.log(GS.qryGetVal(GS.getQueryString(), 'show'));
+            if (
+                //GS.qryGetVal(querystringShownObj, 'schema') !== GS.qryGetVal(GS.getQueryString(), 'schema') ||
+                //GS.qryGetVal(querystringShownObj, 'schemas-all') !== GS.qryGetVal(GS.getQueryString(), 'schemas-all') ||
+                //GS.qryGetVal(querystringShownObj, 'show') !== GS.qryGetVal(GS.getQueryString(), 'show') &&
+                GS.qryGetVal(GS.getQueryString(), 'schemas-all').trim() !== ''
+                //GS.qryGetVal(GS.getQueryString(), 'show').trim() !== ''
+                
+            ) {
+                localStorage.shownObjects = querystringShownObj;
+            }
+            
             // save to querystring
             GS.pushQueryString('schemas=' + (strSchema || '') +
                               '&schemas-all=' + strSchemaAll +
                               '&show=' + arrShown.join(','));
+                              
+            
+            
+            //localStorage.shownObjects = querystringShownObj;
         }
     };
 
@@ -1718,13 +1746,17 @@ function dependDialog(intOid, bolGraph) {
 
 function propertyButton(strPropName, intOid, strNamePartOne, strNamePartTwo) {
     'use strict';
+    
     return '<gs-button iconleft inline remove-all icon="list" no-focus title="Object properties" ' +
                 'onclick="' +
                     'propertyDialog(propQuery.' + strPropName + ',' +
                                     intOid + ',' +
                                     '\'' + singleQuoteSafe(strNamePartOne || '') + '\',' +
-                                    '\'' + singleQuoteSafe(strNamePartTwo || '') + '\');' +
+                                    '\'' + singleQuoteSafe(strNamePartTwo.replace(/"/g, '').trim() || '') + '\');' +
                 '">Properties</gs-button>';
+                
+    console.log(strNamePartOne);
+    console.log(strNamePartTwo);
 }
 
 function propertyDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {

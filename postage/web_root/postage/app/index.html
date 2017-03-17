@@ -27,13 +27,15 @@
                     link2 = GS.stringToElement('<link href="resources/ws-home.css" type="text/css" rel="stylesheet" />'),
                     link3 = GS.stringToElement('<link href="resources/pg-9.2-tree-functions.css" type="text/css" rel="stylesheet" />'),
                     link4 = GS.stringToElement('<link href="resources/pg-9.2-other.css" type="text/css" rel="stylesheet" />'),
-                    link5 = GS.stringToElement('<link href="resources/pg-9.2-autocomplete.css" type="text/css" rel="stylesheet" />');
+                    link5 = GS.stringToElement('<link href="resources/pg-9.2-autocomplete.css" type="text/css" rel="stylesheet" />'),
+                    link6 = GS.stringToElement('<link href="/css/postage.css" type="text/css" rel="stylesheet" />');
 
                 document.body.appendChild(link1);
                 document.body.appendChild(link2);
                 document.body.appendChild(link3);
                 document.body.appendChild(link4);
                 document.body.appendChild(link5);
+                document.body.appendChild(link6);
             });
 
             var reconnectNumber = 0;
@@ -179,10 +181,10 @@
                 // open socket for query execution
                 GS.querySocket = GS.openSocket('env');
 
-
                 // load context info
                 loadContextData(function () {
                     // time to get things started
+                    handleQueryVersionDifferences(contextData.minorVersionNumber);
                     treeStart();
                     startTabContainer();
                     autocompleteStart();
@@ -303,6 +305,7 @@
                  || !window.bolSettingsLoaded) {
                     orderSixtySix();
                 }
+                
             });
 
             function orderSixtySix() {
@@ -442,9 +445,11 @@
                     }
                 }
             })();
-
+            
+                
             function handleLoad() {
                 'use strict';
+                GS.pushQueryString(localStorage.shownObjects);
                 var strQueryString = GS.getQueryString(), strView;
 
                 qsLoadLeftPanel(strQueryString);
