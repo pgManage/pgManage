@@ -166,6 +166,23 @@ function menuUser(target) {
     GS.openDialogToElement(target, templateElement, 'down');
 }
 
+console.log('create buttonReloadWindow 1');
+function buttonReloadWindow() {
+	console.log('websocket close 1');
+	GS.closeAllSockets();
+	console.log('websocket close 2');
+	/*
+	if (window.process && window.process.type === 'renderer') {
+		var electron = require('electron');
+		electron.remote.getCurrentWindow().webContents.reload();
+	} else {
+	*/
+		window.location.reload(true);
+		console.log('shouldn\'t get here');
+	//}
+}
+console.log('create buttonReloadWindow 2');
+
 function menuTools(target) {
     'use strict';
     var templateElement = document.createElement('template');
@@ -200,7 +217,7 @@ function menuTools(target) {
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft onclick="GS.showShimmed()" icon="heartbeat">Browser Support</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
-                            no-focus iconleft onclick="window.location.reload(true);" icon="refresh">Clear Cache</gs-button>
+                            no-focus iconleft onclick="buttonReloadWindow()" icon="refresh">Clear Cache</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft target="_blank"
                             href="https://github.com/workflowproducts/postage/" icon="github">Postage On Github</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft target="_blank"
