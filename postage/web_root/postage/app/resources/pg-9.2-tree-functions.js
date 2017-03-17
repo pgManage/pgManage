@@ -1718,13 +1718,17 @@ function dependDialog(intOid, bolGraph) {
 
 function propertyButton(strPropName, intOid, strNamePartOne, strNamePartTwo) {
     'use strict';
+    
     return '<gs-button iconleft inline remove-all icon="list" no-focus title="Object properties" ' +
                 'onclick="' +
                     'propertyDialog(propQuery.' + strPropName + ',' +
                                     intOid + ',' +
                                     '\'' + singleQuoteSafe(strNamePartOne || '') + '\',' +
-                                    '\'' + singleQuoteSafe(strNamePartTwo || '') + '\');' +
+                                    '\'' + singleQuoteSafe(strNamePartTwo.replace(/"/g, '').trim() || '') + '\');' +
                 '">Properties</gs-button>';
+                
+    console.log(strNamePartOne);
+    console.log(strNamePartTwo);
 }
 
 function propertyDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {

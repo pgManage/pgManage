@@ -172,6 +172,7 @@
                 // load context info
                 loadContextData(function () {
                     // time to get things started
+                    handleQueryVersionDifferences(contextData.minorVersionNumber);
                     treeStart();
                     startTabContainer();
                     autocompleteStart();
