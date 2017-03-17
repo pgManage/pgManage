@@ -359,7 +359,9 @@ var $ = {
                             }
                             error = false;
                         } else {
-                            $.changeStatus(key, intCurrent, 'running', 'fail');
+							console.log(arrStrActualOutput[j].length, arrStrActualOutput[j].replace(/\n/g, '\\n'));
+							console.log(arrStrExpectedOutput[k].length, arrStrExpectedOutput[k].replace(/\{\{test_random\}\}/g, $.test_random).replace(/\n/g, '\\n'));
+
                             error = true;
                             break;
                         }
@@ -389,10 +391,6 @@ var $ = {
                 } else if (JSON.stringify(data) === ml(function() {/*"Query failed: FATAL\nerror_text\tERROR:  canceling statement due to user request\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"*/})) {
                     $.changeStatus(key, intCurrent, 'running', 'pass');
                     $.runTest(key, intCurrent + 1);
-                } else if (i > 50) {
-                    document.getElementById('actual-status-' + key).value = i;
-                    document.getElementById('actual-output-' + key).value = JSON.stringify(data);
-                    $.changeStatus(key, intCurrent, 'running', 'fail');
                 }
                 i += 1;
             });

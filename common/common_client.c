@@ -1000,9 +1000,11 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 				client_request->int_response_id += 1;
 				snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 
+				SFREE(client_request->str_current_response);
+
 				char *_str_response = "FATAL\nQuery failed: FATAL\nerror_text\tERROR:  canceling statement due to user request\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n";
 				if (client_request->str_transaction_id != NULL) {
-					SERROR_SNCAT(str_response, &int_response_len,
+					SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
 						"messageid = ", (size_t)12,
 						client_request->str_message_id, strlen(client_request->str_message_id),
 						"\012responsenumber = ", (size_t)18,
@@ -1012,7 +1014,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 						"\012", (size_t)1,
 						_str_response, strlen(_str_response));
 				} else {
-					SERROR_SNCAT(str_response, &int_response_len,
+					SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
 						"messageid = ", (size_t)12,
 						client_request->str_message_id, strlen(client_request->str_message_id),
 						"\012responsenumber = ", (size_t)18,
@@ -1020,11 +1022,6 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 						"\012", (size_t)1,
 						_str_response, strlen(_str_response));
 				}
-
-				SDEBUG("str_response: %s", str_response);
-				WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len);
-				DArray_push(client_request->arr_response, str_response);
-				str_response = NULL;
 
 			} else if (client->cur_request != NULL) {
 				SINFO("cur_request branch");
