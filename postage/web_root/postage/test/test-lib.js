@@ -377,28 +377,30 @@ var $ = {
             });
         } else if (strType === 'websocket cancel') {
             arrCurrent[3] = arrCurrent[3].replace(/\r\n/gi, '\n');
-            strArgs = arrCurrent[3];
-            arrStrExpectedOutput = arrCurrent[4];
-            arrStrActualOutput = [];
+            var strArgs = arrCurrent[3].replace(/\{\{test_random\}\}/g, $.test_random);
+            var intCancelAtMessage = arrCurrent[4] !== undefined ? arrCurrent[4] : 1;
             $.changeStatus(key, intCurrent, 'waiting', 'running');
             i = 0;
             WS.requestFromSocket($.tests[key].socket, key, strArgs, function (data, error) {
-                if (i === 0 && data.indexOf('QUERY') === 0) {
-                } else if (i === 1 && data.indexOf('START') === 0) {
+                if (i === (intCancelAtMessage - 1)) {
                     WS.requestFromSocket($.tests[key].socket, key, 'CANCEL', function (data) {
                         // console.log(data);
                     });
-                } else if (i === 2 && data.indexOf('END') === 0) {
-                } else if (i === 3 && JSON.stringify(data) === ml(function() {/*"Query failed: FATAL\nerror_text\tERROR:  canceling statement due to user request\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"*/})) {
+                } else if (JSON.stringify(data) === ml(function() {/*"Query failed: FATAL\nerror_text\tERROR:  canceling statement due to user request\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"*/})) {
                     $.changeStatus(key, intCurrent, 'running', 'pass');
                     $.runTest(key, intCurrent + 1);
-                } else {
+                } else if (i > 50) {
                     document.getElementById('actual-status-' + key).value = i;
                     document.getElementById('actual-output-' + key).value = JSON.stringify(data);
                     $.changeStatus(key, intCurrent, 'running', 'fail');
                 }
                 i += 1;
             });
+			if (intCancelAtMessage === 0) {
+                WS.requestFromSocket($.tests[key].socket, key, 'CANCEL', function (data) {
+                    // console.log(data);
+                });
+			}
         } else if (strType === 'websocket end') {
             $.changeStatus(key, intCurrent, 'waiting', 'running');
             var i = 0;

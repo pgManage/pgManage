@@ -290,6 +290,10 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 	SDEBUG("str_response: %s", str_response);
 	size_t int_response_len = 0;
 
+	if (client_request->bol_cancel_return == true) {
+		goto finish;
+	}
+
 	if (bol_success) {
 		if (client_request->str_current_response == NULL && !bol_last) {
 			SDEBUG("Build Message Headers...");

@@ -654,8 +654,8 @@ bool ws_raw_step3(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 		PQclear(res);
 	}
 	if (client_request->str_current_response != NULL) {
-		SDEBUG("       client_request->str_current_response : %s", client_request->str_current_response);
-		SDEBUG("strlen(client_request->str_current_response): %d", strlen(client_request->str_current_response));
+		SINFO("       client_request->str_current_response : %s", client_request->str_current_response);
+		SINFO("strlen(client_request->str_current_response): %d", strlen(client_request->str_current_response));
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, client_request->str_current_response, strlen(client_request->str_current_response));
 		DArray_push(client_request->arr_response, client_request->str_current_response);
 		client_request->str_current_response = NULL;
@@ -673,6 +673,7 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 	struct sock_ev_client_copy_check *client_copy_check = NULL;
 	SFINISH_SALLOC(client_copy_check, sizeof(struct sock_ev_client_copy_check));
 	client_copy_check->client_request = client_request;
+	client_raw->copy_check = client_copy_check;
 	size_t int_response_len = 0;
 	int int_status = 0;
 
@@ -893,6 +894,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 					client_request->str_transaction_id, strlen(client_request->str_transaction_id),
 					"\012", (size_t)1);
 			}
+			client_raw->res = NULL;
 			PQclear(res);
 
 			if (client_request->int_i < client_request->int_len) {
@@ -976,6 +978,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				SINFO("TRANSACTION COMPLETED");
 			}
 
+			client_raw->copy_check = NULL;
 			SFREE(client_copy_check);
 			break;
 		}

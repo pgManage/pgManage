@@ -212,6 +212,8 @@ struct sock_ev_client_request {
 	ssize_t int_i;
 	ssize_t int_len;
 
+	bool bol_cancel_return;
+
 	void *vod_request_data;
 	size_t int_req_type;
 
