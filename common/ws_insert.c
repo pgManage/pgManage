@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "ws_insert.h"
 
 void ws_insert_step1(struct sock_ev_client_request *client_request) {
@@ -95,7 +96,7 @@ void ws_insert_step1(struct sock_ev_client_request *client_request) {
 	while (*client_insert->ptr_values == '\012') {
 		client_insert->ptr_values += 1;
 	}
-	SDEBUG("client_insert->ptr_values: %s", client_insert->ptr_values);
+	//SDEBUG("client_insert->ptr_values: %s", client_insert->ptr_values);
 
 	ptr_column_names = client_insert->ptr_values;
 	SFINISH_CHECK(*ptr_column_names != 0, "No column names");
@@ -440,6 +441,7 @@ finish:
 #endif
 
 bool ws_insert_step2(EV_P, void *cb_data, DB_result *res) {
+	SDEBUG("ws_insert_step2: TEMP TABLE CREATED, STARTING COPY IN");
 	struct sock_ev_client_request *client_request = cb_data;
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
 	size_t int_len_content;
@@ -530,6 +532,7 @@ finish:
 }
 
 bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
+	SDEBUG("ws_insert_step4: COPY IN FINISHED, CREATE SECOND TEMP TABLE");
 	struct sock_ev_client_request *client_request = cb_data;
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
 	SDEFINE_VAR_ALL(str_sql);
@@ -722,6 +725,7 @@ finish:
 #endif
 
 bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
+	SDEBUG("ws_insert_step5: SECOND TEMP TABLE CREATED, CREATING INSERT QUERIES");
 	struct sock_ev_client_request *client_request = cb_data;
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
 	char *str_response = NULL;
@@ -889,6 +893,7 @@ finish:
 }
 
 bool ws_insert_step6(EV_P, void *cb_data, DB_result *res) {
+	SDEBUG("ws_insert_step6: INSERT ROW...");
 	struct sock_ev_client_request *client_request = cb_data;
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
 	SDEFINE_VAR_ALL(str_temp, str_sql);
@@ -961,6 +966,7 @@ finish:
 }
 
 bool ws_insert_step7(EV_P, void *cb_data, DB_result *res) {
+	SDEBUG("ws_insert_step6: ALL ROWS INSERTED, STARTING COPY OUT");
 	struct sock_ev_client_request *client_request = cb_data;
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
 	char *str_response = NULL;

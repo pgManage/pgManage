@@ -963,7 +963,7 @@ ORDER BY	id DESC
 
 id	test_name	test_name2
 */
-			}) + createTestDataRequest('', 1000), 1],
+			}) + createTestDataRequest('', 2000), 1],
 			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 		    ['SOCKET CLOSE', 'websocket end']
         ]
