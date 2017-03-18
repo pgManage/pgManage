@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "http_upload.h"
 
 void http_upload_step1(struct sock_ev_client *client) {
