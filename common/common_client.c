@@ -1028,7 +1028,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 				SINFO("cur_request branch");
 				struct sock_ev_client_request *client_request = client->cur_request;
 
-				if (client_request->int_req_type == POSTAGE_REQ_RAW) {
+				if (client_request->int_req_type == POSTAGE_REQ_RAW && client_request->vod_request_data != NULL) {
 					struct sock_ev_client_raw *client_raw = client_request->vod_request_data;
 
 					char str_temp[101] = { 0 };

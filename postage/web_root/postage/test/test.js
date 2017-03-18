@@ -17,6 +17,21 @@ document.addEventListener('change', function (event) {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+	$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=begin&program_name=postage&user_agent=' +
+		encodeURIComponent(navigator.userAgent), 'POST', function (data) {
+		console.log(data);
+		if (!isNaN(parseInt(data, 10))) {
+			$.intID = data;
+
+			startTests();
+
+		} else {
+			alert(data);
+		}
+	});
+});
+
+function startTests() {
     $.ajax('/postage/auth', 'action=logout', 'POST', function (data) {
         $.ajax('/postage/auth', 'action=login&username=postgres&password=password&connname=test', 'POST', function (data) {
             var i, len, key;
@@ -68,4 +83,4 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
         });
     });
-});
+}

@@ -60,9 +60,17 @@ var $ = {
             document.getElementById('status-note-' + key).textContent = '(ERROR)';
 			$.tests[key].error = true;
 			pushState({}, 'Postage Test Backend', '/postage/test/index.html' + window.location.search);
+			$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=fail&id=' + $.intID + '&fail_name=' + encodeURIComponent(document.getElementById('test' + key + intCurrent + '_label').innerText), 'POST', function (data) {
+
+			});
         } else {
             document.getElementById('status-note-' + key).textContent = '(RUNNING)';
         }
+		if (strNewClass === 'pass') {
+			$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=success&id=' + $.intID, 'POST', function (data) {
+
+			});
+		}
         objLabel.strStatus = strStatus;
         objLabel.strErrorText = strErrorText;
     },
@@ -74,7 +82,7 @@ var $ = {
 		}
         var arrCurrent = $.tests[key].tests[intCurrent];
         if (arrCurrent === undefined) {
-			var minRuns = Infinity, error = false;
+			var minRuns = Infinity, minKey, error = false;
 			for (var key2 in $.tests) {
 				if ($.tests.hasOwnProperty(key2) && key2[0] !== '_') {
 					var runs = 0;
@@ -83,6 +91,7 @@ var $ = {
 					}
 					if (runs < minRuns) {
 						minRuns = runs;
+						minKey = key2;
 					}
 					error = error || $.tests[key2].error || false;
 				}
@@ -99,6 +108,11 @@ var $ = {
 
                 $.runTest(key, 0);
             } else {
+				if (key === minKey) {
+					$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + $.intID, 'POST', function (data) {
+
+					});
+				}
                 document.getElementById('status-note-' + key).textContent = ' (STOPPED)';
 				if (key[0] === '_') {
 					pushState({}, 'Postage Test Backend', '/postage/test/index.html' + window.location.search);
