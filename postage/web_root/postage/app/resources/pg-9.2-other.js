@@ -2058,7 +2058,7 @@ function executeScript() {
         //      it shows and binds the "Stop Loading" button
         startLoading = function () {
             currentTab.relatedClearButton.setAttribute('hidden', '');
-
+            currentTab.relatedStopSocketButton.removeAttribute('hidden');
             //currentTab.relatedStopLoadingButton.removeAttribute('hidden');
             //currentTab.relatedStopLoadingButton.addEventListener('click', stopLoadingHandler);
         };
@@ -2069,7 +2069,8 @@ function executeScript() {
             currentTab.relatedClearButton.removeAttribute('hidden');
             resultsHeaderElement.classList.remove('executing');
             currentTab.handlingQuery = false;
-
+            currentTab.relatedStopSocketButton.setAttribute('hidden', '');
+            currentTab.relatedStopSocketButton.removeEventListener('click', '');
             //currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
             //currentTab.relatedStopLoadingButton.removeEventListener('click', stopLoadingHandler);
         };
@@ -2098,7 +2099,7 @@ function executeScript() {
             resultsTallyElement.innerHTML = ' (<b>Pass: ' + (intQuery - intError) + '</b>, <b>Fail: ' + (intError) + '</b>)';
             //resultsTallyElement.innerHTML = ' (<b>Success: ' + (intQuery - intError) + '</b>, <b>Error: ' + (intError) + '</b>)';
         };
-
+        
         // begin
         startExecute();
         messageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
@@ -2124,6 +2125,15 @@ function executeScript() {
                         endExecute();
                         startLoading();
                     }
+                    
+                    currentTab.relatedStopSocketButton.addEventListener('click', function () {
+                        GS.requestFromSocket(GS.querySocket, 'CANCEL', function () {});
+                        stopLoadingHandler();
+                        bolIgnoreMessages = true;
+                        document.getElementById('RowCountSmall').innerHTML = '' + (parseInt(data.intCallbackNumberThisQuery * 10, 10) + 10) + ' loaded of ' + data.intRows;
+                        console.log(data.intCallbackNumberThisQuery * 10 + 10);
+                    });
+                        
                     if (data.bolLastMessage) {
                         endLoading();
                     }
@@ -2236,6 +2246,8 @@ function executeScript() {
 
                         // else if result query
                         } else if (data.arrColumnNames.length > 0) {
+                            
+                            
                             // if this is the first callback for this query: set up title, table and header
                             if (data.intCallbackNumberThisQuery === 0) {
                                 divElement = document.createElement('div');
@@ -2265,8 +2277,9 @@ function executeScript() {
                                 strHTML += '<br />';
 
                                 if (data.intRows !== undefined) {
-                                    strHTML += '<small>' + data.intRows + ' rows</small>';
+                                    strHTML += '<small id="RowCountSmall">' + data.intRows + ' rows</small>';
                                 }
+                                
 
                                 strHTML +=      '</div>' +
                                                 '<span>&nbsp;</span>' +
@@ -2336,6 +2349,8 @@ function executeScript() {
                                 // make the table selectable
                                 GS.makeTableSelectable(tableElement, evt.touchDevice);
                             }
+                            
+                            
 
                             //console.log('0***', data);
                             // if not end query, therefore: results
@@ -2421,7 +2436,6 @@ function executeScript() {
                                 //console.log('5***');
                                 // add a br for spacing/padding
                                 resultsContainer.appendChild(document.createElement('br'));
-
                                 // set part number to 0 and add one to the query number
                                 intQuery += 1;
 

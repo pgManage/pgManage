@@ -182,11 +182,9 @@
                     startTabContainer();
                     autocompleteStart();
                     loadHeaderText();
-                    loadTabsFromServer();
+                    // load state from query string, AFTER the tabs are loaded from the server
+                    loadTabsFromServer(false, handleLoad);
                     zoomStart();
-
-                    // load state from query string
-                    handleLoad();
 
                     // put connection name in tab name
                     document.title = 'Postage: ' + contextData.connectionName;

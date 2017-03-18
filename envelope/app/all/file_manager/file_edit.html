@@ -620,15 +620,18 @@
             
             function search() {
                 'use strict';
-                var aceContainer = document.getElementById('area'), regexToggle, caseSensitiveToggle,
+                var aceContainer = document.getElementById('area'), regexToggle, caseSensitiveToggle, objSearchField,
                     jsnArgs = GS.qryToJSON(GS.getQueryString());
 
                 if (jsnArgs.pattern) {
                     editor.find(jsnArgs.pattern);
                     editor.execCommand('find');
                     
+                    objSearchField = xtag.query(aceContainer, '.ace_search .ace_search_field')[0];
                     regexToggle = xtag.query(aceContainer, '.ace_search .ace_button[action="toggleRegexpMode"]')[0];
                     caseSensitiveToggle = xtag.query(aceContainer, '.ace_search .ace_button[action="toggleCaseSensitive"]')[0];
+                    
+                    objSearchField.value = jsnArgs.pattern;
                     
                     if (jsnArgs.regexp === 'true' && !regexToggle.classList.contains('checked')) {
                         GS.triggerEvent(regexToggle, 'click');
