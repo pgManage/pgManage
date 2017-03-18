@@ -8239,10 +8239,10 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                         .replace(/^NULL$/g, '\\N');
     }
     
-    var bolPreventErrors = false;
+    GS.bolPreventErrors = false;
     function webSocketConnectionErrorDialog(socket, addinText, retryCallback, cancelCallback) {
         
-        if (!document.getElementById('dialog-from-dialog-ws-conn-error') && bolPreventErrors === false) {
+        if (!document.getElementById('dialog-from-dialog-ws-conn-error') && GS.bolPreventErrors === false) {
             var templateElement = document.createElement('template');
             
             GS.removeAllLoaders();
@@ -8270,7 +8270,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                     GS.closeSocket(GS.envSocket);
                     GS.envSocket = GS.openSocket('env', socket.GSSessionID, socket.notifications);
                 } else {
-                    bolPreventErrors = true;
+                    GS.bolPreventErrors = true;
                 }
             });
         }
