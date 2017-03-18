@@ -37,21 +37,30 @@ void query_callback_handler(EV_P, ev_io *w, int revents) {
 	DArray *arr_res = NULL;
 
 	ExecStatusType result = 0;
+	int int_status = 1;
 	int int_status2 = 1;
 	bool bol_result;
 	size_t int_i;
 	size_t int_len;
 
-	int int_status = PQconsumeInput(client->cnxn);
-	if (int_status != 1) {
-		SERROR_NORESPONSE("PQconsumeInput failed %s", PQerrorMessage(client->cnxn));
-		// Don't put the ev_io_stop after the callback, it causes a bug that makes RAW hang
-		// I don't know why, but this works
-		ev_io_stop(EV_A, &cb_data->io);
-		cb_data->callback(EV_A, NULL, 0, cb_data->client_request);
-		cb_data->client_request->cb_data = NULL;
-		SFREE(cb_data);
-		return;
+
+	if ((revents & EV_WRITE) == EV_WRITE) {
+		if (PQflush(client->cnxn) == 0) {
+			ev_io_set(w, w->fd, EV_READ);
+		}
+	}
+	if ((revents & EV_READ) == EV_READ) {
+		int_status = PQconsumeInput(client->cnxn);
+		if (int_status != 1) {
+			SERROR_NORESPONSE("PQconsumeInput failed %s", PQerrorMessage(client->cnxn));
+			// Don't put the ev_io_stop after the callback, it causes a bug that makes RAW hang
+			// I don't know why, but this works
+			ev_io_stop(EV_A, &cb_data->io);
+			cb_data->callback(EV_A, NULL, 0, cb_data->client_request);
+			cb_data->client_request->cb_data = NULL;
+			SFREE(cb_data);
+			return;
+		}
 	}
 
 	int_status2 = PQisBusy(client->cnxn);

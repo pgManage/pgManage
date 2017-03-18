@@ -737,7 +737,8 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 		if (PQflush(conn->conn) == 0) {
 			ev_io_set(w, w->fd, EV_READ);
 		}
-	} else {
+	}
+	if ((revents & EV_READ) == EV_READ) {
 		int_status = PQconsumeInput(conn->conn);
 		if (int_status != 1) {
 			SERROR_NORESPONSE("PQconsumeInput failed %s", PQerrorMessage(conn->conn));
