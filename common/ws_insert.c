@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "ws_insert.h"
 
 void ws_insert_step1(struct sock_ev_client_request *client_request) {
@@ -839,9 +838,9 @@ bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
 		str_sql = NULL;
 	}
 
-	SDEBUG("INSERTING...");
-	SDEBUG("DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query): %s",
-		DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query));
+	//SDEBUG("INSERTING...");
+	//SDEBUG("DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query): %s",
+	//	DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query));
 	SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request,
 		DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query++), ws_insert_step6), "DB_exec failed");
 
@@ -893,7 +892,7 @@ finish:
 }
 
 bool ws_insert_step6(EV_P, void *cb_data, DB_result *res) {
-	SDEBUG("ws_insert_step6: INSERT ROW...");
+	//SDEBUG("ws_insert_step6: INSERT ROW...");
 	struct sock_ev_client_request *client_request = cb_data;
 	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
 	SDEFINE_VAR_ALL(str_temp, str_sql);
@@ -907,8 +906,8 @@ bool ws_insert_step6(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
 
 	// no need to check these queries for injection, they are already checked in the above step
-	SDEBUG("DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query): %s",
-		DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query));
+	//SDEBUG("DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query): %s",
+	//	DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query));
 	if (client_insert->int_current_insert_query < (DArray_end(client_insert->darr_insert_queries) - 1)) {
 		SFINISH_CHECK(DB_exec(EV_A, client_request->parent->conn, client_request,
 			DArray_get(client_insert->darr_insert_queries, client_insert->int_current_insert_query++), ws_insert_step6), "DB_exec failed");

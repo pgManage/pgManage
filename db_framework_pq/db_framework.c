@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "db_framework.h"
 
 const char *const WONT_GUESS = "____GS_YOU_WONT_GUESS_THIS_DATA_JHDFKSHDFURIHKSDJFHUIRSDJHF____";
@@ -150,7 +149,9 @@ bool _DB_exec(
 	int int_status = PQsendQuery(conn->conn, str_query);
 	SERROR_CHECK(int_status == 1, "PQsendQuery failed %s", PQerrorMessage(conn->conn));
 
-	ev_io_init(&res_poll->io, db_query_cb, conn->int_sock, EV_READ);
+	PQflush(conn->conn);
+
+	ev_io_init(&res_poll->io, db_query_cb, conn->int_sock, EV_READ | EV_WRITE);
 	ev_io_start(EV_A, &res_poll->io);
 
 	return true;
@@ -724,7 +725,7 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 	DArray *arr_res = NULL;
 
 	ExecStatusType result = 0;
-	int int_status = 0;
+	int int_status = 1;
 	int int_status2 = 1;
 	size_t int_i = 0, int_j = 0, int_len = 0;
 	query_cb_t query_cb = NULL;
@@ -732,14 +733,20 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 
 	SDEFINE_VAR_ALL(str_error);
 
-	int_status = PQconsumeInput(conn->conn);
-	if (int_status != 1) {
-		SERROR_NORESPONSE("PQconsumeInput failed %s", PQerrorMessage(conn->conn));
-		conn->res_poll = NULL;
-		ev_io_stop(EV_A, &res_poll->io);
-		res_poll->query_cb(EV_A, res_poll->cb_data, db_res);
-		DB_res_poll_free(res_poll);
-		return;
+	if ((revents & EV_WRITE) == EV_WRITE) {
+		if (PQflush(conn->conn) == 0) {
+			ev_io_set(w, w->fd, EV_READ);
+		}
+	} else {
+		int_status = PQconsumeInput(conn->conn);
+		if (int_status != 1) {
+			SERROR_NORESPONSE("PQconsumeInput failed %s", PQerrorMessage(conn->conn));
+			conn->res_poll = NULL;
+			ev_io_stop(EV_A, &res_poll->io);
+			res_poll->query_cb(EV_A, res_poll->cb_data, db_res);
+			DB_res_poll_free(res_poll);
+			return;
+		}
 	}
 
 	int_status2 = PQisBusy(conn->conn);
@@ -792,6 +799,7 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 		} else if (result == PGRES_COPY_IN) {
 			SDEBUG("result == PGRES_COPY_IN");
 			int_status = PQputCopyData(conn->conn, res_poll->str_data, res_poll->int_len);
+			SDEBUG("res_poll->int_len = %d", res_poll->int_len);
 			SDEBUG("int_status = %d", int_status);
 			SERROR_CHECK(int_status == 1, "PQputCopyData failed: %s", PQerrorMessage(conn->conn));
 			int_status = PQputCopyEnd(conn->conn, 0);
@@ -814,6 +822,8 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 			DArray_destroy(arr_res);
 			SFREE_ALL();
 			SDEBUG("w->active: %d", w->active);
+
+			ev_io_set(w, w->fd, EV_READ | EV_WRITE);
 			return;
 		} else {
 			ev_io_stop(EV_A, &res_poll->io);
