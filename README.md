@@ -3,7 +3,7 @@
 # If this is your first time trying Postage:
 # DO NOT DO A GIT CLONE
 
-If you'd like to try Postage please go to ["Releases"](https://github.com/workflowproducts/postage/releases) and download the appropriate package for your OS. The names of these packages start with "Postage", not "Source Code". The team has spent a rediculous amount of time ensuring you have an easy, convenient installer for your OS. Please use it. Compiling Postage from source can be time consuming. 
+If you'd like to try Postage please go to ["Releases"](https://github.com/workflowproducts/postage/releases) and download the appropriate package for your OS. The names of these packages start with "Postage", not "Source Code". The team has spent a ridiculous amount of time ensuring you have an easy, convenient installer for your OS. Please use it. Compiling Postage from source can be time consuming. 
 
 Postage can be run in two modes:
 
