@@ -116,7 +116,6 @@
                 GS.triggerEvent(window, 'notification-received', {'message': event.message, 'jsnMessage': jsnMessage});
             });
             
-			var bolPreventErrors = false;
 			/*
 			function buttonReloadWindow() {
 				GS.envSocket.close();
@@ -132,10 +131,11 @@
 			*/
             // open dialog and show server settings
             function webSocketConnectionErrorDialog(addinText) {
-                if (!document.getElementById('dialog-from-dialog-ws-conn-error') && bolPreventErrors === false) {
+                if (!document.getElementById('dialog-from-dialog-ws-conn-error') && GS.bolPreventErrors === false) {
                     var templateElement = document.createElement('template');
                     
                     GS.removeAllLoaders();
+					GS.bolPreventErrors = true;
                     
                     templateElement.setAttribute('id', 'dialog-ws-conn-error');
                     templateElement.setAttribute('data-theme', 'error');
@@ -147,19 +147,12 @@
             There has been an error with the Database connection.{{ADDIN}}</pre>
                             </gs-body>
                             <gs-footer>
-                                <gs-grid gutter reflow-at="420">
-                                    <gs-block><gs-button onclick="buttonReloadWindow();">Reload Postage</gs-button></gs-block>
-                                    <gs-block><gs-button dialogclose>Dismiss so I can copy my progress</gs-button></gs-block>
-                                </gs-grid>
+                                <gs-button onclick="buttonReloadWindow();">Reload Postage</gs-button>
                             </gs-footer>
                         </gs-page>
                     */}).replace('{{ADDIN}}', (addinText ? '\n\n' + addinText : ''));
                     
                     GS.openDialog(templateElement, '', function (event, strAnswer) {
-                        if (strAnswer === 'Reload Postage') {
-                        } else {
-							bolPreventErrors = true;
-						}
                     });
                 }
             }
@@ -449,7 +442,9 @@
                 
             function handleLoad() {
                 'use strict';
-                GS.pushQueryString(localStorage.shownObjects);
+				if (localStorage.shownObjects) {
+                	GS.pushQueryString(localStorage.shownObjects);
+				}
                 var strQueryString = GS.getQueryString(), strView;
 
                 qsLoadLeftPanel(strQueryString);

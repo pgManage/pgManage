@@ -22,7 +22,7 @@ function refreshButtons (bolBtnType) {
             curr_toolbar = xtag.query(document.body, '.tab-button')[i];
             if (curr_toolbar.relatedEditorToolbar) {
                 curr_tab_num = curr_toolbar.relatedEditorToolbar.id.substring(parseInt(curr_toolbar.relatedEditorToolbar.id.lastIndexOf('-'), 10) + 1, curr_toolbar.relatedEditorToolbar.id.length);
-                
+
                 document.getElementById('ace-toolbar-labeled-' + curr_tab_num + '').style.display = 'none';
                 document.getElementById('ace-toolbar-unlabeled-' + curr_tab_num + '').style.display = '';
             }
@@ -33,7 +33,7 @@ function refreshButtons (bolBtnType) {
             curr_toolbar = xtag.query(document.body, '.tab-button')[i];
             if (curr_toolbar.relatedEditorToolbar) {
                 curr_tab_num = curr_toolbar.relatedEditorToolbar.id.substring(parseInt(curr_toolbar.relatedEditorToolbar.id.lastIndexOf('-'), 10) + 1, curr_toolbar.relatedEditorToolbar.id.length);
-                
+
                 document.getElementById('ace-toolbar-labeled-' + curr_tab_num + '').style.display = '';
                 document.getElementById('ace-toolbar-unlabeled-' + curr_tab_num + '').style.display = 'none';
             }
@@ -55,38 +55,37 @@ function refreshCustomCSS (customCSS) {
         customCSSText = ml(function () {/*
 /* Default SQL Results CSS * /
 .sql-results-area {
-    word-wrap: break-word;
-    text-align: left;
-    color: #333;
-    font-family: Helvetica,Arial,sans-serif;
-    font-size: 14px;
-    line-height: 1.42857;
-
+	word-wrap: break-word;
+	text-align: left;
+	color: #333;
+	font-family: Helvetica,Arial,sans-serif;
+	font-size: 14px;
+	line-height: 1.42857;
 }
 
 /* Monospace SQL Results CSS, Uncomment to Activate * /
 /*
 .sql-results-area {
-    word-wrap: break-word;
-    text-align: left;
-    color: #333;
-    font-family: "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
-    font-feature-settings: normal;
-    font-kerning: auto;
-    font-language-override: normal;
-    font-size: 11.2px;
-    font-size-adjust: none;
-    font-stretch: normal;
-    font-style: normal;
-    font-synthesis: weight style;
-    font-variant: normal;
-    font-variant-alternates: normal;
-    font-variant-caps: normal;
-    font-variant-east-asian: normal;
-    font-variant-ligatures: normal;
-    font-variant-numeric: normal;
-    font-variant-position: normal;
-    font-weight: 400;
+	word-wrap: break-word;
+	text-align: left;
+	color: #333;
+	font-family: "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
+	font-feature-settings: normal;
+	font-kerning: auto;
+	font-language-override: normal;
+	font-size: 11.2px;
+	font-size-adjust: none;
+	font-stretch: normal;
+	font-style: normal;
+	font-synthesis: weight style;
+	font-variant: normal;
+	font-variant-alternates: normal;
+	font-variant-caps: normal;
+	font-variant-east-asian: normal;
+	font-variant-ligatures: normal;
+	font-variant-numeric: normal;
+	font-variant-position: normal;
+	font-weight: 400;
 }
 * /
 */}).replace(/\* \//g, '*/');
@@ -106,27 +105,3 @@ function refreshCustomCSS (customCSS) {
 window.addEventListener('load', function () {
     refreshCustomCSS(localStorage.customCSS);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
