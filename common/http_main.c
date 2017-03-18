@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "http_main.h"
 
 bool http_client_info_cb(EV_P, void *cb_data, DB_result *res);
@@ -165,6 +164,7 @@ void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 		}
 #endif
 	} else {
+		SDEBUG("http_file_step1");
 		http_file_step1(client);
 	}
 finish:
@@ -288,16 +288,17 @@ void http_main(struct sock_ev_client *client) {
 			SFREE(str_uri_temp);
 		}
 
-		// set_cnxn does its own error handling
 		SDEBUG("str_uri: %s", str_uri);
 
-		//don't check the database connection for file requests
+		//don't check the database connection for file requests (except download)
 		if (strncmp(str_uri, "/postage/app/upload", 22) == 0 ||
 		#ifdef POSTAGE_INTERFACE_LIBPQ
 			strncmp(str_uri, "/postage/app/export", 22) == 0 ||
 		#endif
 			strncmp(str_uri, "/postage/app/action_ev", 23) == 0 ||
-			strncmp(str_uri, "/postage/app/action_info", 25) == 0) {
+			strncmp(str_uri, "/postage/app/action_info", 25) == 0 ||
+			strncmp(str_uri, "/postage/app/download/", 22) == 0) {
+			// set_cnxn does its own error handling
 			if ((client->conn = set_cnxn(client, http_main_cnxn_cb)) == NULL) {
 				SFINISH_CLIENT_CLOSE(client);
 			}
