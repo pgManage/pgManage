@@ -285,8 +285,8 @@ test
 			['SOCKET OPEN', 'websocket start'],
 
 			['CANCEL RAW 1', 'websocket cancel', '', ml(function () {/*RAW
-SELECT pg_sleep(1);
-*/}), 3],
+SELECT pg_sleep(2);
+*/}), 2],
 			['CANCEL RAW 2', 'websocket cancel', '', ml(function () {/*RAW
 SELECT *
 	FROM generate_series(1, 100) em1, generate_series(1, 100) em2, generate_series(1, 100) em3;

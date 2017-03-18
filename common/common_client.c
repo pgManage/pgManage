@@ -1031,52 +1031,46 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 				if (client_request->int_req_type == POSTAGE_REQ_RAW && client_request->vod_request_data != NULL) {
 					struct sock_ev_client_raw *client_raw = client_request->vod_request_data;
 
-					char str_temp[101] = { 0 };
-					client_request->int_response_id += 1;
-					snprintf(str_temp, 100, "%zd", client_request->int_response_id);
-
-					char *_str_response = "TRANSACTION COMPLETED";
-					if (client_request->str_transaction_id != NULL) {
-						SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
-							"messageid = ", (size_t)12,
-							client_request->str_message_id, strlen(client_request->str_message_id),
-							"\012responsenumber = ", (size_t)18,
-							str_temp, strlen(str_temp),
-							"\012transactionid = ", (size_t)17,
-							client_request->str_transaction_id, strlen(client_request->str_transaction_id),
-							"\012", (size_t)1,
-							_str_response, strlen(_str_response));
-					} else {
-						SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
-							"messageid = ", (size_t)12,
-							client_request->str_message_id, strlen(client_request->str_message_id),
-							"\012responsenumber = ", (size_t)18,
-							str_temp, strlen(str_temp),
-							"\012", (size_t)1,
-							_str_response, strlen(_str_response));
-					}
-
 					if (client_raw->copy_check != NULL) {
+						char str_temp[101] = { 0 };
+						client_request->int_response_id += 1;
+						snprintf(str_temp, 100, "%zd", client_request->int_response_id);
+
+						char *_str_response = "TRANSACTION COMPLETED";
+						if (client_request->str_transaction_id != NULL) {
+							SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
+								"messageid = ", (size_t)12,
+								client_request->str_message_id, strlen(client_request->str_message_id),
+								"\012responsenumber = ", (size_t)18,
+								str_temp, strlen(str_temp),
+								"\012transactionid = ", (size_t)17,
+								client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+								"\012", (size_t)1,
+								_str_response, strlen(_str_response));
+						} else {
+							SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
+								"messageid = ", (size_t)12,
+								client_request->str_message_id, strlen(client_request->str_message_id),
+								"\012responsenumber = ", (size_t)18,
+								str_temp, strlen(str_temp),
+								"\012", (size_t)1,
+								_str_response, strlen(_str_response));
+						}
+
+						int int_status = PQsendQuery(client_request->parent->cnxn, "ROLLBACK");
+						if (int_status != 1) {
+							SERROR_NORESPONSE("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
+						} else {
+							query_callback(EV_A, client_request, ws_raw_step3);
+						}
+
 						decrement_idle(EV_A);
 						ev_check_stop(EV_A, &client_raw->copy_check->check);
 						SFREE(client_raw->copy_check);
+						if (client_raw->res != NULL) {
+							PQclear(client_raw->res);
+						}
 					}
-					if (client_raw->res != NULL) {
-						PQclear(client_raw->res);
-					}
-					if (client_request->cb_data != NULL) {
-						ev_io_stop(EV_A, &client_request->cb_data->io);
-						SFREE(client_request->cb_data);
-					}
-
-					int int_status = PQsendQuery(client_request->parent->cnxn, "ROLLBACK");
-					if (int_status != 1) {
-						SERROR_NORESPONSE("Query failed: %s", PQerrorMessage(client_request->parent->cnxn));
-					} else {
-						query_callback(EV_A, client_request, ws_raw_step3);
-					}
-
-					SFREE(client_request->vod_request_data);
 				}
 			}
 #endif
