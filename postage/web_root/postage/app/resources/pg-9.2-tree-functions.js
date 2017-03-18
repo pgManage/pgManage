@@ -1399,16 +1399,8 @@ function dialogAddSchema(target) {
             // console.log(GS.qryGetVal(GS.getQueryString(), 'schemas-all'));
             // console.log(GS.qryGetVal(querystringShownObj, 'show'));
             // console.log(GS.qryGetVal(GS.getQueryString(), 'show'));
-            if (
-                //GS.qryGetVal(querystringShownObj, 'schema') !== GS.qryGetVal(GS.getQueryString(), 'schema') ||
-                //GS.qryGetVal(querystringShownObj, 'schemas-all') !== GS.qryGetVal(GS.getQueryString(), 'schemas-all') ||
-                //GS.qryGetVal(querystringShownObj, 'show') !== GS.qryGetVal(GS.getQueryString(), 'show') &&
-                GS.qryGetVal(GS.getQueryString(), 'schemas-all').trim() !== ''
-                //GS.qryGetVal(GS.getQueryString(), 'show').trim() !== ''
-                
-            ) {
-                localStorage.shownObjects = querystringShownObj;
-            }
+            
+            localStorage.shownObjects = querystringShownObj;
             
             // save to querystring
             GS.pushQueryString('schemas=' + (strSchema || '') +

@@ -1234,7 +1234,7 @@ GS.userChangePassword=function(){changePassword('env','User');};})();GS.normalUs
                     </gs-page>
                 */}).replace('{{ERROR}}',(strOldError?'<br /><div style="color: #FF0000">'+strOldError+'</div>':''));if(GS.getCookie('greyspots_uname')){xtag.query(templateElement.content,'#normal-uname')[0].setAttribute('value',decodeURIComponent(GS.getCookie('greyspots_uname')));xtag.query(templateElement.content,'#normal-pword')[0].setAttribute('autofocus','');}else{xtag.query(templateElement.content,'#normal-uname')[0].setAttribute('autofocus','');}
 GS.openDialog(templateElement,function(){var dialog=this;document.getElementById('normal-pword').addEventListener('keydown',function(event){var intKeyCode=event.which||event.keyCode;if(intKeyCode===13){GS.triggerEvent(document.getElementById('normal-login'),'click');}});document.getElementById('normal-login').addEventListener('click',function(){var strUserName=document.getElementById('normal-uname').value,strLink;if(document.getElementById('normal-pword').value){GS.addLoader('log-in','Logging In...');GS.ajaxJSON('/env/auth','action=login'+'&username='+encodeURIComponent(document.getElementById('normal-uname').value)+'&password='+encodeURIComponent(document.getElementById('normal-pword').value),function(data,error){GS.removeLoader('log-in');GS.closeDialog(dialog,'');window.userLogin=false;if(!error){GS.setCookie('greyspots_uname',strUserName,30);if(typeof loggedInCallback==='function'){if(window.location.hostname.substring(0,window.location.hostname.indexOf('.'))===strDefaultSubDomain){GS.normalUserLogin(loggedInCallback,'',strDefaultSubDomain);}else{loggedInCallback(data.dat,strDefaultSubDomain);}}}else{GS.normalUserLogin(loggedInCallback,data.error_text,strDefaultSubDomain);}});}});});}});}};(function(){'use strict';function encodeForTabDelimited(strValue){return strValue==='\\N'?strValue:strValue.replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/\r/g,'\\r').replace(/\t/g,'\\t').replace(/^NULL$/g,'\\N');}
-var bolPreventErrors=false;function webSocketConnectionErrorDialog(socket,addinText,retryCallback,cancelCallback){if(!document.getElementById('dialog-from-dialog-ws-conn-error')&&bolPreventErrors===false){var templateElement=document.createElement('template');GS.removeAllLoaders();templateElement.setAttribute('id','dialog-ws-conn-error');templateElement.setAttribute('data-theme','error');templateElement.innerHTML=ml(function(){/*
+GS.bolPreventErrors=false;function webSocketConnectionErrorDialog(socket,addinText,retryCallback,cancelCallback){if(!document.getElementById('dialog-from-dialog-ws-conn-error')&&GS.bolPreventErrors===false){var templateElement=document.createElement('template');GS.removeAllLoaders();templateElement.setAttribute('id','dialog-ws-conn-error');templateElement.setAttribute('data-theme','error');templateElement.innerHTML=ml(function(){/*
                 <gs-page>
                     <gs-header><center><h3>There was an error!</h3></center></gs-header>
                     <gs-body padded>
@@ -1248,7 +1248,7 @@ var bolPreventErrors=false;function webSocketConnectionErrorDialog(socket,addinT
                         </gs-grid>
                     </gs-footer>
                 </gs-page>
-            */}).replace('{{ADDIN}}',(addinText?'\n\n'+addinText:''));GS.openDialog(templateElement,'',function(event,strAnswer){if(strAnswer==='Try to reconnect'){GS.closeSocket(GS.envSocket);GS.envSocket=GS.openSocket('env',socket.GSSessionID,socket.notifications);}else{bolPreventErrors=true;}});}}
+            */}).replace('{{ADDIN}}',(addinText?'\n\n'+addinText:''));GS.openDialog(templateElement,'',function(event,strAnswer){if(strAnswer==='Try to reconnect'){GS.closeSocket(GS.envSocket);GS.envSocket=GS.openSocket('env',socket.GSSessionID,socket.notifications);}else{GS.bolPreventErrors=true;}});}}
 function webSocketNormalizeError(event){var i,len,arrLines,arrLine,strData,jsnRet={'error_title':'','error_text':'','error_detail':'','error_hint':'','error_query':'','error_context':'','error_position':'','error_notice':'','original_data':event};event=event||{};jsnRet.error_text=event.reason||'';if(event.data){strData=event.data;if(strData.substring(0,strData.indexOf(' '))==='messageid'){strData=strData.substring(strData.indexOf('\n')+1);}
 if(strData.substring(0,strData.indexOf(' '))==='responsenumber'){strData=strData.substring(strData.indexOf('\n')+1);}
 if(strData.indexOf('FATAL\n')===0){strData=strData.substring(strData.indexOf('\n')+1);}
@@ -1269,25 +1269,25 @@ function errorJSONToHTML(errorJSON){return'<pre style="word-break: break-all; wh
 (errorJSON.error_position?'<br /><br />ERROR POSITION: '+encodeHTML(errorJSON.error_position):'')+
 (errorJSON.error_context?'<br /><br />CONTEXT: '+encodeHTML(errorJSON.error_context):'')+
 (errorJSON.error_notice?'<br /><br /><br />'+encodeHTML(errorJSON.error_notice):'')+'</pre>';}
-GS.webSocketErrorDialog=function(jsnError,tryAgainCallback,cancelCallback){var templateElement=document.createElement('template'),strHTML,jsnErrorClean;jsnErrorClean={};jsnErrorClean.error_text=cleanErrorValue(jsnError.error_text);jsnErrorClean.error_hint=cleanErrorValue(jsnError.error_hint);jsnErrorClean.error_detail=cleanErrorValue(jsnError.error_detail);jsnErrorClean.error_query=cleanErrorValue(jsnError.error_query);jsnErrorClean.error_position=cleanErrorValue(jsnError.error_position);jsnErrorClean.error_context=cleanErrorValue(jsnError.error_context);jsnErrorClean.error_notice=cleanErrorValue(jsnError.error_notice);templateElement.setAttribute('data-theme','error');strHTML=ml(function(){/*
-            <gs-page>
-                <gs-header><center><h3>There was an error!</h3></center></gs-header>
-                <gs-body padded>
-                    {{HTML}}
-                    <br />
-                    <gs-button class="error-button-show-full-text">Show Full Error Text</gs-button>
-                </gs-body>
-                <gs-footer>{{BUTTONS}}</gs-footer>
-            </gs-page>
-        */}).replace('{{HTML}}',errorJSONToHTML(jsnErrorClean));var openFunction=function(){xtag.query(this,'.error-button-show-full-text')[0].addEventListener('click',function(){var templateElement=document.createElement('template');templateElement.innerHTML=ml(function(){/*
-                    <gs-page>
-                        <gs-header><center><h3>Full Error Text</h3></center></gs-header>
-                        <gs-body padded>
-                            {{HTML}}
-                        </gs-body>
-                        <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
-                    </gs-page>
-                */}).replace('{{HTML}}',errorJSONToHTML(jsnError));GS.openDialog(templateElement);});};if(typeof tryAgainCallback==='function'){templateElement.innerHTML=strHTML.replace('{{BUTTONS}}','<gs-grid>'+'    <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>'+'    <gs-block><gs-button dialogclose listen-for-return>Try Again</gs-button></gs-block>'+'</gs-grid>');GS.openDialog(templateElement,openFunction,function(event,strAnswer){if(strAnswer==='Try Again'){tryAgainCallback(strAnswer);}else{if(typeof cancelCallback==='function'){cancelCallback(strAnswer);}}});}else{templateElement.innerHTML=strHTML.replace('{{BUTTONS}}','<gs-button dialogclose listen-for-return>Ok</gs-button>');GS.openDialog(templateElement,openFunction);}};GS.websockets=new Array();GS.closeAllSockets=function(){var i,len=GS.websockets.length;for(i=0;i<len;i++){GS.closeSocket(GS.websockets[i]);}};var sequence=0,jsnMessages={},arrWaitingCalls=[];GS.openSocket=function(strLink,relinkSessionID,relinkSessionNotifications){var strLoc=window.location.toString(),intUrlStart=strLoc.indexOf('/postage/')+9,strConn=strLoc.substring(intUrlStart,strLoc.substring(intUrlStart).indexOf('/')+intUrlStart);var socket=new WebSocket((window.location.protocol.toLowerCase().indexOf('https')===0?'wss':'ws')+'://'+(window.location.host||window.location.hostname)+'/postage/'+strConn+'/'+strLink+
+GS.webSocketErrorDialog=function(jsnError,tryAgainCallback,cancelCallback){if(GS.bolPreventErrors===false){var templateElement=document.createElement('template'),strHTML,jsnErrorClean;jsnErrorClean={};jsnErrorClean.error_text=cleanErrorValue(jsnError.error_text);jsnErrorClean.error_hint=cleanErrorValue(jsnError.error_hint);jsnErrorClean.error_detail=cleanErrorValue(jsnError.error_detail);jsnErrorClean.error_query=cleanErrorValue(jsnError.error_query);jsnErrorClean.error_position=cleanErrorValue(jsnError.error_position);jsnErrorClean.error_context=cleanErrorValue(jsnError.error_context);jsnErrorClean.error_notice=cleanErrorValue(jsnError.error_notice);templateElement.setAttribute('data-theme','error');strHTML=ml(function(){/*
+                <gs-page>
+                    <gs-header><center><h3>There was an error!</h3></center></gs-header>
+                    <gs-body padded>
+                        {{HTML}}
+                        <br />
+                        <gs-button class="error-button-show-full-text">Show Full Error Text</gs-button>
+                    </gs-body>
+                    <gs-footer>{{BUTTONS}}</gs-footer>
+                </gs-page>
+            */}).replace('{{HTML}}',errorJSONToHTML(jsnErrorClean));var openFunction=function(){xtag.query(this,'.error-button-show-full-text')[0].addEventListener('click',function(){var templateElement=document.createElement('template');templateElement.innerHTML=ml(function(){/*
+                        <gs-page>
+                            <gs-header><center><h3>Full Error Text</h3></center></gs-header>
+                            <gs-body padded>
+                                {{HTML}}
+                            </gs-body>
+                            <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
+                        </gs-page>
+                    */}).replace('{{HTML}}',errorJSONToHTML(jsnError));GS.openDialog(templateElement);});};if(typeof tryAgainCallback==='function'){templateElement.innerHTML=strHTML.replace('{{BUTTONS}}','<gs-grid>'+'    <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>'+'    <gs-block><gs-button dialogclose listen-for-return>Try Again</gs-button></gs-block>'+'</gs-grid>');GS.openDialog(templateElement,openFunction,function(event,strAnswer){if(strAnswer==='Try Again'){tryAgainCallback(strAnswer);}else{if(typeof cancelCallback==='function'){cancelCallback(strAnswer);}}});}else{templateElement.innerHTML=strHTML.replace('{{BUTTONS}}','<gs-button dialogclose listen-for-return>Ok</gs-button>');GS.openDialog(templateElement,openFunction);}}};GS.websockets=new Array();GS.closeAllSockets=function(){var i,len=GS.websockets.length;for(i=0;i<len;i++){GS.closeSocket(GS.websockets[i]);}};var sequence=0,jsnMessages={},arrWaitingCalls=[];GS.openSocket=function(strLink,relinkSessionID,relinkSessionNotifications){var strLoc=window.location.toString(),intUrlStart=strLoc.indexOf('/postage/')+9,strConn=strLoc.substring(intUrlStart,strLoc.substring(intUrlStart).indexOf('/')+intUrlStart);var socket=new WebSocket((window.location.protocol.toLowerCase().indexOf('https')===0?'wss':'ws')+'://'+(window.location.host||window.location.hostname)+'/postage/'+strConn+'/'+strLink+
 (relinkSessionID?'?sessionid='+relinkSessionID:''));GS.websockets.push(socket);if(relinkSessionID){socket.GSSessionID=relinkSessionID;socket.oldSessionID=relinkSessionID;}
 if(relinkSessionNotifications){socket.notifications=relinkSessionNotifications;}else{socket.notifications=[];}
 socket.onmessage=function(event){var message=event.data,messageID,responseNumber,key,strError,arrLines,i,len,jsnMessage,startFrom;if(typeof(message)==='object'){var buf=message;message=String.fromCharCode.apply(null,new Uint8Array(buf));}
