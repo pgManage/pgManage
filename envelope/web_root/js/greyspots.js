@@ -8436,72 +8436,74 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
     }
     
     GS.webSocketErrorDialog = function (jsnError, tryAgainCallback, cancelCallback) {
-        var templateElement = document.createElement('template'), strHTML, jsnErrorClean;
-        
-        jsnErrorClean = {};
-        
-        jsnErrorClean.error_text     = cleanErrorValue(jsnError.error_text);
-        jsnErrorClean.error_hint     = cleanErrorValue(jsnError.error_hint);
-        jsnErrorClean.error_detail   = cleanErrorValue(jsnError.error_detail);
-        jsnErrorClean.error_query    = cleanErrorValue(jsnError.error_query);
-        jsnErrorClean.error_position = cleanErrorValue(jsnError.error_position);
-        jsnErrorClean.error_context  = cleanErrorValue(jsnError.error_context);
-        jsnErrorClean.error_notice   = cleanErrorValue(jsnError.error_notice);
-        
-        templateElement.setAttribute('data-theme', 'error');
-        strHTML = ml(function () {/*
-            <gs-page>
-                <gs-header><center><h3>There was an error!</h3></center></gs-header>
-                <gs-body padded>
-                    {{HTML}}
-                    <br />
-                    <gs-button class="error-button-show-full-text">Show Full Error Text</gs-button>
-                </gs-body>
-                <gs-footer>{{BUTTONS}}</gs-footer>
-            </gs-page>
-        */}).replace('{{HTML}}', errorJSONToHTML(jsnErrorClean));
-        
-        var openFunction = function () {
-            xtag.query(this, '.error-button-show-full-text')[0].addEventListener('click', function () {
-                var templateElement = document.createElement('template');
-                
-                templateElement.innerHTML = ml(function () {/*
-                    <gs-page>
-                        <gs-header><center><h3>Full Error Text</h3></center></gs-header>
-                        <gs-body padded>
-                            {{HTML}}
-                        </gs-body>
-                        <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
-                    </gs-page>
-                */}).replace('{{HTML}}', errorJSONToHTML(jsnError));
-                
-                GS.openDialog(templateElement);
-            });
-        };
-        
-        if (typeof tryAgainCallback === 'function') {
-            templateElement.innerHTML =
-                strHTML.replace(
-                    '{{BUTTONS}}',
-                    '<gs-grid>' +
-                    '    <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>' +
-                    '    <gs-block><gs-button dialogclose listen-for-return>Try Again</gs-button></gs-block>' +
-                    '</gs-grid>'
-                );
+        if (GS.bolPreventErrors === false) {
+            var templateElement = document.createElement('template'), strHTML, jsnErrorClean;
             
-            GS.openDialog(templateElement, openFunction, function (event, strAnswer) {
-                if (strAnswer === 'Try Again') {
-                    tryAgainCallback(strAnswer);
-                } else {
-                    if (typeof cancelCallback === 'function') {
-                        cancelCallback(strAnswer);
+            jsnErrorClean = {};
+            
+            jsnErrorClean.error_text     = cleanErrorValue(jsnError.error_text);
+            jsnErrorClean.error_hint     = cleanErrorValue(jsnError.error_hint);
+            jsnErrorClean.error_detail   = cleanErrorValue(jsnError.error_detail);
+            jsnErrorClean.error_query    = cleanErrorValue(jsnError.error_query);
+            jsnErrorClean.error_position = cleanErrorValue(jsnError.error_position);
+            jsnErrorClean.error_context  = cleanErrorValue(jsnError.error_context);
+            jsnErrorClean.error_notice   = cleanErrorValue(jsnError.error_notice);
+            
+            templateElement.setAttribute('data-theme', 'error');
+            strHTML = ml(function () {/*
+                <gs-page>
+                    <gs-header><center><h3>There was an error!</h3></center></gs-header>
+                    <gs-body padded>
+                        {{HTML}}
+                        <br />
+                        <gs-button class="error-button-show-full-text">Show Full Error Text</gs-button>
+                    </gs-body>
+                    <gs-footer>{{BUTTONS}}</gs-footer>
+                </gs-page>
+            */}).replace('{{HTML}}', errorJSONToHTML(jsnErrorClean));
+            
+            var openFunction = function () {
+                xtag.query(this, '.error-button-show-full-text')[0].addEventListener('click', function () {
+                    var templateElement = document.createElement('template');
+                    
+                    templateElement.innerHTML = ml(function () {/*
+                        <gs-page>
+                            <gs-header><center><h3>Full Error Text</h3></center></gs-header>
+                            <gs-body padded>
+                                {{HTML}}
+                            </gs-body>
+                            <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
+                        </gs-page>
+                    */}).replace('{{HTML}}', errorJSONToHTML(jsnError));
+                    
+                    GS.openDialog(templateElement);
+                });
+            };
+            
+            if (typeof tryAgainCallback === 'function') {
+                templateElement.innerHTML =
+                    strHTML.replace(
+                        '{{BUTTONS}}',
+                        '<gs-grid>' +
+                        '    <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>' +
+                        '    <gs-block><gs-button dialogclose listen-for-return>Try Again</gs-button></gs-block>' +
+                        '</gs-grid>'
+                    );
+                
+                GS.openDialog(templateElement, openFunction, function (event, strAnswer) {
+                    if (strAnswer === 'Try Again') {
+                        tryAgainCallback(strAnswer);
+                    } else {
+                        if (typeof cancelCallback === 'function') {
+                            cancelCallback(strAnswer);
+                        }
                     }
-                }
-            });
-            
-        } else {
-            templateElement.innerHTML = strHTML.replace('{{BUTTONS}}', '<gs-button dialogclose listen-for-return>Ok</gs-button>');
-            GS.openDialog(templateElement, openFunction);
+                });
+                
+            } else {
+                templateElement.innerHTML = strHTML.replace('{{BUTTONS}}', '<gs-button dialogclose listen-for-return>Ok</gs-button>');
+                GS.openDialog(templateElement, openFunction);
+            }
         }
     };
     
