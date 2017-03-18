@@ -294,6 +294,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 
 	if (client_request->bol_cancel_return == true) {
 		if (bol_last) {
+			SDEBUG("client_request->str_current_response: %s", client_request->str_current_response);
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, client_request->str_current_response,
 				client_request->int_current_response_length);
 			DArray_push(client_request->arr_response, client_request->str_current_response);

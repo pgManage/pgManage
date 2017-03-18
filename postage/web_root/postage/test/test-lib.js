@@ -70,7 +70,7 @@ var $ = {
         'use strict';
         // console.log('run_test:', intCurrent);
 		if (intCurrent === 0) {
-			$.tests[key].test_random = rightPad(parseInt(Math.random().toString().substring(2, 7), 10).toString(), '0', 5);
+			$.tests[key].test_random = rightPad(parseInt(Math.random().toString().substring(2, 6), 10).toString(), '0', 4);
 		}
         var arrCurrent = $.tests[key].tests[intCurrent];
         if (arrCurrent === undefined) {
@@ -237,7 +237,7 @@ var $ = {
             if (typeof arrCurrent[3] === 'string') {
                 arrCurrent[3] = arrCurrent[3].replace(/\r\n/gi, '\n').replace(/\{\{test_random\}\}/g, $.test_random);
             }
-            var strArgs = arrCurrent[3];
+            var strArgs = (typeof arrCurrent[3] === 'string' ? arrCurrent[3].replace(/\{\{test_random1\}\}/g, $.tests[key].test_random) : arrCurrent[3]);
             var arrStrExpectedOutput = arrCurrent[4];
             var arrStrActualOutput = [];
             $.changeStatus(key, intCurrent, 'waiting', 'running');
@@ -274,7 +274,7 @@ var $ = {
                     //console.log(i, data);
                     var j, k, l, len, len1;
                     for (j = 0, k = 0, len = i; j < len; j += 1, k += 1) {
-                        if (arrStrActualOutput[j] === arrStrExpectedOutput[k].replace(/\{\{test_random\}\}/g, $.test_random) ||
+                        if (arrStrActualOutput[j] === arrStrExpectedOutput[k].replace(/\{\{test_random\}\}/g, $.test_random).replace(/\{\{test_random1\}\}/g, $.tests[key].test_random) ||
                             arrStrExpectedOutput[k] === 'ANYTHING' ||
                             arrStrExpectedOutput[k].substring(0, 8) === 'OPTIONAL' ||
                             (
@@ -288,7 +288,7 @@ var $ = {
                             )
                         ) {
                             if (arrStrExpectedOutput[k].substring(0, 8) === 'OPTIONAL' &&
-                                arrStrActualOutput[j] !== arrStrExpectedOutput[k].substring(8).replace(/\{\{test_random\}\}/g, $.test_random)
+                                arrStrActualOutput[j] !== arrStrExpectedOutput[k].substring(8).replace(/\{\{test_random\}\}/g, $.test_random).replace(/\{\{test_random1\}\}/g, $.tests[key].test_random)
                             ) {
                                 j -= 1;
                             }
@@ -379,7 +379,7 @@ var $ = {
             });
         } else if (strType === 'websocket cancel') {
             arrCurrent[3] = arrCurrent[3].replace(/\r\n/gi, '\n');
-            var strArgs = arrCurrent[3].replace(/\{\{test_random\}\}/g, $.test_random);
+            var strArgs = arrCurrent[3].replace(/\{\{test_random\}\}/g, $.test_random).replace(/\{\{test_random1\}\}/g, $.tests[key].test_random);
             var intCancelAtMessage = arrCurrent[4] !== undefined ? arrCurrent[4] : 1;
             $.changeStatus(key, intCurrent, 'waiting', 'running');
             i = 0;
@@ -388,7 +388,9 @@ var $ = {
                     WS.requestFromSocket($.tests[key].socket, key, 'CANCEL', function (data) {
                         // console.log(data);
                     });
-                } else if (JSON.stringify(data) === ml(function() {/*"Query failed: FATAL\nerror_text\tERROR:  canceling statement due to user request\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"*/})) {
+                } else if (	JSON.stringify(data) === ml(function() {/*"Query failed: FATAL\nerror_text\tERROR:  canceling statement due to user request\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"*/}) ||
+							JSON.stringify(data) === ml(function() {/*"FATAL\nerror_text\tERROR:  canceling statement due to user request\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t\n"*/}) ||
+							JSON.stringify(data) === ml(function() {/*"TRANSACTION COMPLETED"*/})) {
                     $.changeStatus(key, intCurrent, 'running', 'pass');
                     $.runTest(key, intCurrent + 1);
                 }
