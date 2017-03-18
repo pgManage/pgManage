@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "http_main.h"
 
 bool http_client_info_cb(EV_P, void *cb_data, DB_result *res);
@@ -208,6 +209,7 @@ void http_main(struct sock_ev_client *client) {
 #endif
 	char *str_response = NULL;
 	char *ptr_end_uri = NULL;
+	char *str_uri_temp = NULL;
 	size_t int_uri_len = 0;
 	size_t int_full_uri_len = 0;
 #ifdef ENVELOPE
@@ -276,13 +278,33 @@ void http_main(struct sock_ev_client *client) {
 
 		http_auth(client_auth);
 	} else if (strncmp(str_uri, "/postage", 8) == 0 && isdigit(str_uri[9])) {
+		if (isdigit(str_uri[9])) {
+			str_uri_temp = str_uri;
+			char *str_temp = strchr(str_uri_temp + 9, '/');
+			SFINISH_CHECK(str_temp != NULL, "strchr failed");
+			SFINISH_SNCAT(str_uri, &int_uri_len,
+				"/postage/app", (size_t)12,
+				str_temp, strlen(str_temp));
+			SFREE(str_uri_temp);
+		}
+
 		// set_cnxn does its own error handling
 		SDEBUG("str_uri: %s", str_uri);
 
-		if ((client->conn = set_cnxn(client, http_main_cnxn_cb)) == NULL) {
-			SFINISH_CLIENT_CLOSE(client);
+		//don't check the database connection for file requests
+		if (strncmp(str_uri, "/postage/app/upload", 22) == 0 ||
+		#ifdef POSTAGE_INTERFACE_LIBPQ
+			strncmp(str_uri, "/postage/app/export", 22) == 0 ||
+		#endif
+			strncmp(str_uri, "/postage/app/action_ev", 23) == 0 ||
+			strncmp(str_uri, "/postage/app/action_info", 25) == 0) {
+			if ((client->conn = set_cnxn(client, http_main_cnxn_cb)) == NULL) {
+				SFINISH_CLIENT_CLOSE(client);
+			}
+			// DEBUG("str_conninfo: %s", str_conninfo);
+		} else {
+			http_file_step1(client);
 		}
-		// DEBUG("str_conninfo: %s", str_conninfo);
 	} else {
 		http_file_step1(client);
 	}

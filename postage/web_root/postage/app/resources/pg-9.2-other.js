@@ -166,22 +166,12 @@ function menuUser(target) {
     GS.openDialogToElement(target, templateElement, 'down');
 }
 
-console.log('create buttonReloadWindow 1');
 function buttonReloadWindow() {
-	console.log('websocket close 1');
 	GS.closeAllSockets();
-	console.log('websocket close 2');
-	/*
-	if (window.process && window.process.type === 'renderer') {
-		var electron = require('electron');
-		electron.remote.getCurrentWindow().webContents.reload();
-	} else {
-	*/
-		window.location.reload(true);
-		console.log('shouldn\'t get here');
-	//}
+	window.location.reload(true);
+	//no GS.loader in postage?
+	//GS.loader('reload-lodaer','Reloading the page');
 }
-console.log('create buttonReloadWindow 2');
 
 function menuTools(target) {
     'use strict';
