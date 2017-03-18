@@ -66,7 +66,7 @@ function startTabContainer() {
     'use strict';
     document.getElementById('tab-container').innerHTML = ml(function () {/*
         <div id="tab-bar-container" flex-horizontal flex-fill>
-            <div class="tab-bar-toolbar left">
+            <div class="tab-bar-toolbar left" flex-horizontal>
                 <gs-button id="button-home" onclick="setQSToHome()" icononly icon="home" inline remove-all no-focus title="Back to home [ESC]"></gs-button><gs-button id="button-new-tab" onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icononly icon="folder-o" title="Create a blank script tab" inline remove-all no-focus><span id="button-new-tab-plus">+</span></gs-button>
             </div>
             <div id="tab-bar" flex prevent-text-selection></div>
