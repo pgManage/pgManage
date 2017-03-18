@@ -1021,7 +1021,10 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 						_str_response, strlen(_str_response));
 				}
 
-			} else if (client->cur_request != NULL) {
+			}
+#ifdef ENVELOPE
+#else
+			else if (client->cur_request != NULL) {
 				SINFO("cur_request branch");
 				struct sock_ev_client_request *client_request = client->cur_request;
 
@@ -1076,6 +1079,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 					SFREE(client_request->vod_request_data);
 				}
 			}
+#endif
 
 			WS_freeFrame(frame);
 			SFREE(str_message_id);
