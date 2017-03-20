@@ -511,27 +511,27 @@ oid ASC	10
 RETURN	enumtypid	enumsortorder	enumlabel
 */
 			}),
-			["datname\tdatistemplate\nname\tboolean\n", "TRANSACTION COMPLETED"]],
+			["enumtypid\tenumsortorder\tenumlabel\noid\treal\tname\n", "TRANSACTION COMPLETED"]],
 			['SELECT 3', 'websocket', '', ml(function () {/*SELECT	pg_enum
 RETURN	enumtypid	enumsortorder	enumlabel
 
 */
 			}),
-			["datname\tdatistemplate\nname\tboolean\n", "TRANSACTION COMPLETED"]],
+			["enumtypid\tenumsortorder\tenumlabel\noid\treal\tname\n", "TRANSACTION COMPLETED"]],
 			['SELECT 4', 'websocket', '', ml(function () {/*SELECT	pg_enum
 RETURN	enumtypid	enumsortorder	enumlabel
 
 
 */
 			}),
-			["datname\tdatistemplate\nname\tboolean\n", "TRANSACTION COMPLETED"]],
+			["enumtypid\tenumsortorder\tenumlabel\noid\treal\tname\n", "TRANSACTION COMPLETED"]],
 			['SELECT 5', 'websocket', '', new Blob([ml(function () {/*SELECT	pg_enum
 RETURN	enumtypid	enumsortorder	enumlabel
 
 
 */
 			})], {type: 'application/x-binary'}),
-			["datname\tdatistemplate\nname\tboolean\n", "TRANSACTION COMPLETED"]],
+			["enumtypid\tenumsortorder\tenumlabel\noid\treal\tname\n", "TRANSACTION COMPLETED"]],
 
 
 			['SELECT 6', 'websocket', '', ml(function () {/*SELECT	pg_enum
@@ -540,7 +540,7 @@ RETURN	enumtypid	enumsortorder	enumlabel
 
 */
             }),
-			["datname\tdatistemplate\nname\tboolean\n"]],
+			["enumtypid\tenumsortorder\tenumlabel\noid\treal\tname\n", "TRANSACTION COMPLETED"]],
 			['SELECT 7', 'websocket', '', ml(function () {/*SELECT	rtesting_table_with_capital_column_name
 RETURN	id	test_name	TestName
 
