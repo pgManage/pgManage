@@ -47,7 +47,7 @@ var $ = {
 		$.tests[key].running = true;
     },
     intRun: 10,
-
+	testsEnded: false,
 	test_random: rightPad(parseInt(Math.random().toString().substring(2, 7), 10).toString(), '0', 5),
     test_change_stamp: (function () {
         var test_change_stamp = new Date();
@@ -123,7 +123,7 @@ var $ = {
 					}
 				}
 
-				if (bolEndTests && $.testsEnded !== true) {
+				if (key[0] !== '_' && bolEndTests && $.testsEnded !== true) {
 					$.testsEnded = true;
 					$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + $.intID, 'POST', function (data) {
 						$.ajax('http://127.0.0.1:45654', '', 'GET', function (data) {
