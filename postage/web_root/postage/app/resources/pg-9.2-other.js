@@ -717,7 +717,7 @@ function dialogOptions() {
         if (/^postageZoom/.test(strProp)) {
             strZoom = strZoom + '<tr>' +
                     '<td>' + strProp.toString().replace(/^postageZoom/,'') + '</td>' +
-                    '<td><gs-text id="postage-options-left-panel-' + strProp.toString().replace(/^postageZoom/,'') + '"></gs-text></td>' +
+                    '<td style="width: 10em;"><gs-text id="postage-options-left-panel-' + strProp.toString().replace(/^postageZoom/,'') + '"></gs-text></td>' +
                 '</tr>';
         }
     }
@@ -732,92 +732,100 @@ function dialogOptions() {
             <gs-header><center><h3>Postage Options</h3></center></gs-header>
             <gs-body padded>
                 <h3>General</h3>
-                <div flex-horizontal>
+                
+                <div style="width: 20em">
                     <label for="postage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
                     <gs-text id="postage-options-left-panel" flex></gs-text>
+                    
+                    <label>SQL Toolbar Button Style:</label>
+                    <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
+                        <gs-option value="true">Labeled</gs-option>
+                        <gs-option value="false">Unlabeled</gs-option>
+                    </gs-optionbox>
                 </div>
+                
 
                 <h3>Clip Options</h3>
-                <gs-grid widths="1,1" gutter>
-                    <gs-block>
-                        <gs-optionbox id="clip-options-quote-which" style="padding: 0 0.25em 0.25em 0.25em;">
-                                <label>Quote:</label>
-                                <gs-option value="none">Nothing</gs-option>
-                                <gs-option value="strings">Strings</gs-option>
-                                <gs-option value="all">All Fields</gs-option>
-                        </gs-optionbox>
-                    </gs-block>
-                    <gs-block>
-                        <gs-optionbox id="clip-options-column-names" style="padding: 0 0.25em 0.25em 0.25em;">
-                                <label>Column Names:</label>
-                                <gs-option value="true">Always</gs-option>
-                                <gs-option value="false">Only When Selected</gs-option>
-                        </gs-optionbox>
-                    </gs-block>
-                </gs-grid>
-                <div flex-horizontal>
-                    <label for="clip-options-quote-char" style="min-width: 7.25em;">Quote Char:</label>
-                    <gs-combo id="clip-options-quote-char" flex>
-                        <template>
-                            <table>
-                                <tbody>
-                                    <tr value="&#34;"><td>(Double Quote)</td></tr>
-                                    <tr value="&#39;"><td>(Single Quote)</td></tr>
-                                </tbody>
-                            </table>
-                        </template>
-                    </gs-combo>
+                <div style="width: 45em">
+                    <gs-grid widths="1,1" gutter>
+                        <gs-block>
+                            <gs-optionbox id="clip-options-quote-which" style="padding: 0 0.25em 0.25em 0.25em;">
+                                    <label>Escape Values When:</label>
+                                    <gs-option value="none">Nothing</gs-option>
+                                    <gs-option value="strings">Strings</gs-option>
+                                    <gs-option value="all">All Fields</gs-option>
+                            </gs-optionbox>
+                        </gs-block>
+                        <gs-block>
+                            <gs-optionbox id="clip-options-column-names" style="padding: 0 0.25em 0.25em 0.25em;">
+                                    <label>Include Column Names:</label>
+                                    <gs-option value="true">Always</gs-option>
+                                    <gs-option value="false">Only When Selected</gs-option>
+                            </gs-optionbox>
+                        </gs-block>
+                    </gs-grid>
                 </div>
-                <div flex-horizontal>
-                    <label for="clip-options-field-delimiter" style="min-width: 7.25em;">Field Delimiter:</label>
-                    <gs-combo id="clip-options-field-delimiter" flex>
-                        <template>
-                            <table>
-                                <tbody>
-                                    <tr value="&#9;"><td>(Tab)</td></tr>
-                                    <tr value="&#44;"><td>(Comma)</td></tr>
-                                    <tr value="&#124;"><td>(Vertical Bar)</td></tr>
-                                </tbody>
-                            </table>
-                        </template>
-                    </gs-combo>
-                </div>
-                <div flex-horizontal>
-                    <label for="clip-options-null-values" style="min-width: 7.25em;">Null Values:</label>
-                    <gs-combo id="clip-options-null-values" flex>
-                        <template>
-                            <table>
-                                <tbody>
-                                    <tr value="&lt;NULL&gt;"><td>&lt;NULL&gt;</td></tr>
-                                    <tr value="NULL"><td>NULL</td></tr>
-                                    <tr value=""><td>(Nothing)</td></tr>
-                                </tbody>
-                            </table>
-                        </template>
-                    </gs-combo>
+                <div style="width: 25em">
+                    <div flex-horizontal>
+                        <label for="clip-options-quote-char" style="min-width: 7.25em;">Escape Values with Char:</label>
+                        <gs-combo id="clip-options-quote-char" flex>
+                            <template>
+                                <table>
+                                    <tbody>
+                                        <tr value="&#34;"><td>(Double Quote)</td></tr>
+                                        <tr value="&#39;"><td>(Single Quote)</td></tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-combo>
+                    </div>
+                    <div flex-horizontal>
+                        <label for="clip-options-field-delimiter" style="min-width: 7.25em;">Field Delimiter:</label>
+                        <gs-combo id="clip-options-field-delimiter" flex>
+                            <template>
+                                <table>
+                                    <tbody>
+                                        <tr value="&#9;"><td>(Tab)</td></tr>
+                                        <tr value="&#44;"><td>(Comma)</td></tr>
+                                        <tr value="&#124;"><td>(Vertical Bar)</td></tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-combo>
+                    </div>
+                    <div flex-horizontal>
+                        <label for="clip-options-null-values" style="min-width: 7.25em;">Null Values:</label>
+                        <gs-combo id="clip-options-null-values" flex>
+                            <template>
+                                <table>
+                                    <tbody>
+                                        <tr value="&lt;NULL&gt;"><td>&lt;NULL&gt;</td></tr>
+                                        <tr value="NULL"><td>NULL</td></tr>
+                                        <tr value=""><td>(Nothing)</td></tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-combo>
+                    </div>
                 </div>
 
                 <h3>Page Zoom Levels</h3>
-                <div id="options-container" style="position: relative; min-height: 10em;">
-                    <table class="simple-table">
-                        <thead>
-                            <tr>
-                                <th>Page</th>
-                                <th>Setting Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{ZOOM}}
-                        </tbody>
-                    </table>
+                <div style="width: 35em">
+                    <!--<div id="options-container" style="position: relative; min-height: 10em;">-->
+                    <div id="options-container">
+                        <table class="simple-table">
+                            <thead>
+                                <tr>
+                                    <th>Page</th>
+                                    <th style="width: 10em;">Setting Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{ZOOM}}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-
-                <h3>SQL Toolbar Buttons</h3>
-                <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
-                        <label>Button Style:</label>
-                        <gs-option value="true">Labeled</gs-option>
-                        <gs-option value="false">Unlabeled</gs-option>
-                </gs-optionbox>
 
                 <h3>Custom CSS Stylesheet</h3>
                 <div id="customCSSAce"></div>
@@ -2070,7 +2078,7 @@ function executeScript() {
             resultsHeaderElement.classList.remove('executing');
             currentTab.handlingQuery = false;
             currentTab.relatedStopSocketButton.setAttribute('hidden', '');
-            currentTab.relatedStopSocketButton.removeEventListener('click', '');
+            currentTab.relatedStopSocketButton.removeEventListener('click', stopLoadingHandler);
             //currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
             //currentTab.relatedStopLoadingButton.removeEventListener('click', stopLoadingHandler);
         };

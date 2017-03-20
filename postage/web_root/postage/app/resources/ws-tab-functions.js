@@ -1182,7 +1182,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                         '<gs-button style="padding-right: 0.25em; " icononly inline remove-all icon="play" onclick="executeScript()" ' +
     								'title="Execute Script [F5]" remove-bottom no-focus></gs-button>' +
     					'<gs-checkbox style="padding-right: 0.35em; height: 2.35em;" icononly inline id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit" remove-all><label></label></gs-checkbox>' +
-    					'<gs-button inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
+    					'<gs-button style="height: 2.35em; padding-left: 0.5em !important; padding-right: 0.5em !important;" inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
     								'title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span></gs-button>' +
     					'<gs-button style="padding-right: 0.25em; " icononly inline remove-all icon="indent" onclick="indentScript()" ' +
     								'title="Indent the selected text [TAB]" remove-all no-focus></gs-button>' +
@@ -1218,8 +1218,8 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     					'<gs-button inline style="height: 2.35em" remove-all class="button-ace-info" onclick="dialogAceInfo()" ' +
     								'title="Information and tips about the Editor" remove-all no-focus>' +
     							'<span class="ace-icon-container">' +
-    								'<span class="ace-suit">&#9824;</span>' + //&#9830;
-    								'<span class="ace-letter">A</span>' +
+    								'<span style="top: 0.1em;" class="ace-suit">&#9824;</span>' + //&#9830;
+    								'<span style="top: 0.1em;" class="ace-letter">A</span>' +
     							'</span>' +
     					'</gs-button>' +
     					'<gs-button style="padding-right: 0.25em;" icononly inline remove-all icon="black-tie" onclick="beautifySQL()" ' + 'title="Beautify the Current SQL" no-focus></gs-button>' +
