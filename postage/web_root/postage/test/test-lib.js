@@ -43,8 +43,10 @@ var $ = {
     },
     runTests: function (key) {
         $.runTest(key, 0);
+		$.tests[key].running = true;
     },
     intRun: 10,
+
 	test_random: rightPad(parseInt(Math.random().toString().substring(2, 7), 10).toString(), '0', 5),
     test_change_stamp: (function () {
         var test_change_stamp = new Date();
@@ -100,7 +102,7 @@ var $ = {
 				$.tests[key].intRun = 0;
 			}
 			$.tests[key].intRun += 1;
-            if (key[0] !== '_' && $.tests[key].intRun < 50 && (minRuns + 1) < $.intRun && !error) {
+            if (key[0] !== '_' && $.tests[key].intRun < ($.intRun * 5) && (minRuns + 1) < $.intRun && !error) {
                 var i = 0, len = $.tests[key].tests.length;
 				for (; i < len; i += 1) {
 					$.changeStatus(key, i, 'pass', 'waiting');
@@ -108,7 +110,20 @@ var $ = {
 
                 $.runTest(key, 0);
             } else {
-				if (key === minKey) {
+				$.tests[key].running = false;
+				var bolEndTests = false;
+
+				for (var key2 in $.tests) {
+					if ($.tests.hasOwnProperty(key2) && key2[0] !== '_') {
+						if ($.tests[key2].running) {
+							bolEndTests = true;
+							break;
+						}
+					}
+				}
+
+				if (bolEndTests && $.testsEnded !== true) {
+					$.testsEnded = true;
 					$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + $.intID, 'POST', function (data) {
 						$.ajax('http://127.0.0.1:45654', '', 'GET', function (data) {
 
