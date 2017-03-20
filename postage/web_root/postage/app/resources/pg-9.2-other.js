@@ -733,7 +733,7 @@ function dialogOptions() {
             <gs-body padded>
                 <h3>General</h3>
                 
-                <div style="width: 20em">
+                <div>
                     <label for="postage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
                     <gs-text id="postage-options-left-panel" flex></gs-text>
                     
@@ -746,7 +746,7 @@ function dialogOptions() {
                 
 
                 <h3>Clip Options</h3>
-                <div style="width: 45em">
+                <div>
                     <gs-grid widths="1,1" gutter>
                         <gs-block>
                             <gs-optionbox id="clip-options-quote-which" style="padding: 0 0.25em 0.25em 0.25em;">
@@ -765,7 +765,7 @@ function dialogOptions() {
                         </gs-block>
                     </gs-grid>
                 </div>
-                <div style="width: 25em">
+                <div>
                     <div flex-horizontal>
                         <label for="clip-options-quote-char" style="min-width: 7.25em;">Escape Values with Char:</label>
                         <gs-combo id="clip-options-quote-char" flex>
