@@ -43,8 +43,8 @@ var $ = {
     },
     runTests: function (key) {
 		$.tests[key].test_random = '1000';
-        $.runTest(key, 0);
 		$.tests[key].running = true;
+        $.runTest(key, 0);
     },
     intRun: 10,
 	testsEnded: false,
