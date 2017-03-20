@@ -110,7 +110,9 @@ var $ = {
             } else {
 				if (key === minKey) {
 					$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + $.intID, 'POST', function (data) {
+						$.ajax('http://127.0.0.1:45654', '', 'GET', function (data) {
 
+						});
 					});
 				}
                 document.getElementById('status-note-' + key).textContent = ' (STOPPED)';
