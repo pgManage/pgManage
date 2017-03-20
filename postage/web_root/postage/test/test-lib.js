@@ -115,7 +115,7 @@ var $ = {
 
 				for (var key2 in $.tests) {
 					if ($.tests.hasOwnProperty(key2) && key2[0] !== '_') {
-						if ($.tests[key2].running) {
+						if ($.tests[key2].running || $.tests[key].error) {
 							bolEndTests = true;
 							break;
 						}
