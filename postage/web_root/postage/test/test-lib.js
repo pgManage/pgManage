@@ -81,7 +81,7 @@ var $ = {
         'use strict';
         // console.log('run_test:', intCurrent);
 		if (intCurrent === 0) {
-			$.tests[key].test_random = qs['seq_numbers'] === 'true' ? $.tests[key].test_random + 1 : rightPad(parseInt(Math.random().toString().substring(2, 6), 10).toString(), '0', 4);
+			$.tests[key].test_random = qs['seq_numbers'] === 'true' ? (parseInt($.tests[key].test_random, 10) + 1).toString() : rightPad(parseInt(Math.random().toString().substring(2, 6), 10).toString(), '0', 4);
 		}
         var arrCurrent = $.tests[key].tests[intCurrent];
         if (arrCurrent === undefined) {
@@ -112,12 +112,12 @@ var $ = {
                 $.runTest(key, 0);
             } else {
 				$.tests[key].running = false;
-				var bolEndTests = false;
+				var bolEndTests = true;
 
 				for (var key2 in $.tests) {
 					if ($.tests.hasOwnProperty(key2) && key2[0] !== '_') {
 						if ($.tests[key2].running || $.tests[key].error) {
-							bolEndTests = true;
+							bolEndTests = false;
 							break;
 						}
 					}
