@@ -126,6 +126,7 @@ var $ = {
 				if (key[0] !== '_' && bolEndTests && $.testsEnded !== true) {
 					$.testsEnded = true;
 					$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + $.intID, 'POST', function (data) {
+						console.log(data);
 						$.ajax('http://127.0.0.1:45654', '', 'GET', function (data) {
 
 						});
