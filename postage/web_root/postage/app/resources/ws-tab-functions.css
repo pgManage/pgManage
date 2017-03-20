@@ -9,6 +9,8 @@
     overflow: hidden;
 }
 
+
+
 #tab-bar-container {
     box-shadow: 0 0 0.1em 0.1em #AAAAAA;
 }
@@ -295,7 +297,7 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
 	position: relative;
 	top: 0.1em;
 	overflow: none;
-5
+}
 
 
 /* ###################################################### */
@@ -392,3 +394,31 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     -moz-animation: error-pulsate 1100ms linear infinite;
     animation: error-pulsate 1100ms linear infinite;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.ace-toolbar > gs-button:after {
+    top: 0.23em !important;
+}
+
+
+
+
+
+

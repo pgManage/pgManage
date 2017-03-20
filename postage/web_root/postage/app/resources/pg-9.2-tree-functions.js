@@ -1746,9 +1746,6 @@ function propertyButton(strPropName, intOid, strNamePartOne, strNamePartTwo) {
                                     '\'' + singleQuoteSafe(strNamePartOne || '') + '\',' +
                                     '\'' + singleQuoteSafe(strNamePartTwo.replace(/"/g, '').trim() || '') + '\');' +
                 '">Properties</gs-button>';
-                
-    console.log(strNamePartOne);
-    console.log(strNamePartTwo);
 }
 
 function propertyDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {

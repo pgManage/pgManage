@@ -1182,7 +1182,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                         '<gs-button style="padding-right: 0.25em; " icononly inline remove-all icon="play" onclick="executeScript()" ' +
     								'title="Execute Script [F5]" remove-bottom no-focus></gs-button>' +
     					'<gs-checkbox style="padding-right: 0.35em; height: 2.35em;" icononly inline id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit" remove-all><label></label></gs-checkbox>' +
-    					'<gs-button inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
+    					'<gs-button style="height: 2.35em; padding-left: 0.5em !important; padding-right: 0.5em !important;" inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
     								'title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span></gs-button>' +
     					'<gs-button style="padding-right: 0.25em; " icononly inline remove-all icon="indent" onclick="indentScript()" ' +
     								'title="Indent the selected text [TAB]" remove-all no-focus></gs-button>' +
@@ -1199,16 +1199,16 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     						'<gs-button style="padding-right: 0.25em;" icononly inline remove-all id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
     								'title="Download as a file" remove-all no-focus></gs-button>'
     					) +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain()" ' +
+    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px; padding-right: 0;" onclick="explain()" ' +
     								'title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span></gs-button>' +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" ' +
+    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(true)" ' +
     								'title="Query explanation. Note that the query will run, meaning that you\'ll get run times." ' +
     								'remove-top no-focus>' +
     						'<span class="explain-letter" icon="play">E</span>' +
     					'</gs-button>' +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(false, true)" ' +
+    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(false, true)" ' +
     								'title="Query explanation. Text format. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">T</span></gs-button>' +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(true, true)" ' +
+    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(true, true)" ' +
     								'title="Query explanation. Text format. Note that the query will run, meaning that you\'ll get run times." ' +
     								'remove-top no-focus>' +
     						'<span class="explain-letter" icon="play">T</span>' +
@@ -1217,9 +1217,9 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     								'title="Download a single query\'s results as a file" remove-all no-focus></gs-button>' +
     					'<gs-button inline style="height: 2.35em" remove-all class="button-ace-info" onclick="dialogAceInfo()" ' +
     								'title="Information and tips about the Editor" remove-all no-focus>' +
-    							'<span class="ace-icon-container">' +
-    								'<span class="ace-suit">&#9824;</span>' + //&#9830;
-    								'<span class="ace-letter">A</span>' +
+    							'<span style="width: 2em; font-size: 1em;" class="ace-icon-container">' +
+    								'<span style="top: 0;" class="ace-suit">&#9824;</span>' + //&#9830;
+    								'<span style="top: 0;" class="ace-letter">A</span>' +
     							'</span>' +
     					'</gs-button>' +
     					'<gs-button style="padding-right: 0.25em;" icononly inline remove-all icon="black-tie" onclick="beautifySQL()" ' + 'title="Beautify the Current SQL" no-focus></gs-button>' +
