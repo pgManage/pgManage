@@ -42,6 +42,7 @@ var $ = {
         return request;
     },
     runTests: function (key) {
+		$.tests[key].test_random = 0;
         $.runTest(key, 0);
 		$.tests[key].running = true;
     },
@@ -80,7 +81,7 @@ var $ = {
         'use strict';
         // console.log('run_test:', intCurrent);
 		if (intCurrent === 0) {
-			$.tests[key].test_random = rightPad(parseInt(Math.random().toString().substring(2, 6), 10).toString(), '0', 4);
+			$.tests[key].test_random = qs['seq_numbers'] === 'true' ? $.tests[key].test_random + 1 : rightPad(parseInt(Math.random().toString().substring(2, 6), 10).toString(), '0', 4);
 		}
         var arrCurrent = $.tests[key].tests[intCurrent];
         if (arrCurrent === undefined) {
