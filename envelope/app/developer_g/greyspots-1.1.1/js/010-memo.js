@@ -34,6 +34,11 @@ window.addEventListener('design-register-element', function () {
         addProp('Autoresize', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('autoresize')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'autoresize', (this.value === 'true'), true);
         });
+        
+        addProp('Allow tab', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('allow-tab-char')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'allow-tab-char', (this.value === 'true'), true);
+        });
+        
         addProp('Resize Handle', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-resize-handle')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-resize-handle', (this.value === 'true'), false);
         });
