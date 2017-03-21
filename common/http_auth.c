@@ -626,6 +626,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 			"HTTP/1.1 303 See Other\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 			"Connection: close\015\012"
+			"Content-Length: 0\015\012"
 			"Set-Cookie: postage_";
 		size_t int_temp1 = strlen(str_temp1);
 		char *str_temp2 =
