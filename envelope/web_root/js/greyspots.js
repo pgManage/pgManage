@@ -10206,12 +10206,19 @@ GS.trim = function(string, strStringToTrim) {
 // set a cookie in the browser
 GS.setCookie = function (c_name, value, exdays) {
     'use strict';
+    var exDayNum;
+    if (!exdays) {
+        exDayNum = 30;
+    } else {
+        exDayNum = exdays;
+    }
+    
     var hostname = location.hostname;
     var exdate = new Date(), c_value;
     hostname = hostname.substring(hostname.indexOf('.'));
-    exdate.setDate(exdate.getDate() + exdays);
+    exdate.setDate(exdate.getDate() + exDayNum);
     
-    c_value = encodeURIComponent(value) + ((exdays === null || exdays === undefined) ? '' : '; expires=' + exdate.toUTCString()) + '; domain=' + hostname + '; path=/';
+    c_value = encodeURIComponent(value) + ((exDayNum === null || exDayNum === undefined) ? '' : '; expires=' + exdate.toUTCString()) + '; domain=' + hostname + '; path=/';
     
     document.cookie = c_name + '=' + c_value;
 };
