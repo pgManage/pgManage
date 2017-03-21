@@ -364,7 +364,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012Connection: close\015\012\015\012"
 			"The change_database action is useful in postage, but not envelope.";
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
 
@@ -374,7 +374,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012Connection: close\015\012\015\012"
 			"The list action is useful in postage, but not envelope.";
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
 
@@ -385,7 +385,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012Connection: close\015\012\015\012"
 			"The canadd action is useful in postage, but not envelope.";
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
 
@@ -513,7 +513,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 	} else if (strncmp(client_auth->str_action, "list", 5) == 0) {
 		char *str_temp =
 			"HTTP/1.1 200 OK\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012Connection: close\015\012\015\012";
 		size_t int_temp = strlen(str_temp);
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, int_temp);
 		struct struct_connection *current_connection;
@@ -532,7 +532,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 	} else if (strncmp(client_auth->str_action, "canadd", 7) == 0) {
 		char *str_temp =
 			"HTTP/1.1 200 OK\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012Connection: close\015\012\015\012";
 		size_t int_temp = strlen(str_temp);
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -603,6 +603,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		char *str_temp1 =
 			"HTTP/1.1 303 See Other\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Set-Cookie: envelope=";
 		size_t int_temp1 = strlen(str_temp1);
 		char *str_temp2 =
@@ -624,6 +625,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		char *str_temp1 =
 			"HTTP/1.1 303 See Other\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Set-Cookie: postage_";
 		size_t int_temp1 = strlen(str_temp1);
 		char *str_temp2 =
@@ -652,7 +654,8 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012\015\012"
 			"Not a valid action.";
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
 
@@ -674,6 +677,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -779,6 +783,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -871,6 +876,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -945,6 +951,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -1051,6 +1058,7 @@ void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 		char *str_temp1 =
 			"HTTP/1.1 200 OK\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Set-Cookie: envelope=";
 		char *str_temp2 =
 			"; HttpOnly;\015\012Set-Cookie: DB=SS; path=/;\015\012Content-Length: 48\015\012\015\012"
@@ -1120,6 +1128,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -1202,6 +1211,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		str_temp1 =
 			"HTTP/1.1 403 Forbidden\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -1221,6 +1231,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		char *str_temp1 =
 			"HTTP/1.1 403 Forbidden\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		char *str_temp2 =
 			"{\"stat\": false, \"dat\": \"You must login as a member "
@@ -1246,6 +1257,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		char *str_temp1 =
 			"HTTP/1.1 200 OK\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Set-Cookie: envelope=";
 		char *str_temp2 =
 			"; HttpOnly;\015\012Set-Cookie: DB=";
@@ -1270,6 +1282,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		char *str_temp1 =
 			"HTTP/1.1 200 OK\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Set-Cookie: postage_";
 		char *str_temp2 =
 			"; HttpOnly;\015\012Set-Cookie: DB=";
@@ -1443,6 +1456,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -1568,6 +1582,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -1620,6 +1635,7 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 	char *str_temp1 =
 		"HTTP/1.1 200 OK\015\012"
 		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012Content-Type: application/json; charset=UTF-8\015\012"
+			"Connection: close\015\012"
 		"Set-Cookie: envelope=";
 	char *str_temp2 = "; HttpOnly\015\012\015\012{\"stat\": true, \"dat\": \"OK\"}";
 	SFINISH_SNCAT(str_response, &int_response_len,
@@ -1633,6 +1649,7 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 	char *str_temp1 =
 		"HTTP/1.1 200 OK\015\012"
 		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012Content-Type: application/json; charset=UTF-8\015\012"
+			"Connection: close\015\012"
 		"Set-Cookie: postage_";
 	char *str_temp2 = "; HttpOnly\015\012\015\012{\"stat\": true, \"dat\": \"OK\"}";
 	SFINISH_SNCAT(str_response, &int_response_len,
@@ -1693,6 +1710,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -1741,6 +1759,7 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 	char *str_temp2 =
 		"HTTP/1.1 200 OK\015\012"
 		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 		"Content-Type: application/json; charset=UTF-8\015\012"
 		"Set-Cookie: envelope=";
 	char *str_temp3 =
@@ -1760,6 +1779,7 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 	char *str_temp2 =
 		"HTTP/1.1 200 OK\015\012"
 		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 		"Content-Type: application/json; charset=UTF-8\015\012"
 		"Set-Cookie: postage_";
 	char *str_temp3 =
@@ -1916,6 +1936,7 @@ finish:
 		snprintf(str_length, 50, "%zu", strlen(_str_response));
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Connection: close\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(

@@ -538,8 +538,10 @@ bool http_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, ch
 			SFINISH_SNCAT(str_header, &int_header_len,
 				"HTTP/1.1 200 OK\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Connection: close\015\012"
 				"Content-Length: ",strlen("HTTP/1.1 200 OK\015\012"
 					"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+					"Connection: close\015\012"
 					"Content-Length: "),
 				str_length, strlen(str_length),
 				"\015\012\015\012", (size_t)4);
@@ -578,8 +580,10 @@ finish:
 		SFINISH_SNCAT(_str_response, &_int_response_len,
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ", strlen("HTTP/1.1 500 Internal Server Error\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Connection: close\015\012"
 				"Content-Length: "),
 			str_length, strlen(str_length),
 			"\015\012\015\012", (size_t)4,

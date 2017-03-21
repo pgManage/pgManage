@@ -132,6 +132,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
