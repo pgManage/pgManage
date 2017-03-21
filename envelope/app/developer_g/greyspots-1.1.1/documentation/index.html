@@ -90,6 +90,7 @@ CREATE TABLE gsdoc.rpeople_line(
   id integer NOT NULL DEFAULT nextval(('gsdoc.global_seq'::text)::regclass),
   people_id integer NOT NULL,
   pet_name text NOT NULL,
+  alive varchar(2) NOT NULL DEFAULT 0,
   birth_date timestamp with time zone NOT NULL,
   change_login name DEFAULT "current_user"(),
   change_stamp timestamp with time zone DEFAULT date_trunc('second'::text, ('now'::text)::timestamp with time zone),
@@ -162,7 +163,7 @@ GRANT SELECT,UPDATE,INSERT,DELETE ON TABLE gsdoc.tpeople_list_inital TO normal_g
 
 -- ####### gsdoc.tpeople_line; #######
 CREATE OR REPLACE VIEW gsdoc.tpeople_line AS
- SELECT rpeople_line.id, rpeople_line.people_id, rpeople_line.pet_name, rpeople_line.birth_date,
+ SELECT rpeople_line.id, rpeople_line.people_id, rpeople_line.pet_name, rpeople_line.alive, rpeople_line.birth_date,
     date_part('year'::text, age(rpeople_line.birth_date)) AS age, rpeople_line.change_stamp
    FROM gsdoc.rpeople_line;
 
@@ -220,6 +221,7 @@ INSERT INTO gsdoc.rpeople_line
     SELECT nextval(('gsdoc.global_seq'::text)::regclass) AS id,
            (SELECT id FROM gsdoc.rpeople LIMIT 1 OFFSET random_offset) AS people_id,
            arr_names[trunc(random() * 13 + 1)] AS pet_name,
+           CASE WHEN random() < 0.5 THEN '0' ELSE '-1' END AS alive,
            now() - (trunc(random() * 5000 + 1) || ' day')::interval AS birth_date
      FROM (SELECT generate_series(1,120) AS series_maker,
             trunc(random() * 99 + 1) random_offset,
@@ -233,6 +235,7 @@ INSERT INTO gsdoc.rpeople_line
     SELECT nextval(('gsdoc.global_seq'::text)::regclass) AS id,
            2341 AS people_id,
            arr_names[trunc(random() * 13 + 1)] AS pet_name,
+           CASE WHEN random() < 0.5 THEN '0' ELSE '-1' END AS alive,
            now() - (trunc(random() * 5000 + 1) || ' day')::interval AS birth_date
      FROM (SELECT generate_series(1,3) AS series_maker,
             ARRAY['Spot', 'Roger', 'Cookie', 'Tracer',
@@ -634,7 +637,8 @@ $BODY$
 LANGUAGE plpgsql VOLATILE
 COST 100;
 ALTER FUNCTION gsdoc.action_ajax_test_timeout(text) OWNER TO postgres;
-GRANT ALL ON FUNCTION gsdoc.action_ajax_test_timeout(text) TO normal_g;*/
+GRANT ALL ON FUNCTION gsdoc.action_ajax_test_timeout(text) TO normal_g;
+*/
     });
 
     strPostgreSQL = encodeHTML(strPostgreSQL);

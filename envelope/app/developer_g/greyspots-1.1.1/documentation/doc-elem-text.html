@@ -50,6 +50,23 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[column]</code>:</span>
+                    <p>When you have a <code>gs-text</code> inside a data element and you want to use it to display cell data you use the <code>column</code> attribute.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="14">
+                        <gs-form src="gsdoc.tpeople" where="id=2341">
+                            <template>
+                                <b>First Name:</b>
+                                <gs-text disabled column="first_name"></gs-text>
+                                <b>Last Name:</b>
+                                <gs-text disabled column="last_name"></gs-text>
+                            </template>
+                        </gs-form>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
                     <span class="h3">Attribute <code>[maxlength=""]</code>:</span>
                     <p>To set the maximum length of characters, use the <code>[maxlength=""]</code> attribute.</p>
                 </div>

@@ -48,6 +48,21 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[column]</code>:</span>
+                    <p>When you have a <code>gs-checkbox</code> inside a data element and you want to use it to display cell data you use the <code>column</code> attribute.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="14">
+                        <gs-form src="gsdoc.tpeople_line" where="id=2418">
+                            <template>
+                                <b>Alive:</b>
+                                <gs-checkbox column="alive"></gs-checkbox>
+                            </template>
+                        </gs-form>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
                     <span class="h3">Attribute <code>[onchange=""]</code>:</span><br />
                     <p>A <code>&lt;gs-checkbox&gt;</code> element with an <code>[onchange]</code> attribute.</p>
                 </div>
