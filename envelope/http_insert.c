@@ -148,6 +148,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -211,6 +212,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -337,6 +339,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -442,6 +445,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -523,6 +527,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -587,10 +592,12 @@ bool http_insert_step6(EV_P, void *cb_data, DB_result *res) {
 
 	SFINISH_SNCAT(str_response, &int_response_len,
 		"HTTP/1.1 200 OK\015\012"
-		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+		"Connection: close\015\012\015\012"
 		"{\"stat\": true, \"dat\": {\"lastval\": ",
 		strlen("HTTP/1.1 200 OK\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012\015\012"
 			"{\"stat\": true, \"dat\": {\"lastval\": "),
 		client_insert->str_result, client_insert->int_result_len,
 		"}}", (size_t)2);
@@ -614,6 +621,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,

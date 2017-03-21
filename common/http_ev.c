@@ -245,7 +245,8 @@ finish:
 		char *_str_response = str_response;
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012\015\012";
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp), _str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}
@@ -341,7 +342,8 @@ finish:
 
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012\015\012";
 		SFINISH_SNCAT(str_response, (size_t *)&int_response_len,
 			str_temp, strlen(str_temp),
 			_str_response, strlen(_str_response));

@@ -175,7 +175,7 @@ finish:
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 500 Internal Server Error\015\012Content-Length: ", (size_t)52,
 			str_length, strlen(str_length),
-			"\015\012\015\012", (size_t)4,
+			"\015\012Connection: close\015\012\015\012", (size_t)21,
 			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		if (CLIENT_WRITE(client, str_response, int_response_len) < int_response_len) {
@@ -265,7 +265,7 @@ void http_main(struct sock_ev_client *client) {
 #else
 	if (strncmp(str_uri, "/postage", 8) != 0) {
 		SFINISH_SNCAT(str_response, &int_response_len,
-			"HTTP/1.1 303 See Other\015\012Location: /postage", (size_t)42,
+			"HTTP/1.1 303 See Other\015\012Connection: close\015\012Location: /postage", (size_t)61,
 			str_full_uri, int_full_uri_len,
 			"\015\012\015\012", (size_t)4);
 	} else if (strncmp(str_uri, "/postage/auth", 14) == 0) {
@@ -437,13 +437,15 @@ finish:
 	snprintf(str_length, 50, "%zu", strlen(_str_response));
 	if (bol_error_state) {
 		SFINISH_SNCAT(str_response, &int_response_len,
-			"HTTP/1.1 500 Internal Server Error\015\012Content-Length: ", (size_t)52,
+			"HTTP/1.1 500 Internal Server Error\015\012"
+			"Connection: close\015\012Content-Length: ", (size_t)71,
 			str_length, strlen(str_length),
 			"\015\012\015\012", (size_t)4,
 			_str_response, strlen(_str_response))
 	} else {
 		SFINISH_SNCAT(str_response, &int_response_len,
-			"HTTP/1.1 200 OK\015\012Content-Length: ", (size_t)33,
+			"HTTP/1.1 200 OK\015\012"
+			"Connection: close\015\012Content-Length: ", (size_t)52,
 			str_length, strlen(str_length),
 			"\015\012Content-Type: application/json\015\012\015\012", (size_t)36,
 			_str_response, strlen(_str_response));
