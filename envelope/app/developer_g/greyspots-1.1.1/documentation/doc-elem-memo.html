@@ -64,6 +64,19 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[allow-tab-char]</code>:</span>
+                        <p>A default <code>&lt;gs-memo&gt;</code> does not allow tab characters. To allow tab characters add the <code>[allow-tab-char]</code> attribute.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="20">
+                            <label for="memo-no-allow-tab-char">Memo Without Tab Characters:</label>
+                            <gs-memo id="memo-no-allow-tab-char"></gs-memo>
+                            <label for="memo-allow-tab-char">Memo With Tab Characters:</label>
+                            <gs-memo id="memo-allow-tab-char" allow-tab-char></gs-memo>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
                         <span class="h3">Attribute <code>[onchange=""]</code>:</span>
                         <p>To run javascript when the value changes, use the <code>[onchange=""]</code> attribute.</p>
                     </div>
