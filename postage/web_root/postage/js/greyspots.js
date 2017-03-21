@@ -31045,6 +31045,11 @@ window.addEventListener('design-register-element', function () {
         addProp('Autoresize', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('autoresize')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'autoresize', (this.value === 'true'), true);
         });
+        
+        addProp('Allow tab', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('allow-tab-char')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'allow-tab-char', (this.value === 'true'), true);
+        });
+        
         addProp('Resize Handle', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-resize-handle')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-resize-handle', (this.value === 'true'), false);
         });
@@ -32739,6 +32744,10 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
         
+        addProp('Clearable', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('clearable') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'clearable', this.value === 'true', true);
+        });
+        
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
@@ -32835,7 +32844,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // clear previous selection
         arrSelectedOptions = xtag.query(element, 'gs-option[selected]');
         arrTempSelectedOptions = xtag.query(element, 'gs-option[tempselect]');
-        
         for (i = 0, len = arrSelectedOptions.length; i < len; i += 1) {
             arrSelectedOptions[i].removeAttribute('selected');
         }
@@ -32877,7 +32885,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             option = handle;
         }
-
+        
         highlightOption(element, option);
 
         if (option) {
@@ -33234,8 +33242,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     //console.log(parentOption);
                     
+                    //  else if (this.hasAttribute('clearable') && newValue === oldValue) {
+                    //     console.log('running');
+                    //     selectOption(this, undefined);
+                    // }
+                    
                     if (parentOption && !parentOption.hasAttribute('selected')) {
                         selectOption(this, parentOption, true);
+                    } else if (this.hasAttribute('clearable')) {
+                        selectOption(this, undefined);
                     }
                 }
             }//,
