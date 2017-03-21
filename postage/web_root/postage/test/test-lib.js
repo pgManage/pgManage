@@ -31,7 +31,7 @@ var $ = {
         request.open(strMethod, strLink, true);
         request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
         if (strLink === '/test.txt?if_modified_since=true') {
-            request.setRequestHeader('If-Modified-Since', 'Mon, 1 Aug 2050 21:12:11 GMT');
+            request.setRequestHeader('If-Modified-Since', $.if_modified_since_changestamp);
         }
         if (strMethod === 'POST') {
             request.send(strParams);

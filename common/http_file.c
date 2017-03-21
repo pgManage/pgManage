@@ -465,7 +465,7 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 	if (str_if_modified_since != NULL) {
 		SERROR_SALLOC(tm_if_modified_by, sizeof(struct tm));
 		SERROR_CHECK(strptime(str_if_modified_since, str_date_format, tm_if_modified_by) != NULL, "strptime() failed");
-		tm_if_modified_by->tm_isdst = -1;
+		tm_if_modified_by->tm_isdst = 0;
 		tim_if_modified_by = mktime(tm_if_modified_by);
 		tim_change_stamp = mktime(tm_change_stamp);
 

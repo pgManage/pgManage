@@ -2012,6 +2012,9 @@ $.ajax('/postage/index.html', '', 'GET', function (data) {
         }
     }
 });
+var req = $.ajax('/postage/test.txt', '', 'GET', function (data) {
+    $.if_modified_since_changestamp = req.getResponseHeader('Last-Modified');
+});
 $.ajax('/postage/auth', 'action=login&username=postgres&password=password&connname=test', 'POST', function (data) {
     $.ajax('/postage/0/index.html', '', 'GET', function (data) {
         for (var i = 0, len = $.tests.http_file.tests.length; i < len; i += 1) {
