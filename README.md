@@ -1,7 +1,9 @@
 # Postage - A fast PostgreSQL admin tool 
 
+A fast replacement for PGAdmin!
+
 # If this is your first time trying Postage:
-# DO NOT DO A GIT CLONE
+# Do not use 'GIT CLONE' to get Postage!
 
 If you'd like to try Postage please go to ["Releases"](https://github.com/workflowproducts/postage/releases) and download the appropriate package for your OS. The names of these packages start with "Postage", not "Source Code". The team has spent a ridiculous amount of time ensuring you have an easy, convenient installer for your OS. Please use it. Compiling Postage from source can be time consuming. 
 
@@ -69,7 +71,7 @@ Since Postage runs in a browser we don't really know what will happen if you use
 
 The best way to contribute to Postage is to start by posting an issue. Please read the [README_DEV](https://github.com/workflowproducts/postage/blob/master/README_DEV.md) file for full details.
 
-If you'd like to support Postage and you're in a position to get us paid work then that helps a lot. We mostly do fussy custom ERP solutions for the Aerospace and Medical industries. Any kind of accounting or inventory application is right up our alley, especially the complex stuff. Our specialty is implementing new software systems without disrupting operations (no training implementation). Check out our website or give us a call [WorkflowProducts.com](http://www.workflowproducts.com/about.html).
+If you'd like to support Postage and you're in a position to get us paid work then that helps a lot. We mostly do fussy custom ERP solutions for the Aerospace and Medical industries. Any kind of accounting or inventory application is right up our alley, especially the complex stuff. Our specialty is implementing new systems without disrupting operations (training-free implementations). Check out our website or give us a call [WorkflowProducts.com](http://www.workflowproducts.com/about.html).
 
 
 Copyright 2016 Workflow Products LLC
