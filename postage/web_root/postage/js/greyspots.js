@@ -10206,12 +10206,19 @@ GS.trim = function(string, strStringToTrim) {
 // set a cookie in the browser
 GS.setCookie = function (c_name, value, exdays) {
     'use strict';
+    var exDayNum;
+    if (!exdays) {
+        exDayNum = 30;
+    } else {
+        exDayNum = exdays;
+    }
+    
     var hostname = location.hostname;
     var exdate = new Date(), c_value;
     hostname = hostname.substring(hostname.indexOf('.'));
-    exdate.setDate(exdate.getDate() + exdays);
+    exdate.setDate(exdate.getDate() + exDayNum);
     
-    c_value = encodeURIComponent(value) + ((exdays === null || exdays === undefined) ? '' : '; expires=' + exdate.toUTCString()) + '; domain=' + hostname + '; path=/';
+    c_value = encodeURIComponent(value) + ((exDayNum === null || exDayNum === undefined) ? '' : '; expires=' + exdate.toUTCString()) + '; domain=' + hostname + '; path=/';
     
     document.cookie = c_name + '=' + c_value;
 };
@@ -31038,6 +31045,11 @@ window.addEventListener('design-register-element', function () {
         addProp('Autoresize', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('autoresize')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'autoresize', (this.value === 'true'), true);
         });
+        
+        addProp('Allow tab', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('allow-tab-char')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'allow-tab-char', (this.value === 'true'), true);
+        });
+        
         addProp('Resize Handle', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-resize-handle')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-resize-handle', (this.value === 'true'), false);
         });
@@ -31223,9 +31235,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function keydownFunction(event) {
         var element = event.target;
         if (!element.hasAttribute('readonly')) {
-            if (element.getAttribute('disabled') !== null && event.keyCode !== 9 && !(event.keyCode === 122 && event.metaKey)) {
+            if (element.getAttribute('disabled') !== null && !(event.keyCode === 122 && event.metaKey)) {
                 event.preventDefault();
                 event.stopPropagation();
+            } else if (event.keyCode === 9 && element.parentNode.hasAttribute('allow-tab-char') === true) {
+                event.preventDefault();
+                event.stopPropagation();
+                var cursor_pos_memo = parseInt(element.selectionStart, 10);
+                element.value = element.value.substring(0, cursor_pos_memo) + '\t' + element.value.substring(cursor_pos_memo, element.value.length);
+                GS.setInputSelection(element, parseInt(cursor_pos_memo, 10) + 1, parseInt(cursor_pos_memo, 10) + 1);
             } else {
                 //this.parentNode.syncView();
                 element.parentNode.setAttribute('value', element.value);
@@ -32726,6 +32744,10 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
         
+        addProp('Clearable', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('clearable') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'clearable', this.value === 'true', true);
+        });
+        
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
@@ -32822,7 +32844,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // clear previous selection
         arrSelectedOptions = xtag.query(element, 'gs-option[selected]');
         arrTempSelectedOptions = xtag.query(element, 'gs-option[tempselect]');
-        
         for (i = 0, len = arrSelectedOptions.length; i < len; i += 1) {
             arrSelectedOptions[i].removeAttribute('selected');
         }
@@ -32864,7 +32885,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             option = handle;
         }
-
+        
         highlightOption(element, option);
 
         if (option) {
@@ -33221,8 +33242,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     //console.log(parentOption);
                     
+                    //  else if (this.hasAttribute('clearable') && newValue === oldValue) {
+                    //     console.log('running');
+                    //     selectOption(this, undefined);
+                    // }
+                    
                     if (parentOption && !parentOption.hasAttribute('selected')) {
                         selectOption(this, parentOption, true);
+                    } else if (this.hasAttribute('clearable')) {
+                        selectOption(this, undefined);
                     }
                 }
             }//,
@@ -36077,11 +36105,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.syncView();
 
                     } else if (strAttrName === 'value' && element.initalized) {
-                        if (element.hasAttribute('disabled')) {
-                            currentValue = element.innerHTML;
-                        } else {
+                        //if (element.hasAttribute('disabled')) {
+                        //    currentValue = element.innerHTML;
+                        //} else {
                             currentValue = element.control.value;
-                        }
+                        //}
 
                         // if there is a difference between the new value in the
                         //      attribute and the valued in the front end: refresh the front end
@@ -36096,18 +36124,18 @@ document.addEventListener('DOMContentLoaded', function () {
             // on keydown and keyup sync the value attribute and the control value
             'keydown': function (event) {
                 var element = this;
-                if (!element.hasAttribute('readonly')) {
-                    if (element.hasAttribute('disabled') && event.keyCode !== 9) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    } else {
+                if (!element.hasAttribute('readonly') && !element.hasAttribute('disabled')) {
+                    //if (element.hasAttribute('disabled') && event.keyCode !== 9) {
+                    //    event.preventDefault();
+                    //    event.stopPropagation();
+                    //} else {
                         element.syncGetters();
-                    }
+                    //}
                 }
             },
             'keyup': function () {
                 var element = this;
-                if (!element.hasAttribute('readonly')) {
+                if (!element.hasAttribute('readonly') && !element.hasAttribute('disabled')) {
                     element.syncGetters();
                 }
             }
@@ -36138,7 +36166,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var arrPassThroughAttributes = [
                         'placeholder', 'name', 'maxlength', 'autocorrect',
                         'autocapitalize', 'autocomplete', 'autofocus', 'spellcheck',
-                        'readonly'
+                        'readonly', 'disabled'
                     ];
                 var i;
                 var len;
@@ -36150,7 +36178,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // if the gs-text doesn't have a disabled attribute: use an input element
-                if (!element.hasAttribute('disabled')) {
+                // if (!element.hasAttribute('disabled')) {
                     // add control input and save it to a variable for later use
                     element.innerHTML = '<input class="control" gs-dynamic type="' + (element.getAttribute('type') || 'text') + '" />';
                     element.control = element.children[0];
@@ -36170,10 +36198,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     len = arrPassThroughAttributes.length;
                     while (i < len) {
                         if (element.hasAttribute(arrPassThroughAttributes[i])) {
-                            element.control.setAttribute(
-                                arrPassThroughAttributes[i],
-                                element.getAttribute(arrPassThroughAttributes[i]) || ''
-                            );
+                            if (arrPassThroughAttributes[i] === 'disabled') {
+                                element.control.setAttribute(
+                                    'readonly',
+                                    element.getAttribute(arrPassThroughAttributes[i]) || ''
+                                );
+                            } else {
+                                element.control.setAttribute(
+                                    arrPassThroughAttributes[i],
+                                    element.getAttribute(arrPassThroughAttributes[i]) || ''
+                                );
+                            }
                         }
                         i += 1;
                     }
@@ -36184,19 +36219,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                 // else if the gs-text is disabled: clear the control variable and empty the gs-text
-                } else {
-                    element.control = undefined;
-                    element.innerHTML = '';
-                }
+                // } else {
+                //     element.control = undefined;
+                //     element.innerHTML = '';
+                // }
             },
 
             syncView: function () {
                 var element = this;
-                if (element.hasAttribute('disabled')) {
-                    element.textContent = element.getAttribute('value') || element.getAttribute('placeholder');
-                } else {
+                //if (element.hasAttribute('disabled')) {
+                //    element.textContent = element.getAttribute('value') || element.getAttribute('placeholder');
+                //} else {
                     element.control.value = element.getAttribute('value') || '';
-                }
+                //}
                 element.initalized = true;
             },
 

@@ -147,6 +147,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -431,6 +432,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -546,6 +548,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -620,6 +623,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -704,7 +708,7 @@ bool http_update_step5(EV_P, void *cb_data, DB_result *res) {
 		"]", (size_t)1
 	);
 
-	char *str_temp1 = "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{\"stat\": true, \"dat\": ";
+	char *str_temp1 = "HTTP/1.1 200 OK\015\012Connection: close\015\012Content-Type: application/json; charset=UTF-8\015\012\015\012{\"stat\": true, \"dat\": ";
 	SFINISH_SNCAT(
 		str_response, &int_response_len,
 		str_temp1, strlen(str_temp1),
@@ -734,6 +738,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,

@@ -62,6 +62,25 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[column]</code>:</span>
+                        <p>When you have a <code>gs-select</code> inside a data element and you want to use it to display cell data you use the <code>column</code> attribute.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="14">
+                            <gs-form src="gsdoc.tpeople" where="id=2413">
+                                <template>
+                                    <gs-select column="first_name" id="control_example">
+                                        <option value="Lemon">Lemon</option>
+                                        <option value="Pear">Pear</option>
+                                        <option value="Mango">Mango</option>
+                                        <option value="Grapes">Grapes</option>
+                                    </gs-select>
+                                </template>
+                            </gs-form>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
                         <span class="h3">Attribute <code>[onchange=""]</code>:</span>
                         <p>To run javascript when the value changes, use the <code>[onchange=""]</code> attribute.</p>
                     </div>

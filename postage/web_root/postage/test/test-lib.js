@@ -31,7 +31,7 @@ var $ = {
         request.open(strMethod, strLink, true);
         request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset=UTF-8');
         if (strLink === '/test.txt?if_modified_since=true') {
-            request.setRequestHeader('If-Modified-Since', 'Mon, 1 Aug 2050 21:12:11 GMT');
+            request.setRequestHeader('If-Modified-Since', $.if_modified_since_changestamp);
         }
         if (strMethod === 'POST') {
             request.send(strParams);
@@ -42,9 +42,12 @@ var $ = {
         return request;
     },
     runTests: function (key) {
+		$.tests[key].test_random = '1000';
+		$.tests[key].running = true;
         $.runTest(key, 0);
     },
     intRun: 10,
+	testsEnded: false,
 	test_random: rightPad(parseInt(Math.random().toString().substring(2, 7), 10).toString(), '0', 5),
     test_change_stamp: (function () {
         var test_change_stamp = new Date();
@@ -78,7 +81,7 @@ var $ = {
         'use strict';
         // console.log('run_test:', intCurrent);
 		if (intCurrent === 0) {
-			$.tests[key].test_random = rightPad(parseInt(Math.random().toString().substring(2, 6), 10).toString(), '0', 4);
+			$.tests[key].test_random = qs['seq_numbers'] === 'true' ? (parseInt($.tests[key].test_random, 10) + 1).toString() : rightPad(parseInt(Math.random().toString().substring(2, 6), 10).toString(), '0', 4);
 		}
         var arrCurrent = $.tests[key].tests[intCurrent];
         if (arrCurrent === undefined) {
@@ -100,7 +103,7 @@ var $ = {
 				$.tests[key].intRun = 0;
 			}
 			$.tests[key].intRun += 1;
-            if (key[0] !== '_' && $.tests[key].intRun < 50 && (minRuns + 1) < $.intRun && !error) {
+            if (key[0] !== '_' && $.tests[key].intRun < ($.intRun * 5) && (minRuns + 1) < $.intRun && !error) {
                 var i = 0, len = $.tests[key].tests.length;
 				for (; i < len; i += 1) {
 					$.changeStatus(key, i, 'pass', 'waiting');
@@ -108,10 +111,26 @@ var $ = {
 
                 $.runTest(key, 0);
             } else {
-				if (key === minKey) {
-					$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + $.intID, 'POST', function (data) {
+				$.tests[key].running = false;
+				var bolEndTests = true;
 
-					});
+				for (var key2 in $.tests) {
+					if ($.tests.hasOwnProperty(key2) && key2[0] !== '_') {
+						if ($.tests[key2].running || $.tests[key].error) {
+							bolEndTests = false;
+							break;
+						}
+					}
+				}
+
+				if (key[0] !== '_' && bolEndTests && $.testsEnded !== true) {
+					$.testsEnded = true;
+					$.ajax('http://127.0.0.1:45654', '', 'GET', function (data) {});
+					for (var x = 0; x < 10; x += 1) {
+						$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + $.intID, 'POST', function (data) {
+							console.log(data);
+						});
+					}
 				}
                 document.getElementById('status-note-' + key).textContent = ' (STOPPED)';
 				if (key[0] === '_') {
@@ -279,6 +298,8 @@ var $ = {
 	                data = data.replace(/\\(?![rnt])/g, '/');
 					data = data.replace(/\/Users\\nunzio\/AppData\/Roaming\//g, '/home/super/.');
 					data = data.replace(/\/Users\/joseph\//g, '/home/super/');
+					data = data.replace(/\/Users\/super\//g, '/home/super/');
+					data = data.replace(/\/Users\/nunzio\//g, '/home/super/');
 					data = data.replace(/\\test/g, '/test');
 	                data = data.replace(/\/\//g, '\\\\');
 				}

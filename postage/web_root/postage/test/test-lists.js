@@ -507,48 +507,41 @@ oid ASC	10
 */
 			}),
 			["datname\tdatistemplate\nname\tboolean\n", "template1\tt\ntemplate0\tt\npostgres\tf\n", "TRANSACTION COMPLETED"]],
-			['SELECT 2', 'websocket', '', ml(function () {/*SELECT	pg_database
-RETURN	datname	datistemplate
+			['SELECT 2', 'websocket', '', ml(function () {/*SELECT	pg_enum
+RETURN	enumtypid	enumsortorder	enumlabel
 */
 			}),
-			["datname\tdatistemplate\nname\tboolean\n", "template1\tt\ntemplate0\tt\npostgres\tf\n", "TRANSACTION COMPLETED"]],
-			['SELECT 3', 'websocket', '', ml(function () {/*SELECT	pg_database
-RETURN	datname	datistemplate
+			["enumtypid\tenumsortorder\tenumlabel\noid\treal\tname\n", "TRANSACTION COMPLETED"]],
+			['SELECT 3', 'websocket', '', ml(function () {/*SELECT	pg_enum
+RETURN	enumtypid	enumsortorder	enumlabel
 
 */
 			}),
-			["datname\tdatistemplate\nname\tboolean\n", "template1\tt\ntemplate0\tt\npostgres\tf\n", "TRANSACTION COMPLETED"]],
-			['SELECT 4', 'websocket', '', ml(function () {/*SELECT	pg_database
-RETURN	datname	datistemplate
+			["enumtypid\tenumsortorder\tenumlabel\noid\treal\tname\n", "TRANSACTION COMPLETED"]],
+			['SELECT 4', 'websocket', '', ml(function () {/*SELECT	pg_enum
+RETURN	enumtypid	enumsortorder	enumlabel
 
 
 */
 			}),
-			["datname\tdatistemplate\nname\tboolean\n", "template1\tt\ntemplate0\tt\npostgres\tf\n", "TRANSACTION COMPLETED"]],
-			['SELECT 5', 'websocket', '', new Blob([ml(function () {/*SELECT	pg_database
-RETURN	datname	datistemplate
+			["enumtypid\tenumsortorder\tenumlabel\noid\treal\tname\n", "TRANSACTION COMPLETED"]],
+			['SELECT 5', 'websocket', '', new Blob([ml(function () {/*SELECT	pg_enum
+RETURN	enumtypid	enumsortorder	enumlabel
 
 
 */
 			})], {type: 'application/x-binary'}),
-			["datname\tdatistemplate\nname\tboolean\n", "template1\tt\ntemplate0\tt\npostgres\tf\n", "TRANSACTION COMPLETED"]],
-			['SELECT 6', 'websocket', '', ml(function () {/*SELECT	pg_database
-RETURN	datname	datistemplate
+			["enumtypid\tenumsortorder\tenumlabel\noid\treal\tname\n", "TRANSACTION COMPLETED"]],
+
+
+			['SELECT 6', 'websocket', '', ml(function () {/*SELECT	pg_enum
+RETURN	enumtypid	enumsortorder	enumlabel
 
 
 */
             }),
-			["datname\tdatistemplate\nname\tboolean\n", "template1\tt\ntemplate0\tt\npostgres\tf\n", "TRANSACTION COMPLETED"]],
-
-
-			['SELECT 7', 'websocket', '', ml(function () {/*SELECT	pg_database
-RETURN	datname	datistemplate
-
-
-*/
-            }),
-			["datname\tdatistemplate\nname\tboolean\n", "template1\tt\ntemplate0\tt\npostgres\tf\n"]],
-			['SELECT 8', 'websocket', '', ml(function () {/*SELECT	rtesting_table_with_capital_column_name
+			["enumtypid\tenumsortorder\tenumlabel\noid\treal\tname\n", "TRANSACTION COMPLETED"]],
+			['SELECT 7', 'websocket', '', ml(function () {/*SELECT	rtesting_table_with_capital_column_name
 RETURN	id	test_name	TestName
 
 LIMIT
@@ -556,7 +549,7 @@ LIMIT
 */
 			}),
 			['id\ttest_name\tTestName\ninteger\tcharacter varying(150)\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
-			['SELECT 9', 'websocket send from', '', ml(function () {/*SELECT	public	ttesting_large_view2
+			['SELECT 8', 'websocket send from', '', ml(function () {/*SELECT	public	ttesting_large_view2
 RETURN	*
 
 ORDER BY
@@ -2018,6 +2011,9 @@ $.ajax('/postage/index.html', '', 'GET', function (data) {
             $.tests._http_auth.tests[i][5] = data;
         }
     }
+});
+var req = $.ajax('/postage/test.txt', '', 'GET', function (data) {
+    $.if_modified_since_changestamp = req.getResponseHeader('Last-Modified');
 });
 $.ajax('/postage/auth', 'action=login&username=postgres&password=password&connname=test', 'POST', function (data) {
     $.ajax('/postage/0/index.html', '', 'GET', function (data) {

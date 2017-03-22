@@ -16008,6 +16008,7 @@ gs-text[disabled],
 gs-text[disabled] .control {
     height: 1.35em;
     background-color: #D5D5D5;
+    pointer-events: auto;
 }
 
 

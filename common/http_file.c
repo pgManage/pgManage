@@ -229,6 +229,7 @@ void http_file_step1(struct sock_ev_client *client) {
 				char *str_temp =
 					"HTTP/1.1 404 Not Found\015\012"
 					"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+					"Connection: close\015\012"
 					"Content-Length: 40\015\012"
 					"Content-Type: text/plain\015\012"
 					"\015\012"
@@ -253,6 +254,7 @@ void http_file_step1(struct sock_ev_client *client) {
 		char *str_temp =
 			"HTTP/1.1 404 Not Found\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: 40\015\012"
 			"Content-Type: text/plain\015\012"
 			"\015\012"
@@ -288,7 +290,8 @@ finish:
 
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012\015\012";
 		char *_str_response = str_response;
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp), _str_response, strlen(_str_response));
 		SFREE(_str_response);
@@ -340,6 +343,7 @@ bool http_file_step15_envelope(EV_P, void *cb_data, bool bol_group) {
 			char *str_temp =
 				"HTTP/1.1 404 Not Found\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Connection: close\015\012"
 				"Content-Length: 40\015\012"
 				"Content-Type: text/plain\015\012"
 				"\015\012"
@@ -364,6 +368,7 @@ bool http_file_step15_envelope(EV_P, void *cb_data, bool bol_group) {
 		char *str_temp =
 			"HTTP/1.1 404 Not Found\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: 40\015\012"
 			"Content-Type: text/plain\015\012"
 			"\015\012"
@@ -396,7 +401,8 @@ finish:
 
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
-			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
+			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012\015\012";
 		char *_str_response = str_response;
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp), _str_response, strlen(_str_response));
 		SFREE(_str_response);
@@ -465,7 +471,7 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 	if (str_if_modified_since != NULL) {
 		SERROR_SALLOC(tm_if_modified_by, sizeof(struct tm));
 		SERROR_CHECK(strptime(str_if_modified_since, str_date_format, tm_if_modified_by) != NULL, "strptime() failed");
-		tm_if_modified_by->tm_isdst = -1;
+		tm_if_modified_by->tm_isdst = 0;
 		tim_if_modified_by = mktime(tm_if_modified_by);
 		tim_change_stamp = mktime(tm_change_stamp);
 
@@ -512,7 +518,8 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 	if (strncmp(str_content_type, "text/html", 9) != 0 && tim_if_modified_by != 0 && tim_if_modified_by >= tim_change_stamp) {
 		char *str_temp1 = "HTTP/1.1 304 Not Modified\015\012ETag: \"";
 		char *str_temp2 = "\"\015\012Last-Modified: ";
-		char *str_temp3 = "\015\012Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012";
+		char *str_temp3 = "\015\012Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012\015\012";
 		SERROR_SNCAT(
 			client->str_response, &client_http_file->int_response_len,
 			str_temp1, strlen(str_temp1),
@@ -551,7 +558,8 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 				"\"\015\012", (size_t)3,
 				"Last-Modified: ", (size_t)15,
 				str_last_modified, strlen(str_last_modified),
-				"\015\012", (size_t)2
+				"\015\012", (size_t)2,
+				"Connection: close\015\012", (size_t)19
 				// Not needed right now, but here it is in case we do later.
 				//"Cache-Control: no-store\015\012"
 			);

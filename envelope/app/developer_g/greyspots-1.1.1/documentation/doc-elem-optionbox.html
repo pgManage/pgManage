@@ -58,6 +58,45 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[column]</code>:</span>
+                        <p>When you have a <code>gs-optionbox</code> inside a data element and you want to use it to display cell data you use the <code>column</code> attribute.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="14">
+                            <gs-form src="gsdoc.tpeople" where="id=2413">
+                                <template>
+                                    <gs-optionbox column="first_name" id="control_example">
+                                        <gs-option value="Lemon">Lemon</gs-option>
+                                        <gs-option value="Pear">Pear</gs-option>
+                                        <gs-option value="Mango">Mango</gs-option>
+                                        <gs-option value="Grapes">Grapes</gs-option>
+                                    </gs-optionbox>
+                                </template>
+                            </gs-form>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[clearable]</code>:</span>
+                        <p>The <code>clearable</code> attribute allows you to clear a <code>gs-optionbox</code> by clicking the selected option.</p>
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="17">
+                            <gs-optionbox value="1" clearable>
+                                <label>With Clearable Attribute:</label>
+                                <gs-option value="1">Option 1</gs-option>
+                                <gs-option value="2">Option 2</gs-option>
+                            </gs-optionbox>
+                            <br />
+                            <label>Without Clearable Attribute:</label>
+                            <gs-optionbox value="1">
+                                <gs-option value="1">Option 1</gs-option>
+                                <gs-option value="2">Option 2</gs-option>
+                            </gs-optionbox>
+                        </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
                         <span class="h3">Attribute <code>[onchange=""]</code>:</span>
                         <p>To run javascript when the value changes, use the <code>[onchange=""]</code> attribute.</p>
                     </div>

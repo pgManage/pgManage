@@ -412,16 +412,19 @@ finish:
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 440 Login Timeout\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Set-Cookie: ",
 			strlen(
 				"HTTP/1.1 440 Login Timeout\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 				"Set-Cookie: "
 			),
 			client->str_cookie_name, strlen(client->str_cookie_name),
 			"=; path=/; expires=Tue, 01 Jan 1990 00:00:00 GMT", (size_t)48,
 			bol_tls ? "; secure" : "", strlen(bol_tls ? "; secure" : ""),
-			"; HttpOnly\015\012", (size_t)12);
+			"; HttpOnly\015\012", (size_t)12
+		);
 		if (conn_info != NULL) {
 #ifdef ENVELOPE
 			SFINISH_SNFCAT(str_response, &int_response_len,

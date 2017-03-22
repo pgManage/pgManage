@@ -92,6 +92,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -150,6 +151,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -216,6 +218,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
@@ -261,7 +264,8 @@ bool http_delete_step4(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
 
 	char *str_temp = "HTTP/1.1 200 OK\015\012"
-		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012\015\012"
+		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012\015\012"
 		"{\"stat\": true, \"dat\": \"\"}";
 	SFINISH_SNCAT(
 		str_response, &int_response_len,
@@ -286,6 +290,7 @@ finish:
 		char *str_temp =
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,

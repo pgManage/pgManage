@@ -34,6 +34,11 @@ window.addEventListener('design-register-element', function () {
         addProp('Autoresize', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('autoresize')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'autoresize', (this.value === 'true'), true);
         });
+        
+        addProp('Allow tab', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('allow-tab-char')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'allow-tab-char', (this.value === 'true'), true);
+        });
+        
         addProp('Resize Handle', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-resize-handle')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-resize-handle', (this.value === 'true'), false);
         });
@@ -219,9 +224,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function keydownFunction(event) {
         var element = event.target;
         if (!element.hasAttribute('readonly')) {
-            if (element.getAttribute('disabled') !== null && event.keyCode !== 9 && !(event.keyCode === 122 && event.metaKey)) {
+            if (element.getAttribute('disabled') !== null && !(event.keyCode === 122 && event.metaKey)) {
                 event.preventDefault();
                 event.stopPropagation();
+            } else if (event.keyCode === 9 && element.parentNode.hasAttribute('allow-tab-char') === true) {
+                event.preventDefault();
+                event.stopPropagation();
+                var cursor_pos_memo = parseInt(element.selectionStart, 10);
+                element.value = element.value.substring(0, cursor_pos_memo) + '\t' + element.value.substring(cursor_pos_memo, element.value.length);
+                GS.setInputSelection(element, parseInt(cursor_pos_memo, 10) + 1, parseInt(cursor_pos_memo, 10) + 1);
             } else {
                 //this.parentNode.syncView();
                 element.parentNode.setAttribute('value', element.value);

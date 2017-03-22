@@ -77,9 +77,11 @@ finish:
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ",
 			strlen("HTTP/1.1 500 Internal Server Error\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Connection: close\015\012"
 				"Content-Length: "),
 			str_length, strlen(str_length),
 			"\015\012\015\012", (size_t)4,
@@ -166,9 +168,11 @@ finish:
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ",
 			strlen("HTTP/1.1 500 Internal Server Error\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Connection: close\015\012"
 				"Content-Length: "),
 			str_length, strlen(str_length),
 			"\015\012\015\012", (size_t)4,
@@ -230,11 +234,13 @@ void http_upload_step3(EV_P, ev_check *w, int revents) {
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 200 OK\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: 17\015\012"
 			"\015\012"
 			"Upload Succeeded\012",
 				strlen("HTTP/1.1 200 OK\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Connection: close\015\012"
 				"Content-Length: 17\015\012"
 				"\015\012"
 				"Upload Succeeded\012"));
@@ -263,9 +269,11 @@ finish:
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+			"Connection: close\015\012"
 			"Content-Length: ",
 				strlen("HTTP/1.1 500 Internal Server Error\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
+				"Connection: close\015\012"
 				"Content-Length: "),
 			str_length, strlen(str_length),
 			"\015\012\015\012", (size_t)4,
