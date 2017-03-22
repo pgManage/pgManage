@@ -24,7 +24,6 @@
 		},
 		"deb": {
 			"depends": [
-				"libgtk2.0",
 				"libxss1",
 				"libpq5",
 				"gconf2",
