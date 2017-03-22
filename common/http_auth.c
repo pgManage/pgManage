@@ -1192,10 +1192,8 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 
 	DB_free_result(res);
 
-#ifdef ENVELOPE
-#else
 	if (bol_global_super_only == true && strncmp(str_rolsuper, "FALSE", 5) == 0) {
-		char *str_temp1 = "{\"stat\": false, \"dat\": \"You must login as a super user to use Postage. If you would like to use a non-superuser role, change the `super_only` parameter to false\"}";
+		char *str_temp1 = "{\"stat\": false, \"dat\": \"You must login as a super user to use " SUN_PROGRAM_WORD_NAME ". If you would like to use a non-superuser role, change the `super_only` parameter to false\"}";
 		SFINISH_SNCAT(str_temp, &int_temp, str_temp1, strlen(str_temp1));
 		char str_length[50];
 		snprintf(str_length, 50, "%zu", strlen(str_temp));
@@ -1238,9 +1236,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		);
 
 		SFREE(str_content_length);
-	} else
-#endif
-	{
+	} else {
 		str_expires = str_expire_one_day();
 #ifdef ENVELOPE
 		char *str_temp1 =
