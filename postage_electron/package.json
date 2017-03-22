@@ -23,7 +23,17 @@
 			"depends": "postgresql-libs"
 		},
 		"deb": {
-			"depends": "libpq5"
+			"depends": [
+				"libgtk2.0",
+				"libxss1",
+				"libpq5",
+				"gconf2",
+				"gconf-service",
+				"libnotify4",
+				"libappindicator1",
+				"libxtst6",
+				"libnss3"
+			]
 		},
 		"dmg": {
 			"icon": null,
