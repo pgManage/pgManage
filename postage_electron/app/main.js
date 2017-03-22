@@ -40,6 +40,7 @@ if (process.platform == 'win32') {
 	try {
 		fs.statSync(process.env.APPDATA + '\\postgresql\\pgpass.conf');
 	} catch (e) {
+		fs.mkdirsSync(process.env.APPDATA + '\\postgresql');
 		fs.writeFileSync(process.env.APPDATA + '\\postgresql\\pgpass.conf', '\n', 'utf8');
 	}
 } else {
