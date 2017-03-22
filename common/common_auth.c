@@ -387,13 +387,15 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 			// The only difference here is the callback and no user/pw
 			SDEBUG("SET SESSION CONN");
 			client->connect_cb = connect_cb;
-			client->conn = DB_connect(global_loop, client, str_conn, NULL, 0, NULL, 0,
+			client->conn = DB_connect(global_loop, client, str_conn,
+				NULL, 0, NULL, 0,
 				str_context_data, connect_cb_env);
 		} else {
 #endif
-		SDEBUG("NORMAL CONN");
-		client->conn = DB_connect(global_loop, client, str_conn, str_username, int_user_length, str_password, int_password_length,
-			str_context_data, connect_cb);
+			SDEBUG("NORMAL CONN");
+			client->conn = DB_connect(global_loop, client, str_conn,
+				str_username, int_user_length, str_password, int_password_length,
+				str_context_data, connect_cb);
 #if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
 		}
 #endif
