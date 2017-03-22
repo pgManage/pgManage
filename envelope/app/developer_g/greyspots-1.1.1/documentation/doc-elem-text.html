@@ -76,7 +76,7 @@
                         <gs-text id="control_default" maxlength="5" value="apple"></gs-text>
                     </template>
                 </gs-doc-example>
-                
+               
                 <div class="doc-example-description">
                     <span class="h3">Attribute <code>[onchange=""]</code>:</span>
                     <p>To run javascript when the value changes, use the <code>[onchange=""]</code> attribute.</p>
@@ -206,7 +206,7 @@
                 
                 <div class="doc-example-description">
                     <span class="h3">Attribute <code>[disabled]</code>:</span>
-                    <p>With the <code>[disabled]</code> attribute, you can control whether or not you can use the control.</p>
+                    <p>With the <code>[disabled]</code> attribute, you can control whether or not you can use the control. Disabled still allows you to copy the current text.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="15">
@@ -219,13 +219,29 @@
                 
                 <div class="doc-example-description">
                     <span class="h3">Attribute <code>[readonly]</code>:</span><br />
-                    <p>The <code>[readonly]</code> attribute is similar to <code>[disabled]</code> because it prevents the value from changing. The differences are that readonly is styled differently and allows you to copy the current text from the control.</p>
+                    <p>The <code>[readonly]</code> attribute is similar to <code>[disabled]</code> because it prevents the value from changing. The difference is that readonly is styled differently.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="15">
                         <gs-text readonly value="Read Only"></gs-text>
                     </template>
                 </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Pass-Through Attributes:</span>
+                    <p>Some attributes will pass from the <code>&lt;gs-text&gt;</code> to the <code>&lt;input&gt;</code> inside of it, these are:</p>
+                    <ul>
+                        <li>placeholder</li>
+                        <li>name</li>
+                        <li>maxlength</li>
+                        <li>autocorrect</li>
+                        <li>autocapitalize</li>
+                        <li>autocomplete</li>
+                        <li>autofocus</li>
+                        <li>spellcheck</li>
+                        <li>readonly</li>
+                    </ul>
+                </div>
             </div>
         </gs-container>
         <br />
@@ -238,5 +254,6 @@
         <br />
         <br />
         <br />
+        <!--'placeholder', 'name', 'maxlength', 'autocorrect', 'autocapitalize', 'autocomplete', 'autofocus', 'spellcheck', 'readonly'-->
     </body>
 </html>
