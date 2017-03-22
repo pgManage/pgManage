@@ -36105,11 +36105,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.syncView();
 
                     } else if (strAttrName === 'value' && element.initalized) {
-                        if (element.hasAttribute('disabled')) {
-                            currentValue = element.innerHTML;
-                        } else {
+                        //if (element.hasAttribute('disabled')) {
+                        //    currentValue = element.innerHTML;
+                        //} else {
                             currentValue = element.control.value;
-                        }
+                        //}
 
                         // if there is a difference between the new value in the
                         //      attribute and the valued in the front end: refresh the front end
@@ -36124,18 +36124,18 @@ document.addEventListener('DOMContentLoaded', function () {
             // on keydown and keyup sync the value attribute and the control value
             'keydown': function (event) {
                 var element = this;
-                if (!element.hasAttribute('readonly')) {
-                    if (element.hasAttribute('disabled') && event.keyCode !== 9) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    } else {
+                if (!element.hasAttribute('readonly') && !element.hasAttribute('disabled')) {
+                    //if (element.hasAttribute('disabled') && event.keyCode !== 9) {
+                    //    event.preventDefault();
+                    //    event.stopPropagation();
+                    //} else {
                         element.syncGetters();
-                    }
+                    //}
                 }
             },
             'keyup': function () {
                 var element = this;
-                if (!element.hasAttribute('readonly')) {
+                if (!element.hasAttribute('readonly') && !element.hasAttribute('disabled')) {
                     element.syncGetters();
                 }
             }
@@ -36166,7 +36166,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var arrPassThroughAttributes = [
                         'placeholder', 'name', 'maxlength', 'autocorrect',
                         'autocapitalize', 'autocomplete', 'autofocus', 'spellcheck',
-                        'readonly'
+                        'readonly', 'disabled'
                     ];
                 var i;
                 var len;
@@ -36178,7 +36178,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // if the gs-text doesn't have a disabled attribute: use an input element
-                if (!element.hasAttribute('disabled')) {
+                // if (!element.hasAttribute('disabled')) {
                     // add control input and save it to a variable for later use
                     element.innerHTML = '<input class="control" gs-dynamic type="' + (element.getAttribute('type') || 'text') + '" />';
                     element.control = element.children[0];
@@ -36198,10 +36198,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     len = arrPassThroughAttributes.length;
                     while (i < len) {
                         if (element.hasAttribute(arrPassThroughAttributes[i])) {
-                            element.control.setAttribute(
-                                arrPassThroughAttributes[i],
-                                element.getAttribute(arrPassThroughAttributes[i]) || ''
-                            );
+                            if (arrPassThroughAttributes[i] === 'disabled') {
+                                element.control.setAttribute(
+                                    'readonly',
+                                    element.getAttribute(arrPassThroughAttributes[i]) || ''
+                                );
+                            } else {
+                                element.control.setAttribute(
+                                    arrPassThroughAttributes[i],
+                                    element.getAttribute(arrPassThroughAttributes[i]) || ''
+                                );
+                            }
                         }
                         i += 1;
                     }
@@ -36212,19 +36219,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                 // else if the gs-text is disabled: clear the control variable and empty the gs-text
-                } else {
-                    element.control = undefined;
-                    element.innerHTML = '';
-                }
+                // } else {
+                //     element.control = undefined;
+                //     element.innerHTML = '';
+                // }
             },
 
             syncView: function () {
                 var element = this;
-                if (element.hasAttribute('disabled')) {
-                    element.textContent = element.getAttribute('value') || element.getAttribute('placeholder');
-                } else {
+                //if (element.hasAttribute('disabled')) {
+                //    element.textContent = element.getAttribute('value') || element.getAttribute('placeholder');
+                //} else {
                     element.control.value = element.getAttribute('value') || '';
-                }
+                //}
                 element.initalized = true;
             },
 
