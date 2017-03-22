@@ -20,6 +20,9 @@
             var intLatestSearchOccurances = 0;
             function parseResults(results, bolClear) {
                 "use strict";
+                
+                //console.log(results);
+                
                 var i;
                 var len;
                 var strHTML = '';
@@ -177,7 +180,6 @@
                         var strResults = '';
                         var strPrevLink = '';
                         var bolFirstLoad = true;
-                        var differentLinks = 0;
                         addLoaderElements();
                         GS.requestFromSocket(
                             GS.envSocket,
@@ -207,19 +209,13 @@
                                         strCurrLink = data.split(':')[0];
 
                                         if (strPrevLink === '') {
-                                            differentLinks = 0;
                                             strPrevLink = strCurrLink;
                                             document.getElementById('matches').textContent = '';
                                             document.getElementById('results-container').innerHTML = '';
                                         }
                                         
                                         if (strCurrLink !== strPrevLink) {
-                                            differentLinks += 1;
-                                        }
-                                        
-                                        if (differentLinks >= 10) {
                                             parseResults(strResults, bolFirstLoad);
-                                            differentLinks = 0;
                                             bolFirstLoad = false;
                                             strPrevLink = strCurrLink;
                                             strResults = '';
