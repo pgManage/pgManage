@@ -388,7 +388,10 @@ function openWindow() {
 	mainWindows.push(curWindow);
 	mainWindowState.manage(curWindow);
 
-	curWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/index.html',  { 'extraHeaders': 'pragma: no-cache\n' });
+	curWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/' +
+		(process.argv.indexOf('--postage-test') > -1 ? 'test/' : '') + 'index.html' +
+		(process.argv.indexOf('--postage-test') > -1 ? '?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true' : ''),
+		{ 'extraHeaders': 'pragma: no-cache\n' });
 
 	// Emitted when the window is closed.
 	curWindow.on('closed', function () {
