@@ -1221,7 +1221,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 			"\015\012\015\012", (size_t)4,
 			str_temp, strlen(str_temp)
 		);
-		SFREE(str_temp)
+		SFREE(str_temp);
 	} else if (str_global_login_group != NULL && strncmp(str_rolgroup, "FALSE", 5) == 0) {
 		size_t int_content_length = 83 + strlen(str_global_login_group);
 		// 255 chars should be enough
