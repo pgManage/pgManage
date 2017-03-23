@@ -1002,16 +1002,21 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                         autocompleteGlobals.intSearchEnd = intEndCursorPosition;
                         autocompleteGlobals.intSearchOffset = 1;
                         
-                        autocompleteGetObjectType(''
+                        for (var i = 0, len = treeGlobals.shownObjects.length; i < len; i++) {
+                            if (treeGlobals.shownObjects[i].name === arrPrefix[0]) {
+                                autocompleteGetObjectType(''
                                                 , ['SELECT \'\', $notTObeMATCHEDtoken$' + arrPrefix.join('.') + '$notTObeMATCHEDtoken$::regclass::oid']
                                                 , function (arrResults) {
-                            // if we found an oid: open autocomplete with column list
-                            if (arrResults) {
-                                autocompletePopupOpen(editor, [
-                                    autocompleteQuery.columns.replace(/\{\{PARENTOID\}\}/gi, arrResults[0][1])
-                                ]);
+                                    // if we found an oid: open autocomplete with column list
+                                    if (arrResults) {
+                                        autocompletePopupOpen(editor, [
+                                            autocompleteQuery.columns.replace(/\{\{PARENTOID\}\}/gi, arrResults[0][1])
+                                        ]);
+                                    }
+                                });
                             }
-                        });
+                        }
+                        
                     }
                 }
             // typecasting:
