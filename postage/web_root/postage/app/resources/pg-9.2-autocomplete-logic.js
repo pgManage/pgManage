@@ -1014,6 +1014,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                                         ]);
                                     }
                                 });
+                                break;
                             }
                         }
                         
