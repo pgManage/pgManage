@@ -1,3 +1,67 @@
+Changes since 3.2.0-beta:
+Postage:
+Add options dialog
+Fix .deb dependencies (closed workflowproducts/postage#162)
+Added stop button when loading records (closed workflowproducts/postage#96)
+Fix error notifications (closes workflowproducts/postage#156)
+Add localStorage for shown/hidden items (closes workflowproducts/postage#159)
+Add HTML man page to configuration editor
+Added thicker lines to explain graph where the cost is higher (closed workflowproducts/postage#102)
+Fixed autocomplete with multiple cursors (closed workflowproducts/postage#120)
+Fix update to return records if you update the PK column (closed workflowproducts/postage#100)
+Add button to open tab folder (closed workflowproducts/postage#117)
+Stat page: allow to set interval and add a cut of time (closed workflowproducts/postage#152)
+Added CTRL-O shortcut to open a new SQL tab (closed workflowproducts/postage#154)
+Add text explain (closed workflowproducts/postage#137)
+Add SQL beautifier (closed workflowproducts/postage#42)
+Group table/view-specific objects under their parent table/view (closed workflowproducts/postage#146)
+Add prefix/help options to configure (closed workflowproducts/postage#151)
+Add button to open tabs in a new window (closed workflowproducts/postage#150)
+Change process manager to a tab (for workflowproducts/postage#139)
+Add Order By dropdowns to process manager (for workflowproducts/postage#139)
+Add horizontal mode for toolbar (closed workflowproducts/postage#142)
+Fixed index scripts (closed workflowproducts/postage#145)
+Add AUTOCOMMIT to RAW API (closed workflowproducts/postage#124)
+Change autocomplete to popup when you delete a character (closed workflowproducts/postage#147)
+Added "All" checkbox to dump schema to script dialog
+Make postage pick new port if needed (closed workflowproducts/postage#141)
+Splash page will error when it can't be reached
+Notices will appear one to a line
+Schema dump updated to include more objects (closed workflowproducts/postage#144)
+Fixed extra scrollbar on home ace (closed workflowproducts/postage#134)
+Add PGPASS editor (closed workflowproducts/postage#125)
+Make external links open in default browser (closed workflowproducts/postage#128)
+Add keyboard shorcuts for EXPLAIN and EXPLAIN ANALYZE (closed workflowproducts/postage#130)
+Add zoom functionality (closed workflowproducts/postage#126)
+
+Envelope:
+Fix gs-page doc page
+Add gsdoc schema to make test
+Change gs-text disabled to behave like readonly
+Fix search page to not split results from same file (closed workflowproducts/envelope#41)
+Add "clearable" attribute to the gs-optionbox
+Added attribute to gs-memo to allow tab characters
+GS.setCookie now defaults to thirty days when there is no expiration date supplied (closed workflowproducts/envelope#21)
+Fixed envelope row count not updating (closed workflowproducts/postage#121)
+
+Both:
+New testing system
+Add PQflush to allow much larger INSERT and UPDATE requests
+Fix file descriptor checks in ws_tab, ws_file, http_upload
+Add optional ORDER BY to INSERT request and UPDATE request
+Add fallback_application_name to db_framework (closed workflowproducts/postage#133)
+Upgrade to Windows projects to VS2017
+
+Added column documentation to these elements:
+1. gs-text
+2. gs-date
+3. gs-optionbox
+4. gs-select
+5. gs-memo
+6. gs-checkbox
+7. gs-number
+
+
 Changes since 3.1.3:
 Postage:
 - Redesigned autocomplete experience
