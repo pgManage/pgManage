@@ -9,7 +9,14 @@ char *str_global_tls_cert = NULL;
 char *str_global_tls_key = NULL;
 char *str_global_port = NULL;
 bool bol_global_local_only = false;
+
+
+#ifdef ENVELOPE
+bool bol_global_super_only = false;
+#else
 bool bol_global_super_only = true;
+#endif
+
 size_t int_global_login_timeout = 3600;
 size_t int_global_custom_connection_number = 0;
 uint64_t int_global_session_id = 0;
@@ -669,6 +676,11 @@ bool parse_options(int argc, char *const *argv) {
 	char *str_temp = NULL;
 
 #ifdef ENVELOPE
+	if (str_global_login_group == NULL) {
+		SERROR_SNCAT(str_global_login_group, &int_global_len,
+			"envelope_g", (size_t)10);
+	}
+
 	if (str_global_app_path == NULL) {
 #ifdef _WIN32
 		SERROR_SNCAT(str_global_app_path, &int_global_len,

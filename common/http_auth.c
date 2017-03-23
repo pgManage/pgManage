@@ -1202,10 +1202,8 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 
 	DB_free_result(res);
 
-#ifdef ENVELOPE
-#else
 	if (bol_global_super_only == true && strncmp(str_rolsuper, "FALSE", 5) == 0) {
-		char *str_temp1 = "{\"stat\": false, \"dat\": \"You must login as a super user to use Postage. If you would like to use a non-superuser role, change the `super_only` parameter to false\"}";
+		char *str_temp1 = "{\"stat\": false, \"dat\": \"You must login as a super user to use " SUN_PROGRAM_WORD_NAME ". If you would like to use a non-superuser role, change the `super_only` parameter to false\"}";
 		SFINISH_SNCAT(str_temp, &int_temp, str_temp1, strlen(str_temp1));
 		char str_length[50];
 		snprintf(str_length, 50, "%zu", strlen(str_temp));
@@ -1238,7 +1236,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 			"{\"stat\": false, \"dat\": \"You must login as a member "
 			"of the group '";
 		char *str_temp3 =
-			"' to use Postage\"}";
+			"' to use " SUN_PROGRAM_WORD_NAME "\"}";
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
 			str_temp1, strlen(str_temp1),
@@ -1250,9 +1248,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		);
 
 		SFREE(str_content_length);
-	} else
-#endif
-	{
+	} else {
 		str_expires = str_expire_one_day();
 #ifdef ENVELOPE
 		char *str_temp1 =
@@ -1284,14 +1280,14 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 			"HTTP/1.1 200 OK\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 			"Connection: close\015\012"
-			"Set-Cookie: postage_";
+			"Set-Cookie: " SUN_PROGRAM_LOWER_NAME "_";
 		char *str_temp2 =
 			"; HttpOnly;\015\012Set-Cookie: DB=";
 		char *str_temp3 =
 			"; path=/;\015\012Content-Length: ";
 		char *str_temp4 =
 			"\015\012\015\012"
-			"{\"stat\": true, \"dat\": \"/postage/";
+			"{\"stat\": true, \"dat\": \"/" SUN_PROGRAM_LOWER_NAME "/";
 		char *str_temp5 =
 			"/index.html\"}";
 		SFINISH_SNCAT(
