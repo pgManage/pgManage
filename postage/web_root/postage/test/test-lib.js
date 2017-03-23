@@ -301,6 +301,7 @@ var $ = {
 					data = data.replace(/\/Users\/joseph\//g, '/home/super/');
 					data = data.replace(/\/Users\/super\//g, '/home/super/');
 					data = data.replace(/\/Users\/nunzio\//g, '/home/super/');
+					data = data.replace(/\/usr\/home\/super\//g, '/home/super/');
 					data = data.replace(/\\test/g, '/test');
 	                data = data.replace(/\/\//g, '\\\\');
 				}
