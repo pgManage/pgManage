@@ -88,6 +88,42 @@
                         </gs-insert>
                     </template>
                 </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[pk]</code>:</span>
+                    <p>The <code>[pk]</code> attribute defines the PRIMARY KEY column of the object.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="20">
+                        <gs-insert id="insert-test" src="gsdoc.tpeople_line" pk="id">
+                            <label for="first_name">First Name:</label>
+                            <gs-text id="first_name" column="first_name"></gs-text>
+                            
+                            <label for="last_name">Last Name:</label>
+                            <gs-text id="last_name" column="last_name"></gs-text>
+                            
+                            <gs-button onclick="document.getElementById('insert-test').submit();">Done</gs-button>
+                        </gs-insert>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[seq]</code>:</span>
+                    <p>The <code>[seq]</code> attribute contains the sequence used for the PRIMARY KEY specified in the <code>[pk]</code> attribute.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="20">
+                        <gs-insert id="insert-test" src="gsdoc.tpeople_line" seq="gsdoc.global_seq">
+                            <label for="first_name">First Name:</label>
+                            <gs-text id="first_name" column="first_name"></gs-text>
+                            
+                            <label for="last_name">Last Name:</label>
+                            <gs-text id="last_name" column="last_name"></gs-text>
+                            
+                            <gs-button onclick="document.getElementById('insert-test').submit();">Done</gs-button>
+                        </gs-insert>
+                    </template>
+                </gs-doc-example>
             </div>
         </gs-container>
         <br />

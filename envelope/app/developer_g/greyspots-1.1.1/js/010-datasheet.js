@@ -2904,7 +2904,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (event.target === element ||
                            event.target.hasAttribute('column') ||
                            event.target.classList.contains('hidden-focus-control')) {
-                    
+                               
                     // if mouse selection is not happening right now
                     if (!element.dragAllowed) {
                         arrSelected = element.selectedCells;

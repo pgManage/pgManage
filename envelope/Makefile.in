@@ -148,6 +148,7 @@ test-common:
 	echo $$! > postgres.pid; \
 	sleep 3
 	psql -U postgres -h 127.0.0.1 -p 5431 postgres -1f test.sql
+	cat app/developer_g/greyspots-1.1.1/documentation/index.html | sed 's/normal_g/envelope_g/' | sed '/    var strPostgreSQL = ml(function () {\/\*/,/\*\//!d' | tail -n +2 | head -n -1 | psql -U postgres -h 127.0.0.1 -p 5431 postgres -1
 	kill `cat postgres.pid`; rm postgres.pid; sleep 3
 	cp data_test/pg_hba.conf data_test/pg_hba.bak
 	sed -e '/trust/s/32            trust/32            md5/g' < data_test/pg_hba.bak > data_test/pg_hba.conf
