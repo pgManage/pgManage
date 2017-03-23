@@ -28,7 +28,7 @@
                     link3 = GS.stringToElement('<link href="resources/pg-9.2-tree-functions.css" type="text/css" rel="stylesheet" />'),
                     link4 = GS.stringToElement('<link href="resources/pg-9.2-other.css" type="text/css" rel="stylesheet" />'),
                     link5 = GS.stringToElement('<link href="resources/pg-9.2-autocomplete.css" type="text/css" rel="stylesheet" />'),
-                    link6 = GS.stringToElement('<link href="/css/postage.css" type="text/css" rel="stylesheet" />');
+                    link6 = GS.stringToElement('<link href="../css/postage.css" type="text/css" rel="stylesheet" />');
 
                 document.body.appendChild(link1);
                 document.body.appendChild(link2);
@@ -86,14 +86,14 @@
                         strPID = strMessage.substring(0, strMessage.indexOf('\t'));
                         strMessage = strMessage.substring(strMessage.indexOf('\t') + 1);
                     }
-                    
+
                     if (strType === 'ERROR') {
                         strPayload = GS.decodeFromTabDelimited(strMessage);
-                        
+
                         webSocketConnectionErrorDialog(strPayload);
-                        
+
                         bolHasBeenRead = true;
-                        
+
                     } else {
                         strPayload = GS.decodeFromTabDelimited(strMessage);
                     }
@@ -115,7 +115,7 @@
 
                 GS.triggerEvent(window, 'notification-received', {'message': event.message, 'jsnMessage': jsnMessage});
             });
-            
+
 			/*
 			function buttonReloadWindow() {
 				GS.envSocket.close();
@@ -133,10 +133,10 @@
             function webSocketConnectionErrorDialog(addinText) {
                 if (!document.getElementById('dialog-from-dialog-ws-conn-error') && GS.bolPreventErrors === false) {
                     var templateElement = document.createElement('template');
-                    
+
                     GS.removeAllLoaders();
 					GS.bolPreventErrors = true;
-                    
+
                     templateElement.setAttribute('id', 'dialog-ws-conn-error');
                     templateElement.setAttribute('data-theme', 'error');
                     templateElement.innerHTML = ml(function () {/*
@@ -151,12 +151,12 @@
                             </gs-footer>
                         </gs-page>
                     */}).replace('{{ADDIN}}', (addinText ? '\n\n' + addinText : ''));
-                    
+
                     GS.openDialog(templateElement, '', function (event, strAnswer) {
                     });
                 }
             }
-            
+
             window.addEventListener('load', function () {
                 'use strict';
                 // load ace range constructor so that we can select text programatically
@@ -296,7 +296,7 @@
                  || !window.bolSettingsLoaded) {
                     orderSixtySix();
                 }
-                
+
             });
 
             function orderSixtySix() {
@@ -436,8 +436,8 @@
                     }
                 }
             })();
-            
-                
+
+
             function handleLoad() {
                 'use strict';
 				if (localStorage.shownObjects) {
