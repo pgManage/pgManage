@@ -443,6 +443,7 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 	struct sock_ev_client *client = client_http_file->parent;
 	time_t tim_if_modified_by = 0;
 	time_t tim_change_stamp = 0;
+	bool bol_not_modified = false;
 
 	struct stat *statdata = NULL;
 	SERROR_SALLOC(statdata, sizeof(struct stat));
@@ -466,35 +467,16 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 	SERROR_CHECK(tm_change_stamp != NULL, "gmtime() failed");
 	tm_change_stamp->tm_isdst = 0;
 
+	SERROR_SALLOC(str_last_modified, 101)
+	SERROR_CHECK(strftime(str_last_modified, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
+
 	size_t int_if_modified_since_len = 0;
 	str_if_modified_since = request_header(client->str_request, client->int_request_len, "If-Modified-Since", &int_if_modified_since_len);
 	if (str_if_modified_since != NULL) {
-		SERROR_SALLOC(tm_if_modified_by, sizeof(struct tm));
-		SERROR_CHECK(strptime(str_if_modified_since, str_date_format, tm_if_modified_by) != NULL, "strptime() failed");
-		tm_if_modified_by->tm_isdst = 0;
-		tim_if_modified_by = mktime(tm_if_modified_by);
-		tim_change_stamp = mktime(tm_change_stamp);
-
-		char temp[101] = { 0 };
-		SDEBUG("----------");
-		SDEBUG("name: %s", client_http_file->str_uri_part);
-		SERROR_CHECK(strftime(temp, 100, str_date_format, tm_if_modified_by) != 0, "strftime() failed");
-		temp[100] = 0;
-		SDEBUG("str_if_modified_since: %s", str_if_modified_since);
-		SDEBUG("tim_if_modified_by: %d", tim_if_modified_by);
-		SDEBUG("tm_if_modified_by: %s", temp);
-		SERROR_CHECK(strftime(temp, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
-		temp[100] = 0;
-		SDEBUG("statdata->st_mtime: %d", statdata->st_mtime);
-		SDEBUG("tim_change_stamp: %d", tim_change_stamp);
-		SDEBUG("tm_change_stamp: %s", temp);
-		SDEBUG("----------");
+		bol_not_modified = strncmp(str_last_modified, str_if_modified_since, int_if_modified_since_len) == 0;
 	} else {
 		SFREE(str_global_error);
 	}
-
-	SERROR_SALLOC(str_last_modified, 101)
-	SERROR_CHECK(strftime(str_last_modified, 100, str_date_format, tm_change_stamp) != 0, "strftime() failed");
 
 	char str_length[50];
 	sprintf(str_length, "%zu", client_http_file->int_read_len);
@@ -515,7 +497,7 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 
 	char *str_maybe_download = client_http_file->bol_download ? "Content-Disposition: attachment\015\012" : "";
 
-	if (strncmp(str_content_type, "text/html", 9) != 0 && tim_if_modified_by != 0 && tim_if_modified_by >= tim_change_stamp) {
+	if (strncmp(str_content_type, "text/html", 9) != 0 && bol_not_modified) {
 		char *str_temp1 = "HTTP/1.1 304 Not Modified\015\012ETag: \"";
 		char *str_temp2 = "\"\015\012Last-Modified: ";
 		char *str_temp3 = "\015\012Server: " SUN_PROGRAM_LOWER_NAME "\015\012"

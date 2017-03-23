@@ -206,7 +206,7 @@ function menuTools(target) {
                             no-focus iconleft onclick="dialogSplash()" icon="info">About Postage</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft onclick="GS.showShimmed()" icon="heartbeat">Browser Support</gs-button>
-                <gs-button class="postage-menu-item-button" dialogclose
+                <gs-button class="postage-menu-item-button" dialogclose id="clear-cache-button"
                             no-focus iconleft onclick="buttonReloadWindow()" icon="refresh">Clear Cache</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose no-focus iconleft target="_blank"
                             href="https://github.com/workflowproducts/postage/" icon="github">Postage On Github</gs-button>
@@ -219,7 +219,13 @@ function menuTools(target) {
 
     // dialogAbout()
 
-    GS.openDialogToElement(target, templateElement, 'down');
+    GS.openDialogToElement(target, templateElement, 'down', function () {
+	    //if we are in electron, remove the clear cache button
+	    if (window.process && window.process.type === 'renderer') {
+	        var element = document.getElementById('clear-cache-button');
+			element.parentNode.removeChild(element);
+	    }
+	});
 }
 
 function menuTab(target) {
@@ -732,18 +738,18 @@ function dialogOptions() {
             <gs-header><center><h3>Postage Options</h3></center></gs-header>
             <gs-body padded>
                 <h3>General</h3>
-                
+
                 <div>
                     <label for="postage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
                     <gs-text id="postage-options-left-panel" flex></gs-text>
-                    
+
                     <label>SQL Toolbar Button Style:</label>
                     <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
                         <gs-option value="true">Labeled</gs-option>
                         <gs-option value="false">Unlabeled</gs-option>
                     </gs-optionbox>
                 </div>
-                
+
 
                 <h3>Clip Options</h3>
                 <div>
@@ -2107,7 +2113,7 @@ function executeScript() {
             resultsTallyElement.innerHTML = ' (<b>Pass: ' + (intQuery - intError) + '</b>, <b>Fail: ' + (intError) + '</b>)';
             //resultsTallyElement.innerHTML = ' (<b>Success: ' + (intQuery - intError) + '</b>, <b>Error: ' + (intError) + '</b>)';
         };
-        
+
         // begin
         startExecute();
         messageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
@@ -2133,7 +2139,7 @@ function executeScript() {
                         endExecute();
                         startLoading();
                     }
-                    
+
                     currentTab.relatedStopSocketButton.addEventListener('click', function () {
                         GS.requestFromSocket(GS.querySocket, 'CANCEL', function () {});
                         stopLoadingHandler();
@@ -2141,7 +2147,7 @@ function executeScript() {
                         document.getElementById('RowCountSmall').innerHTML = '' + (parseInt(data.intCallbackNumberThisQuery * 10, 10) + 10) + ' loaded of ' + data.intRows;
                         console.log(data.intCallbackNumberThisQuery * 10 + 10);
                     });
-                        
+
                     if (data.bolLastMessage) {
                         endLoading();
                     }
@@ -2254,8 +2260,8 @@ function executeScript() {
 
                         // else if result query
                         } else if (data.arrColumnNames.length > 0) {
-                            
-                            
+
+
                             // if this is the first callback for this query: set up title, table and header
                             if (data.intCallbackNumberThisQuery === 0) {
                                 divElement = document.createElement('div');
@@ -2287,7 +2293,7 @@ function executeScript() {
                                 if (data.intRows !== undefined) {
                                     strHTML += '<small id="RowCountSmall">' + data.intRows + ' rows</small>';
                                 }
-                                
+
 
                                 strHTML +=      '</div>' +
                                                 '<span>&nbsp;</span>' +
@@ -2357,8 +2363,8 @@ function executeScript() {
                                 // make the table selectable
                                 GS.makeTableSelectable(tableElement, evt.touchDevice);
                             }
-                            
-                            
+
+
 
                             //console.log('0***', data);
                             // if not end query, therefore: results

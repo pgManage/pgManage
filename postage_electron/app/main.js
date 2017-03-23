@@ -272,11 +272,7 @@ function setMenu() {
 				{
 					label: 'Reload',
 					accelerator: 'CmdOrCtrl+R',
-					click: function (item, focusedWindow) {
-						if (focusedWindow) {
-							focusedWindow.reload();
-						}
-					}
+					role: 'forcereload'
 				}, {
 					label: 'Toggle Developer Tools',
 					accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
