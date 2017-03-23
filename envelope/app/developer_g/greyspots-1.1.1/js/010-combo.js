@@ -847,6 +847,7 @@ document.addEventListener('DOMContentLoaded', function () {
               , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
               , response_i = 0, response_len = 0, arrTotalRecords = [];
             
+            
             //GS.addLoader(element, 'Loading...');
             GS.requestCachingSelect(GS.envSocket, strSchema, strObject, strColumns
                                      , strWhere, strOrd, strLimit, strOffset
@@ -900,13 +901,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
             }
             
-            //console.log(strLink);
+            
             
             strLink += '&where='    + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('where') || ''))) +
                        '&limit='    + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('limit') || ''))) +
                        '&offset='   + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('offset') || ''))) +
                        '&order_by=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('ord') || ''))) +
                        '&cols='     + encodeURIComponent(strCols);
+            
             
             if (GS.dataFetch(strLink, bolClearPrevious)) {
                 data = GS.dataFetch(strLink, bolClearPrevious);

@@ -799,7 +799,12 @@ document.addEventListener('DOMContentLoaded', function () {
         accessors: {
             value: {
                 get: function () {
-                    return this.getAttribute('value');
+                    // return this.getAttribute('value');
+                    if (this.getAttribute('value').trim() === '') {
+                        return 'NULL';
+                    } else {
+                        return this.getAttribute('value');
+                    }
                 },
                 set: function (newValue) {
                     this.setAttribute('value', newValue);

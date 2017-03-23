@@ -29,6 +29,13 @@
             <h3>Description:</h3>
             <p>These links handle running postgresql functions.</p>
             
+            <p>Envelope provides context info to postgres for functions, access using:</p>
+            <code>
+            current_setting('sunny.context_info')
+            </code>
+            <p>This returns something like:</p>
+            <pre>request_ip_address=127.0.0.1&request_host=127.0.0.1%3A8082</pre>
+            
             <h1>Examples:</h1>
             <div class="doc-example-description">
                 <span class="h3">Action Example:</span><br/>

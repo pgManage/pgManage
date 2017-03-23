@@ -23,6 +23,17 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
         
+        addProp('Primary Keys', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('pk') || '') + '" mini></gs-text>',
+                function () {
+            return setOrRemoveTextAttribute(selectedElement, 'pk', this.value);
+        });
+        
+        addProp('Sequences', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('seq') || '') + '" mini></gs-text>',
+                function () {
+            return setOrRemoveTextAttribute(selectedElement, 'seq', this.value);
+        });
+        
+        
         // visibility attributes
         strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))          { strVisibilityAttribute = 'hidden'; }

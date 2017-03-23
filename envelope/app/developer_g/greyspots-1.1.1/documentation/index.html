@@ -426,6 +426,7 @@ BEGIN
     --jsonify the return variable
     RETURN gsdoc.jsonify(str_test);
     --try all of these
+    --RETURN gsdoc.jsonify(current_setting('sunny.context_info'));
     --RETURN '123';
     --RETURN array_to_json(ARRAY[[str_args]]::text[][]);
     --RETURN '"test"';
@@ -483,7 +484,7 @@ CREATE OR REPLACE FUNCTION gsdoc.actionnc_test(str_args text)
   RETURNS text AS
 $BODY$
 BEGIN
-    --In public requests you can get the ip address and host fields from the request. This is not possible on regular requests with a cookie. Since you don't know who logged in you can use these headers to determine who is who, but not as reliably as a cookie.
+    --You can get the ip address and host fields from the request. Since you don't know who logged in you can use these headers to determine who is who, but not as reliably as a cookie. This also available on cookie requests, but is not as useful.
     RETURN
         '{"context_info": "' || current_setting('sunny.context_info') || '"}';
     --try all of these

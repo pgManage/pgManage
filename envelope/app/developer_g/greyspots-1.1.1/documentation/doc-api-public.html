@@ -29,7 +29,13 @@
             
             <h3>Description:</h3>
             <p>These links handle users with no cookie. If they do not work, you need to enable No Cookie requests in the envelope.conf.</p>
-                <p>NC stands for No Cookie. Only functions that start with actionnc_ or acceptnc_ are allowed.</p>
+            <p>NC stands for No Cookie. Only functions that start with actionnc_ or acceptnc_ are allowed.</p>
+            <p>Envelope provides context info to postgres for functions, access using:</p>
+            <code>
+            current_setting('sunny.context_info')
+            </code>
+            <p>This returns something like:</p>
+            <pre>request_ip_address=127.0.0.1&request_host=127.0.0.1%3A8082</pre>
             
             <h1>Examples:</h1>
             
@@ -62,11 +68,9 @@
                      RETURNS text AS
                     $BODY$
                     BEGIN
-                        --In public requests you can get the user-agent, ip address and host fields from the request. This is not possible on regular requests with a cookie. Since you don't know who logged in you can use these headers to determine who is who, but not as reliably as a cookie.
+                        --You can get the ip address and host fields from the request. Since you don't know who logged in you can use these headers to determine who is who, but not as reliably as a cookie. This also available on cookie requests, but is not as useful.
                         RETURN
-                          '{"user_agent": "' || current_setting('envelope.request_user_agent') ||
-                          '", "ip": "' || current_setting('envelope.request_ip') ||
-                          '", "host": "' || current_setting('envelope.request_host') || '"}';
+                            '{"context_info": "' || current_setting('sunny.context_info') || '"}';
                         --try all of these
                         --RETURN '123';
                         --RETURN array_to_json(ARRAY[[str_args]]::text[][]);

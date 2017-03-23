@@ -452,7 +452,9 @@
         <script>
             if (window.parent) {
                 window.parent.addEventListener('resize', function () {
-                    refreshCustomCSS(localStorage.customCSS);
+                    if (localStorage && localStorage.customCSS && document.getElementById('customCss')) {
+                        refreshCustomCSS(localStorage.customCSS);
+                    }
                     /*
                     if (localStorage && localStorage.customCSS && document.getElementById('customCss')) {
                         document.getElementById('customCss').innerHTML = localStorage.customCSS;

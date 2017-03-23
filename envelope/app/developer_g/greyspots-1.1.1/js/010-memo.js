@@ -219,6 +219,18 @@ document.addEventListener('DOMContentLoaded', function () {
     function focusFunction(event) {
         GS.triggerEvent(event.target.parentNode, 'focus');
     }
+    // function focusFunction(event) {
+    //     event.preventDefault();
+    //     event.stopPropagation();
+    //     if (event.target.parentNode.hasAttribute('first-value')) {
+    //             console.log(event);
+    //         //GS.triggerEvent(event.target.parentNode, 'focus');
+    //     } else {
+    //         event.target.parentNode.setAttribute('first-value', event.target.value);
+    //         GS.triggerEvent(event.target.parentNode, 'focus');
+    //         //console.log('test');
+    //     }
+    // }
     
     //
     function keydownFunction(event) {

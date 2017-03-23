@@ -542,64 +542,69 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function handleFormat(element, event, bolAlertOnError) {
-        var dteValue, strValueToFormat = element.value, tempSelection = GS.getInputSelection(element.control);
-
-        // if there is a day of the week in the value: remove it
-        if (strValueToFormat.match(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim)) {
-            strValueToFormat = strValueToFormat.replace(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim, '')
-                                               .replace(/  /gim, ' ')
-                                               .trim();
-        }
-
-        if (strValueToFormat.indexOf(':') !== -1) {
-            strValueToFormat = strValueToFormat.substring(0, strValueToFormat.indexOf(':'));
-            strValueToFormat = strValueToFormat.substring(0, strValueToFormat.lastIndexOf(' '));
-        }
-
-        // if there are only six numbers in the field assume that
-        //      the first  two are the month
-        //      the second two are the day   and
-        //      the third  two are the year  and make a date out of that
-        if (strValueToFormat.length === 6 && strValueToFormat.match(/[0-9]/g).join('') === element.value) {
-            dteValue = new Date(strValueToFormat.substring(0, 2) + '/' +
-                                strValueToFormat.substring(2, 4) + '/' +
-                                strValueToFormat.substring(4, 6));
-        } else {
-            //console.log(strValueToFormat.replace(/-/, '/').replace(/-/, '/').replace(/-.*/, ''));
-            dteValue = new Date(strValueToFormat.replace(/-/, '/').replace(/-/, '/').replace(/-.*/, ''));
-            //console.log(dteValue, dteValue.getFullYear());
-        }
-        
-        //console.trace('test', element.value, strValueToFormat, dteValue);
-        
-        if (isNaN(dteValue.getTime())) {
-            if (bolAlertOnError !== undefined && bolAlertOnError !== false) {
-                alert('Invalid Date: ' + element.value);
+        ///console.log(element.value);
+        if (element.value) {
+            var dteValue, strValueToFormat = element.value, tempSelection = GS.getInputSelection(element.control);
+    
+            // if there is a day of the week in the value: remove it
+            if (strValueToFormat.match(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim)) {
+                strValueToFormat = strValueToFormat.replace(/monday|tuesday|wednesday|thursday|friday|saturday|sunday/gim, '')
+                                                   .replace(/  /gim, ' ')
+                                                   .trim();
+            }
+    
+            if (strValueToFormat.indexOf(':') !== -1) {
+                strValueToFormat = strValueToFormat.substring(0, strValueToFormat.indexOf(':'));
+                strValueToFormat = strValueToFormat.substring(0, strValueToFormat.lastIndexOf(' '));
+            }
+    
+            // if there are only six numbers in the field assume that
+            //      the first  two are the month
+            //      the second two are the day   and
+            //      the third  two are the year  and make a date out of that
+            if (strValueToFormat.length === 6 && strValueToFormat.match(/[0-9]/g).join('') === element.value) {
+                dteValue = new Date(strValueToFormat.substring(0, 2) + '/' +
+                                    strValueToFormat.substring(2, 4) + '/' +
+                                    strValueToFormat.substring(4, 6));
+            } else {
+                //console.log(strValueToFormat.replace(/-/, '/').replace(/-/, '/').replace(/-.*/, ''));
+                dteValue = new Date(strValueToFormat.replace(/-/, '/').replace(/-/, '/').replace(/-.*/, ''));
+                //console.log(dteValue, dteValue.getFullYear());
             }
             
-            if (document.activeElement === element.control) {
-                GS.setInputSelection(element.control, tempSelection.start, tempSelection.end);
-                
-                if (event) {
-                    if (event.keyCode === GS.keyCode('backspace')) {
-                        GS.setInputSelection(element.control, tempSelection.start - 1, tempSelection.start - 1);
-                    } else if (event.keyCode === GS.keyCode('delete')) {
-                        GS.setInputSelection(element.control, tempSelection.start, tempSelection.start);
-                    }
-                    event.stopPropagation();
-                    event.preventDefault();
+            //console.trace('test', element.value, strValueToFormat, dteValue);
+            
+            if (isNaN(dteValue.getTime())) {
+                if (bolAlertOnError !== undefined && bolAlertOnError !== false) {
+                    alert('Invalid Date: ' + element.value);
                 }
-            }
-            
-        } else {
-            if (element.control) {
-                element.control.value = formatDate(dteValue, getFormatString(element));
+                
                 if (document.activeElement === element.control) {
                     GS.setInputSelection(element.control, tempSelection.start, tempSelection.end);
+                    
+                    if (event) {
+                        if (event.keyCode === GS.keyCode('backspace')) {
+                            GS.setInputSelection(element.control, tempSelection.start - 1, tempSelection.start - 1);
+                        } else if (event.keyCode === GS.keyCode('delete')) {
+                            GS.setInputSelection(element.control, tempSelection.start, tempSelection.start);
+                        }
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }
                 }
+                
             } else {
-                element.innerHTML = formatDate(dteValue, getFormatString(element));
+                if (element.control) {
+                    element.control.value = formatDate(dteValue, getFormatString(element));
+                    if (document.activeElement === element.control) {
+                        GS.setInputSelection(element.control, tempSelection.start, tempSelection.end);
+                    }
+                } else {
+                    element.innerHTML = formatDate(dteValue, getFormatString(element));
+                }
             }
+        } else {
+            return 'NULL';
         }
     }
     
@@ -1648,7 +1653,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 // get value straight from the input
                 get: function () {
                     if (this.control) {
-                        return this.control.value;
+                        if (this.control.value.trim() === '') {
+                            return 'NULL';
+                        } else {
+                            return this.control.value;
+                        }
                     } else if (this.hasAttribute('disabled')) {
                         return this.innerHTML;
                     }
