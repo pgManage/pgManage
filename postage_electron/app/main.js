@@ -376,66 +376,65 @@ function setMenu() {
 }
 
 function openWindow() {
-	var curWindow = new BrowserWindow({
-		'x': mainWindowState.x,
-		'y': mainWindowState.y,
-		'width': mainWindowState.width,
-		'height': mainWindowState.height
+	electron.session.defaultSession.clearCache(function () {
+		var curWindow = new BrowserWindow({
+			'x': mainWindowState.x,
+			'y': mainWindowState.y,
+			'width': mainWindowState.width,
+			'height': mainWindowState.height
+		});
+		mainWindows.push(curWindow);
+		mainWindowState.manage(curWindow);
+
+		curWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/' +
+			(process.argv.indexOf('--postage-test') > -1 ? 'test/' : '') + 'index.html' +
+			(process.argv.indexOf('--postage-test') > -1 ? '?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true' : ''),
+			{ 'extraHeaders': 'pragma: no-cache\n' });
+
+		// Emitted when the window is closed.
+		curWindow.on('closed', function () {
+			mainWindows.splice(mainWindows.indexOf(curWindow), 1);
+		});
+
+		curWindow.webContents.on('will-navigate', handleRedirect);
+		curWindow.webContents.on('new-window', handleRedirect);
+
+		setMenu();
 	});
-	mainWindows.push(curWindow);
-	mainWindowState.manage(curWindow);
-
-	curWindow.loadURL('http://127.0.0.1:' + int_postage_port + '/postage/' +
-		(process.argv.indexOf('--postage-test') > -1 ? 'test/' : '') + 'index.html' +
-		(process.argv.indexOf('--postage-test') > -1 ? '?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true' : ''),
-		{ 'extraHeaders': 'pragma: no-cache\n' });
-
-	// Emitted when the window is closed.
-	curWindow.on('closed', function () {
-		mainWindows.splice(mainWindows.indexOf(curWindow), 1);
-	});
-
-	curWindow.webContents.on('will-navigate', handleRedirect);
-	curWindow.webContents.on('new-window', handleRedirect);
 }
 
 function appStart() {
 	electron.session.defaultSession = electron.session.fromPartition('persist:postage-session123', { cache: false });
-	electron.session.defaultSession.clearCache(function () {
-		mainWindowState = windowStateKeeper({
-			defaultWidth: 1024,
-			defaultHeight: 768,
-			path: os.homedir() + '/.postage/',
-			file: 'main-window-state.json'
-		});
-
-		configWindowState = windowStateKeeper({
-			defaultWidth: 1024,
-			defaultHeight: 768,
-			path: os.homedir() + '/.postage/',
-			file: 'config-window-state.json'
-		});
-
-		connectionWindowState = windowStateKeeper({
-			defaultWidth: 1024,
-			defaultHeight: 768,
-			path: os.homedir() + '/.postage/',
-			file: 'connection-window-state.json'
-		});
-
-		pgpassWindowState = windowStateKeeper({
-			defaultWidth: 1024,
-			defaultHeight: 768,
-			path: os.homedir() + '/.postage/',
-			file: 'pgpass-window-state.json'
-		});
-
-		if (bolPostageIsReady) {
-			openWindow();
-		}
-
-		setMenu();
+	mainWindowState = windowStateKeeper({
+		defaultWidth: 1024,
+		defaultHeight: 768,
+		path: os.homedir() + '/.postage/',
+		file: 'main-window-state.json'
 	});
+
+	configWindowState = windowStateKeeper({
+		defaultWidth: 1024,
+		defaultHeight: 768,
+		path: os.homedir() + '/.postage/',
+		file: 'config-window-state.json'
+	});
+
+	connectionWindowState = windowStateKeeper({
+		defaultWidth: 1024,
+		defaultHeight: 768,
+		path: os.homedir() + '/.postage/',
+		file: 'connection-window-state.json'
+	});
+
+	pgpassWindowState = windowStateKeeper({
+		defaultWidth: 1024,
+		defaultHeight: 768,
+		path: os.homedir() + '/.postage/',
+		file: 'pgpass-window-state.json'
+	});
+	if (bolPostageIsReady) {
+		openWindow();
+	}
 }
 
 // This method will be called when Electron has finished
