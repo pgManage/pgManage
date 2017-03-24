@@ -46,6 +46,8 @@ extern char *str_global_public_username;
 extern char *str_global_public_password;
 extern bool bol_global_set_user;
 
+extern bool bol_global_allow_origin;
+
 extern char *str_global_app_path;
 extern char *str_global_role_path;
 #else
