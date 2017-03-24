@@ -5,37 +5,37 @@
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
-        
+
         <title>File Manager</title>
-        
+
         <script src="/js/greyspots.js" type="text/javascript"></script>
         <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />
-        
+
         <script>
             //jslint white:true browser:true multivar:true
             var arrCurrentPath = [],
                 arrCheckedPaths = [],
         		arrCheckedPathTypes = [];
-            
+
             var bolWebSocket;
-            
+
             // update the querystring with the latest paths
             function updateQueryString() {
                 "use strict";
                 var strQueryString = '', strPath;
-                
+
                 strPath = arrCurrentPath.join('/');
                 strQueryString = 'path=' + encodeURIComponent(strPath);
-                
+
                 GS.pushQueryString(strQueryString);
             }
-            
+
             // order checked files and folders in the correct manner (to prevent errors)
             //      Example: lets say that we must remove 2 folders and one file (in that order)
             //          rm all/
             //          rm all/bar/       <== ERROR! folder "all" does not exist
             //          rm all/test.txt   <== ERROR! folder "all" does not exist
-            //          
+            //
             //      Solution: order files first then folder paths with the most slashes first
             //          rm all/test.txt
             //          rm all/bar/
@@ -45,26 +45,26 @@
             //      then returns the combined array of the files and folders
             function sortPathArraysInOperationOrder(arrFiles, arrFolders) {
                 'use strict';
-                
+
                 // sort folders by number of slashes (greatest number of slashes to least number of slashes)
                 arrFolders.sort(function(a, b) {
                     return (b.match(/\//g) || '').length - (a.match(/\//g) || '').length;
                 });
-                
+
                 return arrFiles.concat(arrFolders);
             }
-            
+
             // prefix a file name with the current directory path
             function filePathPrefix(strFileName) {
                 'use strict';
                 return (arrCurrentPath.length > 0 ? arrCurrentPath.join('/') + '/' : '') + strFileName;
             }
-            
+
             // sort checked array
             function getCheckedInOrder() {
                 'use strict';
                 var i, len, arrFiles = [], arrFolders = [];
-                
+
                 // seperate files and folders
                 for (i = 0, len = arrCheckedPaths.length; i < len; i += 1) {
                     if (arrCheckedPathTypes[i] === 'file') {
@@ -73,10 +73,10 @@
                         arrFolders.push(arrCheckedPaths[i]);
                     }
                 }
-                
+
                 return sortPathArraysInOperationOrder(arrFiles, arrFolders);
             }
-            
+
             // handle toolbars disabling/enabling/clearing based on the number of checked off paths
             function handleToolbar() {
                 if (arrCurrentPath.length === 0 || (arrCurrentPath.length === 1 && arrCurrentPath[0] === '')) {
@@ -86,7 +86,7 @@
                     document.getElementById('button-top').removeAttribute('disabled');
                     document.getElementById('button-up').removeAttribute('disabled');
                 }
-                
+
                 if (arrCheckedPaths.length > 0) {
                     if (!evt.touchDevice) {
                         document.getElementById('button-zip').removeAttribute('disabled');
@@ -105,17 +105,17 @@
                     document.getElementById('button-checked').setAttribute('disabled', '');
                     document.getElementById('current-action-container').innerHTML = '';
                 }
-                
+
                 if (bolWebSocket) {
                     document.getElementById('button-zip').setAttribute('disabled', '');
                 }
             }
-            
+
             // refresh header path
             function handleHeaderText() {
                 document.getElementById('current-path').textContent = filePathPrefix('') || 'File Manager';
             }
-            
+
             function folderLineHTML(strTitle, strNavigateLink) {
                 return '<div flex-horizontal flex-fill link="' + encodeHTML(strNavigateLink) + '">' +
                                 '<gs-checkbox class="check" remove-right type="folder" ' +
@@ -124,31 +124,31 @@
                                 '<gs-button class="folder" remove-left flex>' + encodeHTML(strTitle) + '</a>' +
                             '</div> ';
             }
-            
+
             function fileLineHTML(strTitle, strAnchorPath, strCurrentPath) {
                 var strHTML = '';
-                
+
                 if (strAnchorPath.indexOf('/') === 0) {
                     strAnchorPath = strAnchorPath.substring(1);
                 }
-                
+
                 if (strAnchorPath.indexOf('app/') == 0) {
                     strAnchorPath = '/env/' + strAnchorPath;
-            
+
                 } else if (strAnchorPath.indexOf('role/') == 0) {
                     strAnchorPath = '/env/' + strAnchorPath;
-            
+
                 } else if (strAnchorPath.indexOf('web_root/') == 0) {
                     strAnchorPath = strAnchorPath.substring(8);
                 } else {
                     strAnchorPath = '/' + strAnchorPath;
                 }
-				
+
                 strHTML += '<div flex-horizontal flex-fill link="' + strCurrentPath + '">' +
                     '<gs-checkbox class="check" type="file" ' +
 					(arrCheckedPaths.indexOf(strCurrentPath) >= 0 ? 'value="true"' : '') +
 					' remove-right></gs-checkbox>';
-                
+
                 if (strCurrentPath.toLowerCase().indexOf('.zip') === strCurrentPath.length - 4) {
                     if (!bolWebSocket) {
                         strHTML += '<gs-button onclick="unzipFile(\'' + strCurrentPath +
@@ -160,82 +160,82 @@
                         'link=' + encodeURIComponent(strCurrentPath) +
                 		'" icononly icon="pencil" remove-all></gs-button>';
                 }
-                
+
                 strHTML += '<gs-button flex href="' + encodeHTML(strAnchorPath) +
 					'" target="_blank" class="file" remove-left>' + encodeHTML(strTitle) + '</gs-button>' +
                     '</div>';
-                
+
                 return strHTML;
             }
-            
+
             // get/refresh the list of files and folders for the current path
             function listCurrentDirectory() {
                 'use strict';
                 var strPath;
-                
+
                 // handle toolbars disabled/clearing and handle header text
                 handleToolbar();
                 handleHeaderText();
-                
+
                 strPath = arrCurrentPath.join('/');
-                
+
                 if (bolWebSocket) {
                     // list files/folders WS style
                     GS.addLoader('file-list-load', 'Loading...');
-                    
+
                     var arrFile = [], arrFolder = [];
                     GS.requestFromSocket(GS.envSocket, 'FILE\tLIST\t' + GS.encodeForTabDelimited(strPath), function (data, error, errorData) {
                         var arrPaths, strHTML, strCurrentPath, strAnchorPath, i, len
                           , arrCells, strType, strName, strFileHTML, strFolderHTML;
-                        
+
                         if (!error && data.trim() && data.indexOf('Failed to get canonical path') === -1) {
                             if (data !== 'TRANSACTION COMPLETED') {
                                 arrPaths = GS.trim(data, '\n').split('\n');
-                                
+
                                 for (i = 0, len = arrPaths.length; i < len; i += 1) {
                                     arrCells = arrPaths[i].split('\t');
                                     strType = GS.decodeFromTabDelimited(arrCells[1]);
                                     strName = GS.trim(GS.decodeFromTabDelimited(arrCells[0]), '/');
-                                    
+
                                     if (strType === 'folder') {
                                         arrFolder.push(strName);
-                                        
+
                                     } else if (strType === 'file') {
                                         arrFile.push(strName);
                                     }
                                 }
-                                
+
                             } else {
                                 strFileHTML = '';
                                 strFolderHTML = '';
-                                
+
                                 arrFolder.sort();
                                 arrFile.sort();
-                                
+
                                 for (i = 0, len = arrFolder.length; i < len; i += 1) {
                                     strName = arrFolder[i];
-                                    
+
                                     strCurrentPath = filePathPrefix(strName);
                                     strFolderHTML += folderLineHTML(strName, strCurrentPath);
                                 }
-                                
+
                                 for (i = 0, len = arrFile.length; i < len; i += 1) {
                                     strName = arrFile[i];
-                                    
+
                                     strCurrentPath = filePathPrefix(strName);
                                     strAnchorPath = strCurrentPath;
-                                    
+
                                     strFileHTML += fileLineHTML(strName, strAnchorPath, strCurrentPath);
                                 }
-                                
+
                                 strHTML  = '<h3>Folders:</h3>';
                                 strHTML += strFolderHTML || '<span class="hint">No Folders.</span>';
-                                
+
                                 strHTML += '<br />';
-                                
+
                                 strHTML += '<h3>Files:</h3>';
                                 strHTML += strFileHTML || '<span class="hint">No files.</span>';
-                                
+
                                 document.getElementById('file-list').innerHTML = strHTML;
                                 GS.removeLoader('file-list-load');
                             }
@@ -244,48 +244,48 @@
                             GS.webSocketErrorDialog(errorData);
                         }
                     });
-                    
+
                 } else {
                     // list files/folders AJAX style
                     GS.addLoader('file-list-load', 'Loading...');
                     GS.ajaxJSON('/env/action_file', 'action=list' +
                                 '&path=' + encodeURIComponent(strPath), function(response, error) {
                         var i, len, strHTML = '', data, strCurrentPath, strAnchorPath;
-                        
+
                         GS.removeLoader('file-list-load');
-                        
+
                         if (!error) {
                             data = response.dat;
-                            
+
                             data.directories = data.directories || [];
                             data.files = data.files || [];
-                            
+
                             data.directories.sort();
                             data.files.sort();
-    
+
                             strHTML += '<h3>Folders:</h3>';
                             for (i = 0, len = data.directories.length; i < len; i += 1) {
                                 strCurrentPath = filePathPrefix(data.directories[i]);
-                                
+
                                 strHTML += folderLineHTML(data.directories[i], strCurrentPath);
                             }
                             if (data.directories.length === 0) {
                                 strHTML += '<span class="hint">No Folders.</span>'
                             }
-    
+
                             strHTML += '<br />';
                             strHTML += '<h3>Files:</h3>';
-    
+
                             for (i = 0, len = data.files.length; i < len; i += 1) {
                                 strCurrentPath = filePathPrefix(data.files[i]);
                                 strAnchorPath = strCurrentPath;
-                                
+
                                 strHTML += fileLineHTML(data.files[i], strAnchorPath, strCurrentPath);
                             }
                             if (data.files.length === 0) {
                                 strHTML += '<span class="hint">No files.</span>'
                             }
-                            
+
                             document.getElementById('file-list').innerHTML = strHTML;
                         } else {
                             GS.ajaxErrorDialog(response, function() {
@@ -299,25 +299,25 @@
                     });
                 }
             }
-            
+
             function unzipFile(strPath) {
                 GS.addLoader('file-unzip', 'Unzipping...');
                 GS.ajaxJSON('/env/action_file', 'action=unzip&path=' + encodeURIComponent(strPath),
                                                  function (data, error) {
                     GS.removeLoader('file-unzip');
-                    
+
                     if (!error) {
                         listCurrentDirectory();
-                        
+
                     } else {
                         GS.ajaxErrorDialog(data);
                     }
                 });
             }
-            
+
             function insertFile(strFileName) {
                 'use strict';
-                
+
                 if (bolWebSocket) {
                     GS.requestFromSocket(GS.envSocket
                                        , 'FILE\tCREATE_FILE\t' + GS.encodeForTabDelimited(strFileName) + '\n'
@@ -339,12 +339,12 @@
                     GS.ajaxJSON('/env/action_file', 'action=create_file' +
                                 '&path=' + encodeURIComponent(strFileName) + '&content=', function(data, error) {
                         GS.removeLoader('file-insert');
-                        
+
                         if (!error) {
                             arrCheckedPaths = [];
                             arrCheckedPathTypes = [];
                             listCurrentDirectory();
-                            
+
                         } else {
                             GS.ajaxErrorDialog(data, function() {
                                 insertFile(strFileName);
@@ -353,7 +353,7 @@
                     });
                 }
             }
-            
+
             function insertFolder(strFolderName) {
                 'use strict';
                 if (bolWebSocket) {
@@ -378,12 +378,12 @@
                     GS.ajaxJSON('/env/action_file', 'action=create_folder' +
                                 '&path=' + encodeURIComponent(strFolderName), function(data, error) {
                         GS.removeLoader('folder-insert');
-                        
+
                         if (!error) {
                             arrCheckedPaths = [];
                             arrCheckedPathTypes = [];
                             listCurrentDirectory();
-                            
+
                         } else {
                             GS.ajaxErrorDialog(data, function() {
                                 insertFolder(strFolderName);
@@ -392,15 +392,15 @@
                     });
                 }
             }
-            
+
             function movePaths(pathsFrom, pathsTo) {
                 'use strict';
                 var i, len, intResponse;
-                
+
                 if (bolWebSocket) {
                     pathsFrom = JSON.parse(pathsFrom);
                     pathsTo = JSON.parse(pathsTo);
-                    
+
                     for (i = 0, len = pathsFrom.length; i < len; i += 1) {
                         GS.addLoader('file-and-folder-move', 'Moving Paths...');
                         intResponse = 0;
@@ -412,7 +412,7 @@
                                 if (data === 'TRANSACTION COMPLETED') {
                                     intResponse += 1;
                                     GS.removeLoader('file-and-folder-move');
-                                    
+
                                     if (intResponse === len) {
                                         arrCheckedPaths = [];
                                         arrCheckedPathTypes = [];
@@ -426,19 +426,19 @@
                             }
                         });
                     }
-                    
+
                 } else {
                     GS.addLoader('file-and-folder-move', 'Moving Paths...');
                     GS.ajaxJSON('/env/action_file', 'action=mv_file' +
                                                                 '&paths_from=' + encodeURIComponent(pathsFrom) +
                                                                 '&paths_to=' + encodeURIComponent(pathsTo), function(data, error) {
                         GS.removeLoader('file-and-folder-move');
-                        
+
                         if (!error) {
                             arrCheckedPaths = [];
                             arrCheckedPathTypes = [];
                             listCurrentDirectory();
-                            
+
                         } else {
                             GS.ajaxErrorDialog(data, function() {
                                 movePaths(pathsFrom, pathsTo);
@@ -447,15 +447,15 @@
                     });
                 }
             }
-            
+
             function copyPaths(pathsFrom, pathsTo) {
                 'use strict';
                 var i, len, intResponse;
-                
+
                 if (bolWebSocket) {
                     pathsFrom = JSON.parse(pathsFrom);
                     pathsTo = JSON.parse(pathsTo);
-                    
+
                     for (i = 0, len = pathsFrom.length; i < len; i += 1) {
                         GS.addLoader('file-and-folder-copy', 'Pasting Paths...');
                         intResponse = 0;
@@ -467,7 +467,7 @@
                                 if (data === 'TRANSACTION COMPLETED') {
                                     intResponse += 1;
                                     GS.removeLoader('file-and-folder-copy');
-                                    
+
                                     if (intResponse === len) {
                                         arrCheckedPaths = [];
                                         arrCheckedPathTypes = [];
@@ -481,19 +481,19 @@
                             }
                         });
                     }
-                    
+
                 } else {
                     GS.addLoader('file-and-folder-copy', 'Pasting Paths...');
                     GS.ajaxJSON('/env/action_file', 'action=cp_file' +
                                                                          '&paths_from=' + encodeURIComponent(pathsFrom) +
                                                                          '&paths_to=' + encodeURIComponent(pathsTo), function(data, error) {
                         GS.removeLoader('file-and-folder-copy');
-                        
+
                         if (!error) {
                             arrCheckedPaths = [];
                             arrCheckedPathTypes = [];
                             listCurrentDirectory();
-                            
+
                         } else {
                             GS.ajaxErrorDialog(data, function() {
                                 copyPaths(pathsFrom, pathsTo);
@@ -502,15 +502,15 @@
                     });
                 }
             }
-            
+
             function renamePaths(pathsFrom, pathsTo) {
                 'use strict';
                 var i, len, intResponse;
-                
+
                 if (bolWebSocket) {
                     pathsFrom = JSON.parse(pathsFrom);
                     pathsTo = JSON.parse(pathsTo);
-                    
+
                     for (i = 0, len = pathsFrom.length; i < len; i += 1) {
                         GS.addLoader('file-and-folder-rename', 'Renaming Paths...');
                         intResponse = 0;
@@ -522,7 +522,7 @@
                                 if (data === 'TRANSACTION COMPLETED') {
                                     intResponse += 1;
                                     GS.removeLoader('file-and-folder-rename');
-                                    
+
                                     if (intResponse === len) {
                                         arrCheckedPaths = [];
                                         arrCheckedPathTypes = [];
@@ -536,19 +536,19 @@
                             }
                         });
                     }
-                    
+
                 } else {
                     GS.addLoader('file-and-folder-rename', 'Renaming Paths...');
                     GS.ajaxJSON('/env/action_file', 'action=mv_file' +
                                                                 '&paths_from=' + encodeURIComponent(pathsFrom) +
                                                                 '&paths_to=' + encodeURIComponent(pathsTo), function(data, error) {
                         GS.removeLoader('file-and-folder-rename');
-                        
+
                         if (!error) {
                             arrCheckedPaths = [];
                             arrCheckedPathTypes = [];
                             listCurrentDirectory();
-                            
+
                         } else {
                             GS.ajaxErrorDialog(data, function() {
                                 movePaths(pathsFrom, pathsTo);
@@ -557,14 +557,14 @@
                     });
                 }
             }
-            
+
             function deletePaths(paths) {
                 'use strict';
                 var i, len, intResponse;
-                
+
                 if (bolWebSocket) {
                     paths = JSON.parse(paths);
-                    
+
                     for (i = 0, len = paths.length; i < len; i += 1) {
                         GS.addLoader('file-and-folder-delete', 'Deleting Paths...');
                         intResponse = 0;
@@ -575,7 +575,7 @@
                                 if (data === 'TRANSACTION COMPLETED') {
                                     intResponse += 1;
                                     GS.removeLoader('file-and-folder-delete');
-                                    
+
                                     if (intResponse === len) {
                                         arrCheckedPaths = [];
                                         arrCheckedPathTypes = [];
@@ -589,18 +589,18 @@
                             }
                         });
                     }
-                    
+
                 } else {
                     GS.addLoader('file-and-folder-delete', 'Deleting Paths...');
                     GS.ajaxJSON('/env/action_file', 'action=rm' +
                                 '&paths=' + encodeURIComponent(paths), function(data, error) {
                             GS.removeLoader('file-and-folder-delete');
-                            
+
                             if (!error) {
                                 arrCheckedPaths = [];
                                 arrCheckedPathTypes = [];
                                 listCurrentDirectory();
-                                
+
                             } else {
                                 GS.ajaxErrorDialog(data, function() {
                                     deletePaths(paths);
@@ -609,37 +609,55 @@
                     });
                 }
             }
-            
+
             // if there is something in the query string: move that data to the correct variables
             function useQueryString() {
                 var strQueryString = GS.getQueryString(), arrQSKeys = GS.qryGetKeys(strQueryString);
-                
+
                 bolWebSocket = (GS.qryGetVal(strQueryString, 'socket') === "true");
-                
+
                 if (strQueryString && arrQSKeys.indexOf('path') >= 0) {
                     arrCurrentPath = GS.qryGetVal(strQueryString, 'path').split('/');
                 } else {
                     arrCurrentPath = [""];
                 }
             }
-            
+
             window.addEventListener('popstate', function () {
                 // use the query string if possible
                 useQueryString();
-                
+
                 // get current folder
                 listCurrentDirectory();
             });
-            
+
             window.addEventListener('load', function (event) {
                 var loadFunction, operateFunction;
-                
+
+                document.getElementById('current-path').addEventListener('click', function (event) {
+                    this.setAttribute('hidden', '');
+					document.getElementById('current-path-edit').value = this.textContent;
+					document.getElementById('current-path-edit').removeAttribute('hidden');
+                });
+                document.getElementById('current-path-edit').addEventListener('change', function (event) {
+                    this.setAttribute('hidden', '');
+					document.getElementById('current-path').textContent = this.value;
+					document.getElementById('current-path').removeAttribute('hidden');
+
+					arrCurrentPath = this.value.split('/');
+					while (arrCurrentPath[arrCurrentPath.length - 1] === '') {
+						arrCurrentPath.pop();
+					}
+					updateQueryString();
+					listCurrentDirectory();
+                });
+
                 // use the query string if possible
                 useQueryString();
-                
+
                 // get current folder
                 listCurrentDirectory();
-                
+
                 // when you click on a folder button add the folder name to the array of folder
                 //      names that make up the current path then refresh the list of files/folders
                 document.getElementById('file-list').addEventListener('click', function (event) {
@@ -649,14 +667,14 @@
                         listCurrentDirectory();
                     }
                 });
-                
+
                 // one of the left side checkboxes are checked add the file or folder to the array of checked paths
-                //      else if the checkbox is unchecked than remove the path from the list 
+                //      else if the checkbox is unchecked than remove the path from the list
                 document.getElementById('file-list').addEventListener('change', function (event) {
                     var path = event.target.parentNode.getAttribute('link');
-                    
+
                     //console.log(event.target);
-                    
+
                     if (event.target.value === 'true') {
                         arrCheckedPaths.push(path);
                         arrCheckedPathTypes.push(event.target.getAttribute('type'));
@@ -664,31 +682,31 @@
                         arrCheckedPathTypes.splice(arrCheckedPaths.indexOf(path), 1);
                         arrCheckedPaths.splice(arrCheckedPaths.indexOf(path), 1);
                     }
-                    
+
                     // handle toolbars disable/clearing
                     handleToolbar();
                 });
-                
+
                 // refresh button in header
                 document.getElementById('button-refresh').addEventListener('click', function (event) {
                     listCurrentDirectory();
                 });
-                
+
                 // override CMD/CTRL - R
                 window.addEventListener('keydown', function (event) {
                     var intKeyCode = event.which || event.keyCode;
-                    
+
                     if ((event.ctrlKey || event.metaKey) && intKeyCode === 82) {
                         event.preventDefault();
                         event.stopPropagation();
                         listCurrentDirectory();
                     }
                 });
-                
-                
+
+
                 document.getElementById('button-checked').addEventListener('click', function(event) {
                     var i, len, strHTML;
-                    
+
                     for (i = 0, len = arrCheckedPaths.length, strHTML = ''; i < len; i += 1) {
                         strHTML += '<div flex-horizontal>' +
                                         '<gs-checkbox id="checked-list-checkbox-' + i + '" value="true" ' +
@@ -697,12 +715,12 @@
                                         '<label for="checked-list-checkbox-' + i + '" flex>' + encodeHTML(arrCheckedPaths[i]) + '</label>' +
                                     '</div>';
                     }
-                    
+
                     GS.openDialog('dialog-checked-off', function () {
                         document.getElementById('checked-off-list').innerHTML = strHTML;
                         document.getElementById('checked-off-list').addEventListener('change', function (event) {
                             var path = event.target.getAttribute('path');
-                            
+
                             if (event.target.value === 'true') {
                                 arrCheckedPaths.push(path);
                                 arrCheckedPathTypes.push(event.target.getAttribute('type'));
@@ -716,40 +734,40 @@
                             arrCheckedPaths = [];
                             arrCheckedPathTypes = [];
                         }
-                        
+
                         listCurrentDirectory();
                     });
                 });
-                
+
                 document.getElementById('button-up').addEventListener('click', function(event) {
                     arrCurrentPath.pop();
                     updateQueryString();
                     listCurrentDirectory();
                 });
-                
+
                 document.getElementById('button-top').addEventListener('click', function(event) {
                     arrCurrentPath = [""];
                     updateQueryString();
                     listCurrentDirectory();
                 });
-                
+
                 // when the form is submitted this iframe is reloaded
                 //      when it is reloaded we parse the data that is now in it looking for success
-                //loadFunction = 
+                //loadFunction =
                 document.getElementById('form-response-iframe').addEventListener('load', function (event) {
                     var strResponseText = document.getElementById('form-response-iframe').contentWindow.document.body.textContent,
                         jsnResponse, strResponse, bolError, strError;
-                    
+
                     //console.log('1***', strResponseText);
-                    
+
                     // get error text
                     try {
                         jsnResponse = JSON.parse(strResponseText);
-                        
+
                     } catch (err) {
                         strResponse = strResponseText;
                     }
-                    
+
                     if (strResponse.trim() === 'Upload Succeeded') {
                         GS.closeDialog(document.getElementsByTagName('gs-dialog')[0], 'cancel');
                     } else {
@@ -768,38 +786,38 @@
                             bolError = true;
                             strError = strResponse;
                         }
-                        
+
                         // if no error destroy new file popup
                         if (!bolError) {
                             GS.closeDialog(document.getElementsByTagName('gs-dialog')[0], 'cancel');
-                            
+
                         // if error open error popup
                         } else {
                             GS.msgbox('Error', strError, 'okonly');
                         }
                     }
-                    
+
                     arrCheckedPaths = [];
                     arrCheckedPathTypes = [];
                     listCurrentDirectory();
                     GS.removeLoader('file-upload');
                 });
-                
+
                 document.getElementById('button-upload-file').addEventListener('click', function(event) {
                     GS.openDialog('dialog-upload', function() {
                         var loadFunction;
-                        
+
                         if (bolWebSocket) {
                             document.getElementById('form-file-upload').setAttribute('action', '/env/upload');
                         }
-                        
+
                         document.getElementById('upload-file-name').value = filePathPrefix('');
-                        
+
                         // upload existing file
                         document.getElementById('new-file-upload').addEventListener('click', function(event) {
                             var strFile = document.getElementById('upload-file-content').value,
                                 strName = document.getElementById('upload-file-name').value;
-                            
+
                             if (strName === '' && strFile === '') { // no values (no file and no file path)
                                 GS.msgbox('Error', 'No values in form. Please fill in the form.', 'okonly');
 
@@ -830,21 +848,21 @@
                         });
                     });
                 });
-                
+
                 document.getElementById('button-new-file').addEventListener('click', function() {
                     GS.openDialog('dialog-create-file', function () {
                         var dialog = this, newFileNameControl = document.getElementById('new-file-name');
-                        
+
                         document.getElementById('new-file-name').value = filePathPrefix('');
-                        
+
                         // new file name focus and put cursor at specific area
                         newFileNameControl.focus();
                         GS.setInputSelection(newFileNameControl, newFileNameControl.value.length);
-                        
+
                         // new file name input on return: close dialog and insert file
                         newFileNameControl.addEventListener('keydown', function (event) {
                             var intKeyCode = event.which || event.keyCode;
-                            
+
                             if (intKeyCode === 13) {
                                 GS.closeDialog(dialog, 'Ok');
                             }
@@ -855,20 +873,20 @@
                         }
                     });
                 });
-                
+
                 document.getElementById('button-new-folder').addEventListener('click', function () {
                     GS.openDialog('dialog-create-folder', function () {
                         var dialog = this, newFolderNameControl = document.getElementById('new-folder-name');
-                        
+
                         document.getElementById('new-folder-name').value = filePathPrefix('');
-                        
+
                         newFolderNameControl.focus();
                         GS.setInputSelection(newFolderNameControl.value.length);
-                        
+
                         // new file name input on return: close dialog and insert file
                         newFolderNameControl.addEventListener('keydown', function (event) {
                             var intKeyCode = event.which || event.keyCode;
-                            
+
                             if (intKeyCode === 13) {
                                 GS.closeDialog(dialog, 'Ok');
                             }
@@ -879,7 +897,7 @@
                         }
                     });
                 });
-                
+
                 // this function has to fluidly operate across linear terrain with duo capibilities for maximum conservation of static lines
                 operateFunction = function (strAction, operationFunction) {
                     document.getElementById('current-action-container').innerHTML =
@@ -887,11 +905,11 @@
                                             '   <gs-block><gs-button id="button-cancel">Cancel</gs-button></gs-block>' +
                                             '   <gs-block><gs-button id="button-confirm">' + strAction + ' Here</gs-button></gs-block>' +
                                             '</gs-grid>';
-                    
+
                     document.getElementById('button-cancel').addEventListener('click', function (event) {
                         document.getElementById('current-action-container').innerHTML = '';
                     });
-                    
+
                     document.getElementById('button-confirm').addEventListener('click', function (event) {
                         var i, len, arrFiles = [],
                             arrFolders = [],
@@ -899,9 +917,9 @@
                             strCurrentPathName,
                             strCurrentPathNameInsertIndex,
                             bolError = false;
-                        
+
                         document.getElementById('current-action-container').innerHTML = '';
-                        
+
                         // seperate files and folders
                         for (i = 0, len = arrCheckedPaths.length; i < len; i += 1) {
                             if (arrCheckedPathTypes[i] === 'file') {
@@ -910,11 +928,11 @@
                                 arrFolders.push(arrCheckedPaths[i]);
                             }
                         }
-                        
+
                         // check for pasting or moving folder into itself
                         for (i = 0, len = arrFolders.length; i < len; i += 1) {
                             strCurrentPathName = '/' + GS.trim(arrFolders[i], '/') + '/';
-                            
+
                             if (strNewFolder.indexOf(strCurrentPathName) === 0) {
                                 bolError = true;
                                 GS.msgbox('Cannot ' + strAction + ' Folders',
@@ -923,87 +941,87 @@
                                 break;
                             }
                         }
-                        
+
                         // if no error
                         if (!bolError) {
                             // rename files
                             for (i = 0, len = arrFiles.length; i < len; i += 1) {
                                 strCurrentPathName = arrFiles[i].substring(arrFiles[i].lastIndexOf('/') + 1, arrFiles[i].length);
-                                
+
                                 if (strNewFolder === arrFiles[i].substring(0, arrFiles[i].lastIndexOf('/') + 1) && strAction !== 'Move') {
                                     strCurrentPathNameInsertIndex = strCurrentPathName.lastIndexOf('.');
-                                    
+
                                     strCurrentPathNameInsertIndex = strCurrentPathNameInsertIndex >= 0 ? strCurrentPathNameInsertIndex : strCurrentPathName.length;
-                                    
+
                                     strCurrentPathName = strCurrentPathName.substring(0, strCurrentPathNameInsertIndex) + '_copy' +
                                                          strCurrentPathName.substring(strCurrentPathNameInsertIndex);
                                 }
-                                
+
                                 arrFiles[i] = strNewFolder + strCurrentPathName;
                             }
-                            
+
                             // rename folders
                             for (i = 0, len = arrFolders.length; i < len; i += 1) {
                                 strCurrentPathName = arrFolders[i].substring(arrFolders[i].lastIndexOf('/') + 1, arrFolders[i].length);
-                                
+
                                 if (strNewFolder === arrFolders[i].substring(0, arrFolders[i].lastIndexOf('/') + 1) && strAction !== 'Move') {
                                     strCurrentPathNameInsertIndex =
                                         strCurrentPathNameInsertIndex >= 0 ? strCurrentPathNameInsertIndex : strCurrentPathName.length;
-                                    
+
                                     strCurrentPathName = strCurrentPathName.substring(0, strCurrentPathNameInsertIndex) + '_copy' +
                                                          strCurrentPathName.substring(strCurrentPathNameInsertIndex);
                                 }
-                                
+
                                 arrFolders[i] = strNewFolder + strCurrentPathName;
                             }
-                            
+
                             // operate
                             operationFunction('["' + getCheckedInOrder().join('","') + '"]', '["' + sortPathArraysInOperationOrder(arrFiles, arrFolders).join('","') + '"]');
                         }
                     });
-                    
+
                     document.getElementById('button-confirm').focus();
                 };
-                
+
                 document.getElementById('button-move').addEventListener('click', function (event) {
                     operateFunction('Move', movePaths);
                 });
-                
+
                 document.getElementById('button-copy').addEventListener('click', function (event) {
                     operateFunction('Paste', copyPaths);
                 });
-                
+
                 document.getElementById('button-zip').addEventListener('click', function (event) {
                     GS.openDialog('dialog-download-zip', function () {
                         var dialog = this, zipNameControl = document.getElementById('text-zip-name');
-                        
+
                         document.getElementById('input-zip-from_paths').value = '["' + getCheckedInOrder().join('","') + '"]';
-                        
+
                         // new file name input on return: close dialog and insert file
                         zipNameControl.focus();
                         zipNameControl.addEventListener('keydown', function (event) {
                             var intKeyCode = event.which || event.keyCode;
-                            
+
                             if (intKeyCode === 13) {
                                 GS.closeDialog(dialog, 'Download');
                             }
                         });
                     }, function (event, strAnswer) {
                         var form = document.getElementById('form-zip-download');
-                        
+
                         if (strAnswer === 'Download') {
                             form.setAttribute('action', '/env/action_file/' + document.getElementById('text-zip-name').value);
                             form.submit();
                         }
                     });
                 });
-                
+
                 document.getElementById('button-delete').addEventListener('click', function (event) {
                     var i, len, path_i, path_len, strHTML,
                         arrCheckedSorted, arrFiles = [],
                         arrFolders = [],
                         strCurrentPath = arrCurrentPath.join('/');
-                    
+
                     // seperate files and folders
                     for (i = 0, len = arrCheckedPaths.length; i < len; i += 1) {
                         if (arrCheckedPathTypes[i] === 'file') {
@@ -1012,13 +1030,13 @@
                             arrFolders.push(arrCheckedPaths[i]);
                         }
                     }
-                    
+
                     arrCheckedSorted = sortPathArraysInOperationOrder(arrFiles, arrFolders);
-                    
+
                     for (i = 0, len = arrCheckedSorted.length, strHTML = ''; i < len; i += 1) {
                         strHTML += '<gs-button>' + encodeHTML(arrCheckedSorted[i]) + '</gs-button>';
                     }
-                    
+
                     GS.openDialog('dialog-delete', function () {
                         document.getElementById('dialog-delete-list').innerHTML = strHTML;
                     }, function(event, strAnswer) {
@@ -1029,48 +1047,48 @@
                                     //console.log(strCurrentPath);
                                 }
                             }
-                            
+
                             arrCurrentPath = strCurrentPath ? strCurrentPath.split('/') : [];
-                            
+
                             deletePaths('["' + arrCheckedSorted.join('","') + '"]');
                         }
                     });
                 });
-                
+
                 document.getElementById('button-rename').addEventListener('click', function(event) {
                     var i, len, strHTML, arrCheckedSorted = getCheckedInOrder(), strCurrentPath;
-                    
+
                     for (i = 0, len = arrCheckedSorted.length, strHTML = ''; i < len; i += 1) {
                         strCurrentPath = arrCheckedSorted[i];
-                        
+
                         strHTML += '<label>' + encodeHTML(strCurrentPath) + '</label>' +
                                 '<gs-text class="rename-input" path-start="' + encodeHTML(strCurrentPath.substring(0, strCurrentPath.lastIndexOf('/') + 1)) +
                                         '" value="' + encodeHTML(strCurrentPath.substring(strCurrentPath.lastIndexOf('/') + 1)) + '"></gs-text>';
                     }
-                    
-                    
+
+
                     GS.openDialog('dialog-rename', function () {
                         if (arrCheckedSorted.length > 1) {
                             document.getElementById('dialog-conditional-plural').textContent = 's';
                         }
-                        
+
                         document.getElementById('dialog-rename-list').innerHTML = strHTML;
-                        
+
                     }, function (event, strAnswer) {
                         var dialog = this, arrNewPathNames = [], i, len, arrInput;
-                        
+
                         if (strAnswer === 'Ok') {
                             arrInput = xtag.query(dialog, '.rename-input');
-                            
+
                             for (i = 0, len = arrInput.length; i < len; i += 1) {
                                 arrNewPathNames.push(arrInput[i].getAttribute('path-start') + arrInput[i].value);
                             }
-                            
+
                             renamePaths('["' + arrCheckedSorted.join('","') + '"]', '["' + arrNewPathNames.join('","') + '"]');
                         }
                     });
                 });
-                
+
                 if (bolWebSocket) {
                     document.getElementById('button-search').setAttribute('href', 'search.html?socket=true');
                 } else {
@@ -1085,38 +1103,38 @@
             #file-list gs-checkbox {
                 width: 3em;
             }
-            
+
             #file-list gs-button {
                 text-align: left;
             }
-            
+
             #file-list > h3 {
                 margin-top: 0;
                 margin-bottom: 0.2em;
             }
-            
+
             .check {
                 width: 1.5em;
             }
-            
+
             .font-adjustment {
                 font-size: 0.8em;
             }
-            
+
             gs-button, gs-checkbox {
                 border-radius: 0.5em;
             }
-            
+
             body > gs-page > gs-header {
                 padding-bottom: 0;
                 padding-left: 0.25em;
                 padding-right: 0.25em;
             }
-            
+
             body > gs-page > gs-footer {
                 padding: 0.25em;
             }
-            
+
             .spacer {
                 height: 0.25em;
             }
@@ -1137,7 +1155,7 @@
                 </gs-footer>
             </gs-page>
         </template>
-        
+
         <template id="dialog-upload">
             <gs-page>
                 <gs-header><center><h3>Upload a File</h3></center></gs-header>
@@ -1159,7 +1177,7 @@
                 </gs-footer>
             </gs-page>
         </template>
-        
+
         <template id="dialog-create-file">
             <gs-page>
                 <gs-header><center><h3>Create a new File</h3></center></gs-header>
@@ -1175,7 +1193,7 @@
                 </gs-footer>
             </gs-page>
         </template>
-        
+
         <template id="dialog-create-folder">
             <gs-page>
                 <gs-header><center><h3>Create a new Folder</h3></center></gs-header>
@@ -1191,7 +1209,7 @@
                 </gs-footer>
             </gs-page>
         </template>
-        
+
         <template id="dialog-download-zip">
             <gs-page>
                 <gs-header><center><h3>Download Zip</h3></center></gs-header>
@@ -1199,7 +1217,7 @@
                     <form id="form-zip-download" method="POST" target="form_response">
                         <input hidden type="text" name="action" value="zip" />
                         <input id="input-zip-from_paths" hidden type="text" name="from_paths" />
-                        
+
                         <label for="text-zip-name">Name For Your Zip:</label>
                         <gs-text id="text-zip-name" value="new-zip.zip"></gs-text>
                     </form>
@@ -1212,7 +1230,7 @@
                 </gs-footer>
             </gs-page>
         </template>
-        
+
         <template id="dialog-delete">
             <gs-page>
                 <gs-header><center><h3>Are you sure?</h3></center></gs-header>
@@ -1229,7 +1247,7 @@
                 </gs-footer>
             </gs-page>
         </template>
-        
+
         <template id="dialog-rename">
             <gs-page>
                 <gs-header><center><h3>File / Folder Rename</h3></center></gs-header>
@@ -1246,11 +1264,12 @@
                 </gs-footer>
             </gs-page>
         </template>
-        
+
         <gs-page>
             <gs-header>
                 <div flex-horizontal>
                     <h4 id="current-path" flex>File Manager</h4>
+                    <gs-text id="current-path-edit" flex hidden></gs-text>
                     <gs-button id="button-refresh" icononly icon="refresh" title="Refresh file list..." remove-right></gs-button>
                     <gs-button id="button-checked" icononly icon="check" title="Look at all checked files and folders" remove-all disabled></gs-button>
                     <gs-button id="button-search" target="_blank" icononly icon="search" title="Go to search page..." remove-left></gs-button>
