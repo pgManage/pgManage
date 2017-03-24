@@ -1,3 +1,11 @@
+Changes since 3.2.0:
+Postage:
+Remove "Clear Cache" button in Electron version
+Make "Reload" menu option a hard refresh
+
+Both:
+Fix caching issues
+
 Changes since 3.2.0-beta:
 Postage:
 Add options dialog
