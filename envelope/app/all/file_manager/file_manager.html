@@ -241,7 +241,11 @@
                             }
                         } else if (error) {
                             GS.removeLoader('file-list-load');
-                            GS.webSocketErrorDialog(errorData);
+                            GS.webSocketErrorDialog(errorData, listCurrentDirectory, function () {
+								console.log('test');
+								arrCurrentPath.pop();
+								listCurrentDirectory();
+							});
                         }
                     });
 
