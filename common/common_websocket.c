@@ -113,6 +113,8 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 		}
 		SDEBUG("int_request_len    : %d", int_request_len);
 		SERROR_CHECK(int_request_len == WEBSOCKET_HEADER_LENGTH, "FAILED TO READ WEBSOCKET HEADER");
+		// 0x79 == 0b01110000 (RSV bits)
+		SERROR_CHECK((buf[0] & 0x70) == 0, "RSV bit set!");
 
 		// clang-format off
 		// Get details from the header
@@ -123,6 +125,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 		// clang-format on
 		frame->int_length = frame->int_orig_length;
 		client_message->bol_have_header = true;
+
 	}
 
 	memset(buf, 0, BUF_LEN + 1);

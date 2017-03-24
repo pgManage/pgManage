@@ -28,6 +28,8 @@ char *str_global_public_username = NULL;
 char *str_global_public_password = NULL;
 bool bol_global_set_user = false;
 
+bool bol_global_allow_origin = false;
+
 char *str_global_app_path = NULL;
 char *str_global_role_path = NULL;
 #else
@@ -64,6 +66,7 @@ char *POSTAGE_PREFIX = NULL;
 // str_global_logfile					log_file						o							log-file
 // str_global_public_username			public_username					u							public-username
 // str_global_public_password			public_password					w							public-password
+// bol_global_allow_origin				allow_origin					i							allow-origin
 // clang-format on
 
 /*
@@ -106,6 +109,9 @@ static int handler(void *str_user, const char *str_section, const char *str_name
 		SFREE(str_global_public_password);
 		SERROR_SNCAT(str_global_public_password, &int_len,
 			str_value, strlen(str_value));
+
+	} else if (SMATCH("", "allow_origin")) {
+		bol_global_allow_origin = *str_value == 'T' || *str_value == 't';
 
 #endif
 	} else if (SMATCH("", "mode")) {
@@ -525,6 +531,7 @@ bool parse_options(int argc, char *const *argv) {
 		{"role-path",						required_argument,		NULL,	'z'},
 		{"public-username",					required_argument,		NULL,	'u'},
 		{"public-password",					required_argument,		NULL,	'w'},
+		{"allow-origin",					required_argument,		NULL,	'i'},
 #else
 		{"allow-custom-connections",		required_argument,		NULL,	'n'},
 #endif
@@ -543,7 +550,7 @@ bool parse_options(int argc, char *const *argv) {
 // clang-format on
 
 #ifdef ENVELOPE
-	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:u:w:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:u:w:i:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #else
 	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #endif
@@ -571,7 +578,7 @@ bool parse_options(int argc, char *const *argv) {
 	ini_parse(str_global_config_file, handler, &str_config_empty);
 
 #ifdef ENVELOPE
-	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:u:w:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
+	while ((ch = getopt_long(argc, argv, "hvc:d:g:y:z:u:w:i:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #else
 	while ((ch = getopt_long(argc, argv, "hvc:d:g:n:x:r:p:j:k:s:t:l:o:", longopts, NULL)) != -1) {
 #endif
@@ -613,6 +620,9 @@ bool parse_options(int argc, char *const *argv) {
 			SFREE(str_global_public_password);
 			SERROR_SNCAT(str_global_public_password, &int_global_len,
 				optarg, strlen(optarg));
+
+		} else if (ch == 'i') {
+			bol_global_allow_origin = *optarg == 'T' || *optarg == 't';
 #else
 		} else if (ch == 'n') {
 			bol_global_allow_custom_connections = *optarg == 'T' || *optarg == 't';

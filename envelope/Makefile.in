@@ -1,5 +1,5 @@
 BINARY = envelope
-CONFIGS = -c config/envelope.conf -t 300
+CONFIGS = -c config/envelope.conf -t 300 -i t
 WEBROOTS = -r ./web_root/ -z ./role -y ./app
 INSTALL_DEPS = @prefix@/sbin/ @prefix@/etc/envelope/ \
 @prefix@/etc/envelope/envelope.conf @prefix@/etc/envelope/envelope-connections.conf \

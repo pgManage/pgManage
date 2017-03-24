@@ -84,10 +84,12 @@ finish:
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-			"Connection: close\015\012\015\012",
+			"Connection: close\015\012",
 			strlen("HTTP/1.1 500 Internal Server Error\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-			"Connection: close\015\012\015\012"),
+				"Connection: close\015\012"),
+			bol_global_allow_origin ? "Access-Control-Allow-Origin: *\015\012\015\012" : "\015\012",
+			strlen(bol_global_allow_origin ? "Access-Control-Allow-Origin: *\015\012\015\012" : "\015\012"),
 			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}
@@ -137,13 +139,15 @@ bool http_action_step2(EV_P, void *cb_data, DB_result *res) {
 		"HTTP/1.1 200 OK\015\012"
 		"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 		"Content-Type: application/json; charset=UTF-8\015\012"
-			"Connection: close\015\012\015\012"
-		"{\"stat\":true, \"dat\": ",
+		"Connection: close\015\012",
 		strlen("HTTP/1.1 200 OK\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
 			"Content-Type: application/json; charset=UTF-8\015\012"
-			"Connection: close\015\012\015\012"
-			"{\"stat\":true, \"dat\": "),
+			"Connection: close\015\012"),
+		bol_global_allow_origin ? "Access-Control-Allow-Origin: *\015\012\015\012" : "\015\012",
+		strlen(bol_global_allow_origin ? "Access-Control-Allow-Origin: *\015\012\015\012" : "\015\012"),
+		"{\"stat\":true, \"dat\": ",
+		strlen("{\"stat\":true, \"dat\": "),
 		_str_response, _int_response_len,
 		"}", (size_t)1);
 	SFREE(_str_response);
@@ -182,10 +186,12 @@ finish:
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-			"Connection: close\015\012\015\012",
+			"Connection: close\015\012",
 			strlen("HTTP/1.1 500 Internal Server Error\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-			"Connection: close\015\012\015\012"),
+				"Connection: close\015\012"),
+			bol_global_allow_origin ? "Access-Control-Allow-Origin: *\015\012\015\012" : "\015\012",
+			strlen(bol_global_allow_origin ? "Access-Control-Allow-Origin: *\015\012\015\012" : "\015\012"),
 			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		_str_response = DB_get_diagnostic(client->conn, res);
@@ -296,10 +302,12 @@ finish:
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 500 Internal Server Error\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-			"Connection: close\015\012\015\012",
+			"Connection: close\015\012",
 			strlen("HTTP/1.1 500 Internal Server Error\015\012"
 				"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
-			"Connection: close\015\012\015\012"),
+				"Connection: close\015\012"),
+			bol_global_allow_origin ? "Access-Control-Allow-Origin: *\015\012\015\012" : "\015\012",
+			strlen(bol_global_allow_origin ? "Access-Control-Allow-Origin: *\015\012\015\012" : "\015\012"),
 			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}

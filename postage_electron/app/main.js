@@ -401,40 +401,41 @@ function openWindow() {
 
 function appStart() {
 	electron.session.defaultSession = electron.session.fromPartition('persist:postage-session123', { cache: false });
+	electron.session.defaultSession.clearCache(function () {
+		mainWindowState = windowStateKeeper({
+			defaultWidth: 1024,
+			defaultHeight: 768,
+			path: os.homedir() + '/.postage/',
+			file: 'main-window-state.json'
+		});
 
-	mainWindowState = windowStateKeeper({
-		defaultWidth: 1024,
-		defaultHeight: 768,
-		path: os.homedir() + '/.postage/',
-		file: 'main-window-state.json'
+		configWindowState = windowStateKeeper({
+			defaultWidth: 1024,
+			defaultHeight: 768,
+			path: os.homedir() + '/.postage/',
+			file: 'config-window-state.json'
+		});
+
+		connectionWindowState = windowStateKeeper({
+			defaultWidth: 1024,
+			defaultHeight: 768,
+			path: os.homedir() + '/.postage/',
+			file: 'connection-window-state.json'
+		});
+
+		pgpassWindowState = windowStateKeeper({
+			defaultWidth: 1024,
+			defaultHeight: 768,
+			path: os.homedir() + '/.postage/',
+			file: 'pgpass-window-state.json'
+		});
+
+		if (bolPostageIsReady) {
+			openWindow();
+		}
+
+		setMenu();
 	});
-
-	configWindowState = windowStateKeeper({
-		defaultWidth: 1024,
-		defaultHeight: 768,
-		path: os.homedir() + '/.postage/',
-		file: 'config-window-state.json'
-	});
-
-	connectionWindowState = windowStateKeeper({
-		defaultWidth: 1024,
-		defaultHeight: 768,
-		path: os.homedir() + '/.postage/',
-		file: 'connection-window-state.json'
-	});
-
-	pgpassWindowState = windowStateKeeper({
-		defaultWidth: 1024,
-		defaultHeight: 768,
-		path: os.homedir() + '/.postage/',
-		file: 'pgpass-window-state.json'
-	});
-
-	if (bolPostageIsReady) {
-		openWindow();
-	}
-
-	setMenu();
 }
 
 // This method will be called when Electron has finished
