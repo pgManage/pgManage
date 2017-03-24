@@ -21207,7 +21207,7 @@ GS.closeDialog = function (dialog, strAnswer) {
             return setOrRemoveTextAttribute(selectedElement, 'ord', this.value);
         });
         
-        addProp('Limit', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('limit') || '') + '" mini></gs-number>', function () {
+        addProp('Limit', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('limit') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'limit', this.value);
         });
         
