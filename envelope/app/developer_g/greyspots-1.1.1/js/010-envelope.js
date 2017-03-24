@@ -34,7 +34,7 @@ window.addEventListener('design-register-element', function (event) {
         });
         
         addProp('Where', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('where') || '') + '" mini></gs-text>', function () {
-            return setOrRemoveTextAttribute(selectedElement, 'where', (this.value));
+            return setOrRemoveTextAttribute(selectedElement, 'where', this.value);
         });
         
         addProp('Order By', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('ord') || '') + '" mini></gs-text>', function () {
@@ -1819,7 +1819,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // binding events
                 element.scrollContainerElement.addEventListener('change', function (event) {
                     var newValue, parentTr;
-                    
+
                     if (event.target.getAttribute('column')) {
                         if (event.target.value !== null) {
                             newValue = event.target.value;
@@ -1830,7 +1830,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         parentTr = GS.findParentTag(event.target, 'tr');
                         
                         // if the control is a direct child of this envelope (fixes sub envelope update)
-                        if (parentTr.parentNode.parentNode.parentNode === element.scrollContainerElement && !element.hasAttribute('no-update')) {
+                        if (
+                            parentTr.parentNode.parentNode.parentNode === element.scrollContainerElement &&
+                            !element.hasAttribute('no-update')
+                        ) {
                             updateRecord(element, parentTr, event.target.getAttribute('column'), newValue);
                         }
                     }

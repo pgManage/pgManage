@@ -53,7 +53,7 @@ function addProp(strTitle, bolTable, strHTML, changeFunction, bolGlobal) {
 
 function setOrRemoveTextAttribute(element, strAttrName, strAttrContent) {
     if (strAttrContent || strAttrContent === 0) {
-        element.setAttribute(strAttrName, strAttrContent);
+        element.setAttribute(strAttrName, encodeHTML(strAttrContent));
         
     } else {
         element.removeAttribute(strAttrName);

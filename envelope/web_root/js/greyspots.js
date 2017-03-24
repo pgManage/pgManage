@@ -14670,8 +14670,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
-});//global GS, xtag, document, window, ml
-//jslint browser:true, white:true, multivar:true, for:true
+});//jslint browser:true, white:true, multivar:true, for:true
 window.addEventListener('design-register-element', function (event) {
     'use strict';
     
@@ -15528,6 +15527,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                         if (refocusElement) {
                             refocusElement.focus();
+                            
                             if (refocusSelection) {
                                 GS.setInputSelection(refocusElement, refocusSelection.start, refocusSelection.end);
                             }
@@ -16648,7 +16648,17 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!evt.touchDevice) {
             // focus copy control
             element.addEventListener('mousedown', function (event) {
-                element.copyControl.focus();
+                var parentDatasheet = GS.findParentTag(event.target, 'gs-datasheet');
+
+                // we dont want to override the focus if the currently focused
+                //      element is inside the gs-datasheet and is capable of being focus
+                if (
+                    !GS.isElementFocusable(event.target) ||
+                    !parentDatasheet ||
+                    parentDatasheet.nodeName !== 'GS-DATASHEET'
+                ) {
+                    element.copyControl.focus();
+                }
             });
         }
         
@@ -17183,7 +17193,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                         data = getReturn(element) + '\n' + data;
                                         
                                         // make the records amber and refresh their data
-                                        refreshRecordsAfterUpdate(element, arrRecordsToRefresh, data);
+                                        refreshRecordsAfterUpdate(element, arrRecordsToRefresh, data);////
                                     } else {
                                         commitFunction();
                                     }
@@ -17348,6 +17358,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // manuel update
         var updateFromEntry = function (target) {
+            
             var updateRecord = GS.findParentElement(target, 'tr')
               , updateRecordData = element.internalData.arrRecords[parseInt(updateRecord.getAttribute('data-index'), 10)]
               , arrPk, arrLock, i, len, col_i, col_len, strRoles, strColumns
@@ -17399,8 +17410,12 @@ document.addEventListener('DOMContentLoaded', function () {
         
         element.addEventListener('change', function (event) {
             var target = event.target;
-            
-            if (target.hasAttribute('column') && !GS.findParentElement(target, 'tr').classList.contains('insert-record') && !event.shiftKey) {
+
+            if (
+                target.hasAttribute('column') &&
+                !GS.findParentElement(target, 'tr').classList.contains('insert-record') &&
+                !event.shiftKey
+            ) {
                 updateFromEntry(target);
             }
         });
@@ -21185,7 +21200,7 @@ GS.closeDialog = function (dialog, strAnswer) {
         });
         
         addProp('Where', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('where') || '') + '" mini></gs-text>', function () {
-            return setOrRemoveTextAttribute(selectedElement, 'where', (this.value));
+            return setOrRemoveTextAttribute(selectedElement, 'where', this.value);
         });
         
         addProp('Order By', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('ord') || '') + '" mini></gs-text>', function () {
@@ -22970,7 +22985,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // binding events
                 element.scrollContainerElement.addEventListener('change', function (event) {
                     var newValue, parentTr;
-                    
+
                     if (event.target.getAttribute('column')) {
                         if (event.target.value !== null) {
                             newValue = event.target.value;
@@ -22981,7 +22996,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         parentTr = GS.findParentTag(event.target, 'tr');
                         
                         // if the control is a direct child of this envelope (fixes sub envelope update)
-                        if (parentTr.parentNode.parentNode.parentNode === element.scrollContainerElement && !element.hasAttribute('no-update')) {
+                        if (
+                            parentTr.parentNode.parentNode.parentNode === element.scrollContainerElement &&
+                            !element.hasAttribute('no-update')
+                        ) {
                             updateRecord(element, parentTr, event.target.getAttribute('column'), newValue);
                         }
                     }
