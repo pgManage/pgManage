@@ -400,17 +400,17 @@ function dialogSwitchDatabase(target) {
         </gs-page>
     */});
 
-    var arrDatabases, i, len, strHTML;
+    var arrDatabases, i, len, strHTML = '';
     GS.openDialogToElement(target, templateElement, 'down', function () {
         GS.requestRawFromSocket(GS.envSocket,
-                                'SELECT datname::text FROM pg_catalog.pg_database',
+                                'SELECT datname::text FROM pg_catalog.pg_database ORDER BY 1',
                                 function (data, error) {
             if (!error) {
                 // if we have a data packet: build up strHTML with the database names
                 if (data.strMessage !== '\\.' && data.strMessage.trim()) {
                     arrDatabases = data.strMessage.split('\n');
 
-                    for (i = 0, len = arrDatabases.length, strHTML = ''; i < len; i += 1) {
+                    for (i = 0, len = arrDatabases.length; i < len; i += 1) {
                         strHTML += '<gs-button class="postage-menu-item-button" dialogclose no-focus>' + encodeHTML(GS.decodeFromTabDelimited(arrDatabases[i])) + '</gs-button>';
                     }
 
