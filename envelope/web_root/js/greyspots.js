@@ -37625,17 +37625,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function elementInserted(element) {
+        var dateValue = '';
+        var timeValue = '';
+        
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
                 
+                var arrValue = element.getAttribute('value').split(' ');
+                dateValue = new Date(arrValue[0]);
+                timeValue = arrValue[1];
+                
                 element.dateControl = document.createElement('gs-date');
                 element.timeControl = document.createElement('gs-time');
                 
-                element.dateControl.setAttribute('format', element.getAttribute('date-format'));
-                element.timeControl.setAttribute('format', element.getAttribute('time-format'));
+                if (element.hasAttribute('date-format')) {
+                    element.dateControl.setAttribute('format', element.getAttribute('date-format'));
+                }
+                if (element.hasAttribute('time-format')) {
+                    element.timeControl.setAttribute('format', element.getAttribute('time-format'));
+                }
                 
                 if (element.hasAttribute('no-date-picker')) {
                     element.dateControl.setAttribute('no-picker', '');
@@ -37644,14 +37655,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.timeControl.setAttribute('no-picker', '');
                 }
                 
-                element.dateControl.setAttribute('value', '');
-                element.timeControl.setAttribute('value', '');
+                element.dateControl.value = dateValue;
+                element.timeControl.value = timeValue;
                 
                 element.dateControl.setAttribute('flex', '');
                 element.timeControl.setAttribute('flex', '');
                 
                 element.dateControl.setAttribute('gs-dynamic', '');
                 element.timeControl.setAttribute('gs-dynamic', '');
+                
+                element.dateControl.addEventListener('change', function () {
+                    
+                });
+                element.timeControl.addEventListener('change', function () {
+                    
+                });
                 
                 console.log(element.dateControl);
                 console.log(element.timeControl);
@@ -37680,6 +37698,8 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             
             attributeChanged: function (strAttrName, oldValue, newValue) {
+                var dateValue = '';
+                var timeValue = '';
                 // if "suspend-created" has been removed: run created and inserted code
                 if (strAttrName === 'suspend-created' && newValue === null) {
                     elementCreated(this);
@@ -37690,7 +37710,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     elementInserted(this);
                     
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    
+                    if (strAttrName === 'value') {
+                        var arrValue = newValue.split(' ');
+                        dateValue = new Date(arrValue[0]);
+                        timeValue = arrValue[1];
+                        
+                        this.dateControl.value = dateValue;
+                        this.timeControl.value = timeValue;
+                    }
                 }
             }
         },
@@ -37698,11 +37725,11 @@ document.addEventListener('DOMContentLoaded', function () {
         accessors: {
             value: {
                 get: function () {
-                    
+                    return this.getAttribute('value');
                 },
                 
                 set: function (newValue) {
-                    
+                    return this.setAttribute('value', newValue);
                 }
             }
         },
