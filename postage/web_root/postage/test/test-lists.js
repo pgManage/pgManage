@@ -549,7 +549,15 @@ LIMIT
 */
 			}),
 			['id\ttest_name\tTestName\ninteger\tcharacter varying(150)\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
-			['SELECT 8', 'websocket send from', '', ml(function () {/*SELECT	public	ttesting_large_view2
+			['SELECT 8', 'websocket', '', ml(function () {/*SELECT	public	ttesting_large_view2
+RETURN	*
+
+GROUP BY	ORDER BY
+id, test1, test2	id DESC
+*/
+			}),
+			["id\ttest1\ttest2\ninteger\ttext\ttext\n"].concat(createTestDataResponse('', 200, false)).concat(['TRANSACTION COMPLETED'])],
+			['SELECT 9', 'websocket send from', '', ml(function () {/*SELECT	public	ttesting_large_view2
 RETURN	*
 
 ORDER BY

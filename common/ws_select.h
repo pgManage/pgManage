@@ -16,6 +16,7 @@ struct sock_ev_client_select {
 	char *str_sql;
 	char *str_row_count;
 	char *str_where;
+	char *str_group_by;
 	char *str_order_by;
 	char *str_limit;
 	char *str_offset;
@@ -30,6 +31,7 @@ struct sock_ev_client_select {
 	size_t int_return_escaped_columns_len;
 	size_t int_real_table_name_len;
 	size_t int_where_len;
+	size_t int_group_by_len;
 	size_t int_order_by_len;
 	size_t int_limit_len;
 	size_t int_offset_len;
