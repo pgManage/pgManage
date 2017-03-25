@@ -851,26 +851,98 @@ document.addEventListener('DOMContentLoaded', function () {
             //    </template>
             //</gs-combo>
             
-            
-            matchRecord = findRecordFromString(element, strSearch, true);
-            
-            // if we found a record and its was already selected: selected the matched record and dont 
-            if (matchRecord) {
-                highlightRecord(element, matchRecord);
-                element.control.value = xtag.queryChildren(matchRecord, 'td')[0].textContent;
-                GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+            if (xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr').length > 2000) {
+                var strSearchCol = '', templateElement = element.tableTemplate, strWhereLink = '', data, strLink, dataFunction,
+                    strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') || element.getAttribute('source') || '')),
+                    strCols = element.getAttribute('cols') || '';
                 
-                //if (strSearch.length === element.control.value.length) {
-                //    selectRecord(element, matchRecord, true);
-                //}
+                templateElement = templateElement.substring(templateElement.indexOf('td'), templateElement.indexOf('/td') - 1);
+                templateElement = templateElement.substring(templateElement.indexOf('{'), templateElement.length);
+                if (templateElement.indexOf('row.') === -1) {
+                    if (templateElement.indexOf('row[') === -1) {
+                        console.warn('There is no doT.js in the first "<td>" in your template please fill your first "<td>" with templating code.');
+                    } else {
+                        templateElement = templateElement.substring(parseInt(templateElement.indexOf('row['), 10) + 5, templateElement.length - 2 - 3).trim();
+                    }
+                } else {
+                    templateElement = templateElement.substring(parseInt(templateElement.indexOf('row.'), 10) + 4, templateElement.length - 3).trim();
+                }
                 
-                scrollToSelectedRecord(element);
+                
+                strSearchCol = templateElement;
+                
+                strLink = 'src=' + encodeURIComponent(strSource);
+                
+                if (element.getAttribute('where')) {
+                    strWhereLink = '' + element.getAttribute('where') + ' AND ' + strSearchCol + '::text ILIKE $UnCOPYQTE$' + strSearch + '%$UnCOPYQTE$';
+                } else {
+                    strWhereLink = strSearchCol + '::text ILIKE $UnCOPYQTE$' + strSearch + '%$UnCOPYQTE$';
+                }
+                
+                strLink += '&where='    + encodeURIComponent(GS.templateWithQuerystring(strWhereLink)) +
+                           '&limit='    + encodeURIComponent(GS.templateWithQuerystring(1)) +
+                           '&offset='   + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('offset') || ''))) +
+                           '&order_by=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('ord') || ''))) +
+                           '&cols='     + encodeURIComponent(strCols);
+                
+                //console.log(strLink);
+                //console.log(strSearchCol);
+                
+                
+                if (strSearchCol) {
+                    GS.ajaxJSON('/env/action_select', strLink, function (data, error) {
+                        if (!error) {
+                            //console.log(data.dat.dat[0][0]);
+                            if (data && data.dat && data.dat.dat && data.dat.dat[0] && data.dat.dat[0][0]) {
+                                //console.log(data.dat.dat[0][0]);
+                                
+                                // console.log(1);
+                                element.control.value = data.dat.dat[0][0];
+                                // console.log(2);
+                                GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                                // console.log(3);
+                                //console.log(element.open);
+                                if (element.open) {
+                                    matchRecord = findRecordFromString(element, strSearch, true);
+                                    // console.log(4);
+                                    if (matchRecord) {
+                                    // console.log(5);
+                                        highlightRecord(element, matchRecord);
+                                    // console.log(6);
+                                        scrollToSelectedRecord(element);
+                                    // console.log(7);
+                                    }
+                                    // console.log(8);
+                                }
+                                
+                            }
+                        } else {
+                            GS.ajaxErrorDialog(data);
+                        }
+                    });
+                }
+                
+                
                 
             } else {
-                clearSelection(element);
-                //selectRecordFromValue(element, strSearch, false);
-                //GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                matchRecord = findRecordFromString(element, strSearch, true);
+                
+                // if we found a record and its was already selected: selected the matched record and dont 
+                if (matchRecord) {
+                    highlightRecord(element, matchRecord);
+                    element.control.value = xtag.queryChildren(matchRecord, 'td')[0].textContent;
+                    GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                    
+                    scrollToSelectedRecord(element);
+                    
+                } else {
+                    clearSelection(element);
+                    //selectRecordFromValue(element, strSearch, false);
+                    //GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                }
             }
+            
+            
         }
         
         if (element.attemptSearchOnNextKeyup === true) {

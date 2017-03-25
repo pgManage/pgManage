@@ -755,28 +755,25 @@ function jsnIsEmpty(jsn) {
     return true;
 }
 
-var bolControlPressed = false, CTRLCMDkeycode;
-
 if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
-    CTRLCMDkeycode = 91;
+    var CTRLCMD = 'cmd';
 } else {
-    CTRLCMDkeycode = 17;
+    var CTRLCMD = 'ctr';
 }
 
 document.addEventListener('keydown', function (event) {
-    if (bolControlPressed && event.keyCode === 79) {
-        event.preventDefault();
-        event.stopPropagation();
-        newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'});
-    }
-    if (event.keyCode === CTRLCMDkeycode) {
-        bolControlPressed = true;
-    }
-});
-
-document.addEventListener('keyup', function (event) {
-    if (event.keyCode === CTRLCMDkeycode) {
-        bolControlPressed = false;
+    if (CTRLCMD === 'cmd') {
+        if (event.metaKey && event.keyCode === 79) {
+            event.preventDefault();
+            event.stopPropagation();
+            newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'});
+        }
+    } else if (CTRLCMD === 'ctr') {
+        if (event.ctrlKey && event.keyCode === 79) {
+            event.preventDefault();
+            event.stopPropagation();
+            newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'});
+        }
     }
 });
 
