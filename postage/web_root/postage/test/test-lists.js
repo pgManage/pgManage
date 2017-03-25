@@ -792,7 +792,9 @@ iπd	test_name
 			['INSERT 1', 'websocket', '', ml(function () {/*INSERT	rtesting_table
 RETURN	id	test_name
 PK	id
-SEQ
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id DESC
 
 id	test_name
 {{test_random}}1	Bob
@@ -807,7 +809,9 @@ id	test_name
 			['INSERT 2', 'websocket', '', ml(function () {/*INSERT	rtesting_table
 RETURN	id	test_name
 PK	id
-SEQ
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id DESC
 
 id	test_name
 {{test_random}}1	Bob
@@ -826,7 +830,9 @@ id	test_name
                 ml(function () {/*INSERT	rtesting_table
 RETURN	id	test@test
 PK	id
-SEQ
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id DESC
 
 id	test@test
 {{test_random}}70	Bob
@@ -849,7 +855,9 @@ id	test@test
                 ml(function () {/*INSERT	rtesting_table
 RETURN	id	select
 PK	id
-SEQ
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id DESC
 
 id	select
 {{test_random}}70	Bob
@@ -2012,7 +2020,7 @@ $.ajax('/postage/index.html', '', 'GET', function (data) {
         }
     }
 });
-var req = $.ajax('/postage/test.txt', '', 'GET', function (data) {
+var req = $.ajax('/postage/test.txt?anticache=' + Math.random().toString().substring(2), '', 'GET', function (data) {
     $.if_modified_since_changestamp = req.getResponseHeader('Last-Modified');
 });
 $.ajax('/postage/auth', 'action=login&username=postgres&password=password&connname=test', 'POST', function (data) {
