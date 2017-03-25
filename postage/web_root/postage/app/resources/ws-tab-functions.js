@@ -754,23 +754,32 @@ function jsnIsEmpty(jsn) {
 
     return true;
 }
-var bolControlPressed = false;
+
+var bolControlPressed = false, CTRLCMDkeycode;
+
+if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
+    CTRLCMDkeycode = 91;
+} else {
+    CTRLCMDkeycode = 17;
+}
+
 document.addEventListener('keydown', function (event) {
     if (bolControlPressed && event.keyCode === 79) {
-    event.preventDefault();
-    event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
         newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'});
     }
-    if (event.keyCode === 17) {
+    if (event.keyCode === CTRLCMDkeycode) {
         bolControlPressed = true;
     }
 });
 
 document.addEventListener('keyup', function (event) {
-    if (event.keyCode === 17) {
+    if (event.keyCode === CTRLCMDkeycode) {
         bolControlPressed = false;
     }
 });
+
 
 var afterDeleteSelectionDirections = [];
 function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFilePath, bolAutoSelect) {

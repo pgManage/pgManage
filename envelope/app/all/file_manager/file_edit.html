@@ -24,21 +24,28 @@
                 bolWebSocket, strParsingMode;
                 //consoleCustom = []
             
-            var bolControlPressed = false;
+            var bolCTRLCMDPressed = false, CTRLCMDkeycode;
+            
+            if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
+                CTRLCMDkeycode = 91;
+            } else {
+                CTRLCMDkeycode = 17;
+            }
+            
             document.addEventListener('keydown', function (event) {
-                if (bolControlPressed && event.keyCode === 83) {
+                if (bolCTRLCMDPressed && event.keyCode === 83) {
                 event.preventDefault();
                 event.stopPropagation();
                     saveFile();
                 }
-                if (event.keyCode === 17) {
-                    bolControlPressed = true;
+                if (event.keyCode === CTRLCMDkeycode) {
+                    bolCTRLCMDPressed = true;
                 }
             });
             
             document.addEventListener('keyup', function (event) {
-                if (event.keyCode === 17) {
-                    bolControlPressed = false;
+                if (event.keyCode === CTRLCMDkeycode) {
+                    bolCTRLCMDPressed = false;
                 }
             });
             
