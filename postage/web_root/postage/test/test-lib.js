@@ -126,11 +126,9 @@ var $ = {
 				if (key[0] !== '_' && bolEndTests && $.testsEnded !== true) {
 					$.testsEnded = true;
 					$.ajax('http://127.0.0.1:45654', '', 'GET', function (data) {});
-					for (var x = 0; x < 10; x += 1) {
-						$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + $.intID, 'POST', function (data) {
-							console.log(data);
-						});
-					}
+					$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + $.intID, 'POST', function (data) {
+						alert('Tests finished!');
+					});
 				}
                 document.getElementById('status-note-' + key).textContent = ' (STOPPED)';
 				if (key[0] === '_') {
