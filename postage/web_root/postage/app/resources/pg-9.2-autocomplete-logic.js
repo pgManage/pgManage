@@ -536,6 +536,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                 }
                 
                 //console.log(arrQueries);
+                
                 // if we've found queries: open the popup
                 if (arrQueries && arrQueries.length > 0) {
                     var strScript2 = editor.getValue()

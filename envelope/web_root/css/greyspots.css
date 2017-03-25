@@ -16330,7 +16330,17 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3f3f3', end
 .gs-time-time-picker-container .time-bottom-toolbar {
     margin-top: 0.4em;
 }
-
+gs-timestamp {
+    display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox;      /* TWEENER - IE 10 */
+    display: -webkit-flex;     /* NEW - Chrome */
+    display: flex;
+    
+    flex-direction: row;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+}
 
 gs-tutorial-popup {
     display: block;

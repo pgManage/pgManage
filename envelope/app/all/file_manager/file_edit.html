@@ -24,6 +24,31 @@
                 bolWebSocket, strParsingMode;
                 //consoleCustom = []
             
+            var bolCTRLCMDPressed = false, CTRLCMDkeycode;
+            
+            if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
+                CTRLCMDkeycode = 91;
+            } else {
+                CTRLCMDkeycode = 17;
+            }
+            
+            document.addEventListener('keydown', function (event) {
+                if (bolCTRLCMDPressed && event.keyCode === 83) {
+                event.preventDefault();
+                event.stopPropagation();
+                    saveFile();
+                }
+                if (event.keyCode === CTRLCMDkeycode) {
+                    bolCTRLCMDPressed = true;
+                }
+            });
+            
+            document.addEventListener('keyup', function (event) {
+                if (event.keyCode === CTRLCMDkeycode) {
+                    bolCTRLCMDPressed = false;
+                }
+            });
+            
             function test() {
                 var testingLink = strCurrentPageLink;
                 
@@ -663,6 +688,16 @@
                     aceIndicator.removeAttribute('hidden');
                     aceIndicator.textContent = 'Saving...';
                     aceIndicator.classList.remove('indicator-error');
+                    
+                    //if the file still hasn't saved after five seconds, then add the ace error class
+                    clearTimeout(window.timeoutSaving);
+                    window.timeoutSaving = setTimeout(function () {
+                        console.log('Saving still up', bolSaveWaiting);
+                        if (bolCurrentlySaving) {// still waiting
+                            aceIndicator.classList.add('indicator-error');
+                        }
+                        //aceContainer.classList.add('indicator-error');
+                    }, 5000);
                     
                     if (bolWebSocket) {
                         webSocketFileSave(bolLoader);

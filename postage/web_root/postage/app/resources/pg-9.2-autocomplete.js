@@ -363,6 +363,24 @@ function autocompletePopupLoad(editor, arrQueries) {
 
                     }
                 }
+                
+                var distinctValues = [];
+                for (var i = 0, len = autocompleteGlobals.arrValuesMaster.length; i < len; i++) {
+                    if (distinctValues.indexOf(autocompleteGlobals.arrValuesMaster[i]) === -1) {
+                        distinctValues.push(autocompleteGlobals.arrValuesMaster[i]);
+                    }
+                }
+                
+                var distinctSearch= [];
+                for (var i = 0, len = autocompleteGlobals.arrSearchMaster.length; i < len; i++) {
+                    if (distinctSearch.indexOf(autocompleteGlobals.arrSearchMaster[i]) === -1) {
+                        distinctSearch.push(autocompleteGlobals.arrSearchMaster[i]);
+                    }
+                }
+                autocompleteGlobals.arrValuesMaster = distinctValues;
+                autocompleteGlobals.arrSearchMaster = distinctSearch;
+                autocompleteGlobals.arrValues = distinctValues;
+                autocompleteGlobals.arrSearch = distinctSearch;
 
 
                 // append text (the substring is to remove the trailing \n)
@@ -382,6 +400,7 @@ function autocompletePopupLoad(editor, arrQueries) {
 
                     autocompletePopupSearch(editor, 'filter');
                 }
+                
             } else {
                 intResult += 1;
                 if (!bolResults) {
@@ -868,12 +887,12 @@ function autocompletePopupWake(editor) {
 // bind keyboard (temporary. binds to sql editor, not autocomplete popup)
 function autocompleteBind(editor) {
     'use strict';
-    editor.standardGoLineDownExec = editor.commands.commands.golinedown.exec;
-    editor.standardGoLineUpExec   = editor.commands.commands.golineup.exec;
-    editor.standardIndentExec     = editor.commands.commands.indent.exec;
 
 
     if (!autocompleteGlobals.bolBound) {
+        editor.standardGoLineDownExec = editor.commands.commands.golinedown.exec;
+        editor.standardGoLineUpExec   = editor.commands.commands.golineup.exec;
+        editor.standardIndentExec     = editor.commands.commands.indent.exec;
 
         editor.commands.commands.golinedown.exec = function () {
             var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
@@ -1004,6 +1023,9 @@ function autocompleteBind(editor) {
 function autocompleteUnbind(editor) {
     'use strict';
     if (autocompleteGlobals.bolBound) {
+        console.log(editor.standardGoLineDownExec);
+        console.log(editor.standardGoLineUpExec);
+        console.log(editor.standardIndentExec);
         editor.commands.commands.golinedown.exec = editor.standardGoLineDownExec;
         editor.commands.commands.golineup.exec = editor.standardGoLineUpExec;
         editor.commands.commands.indent.exec = editor.standardIndentExec;
