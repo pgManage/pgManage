@@ -13607,6 +13607,59 @@ document.addEventListener('DOMContentLoaded', function () {
             strSearch &&
             GS.getInputSelection(element.control).start === strSearch.length) {
             
+            // ######### FOR CROSS
+            // you need to comment the code inside this block.
+            // you need an if statment for >2000 records.
+            // you need to use the currently commented code for <=2000 records.
+            // you need new code for >2000.
+            // you need to get the template and put it inside a virtual template element.
+            // a virtual template element is just a template element inside a javascript variable.
+            //      var templateElement = document.createElement('template');
+            // you need to fill templateElement with the record template string, don't use the thead. (you'll find most everything in element.tableTemplate)
+            // you need to extract the contents of the first td and put that into a variable.
+            // you need to extract the contents of the "value" attribute on the tr (if present).
+            // because you extracted the contents before templating, the variables are untemplated.
+            // you need to get the column name from the first td template.
+            //      there are three things you need to try:
+            //          do a regex for "row.something", cut off the row
+            //              OR
+            //          do a regex for "row['something']", cut off the row[' and ']
+            //              OR
+            //          do a regex for "row["something"]", cut off the row[" and "]
+            //
+            //      that should be good enough. if you can't get the column: stop and
+            //          console.warn to tell the developer to stick <!-- row.column -->
+            //          at the top of the first td 
+            // you need to run an AJAX call on the postgres object in "src" with a where clause.
+            // the where clause will be something like this:
+            //          (OLDWHERE) AND COLUMN ILIKE $UnCOPYQTE$ strSearch%$UnCOPYQTE$
+            // the ajax call should only get one record.
+            // use the two templates to set the value (copy the original code).
+            //
+            // after you're done, leave these comments for future developers
+            
+            
+            
+            //<gs-combo src="test.tpeople" column="">
+            //    <template>
+            //        <table>
+            //            <thead>
+            //                <tr>
+            //                    <th>asdf</th>
+            //                    <th>fdsa</th>
+            //                </tr>
+            //            </thead>
+            //            <tbody>
+            //                <tr value="{{! row.id }}"> <--- hidden value, if present
+            //                    <td>{{! row.asdf }}</td> <--- visible value
+            //                    <td>{{! row.fdsa }}</td>
+            //                </tr>
+            //            </tbody>
+            //        </table>
+            //    </template>
+            //</gs-combo>
+            
+            
             matchRecord = findRecordFromString(element, strSearch, true);
             
             // if we found a record and its was already selected: selected the matched record and dont 
@@ -37409,6 +37462,251 @@ left: 49.75%;"><div class="clock-button clock-minute" data-value="25"><span clas
                     this.open();
                 }
             }
+        }
+    });
+});/*jslint white:true browser:true this:true*/
+/*global window,GS,document,xtag,designRegisterElement,registerDesignSnippet,addProp,encodeHTML,setOrRemoveTextAttribute,setOrRemoveBooleanAttribute,addFlexProps*/
+
+window.addEventListener('design-register-element', function () {
+    'use strict';
+    
+    registerDesignSnippet('<gs-timestamp>', '<gs-timestamp>', 'gs-timestamp date-format="${0:isodate}" time-format=${1}></gs-timestamp>');
+    
+    designRegisterElement('gs-timestamp', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-timestamp.html');
+    
+    window.designElementProperty_GSTIMESTAMP = function (selectedElement) {    
+        // TITLE attribute
+        addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
+        });
+        
+        addProp('Date Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-picker')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'no-date-picker', (this.value === 'true'), false);
+        });
+
+        addProp('Time Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-picker')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'no-time-picker', (this.value === 'true'), false);
+        });
+        
+        // SUSPEND-INSERTED attribute
+        addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
+        });
+        
+        // visibility attributes
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
+        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
+        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
+        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
+        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
+        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
+        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
+        
+        addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
+                                        '<option value="">Visible</option>' +
+                                        '<option value="hidden">Invisible</option>' +
+                                        '<option value="hide-on-desktop">Invisible at desktop size</option>' +
+                                        '<option value="hide-on-tablet">Invisible at tablet size</option>' +
+                                        '<option value="hide-on-phone">Invisible at phone size</option>' +
+                                        '<option value="show-on-desktop">Visible at desktop size</option>' +
+                                        '<option value="show-on-tablet">Visible at tablet size</option>' +
+                                        '<option value="show-on-phone">Visible at phone size</option>' +
+                                    '</gs-select>', function () {
+            selectedElement.removeAttribute('hidden');
+            selectedElement.removeAttribute('hide-on-desktop');
+            selectedElement.removeAttribute('hide-on-tablet');
+            selectedElement.removeAttribute('hide-on-phone');
+            selectedElement.removeAttribute('show-on-desktop');
+            selectedElement.removeAttribute('show-on-tablet');
+            selectedElement.removeAttribute('show-on-phone');
+            
+            if (this.value) {
+                selectedElement.setAttribute(this.value, '');
+            }
+            
+            return selectedElement;
+        });
+        
+        //addFlexContainerProps(selectedElement);
+        addFlexProps(selectedElement);
+    };
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+    
+    function pushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+        var strOperator;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i];
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                } else {
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
+                }
+                i += 1;
+            }
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun !== true) {
+                if (strQSValue !== '' || !element.getAttribute('value')) {
+                    element.setAttribute('value', strQSValue);
+                }
+            } else {
+                element.value = strQSValue;
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
+    }
+    
+    // dont do anything that modifies the element here
+    function elementCreated(element) {
+        // if "created" hasn't been suspended: run created code
+        if (!element.hasAttribute('suspend-created')) {
+            // if the value was set before the "created" lifecycle code runs: set attribute
+            //      (discovered when trying to set a value of a date control in the after_open of a dialog)
+            //      ("delete" keyword added because of firefox)
+            if (element.value && new Date(element.value).getTime()) {
+                element.setAttribute('value', element.value);
+                delete element.value;
+                //element.value = undefined;
+                //element.value = null;
+            }
+        }
+    }
+
+    function elementInserted(element) {
+        // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
+        if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
+            // if this is the first time inserted has been run: continue
+            if (!element.inserted) {
+                element.inserted = true;
+                
+                element.dateControl = document.createElement('gs-date');
+                element.timeControl = document.createElement('gs-time');
+                
+                element.dateControl.setAttribute('format', element.getAttribute('date-format'));
+                element.timeControl.setAttribute('format', element.getAttribute('time-format'));
+                
+                if (element.hasAttribute('no-date-picker')) {
+                    element.dateControl.setAttribute('no-picker', '');
+                }
+                if (element.hasAttribute('no-time-picker')) {
+                    element.timeControl.setAttribute('no-picker', '');
+                }
+                
+                element.dateControl.setAttribute('value', '');
+                element.timeControl.setAttribute('value', '');
+                
+                element.dateControl.setAttribute('flex', '');
+                element.timeControl.setAttribute('flex', '');
+                
+                element.dateControl.setAttribute('gs-dynamic', '');
+                element.timeControl.setAttribute('gs-dynamic', '');
+                
+                console.log(element.dateControl);
+                console.log(element.timeControl);
+                
+                element.appendChild(element.dateControl);
+                element.appendChild(element.timeControl);
+                
+                console.log(element.children);
+                
+                pushReplacePopHandler(element);
+                window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
+                window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
+                window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
+            }
+        }
+    }
+    
+    xtag.register('gs-timestamp', {
+        lifecycle: {
+            created: function () {
+                elementCreated(this);
+            },
+            
+            inserted: function () {
+                elementInserted(this);
+            },
+            
+            attributeChanged: function (strAttrName, oldValue, newValue) {
+                // if "suspend-created" has been removed: run created and inserted code
+                if (strAttrName === 'suspend-created' && newValue === null) {
+                    elementCreated(this);
+                    elementInserted(this);
+                    
+                // if "suspend-inserted" has been removed: run inserted code
+                } else if (strAttrName === 'suspend-inserted' && newValue === null) {
+                    elementInserted(this);
+                    
+                } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                    
+                }
+            }
+        },
+        events: {},
+        accessors: {
+            value: {
+                get: function () {
+                    
+                },
+                
+                set: function (newValue) {
+                    
+                }
+            }
+        },
+        methods: {
         }
     });
 });

@@ -24,6 +24,24 @@
                 bolWebSocket, strParsingMode;
                 //consoleCustom = []
             
+            var bolControlPressed = false;
+            document.addEventListener('keydown', function (event) {
+                if (bolControlPressed && event.keyCode === 83) {
+                event.preventDefault();
+                event.stopPropagation();
+                    saveFile();
+                }
+                if (event.keyCode === 17) {
+                    bolControlPressed = true;
+                }
+            });
+            
+            document.addEventListener('keyup', function (event) {
+                if (event.keyCode === 17) {
+                    bolControlPressed = false;
+                }
+            });
+            
             function test() {
                 var testingLink = strCurrentPageLink;
                 
@@ -663,6 +681,16 @@
                     aceIndicator.removeAttribute('hidden');
                     aceIndicator.textContent = 'Saving...';
                     aceIndicator.classList.remove('indicator-error');
+                    
+                    //if the file still hasn't saved after five seconds, then add the ace error class
+                    clearTimeout(window.timeoutSaving);
+                    window.timeoutSaving = setTimeout(function () {
+                        console.log('Saving still up', bolSaveWaiting);
+                        if (bolCurrentlySaving) {// still waiting
+                            aceIndicator.classList.add('indicator-error');
+                        }
+                        //aceContainer.classList.add('indicator-error');
+                    }, 5000);
                     
                     if (bolWebSocket) {
                         webSocketFileSave(bolLoader);

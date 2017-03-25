@@ -799,6 +799,59 @@ document.addEventListener('DOMContentLoaded', function () {
             strSearch &&
             GS.getInputSelection(element.control).start === strSearch.length) {
             
+            // ######### FOR CROSS
+            // you need to comment the code inside this block.
+            // you need an if statment for >2000 records.
+            // you need to use the currently commented code for <=2000 records.
+            // you need new code for >2000.
+            // you need to get the template and put it inside a virtual template element.
+            // a virtual template element is just a template element inside a javascript variable.
+            //      var templateElement = document.createElement('template');
+            // you need to fill templateElement with the record template string, don't use the thead. (you'll find most everything in element.tableTemplate)
+            // you need to extract the contents of the first td and put that into a variable.
+            // you need to extract the contents of the "value" attribute on the tr (if present).
+            // because you extracted the contents before templating, the variables are untemplated.
+            // you need to get the column name from the first td template.
+            //      there are three things you need to try:
+            //          do a regex for "row.something", cut off the row
+            //              OR
+            //          do a regex for "row['something']", cut off the row[' and ']
+            //              OR
+            //          do a regex for "row["something"]", cut off the row[" and "]
+            //
+            //      that should be good enough. if you can't get the column: stop and
+            //          console.warn to tell the developer to stick <!-- row.column -->
+            //          at the top of the first td 
+            // you need to run an AJAX call on the postgres object in "src" with a where clause.
+            // the where clause will be something like this:
+            //          (OLDWHERE) AND COLUMN ILIKE $UnCOPYQTE$ strSearch%$UnCOPYQTE$
+            // the ajax call should only get one record.
+            // use the two templates to set the value (copy the original code).
+            //
+            // after you're done, leave these comments for future developers
+            
+            
+            
+            //<gs-combo src="test.tpeople" column="">
+            //    <template>
+            //        <table>
+            //            <thead>
+            //                <tr>
+            //                    <th>asdf</th>
+            //                    <th>fdsa</th>
+            //                </tr>
+            //            </thead>
+            //            <tbody>
+            //                <tr value="{{! row.id }}"> <--- hidden value, if present
+            //                    <td>{{! row.asdf }}</td> <--- visible value
+            //                    <td>{{! row.fdsa }}</td>
+            //                </tr>
+            //            </tbody>
+            //        </table>
+            //    </template>
+            //</gs-combo>
+            
+            
             matchRecord = findRecordFromString(element, strSearch, true);
             
             // if we found a record and its was already selected: selected the matched record and dont 
