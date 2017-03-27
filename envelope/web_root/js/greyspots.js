@@ -13659,26 +13659,98 @@ document.addEventListener('DOMContentLoaded', function () {
             //    </template>
             //</gs-combo>
             
-            
-            matchRecord = findRecordFromString(element, strSearch, true);
-            
-            // if we found a record and its was already selected: selected the matched record and dont 
-            if (matchRecord) {
-                highlightRecord(element, matchRecord);
-                element.control.value = xtag.queryChildren(matchRecord, 'td')[0].textContent;
-                GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+            if (xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr').length > 2000) {
+                var strSearchCol = '', templateElement = element.tableTemplate, strWhereLink = '', data, strLink, dataFunction,
+                    strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') || element.getAttribute('source') || '')),
+                    strCols = element.getAttribute('cols') || '';
                 
-                //if (strSearch.length === element.control.value.length) {
-                //    selectRecord(element, matchRecord, true);
-                //}
+                templateElement = templateElement.substring(templateElement.indexOf('td'), templateElement.indexOf('/td') - 1);
+                templateElement = templateElement.substring(templateElement.indexOf('{'), templateElement.length);
+                if (templateElement.indexOf('row.') === -1) {
+                    if (templateElement.indexOf('row[') === -1) {
+                        console.warn('There is no doT.js in the first "<td>" in your template please fill your first "<td>" with templating code.');
+                    } else {
+                        templateElement = templateElement.substring(parseInt(templateElement.indexOf('row['), 10) + 5, templateElement.length - 2 - 3).trim();
+                    }
+                } else {
+                    templateElement = templateElement.substring(parseInt(templateElement.indexOf('row.'), 10) + 4, templateElement.length - 3).trim();
+                }
                 
-                scrollToSelectedRecord(element);
+                
+                strSearchCol = templateElement;
+                
+                strLink = 'src=' + encodeURIComponent(strSource);
+                
+                if (element.getAttribute('where')) {
+                    strWhereLink = '' + element.getAttribute('where') + ' AND ' + strSearchCol + '::text ILIKE $UnCOPYQTE$' + strSearch + '%$UnCOPYQTE$';
+                } else {
+                    strWhereLink = strSearchCol + '::text ILIKE $UnCOPYQTE$' + strSearch + '%$UnCOPYQTE$';
+                }
+                
+                strLink += '&where='    + encodeURIComponent(GS.templateWithQuerystring(strWhereLink)) +
+                           '&limit='    + encodeURIComponent(GS.templateWithQuerystring(1)) +
+                           '&offset='   + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('offset') || ''))) +
+                           '&order_by=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('ord') || ''))) +
+                           '&cols='     + encodeURIComponent(strCols);
+                
+                //console.log(strLink);
+                //console.log(strSearchCol);
+                
+                
+                if (strSearchCol) {
+                    GS.ajaxJSON('/env/action_select', strLink, function (data, error) {
+                        if (!error) {
+                            //console.log(data.dat.dat[0][0]);
+                            if (data && data.dat && data.dat.dat && data.dat.dat[0] && data.dat.dat[0][0]) {
+                                //console.log(data.dat.dat[0][0]);
+                                
+                                // console.log(1);
+                                element.control.value = data.dat.dat[0][0];
+                                // console.log(2);
+                                GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                                // console.log(3);
+                                //console.log(element.open);
+                                if (element.open) {
+                                    matchRecord = findRecordFromString(element, strSearch, true);
+                                    // console.log(4);
+                                    if (matchRecord) {
+                                    // console.log(5);
+                                        highlightRecord(element, matchRecord);
+                                    // console.log(6);
+                                        scrollToSelectedRecord(element);
+                                    // console.log(7);
+                                    }
+                                    // console.log(8);
+                                }
+                                
+                            }
+                        } else {
+                            GS.ajaxErrorDialog(data);
+                        }
+                    });
+                }
+                
+                
                 
             } else {
-                clearSelection(element);
-                //selectRecordFromValue(element, strSearch, false);
-                //GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                matchRecord = findRecordFromString(element, strSearch, true);
+                
+                // if we found a record and its was already selected: selected the matched record and dont 
+                if (matchRecord) {
+                    highlightRecord(element, matchRecord);
+                    element.control.value = xtag.queryChildren(matchRecord, 'td')[0].textContent;
+                    GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                    
+                    scrollToSelectedRecord(element);
+                    
+                } else {
+                    clearSelection(element);
+                    //selectRecordFromValue(element, strSearch, false);
+                    //GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                }
             }
+            
+            
         }
         
         if (element.attemptSearchOnNextKeyup === true) {
@@ -19987,17 +20059,22 @@ GS.closeDialog = function (dialog, strAnswer) {
     
     // on focus: if the currently focus element is not in the frontmost dialog: focus first control of the frontmost dialog
     document.addEventListener('focus', function (event) {
-        var arrDialog = document.getElementsByTagName('gs-dialog'), frontDialog, parentFind, arrElements, i, len; 
-        
+        var arrDialog = document.getElementsByTagName('gs-dialog');
+        var frontDialog;
+        var parentFind;
+        var arrElements;
+        var i;
+        var len;
+
         //console.log('1*** focus: ', document.activeElement);
         if (arrDialog.length > 0) {
             frontDialog = arrDialog[arrDialog.length - 1];
             parentFind = GS.findParentElement(document.activeElement, frontDialog);
-            
+
             //console.log('2***', parentFind, frontDialog);
             if (parentFind !== frontDialog) {
                 arrElements = xtag.query(frontDialog, 'input, textarea, select, button, iframe, [tabindex], a');
-                
+
                 for (i = 0, len = arrElements.length; i < len; i += 1) {
                     if (GS.isElementFocusable(arrElements[i])) {
                         arrElements[i].focus();
@@ -20008,8 +20085,7 @@ GS.closeDialog = function (dialog, strAnswer) {
             }
         }
     }, true);
-    
-    
+
     // DEPRECATED
     GS.dialog = function (options) {
         var strHTML, dialogOverlay, dialog, strContent = '', strButtons = '', i, len, gridEach,
@@ -37475,9 +37551,60 @@ window.addEventListener('design-register-element', function () {
     designRegisterElement('gs-timestamp', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-timestamp.html');
     
     window.designElementProperty_GSTIMESTAMP = function (selectedElement) {    
-        // TITLE attribute
-        addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
-            return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
+        addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
+        });
+        
+        addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
+        });
+        
+        addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
+        });
+        
+        addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
+        });
+        
+        addProp('Date Format', true, '<gs-combo class="target" value="' + encodeHTML(selectedElement.getAttribute('date-format') || '') + '" mini>' + 
+                        ml(function () {/*<template>
+                                            <table>
+                                                <tbody>
+                                                    <tr value="">
+                                                        <td hidden>Default</td>
+                                                        <td><center>Default<br /> (01/01/2015)</center></td>
+                                                    </tr>
+                                                    <tr value="shortdate">
+                                                        <td hidden>shortdate</td>
+                                                        <td><center>shortdate<br /> (1/1/15)</center></td>
+                                                    </tr>
+                                                    <tr value="mediumdate">
+                                                        <td hidden>mediumdate</td>
+                                                        <td><center>mediumdate<br /> (Jan 1, 2015)</center></td>
+                                                    </tr>
+                                                    <tr value="longdate">
+                                                        <td hidden>longdate</td>
+                                                        <td><center>longdate<br /> (January 1, 2015)</center></td>
+                                                    </tr>
+                                                    <tr value="fulldate">
+                                                        <td hidden>fulldate</td>
+                                                        <td><center>fulldate<br /> (Thursday, January 1, 2015)</center></td>
+                                                    </tr>
+                                                    <tr value="isodate">
+                                                        <td hidden>isodate</td>
+                                                        <td><center>isodate<br /> (2015-01-01)</center></td>
+                                                    </tr>
+                                                    <tr value="isodatetime">
+                                                        <td hidden>isodatetime</td>
+                                                        <td><center>isodatetime<br /> (2015-01-01T00:00:00)</center></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </template>
+                                    </gs-combo>
+                                */}), function () {
+            return setOrRemoveTextAttribute(selectedElement, 'date-format', this.value);
         });
         
         addProp('Date Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-picker')) + '" mini></gs-checkbox>', function () {
@@ -37486,6 +37613,27 @@ window.addEventListener('design-register-element', function () {
 
         addProp('Time Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-picker')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-time-picker', (this.value === 'true'), false);
+        });
+        
+        // TITLE attribute
+        addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
+        });
+        
+        addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
         });
         
         // SUSPEND-INSERTED attribute
@@ -37526,6 +37674,11 @@ window.addEventListener('design-register-element', function () {
             }
             
             return selectedElement;
+        });
+        
+        // DISABLED attribute
+        addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
         
         //addFlexContainerProps(selectedElement);
@@ -37608,6 +37761,18 @@ document.addEventListener('DOMContentLoaded', function () {
         element.internal.bolQSFirstRun = true;
     }
     
+    // for a given element, copy the control values with the value attribute
+    function syncView(element) {
+        var newValue = element.dateControl.value + ' ' + element.timeControl.value;
+        
+        console.log(element.dateControl.value);
+        console.log(element.timeControl.value);
+        console.log(newValue);
+        console.log(new Date(newValue));
+        
+        element.setAttribute('value', newValue);
+    }
+    
     // dont do anything that modifies the element here
     function elementCreated(element) {
         // if "created" hasn't been suspended: run created code
@@ -37634,9 +37799,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!element.inserted) {
                 element.inserted = true;
                 
-                var arrValue = element.getAttribute('value').split(' ');
-                dateValue = new Date(arrValue[0]);
-                timeValue = arrValue[1];
+                if (element.hasAttribute('value')) {
+                    var arrValue = element.getAttribute('value').split(' ');
+                    dateValue = new Date(arrValue[0]);
+                    timeValue = arrValue[1];
+                }
                 
                 element.dateControl = document.createElement('gs-date');
                 element.timeControl = document.createElement('gs-time');
@@ -37655,6 +37822,31 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.timeControl.setAttribute('no-picker', '');
                 }
                 
+                if (element.hasAttribute('mini')) {
+                    element.dateControl.setAttribute('mini', '');
+                    element.timeControl.setAttribute('mini', '');
+                }
+                if (element.hasAttribute('autocorrect')) {
+                    element.dateControl.setAttribute('autocorrect', '');
+                    element.timeControl.setAttribute('autocorrect', '');
+                }
+                if (element.hasAttribute('autocapitalize')) {
+                    element.dateControl.setAttribute('autocapitalize', '');
+                    element.timeControl.setAttribute('autocapitalize', '');
+                }
+                if (element.hasAttribute('autocomplete')) {
+                    element.dateControl.setAttribute('autocomplete', '');
+                    element.timeControl.setAttribute('autocomplete', '');
+                }
+                if (element.hasAttribute('spellcheck')) {
+                    element.dateControl.setAttribute('spellcheck', '');
+                    element.timeControl.setAttribute('spellcheck', '');
+                }
+                if (element.hasAttribute('diabled')) {
+                    element.dateControl.setAttribute('diabled', '');
+                    element.timeControl.setAttribute('diabled', '');
+                }
+                
                 element.dateControl.value = dateValue;
                 element.timeControl.value = timeValue;
                 
@@ -37665,10 +37857,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.timeControl.setAttribute('gs-dynamic', '');
                 
                 element.dateControl.addEventListener('change', function () {
-                    
+                    syncView(element);
                 });
                 element.timeControl.addEventListener('change', function () {
-                    
+                    syncView(element);
                 });
                 
                 console.log(element.dateControl);
@@ -37711,13 +37903,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                 } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
                     if (strAttrName === 'value') {
-                        var arrValue = newValue.split(' ');
-                        dateValue = new Date(arrValue[0]);
-                        timeValue = arrValue[1];
+                        if (newValue !== null) {
+                            var arrValue = newValue.split(' ');
+                            dateValue = new Date(arrValue[0]);
+                            timeValue = arrValue[1];
+                            
+                            this.dateControl.value = dateValue;
+                            this.timeControl.value = timeValue;
+                        } else {
+                            this.dateControl.value = null;
+                            this.timeControl.value = null;
+                        }
+                    }/* ele if (newValue === '') {
                         
-                        this.dateControl.value = dateValue;
-                        this.timeControl.value = timeValue;
-                    }
+                    }*/
                 }
             }
         },
@@ -37729,7 +37928,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 
                 set: function (newValue) {
-                    return this.setAttribute('value', newValue);
+                    this.setAttribute('value', newValue);
                 }
             }
         },
