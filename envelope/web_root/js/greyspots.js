@@ -37801,7 +37801,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 if (element.hasAttribute('value')) {
                     var arrValue = element.getAttribute('value').split(' ');
-                    dateValue = new Date(arrValue[0]);
+                    dateValue = new Date(arrValue[0] + ' 00:00:00');
                     timeValue = arrValue[1];
                 }
                 

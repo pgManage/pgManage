@@ -4380,7 +4380,7 @@ i+=1;}}else if(GS.qryGetKeys(strQS).indexOf(strQSCol)>-1){strQSValue=GS.qryGetVa
 element.internal.bolQSFirstRun=true;}
 function syncView(element){var newValue=element.dateControl.value+' '+element.timeControl.value;console.log(element.dateControl.value);console.log(element.timeControl.value);console.log(newValue);console.log(new Date(newValue));element.setAttribute('value',newValue);}
 function elementCreated(element){if(!element.hasAttribute('suspend-created')){if(element.value&&new Date(element.value).getTime()){element.setAttribute('value',element.value);delete element.value;}}}
-function elementInserted(element){var dateValue='';var timeValue='';if(!element.hasAttribute('suspend-created')&&!element.hasAttribute('suspend-inserted')){if(!element.inserted){element.inserted=true;if(element.hasAttribute('value')){var arrValue=element.getAttribute('value').split(' ');dateValue=new Date(arrValue[0]);timeValue=arrValue[1];}
+function elementInserted(element){var dateValue='';var timeValue='';if(!element.hasAttribute('suspend-created')&&!element.hasAttribute('suspend-inserted')){if(!element.inserted){element.inserted=true;if(element.hasAttribute('value')){var arrValue=element.getAttribute('value').split(' ');dateValue=new Date(arrValue[0]+' 00:00:00');timeValue=arrValue[1];}
 element.dateControl=document.createElement('gs-date');element.timeControl=document.createElement('gs-time');if(element.hasAttribute('date-format')){element.dateControl.setAttribute('format',element.getAttribute('date-format'));}
 if(element.hasAttribute('time-format')){element.timeControl.setAttribute('format',element.getAttribute('time-format'));}
 if(element.hasAttribute('no-date-picker')){element.dateControl.setAttribute('no-picker','');}

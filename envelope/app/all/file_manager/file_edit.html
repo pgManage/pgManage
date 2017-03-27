@@ -431,9 +431,48 @@
                 replacementElementHTML = replacementElementHTML.replace(/=""/gim, '');
                 
                 if (currentElement) {
+                    var strOldText = strCurrentText;
+                    var strStatus = '';
+                    var chrCurrent;
+                    var i = 0;
+                    strCurrentText = '';
+                    
+                    chrCurrent = strOldText.substring(i, i + 1);
+                    
+                    while (i < strOldText.length) {
+                        chrCurrent = strOldText.substring(i, i + 1);
+                        
+                        // Turn on quote status
+                        if (strStatus === '' && chrCurrent === '"') {
+                            strStatus = '"';
+                            strCurrentText = strCurrentText + chrCurrent;
+                        
+                        // Turn off quote status
+                        } else if (strStatus === '"' && chrCurrent === '"') {
+                            strStatus = '';
+                            strCurrentText = strCurrentText + chrCurrent;
+                        
+                        // Turn on escape status
+                        } else if (strStatus === '' && chrCurrent === '\\') {
+                            strStatus = '';
+                            strCurrentText = strCurrentText + chrCurrent;
+                        
+                        // Turn off escape status
+                        } else if (strStatus === '' && chrCurrent === '"') {
+                        } else if (strStatus === '' && chrCurrent === '"') {
+                        } else if (strStatus === '' && chrCurrent === '>') {
+                        } else {
+                            strCurrentText = strCurrentText + chrCurrent;
+                        }
+                        
+                        i++;
+                    }
+                    
+                    /*
                     strCurrentText = strCurrentText.substring(0, currentElement.start) +
                                      replacementElementHTML.substring(0, replacementElementHTML.indexOf('>') + 1) +
                                      strCurrentText.substring(currentElement.start + currentElement.length);
+                    */
                 }
                 
                 editor.setValue(strCurrentText);
