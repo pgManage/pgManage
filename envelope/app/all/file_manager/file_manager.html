@@ -113,7 +113,7 @@
 
             // refresh header path
             function handleHeaderText() {
-                document.getElementById('current-path').textContent = filePathPrefix('') || 'File Manager';
+                document.getElementById('current-path').textContent = filePathPrefix('') || '/';
             }
 
             function folderLineHTML(strTitle, strNavigateLink) {
@@ -642,6 +642,10 @@
                     this.setAttribute('hidden', '');
 					document.getElementById('current-path-edit').value = this.textContent;
 					document.getElementById('current-path-edit').removeAttribute('hidden');
+					document.getElementById('current-path-edit').focus();
+                });
+                document.getElementById('current-path-edit').addEventListener('blur', function (event) {
+                    GS.triggerEvent(this, 'change');
                 });
                 document.getElementById('current-path-edit').addEventListener('change', function (event) {
                     this.setAttribute('hidden', '');

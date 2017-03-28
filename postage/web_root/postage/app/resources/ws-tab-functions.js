@@ -94,82 +94,137 @@ function startTabContainer() {
 
     // bind esc to toggle between home and the currently selected tab (or the first tab)
     var backToTab;
-    document.addEventListener('keydown', function (event) {
-        //console.log('0***');
+    // document.addEventListener('keydown', function (event) {
+    //     //console.log('0***');
 
-        // if the key that was pressed is escape (27)
-        if (event.keyCode === 27 && document.getElementsByTagName('gs-dialog').length === 0) {
-            if (document.getElementById('tab-bar-container').classList.contains('home-mode') === true) {
-                if (backToTab && backToTab.parentNode) {
-                    GS.triggerEvent(backToTab, 'click');
+    //     // if the key that was pressed is escape (27)
+    //     if (event.keyCode === 27 && document.getElementsByTagName('gs-dialog').length === 0) {
+    //         if (document.getElementById('tab-bar-container').classList.contains('home-mode') === true) {
+    //             if (backToTab && backToTab.parentNode) {
+    //                 GS.triggerEvent(backToTab, 'click');
 
-                } else if (document.getElementById('tab-bar').children.length > 0) {
-                    GS.triggerEvent(document.getElementById('tab-bar').children[0], 'click');
+    //             } else if (document.getElementById('tab-bar').children.length > 0) {
+    //                 GS.triggerEvent(document.getElementById('tab-bar').children[0], 'click');
+    //             }
+
+    //         } else {
+    //             if (document.getElementsByClassName('current-tab').length > 0) {
+    //                 backToTab = document.getElementsByClassName('current-tab')[0];
+
+    //             } else if (document.getElementById('tab-bar').children.length > 0) {
+    //                 backToTab = document.getElementById('tab-bar').children[0];
+    //             }
+
+    //             //console.log('3***');
+    //             GS.triggerEvent(document.getElementById('button-home'), 'click');
+    //         }
+    //     }
+    // });
+
+    // // bind [meta][.]
+    // document.addEventListener('keydown', function (event) {
+    //     var strQuery, strLink, intStart, intEnd, currentRange
+    //       , currentTab = document.getElementsByClassName('current-tab')[0];
+
+    //     // if shift is down and the key that was pressed is "." (190)
+    //     if ((event.metaKey || event.ctrlKey) && event.keyCode === 190) {
+
+    //         if (currentTab) {
+    //             // cmd-.
+    //             if ((event.which || event.keyCode) === 190 && event.metaKey) {
+    //                 strQuery = currentTab.relatedEditor.getValue();
+    //                 currentRange = currentTab.relatedEditor.currentQueryRange;
+
+    //                 if (currentRange) {
+    //                     intStart = rowAndColumnToIndex(strQuery, currentRange.start.row, currentRange.start.column);
+    //                     intEnd = rowAndColumnToIndex(strQuery, currentRange.end.row, currentRange.end.column);
+    //                     strQuery = strQuery.substring(intStart, intEnd);
+
+    //                     if (strQuery) {
+    //                         strLink = docButtonForQuery(strQuery);
+
+    //                         if (strLink) {
+    //                             window.open(strLink, '_blank');
+    //                         }
+    //                     }
+    //                 }
+
+    //                 if (!currentRange || !strQuery || !strLink) {
+    //                     GS.pushMessage('<center><h4>No Documentation Found</h4></center>', 700);
+    //                 }
+    //             }
+    //         }
+
+
+    //         //// if there is a current tab and the tab has a property button
+    //         //if (currentTab && currentTab.relatedPropertyButton) {
+    //         //    // if a property dialog is not open: trigger a click on the property button
+    //         //    if (!document.getElementById('dialog-from-dialog-property-window') &&
+    //         //        !currentTab.relatedPropertyButton.hasAttribute('disabled')) {
+    //         //        GS.triggerEvent(currentTab.relatedPropertyButton, 'click');
+    //         //
+    //         //    // else if a property dialog is open: tell the dialog to apply it's changes and close
+    //         //    } else {
+    //         //        closePropertyDialog();
+    //         //    }
+    //         //}
+    //     }
+    // });
+    
+
+    
+}
+
+function ShortcutHome () { 
+    var backToTab;
+    if (document.getElementsByTagName('gs-dialog').length === 0) {
+        if (document.getElementById('tab-bar-container').classList.contains('home-mode') === true) {
+            if (backToTab && backToTab.parentNode) {
+                GS.triggerEvent(backToTab, 'click');
+
+            } else if (document.getElementById('tab-bar').children.length > 0) {
+                GS.triggerEvent(document.getElementById('tab-bar').children[0], 'click');
+            }
+
+        } else {
+            if (document.getElementsByClassName('current-tab').length > 0) {
+                backToTab = document.getElementsByClassName('current-tab')[0];
+
+            } else if (document.getElementById('tab-bar').children.length > 0) {
+                backToTab = document.getElementById('tab-bar').children[0];
+            }
+
+            //console.log('3***');
+            GS.triggerEvent(document.getElementById('button-home'), 'click');
+        }
+    }
+}
+
+function ShortcutDocs () {
+    var strQuery, strLink, intStart, intEnd, currentRange
+      , currentTab = document.getElementsByClassName('current-tab')[0];
+    if (currentTab) {
+        strQuery = currentTab.relatedEditor.getValue();
+        currentRange = currentTab.relatedEditor.currentQueryRange;
+
+        if (currentRange) {
+            intStart = rowAndColumnToIndex(strQuery, currentRange.start.row, currentRange.start.column);
+            intEnd = rowAndColumnToIndex(strQuery, currentRange.end.row, currentRange.end.column);
+            strQuery = strQuery.substring(intStart, intEnd);
+
+            if (strQuery) {
+                strLink = docButtonForQuery(strQuery);
+
+                if (strLink) {
+                    window.open(strLink, '_blank');
                 }
-
-            } else {
-                if (document.getElementsByClassName('current-tab').length > 0) {
-                    backToTab = document.getElementsByClassName('current-tab')[0];
-
-                } else if (document.getElementById('tab-bar').children.length > 0) {
-                    backToTab = document.getElementById('tab-bar').children[0];
-                }
-
-                //console.log('3***');
-                GS.triggerEvent(document.getElementById('button-home'), 'click');
             }
         }
-    });
 
-    // bind [meta][.]
-    document.addEventListener('keydown', function (event) {
-        var strQuery, strLink, intStart, intEnd, currentRange
-          , currentTab = document.getElementsByClassName('current-tab')[0];
-
-        // if shift is down and the key that was pressed is "." (190)
-        if ((event.metaKey || event.ctrlKey) && event.keyCode === 190) {
-
-            if (currentTab) {
-                // cmd-.
-                if ((event.which || event.keyCode) === 190 && event.metaKey) {
-                    strQuery = currentTab.relatedEditor.getValue();
-                    currentRange = currentTab.relatedEditor.currentQueryRange;
-
-                    if (currentRange) {
-                        intStart = rowAndColumnToIndex(strQuery, currentRange.start.row, currentRange.start.column);
-                        intEnd = rowAndColumnToIndex(strQuery, currentRange.end.row, currentRange.end.column);
-                        strQuery = strQuery.substring(intStart, intEnd);
-
-                        if (strQuery) {
-                            strLink = docButtonForQuery(strQuery);
-
-                            if (strLink) {
-                                window.open(strLink, '_blank');
-                            }
-                        }
-                    }
-
-                    if (!currentRange || !strQuery || !strLink) {
-                        GS.pushMessage('<center><h4>No Documentation Found</h4></center>', 700);
-                    }
-                }
-            }
-
-
-            //// if there is a current tab and the tab has a property button
-            //if (currentTab && currentTab.relatedPropertyButton) {
-            //    // if a property dialog is not open: trigger a click on the property button
-            //    if (!document.getElementById('dialog-from-dialog-property-window') &&
-            //        !currentTab.relatedPropertyButton.hasAttribute('disabled')) {
-            //        GS.triggerEvent(currentTab.relatedPropertyButton, 'click');
-            //
-            //    // else if a property dialog is open: tell the dialog to apply it's changes and close
-            //    } else {
-            //        closePropertyDialog();
-            //    }
-            //}
+        if (!currentRange || !strQuery || !strLink) {
+            GS.pushMessage('<center><h4>No Documentation Found</h4></center>', 700);
         }
-    });
+    }
 }
 
 
@@ -755,34 +810,18 @@ function jsnIsEmpty(jsn) {
     return true;
 }
 
-if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
-    var CTRLCMD = 'cmd';
-} else {
-    var CTRLCMD = 'ctr';
+function ShortcutNewTab () {
+    event.preventDefault();
+    event.stopPropagation();
+    newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'});
 }
 
-document.addEventListener('keydown', function (event) {
-    if (CTRLCMD === 'cmd') {
-        if (event.metaKey && event.keyCode === 79) {
-            event.preventDefault();
-            event.stopPropagation();
-            newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'});
-        }
-    } else if (CTRLCMD === 'ctr') {
-        if (event.ctrlKey && event.keyCode === 79) {
-            event.preventDefault();
-            event.stopPropagation();
-            newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'});
-        }
-    }
-});
 
-
-var afterDeleteSelectionDirections = [];
+var afterDeleteSelectionDirections = [], intSaveTimerID;
 function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFilePath, bolAutoSelect) {
     'use strict';
     var tabElement, frameElement, editor, selectionChangeHandler
-      , intTimerID, arrCurrentTabNames, i, len, arrElements
+      , arrCurrentTabNames, i, len, arrElements
       , FFiveFunction, FFiveUpFunction, windowResizeHandler;
     strType = strType || 'sql';
     jsnParameters = jsnParameters || {};
@@ -1579,40 +1618,40 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 
         window.addEventListener('resize', windowResizeHandler);
 
-        // bind to F5
-        FFiveFunction = function (event) {
-            if (tabElement.parentNode) {
-                if (tabElement.classList.contains('current-tab') &&
-                    (event.keyCode || event.which) === 116 &&
-                    tabElement.executedWaitingForKeyup !== true) {
+        // // bind to F5
+        // FFiveFunction = function (event) {
+        //     if (tabElement.parentNode) {
+        //         if (tabElement.classList.contains('current-tab') &&
+        //             (event.keyCode || event.which) === 116 &&
+        //             tabElement.executedWaitingForKeyup !== true) {
 
-                    tabElement.executedWaitingForKeyup = true;
-                    executeScript();
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-            } else {
-                window.removeEventListener('keydown', FFiveFunction);
-                window.removeEventListener('keyup', FFiveUpFunction);
-            }
-        };
+        //             tabElement.executedWaitingForKeyup = true;
+        //             executeScript();
+        //             event.preventDefault();
+        //             event.stopPropagation();
+        //         }
+        //     } else {
+        //         window.removeEventListener('keydown', FFiveFunction);
+        //         window.removeEventListener('keyup', FFiveUpFunction);
+        //     }
+        // };
 
-        FFiveUpFunction = function (event) {
-            if (tabElement.parentNode) {
-                if (tabElement.classList.contains('current-tab') && (event.keyCode || event.which) === 116) {
-                    tabElement.executedWaitingForKeyup = false;
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-            } else {
-                window.removeEventListener('keydown', FFiveFunction);
-                window.removeEventListener('keyup', FFiveUpFunction);
-            }
-        };
+        // FFiveUpFunction = function (event) {
+        //     if (tabElement.parentNode) {
+        //         if (tabElement.classList.contains('current-tab') && (event.keyCode || event.which) === 116) {
+        //             tabElement.executedWaitingForKeyup = false;
+        //             event.preventDefault();
+        //             event.stopPropagation();
+        //         }
+        //     } else {
+        //         window.removeEventListener('keydown', FFiveFunction);
+        //         window.removeEventListener('keyup', FFiveUpFunction);
+        //     }
+        // };
 
-        // bind F5 to run executeScript, if we're on a script tab
-        window.addEventListener('keydown', FFiveFunction);
-        window.addEventListener('keyup', FFiveUpFunction);
+        // // bind F5 to run executeScript, if we're on a script tab
+        // window.addEventListener('keydown', FFiveFunction);
+        // window.addEventListener('keyup', FFiveUpFunction);
 
         editor.setTheme('ace/theme/eclipse');
         editor.getSession().setMode('ace/mode/pgsql');
@@ -1639,18 +1678,6 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         //document.getElementById('sql-ace-area-' + intTabNumber).addEventListener(evt.mouseup, editor.selectionChangeHandler);
         //document.getElementById('sql-ace-area-' + intTabNumber).addEventListener('keyup', editor.selectionChangeHandler);
 
-        // bind cmd-s and cmd-.
-        document.addEventListener('keydown', function (event) {
-            // cmd-s
-            if (tabElement.parentNode && tabElement.classList.contains('current-tab') && (event.which || event.keyCode) === 83 && event.metaKey) {
-                event.preventDefault();
-                event.stopPropagation();
-                clearTimeout(intTimerID);
-                intTimerID = null;
-                saveScript(tabElement, true);
-            }
-        });
-
         // bind query selection
         editor.selectionChangeHandler = function (event) {
             selectionFindRange(tabElement, editor);
@@ -1666,11 +1693,11 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         // bind text change saving
         editor.addEventListener('change', function (event) {
             if (editor.ignoreChange !== true) {
-                clearTimeout(intTimerID);
-                intTimerID = setTimeout(function () {
+                clearTimeout(intSaveTimerID);
+                intSaveTimerID = setTimeout(function () {
                     saveScript(tabElement);
 
-                    intTimerID = null;
+                    intSaveTimerID = null;
                 }, 300);
             }
         });
@@ -1742,6 +1769,18 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 
     return tabElement;
 }
+
+function ShortcutSave () {
+    var tabElement = xtag.queryChildren(document.getElementById('tab-bar'), '.current-tab')[0];
+    if (tabElement.parentNode && tabElement.classList.contains('current-tab')) {
+        event.preventDefault();
+        event.stopPropagation();
+        clearTimeout(intSaveTimerID);
+        intSaveTimerID = null;
+        saveScript(tabElement, true);
+    }
+}
+
 
 function closeFile(tabElement, callBack) {
     'use strict';

@@ -851,10 +851,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 //if (element.hasAttribute('disabled')) {
                 //    element.innerHTML = element.getAttribute('value') || element.getAttribute('placeholder') || '';
                 //} else {
-                element.innerHTML = '';
-                element.appendChild(singleLineTemplate.cloneNode(true));
-                if (element.oldTabIndex) {
-                    xtag.query(element, '.control')[0].setAttribute('tabindex', element.oldTabIndex);
+                if (!element.hasAttribute('disabled')) {
+                    element.innerHTML = '';
+                    element.appendChild(singleLineTemplate.cloneNode(true));
+                    if (element.oldTabIndex) {
+                        xtag.query(element, '.control')[0].setAttribute('tabindex', element.oldTabIndex);
+                    }
                 }
                 //}
                 
@@ -1098,7 +1100,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 // if vertical arrow: update current date part
                                 } else if (intKeyCode === 38 || // up arrow
                                            intKeyCode === 40) { // down arrow
-                                    dteDate = new Date(strValue);
+                                    // If the date is in ISO format, new Date() will create it in GMT then convert it to the local timezone
+                                    dteDate = new Date(strValue + ' 00:00:00');
                                     
                                     // if current part is year
                                     if (strCurrentSection === 'year') {
@@ -1680,8 +1683,12 @@ document.addEventListener('DOMContentLoaded', function () {
                            GS.setInputSelection(this.control, tempSelection.start, tempSelection.end);
                         }
                         
-                    } else if (this.hasAttribute('disabled')) {
-                        this.innerHTML = newValue;
+                    } else if (this.hasAttribute('disabled')) {                        
+                        if (newValue && typeof newValue === 'object') {
+                            this.innerHTML = formatDate(newValue, getFormatString(this));
+                        } else {
+                            this.innerHTML = newValue || '';
+                        }
                         
                     } else {
                         this.setAttribute('value', newValue);

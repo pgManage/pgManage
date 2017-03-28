@@ -13,6 +13,19 @@
     </head>
     <body>
         
-        
+        <gs-envelope src="test.tpeople" where="id &#60;&#62; 10" ord="test DESC">
+            <template for="hud"></template>
+            <template for="table">
+                <table>
+                    <tbody>
+                        <tr>
+                            <th heading="#"><gs-static column="row_number"></gs-static></th>
+                            <td heading=""></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </template>
+            <template for="insert"></template>
+        </gs-envelope>
     </body>
 </html>

@@ -2,13 +2,17 @@
 var bolExplainLoaded = true;
 var rowCount = [], intRowCount = 0;
 
-document.addEventListener('keydown', function (event) {
-    if (event.keyCode === 118 && event.shiftKey === false) {
-        explain();
-    } else if (event.keyCode === 118 && event.shiftKey === true) {
-        explain(true);
-    }
-})
+function ShortcutExplain () {
+    event.preventDefault();
+    event.stopPropagation();
+    explain();
+}
+function ShortcutExplainAnalyze () {
+    event.preventDefault();
+    event.stopPropagation();
+    explain(true);
+}
+
 
 function explain(bolRun, bolText) {
     'use strict';

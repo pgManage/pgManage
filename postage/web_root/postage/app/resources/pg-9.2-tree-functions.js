@@ -1481,7 +1481,7 @@ function treeGetLineChildren(index) {
 function treeLoad(data, index, intColumn) {
     'use strict';
     var arrType = data.type.split(','), intLine, arrLine, strName, strSqlSafeName, arrChildren;
-
+    
     if (arrType.indexOf('folder') !== -1 &&
         (
             (
@@ -1606,7 +1606,7 @@ function treeLoad(data, index, intColumn) {
     if (arrType.indexOf('script') !== -1 &&
         (
             //If object is not a schema folder or a table folder then continue
-            (data.query !== 'objectSchema' && data.query !== 'objectTable') ||
+            (data.query !== 'objectSchema' && data.query !== 'objectTable' && data.query !== 'objectView') ||
             //If its not a mouse event then continue
             (!intColumn) ||
             //If object is a schema folder, and the position of the click is before the arrow, then continue

@@ -242,6 +242,7 @@
                         // if an open tag is found first
                         if (strValue[i] === '<' && strValue[i + 1].match(/[a-z]/gim)) {
                             intOpenTagStart = i;
+                            var strStatus = '';
                             
                             // go forwards from intOpenTagStart until a ">" is found
                             for (i = intOpenTagStart, len = strValue.length; i < len; i += 1) {
@@ -250,7 +251,32 @@
                                     //console.log(strTag);
                                 }
                                 
-                                if (strValue[i] === '>') {
+                                // Turn on quote status
+                                if (strStatus === '' && strValue[i] === '"') {
+                                    strStatus = '"';
+                                
+                                // Turn off quote status
+                                } else if (strStatus === '"' && strValue[i] === '"') {
+                                    strStatus = '';
+                                
+                                // Turn on single quote status
+                                } else if (strStatus === '' && strValue[i] === '\'') {
+                                    strStatus = '\'';
+                                
+                                // Turn off single quote status
+                                } else if (strStatus === '\'' && strValue[i] === '\'') {
+                                    strStatus = '';
+                                
+                                // Turn on escape status
+                                } else if (strStatus === '' && strValue[i] === '\\') {
+                                    strStatus = '\\';
+                                
+                                // Turn off escape status
+                                } else if (strStatus === '\\') {
+                                    strStatus = '';
+                                
+                                // End string at >
+                                } else if (strStatus === '' && strValue[i] === '>') {
                                     intOpenTagEnd = i + 1;
                                     
                                     bolSingleton = (strValue[i - 1] === '/');
@@ -431,9 +457,64 @@
                 replacementElementHTML = replacementElementHTML.replace(/=""/gim, '');
                 
                 if (currentElement) {
+                    var strOldText = strCurrentText;
+                    var strStatus = '';
+                    var chrCurrent;
+                    var i = 0;
+                    strCurrentText = strOldText.substring(0, currentElement.start);
+                    
+                    // Loop through every character in current element
+                    while (i < replacementElementHTML.length) {
+                        chrCurrent = replacementElementHTML.substring(i, i + 1);
+                        
+                        // Turn on quote status
+                        if (strStatus === '' && chrCurrent === '"') {
+                            strStatus = '"';
+                            strCurrentText = strCurrentText + chrCurrent;
+                        
+                        // Turn off quote status
+                        } else if (strStatus === '"' && chrCurrent === '"') {
+                            strStatus = '';
+                            strCurrentText = strCurrentText + chrCurrent;
+                        
+                        // Turn on single quote status
+                        } else if (strStatus === '' && chrCurrent === '\'') {
+                            strStatus = '\'';
+                            strCurrentText = strCurrentText + chrCurrent;
+                        
+                        // Turn off single quote status
+                        } else if (strStatus === '\'' && chrCurrent === '\'') {
+                            strStatus = '';
+                            strCurrentText = strCurrentText + chrCurrent;
+                        
+                        // Turn on escape status
+                        } else if (strStatus === '' && chrCurrent === '\\') {
+                            strStatus = '\\';
+                            strCurrentText = strCurrentText + chrCurrent;
+                        
+                        // Turn off escape status
+                        } else if (strStatus === '\\') {
+                            strStatus = '';
+                            strCurrentText = strCurrentText + chrCurrent;
+                        
+                        // End string at >
+                        } else if (strStatus === '' && chrCurrent === '>') {
+                            strCurrentText = strCurrentText + chrCurrent;
+                            break;
+                            
+                        } else {
+                            strCurrentText = strCurrentText + chrCurrent;
+                        }
+                        
+                        i++;
+                    }
+                    
+                    strCurrentText = strCurrentText + strOldText.substring(currentElement.start + currentElement.length);
+                    /*
                     strCurrentText = strCurrentText.substring(0, currentElement.start) +
                                      replacementElementHTML.substring(0, replacementElementHTML.indexOf('>') + 1) +
                                      strCurrentText.substring(currentElement.start + currentElement.length);
+                    */
                 }
                 
                 editor.setValue(strCurrentText);
@@ -565,6 +646,10 @@
                         clearTimeout(intTimerID);
                         intTimerID = null;
                         saveFile(true);
+                        
+                    // space
+                    } else if (intKeyCode === 32) {
+                        editor.completer.detach();
                     }
                 });
                 
