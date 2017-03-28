@@ -284,6 +284,19 @@ test
 		tests: [
 			['SOCKET OPEN', 'websocket start'],
 
+			['CLOSE SOCKET IN RAW 1', 'websocket close in request', '', ml(function () {/*RAW
+SELECT pg_sleep(2);
+*/}), 2],
+
+			['SOCKET OPEN', 'websocket start'],
+
+			['CLOSE SOCKET IN RAW 2', 'websocket close in request', '', ml(function () {/*RAW
+SELECT *
+	FROM generate_series(1, 10) em1, generate_series(1, 100) em2, generate_series(1, 100) em3;
+*/}), 10],
+
+			['SOCKET OPEN', 'websocket start'],
+
 			['CANCEL RAW 1', 'websocket cancel', '', ml(function () {/*RAW
 SELECT pg_sleep(2);
 */}), 2],
