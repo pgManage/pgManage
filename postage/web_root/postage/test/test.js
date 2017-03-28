@@ -19,7 +19,6 @@ document.addEventListener('change', function (event) {
 document.addEventListener('DOMContentLoaded', function () {
 	$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=begin&program_name=postage&user_agent=' +
 		encodeURIComponent(navigator.userAgent), 'POST', function (data) {
-		console.log(data);
 		if (!isNaN(parseInt(data, 10))) {
 			$.intID = data;
 

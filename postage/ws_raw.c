@@ -57,7 +57,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 			"\012", (size_t)1);
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"EMPTY", (size_t)5);
-		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
 
@@ -103,7 +103,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 			"\012", (size_t)1);
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"TRANSACTION COMPLETED", (size_t)21);
-		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
 		SINFO("TRANSACTION COMPLETED");
@@ -122,7 +122,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		str_escaped_sql = bescape_value(str_sql_temp, &int_sql_temp_len);
 		SFREE(str_sql_temp);
 		SFINISH_CHECK(str_escaped_sql != NULL, "bescape_value failed");
-		int_escaped_sql_len = strlen(str_escaped_sql);
+		int_escaped_sql_len = int_sql_temp_len;
 
 		client_request->int_response_id += 1;
 		memset(str_temp, 0, 101);
@@ -143,7 +143,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"QUERY\t", (size_t)6,
 			str_escaped_sql, int_escaped_sql_len);
-		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 
 		client_request->int_response_id += 1;
@@ -191,7 +191,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 			"\t", (size_t)1,
 			str_temp, strlen(str_temp));
 
-		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
 
@@ -230,7 +230,7 @@ finish:
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			_str_response, strlen(_str_response));
 		SFREE(_str_response);
-		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
 		// client_request_free(client_request);
@@ -318,7 +318,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 		}
 #endif
 
-		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		SDEBUG("AFTER");
 		str_response = NULL;
@@ -357,7 +357,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			// FINISH("Query empty");
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"EMPTY", (size_t)5);
-			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
 
@@ -447,7 +447,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 		PQclear(res);
 		res = NULL;
 		if (str_response != NULL && client_request->int_i != 0) {
-			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
 		} else {
@@ -466,7 +466,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			str_escaped_sql = bescape_value(str_sql_temp, &int_sql_temp_len);
 			SFREE(str_sql_temp);
 			SFINISH_CHECK(str_escaped_sql != NULL, "bescape_value failed");
-			int_escaped_sql_len = strlen(str_escaped_sql);
+			int_escaped_sql_len = int_sql_temp_len;
 
 			SFINISH_SNCAT(str_response, &int_response_len,
 				"messageid = ", (size_t)12,
@@ -483,7 +483,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"QUERY\t", (size_t)6,
 				str_escaped_sql, int_escaped_sql_len);
-			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 			DArray_push(client_request->arr_response, str_response);
 
 			client_request->int_response_id += 1;
@@ -528,7 +528,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 				"\t", (size_t)1,
 				str_temp, strlen(str_temp));
 
-			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
 
@@ -559,7 +559,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			}
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"TRANSACTION COMPLETED", (size_t)21);
-			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
 			SINFO("TRANSACTION COMPLETED");
@@ -706,7 +706,7 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 	SFINISH_SNFCAT(str_response, &int_response_len,
 		"ROWS\t", (size_t)5,
 		str_temp, strlen(str_temp));
-	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 	DArray_push(client_request->arr_response, str_response);
 	str_response = NULL;
 
@@ -742,7 +742,7 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 	}
 	PQclear(res);
 
-	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 	DArray_push(client_request->arr_response, str_response);
 	str_response = NULL;
 
@@ -850,7 +850,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 		if ((ssize_t)client_copy_check->int_i == int_num_rows) {
 			if ((client_copy_check->int_i % 10) > 0) {
 				SDEBUG("client_copy_check->str_message_id: %s", client_request->str_message_id);
-				WS_sendFrame(EV_A, client, true, 0x01, str_response, strlen(str_response));
+				WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len);
 				DArray_push(client_request->arr_response, str_response);
 				client_request->int_response_id += 1;
 				memset(str_temp, 0, 101);
@@ -907,9 +907,9 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 
 				SFINISH_SNFCAT(str_response, &int_response_len,
 					"QUERY\t", (size_t)6,
-					str_escaped_sql, strlen(str_escaped_sql));
+					str_escaped_sql, int_sql_temp_len);
 
-				WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
+				WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 				DArray_push(client_request->arr_response, str_response);
 
 				client_request->int_response_id += 1;
@@ -992,7 +992,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 			SFINISH_CHECK(str_temp1 != NULL, "bescape_value failed");
 
 			SFINISH_SNFCAT(str_response, &int_response_len,
-				str_temp1, strlen(str_temp1),
+				str_temp1, int_sql_temp_len,
 				int_column < (int_num_columns - 1) ? "\t" :
 				(ssize_t)client_copy_check->int_i < (int_num_rows - 1)
 				&& (client_copy_check->int_i % 10) < 9 ? "\012": "",
@@ -1015,4 +1015,15 @@ finish:
 	}
 }
 
+
+void ws_raw_free(struct sock_ev_client_raw *to_free) {
+	if (to_free->copy_check != NULL) {
+		decrement_idle(global_loop);
+		ev_check_stop(global_loop, &to_free->copy_check->check);
+		SFREE(to_free->copy_check);
+	}
+	if (to_free->res != NULL) {
+		PQclear(to_free->res);
+	}
+}
 #endif
