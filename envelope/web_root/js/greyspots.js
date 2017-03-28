@@ -9459,22 +9459,43 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('GS.trim', 'GS.trim', 'GS.trim(${1:stringToBeTrimmed}, \'${0:stringToTrimOff}\');');
     
     registerDesignSnippet('GS.setCookie', 'GS.setCookie', 'GS.setCookie(\'${1:cookieName}\', ${2:newValue}, ${0:daysUntilExpire});');
-    
+
     registerDesignSnippet('GS.getCookie', 'GS.getCookie', 'GS.getCookie(\'${1:cookieName}\');');
-    
+
     registerDesignSnippet('GS.pushState', 'GS.pushState', 'GS.pushState(${1:stateObj}, ${2:title}, ${0:newURL});');
-    
+
     registerDesignSnippet('GS.replaceState', 'GS.replaceState', 'GS.replaceState(${1:stateObj}, ${2:title}, ${0:newURL});');
-    
+
     registerDesignSnippet('GS.searchToWhere', 'GS.searchToWhere', 'GS.searchToWhere(\'${1:columns}\', ${0:searchClause});');
-    
+
     registerDesignSnippet('GS.iconList', 'GS.iconList', 'GS.iconList();');
-    
+
     registerDesignSnippet('GS.lorem', 'GS.lorem', 'GS.lorem();');
-    
-    registerDesignSnippet('GS.numberSuffix', 'GS.numberSuffix', 'GS.numberSuffix(intNumber);');
+
+    registerDesignSnippet('GS.numberSuffix', 'GS.numberSuffix', 'GS.numberSuffix(${1:intNumber});');
+
+    registerDesignSnippet('GS.hitLink', 'GS.hitLink', 'GS.hitLink(${1:strLink});');
 });
 
+
+// sometimes, we need to hit a link without paying attention
+//      to the response and without opening a new tab. for
+//      example, mailto: and tel: links
+GS.hitLink = function (strLink) {
+    "use strict";
+    var iframeElement;
+
+    iframeElement = document.createElement('iframe');
+    iframeElement.setAttribute('hidden', '');
+    iframeElement.addEventListener('load', function () {
+        if (iframeElement.parentNode === document.body) {
+            document.body.removeChild(iframeElement);
+        }
+    });
+
+    iframeElement.setAttribute("src", strLink);
+    document.body.appendChild(iframeElement);
+};
 
 
 GS.numberSuffix = function(intNumber) {
@@ -37968,9 +37989,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             this.dateControl.value = null;
                             this.timeControl.value = null;
                         }
-                    }/* ele if (newValue === '') {
-                        
-                    }*/
+                    }
                 }
             }
         },

@@ -273,28 +273,28 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             } else if (intEnd === null && intStart !== null && i === len) {
                 intEnd = i;
             }
-            
+
             if (intEnd !== null && intStart !== null) {
                 strCurrentWord = strScript.substring(intEnd, intStart).toUpperCase();
                 arrFirstWords.push(strCurrentWord);
-                
+
                 // clear variables for next cycle
                 intEnd = null;
                 intStart = null;
             }
-            
+
             i += 1;
         }
         strPreviousKeyWord = arrPreviousKeyWords[0];
         strPreviousWord = arrPreviousWords[0];
-        
+
         // waterfall to get the autocomplete list type
         if (strPreviousWord && (/[A-Z\"]/gim).test(strScript[parseInt(intCursorPosition, 10) + 1]) !== true) {
             bolPreviousCharWhitespace = (!(strScript[intCursorPosition - 1] || '').trim());
             bolCurrentCharWhitespace  = (!(strScript[intCursorPosition] || '').trim());
             bolPreviousCharReturn     = (strScript[intCursorPosition - 1] === '\n');
             bolCurrentCharReturn      = (strScript[intCursorPosition] === '\n');
-            
+
             bolCurrentCharPeriod      = (strScript[intCursorPosition] === '.');
             bolCurrentCharValidStart  = (/[a-z0-9\"]/gi).test(strScript[intCursorPosition]);
             bolAfterComma             = (strPreviousWord[strPreviousWord.length - 1] === ',');
@@ -305,11 +305,11 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             var noComma;
             var bolCols = false, bolTables = false, bolSchemas = false, bolTableFuncs = false, bolBuiltins = false, bolGroups = false, bolUsers = false, bolReturnTypes = false, bolTypes = false, bolLanguages = false, bolRules = false, bolTablespace = false;
             bolFirstSpace = bolCurrentCharWhitespace && !bolPreviousCharWhitespace;
-            
-            
+
+
             if (event.action === 'remove' && (/[A-Z\"]/gim).test(strScript[intCursorPosition - 1]) || ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && !bolCurrentCharWhitespace && (bolPreviousCharWhitespace || bolPreviousCharOpenParen || strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_'))) {
-                
-                
+
+
                 if (arrPreviousKeyWords[1] === 'INSERT' && strPreviousKeyWord === 'INTO') {
                     //console.log('schema');
                     bolSchemas = true;
@@ -543,7 +543,6 @@ function autocompleteChangeHandler(tabElement, editor, event) {
                           , intSearchStringStart = (autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset)
                           , intSearchStringEnd = autocompleteGlobals.intSearchEnd
                           , strSearch = strScript2.substring(intSearchStringStart, intSearchStringEnd);
-                          
                           
                     if (strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_') {
                         autocompleteGlobals.intSearchStart = intEndCursorPosition - strCurrWord.length - autocompleteGlobals.intSearchOffset;

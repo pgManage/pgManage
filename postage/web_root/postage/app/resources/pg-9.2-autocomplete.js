@@ -11,6 +11,7 @@ var autocompleteLoaded = true
       , 'arrValues':       []
       , 'arrSearchMaster': []
       , 'arrValuesMaster': []
+      , 'arrVariables':    []
       , 'bolInserting':    false
       , 'strQueryID':      null
       , 'jsnKeywords':     {} // <-- filled in by the "autocompleteLoadKeywords" function
@@ -241,6 +242,7 @@ function autocompletePopupLoad(editor, arrQueries) {
     autocompleteGlobals.arrValues = [];
     autocompleteGlobals.arrSearchMaster = [];
     autocompleteGlobals.arrValuesMaster = [];
+    autocompleteGlobals.arrVariables = [];
 
     var strText = '', autocompleteTempList = [];
 
@@ -264,8 +266,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                 if (autocompleteTempList.length === 1) {
                     strCurrent = autocompleteTempList[0][0];
                     // create a search string (normalize to double quoted and lowercase)
-                    strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
-
+                    //strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
+                    strSearch = strCurrent;
                     strText += '\n' + strCurrent;
                     autocompleteGlobals.arrSearch.push(strSearch);
                     autocompleteGlobals.arrValues.push(strCurrent);
@@ -324,8 +326,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                                 bolFinalRecord = true
                             }
                             // create a search string (normalize to double quoted and lowercase)
-                            strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
-
+                            //strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
+                            strSearch = strCurrent;
                             strText += '\n' + strCurrent;
                             autocompleteGlobals.arrSearch.push(strSearch);
                             autocompleteGlobals.arrValues.push(strCurrent);
@@ -353,8 +355,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                         strCurrent = currSnippet[2] + ' (Snippet)';
 
                         // create a search string (normalize to double quoted and lowercase)
-                        strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
-
+                        //strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
+                        strSearch = strCurrent;
                         strText += '\n' + strCurrent;
                         autocompleteGlobals.arrSearch.push(strSearch);
                         autocompleteGlobals.arrValues.push(strCurrent);
@@ -364,24 +366,75 @@ function autocompletePopupLoad(editor, arrQueries) {
                     }
                 }
                 
+                var strDeclare = editor.getValue(), substrEnd, arrFuncVariables = [];
+                // if there is a declare statement: get variable names;
+                if (strDeclare.toLowerCase().indexOf('declare') !== -1) {
+                    // if there is a begin: substring to that;
+                    if (strDeclare.toLowerCase().indexOf('begin') !== -1) {
+                        substrEnd = strDeclare.toLowerCase().indexOf('begin');
+                        strDeclare = strDeclare.substring(strDeclare.toLowerCase().indexOf('declare'), substrEnd);
+                        // get variable names
+                        arrFuncVariables = strDeclare.match(/([A-Za-z_0-9]+\ )+/ig);
+                        // trim variable names
+                        if (arrFuncVariables) {
+                            for (var i = 0, len = arrFuncVariables.length; i < len; i++) {
+                                arrFuncVariables[i] = arrFuncVariables[i].trim();
+                                // if arrFuncVariables[i] has a space in it still: substring it off
+                                if (arrFuncVariables[i].indexOf(' ') !== -1) {
+                                arrFuncVariables[i] = arrFuncVariables[i].substring(0, arrFuncVariables[i].indexOf(' '));
+                                }
+                            }
+                        }
+                    }
+                }
+                autocompleteGlobals.arrVariables = [];
+
+                autocompleteGlobals.arrVariables = arrFuncVariables;
+
+
+                if (autocompleteGlobals.arrVariables && autocompleteGlobals.arrVariables.length > 0) {
+                    for (var i = 0, len = autocompleteGlobals.arrVariables.length; i < len; i++) {
+                        var strCurrentVar = autocompleteGlobals.arrVariables[i];
+
+                        //strSearch = (strCurrentVar[0] === '"' ? strCurrentVar.toLowerCase() : '"' + strCurrentVar.toLowerCase() + '"');
+                        strSearch = strCurrentVar;
+                        autocompleteGlobals.arrSearch.push(strSearch);
+                        autocompleteGlobals.arrValues.push(strCurrentVar);
+                        autocompleteGlobals.arrSearchMaster.push(strSearch);
+                        autocompleteGlobals.arrValuesMaster.push(strCurrentVar);
+                    }
+                }
+
+
                 var distinctValues = [];
                 for (var i = 0, len = autocompleteGlobals.arrValuesMaster.length; i < len; i++) {
                     if (distinctValues.indexOf(autocompleteGlobals.arrValuesMaster[i]) === -1) {
                         distinctValues.push(autocompleteGlobals.arrValuesMaster[i]);
                     }
                 }
-                
+
                 var distinctSearch= [];
                 for (var i = 0, len = autocompleteGlobals.arrSearchMaster.length; i < len; i++) {
                     if (distinctSearch.indexOf(autocompleteGlobals.arrSearchMaster[i]) === -1) {
                         distinctSearch.push(autocompleteGlobals.arrSearchMaster[i]);
                     }
                 }
-                autocompleteGlobals.arrValuesMaster = distinctValues;
-                autocompleteGlobals.arrSearchMaster = distinctSearch;
-                autocompleteGlobals.arrValues = distinctValues;
-                autocompleteGlobals.arrSearch = distinctSearch;
+                autocompleteGlobals.arrValuesMaster = distinctValues.sort();
+                autocompleteGlobals.arrSearchMaster = distinctSearch.sort();
+                autocompleteGlobals.arrValues = distinctValues.sort();
+                autocompleteGlobals.arrSearch = distinctSearch.sort();
 
+                var currSearchVal;
+                for (var i = 0, len = autocompleteGlobals.arrSearchMaster.length; i < len; i++) {
+                    currSearchVal = autocompleteGlobals.arrSearchMaster[i];
+                    strSearch = (currSearchVal[0] === '"' ? currSearchVal.toLowerCase() : '"' + currSearchVal.toLowerCase() + '"');
+                    autocompleteGlobals.arrSearchMaster[i] = strSearch;
+                }
+
+                // autocompleteGlobals.arrValuesMaster = autocompleteGlobals.arrValuesMaster
+                // autocompleteGlobals.arrSearchMaster = autocompleteGlobals.arrSearchMaster
+                // autocompleteGlobals.arrValues = autocompleteGlobals.arrValues
+                // autocompleteGlobals.arrSearch = autocompleteGlobals.arrSearch
 
                 // append text (the substring is to remove the trailing \n)
                 autocompleteGlobals.popupAceSession.insert({
@@ -400,7 +453,7 @@ function autocompletePopupLoad(editor, arrQueries) {
 
                     autocompletePopupSearch(editor, 'filter');
                 }
-                
+
             } else {
                 intResult += 1;
                 if (!bolResults) {
@@ -417,7 +470,7 @@ function autocompletePopupLoad(editor, arrQueries) {
                     //    console.log(arrRows[i][0]);
                     //}
 
-                    /*// create a search string (normalize to double quoted and lowercase)
+                    /* create a search string (normalize to double quoted and lowercase)
                     strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
 
                     strText += '\n' + strCurrent;
@@ -523,6 +576,7 @@ function autocompletePopupClose(editor) {
     autocompleteGlobals.arrValues = [];
     autocompleteGlobals.arrSearchMaster = [];
     autocompleteGlobals.arrValuesMaster = [];
+    autocompleteGlobals.arrVariables = [];
     autocompleteGlobals.searchLength = 0;
 
 }
@@ -659,7 +713,7 @@ function autocompletePopupSearch(editor, strMode) {
       , intSearchStringEnd = autocompleteGlobals.intSearchEnd
       , strSearch = strScript.substring(intSearchStringStart, intSearchStringEnd)
       , choices, match, i, len, strCurrentMasterSearch, strCurrentMasterValue, strNewValue, strAdded;
-
+    
     if (editor.currentSelections.length > 1) {
         if (autocompleteGlobals.searchLength !== 0 && autocompleteGlobals.searchLength !== 1) {
             if (curr_run_search > 0) {
@@ -741,6 +795,7 @@ function autocompletePopupSearch(editor, strMode) {
         // if mode is filter: take the current autocompleteGlobals.arrSearch and remove
         //      any items that don't match
         if (strMode === 'filter') {
+            var arrNewValue = [];
             autocompleteGlobals.popupAce.setValue('');
             //console.log(autocompleteGlobals.arrSearch);
             //console.log(strSearch);
@@ -748,7 +803,6 @@ function autocompletePopupSearch(editor, strMode) {
             // console.log(autocompleteGlobals.arrValues);
             // console.log(strSearch);
             for (i = 0, len = autocompleteGlobals.arrSearch.length, strNewValue = ''; i < len; i += 1) {
-
 
                 // if the current item doesn't match: remove from ace, arrSearch and arrValues
                 if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
@@ -761,10 +815,15 @@ function autocompletePopupSearch(editor, strMode) {
                     len -= 1;
                 } else {
                     // console.log('match', i);
+                    //arrNewValue.push(autocompleteGlobals.arrValues[i]);
                     strNewValue += '\n';
                     strNewValue += autocompleteGlobals.arrValues[i];
                 }
             }
+            
+            // arrNewValue = arrNewValue.sort();
+            
+            // strNewValue = '\n' + arrNewValue.join('\n');
 
             autocompleteGlobals.popupAce.setValue(strNewValue.substring(1));
 
