@@ -18963,10 +18963,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 //if (element.hasAttribute('disabled')) {
                 //    element.innerHTML = element.getAttribute('value') || element.getAttribute('placeholder') || '';
                 //} else {
-                element.innerHTML = '';
-                element.appendChild(singleLineTemplate.cloneNode(true));
-                if (element.oldTabIndex) {
-                    xtag.query(element, '.control')[0].setAttribute('tabindex', element.oldTabIndex);
+                if (!element.hasAttribute('disabled')) {
+                    element.innerHTML = '';
+                    element.appendChild(singleLineTemplate.cloneNode(true));
+                    if (element.oldTabIndex) {
+                        xtag.query(element, '.control')[0].setAttribute('tabindex', element.oldTabIndex);
+                    }
                 }
                 //}
                 
@@ -19210,7 +19212,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 // if vertical arrow: update current date part
                                 } else if (intKeyCode === 38 || // up arrow
                                            intKeyCode === 40) { // down arrow
-                                    dteDate = new Date(strValue);
+                                    // If the date is in ISO format, new Date() will create it in GMT then convert it to the local timezone
+                                    dteDate = new Date(strValue + ' 00:00:00');
                                     
                                     // if current part is year
                                     if (strCurrentSection === 'year') {
@@ -19792,8 +19795,12 @@ document.addEventListener('DOMContentLoaded', function () {
                            GS.setInputSelection(this.control, tempSelection.start, tempSelection.end);
                         }
                         
-                    } else if (this.hasAttribute('disabled')) {
-                        this.innerHTML = newValue;
+                    } else if (this.hasAttribute('disabled')) {                        
+                        if (newValue && typeof newValue === 'object') {
+                            this.innerHTML = formatDate(newValue, getFormatString(this));
+                        } else {
+                            this.innerHTML = newValue || '';
+                        }
                         
                     } else {
                         this.setAttribute('value', newValue);
@@ -37223,7 +37230,7 @@ document.addEventListener('DOMContentLoaded', function () {
             value: {
                 get: function () {
                     // return this.getAttribute('value');
-                    if (this.getAttribute('value').trim() === '') {
+                    if (!this.getAttribute('value') || this.getAttribute('value').trim() === '') {
                         return 'NULL';
                     } else {
                         return this.getAttribute('value');
@@ -37563,8 +37570,20 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
         
+        addProp('Date Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('date-placeholder') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'date-placeholder', this.value);
+        });
+        
+        addProp('Time Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('time-placeholder') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'time-placeholder', this.value);
+        });
+        
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
+        });
+        
+        addProp('Date Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-date-picker')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'no-date-picker', (this.value === 'true'), false);
         });
         
         addProp('Date Format', true, '<gs-combo class="target" value="' + encodeHTML(selectedElement.getAttribute('date-format') || '') + '" mini>' + 
@@ -37606,18 +37625,37 @@ window.addEventListener('design-register-element', function () {
                                 */}), function () {
             return setOrRemoveTextAttribute(selectedElement, 'date-format', this.value);
         });
-        
-        addProp('Date Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-picker')) + '" mini></gs-checkbox>', function () {
-            return setOrRemoveBooleanAttribute(selectedElement, 'no-date-picker', (this.value === 'true'), false);
+
+        addProp('Time Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-time-picker')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'no-time-picker', (this.value === 'true'), false);
         });
 
-        addProp('Time Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-picker')) + '" mini></gs-checkbox>', function () {
-            return setOrRemoveBooleanAttribute(selectedElement, 'no-time-picker', (this.value === 'true'), false);
+        addProp('Time Display Format', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('time-format') || '') + '" mini>' +
+                                    '<option value="">Regular (1:30 PM)</option>' +
+                                    '<option value="military">Military (13:30)</option>' +
+                                '</gs-select>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'time-format', this.value);
+        });
+
+        addProp('Time Non-Empty', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('time-non-empty')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'time-non-empty', (this.value === 'true'), true);
+        });
+
+        addProp('Time Now Button', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('time-no-now-button')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'time-no-now-button', (this.value === 'true'), false);
         });
         
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
+        });
+        
+        addProp('Date Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('date-tabindex') || '') + '" mini></gs-number>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'date-tabindex', this.value);
+        });
+        
+        addProp('Time Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('time-tabindex') || '') + '" mini></gs-number>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'time-tabindex', this.value);
         });
         
         addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
@@ -37634,11 +37672,6 @@ window.addEventListener('design-register-element', function () {
         
         addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
-        });
-        
-        // SUSPEND-INSERTED attribute
-        addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
-            return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
         
         // visibility attributes
@@ -37683,6 +37716,11 @@ window.addEventListener('design-register-element', function () {
         
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
+        
+        // SUSPEND-INSERTED attribute
+        addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
+        });
     };
 });
 
@@ -37700,7 +37738,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrAttrParts;
         var strOperator;
 
-        if (strQSCol.indexOf('=') !== -1) {
+        if (strQSCol && strQSCol.indexOf('=') !== -1) {
             arrAttrParts = strQSCol.split(',');
             i = 0;
             len = arrAttrParts.length;
@@ -37746,7 +37784,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 i += 1;
             }
-        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+        } else if (strQSCol && GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
             strQSValue = GS.qryGetVal(strQS, strQSCol);
 
             if (element.internal.bolQSFirstRun !== true) {
@@ -37763,14 +37801,39 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // for a given element, copy the control values with the value attribute
     function syncView(element) {
-        var newValue = element.dateControl.value + ' ' + element.timeControl.value;
+        var strDateValue = element.dateControl.value + ' ' + (element.timeControl.value === 'NULL' ? '00:00' : element.timeControl.value);
+        var dateValue = new Date(strDateValue);
+        var newValue = dateValue.getFullYear() + '-' + (dateValue.getMonth() + 1) + '-' + dateValue.getDate() + ' ' + dateValue.getHours() + ':' + dateValue.getMinutes();
         
-        console.log(element.dateControl.value);
-        console.log(element.timeControl.value);
-        console.log(newValue);
-        console.log(new Date(newValue));
+        //console.log(element.dateControl.value);
+        //console.log(element.timeControl.value === 'NULL' ? '00:00' : element.timeControl.value);
+        //console.log(strDateValue);
+        //console.log(dateValue);
+        //console.log(newValue);
         
         element.setAttribute('value', newValue);
+    }
+    
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
+        }
     }
     
     // dont do anything that modifies the element here
@@ -37798,53 +37861,40 @@ document.addEventListener('DOMContentLoaded', function () {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
+                element.internal = {};
+                saveDefaultAttributes(element);
                 
                 if (element.hasAttribute('value')) {
                     var arrValue = element.getAttribute('value').split(' ');
-                    dateValue = new Date(arrValue[0] + ' 00:00:00');
+                    dateValue = new Date(arrValue[0] + ' 00:00:00');    // adding an empty time causes the date to not be iso format
+                                                                        // this makes the browser choose the local timezone instead of GMT
                     timeValue = arrValue[1];
                 }
                 
                 element.dateControl = document.createElement('gs-date');
                 element.timeControl = document.createElement('gs-time');
                 
-                if (element.hasAttribute('date-format')) {
-                    element.dateControl.setAttribute('format', element.getAttribute('date-format'));
-                }
-                if (element.hasAttribute('time-format')) {
-                    element.timeControl.setAttribute('format', element.getAttribute('time-format'));
-                }
+                var arrPassthrough = ['mini', 'autocorrect', 'autocapitalize', 'autocomplete', 'spellcheck', 'disabled', 'readonly'];
+                var arrDatePassthrough = ['date-placeholder', 'no-date-picker', 'date-format', 'date-tabindex'];
+                var arrTimePassthrough = ['time-placeholder', 'no-time-picker', 'time-format', 'time-non-empty', 'time-no-now-button', 'time-tabindex'];
+                var i;
+                var len;
                 
-                if (element.hasAttribute('no-date-picker')) {
-                    element.dateControl.setAttribute('no-picker', '');
+                for (i = 0, len = arrPassthrough.length; i < len; i += 1) {
+                    if (element.hasAttribute(arrPassthrough[i])) {
+                        element.dateControl.setAttribute(arrPassthrough[i], '');
+                        element.timeControl.setAttribute(arrPassthrough[i], '');
+                    }
                 }
-                if (element.hasAttribute('no-time-picker')) {
-                    element.timeControl.setAttribute('no-picker', '');
+                for (i = 0, len = arrDatePassthrough.length; i < len; i += 1) {
+                    if (element.hasAttribute(arrDatePassthrough[i])) {
+                        element.dateControl.setAttribute(arrDatePassthrough[i].replace(/date\-/g, ''), element.getAttribute(arrDatePassthrough[i]) || '');
+                    }
                 }
-                
-                if (element.hasAttribute('mini')) {
-                    element.dateControl.setAttribute('mini', '');
-                    element.timeControl.setAttribute('mini', '');
-                }
-                if (element.hasAttribute('autocorrect')) {
-                    element.dateControl.setAttribute('autocorrect', '');
-                    element.timeControl.setAttribute('autocorrect', '');
-                }
-                if (element.hasAttribute('autocapitalize')) {
-                    element.dateControl.setAttribute('autocapitalize', '');
-                    element.timeControl.setAttribute('autocapitalize', '');
-                }
-                if (element.hasAttribute('autocomplete')) {
-                    element.dateControl.setAttribute('autocomplete', '');
-                    element.timeControl.setAttribute('autocomplete', '');
-                }
-                if (element.hasAttribute('spellcheck')) {
-                    element.dateControl.setAttribute('spellcheck', '');
-                    element.timeControl.setAttribute('spellcheck', '');
-                }
-                if (element.hasAttribute('diabled')) {
-                    element.dateControl.setAttribute('diabled', '');
-                    element.timeControl.setAttribute('diabled', '');
+                for (i = 0, len = arrTimePassthrough.length; i < len; i += 1) {
+                    if (element.hasAttribute(arrTimePassthrough[i])) {
+                        element.timeControl.setAttribute(arrTimePassthrough[i].replace(/time\-/g, ''), element.getAttribute(arrTimePassthrough[i]) || '');
+                    }
                 }
                 
                 element.dateControl.value = dateValue;
@@ -37856,20 +37906,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.dateControl.setAttribute('gs-dynamic', '');
                 element.timeControl.setAttribute('gs-dynamic', '');
                 
-                element.dateControl.addEventListener('change', function () {
+                element.dateControl.addEventListener('change', function (event) {
                     syncView(element);
+                    event.stopPropagation();
+                    GS.triggerEvent(element, 'change');
                 });
-                element.timeControl.addEventListener('change', function () {
+                element.timeControl.addEventListener('change', function (event) {
                     syncView(element);
+                    event.stopPropagation();
+                    GS.triggerEvent(element, 'change');
                 });
                 
-                console.log(element.dateControl);
-                console.log(element.timeControl);
+                //console.log(element.dateControl);
+                //console.log(element.timeControl);
                 
                 element.appendChild(element.dateControl);
                 element.appendChild(element.timeControl);
                 
-                console.log(element.children);
+                //console.log(element.children);
                 
                 pushReplacePopHandler(element);
                 window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });

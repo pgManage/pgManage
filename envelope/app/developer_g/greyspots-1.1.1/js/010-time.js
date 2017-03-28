@@ -800,7 +800,7 @@ document.addEventListener('DOMContentLoaded', function () {
             value: {
                 get: function () {
                     // return this.getAttribute('value');
-                    if (this.getAttribute('value').trim() === '') {
+                    if (!this.getAttribute('value') || this.getAttribute('value').trim() === '') {
                         return 'NULL';
                     } else {
                         return this.getAttribute('value');

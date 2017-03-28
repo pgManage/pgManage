@@ -42,7 +42,6 @@ function refreshButtons (bolBtnType) {
     }
 }
 
-
 function refreshCustomCSS (customCSS) {
     'use strict';
     var customCSSText;
@@ -105,3 +104,242 @@ function refreshCustomCSS (customCSS) {
 window.addEventListener('load', function () {
     refreshCustomCSS(localStorage.customCSS);
 });
+
+
+
+
+function refreshShortcutKeys (shortcutKeys) {
+    'use strict';
+    var shortcutKeysText = [];
+    if (!shortcutKeys) {
+            
+        if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
+            var CTRLCMD = 'Command';
+        } else {
+            var CTRLCMD = 'Control';
+        }
+
+        
+        shortcutKeysText = [
+              [CTRLCMD,     'o',       'ShortcutNewTab']
+            , ['',          'F7',      'ShortcutExplain']
+            , ['Shift',     'F7',      'ShortcutExplainAnalyze']
+            , ['',          'F5',      'ShortcutRunQuery']
+            , [CTRLCMD,     's',       'ShortcutSave']
+            , [CTRLCMD,     '.',       'ShortcutDocs']
+            , ['',          'Escape',  'ShortcutHome']
+        ];
+    } else {
+        shortcutKeysText = shortcutKeys;
+    }
+    localStorage.ShortcutNewTab = shortcutKeysText[0];
+    localStorage.ShortcutExplain = shortcutKeysText[1];
+    localStorage.ShortcutExplainAnalyze = shortcutKeysText[2];
+    localStorage.ShortcutRunQuery = shortcutKeysText[3];
+    localStorage.ShortcutSave = shortcutKeysText[4];
+    localStorage.ShortcutDocs = shortcutKeysText[5];
+    localStorage.ShortcutHome = shortcutKeysText[6];
+    
+    // var strScript, thisArrText;
+    // var keydownShortcuts = '';
+    // //strScript = 'function keydownShortcuts (event) {;\n';
+    // strScript = 'document.addEventListener("keydown", keydownShortcuts = function (event) {\n';
+    
+    // for (var i = 0, len = shortcutKeysText.length; i < len; i++) {
+    //     thisArrText = shortcutKeysText[i];
+    //     console.log(thisArrText);
+    //     strScript += '    if (event.key === "' + thisArrText[1] + '"';
+    //     if (thisArrText[0] === 'Command') {
+    //         strScript += ' && event.metaKey) {\n';
+    //     } else if (thisArrText[0] === 'Control') {
+    //         strScript += ' && event.ctrlKey) {\n';
+    //     } else if (thisArrText[0] === 'Option') {
+    //         strScript += ' && event.altKey) {\n';
+    //     } else if (thisArrText[0] === 'Shift') {
+    //         strScript += ' && event.shiftKey) {\n';
+    //     } else {
+    //         strScript += ') {\n';
+    //     }
+    //     strScript += '        ' + thisArrText[2] + '();\n';
+    //     strScript += '    }\n';
+    // }
+    // strScript += '});\n\n';
+    
+    // strScript += "document.addEventListener('keydown', keydownShortcuts(event));\n";
+    // document.getElementById('shortcutKeys').innerHTML = strScript;
+}
+
+document.addEventListener('keydown', function (event) {
+    if (keyCodeCheck(event, localStorage.ShortcutNewTab)) {
+        ShortcutNewTab();
+    } else if (keyCodeCheck(event, localStorage.ShortcutExplain)) {
+        ShortcutExplain();
+    } else if (keyCodeCheck(event, localStorage.ShortcutExplainAnalyze)) {
+        ShortcutExplainAnalyze();
+    } else if (keyCodeCheck(event, localStorage.ShortcutRunQuery)) {
+        var tabElement = xtag.queryChildren(document.getElementById('tab-bar'), '.current-tab')[0];
+        if (tabElement.parentNode) {
+            if (tabElement.executedWaitingForKeyup !== true) {
+
+                tabElement.executedWaitingForKeyup = true;
+                executeScript();
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        }
+    } else if (keyCodeCheck(event, localStorage.ShortcutSave)) {
+        ShortcutSave();
+    } else if (keyCodeCheck(event, localStorage.ShortcutDocs)) {
+        ShortcutDocs();
+    } else if (keyCodeCheck(event, localStorage.ShortcutHome)) {
+        ShortcutHome();
+    }
+});
+
+document.addEventListener('keyup', function (event) {
+    if (keyCodeCheck(event, localStorage.ShortcutRunQuery)) {
+        var tabElement = xtag.queryChildren(document.getElementById('tab-bar'), '.current-tab')[0];
+        if (tabElement.parentNode) {
+            tabElement.executedWaitingForKeyup = false;
+            event.preventDefault();
+            event.stopPropagation();
+            console.log('yes');
+        }
+    }
+});
+
+
+
+function keyCodeCheck(event, storage) {
+    if (storage.substring(0, storage.indexOf(',')) === 'Command') {
+        if (event.metaKey && event.key.toLowerCase() === storage.substring(parseInt(storage.indexOf(','), 10 ) + 1, storage.lastIndexOf(',')).toLowerCase()) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (storage.substring(0, storage.indexOf(',')) === 'Control') {
+        if (event.ctrlKey && event.key.toLowerCase() === storage.substring(parseInt(storage.indexOf(','), 10 ) + 1, storage.lastIndexOf(',')).toLowerCase()) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (storage.substring(0, storage.indexOf(',')) === 'Option') {
+        if (event.altKey && event.key.toLowerCase() === storage.substring(parseInt(storage.indexOf(','), 10 ) + 1, storage.lastIndexOf(',')).toLowerCase()) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (storage.substring(0, storage.indexOf(',')) === 'Shift') {
+        if (event.shiftKey && event.key.toLowerCase() === storage.substring(parseInt(storage.indexOf(','), 10 ) + 1, storage.lastIndexOf(',')).toLowerCase()) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        if (event.key.toLowerCase() === storage.substring(parseInt(storage.indexOf(','), 10 ) + 1, storage.lastIndexOf(',')).toLowerCase()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+
+
+function getShortcuts () {
+    
+        var ValKeyNewTab = localStorage.ShortcutNewTab.split(',')[1];
+        var ValKeySaveTab = localStorage.ShortcutSave.split(',')[1];
+        var ValKeyRunQuery = localStorage.ShortcutRunQuery.split(',')[1];
+        var ValKeyFindDocumentation = localStorage.ShortcutDocs.split(',')[1];
+        var ValKeyExplain = localStorage.ShortcutExplain.split(',')[1];
+        var ValKeyExplainAnalyze = localStorage.ShortcutExplainAnalyze.split(',')[1];
+        var ValKeyHome = localStorage.ShortcutHome.split(',')[1];
+
+        var ValMetaKeyNewTab = localStorage.ShortcutNewTab.split(',')[0];
+        var ValMetaKeySaveTab = localStorage.ShortcutSave.split(',')[0];
+        var ValMetaKeyRunQuery = localStorage.ShortcutRunQuery.split(',')[0];
+        var ValMetaKeyFindDocumentation = localStorage.ShortcutDocs.split(',')[0];
+        var ValMetaKeyExplain = localStorage.ShortcutExplain.split(',')[0];
+        var ValMetaKeyExplainAnalyze = localStorage.ShortcutExplainAnalyze.split(',')[0];
+        var ValMetaKeyHome = localStorage.ShortcutHome.split(',')[0];
+    
+
+    var ShortcutKeysText = [
+          [ValMetaKeyNewTab              ,     ValKeyNewTab,             'ShortcutNewTab']
+        , [ValMetaKeyExplain             ,     ValKeyExplain,            'ShortcutExplain']
+        , [ValMetaKeyExplainAnalyze      ,     ValKeyExplainAnalyze,     'ShortcutExplainAnalyze']
+        , [ValMetaKeyRunQuery            ,     ValKeyRunQuery,           'ShortcutRunQuery']
+        , [ValMetaKeySaveTab             ,     ValKeySaveTab,            'ShortcutSave']
+        , [ValMetaKeyFindDocumentation   ,     ValKeyFindDocumentation,  'ShortcutDocs']
+        , [ValMetaKeyHome                ,     ValKeyHome,               'ShortcutHome']
+    ];
+    
+    return ShortcutKeysText;
+}
+
+window.addEventListener('load', function () {
+    refreshShortcutKeys(getShortcuts());
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

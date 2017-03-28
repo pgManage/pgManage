@@ -833,6 +833,116 @@ function dialogOptions() {
                     </div>
                 </div>
 
+                <h3 style="float: left;" id="KeyboardShortCuts">Keyboard Shortcuts</h3>
+                <div id="shortcuts-options-container">
+                    <table class="simple-table">
+                        <thead>
+                            <tr>
+                                <th style="padding: 0.75em;">Meta Key&nbsp;&nbsp;<gs-button id="metaKeyReset" inline>Reset</gs-button></th>
+                                <th style="padding: 0.75em;">Key&nbsp;&nbsp;<gs-button id="keyReset" inline>Reset</gs-button></th>
+                                <th style="padding: 0.75em;">Function</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                
+                                <td>
+                                    <gs-select id="shortcutMetaKeyNewTab" mini>
+                                        <option value="Command">Command/Windows Key</option>
+                                        <option value="Control">Control</option>
+                                        <option value="Option">Option</option>
+                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="None">None</option>
+                                    </gs-select>
+                                </td>
+                                <td><gs-text id="ShortcutKeyNewTab" mini></gs-text></td>
+                                <td><gs-static value="New Tab"></gs-static></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <gs-select id="shortcutMetaKeySaveTab" mini>
+                                        <option value="Command">Command/Windows Key</option>
+                                        <option value="Control">Control</option>
+                                        <option value="Option">Option</option>
+                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="None">None</option>
+                                    </gs-select>
+                                </td>
+                                <td><gs-text id="ShortcutKeySaveTab" mini></gs-text></td>
+                                <td><gs-static value="Save Tab"></gs-static></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <gs-select id="shortcutMetaKeyRunQuery" mini>
+                                        <option value="Command">Command/Windows Key</option>
+                                        <option value="Control">Control</option>
+                                        <option value="Option">Option</option>
+                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="None">None</option>
+                                    </gs-select>
+                                </td>
+                                <td><gs-text id="ShortcutKeyRunQuery" mini></gs-text></td>
+                                <td><gs-static value="Run Query"></gs-static></td>
+                            </tr>
+                            <tr>
+                                
+                                <td>
+                                    <gs-select id="shortcutMetaKeyFindDocumentation" mini>
+                                        <option value="Command">Command/Windows Key</option>
+                                        <option value="Control">Control</option>
+                                        <option value="Option">Option</option>
+                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="None">None</option>
+                                    </gs-select>
+                                </td>
+                                <td><gs-text id="ShortcutKeyFindDocumentation" mini></gs-text></td>
+                                <td><gs-static value="Find Documentation"></gs-static></td>
+                            </tr>
+                            <tr>
+                                
+                                <td>
+                                    <gs-select id="shortcutMetaKeyExplain" mini>
+                                        <option value="Command">Command/Windows Key</option>
+                                        <option value="Control">Control</option>
+                                        <option value="Option">Option</option>
+                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="None">None</option>
+                                    </gs-select>
+                                </td>
+                                <td><gs-text id="ShortcutKeyExplain" mini></gs-text></td>
+                                <td><gs-static value="Explain"></gs-static></td>
+                            </tr>
+                            <tr>
+                                
+                                <td>
+                                    <gs-select id="shortcutMetaKeyExplainAnalyze" mini>
+                                        <option value="Command">Command/Windows Key</option>
+                                        <option value="Control">Control</option>
+                                        <option value="Option">Option</option>
+                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="None">None</option>
+                                    </gs-select>
+                                </td>
+                                <td><gs-text id="ShortcutKeyExplainAnalyze" mini></gs-text></td>
+                                <td><gs-static value="Explain Analyze"></gs-static></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <gs-select id="shortcutMetaKeyHome" mini>
+                                        <option value="Command">Command/Windows Key</option>
+                                        <option value="Control">Control</option>
+                                        <option value="Option">Option</option>
+                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="None">None</option>
+                                    </gs-select>
+                                </td>
+                                <td><gs-text id="ShortcutKeyHome" mini></gs-text></td>
+                                <td><gs-static value="Home"></gs-static></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
                 <h3>Custom CSS Stylesheet</h3>
                 <div id="customCSSAce"></div>
                 <div><p>This Ace is stored in your local storage. Because this can get emptied it's recommended to save a copy.</p><div>
@@ -901,6 +1011,91 @@ function dialogOptions() {
         CSSEditor.addEventListener('change', function () {
             customCSSText = CSSEditor.getValue();
         });
+        
+        
+        document.getElementById('ShortcutKeyNewTab').value = localStorage.ShortcutNewTab.split(',')[1];
+        document.getElementById('ShortcutKeySaveTab').value = localStorage.ShortcutSave.split(',')[1];
+        document.getElementById('ShortcutKeyRunQuery').value = localStorage.ShortcutRunQuery.split(',')[1];
+        document.getElementById('ShortcutKeyFindDocumentation').value = localStorage.ShortcutDocs.split(',')[1];
+        document.getElementById('ShortcutKeyExplain').value = localStorage.ShortcutExplain.split(',')[1];
+        document.getElementById('ShortcutKeyExplainAnalyze').value = localStorage.ShortcutExplainAnalyze.split(',')[1];
+        document.getElementById('ShortcutKeyHome').value = localStorage.ShortcutHome.split(',')[1];
+        
+        document.getElementById('shortcutMetaKeyNewTab').value = (localStorage.ShortcutNewTab.split(',')[0] || 'None');
+        document.getElementById('shortcutMetaKeySaveTab').value = (localStorage.ShortcutSave.split(',')[0] || 'None');
+        document.getElementById('shortcutMetaKeyRunQuery').value = (localStorage.ShortcutRunQuery.split(',')[0] || 'None');
+        document.getElementById('shortcutMetaKeyFindDocumentation').value = (localStorage.ShortcutDocs.split(',')[0] || 'None');
+        document.getElementById('shortcutMetaKeyExplain').value = (localStorage.ShortcutExplain.split(',')[0] || 'None');
+        document.getElementById('shortcutMetaKeyExplainAnalyze').value = (localStorage.ShortcutExplainAnalyze.split(',')[0] || 'None');
+        document.getElementById('shortcutMetaKeyHome').value = (localStorage.ShortcutHome.split(',')[0] || 'None');
+        
+        
+
+        document.getElementById('metaKeyReset').addEventListener('click', function (event) {
+            if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
+                var CTRLCMD = 'Command';
+            } else {
+                var CTRLCMD = 'Control';
+            }
+            document.getElementById('shortcutMetaKeyNewTab').value = CTRLCMD;
+            document.getElementById('shortcutMetaKeySaveTab').value = CTRLCMD;
+            document.getElementById('shortcutMetaKeyRunQuery').value = 'None';
+            document.getElementById('shortcutMetaKeyFindDocumentation').value = CTRLCMD;
+            document.getElementById('shortcutMetaKeyExplain').value = 'None';
+            document.getElementById('shortcutMetaKeyExplainAnalyze').value = 'Shift';
+            document.getElementById('shortcutMetaKeyHome').value = 'None';
+        });
+        document.getElementById('keyReset').addEventListener('click', function (event) {
+            if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
+                var CTRLCMD = 'Command';
+            } else {
+                var CTRLCMD = 'Control';
+            }
+            document.getElementById('ShortcutKeyNewTab').value = 'o'
+            document.getElementById('ShortcutKeySaveTab').value = 's'
+            document.getElementById('ShortcutKeyRunQuery').value = 'F5'
+            document.getElementById('ShortcutKeyFindDocumentation').value = '.'
+            document.getElementById('ShortcutKeyExplain').value = 'F7'
+            document.getElementById('ShortcutKeyExplainAnalyze').value = 'F7'
+            document.getElementById('ShortcutKeyHome').value = 'Escape'
+        });
+        
+        document.getElementById('ShortcutKeyNewTab').addEventListener('keydown', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('ShortcutKeyNewTab').value = event.key;
+        });
+        document.getElementById('ShortcutKeySaveTab').addEventListener('keydown', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('ShortcutKeySaveTab').value = event.key;
+        });
+        document.getElementById('ShortcutKeyRunQuery').addEventListener('keydown', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('ShortcutKeyRunQuery').value = event.key;
+        });
+        document.getElementById('ShortcutKeyFindDocumentation').addEventListener('keydown', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('ShortcutKeyFindDocumentation').value = event.key;
+        });
+        document.getElementById('ShortcutKeyExplain').addEventListener('keydown', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('ShortcutKeyExplain').value = event.key;
+        });
+        document.getElementById('ShortcutKeyExplainAnalyze').addEventListener('keydown', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('ShortcutKeyExplainAnalyze').value = event.key;
+        });
+        document.getElementById('ShortcutKeyHome').addEventListener('keydown', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('ShortcutKeyHome').value = event.key;
+        });
+        
         document.getElementById('clip-options-quote-char').addEventListener('change', setAllClipSettings);
         document.getElementById('clip-options-field-delimiter').addEventListener('change', setAllClipSettings);
         document.getElementById('clip-options-null-values').addEventListener('change', setAllClipSettings);
@@ -949,9 +1144,48 @@ function dialogOptions() {
             }
         }
     }, function () {
+        var ValKeyNewTab = document.getElementById('ShortcutKeyNewTab').value;
+        var ValKeySaveTab = document.getElementById('ShortcutKeySaveTab').value;
+        var ValKeyRunQuery = document.getElementById('ShortcutKeyRunQuery').value;
+        var ValKeyFindDocumentation = document.getElementById('ShortcutKeyFindDocumentation').value;
+        var ValKeyExplain = document.getElementById('ShortcutKeyExplain').value;
+        var ValKeyExplainAnalyze = document.getElementById('ShortcutKeyExplainAnalyze').value;
+        var ValKeyHome = document.getElementById('ShortcutKeyHome').value;
+        var ValMetaKeyNewTab = document.getElementById('shortcutMetaKeyNewTab').value;
+        var ValMetaKeySaveTab = document.getElementById('shortcutMetaKeySaveTab').value;
+        var ValMetaKeyRunQuery = document.getElementById('shortcutMetaKeyRunQuery').value;
+        var ValMetaKeyFindDocumentation = document.getElementById('shortcutMetaKeyFindDocumentation').value;
+        var ValMetaKeyExplain = document.getElementById('shortcutMetaKeyExplain').value;
+        var ValMetaKeyExplainAnalyze = document.getElementById('shortcutMetaKeyExplainAnalyze').value;
+        var ValMetaKeyHome = document.getElementById('shortcutMetaKeyHome').value;
+        
+        ValMetaKeyNewTab = ((ValMetaKeyNewTab === 'None') ? '' : ValMetaKeyNewTab);
+        ValMetaKeySaveTab = ((ValMetaKeySaveTab === 'None') ? '' : ValMetaKeySaveTab);
+        ValMetaKeyRunQuery = ((ValMetaKeyRunQuery === 'None') ? '' : ValMetaKeyRunQuery);
+        ValMetaKeyFindDocumentation = ((ValMetaKeyFindDocumentation === 'None') ? '' : ValMetaKeyFindDocumentation);
+        ValMetaKeyExplain = ((ValMetaKeyExplain === 'None') ? '' : ValMetaKeyExplain);
+        ValMetaKeyExplainAnalyze = ((ValMetaKeyExplainAnalyze === 'None') ? '' : ValMetaKeyExplainAnalyze);
+        ValMetaKeyHome = ((ValMetaKeyHome === 'None') ? '' : ValMetaKeyHome);
+        
+        var ShortcutKeysText = [
+              [ValMetaKeyNewTab              ,     ValKeyNewTab,             'ShortcutNewTab']
+            , [ValMetaKeyExplain             ,     ValKeyExplain,            'ShortcutExplain']
+            , [ValMetaKeyExplainAnalyze      ,     ValKeyExplainAnalyze,     'ShortcutExplainAnalyze']
+            , [ValMetaKeyRunQuery            ,     ValKeyRunQuery,           'ShortcutRunQuery']
+            , [ValMetaKeySaveTab             ,     ValKeySaveTab,            'ShortcutSave']
+            , [ValMetaKeyFindDocumentation   ,     ValKeyFindDocumentation,  'ShortcutDocs']
+            , [ValMetaKeyHome                ,     ValKeyHome,               'ShortcutHome']
+        ];
+        
+        
         refreshCustomCSS(customCSSText);
+        refreshShortcutKeys(ShortcutKeysText);
     });
 }
+
+
+
+
 
 // take a query a pull the comments out
 function consumeComments(strScript) {
@@ -1124,8 +1358,25 @@ function consumeComments(strScript) {
 }
 
 function dialogAceInfo() {
-    var templateElement = document.createElement('template');
-
+var templateElement = document.createElement('template');
+    
+var strRunToken =  ((localStorage.ShortcutRunQuery.split(',')[0]) ? localStorage.ShortcutRunQuery.split(',')[0] + '-' : '') + localStorage.ShortcutRunQuery.split(',')[1]
+var strNewToken =  ((localStorage.ShortcutNewTab.split(',')[0]) ? localStorage.ShortcutNewTab.split(',')[0] + '-' : '') + localStorage.ShortcutNewTab.split(',')[1]
+var strSaveToken =  ((localStorage.ShortcutSave.split(',')[0]) ? localStorage.ShortcutSave.split(',')[0] + '-' : '') + localStorage.ShortcutSave.split(',')[1]
+var strDocsToken =  ((localStorage.ShortcutDocs.split(',')[0]) ? localStorage.ShortcutDocs.split(',')[0] + '-' : '') + localStorage.ShortcutDocs.split(',')[1]
+var strExpToken =  ((localStorage.ShortcutExplain.split(',')[0]) ? localStorage.ShortcutExplain.split(',')[0] + '-' : '') + localStorage.ShortcutExplain.split(',')[1]
+var strExpAnToken =  ((localStorage.ShortcutExplainAnalyze.split(',')[0]) ? localStorage.ShortcutExplainAnalyze.split(',')[0] + '-' : '') + localStorage.ShortcutExplainAnalyze.split(',')[1]
+var strHomeToken =  ((localStorage.ShortcutHome.split(',')[0]) ? localStorage.ShortcutHome.split(',')[0] + '-' : '') + localStorage.ShortcutHome.split(',')[1]
+    
+    // console.log(strRunToken);
+    // console.log(strNewToken);
+    // console.log(strSaveToken);
+    // console.log(strDocsToken);
+    // console.log(strExpToken);
+    // console.log(strExpAnToken);
+    // console.log(strHomeToken);
+    
+    
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -1145,12 +1396,29 @@ function dialogAceInfo() {
 
                 	<li>You can type using multiple cursors at once. To select in multiple places, hold down <kbd>CMD</kbd> (might be <kbd>CTRL</kbd> on Windows) and click in several places. To put a cursor in the same place on multiple lines, hold <kbd>OPTION</kbd> and then click and drag.</li>
                 </ul>
+                Tab Shortcuts: (Configurable in "Postage Options" <a style="text-decoration: underline; cursor: pointer; color: #0000FF;" onclick="dialogOptions();" dialogclose>Here</a>)<br />
+                <ul>
+                    <li>Use "{{F5TOKEN}}" to run Queries inside the Ace Editor.</li>
+                	
+                	<li>Use "{{CTRLOTOKEN}}" to open a new editor tab.</li>
+                	
+                	<li>Use "{{CTRLSTOKEN}}" to save the currently opened tab.</li>
+                	
+                	<li>Use "{{DOCSTOKEN}}" to find the PostgreSQL documentation of the currently highlighted keyword.</li>
+                	
+                	<li>Use "{{EXPTOKEN}}" to run the PostgreSQL Explain function.</li>
+                	
+                	<li>Use "{{EXPANTOKEN}}" to run the PostgreSQL Explain Analyze function.</li>
+                	
+                	<li>Use "{{HOMETOKEN}}" to switch between the current tab and the home page.</li>
+                </ul>
+                
             </gs-body>
             <gs-footer>
                 <gs-button dialogclose>Done</gs-button>
             </gs-footer>
         </gs-page>
-    */});
+    */}).replace(/\{\{F5TOKEN\}\}/gim, strRunToken).replace(/\{\{CTRLOTOKEN\}\}/gim, strNewToken).replace(/\{\{CTRLSTOKEN\}\}/gim, strSaveToken).replace(/\{\{DOCSTOKEN\}\}/gim, strDocsToken).replace(/\{\{EXPTOKEN}\}/gim, strExpToken).replace(/\{\{EXPANTOKEN\}\}/gim, strExpAnToken).replace(/\{\{HOMETOKEN}\}/gim, strHomeToken);
 
     GS.openDialog(templateElement);
 }

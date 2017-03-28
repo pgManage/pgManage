@@ -1023,9 +1023,6 @@ function autocompleteBind(editor) {
 function autocompleteUnbind(editor) {
     'use strict';
     if (autocompleteGlobals.bolBound) {
-        console.log(editor.standardGoLineDownExec);
-        console.log(editor.standardGoLineUpExec);
-        console.log(editor.standardIndentExec);
         editor.commands.commands.golinedown.exec = editor.standardGoLineDownExec;
         editor.commands.commands.golineup.exec = editor.standardGoLineUpExec;
         editor.commands.commands.indent.exec = editor.standardIndentExec;
