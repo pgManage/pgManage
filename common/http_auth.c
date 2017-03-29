@@ -398,6 +398,24 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		client_auth->str_database = getpar(str_form_data, "database", int_query_length, &client_auth->int_dbname_length);
 		SFINISH_CHECK(client_auth->str_database != NULL, "getpar failed");
 
+		size_t int_len = client_auth->int_dbname_length;
+		char *str_temp = client_auth->str_database;
+		char *str_temp2 = escape_conninfo_value(str_temp, &int_len);
+		SFINISH_CHECK(str_temp2 != NULL, "escape_conninfo_value failed!");
+		// if the added characters amount to more than two chars, then an escape happened
+		if ((int_len - client_auth->int_dbname_length) > 2) {
+			client_auth->str_database = str_temp2;
+			client_auth->int_dbname_length = int_len;
+
+			SFREE(str_temp);
+			str_temp2 = NULL;
+
+		// else, it isn't needed
+		} else {
+			str_temp = NULL;
+			SFREE(str_temp2);
+		}
+
 		SDEBUG("client_auth->parent->str_request: %s", client_auth->parent->str_request);
 
 		str_referer = request_header(client_auth->parent->str_request, client_auth->parent->int_request_len, "referer", &int_referer_len);

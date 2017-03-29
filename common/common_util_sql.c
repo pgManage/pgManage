@@ -38,7 +38,7 @@ char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_tab
 		ptr_table_name, ptr_end_table_name - ptr_table_name
 	);
 
-	SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
+	SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "g");
 
 	str_temp1 = bunescape_value(str_temp, &int_temp_len);
 	SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
@@ -59,7 +59,7 @@ char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_tab
 		*ptr_end_table_name = 0;
 
 		SERROR_SNCAT(str_temp, &int_temp_len, ptr_table_name, ptr_end_table_name - ptr_table_name);
-		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
+		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "g");
 
 		str_temp1 = bunescape_value(str_temp, &int_temp_len);
 		SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
@@ -115,7 +115,7 @@ char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table
 	);
 
 	if (strncmp(str_temp, "*", 2) != 0) {
-		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
+		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "g");
 		SERROR_BREPLACE(str_temp, &int_temp_len, "\t", "\", {{TABLE}}.\"", "g");
 
 		str_temp1 = bunescape_value(str_temp, &int_temp_len);
@@ -205,7 +205,7 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query, size_t int_
 
 	SERROR_SNCAT(str_temp, &int_temp_len, ptr_return_columns, ptr_end_return_columns - ptr_return_columns);
 	if (strncmp(str_temp, "*", 2) != 0) {
-		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "");
+		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "g");
 
 		SERROR_BREPLACE(str_temp, &int_temp_len, "\\t", "TABHERE3141592653589793TABHERE", "g");
 		str_temp1 = bunescape_value(str_temp, &int_temp_len);

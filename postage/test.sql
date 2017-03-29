@@ -83,3 +83,16 @@ $BODY$ LANGUAGE plpgsql VOLATILE;
 CREATE VIEW ttesting_large_view2 AS
 	SELECT generate_series AS id, 'testset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg'::text AS test1, ';alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj'::text AS test2
 		FROM generate_series(1, 200);
+
+
+
+CREATE DATABASE "WFP's ""Testing"" Database";
+CREATE ROLE "WFP's ""Testing"" User" LOGIN PASSWORD 'WFP''s "Testing" Password' SUPERUSER CONNECTION LIMIT -1 VALID UNTIL 'infinity';
+CREATE TABLE public."WFP's ""Testing"" Table" (
+  id integer NOT NULL,
+  "WFP's First ""Testing"" Column" character varying(150),
+  "WFP's Second ""Testing"" Column" character varying(150),
+  CONSTRAINT "WFP's ""Testing"" Primary Key" PRIMARY KEY (id)
+) WITH (
+  OIDS=FALSE
+);

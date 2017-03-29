@@ -363,11 +363,7 @@ bool parse_connection_file() {
 							int_param_len += 1;
 							do {
 								int_param_len += 1;
-							} while (ptr_temp[int_param_len] != '\'' ||
-									 ((ptr_temp[int_param_len - 1] == '\\' && ptr_temp[int_param_len - 2] != '\\') ||
-										 (ptr_temp[int_param_len + 1] == '\'' && ptr_temp[int_param_len] == '\'') ||
-										 (ptr_temp[int_param_len - 1] == '\'' && ptr_temp[int_param_len - 2] != '\'' &&
-											 ptr_temp[int_param_len - 2] != '\\')));
+							} while (ptr_temp[int_param_len] != '\'' || (ptr_temp[int_param_len - 1] == '\\' && ptr_temp[int_param_len - 2] != '\\'));
 							int_param_len += 1;
 						} else {
 							int_param_len += strcspn(ptr_temp + int_param_len, " ");
@@ -379,6 +375,7 @@ bool parse_connection_file() {
 							memcpy(temp_connection->str_connection_database, ptr_temp + int_equals_len + 1,
 								int_param_len - (int_equals_len + 1));
 							temp_connection->str_connection_database[int_param_len - (int_equals_len + 1)] = '\0';
+
 							SDEBUG("str_connection_database: %s", temp_connection->str_connection_database);
 						}
 
