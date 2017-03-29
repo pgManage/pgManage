@@ -122,7 +122,8 @@ void ws_select_step1(struct sock_ev_client_request *client_request) {
 
 			bstr_toupper(str_attr_name, int_attr_name_len);
 			if (strncmp(str_attr_name, "WHERE", 6) == 0 || strncmp(str_attr_name, "ORDER BY", 9) == 0 ||
-				strncmp(str_attr_name, "LIMIT", 6) == 0 || strncmp(str_attr_name, "OFFSET", 7) == 0) {
+				strncmp(str_attr_name, "LIMIT", 6) == 0 || strncmp(str_attr_name, "OFFSET", 7) == 0 || 
+				strncmp(str_attr_name, "GROUP BY", 9) == 0) {
 #ifdef POSTAGE_INTERFACE_LIBPQ
 				SFINISH_SNFCAT(client_select->str_sql, &client_select->int_sql_len,
 					str_attr_name, int_attr_name_len,
@@ -151,6 +152,12 @@ void ws_select_step1(struct sock_ev_client_request *client_request) {
 							SFREE(client_select->str_where);
 						}
 
+					} else if (strncmp(str_attr_name, "GROUP BY", 8) == 0) {
+						SFREE(client_select->str_group_by);
+						SFINISH_SNCAT(client_select->str_group_by, &client_select->int_group_by_len,
+							str_attr_value, int_attr_value_len);
+						SDEBUG("str_group_by: %s", client_select->str_group_by);
+
 					} else if (strncmp(str_attr_name, "ORDER BY", 8) == 0) {
 						SFREE(client_select->str_order_by);
 						SFINISH_SNCAT(client_select->str_order_by, &client_select->int_order_by_len,
@@ -175,7 +182,7 @@ void ws_select_step1(struct sock_ev_client_request *client_request) {
 				}
 #endif
 			} else {
-				SFINISH("Only WHERE, ORDER BY, LIMIT and OFFSET are allowed in the SELECT request");
+				SFINISH("Only WHERE, GROUP BY, ORDER BY, LIMIT and OFFSET are allowed in the SELECT request");
 			}
 
 			// Free name and value
@@ -366,6 +373,11 @@ bool ws_select_step4(EV_P, void *cb_data, DB_result *res) {
 				client_select->str_offset, client_select->int_offset_len,
 				")", (size_t)1);
 		}
+		if (client_select->str_group_by != NULL) {
+			SFINISH_SNFCAT(client_select->str_sql_escaped_return, &client_select->int_sql_escaped_return_len,
+				"	GROUP BY ", (size_t)10,
+				client_select->str_group_by, client_select->int_group_by_len);
+		}
 		SFINISH_SNFCAT(client_select->str_sql_escaped_return, &client_select->int_sql_escaped_return_len,
 			"	ORDER BY ", (size_t)10,
 			client_select->str_order_by, client_select->int_order_by_len,
@@ -510,6 +522,7 @@ void ws_select_free(struct sock_ev_client_select *to_free) {
 	SFREE(to_free->str_row_count);
 
 	SFREE(to_free->str_where);
+	SFREE(to_free->str_group_by);
 	SFREE(to_free->str_order_by);
 	SFREE(to_free->str_offset);
 	SFREE(to_free->str_limit);

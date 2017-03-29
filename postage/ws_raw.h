@@ -56,4 +56,6 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 This function just sends data to the client
 */
 void _raw_tuples_check_callback(EV_P, ev_check *w, int revents);
+
+void ws_raw_free(struct sock_ev_client_raw *to_free);
 #endif

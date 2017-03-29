@@ -1,3 +1,19 @@
+Changes since 3.2.1:
+Postage:
+Clear Electron cache when opening a window
+Fix database list code to not clear HTML every 10 records (closed workflowproducts/postage#164)
+
+Envelope:
+Fix limit property not templating
+Fix datasheet flashing records
+Make the file manager go up a directory if there is an error listing the files (closed workflowproducts/envelope#40)
+Add editable breadcrumb to file manager (closed workflowproducts/envelope#43)
+Add option to put "Access-Control-Allow-Origin: *" on actionnc responses (closed workflowproducts/envelope#18)
+
+Both:
+Error when an RSV bit is set in a websocket message (closed workflowproducts/envelope#9)
+
+
 Changes since 3.2.0:
 Postage:
 Remove "Clear Cache" button in Electron version
@@ -5,6 +21,7 @@ Make "Reload" menu option a hard refresh
 
 Both:
 Fix caching issues
+
 
 Changes since 3.2.0-beta:
 Postage:

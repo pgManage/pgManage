@@ -1064,12 +1064,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 							query_callback(EV_A, client_request, ws_raw_step3);
 						}
 
-						decrement_idle(EV_A);
-						ev_check_stop(EV_A, &client_raw->copy_check->check);
-						SFREE(client_raw->copy_check);
-						if (client_raw->res != NULL) {
-							PQclear(client_raw->res);
-						}
+						ws_raw_free(client_raw);
 					}
 				}
 			}
@@ -2120,6 +2115,12 @@ void client_close_immediate(struct sock_ev_client *client) {
 #else
 		} else if (client->cur_request->int_req_type == POSTAGE_REQ_TAB) {
 			ws_tab_free(client->cur_request->vod_request_data);
+		} else if (client->cur_request->int_req_type == POSTAGE_REQ_RAW) {
+			struct sock_ev_client_raw *client_raw = client->cur_request->vod_request_data;
+			if (client_raw->copy_check != NULL && client->client_paused_request->watcher == ((ev_watcher *)&client_raw->copy_check->check)) {
+				client->client_paused_request->watcher = NULL;
+			}
+			ws_raw_free(client->cur_request->vod_request_data);
 #endif
 		} else if (client->cur_request->int_req_type == POSTAGE_REQ_AUTH) {
 			http_auth_free(client->cur_request->vod_request_data);
@@ -2145,6 +2146,8 @@ void client_close_immediate(struct sock_ev_client *client) {
 #else
 			} else if (client_request->int_req_type == POSTAGE_REQ_TAB) {
 				ws_tab_free(client_request->vod_request_data);
+			} else if (client->cur_request->int_req_type == POSTAGE_REQ_RAW) {
+				ws_raw_free(client->cur_request->vod_request_data);
 #endif
 			} else if (client_request->int_req_type == POSTAGE_REQ_AUTH) {
 				http_auth_free(client_request->vod_request_data);

@@ -401,21 +401,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.displayIframe.contentWindow.document.close();
                     element.handleQueryString();
 
-					try {
-						element.displayIframe.contentWindow.addEventListener('load', function () {
-							//console.log('check for window.frameElement');
-							if (window.parent) {
-								// in frame
-								//console.log('window.frameElement exists');
-								window.parent.iframeFinished(
-									element.displayIframe
-								);
-							}
-						});
-					}
-					catch (e) { // standard
-						console.log(e);
-					};
+                    if (window.parent.iframeFinished !== undefined) {
+                        element.displayIframe.contentWindow.addEventListener('load', function () {
+                            //console.log('check for window.frameElement');
+                            if (window.parent) {
+                                // in frame
+                                //console.log('window.frameElement exists');
+                                window.parent.iframeFinished(
+                                    element.displayIframe
+                                );
+                            }
+                        });
+                    }
 
                 //}
             },

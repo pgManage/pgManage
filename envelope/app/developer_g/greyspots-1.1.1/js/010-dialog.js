@@ -195,17 +195,22 @@ GS.closeDialog = function (dialog, strAnswer) {
     
     // on focus: if the currently focus element is not in the frontmost dialog: focus first control of the frontmost dialog
     document.addEventListener('focus', function (event) {
-        var arrDialog = document.getElementsByTagName('gs-dialog'), frontDialog, parentFind, arrElements, i, len; 
-        
+        var arrDialog = document.getElementsByTagName('gs-dialog');
+        var frontDialog;
+        var parentFind;
+        var arrElements;
+        var i;
+        var len;
+
         //console.log('1*** focus: ', document.activeElement);
         if (arrDialog.length > 0) {
             frontDialog = arrDialog[arrDialog.length - 1];
             parentFind = GS.findParentElement(document.activeElement, frontDialog);
-            
+
             //console.log('2***', parentFind, frontDialog);
             if (parentFind !== frontDialog) {
                 arrElements = xtag.query(frontDialog, 'input, textarea, select, button, iframe, [tabindex], a');
-                
+
                 for (i = 0, len = arrElements.length; i < len; i += 1) {
                     if (GS.isElementFocusable(arrElements[i])) {
                         arrElements[i].focus();
@@ -216,8 +221,7 @@ GS.closeDialog = function (dialog, strAnswer) {
             }
         }
     }, true);
-    
-    
+
     // DEPRECATED
     GS.dialog = function (options) {
         var strHTML, dialogOverlay, dialog, strContent = '', strButtons = '', i, len, gridEach,

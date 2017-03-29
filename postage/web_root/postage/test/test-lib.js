@@ -126,11 +126,9 @@ var $ = {
 				if (key[0] !== '_' && bolEndTests && $.testsEnded !== true) {
 					$.testsEnded = true;
 					$.ajax('http://127.0.0.1:45654', '', 'GET', function (data) {});
-					for (var x = 0; x < 10; x += 1) {
-						$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + $.intID, 'POST', function (data) {
-							console.log(data);
-						});
-					}
+					$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=end&id=' + $.intID, 'POST', function (data) {
+						alert('Tests finished!');
+					});
 				}
                 document.getElementById('status-note-' + key).textContent = ' (STOPPED)';
 				if (key[0] === '_') {
@@ -437,6 +435,23 @@ var $ = {
                 WS.requestFromSocket($.tests[key].socket, key, 'CANCEL', function (data) {
                     // console.log(data);
                 });
+			}
+        } else if (strType === 'websocket close in request') {
+            arrCurrent[3] = arrCurrent[3].replace(/\r\n/gi, '\n');
+            var strArgs = arrCurrent[3].replace(/\{\{test_random\}\}/g, $.test_random).replace(/\{\{test_random1\}\}/g, $.tests[key].test_random);
+            var intCloseAtMessage = arrCurrent[4] !== undefined ? arrCurrent[4] : 1;
+            $.changeStatus(key, intCurrent, 'waiting', 'running');
+            i = 0;
+            WS.requestFromSocket($.tests[key].socket, key, strArgs, function (data, error) {
+                if (i === (intCloseAtMessage - 1)) {
+	                WS.closeSocket($.tests[key].socket);
+                    $.changeStatus(key, intCurrent, 'running', 'pass');
+                    $.runTest(key, intCurrent + 1);
+                }
+                i += 1;
+            });
+			if (intCloseAtMessage === 0) {
+                WS.closeSocket($.tests[key].socket);
 			}
         } else if (strType === 'websocket end') {
             $.changeStatus(key, intCurrent, 'waiting', 'running');

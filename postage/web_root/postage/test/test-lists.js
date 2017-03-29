@@ -284,6 +284,19 @@ test
 		tests: [
 			['SOCKET OPEN', 'websocket start'],
 
+			['CLOSE SOCKET IN RAW 1', 'websocket close in request', '', ml(function () {/*RAW
+SELECT pg_sleep(2);
+*/}), 2],
+
+			['SOCKET OPEN', 'websocket start'],
+
+			['CLOSE SOCKET IN RAW 2', 'websocket close in request', '', ml(function () {/*RAW
+SELECT *
+	FROM generate_series(1, 10) em1, generate_series(1, 100) em2, generate_series(1, 100) em3;
+*/}), 10],
+
+			['SOCKET OPEN', 'websocket start'],
+
 			['CANCEL RAW 1', 'websocket cancel', '', ml(function () {/*RAW
 SELECT pg_sleep(2);
 */}), 2],
@@ -549,7 +562,15 @@ LIMIT
 */
 			}),
 			['id\ttest_name\tTestName\ninteger\tcharacter varying(150)\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
-			['SELECT 8', 'websocket send from', '', ml(function () {/*SELECT	public	ttesting_large_view2
+			['SELECT 8', 'websocket', '', ml(function () {/*SELECT	public	ttesting_large_view2
+RETURN	*
+
+GROUP BY	ORDER BY
+id, test1, test2	id DESC
+*/
+			}),
+			["id\ttest1\ttest2\ninteger\ttext\ttext\n"].concat(createTestDataResponse('', 200, false)).concat(['TRANSACTION COMPLETED'])],
+			['SELECT 9', 'websocket send from', '', ml(function () {/*SELECT	public	ttesting_large_view2
 RETURN	*
 
 ORDER BY
@@ -792,7 +813,9 @@ iπd	test_name
 			['INSERT 1', 'websocket', '', ml(function () {/*INSERT	rtesting_table
 RETURN	id	test_name
 PK	id
-SEQ
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id DESC
 
 id	test_name
 {{test_random}}1	Bob
@@ -807,7 +830,9 @@ id	test_name
 			['INSERT 2', 'websocket', '', ml(function () {/*INSERT	rtesting_table
 RETURN	id	test_name
 PK	id
-SEQ
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id DESC
 
 id	test_name
 {{test_random}}1	Bob
@@ -826,7 +851,9 @@ id	test_name
                 ml(function () {/*INSERT	rtesting_table
 RETURN	id	test@test
 PK	id
-SEQ
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id DESC
 
 id	test@test
 {{test_random}}70	Bob
@@ -849,7 +876,9 @@ id	test@test
                 ml(function () {/*INSERT	rtesting_table
 RETURN	id	select
 PK	id
-SEQ
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id DESC
 
 id	select
 {{test_random}}70	Bob
@@ -2012,7 +2041,7 @@ $.ajax('/postage/index.html', '', 'GET', function (data) {
         }
     }
 });
-var req = $.ajax('/postage/test.txt', '', 'GET', function (data) {
+var req = $.ajax('/postage/test.txt?anticache=' + Math.random().toString().substring(2), '', 'GET', function (data) {
     $.if_modified_since_changestamp = req.getResponseHeader('Last-Modified');
 });
 $.ajax('/postage/auth', 'action=login&username=postgres&password=password&connname=test', 'POST', function (data) {

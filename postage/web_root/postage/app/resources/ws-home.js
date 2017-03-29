@@ -27,7 +27,7 @@ function loadHome() {
             <div style="width: 100%; height: 100%;" id="iframe-news">
                 <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
             </div>
-			<div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 200; background-color: #FFFFFF;" id="object-details-container" hidden></div>
+			<div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 200; background-color: #FFFFFF; overflow: auto;" id="object-details-container" hidden></div>
         </div>
     */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
 

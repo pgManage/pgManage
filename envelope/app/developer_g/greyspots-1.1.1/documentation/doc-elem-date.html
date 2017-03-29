@@ -218,6 +218,174 @@
                     <gs-date id="control_readonly" readonly value="05/05/05"></gs-date>
                 </template>
             </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">Attribute <code>[format]</code>:</span><br />
+                <p>The <code>[format]</code> attribute describes how the date you want to edit is structured.</p>
+                <p>The following format names are accepted:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td>01/01/2015</td>
+                        </tr>
+                        <tr>
+                            <td>shortdate</td>
+                            <td>1/1/15</td>
+                        </tr>
+                        <tr>
+                            <td>mediumdate</td>
+                            <td>Jan 1, 2015</td>
+                        </tr>
+                        <tr>
+                            <td>longdate</td>
+                            <td>January 1, 2015</td>
+                        </tr>
+                        <tr>
+                            <td>fulldate</td>
+                            <td>Thursday, January 1, 2015</td>
+                        </tr>
+                        <tr>
+                            <td>isodate</td>
+                            <td>2015-01-01</td>
+                        </tr>
+                        <tr>
+                            <td>isodatetime</td>
+                            <td>2015-01-01T00:00:00</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>You can specify your own format with these specifiers:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Output</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>y</td>
+                            <td>Full year</td>
+                        </tr>
+                        <tr>
+                            <td>yyyy</td>
+                            <td>Full year</td>
+                        </tr>
+                        <tr>
+                            <td>yy</td>
+                            <td>Last two digits of the year</td>
+                        </tr>
+                        <tr>
+                            <td>M</td>
+                            <td>Month number</td>
+                        </tr>
+                        <tr>
+                            <td>MM</td>
+                            <td>Padded month number</td>
+                        </tr>
+                        <tr>
+                            <td>MMM</td>
+                            <td>Short month name</td>
+                        </tr>
+                        <tr>
+                            <td>MMMM</td>
+                            <td>Full month name</td>
+                        </tr>
+                        <tr>
+                            <td>d</td>
+                            <td>Day of the month</td>
+                        </tr>
+                        <tr>
+                            <td>dd</td>
+                            <td>Padded day of the month</td>
+                        </tr>
+                        <tr>
+                            <td>EEE</td>
+                            <td>Short day name</td>
+                        </tr>
+                        <tr>
+                            <td>EEEE</td>
+                            <td>Full day name</td>
+                        </tr>
+                        <tr>
+                            <td>H</td>
+                            <td>Hour number (24-hour, midnight 0)</td>
+                        </tr>
+                        <tr>
+                            <td>HH</td>
+                            <td>Padded hour number (24-hour, midnight 0)</td>
+                        </tr>
+                        <tr>
+                            <td>h</td>
+                            <td>Hour number (12-hour)</td>
+                        </tr>
+                        <tr>
+                            <td>hh</td>
+                            <td>Padded hour number (12-hour)</td>
+                        </tr>
+                        <tr>
+                            <td>K</td>
+                            <td>Hour number (24-hour, midnight 12)</td>
+                        </tr>
+                        <tr>
+                            <td>KK</td>
+                            <td>Padded hour number (24-hour, midnight 12)</td>
+                        </tr>
+                        <tr>
+                            <td>AM</td>
+                            <td>AM/PM</td>
+                        </tr>
+                        <tr>
+                            <td>m</td>
+                            <td>Minutes</td>
+                        </tr>
+                        <tr>
+                            <td>mm</td>
+                            <td>Padded minutes</td>
+                        </tr>
+                        <tr>
+                            <td>s</td>
+                            <td>Seconds</td>
+                        </tr>
+                        <tr>
+                            <td>ss</td>
+                            <td>Padded seconds</td>
+                        </tr>
+                        <tr>
+                            <td>S</td>
+                            <td>Milliseconds</td>
+                        </tr>
+                        <tr>
+                            <td>SS</td>
+                            <td>Padded milliseconds (length 2)</td>
+                        </tr>
+                        <tr>
+                            <td>SSS</td>
+                            <td>Padded milliseconds (length 3)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><b>NOTE:</b> If you have a time in your format, arrowing will not work. Use a <code>&lt;gs-timestamp&gt;</code> instead.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="25">
+                    <gs-date format="" value="01/01/2015"></gs-date>
+                    <gs-date format="shortdate" value="1/1/15"></gs-date>
+                    <gs-date format="mediumdate" value="Jan 1, 2015"></gs-date>
+                    <gs-date format="longdate" value="January 1, 2015"></gs-date>
+                    <gs-date format="fulldate" value="Thursday, January 1, 2015"></gs-date>
+                    <gs-date format="isodate" value="2015-01-01"></gs-date>
+                    <gs-date format="isodatetime" value="2015-01-01T00:00:00"></gs-date>
+                    <gs-date format="yyyy-mm-dd KK:mm:ss.SSS" value="2015-01-01 00:00:00"></gs-date>
+                </template>
+            </gs-doc-example>
         </gs-container>
         <br />
         <br />
