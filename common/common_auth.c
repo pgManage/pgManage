@@ -195,11 +195,11 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 		////GET THINGS FOR CONNECTION STRING
 		str_username = getpar(str_cookie_decrypted, "username", int_cookie_len, &int_user_length);
 		SFINISH_CHECK(str_username != NULL, "getpar failed");
-		str_username = bstr_tolower(str_username, int_user_length);
+		//str_username = bstr_tolower(str_username, int_user_length);
 
 		str_database = getpar(str_cookie_decrypted, "dbname", int_cookie_len, &client->int_database_len);
 		SFINISH_CHECK(str_database != NULL, "getpar failed");
-		str_database = bstr_tolower(str_database, client->int_database_len);
+		//str_database = bstr_tolower(str_database, client->int_database_len);
 		SNOTICE("REQUEST USERNAME: %s", str_username);
 		if (str_database != NULL && strlen(str_database) == 0) {
 			SFREE(str_database);
