@@ -348,7 +348,7 @@ SELECT {{INTOID}} AS oid, 'Columns (' || COUNT(attname) || ')' AS caption, 'obje
     JOIN pg_index idx ON cl.oid = idx.indrelid 
     JOIN pg_class clidx ON clidx.oid = idx.indexrelid 
     LEFT JOIN pg_namespace nsp ON nsp.oid = cl.relnamespace 
-    WHERE (cl.oid = {{INTOID}} OR cl.relname = '{{STRNAME}}')
+    WHERE (cl.oid = {{INTOID}} OR cl.relname = '{{STRSQLSAFENAME}}')
       AND (SELECT count(*) FROM pg_constraint con WHERE con.conindid = clidx.oid) = 0
         HAVING COUNT(clidx.relname) > 0
     UNION
@@ -419,7 +419,7 @@ SELECT {{INTOID}} AS oid, 'Columns (' || COUNT(attname) || ')' AS caption, 'obje
     JOIN pg_index idx ON cl.oid = idx.indrelid 
     JOIN pg_class clidx ON clidx.oid = idx.indexrelid 
     LEFT JOIN pg_namespace nsp ON nsp.oid = cl.relnamespace 
-    WHERE (cl.oid = {{INTOID}} OR cl.relname = '{{STRNAME}}')
+    WHERE (cl.oid = {{INTOID}} OR cl.relname = '{{STRSQLSAFENAME}}')
       AND (SELECT count(*) FROM pg_constraint con WHERE con.conindid = clidx.oid) = 0
         HAVING COUNT(clidx.relname) > 0
     UNION
@@ -602,7 +602,7 @@ SELECT count(clidx.relname) AS result
         JOIN pg_index idx ON cl.oid = idx.indrelid 
         JOIN pg_class clidx ON clidx.oid = idx.indexrelid 
         LEFT JOIN pg_namespace nsp ON nsp.oid = cl.relnamespace 
-        WHERE (cl.oid = {{INTOID}} OR cl.relname = '{{STRNAME}}')
+        WHERE (cl.oid = {{INTOID}} OR cl.relname = '{{STRSQLSAFENAME}}')
           AND (SELECT count(*) FROM pg_constraint con WHERE con.conindid = clidx.oid) = 0;
 */});
 
@@ -724,7 +724,7 @@ SELECT {{INTOID}}, quote_ident(clidx.relname) AS name, '{{SCHEMA}}' AS schema_na
         JOIN pg_index idx ON cl.oid = idx.indrelid 
         JOIN pg_class clidx ON clidx.oid = idx.indexrelid 
         LEFT JOIN pg_namespace nsp ON nsp.oid = cl.relnamespace 
-        WHERE (cl.oid = {{INTOID}} OR cl.relname = '{{STRNAME}}')
+        WHERE (cl.oid = {{INTOID}} OR cl.relname = '{{STRSQLSAFENAME}}')
           AND (SELECT count(*) FROM pg_constraint con WHERE con.conindid = clidx.oid) = 0;
 */});
 
@@ -1083,7 +1083,7 @@ scriptQuery.objectTrigger = ml(function () {/*
                   JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                  WHERE (
                             pg_trigger.oid = {{INTOID}}
-                         OR pg_namespace.nspname || '.' || pg_trigger.tgname = '{{STRNAME}}'
+                         OR pg_namespace.nspname || '.' || pg_trigger.tgname = '{{STRSQLSAFENAME}}'
                        )
                    AND pg_trigger.tgisinternal != TRUE
             )
@@ -1108,7 +1108,7 @@ scriptQuery.objectTrigger = ml(function () {/*
                   JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                  WHERE (
                             pg_trigger.oid = {{INTOID}}
-                         OR pg_namespace.nspname || '.' || pg_trigger.tgname = '{{STRNAME}}'
+                         OR pg_namespace.nspname || '.' || pg_trigger.tgname = '{{STRSQLSAFENAME}}'
                        )
                    AND pg_trigger.tgisinternal != TRUE
             );
@@ -1249,14 +1249,14 @@ SELECT '-- Index: ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(
     LEFT JOIN pg_catalog.pg_index ON pg_index.indrelid = pg_class.oid
     LEFT JOIN pg_catalog.pg_class pg_index_class ON pg_index.indexrelid = pg_index_class.oid
     LEFT JOIN pg_catalog.pg_namespace pg_index_class_namespace ON pg_index_class_namespace.oid = pg_index_class.relnamespace
-    WHERE pg_index_class.relkind = 'i' AND pg_namespace.nspname || '.' || pg_index_class.relname = '{{STRNAME}}';
+    WHERE pg_index_class.relkind = 'i' AND pg_namespace.nspname || '.' || pg_index_class.relname = '{{STRSQLSAFENAME}}';
 */});
 
 associatedButtons.objectKey = ['propertyButton', 'dependButton'];
 scriptQuery.objectKey = ml(function () {/*
 SELECT '-- Constraint: ' || conname || E';\n\n' ||
-    '-- ALTER TABLE ' || '{{STRNAME}}' || ' DROP CONSTRAINT ' || conname || E';\n' ||
-    '-- ALTER TABLE ' || '{{STRNAME}}' || ' ADD CONSTRAINT ' || conname || ' ' || pg_get_constraintdef(oid, true) || E';\n'
+    '-- ALTER TABLE ' || '{{STRSQLSAFENAME}}' || ' DROP CONSTRAINT ' || conname || E';\n' ||
+    '-- ALTER TABLE ' || '{{STRSQLSAFENAME}}' || ' ADD CONSTRAINT ' || conname || ' ' || pg_get_constraintdef(oid, true) || E';\n'
              FROM 
                 (SELECT oid, *
                    FROM pg_constraint
@@ -1527,21 +1527,21 @@ scriptQuery.objectCollation = ml(function () {/*
                 '-- DROP COLLATION ' || (quote_ident(nspname) || '.' || quote_ident(collname)) || E';\n\n'
            FROM pg_catalog.pg_collation
       LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_collation.collnamespace
-          WHERE pg_collation.oid = {{INTOID}}::oid -- OR (nspname || '.' || collname) = '{{STRNAME}}'
+          WHERE pg_collation.oid = {{INTOID}}::oid -- OR (nspname || '.' || collname) = '{{STRSQLSAFENAME}}'
                                                     ) ||
         
         -- ############ CREATE ############
         (SELECT 'CREATE COLLATION ' || (quote_ident(nspname) || '.' || quote_ident(collname)) || E'\n'
            FROM pg_catalog.pg_collation
       LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_collation.collnamespace
-          WHERE pg_collation.oid = {{INTOID}}::oid -- OR (nspname || '.' || collname) = '{{STRNAME}}'
+          WHERE pg_collation.oid = {{INTOID}}::oid -- OR (nspname || '.' || collname) = '{{STRSQLSAFENAME}}'
                                                     ) ||
         
         -- ########## parameters ##########
         (SELECT E'\t(LC_COLLATE=''' || collcollate || ''', LC_CTYPE=''' || collctype || E''');\n\n'
            FROM pg_catalog.pg_collation
       LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_collation.collnamespace
-          WHERE pg_collation.oid = {{INTOID}}::oid -- OR (nspname || '.' || collname) = '{{STRNAME}}'
+          WHERE pg_collation.oid = {{INTOID}}::oid -- OR (nspname || '.' || collname) = '{{STRSQLSAFENAME}}'
                                                     ) ||
         
         -- ############ ALTER ############
@@ -1550,7 +1550,7 @@ scriptQuery.objectCollation = ml(function () {/*
            FROM pg_catalog.pg_collation
       LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_collation.collnamespace
       LEFT JOIN pg_catalog.pg_roles ON pg_roles.oid = pg_collation.collowner
-          WHERE pg_collation.oid = {{INTOID}}::oid -- OR (nspname || '.' || collname) = '{{STRNAME}}'
+          WHERE pg_collation.oid = {{INTOID}}::oid -- OR (nspname || '.' || collname) = '{{STRSQLSAFENAME}}'
                                                     ) ||
         
         -- ########### COMMENT ###########
@@ -1560,12 +1560,12 @@ scriptQuery.objectCollation = ml(function () {/*
            FROM pg_catalog.pg_collation
       LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_collation.collnamespace
       LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_collation.oid
-          WHERE pg_collation.oid = {{INTOID}}::oid -- OR (nspname || '.' || collname) = '{{STRNAME}}'
+          WHERE pg_collation.oid = {{INTOID}}::oid -- OR (nspname || '.' || collname) = '{{STRSQLSAFENAME}}'
                                                     ), '');
     */});
           //WHERE pg_collation.oid = {{INTOID}}::oid) ||
-          //WHERE pg_collation.oid = {{INTOID}}::oid OR (nspname || '.' || collname) = '{{STRNAME}}') ||
-          //WHERE pg_collation.oid = {{INTOID}}::oid OR (nspname || '.' || collname) = '{{STRNAME}}'))
+          //WHERE pg_collation.oid = {{INTOID}}::oid OR (nspname || '.' || collname) = '{{STRSQLSAFENAME}}') ||
+          //WHERE pg_collation.oid = {{INTOID}}::oid OR (nspname || '.' || collname) = '{{STRSQLSAFENAME}}'))
 
 associatedButtons.objectConversion = ['propertyButton', 'dependButton'];
 scriptQuery.objectConversion = ml(function () {/*
@@ -1626,7 +1626,7 @@ scriptQuery.objectOperator = ml(function () {/*
         FROM pg_operator op 
         JOIN pg_namespace nsp ON nsp.oid = op.oprnamespace 
         JOIN pg_roles rol ON rol.oid = op.oprowner 
-        WHERE op.oid = {{INTOID}} OR (nsp.nspname || '.' || op.oprname || ' (' || format_type(op.oprleft, NULL) || ', ' || format_type(op.oprright, NULL) || ')') = '{{STRNAME}}';
+        WHERE op.oid = {{INTOID}} OR (nsp.nspname || '.' || op.oprname || ' (' || format_type(op.oprleft, NULL) || ', ' || format_type(op.oprright, NULL) || ')') = '{{STRSQLSAFENAME}}';
     */});
 
 
@@ -1668,7 +1668,7 @@ scriptQuery.objectSequence = ml(function () {/*
         LEFT JOIN pg_description ON pg_description.objoid = c.oid
         LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
                                              AND s.sequence_name = c.relname
-        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRNAME}}'))
+        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}'))
         
         
         
@@ -1693,7 +1693,7 @@ scriptQuery.objectSequence = ml(function () {/*
         LEFT JOIN pg_description ON pg_description.objoid = c.oid
         LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
                                              AND s.sequence_name = c.relname
-        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRNAME}}')),'')
+        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'')
         
         || COALESCE((SELECT array_to_string(array_agg(
         	(SELECT array_to_string((SELECT array_agg('GRANT ' || ok) FROM 
@@ -1716,7 +1716,7 @@ scriptQuery.objectSequence = ml(function () {/*
         LEFT JOIN pg_description ON pg_description.objoid = c.oid
         LEFT JOIN information_schema.sequences s ON s.sequence_schema = n.nspname
                                              AND s.sequence_name = c.relname
-        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRNAME}}')),'');
+        WHERE c.relkind = 'S'::char AND (c.oid = {{INTOID}} OR n.nspname || '.' || c.relname = '{{STRSQLSAFENAME}}')),'');
     */});
 
         
@@ -1729,7 +1729,7 @@ SELECT E'-- DROP RULE ' || quote_ident(pg_rewrite.rulename) ||
         FROM pg_class
         LEFT JOIN pg_rewrite ON pg_class.oid=pg_rewrite.ev_class
         LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_namespace.nspname || '.' || quote_ident(pg_rewrite.rulename) = '{{STRNAME}}'
+        WHERE (pg_rewrite.oid = {{INTOID}} OR pg_namespace.nspname || '.' || quote_ident(pg_rewrite.rulename) = '{{STRSQLSAFENAME}}')
     */});
 
 associatedButtons.objectColumn = ['dependButton', 'statButton'];
@@ -1745,27 +1745,27 @@ SELECT '-- Column: ' || attname || E';\n\n' ||
             FROM pg_stats
             LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.schemaname = pg_stats.schemaname AND pg_stat_user_tables.relname = pg_stats.tablename
             WHERE pg_stat_user_tables.relid = {{INTOID}}
-            AND attname = '{{STRNAME}}'
+            AND attname = '{{STRSQLSAFENAME}}'
             ORDER BY relid DESC
             LIMIT 1), E'-- No statistics found\n\n') ||
     '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' DROP COLUMN IF EXISTS ' || attname || E';\n' ||
     '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' ADD COLUMN IF NOT EXISTS ' || attname || ' ' || (
         SELECT COALESCE(format_type(atttypid, atttypmod),'') FROM pg_catalog.pg_attribute
-            WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = {{INTOID}} AND attname = '{{STRNAME}}'
+            WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = {{INTOID}} AND attname = '{{STRSQLSAFENAME}}'
           --  ORDER BY attnum ASC
             LIMIT 1) || E';\n'||
     '-- ALTER TABLE ' || pg_stat_user_tables.schemaname || '.' || pg_stat_user_tables.relname || ' ALTER COLUMN ' || attname || E' SET DATA TYPE <data_type>;\n', '')
         FROM pg_attribute
         LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = attrelid
-        WHERE attrelid = {{INTOID}} AND attname = '{{STRNAME}}'
+        WHERE attrelid = {{INTOID}} AND attname = '{{STRSQLSAFENAME}}'
 */});
     
     
 associatedButtons.objectConstraint = ['dependButton'];
 scriptQuery.objectConstraint = ml(function () {/*
 SELECT '-- Constraint: ' || conname || E';\n\n' ||
-    '-- ALTER TABLE ' || '{{STRNAME}}' || ' DROP CONSTRAINT ' || conname || E';\n' ||
-    '-- ALTER TABLE ' || '{{STRNAME}}' || ' ADD CONSTRAINT ' || conname || ' ' || pg_get_constraintdef(oid, true) || E';\n'
+    '-- ALTER TABLE ' || '{{STRSQLSAFENAME}}' || ' DROP CONSTRAINT ' || conname || E';\n' ||
+    '-- ALTER TABLE ' || '{{STRSQLSAFENAME}}' || ' ADD CONSTRAINT ' || conname || ' ' || pg_get_constraintdef(oid, true) || E';\n'
              FROM 
                 (SELECT oid, *
                    FROM pg_constraint
@@ -1917,7 +1917,7 @@ scriptQuery.objectTable = ml(function () {/*
          JOIN pg_roles ON pg_roles.oid = pg_class.relowner
          JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
-        WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRNAME}}'
+        WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}'
         GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relacl,
                 pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions) --pg_description.description
                 
@@ -1939,7 +1939,7 @@ scriptQuery.objectTable = ml(function () {/*
         	)
         FROM pg_class 
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRNAME}}' ),'')
+        WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}' ),'')
         
         ||  COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
         	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
@@ -1958,7 +1958,7 @@ scriptQuery.objectTable = ml(function () {/*
         	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
         FROM pg_class 
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRNAME}}' ), '')
+        WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}' ), '')
         
         || COALESCE(
         (SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (SELECT 'GRANT ' || (SELECT array_to_string((SELECT array_agg(perms)
@@ -1975,7 +1975,7 @@ scriptQuery.objectTable = ml(function () {/*
         FROM pg_class 
         LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRNAME}}') AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'r[^*]|w[^*]|a[^*]|x[^*]')ok),'')), '')
+        WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'r[^*]|w[^*]|a[^*]|x[^*]')ok),'')), '')
         
         || COALESCE((SELECT E'\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (SELECT 'GRANT ' || (SELECT array_to_string((SELECT array_agg(perms)
         	FROM (	SELECT 4, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'r\*' THEN 'SELECT(' || att.attname || ')' END as perms
@@ -1991,7 +1991,7 @@ scriptQuery.objectTable = ml(function () {/*
         FROM pg_class 
         LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRNAME}}') AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ '(r|w|a|x)\*')ok),'')), '')
+        WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ '(r|w|a|x)\*')ok),'')), '')
         
         || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(perms) FROM (
         
@@ -2002,7 +2002,7 @@ scriptQuery.objectTable = ml(function () {/*
         FROM pg_class
         LEFT JOIN pg_rewrite ON pg_class.oid=pg_rewrite.ev_class
         LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_rewrite.rulename <> '_RETURN' AND (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRNAME}}') )ok),'')), '')
+        WHERE pg_rewrite.rulename <> '_RETURN' AND (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') )ok),'')), '')
         
         || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
         
@@ -2013,7 +2013,7 @@ scriptQuery.objectTable = ml(function () {/*
         FROM pg_class 
         JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRNAME}}') AND pg_trigger.tgisinternal != TRUE
+        WHERE (pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}') AND pg_trigger.tgisinternal != TRUE
         )ok),'')), '')
         
         || COALESCE((SELECT E'\n\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
@@ -2025,7 +2025,7 @@ scriptQuery.objectTable = ml(function () {/*
         JOIN pg_index idx ON cl.oid = idx.indrelid 
         JOIN pg_class clidx ON clidx.oid = idx.indexrelid 
         LEFT JOIN pg_namespace nsp ON nsp.oid = cl.relnamespace 
-        WHERE (cl.oid = {{INTOID}} OR nsp.nspname || '.' || cl.relname = '{{STRNAME}}')
+        WHERE (cl.oid = {{INTOID}} OR nsp.nspname || '.' || cl.relname = '{{STRSQLSAFENAME}}')
           AND (SELECT count(*) FROM pg_constraint con WHERE con.conindid = clidx.oid) = 0
      ORDER BY clidx.relname
         )ok),'')), '') ||
@@ -2379,7 +2379,7 @@ scriptQuery.objectView = ml(function () {/*
         	LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
         	LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
         	LEFT JOIN pg_description ON pg_description.objoid = c.oid
-        	 WHERE c.relkind = 'v'::char AND (c.oid = {{INTOID}} OR (n.nspname || '.' || c.relname) = '{{STRNAME}}')) em)
+        	 WHERE c.relkind = 'v'::char AND (c.oid = {{INTOID}} OR (n.nspname || '.' || c.relname) = '{{STRSQLSAFENAME}}')) em)
          
         || COALESCE((SELECT E'\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
         	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
@@ -2399,7 +2399,7 @@ scriptQuery.objectView = ml(function () {/*
         	)
         FROM pg_class 
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_class.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_class.relname) = '{{STRNAME}}' ),'')
+        WHERE pg_class.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_class.relname) = '{{STRSQLSAFENAME}}' ),'')
         
         || COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
         	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
@@ -2418,7 +2418,7 @@ scriptQuery.objectView = ml(function () {/*
         	WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
         FROM pg_class 
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_class.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_class.relname) = '{{STRNAME}}' ), '')
+        WHERE pg_class.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_class.relname) = '{{STRSQLSAFENAME}}' ), '')
         	
         
         || COALESCE((SELECT E'\n' || array_to_string(array_agg(drp),E'\n')
@@ -2429,7 +2429,7 @@ scriptQuery.objectView = ml(function () {/*
           FROM pg_class c
         LEFT JOIN pg_rewrite ON c.oid=pg_rewrite.ev_class
         LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-         WHERE pg_rewrite.rulename <> '_RETURN' AND (c.oid = {{INTOID}} OR (n.nspname || '.' || c.relname) = '{{STRNAME}}')) em
+         WHERE pg_rewrite.rulename <> '_RETURN' AND (c.oid = {{INTOID}} OR (n.nspname || '.' || c.relname) = '{{STRSQLSAFENAME}}')) em
         	),'')
         
         
@@ -2443,7 +2443,7 @@ scriptQuery.objectView = ml(function () {/*
           FROM pg_class c
           JOIN pg_trigger ON pg_trigger.tgrelid = c.oid
         LEFT JOIN pg_namespace ON pg_namespace.oid = c.relnamespace
-        WHERE (c.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || c.relname) = '{{STRNAME}}')) em
+        WHERE (c.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || c.relname) = '{{STRSQLSAFENAME}}')) em
         	),'') ||
         (
             SELECT E'\n\n/' || E'*\nSELECT ' || string_agg(quote_ident(attname), ', ') ||
@@ -2504,12 +2504,12 @@ scriptQuery.objectCast = ml(function () {/*
         LEFT JOIN pg_catalog.pg_type pg_type2 ON pg_type2.oid = pg_cast.casttarget
         LEFT JOIN pg_catalog.pg_proc ON pg_proc.oid = pg_cast.castfunc
         LEFT JOIN pg_catalog.pg_namespace nsp ON nsp.oid = pg_proc.pronamespace
-        WHERE pg_cast.oid = {{INTOID}} OR (format_type(pg_type1.oid,NULL) || '->' || format_type(pg_type2.oid,pg_type2.typtypmod)) = '{{STRNAME}}';
+        WHERE pg_cast.oid = {{INTOID}} OR (format_type(pg_type1.oid,NULL) || '->' || format_type(pg_type2.oid,pg_type2.typtypmod)) = '{{STRSQLSAFENAME}}';
     */});
 
 associatedButtons.informationSchemaView = [];
 scriptQuery.informationSchemaView = ml(function () {/*
-    SELECT '-- Information Schema Query' || E'\n\nSELECT * \n  FROM information_schema.' || $ASDF${{STRNAME}}$ASDF$ || E';\n';
+    SELECT '-- Information Schema Query' || E'\n\nSELECT * \n  FROM information_schema.' || $ASDF${{STRSQLSAFENAME}}$ASDF$ || E';\n';
 */});
 
 associatedButtons.objectDatabase = ['propertyButton', 'dependButton'];
@@ -2518,11 +2518,11 @@ scriptQuery.objectDatabase = ml(function () {/*
         (SELECT '-- DROP DATABASE ' || quote_ident(datname) || E';\n\n' ||
              'CREATE DATABASE ' || quote_ident(datname) || E'\n  WITH ' ||
              trim(trailing E'\n ' from
-               COALESCE('OWNER = ' || rolname || E'\n       ', '') ||
-               COALESCE('ENCODING = ' || pg_encoding_to_char(encoding) || E'\n       ', '') ||
+               COALESCE('OWNER = ' || quote_ident(rolname) || E'\n       ', '') ||
+               COALESCE('ENCODING = ' || quote_literal(pg_encoding_to_char(encoding)) || E'\n       ', '') ||
                COALESCE('TABLESPACE = ' || spcname || E'\n       ', '') ||
-               COALESCE('LC_COLLATE = ' || datcollate || E'\n       ', '') ||
-               COALESCE('LC_LC_CTYPE = ' || datctype || E'\n       ', '') ||
+               COALESCE('LC_COLLATE = ' || quote_literal(datcollate) || E'\n       ', '') ||
+               COALESCE('LC_CTYPE = ' || quote_literal(datctype) || E'\n       ', '') ||
                COALESCE('CONNECTION LIMIT = ' || datconnlimit || E'\n       ', '')) || E';\n\n' ||
              COALESCE((SELECT array_to_string(array_agg( 'GRANT ' || 
         	 (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
@@ -2592,7 +2592,7 @@ scriptQuery.objectExtension = ml(function () {/*
                    COALESCE('VERSION ' || extversion, '') || ';'--, *
              FROM pg_catalog.pg_extension
         LEFT JOIN pg_catalog.pg_namespace ON pg_extension.extnamespace = pg_namespace.oid
-            WHERE pg_extension.oid = {{INTOID}} OR extname = '{{STRNAME}}'
+            WHERE pg_extension.oid = {{INTOID}} OR extname = '{{STRSQLSAFENAME}}'
          ORDER BY extname;
     */});
 
@@ -2619,7 +2619,7 @@ scriptQuery.objectTextSearchConfiguration = ml(function () {/*
         LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_ts_config.oid
         LEFT JOIN (SELECT * FROM pg_catalog.pg_ts_config_map ORDER BY mapcfg, mapseqno) pg_ts_config_map ON pg_ts_config_map.mapcfg = pg_ts_config.oid
         LEFT JOIN pg_ts_dict ON pg_ts_dict.oid = pg_ts_config_map.mapdict
-            WHERE pg_ts_config.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_ts_config.cfgname) = '{{STRNAME}}'
+            WHERE pg_ts_config.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_ts_config.cfgname) = '{{STRSQLSAFENAME}}'
         GROUP BY pg_namespace.nspname, pg_ts_config.cfgname, pg_ts_parser.prsname, pg_description.description;
     */});
 
@@ -2639,7 +2639,7 @@ scriptQuery.objectTextSearchDictionary = ml(function () {/*
         LEFT JOIN pg_catalog.pg_namespace ON pg_ts_dict.dictnamespace = pg_namespace.oid
         LEFT JOIN pg_catalog.pg_ts_template ON pg_ts_dict.dicttemplate = pg_ts_template.oid
         LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_ts_dict.oid
-       WHERE pg_ts_dict.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_ts_dict.dictname) = '{{STRNAME}}'
+       WHERE pg_ts_dict.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_ts_dict.dictname) = '{{STRSQLSAFENAME}}'
     ORDER BY pg_ts_dict.dictname;
     */});
 
@@ -2661,7 +2661,7 @@ scriptQuery.objectTextSearchParser = ml(function () {/*
          FROM pg_catalog.pg_ts_parser
     LEFT JOIN pg_catalog.pg_namespace ON pg_ts_parser.prsnamespace = pg_namespace.oid
     LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_ts_parser.oid
-        WHERE pg_ts_parser.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_ts_parser.prsname) = '{{STRNAME}}';
+        WHERE pg_ts_parser.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_ts_parser.prsname) = '{{STRSQLSAFENAME}}';
     */});
 
 associatedButtons.objectTextSearchTemplate = ['propertyButton', 'dependButton'];
@@ -2679,7 +2679,7 @@ scriptQuery.objectTextSearchTemplate = ml(function () {/*
       FROM pg_catalog.pg_ts_template
  LEFT JOIN pg_catalog.pg_namespace ON pg_ts_template.tmplnamespace = pg_namespace.oid
  LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_ts_template.oid
-     WHERE pg_ts_template.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_ts_template.tmplname) = '{{STRNAME}}';
+     WHERE pg_ts_template.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_ts_template.tmplname) = '{{STRSQLSAFENAME}}';
     */});
 
 associatedButtons.objectOperatorFamily = ['propertyButton', 'dependButton'];
@@ -2697,7 +2697,7 @@ scriptQuery.objectOperatorFamily = ml(function () {/*
  LEFT JOIN pg_catalog.pg_namespace ON pg_opfamily.opfnamespace = pg_namespace.oid
  LEFT JOIN pg_catalog.pg_am ON pg_opfamily.opfmethod = pg_am.oid
  LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_opfamily.oid
-     WHERE pg_opfamily.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_opfamily.opfname) = '{{STRNAME}}';
+     WHERE pg_opfamily.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_opfamily.opfname) = '{{STRSQLSAFENAME}}';
 */});
 
 associatedButtons.objectOperatorClass = ['propertyButton', 'dependButton'];
@@ -2745,7 +2745,7 @@ scriptQuery.objectOperatorClass = ml(function () {/*
     LEFT JOIN pg_catalog.pg_proc ON pg_proc.oid = pg_amproc.amproc
     LEFT JOIN pg_catalog.pg_namespace pg_proc_namespace ON pg_proc_namespace.oid = pg_proc.pronamespace
     LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_opclass.oid
-        WHERE pg_opclass.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_opclass.opcname) = '{{STRNAME}}'
+        WHERE pg_opclass.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_opclass.opcname) = '{{STRSQLSAFENAME}}'
      GROUP BY pg_opclass.oid, pg_namespace.nspname, pg_opclass.opcname, pg_opclass.opcdefault, pg_type.typname, pg_am.amname, pg_description.description, pg_storage_type.typname;
 */});
 
@@ -2758,7 +2758,7 @@ scriptQuery.objectType = ml(function () {/*
                '-- DROP TYPE ' || (quote_ident(nspname) || '.' || quote_ident(typname)) || E';\n\n'
           FROM pg_catalog.pg_type
      LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
-         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') ||
+         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') ||
         
         (SELECT 
             CASE 
@@ -2801,7 +2801,7 @@ scriptQuery.objectType = ml(function () {/*
         LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
         LEFT JOIN pg_catalog.pg_type pg_array_type ON pg_array_type.oid = pg_type.typelem
         LEFT JOIN pg_catalog.pg_collation ON pg_collation.oid = pg_type.typcollation
-        WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') ||
+        WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') ||
         
         (SELECT CASE pg_type.typtype
             WHEN 'r' --RANGE
@@ -2826,7 +2826,7 @@ scriptQuery.objectType = ml(function () {/*
         LEFT JOIN pg_catalog.pg_namespace pg_opclass_namespace ON pg_opclass_namespace.oid = pg_opclass.opcnamespace
         LEFT JOIN pg_catalog.pg_collation ON pg_collation.oid = pg_range.rngcollation
         LEFT JOIN pg_catalog.pg_namespace pg_collation_namespace ON pg_collation_namespace.oid = pg_collation.collnamespace
-        WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') ||
+        WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') ||
         
         (SELECT CASE pg_type.typtype
             WHEN 'e' --ENUM
@@ -2841,7 +2841,7 @@ scriptQuery.objectType = ml(function () {/*
         FROM pg_catalog.pg_type
         LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
         LEFT JOIN pg_catalog.pg_enum ON pg_enum.enumtypid = pg_type.oid
-        WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}'
+        WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}'
         GROUP BY pg_namespace.nspname, pg_type.typname, pg_type.typtype) ||
         
         (SELECT CASE pg_type.typtype
@@ -2857,7 +2857,7 @@ scriptQuery.objectType = ml(function () {/*
         LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
         LEFT JOIN pg_catalog.pg_class ON pg_class.oid = pg_type.typrelid
         LEFT JOIN pg_catalog.pg_attribute ON pg_class.oid = pg_attribute.attrelid
-        WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}'
+        WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}'
         GROUP BY pg_namespace.nspname, pg_type.typname, pg_type.typtype) ||
         
          -- ############ ALTER ############
@@ -2866,7 +2866,7 @@ scriptQuery.objectType = ml(function () {/*
           FROM pg_catalog.pg_type
      LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
      LEFT JOIN pg_catalog.pg_roles ON pg_roles.oid = pg_type.typowner
-         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') ||
+         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') ||
         
        -- ########### COMMENT ###########
        COALESCE(
@@ -2875,7 +2875,7 @@ scriptQuery.objectType = ml(function () {/*
           FROM pg_catalog.pg_type
      LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
      LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_type.oid
-         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}'), '');
+         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}'), '');
 */});
 
 associatedButtons.objectDomain = ['propertyButton', 'dependButton'];
@@ -2886,7 +2886,7 @@ scriptQuery.objectDomain = ml(function () {/*
                '-- DROP DOMAIN ' || (quote_ident(nspname) || '.' || quote_ident(typname)) || E';\n\n'
           FROM pg_catalog.pg_type
      LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
-         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') ||
+         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') ||
 
 (SELECT 'CREATE DOMAIN ' ||
     COALESCE(quote_ident(pg_namespace.nspname), '') || '.' || COALESCE(quote_ident(pg_type.typname), '') ||
@@ -2902,7 +2902,7 @@ LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
 LEFT JOIN pg_catalog.pg_collation ON pg_collation.oid = pg_type.typcollation
 LEFT JOIN pg_catalog.pg_namespace pg_collation_namespace ON pg_collation_namespace.oid = pg_collation.collnamespace
 LEFT JOIN pg_catalog.pg_constraint ON pg_constraint.contypid = pg_type.oid
-WHERE (pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') AND pg_type.typtype = 'd'
+WHERE (pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') AND pg_type.typtype = 'd'
 GROUP BY pg_namespace.nspname, pg_type.typname, pg_collation_namespace.nspname, pg_collation.collname, pg_type.typbasetype, pg_type.typtypmod, pg_collation.collname, pg_type.typdefault, pg_type.typnotnull) ||
 
  -- ############ ALTER ############
@@ -2911,14 +2911,14 @@ GROUP BY pg_namespace.nspname, pg_type.typname, pg_collation_namespace.nspname, 
           FROM pg_catalog.pg_type
      LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
      LEFT JOIN pg_catalog.pg_roles ON pg_roles.oid = pg_type.typowner
-         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') ||
+         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') ||
 
     -- grants:
     CASE WHEN (SELECT count(*)
     	FROM (SELECT unnest(typacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(typname) as name
     		FROM pg_type 
     		LEFT JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid
-    		WHERE pg_type.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') em
+    		WHERE pg_type.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') em
     	WHERE acl::text like '=%') > 0
 
         THEN (SELECT array_to_string(array_agg(E'\nGRANT ' || CASE WHEN substring(acl from strpos(acl, '=')+1) like '%X%' THEN 'EXECUTE' ELSE '' END || ' ON FUNCTION ' || name 
@@ -2926,7 +2926,7 @@ GROUP BY pg_namespace.nspname, pg_type.typname, pg_collation_namespace.nspname, 
         	FROM (SELECT acl, name FROM (SELECT unnest(typacl)::text as acl, quote_ident(nspname) || '.' || quote_ident(typname) as name
         		FROM pg_type 
         		LEFT JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid
-        		WHERE pg_type.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') em
+        		WHERE pg_type.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') em
         	WHERE acl::text not like '=%'
             ORDER BY acl) em) 
         
@@ -2937,7 +2937,7 @@ GROUP BY pg_namespace.nspname, pg_type.typname, pg_collation_namespace.nspname, 
     	FROM (SELECT unnest(typacl)::text as acl, quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_type.typname) as name
     		FROM pg_type
     		LEFT JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid
-    		WHERE pg_type.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') em
+    		WHERE pg_type.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') em
     	WHERE acl::text like '=%') >0 
     
        THEN
@@ -2947,7 +2947,7 @@ GROUP BY pg_namespace.nspname, pg_type.typname, pg_collation_namespace.nspname, 
     	FROM (SELECT unnest(typacl)::text as acl, quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_type.typname) as name
     		FROM pg_type 
     		LEFT JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid
-    		WHERE pg_type.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') em
+    		WHERE pg_type.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') em
     	WHERE acl::text like '=%')
     
        ELSE
@@ -2956,7 +2956,7 @@ GROUP BY pg_namespace.nspname, pg_type.typname, pg_collation_namespace.nspname, 
     	FROM (SELECT quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_type.typname) as name
     		FROM pg_type 
     		LEFT JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid
-    		WHERE pg_type.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}') em)
+    		WHERE pg_type.oid = {{INTOID}} OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}') em)
        END ||
        -- ########### COMMENT ###########
        COALESCE(
@@ -2965,7 +2965,7 @@ GROUP BY pg_namespace.nspname, pg_type.typname, pg_collation_namespace.nspname, 
           FROM pg_catalog.pg_type
      LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
      LEFT JOIN pg_catalog.pg_description ON pg_description.objoid = pg_type.oid
-         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRNAME}}'), '');
+         WHERE pg_type.oid = {{INTOID}}::oid OR (pg_namespace.nspname || '.' || pg_type.typname) = '{{STRSQLSAFENAME}}'), '');
 */});
 
 associatedButtons.objectForeignServer = ['propertyButton', 'dependButton'];
@@ -3327,7 +3327,7 @@ UNION ALL
     FROM pg_stats
     LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.schemaname = pg_stats.schemaname AND pg_stat_user_tables.relname = pg_stats.tablename
     WHERE pg_stat_user_tables.relid = {{INTOID}}
-    AND attname = '{{STRNAME}}'
+    AND attname = '{{STRSQLSAFENAME}}'
     ORDER BY sort ASC;
     */});
     
@@ -3391,7 +3391,7 @@ UNION ALL
      FROM pg_catalog.pg_stat_all_tables
 LEFT JOIN pg_catalog.pg_statio_all_tables ON pg_statio_all_tables.relid = pg_stat_all_tables.relid
     WHERE pg_stat_all_tables.relid = {{INTOID}}
-       OR (pg_stat_all_tables.schemaname || '.' || pg_stat_all_tables.relname) = '{{STRNAME}}'
+       OR (pg_stat_all_tables.schemaname || '.' || pg_stat_all_tables.relname) = '{{STRSQLSAFENAME}}'
  ORDER BY sort ASC;
 */});
 
@@ -3412,7 +3412,7 @@ UNION
      FROM pg_catalog.pg_stat_all_indexes
 LEFT JOIN pg_catalog.pg_statio_all_indexes ON pg_statio_all_indexes.indexrelid = pg_stat_all_indexes.indexrelid
     WHERE pg_stat_all_indexes.indexrelid = {{INTOID}}
-       OR (pg_stat_all_indexes.schemaname || '.' || pg_stat_all_indexes.indexrelname) = '{{STRNAME}}'
+       OR (pg_stat_all_indexes.schemaname || '.' || pg_stat_all_indexes.indexrelname) = '{{STRSQLSAFENAME}}'
  ORDER BY sort ASC;
 */});
 
@@ -3425,7 +3425,7 @@ UNION ALL
           blks_read::text,
           blks_hit::text
      FROM pg_catalog.pg_statio_all_sequences
-    WHERE relid = {{INTOID}} OR (schemaname || '.' || relname) = '{{STRNAME}}'
+    WHERE relid = {{INTOID}} OR (schemaname || '.' || relname) = '{{STRSQLSAFENAME}}'
  ORDER BY sort ASC
 */});
 
@@ -3440,7 +3440,7 @@ UNION ALL
          self_time::text,
          total_time::text
     FROM pg_catalog.pg_stat_user_functions
-   WHERE funcid = {{INTOID}} OR (schemaname || '.' || funcname) = '{{STRNAME}}'
+   WHERE funcid = {{INTOID}} OR (schemaname || '.' || funcname) = '{{STRSQLSAFENAME}}'
 ORDER BY sort ASC
 */});
 
@@ -3952,9 +3952,9 @@ UNION ALL
           sequences.minimum_value::text,
           sequences.maximum_value::text,
           sequences.increment::text,
-          (SELECT cache_value FROM {{SQLSAFENAME}})::text,
-          (SELECT (CASE WHEN is_cycled THEN 'Yes' ELSE 'No' END) FROM {{SQLSAFENAME}})::text,
-          (SELECT (CASE WHEN is_called THEN 'Yes' ELSE 'No' END) FROM {{SQLSAFENAME}})::text,
+          (SELECT cache_value FROM {{STRSQLSAFENAME}})::text,
+          (SELECT (CASE WHEN is_cycled THEN 'Yes' ELSE 'No' END) FROM {{STRSQLSAFENAME}})::text,
+          (SELECT (CASE WHEN is_called THEN 'Yes' ELSE 'No' END) FROM {{STRSQLSAFENAME}})::text,
           description::text
      FROM pg_class
 LEFT JOIN pg_roles ON pg_roles.oid = pg_class.relowner

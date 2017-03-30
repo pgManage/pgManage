@@ -1767,15 +1767,14 @@ function propertyDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {
 
     var strHTML = ml(function () {/*
         <gs-container padded>
-            <b>Properties For:</b> {{STRNAME}}<br /><br />
+            <b>Properties For:</b> {{STRSQLSAFENAME}}<br /><br />
             <div id="properties-container" style="min-height: 6em;"></div>
         </gs-container>
-    */}).replace(/\{\{STRNAME\}\}/g, strName);
+    */}).replace(/\{\{STRSQLSAFENAME\}\}/g, strName);
 
     setObjectDetailValue(strHTML, function () {
         getListData(strQuery.replace(/\{\{INTOID\}\}/g, intOid)
-                            .replace(/\{\{STRNAME\}\}/g, strSafeName)
-                            .replace(/\{\{SQLSAFENAME\}\}/g, strSafeName),
+                            .replace(/\{\{STRSQLSAFENAME\}\}/g, strSafeName),
                     document.getElementById('properties-container'),
                     function (arrRecords) {
             var i, len, col_i, col_len, strHTML = '';
@@ -1825,10 +1824,10 @@ function statDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {
     //console.log(strQuery, intOid, strSafeName);
     var strHTML = ml(function () {/*
         <gs-container padded>
-            <b>Statistics For:</b> {{STRNAME}}<br /><br />
+            <b>Statistics For:</b> {{STRSQLSAFENAME}}<br /><br />
             <div id="stats-container" style="min-height: 6em;"></div>
         </gs-container>
-    */}).replace(/\{\{STRNAME\}\}/g, strName);
+    */}).replace(/\{\{STRSQLSAFENAME\}\}/g, strName);
 
     if (strQuery === statQuery.objectColumn) {
         strSafeName = strSafeName.substring(strSafeName.indexOf('.') + 1, strSafeName.length);
@@ -1836,8 +1835,7 @@ function statDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {
 
 	setObjectDetailValue(strHTML, function () {
         getListData(strQuery.replace(/\{\{INTOID\}\}/g, intOid)
-                            .replace(/\{\{STRNAME\}\}/g, strSafeName)
-                            .replace(/\{\{SQLSAFENAME\}\}/g, strSafeName),
+                            .replace(/\{\{STRSQLSAFENAME\}\}/g, strSafeName),
                     document.getElementById('stats-container'),
                     function (arrRecords) {
             var i, len, col_i, col_len, strHTML = '';

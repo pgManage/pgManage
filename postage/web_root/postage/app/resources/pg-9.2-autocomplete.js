@@ -12,6 +12,7 @@ var autocompleteLoaded = true
       , 'arrSearchMaster': []
       , 'arrValuesMaster': []
       , 'arrVariables':    []
+//      , 'arrObjType':      []
       , 'bolInserting':    false
       , 'strQueryID':      null
       , 'jsnKeywords':     {} // <-- filled in by the "autocompleteLoadKeywords" function
@@ -243,6 +244,8 @@ function autocompletePopupLoad(editor, arrQueries) {
     autocompleteGlobals.arrSearchMaster = [];
     autocompleteGlobals.arrValuesMaster = [];
     autocompleteGlobals.arrVariables = [];
+    //autocompleteGlobals.arrObjType = [];
+    
 
     var strText = '', autocompleteTempList = [];
 
@@ -273,12 +276,14 @@ function autocompletePopupLoad(editor, arrQueries) {
                     autocompleteGlobals.arrValues.push(strCurrent);
                     autocompleteGlobals.arrSearchMaster.push(strSearch);
                     autocompleteGlobals.arrValuesMaster.push(strCurrent);
+                    //autocompleteGlobals.arrObjType.push([strCurrent, autocompleteTempList[i][1]]);
+                    //console.log(autocompleteTempList[i][1]);
                 } else {
 
 
                     for (var i = 0, len = autocompleteTempList.length; i < len; i++) {
                         strCurrent = autocompleteTempList[i][0]
-
+                        
                         strCurrentMeta = autocompleteTempList[i][1];
                         if (i + 1 < autocompleteTempList.length) {
                             strNext = autocompleteTempList[i + 1][0];
@@ -315,6 +320,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                             autocompleteGlobals.arrValues.push(nextItem);
                             autocompleteGlobals.arrSearchMaster.push(strSearch);
                             autocompleteGlobals.arrValuesMaster.push(nextItem);
+                            //autocompleteGlobals.arrObjType.push([strCurrent, 'FN']);
+                            //console.log('FN');
                             bolIsFunction = false;
                         } else {
                             if (autocompleteTempList[i + 1]) {
@@ -333,6 +340,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                             autocompleteGlobals.arrValues.push(strCurrent);
                             autocompleteGlobals.arrSearchMaster.push(strSearch);
                             autocompleteGlobals.arrValuesMaster.push(strCurrent);
+                            //autocompleteGlobals.arrObjType.push([strCurrent, strCurrentMeta]);
+                            //console.log(strCurrentMeta);
                         }
 
 
@@ -362,6 +371,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                         autocompleteGlobals.arrValues.push(strCurrent);
                         autocompleteGlobals.arrSearchMaster.push(strSearch);
                         autocompleteGlobals.arrValuesMaster.push(strCurrent);
+                        //autocompleteGlobals.arrObjType.push([strCurrent, 'SN']);
+                        //console.log('SN');
 
                     }
                 }
@@ -402,6 +413,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                         autocompleteGlobals.arrValues.push(strCurrentVar);
                         autocompleteGlobals.arrSearchMaster.push(strSearch);
                         autocompleteGlobals.arrValuesMaster.push(strCurrentVar);
+                        //autocompleteGlobals.arrObjType.push([strCurrentVar, 'VR']);
+                        //console.log('VR');
                     }
                 }
 
@@ -419,10 +432,27 @@ function autocompletePopupLoad(editor, arrQueries) {
                         distinctSearch.push(autocompleteGlobals.arrSearchMaster[i]);
                     }
                 }
-                autocompleteGlobals.arrValuesMaster = distinctValues.sort();
-                autocompleteGlobals.arrSearchMaster = distinctSearch.sort();
-                autocompleteGlobals.arrValues = distinctValues.sort();
-                autocompleteGlobals.arrSearch = distinctSearch.sort();
+                
+                function CompareStrs (a, b) {
+                    if (a.toLowerCase() < b.toLowerCase()) return -1;
+                    if (a.toLowerCase() > b.toLowerCase()) return 1;
+                    return 0;
+                }
+                
+                
+                function CompareStrsForArray (a, b) {
+                    if (a[1].toLowerCase() < b[1].toLowerCase()) return -1;
+                    if (a[1].toLowerCase() > b[1].toLowerCase()) return 1;
+                    return 0;
+                }
+                //autocompleteGlobals.arrObjType = autocompleteGlobals.arrObjType.sort(CompareStrsForArray);
+                
+                
+                autocompleteGlobals.arrValuesMaster = distinctValues.sort(CompareStrs);
+                autocompleteGlobals.arrSearchMaster = distinctSearch.sort(CompareStrs);
+                autocompleteGlobals.arrValues = distinctValues.sort(CompareStrs);
+                autocompleteGlobals.arrSearch = distinctSearch.sort(CompareStrs);
+
 
                 var currSearchVal;
                 for (var i = 0, len = autocompleteGlobals.arrSearchMaster.length; i < len; i++) {
@@ -576,6 +606,7 @@ function autocompletePopupClose(editor) {
     autocompleteGlobals.arrValues = [];
     autocompleteGlobals.arrSearchMaster = [];
     autocompleteGlobals.arrValuesMaster = [];
+    //autocompleteGlobals.arrObjType = [];
     autocompleteGlobals.arrVariables = [];
     autocompleteGlobals.searchLength = 0;
 
