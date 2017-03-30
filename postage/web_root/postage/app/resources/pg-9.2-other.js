@@ -1931,7 +1931,7 @@ function loadHeaderText() {
     //                '<small>Db:</small> ' + encodeHTML(contextData.databaseName) + ' ' +
     //                '<small>Connection:</small> ' + encodeHTML(contextData.connectionName);
 
-    shortText = encodeHTML(contextData.databaseName + '@' + contextData.connectionName);
+    shortText = encodeHTML(contextData.databaseName + '@' + contextData.connectionName + '(' + contextData.sessionUser + ')');
 
     document.getElementById('header-text-container').innerHTML = shortText;
     document.getElementById('header-text-container').setAttribute('title', longText);
