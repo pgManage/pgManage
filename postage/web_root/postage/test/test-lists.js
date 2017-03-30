@@ -23,6 +23,7 @@ function createTestDataResponse(rowPrefix, intCount) {
 		 tests: [
 			 ['List Connections', 'ajax', 200, '/postage/auth', 'action=list',
  				ml(function () {/*test
+test2
 localhost@5432
 ip example
 host example*/})],
@@ -128,7 +129,17 @@ There is no connection info with that name.*/ })],
  				ml(function () {/*{"stat": true, "dat": "/postage/0/index.html"}*/ })
  			],
  			[
- 				'Login 5 *',
+ 				'Login 5',
+ 				'ajax',
+ 				200,
+ 				'/postage/auth',
+ 				'action=login&connname=test2&username=WFP\'s%20%22Testing%22%20User&password=WFP\'s%20%22Testing%22%20Password',
+ 				ml(function () {/*{"stat": true, "dat": "/postage/1/index.html"}*/ })
+ 			],
+			['Download Fail', 'ajax', 404, '/postage/1/download/test_doesnt_exist.sql', '',
+				ml(function () {/*The file you are requesting is not here.*/})],
+ 			[
+ 				'Login 6 *',
  				'ajax spam',
  				200,
  				'/postage/auth',
@@ -143,7 +154,7 @@ There is no connection info with that name.*/ })],
 Old password does not match.*/})],
 			['Change Password', 'ajax', 200, '/postage/auth', 'action=change_pw&password_old=test1&password_new=password',
 				ml(function () {/*{"stat": true, "dat": "OK"}*/})],
-			['Switch DB', 'ajax', 200, '/postage/auth', 'action=change_database&database=template1',
+			['Switch DB', 'ajax', 200, '/postage/auth', 'action=change_database&database=WFP\'s%20%22Testing%22%20Database',
 				ml(function () {/*{"stat": true, "dat": "OK"}*/})],
 			['Switch DB Fail', 'ajax', 500, '/postage/auth', 'action=change_database&database=template20',
 				ml(function () {/*FATAL
@@ -519,7 +530,7 @@ ORDER BY	LIMIT
 oid ASC	10
 */
 			}),
-			["datname\tdatistemplate\nname\tboolean\n", "template1\tt\ntemplate0\tt\npostgres\tf\n", "TRANSACTION COMPLETED"]],
+			["datname\tdatistemplate\nname\tboolean\n", "template1\tt\ntemplate0\tt\npostgres\tf\nWFP's \"Testing\" Database\tf\n", "TRANSACTION COMPLETED"]],
 			['SELECT 2', 'websocket', '', ml(function () {/*SELECT	pg_enum
 RETURN	enumtypid	enumsortorder	enumlabel
 */
@@ -579,6 +590,14 @@ id DESC
 			}),
 			["id\ttest1\ttest2\ninteger\ttext\ttext\n"].concat(createTestDataResponse('', 200, false))
 			],
+			['SELECT 10', 'websocket', '', ml(function () {/*SELECT	WFP's "Testing" Table
+RETURN	id	WFP's First "Testing" Column	WFP's Second "Testing" Column
+
+LIMIT
+0
+*/
+			}),
+			['id\tWFP\'s First "Testing" Column\tWFP\'s Second "Testing" Column\ninteger\tcharacter varying(150)\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
 			['INSERT RECORDS', 'websocket', '', ml(function () {/*INSERT	rtesting_table
 RETURN	id	test_name	test_name2
@@ -815,7 +834,7 @@ RETURN	id	test_name
 PK	id
 SEQ	*/
 }) + ml(function () {/*
-ORDER BY	id DESC
+ORDER BY	id ASC
 
 id	test_name
 {{test_random}}1	Bob
@@ -832,7 +851,7 @@ RETURN	id	test_name
 PK	id
 SEQ	*/
 }) + ml(function () {/*
-ORDER BY	id DESC
+ORDER BY	id ASC
 
 id	test_name
 {{test_random}}1	Bob
@@ -853,7 +872,7 @@ RETURN	id	test@test
 PK	id
 SEQ	*/
 }) + ml(function () {/*
-ORDER BY	id DESC
+ORDER BY	id ASC
 
 id	test@test
 {{test_random}}70	Bob
@@ -878,7 +897,7 @@ RETURN	id	select
 PK	id
 SEQ	*/
 }) + ml(function () {/*
-ORDER BY	id DESC
+ORDER BY	id ASC
 
 id	select
 {{test_random}}70	Bob
@@ -968,6 +987,23 @@ id	test_name	test_name2
 */
 			}) + createTestDataRequest('', 200), createTestDataResponse('', 200)],
 			['COMMIT', 'websocket', '', 'COMMIT', ['OK']],
+
+			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
+			['INSERT 8', 'websocket', '', ml(function () {/*INSERT	WFP's "Testing" Table
+RETURN	id	WFP's First "Testing" Column	WFP's Second "Testing" Column
+PK	id
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id ASC
+
+id	WFP's First "Testing" Column	WFP's Second "Testing" Column
+{{test_random}}1	test1	test1
+{{test_random}}2	test2	test2
+{{test_random}}3	test3	test3
+*/}),
+			['{{test_random}}1\ttest1\ttest1\n{{test_random}}2\ttest2\ttest2\n{{test_random}}3\ttest3\ttest3\n', 'TRANSACTION COMPLETED']],
+			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
+
 			['DELETE RECORDS 2', 'websocket', '', ml(function () {/*RAW
 DELETE FROM rtesting_table
 WHERE id::text ILIKE '{{test_random}}%';
@@ -1381,6 +1417,33 @@ id	id
 			["1{{test_random}}4\tBobby\n", "TRANSACTION COMPLETED"]],
 			['COMMIT', 'websocket', '', 'COMMIT', ['OK']],
 
+			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
+			['INSERT RECORDS 2', 'websocket', '', ml(function () {/*INSERT	WFP's "Testing" Table
+RETURN	id	WFP's First "Testing" Column	WFP's Second "Testing" Column
+PK	id
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id ASC
+
+id	WFP's First "Testing" Column	WFP's Second "Testing" Column
+1{{test_random}}1	test1	test1
+1{{test_random}}2	test2	test2
+1{{test_random}}3	test3	test3
+*/}),
+			['1{{test_random}}1\ttest1\ttest1\n1{{test_random}}2\ttest2\ttest2\n1{{test_random}}3\ttest3\ttest3\n', 'TRANSACTION COMPLETED']],
+			['UPDATE 10', 'websocket', '', ml(function () {/*UPDATE	WFP's "Testing" Table
+RETURN	id	WFP's First "Testing" Column	WFP's Second "Testing" Column
+ORDER BY	id ASC
+
+pk	set	set
+id	WFP's First "Testing" Column	WFP's Second "Testing" Column
+1{{test_random}}1	test1	test1
+1{{test_random}}2	test2	test2
+1{{test_random}}3	test3	test3
+*/}),
+			['1{{test_random}}1\ttest1\ttest1\n1{{test_random}}2\ttest2\ttest2\n1{{test_random}}3\ttest3\ttest3\n', 'TRANSACTION COMPLETED']],
+			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
+
 			['DELETE RECORDS 1', 'websocket', '', ml(function () {/*RAW
 DELETE FROM rtesting_table
 WHERE id::text ILIKE '1{{test_random}}%';
@@ -1398,7 +1461,7 @@ WHERE id::text ILIKE '1{{test_random}}%';
                 "TRANSACTION COMPLETED"
 			]],
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
-			['INSERT RECORDS 2', 'websocket', '', ml(function () {/*INSERT	rtesting_table
+			['INSERT RECORDS 3', 'websocket', '', ml(function () {/*INSERT	rtesting_table
 RETURN	id	test_name	test_name2
 PK	id
 SEQ	*/
@@ -1410,7 +1473,7 @@ id	test_name	test_name2
 			}) + createTestDataRequest('1', 1000), createTestDataResponse('1', 1000)],
 			['COMMIT', 'websocket', '', 'COMMIT', ['OK']],
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
-			['UPDATE 10', 'websocket send from', '', ml(function () {/*UPDATE	rtesting_table
+			['UPDATE 11', 'websocket send from', '', ml(function () {/*UPDATE	rtesting_table
 RETURN	id	test_name	test_name2
 ORDER BY	id DESC
 
@@ -1806,7 +1869,32 @@ WHERE id::text ILIKE '2{{test_random}}%';
 			]],
 
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
-			['INSERT RECORDS 2', 'websocket', '', ml(function () {/*INSERT	rtesting_table
+			['INSERT RECORDS 2', 'websocket', '', ml(function () {/*INSERT	WFP's "Testing" Table
+RETURN	id	WFP's First "Testing" Column	WFP's Second "Testing" Column
+PK	id
+SEQ	*/
+}) + ml(function () {/*
+ORDER BY	id ASC
+
+id	WFP's First "Testing" Column	WFP's Second "Testing" Column
+2{{test_random}}1	test1	test1
+2{{test_random}}2	test2	test2
+2{{test_random}}3	test3	test3
+*/}),
+			['2{{test_random}}1\ttest1\ttest1\n2{{test_random}}2\ttest2\ttest2\n2{{test_random}}3\ttest3\ttest3\n', 'TRANSACTION COMPLETED']],
+			['DELETE 7', 'websocket', '', ml(function () {/*DELETE	WFP's "Testing" Table
+
+pk
+id
+2{{test_random}}1
+2{{test_random}}2
+2{{test_random}}3
+*/}),
+			['Rows Affected\n3\n', 'TRANSACTION COMPLETED']],
+			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
+
+			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
+			['INSERT RECORDS 3', 'websocket', '', ml(function () {/*INSERT	rtesting_table
 RETURN	id	test_name	test_name2
 PK	id
 SEQ	*/
@@ -1820,7 +1908,7 @@ id	test_name	test_name2
 			['COMMIT', 'websocket', '', 'COMMIT', ['OK']],
 
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
-			['DELETE 7', 'websocket', '', ml(function () {/*DELETE	rtesting_table
+			['DELETE 8', 'websocket', '', ml(function () {/*DELETE	rtesting_table
 
 pk
 id
