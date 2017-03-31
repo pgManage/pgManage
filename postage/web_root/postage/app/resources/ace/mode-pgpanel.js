@@ -201,7 +201,7 @@ var pgpanelHighlightRules = function(options) {
         ],
         "string.bullet": [
             { token: "bullet",     regex: "•" },
-            { token: "arrowdown",  regex: "▼" },
+            { token: "arrowdown",  regex: "◣" },
             { token: "arrowright", regex: "▶" },
             
             { token: "ag", regex: "AG" },

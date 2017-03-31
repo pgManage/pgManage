@@ -16,8 +16,8 @@ var bolTreeFunctionsLoaded = true
         'ace':          null
       , 'aceSession':   null
       , 'data':         []
-      , 'folderPlus':   '▶' //(window.navigator.userAgent.indexOf('CrOS') === -1 ? '▶' : '►')
-      , 'folderMinus':  '▼'
+      , 'folderPlus':   '▶' //(window.navigator.userAgent.indexOf('CrOS') === -1 ? '▶' : '►')((window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) ? '▶' : '►')
+      , 'folderMinus':  '◣'
       , 'scriptMarker': '•' // sometimes not used for a script in favor of a 2 character object-type specific code
       , 'padString':    ' '
       , 'shownItems':   []

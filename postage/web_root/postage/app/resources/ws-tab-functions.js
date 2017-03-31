@@ -1761,7 +1761,9 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     // increment tab number
     intNumberOfTabs += 1;
     intTabNumber += 1;
-
+    
+    refreshButtons(localStorage.labeledButtons);
+    
     return tabElement;
 }
 

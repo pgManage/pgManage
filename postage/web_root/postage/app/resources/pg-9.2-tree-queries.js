@@ -1764,11 +1764,12 @@ SELECT '-- Column: ' || attname || E';\n\n' ||
 associatedButtons.objectConstraint = ['dependButton'];
 scriptQuery.objectConstraint = ml(function () {/*
 SELECT '-- Constraint: ' || conname || E';\n\n' ||
-    '-- ALTER TABLE ' || '{{STRSQLSAFENAME}}' || ' DROP CONSTRAINT ' || conname || E';\n' ||
-    '-- ALTER TABLE ' || '{{STRSQLSAFENAME}}' || ' ADD CONSTRAINT ' || conname || ' ' || pg_get_constraintdef(oid, true) || E';\n'
+    '-- ALTER TABLE ' || '{{SCHEMA}}.' || relname || ' DROP CONSTRAINT ' || conname || E';\n' ||
+    '-- ALTER TABLE ' || '{{SCHEMA}}.' || relname || ' ADD CONSTRAINT ' || conname || ' ' || pg_get_constraintdef(oid, true) || E';\n'
              FROM 
-                (SELECT oid, *
+                (SELECT pg_constraint.oid, *
                    FROM pg_constraint
+                   LEFT JOIN pg_catalog.pg_statio_user_tables ON pg_statio_user_tables.relid = {{INTOID}}
                   WHERE pg_constraint.conrelid = {{INTOID}}
                ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
                               WHEN contype = 'c' THEN 3 WHEN contype = 'f' THEN 4
