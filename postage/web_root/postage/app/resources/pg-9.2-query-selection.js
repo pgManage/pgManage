@@ -234,7 +234,7 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
             // if we have an intWordPoint and we run into a whitespace character (or the beginning of the script):
             if (typeof intWordPoint === 'number' || intNeedle === 0) {
                 if (bolEnder) {
-                    console.log(strWord);
+                    //console.log(strWord);
                     strWord = strScript.substring(intNeedle + 1, intWordPoint + 1);
                     intQueryStart = (intNeedle + 1);
                 } else if (intNeedle === 0) {
@@ -597,7 +597,7 @@ function selectionFindRange(tabElement, editor) {
     if (intCursorPos === strScript.length) {
         intCursorPos -= 1;
     }
-    console.log(jsnQuery);
+    //console.log(jsnQuery);
     // if the cursor is not in the selection: search higher
     if (intCursorPos > jsnQuery.intQueryEnd) {
         // there are only some queries that can wrap around other queries. that's
@@ -647,7 +647,7 @@ function selectionFindRange(tabElement, editor) {
         
         
         //console.log(JSON.stringify(editor.currentQueryRange));
-        console.log(editor.currentQueryRange.text);
+        //console.log(editor.currentQueryRange.text);
     }
     editor.currentSelections = editor.getSelection().getAllRanges().slice(0);
 

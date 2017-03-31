@@ -1,1320 +1,548 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var popup_instruct_top;
-var autocompleteLoaded = true
-  , autocompleteGlobals = {
-        'popupOpen':       false
-      , 'popupAsleep':     false
-      , 'popupElement':    null
-      , 'intSearchStart':  null
-      , 'intSearchEnd':    null
-      , 'intSearchOffset': null
-      , 'arrSearch':       []
-      , 'arrValues':       []
-      , 'arrSearchMaster': []
-      , 'arrValuesMaster': []
-      , 'bolInserting':    false
-      , 'strQueryID':      null
-      , 'jsnKeywords':     {} // <-- filled in by the "autocompleteLoadKeywords" function
-      , 'arrTypes':        [] // <-- filled in by the "autocompleteLoadTypes" function
-      , 'loadId':          0
-      //, 'currentLoadId':   0
-      , 'arrCancelledIds': []
-    };
-var strSearchFixed;
-function autocompleteStart() { 'use strict'; }
-
-// this is called on every code tab's editor
-function autocompleteBindEditor(tabElement, editor) {
+function executeScriptFromCursor() {
     'use strict';
-    if (!evt.touch_device) {
-        if (!autocompleteGlobals.popupElement) {
-            // create popup element
-            autocompleteGlobals.popupElement = document.createElement('div');
-            autocompleteGlobals.popupElement.setAttribute('id', 'autocomplete-popup');
-            autocompleteGlobals.popupElement.innerHTML = '<div id="autocomplete-popup-instruction">Press Tab to Autocomplete&nbsp;</div><div id="autocomplete-popup-ace"></div>';
+    var currentTab           = document.getElementsByClassName('current-tab')[0]
+      , editor               = currentTab.relatedEditor
+      , resultsContainer     = currentTab.relatedResultsArea
+      , resultsTallyElement  = currentTab.relatedResultsTallyElement
+      , resultsHeaderElement = currentTab.relatedResultsHeaderElement
+      , bolAutocommit        = currentTab.relatedAutocommitCheckbox.value === 'true'
+      , jsnCurrentQuery, startExecute, endExecute, startLoading, endLoading, updateTally
+      , stopLoadingHandler, bolIgnoreMessages = false, cancelSignalHandler
+      , messageID, currentTargetTbody, intRecordsThisQuery, intError, intQuery
+      , divElement, intErrorStartLine, bindShowQueryButton, strScript;
 
-            // create and configure popup ace
-            autocompleteGlobals.popupAce = ace.edit(autocompleteGlobals.popupElement.children[1]);
-            autocompleteGlobals.popupAce.setTheme('ace/theme/clouds'); //eclipse
-            autocompleteGlobals.popupAce.getSession().setMode('ace/mode/text');
-            autocompleteGlobals.popupAce.setShowPrintMargin(false);
-            autocompleteGlobals.popupAce.setDisplayIndentGuides(false);
-            autocompleteGlobals.popupAce.setShowFoldWidgets(false);
-            autocompleteGlobals.popupAce.setBehavioursEnabled(false);
-            autocompleteGlobals.popupAce.setHighlightActiveLine(true);
-            autocompleteGlobals.popupAce.$blockScrolling = Infinity; // <== blocks a warning
-            autocompleteGlobals.popupAce.setValue('');
-            autocompleteGlobals.popupAce.setReadOnly(true);
-            autocompleteGlobals.popupAce.renderer.setShowGutter(false);
-            autocompleteGlobals.popupAce.renderer.hideCursor();
-            autocompleteGlobals.popupAce.renderer.$cursorLayer.element.style.display = 'none';
-            autocompleteGlobals.popupAceSession = autocompleteGlobals.popupAce.getSession();
-
-            // hide the popup and append it to the DOM (fixes first load problem)
-            autocompleteGlobals.popupElement.style.left = '-500px';
-            autocompleteGlobals.popupElement.style.top = '-500px';
-            document.body.appendChild(autocompleteGlobals.popupElement);
-            autocompleteGlobals.popupAce.setValue('test');
-            autocompleteGlobals.popupAce.resize();
-
-            // load autocomplete keywords and types
-            autocompleteLoadKeywords();
-            autocompleteLoadTypes();
-        }
-
-        // bind change event
-        editor.addEventListener('change', function (event) {
-            //console.log(editor.currentQueryRange);//editor.getSelectionRange !== (null || undefined || '' || [] || {}));
-            if (autocompleteGlobals.popupLoading === true) {
-                autocompleteGlobals.arrCancelledIds.push(autocompleteGlobals.loadId);
-                autocompletePopupClose(editor);
-            } else {
-                if (event.lines[0].length !== 0 && event.lines[0].length === 1) {
-                    if (editor.ignoreChange !== true
-                            && event.action === 'insert'
-                            && autocompleteGlobals.bolInserting === false
-                            && editor.currentQueryRange) {
-
-                        try {
-                            // this function is in pg-9.2-autocomplete-logic.js
-                            autocompleteChangeHandler(tabElement, editor, event);
-                        } catch (e) {
-                            console.error('Caught Autocomplete Error:', e);
-                        }
-                    }
-                }
-            }
-        });
-
-
-        //editor.container.addEventListener('range-update', function (event) {
-        //    console.log('test 2', editor.currentQueryRange, event);
-        //});
-        //editor.container.addEventListener('keyup', function (event) {
-        //    //console.log('test 2', editor.currentQueryRange, event);
-        //    if (autocompleteGlobals.popupOpen === false
-        //     && (event.code !== 'Backspace' && event.code !== 'Delete')
-        //     && editor.currentQueryRange) {
-        //
-        //        event.action = 'insert';
-        //        event.selection = editor.getSelectionRange();
-        //        event.start = event.selection.start;
-        //        event.end = event.selection.end;
-        //
-        //        autocompleteChangeHandler(tabElement, editor, event);
-        //    }
-        //});
-
-        // bind search
-        editor.addEventListener('change', function (event) {
-            if (event.action === 'insert') {
-                autocompleteGlobals.intSearchEnd = rowAndColumnToIndex(editor.getValue(), event.end.row, event.end.column);
-            } else if (event.action === 'remove') {
-                autocompleteGlobals.intSearchEnd = rowAndColumnToIndex(editor.getValue(), event.start.row, event.start.column);
-            }
-
-            if (autocompleteGlobals.bolInserting === false) {
-                if (autocompleteGlobals.popupOpen === true && autocompleteGlobals.popupLoading === false) {
-                    // if the search text start is less than the search text end: search else: close
-                    if (autocompleteGlobals.intSearchStart < autocompleteGlobals.intSearchEnd) {
-                        autocompletePopupSearch(editor, (event.action === 'insert' ? 'filter' : 'expand'));
-                    } else {
-                        autocompletePopupClose(editor);
-                    }
-                }
-            }
-        });
-
-        // bind scroll
-        editor.session.addEventListener('changeScrollTop', function (event) {
-            if (autocompleteGlobals.popupOpen === true && autocompleteGlobals.popupLoading === false) {
-                autocompletePopupClose(editor);
-            }
-        });
-
-        //editor.container.addEventListener('range-update', function () { });
-        //editor.addEventListener('change', function () { });
-    }
-}
-
-
-
-// ##############################################################################
-// ######################### POPUP OPEN/CLOSE/LOAD CODE #########################
-// ##############################################################################
-
-// this function loads data into the autocomplete popup
-function autocompletePopupLoad(editor, arrQueries) {
-    'use strict';
-    var bolResults = false, intResult = 0;
-    var intLoadId;
-
-    autocompleteGlobals.loadId += 1;
-    intLoadId = autocompleteGlobals.loadId;
-    //autocompleteGlobals.currentLoadId = intLoadId;
-    autocompleteGlobals.popupAce.setValue('');
-    autocompleteGlobals.arrSearch = [];
-    autocompleteGlobals.arrValues = [];
-    autocompleteGlobals.arrSearchMaster = [];
-    autocompleteGlobals.arrValuesMaster = [];
-
-
-    autocompleteGetList(arrQueries, function (bolLast, arrRows) {
-        var i, len, strText, strSearch, element, strCurrent, strNext, strNextMeta, strCurrentMeta, autocompleteTempList = [];
-        if (autocompleteGlobals.arrCancelledIds.indexOf(intLoadId) === -1) {
-            if (bolLast === true) {
-                // set state variable
-                autocompleteGlobals.popupLoading = false;
-
-                // refresh popup height
-                autocompletePopupHeightRefresh();
-                //// select first line
-                //autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
-                //autocompleteGlobals.popupAce.scrollToLine(0);
-
-                // if there was no results: close the popup
-                if (!bolResults) {
-                    autocompletePopupClose(editor);
-
-                // else: search the popup
-                } else {
-                    // bind popup
-                    autocompleteBind(editor);
-
-                    autocompletePopupSearch(editor, 'filter');
-                }
-            } else {
-                intResult += 1;
-                if (!bolResults) {
-                    bolResults = true;
-
-                    // unhide the popup
-                    autocompleteGlobals.popupElement.removeAttribute('hidden');
-                    autocompleteGlobals.popupAce.resize();
-                }
-
-                for (i = 0, len = arrRows.length, strText = ''; i < len; i += 1) {
-                    strCurrent = arrRows[i][0];
-
-
-                    autocompleteTempList.push(strCurrent);
-
-                    /*// create a search string (normalize to double quoted and lowercase)
-                    strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
-
-                    strText += '\n' + strCurrent;
-                    autocompleteGlobals.arrSearch.push(strSearch);
-                    autocompleteGlobals.arrValues.push(strCurrent);
-                    autocompleteGlobals.arrSearchMaster.push(strSearch);
-                    autocompleteGlobals.arrValuesMaster.push(strCurrent);
-                    strNext = '';*/
-                }
-
-                strCurrent = arrRows[0][0]
-                strCurrentMeta = arrRows[-][1];
-                strNext = arrRows[1][0];
-                strNextMeta = arrRows[1][1];
-                var nextItem;
-
-                for (var i = 0, len = autocompleteTempList.length; i < len; i++) {
-                    nextItem = '' + strCurrent.substring(0, strCurrent.lastIndexOf('(')) + '{';
-                    nextItem = nextItem + '(' + strCurrent.substring(parseInt(strCurrent.indexOf('('), 10) + 1, strCurrent.lastIndexOf(')')) + ')';
-                    while ((strNext && strNextMeta === 'funcSnippet' && strCurrentMeta === 'funcSnippet') && nextItem.substring(0, nextItem.lastIndexOf('{')) === strNext.substring(0, strNext.lastIndexOf('('))) {
-                        nextItem = nextItem + ', ' + strNext.substring(strNext.lastIndexOf('('), strNext.lastIndexOf(')')) + ')';
-                        i += 1;
-
-                        if (arrRows[i + 1]) {
-                            strNext = arrRows[i + 1][0];
-                            strNextMeta = arrRows[i + 1][1];
-                        }
-                    }
-                    // create a search string (normalize to double quoted and lowercase)
-                    strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
-
-                    strText += '\n' + strCurrent;
-                    autocompleteGlobals.arrSearch.push(strSearch);
-                    autocompleteGlobals.arrValues.push(strCurrent);
-                    autocompleteGlobals.arrSearchMaster.push(strSearch);
-                    autocompleteGlobals.arrValuesMaster.push(strCurrent);
-                }
-
-
-
-                // append text (the substring is to remove the trailing \n)
-                autocompleteGlobals.popupAceSession.insert({
-                    'row': autocompleteGlobals.popupAceSession.getLength(),
-                    'column': 0
-                }, (intResult === 1 ? strText.substring(1) : strText));
-
-            }
-        }
-    });
-
-}
-
-// this function appends, positions and binds the autocomplete popup
-function autocompletePopupOpen(editor, arrQueries) {
-    'use strict';
-    var jsnSearchStart = indexToRowAndColumn(editor.getValue(), autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset)
-      , jsnPosition = editor.renderer.textToScreenCoordinates(jsnSearchStart.row, jsnSearchStart.column)
-      , intLeft = jsnPosition.pageX
-      , intTop = jsnPosition.pageY
-      , intLineHeight = editor.renderer.$textLayer.getLineHeight();
-
-    // if autocomplete is open: close it first
-    if (autocompleteGlobals.popupOpen === true) {
-        if (autocompleteGlobals.popupAsleep === true) {
-            autocompletePopupWake(editor);
-        }
-        autocompletePopupClose(editor);
-    }
-
-    // hide and append the popup
-    autocompleteGlobals.popupElement.setAttribute('hidden', '');
-    document.body.appendChild(autocompleteGlobals.popupElement);
-
-    // set state variables
-    autocompleteGlobals.popupLoading = true;
-    autocompleteGlobals.popupOpen = true;
-
-    // position the autocomplete popup
-
-    // handle horizontal window collision (302 -> popup width)
-    if ((intLeft + 302) > window.innerWidth) {
-        autocompleteGlobals.popupElement.style.right = '1px';
-        autocompleteGlobals.popupElement.style.left = '';
-    } else {
-        autocompleteGlobals.popupElement.style.right = '';
-        autocompleteGlobals.popupElement.style.left = intLeft + 'px';
-    }
-
-    // handle vertical window collision (152 -> max popup height)
-    if ((intTop + intLineHeight + 152) > window.innerHeight) {
-        autocompleteGlobals.popupElement.style.bottom = (window.innerHeight - intTop) + 'px';
-        autocompleteGlobals.popupElement.style.top = '';
-    } else {
-        autocompleteGlobals.popupElement.style.bottom = '';
-        autocompleteGlobals.popupElement.style.top = (intLineHeight + intTop) + 'px';
-    }
-
-    // default the height of the popup to 150px
-    autocompleteGlobals.popupElement.style.height = '150px';
-
-    // set scroll to top
-    autocompleteGlobals.popupAce.scrollToLine(0);
-
-    // load the autocomplete data
-    autocompletePopupLoad(editor, arrQueries);
-}
-
-// this function removes, empties and unbinds the autocomplete popup
-function autocompletePopupClose(editor) {
-    'use strict';
-    strSearchFixed = false;
-    // if the autocomplete query is still running: cancel it
-    if (autocompleteGlobals.strQueryID) {
-        GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
-        autocompleteGlobals.popupLoading = false;
-    }
-
-    // if popup is asleep: wake up
-    if (autocompleteGlobals.popupAsleep === true) {
-        autocompletePopupWake(editor);
-    }
-
-    if (autocompleteGlobals.popupElement.parentNode === document.body) {
-        // remove the popup from the dom
-        document.body.removeChild(autocompleteGlobals.popupElement);
-    }
-
-    // empty the popup
-    //autocompleteGlobals.popupElement.innerHTML = '';
-    autocompleteGlobals.popupAce.setValue('');
-
-    // only unbind the editor if there isn't a query running
-    if (!autocompleteGlobals.strQueryID) {
-        autocompleteUnbind(editor);
-    }
-
-    // set popupOpen to false
-    autocompleteGlobals.popupOpen = false;
-}
-
-// complete using the selected choice in the autocomplete popup
-function autocompleteComplete(editor) {
-    'use strict';
-    var intSearchStringStart = (autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset)
-      , intSearchStringEnd = (autocompleteGlobals.intSearchEnd)
-      , jsnSearchStringRange, strScript
-      , intFocusedLine = autocompleteGlobals.popupAce.getSelectionRange().start.row;
-
-    // if there is a selected choice
-    //console.log(intSearchStringStart, intSearchStringEnd);
-    if (intFocusedLine !== undefined && intFocusedLine !== null && intSearchStringStart && intSearchStringEnd) {//selectedChoice
+    // if we found an editor to get the query from and the current tab is not already running a query
+    if (editor && currentTab.handlingQuery !== true) {
+        // get current query
         strScript = editor.getValue();
-
-        if (autocompleteGlobals.arrValues[intFocusedLine]) {
-            // get autocomplete replace range
-            jsnSearchStringRange = {
-                'start': indexToRowAndColumn(strScript, intSearchStringStart)
-              , 'end': indexToRowAndColumn(strScript, intSearchStringEnd)
-            };
-
-            if (strSearchFixed === true) {
-                editor.getSelection().setSelectionRange(new Range(
-                    jsnSearchStringRange.start.row,
-                    jsnSearchStringRange.start.column - 1,
-                    jsnSearchStringRange.end.row,
-                    jsnSearchStringRange.end.column
-                ));
-            } else {
-                // set selection using replace range
-                editor.getSelection().setSelectionRange(new Range(
-                    jsnSearchStringRange.start.row,
-                    jsnSearchStringRange.start.column,
-                    jsnSearchStringRange.end.row,
-                    jsnSearchStringRange.end.column
-                ));
-            }
-
-            // replace the range with the selected choice's text
-            autocompleteGlobals.bolInserting = true;
-            editor.insert(autocompleteGlobals.arrValues[intFocusedLine]);
-            autocompleteGlobals.bolInserting = false;
-        }
-        //console.log(autocompleteGlobals.arrValues[intFocusedLine]);
-    }
-
-    // close the autocomplete popup
-    autocompletePopupClose(editor);
-}
-
-
-// ##############################################################################
-// ############################## POPUP EVENT CODE ##############################
-// ##############################################################################
-
-// this function searches through the autocompletePopup on change
-function autocompletePopupSearch(editor, strMode) {
-    'use strict';
-    var strScript = editor.getValue()
-      , intSearchStringStart = (autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset)
-      , intSearchStringEnd = autocompleteGlobals.intSearchEnd
-      , strSearch = strScript.substring(intSearchStringStart, intSearchStringEnd)
-      , choices, match, i, len, strCurrentMasterSearch, strCurrentMasterValue, strNewValue, strAdded;
-
-    if (autocompleteGlobals.popupOpen === true) {
-        //console.log(autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset);
-        //console.log(autocompleteGlobals.intSearchEnd);
-        // normalize strSearch
-        //strSearch = (strSearch[0] === '"' ? strSearch.toLowerCase() : '"' + strSearch.toLowerCase());
-        if (strSearch[0] === '"') {
-            strSearch = strSearch.toLowerCase();
-            strAdded = false;
+        var strScript = editor.getValue();
+        var jsnSelection = editor.getSelectionRange();
+        if (jsnSelection.start.column === 0 ||
+            jsnSelection.start.column === 1
+        ) {
+            var intCursorPos = rowAndColumnToIndex(strScript, jsnSelection.start.row, jsnSelection.start.column);
         } else {
-            strSearch = '"' + strSearch.toLowerCase();
-            strAdded = true;
+            var intCursorPos = rowAndColumnToIndex(strScript, jsnSelection.start.row, jsnSelection.start.column - 1);
         }
-
-        if (strSearch === '"' && (strScript.substring(intSearchStringStart - 1, intSearchStringEnd) !== '.') || strSearchFixed === true) {
-            strSearchFixed = true;
-            //console.log(strSearchFixed);
-            strSearch = strScript.substring(intSearchStringStart - 1, intSearchStringEnd);
-            if (strSearch[0] === '"') {
-                strSearch = strSearch.toLowerCase();
-                strAdded = false;
-            } else {
-                strSearch = '"' + strSearch.toLowerCase();
-                strAdded = true;
-            }
-        } else {
-            strSearchFixed = false;
-            //console.log(strSearchFixed);
-        }
-
-        if (strSearch === ':') {
-            strSearch = '';
-        } else if (strSearch === '":') {
-            strSearch = '"';
-            strSearchFixed = false;
-        }
-
-        // default strMode to 'filter', the only other option is 'expand'
-        strMode = strMode || 'filter';
-
-        // if mode is filter: take the current autocompleteGlobals.arrSearch and remove
-        //      any items that don't match
-        if (strMode === 'filter') {
-            autocompleteGlobals.popupAce.setValue('');
-            //console.log(autocompleteGlobals.arrSearch);
-            //console.log(strSearch);
-            // console.log(autocompleteGlobals.arrSearch);
-            // console.log(autocompleteGlobals.arrValues);
-            // console.log(strSearch);
-            for (i = 0, len = autocompleteGlobals.arrSearch.length, strNewValue = ''; i < len; i += 1) {
-                // if the current item doesn't match: remove from ace, arrSearch and arrValues
-                if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
-                    autocompleteGlobals.arrSearch.splice(i, 1);
-                    autocompleteGlobals.arrValues.splice(i, 1);
-                    // console.log('reject', i);
-
-                    i -= 1;
-                    len -= 1;
-                } else {
-                    // console.log('match', i);
-                    strNewValue += '\n';
-                    strNewValue += autocompleteGlobals.arrValues[i];
-                }
-            }
-
-            autocompleteGlobals.popupAce.setValue(strNewValue.substring(1));
-
-        // else if mode is expand: take the autocompleteGlobals.arrSearchMaster and fill
-        //      autocompleteGlobals.arrSearch with all matching items
-        } else if (strMode === 'expand') {
-            autocompleteGlobals.popupAce.setValue('');
-            autocompleteGlobals.arrSearch = [];
-            autocompleteGlobals.arrValues = [];
-
-            for (i = 0, len = autocompleteGlobals.arrSearchMaster.length, strNewValue = ''; i < len; i += 1) {
-                strCurrentMasterSearch = autocompleteGlobals.arrSearchMaster[i];
-                // if the current item doesn't match: remove from ace, arrSearch and arrValues
-                if (strCurrentMasterSearch.indexOf(strSearch) === 0) {
-                    strCurrentMasterValue = autocompleteGlobals.arrValuesMaster[i];
-
-                    autocompleteGlobals.arrSearch.push(strCurrentMasterSearch);
-                    autocompleteGlobals.arrValues.push(strCurrentMasterValue);
-
-                    strNewValue += '\n';
-                    strNewValue += strCurrentMasterValue;
-                }
-            }
-
-            autocompleteGlobals.popupAce.setValue(strNewValue.substring(1));
-        }
-
-            //console.log(autocompleteGlobals.arrValues.length, autocompleteGlobals.arrValues[0], strSearch);
-            //console.log(autocompleteGlobals.arrValues.length, autocompleteGlobals.arrValues[0] === strSearch);
-
-        if (strAdded === true) {
-            strSearch = strSearch.substring(1, strSearch.length);
-            //console.log(strSearch);
-            // if no items are left after the filter or expand AND the popup is not already asleep: put popup to sleep
-            // console.log(autocompleteGlobals.arrValues);
-            if ((autocompleteGlobals.arrValues.length === 0 && autocompleteGlobals.popupAsleep === false) || (autocompleteGlobals.arrValues.length === 1 && autocompleteGlobals.arrValues[0] === strSearch)) {
-                //autocompletePopupSleep(editor);  this may have been causing a bug where the list would only have one option and then would put the popup to sleep but still had the keys bound
-                autocompletePopupClose(editor);
-            // else if items are in the popup AND the popup is asleep: wake up the popup
-            } else if (autocompleteGlobals.arrValues.length > 0 && autocompleteGlobals.popupAsleep === true) {
-                autocompletePopupWake(editor);
-            }
-            strSearch = '"' + strSearch.toLowerCase();
-        }
-
-        // select first line
-        autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
-        autocompleteGlobals.popupAce.scrollToLine(0);
-
-        // refresh popup height
-        autocompletePopupHeightRefresh();
-
-        if (document.getElementById('autocomplete-popup')) {
-            popup_instruct_top = document.getElementById('autocomplete-popup').style.height +
-                                 document.getElementById('autocomplete-popup-instruction').style.height;
-            document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
-        }
-    }
-    //console.log(document.getElementById('autocomplete-popup-instruction').style.top, popup_instruct_top);
-
-    //// search to select
-    //for (i = 0, len = autocompleteGlobals.arrSearch.length; i < len; i += 1) {
-    //    if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === 0) {
-    //        // we found a choice: focus that line
-    //        autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(i, 0, i, 0));
-    //        autocompleteGlobals.popupAce.scrollToLine(autocompleteGlobals.popupAce.getSelectionRange().start.row);
-    //        //match = autocompleteGlobals.arrElements[i];
-    //        break;
-    //    }
-    //}
-}
-
-// put popup to sleep
-function autocompletePopupSleep(editor) {
-    'use strict';
-    // hide the popup and set state
-    autocompleteGlobals.popupElement.setAttribute('hidden', '');
-    autocompleteGlobals.popupAsleep = true;
-
-    // unbind the popup
-    autocompleteUnbind(editor);
-
-    // bind keydown
-    editor.keyListenerElementSleep = xtag.query(editor.container, '.ace_text-input')[0];
-    editor.keyListenerFunctionSleep = function (event) {
-        if (   event.keyCode === 37  // left arrow
-            || event.keyCode === 38  // up arrow
-            || event.keyCode === 39  // right arrow
-            || event.keyCode === 40  // down arrow
-            || event.keyCode === 110 // .
-            || event.keyCode === 190 // decimal point
-            || event.keyCode === 32  // space
-            || event.keyCode === 13  // return
-            ) {
-            autocompletePopupClose(editor);
-        }
-    };
-
-    editor.keyListenerElementSleep.addEventListener('keydown', editor.keyListenerFunctionSleep);
-}
-
-// wake popup up
-function autocompletePopupWake(editor) {
-    'use strict';
-    // show the popup and set state
-    autocompleteGlobals.popupElement.removeAttribute('hidden');
-    autocompleteGlobals.popupAsleep = false;
-
-    // unbind keydown
-    if (editor.keyListenerElementSleep) {
-        editor.keyListenerElementSleep.removeEventListener('keydown', editor.keyListenerFunctionSleep);
-    }
-
-    // bind the popup
-    autocompleteBind(editor);
-}
-
-// bind keyboard (temporary. binds to sql editor, not autocomplete popup)
-function autocompleteBind(editor) {
-    'use strict';
-    editor.standardGoLineDownExec = editor.commands.commands.golinedown.exec;
-    editor.standardGoLineUpExec   = editor.commands.commands.golineup.exec;
-    editor.standardIndentExec     = editor.commands.commands.indent.exec;
-
-    editor.commands.commands.golinedown.exec = function () {
-        var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
-          , intLastLine = autocompleteGlobals.arrValues.length - 1;
-
-        if (intCurrentLine !== intLastLine) {
-            autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine + 1), 0, (intCurrentLine + 1), 0));
-        } else {
-            autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(0, 0, 0, 0));
-        }
-
-        autocompleteGlobals.popupAce.scrollToLine(autocompleteGlobals.popupAce.getSelectionRange().start.row);
-    };
-    editor.commands.commands.golineup.exec = function () {
-        var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
-          , intLastLine = autocompleteGlobals.arrValues.length - 1;
-
-        if (intCurrentLine !== 0) {
-            autocompleteGlobals.popupAce.selection.setSelectionRange(new Range((intCurrentLine - 1), 0, (intCurrentLine - 1), 0));
-        } else {
-            autocompleteGlobals.popupAce.selection.setSelectionRange(new Range(intLastLine, 0, intLastLine, 0));
-        }
-
-        autocompleteGlobals.popupAce.scrollToLine(autocompleteGlobals.popupAce.getSelectionRange().start.row);
-    };
-
-    editor.commands.commands.indent.exec = function () {
-        autocompleteComplete(editor);
-        return;
-    };
-
-    editor.commands.addCommand({
-        name: 'hideautocomplete',
-        bindKey: 'Esc',
-        exec: function () {
-            autocompletePopupClose(editor);
-        }
-    });
-
-    editor.commands.addCommand({
-        name: 'autocomplete',
-        bindKey: 'Return',
-        exec: function () {
-            autocompletePopupClose(editor);
-            editor.insert('\n');
-            //autocompleteComplete(editor);
-            //return;
-        }
-    });
-
-    // bind keydown
-    editor.keyListenerElement = xtag.query(editor.container, '.ace_text-input')[0];
-    editor.keyListenerFunction = function (event) {
-        if (   event.keyCode === 37  // left arrow
-            || event.keyCode === 39  // right arrow
-            || event.keyCode === 110 // .
-            || event.keyCode === 190 // decimal point
-            || event.keyCode === 32  // space
-            || (event.shiftKey && (event.keyCode === 38 || event.keyCode === 40))) {
-            autocompletePopupClose(editor);
-        }
-    };
-
-    editor.keyListenerElement.addEventListener('keydown', editor.keyListenerFunction);
-
-    // bind mousedown
-    editor.mousedownFunction = function (event) {
-        autocompletePopupClose(editor);
-    };
-
-    editor.container.addEventListener('mousedown', editor.mousedownFunction);
-
-    // bind focusout
-    editor.focusoutFunction = function (event) {
-        // if the element that stole the focus is not the popup ace: close the popup
-        if (event.relatedTarget !== autocompleteGlobals.popupAce.focusElement) {
-            //autocompletePopupClose(editor);
-        }
-    };
-
-    editor.container.addEventListener('focusout', editor.focusoutFunction);
-
-    autocompleteGlobals.popupAce.focusElement = xtag.query(autocompleteGlobals.popupAce.container, '.ace_text-input')[0];
-    autocompleteGlobals.popupAce.focusFunction = function (event) {
-        autocompleteComplete(editor);
-        autocompletePopupClose(editor);
-        editor.focus();
-    };
-
-    autocompleteGlobals.popupAce.focusElement.addEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
-}
-
-// unbind keyboard
-function autocompleteUnbind(editor) {
-    'use strict';
-    editor.commands.commands.golinedown.exec = editor.standardGoLineDownExec;
-    editor.commands.commands.golineup.exec = editor.standardGoLineUpExec;
-    editor.commands.commands.indent.exec = editor.standardIndentExec;
-    editor.commands.removeCommand('hideautocomplete');
-    editor.commands.removeCommand('autocomplete');
-    autocompleteGlobals.popupElement.removeEventListener('change', autocompleteGlobals.popupElement.clickFunction);
-
-    if (editor.keyListenerElement) {
-        editor.keyListenerElement.removeEventListener('keydown', editor.keyListenerFunction);
-    }
-
-    editor.container.removeEventListener('mousedown', editor.mousedownFunction);
-    editor.container.removeEventListener('focusout', editor.focusoutFunction);
-    autocompleteGlobals.popupAce.focusElement.removeEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
-}
-
-
-// #############################################################################
-// ################################# MISC CODE #################################
-// #############################################################################
-
-function autocompleteLoadTypes() {
-    'use strict';
-    var strQuery = ml(function () {/*
-            SELECT string_agg(pg_type.typname, ',')
-              FROM pg_catalog.pg_type
-             WHERE (pg_type.typrelid = 0 OR (SELECT pg_class.relkind = 'c' FROM pg_catalog.pg_class WHERE pg_class.oid = pg_type.typrelid))
-               AND (NOT EXISTS (SELECT TRUE FROM pg_catalog.pg_type elem WHERE elem.oid = pg_type.typelem AND elem.typarray = pg_type.oid))
-               AND (pg_type.typtype <> 'd')
-    */});
-
-    GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
-        var arrRows, i, len;
-
-        if (!error) {
-            if (data.strMessage !== '\\.' && data.strMessage !== '') {
-                arrRows = data.strMessage.split('\n');
-
-                autocompleteGlobals.arrTypes = GS.decodeFromTabDelimited(arrRows[0]).split(',');
-            }
-        } else {
-            GS.webSocketErrorDialog(data);
-        }
-    });
-}
-
-function autocompleteLoadKeywords() {
-    'use strict';
-                    // ROW #1: "C": unreserved (cannot be function or type name)
-                    // ROW #2: "R": reserved
-                    // ROW #3: "T": reserved (can be function or type name)
-                    // ROW #4: "U": unreserved
-    var strQuery = ml(function () {/*
-            SELECT string_agg(word, ',')
-              FROM pg_catalog.pg_get_keywords()
-          GROUP BY catcode
-          ORDER BY catcode
-    */});
-
-    GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
-        var arrRows, i, len;
-
-        if (!error) {
-            if (data.strMessage !== '\\.' && data.strMessage !== '') {
-                arrRows = data.strMessage.split('\n');
-
-                autocompleteGlobals.jsnKeywords.c = GS.decodeFromTabDelimited(arrRows[0]).split(',');
-                autocompleteGlobals.jsnKeywords.c.desc = 'unreserved but cannot be the name of a FUNCTION or TYPE';
-
-                autocompleteGlobals.jsnKeywords.r = GS.decodeFromTabDelimited(arrRows[1]).split(',');
-                autocompleteGlobals.jsnKeywords.r.desc = 'reserved';
-
-                autocompleteGlobals.jsnKeywords.t = GS.decodeFromTabDelimited(arrRows[2]).split(',');
-                autocompleteGlobals.jsnKeywords.t.desc = 'reserved but can be the name of a FUNCTION or TYPE)';
-
-                autocompleteGlobals.jsnKeywords.u = GS.decodeFromTabDelimited(arrRows[3]).split(',');
-                autocompleteGlobals.jsnKeywords.u.desc = 'unreserved';
-
-                autocompleteGlobals.jsnKeywords.all = [];
-                autocompleteGlobals.jsnKeywords.all = autocompleteGlobals.jsnKeywords.all.concat(autocompleteGlobals.jsnKeywords.c);
-                autocompleteGlobals.jsnKeywords.all = autocompleteGlobals.jsnKeywords.all.concat(autocompleteGlobals.jsnKeywords.r);
-                autocompleteGlobals.jsnKeywords.all = autocompleteGlobals.jsnKeywords.all.concat(autocompleteGlobals.jsnKeywords.t);
-                autocompleteGlobals.jsnKeywords.all = autocompleteGlobals.jsnKeywords.all.concat(autocompleteGlobals.jsnKeywords.u);
-            }
-        } else {
-            GS.webSocketErrorDialog(data);
-        }
-    });
-}
-
-function autocompletePopupHeightRefresh() {
-    'use strict';
-    var intHeight;
-
-    // calculate popup height
-    intHeight = autocompleteGlobals.popupAce.renderer.$textLayer.getLineHeight() * autocompleteGlobals.arrValues.length;
-    if (intHeight > 150) { intHeight = 150; }
-
-    // set popup height
-    autocompleteGlobals.popupElement.style.height = intHeight + 'px';
-}
-
-function autocompleteGetObjectType(strName, arrQueries, callback, schemaOID) {
-    'use strict';
-    var strQuery, arrResults = [], i, len;
-
-    // normailize name
-    strName = GS.trim(strName.trim(), '"');
-
-    // loop through array of queries
-    for (i = 0, len = arrQueries.length; i < len; i += 1) {
-        arrQueries[i] = arrQueries[i].replace(/\{\{NAME\}\}/gi, strName);
-
-        // if schemaOID has a value: schema qualify the query
-        if (schemaOID) {
-            arrQueries[i] = arrQueries[i].replace(/\{\{ADDITIONALWHERE\}\}/gi, 'AND pg_namespace.oid = ' + schemaOID);
-        } else {
-            arrQueries[i] = arrQueries[i].replace(/\{\{ADDITIONALWHERE\}\}/gi, '');
-        }
-    }
-
-    // join array into a query
-    strQuery =  'SELECT * FROM (\n' +
-                    arrQueries.join('\n     UNION ALL\n') + '\n' +
-                ') em;';
-
-    GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
-        var arrRows, i, len;
-
-        if (!error) {
-            if (data.strMessage !== '\\.' && data.strMessage !== '') {
-                arrRows = data.strMessage.split('\n');
-
-                for (i = 0, len = arrRows.length; i < len; i += 1) {
-                    arrRows[i] = arrRows[i].split('\t');
-                    arrRows[i][1] = GS.decodeFromTabDelimited(arrRows[i][1]);
-
-                    arrResults.push(arrRows[i]);
+        //console.log(intCursorPos);
+        jsnCurrentQuery = findSqlQueryFromCursor(strScript, intCursorPos);
+
+        // clear error annotation in ace
+        editor.getSession().setAnnotations([]);
+
+        // clear query data store
+        currentTab.arrQueryDataStore = [];
+
+        // set the results pane header and clear out the results pane content
+        currentTab.relatedResultsTitleElement.textContent = 'Results';
+        resultsContainer.innerHTML = '';
+        resultsHeaderElement.classList.remove('error');
+        resultsHeaderElement.classList.remove('executing');
+
+        // set number tracking variables
+        intRecordsThisQuery = 0; // number of records this query so that we can get valid row numbers
+        intError = 0;            // number error the callback is on
+        intQuery = 0;            // number query the callback is on
+        intErrorStartLine = 0;   // number of lines in the queries that successfully ran, so that we can offset the error annotation
+
+        // this function is going to be bound to the "Stop Execution" button,
+        //      it sets the "bolIgnoreMessages" variable to true, meaning the callback for the query execution will not do anything
+        //      it also changes the results pane header (the tally results portion) to "(Loading Stopped)"
+        //      it also runs the "endExecute" and "endLoading" functions
+        stopLoadingHandler = function () {
+            bolIgnoreMessages = true;
+            resultsTallyElement.innerHTML = ' (Loading Stopped)';
+            endExecute();
+            endLoading();
+        };
+
+        // this function is going to be bound to the "Stop Execution" button,
+        //      it uses the "messageID" variable to send a "CANCEL" signal through the websocket
+        cancelSignalHandler = function () {
+            GS.requestFromSocket(GS.querySocket, 'CANCEL', '', messageID);
+        };
+
+        // this function is run when we send the queries through the websocket,
+        //      it adds a loader, disables the "Clear" button and shows/binds the "Stop Execution" button
+        startExecute = function () {
+            GS.addLoader(editor.container.parentNode.parentNode, 'Executing Query...');
+            currentTab.relatedClearButton.setAttribute('hidden', '');
+            currentTab.relatedCopyOptionsButton.setAttribute('hidden', '');
+            currentTab.handlingQuery = true;
+
+            resultsHeaderElement.classList.add('executing');
+            currentTab.relatedStopButton.removeAttribute('hidden');
+            currentTab.relatedStopButton.addEventListener('click', cancelSignalHandler);
+        };
+
+        // this function is run when we get our first callback,
+        //      it removes the loader, hides/unbinds the "Stop Execution" button
+        endExecute = function () {
+            GS.removeLoader(editor.container.parentNode.parentNode);
+
+            currentTab.relatedStopButton.setAttribute('hidden', '');
+            currentTab.relatedStopButton.removeEventListener('click', cancelSignalHandler);
+        };
+
+        // this function is run when we get our first callback,
+        //      it shows and binds the "Stop Loading" button
+        startLoading = function () {
+            currentTab.relatedClearButton.setAttribute('hidden', '');
+            currentTab.relatedStopSocketButton.removeAttribute('hidden');
+            //currentTab.relatedStopLoadingButton.removeAttribute('hidden');
+            //currentTab.relatedStopLoadingButton.addEventListener('click', stopLoadingHandler);
+        };
+
+        // this function is run when we encounter an error or we've recieved the last transmission,
+        //      it enables the "Clear" button and hides/unbinds the "Stop Loading" button
+        endLoading = function () {
+            currentTab.relatedClearButton.removeAttribute('hidden');
+            resultsHeaderElement.classList.remove('executing');
+            currentTab.handlingQuery = false;
+            currentTab.relatedStopSocketButton.setAttribute('hidden', '');
+            currentTab.relatedStopSocketButton.removeEventListener('click', stopLoadingHandler);
+            //currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
+            //currentTab.relatedStopLoadingButton.removeEventListener('click', stopLoadingHandler);
+        };
+
+        // this function is run when the user clicks "Show Query",
+        //      it opens a dialog with the query in it
+        bindShowQueryButton = function (element, strQuery) {
+            element.addEventListener('click', function () {
+                var templateElement = document.createElement('template');
+
+                templateElement.setAttribute('data-overlay-close', 'true');
+                templateElement.innerHTML = ml(function () {/*
+                    <gs-page>
+                        <gs-body padded>
+                            <pre>{{STRHTML}}</pre>
+                        </gs-body>
+                    </gs-page>
+                */}).replace(/\{\{STRHTML\}\}/gim, encodeHTML(strQuery));
+
+                GS.openDialogToElement(element, templateElement, 'left');
+            });
+        };
+
+        // This function updates the results header Success/Error tally
+        updateTally = function (intQuery, intError) {
+            resultsTallyElement.innerHTML = ' (<b>Pass: ' + (intQuery - intError) + '</b>, <b>Fail: ' + (intError) + '</b>)';
+            //resultsTallyElement.innerHTML = ' (<b>Success: ' + (intQuery - intError) + '</b>, <b>Error: ' + (intError) + '</b>)';
+        };
+
+        // begin
+        startExecute();
+        messageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
+            var tableElement, scrollElement, trElement, arrRecords
+              , arrCells, intRows, strHTML, arrLines, strError
+              , intLine, i, len, col_i, col_len, rec_i, rec_len
+              , warningHTML, buttonContainerElement, strCSS
+              , styleElement;
+
+            if (bolIgnoreMessages === false) {
+                // get name of query if applicable
+                var strQueryName = "";
+                if (data.strQuery) {
+                    var arrStrMatches = data.strQuery.match(/\-\-[ \t]*Name\:(.*)$/im);
+
+                    if (arrStrMatches && arrStrMatches.length > 1) {
+                    	strQueryName = ", " + arrStrMatches[1].trim();
+                    }
                 }
 
-            } else if (data.strMessage === '\\.') {
-                callback(arrResults);
-            }
-        }// else {
-        //    GS.webSocketErrorDialog(data);
-        //}
-    });
-}
+                if (!error) {
+                    if (data.intCallbackNumber === 0) {
+                        endExecute();
+                        startLoading();
+                    }
 
-function autocompleteGetList(arrQueries, callback) {
-    'use strict';
-    var strQuery, i, len, arrSuggestion, suggestion_i, suggestion_len;
-
-    for (i = 0, len = arrQueries.length; i < len; i += 1) {
-        if (typeof arrQueries[i] !== 'string') {
-            for (suggestion_i = 0, suggestion_len = arrQueries[i].length; suggestion_i < suggestion_len; suggestion_i += 1) {
-                arrQueries[i][suggestion_i] = 'SELECT $token$' + arrQueries[i][suggestion_i] + '$token$::text AS obj_name, \'\'::text AS obj_meta';
-            }
-
-            arrQueries[i] = 'SELECT * FROM (' + arrQueries[i].join('\nUNION ALL\n') + ') list_suggestions_' + i;
-        }
-    }
-
-    strQuery = 'SELECT * FROM (\n' + arrQueries.join('\n     UNION ALL\n') + '\n' + ') em;';
-//    console.log(strQuery);
-    // if the autocomplete query is still running: cancel it
-    if (autocompleteGlobals.strQueryID) {
-        GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
-    }
-
-    // make the request
-    autocompleteGlobals.strQueryID = GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
-        var arrRows, i, len;
-        if (!error) {
-            //console.log(data);
-            if (data.strMessage !== '\\.' && data.strMessage !== '') {
-                arrRows = data.strMessage.split('\n');
-                for (i = 0, len = arrRows.length; i < len; i += 1) {
-                    arrRows[i] = arrRows[i].split('\t');
-                    arrRows[i][0] = GS.decodeFromTabDelimited(arrRows[i][0]);
-                    //console.log(arrRows[i][0]);
-                }
-
-                callback(false, arrRows);
-            } else if (data.strMessage === '\\.') {
-                callback(true, arrRows);
-                autocompleteGlobals.strQueryID = null;
-            }
-        }// else {
-        //    GS.webSocketErrorDialog(data);
-        //}
-    });
-}
-
-
-// #############################################################################
-// ################################ PREFIX CODE ################################
-// #############################################################################
-
-function autocompleteGetPrefix(strScript, cursorPosition) {
-    'use strict';
-    var int_qs = 0 // quote status
-      , int_ps = 0 // parenthesis level
-      , int_element_len = 0
-      , int_tag = 0
-      , str_tag = ''
-      , arr_str_list = []
-      , str_form_data = strScript.substring(0, cursorPosition)
-      , int_form_data_length = str_form_data.length
-      , int_inputstring_len = str_form_data.length
-      , str_trailing, ptr_loop = 0, ptr_start = 0, int_chunk_len
-      , int_query_start, int_query_end, int_query_length
-      , arr_int_open_paren_indexes = [], str_srch_string
-      , str_function_quote, int_function_quote_len, ptr_quote_loop
-      , bol_function = false
-      , i, arrFinds
-      , int_chunk_start = 0, intLastChunkType, arrStrings
-      , current_chunk_type, calculated_chunk_type, arrChunks = [];
-    // quote status (int_qs) values:
-    //      0 => no quotes
-    //      2 => dollar tag
-    //      3 => single quote
-    //      4 => double quote
-    //      5 => multiline comment
-    //      6 => line comment
-    // special mention:
-    //      int_ps is the number of parenthesis we are deep
-    // chunk types:
-    //      0 => whitespace group
-    //      1 => equals / comma
-    //      2 => quote / character / parenthesis group
-    //      3 => .
-
-    //console.log('1***', str_form_data);
-    while (int_inputstring_len > 0) {
-        int_element_len += 1;
-
-        // FOUND MULTILINE COMMENT:
-        if (int_qs === 0 && str_form_data.substr(ptr_loop, 2) === "/*") {
-            int_qs = 5;
-            str_form_data = str_form_data.substring(0, ptr_loop) + ' ' + str_form_data.substring(ptr_loop + 1);
-            //console.log("found multiline comment");
-
-        // ENDING MULTILINE COMMENT
-        } else if (int_qs === 5 && str_form_data.substr(ptr_loop, 2) === "*/") {
-            int_qs = 0;
-            str_form_data = str_form_data.substring(0, ptr_loop) + ' ' + str_form_data.substring(ptr_loop + 1);
-            str_form_data = str_form_data.substring(0, ptr_loop + 1) + ' ' + str_form_data.substring(ptr_loop + 2);
-            //console.log("found end of multiline comment");
-
-        // FOUND DASH COMMENT:
-        } else if (int_qs === 0 && str_form_data.substr(ptr_loop, 2) === "--") {
-            int_qs = 6;
-            str_form_data = str_form_data.substring(0, ptr_loop) + ' ' + str_form_data.substring(ptr_loop + 1);
-            //console.log("found dash comment");
-
-        // ENDING DASH COMMENT
-        } else if (int_qs === 6 && (str_form_data.substr(ptr_loop, 1) === "\n" || str_form_data.substr(ptr_loop, 1) === "\r")) {
-            int_qs = 0;
-            //console.log("found end of dash comment");
-
-        // CONSUME COMMENT
-        } else if (int_qs === 6 || int_qs === 5) {
-            str_form_data =
-                str_form_data.substring(0, ptr_loop) +
-                (str_form_data[ptr_loop] === '\t' || str_form_data[ptr_loop] === '\n' ? str_form_data[ptr_loop] : ' ') +
-                str_form_data.substring(ptr_loop + 1);
-
-            //console.log(str_form_data[ptr_loop], ptr_loop);
-
-        // FOUND SLASH:  we don't skip slashed chars within dollar tags, double quotes and comments.
-        } else if (str_form_data.substr(ptr_loop, 1) === "\\" && int_qs !== 4 && int_qs !== 2 && int_qs !== 5 && int_qs !== 6) {
-            // skip next character
-            ptr_loop += 1;
-            int_chunk_len = 1;
-            int_inputstring_len -= int_chunk_len;
-            int_element_len += int_chunk_len;
-            //console.log("found slash ptr_loop: " + ptr_loop, ptr_loop, int_inputstring_len, int_chunk_len, int_element_len);
-
-        // FOUND SINGLE QUOTE:
-        } else if (int_qs === 0 && str_form_data.substr(ptr_loop, 1) === "'") {
-            int_qs = 3;
-            //console.log("found single quote");
-
-        // ENDING SINGLE QUOTE
-        } else if (int_qs === 3 && str_form_data.substr(ptr_loop, 1) === "'") {
-            int_qs = 0;
-            //console.log("found end of single quote");
-
-        // FOUND DOUBLE QUOTE:
-        } else if (int_qs === 0 && str_form_data.substr(ptr_loop, 1) === "\"") {
-            int_qs = 4;
-            //console.log("found double quote");
-
-        // ENDING DOUBLE QUOTE
-        } else if (int_qs === 4 && str_form_data.substr(ptr_loop, 1) === "\"") {
-            int_qs = 0;
-            //console.log("found end of double quote");
-
-        // FOUND OPEN PARENTHESIS:
-        } else if (int_qs === 0 && str_form_data.substr(ptr_loop, 1) === "(") {
-            int_ps = int_ps + 1;
-            arr_int_open_paren_indexes.push(ptr_loop);
-            //console.log(' OPEN: ', arr_int_open_paren_indexes);
-            //console.log("found open parenthesis");
-
-        // FOUND CLOSE PARENTHESIS
-        } else if (int_qs === 0 && str_form_data.substr(ptr_loop, 1) === ")" && int_ps > 0) {
-            int_ps = int_ps - 1;
-
-            arr_int_open_paren_indexes.splice(arr_int_open_paren_indexes.length - 1, 1);
-            //console.log('CLOSE: ', arr_int_open_paren_indexes);
-            //console.log("found close parenthesis");
-
-        // FOUND DOLLAR TAG START:
-        } else if (int_qs === 0 && str_form_data.substr(ptr_loop, 1) === "$") {
-            // we should be looking ahead here. get the tag or if false start then just continue
-            ptr_quote_loop = ptr_loop + 1;
-            //console.log("found start dollar");
-
-            while (ptr_quote_loop < int_form_data_length && str_form_data.substr(ptr_quote_loop, 1).match("^[a-zA-Z0-9_]$")) {
-                ptr_quote_loop += 1;
-            }
-
-            if (str_form_data.substring(ptr_quote_loop, ptr_quote_loop + 1) === "$") {
-                int_tag = ptr_quote_loop - (ptr_loop - 1);
-                str_tag = str_form_data.substr(ptr_loop, int_tag);
-
-                // we found the end of the tag, now look for the close tag
-                ptr_loop += int_tag;
-                int_inputstring_len -= int_tag;
-                int_element_len += int_tag;
-                int_qs = 2;
-
-            } else {
-                // false alarm, do nothing
-            }
-
-            //console.log(str_tag);
-
-        // END DOLLAR TAG
-        } else if (int_qs === 2 && str_form_data.substr(ptr_loop, int_tag) === str_tag) {
-            //console.log("found end of dollar", str_tag);
-            int_qs = 0;
-            // move pointer to end of end dollar tag
-            int_tag -= 1;
-            int_element_len += int_tag;
-            ptr_loop += int_tag;
-            int_inputstring_len -= int_tag;
-
-        // FOUND AN UNQUOTED SEMICOLON:
-        } else if (int_ps === 0 && int_qs === 0 && str_form_data.substr(ptr_loop, 1) === ";") {
-            //console.log("found semicolon >" + ptr_start + "|" + ptr_loop + "<");
-            //console.log("found block >" + (str_form_data.substring(ptr_start, ptr_loop)) + "<");
-
-            ptr_start = ptr_loop + 1;
-            int_element_len = 0;
-        }
-
-        // calculate type
-        if (
-                (
-                    (
-                        str_form_data.substr(ptr_loop, 1).match(/\s/gi)
-                    ) || (
-                        int_qs === 5 ||
-                        int_qs === 6 ||
-                        str_form_data.substr(ptr_loop, 2) === '*/'
-                    )
-                ) &&
-                int_ps === 0 &&
-                int_qs !== 2 &&
-                int_qs !== 3 &&
-                int_qs !== 4) {
-            calculated_chunk_type = 0;
-        } else if (str_form_data.substr(ptr_loop, 1) === ',' || str_form_data.substr(ptr_loop, 1) === '=') {
-            calculated_chunk_type = 1;
-        } else if (str_form_data.substr(ptr_loop, 1) === '.') {
-            calculated_chunk_type = 3;
-        } else if (int_ps > 0 || str_form_data.substr(ptr_loop, 1) === ')') {
-            calculated_chunk_type = 2;
-        } else if (str_form_data.substr(ptr_loop, 1) !== '.') {
-            calculated_chunk_type = 2;
-        }
-        //console.log(calculated_chunk_type, current_chunk_type, str_form_data.substr(ptr_loop, 1));
-
-        if (current_chunk_type !== undefined) {
-            // if current type is different from calculated type: seperate chunk
-            if (current_chunk_type !== calculated_chunk_type) {
-                if (current_chunk_type !== 0 && current_chunk_type !== 1) {
-                    arrChunks.push({
-                        'chunkText': str_form_data.substring(int_chunk_start, ptr_loop),
-                        'chunkStart': int_chunk_start,
-                        'chunkEnd': ptr_loop,
-                        'chunkType': current_chunk_type
+                    currentTab.relatedStopSocketButton.addEventListener('click', function () {
+                        GS.requestFromSocket(GS.querySocket, 'CANCEL', function () {});
+                        stopLoadingHandler();
+                        bolIgnoreMessages = true;
+                        document.getElementById('RowCountSmall').innerHTML = '' + (parseInt(data.intCallbackNumberThisQuery * 10, 10) + 10) + ' loaded of ' + data.intRows;
+                        console.log(data.intCallbackNumberThisQuery * 10 + 10);
                     });
+
+                    if (data.bolLastMessage) {
+                        endLoading();
+                    }
+                    if (data.intCallbackNumberThisQuery === 0) {
+                        if (data.strQuery.trim()) {
+                            arrExecuteHistory.push({
+                                'strQuery': data.strQuery,
+                                'dteStart': new Date(data.dteStart),
+                                'dteEnd': new Date(data.dteEnd),
+                                'intRows': data.intRows
+                            });
+                        }
+
+                        // add datastore entry for the current query's results
+                        currentTab.arrQueryDataStore.push([]);
+
+                        //console.log(((data.strQuery.match(/\n/gim) || []).length), data);
+                        intErrorStartLine += (data.strQuery.match(/\n/gim) || []).length;
+                    }
+
+                    // handle putting the response in the results pane
+
+                    // if this isn't the last message
+                    if (!data.bolLastMessage) {
+                        // if rows affected
+                        if (data.strMessage.indexOf('Rows Affected\n') === 0) {
+                            intRows = parseInt(data.strMessage.substring('Rows Affected\n'.length).trim(), 10);
+
+                            for (i = 0, len = data.arrMessages.length, warningHTML = ''; i < len; i += 1) {
+                                warningHTML += '<i>' +
+                                                    '<b>' + data.arrMessages[i].level + ':</b> ' +
+                                                    encodeHTML(data.arrMessages[i].content) +
+                                                '</i><br/>';
+                            }
+
+
+                            strHTML = '<div flex-horizontal>' +
+                                            '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
+                                            '<div>';
+
+                            if (data.dteStart && data.dteEnd && !isNaN(data.dteStart.getTime()) && !isNaN(data.dteEnd.getTime())) {
+                                strHTML +=
+                                    '<small>' +
+                                        'Approx. ' + ((data.dteEnd.getTime() - data.dteStart.getTime()) / 1000).toFixed(3) + ' seconds' +
+                                    '</small>';
+                            }
+
+                            strHTML += '<br />';
+
+                            if (data.intRows !== undefined) {
+                                strHTML += '<small>' + data.intRows + ' rows</small>';
+                            }
+
+                            strHTML +=      '</div>' +
+                                            '<span>&nbsp;</span>' +
+                                            '<gs-button class="button-show-query" no-focus>Query</gs-button>' +
+                                        '</div>' + warningHTML;
+
+                            divElement = document.createElement('div');
+                            divElement.innerHTML =  strHTML + '<pre>' + intRows + ' Row' + (intRows === 1 ? '' : 's') + ' Affected</pre><br />';
+
+                            resultsContainer.appendChild(divElement);
+                            bindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
+                            intQuery += 1;
+
+                            // update the success and error tally
+                            updateTally(intQuery, intError);
+
+                        // else if empty
+                        } else if (data.strMessage === 'EMPTY') {
+                            divElement = document.createElement('div');
+
+                            for (i = 0, len = data.arrMessages.length, warningHTML = ''; i < len; i += 1) {
+                                warningHTML += '<i>' +
+                                                    '<b>' + data.arrMessages[i].level + ':</b> ' +
+                                                    encodeHTML(data.arrMessages[i].content) +
+                                                '</i><br/>';
+                            }
+
+                            strHTML = '<div flex-horizontal>' +
+                                            '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
+                                            '<div>';
+
+                            if (data.dteStart && data.dteEnd && !isNaN(data.dteStart.getTime()) && !isNaN(data.dteEnd.getTime())) {
+                                strHTML +=
+                                    '<small>' +
+                                        'Approx. ' + ((data.dteEnd.getTime() - data.dteStart.getTime()) / 1000).toFixed(3) + ' seconds' +
+                                    '</small>';
+                            }
+
+                            strHTML += '<br />';
+
+                            if (data.intRows !== undefined) {
+                                strHTML += '<small>' + data.intRows + ' rows</small>';
+                            }
+
+                            strHTML +=      '</div>' +
+                                            '<span>&nbsp;</span>' +
+                                            '<gs-button class="button-show-query" no-focus>Query</gs-button>' +
+                                        '</div>' + warningHTML;
+
+                            divElement.innerHTML = strHTML + '<pre>Empty Query</pre><br />';
+
+                            resultsContainer.appendChild(divElement);
+                            bindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
+                            intQuery += 1;
+
+                            // update the success and error tally
+                            updateTally(intQuery, intError);
+
+                        // else if result query
+                        } else if (data.arrColumnNames.length > 0) {
+
+
+                            // if this is the first callback for this query: set up title, table and header
+                            if (data.intCallbackNumberThisQuery === 0) {
+                                divElement = document.createElement('div');
+                                scrollElement = document.createElement('div');
+
+                                scrollElement.classList.add('result-table-scroll-container');
+
+                                for (i = 0, len = data.arrMessages.length, warningHTML = ''; i < len; i += 1) {
+                                    //console.log('"' + data.arrMessages[i].level + '"', '"' + data.arrMessages[i].content + '"');
+                                    warningHTML += '<i>' +
+                                                        '<b>' + data.arrMessages[i].level + ':</b> ' +
+                                                        encodeHTML(data.arrMessages[i].content) +
+                                                    '</i><br/>';
+                                }
+
+                                strHTML = '<div flex-horizontal>' +
+                                                '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
+                                                '<div>';
+
+                                if (data.dteStart && data.dteEnd && !isNaN(data.dteStart.getTime()) && !isNaN(data.dteEnd.getTime())) {
+                                    strHTML +=
+                                        '<small>' +
+                                            'Approx. ' + ((data.dteEnd.getTime() - data.dteStart.getTime()) / 1000).toFixed(3) + ' seconds' +
+                                        '</small>';
+                                }
+
+                                strHTML += '<br />';
+
+                                if (data.intRows !== undefined) {
+                                    strHTML += '<small id="RowCountSmall">' + data.intRows + ' rows</small>';
+                                }
+
+
+                                strHTML +=      '</div>' +
+                                                '<span>&nbsp;</span>' +
+                                                '<gs-button class="button-show-query" no-focus>Query</gs-button>' +
+                                            '</div>' + warningHTML;
+
+                                divElement.innerHTML = strHTML;
+
+                                divElement.appendChild(scrollElement);
+                                resultsContainer.appendChild(divElement);
+                                bindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
+
+                                strHTML = '<thead><tr><th>#</th>';
+                                strCSS = '';
+                                for (col_i = 0, col_len = data.arrColumnNames.length; col_i < col_len; col_i += 1) {
+                                    strHTML += '<th>';
+                                    strHTML +=     '<b>';
+                                    strHTML +=     encodeHTML(GS.decodeFromTabDelimited(data.arrColumnNames[col_i]));
+                                    strHTML +=     '</b><br />';
+                                    strHTML +=     '<small>';
+                                    strHTML +=          encodeHTML(GS.decodeFromTabDelimited(data.arrColumnTypes[col_i]));
+                                    strHTML +=     '</small>';
+                                    strHTML += '</th>';
+
+
+                                    //int2 / smallint
+                                    //int4 / integer
+                                    //int8 / bigint
+                                    //numeric
+                                    //float
+                                    //decimal
+                                    //real
+                                    //double
+                                    //money
+                                    //oid
+
+                                    // if this column is a number type: align column text to the right
+                                    if ((/^(int|smallint|bigint|numeric|float|decimal|real|double|money|oid)/gi).test(data.arrColumnTypes[col_i])) {
+                                        strCSS += ' table[data-query-number="' + data.intQueryNumber + '"] tbody tr :nth-child(' + (col_i + 2) + ') { ';
+                                        strCSS += '     text-align: right;';
+                                        strCSS += ' } ';
+                                    }
+                                }
+                                strHTML += '</tr></thead>';
+
+
+                                tableElement = document.createElement('table');
+                                tableElement.classList.add('results-table');
+                                tableElement.setAttribute('data-query-number', data.intQueryNumber);
+                                tableElement.innerHTML = strHTML;
+                                scrollElement.appendChild(tableElement);
+
+                                styleElement = document.createElement('style');
+                                styleElement.innerHTML = strCSS;
+                                scrollElement.appendChild(styleElement);
+
+                                currentTargetTbody = document.createElement('tbody');
+                                tableElement.appendChild(currentTargetTbody);
+
+                                // set table attributes for copy settings
+                                tableElement.setAttribute('quote-type', getClipSetting("quoteType"));
+                                tableElement.setAttribute('quote-char', getClipSetting("quoteChar"));
+                                tableElement.setAttribute('field-delimiter', getClipSetting("fieldDelimiter"));
+                                tableElement.setAttribute('null-values', getClipSetting("nullValues"));
+                                tableElement.setAttribute('column-names', getClipSetting("columnNames"));
+
+                                // make the table selectable
+                                GS.makeTableSelectable(tableElement, evt.touchDevice);
+                            }
+
+
+
+                            //console.log('0***', data);
+                            // if not end query, therefore: results
+                            if (data.strMessage !== '\\.') {
+                                arrRecords = data.strMessage.split('\n');
+                                strHTML = '';
+
+                                //console.log(
+                                //    '1***',
+                                //    data.intCallbackNumberThisQuery,
+                                //    data.intQueryNumber,
+                                //    arrRecords
+                                //);
+
+                                for (rec_i = 0, rec_len = arrRecords.length; rec_i < rec_len; rec_i += 1) {
+                                    // if appending this would make more than 10 records: save to data store
+                                    if (data.intCallbackNumberThisQuery >= 1) {
+                                        //console.log(
+                                        //    '2***',
+                                        //    intRecordsThisQuery,
+                                        //    currentTab.arrQueryDataStore[data.intQueryNumber].length,
+                                        //    arrRecords[rec_i]
+                                        //);
+                                        currentTab.arrQueryDataStore[data.intQueryNumber].push((intRecordsThisQuery + 1) + '\t' + arrRecords[rec_i]);
+
+                                        // if this is the first time adding to the data store: add append buttons below the table
+                                        if (currentTab.arrQueryDataStore[data.intQueryNumber].length === 1) {
+                                            //console.log('3***');
+                                            buttonContainerElement = document.createElement('div');
+                                            buttonContainerElement.style.whiteSpace = 'normal';
+
+                                            GS.insertElementAfter(buttonContainerElement, currentTargetTbody.parentNode);
+
+                                            buttonContainerElement.innerHTML = ml(function () {/*
+                                                <gs-grid min-width="all {reflow}; 482px {1,1,1,1};">
+                                                    <gs-block>
+                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 10)">Show 10 More</gs-button>
+                                                    </gs-block>
+                                                    <gs-block>
+                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 100)">Show 100 More</gs-button>
+                                                    </gs-block>
+                                                    <gs-block>
+                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 1000)">Show 1000 More</gs-button>
+                                                    </gs-block>
+                                                    <gs-block>
+                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 'all')">Show All</gs-button>
+                                                    </gs-block>
+                                                </gs-grid>
+                                            */}).replace(/\{\{QUERY\}\}/gi, data.intQueryNumber);
+                                        }
+
+                                    // else append to the dom
+                                    } else {
+                                        trElement = document.createElement('tr');
+                                        arrCells = arrRecords[rec_i].split('\t');
+
+                                        //console.log(
+                                        //    '4***',
+                                        //    arrCells
+                                        //);
+
+                                        strHTML = '<th>' + (intRecordsThisQuery + 1) + '</th>';
+                                        for (col_i = 0, col_len = arrCells.length; col_i < col_len; col_i += 1) {
+                                            strHTML += '<td>';
+                                            strHTML += encodeHTML(GS.decodeFromTabDelimited(arrCells[col_i]));
+                                                            //.replace(/&/g, '&amp;')
+                                                            //.replace(/"/g, '&quot;')
+                                                            //.replace(/'/g, '&#39;')
+                                                            //.replace(/</g, '&lt;')
+                                                            //.replace(/>/g, '&gt;');
+                                            strHTML += '</td>';
+                                        }
+                                        trElement.innerHTML = strHTML;
+
+                                        currentTargetTbody.appendChild(trElement);
+                                    }
+
+                                    intRecordsThisQuery += 1;
+                                }
+
+                            // else if end message
+                            } else if (data.strMessage === '\\.') {
+                                //console.log('5***');
+                                // add a br for spacing/padding
+                                resultsContainer.appendChild(document.createElement('br'));
+                                // set part number to 0 and add one to the query number
+                                intQuery += 1;
+
+                                // update the success and error tally
+                                updateTally(intQuery, intError);
+
+                                intRecordsThisQuery = 0;
+                                currentTab.relatedClearButton.removeAttribute('disabled');
+                                currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
+                                currentTab.relatedStopLoadingButton.removeEventListener('click', stopLoadingHandler);
+                            }
+                        }
+                    }
+                } else {
+                    endExecute();
+                    endLoading();
+
+                    arrExecuteHistory.push({
+                        'strQuery': jsnCurrentQuery.strQuery,
+                        'failed': true,
+                        'errorText': data.error_text
+                    });
+
+                    // template warnings
+                    for (i = 0, len = data.arrMessages.length, warningHTML = ''; i < len; i += 1) {
+                        warningHTML += '<i>' +
+                                            '<b>' + data.arrMessages[i].level + ':</b> ' +
+                                            encodeHTML(data.arrMessages[i].content) +
+                                        '</i><br/>';
+                    }
+
+                    // handle putting the error response in the results pane
+                    //console.log(data);
+                    arrLines = data.error_text.split('\n');
+                    intQuery += 1;
+                    intError += 1;
+
+                    for (i = 0, len = arrLines.length; i < len; i += 1) {
+                        if (arrLines[i].substring(0, arrLines[i].indexOf(':')) === 'ERROR') {
+                            strError = arrLines[i].substring(arrLines[i].indexOf(':') + 1, arrLines[i].length).trim();
+                        }
+                        if (arrLines[i].substring(0, arrLines[i].indexOf(' ')) === 'LINE') {
+                            intLine = parseInt(arrLines[i].substring(arrLines[i].indexOf(' ') + 1, arrLines[i].indexOf(':')), 10);
+                        }
+                    }
+
+                    divElement = document.createElement('div');
+                    divElement.innerHTML = '<h4 id="error' + intQuery + '">Query #' + (intQuery) + strQueryName + ' Error:</h4>' + warningHTML +
+                                            '<pre>' + encodeHTML(GS.decodeFromTabDelimited(data.error_text)) + '</pre>'; //strError ||
+                    resultsContainer.appendChild(divElement);
+                    resultsContainer.appendChild(document.createElement('br'));
+                    //resultsContainer.scrollTop = resultsContainer.scrollHeight + resultsContainer.offsetHeight;
+                    //console.log(resultsContainer.scrollTop = document.getElementById('error' + intQuery));
+                    resultsContainer.scrollTop = document.getElementById('error' + intQuery).offsetTop - 40;
+                    //resultsContainer.scrollTop = document.getElementById('error' + intQuery).offset().top;
+                    resultsHeaderElement.classList.add('error');
+
+                    //console.log(intLine, jsnCurrentQuery.start_row, intErrorStartLine);
+                    if (intLine) {
+                        editor.getSession().setAnnotations([
+                            {'row': jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1), 'column': parseInt(data.error_position, 10) || 0,
+                                'text': strError, 'type': 'error'}
+                        ]);
+
+                        editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1)), true, true);
+                    }
+
+                    // update the success and error tally
+                    updateTally(intQuery, intError);
+
+                    //editor.gotoLine(
+                    //    (jsnCurrentQuery.start_row + intLine),
+                    //    (parseInt(data.error_position, 10) || 0),
+                    //    true
+                    //);
                 }
-                int_chunk_start = ptr_loop;
-                current_chunk_type = calculated_chunk_type;
             }
-        } else {
-            current_chunk_type = calculated_chunk_type;
-        }
-
-        ptr_loop += 1;
-        int_inputstring_len -= 1;
+        }, bolAutocommit);
     }
-
-    // seperate last chunk
-    arrChunks.push({
-        'chunkText': strScript.substring(int_chunk_start, ptr_loop),
-        'chunkStart': int_chunk_start,
-        'chunkEnd': ptr_loop,
-        'chunkType': current_chunk_type
-    });
-    int_chunk_start = ptr_loop;
-    current_chunk_type = calculated_chunk_type;
-
-    //console.log('2***', str_form_data, arrChunks);
-
-    i = arrChunks.length - 1;
-    intLastChunkType = null;
-    arrFinds = [];
-    arrStrings = [];
-
-    while (i >= 0) {
-        //console.log('2.5*', arrChunks[i], intLastChunkType);
-        if (arrChunks[i].chunkType === 2) {
-            if (arrChunks[i].chunkText[0] === '(') {
-                arrChunks[i].chunkStart += 1;
-                arrChunks[i].chunkText = arrChunks[i].chunkText.substring(1);
-            }
-
-            arrFinds.push(arrChunks[i]);
-            arrStrings.push(arrChunks[i].chunkText);
-
-            if ((!arrChunks[i - 1] || arrChunks[i - 1].chunkType === 2)) {
-                break;
-            }
-        } else if (arrChunks[i].chunkType === 3 && (intLastChunkType === 3 || arrChunks[i].chunkText.length > 1)) {
-            break;
-        }
-
-        intLastChunkType = arrChunks[i].chunkType;
-        i -= 1;
-    }
-
-    arrFinds.reverse();
-    arrStrings.reverse();
-
-    //console.log('3***', arrFinds, arrChunks);
-
-    if (arrFinds.length === 0) {
-        return {'start': 0, 'end': 0, 'arrStrings': []};
-    }
-
-    return {'start': arrFinds[0].chunkStart, 'end': arrFinds[arrFinds.length - 1].chunkEnd, 'arrStrings': arrStrings};
 }

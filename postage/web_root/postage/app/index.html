@@ -505,6 +505,30 @@
                 -ms-user-select: none;
                 user-select: none;
             }
+            .ace-cursor-query {
+                position: absolute;
+                background-image:none !important;
+                -webkit-animation: ace-fade-cursor-query 2s ease-in-out; 
+                   -moz-animation: ace-fade-cursor-query 2s ease-in-out; 
+                     -o-animation: ace-fade-cursor-query 2s ease-in-out; 
+                        animation: ace-fade-cursor-query 2s ease-in-out; 
+            }
+            @-webkit-keyframes ace-fade-cursor-query {
+              0%   { background-color: #91ffb2; }
+              100% { background-color: white; }
+            }
+            @-moz-keyframes ace-fade-cursor-query {
+              0%   { background-color: #91ffb2; }
+              100% { background-color: white; }
+            }
+            @-o-keyframes ace-fade-cursor-query {
+              0%   { background-color: #91ffb2; }
+              100% { background-color: white; }
+            }
+            @keyframes ace-fade-cursor-query {
+              0%   { background-color: #91ffb2; }
+              100% { background-color: white; }
+            }
         </style>
     </head>
     <body>
@@ -614,6 +638,7 @@
         <script src="resources/snippets.js" type="text/javascript"></script>
         <script src="resources/beautifier.js" type="text/javascript"></script>
         <script src="resources/underscore_min.js" type="text/javascript"></script>
+        <script src="resources/sql_split.js" type="text/javascript"></script>
 
         <script src="resources/pg-9.2-tree-functions.js" type="text/javascript"></script>
         <script src="resources/pg-9.2-tree-queries.js" type="text/javascript"></script>

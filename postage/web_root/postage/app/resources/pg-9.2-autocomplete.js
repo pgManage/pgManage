@@ -1106,6 +1106,10 @@ function autocompleteBind(editor) {
     }
     autocompleteGlobals.bolBound = true;
     autocompleteGlobals.popupAce.focusElement.addEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
+    
+    // SELECT *
+    // FROM wtkv2.rtime
+    // WHERE rtime.create_stamp = '9/19/15'::date;
 
 }
 
