@@ -2,7 +2,6 @@
 
 var bolSettingsLoaded = true;
 
-
 function refreshButtons (bolBtnType) {
     'use strict';
     var curr_toolbar, curr_tab_num, tabElement, bolBtnLabeled;
