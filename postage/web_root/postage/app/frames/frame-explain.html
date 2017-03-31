@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+
+        <title>Explain</title>
+
+        <script src="../../js/greyspots.js" type="text/javascript"></script>
+        <link href="../../css/greyspots.css" type="text/css" rel="stylesheet" />
+
+        <link href="../../css/postage.css" type="text/css" rel="stylesheet" />
+
+        <script src="../resources/ws-get-functions.js" type="text/javascript"></script>
+
+        <!-- right now these scripts are hard coded for postgres 9.2 -->
+        <script src="../resources/pg-9.2-tree-queries.js" type="text/javascript"></script>
+        <script src="../resources/pg-9.2-other.js" type="text/javascript"></script>
+
+        <script src="../../js/page-zoom.js" type="text/javascript"></script>
+        <script src="../../js/d3.js" type="text/javascript"></script>
+        <script>
+			//jslint white:true multivar:true
+            window.addEventListener('DOMContentLoaded', function () {
+                'use strict';
+                var link1 = GS.stringToElement('<link href="../resources/ws-tab-functions.css" type="text/css" rel="stylesheet" />'),
+                    link2 = GS.stringToElement('<link href="../resources/ws-home.css" type="text/css" rel="stylesheet" />'),
+                    link3 = GS.stringToElement('<link href="../resources/pg-9.2-tree-functions.css" type="text/css" rel="stylesheet" />'),
+                    link4 = GS.stringToElement('<link href="../resources/pg-9.2-other.css" type="text/css" rel="stylesheet" />'),
+                    link5 = GS.stringToElement('<link href="../resources/pg-9.2-autocomplete.css" type="text/css" rel="stylesheet" />'),
+                    link6 = GS.stringToElement('<link href="../../css/postage.css" type="text/css" rel="stylesheet" />');
+
+                document.body.appendChild(link1);
+                document.body.appendChild(link2);
+                document.body.appendChild(link3);
+                document.body.appendChild(link4);
+                document.body.appendChild(link5);
+                document.body.appendChild(link6);
+            });
+
+			window.addEventListener('data-ready', function (event) {
+				// We want each function to have it's own copt of the JSON
+				handleExplainGraph(JSON.parse(JSON.stringify(event.explainJSON)), document.getElementById('explain-results-graph'), event.bolRun);
+				handleExplainHTML(JSON.parse(JSON.stringify(event.explainJSON)), event.bolRun);
+
+				var   explainFrame = document.getElementById('frame-explain')
+					, explainTabBar = document.getElementById('explain-results-tab-bar')
+					, explainTabs = {
+						  'graph': document.getElementById('explain-results-graph')
+						, 'html': document.getElementById('explain-results-html')
+						, 'text': document.getElementById('explain-results-text')
+						, 'stats': document.getElementById('explain-results-stats')
+					};
+
+				explainTabBar.addEventListener('change', function () {
+					explainTabs['graph'].setAttribute('hidden', '');
+					explainTabs['html'].setAttribute('hidden', '');
+					explainTabs['text'].setAttribute('hidden', '');
+					explainTabs['stats'].setAttribute('hidden', '');
+
+					explainTabs[explainTabBar.value].removeAttribute('hidden', '');
+				});
+			});
+
+			function handleExplainGraph(explainJSON, target, bolRun) {
+				'use strict';
+
+				target.innerHTML = '';
+				target.style.padding = '0px';
+				target.style.overflow = 'hidden';
+
+				var color = d3.scaleOrdinal()
+								.domain([])
+								.range(d3.scaleOrdinal(d3.schemeCategory20).range().concat(d3.scaleOrdinal(d3.schemeCategory20c).range()));
+
+				// get total records, get total cost, get total time
+				var intTotalCost = 0;
+				var intTotalRecords = 0;
+				var intTotalTime = 0;
+
+				var levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, jsnLevel) {
+					var i, len, arrChildren = jsnLevel.Plans;
+
+					jsnLevel['Node Cost'] = parseFloat(jsnLevel['Total Cost']);
+
+					if (jsnLevel['Plans'] !== undefined) {
+						for (i = 0, len = jsnLevel['Plans'].length; i < len; i += 1) {
+							if (jsnLevel['Plans'][i]['Node Type'] !== 'CTE Scan') {
+								jsnLevel['Node Cost'] -= parseFloat(jsnLevel['Plans'][i]['Total Cost']);
+							}
+						}
+					}
+
+					intTotalCost += jsnLevel['Node Cost'];
+					intTotalRecords += jsnLevel['Plan Rows'];
+					intTotalTime += jsnLevel['Actual Total Time'];
+
+					// handle child plans
+					if (arrChildren) {
+						levelNumber += 1;
+						for (i = 0, len = arrChildren.length; i < len; i += 1) {
+							levelTraveler(levelNumber, numberChild, i, jsnLevel, arrChildren[i]);
+						}
+					}
+				};
+
+				levelTraveler(0, 0, 0, '', explainJSON[0].Plan);
+
+
+				var jsnCostliest = null;
+				var jsnLargest = null;
+				var jsnSlowest = null;
+
+				// build nodes
+				levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, parentNode, jsnLevel) {
+					var i, len, arrChildren = jsnLevel.Plans, node = {};
+
+					jsnLevel.level = levelNumber;
+					jsnLevel.intTotalCost = intTotalCost;
+					jsnLevel.intTotalRecords = intTotalRecords;
+					jsnLevel.intTotalTime = intTotalTime;
+
+					node.data = jsnLevel;
+					node.children = [];
+
+					jsnCostliest = jsnCostliest === null ? node : (jsnCostliest.data['Node Cost'] < node.data['Node Cost'] ? node : jsnCostliest);
+					if (node.data['Actual Rows'] != undefined) {
+						jsnLargest = jsnLargest === null ? node : (jsnLargest.data['Actual Rows'] < node.data['Actual Rows'] ? node : jsnLargest);
+					} else {
+						jsnLargest = jsnLargest === null ? node : (jsnLargest.data['Plan Rows'] < node.data['Plan Rows'] ? node : jsnLargest);
+					}
+					jsnSlowest = jsnSlowest === null ? node : (jsnSlowest.data['Actual Total Time'] < node.data['Actual Total Time'] ? node : jsnSlowest);
+
+					// handle child plans
+					if (arrChildren) {
+						levelNumber += 1;
+						for (i = 0, len = arrChildren.length; i < len; i += 1) {
+							node.children.push(levelTraveler(levelNumber, numberChild, i, jsnLevel, node, arrChildren[i]));
+						}
+					}
+
+					return node;
+				};
+
+				var treeData = levelTraveler(0, 0, 0, '', {}, explainJSON[0].Plan);
+
+				jsnCostliest.costliest = true;
+				jsnLargest.largest = true;
+				jsnSlowest.slowest = true;
+
+				var root = d3.hierarchy(treeData);
+
+				var tree = d3.tree().nodeSize([210, 300]);
+				root = tree(root);
+				//console.log(root);
+
+				var svg = d3.select(target).append('svg')
+									.attr("width", "100%")
+									.attr("flex", ""),
+					g = svg
+						.append('g').attr("transform", "translate(" + (target.clientWidth / 2) + ", 120)")
+						.call(
+							d3.zoom().on('zoom', function () {
+								g.attr('transform', d3.event.transform.toString());
+							})
+						)
+						.append("g")
+							.attr('width', '100%')
+							.attr('height', '100%');
+
+				g.append('rect')
+					//.attr('width', _width)
+					//.attr('height', _height)
+					.attr('width', 500000)
+					.attr('height', 500000)
+					.attr('x', -250000)
+					.attr('y', -250000)
+					.style('fill', 'transparent');
+
+				var link = g.selectAll(".explain-link")
+					.data(root.descendants().slice(1))
+					.enter().append("path")
+						.attr('style', function (d) {
+							var costLow = parseInt(d.data.data['Startup Cost'], 10);
+							var costHigh = parseInt(d.data.data['Total Cost'], 10);
+							return 'stroke-width: ' + Math.max(3, Math.min(10, Math.log((costHigh - costLow) / 2 + costLow)) * 3) + 'px;';
+						})
+						.attr('class', 'explain-link')
+						.attr("d", function(d) {
+							return "M" + d.x + "," + d.y
+								 + "C" + d.x + "," + (d.y + d.parent.y) / 2
+								 + " " + d.parent.x + "," +  (d.y + d.parent.y) / 2
+								 + " " + d.parent.x + "," + d.parent.y;
+						});
+
+
+				var node = g.selectAll(".explain-node")
+					.data(root.descendants())
+					.enter().append("g")
+						.attr("class", "explain-node")
+						.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+						.on('click', function (d) {
+							return dialogExplainPlan(d.data);
+						}, true);;
+
+				node.append('rect')
+					.attr("y", -100)
+					.attr("x", -100)
+					.attr('width', 200)
+					.attr('height', 275)
+					.style('fill', '#fff')
+					.style('stroke', '#ddd')
+					.style('stroke-width', 2)
+					.style('stroke-opacity', 1);
+
+				node.append('foreignObject')
+					.attr("y", -95)
+					.attr("x", -95)
+					.attr('width', 195)
+					.attr('height', 270)
+						.html(function (d) {
+							var strHTML = '<body xmlns="http://www.w3.org/1999/xhtml">';
+
+							strHTML += '<div class="explain-node-container" style="width: 190px">';
+							strHTML += '<h3 style="margin: 0; margin-bottom: 2px;">' + d.data.data['Node Type'] + '</h3>'
+
+							if (d.data.costliest) {
+								strHTML +=  '<div class="costliest-label">costliest</div>';
+								//console.log(strHTML);
+							}
+							if (d.data.largest) {
+								strHTML +=  '<div class="largest-label">largest</div>';
+								//console.log(strHTML);
+							}
+							if (d.data.slowest) {
+								strHTML +=  '<div class="slowest-label">slowest</div>';
+								//console.log(strHTML);
+							}
+
+							if (d.data.data['Node Type'] === 'Hash Join') {
+								strHTML +=  '<p style="width: 190px; height: auto;">' + d.data.data['Join Type'] + ' Join on ' + d.data.data['Hash Cond'] + '</p>';
+							} else if (d.data.data['Node Type'] === 'Sort') {
+								strHTML +=  '<p style="width: 190px; height: auto; max-height: 6.6em; overflow: auto;">by ' + d.data.data['Sort Key'].join(', ') + '</p>';
+							} else if (d.data.data['Node Type'] === 'Seq Scan') {
+								strHTML +=  '<p style="width: 190px; height: auto;">on ' + d.data.data['Schema'] + '.' + d.data.data['Relation Name'] + '(' + d.data.data['Alias'] + ')' + '</p>';
+							}
+
+							if (d.data.data['Total Cost'] !== undefined) {
+								var strBarHTML = (d.data.data['Total Cost'] < 1 ? '<div class="explain-bar-0">0</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Total Cost']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
+								strHTML +=
+											'<div flex-horizontal flex-fill>' +
+												'<div flex class="explain-bar red" flex-horizontal flex-fill>' +
+													'<div flex>' +
+													'</div>' +
+													strBarHTML +
+												'</div>' +
+												'<div class="explain-bar-label">' +
+													'Cost' +
+												'</div>' +
+											'</div>';
+							}
+
+							if (d.data.data['Node Cost'] !== undefined) {
+								var strBarHTML = (d.data.data['Node Cost'] < 1 ? '<div class="explain-bar-0">0</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Node Cost']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
+								strHTML +=
+											'<div flex-horizontal flex-fill>' +
+												'<div flex class="explain-bar yellow" flex-horizontal flex-fill>' +
+													'<div flex>' +
+													'</div>' +
+													strBarHTML +
+												'</div>' +
+												'<div class="explain-bar-label">' +
+													'Node' +
+												'</div>' +
+											'</div>';
+							}
+
+							if (d.data.data['Plan Rows'] !== undefined) {
+								var strBarHTML = (d.data.data['Plan Rows'] < 1 ? '<div class="explain-bar-0">0</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Plan Rows']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
+								strHTML +=
+											'<div flex-horizontal flex-fill>' +
+												'<div flex class="explain-bar blue" flex-horizontal flex-fill>' +
+													'<div flex>' +
+													'</div>' +
+													strBarHTML +
+												'</div>' +
+												'<div class="explain-bar-label">' +
+													'Plan' +
+												'</div>' +
+											'</div>';
+							}
+
+							if (d.data.data['Actual Rows'] !== undefined) {
+								var strBarHTML = (d.data.data['Actual Rows'] < 1 ? '<div class="explain-bar-0">0</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Actual Rows']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
+								strHTML +=
+											'<div flex-horizontal flex-fill>' +
+												'<div flex class="explain-bar cyan" flex-horizontal flex-fill>' +
+													'<div flex>' +
+													'</div>' +
+													strBarHTML +
+												'</div>' +
+												'<div class="explain-bar-label">' +
+													'Rows' +
+												'</div>' +
+											'</div>';
+							}
+
+							if (d.data.data['Actual Total Time'] !== undefined) {
+								var strBarHTML = (d.data.data['Actual Total Time'] < 1 ? '<div class="explain-bar-0">&lt;</div><div class="explain-bar-0">1</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Actual Total Time']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
+								strHTML +=
+											'<div flex-horizontal flex-fill>' +
+												'<div flex>' +
+													'<div class="explain-bar green" flex-horizontal flex-fill>' +
+														'<div flex>' +
+														'</div>' +
+														strBarHTML +
+													'</div>' +
+												'</div>' +
+												'<div class="explain-bar-label">' +
+													'Time' +
+												'</div>' +
+											'</div>';
+							}
+
+							strHTML += '</div></body>';
+
+							return strHTML;
+						});
+			}
+
+			function dialogExplainPlan(d) {
+				var element = this, key, strHTML = '', templateElement = document.createElement('template');
+
+				// prevents drags from being clicks
+				if (d3.event.defaultPrevented) {
+					return;
+				}
+
+				strHTML += '<table class="explain-property-table"><tbody>';
+				strHTML += '<td style="width: 15em;">Node Cost</td><td>' + encodeHTML(d.data['Node Cost']) + '</td>';
+
+				// build html
+				for (key in d.data) {
+					strHTML += '<tr>';
+					if (key === 'Output') {
+						strHTML += '<td>Output:</td><td>' + encodeHTML(d.data[key]) + '</td>';
+
+					} else if (key === 'Total Cost') {
+						strHTML += '<td>Total Cost:</td><td>' + encodeHTML(d.data[key]) +
+													' <small>(Approx. ' + Math.round(parseFloat(d.data[key]) / (d.data.intTotalCost / 100)) + '% of total cost)</small></td>';
+
+					} else if (key === 'Plan Rows') {
+						strHTML += '<td>Plan Rows:</td><td>' + encodeHTML(d.data[key]) +
+													' <small>(Approx. ' + Math.round(parseFloat(d.data[key]) / (d.data.intTotalRecords / 100)) + '% of total rows)</small></td>';
+
+					} else if (key === 'Actual Total Time') {
+						strHTML += '<td>Actual Total Time:</td><td>' + encodeHTML(d.data[key]) +
+													' <small>(Approx. ' + Math.round(parseFloat(d.data[key]) / (d.data.intTotalTime / 100)) + '% of total time)</small></td>';
+
+					} else if (key !== 'Plans'         && key !== 'relatedElement' && key !== 'Node Type' &&
+							   key !== 'parent_number' && key !== 'child_number'   && key !== 'parent_object' &&
+							   key !== 'column_offset' && key !== 'intTotalCost'   && key !== 'intTotalRecords' &&
+							   key !== 'intTotalTime'  && key !== 'Node Cost') {
+						strHTML += '<td>' + encodeHTML(key) + '</td><td>' + encodeHTML(d.data[key]) + '</td>';
+					}
+					strHTML += '</tr>';
+				}
+				strHTML += '</tbody></table>';
+
+				if (evt.deviceType === 'phone') {
+					templateElement.setAttribute('data-mode', 'full');
+				} else {
+					templateElement.setAttribute('data-overlay-close', 'true');
+				}
+
+				templateElement.innerHTML = ml(function () {/*
+					<gs-page>
+						<gs-header><center><h4>{{NODETYPE}}</h4></center></gs-header>
+						<gs-body padded>
+							{{STRHTML}}
+						</gs-body>
+						<gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
+					</gs-page>
+				*/}).replace(/\{\{STRHTML\}\}/gim, strHTML)
+					.replace(/\{\{NODETYPE\}\}/gim, d.data['Node Type']);
+
+				GS.openDialog(templateElement, 'down');
+				//}
+			}
+
+			function repeat(str, len) {
+				// the plus one makes it so that there is the number of gaps we want for the join
+				return Array(len + 1).join(str);
+			}
+
+			function handleExplainHTML(explainJSON, bolRun) {
+				var strHTML = '';
+
+				var intTotalCost = 0;
+				var intTotalRecords = 0;
+				var intTotalTime = 0;
+
+				var target = document.getElementById('explain-results-html');
+
+				strHTML +=
+					'<table>' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>Exclusive</th>' +
+								'<th>Inclusive</th>' +
+								'<th>Rows X</th>' +
+								'<th>Rows</th>' +
+								'<th>Loops</th>' +
+								'<th>Node</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+					'';
+
+				var levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, jsnLevel) {
+					var i, len, arrChildren = jsnLevel.Plans;
+
+					jsnLevel['Node Cost'] = parseFloat(jsnLevel['Total Cost']);
+
+					if (jsnLevel['Plans'] !== undefined) {
+						for (i = 0, len = jsnLevel['Plans'].length; i < len; i += 1) {
+							if (jsnLevel['Plans'][i]['Node Type'] !== 'CTE Scan') {
+								jsnLevel['Node Cost'] -= parseFloat(jsnLevel['Plans'][i]['Total Cost']);
+							}
+						}
+					}
+
+					intTotalCost += jsnLevel['Node Cost'];
+					intTotalRecords += jsnLevel['Plan Rows'];
+					intTotalTime += jsnLevel['Actual Total Time'];
+
+					jsnLevel['Actual Exclusive Time'] = parseFloat(jsnLevel['Actual Total Time']);
+
+					// handle child plans
+					if (arrChildren) {
+						levelNumber += 1;
+						for (i = 0, len = arrChildren.length; i < len; i += 1) {
+							jsnLevel['Actual Exclusive Time'] -= levelTraveler(levelNumber, numberChild, i, jsnLevel, arrChildren[i]);
+						}
+					}
+
+					return jsnLevel['Actual Exclusive Time'];
+				};
+
+				levelTraveler(0, 0, 0, '', explainJSON[0].Plan);
+
+				var planI = 0;
+				var levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, jsnLevel) {
+					var i, len, arrChildren = jsnLevel['Plans'];
+
+					jsnLevel['Node Cost'] = parseFloat(jsnLevel['Total Cost']);
+
+					var strLevelPadding = repeat(' ', 2 + (levelNumber * 6));
+
+					var strNode = (levelNumber > 0 ? repeat(' ', ((levelNumber * 4) - 4) + levelNumber * 2) : '') + (levelNumber === 0 ? '' : '->  ');
+
+					if (jsnLevel['Node Type'] === 'Nested Loop') {
+						strNode += 'Nested Loop ' + jsnLevel['Join Type'] + ' Join';
+					} else if (jsnLevel['Node Type'] === 'Hash Join') {
+						strNode += 'Hash ' + jsnLevel['Join Type'] + ' Join';
+					} else if (jsnLevel['Node Type'] === 'Seq Scan') {
+						strNode += 'Seq Scan on ' + jsnLevel['Schema'] + '.' + jsnLevel['Relation Name'] + (jsnLevel['Relation Name'] === jsnLevel['Alias'] ? '' : ' ' + jsnLevel['Alias']);
+					} else {
+						strNode += jsnLevel['Node Type'];
+					}
+
+					var startupCost = parseFloat(jsnLevel['Startup Cost']).toFixed(2);
+					var totalCost = parseFloat(jsnLevel['Total Cost']).toFixed(2);
+					var startupTime = parseFloat(jsnLevel['Actual Startup Time']).toFixed(3);
+					var totalTime = parseFloat(jsnLevel['Actual Total Time']).toFixed(3);
+
+					strNode += '  (cost=' + startupCost + '..' + totalCost + ' rows=' + jsnLevel['Plan Rows'] + ' width=' + jsnLevel['Plan Width'] + ')' +
+							(jsnLevel['Actual Total Time'] ? ' (actual time=' + startupTime + '..' + totalTime +
+									' rows=' + jsnLevel['Actual Rows'] + ' loops=' + jsnLevel['Actual Loops'] + ')' : '');
+
+					strNode += (jsnLevel['Output'] 				? '\n' + strLevelPadding + 'Output: ' + jsnLevel['Output'].join(', ') : '');
+
+					if (jsnLevel['Node Type'] === 'Sort') {
+						strNode += '\n' + strLevelPadding + 'Sort Key: ' + jsnLevel['Sort Key'].join(', ');
+						strNode += '\n' + strLevelPadding + 'Sort Method: ' + jsnLevel['Sort Method'] + '  ' + jsnLevel['Sort Space Type'] + ': ' + jsnLevel['Sort Space Used'] + 'kB';
+					}
+
+					strNode += (jsnLevel['Join Filter'] 				? '\n' + strLevelPadding + 'Join Filter: ' + jsnLevel['Join Filter'] : '');
+					strNode += (jsnLevel['Rows Removed by Join Filter']	? '\n' + strLevelPadding + 'Rows Removed by Join Filter: ' + jsnLevel['Rows Removed by Join Filter'] : '');
+					strNode += (jsnLevel['Hash Cond'] 					? '\n' + strLevelPadding + 'Hash Cond: ' + jsnLevel['Hash Cond'] : '');
+					strNode += (jsnLevel['Hash Buckets'] 				? '\n' + strLevelPadding + 'Buckets: ' + jsnLevel['Hash Buckets'] : '');
+					strNode += (jsnLevel['Hash Batches'] 				? '  Batches: ' + jsnLevel['Hash Batches'] : '');
+					strNode += (jsnLevel['Peak Memory Usage'] 			? '  Memory Usage: ' + jsnLevel['Peak Memory Usage'] + 'kB' : '');
+
+					if ((jsnLevel['Shared Hit Blocks'] !== 0 		&& jsnLevel['Shared Hit Blocks'] !== undefined) ||
+						(jsnLevel['Shared Read Blocks'] !== 0 		&& jsnLevel['Shared Read Blocks'] !== undefined) ||
+						(jsnLevel['Shared Dirtied Blocks'] !== 0 	&& jsnLevel['Shared Dirtied Blocks'] !== undefined) ||
+						(jsnLevel['Shared Written Blocks'] !== 0 	&& jsnLevel['Shared Written Blocks'] !== undefined) ||
+						(jsnLevel['Local Hit Blocks'] !== 0 		&& jsnLevel['Local Hit Blocks'] !== undefined) ||
+						(jsnLevel['Local Read Blocks'] !== 0 		&& jsnLevel['Local Read Blocks'] !== undefined) ||
+						(jsnLevel['Local Dirtied Blocks'] !== 0 	&& jsnLevel['Local Dirtied Blocks'] !== undefined) ||
+						(jsnLevel['Local Written Blocks'] !== 0 	&& jsnLevel['Local Written Blocks'] !== undefined) ||
+						(jsnLevel['Temp Read Blocks'] !== 0 		&& jsnLevel['Temp Read Blocks'] !== undefined) ||
+						(jsnLevel['Temp Written Blocks'] !== 0 		&& jsnLevel['Temp Written Blocks'] !== undefined)) {
+
+						strNode += '\n' + strLevelPadding + 'Buffers: '
+
+						var bolComma = false;
+
+						if (jsnLevel['Shared Hit Blocks'] !== 0 ||
+							jsnLevel['Shared Read Blocks'] !== 0 ||
+							jsnLevel['Shared Dirtied Blocks'] !== 0 ||
+							jsnLevel['Shared Written Blocks'] !== 0) {
+							strNode += 'shared' +
+							(jsnLevel['Shared Hit Blocks'] ? ' hit=' + jsnLevel['Shared Hit Blocks'] : '') +
+							(jsnLevel['Shared Read Blocks'] ? ' read=' + jsnLevel['Shared Read Blocks'] : '') +
+							(jsnLevel['Shared Dirtied Blocks'] ? ' dirtied=' + jsnLevel['Shared Dirtied Blocks'] : '') +
+							(jsnLevel['Shared Written Blocks'] ? ' written=' + jsnLevel['Shared Written Blocks'] : '') +
+							'';
+
+							bolComma = true;
+						}
+						if (jsnLevel['Local Hit Blocks'] !== 0 ||
+							jsnLevel['Local Read Blocks'] !== 0 ||
+							jsnLevel['Local Dirtied Blocks'] !== 0 ||
+							jsnLevel['Local Written Blocks'] !== 0) {
+
+							if (bolComma) {
+								strNode += ', ';
+							}
+							strNode += 'local' +
+							(jsnLevel['Local Hit Blocks'] ? ' hit=' + jsnLevel['Local Hit Blocks'] : '') +
+							(jsnLevel['Local Read Blocks'] ? ' read=' + jsnLevel['Local Read Blocks'] : '') +
+							(jsnLevel['Local Dirtied Blocks'] ? ' dirtied=' + jsnLevel['Local Dirtied Blocks'] : '') +
+							(jsnLevel['Local Written Blocks'] ? ' written=' + jsnLevel['Local Written Blocks'] : '') +
+							'';
+
+							bolComma = true;
+						}
+						if (jsnLevel['Temp Read Blocks'] !== 0 ||
+							jsnLevel['Temp Written Blocks'] !== 0) {
+
+							if (bolComma) {
+								strNode += ', ';
+							}
+							strNode += 'temp' +
+							(jsnLevel['Temp Read Blocks'] ? ' read=' + jsnLevel['Local Read Blocks'] : '') +
+							(jsnLevel['Temp Written Blocks'] ? ' written=' + jsnLevel['Local Written Blocks'] : '') +
+							'';
+						}
+					}
+
+					var exTimPoint = 2, inTimPoint = 2;
+					if (jsnLevel['Actual Total Time']) {
+						exTimPoint = parseFloat(jsnLevel['Actual Exclusive Time']) / parseFloat(explainJSON[0].Plan['Actual Total Time']);
+						exTimPoint = (exTimPoint > 0.9 ? 4 : (exTimPoint > 0.5 ? 3 : (exTimPoint > 0.1 ? 2 : 1)));
+
+						inTimPoint = parseFloat(jsnLevel['Actual Total Time']) / parseFloat(explainJSON[0].Plan['Actual Total Time']);
+						inTimPoint = (inTimPoint > 0.9 ? 4 : (inTimPoint > 0.5 ? 3 : (inTimPoint > 0.1 ? 2 : 1)));
+					}
+
+
+					var rowsX = 0;
+					var rowsXMark = 'down';
+					var rowsXPoint = 1;
+					if (jsnLevel['Plan Rows'] && jsnLevel['Actual Rows']) {
+						jsnLevel['Actual Rows'] = parseInt(jsnLevel['Actual Rows'], 10);
+						jsnLevel['Plan Rows'] = parseInt(jsnLevel['Plan Rows'], 10);
+
+						if (jsnLevel['Actual Rows'] > jsnLevel['Plan Rows']) {
+							rowsX = jsnLevel['Actual Rows'] / jsnLevel['Plan Rows'];
+							rowsXMark = '&darr;';
+						} else {
+							rowsX = jsnLevel['Plan Rows'] / jsnLevel['Actual Rows'];
+							rowsXMark = '&uarr;';
+						}
+
+						rowsXPoint = (rowsX > 1000 ? 4 : (rowsX > 100 ? 3 : (rowsX > 10 ? 2 : 1)));
+					}
+
+					jsnLevel['Node Text'] = strNode;
+
+					strHTML +=
+						'<tr data-level="' + levelNumber + '" data-children="' + (arrChildren ? arrChildren.length : 0) + '">' +
+							'<td>' + (planI += 1) + '</td>' +
+							'<td class="point-' + exTimPoint + '">' + (jsnLevel['Actual Exclusive Time'] || 0).toFixed(3) + '</td>' +
+							'<td class="point-' + inTimPoint + '">' + (jsnLevel['Actual Total Time'] || 0) + '</td>' +
+							'<td class="point-' + rowsXPoint + '">' + rowsXMark + ' '+ rowsX.toFixed(1) + '</td>' +
+							'<td>' + (jsnLevel['Actual Rows'] || 0) + '</td>' +
+							'<td>' + (jsnLevel['Actual Loops'] || 0) + '</td>' +
+							'<td>' + strNode + '</td>' +
+						'</tr>' +
+						'';
+
+
+
+					// handle child plans
+					if ((arrChildren)) {
+						levelNumber += 1;
+						for (i = 0, len = arrChildren.length; i < len; i += 1) {
+							levelTraveler(levelNumber, numberChild, i, jsnLevel, arrChildren[i]);
+						}
+					}
+				};
+
+				levelTraveler(0, 0, 0, '', explainJSON[0].Plan);
+
+				strHTML +=
+						'</tbody>' +
+					'</table>' +
+					'';
+
+				target.innerHTML = strHTML;
+
+				target.children[0].setAttribute('quote-type', getClipSetting("quoteType"));
+				target.children[0].setAttribute('quote-char', getClipSetting("quoteChar"));
+				target.children[0].setAttribute('field-delimiter', getClipSetting("fieldDelimiter"));
+				target.children[0].setAttribute('null-values', getClipSetting("nullValues"));
+				target.children[0].setAttribute('column-names', getClipSetting("columnNames"));
+
+				var arrRow = target.querySelectorAll('tbody tr');
+				var mouseOverHandler = function (row, event) {
+					var len = parseInt(row.getAttribute('data-children'), 10);
+					var level = parseInt(row.getAttribute('data-level'), 10);
+					row = row.nextElementSibling;
+					while (len > 0) {
+						if (parseInt(row.getAttribute('data-level'), 10) === (level + 1)) {
+							row.classList.add('child-hover');
+							len -= 1;
+						}
+
+						row = row.nextElementSibling;
+					}
+				};
+				var mouseOutHandler = function (row, event) {
+					var len = parseInt(row.getAttribute('data-children'), 10);
+					var level = parseInt(row.getAttribute('data-level'), 10);
+					row = row.nextElementSibling;
+					while (len > 0) {
+						if (parseInt(row.getAttribute('data-level'), 10) === (level + 1)) {
+							row.classList.remove('child-hover');
+							len -= 1;
+						}
+
+						row = row.nextElementSibling;
+					}
+				};
+
+				for (var i = 0, len = arrRow.length; i < len; i += 1) {
+					(function (x) {
+						arrRow[x].addEventListener('mouseover', function (event) {
+							mouseOverHandler(arrRow[x], event);
+						});
+						arrRow[x].addEventListener('mouseout', function (event) {
+							mouseOutHandler(arrRow[x], event);
+						});
+					}(i))
+				}
+
+				GS.makeTableSelectable(target.children[0], evt.touchDevice);
+
+				target = document.getElementById('explain-results-text');
+				strHTML = '';
+				var levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, jsnLevel) {
+					var i, len, arrChildren = jsnLevel['Plans'];
+
+					strHTML += jsnLevel['Node Text'] + '\n';
+
+					if ((arrChildren)) {
+						levelNumber += 1;
+						for (i = 0, len = arrChildren.length; i < len; i += 1) {
+							levelTraveler(levelNumber, numberChild, i, jsnLevel, arrChildren[i]);
+						}
+					}
+				};
+				levelTraveler(0, 0, 0, '', explainJSON[0].Plan);
+
+				strHTML += 'Planning time: ' + explainJSON[0]['Planning Time'] + ' ms\n';
+				strHTML += 'Execution time: ' + explainJSON[0]['Execution Time'] + ' ms\n';
+				target.innerHTML = strHTML;
+
+			}
+		</script>
+
+        <style>
+			gs-option {
+				float: left;
+			}
+			gs-option:not(:last-child) {
+				border-right: none;
+			}
+			.explain-results-tab {
+				outline: #ccc 1px solid;
+			}
+			#explain-results-html table {
+			    width: initial;
+			}
+			#explain-results-html table td:last-child, #explain-results-text {
+			    font-family: "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
+				white-space: pre;
+			}
+			#explain-results-html table tbody tr:hover {
+				background: #ededed;
+			}
+			#explain-results-html table tbody tr.child-hover {
+				background: #ccffcc;
+			}
+			#explain-results-html table tbody tr td.point-4:not([selected]) {
+				background: #880000 !important;
+				color: #ffffff !important;
+			}
+			#explain-results-html table tbody tr td.point-3:not([selected]) {
+				background: #ee8800 !important;
+				color: #ffffff !important;
+			}
+			#explain-results-html table tbody tr td.point-2:not([selected]) {
+				background: #ffee88 !important;
+			}
+			#explain-results-html table tbody tr td.point-1:not([selected]) {
+				background: none;
+			}
+        </style>
+        <script src="../../js/settings.js" type="text/javascript"></script>
+        <script>
+        window.addEventListener('load', function () {
+            refreshCustomCSS(localStorage.customCSS);
+        });
+        </script>
+        <style id="customCss"></style>
+    </head>
+    <body>
+		<gs-page>
+            <gs-body flex-vertical flex-fill>
+				<div style="width: 100%; height: 100%;" flex-vertical>
+					<gs-optionbox id="explain-results-tab-bar" style="width: 100%;" no-target mini value="graph">
+						<gs-option jumbo value="graph" remove-all inline>Graph</gs-option>
+						<gs-option jumbo value="html" remove-all inline>HTML</gs-option>
+						<gs-option jumbo value="text" remove-all inline>Text</gs-option>
+						<gs-option jumbo value="stats" remove-all inline>Stats</gs-option>
+					</gs-optionbox>
+
+					<div class="explain-results-tab" id="explain-results-graph" style="width: 100%;" flex flex-vertical>
+
+					</div>
+					<div class="explain-results-tab" id="explain-results-html" style="width: 100%;" flex hidden>
+
+					</div>
+					<div class="explain-results-tab" id="explain-results-text" style="width: 100%;" flex hidden>
+
+					</div>
+					<div class="explain-results-tab" id="explain-results-stats" style="width: 100%;" flex hidden>
+
+					</div>
+				</div>
+            </gs-body>
+        </gs-page>
+    </body>
+</html>

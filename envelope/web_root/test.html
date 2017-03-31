@@ -13,9 +13,9 @@
 
 	<script>
 		var Global = {};
-		
+
 		Global.i = 0;
-		
+
 		Global.arrStrPages = [
 			'doc-api-auth.html',
 			'doc-api-database.html',
@@ -56,6 +56,7 @@
 			'doc-elem-switch.html',
 			'doc-elem-text.html',
 			'doc-elem-time.html',
+			'doc-elem-timestamp.html',
 			'doc-elem-typography.html',
 			'doc-ins-getting-started.html',
 			'doc-jslib-account.html',
@@ -104,30 +105,30 @@
 			'doc-library/doc-target.html',
 			'doc-permissions.html'
 		];
-		
+
 		function iframeLoaded(strCurrentHTML, i) {
 			//console.log('iframeLoaded');
-			
+
 			//console.log(strHTML);
 			var strFile = Global.arrStrPages[Global.i];
-			
+
 			//console.log('strFile', strFile);
 			strFile = strFile.replace('.html', '-' + i + '.html');
 			//console.log('strFile', strFile);
-			
+
 			var strMessage =
 				'FILE\tREAD\t' +
 				'/role/all/tests/' + strFile;
-			
+
 			GS.requestFromSocket(GS.envSocket, strMessage, function (data, error, errorData) {
 				if (!error) {
 					if (data !== 'TRANSACTION COMPLETED') {
 						var lastModified = data.substring(0, data.indexOf('\n'));
 						var strTestContent = data.substring(data.indexOf('\n') + 1);
-						
+
 						//console.log('strCurrentHTML', strCurrentHTML);
 						//console.log('strTestContent', strTestContent);
-						
+
 						if (strTestContent === strCurrentHTML) {
 							GS.ajaxJSON('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=success&id=' + Global.intID,
 							function (data, error) {
@@ -135,15 +136,15 @@
 								if (!error) {
 									Global.iframeI++;
 									console.log('Global.iframeI: ' + Global.iframeI + '/' + Global.iframeLen);
-									
+
 									console.log('pass: ' + strFile);
 									if ((Global.iframeI === Global.iframeLen) && (Global.testFailed !== true)) {
 										Global.i++;
-										
+
 										//console.log('pageLoad');
 										pageLoad();
 									}
-									
+
 								// else there was no error
 								} else {
 									Global.testFailed = true;
@@ -159,14 +160,14 @@
 								if (!error) {
 									document.getElementById('iframe_old').src =
 										'/env/role/all/tests/' + strFile;
-									
+
 									document.getElementById('pre_current').innerText = strCurrentHTML;
 									document.getElementById('pre_old').innerText = strTestContent;
-									
+
 									Global.testFailed = true;
 									console.log('testFailed set');
 									GS.msgbox('Error', 'Test Failed!');
-									
+
 								// else there was no error
 								} else {
 									Global.testFailed = true;
@@ -182,7 +183,7 @@
 						'/role/all/tests/' + strFile + '\t' +
 						GS.encodeForTabDelimited(lastModified) + '\n' +
 						strCurrentHTML;
-					
+
 					GS.ajaxJSON('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=save&id=' + Global.intID,
 						function (data, error) {
 						// if there was no error
@@ -192,23 +193,23 @@
 									if (data !== 'TRANSACTION COMPLETED') {
 										Global.iframeI++;
 										console.log('Global.iframeI: ' + Global.iframeI + '/' + Global.iframeLen);
-										
+
 										console.log('save: ' + strFile);
 										if ((Global.iframeI === Global.iframeLen) && (Global.testFailed !== true)) {
 											Global.i++;
-											
+
 											//console.log('pageLoad');
 											pageLoad();
 										}
 									}
-									
+
 								} else {
 									Global.testFailed = true;
 									console.log('testFailed set');
 									GS.webSocketErrorDialog(errorData);
 								}
 							});
-							
+
 						// else there was no error
 						} else {
 							Global.testFailed = true;
@@ -216,20 +217,20 @@
 							GS.ajaxErrorDialog(data);
 						}
 					});
-					
+
 				}
 			});
 		}
-		
+
 		function iframeFinished(objIFrame) {
 			//console.log('iframeFinished');
-			
+
 			var arrIFrame = document.getElementById('iframe_current').contentWindow.document.body.querySelectorAll('iframe');
-			
+
 			Global.iframeLen = arrIFrame.length;
-			
+
 			//console.log('objIFrame', objIFrame);
-			
+
 			for (var i = 0, len = arrIFrame.length; i < len; i += 1) {
 				arrIFrame[i].i = i;
 				//console.log('arrIFrame[i]', arrIFrame[i]);
@@ -239,7 +240,7 @@
 				}
 			}
 		}
-		
+
 		function pageLoad() {
 			if (Global.i < Global.arrStrPages.length) {
 				Global.iframeI = 0;
@@ -247,10 +248,10 @@
 					'/env/app/developer_g/greyspots-1.1.1/documentation/' + Global.arrStrPages[Global.i];
 				document.getElementById('iframe_current').onload = function (event) {
 					var arrDocExamples = document.getElementById('iframe_current').contentWindow.document.body.querySelectorAll('gs-doc-example');
-					
+
 					if (arrDocExamples.length === 0) {
 						Global.i++;
-						
+
 						pageLoad();
 					}
 				};
@@ -260,7 +261,7 @@
 					// if there was no error
 					if (!error) {
 						GS.msgbox('Done', 'Test Succeeded!');
-						
+
 					// else there was no error
 					} else {
 						GS.ajaxErrorDialog(data);
@@ -268,27 +269,27 @@
 				});
 			}
 		}
-		
+
 		window.addEventListener('load', function () {
 			GS.ajaxJSON('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=begin&program_name=envelope&user_agent=' +
 				encodeURIComponent(navigator.userAgent), function (data, error) {
 				// if there was no error
 				if (!error) {
 					Global.intID = data;
-					
+
 					GS.ajaxJSON('/env/auth', 'action=login&connname=doesntexist&username=postgres&password=password',
 					function (data, error) {
 						// if there was no error
 						if (!error) {
 							// first page
 							pageLoad();
-							
+
 						// else there was no error
 						} else {
 							GS.ajaxErrorDialog(data);
 						}
 					});
-					
+
 				// else there was no error
 				} else {
 					GS.ajaxErrorDialog(data);

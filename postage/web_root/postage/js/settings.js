@@ -116,10 +116,6 @@ function refreshShortcutKeys (shortcutKeys) {
         var CTRLCMD = 'Control';
     }
     if (!shortcutKeys) {
-            
-
-
-        
         shortcutKeysText = [
               [CTRLCMD,     'o',       'ShortcutNewTab']
             , ['',          'F7',      'ShortcutExplain']
@@ -141,12 +137,11 @@ function refreshShortcutKeys (shortcutKeys) {
     localStorage.ShortcutDocs = shortcutKeysText[5];
     localStorage.ShortcutHome = shortcutKeysText[6];
     localStorage.ShortcutRunCursorQuery = shortcutKeysText[7];
-    
     // var strScript, thisArrText;
     // var keydownShortcuts = '';
     // //strScript = 'function keydownShortcuts (event) {;\n';
     // strScript = 'document.addEventListener("keydown", keydownShortcuts = function (event) {\n';
-    
+
     // for (var i = 0, len = shortcutKeysText.length; i < len; i++) {
     //     thisArrText = shortcutKeysText[i];
     //     console.log(thisArrText);
@@ -166,7 +161,7 @@ function refreshShortcutKeys (shortcutKeys) {
     //     strScript += '    }\n';
     // }
     // strScript += '});\n\n';
-    
+
     // strScript += "document.addEventListener('keydown', keydownShortcuts(event));\n";
     // document.getElementById('shortcutKeys').innerHTML = strScript;
 }
@@ -174,10 +169,10 @@ function refreshShortcutKeys (shortcutKeys) {
 document.addEventListener('keydown', function (event) {
     if (keyCodeCheck(event, localStorage.ShortcutNewTab)) {
         ShortcutNewTab();
-    } else if (keyCodeCheck(event, localStorage.ShortcutExplain)) {
-        ShortcutExplain();
     } else if (keyCodeCheck(event, localStorage.ShortcutExplainAnalyze)) {
         ShortcutExplainAnalyze();
+    } else if (keyCodeCheck(event, localStorage.ShortcutExplain)) {
+        ShortcutExplain();
     } else if (keyCodeCheck(event, localStorage.ShortcutRunQuery)) {
         var tabElement = xtag.queryChildren(document.getElementById('tab-bar'), '.current-tab')[0];
         if (tabElement.parentNode) {
@@ -253,6 +248,7 @@ function keyCodeCheck(event, storage) {
 
 
 function getShortcuts () {
+	try {
         if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
             var CTRLCMD = 'Command';
         } else {
@@ -276,84 +272,25 @@ function getShortcuts () {
         var ValMetaKeyExplain = localStorage.ShortcutExplain.split(',')[0];
         var ValMetaKeyExplainAnalyze = localStorage.ShortcutExplainAnalyze.split(',')[0];
         var ValMetaKeyHome = localStorage.ShortcutHome.split(',')[0];
-    
 
-    var ShortcutKeysText = [
-          [ValMetaKeyNewTab              ,     ValKeyNewTab,             'ShortcutNewTab']
-        , [ValMetaKeyExplain             ,     ValKeyExplain,            'ShortcutExplain']
-        , [ValMetaKeyExplainAnalyze      ,     ValKeyExplainAnalyze,     'ShortcutExplainAnalyze']
-        , [ValMetaKeyRunQuery            ,     ValKeyRunQuery,           'ShortcutRunQuery']
-        , [ValMetaKeySaveTab             ,     ValKeySaveTab,            'ShortcutSave']
-        , [ValMetaKeyFindDocumentation   ,     ValKeyFindDocumentation,  'ShortcutDocs']
-        , [ValMetaKeyHome                ,     ValKeyHome,               'ShortcutHome']
-        , [ValMetaKeyRunCursorQuery            ,     ValKeyRunCursorQuery,           'ShortcutRunCursorQuery']
-    ];
-    
-    return ShortcutKeysText;
+
+	    var ShortcutKeysText = [
+	          [ValMetaKeyNewTab              ,     ValKeyNewTab,             'ShortcutNewTab']
+	        , [ValMetaKeyExplain             ,     ValKeyExplain,            'ShortcutExplain']
+	        , [ValMetaKeyExplainAnalyze      ,     ValKeyExplainAnalyze,     'ShortcutExplainAnalyze']
+	        , [ValMetaKeyRunQuery            ,     ValKeyRunQuery,           'ShortcutRunQuery']
+	        , [ValMetaKeySaveTab             ,     ValKeySaveTab,            'ShortcutSave']
+	        , [ValMetaKeyFindDocumentation   ,     ValKeyFindDocumentation,  'ShortcutDocs']
+	        , [ValMetaKeyHome                ,     ValKeyHome,               'ShortcutHome']
+	        , [ValMetaKeyRunCursorQuery            ,     ValKeyRunCursorQuery,           'ShortcutRunCursorQuery']
+	    ];
+
+	    return ShortcutKeysText;
+	} catch (e) {
+		return undefined;
+	}
 }
 
 window.addEventListener('load', function () {
     refreshShortcutKeys(getShortcuts());
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

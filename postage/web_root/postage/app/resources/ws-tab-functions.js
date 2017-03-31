@@ -170,12 +170,12 @@ function startTabContainer() {
     //         //}
     //     }
     // });
-    
 
-    
+
+
 }
 
-function ShortcutHome () { 
+function ShortcutHome () {
     var backToTab;
     if (document.getElementsByTagName('gs-dialog').length === 0) {
         if (document.getElementById('tab-bar-container').classList.contains('home-mode') === true) {
@@ -285,7 +285,7 @@ function loadTabsFromServer(bolChooseFirst, callback) {
                 GS.pushQueryString('view=tab:' + encodeURIComponent(tabElement.filePath));
                 //setFrame(tabElement, tabElement.relatedFrame);
             }
-            
+
             if (callback) {
                 callback();
             }
@@ -1244,19 +1244,12 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     						'<gs-button style="padding-right: 0.25em;" icononly inline remove-all id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
     								'title="Download as a file" remove-all no-focus></gs-button>'
     					) +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px; padding-right: 0;" onclick="explain()" ' +
+    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(false)" ' +
     								'title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span></gs-button>' +
     					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(true)" ' +
     								'title="Query explanation. Note that the query will run, meaning that you\'ll get run times." ' +
     								'remove-top no-focus>' +
     						'<span class="explain-letter" icon="play">E</span>' +
-    					'</gs-button>' +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(false, true)" ' +
-    								'title="Query explanation. Text format. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">T</span></gs-button>' +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(true, true)" ' +
-    								'title="Query explanation. Text format. Note that the query will run, meaning that you\'ll get run times." ' +
-    								'remove-top no-focus>' +
-    						'<span class="explain-letter" icon="play">T</span>' +
     					'</gs-button>' +
     					'<gs-button style="padding-right: 0.25em;" inline icononly remove-all class="button-csv" icon="file-text" onclick="exportCSV()" ' +
     								'title="Download a single query\'s results as a file" remove-all no-focus></gs-button>' +
@@ -1309,7 +1302,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                     '</gs-page>' +
                 '</div>' +
             '</div>';
-            
+
         //<gs-button class="header-button" icononly icon="bug" onclick="debugScript()" remove-all></gs-button>
         //<gs-button class="header-button" icononly icon="text-height" onclick="resultsToText()" remove-right></gs-button>
         //<gs-button class="header-button" icononly icon="th" onclick="resultsToGrid()" remove-all></gs-button>
@@ -1546,6 +1539,8 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
             //    tabElement.relatedAcePositionContainer.style.height = '';
             //}
         }
+
+		tabElement.intTabNumber = intTabNumber;
 
         // bind sql results resizing
         tabElement.relatedResizeHandle.addEventListener(evt.mousedown, function (event) {
@@ -2182,21 +2177,13 @@ function menuExplain(target) {
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-body class="ace-toolbar">
-                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain()" title="Query explanation. This does not run the query." remove-all no-focus>
+                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(false)" title="Query explanation. This does not run the query." remove-all no-focus>
                     <span class="explain-letter" icon="play-circle-o">E</span>
                     Explain
                 </gs-button>
                 <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" title="Query explanation. Note that the query will run, meaning that you\'ll get run times." remove-top no-focus>
                 	<span class="explain-letter" icon="play">E</span>
                 	Explain Analyze
-                </gs-button>
-                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(false, true)" title="Query explanation. Text format. This does not run the query." remove-all no-focus>
-                    <span class="explain-letter" icon="play-circle-o">T</span>
-                    Explain (Text)
-                    </gs-button>
-                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true, true)" title="Query explanation. Text format. Note that the query will run, meaning that you\'ll get run times." remove-top no-focus>
-                	<span class="explain-letter" icon="play">T</span>
-                	Explain Analyze (Text)
                 </gs-button>
             </gs-body>
         </gs-page>
