@@ -1,11 +1,10 @@
 //jslint white:true multivar:true
 var bolExplainLoaded = true;
-var rowCount = [], intRowCount = 0;
 
 function ShortcutExplain () {
     event.preventDefault();
     event.stopPropagation();
-    explain();
+    explain(false);
 }
 function ShortcutExplainAnalyze () {
     event.preventDefault();
@@ -14,19 +13,20 @@ function ShortcutExplainAnalyze () {
 }
 
 
-function explain(bolRun, bolText) {
+function explain(bolRun) {
     'use strict';
     var currentTab           = document.getElementsByClassName('current-tab')[0]
       , editor               = currentTab.relatedEditor
       , resultsContainer     = currentTab.relatedResultsArea
       , resultsTallyElement  = currentTab.relatedResultsTallyElement
       , resultsHeaderElement = currentTab.relatedResultsHeaderElement
+	  , intTabNumber = currentTab.currentTab
       , jsnCurrentQuery, startExecute, endExecute, startLoading, endLoading, updateTally
       , stopLoadingHandler, bolIgnoreMessages = false, cancelSignalHandler
       , messageID, currentTargetTbody, intError, intQuery
       , divElement, intErrorStartLine, bindShowQueryButton, strRunQuery;
 
-    // if we found an editor to get the query from and the current tab is not already running a query
+   	// if we found an editor to get the query from and the current tab is not already running a query
     if (editor && currentTab.handlingQuery !== true) {
         // get current query
         jsnCurrentQuery = getCurrentQuery();
@@ -135,17 +135,11 @@ function explain(bolRun, bolText) {
         // get the current query
         strRunQuery = jsnCurrentQuery.strQuery;
 
-        var explainFormat = 'JSON';
-        if (bolText) {
-            explainFormat = 'TEXT';
-            resultsContainer.innerHTML = '<pre style="white-space: pre;"></pre>';
-        }
-
         // append explain-specific delarations depending on wheather or not we are going to run the actual code
         if (bolRun) {
-            strRunQuery = 'EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT ' + explainFormat + ') ' + strRunQuery;
+            strRunQuery = 'EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) ' + strRunQuery;
         } else {
-            strRunQuery = 'EXPLAIN (FORMAT ' + explainFormat + ', VERBOSE) ' + strRunQuery;
+            strRunQuery = 'EXPLAIN (FORMAT JSON, VERBOSE) ' + strRunQuery;
         }
 
         // begin
@@ -170,83 +164,29 @@ function explain(bolRun, bolText) {
                     if (data.intCallbackNumberThisQuery === 0) {
                         intErrorStartLine += (data.strQuery.match(/\n/gim) || []).length;
                     }
-                    
+
                     // if not end query, therefore: results
                     if (data.strMessage !== '\\.') {
-                        //console.log('1***', data.intCallbackNumber, data.intCallbackNumberThisQuery, data.strMessage);
+                        if (data.intCallbackNumber === 0) {
+                            resultsContainer.innerHTML =
+								'<div style="width: 100%; height: 100%;" flex-vertical>' +
+									'<iframe id="frame-explain-' + intTabNumber + '" style="width: 100%; border: none;" flex src="frames/frame-explain.html"></iframe>' +
+								'</div>' +
+								'';
+							var explainFrame = document.getElementById('frame-explain-' + intTabNumber);
 
-                        if (bolText) {
-                            resultsContainer.firstElementChild.innerHTML +=
-                                encodeHTML(GS.decodeFromTabDelimited(data.strMessage));
-                        } else {
-                            if (data.intCallbackNumber === 0) {
-    
-                                resultsContainer.innerHTML = '<div style="width: 100%; height: 100%;"></div>';
-                                
-                                handleExplain(JSON.parse(GS.decodeFromTabDelimited(data.strMessage)), resultsContainer.children[0], bolRun);
-                            }
+							explainFrame.onload = function () {
+								GS.triggerEvent(explainFrame.contentWindow, 'data-ready', {
+									explainJSON: JSON.parse(GS.decodeFromTabDelimited(data.strMessage)),
+									bolRun: bolRun
+								});
+							};
                         }
 
                     // else if end message
                     } else if (data.strMessage === '\\.') {
                         // set part number to 0 and add one to the query number
                         intQuery += 1;
-                        
-                        if (rowCount) {
-                            //console.log(rowCount);
-                            var distinctRowCount = [];
-                            for (var i = 0, len = rowCount.length; i < len; i++) {
-                                if (distinctRowCount.indexOf(rowCount[i]) === -1) {
-                                    distinctRowCount.push(rowCount[i]);
-                                }
-                            }
-                            //console.log(distinctRowCount);
-                            function sortNumber(a,b) {
-                                return a - b;
-                            }
-                            distinctRowCount.sort(sortNumber);
-                            //console.log(distinctRowCount);
-                            var linkElemsByClass;
-                            for (i = 0 + 1, len = distinctRowCount.length + 1; i < len; i++) {
-                                if (distinctRowCount[i]) {
-                                    linkElemsByClass = document.getElementsByClassName('rows-' + distinctRowCount[i]);
-                                    //console.log(linkElemsByClass);
-                                    //console.log(distinctRowCount[i]);
-                                    for (var i2 = 0, len2 = linkElemsByClass.length; i2 < len2; i2++) {
-                                        if (linkElemsByClass[i2]) {
-                                            if (len > 10) {
-                                                if (i === 0) {
-                                                    linkElemsByClass[i2].style['stroke-width'] = 1.5;
-                                                } else if (i * (distinctRowCount[i] / (i *distinctRowCount[i].toString().length * 100)) + 1 < 1) {
-                                                    linkElemsByClass[i2].style['stroke-width'] = 1.5;
-                                                    //console.log(1.5, distinctRowCount[i]);
-                                                } else if (i * (distinctRowCount[i] / (i * distinctRowCount[i].toString().length * 100)) + 1 < 30) {
-                                                    linkElemsByClass[i2].style['stroke-width'] = i * (distinctRowCount[i] / (i * distinctRowCount[i].toString().length * 100)) + 1;//i * 1.5;
-                                                    //console.log(Math.round((distinctRowCount[i] / distinctRowCount[0]) / (distinctRowCount[i].toString().length * 10 * (distinctRowCount[i].toString().length / 0.75 * 2))) + 0.5, distinctRowCount[i]);
-                                                } else {
-                                                     linkElemsByClass[i2].style['stroke-width'] = 30;
-                                                }
-                                            } else {
-                                                if (i === 0) {
-                                                    linkElemsByClass[i2].style['stroke-width'] = 1.5;
-                                                } else if (Math.round((distinctRowCount[i] / distinctRowCount[0]) / ((i / distinctRowCount[i].toString().length * 10) * (distinctRowCount[i].toString().length / 0.75 * 2))) + 0.5 < 1) {
-                                                    linkElemsByClass[i2].style['stroke-width'] = 1.5;
-                                                    //console.log(1.5, distinctRowCount[i]);
-                                                } else if (Math.round((distinctRowCount[i] / distinctRowCount[0]) / ((i / distinctRowCount[i].toString().length * 10) * (distinctRowCount[i].toString().length / 0.75 * 2))) + 0.5 < 30) {
-                                                    linkElemsByClass[i2].style['stroke-width'] = Math.round((distinctRowCount[i] / distinctRowCount[0]) / ((i / distinctRowCount[i].toString().length * 10) * (distinctRowCount[i].toString().length / 0.75 * 2))) + 0.5;//i * 1.5;
-                                                    //console.log(Math.round((distinctRowCount[i] / distinctRowCount[0]) / ((i / distinctRowCount[i].toString().length * 10) * (distinctRowCount[i].toString().length / 0.75 * 2))) + 0.5, distinctRowCount[i]);
-                                                } else {
-                                                     linkElemsByClass[i2].style['stroke-width'] = 30;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    //HTMLstyleText += '.rows-' + distinctRowCount[i] + '{ stroke-width: ' + i * 2 + 'px; }' + '\n';
-                                }
-                            }
-                            rowCount = [];
-                        }
-                        
 
                         // update the success and error tally
                         updateTally(intQuery, intError);
@@ -304,358 +244,4 @@ function explain(bolRun, bolText) {
             }
         });
     }
-}
-
-function roundToFactor (int) {
-    if (int && int.toString().length === 1) {
-        return 1;
-    } else if (int) {
-        if (int.toString()[1] >= 5) {
-            var resultInt = '' + (parseInt(int.toString()[0], 10) + 1) + '';
-        } else {
-            var resultInt = int.toString()[0];
-        }
-        for (var i = 0, len = int.toString().length - 1; i < len; i++) {
-            resultInt += '0';
-        }
-        return parseInt(resultInt, 10);
-    } else {
-        return 0;
-    }
-}
-
-function handleExplain(explainJSON, target, bolRun) {
-    'use strict';
-
-    target.innerHTML = '';
-    target.style.padding = '0px';
-    target.style.overflow = 'hidden';
-    
-    var color = d3.scaleOrdinal()
-                    .domain([])
-                    .range(d3.scaleOrdinal(d3.schemeCategory20).range().concat(d3.scaleOrdinal(d3.schemeCategory20c).range()));
-    
-    // get total records, get total cost, get total time
-    var intTotalCost = 0;
-    var intTotalRecords = 0;
-    var intTotalTime = 0;
-    
-    var levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, jsnLevel) {
-        var i, len, arrChildren = jsnLevel.Plans;
-        
-        jsnLevel['Node Cost'] = parseFloat(jsnLevel['Total Cost']);
-        
-        if (jsnLevel['Plans'] !== undefined) {
-            for (i = 0, len = jsnLevel['Plans'].length; i < len; i += 1) {
-                if (jsnLevel['Plans'][i]['Node Type'] !== 'CTE Scan') {
-                    jsnLevel['Node Cost'] -= parseFloat(jsnLevel['Plans'][i]['Total Cost']);
-                }
-            }
-        }
-                
-        intTotalCost += jsnLevel['Node Cost'];
-        intTotalRecords += jsnLevel['Plan Rows'];
-        intTotalTime += jsnLevel['Actual Total Time'];
-        
-        // handle child plans
-        if (arrChildren) {
-            levelNumber += 1;
-            for (i = 0, len = arrChildren.length; i < len; i += 1) {
-                levelTraveler(levelNumber, numberChild, i, jsnLevel, arrChildren[i]);
-            }
-        }
-    };
-
-    levelTraveler(0, 0, 0, '', explainJSON[0].Plan);
-    
-    
-    var jsnCostliest = null;
-    var jsnLargest = null;
-    var jsnSlowest = null;
-    
-    // build nodes
-    levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, parentNode, jsnLevel) {
-        var i, len, arrChildren = jsnLevel.Plans, node = {};
-        
-        jsnLevel.level = levelNumber;
-        jsnLevel.intTotalCost = intTotalCost;
-        jsnLevel.intTotalRecords = intTotalRecords;
-        jsnLevel.intTotalTime = intTotalTime;
-        
-        node.data = jsnLevel;
-        node.children = [];
-        
-        jsnCostliest = jsnCostliest === null ? node : (jsnCostliest.data['Node Cost'] < node.data['Node Cost'] ? node : jsnCostliest);
-        if (node.data['Actual Rows'] != undefined) {
-            jsnLargest = jsnLargest === null ? node : (jsnLargest.data['Actual Rows'] < node.data['Actual Rows'] ? node : jsnLargest);
-        } else {
-            jsnLargest = jsnLargest === null ? node : (jsnLargest.data['Plan Rows'] < node.data['Plan Rows'] ? node : jsnLargest);
-        }
-        jsnSlowest = jsnSlowest === null ? node : (jsnSlowest.data['Actual Total Time'] < node.data['Actual Total Time'] ? node : jsnSlowest);
-        
-        // handle child plans
-        if (arrChildren) {
-            levelNumber += 1;
-            for (i = 0, len = arrChildren.length; i < len; i += 1) {
-                node.children.push(levelTraveler(levelNumber, numberChild, i, jsnLevel, node, arrChildren[i]));
-            }
-        }
-        
-        return node;
-    };
-
-    var treeData = levelTraveler(0, 0, 0, '', {}, explainJSON[0].Plan);
-    
-    jsnCostliest.costliest = true;
-    jsnLargest.largest = true;
-    jsnSlowest.slowest = true;
-    
-    var root = d3.hierarchy(treeData);
-    
-    var tree = d3.tree().nodeSize([210, 300]);
-    root = tree(root);
-    //console.log(root);
-    
-    var svg = d3.select(target).append('svg')
-                        .attr("width", "100%")
-                        .attr("height", "100%"),
-        g = svg
-            .append('g').attr("transform", "translate(" + (target.clientWidth / 2) + ", 120)")
-            .call(
-                d3.zoom().on('zoom', function () {
-                    g.attr('transform', d3.event.transform.toString());
-                })
-            )
-            .append("g")
-                .attr('width', '100%')
-                .attr('height', '100%');
-    
-    g.append('rect')
-        //.attr('width', _width)
-        //.attr('height', _height)
-        .attr('width', 500000)
-        .attr('height', 500000)
-        .attr('x', -250000)
-        .attr('y', -250000)
-        .style('fill', 'transparent');
-    
-    var link = g.selectAll(".explain-link")
-        .data(root.descendants().slice(1))
-        .enter().append("path")
-            .attr('style', function (d) {
-                var costLow = parseInt(d.data.data['Startup Cost'], 10);
-                var costHigh = parseInt(d.data.data['Total Cost'], 10);
-                return 'stroke-width: ' + Math.max(3, Math.min(10, Math.log((costHigh - costLow) / 2 + costLow)) * 3) + 'px;';
-            })
-            .attr('class', 'explain-link')
-            //.attr("class", function(d) {
-            //        return "explain-link rows-" + roundToFactor(d.data.data['Actual Rows']) + "";
-            //    })
-            .attr("d", function(d) {
-                return "M" + d.x + "," + d.y
-                     + "C" + d.x + "," + (d.y + d.parent.y) / 2
-                     + " " + d.parent.x + "," +  (d.y + d.parent.y) / 2
-                     + " " + d.parent.x + "," + d.parent.y;
-            });
-    
-    
-    var node = g.selectAll(".explain-node")
-        .data(root.descendants())
-        .enter().append("g")
-            .attr("class", "explain-node")
-            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-            .on('click', function (d) {
-                return dialogExplainPlan(d.data);
-            }, true);;
-    
-    node.append('rect')
-        .attr("y", -100)
-        .attr("x", -100)
-        .attr('width', 200)
-        .attr('height', 275)
-        .style('fill', '#fff')
-        .style('stroke', '#ddd')
-        .style('stroke-width', 2)
-        .style('stroke-opacity', 1);
-        
-    node.append('foreignObject')
-        .attr("y", -95)
-        .attr("x", -95)
-        .attr('width', 195)
-        .attr('height', 270)
-            .html(function (d) {
-                var strHTML = '<body xmlns="http://www.w3.org/1999/xhtml">';
-                
-                strHTML += '<div class="explain-node-container" style="width: 190px">';
-                strHTML += '<h3 style="margin: 0; margin-bottom: 2px;">' + d.data.data['Node Type'] + '</h3>'
-                
-                if (d.data.costliest) {
-                    strHTML +=  '<div class="costliest-label">costliest</div>';
-                    //console.log(strHTML);
-                }
-                if (d.data.largest) {
-                    strHTML +=  '<div class="largest-label">largest</div>';
-                    //console.log(strHTML);
-                }
-                if (d.data.slowest) {
-                    strHTML +=  '<div class="slowest-label">slowest</div>';
-                    //console.log(strHTML);
-                }
-                
-                if (d.data.data['Node Type'] === 'Hash Join') {
-                    strHTML +=  '<p style="width: 190px; height: auto;">' + d.data.data['Join Type'] + ' Join on ' + d.data.data['Hash Cond'] + '</p>';
-                } else if (d.data.data['Node Type'] === 'Sort') {
-                    strHTML +=  '<p style="width: 190px; height: auto; max-height: 6.6em; overflow: auto;">by ' + d.data.data['Sort Key'].join(', ') + '</p>';
-                } else if (d.data.data['Node Type'] === 'Seq Scan') {
-                    strHTML +=  '<p style="width: 190px; height: auto;">on ' + d.data.data['Schema'] + '.' + d.data.data['Relation Name'] + '(' + d.data.data['Alias'] + ')' + '</p>';
-                }
-                
-                if (d.data.data['Total Cost'] !== undefined) {
-                    var strBarHTML = (d.data.data['Total Cost'] < 1 ? '<div class="explain-bar-0">0</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Total Cost']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
-                    strHTML +=  
-                                '<div flex-horizontal flex-fill>' +
-                                    '<div flex class="explain-bar red" flex-horizontal flex-fill>' +
-                                        '<div flex>' +
-                                        '</div>' +
-                                        strBarHTML +
-                                    '</div>' +
-                                    '<div class="explain-bar-label">' +
-                                        'Cost' +
-                                    '</div>' +
-                                '</div>';
-                }
-                
-                if (d.data.data['Node Cost'] !== undefined) {
-                    intRowCount += 1;
-                    rowCount[intRowCount] = roundToFactor(Math.round(d.data.data['Node Cost']).toString().replace('..', ',').split(',')[1]);
-                    var strBarHTML = (d.data.data['Node Cost'] < 1 ? '<div class="explain-bar-0">0</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Node Cost']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
-                    strHTML +=  
-                                '<div flex-horizontal flex-fill>' +
-                                    '<div flex class="explain-bar yellow" flex-horizontal flex-fill>' +
-                                        '<div flex>' +
-                                        '</div>' +
-                                        strBarHTML +
-                                    '</div>' +
-                                    '<div class="explain-bar-label">' +
-                                        'Node' +
-                                    '</div>' +
-                                '</div>';
-                }
-                
-                if (d.data.data['Plan Rows'] !== undefined) {
-                    var strBarHTML = (d.data.data['Plan Rows'] < 1 ? '<div class="explain-bar-0">0</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Plan Rows']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
-                    strHTML +=  
-                                '<div flex-horizontal flex-fill>' +
-                                    '<div flex class="explain-bar blue" flex-horizontal flex-fill>' +
-                                        '<div flex>' +
-                                        '</div>' +
-                                        strBarHTML +
-                                    '</div>' +
-                                    '<div class="explain-bar-label">' +
-                                        'Plan' +
-                                    '</div>' +
-                                '</div>';
-                }
-                
-                //console.log(rowCount);
-                if (d.data.data['Actual Rows'] !== undefined) {
-                    //////intRowCount += 1;
-                    //////rowCount[intRowCount] = roundToFactor(Math.round(d.data.data['Actual Rows']).toString());
-                    //console.log(rowCount[intRowCount], intRowCount);
-                    //link.attr("id", "rows-" + intRowCount + "");
-                    var strBarHTML = (d.data.data['Actual Rows'] < 1 ? '<div class="explain-bar-0">0</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Actual Rows']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
-                    strHTML +=  
-                                '<div flex-horizontal flex-fill>' +
-                                    '<div flex class="explain-bar cyan" flex-horizontal flex-fill>' +
-                                        '<div flex>' +
-                                        '</div>' +
-                                        strBarHTML +
-                                    '</div>' +
-                                    '<div class="explain-bar-label">' +
-                                        'Rows' +
-                                    '</div>' +
-                                '</div>';
-                }
-                
-                if (d.data.data['Actual Total Time'] !== undefined) {
-                    var strBarHTML = (d.data.data['Actual Total Time'] < 1 ? '<div class="explain-bar-0">&lt;</div><div class="explain-bar-0">1</div>' : ('<div class="explain-bar-block">' + Math.round(d.data.data['Actual Total Time']).toString().split('').join('</div><div class="explain-bar-block">') + '</div>'));
-                    strHTML +=  
-                                '<div flex-horizontal flex-fill>' +
-                                    '<div flex>' +
-                                        '<div class="explain-bar green" flex-horizontal flex-fill>' +
-                                            '<div flex>' +
-                                            '</div>' +
-                                            strBarHTML +
-                                        '</div>' +
-                                    '</div>' +
-                                    '<div class="explain-bar-label">' +
-                                        'Time' +
-                                    '</div>' +
-                                '</div>';
-                }
-                
-                strHTML += '</div></body>';
-                
-                return strHTML;
-            });
-}
-
-function dialogExplainPlan(d) {
-    var element = this, key, strHTML = '', templateElement = document.createElement('template');
-    
-    // prevents drags from being clicks
-    if (d3.event.defaultPrevented) {
-        return;
-    }
-    
-    strHTML += '<table class="explain-property-table"><tbody>';
-    strHTML += '<td style="width: 15em;">Node Cost</td><td>' + encodeHTML(d.data['Node Cost']) + '</td>';
-    
-    // build html
-    for (key in d.data) {
-        strHTML += '<tr>';
-        if (key === 'Output') {
-            strHTML += '<td>Output:</td><td>' + encodeHTML(d.data[key]) + '</td>';
-            
-        } else if (key === 'Total Cost') {
-            strHTML += '<td>Total Cost:</td><td>' + encodeHTML(d.data[key]) +
-                                        ' <small>(Approx. ' + Math.round(parseFloat(d.data[key]) / (d.data.intTotalCost / 100)) + '% of total cost)</small></td>';
-            
-        } else if (key === 'Plan Rows') {
-            strHTML += '<td>Plan Rows:</td><td>' + encodeHTML(d.data[key]) +
-                                        ' <small>(Approx. ' + Math.round(parseFloat(d.data[key]) / (d.data.intTotalRecords / 100)) + '% of total rows)</small></td>';
-            
-        } else if (key === 'Actual Total Time') {
-            strHTML += '<td>Actual Total Time:</td><td>' + encodeHTML(d.data[key]) +
-                                        ' <small>(Approx. ' + Math.round(parseFloat(d.data[key]) / (d.data.intTotalTime / 100)) + '% of total time)</small></td>';
-            
-        } else if (key !== 'Plans'         && key !== 'relatedElement' && key !== 'Node Type' &&
-                   key !== 'parent_number' && key !== 'child_number'   && key !== 'parent_object' &&
-                   key !== 'column_offset' && key !== 'intTotalCost'   && key !== 'intTotalRecords' &&
-                   key !== 'intTotalTime'  && key !== 'Node Cost') {
-            strHTML += '<td>' + encodeHTML(key) + '</td><td>' + encodeHTML(d.data[key]) + '</td>';
-        }
-        strHTML += '</tr>';
-    }
-    strHTML += '</tbody></table>';
-    
-    if (evt.deviceType === 'phone') {
-        templateElement.setAttribute('data-mode', 'full');
-    } else {
-        templateElement.setAttribute('data-overlay-close', 'true');
-    }
-    
-    templateElement.innerHTML = ml(function () {/*
-        <gs-page>
-            <gs-header><center><h4>{{NODETYPE}}</h4></center></gs-header>
-            <gs-body padded>
-                {{STRHTML}}
-            </gs-body>
-            <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
-        </gs-page>
-    */}).replace(/\{\{STRHTML\}\}/gim, strHTML)
-        .replace(/\{\{NODETYPE\}\}/gim, d.data['Node Type']);
-    
-    GS.openDialog(templateElement, 'down');
-    //}
 }

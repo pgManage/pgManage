@@ -845,13 +845,13 @@ function dialogOptions() {
                         </thead>
                         <tbody>
                             <tr>
-                                
+
                                 <td>
                                     <gs-select id="shortcutMetaKeyNewTab" mini>
                                         <option value="Command">Command/Windows Key</option>
                                         <option value="Control">Control</option>
-                                        <option value="Option">Option</option>
-                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="Option">Option/Alt</option>
+                                        <option value="Shift">Shift</option>
                                         <option value="None">None</option>
                                     </gs-select>
                                 </td>
@@ -863,8 +863,8 @@ function dialogOptions() {
                                     <gs-select id="shortcutMetaKeySaveTab" mini>
                                         <option value="Command">Command/Windows Key</option>
                                         <option value="Control">Control</option>
-                                        <option value="Option">Option</option>
-                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="Option">Option/Alt</option>
+                                        <option value="Shift">Shift</option>
                                         <option value="None">None</option>
                                     </gs-select>
                                 </td>
@@ -876,8 +876,8 @@ function dialogOptions() {
                                     <gs-select id="shortcutMetaKeyRunQuery" mini>
                                         <option value="Command">Command/Windows Key</option>
                                         <option value="Control">Control</option>
-                                        <option value="Option">Option</option>
-                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="Option">Option/Alt</option>
+                                        <option value="Shift">Shift</option>
                                         <option value="None">None</option>
                                     </gs-select>
                                 </td>
@@ -885,13 +885,13 @@ function dialogOptions() {
                                 <td><gs-static value="Run Query"></gs-static></td>
                             </tr>
                             <tr>
-                                
+
                                 <td>
                                     <gs-select id="shortcutMetaKeyFindDocumentation" mini>
                                         <option value="Command">Command/Windows Key</option>
                                         <option value="Control">Control</option>
-                                        <option value="Option">Option</option>
-                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="Option">Option/Alt</option>
+                                        <option value="Shift">Shift</option>
                                         <option value="None">None</option>
                                     </gs-select>
                                 </td>
@@ -899,13 +899,13 @@ function dialogOptions() {
                                 <td><gs-static value="Find Documentation"></gs-static></td>
                             </tr>
                             <tr>
-                                
+
                                 <td>
                                     <gs-select id="shortcutMetaKeyExplain" mini>
                                         <option value="Command">Command/Windows Key</option>
                                         <option value="Control">Control</option>
-                                        <option value="Option">Option</option>
-                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="Option">Option/Alt</option>
+                                        <option value="Shift">Shift</option>
                                         <option value="None">None</option>
                                     </gs-select>
                                 </td>
@@ -913,13 +913,13 @@ function dialogOptions() {
                                 <td><gs-static value="Explain"></gs-static></td>
                             </tr>
                             <tr>
-                                
+
                                 <td>
                                     <gs-select id="shortcutMetaKeyExplainAnalyze" mini>
                                         <option value="Command">Command/Windows Key</option>
                                         <option value="Control">Control</option>
-                                        <option value="Option">Option</option>
-                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="Option">Option/Alt</option>
+                                        <option value="Shift">Shift</option>
                                         <option value="None">None</option>
                                     </gs-select>
                                 </td>
@@ -931,8 +931,8 @@ function dialogOptions() {
                                     <gs-select id="shortcutMetaKeyHome" mini>
                                         <option value="Command">Command/Windows Key</option>
                                         <option value="Control">Control</option>
-                                        <option value="Option">Option</option>
-                                        <option value="Shift">Shift/Alt</option>
+                                        <option value="Option">Option/Alt</option>
+                                        <option value="Shift">Shift</option>
                                         <option value="None">None</option>
                                     </gs-select>
                                 </td>
@@ -1011,8 +1011,8 @@ function dialogOptions() {
         CSSEditor.addEventListener('change', function () {
             customCSSText = CSSEditor.getValue();
         });
-        
-        
+
+
         document.getElementById('ShortcutKeyNewTab').value = localStorage.ShortcutNewTab.split(',')[1];
         document.getElementById('ShortcutKeySaveTab').value = localStorage.ShortcutSave.split(',')[1];
         document.getElementById('ShortcutKeyRunQuery').value = localStorage.ShortcutRunQuery.split(',')[1];
@@ -1020,7 +1020,7 @@ function dialogOptions() {
         document.getElementById('ShortcutKeyExplain').value = localStorage.ShortcutExplain.split(',')[1];
         document.getElementById('ShortcutKeyExplainAnalyze').value = localStorage.ShortcutExplainAnalyze.split(',')[1];
         document.getElementById('ShortcutKeyHome').value = localStorage.ShortcutHome.split(',')[1];
-        
+
         document.getElementById('shortcutMetaKeyNewTab').value = (localStorage.ShortcutNewTab.split(',')[0] || 'None');
         document.getElementById('shortcutMetaKeySaveTab').value = (localStorage.ShortcutSave.split(',')[0] || 'None');
         document.getElementById('shortcutMetaKeyRunQuery').value = (localStorage.ShortcutRunQuery.split(',')[0] || 'None');
@@ -1028,8 +1028,8 @@ function dialogOptions() {
         document.getElementById('shortcutMetaKeyExplain').value = (localStorage.ShortcutExplain.split(',')[0] || 'None');
         document.getElementById('shortcutMetaKeyExplainAnalyze').value = (localStorage.ShortcutExplainAnalyze.split(',')[0] || 'None');
         document.getElementById('shortcutMetaKeyHome').value = (localStorage.ShortcutHome.split(',')[0] || 'None');
-        
-        
+
+
 
         document.getElementById('metaKeyReset').addEventListener('click', function (event) {
             if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
@@ -1059,7 +1059,7 @@ function dialogOptions() {
             document.getElementById('ShortcutKeyExplainAnalyze').value = 'F7'
             document.getElementById('ShortcutKeyHome').value = 'Escape'
         });
-        
+
         document.getElementById('ShortcutKeyNewTab').addEventListener('keydown', function (event) {
             event.preventDefault();
             event.stopPropagation();
@@ -1095,7 +1095,7 @@ function dialogOptions() {
             event.stopPropagation();
             document.getElementById('ShortcutKeyHome').value = event.key;
         });
-        
+
         document.getElementById('clip-options-quote-char').addEventListener('change', setAllClipSettings);
         document.getElementById('clip-options-field-delimiter').addEventListener('change', setAllClipSettings);
         document.getElementById('clip-options-null-values').addEventListener('change', setAllClipSettings);
@@ -1158,7 +1158,7 @@ function dialogOptions() {
         var ValMetaKeyExplain = document.getElementById('shortcutMetaKeyExplain').value;
         var ValMetaKeyExplainAnalyze = document.getElementById('shortcutMetaKeyExplainAnalyze').value;
         var ValMetaKeyHome = document.getElementById('shortcutMetaKeyHome').value;
-        
+
         ValMetaKeyNewTab = ((ValMetaKeyNewTab === 'None') ? '' : ValMetaKeyNewTab);
         ValMetaKeySaveTab = ((ValMetaKeySaveTab === 'None') ? '' : ValMetaKeySaveTab);
         ValMetaKeyRunQuery = ((ValMetaKeyRunQuery === 'None') ? '' : ValMetaKeyRunQuery);
@@ -1166,7 +1166,7 @@ function dialogOptions() {
         ValMetaKeyExplain = ((ValMetaKeyExplain === 'None') ? '' : ValMetaKeyExplain);
         ValMetaKeyExplainAnalyze = ((ValMetaKeyExplainAnalyze === 'None') ? '' : ValMetaKeyExplainAnalyze);
         ValMetaKeyHome = ((ValMetaKeyHome === 'None') ? '' : ValMetaKeyHome);
-        
+
         var ShortcutKeysText = [
               [ValMetaKeyNewTab              ,     ValKeyNewTab,             'ShortcutNewTab']
             , [ValMetaKeyExplain             ,     ValKeyExplain,            'ShortcutExplain']
@@ -1176,8 +1176,8 @@ function dialogOptions() {
             , [ValMetaKeyFindDocumentation   ,     ValKeyFindDocumentation,  'ShortcutDocs']
             , [ValMetaKeyHome                ,     ValKeyHome,               'ShortcutHome']
         ];
-        
-        
+
+
         refreshCustomCSS(customCSSText);
         refreshShortcutKeys(ShortcutKeysText);
     });
@@ -1359,7 +1359,7 @@ function consumeComments(strScript) {
 
 function dialogAceInfo() {
 var templateElement = document.createElement('template');
-    
+
 var strRunToken =  ((localStorage.ShortcutRunQuery.split(',')[0]) ? localStorage.ShortcutRunQuery.split(',')[0] + '-' : '') + localStorage.ShortcutRunQuery.split(',')[1]
 var strNewToken =  ((localStorage.ShortcutNewTab.split(',')[0]) ? localStorage.ShortcutNewTab.split(',')[0] + '-' : '') + localStorage.ShortcutNewTab.split(',')[1]
 var strSaveToken =  ((localStorage.ShortcutSave.split(',')[0]) ? localStorage.ShortcutSave.split(',')[0] + '-' : '') + localStorage.ShortcutSave.split(',')[1]
@@ -1367,7 +1367,7 @@ var strDocsToken =  ((localStorage.ShortcutDocs.split(',')[0]) ? localStorage.Sh
 var strExpToken =  ((localStorage.ShortcutExplain.split(',')[0]) ? localStorage.ShortcutExplain.split(',')[0] + '-' : '') + localStorage.ShortcutExplain.split(',')[1]
 var strExpAnToken =  ((localStorage.ShortcutExplainAnalyze.split(',')[0]) ? localStorage.ShortcutExplainAnalyze.split(',')[0] + '-' : '') + localStorage.ShortcutExplainAnalyze.split(',')[1]
 var strHomeToken =  ((localStorage.ShortcutHome.split(',')[0]) ? localStorage.ShortcutHome.split(',')[0] + '-' : '') + localStorage.ShortcutHome.split(',')[1]
-    
+
     // console.log(strRunToken);
     // console.log(strNewToken);
     // console.log(strSaveToken);
@@ -1375,8 +1375,8 @@ var strHomeToken =  ((localStorage.ShortcutHome.split(',')[0]) ? localStorage.Sh
     // console.log(strExpToken);
     // console.log(strExpAnToken);
     // console.log(strHomeToken);
-    
-    
+
+
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -1399,20 +1399,20 @@ var strHomeToken =  ((localStorage.ShortcutHome.split(',')[0]) ? localStorage.Sh
                 Tab Shortcuts: (Configurable in "Postage Options" <a style="text-decoration: underline; cursor: pointer; color: #0000FF;" onclick="dialogOptions();" dialogclose>Here</a>)<br />
                 <ul>
                     <li>Use "{{F5TOKEN}}" to run Queries inside the Ace Editor.</li>
-                	
+
                 	<li>Use "{{CTRLOTOKEN}}" to open a new editor tab.</li>
-                	
+
                 	<li>Use "{{CTRLSTOKEN}}" to save the currently opened tab.</li>
-                	
+
                 	<li>Use "{{DOCSTOKEN}}" to find the PostgreSQL documentation of the currently highlighted keyword.</li>
-                	
+
                 	<li>Use "{{EXPTOKEN}}" to run the PostgreSQL Explain function.</li>
-                	
+
                 	<li>Use "{{EXPANTOKEN}}" to run the PostgreSQL Explain Analyze function.</li>
-                	
+
                 	<li>Use "{{HOMETOKEN}}" to switch between the current tab and the home page.</li>
                 </ul>
-                
+
             </gs-body>
             <gs-footer>
                 <gs-button dialogclose>Done</gs-button>
