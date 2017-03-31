@@ -453,21 +453,48 @@
 				levelTraveler(0, 0, 0, '', explainJSON[0].Plan);
 
 				var planI = 0;
-				var levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, jsnLevel) {
+				var intLevelPadding = 2;
+				levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, jsnLevel, intLevelPadding) {
 					var i, len, arrChildren = jsnLevel['Plans'];
 
 					jsnLevel['Node Cost'] = parseFloat(jsnLevel['Total Cost']);
 
-					var strLevelPadding = repeat(' ', 2 + (levelNumber * 6));
+					intLevelPadding += (levelNumber > 0 ? 6 : 0);
+					var strLevelPadding = repeat(' ', intLevelPadding);
 
-					var strNode = (levelNumber > 0 ? repeat(' ', ((levelNumber * 4) - 4) + levelNumber * 2) : '') + (levelNumber === 0 ? '' : '->  ');
+					var strNode = '';
+
+					if (jsnLevel['Subplan Name']) {
+						strNode += repeat(' ', 2 + ((levelNumber - 1) * 6)) + jsnLevel['Subplan Name'] + '\n';
+						intLevelPadding += 2;
+						strLevelPadding += '  ';
+					}
+
+
+					strNode += (levelNumber > 0 ? repeat(' ', intLevelPadding - 6) : '') + (levelNumber === 0 ? '' : '->  ');
+
 
 					if (jsnLevel['Node Type'] === 'Nested Loop') {
 						strNode += 'Nested Loop ' + jsnLevel['Join Type'] + ' Join';
 					} else if (jsnLevel['Node Type'] === 'Hash Join') {
 						strNode += 'Hash ' + jsnLevel['Join Type'] + ' Join';
+					} else if (jsnLevel['Node Type'] === 'Merge Join') {
+						strNode += 'Merge ' + jsnLevel['Join Type'] + ' Join';
 					} else if (jsnLevel['Node Type'] === 'Seq Scan') {
 						strNode += 'Seq Scan on ' + jsnLevel['Schema'] + '.' + jsnLevel['Relation Name'] + (jsnLevel['Relation Name'] === jsnLevel['Alias'] ? '' : ' ' + jsnLevel['Alias']);
+					} else if (jsnLevel['Node Type'] === 'Index Scan' || jsnLevel['Node Type'] === 'Index Only Scan') {
+						strNode += jsnLevel['Node Type'] + (jsnLevel['Scan Direction'] !== 'Forward' ? ' ' + jsnLevel['Scan Direction'] : '') +
+										' using ' + jsnLevel['Index Name'] + ' on ' + jsnLevel['Schema'] + '.' + jsnLevel['Relation Name'];
+					} else if (jsnLevel['Node Type'] === 'Bitmap Heap Scan') {
+						strNode += 'Bitmap Heap Scan on ' + jsnLevel['Schema'] + '.' + jsnLevel['Relation Name'];
+					} else if (jsnLevel['Node Type'] === 'Bitmap Index Scan') {
+						strNode += 'Bitmap Index Scan on ' + jsnLevel['Index Name'];
+					} else if (jsnLevel['Node Type'] === 'Aggregate') {
+						strNode += (jsnLevel['Strategy'] === 'Hashed' ? 'Hash' : (jsnLevel['Strategy'] === 'Sorted' ? 'Group' : '')) + 'Aggregate';
+					} else if (jsnLevel['Node Type'] === 'SetOp') {
+						strNode += (jsnLevel['Strategy'] === 'Hashed' ? 'Hash' : '') + 'SetOp';
+					} else if (jsnLevel['Node Type'] === 'CTE Scan') {
+						strNode += 'CTE Scan on ' + jsnLevel['CTE Name'] + (jsnLevel['CTE Name'] === jsnLevel['Alias'] ? '' : ' ' + jsnLevel['Alias']);
 					} else {
 						strNode += jsnLevel['Node Type'];
 					}
@@ -490,6 +517,18 @@
 
 					strNode += (jsnLevel['Join Filter'] 				? '\n' + strLevelPadding + 'Join Filter: ' + jsnLevel['Join Filter'] : '');
 					strNode += (jsnLevel['Rows Removed by Join Filter']	? '\n' + strLevelPadding + 'Rows Removed by Join Filter: ' + jsnLevel['Rows Removed by Join Filter'] : '');
+
+
+					strNode += (jsnLevel['Filter'] 						? '\n' + strLevelPadding + 'Filter: ' + jsnLevel['Filter'] : '');
+					strNode += (jsnLevel['Rows Removed by Filter']		? '\n' + strLevelPadding + 'Rows Removed by Filter: ' + jsnLevel['Rows Removed by Filter'] : '');
+
+					strNode += (jsnLevel['Recheck Cond']				? '\n' + strLevelPadding + 'Recheck Cond: ' + jsnLevel['Recheck Cond'] : '');
+
+					strNode += (jsnLevel['Index Cond']					? '\n' + strLevelPadding + 'Index Cond: ' + jsnLevel['Index Cond'] : '');
+					strNode += (jsnLevel['Heap Fetches'] !== undefined	? '\n' + strLevelPadding + 'Heap Fetches: ' + jsnLevel['Heap Fetches'] : '');
+
+					strNode += (jsnLevel['Merge Cond'] 					? '\n' + strLevelPadding + 'Merge Cond: ' + jsnLevel['Merge Cond'] : '');
+
 					strNode += (jsnLevel['Hash Cond'] 					? '\n' + strLevelPadding + 'Hash Cond: ' + jsnLevel['Hash Cond'] : '');
 					strNode += (jsnLevel['Hash Buckets'] 				? '\n' + strLevelPadding + 'Buckets: ' + jsnLevel['Hash Buckets'] : '');
 					strNode += (jsnLevel['Hash Batches'] 				? '  Batches: ' + jsnLevel['Hash Batches'] : '');
@@ -601,12 +640,12 @@
 					if ((arrChildren)) {
 						levelNumber += 1;
 						for (i = 0, len = arrChildren.length; i < len; i += 1) {
-							levelTraveler(levelNumber, numberChild, i, jsnLevel, arrChildren[i]);
+							levelTraveler(levelNumber, numberChild, i, jsnLevel, arrChildren[i], intLevelPadding);
 						}
 					}
 				};
 
-				levelTraveler(0, 0, 0, '', explainJSON[0].Plan);
+				levelTraveler(0, 0, 0, '', explainJSON[0].Plan, intLevelPadding);
 
 				strHTML +=
 						'</tbody>' +
@@ -664,7 +703,7 @@
 
 				target = document.getElementById('explain-results-text');
 				strHTML = '';
-				var levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, jsnLevel) {
+				levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, jsnLevel) {
 					var i, len, arrChildren = jsnLevel['Plans'];
 
 					strHTML += jsnLevel['Node Text'] + '\n';
