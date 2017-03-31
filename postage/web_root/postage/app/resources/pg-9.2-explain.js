@@ -169,15 +169,25 @@ function explain(bolRun) {
                     if (data.strMessage !== '\\.') {
                         if (data.intCallbackNumber === 0) {
                             resultsContainer.innerHTML =
-								'<div style="width: 100%; height: 100%;" flex-vertical>' +
+								'<div style="width: 100%; height: 100%; position: relative;" flex-vertical>' +
 									'<iframe style="width: 100%; border: none;" flex src="frames/frame-explain.html"></iframe>' +
+									'<gs-button remove-all class="button-pop-out-explain" icononly icon="external-link" inline></gs-button>' +
 								'</div>' +
 								'';
 							var explainFrame = resultsContainer.children[0].children[0];
-							console.log(explainFrame);
+							var popoutButton = resultsContainer.children[0].children[1];
+
+							popoutButton.addEventListener('click', function () {
+								var newWindow = window.open('frames/frame-explain.html', 'ExplainQuery' + CryptoJS.MD5(strRunQuery), 'menubar=off');
+								newWindow.onload = function () {
+									GS.triggerEvent(newWindow, 'data-ready', {
+										explainJSON: JSON.parse(GS.decodeFromTabDelimited(data.strMessage)),
+										bolRun: bolRun
+									});
+								};
+							});
 
 							explainFrame.onload = function () {
-								console.log(explainFrame.onload);
 								GS.triggerEvent(explainFrame.contentWindow, 'data-ready', {
 									explainJSON: JSON.parse(GS.decodeFromTabDelimited(data.strMessage)),
 									bolRun: bolRun

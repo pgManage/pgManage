@@ -164,7 +164,7 @@ table.table-dep th {
 
 .ace-toolbar gs-button {
     text-indent: 0;
-    
+
 }
 
 /* ##################################################### */
@@ -250,6 +250,13 @@ table.table-dep th {
 /* ##################################################### */
 /* ################## EXPLAIN BUTTONS ################## */
 /* ##################################################### */
+
+gs-button.button-pop-out-explain {
+	position: absolute;
+    top: 0;
+    right: 0;
+	font-size: 1.3em;
+}
 
 .ace-toolbar gs-button.button-explain {
     text-indent: 0;
