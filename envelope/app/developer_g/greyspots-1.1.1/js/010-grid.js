@@ -4,59 +4,73 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-grid>', '<gs-grid>', 'gs-grid widths="${1}">\n' +
                                                     '    <gs-block>${2}</gs-block>\n' +
                                                     '</gs-grid>');
-    
+
     designRegisterElement('gs-grid', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
-    
+
     window.designElementProperty_GSGRID = function(selectedElement) {
         addProp('Min-Width Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('min-width') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'min-width', this.value);
         });
-        
+
         addProp('Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('media') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'media', this.value);
         });
-        
+
         addProp('Widths', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('widths') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'widths', this.value);
         });
-        
+
         addProp('Padded', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('padded')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'padded', (this.value === 'true'), true);
         });
-        
+
         addProp('Gutters', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('gutter')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'gutter', (this.value === 'true'), true);
         });
-        
+
         addProp('Reflow At', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('reflow-at') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'reflow-at', this.value);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -86,34 +100,48 @@ window.addEventListener('design-register-element', function () {
         addFlexProps(selectedElement);
     };
 });
-    
+
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-block>', '<gs-block>', 'gs-block>${2}</gs-block>');
-    
+
     designRegisterElement('gs-block', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
-    
+
     window.designElementProperty_GSBLOCK = function(selectedElement) {
         addProp('Width:', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('width') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'width', this.value);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -163,17 +191,17 @@ document.addEventListener('DOMContentLoaded', function () {
             handleObserver(element);
         }
     }
-    
+
     //
     function elementInserted(element) {
         var styleElement;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+
                 // if the style element for the grid column CSS doesn't exist: create it
                 if (!document.getElementById('gs-dynamic-css')) {
                     styleElement = document.createElement('style');
@@ -181,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     styleElement.setAttribute('gs-dynamic', '');
                     document.head.appendChild(styleElement);
                 }
-                
+
                 // if no width parameter is set: default
                 if (!element.getAttribute('widths') && !element.getAttribute('min-width') && !element.getAttribute('media')) {
                     element.bolIgnoreAttribute = true;
@@ -189,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                                                     .join('1').split('').join(','));
                     element.bolIgnoreAttribute = false;
                 }
-                
+
                 element.handleCSS();
                 element.handleBlocks();
             }

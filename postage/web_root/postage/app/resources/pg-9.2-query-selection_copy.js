@@ -62,8 +62,6 @@ function highlightCurrentQuery(tabElement, jsnQueryStart, jsnQueryEnd) {
 function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, arrDangerousQueryStartKeywords, arrExtraSearchKeywords) {
     "use strict";
     var intNeedle;
-    var prevChar;
-    var currChar;
     var intWordPoint;
     var strChar;
     var str2Char;
@@ -87,12 +85,6 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
     var scriptLen = strScript.length;
     var i;
     var len;
-    var bolIgnore = false;
-    var intDollarQuotes = 0;
-    var arrDollarQuotes = [];
-    var incompleteQoute = '';
-    var overRideBolExtraSearch = false;
-    
 
     // behaviours:
     //      if the cursor is on a starting word for a query, that query is selected
@@ -146,224 +138,135 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
     //console.log(intNeedle, strChar);
     // move the needle backward until we run into a character that's not in the alphabet
     while (intNeedle >= 0) {
-        currChar = strScript[intNeedle];
-        if (intNeedle > 0) {
-            prevChar = strScript[intNeedle - 1];
-        } else {
-            prevChar = strScript[intNeedle];
-        }
-        
-        
-        
-        if (bolIgnore === false) {
-            if (currChar === '/' && prevChar === '*') {
-                bolIgnore = true;
-            }if (currChar === '*' && prevChar === '/') {
-                bolIgnore = true;
-            } else if (currChar === '"') {
-                bolIgnore = true;
-            } else if (currChar === "'") {
-                bolIgnore = true;
-            } else if (currChar === ')') {
-                bolIgnore = true;
-            } else if (currChar === '$') {
-                bolIgnore = false;
-                for (var i = 1, len = strScript.length; i < len; i++) {
-                    if (strScript[intNeedle - i] !== '$') {
-                        incompleteQoute += strScript[intNeedle - i];
-                        bolIgnore = true;
-                    } else {
-                        if (arrDollarQuotes.indexOf(incompleteQoute) === -1) {
-                            arrDollarQuotes.push(incompleteQoute);
-                            bolIgnore = true;
-                        } else {
-                            if (arrDollarQuotes.indexOf(incompleteQoute) !== -1) {
-                                arrDollarQuotes.splice(arrDollarQuotes.indexOf(incompleteQoute), 1);
-                                bolIgnore = false;
-                            }
-                        }
-                        incompleteQoute = '';
-                        intNeedle -= i;
-                        i = strScript.length;
-                    }
-                }
-                
-            }
-        } else {
-            if (currChar === '*' && prevChar === '/') {
-                bolIgnore = false;
-            } else if (currChar === '"') {
-                bolIgnore = false;
-            } else if (currChar === "'") {
-                bolIgnore = false;
-            } else if (currChar === '(') {
-                bolIgnore = false;
-            } else if (currChar === '$') {
-                bolIgnore = false;
-                for (var i = 1, len = strScript.length; i < len; i++) {
-                    if (strScript[intNeedle - i] !== '$') {
-                        incompleteQoute += strScript[intNeedle - i];
-                        bolIgnore = true;
-                    } else {
-                        if (arrDollarQuotes.indexOf(incompleteQoute) === -1) {
-                            arrDollarQuotes.push(incompleteQoute);
-                            bolIgnore = true;
-                        } else {
-                            if (arrDollarQuotes.indexOf(incompleteQoute) !== -1) {
-                                arrDollarQuotes.splice(arrDollarQuotes.indexOf(incompleteQoute), 1);
-                                bolIgnore = false;
-                            }
-                        }
-                        incompleteQoute = '';
-                        intNeedle -= i;
-                        i = strScript.length;
-                    }
-                }
-                
-            }
-        }
-        
         strChar = strScript[intNeedle];
         bolAlpha = (/[a-z]/gi).test(strChar);
-        bolEnder = (/[\s\(\)\'\"\.]/gi).test(strChar);
-        
-        
-        //$SELECT$SELECT$SELECT$
-        if (!bolIgnore || bolEnder || overRideBolExtraSearch) {
-    
-            // if we have an intWordPoint and we run into a whitespace character (or the beginning of the script):
-            if (typeof intWordPoint === 'number' || intNeedle === 0) {
-                if (bolEnder) {
-                    //console.log(strWord);
-                    strWord = strScript.substring(intNeedle + 1, intWordPoint + 1);
-                    intQueryStart = (intNeedle + 1);
-                } else if (intNeedle === 0) {
-                    strWord = '';
-                    if (typeof intWordPoint === 'number') {
-                        strWord = strScript.substring(0, intWordPoint + 1);
-                    }
-                    intQueryStart = 0;
+        bolEnder = (/[\s\(\)\'\"\$\.]/gi).test(strChar);
+
+        // if we have an intWordPoint and we run into a whitespace character (or the beginning of the script):
+        if (typeof intWordPoint === 'number' || intNeedle === 0) {
+            if (bolEnder) {
+                strWord = strScript.substring(intNeedle + 1, intWordPoint + 1);
+                intQueryStart = (intNeedle + 1);
+            } else if (intNeedle === 0) {
+                strWord = '';
+                if (typeof intWordPoint === 'number') {
+                    strWord = strScript.substring(0, intWordPoint + 1);
                 }
-    
-                if (bolEnder || intNeedle === 0) {
-                    bolWord = false;
-    
-                    // if word is only alpha: test word
-                    if ((/^[a-z]*$/gi).test(strWord)) {
-                        bolWord = true;
-                        strWord = strWord.toUpperCase();
-                    }
-                        
-                    // if we found a word
-                    //          and it's a dangerous starting word
-                    //          and we haven't started an extra search
-                    if (
-                            bolWord &&
-                            arrDangerousQueryStartKeywords.indexOf(strWord) !== -1 &&
-                            !bolExtraSearch
-                        ) {
-                        // set the number of words to find to 8, add the current word and set bolExtraSearch to true
-                        if (overRideBolExtraSearch) {
-                            bolExtraSearch = false;
-                        } else {
-                            intStartingWordsToFind = 8;
-                            arrExtraSearchWords = [];
-                            bolExtraSearch = true;
-                        }
-                    }
-    
-                    // if we found a word
-                    //          and it's a starting word or an extra search keyword
-                    //          and we've started an extra search
-                    if (
-                            bolWord &&
-                            (
-                                arrQueryStartKeywords.indexOf(strWord) !== -1 ||
-                                arrExtraSearchKeywords.indexOf(strWord) !== -1
-                            ) &&
-                            bolExtraSearch) {
-                                
-                        // add starting word to extra word array and decrease the number of words to find
-                        arrExtraSearchWords.push({
-                            'word': strWord,
-                            'index': (intNeedle === 0 ? 0 : intNeedle + 1)
-                        });
-                        intStartingWordsToFind -= 1;
-                    }
-                        
-                    // if we've started an extra search
-                    //          and (
-                    //              we've found our last extra word
-                    //              or we've scanned to the beginning of the document
-                    //          )
-                    if (bolExtraSearch && (
-                            intStartingWordsToFind === 0 ||
-                            intNeedle === 0
-                        )) {
-                        // deduce the real starting word
-                        
-                        // if we run into a TO or FROM, query starts at first found word
-                        // if we run into a GRANT or REVOKE, query starts there
-                        //// if we run into a WITH immediatly before SELECT,INSERT,UPDATE,DELETE, query starts there
-                        // else, query starts at first found word
-    
-                        i = 0;
-                        len = arrExtraSearchWords.length;
-                        while (i < len) {
-                            if (arrExtraSearchWords[i].word === 'TO' || arrExtraSearchWords[i].word === 'FROM') {
-                                bolDeduced = true;
-                                intQueryStart = arrExtraSearchWords[0].index;
-                                strFirstWord = arrExtraSearchWords[0].word;
-                                break;
-                            } else if (arrExtraSearchWords[i].word === 'GRANT' || arrExtraSearchWords[i].word === 'REVOKE') {
-                                bolDeduced = true;
-                                intQueryStart = arrExtraSearchWords[i].index;
-                                strFirstWord = arrExtraSearchWords[i].word;
-                                break;
-                            }
-                            //console.log('\'' + arrExtraSearchWords[i].word + '\'');
-                            i += 1;
-                        }
-    
-                        if (!bolDeduced) {
+                intQueryStart = 0;
+            }
+
+            if (bolEnder || intNeedle === 0) {
+                bolWord = false;
+
+                // if word is only alpha: test word
+                if ((/^[a-z]*$/gi).test(strWord)) {
+                    bolWord = true;
+                    strWord = strWord.toUpperCase();
+                }
+                    
+                // if we found a word
+                //          and it's a dangerous starting word
+                //          and we haven't started an extra search
+                if (
+                        bolWord &&
+                        arrDangerousQueryStartKeywords.indexOf(strWord) !== -1 &&
+                        !bolExtraSearch
+                    ) {
+                    // set the number of words to find to 8, add the current word and set bolExtraSearch to true
+                    intStartingWordsToFind = 8;
+                    arrExtraSearchWords = [];
+                    bolExtraSearch = true;
+                }
+
+                // if we found a word
+                //          and it's a starting word or an extra search keyword
+                //          and we've started an extra search
+                if (
+                        bolWord &&
+                        (
+                            arrQueryStartKeywords.indexOf(strWord) !== -1 ||
+                            arrExtraSearchKeywords.indexOf(strWord) !== -1
+                        ) &&
+                        bolExtraSearch) {
+                            
+                    // add starting word to extra word array and decrease the number of words to find
+                    arrExtraSearchWords.push({
+                        'word': strWord,
+                        'index': (intNeedle === 0 ? 0 : intNeedle + 1)
+                    });
+                    intStartingWordsToFind -= 1;
+                }
+                    
+                // if we've started an extra search
+                //          and (
+                //              we've found our last extra word
+                //              or we've scanned to the beginning of the document
+                //          )
+                if (bolExtraSearch && (
+                        intStartingWordsToFind === 0 ||
+                        intNeedle === 0
+                    )) {
+                    // deduce the real starting word
+                    
+                    // if we run into a TO or FROM, query starts at first found word
+                    // if we run into a GRANT or REVOKE, query starts there
+                    //// if we run into a WITH immediatly before SELECT,INSERT,UPDATE,DELETE, query starts there
+                    // else, query starts at first found word
+
+                    i = 0;
+                    len = arrExtraSearchWords.length;
+                    while (i < len) {
+                        if (arrExtraSearchWords[i].word === 'TO' || arrExtraSearchWords[i].word === 'FROM') {
+                            bolDeduced = true;
                             intQueryStart = arrExtraSearchWords[0].index;
                             strFirstWord = arrExtraSearchWords[0].word;
+                            break;
+                        } else if (arrExtraSearchWords[i].word === 'GRANT' || arrExtraSearchWords[i].word === 'REVOKE') {
+                            bolDeduced = true;
+                            intQueryStart = arrExtraSearchWords[i].index;
+                            strFirstWord = arrExtraSearchWords[i].word;
+                            break;
                         }
-    
-                        bolFoundStart = true;
-                        break;
+                        //console.log('\'' + arrExtraSearchWords[i].word + '\'');
+                        i += 1;
                     }
-                    
-                    // if we haven't started an extra search
-                    //          and we've found a word
-                    //          and we've found a query starting word
-                    if (!bolExtraSearch && bolWord && arrQueryStartKeywords.indexOf(strWord) !== -1) {
-                        // we've found the query start
-                        bolFoundStart = true;
-                        strFirstWord = strWord;
-                        break;
+
+                    if (!bolDeduced) {
+                        intQueryStart = arrExtraSearchWords[0].index;
+                        strFirstWord = arrExtraSearchWords[0].word;
                     }
-    
-                    //// if word is only alpha: test word
-                    //if ((/^[a-z]*$/gi).test(strWord)) {
-                    //    strWord = strWord.toUpperCase();
-                    //    if (arrQueryStartKeywords.indexOf(strWord) !== -1) {
-                    //        break;
-                    //    }
-                    //}
-                    intWordPoint = null;
+
+                    bolFoundStart = true;
+                    break;
                 }
-                intQueryStart = null;
-    
-            // if we dont have an intWordPoint and we run into an alpha character: set intWordPoint
-            } else if (typeof intWordPoint !== 'number' && bolAlpha) {
-                intWordPoint = intNeedle;
+
+                // if we haven't started an extra search
+                //          and we've found a word
+                //          and we've found a query starting word
+                if (!bolExtraSearch && bolWord && arrQueryStartKeywords.indexOf(strWord) !== -1) {
+                    // we've found the query start
+                    bolFoundStart = true;
+                    strFirstWord = strWord;
+                    break;
+                }
+
+                //// if word is only alpha: test word
+                //if ((/^[a-z]*$/gi).test(strWord)) {
+                //    strWord = strWord.toUpperCase();
+                //    if (arrQueryStartKeywords.indexOf(strWord) !== -1) {
+                //        break;
+                //    }
+                //}
+                intWordPoint = null;
             }
+            intQueryStart = null;
+
+        // if we dont have an intWordPoint and we run into an alpha character: set intWordPoint
+        } else if (typeof intWordPoint !== 'number' && bolAlpha) {
+            intWordPoint = intNeedle;
         }
+
         intNeedle -= 1;
-        if (bolIgnore && intNeedle === 1) {
-            overRideBolExtraSearch = true;
-        }
     }
     /*
 
@@ -597,7 +500,7 @@ function selectionFindRange(tabElement, editor) {
     if (intCursorPos === strScript.length) {
         intCursorPos -= 1;
     }
-    //console.log(jsnQuery);
+    
     // if the cursor is not in the selection: search higher
     if (intCursorPos > jsnQuery.intQueryEnd) {
         // there are only some queries that can wrap around other queries. that's
@@ -647,7 +550,7 @@ function selectionFindRange(tabElement, editor) {
         
         
         //console.log(JSON.stringify(editor.currentQueryRange));
-        //console.log(editor.currentQueryRange.text);
+        console.log(editor.currentQueryRange.text);
     }
     editor.currentSelections = editor.getSelection().getAllRanges().slice(0);
 

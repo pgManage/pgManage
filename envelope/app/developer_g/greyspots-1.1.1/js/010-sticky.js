@@ -1,7 +1,7 @@
 
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-sticky>', '<gs-sticky>', 'gs-sticky>\n' +
                                                         '    <gs-sticky-inner>\n' +
                                                         '        ${0}\n' +
@@ -9,7 +9,7 @@ window.addEventListener('design-register-element', function () {
                                                         '</gs-sticky>');
     
     designRegisterElement('gs-sticky', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-sticky.html');
-    
+
     window.designElementProperty_GSSTICKY = function (selectedElement) {
         addProp('Direction', true,  '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('direction') || '') + '" mini>' +
                                         '<option value="">Up</option>' +
@@ -18,34 +18,48 @@ window.addEventListener('design-register-element', function () {
                                     function () {
             return setOrRemoveTextAttribute(selectedElement, 'direction', this.value);
         });
-        
+
         addProp('Always Stuck', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('stuck') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'stuck', this.value === 'true', true);
         });
-        
+
         addProp('Touch Devices Allowed', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('touch-device-allowed') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'touch-device-allowed', this.value === 'true', true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
 
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden')) { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop')) { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet')) { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone')) { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop')) { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet')) { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone')) { strVisibilityAttribute = 'show-on-phone'; }
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
 
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +

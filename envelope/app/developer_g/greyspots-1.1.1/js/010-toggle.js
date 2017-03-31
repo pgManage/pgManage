@@ -98,7 +98,7 @@ window.addEventListener('design-register-element', function () {
             } else if (selectedElement.hasAttribute('iconrotatedown'))  { strIconRotation = 'iconrotatedown';
             } else if (selectedElement.hasAttribute('iconrotateleft'))  { strIconRotation = 'iconrotateleft';
             } else { strIconRotation = ''; }
-            
+
             addProp('Icon&nbsp;Rotation', true, '<gs-select class="target" value="' + strIconRotation + '" mini>' +
                                                 '   <option value="">None</option>' +
                                                 '   <option value="iconrotateright">90 degrees</option>' +
@@ -108,35 +108,49 @@ window.addEventListener('design-register-element', function () {
                 selectedElement.removeAttribute('iconrotateright');
                 selectedElement.removeAttribute('iconrotatedown');
                 selectedElement.removeAttribute('iconrotateleft');
-                
+
                 if (this.value) {
                     selectedElement.setAttribute(this.value, '');
                 }
-                
+
                 return selectedElement;
             });
         }
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +

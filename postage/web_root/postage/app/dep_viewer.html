@@ -837,8 +837,7 @@ SELECT *
                 
                 
                 getListData(propQuery['prop_' + objectType].replace(/\{\{INTOID\}\}/g, d.oid)
-                                                           .replace(/\{\{STRNAME\}\}/g, d.name)
-                                                           .replace(/\{\{SQLSAFENAME\}\}/g, d.name),
+                                                           .replace(/\{\{STRSQLSAFENAME\}\}/g, d.name),
                             document.getElementById('properties-container'),
                             function (arrRecords) {
                     var i, len, col_i, col_len, strHTML = '';

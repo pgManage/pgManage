@@ -885,7 +885,19 @@ function dialogOptions() {
                                 <td><gs-static value="Run Query"></gs-static></td>
                             </tr>
                             <tr>
-
+                                <td>
+                                    <gs-select id="shortcutMetaKeyRunCursorQuery" mini>
+                                        <option value="Command">Command/Windows Key</option>
+                                        <option value="Control">Control</option>
+                                        <option value="Option">Option/Alt</option>
+                                        <option value="Shift">Shift</option>
+                                        <option value="None">None</option>
+                                    </gs-select>
+                                </td>
+                                <td><gs-text id="ShortcutKeyRunCursorQuery" mini></gs-text></td>
+                                <td><gs-static value="Run Query"></gs-static></td>
+                            </tr>
+                            <tr>
                                 <td>
                                     <gs-select id="shortcutMetaKeyFindDocumentation" mini>
                                         <option value="Command">Command/Windows Key</option>
@@ -1012,10 +1024,16 @@ function dialogOptions() {
             customCSSText = CSSEditor.getValue();
         });
 
-
+        if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
+            var CTRLCMD = 'Command';
+        } else {
+            var CTRLCMD = 'Control';
+        }
+        localStorage.ShortcutRunCursorQuery = (localStorage.ShortcutRunCursorQuery || [CTRLCMD,     'Enter',   'ShortcutRunCursorQuery']);
         document.getElementById('ShortcutKeyNewTab').value = localStorage.ShortcutNewTab.split(',')[1];
         document.getElementById('ShortcutKeySaveTab').value = localStorage.ShortcutSave.split(',')[1];
         document.getElementById('ShortcutKeyRunQuery').value = localStorage.ShortcutRunQuery.split(',')[1];
+        document.getElementById('ShortcutKeyRunCursorQuery').value = localStorage.ShortcutRunCursorQuery.split(',')[1];
         document.getElementById('ShortcutKeyFindDocumentation').value = localStorage.ShortcutDocs.split(',')[1];
         document.getElementById('ShortcutKeyExplain').value = localStorage.ShortcutExplain.split(',')[1];
         document.getElementById('ShortcutKeyExplainAnalyze').value = localStorage.ShortcutExplainAnalyze.split(',')[1];
@@ -1024,6 +1042,7 @@ function dialogOptions() {
         document.getElementById('shortcutMetaKeyNewTab').value = (localStorage.ShortcutNewTab.split(',')[0] || 'None');
         document.getElementById('shortcutMetaKeySaveTab').value = (localStorage.ShortcutSave.split(',')[0] || 'None');
         document.getElementById('shortcutMetaKeyRunQuery').value = (localStorage.ShortcutRunQuery.split(',')[0] || 'None');
+        document.getElementById('shortcutMetaKeyRunCursorQuery').value = (localStorage.ShortcutRunCursorQuery.split(',')[0] || 'None');
         document.getElementById('shortcutMetaKeyFindDocumentation').value = (localStorage.ShortcutDocs.split(',')[0] || 'None');
         document.getElementById('shortcutMetaKeyExplain').value = (localStorage.ShortcutExplain.split(',')[0] || 'None');
         document.getElementById('shortcutMetaKeyExplainAnalyze').value = (localStorage.ShortcutExplainAnalyze.split(',')[0] || 'None');
@@ -1040,20 +1059,17 @@ function dialogOptions() {
             document.getElementById('shortcutMetaKeyNewTab').value = CTRLCMD;
             document.getElementById('shortcutMetaKeySaveTab').value = CTRLCMD;
             document.getElementById('shortcutMetaKeyRunQuery').value = 'None';
+            document.getElementById('shortcutMetaKeyRunCursorQuery').value = CTRLCMD;
             document.getElementById('shortcutMetaKeyFindDocumentation').value = CTRLCMD;
             document.getElementById('shortcutMetaKeyExplain').value = 'None';
             document.getElementById('shortcutMetaKeyExplainAnalyze').value = 'Shift';
             document.getElementById('shortcutMetaKeyHome').value = 'None';
         });
         document.getElementById('keyReset').addEventListener('click', function (event) {
-            if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
-                var CTRLCMD = 'Command';
-            } else {
-                var CTRLCMD = 'Control';
-            }
             document.getElementById('ShortcutKeyNewTab').value = 'o'
             document.getElementById('ShortcutKeySaveTab').value = 's'
             document.getElementById('ShortcutKeyRunQuery').value = 'F5'
+            document.getElementById('ShortcutKeyRunCursorQuery').value = 'Enter'
             document.getElementById('ShortcutKeyFindDocumentation').value = '.'
             document.getElementById('ShortcutKeyExplain').value = 'F7'
             document.getElementById('ShortcutKeyExplainAnalyze').value = 'F7'
@@ -1074,6 +1090,11 @@ function dialogOptions() {
             event.preventDefault();
             event.stopPropagation();
             document.getElementById('ShortcutKeyRunQuery').value = event.key;
+        });
+        document.getElementById('ShortcutKeyRunCursorQuery').addEventListener('keydown', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('ShortcutKeyRunCursorQuery').value = event.key;
         });
         document.getElementById('ShortcutKeyFindDocumentation').addEventListener('keydown', function (event) {
             event.preventDefault();
@@ -1147,6 +1168,7 @@ function dialogOptions() {
         var ValKeyNewTab = document.getElementById('ShortcutKeyNewTab').value;
         var ValKeySaveTab = document.getElementById('ShortcutKeySaveTab').value;
         var ValKeyRunQuery = document.getElementById('ShortcutKeyRunQuery').value;
+        var ValKeyRunCursorQuery = document.getElementById('ShortcutKeyRunCursorQuery').value;
         var ValKeyFindDocumentation = document.getElementById('ShortcutKeyFindDocumentation').value;
         var ValKeyExplain = document.getElementById('ShortcutKeyExplain').value;
         var ValKeyExplainAnalyze = document.getElementById('ShortcutKeyExplainAnalyze').value;
@@ -1154,6 +1176,7 @@ function dialogOptions() {
         var ValMetaKeyNewTab = document.getElementById('shortcutMetaKeyNewTab').value;
         var ValMetaKeySaveTab = document.getElementById('shortcutMetaKeySaveTab').value;
         var ValMetaKeyRunQuery = document.getElementById('shortcutMetaKeyRunQuery').value;
+        var ValMetaKeyRunCursorQuery = document.getElementById('shortcutMetaKeyRunCursorQuery').value;
         var ValMetaKeyFindDocumentation = document.getElementById('shortcutMetaKeyFindDocumentation').value;
         var ValMetaKeyExplain = document.getElementById('shortcutMetaKeyExplain').value;
         var ValMetaKeyExplainAnalyze = document.getElementById('shortcutMetaKeyExplainAnalyze').value;
@@ -1175,6 +1198,7 @@ function dialogOptions() {
             , [ValMetaKeySaveTab             ,     ValKeySaveTab,            'ShortcutSave']
             , [ValMetaKeyFindDocumentation   ,     ValKeyFindDocumentation,  'ShortcutDocs']
             , [ValMetaKeyHome                ,     ValKeyHome,               'ShortcutHome']
+            , [ValMetaKeyRunCursorQuery      ,     ValKeyRunCursorQuery,     'ShortcutRunCursorQuery']
         ];
 
 
@@ -1931,7 +1955,7 @@ function loadHeaderText() {
     //                '<small>Db:</small> ' + encodeHTML(contextData.databaseName) + ' ' +
     //                '<small>Connection:</small> ' + encodeHTML(contextData.connectionName);
 
-    shortText = encodeHTML(contextData.databaseName + '@' + contextData.connectionName);
+    shortText = encodeHTML(contextData.databaseName + '@' + contextData.connectionName + '(' + contextData.sessionUser + ')');
 
     document.getElementById('header-text-container').innerHTML = shortText;
     document.getElementById('header-text-container').setAttribute('title', longText);
@@ -2259,9 +2283,39 @@ function setClipSetting(propertyName, newValue) {
     localStorage.clip_settings = JSON.stringify(savedSettings);
 }
 
+function highlightCurrentCursorQuery(tabElement, jsnQueryStart, jsnQueryEnd) {
+    "use strict";
+    // remove and old yellow highlights
+    if (tabElement.openSelectionMarker) {
+        tabElement.relatedEditor.getSession().removeMarker(tabElement.openSelectionMarker);
+        tabElement.openSelectionMarker = null;
+    }
+    removeMarkerHighlighted();
+    tabElement.openCursorQueryMarker =
+        tabElement.relatedEditor.getSession()
+            .addMarker(
+                new Range(jsnQueryStart.row, jsnQueryStart.column, jsnQueryEnd.row , jsnQueryEnd.column),
+                'ace-cursor-query',
+                'background'
+            );
+
+    //console.log(jsnQueryStart.row - 1, jsnQueryStart.column, jsnQueryEnd.row, jsnQueryEnd.column);
+
+    //console.log(tabElement.openCursorQueryMarker);
+    setTimeout(removeMarkerHighlighted, 2500);
+}
+
+function removeMarkerHighlighted() {
+    var tabElement = document.getElementsByClassName('current-tab')[0];
+    if (tabElement.openCursorQueryMarker) {
+        tabElement.relatedEditor.getSession().removeMarker(tabElement.openCursorQueryMarker);
+        tabElement.openCursorQueryMarker = null;
+    }
+}
+
 // executes SQL in current tab
 var arrExecuteHistory = [];
-function executeScript() {
+function executeScript(bolCursorQuery) {
     'use strict';
     var currentTab           = document.getElementsByClassName('current-tab')[0]
       , editor               = currentTab.relatedEditor
@@ -2272,12 +2326,36 @@ function executeScript() {
       , jsnCurrentQuery, startExecute, endExecute, startLoading, endLoading, updateTally
       , stopLoadingHandler, bolIgnoreMessages = false, cancelSignalHandler
       , messageID, currentTargetTbody, intRecordsThisQuery, intError, intQuery
-      , divElement, intErrorStartLine, bindShowQueryButton;
+      , divElement, intErrorStartLine, bindShowQueryButton, jsnQueryStart, jsnQueryEnd;
 
     // if we found an editor to get the query from and the current tab is not already running a query
     if (editor && currentTab.handlingQuery !== true) {
         // get current query
-        jsnCurrentQuery = getCurrentQuery();
+        if (bolCursorQuery) {
+            strScript = editor.getValue();
+            var strScript = editor.getValue();
+            var jsnSelection = editor.getSelectionRange();
+            if (jsnSelection.start.column === 0 ||
+                jsnSelection.start.column === 1
+            ) {
+                var intCursorPos = rowAndColumnToIndex(strScript, jsnSelection.start.row, jsnSelection.start.column);
+            } else {
+                var intCursorPos = rowAndColumnToIndex(strScript, jsnSelection.start.row, jsnSelection.start.column - 1);
+            }
+            //console.log(intCursorPos);
+            jsnCurrentQuery = findSqlQueryFromCursor(strScript, intCursorPos);
+            jsnQueryStart = {
+                 'row':        jsnCurrentQuery.start_row
+                ,'column':     jsnCurrentQuery.start_column
+            };
+            jsnQueryEnd = {
+                 'row':        jsnCurrentQuery.end_row
+                ,'column':     jsnCurrentQuery.end_column
+            };
+            highlightCurrentCursorQuery(currentTab, jsnQueryStart, jsnQueryEnd);
+        } else {
+            jsnCurrentQuery = getCurrentQuery();
+        }
 
         // clear error annotation in ace
         editor.getSession().setAnnotations([]);

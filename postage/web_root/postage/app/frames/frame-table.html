@@ -24,7 +24,6 @@
         <script>
             var strTableName, strSchemaName, strHasOids, strConstraints, arrConstraint, strGrantsEtc, arrColumn = [], strRelOptions;
             
-            
             scriptQuery.ruleSql = ml(function () {/*
                    SELECT   E'-- DROP RULE ' || quote_ident(pg_rewrite.rulename) || ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || E';\n' ||
                             E'\nCREATE OR REPLACE ' || substring(pg_get_ruledef(pg_rewrite.oid, true), 8) ||
@@ -33,7 +32,7 @@
                 LEFT JOIN pg_rewrite ON pg_class.oid = pg_rewrite.ev_class
                 LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                     WHERE pg_rewrite.oid = {{INTOID}};
-                */});
+                * /});
             
             scriptQuery.triggerSql = ml(function () {/*
                    SELECT   '-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n\n' || 
@@ -220,6 +219,8 @@
                 handleListResults = function (arrResult) {
                     var strDumpQuery = '', strQuery, i, len, tempFunction, handleScriptResults, arrRow;
                     
+                    //console.log(arrResult);
+                    
                     for (i = arrResult.length - 1; i >= 0; i -= 1) {
                         strDumpQuery +=
                             'DROP ' + arrResult[i][3].toUpperCase() + ' ' +
@@ -344,8 +345,8 @@
                         //console.log('arrResult 1:', arrResult[i][1]);
                         //console.log('arrResult 2:', arrResult[i][2]);
                         //console.log('arrResult 3:', arrResult[i][3]);
+                        //console.log('object ' + i + ':', arrResult[i][2] + '.' + arrResult[i][1]);
                         //console.log(scriptQuery['object' + GS.strToTitle(arrResult[i][3])]);
-                        
                         strQuery += '\n\n' +
                             (
                                 //scriptQuery[arrResult[i][3].toLowerCase()] ||
@@ -358,9 +359,15 @@
                     
                     handleScriptResults = function (arrResult) {
                         var i, len;
+                        if (arrResult.length !== 2) {
+                            console.error(arrResult.length + ' results for query ' + j + ' of ' + len1, arrResult[0], arrResult[1]);
+                            GS.msgbox(arrResult.length + ' results for query ' + j + ' of ' + len1, arrResult[0], arrResult[1]);
+                        }
+                        
+                        // removes column name record
                         arrResult.splice(0, 1);
                         
-                        //console.log(arrResult);
+                        //console.log('arrResult: ' + arrResult);
                         //console.log(j, len1);
                         
                         for (i = 0, len = arrResult.length; i < len; i += 1) {
@@ -377,6 +384,7 @@
                     };
                     
                     if (strQuery) {
+                        //console.log('strQuery: ' + strQuery);
                         getListsForDump(strQuery, handleScriptResults);
                     } else {
                         handleScriptResults([]);
@@ -882,7 +890,9 @@
         <script>
             if (window.parent) {
                 window.parent.addEventListener('resize', function () {
-                    refreshCustomCSS(localStorage.customCSS);
+                    if (localStorage && localStorage.customCSS) {
+                        refreshCustomCSS(localStorage.customCSS);
+                    }
                     /*
                     if (localStorage && localStorage.customCSS && document.getElementById('customCss')) {
                         document.getElementById('customCss').innerHTML = localStorage.customCSS;

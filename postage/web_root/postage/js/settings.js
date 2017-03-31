@@ -111,14 +111,12 @@ window.addEventListener('load', function () {
 function refreshShortcutKeys (shortcutKeys) {
     'use strict';
     var shortcutKeysText = [];
+    if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
+        var CTRLCMD = 'Command';
+    } else {
+        var CTRLCMD = 'Control';
+    }
     if (!shortcutKeys) {
-        if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
-            var CTRLCMD = 'Command';
-        } else {
-            var CTRLCMD = 'Control';
-        }
-
-
         shortcutKeysText = [
               [CTRLCMD,     'o',       'ShortcutNewTab']
             , ['',          'F7',      'ShortcutExplain']
@@ -127,6 +125,7 @@ function refreshShortcutKeys (shortcutKeys) {
             , [CTRLCMD,     's',       'ShortcutSave']
             , [CTRLCMD,     '.',       'ShortcutDocs']
             , ['',          'Escape',  'ShortcutHome']
+            , [CTRLCMD,     'Enter',   'ShortcutRunCursorQuery']
         ];
     } else {
         shortcutKeysText = shortcutKeys;
@@ -138,7 +137,7 @@ function refreshShortcutKeys (shortcutKeys) {
     localStorage.ShortcutSave = shortcutKeysText[4];
     localStorage.ShortcutDocs = shortcutKeysText[5];
     localStorage.ShortcutHome = shortcutKeysText[6];
-
+    localStorage.ShortcutRunCursorQuery = shortcutKeysText[7];
     // var strScript, thisArrText;
     // var keydownShortcuts = '';
     // //strScript = 'function keydownShortcuts (event) {;\n';
@@ -188,6 +187,10 @@ document.addEventListener('keydown', function (event) {
         }
     } else if (keyCodeCheck(event, localStorage.ShortcutSave)) {
         ShortcutSave();
+    } else if (keyCodeCheck(event, localStorage.ShortcutRunCursorQuery)) {
+        event.preventDefault();
+        event.stopPropagation();
+        executeScript(true);
     } else if (keyCodeCheck(event, localStorage.ShortcutDocs)) {
         ShortcutDocs();
     } else if (keyCodeCheck(event, localStorage.ShortcutHome)) {
@@ -247,21 +250,30 @@ function keyCodeCheck(event, storage) {
 
 function getShortcuts () {
 	try {
-	    var ValKeyNewTab = localStorage.ShortcutNewTab.split(',')[1];
-	    var ValKeySaveTab = localStorage.ShortcutSave.split(',')[1];
-	    var ValKeyRunQuery = localStorage.ShortcutRunQuery.split(',')[1];
-	    var ValKeyFindDocumentation = localStorage.ShortcutDocs.split(',')[1];
-	    var ValKeyExplain = localStorage.ShortcutExplain.split(',')[1];
-	    var ValKeyExplainAnalyze = localStorage.ShortcutExplainAnalyze.split(',')[1];
-	    var ValKeyHome = localStorage.ShortcutHome.split(',')[1];
+        if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
+            var CTRLCMD = 'Command';
+        } else {
+            var CTRLCMD = 'Control';
+        }
+        localStorage.ShortcutRunCursorQuery = (localStorage.ShortcutRunCursorQuery || [CTRLCMD,     'Enter',   'ShortcutRunCursorQuery']);
+        var ValKeyNewTab = localStorage.ShortcutNewTab.split(',')[1];
+        var ValKeySaveTab = localStorage.ShortcutSave.split(',')[1];
+        var ValKeyRunQuery = localStorage.ShortcutRunQuery.split(',')[1];
+        var ValKeyRunCursorQuery = localStorage.ShortcutRunCursorQuery.split(',')[1];
+        var ValKeyFindDocumentation = localStorage.ShortcutDocs.split(',')[1];
+        var ValKeyExplain = localStorage.ShortcutExplain.split(',')[1];
+        var ValKeyExplainAnalyze = localStorage.ShortcutExplainAnalyze.split(',')[1];
+        var ValKeyHome = localStorage.ShortcutHome.split(',')[1];
 
-	    var ValMetaKeyNewTab = localStorage.ShortcutNewTab.split(',')[0];
-	    var ValMetaKeySaveTab = localStorage.ShortcutSave.split(',')[0];
-	    var ValMetaKeyRunQuery = localStorage.ShortcutRunQuery.split(',')[0];
-	    var ValMetaKeyFindDocumentation = localStorage.ShortcutDocs.split(',')[0];
-	    var ValMetaKeyExplain = localStorage.ShortcutExplain.split(',')[0];
-	    var ValMetaKeyExplainAnalyze = localStorage.ShortcutExplainAnalyze.split(',')[0];
-	    var ValMetaKeyHome = localStorage.ShortcutHome.split(',')[0];
+        var ValMetaKeyNewTab = localStorage.ShortcutNewTab.split(',')[0];
+        var ValMetaKeySaveTab = localStorage.ShortcutSave.split(',')[0];
+        var ValMetaKeyRunQuery = localStorage.ShortcutRunQuery.split(',')[0];
+        var ValMetaKeyRunCursorQuery = localStorage.ShortcutRunCursorQuery.split(',')[0];
+        var ValMetaKeyFindDocumentation = localStorage.ShortcutDocs.split(',')[0];
+        var ValMetaKeyExplain = localStorage.ShortcutExplain.split(',')[0];
+        var ValMetaKeyExplainAnalyze = localStorage.ShortcutExplainAnalyze.split(',')[0];
+        var ValMetaKeyHome = localStorage.ShortcutHome.split(',')[0];
+
 
 	    var ShortcutKeysText = [
 	          [ValMetaKeyNewTab              ,     ValKeyNewTab,             'ShortcutNewTab']
@@ -271,6 +283,7 @@ function getShortcuts () {
 	        , [ValMetaKeySaveTab             ,     ValKeySaveTab,            'ShortcutSave']
 	        , [ValMetaKeyFindDocumentation   ,     ValKeyFindDocumentation,  'ShortcutDocs']
 	        , [ValMetaKeyHome                ,     ValKeyHome,               'ShortcutHome']
+	        , [ValMetaKeyRunCursorQuery            ,     ValKeyRunCursorQuery,           'ShortcutRunCursorQuery']
 	    ];
 
 	    return ShortcutKeysText;

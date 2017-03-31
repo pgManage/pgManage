@@ -84,7 +84,7 @@ window.addEventListener('design-register-element', function () {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
+        var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
         if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
         if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }

@@ -13,17 +13,31 @@ window.addEventListener('design-register-element', function () {
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
