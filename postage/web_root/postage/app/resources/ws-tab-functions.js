@@ -1290,7 +1290,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                             '<gs-button id="sql-results-stop-' + intTabNumber + '" hidden no-focus' +
                                       ' class="header-button-text" icon="stop" no-focus>Stop Execution</gs-button>' +
                             '<gs-button id="sql-results-StopSocket-' + intTabNumber + '" hidden no-focus' +
-                                      ' class="header-button-text" no-focus>Stop Socket</gs-button>' +
+                                      ' class="header-button-text" no-focus>Stop Loading</gs-button>' +
                             '<gs-button id="sql-results-stop-loading-' + intTabNumber + '" hidden no-focus' +
                                       ' class="header-button-text" icon="hand-stop-o" no-focus>Stop Loading</gs-button>' +
                             '<gs-button id="sql-results-copy-options-' + intTabNumber + '" hidden no-focus' +

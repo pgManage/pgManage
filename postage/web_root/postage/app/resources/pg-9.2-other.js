@@ -2294,12 +2294,12 @@ function highlightCurrentCursorQuery(tabElement, jsnQueryStart, jsnQueryEnd) {
     tabElement.openCursorQueryMarker =
         tabElement.relatedEditor.getSession()
             .addMarker(
-                new Range(jsnQueryStart.row, jsnQueryStart.column, jsnQueryEnd.row , jsnQueryEnd.column),
+                new Range(jsnQueryStart.row, jsnQueryStart.column, jsnQueryEnd.row, jsnQueryEnd.column),
                 'ace-cursor-query',
                 'background'
             );
 
-    //console.log(jsnQueryStart.row - 1, jsnQueryStart.column, jsnQueryEnd.row, jsnQueryEnd.column);
+    console.log(jsnQueryStart.row, jsnQueryStart.column, jsnQueryEnd.row, jsnQueryEnd.column);
 
     //console.log(tabElement.openCursorQueryMarker);
     setTimeout(removeMarkerHighlighted, 2500);

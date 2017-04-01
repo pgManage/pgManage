@@ -9,6 +9,243 @@
     // formatSql object
     var _formatsql = {};
 
+    var _defaultOptions = {
+        cursurReturnToken: '\n',
+        scopeTabCoefficient: 1,
+        linebreakKeywords: [
+            {
+                capitalize: false,
+                keyword: "CREATE\\sOR\\sREPLACE\\sFUNCTION\\s([^ \\t\(\)]*\.)?[^ \\t\(\)]*\\s*\([^ \\t\(\)]*\)$",
+                tabBefore: false,
+                newlineBefore: true,
+                newlineAfter: true
+            },
+            {
+                capitalize: true,
+                keyword: "CREATE\\sOR\\sREPLACE",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "VIEW",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "TABLE",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "FUNCTION",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "SEQUENCE",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "GRANT",
+                tabBefore: false,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "SELECT",
+                tabBefore: true,
+                newlineBefore: true,
+                newlinesAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "INSERT",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "FROM",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "WHERE",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "ORDER BY",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "GROUP BY",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "HAVING",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "FETCH",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "UPDATE",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "DELETE",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "(LEFT|LEFT\\sOUTER|RIGHT|RIGHT\\sOUTER|INNER)?\\s?JOIN",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "AND",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "OR",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "SET",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "ON",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "AS",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false
+            },
+            {
+                capitalize: false,
+                keyword: "[^ \\t]*;",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false,
+                newlineAfterNoExtraTab: true
+            },
+            {
+                capitalize: true,
+                keyword: "RETURNS",
+                tabBefore: false,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "DECLARE",
+                tabBefore: false,
+                newlineBefore: true,
+                newlineAfter: true
+            },
+            {
+                capitalize: true,
+                keyword: "BEGIN",
+                tabBefore: false,
+                newlineBefore: true,
+                newlineAfter: true,
+                newlineAfterNoExtraTab: false
+            },
+            {
+                capitalize: true,
+                keyword: "THEN",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false,
+                newlineAfterNoExtraTab: true
+            },
+            {
+                capitalize: true,
+                keyword: "END(\\s[\ \t]+IF[\ \t]*;){0}",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false,
+                newlineAfterNoExtraTab: true
+            },
+            {
+                capitalize: true,
+                keyword: "IF([\ \t]*;){0}",
+                tabBefore: true,
+                newlineBefore: true,
+                newlineAfter: false
+            },
+            {
+                capitalize: true,
+                keyword: "END\\s[\ \t]+IF[\ \t]*;",
+                tabBefore: false,
+                newlineBefore: false,
+                newlineAfter: false,
+                newlineAfterNoExtraTab: true
+            },
+            {
+                capitalize: true,
+                keyword: "\\$BODY\\$",
+                tabBefore: false,
+                newlineBefore: true,
+                newlineAfter: true
+            }
+        ]
+
+    };
+
 
     _formatsql.formatQuery = function (inputText) {
         //console.log('formatQuery 1>' + inputText + '<');
@@ -59,6 +296,38 @@
         return outputText;
     };
 
+
+    //WARNING: This doesn't take literals in effect. It assumes -- doesn't take place within a literal
+    var _removeComments = function (inputText) {
+        var outputText = "";
+        var cur = "";
+        var tail = inputText;
+        var lineEnd;
+        var commentStart;
+
+        while (tail.length > 0) {
+            //grab next line to look at and place it into cur
+            lineEnd = tail.indexOf(_defaultOptions.cursurReturnToken);
+            if (lineEnd > -1) {
+                cur = tail.substring(0, lineEnd + _defaultOptions.cursurReturnToken.length);
+                tail = tail.substring(lineEnd + _defaultOptions.cursurReturnToken.length);
+            } else {
+                cur = tail;
+                tail = "";
+            }
+
+            //check to see if there is a comment
+            commentStart = cur.indexOf('--');
+
+            if (commentStart > -1) {
+                outputText += cur.substring(0, commentStart) + _defaultOptions.cursurReturnToken;
+            } else {
+                outputText += cur;
+            }
+        }
+
+        return outputText;
+    };
 
     var _addLineBreaksBeta = function (inputText) {
         // split text by single quotes. even indexes are now outside of literals. Odd indexes are now inside of literals.

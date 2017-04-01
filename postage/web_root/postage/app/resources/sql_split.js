@@ -472,12 +472,13 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 	var intNotReset = 0;
 	var cursorIsInQuery = false;
 	var bolLastQuery = false
-	var query_start_row = 1;
+	var query_start_row = 0;
 	var query_end_row = 1;
 	var query_start_col = 1;
-	var query_end_col = 1;
+	var query_end_col = 0;
 	var currRow = 1;
 	var currCol = 1;
+	var bolIngnoreWhiteSpace = true;
 
 	int_inputstring_len = str_form_data.length;
 	// I considered copying input to local memory but we don't change it.
@@ -519,6 +520,26 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
     		    //console.log(cursorIsInQuery);
     		}
 		}
+		
+		if (bolIngnoreWhiteSpace) {
+		    while (str_form_data.substr(int_loop, 1) === " " || str_form_data.substr(int_loop, 1) === "\t" || str_form_data.substr(int_loop, 1) === "\n") {
+                if (str_form_data.substr(int_loop, 1) === "\n") {
+                    currRow += 1;
+                    currCol = 0;
+                } else {
+                    currCol += int_chunk_len;
+                }
+		        console.log(str_form_data.substr(int_loop, 1), int_loop, 'please');
+				int_loop += int_chunk_len;
+				int_inputstring_len -= int_chunk_len;
+				int_element_len += int_chunk_len;
+		    }
+		    query_start_row += currRow - query_start_row - 1;
+            query_start_col = currCol;
+		    bolIngnoreWhiteSpace = false;
+		}
+		console.log(str_form_data.substr(int_loop, 1), int_loop);
+		//console.log((str_form_data.substr(int_loop, 1)));
 		//SDEBUG("int_inputstring_len: %i, int_chunk_len: %i, int_element_len: %i ", int_inputstring_len, int_chunk_len,
 		//	int_element_len);
 
@@ -651,8 +672,8 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 			//if (cursorIsInQuery) {
 			if ((int_element_len + 1 === cursorPos) || bolLastQuery) {
 			    strQuery = str_temp;
-			    //console.log(str_temp);
-			    query_end_row = currRow;
+			    console.log(str_temp);
+			    query_end_row = currRow - 1;
                 query_end_col = currCol;
 			    break;
 			} else {
@@ -664,6 +685,7 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 			str_temp = '';
 		    query_start_row = currRow;
             query_start_col = 0;
+            bolIngnoreWhiteSpace = true;
 		}
 		int_loop += int_chunk_len;
 		int_inputstring_len -= int_chunk_len;

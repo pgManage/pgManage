@@ -307,8 +307,7 @@ function autocompleteChangeHandler(tabElement, editor, event) {
             bolFirstSpace = bolCurrentCharWhitespace && !bolPreviousCharWhitespace;
 
 
-            if (event.action === 'remove' && (/[A-Z\"]/gim).test(strScript[intCursorPosition - 1]) || ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && !bolCurrentCharWhitespace && (bolPreviousCharWhitespace || bolPreviousCharOpenParen || strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_'))) {
-
+            if (event.action === 'remove' && (/[A-Z\"]/gim).test(strScript[intCursorPosition - 1]) || ((/[A-Z\"]/gim).test(strScript[intCursorPosition]) && !bolCurrentCharWhitespace && (bolPreviousCharWhitespace || bolPreviousCharOpenParen || strScript[intCursorPosition - 1] === '_' || strScript[intCursorPosition] === '_')) && !bolCurrentCharPeriod) {
 
                 if (arrPreviousKeyWords[1] === 'INSERT' && strPreviousKeyWord === 'INTO') {
                     //console.log('schema');
