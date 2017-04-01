@@ -83,20 +83,11 @@ var pgPanelCSSText = ml(function () {/*
     .ace-pgpanel .ace_indent-guide {
         background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y
     }
-    
+
     .ace-pgpanel .ace_bullet { color: #000; }
     .ace-pgpanel .ace_arrowdown { color: #000; font-size: 1em;}
     .ace-pgpanel .ace_arrowright { color: #000; font-size: 1em;}
-    /*.ace-pgpanel .ace_arrowright {
-        color: #000;
-        font-size: 1em;
-        -webkit-transform: rotate(90deg);
-        -moz-transform: rotate(90deg);
-        -ms-transform: rotate(90deg);
-        -o-transform: rotate(90deg);
-        transform: rotate(90deg);
-    }*/
-    
+
     .ace-pgpanel .ace_ag,
     .ace-pgpanel .ace_cl,
     .ace-pgpanel .ace_cn,
@@ -122,10 +113,10 @@ var pgPanelCSSText = ml(function () {/*
         font-size: 0.75em;
         font-weight: 900;
     }
-            
-            
-            
-    
+
+
+
+
     .ace-pgpanel .ace_ag { color: #CF4F19; }
     .ace-pgpanel .ace_cl { color: #8A3F00; }
     .ace-pgpanel .ace_cn { color: #6F003D; }
