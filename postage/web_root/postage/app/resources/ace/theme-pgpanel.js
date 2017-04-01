@@ -141,6 +141,18 @@ var pgPanelCSSText = ml(function () {/*
     .ace-pgpanel .ace_vw { color: #006E00; }
 */});
 
+    /*.ace-pgpanel .ace_arrowright {
+        color: #000;
+        font-size: 1em;
+        -webkit-transform: rotate(90deg);
+        -moz-transform: rotate(90deg);
+        -ms-transform: rotate(90deg);
+        -o-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+    */
+
+
 /*
 
     .ace-pgpanel .ace_constant.ace_numeric {
