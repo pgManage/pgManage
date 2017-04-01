@@ -130,7 +130,7 @@ test-common:
 	{ postgres -D data_test -p 5431 2> output.txt > output.txt & }; \
 	echo $$! > postgres.pid; \
 	sleep 3
-	psql -U postgres -h 127.0.0.1 -p 5431 postgres -1f test.sql
+	psql -U postgres -h 127.0.0.1 -p 5431 postgres -f test.sql
 	kill `cat postgres.pid`; rm postgres.pid; sleep 3
 	cp data_test/pg_hba.conf data_test/pg_hba.bak
 	sed -e '/trust/s/32            trust/32            md5/g' < data_test/pg_hba.bak > data_test/pg_hba.conf
