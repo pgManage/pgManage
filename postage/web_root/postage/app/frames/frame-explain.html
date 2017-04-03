@@ -443,7 +443,11 @@
 					if (arrChildren) {
 						levelNumber += 1;
 						for (i = 0, len = arrChildren.length; i < len; i += 1) {
-							jsnLevel['Actual Exclusive Time'] -= levelTraveler(levelNumber, numberChild, i, jsnLevel, arrChildren[i]);
+							if (jsnLevel['Node Type'] === 'Materialize') {
+								levelTraveler(levelNumber, numberChild, i, jsnLevel, arrChildren[i]);
+							} else {
+								jsnLevel['Actual Exclusive Time'] -= levelTraveler(levelNumber, numberChild, i, jsnLevel, arrChildren[i]);
+							}
 						}
 					}
 
@@ -470,9 +474,7 @@
 						strLevelPadding += '  ';
 					}
 
-
 					strNode += (levelNumber > 0 ? repeat(' ', intLevelPadding - 6) : '') + (levelNumber === 0 ? '' : '->  ');
-
 
 					if (jsnLevel['Node Type'] === 'Nested Loop') {
 						strNode += 'Nested Loop ' + jsnLevel['Join Type'] + ' Join';
@@ -659,6 +661,7 @@
 				target.children[0].setAttribute('field-delimiter', getClipSetting("fieldDelimiter"));
 				target.children[0].setAttribute('null-values', getClipSetting("nullValues"));
 				target.children[0].setAttribute('column-names', getClipSetting("columnNames"));
+				GS.makeTableSelectable(target.children[0], evt.touchDevice);
 
 				var arrRow = target.querySelectorAll('tbody tr');
 				var mouseOverHandler = function (row, event) {
@@ -699,8 +702,6 @@
 					}(i))
 				}
 
-				GS.makeTableSelectable(target.children[0], evt.touchDevice);
-
 				target = document.getElementById('explain-results-text');
 				strHTML = '';
 				levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, jsnLevel) {
@@ -721,6 +722,141 @@
 				strHTML += 'Execution time: ' + explainJSON[0]['Execution Time'] + ' ms\n';
 				target.innerHTML = strHTML;
 
+
+				target = document.getElementById('explain-results-stats');
+				strHTML = '';
+				var jsnPerNodeStat = {},
+					arrPerNodeStat = [],
+					jsnPerTableStat = {},
+					arrPerTableStat = [];
+
+				levelTraveler = function (levelNumber, numberParent, numberChild, parentObject, jsnLevel) {
+					var i, len, arrChildren = jsnLevel['Plans'];
+
+					if (jsnPerNodeStat[jsnLevel['Node Type']]) {
+						jsnPerNodeStat[jsnLevel['Node Type']].count += 1;
+						jsnPerNodeStat[jsnLevel['Node Type']].time += jsnLevel['Actual Exclusive Time'];
+
+					} else {
+						jsnPerNodeStat[jsnLevel['Node Type']] = {
+							count: 1,
+							time: jsnLevel['Actual Exclusive Time']
+						};
+					}
+
+					if (jsnLevel['Node Type'].indexOf('Scan') > -1) {
+						if (jsnPerTableStat[jsnLevel['Schema'] + '.' + jsnLevel['Relation Name']]) {
+							jsnPerTableStat[jsnLevel['Schema'] + '.' + jsnLevel['Relation Name']].count += 1;
+							jsnPerTableStat[jsnLevel['Schema'] + '.' + jsnLevel['Relation Name']].time += jsnLevel['Actual Exclusive Time'];
+
+						} else {
+							jsnPerTableStat[jsnLevel['Schema'] + '.' + jsnLevel['Relation Name']] = {
+								scans: {},
+								count: 1,
+								time: jsnLevel['Actual Exclusive Time']
+							};
+						}
+						if (jsnPerTableStat[jsnLevel['Schema'] + '.' + jsnLevel['Relation Name']].scans[jsnLevel['Node Type']]) {
+							jsnPerTableStat[jsnLevel['Schema'] + '.' + jsnLevel['Relation Name']].scans[jsnLevel['Node Type']].count += 1;
+							jsnPerTableStat[jsnLevel['Schema'] + '.' + jsnLevel['Relation Name']].scans[jsnLevel['Node Type']].time += jsnLevel['Actual Exclusive Time'];
+						} else {
+							jsnPerTableStat[jsnLevel['Schema'] + '.' + jsnLevel['Relation Name']].scans[jsnLevel['Node Type']] = {
+								count: 1,
+								time: jsnLevel['Actual Exclusive Time']
+							};
+						}
+					}
+
+					if ((arrChildren)) {
+						levelNumber += 1;
+						for (i = 0, len = arrChildren.length; i < len; i += 1) {
+							levelTraveler(levelNumber, numberChild, i, jsnLevel, arrChildren[i]);
+						}
+					}
+				};
+				levelTraveler(0, 0, 0, '', explainJSON[0].Plan);
+
+				var key;
+				for (key in jsnPerNodeStat) {
+					if (jsnPerNodeStat.hasOwnProperty(key)) {
+						arrPerNodeStat.push([key, jsnPerNodeStat[key].count, jsnPerNodeStat[key].time]);
+					}
+				}
+				arrPerNodeStat.sort(function (a, b) {
+					return a[0] > b[0];
+				});
+
+
+				for (key in jsnPerTableStat) {
+					if (jsnPerTableStat.hasOwnProperty(key)) {
+						var arrTableScans = [], key2;
+						for (key2 in jsnPerTableStat[key].scans) {
+							if (jsnPerTableStat[key].scans.hasOwnProperty(key2)) {
+								arrTableScans.push([key2, jsnPerTableStat[key].scans[key2].count, jsnPerTableStat[key].scans[key2].time]);
+							}
+						}
+						arrPerTableStat.push([key, jsnPerTableStat[key].count, jsnPerTableStat[key].time, arrTableScans]);
+					}
+				}
+				arrPerTableStat.sort(function (a, b) {
+					return a[0] > b[0];
+				});
+
+				strHTML += '<h3>Per Node Type Stats</h3>';
+				strHTML += '<hr>';
+				strHTML += '<table><thead>';
+				strHTML += '<tr style="background: #eeeeee;"><td>Node Type</td><td>Count</td><td>Sum of Times</td><td>% of query</td></tr>';
+				strHTML += '<thead><tbody>';
+
+				var i, len;
+				for (i = 0, len = arrPerNodeStat.length; i < len; i += 1) {
+					strHTML += '<tr><td><b>';
+					strHTML += arrPerNodeStat[i][0];
+					strHTML += '</b></td><td>';
+					strHTML += arrPerNodeStat[i][1];
+					strHTML += '</td><td>';
+					strHTML += arrPerNodeStat[i][2].toFixed(3);
+					strHTML += ' ms</td><td>';
+					strHTML += ((arrPerNodeStat[i][2] / parseFloat(explainJSON[0].Plan['Actual Total Time'])) * 100).toFixed(1);
+					strHTML += ' %</td></tr>';
+				}
+
+				strHTML += '<tbody><table>';
+
+				strHTML += '<h3>Per Table Stats</h3>';
+				strHTML += '<hr>';
+				strHTML += '<table><thead>';
+				strHTML += '<tr style="background: #eeeeee;"><td>Table Name</td><td>Scan count</td><td>Total time</td><td>% of Query</td></tr>';
+				strHTML += '<tr style="background: #eeeeee;"><td>Scan Type</td><td>Count</td><td>Sum of Times</td><td>% of Table</td></tr>';
+				strHTML += '<thead><tbody>';
+
+				for (i = 0, len = arrPerTableStat.length; i < len; i += 1) {
+					strHTML += '<tr><td><b>';
+					strHTML += arrPerTableStat[i][0];
+					strHTML += '</b></td><td>';
+					strHTML += arrPerTableStat[i][1];
+					strHTML += '</td><td>';
+					strHTML += arrPerTableStat[i][2].toFixed(3);
+					strHTML += ' ms</td><td>';
+					strHTML += ((arrPerTableStat[i][2] / explainJSON[0].Plan['Actual Total Time']) * 100).toFixed(1);
+					strHTML += ' %</td></tr>';
+
+					for (var j = 0, len2 = arrPerTableStat[i][3].length; j < len2; j += 1) {
+						strHTML += '<tr><td>&nbsp;&nbsp;';
+						strHTML += arrPerTableStat[i][3][j][0];
+						strHTML += '</td><td>';
+						strHTML += arrPerTableStat[i][3][j][1];
+						strHTML += '</td><td>';
+						strHTML += arrPerTableStat[i][3][j][2].toFixed(3);
+						strHTML += ' ms</td><td>';
+						strHTML += ((arrPerTableStat[i][3][j][2] / arrPerTableStat[i][2]) * 100).toFixed(1);
+						strHTML += ' %</td></tr>';
+					}
+				}
+
+				strHTML += '<tbody><table>';
+
+				target.innerHTML = strHTML;
 			}
 		</script>
 
@@ -734,7 +870,7 @@
 			.explain-results-tab {
 				outline: #ccc 1px solid;
 			}
-			#explain-results-html table {
+			.explain-results-tab table {
 			    width: initial;
 			}
 			#explain-results-html table td:last-child, #explain-results-text {
