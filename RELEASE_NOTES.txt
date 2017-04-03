@@ -1,3 +1,33 @@
+Changes since 3.2.2
+Postage:
+Add depesz based explain (closed workflowproducts/postage#176)
+Fix query highlighting
+Fix triangle icons (closed workflowproducts/postage#185)
+Fix tree queries for constraint (closed workflowproducts/postage#187)
+Add second run option to only run the query under the cursor (closed workflowproducts/postage #171)
+Add session user to current user information (closed workflowproducts/postage#180)
+Fix problem with query detection (closed workflowproducts/postage#179)
+Fix escaping for odd names (closed workflowproducts/postage#178)
+Remove lowercasing database and user (closed workflowproducts/postage#178)
+Add declared variables to autocomplete (closed workflowproducts/postage#170)
+Fix ws_raw socket close (related to workflowproducts/postage#174)
+Add a keyboard shortcut editor (closed workflowproducts/postage#167)
+Fix view scripts opening when you click the arrow (closed workflowproducts/postage#169)
+Fix windows installation when installer is on a different drive
+Fix arrowing in some autocomplete situations (closed workflowproducts/postage#182)
+Make Ctrl/Cmd+s save shortcut in tab editor
+Add ORDER BY to all INSERT tests with more than one record (prevents a fail that happens sometimes)
+Add alert to tell the tester when the API tests are done
+
+Envelope:
+Make GS.pushMessage() appear over a GS.dialog() (closed workflowproducts/envelope#50)
+Make gs-combo faster when autocompleting with lots of records (closed workflowproducts/envelope#3)
+Make Ctrl/Cmd+s save shortcut in file editor (closed workflowproducts/envelope#48)
+
+Both:
+Add GROUP BY to websocket SELECT
+
+
 Changes since 3.2.1:
 Postage:
 Clear Electron cache when opening a window
