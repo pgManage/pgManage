@@ -1,7 +1,7 @@
 /*global ml, GS, xtag, evt, ace, Range, newTab, clearPropertyList, getScriptForAce*/
 'use strict';
 var bolHomeLoaded = true
-  , arrTargets = [], arrScripts = [], arrNames = []
+  , arrTargets = [], arrScripts = [], arrBeautify = [], arrNames = []
   , arrVersions = [], arrToolbarAddons = [], homeEditor;
 
 
@@ -119,7 +119,7 @@ function openHome() {
     if (arrScripts.length > 0) {
         //GS.triggerEvent(arrScripts[arrScripts.length - 1], 'click');
         //console.log(arrToolbarAddons[arrToolbarAddons.length - 1]);
-        getScript(arrNames[arrNames.length - 1], arrToolbarAddons[arrToolbarAddons.length - 1], arrScripts[arrScripts.length - 1], true);
+        getScript(arrNames[arrNames.length - 1], arrToolbarAddons[arrToolbarAddons.length - 1], arrScripts[arrScripts.length - 1], true, arrBeautify[arrBeautify.length - 1]);
 
         //getScriptForAce(arrTargets[arrTargets.length - 1],
         //                arrNames[arrNames.length - 1],
@@ -135,11 +135,12 @@ function setQSToHome() {
     GS.pushQueryString('view=' + (strPreviousScript || 'home'));
 }
 
-function addHomeQuery(target, strName, strQuery, strToolbarAddons) {
+function addHomeQuery(target, strName, strQuery, strToolbarAddons, bolBeautify) {
     if (arrScripts[arrScripts.length - 1] !== strQuery) {
         arrTargets.push(target);
         arrNames.push(strName);
         arrScripts.push(strQuery);
+        arrBeautify.push(bolBeautify);
         arrToolbarAddons.push(strToolbarAddons);
     }
 

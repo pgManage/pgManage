@@ -130,12 +130,13 @@ function getListsForDump(strQuery, callback) {
     getListData(strQuery, 'surgery-lists', callback);
 }
 
-function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh) {
+function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh, bolBeautify) {
     'use strict';
     var intScrollTop;
 
+    console.trace(arguments);
     if (!bolHomeRefresh) {
-        addHomeQuery('', strFinalName, strQuery, strToolbarAddons);
+        addHomeQuery('', strFinalName, strQuery, strToolbarAddons, bolBeautify);
     } else {
         intScrollTop = homeEditor.getSession().getScrollTop();
         setHomeValue('Loading Script', '\n\nLoading Your Script\n\n', '');
@@ -153,8 +154,12 @@ function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh) {
                     '\n\n\n\n' +
                     '\n\n\n\n' +
                     '\n\n\n\n';
-
-                setHomeValue(strFinalName, strScript, strToolbarAddons);
+                console.log(bolBeautify);
+                if (bolBeautify) {
+                    setHomeValue(strFinalName, SQLBeautify(strScript), strToolbarAddons);
+                } else {
+                    setHomeValue(strFinalName, strScript, strToolbarAddons);
+                }
                 
                 //console.log(intScrollTop);
                 homeEditor.getSession().setScrollTop(intScrollTop);

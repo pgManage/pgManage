@@ -405,8 +405,12 @@
                             if (buttons.indexOf('dataObjectButtons') !== -1) {
                                 strButtons += dataObjectButtons(strTemplate, strOID, strSchema, strObjectName);
                             }
-
-                            getScript(strFinalName, strButtons, strScript);
+                            
+                            if (strTemplate === 'objectView') {
+                                getScript(strFinalName, strButtons, strScript, false, true);
+                            } else {
+                                getScript(strFinalName, strButtons, strScript);
+                            }
 
                         // else, tab link
                         } else {
