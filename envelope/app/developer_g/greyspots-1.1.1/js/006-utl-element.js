@@ -554,7 +554,7 @@ GS.getInertDOMHTML = function (inertDOM) {
             currentElement = currentElement.parentNode;
         }
         
-        if (currentElement.nodeName !== 'TD' && currentElement.nodeName !== 'TH') {
+        if (currentElement && currentElement.nodeName !== 'TD' && currentElement.nodeName !== 'TH') {
             return undefined;
         }
         

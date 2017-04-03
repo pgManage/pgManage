@@ -6763,7 +6763,7 @@ GS.getInertDOMHTML = function (inertDOM) {
             currentElement = currentElement.parentNode;
         }
         
-        if (currentElement.nodeName !== 'TD' && currentElement.nodeName !== 'TH') {
+        if (currentElement && currentElement.nodeName !== 'TD' && currentElement.nodeName !== 'TH') {
             return undefined;
         }
         
@@ -9459,22 +9459,43 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('GS.trim', 'GS.trim', 'GS.trim(${1:stringToBeTrimmed}, \'${0:stringToTrimOff}\');');
     
     registerDesignSnippet('GS.setCookie', 'GS.setCookie', 'GS.setCookie(\'${1:cookieName}\', ${2:newValue}, ${0:daysUntilExpire});');
-    
+
     registerDesignSnippet('GS.getCookie', 'GS.getCookie', 'GS.getCookie(\'${1:cookieName}\');');
-    
+
     registerDesignSnippet('GS.pushState', 'GS.pushState', 'GS.pushState(${1:stateObj}, ${2:title}, ${0:newURL});');
-    
+
     registerDesignSnippet('GS.replaceState', 'GS.replaceState', 'GS.replaceState(${1:stateObj}, ${2:title}, ${0:newURL});');
-    
+
     registerDesignSnippet('GS.searchToWhere', 'GS.searchToWhere', 'GS.searchToWhere(\'${1:columns}\', ${0:searchClause});');
-    
+
     registerDesignSnippet('GS.iconList', 'GS.iconList', 'GS.iconList();');
-    
+
     registerDesignSnippet('GS.lorem', 'GS.lorem', 'GS.lorem();');
-    
-    registerDesignSnippet('GS.numberSuffix', 'GS.numberSuffix', 'GS.numberSuffix(intNumber);');
+
+    registerDesignSnippet('GS.numberSuffix', 'GS.numberSuffix', 'GS.numberSuffix(${1:intNumber});');
+
+    registerDesignSnippet('GS.hitLink', 'GS.hitLink', 'GS.hitLink(${1:strLink});');
 });
 
+
+// sometimes, we need to hit a link without paying attention
+//      to the response and without opening a new tab. for
+//      example, mailto: and tel: links
+GS.hitLink = function (strLink) {
+    "use strict";
+    var iframeElement;
+
+    iframeElement = document.createElement('iframe');
+    iframeElement.setAttribute('hidden', '');
+    iframeElement.addEventListener('load', function () {
+        if (iframeElement.parentNode === document.body) {
+            document.body.removeChild(iframeElement);
+        }
+    });
+
+    iframeElement.setAttribute("src", strLink);
+    document.body.appendChild(iframeElement);
+};
 
 
 GS.numberSuffix = function(intNumber) {
@@ -10408,7 +10429,54 @@ GS.lorem = function () {
     return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
 };
 
-
+if (!String.prototype.repeat) {
+  String.prototype.repeat = function(count) {
+    'use strict';
+    if (this == null) {
+      throw new TypeError('can\'t convert ' + this + ' to object');
+    }
+    var str = '' + this;
+    count = +count;
+    if (count != count) {
+      count = 0;
+    }
+    if (count < 0) {
+      throw new RangeError('repeat count must be non-negative');
+    }
+    if (count == Infinity) {
+      throw new RangeError('repeat count must be less than infinity');
+    }
+    count = Math.floor(count);
+    if (str.length == 0 || count == 0) {
+      return '';
+    }
+    // Ensuring count is a 31-bit integer allows us to heavily optimize the
+    // main part. But anyway, most current (August 2014) browsers can't handle
+    // strings 1 << 28 chars or longer, so:
+    if (str.length * count >= 1 << 28) {
+      throw new RangeError('repeat count must not overflow maximum string size');
+    }
+    var rpt = '';
+    for (;;) {
+      if ((count & 1) == 1) {
+        rpt += str;
+      }
+      count >>>= 1;
+      if (count == 0) {
+        break;
+      }
+      str += str;
+    }
+    // Could we try:
+    // return Array(count + 1).join(this);
+    return rpt;
+  }
+}
+if (!String.prototype.trim) {
+  String.prototype.trim = function () {
+    return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+  };
+}
 window.addEventListener('design-register-element', function () {
     registerDesignSnippet('Add Loader (to page)', 'GS.addLoader', 'addLoader(\'${0:class-name}\', \'${1:Loading...}\');');
     registerDesignSnippet('Add Loader (to element)', 'GS.addLoader', 'addLoader(${0:document.getElementById(\'id\')}, \'${1:Loading...}\');');
@@ -12902,7 +12970,7 @@ window.addEventListener('design-register-element', function () {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
+        var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))          { strVisibilityAttribute = 'hidden'; }
         if (selectedElement.hasAttribute('hide-on-desktop')) { strVisibilityAttribute = 'hide-on-desktop'; }
         if (selectedElement.hasAttribute('hide-on-tablet'))  { strVisibilityAttribute = 'hide-on-tablet'; }
@@ -13607,25 +13675,150 @@ document.addEventListener('DOMContentLoaded', function () {
             strSearch &&
             GS.getInputSelection(element.control).start === strSearch.length) {
             
-            matchRecord = findRecordFromString(element, strSearch, true);
+            // ######### FOR CROSS
+            // you need to comment the code inside this block.
+            // you need an if statment for >2000 records.
+            // you need to use the currently commented code for <=2000 records.
+            // you need new code for >2000.
+            // you need to get the template and put it inside a virtual template element.
+            // a virtual template element is just a template element inside a javascript variable.
+            //      var templateElement = document.createElement('template');
+            // you need to fill templateElement with the record template string, don't use the thead. (you'll find most everything in element.tableTemplate)
+            // you need to extract the contents of the first td and put that into a variable.
+            // you need to extract the contents of the "value" attribute on the tr (if present).
+            // because you extracted the contents before templating, the variables are untemplated.
+            // you need to get the column name from the first td template.
+            //      there are three things you need to try:
+            //          do a regex for "row.something", cut off the row
+            //              OR
+            //          do a regex for "row['something']", cut off the row[' and ']
+            //              OR
+            //          do a regex for "row["something"]", cut off the row[" and "]
+            //
+            //      that should be good enough. if you can't get the column: stop and
+            //          console.warn to tell the developer to stick <!-- row.column -->
+            //          at the top of the first td 
+            // you need to run an AJAX call on the postgres object in "src" with a where clause.
+            // the where clause will be something like this:
+            //          (OLDWHERE) AND COLUMN ILIKE $UnCOPYQTE$ strSearch%$UnCOPYQTE$
+            // the ajax call should only get one record.
+            // use the two templates to set the value (copy the original code).
+            //
+            // after you're done, leave these comments for future developers
             
-            // if we found a record and its was already selected: selected the matched record and dont 
-            if (matchRecord) {
-                highlightRecord(element, matchRecord);
-                element.control.value = xtag.queryChildren(matchRecord, 'td')[0].textContent;
-                GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+            
+            
+            //<gs-combo src="test.tpeople" column="">
+            //    <template>
+            //        <table>
+            //            <thead>
+            //                <tr>
+            //                    <th>asdf</th>
+            //                    <th>fdsa</th>
+            //                </tr>
+            //            </thead>
+            //            <tbody>
+            //                <tr value="{{! row.id }}"> <--- hidden value, if present
+            //                    <td>{{! row.asdf }}</td> <--- visible value
+            //                    <td>{{! row.fdsa }}</td>
+            //                </tr>
+            //            </tbody>
+            //        </table>
+            //    </template>
+            //</gs-combo>
+            
+            if (xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr').length > 2000) {
+                var strSearchCol = '', templateElement = element.tableTemplate, strWhereLink = '', data, strLink, dataFunction,
+                    strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') || element.getAttribute('source') || '')),
+                    strCols = element.getAttribute('cols') || '';
                 
-                //if (strSearch.length === element.control.value.length) {
-                //    selectRecord(element, matchRecord, true);
-                //}
+                templateElement = templateElement.substring(templateElement.indexOf('td'), templateElement.indexOf('/td') - 1);
+                templateElement = templateElement.substring(templateElement.indexOf('{'), templateElement.length);
+                if (templateElement.indexOf('row.') === -1) {
+                    if (templateElement.indexOf('row[') === -1) {
+                        console.warn('There is no doT.js in the first "<td>" in your template please fill your first "<td>" with templating code.');
+                    } else {
+                        templateElement = templateElement.substring(parseInt(templateElement.indexOf('row['), 10) + 5, templateElement.length - 2 - 3).trim();
+                    }
+                } else {
+                    templateElement = templateElement.substring(parseInt(templateElement.indexOf('row.'), 10) + 4, templateElement.length - 3).trim();
+                }
                 
-                scrollToSelectedRecord(element);
+                
+                strSearchCol = templateElement;
+                
+                strLink = 'src=' + encodeURIComponent(strSource);
+                
+                if (element.getAttribute('where')) {
+                    strWhereLink = '' + element.getAttribute('where') + ' AND ' + strSearchCol + '::text ILIKE $UnCOPYQTE$' + strSearch + '%$UnCOPYQTE$';
+                } else {
+                    strWhereLink = strSearchCol + '::text ILIKE $UnCOPYQTE$' + strSearch + '%$UnCOPYQTE$';
+                }
+                
+                strLink += '&where='    + encodeURIComponent(GS.templateWithQuerystring(strWhereLink)) +
+                           '&limit='    + encodeURIComponent(GS.templateWithQuerystring(1)) +
+                           '&offset='   + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('offset') || ''))) +
+                           '&order_by=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('ord') || ''))) +
+                           '&cols='     + encodeURIComponent(strCols);
+                
+                //console.log(strLink);
+                //console.log(strSearchCol);
+                
+                
+                if (strSearchCol) {
+                    GS.ajaxJSON('/env/action_select', strLink, function (data, error) {
+                        if (!error) {
+                            //console.log(data.dat.dat[0][0]);
+                            if (data && data.dat && data.dat.dat && data.dat.dat[0] && data.dat.dat[0][0]) {
+                                //console.log(data.dat.dat[0][0]);
+                                
+                                // console.log(1);
+                                element.control.value = data.dat.dat[0][0];
+                                // console.log(2);
+                                GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                                // console.log(3);
+                                //console.log(element.open);
+                                if (element.open) {
+                                    matchRecord = findRecordFromString(element, strSearch, true);
+                                    // console.log(4);
+                                    if (matchRecord) {
+                                    // console.log(5);
+                                        highlightRecord(element, matchRecord);
+                                    // console.log(6);
+                                        scrollToSelectedRecord(element);
+                                    // console.log(7);
+                                    }
+                                    // console.log(8);
+                                }
+                                
+                            }
+                        } else {
+                            GS.ajaxErrorDialog(data);
+                        }
+                    });
+                }
+                
+                
                 
             } else {
-                clearSelection(element);
-                //selectRecordFromValue(element, strSearch, false);
-                //GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                matchRecord = findRecordFromString(element, strSearch, true);
+                
+                // if we found a record and its was already selected: selected the matched record and dont 
+                if (matchRecord) {
+                    highlightRecord(element, matchRecord);
+                    element.control.value = xtag.queryChildren(matchRecord, 'td')[0].textContent;
+                    GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                    
+                    scrollToSelectedRecord(element);
+                    
+                } else {
+                    clearSelection(element);
+                    //selectRecordFromValue(element, strSearch, false);
+                    //GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
+                }
             }
+            
+            
         }
         
         if (element.attemptSearchOnNextKeyup === true) {
@@ -18088,7 +18281,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
+        var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
         if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
         if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
@@ -18838,10 +19031,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 //if (element.hasAttribute('disabled')) {
                 //    element.innerHTML = element.getAttribute('value') || element.getAttribute('placeholder') || '';
                 //} else {
-                element.innerHTML = '';
-                element.appendChild(singleLineTemplate.cloneNode(true));
-                if (element.oldTabIndex) {
-                    xtag.query(element, '.control')[0].setAttribute('tabindex', element.oldTabIndex);
+                if (!element.hasAttribute('disabled')) {
+                    element.innerHTML = '';
+                    element.appendChild(singleLineTemplate.cloneNode(true));
+                    if (element.oldTabIndex) {
+                        xtag.query(element, '.control')[0].setAttribute('tabindex', element.oldTabIndex);
+                    }
                 }
                 //}
                 
@@ -19085,7 +19280,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 // if vertical arrow: update current date part
                                 } else if (intKeyCode === 38 || // up arrow
                                            intKeyCode === 40) { // down arrow
-                                    dteDate = new Date(strValue);
+                                    // If the date is in ISO format, new Date() will create it in GMT then convert it to the local timezone
+                                    dteDate = new Date(strValue + ' 00:00:00');
                                     
                                     // if current part is year
                                     if (strCurrentSection === 'year') {
@@ -19667,8 +19863,12 @@ document.addEventListener('DOMContentLoaded', function () {
                            GS.setInputSelection(this.control, tempSelection.start, tempSelection.end);
                         }
                         
-                    } else if (this.hasAttribute('disabled')) {
-                        this.innerHTML = newValue;
+                    } else if (this.hasAttribute('disabled')) {                        
+                        if (newValue && typeof newValue === 'object') {
+                            this.innerHTML = formatDate(newValue, getFormatString(this));
+                        } else {
+                            this.innerHTML = newValue || '';
+                        }
                         
                     } else {
                         this.setAttribute('value', newValue);
@@ -19934,17 +20134,22 @@ GS.closeDialog = function (dialog, strAnswer) {
     
     // on focus: if the currently focus element is not in the frontmost dialog: focus first control of the frontmost dialog
     document.addEventListener('focus', function (event) {
-        var arrDialog = document.getElementsByTagName('gs-dialog'), frontDialog, parentFind, arrElements, i, len; 
-        
+        var arrDialog = document.getElementsByTagName('gs-dialog');
+        var frontDialog;
+        var parentFind;
+        var arrElements;
+        var i;
+        var len;
+
         //console.log('1*** focus: ', document.activeElement);
         if (arrDialog.length > 0) {
             frontDialog = arrDialog[arrDialog.length - 1];
             parentFind = GS.findParentElement(document.activeElement, frontDialog);
-            
+
             //console.log('2***', parentFind, frontDialog);
             if (parentFind !== frontDialog) {
                 arrElements = xtag.query(frontDialog, 'input, textarea, select, button, iframe, [tabindex], a');
-                
+
                 for (i = 0, len = arrElements.length; i < len; i += 1) {
                     if (GS.isElementFocusable(arrElements[i])) {
                         arrElements[i].focus();
@@ -19955,8 +20160,7 @@ GS.closeDialog = function (dialog, strAnswer) {
             }
         }
     }, true);
-    
-    
+
     // DEPRECATED
     GS.dialog = function (options) {
         var strHTML, dialogOverlay, dialog, strContent = '', strButtons = '', i, len, gridEach,
@@ -25601,7 +25805,7 @@ window.addEventListener('design-register-element', function () {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
+        var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
         if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
         if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
@@ -26876,59 +27080,73 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('<gs-grid>', '<gs-grid>', 'gs-grid widths="${1}">\n' +
                                                     '    <gs-block>${2}</gs-block>\n' +
                                                     '</gs-grid>');
-    
+
     designRegisterElement('gs-grid', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
-    
+
     window.designElementProperty_GSGRID = function(selectedElement) {
         addProp('Min-Width Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('min-width') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'min-width', this.value);
         });
-        
+
         addProp('Media', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('media') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'media', this.value);
         });
-        
+
         addProp('Widths', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('widths') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'widths', this.value);
         });
-        
+
         addProp('Padded', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('padded')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'padded', (this.value === 'true'), true);
         });
-        
+
         addProp('Gutters', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('gutter')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'gutter', (this.value === 'true'), true);
         });
-        
+
         addProp('Reflow At', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('reflow-at') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'reflow-at', this.value);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -26958,34 +27176,48 @@ window.addEventListener('design-register-element', function () {
         addFlexProps(selectedElement);
     };
 });
-    
+
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-block>', '<gs-block>', 'gs-block>${2}</gs-block>');
-    
+
     designRegisterElement('gs-block', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-grid.html');
-    
+
     window.designElementProperty_GSBLOCK = function(selectedElement) {
         addProp('Width:', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('width') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'width', this.value);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -27035,17 +27267,17 @@ document.addEventListener('DOMContentLoaded', function () {
             handleObserver(element);
         }
     }
-    
+
     //
     function elementInserted(element) {
         var styleElement;
-        
+
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
-                
+
                 // if the style element for the grid column CSS doesn't exist: create it
                 if (!document.getElementById('gs-dynamic-css')) {
                     styleElement = document.createElement('style');
@@ -27053,7 +27285,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     styleElement.setAttribute('gs-dynamic', '');
                     document.head.appendChild(styleElement);
                 }
-                
+
                 // if no width parameter is set: default
                 if (!element.getAttribute('widths') && !element.getAttribute('min-width') && !element.getAttribute('media')) {
                     element.bolIgnoreAttribute = true;
@@ -27061,7 +27293,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                                                     .join('1').split('').join(','));
                     element.bolIgnoreAttribute = false;
                 }
-                
+
                 element.handleCSS();
                 element.handleBlocks();
             }
@@ -27748,17 +27980,31 @@ window.addEventListener('design-register-element', function () {
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -27855,17 +28101,31 @@ window.addEventListener('design-register-element', function () {
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -28148,14 +28408,28 @@ window.addEventListener('design-register-element', function () {
         
         
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))          { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop')) { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))  { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))   { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop')) { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))  { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))   { strVisibilityAttribute = 'show-on-phone'; }
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
         
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
@@ -29761,17 +30035,31 @@ window.addEventListener('design-register-element', function () {
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -29830,83 +30118,97 @@ window.addEventListener('design-register-element', function () {
                                                                      '</gs-listbox>');
     registerDesignSnippet('Dynamic Template <gs-listbox>', '<gs-listbox>', 'gs-listbox src="${1:test.tpeople}"></gs-listbox>');
     registerDesignSnippet('<gs-listbox>', '<gs-listbox>', 'gs-listbox src="${1:test.tpeople}"></gs-listbox>');
-    
+
     designRegisterElement('gs-listbox', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-listbox.html');
-    
+
     window.designElementProperty_GSLISTBOX = function(selectedElement) {
         addProp('Source', true, '<gs-memo class="target" value="' + encodeHTML(decodeURIComponent(selectedElement.getAttribute('src') ||
                                                                             selectedElement.getAttribute('source') || '')) + '" mini></gs-memo>',
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'src', encodeURIComponent(this.value));
         });
-        
+
         addProp('Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('cols') || '') + '" mini></gs-text>',
                 function () {
             return setOrRemoveTextAttribute(selectedElement, 'cols', this.value);
         });
-        
+
         addProp('Hide Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('hide') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'hide', this.value);
         });
-        
+
         addProp('Where', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('where') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'where', this.value);
         });
-        
+
         addProp('Order By', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('ord') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'ord', this.value);
         });
-        
+
         addProp('Limit', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('limit') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'limit', this.value);
         });
-        
+
         addProp('Offset', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('offset') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'offset', this.value);
         });
-        
+
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))           { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -29924,29 +30226,29 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // DISABLED attribute
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         // NO-SELECT attribute
         addProp('Dissallow&nbsp;Select', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('no-select') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'no-select', this.value === 'true', true);
         });
-        
+
         // LETTER-SCROLLBAR attribute
         addProp('Letter&nbsp;Scrollbar', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('letter-scrollbar') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'letter-scrollbar', this.value === 'true', true);
         });
-        
+
         // LETTER-DIVIDERS attribute
         addProp('Letter Dividers', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('letter-dividers') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'letter-dividers', this.value === 'true', true);
@@ -31135,7 +31437,7 @@ window.addEventListener('design-register-element', function () {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
+        var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
         if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
         if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
@@ -31697,7 +31999,7 @@ window.addEventListener('design-register-element', function () {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
+        var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
         if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
         if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
@@ -32134,82 +32436,96 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 window.addEventListener('design-register-element', function () {
-    
+
     registerDesignSnippet('<gs-number>', '<gs-number>', 'gs-number column="${1:name}"></gs-number>');
     registerDesignSnippet('<gs-number> With Label', '<gs-number>', 'label for="${1:number-insert-qty}">${2:Quantity}:</label>\n' +
                                                                    '<gs-number id="${1:number-insert-qty}" column="${3:qty}"></gs-number>');
-    
+
     designRegisterElement('gs-number', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-number.html');
-    
+
     window.designElementProperty_GSNUMBER = function(selectedElement) {
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
         });
-        
+
         addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
         });
-        
+
         addProp('Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('placeholder') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'placeholder', this.value);
         });
-        
+
         //console.log(selectedElement.hasAttribute('mini'));
-        
+
         addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
         });
-        
+
         addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
         });
-        
+
         // SUSPEND-CREATED attribute
         addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +
@@ -32227,19 +32543,19 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('show-on-desktop');
             selectedElement.removeAttribute('show-on-tablet');
             selectedElement.removeAttribute('show-on-phone');
-            
+
             if (this.value) {
                 selectedElement.setAttribute(this.value, '');
             }
-            
+
             return selectedElement;
         });
-        
+
         // DISABLED attribute
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };
@@ -32828,7 +33144,7 @@ window.addEventListener('design-register-element', function () {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
+        var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
         if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
         if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
@@ -33396,7 +33712,7 @@ window.addEventListener('design-register-element', function () {
         });
         
         // visibility attributes
-        strVisibilityAttribute = '';
+        var strVisibilityAttribute = '';
         if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
         if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
         if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
@@ -35041,7 +35357,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 window.addEventListener('design-register-element', function () {
     'use strict';
-    
+
     registerDesignSnippet('<gs-sticky>', '<gs-sticky>', 'gs-sticky>\n' +
                                                         '    <gs-sticky-inner>\n' +
                                                         '        ${0}\n' +
@@ -35049,7 +35365,7 @@ window.addEventListener('design-register-element', function () {
                                                         '</gs-sticky>');
     
     designRegisterElement('gs-sticky', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-sticky.html');
-    
+
     window.designElementProperty_GSSTICKY = function (selectedElement) {
         addProp('Direction', true,  '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('direction') || '') + '" mini>' +
                                         '<option value="">Up</option>' +
@@ -35058,34 +35374,48 @@ window.addEventListener('design-register-element', function () {
                                     function () {
             return setOrRemoveTextAttribute(selectedElement, 'direction', this.value);
         });
-        
+
         addProp('Always Stuck', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('stuck') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'stuck', this.value === 'true', true);
         });
-        
+
         addProp('Touch Devices Allowed', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('touch-device-allowed') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'touch-device-allowed', this.value === 'true', true);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
         });
 
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden')) { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop')) { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet')) { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone')) { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop')) { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet')) { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone')) { strVisibilityAttribute = 'show-on-phone'; }
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
 
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
@@ -36374,14 +36704,28 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
 
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
@@ -37094,7 +37438,7 @@ document.addEventListener('DOMContentLoaded', function () {
             value: {
                 get: function () {
                     // return this.getAttribute('value');
-                    if (this.getAttribute('value').trim() === '') {
+                    if (!this.getAttribute('value') || this.getAttribute('value').trim() === '') {
                         return 'NULL';
                     } else {
                         return this.getAttribute('value');
@@ -37411,6 +37755,446 @@ left: 49.75%;"><div class="clock-button clock-minute" data-value="25"><span clas
             }
         }
     });
+});/*jslint white:true browser:true this:true*/
+/*global window,GS,document,xtag,designRegisterElement,registerDesignSnippet,addProp,encodeHTML,setOrRemoveTextAttribute,setOrRemoveBooleanAttribute,addFlexProps*/
+
+window.addEventListener('design-register-element', function () {
+    'use strict';
+    
+    registerDesignSnippet('<gs-timestamp>', '<gs-timestamp>', 'gs-timestamp date-format="${0:isodate}" time-format=${1}></gs-timestamp>');
+    
+    designRegisterElement('gs-timestamp', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-timestamp.html');
+    
+    window.designElementProperty_GSTIMESTAMP = function (selectedElement) {    
+        addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
+        });
+        
+        addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
+        });
+        
+        addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
+        });
+        
+        addProp('Date Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('date-placeholder') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'date-placeholder', this.value);
+        });
+        
+        addProp('Time Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('time-placeholder') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'time-placeholder', this.value);
+        });
+        
+        addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
+        });
+        
+        addProp('Date Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-date-picker')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'no-date-picker', (this.value === 'true'), false);
+        });
+        
+        addProp('Date Format', true, '<gs-combo class="target" value="' + encodeHTML(selectedElement.getAttribute('date-format') || '') + '" mini>' + 
+                        ml(function () {/*<template>
+                                            <table>
+                                                <tbody>
+                                                    <tr value="">
+                                                        <td hidden>Default</td>
+                                                        <td><center>Default<br /> (01/01/2015)</center></td>
+                                                    </tr>
+                                                    <tr value="shortdate">
+                                                        <td hidden>shortdate</td>
+                                                        <td><center>shortdate<br /> (1/1/15)</center></td>
+                                                    </tr>
+                                                    <tr value="mediumdate">
+                                                        <td hidden>mediumdate</td>
+                                                        <td><center>mediumdate<br /> (Jan 1, 2015)</center></td>
+                                                    </tr>
+                                                    <tr value="longdate">
+                                                        <td hidden>longdate</td>
+                                                        <td><center>longdate<br /> (January 1, 2015)</center></td>
+                                                    </tr>
+                                                    <tr value="fulldate">
+                                                        <td hidden>fulldate</td>
+                                                        <td><center>fulldate<br /> (Thursday, January 1, 2015)</center></td>
+                                                    </tr>
+                                                    <tr value="isodate">
+                                                        <td hidden>isodate</td>
+                                                        <td><center>isodate<br /> (2015-01-01)</center></td>
+                                                    </tr>
+                                                    <tr value="isodatetime">
+                                                        <td hidden>isodatetime</td>
+                                                        <td><center>isodatetime<br /> (2015-01-01T00:00:00)</center></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </template>
+                                    </gs-combo>
+                                */}), function () {
+            return setOrRemoveTextAttribute(selectedElement, 'date-format', this.value);
+        });
+
+        addProp('Time Picker', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('no-time-picker')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'no-time-picker', (this.value === 'true'), false);
+        });
+
+        addProp('Time Display Format', true, '<gs-select class="target" value="' + encodeHTML(selectedElement.getAttribute('time-format') || '') + '" mini>' +
+                                    '<option value="">Regular (1:30 PM)</option>' +
+                                    '<option value="military">Military (13:30)</option>' +
+                                '</gs-select>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'time-format', this.value);
+        });
+
+        addProp('Time Non-Empty', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('time-non-empty')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'time-non-empty', (this.value === 'true'), true);
+        });
+
+        addProp('Time Now Button', true, '<gs-checkbox class="target" value="' + (!selectedElement.hasAttribute('time-no-now-button')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'time-no-now-button', (this.value === 'true'), false);
+        });
+        
+        // TITLE attribute
+        addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
+        });
+        
+        addProp('Date Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('date-tabindex') || '') + '" mini></gs-number>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'date-tabindex', this.value);
+        });
+        
+        addProp('Time Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('time-tabindex') || '') + '" mini></gs-number>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'time-tabindex', this.value);
+        });
+        
+        addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocapitalize', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocapitalize') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocapitalize', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Autocomplete', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocomplete') !== 'off') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'autocomplete', (this.value === 'false' ? 'off' : ''));
+        });
+        
+        addProp('Spellcheck', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('spellcheck') !== 'false') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'spellcheck', (this.value === 'false' ? 'false' : ''));
+        });
+        
+        // visibility attributes
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
+        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
+        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
+        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
+        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
+        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
+        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
+        
+        addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
+                                        '<option value="">Visible</option>' +
+                                        '<option value="hidden">Invisible</option>' +
+                                        '<option value="hide-on-desktop">Invisible at desktop size</option>' +
+                                        '<option value="hide-on-tablet">Invisible at tablet size</option>' +
+                                        '<option value="hide-on-phone">Invisible at phone size</option>' +
+                                        '<option value="show-on-desktop">Visible at desktop size</option>' +
+                                        '<option value="show-on-tablet">Visible at tablet size</option>' +
+                                        '<option value="show-on-phone">Visible at phone size</option>' +
+                                    '</gs-select>', function () {
+            selectedElement.removeAttribute('hidden');
+            selectedElement.removeAttribute('hide-on-desktop');
+            selectedElement.removeAttribute('hide-on-tablet');
+            selectedElement.removeAttribute('hide-on-phone');
+            selectedElement.removeAttribute('show-on-desktop');
+            selectedElement.removeAttribute('show-on-tablet');
+            selectedElement.removeAttribute('show-on-phone');
+            
+            if (this.value) {
+                selectedElement.setAttribute(this.value, '');
+            }
+            
+            return selectedElement;
+        });
+        
+        // DISABLED attribute
+        addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
+        });
+        
+        //addFlexContainerProps(selectedElement);
+        addFlexProps(selectedElement);
+        
+        // SUSPEND-INSERTED attribute
+        addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
+        });
+    };
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+    
+    function pushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+        var strOperator;
+
+        if (strQSCol && strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i];
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                } else {
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
+                }
+                i += 1;
+            }
+        } else if (strQSCol && GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun !== true) {
+                if (strQSValue !== '' || !element.getAttribute('value')) {
+                    element.setAttribute('value', strQSValue);
+                }
+            } else {
+                element.value = strQSValue;
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
+    }
+    
+    // for a given element, copy the control values with the value attribute
+    function syncView(element) {
+        var strDateValue = element.dateControl.value + ' ' + (element.timeControl.value === 'NULL' ? '00:00' : element.timeControl.value);
+        var dateValue = new Date(strDateValue);
+        var newValue = dateValue.getFullYear() + '-' + (dateValue.getMonth() + 1) + '-' + dateValue.getDate() + ' ' + dateValue.getHours() + ':' + dateValue.getMinutes();
+        
+        //console.log(element.dateControl.value);
+        //console.log(element.timeControl.value === 'NULL' ? '00:00' : element.timeControl.value);
+        //console.log(strDateValue);
+        //console.log(dateValue);
+        //console.log(newValue);
+        
+        element.setAttribute('value', newValue);
+    }
+    
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
+        }
+    }
+    
+    // dont do anything that modifies the element here
+    function elementCreated(element) {
+        // if "created" hasn't been suspended: run created code
+        if (!element.hasAttribute('suspend-created')) {
+            // if the value was set before the "created" lifecycle code runs: set attribute
+            //      (discovered when trying to set a value of a date control in the after_open of a dialog)
+            //      ("delete" keyword added because of firefox)
+            if (element.value && new Date(element.value).getTime()) {
+                element.setAttribute('value', element.value);
+                delete element.value;
+                //element.value = undefined;
+                //element.value = null;
+            }
+        }
+    }
+
+    function elementInserted(element) {
+        var dateValue = '';
+        var timeValue = '';
+        
+        // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
+        if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
+            // if this is the first time inserted has been run: continue
+            if (!element.inserted) {
+                element.inserted = true;
+                element.internal = {};
+                saveDefaultAttributes(element);
+                
+                if (element.hasAttribute('value')) {
+                    var arrValue = element.getAttribute('value').split(' ');
+                    dateValue = new Date(arrValue[0] + ' 00:00:00');    // adding an empty time causes the date to not be iso format
+                                                                        // this makes the browser choose the local timezone instead of GMT
+                    timeValue = arrValue[1];
+                }
+                
+                element.dateControl = document.createElement('gs-date');
+                element.timeControl = document.createElement('gs-time');
+                
+                var arrPassthrough = ['mini', 'autocorrect', 'autocapitalize', 'autocomplete', 'spellcheck', 'disabled', 'readonly'];
+                var arrDatePassthrough = ['date-placeholder', 'no-date-picker', 'date-format', 'date-tabindex'];
+                var arrTimePassthrough = ['time-placeholder', 'no-time-picker', 'time-format', 'time-non-empty', 'time-no-now-button', 'time-tabindex'];
+                var i;
+                var len;
+                
+                for (i = 0, len = arrPassthrough.length; i < len; i += 1) {
+                    if (element.hasAttribute(arrPassthrough[i])) {
+                        element.dateControl.setAttribute(arrPassthrough[i], '');
+                        element.timeControl.setAttribute(arrPassthrough[i], '');
+                    }
+                }
+                for (i = 0, len = arrDatePassthrough.length; i < len; i += 1) {
+                    if (element.hasAttribute(arrDatePassthrough[i])) {
+                        element.dateControl.setAttribute(arrDatePassthrough[i].replace(/date\-/g, ''), element.getAttribute(arrDatePassthrough[i]) || '');
+                    }
+                }
+                for (i = 0, len = arrTimePassthrough.length; i < len; i += 1) {
+                    if (element.hasAttribute(arrTimePassthrough[i])) {
+                        element.timeControl.setAttribute(arrTimePassthrough[i].replace(/time\-/g, ''), element.getAttribute(arrTimePassthrough[i]) || '');
+                    }
+                }
+                
+                element.dateControl.value = dateValue;
+                element.timeControl.value = timeValue;
+                
+                element.dateControl.setAttribute('flex', '');
+                element.timeControl.setAttribute('flex', '');
+                
+                element.dateControl.setAttribute('gs-dynamic', '');
+                element.timeControl.setAttribute('gs-dynamic', '');
+                
+                element.dateControl.addEventListener('change', function (event) {
+                    syncView(element);
+                    event.stopPropagation();
+                    GS.triggerEvent(element, 'change');
+                });
+                element.timeControl.addEventListener('change', function (event) {
+                    syncView(element);
+                    event.stopPropagation();
+                    GS.triggerEvent(element, 'change');
+                });
+                
+                //console.log(element.dateControl);
+                //console.log(element.timeControl);
+                
+                element.appendChild(element.dateControl);
+                element.appendChild(element.timeControl);
+                
+                //console.log(element.children);
+                
+                pushReplacePopHandler(element);
+                window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
+                window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
+                window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
+            }
+        }
+    }
+    
+    xtag.register('gs-timestamp', {
+        lifecycle: {
+            created: function () {
+                elementCreated(this);
+            },
+            
+            inserted: function () {
+                elementInserted(this);
+            },
+            
+            attributeChanged: function (strAttrName, oldValue, newValue) {
+                var dateValue = '';
+                var timeValue = '';
+                // if "suspend-created" has been removed: run created and inserted code
+                if (strAttrName === 'suspend-created' && newValue === null) {
+                    elementCreated(this);
+                    elementInserted(this);
+                    
+                // if "suspend-inserted" has been removed: run inserted code
+                } else if (strAttrName === 'suspend-inserted' && newValue === null) {
+                    elementInserted(this);
+                    
+                } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                    if (strAttrName === 'value') {
+                        if (newValue !== null) {
+                            var arrValue = newValue.split(' ');
+                            dateValue = new Date(arrValue[0]);
+                            timeValue = arrValue[1];
+                            
+                            this.dateControl.value = dateValue;
+                            this.timeControl.value = timeValue;
+                        } else {
+                            this.dateControl.value = null;
+                            this.timeControl.value = null;
+                        }
+                    }
+                }
+            }
+        },
+        events: {},
+        accessors: {
+            value: {
+                get: function () {
+                    return this.getAttribute('value');
+                },
+                
+                set: function (newValue) {
+                    this.setAttribute('value', newValue);
+                }
+            }
+        },
+        methods: {
+        }
+    });
 });
 window.addEventListener('design-register-element', function () {
     
@@ -37511,7 +38295,7 @@ window.addEventListener('design-register-element', function () {
             } else if (selectedElement.hasAttribute('iconrotatedown'))  { strIconRotation = 'iconrotatedown';
             } else if (selectedElement.hasAttribute('iconrotateleft'))  { strIconRotation = 'iconrotateleft';
             } else { strIconRotation = ''; }
-            
+
             addProp('Icon&nbsp;Rotation', true, '<gs-select class="target" value="' + strIconRotation + '" mini>' +
                                                 '   <option value="">None</option>' +
                                                 '   <option value="iconrotateright">90 degrees</option>' +
@@ -37521,35 +38305,49 @@ window.addEventListener('design-register-element', function () {
                 selectedElement.removeAttribute('iconrotateright');
                 selectedElement.removeAttribute('iconrotatedown');
                 selectedElement.removeAttribute('iconrotateleft');
-                
+
                 if (this.value) {
                     selectedElement.setAttribute(this.value, '');
                 }
-                
+
                 return selectedElement;
             });
         }
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         // TABINDEX attribute
         addProp('Tabindex', true, '<gs-number class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-number>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
         });
-        
+
         // visibility attributes
-        strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
-        
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
         addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
                                         '<option value="">Visible</option>' +
                                         '<option value="hidden">Invisible</option>' +

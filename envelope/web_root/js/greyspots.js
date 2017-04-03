@@ -6763,7 +6763,7 @@ GS.getInertDOMHTML = function (inertDOM) {
             currentElement = currentElement.parentNode;
         }
         
-        if (currentElement.nodeName !== 'TD' && currentElement.nodeName !== 'TH') {
+        if (currentElement && currentElement.nodeName !== 'TD' && currentElement.nodeName !== 'TH') {
             return undefined;
         }
         
@@ -10429,7 +10429,54 @@ GS.lorem = function () {
     return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
 };
 
-
+if (!String.prototype.repeat) {
+  String.prototype.repeat = function(count) {
+    'use strict';
+    if (this == null) {
+      throw new TypeError('can\'t convert ' + this + ' to object');
+    }
+    var str = '' + this;
+    count = +count;
+    if (count != count) {
+      count = 0;
+    }
+    if (count < 0) {
+      throw new RangeError('repeat count must be non-negative');
+    }
+    if (count == Infinity) {
+      throw new RangeError('repeat count must be less than infinity');
+    }
+    count = Math.floor(count);
+    if (str.length == 0 || count == 0) {
+      return '';
+    }
+    // Ensuring count is a 31-bit integer allows us to heavily optimize the
+    // main part. But anyway, most current (August 2014) browsers can't handle
+    // strings 1 << 28 chars or longer, so:
+    if (str.length * count >= 1 << 28) {
+      throw new RangeError('repeat count must not overflow maximum string size');
+    }
+    var rpt = '';
+    for (;;) {
+      if ((count & 1) == 1) {
+        rpt += str;
+      }
+      count >>>= 1;
+      if (count == 0) {
+        break;
+      }
+      str += str;
+    }
+    // Could we try:
+    // return Array(count + 1).join(this);
+    return rpt;
+  }
+}
+if (!String.prototype.trim) {
+  String.prototype.trim = function () {
+    return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+  };
+}
 window.addEventListener('design-register-element', function () {
     registerDesignSnippet('Add Loader (to page)', 'GS.addLoader', 'addLoader(\'${0:class-name}\', \'${1:Loading...}\');');
     registerDesignSnippet('Add Loader (to element)', 'GS.addLoader', 'addLoader(${0:document.getElementById(\'id\')}, \'${1:Loading...}\');');

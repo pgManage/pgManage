@@ -1999,7 +1999,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     </gs-checkbox>
                 </div>
 				<br />
-                <gs-grid>
+                <gs-grid style="margin-bottom: 2.5em;">
                     <gs-block><gs-button remove-all class="dump-dialog-close">Cancel</gs-button></gs-block>
                     <gs-block><gs-button remove-all id="button-schema-dump" class="dump-dialog-close">Open Script</gs-button></gs-block>
                 </gs-grid>

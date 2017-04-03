@@ -2299,7 +2299,7 @@ function highlightCurrentCursorQuery(tabElement, jsnQueryStart, jsnQueryEnd) {
                 'background'
             );
 
-    console.log(jsnQueryStart.row, jsnQueryStart.column, jsnQueryEnd.row, jsnQueryEnd.column);
+    //console.log(jsnQueryStart.row, jsnQueryStart.column, jsnQueryEnd.row, jsnQueryEnd.column);
 
     //console.log(tabElement.openCursorQueryMarker);
     setTimeout(removeMarkerHighlighted, 2500);
@@ -2342,8 +2342,8 @@ function executeScript(bolCursorQuery) {
             } else {
                 var intCursorPos = rowAndColumnToIndex(strScript, jsnSelection.start.row, jsnSelection.start.column - 1);
             }
-            //console.log(intCursorPos);
-            jsnCurrentQuery = findSqlQueryFromCursor(strScript, intCursorPos);
+            jsnCurrentQuery = findSqlQueryFromCursor(strScript.trim(), intCursorPos);
+            console.log(jsnCurrentQuery.strQuery);
             jsnQueryStart = {
                  'row':        jsnCurrentQuery.start_row
                 ,'column':     jsnCurrentQuery.start_column
