@@ -18,6 +18,8 @@ Fix arrowing in some autocomplete situations (closed workflowproducts/postage#18
 Make Ctrl/Cmd+s save shortcut in tab editor
 Add ORDER BY to all INSERT tests with more than one record (prevents a fail that happens sometimes)
 Add alert to tell the tester when the API tests are done
+Fix Beautify to work properly (closed workflowproducts/postage#183)
+make Beautify run when opening a VIEW script
 
 Envelope:
 Make GS.pushMessage() appear over a GS.dialog() (closed workflowproducts/envelope#50)
