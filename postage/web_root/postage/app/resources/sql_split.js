@@ -68,7 +68,7 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
         		bolLastQuery = true;
         	}
 		} else {
-		    console.log(intNotReset, cursorPos);
+		    //console.log(intNotReset, cursorPos);
 		    if (intNotReset === cursorPos - 2) {
         		bolLastQuery = true;
         	} else if (intNotReset === cursorPos - 1) {
