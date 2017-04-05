@@ -910,25 +910,17 @@
 		<gs-page>
             <gs-body flex-vertical flex-fill>
 				<div style="width: 100%; height: 100%;" flex-vertical>
-					<gs-optionbox id="explain-results-tab-bar" style="width: 100%;" no-target mini value="graph">
-						<gs-option jumbo value="graph" remove-all inline>Graph</gs-option>
+					<gs-optionbox id="explain-results-tab-bar" style="width: 100%;" no-target mini value="html">
 						<gs-option jumbo value="html" remove-all inline>HTML</gs-option>
 						<gs-option jumbo value="text" remove-all inline>Text</gs-option>
 						<gs-option jumbo value="stats" remove-all inline>Stats</gs-option>
+						<gs-option jumbo value="graph" remove-all inline>Graph</gs-option>
 					</gs-optionbox>
 
-					<div class="explain-results-tab" id="explain-results-graph" style="width: 100%;" flex flex-vertical>
-
-					</div>
-					<div class="explain-results-tab" id="explain-results-html" style="width: 100%;" flex hidden>
-
-					</div>
-					<div class="explain-results-tab" id="explain-results-text" style="width: 100%;" flex hidden>
-
-					</div>
-					<div class="explain-results-tab" id="explain-results-stats" style="width: 100%;" flex hidden>
-
-					</div>
+					<div class="explain-results-tab" id="explain-results-html" style="width: 100%;" flex></div>
+					<div class="explain-results-tab" id="explain-results-text" style="width: 100%;" flex hidden></div>
+					<div class="explain-results-tab" id="explain-results-stats" style="width: 100%;" flex hidden></div>
+					<div class="explain-results-tab" id="explain-results-graph" style="width: 100%;" flex flex-vertical hidden></div>
 				</div>
             </gs-body>
         </gs-page>

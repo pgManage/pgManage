@@ -729,55 +729,104 @@ GS.getTextWidth = function (scope, strText, bolWhitePreserve) {
 
 
 
-GS.scrollParent = function (element) {
-    var i = 0, currentElement = element, bolFoundScrollable = false, strOverflow;
-    
+GS.scrollParent = function (element, strDirection) {
+    "use strict";
+    var strDirectionText;
+    if (strDirection) {
+        strDirectionText = strDirection;
+    } else {
+        strDirectionText = 'vertical';
+    }
+    var i = 0;
+    var currentElement = element;
+    var bolFoundScrollable = false;
+    var strOverflow;
+
     if (currentElement) {
-        while (currentElement && currentElement.nodeName !== 'HTML' && bolFoundScrollable === false && i < 75) {
+        while (
+            currentElement &&
+            currentElement.nodeName !== 'HTML' &&
+            bolFoundScrollable === false &&
+            i < 75
+        ) {
             strOverflow = GS.getStyle(currentElement, 'overflow');
-            
-            if (strOverflow === 'scroll' || (strOverflow === 'auto' && currentElement.clientHeight < currentElement.scrollHeight)) {
+            if (
+                strOverflow === 'scroll' ||
+                (
+                    strOverflow === 'auto' &&
+                    strDirectionText === 'vertical' &&
+                    currentElement.clientHeight < currentElement.scrollHeight
+                ) ||
+                (
+                    strOverflow === 'auto' &&
+                    strDirectionText === 'horizontal' &&
+                    currentElement.clientWidth < currentElement.scrollWidth
+                )
+            ) {
                 bolFoundScrollable = true;
             } else {
                 currentElement = currentElement.parentNode;
                 i += 1;
             }
         }
-        
+
         //console.log(currentElement.nodeName);
         if (!currentElement || currentElement.nodeName === 'HTML') {
             return document.body;
         }
-        
-        return bolFoundScrollable ? currentElement : undefined;
+
+        return (
+            bolFoundScrollable
+                ? currentElement
+                : undefined
+        );
     }
     return undefined;
-};
+}
+
 
 //
-GS.scrollIntoView = function (element) {
-    var scrollingContainer = GS.scrollParent(element), arrSiblings, i, len, intScrollTop;
-    
+GS.scrollIntoView = function (element, strDirection) {
+    var strDirectionText;
+    if (strDirection) {
+        strDirectionText = strDirection;
+    } else {
+        strDirectionText = 'vertical';
+    }
+    var scrollingContainer = GS.scrollParent(element, strDirectionText), arrSiblings, i, len, intScrollTop, intScrollLeft;
     if (scrollingContainer) {
         //console.log(scrollingContainer);
-        
-        arrSiblings = element.parentNode.children;
-        
-        for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
-            if (arrSiblings[i] === element) {
-                intScrollTop += arrSiblings[i].offsetHeight / 2;
-                
-                break;
-            } else {
-                intScrollTop += arrSiblings[i].offsetHeight;
+        if (strDirectionText === 'horizontal') {
+            arrSiblings = element.parentNode.children;
+            
+            for (i = 0, intScrollLeft = 0, len = arrSiblings.length; i < len; i += 1) {
+                if (arrSiblings[i] === element) {
+                    intScrollLeft += arrSiblings[i].offsetWidth / 2;
+                    
+                    break;
+                } else {
+                    intScrollLeft += arrSiblings[i].offsetWidth;
+                }
             }
+            
+            intScrollLeft = intScrollLeft - (scrollingContainer.offsetWidth / 2);
+            scrollingContainer.scrollLeft = intScrollLeft;
+        } else {
+            arrSiblings = element.parentNode.children;
+            
+            for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
+                if (arrSiblings[i] === element) {
+                    intScrollTop += arrSiblings[i].offsetHeight / 2;
+                    
+                    break;
+                } else {
+                    intScrollTop += arrSiblings[i].offsetHeight;
+                }
+            }
+            
+            intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
+            scrollingContainer.scrollTop = intScrollTop;
         }
-        
-        intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
-        
-        //console.log(intScrollTop);
-        
-        scrollingContainer.scrollTop = intScrollTop;
     }
 };
 

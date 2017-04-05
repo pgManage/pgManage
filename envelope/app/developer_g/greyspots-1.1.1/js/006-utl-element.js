@@ -303,33 +303,70 @@ GS.isElementFocusable = function (element) {
 //    }
 //    return undefined;
 //};
-
+// see function in 006-utl.js
 // scroll an element to the middle of its scrollparent
-GS.scrollIntoView = function (element) {
-    var scrollingContainer = GS.scrollParent(element), arrSiblings, i, len, intScrollTop;
-    
-    if (scrollingContainer) {
-        //console.log(scrollingContainer);
+// GS.scrollIntoView = function (element) {
+//     var scrollingContainer = GS.scrollParent(element), arrSiblings, i, len, intScrollTop;
+//     console.log(scrollingContainer);
+//     if (scrollingContainer) {
+//         //console.log(scrollingContainer);
         
-        arrSiblings = element.parentNode.children;
+//         arrSiblings = element.parentNode.children;
         
-        for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
-            if (arrSiblings[i] === element) {
-                intScrollTop += arrSiblings[i].offsetHeight / 2;
+//         for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
+//             if (arrSiblings[i] === element) {
+//                 intScrollTop += arrSiblings[i].offsetHeight / 2;
                 
-                break;
-            } else {
-                intScrollTop += arrSiblings[i].offsetHeight;
-            }
-        }
+//                 break;
+//             } else {
+//                 intScrollTop += arrSiblings[i].offsetHeight;
+//             }
+//         }
         
-        intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
+//         intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
         
-        //console.log(intScrollTop);
+//         //console.log(intScrollTop);
         
-        scrollingContainer.scrollTop = intScrollTop;
-    }
-};
+//         scrollingContainer.scrollTop = intScrollTop;
+//     }
+// };
+
+
+// GS.scrollIntoView = function (element, strDirection) {
+//     var strDirectionText;
+//     if (strDirection) {
+//         strDirectionText = strDirection;
+//     } else {
+//         strDirectionText = 'vertical';
+//     }
+//     var scrollingContainer = GS.scrollParent(element, strDirectionText), arrSiblings, i, len, intScrollTop;
+    
+    
+//     if (scrollingContainer) {
+        
+//         arrSiblings = element.parentNode.children;
+        
+//         for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
+//             if (arrSiblings[i] === element) {
+//                 intScrollTop += arrSiblings[i].offsetHeight / 2;
+                
+//                 break;
+//             } else {
+//                 intScrollTop += arrSiblings[i].offsetHeight;
+//             }
+//         }
+        
+//         intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
+        
+//         //console.log(intScrollTop);
+        
+//         scrollingContainer.scrollTop = intScrollTop;
+//     }
+// };
+
+
+
+
 
 
 // #################################################################

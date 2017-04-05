@@ -63,6 +63,32 @@ GS.scrollIntoView(&lt;ELEMENT&gt;);</code></pre>
                 </template>
             </gs-doc-example>
             
+            <div class="doc-example-description">
+                <span class="h3">GS.scrollParent Horizontal:</span><br />
+                <p>The GS.scrollParent function has a second parameter that allows it to search for a horizontal scrollbar.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="24">
+                    <gs-button onclick="testScrollParent()">Find Horizontal Scroll Parent</gs-button>
+                    <br />
+                    <div bg-danger style="padding:1em;">
+                        <div bg-success style="padding:1em;overflow:auto;height:4em;">
+                            <div bg-primary>
+                                <div>test</div>
+                                <div id="target" style="width: 200%">target width: 200%</div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <template for="js" height="8">
+                    function testScrollParent() {
+                        var target = document.getElementById('target');
+                        
+                        GS.scrollParent(target, 'horizontal').style.border = '1px solid #000';
+                    }
+                </template>
+            </gs-doc-example>
+            
             
             <div class="doc-example-description">
                 <span class="h3">GS.scrollIntoView Example:</span><br />
@@ -118,6 +144,55 @@ GS.scrollIntoView(&lt;ELEMENT&gt;);</code></pre>
                     }
                 </template>
             </gs-doc-example>
+            
+            <div class="doc-example-description">
+                <span class="h3">GS.scrollIntoView Horizontal:</span><br />
+                <p>The GS.scrollIntoView function has a second parameter that allows it to scroll horizontally.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="30">
+                    <gs-button onclick="testScrollIntoView('target-horizontal-1')">
+                        Scroll Target 1 Into View</gs-button>
+                    <gs-button onclick="testScrollIntoView('target-horizontal-2')">
+                        Scroll Target 2 Into View</gs-button>
+                    <gs-button onclick="testScrollIntoView('target-horizontal-3')">
+                        Scroll Target 3 Into View</gs-button>
+                    <gs-button onclick="testScrollIntoView('target-horizontal-4')">
+                        Scroll Target 4 Into View</gs-button>
+                    <br />
+                    <div bg-primary style="overflow:auto;height:4em;">
+                        <div style="width: 260%;">
+                            <span style="padding-left: 10%; width: 5%; padding-right: 10%;" id="target-horizontal-1">target 1</span> 
+                            <span style="padding-left: 10%; width: 5%; padding-right: 10%;" id="target-horizontal-2">target 2</span> 
+                            <span style="padding-left: 10%; width: 5%; padding-right: 10%;" id="target-horizontal-3">target 3</span> 
+                            <span style="padding-left: 10%; width: 5%; padding-right: 10%;" id="target-horizontal-4">target 4</span>
+                        </div>
+                    </div>
+                </template>
+                <template for="js" height="5">
+                    function testScrollIntoView(strID) {
+                        GS.scrollIntoView(document.getElementById(strID), 'horizontal');
+                    }
+                </template>
+            </gs-doc-example>
         </gs-container>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
     </body>
 </html>

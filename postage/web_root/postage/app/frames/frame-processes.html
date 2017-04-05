@@ -171,13 +171,17 @@
     <body>
 		<gs-page>
             <gs-body padded flex-vertical flex-fill>
-				<gs-checkbox id="autorefresh" value="true" flex-horizontal><label style="text-align: left;" flex>&nbsp;Autorefresh</label></gs-checkbox>
-				<label for="autorefresh_interval">Autorefresh Interval:</label>
-				<gs-text id="autorefresh_interval" value="5"></gs-text>
-				<br />
-				<label>Order by:</label>
-				<gs-grid widths="1,1">
-					<gs-block>
+                <gs-grid widths="1,1,1,1" reflow-at="945px">
+                    <gs-block>
+                        <label>Autorefresh:</label>
+			        	<gs-checkbox id="autorefresh" value="true" flex-horizontal></gs-checkbox>
+			        </gs-block>
+                    <gs-block>
+                    	<label>Autorefresh Interval:</label>
+				        <gs-text id="autorefresh_interval" value="5"></gs-text>
+                    </gs-block>
+                    <gs-block>    
+			    	    <label>Order by:</label>
 						<gs-select id="orderby_column" value="pid">
 							<option value="datname">Database</option>
 							<option value="pid">Process ID</option>
@@ -194,14 +198,16 @@
 							<option value="query_start">Query Start</option>
 							<option value="state_change">Last State Change</option>
 						</gs-select>
-					</gs-block>
-					<gs-block>
-						<gs-select id="orderby_direction">
+                    </gs-block>
+                    <gs-block>
+			    	    <label>Order by direction:</label>
+                        <gs-select id="orderby_direction">
 							<option value="ASC">Ascending</option>
 							<option value="DESC">Descending</option>
 						</gs-select>
-					</gs-block>
-				</gs-grid>
+                    </gs-block>
+                </gs-grid>
+				<br />
 				<br />
 				<gs-datasheet flex id="datasheet-processes" src="pg_catalog.pg_stat_activity"
                             pk="pid" lock="pid" socket="postageProcessDialogSocket" no-filter
