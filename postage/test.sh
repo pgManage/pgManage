@@ -1,6 +1,6 @@
  #!/bin/bash
 
- set -e
+set -e
 
 rm -rf postage-master master.zip ~/.mozilla ~/.postage
 
