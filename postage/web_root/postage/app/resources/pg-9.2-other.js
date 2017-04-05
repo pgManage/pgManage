@@ -895,7 +895,7 @@ function dialogOptions() {
                                     </gs-select>
                                 </td>
                                 <td><gs-text id="ShortcutKeyRunCursorQuery" mini></gs-text></td>
-                                <td><gs-static value="Run Query"></gs-static></td>
+                                <td><gs-static value="Run Query Under Cursor"></gs-static></td>
                             </tr>
                             <tr>
                                 <td>
@@ -2342,7 +2342,7 @@ function executeScript(bolCursorQuery) {
             } else {
                 var intCursorPos = rowAndColumnToIndex(strScript, jsnSelection.start.row, jsnSelection.start.column - 1);
             }
-            jsnCurrentQuery = findSqlQueryFromCursor(strScript.trim(), intCursorPos);
+            jsnCurrentQuery = findSqlQueryFromCursor(strScript, intCursorPos);
             console.log(jsnCurrentQuery.strQuery);
             jsnQueryStart = {
                  'row':        jsnCurrentQuery.start_row

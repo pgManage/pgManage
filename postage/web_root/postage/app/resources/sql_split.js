@@ -1,5 +1,316 @@
 /*jslint white:true*/
 
+
+function findSqlQueryFromCursor(str_form_data, cursorPos) {
+	var int_inputstring_len;
+	var int_qs = 0; // quote status
+	var int_E_quote = 0; // for single quotes and backslash skipping
+	var int_ps = 0; // parenthesis level
+	var int_element_len = 0;
+	var int_chunk_len = 0;
+	var int_tag = 0;
+	var int_last_query = 0;
+	var int_tag_len = 0;
+	var str_tag = '', str_temp = '', str_trailing = '';
+	var strQuery = '';
+	var intNotReset = 0;
+	var cursorIsInQuery = false;
+	var bolLastQuery = false
+	var query_start_row = 0;
+	var query_end_row = 1;
+	var query_start_col = 1;
+	var query_end_col = 0;
+	var currRow = 1;
+	var currCol = 1;
+	var bolIgnoreWhiteSpace = true;
+	var bolFirstQuery = true;
+
+	int_inputstring_len = str_form_data.length;
+	// I considered copying input to local memory but we don't change it.
+	//   So don't copy the entire item into a new variable, it could be large.
+	var int_loop = 0;  // increments by one character per loop
+	var int_start = 0; // increments when we push SQL to array
+    
+    //change from array to String
+    //keep track of query start and end
+    //when we find an unquoted SEMICOLON then 
+    //if the next number is cursorPos
+    //  return the String
+    //if we find the cursor in the query elsewhere then
+    //  set bolLastQuery to true
+    // when we get to the if bolLastQuery is true return the query text
+    
+	// quote status
+	// 0 => no quotes
+	// 1 => start a dollar tag
+	// 2 => have a dollar tag
+	// 3 => single quote
+	// 4 => double quote
+	// 5 => multiline comment
+	// 6 => line comment
+
+	while (int_inputstring_len > 0) {
+	    intNotReset += 1;
+		//SDEBUG("1");
+		//SDEBUG("int_loop: %s", int_loop);
+		int_chunk_len = 1;
+		int_element_len += int_chunk_len;
+		
+		if (cursorPos === 0) {
+		    if (intNotReset === cursorPos + 1) {
+    		    bolLastQuery = true;
+    		    //console.log(cursorIsInQuery);
+    		}
+		}
+		
+		if (bolFirstQuery) {
+    		if (intNotReset === cursorPos) {
+        		bolLastQuery = true;
+        	}
+		} else {
+		    console.log(intNotReset, cursorPos);
+		    if (intNotReset === cursorPos - 2) {
+        		bolLastQuery = true;
+        	} else if (intNotReset === cursorPos - 1) {
+        		bolLastQuery = true;
+        	} else if (intNotReset === cursorPos) {
+        		bolLastQuery = true;
+        	}
+		}
+		
+// 		if (!bolFirstQuery) {
+//     		console.log('str_form_data[intNotReset]:  ' + str_form_data[intNotReset]);
+//     		console.log('str_form_data[int_loop]:  ' + str_form_data[int_loop]);
+//     		console.log(' ');
+//     		console.log(' ');
+//     		console.log(' ');
+//     		console.log(' ');
+// 		}
+		
+		if (bolIgnoreWhiteSpace) {
+		    while (str_form_data.substr(int_loop, 1) === ' ' || str_form_data.substr(int_loop, 1) === "\n" || str_form_data.substr(int_loop, 1) === "\t" || str_form_data.substr(int_loop, 1) === "\r") {
+                if (str_form_data.substr(int_loop, 1) === "\n") {
+                    currRow += 1;
+                    currCol = 0;
+                } else {
+                    currCol += int_chunk_len;
+                }
+		        //console.log(str_form_data.substr(int_loop, 1), int_loop, 'whitespace');
+				int_loop += 1;
+				intNotReset += 1;
+				int_element_len += 1;
+		    }
+		    //console.log(int_loop);
+		    query_start_row += currRow - query_start_row - 1;
+		    //console.log(query_start_row);
+            query_start_col = currCol;
+            intNotReset -= 1;
+		    bolIgnoreWhiteSpace = false;
+		}
+		
+// 		console.log(str_form_data.substr(int_loop, 1), int_loop, 'not whitespace');
+		//console.log(str_form_data.substr(int_loop, 1), int_loop);
+		//console.log((str_form_data.substr(int_loop, 1)));
+		//SDEBUG("int_inputstring_len: %i, int_chunk_len: %i, int_element_len: %i ", int_inputstring_len, int_chunk_len,
+		//	int_element_len);
+
+		// if we're beginning a new element then strip white space
+		/*if ( element_len === 1 && ( start_ptr[0] === ' ' || start_ptr[0] === '\r' || start_ptr[0] === '\n' || start_ptr[0] === '\t' ) ) {
+			start_ptr = start_ptr + 1;
+			element_len = 0;
+			// SDEBUG("test start_ptr: %i;", start_ptr[0] );
+
+
+		} else*/
+		if (str_form_data.substr(int_loop, 1) === "\n") {
+            currCol = 0;
+            currRow += 1;
+        } else {
+            currCol += 1;
+        }
+        
+		// FOUND MULTILINE COMMENT:
+		if (int_qs === 0 && int_inputstring_len > 1 && str_form_data.substr(int_loop, 2) === "/*") {
+			int_qs = 5;
+		// console.log("found multiline comment");
+
+			// ENDING MULTILINE COMMENT
+		} else if (int_qs === 5 && int_inputstring_len > 1 && str_form_data.substr(int_loop, 2) === "*/") {
+			int_qs = 0;
+		// console.log("found end of multiline comment");
+
+			// FOUND DASH COMMENT:
+		} else if (int_qs === 0 && int_inputstring_len > 1 && str_form_data.substr(int_loop, 2) === "--") {
+			int_qs = 6;
+		// console.log("found dash comment");
+
+			// ENDING DASH COMMENT
+		} else if (int_qs === 6 && int_inputstring_len > 1 && (str_form_data.substr(int_loop, 1) === "\n" || str_form_data.substr(int_loop, 1) === "\r")) {
+			int_qs = 0;
+		// console.log("found end of dash comment");
+
+			// CONSUME COMMENT
+		} else if (int_qs === 6 || int_qs === 5) {
+			// this speeds things up but it doesn't consume comments because we can't
+			// overwrite the incoming pointer
+			// and we don't memcpy one letter at a time, we copy each element as a
+			// whole. Trying to get rid of SQL with
+			// only comments in them is going to require a re-write
+
+			// FOUND SLASH:  we don't skip slashed chars within dollar tags, double or single quotes and comments.
+		} else if (str_form_data.substr(int_loop, 1) === "\\" && int_qs !== 4 && int_qs !== 2 && int_qs !== 5 && int_qs !== 6) {
+			// skip next character
+			int_loop = int_loop + int_chunk_len;
+			int_inputstring_len -= int_chunk_len;
+			int_chunk_len = 1;
+			int_element_len += int_chunk_len;
+		// console.log("found slash int_loop: %s", int_loop);
+
+			// FOUND SINGLE QUOTE:
+		} else if (int_qs === 0 && str_form_data.substr(int_loop, 1) === "'") {
+			int_qs = 3;
+			int_E_quote = (int_loop - 1) === 'E';
+		// console.log("found single quote");
+
+			// ENDING SINGLE QUOTE
+		} else if (int_qs === 3 && str_form_data.substr(int_loop, 1) === "'") {
+			int_qs = 0;
+			int_E_quote = 0;
+		// console.log("found end of single quote");
+
+			// FOUND DOUBLE QUOTE:
+		} else if (int_qs === 0 && str_form_data.substr(int_loop, 1) === "\"") {
+			int_qs = 4;
+		// console.log("found double quote");
+
+			// ENDING DOUBLE QUOTE
+		} else if (int_qs === 4 && str_form_data.substr(int_loop, 1) === "\"") {
+			int_qs = 0;
+		// console.log("found end of double quote");
+
+			// FOUND OPEN PARENTHESIS:
+		} else if (int_qs === 0 && str_form_data.substr(int_loop, 1) === "(") {
+			int_ps = int_ps + 1;
+		// console.log("found open parenthesis");
+
+			// FOUND CLOSE PARENTHESIS
+		} else if (int_qs === 0 && str_form_data.substr(int_loop, 1) === ")" && int_ps > 0) {
+			int_ps = int_ps - 1;
+		// console.log("found close parenthesis");
+
+			// FOUND DOLLAR TAG START:
+		} else if (int_qs === 0 && str_form_data.substr(int_loop, 1) === "$") {
+		   //// console.log('start dollar tag');
+			// we should be looking ahead here. get the tag or if false start then
+			// just continue
+			var int_test_loop = int_loop + 1;
+
+            while (int_test_loop < int_inputstring_len && str_form_data.substr(int_test_loop, 1).match("^[a-zA-Z0-9_]$")) {
+                int_test_loop += 1;
+            }
+            
+			if (str_form_data.substr(int_test_loop, 1) === '$') {
+				int_tag = (int_test_loop - (int_loop - 1));
+				str_tag = str_form_data.substr(int_loop, int_tag);
+				// we found the end of the tag, now look for the close tag
+				int_loop += int_tag;
+				intNotReset += int_tag;
+				int_inputstring_len -= int_tag;
+				int_element_len += int_tag;
+                currCol += int_tag;
+				int_qs = 2;
+				// SDEBUG("after int_loop: %s", int_loop);
+			} else {
+				// false alarm, do nothing
+			}
+
+			// END DOLLAR TAG
+		} else if (int_qs === 2 && str_form_data.substr(int_loop, str_tag.length) === str_tag)  {
+			int_qs = 0;
+			// move pointer to end of end dollar tag
+			int_tag -= 1;
+			int_element_len += int_tag;
+			int_loop += int_tag;
+			intNotReset += int_tag;
+			currCol += int_tag;
+			int_inputstring_len -= int_tag;
+			// FOUND AN UNQUOTED/ UNPARENTHESISED SEMICOLON: || found end of document
+		} else if (int_ps === 0 && int_qs === 0 && str_form_data.substr(int_loop, 1) === ";" || str_form_data.length - 1 === int_loop) {
+		// console.log("found semicolon;");
+			// stash away this array element
+
+			str_temp = str_form_data.substr(int_start, int_element_len);
+			
+			//console.log(cursorIsInQuery);
+			//if (cursorIsInQuery) {
+			if (bolLastQuery) {
+			    strQuery = str_temp;
+			    //console.log(str_temp);
+			    query_end_row = currRow - 1;
+                query_end_col = currCol;
+			    break;
+			} else {
+    		    query_start_row = currRow;
+                query_start_col = 0;
+			}
+			bolFirstQuery = false;
+			int_start = int_loop + int_chunk_len;
+			int_element_len = 0;
+			str_temp = '';
+            bolIgnoreWhiteSpace = true;
+		}
+		int_loop += int_chunk_len;
+		int_inputstring_len -= int_chunk_len;
+	}
+
+	// if we have a trailing SQL statement (or nothing in form data at all)
+	if (int_element_len > 0) {
+		// if you are reading this see the comment above marked "consume comment"
+
+		// stash away this array element
+
+        str_temp = str_form_data.substr(int_start, int_element_len);
+		//strQuery = str_temp;
+		// SDEBUG("int_start: %i", int_start);
+		// SDEBUG("int_loop: %i", int_loop);
+		// SDEBUG("int_element_len: %i", int_element_len);
+	}
+    
+    //console.log(query_start_col, query_start_row, query_end_col, query_end_row);
+    
+	return {
+	     'strQuery':       strQuery.trim()
+	    ,'end_column':     query_end_col
+	    ,'end_row':        query_end_row
+	    ,'start_column':   query_start_col
+	    ,'start_row':      query_start_row
+	};
+
+
+}
+
+
+
+// var strCursorSplitText = ml(function () {/*
+// SELECT *, 'SELECT * FROM test.asdf' AS ";"
+// FROM wiki.rgroups
+// Limit 10;
+// SELECT *, 'SELECT * FROM test.asdf' AS ";"
+// FROM wiki.rgroups
+// Limit 10;
+// SELECT *, 'SELECT * FROM test.asdf' AS ";"
+// FROM wiki.rgroups
+// Limit 10;
+// SELECT *, 'SELECT * FROM test.asdf' AS ";"
+// --FROM wiki.rgroups;
+// Limit 10;
+// */});
+// var arrSplitSQLFromPos = findSqlQueryFromCursor(strCursorSplitText, 50);
+
+
+
+
+
 // NOTES:                   Start   End
 // Dash Comment             --      \r or \n
 // Multi-line comment       /*      */
@@ -456,289 +767,6 @@
 
     
 // });
-
-function findSqlQueryFromCursor(str_form_data, cursorPos) {
-	var int_inputstring_len;
-	var int_qs = 0; // quote status
-	var int_E_quote = 0; // for single quotes and backslash skipping
-	var int_ps = 0; // parenthesis level
-	var int_element_len = 0;
-	var int_chunk_len = 0;
-	var int_tag = 0;
-	var int_last_query = 0;
-	var int_tag_len = 0;
-	var str_tag = '', str_temp = '', str_trailing = '';
-	var strQuery = '';
-	var intNotReset = 0;
-	var cursorIsInQuery = false;
-	var bolLastQuery = false
-	var query_start_row = 0;
-	var query_end_row = 1;
-	var query_start_col = 1;
-	var query_end_col = 0;
-	var currRow = 1;
-	var currCol = 1;
-	var bolIgnoreWhiteSpace = true;
-
-	int_inputstring_len = str_form_data.length;
-	// I considered copying input to local memory but we don't change it.
-	//   So don't copy the entire item into a new variable, it could be large.
-	var int_loop = 0;  // increments by one character per loop
-	var int_start = 0; // increments when we push SQL to array
-    
-    //change from array to String
-    //keep track of query start and end
-    //when we find an unquoted SEMICOLON then 
-    //if the next number is cursorPos
-    //  return the String
-    //if we find the cursor in the query elsewhere then
-    //  set bolLastQuery to true
-    // when we get to the if bolLastQuery is true return the query text
-    
-	// quote status
-	// 0 => no quotes
-	// 1 => start a dollar tag
-	// 2 => have a dollar tag
-	// 3 => single quote
-	// 4 => double quote
-	// 5 => multiline comment
-	// 6 => line comment
-
-	while (int_inputstring_len > 0) {
-	    intNotReset += 1;
-		//SDEBUG("1");
-		//SDEBUG("int_loop: %s", int_loop);
-		int_chunk_len = 1;
-		int_element_len += int_chunk_len;
-		if (intNotReset === cursorPos) {
-		    bolLastQuery = true;
-		    //console.log(cursorIsInQuery);
-		}
-		if (cursorPos === 0) {
-		    if (intNotReset === cursorPos + 1) {
-    		    bolLastQuery = true;
-    		    //console.log(cursorIsInQuery);
-    		}
-		}
-		
-		if (bolIgnoreWhiteSpace) {
-		    while (str_form_data.substr(int_loop, 1) === " " || str_form_data.substr(int_loop, 1) === "\t" || str_form_data.substr(int_loop, 1) === "\n") {
-                if (str_form_data.substr(int_loop, 1) === "\n") {
-                    currRow += 1;
-                    currCol = 0;
-                } else {
-                    currCol += int_chunk_len;
-                }
-		        //console.log(str_form_data.substr(int_loop, 1), int_loop, 'please');
-				int_loop += int_chunk_len;
-				int_inputstring_len -= int_chunk_len;
-				int_element_len += int_chunk_len;
-		    }
-		    query_start_row += currRow - query_start_row - 1;
-            query_start_col = currCol;
-		    bolIgnoreWhiteSpace = false;
-		}
-		//console.log(str_form_data.substr(int_loop, 1), int_loop);
-		//console.log((str_form_data.substr(int_loop, 1)));
-		//SDEBUG("int_inputstring_len: %i, int_chunk_len: %i, int_element_len: %i ", int_inputstring_len, int_chunk_len,
-		//	int_element_len);
-
-		// if we're beginning a new element then strip white space
-		/*if ( element_len === 1 && ( start_ptr[0] === ' ' || start_ptr[0] === '\r' || start_ptr[0] === '\n' || start_ptr[0] === '\t' ) ) {
-			start_ptr = start_ptr + 1;
-			element_len = 0;
-			// SDEBUG("test start_ptr: %i;", start_ptr[0] );
-
-
-		} else*/
-		if (str_form_data.substr(int_loop, 1) === "\n") {
-            currCol = 0;
-            currRow += 1;
-        } else {
-            currCol += 1;
-        }
-        
-		// FOUND MULTILINE COMMENT:
-		if (int_qs === 0 && int_inputstring_len > 1 && str_form_data.substr(int_loop, 2) === "/*") {
-			int_qs = 5;
-		// console.log("found multiline comment");
-
-			// ENDING MULTILINE COMMENT
-		} else if (int_qs === 5 && int_inputstring_len > 1 && str_form_data.substr(int_loop, 2) === "*/") {
-			int_qs = 0;
-		// console.log("found end of multiline comment");
-
-			// FOUND DASH COMMENT:
-		} else if (int_qs === 0 && int_inputstring_len > 1 && str_form_data.substr(int_loop, 2) === "--") {
-			int_qs = 6;
-		// console.log("found dash comment");
-
-			// ENDING DASH COMMENT
-		} else if (int_qs === 6 && int_inputstring_len > 1 && (str_form_data.substr(int_loop, 1) === "\n" || str_form_data.substr(int_loop, 1) === "\r")) {
-			int_qs = 0;
-		// console.log("found end of dash comment");
-
-			// CONSUME COMMENT
-		} else if (int_qs === 6 || int_qs === 5) {
-			// this speeds things up but it doesn't consume comments because we can't
-			// overwrite the incoming pointer
-			// and we don't memcpy one letter at a time, we copy each element as a
-			// whole. Trying to get rid of SQL with
-			// only comments in them is going to require a re-write
-
-			// FOUND SLASH:  we don't skip slashed chars within dollar tags, double or single quotes and comments.
-		} else if (str_form_data.substr(int_loop, 1) === "\\" && int_qs !== 4 && int_qs !== 2 && int_qs !== 5 && int_qs !== 6) {
-			// skip next character
-			int_loop = int_loop + int_chunk_len;
-			int_inputstring_len -= int_chunk_len;
-			int_chunk_len = 1;
-			int_element_len += int_chunk_len;
-		// console.log("found slash int_loop: %s", int_loop);
-
-			// FOUND SINGLE QUOTE:
-		} else if (int_qs === 0 && str_form_data.substr(int_loop, 1) === "'") {
-			int_qs = 3;
-			int_E_quote = (int_loop - 1) === 'E';
-		// console.log("found single quote");
-
-			// ENDING SINGLE QUOTE
-		} else if (int_qs === 3 && str_form_data.substr(int_loop, 1) === "'") {
-			int_qs = 0;
-			int_E_quote = 0;
-		// console.log("found end of single quote");
-
-			// FOUND DOUBLE QUOTE:
-		} else if (int_qs === 0 && str_form_data.substr(int_loop, 1) === "\"") {
-			int_qs = 4;
-		// console.log("found double quote");
-
-			// ENDING DOUBLE QUOTE
-		} else if (int_qs === 4 && str_form_data.substr(int_loop, 1) === "\"") {
-			int_qs = 0;
-		// console.log("found end of double quote");
-
-			// FOUND OPEN PARENTHESIS:
-		} else if (int_qs === 0 && str_form_data.substr(int_loop, 1) === "(") {
-			int_ps = int_ps + 1;
-		// console.log("found open parenthesis");
-
-			// FOUND CLOSE PARENTHESIS
-		} else if (int_qs === 0 && str_form_data.substr(int_loop, 1) === ")" && int_ps > 0) {
-			int_ps = int_ps - 1;
-		// console.log("found close parenthesis");
-
-			// FOUND DOLLAR TAG START:
-		} else if (int_qs === 0 && str_form_data.substr(int_loop, 1) === "$") {
-		   //// console.log('start dollar tag');
-			// we should be looking ahead here. get the tag or if false start then
-			// just continue
-			var int_test_loop = int_loop + 1;
-
-            while (int_test_loop < int_inputstring_len && str_form_data.substr(int_test_loop, 1).match("^[a-zA-Z0-9_]$")) {
-                int_test_loop += 1;
-            }
-            
-			if (str_form_data.substr(int_test_loop, 1) === '$') {
-				int_tag = (int_test_loop - (int_loop - 1));
-				str_tag = str_form_data.substr(int_loop, int_tag);
-				// we found the end of the tag, now look for the close tag
-				int_loop += int_tag;
-				int_inputstring_len -= int_tag;
-				int_element_len += int_tag;
-                currCol += int_tag;
-				int_qs = 2;
-				// SDEBUG("after int_loop: %s", int_loop);
-			} else {
-				// false alarm, do nothing
-			}
-
-			// END DOLLAR TAG
-		} else if (int_qs === 2 && str_form_data.substr(int_loop, str_tag.length) === str_tag)  {
-			int_qs = 0;
-			// move pointer to end of end dollar tag
-			int_tag -= 1;
-			int_element_len += int_tag;
-			int_loop += int_tag;
-			currCol += int_tag;
-			int_inputstring_len -= int_tag;
-			// FOUND AN UNQUOTED/ UNPARENTHESISED SEMICOLON: || found end of document
-		} else if (int_ps === 0 && int_qs === 0 && str_form_data.substr(int_loop, 1) === ";" || str_form_data.length - 1 === int_loop) {
-		// console.log("found semicolon;");
-			// stash away this array element
-
-			str_temp = str_form_data.substr(int_start, int_element_len);
-			
-			//console.log(cursorIsInQuery);
-			//if (cursorIsInQuery) {
-			if ((int_element_len + 1 === cursorPos) || bolLastQuery) {
-			    strQuery = str_temp;
-			    //console.log(str_temp);
-			    query_end_row = currRow - 1;
-                query_end_col = currCol;
-			    break;
-			} else {
-			    
-			}
-			
-			int_start = int_loop + int_chunk_len;
-			int_element_len = 0;
-			str_temp = '';
-		    query_start_row = currRow;
-            query_start_col = 0;
-            bolIgnoreWhiteSpace = true;
-		}
-		int_loop += int_chunk_len;
-		int_inputstring_len -= int_chunk_len;
-	}
-
-	// if we have a trailing SQL statement (or nothing in form data at all)
-	if (int_element_len > 0) {
-		// if you are reading this see the comment above marked "consume comment"
-
-		// stash away this array element
-
-        str_temp = str_form_data.substr(int_start, int_element_len);
-		//strQuery = str_temp;
-		// SDEBUG("int_start: %i", int_start);
-		// SDEBUG("int_loop: %i", int_loop);
-		// SDEBUG("int_element_len: %i", int_element_len);
-	}
-    
-    //console.log(query_start_col, query_start_row, query_end_col, query_end_row);
-    
-	return {
-	     'strQuery':       strQuery
-	    ,'end_column':     query_end_col
-	    ,'end_row':        query_end_row
-	    ,'start_column':   query_start_col
-	    ,'start_row':      query_start_row
-	};
-
-
-}
-
-
-
-// var strCursorSplitText = ml(function () {/*
-// SELECT *, 'SELECT * FROM test.asdf' AS ";"
-// FROM wiki.rgroups
-// Limit 10;
-// SELECT *, 'SELECT * FROM test.asdf' AS ";"
-// FROM wiki.rgroups
-// Limit 10;
-// SELECT *, 'SELECT * FROM test.asdf' AS ";"
-// FROM wiki.rgroups
-// Limit 10;
-// SELECT *, 'SELECT * FROM test.asdf' AS ";"
-// --FROM wiki.rgroups;
-// Limit 10;
-// */});
-// var arrSplitSQLFromPos = findSqlQueryFromCursor(strCursorSplitText, 50);
-
-
-
-
-
 
 
 
