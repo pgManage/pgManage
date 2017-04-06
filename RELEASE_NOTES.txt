@@ -1,4 +1,4 @@
-Changes since 3.2.2:
+Changes since 3.2.3:
 Postage:
 Fix punctuation in an error
 Fix cursor query split
