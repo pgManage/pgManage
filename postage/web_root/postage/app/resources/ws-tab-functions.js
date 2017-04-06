@@ -2223,6 +2223,7 @@ function SQLBeautify(strInput) {
     var bolNoExtraWhitespace = true;
     var bolFunction = false;
     var bolGrant = false;
+    var bolStdin = false;
     var intCase = 0;
     var i;
 
@@ -2414,13 +2415,24 @@ function SQLBeautify(strInput) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === ";") {
             // Remove semicolon and whitespace
             strResult = strResult.trim();
-            if (bolDeclare || bolGrant) {
-                strResult += ';\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+            
+            //if state is a copy, from stdin, then we need to ignore the data after wards
+            if (bolStdin) {
+                strResult += ';\n' + strInput.substr(i + 2, strInput.substr(i + 2).indexOf('\n\\.')) +
+                    '\n\\.\n\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+                i += 1 + strInput.substr(i + 1).indexOf('\n\\.') + 3;//\n\\.
+                bolStdin = false;
             } else {
-                strResult += ';\n\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+                if (bolDeclare || bolGrant) {
+                    strResult += ';\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+                } else {
+                    strResult += ';\n\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+                }
             }
             bolGrant = false;
             bolNoExtraWhitespace = true;
+            
+            
             //console.log(">;|" + intTabLevel + "<");
 
         // Function Declare
@@ -2585,7 +2597,7 @@ function SQLBeautify(strInput) {
     */
         
         // FOUND a main keyword, no newline INSIDE A GRANT STATEMENT
-        }else if (int_qs === 0 && strInput.substr(i).match(/^((SELECT|FROM))\b/i) && bolGrant) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^((SELECT|FROM))\b/i) && bolGrant) {
                 // Remove previous tab if previous character is whitespace
                 if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                     strResult = strResult.substr(0, strResult.length - 1);
@@ -2597,14 +2609,19 @@ function SQLBeautify(strInput) {
                 //console.log(">KEYWORD|" + intTabLevel + "<");
     
             // FOUND a main keyword, newline before
-        } else if (int_qs === 0 && strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET)\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|FROM[\ \t\n\r]+STDIN)\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
-//(^((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|\bRETURNS|\bSELECT|\bFROM|\bGROUP|\bORDER|\bWHERE|\bLIMIT|\bOFFSET)\b
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET)\b/i)[0].toUpperCase().trim() + ' ';
-            i += (strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET)\b/i)[0].length - 1);
+            
+            //if state is a copy, from stdin, then we need to ignore the data after wards
+            if (strInput.substr(i).match(/^FROM[\ \t\n\r]+STDIN/i)) {
+                bolStdin = true;
+            }
+            
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|FROM[\ \t\n\r]+STDIN)\b/i)[0].toUpperCase().trim() + ' ';
+            i += (strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|FROM[\ \t\n\r]+STDIN)\b/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
