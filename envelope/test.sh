@@ -30,7 +30,7 @@ sudo kill $ENVELOPEPID
 sudo make uninstall
 
 kill -9 $(cat envelope/postgres.pid)
-getchar
+read
 
 cd ..
 
