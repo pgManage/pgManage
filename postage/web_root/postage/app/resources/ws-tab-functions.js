@@ -2381,12 +2381,12 @@ function SQLBeautify(strInput) {
             i += int_tag;
 
         // FOUND GRANT/REVOKE
-        } else if (int_qs === 0 && strInput.substr(i, 6).match(/^GRANT|REVOKE\b/i)) {
+        } else if (int_qs === 0 && strInput.substr(i, 7).match(/^GRANT |REVOKE \b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             bolGrant = true;
             if (int_ps > 0) {
-                strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i, 6).match(/^GRANT|REVOKE\b/i) + ' ';
+                strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i, 7).match(/^GRANT|REVOKE\b/i) + ' ';
             } else {
-                strResult += '\n' + strInput.substr(i, 6).match(/^GRANT|REVOKE\b/i) + ' ';
+                strResult += '\n' + strInput.substr(i, 7).match(/^GRANT|REVOKE\b/i) + ' ';
             }
             i += (strInput.substr(i, 6).match(/^GRANT|REVOKE\b/i)[0].length - 1);
             bolNoExtraWhitespace = true;
@@ -2584,7 +2584,7 @@ function SQLBeautify(strInput) {
     add keywords
     */
         
-        // FOUND a main keyword, newline before NOT INSIDE A GRANT STATEMENT
+        // FOUND a main keyword, no newline INSIDE A GRANT STATEMENT
         }else if (int_qs === 0 && strInput.substr(i).match(/^((SELECT|FROM))\b/i) && bolGrant) {
                 // Remove previous tab if previous character is whitespace
                 if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
@@ -2609,10 +2609,10 @@ function SQLBeautify(strInput) {
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
         // FOUND a main keyword, capitalize only
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(LANGUAGE|VOLATILE|BY|COST)/i)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^\b(LANGUAGE|VOLATILE|BY|COST)\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
 
-            strResult += strInput.substr(i).match(/^(LANGUAGE|VOLATILE|BY|COST)/i)[0].toUpperCase() + ' ';
-            i += (strInput.substr(i).match(/^(LANGUAGE|VOLATILE|BY|COST)/i)[0].length - 1);
+            strResult += strInput.substr(i).match(/^\b(LANGUAGE|VOLATILE|BY|COST)\b/i)[0].toUpperCase() + ' ';
+            i += (strInput.substr(i).match(/^\b(LANGUAGE|VOLATILE|BY|COST)\b/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
