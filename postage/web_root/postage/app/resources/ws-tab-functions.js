@@ -2609,7 +2609,7 @@ function SQLBeautify(strInput) {
                 //console.log(">KEYWORD|" + intTabLevel + "<");
     
             // FOUND a main keyword, newline before
-        } else if (int_qs === 0 && strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|FROM[\ \t\n\r]+STDIN)\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN)\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
@@ -2620,16 +2620,16 @@ function SQLBeautify(strInput) {
                 bolStdin = true;
             }
             
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|FROM[\ \t\n\r]+STDIN)\b/i)[0].toUpperCase().trim() + ' ';
-            i += (strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|FROM[\ \t\n\r]+STDIN)\b/i)[0].length - 1);
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN)\b/i)[0].toUpperCase().trim() + ' ';
+            i += (strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN)\b/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
         // FOUND a main keyword, capitalize only
-        } else if (int_qs === 0 && strInput.substr(i).match(/^\b(LANGUAGE|VOLATILE|BY|COST)\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^\b(LANGUAGE|VOLATILE|BY|INTO|COST)\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
 
-            strResult += strInput.substr(i).match(/^\b(LANGUAGE|VOLATILE|BY|COST)\b/i)[0].toUpperCase() + ' ';
-            i += (strInput.substr(i).match(/^\b(LANGUAGE|VOLATILE|BY|COST)\b/i)[0].length - 1);
+            strResult += strInput.substr(i).match(/^\b(LANGUAGE|VOLATILE|BY|INTO|COST)\b/i)[0].toUpperCase() + ' ';
+            i += (strInput.substr(i).match(/^\b(LANGUAGE|VOLATILE|BY|INTO|COST)\b/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
