@@ -25,7 +25,7 @@ sudo /usr/local/sbin/envelope & export ENVELOPEPID="$!"
 sleep 5
 xdg-open "http://127.0.0.1:8888/test.html"
 printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
-kill $ENVELOPEPID
+sudo kill $ENVELOPEPID
 
 sudo make uninstall
 
