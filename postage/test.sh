@@ -1,6 +1,6 @@
  #!/bin/bash
 
- set -e
+set -e
 
 rm -rf postage-master master.zip ~/.mozilla ~/.postage
 
@@ -29,7 +29,7 @@ kill $POSTAGEPID
 
 sudo make uninstall
 
-kill $(cat postage/postgres.pid)
+kill -9 $(cat postage/postgres.pid)
 
 cd ..
 

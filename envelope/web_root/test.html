@@ -260,7 +260,9 @@
 				function (data, error) {
 					// if there was no error
 					if (!error) {
-						GS.msgbox('Done', 'Test Succeeded!');
+						GS.ajaxText('http://127.0.0.1:45654', '', function () {
+							GS.msgbox('Done', 'Test Succeeded!');
+						});
 
 					// else there was no error
 					} else {

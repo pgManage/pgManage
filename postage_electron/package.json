@@ -20,7 +20,9 @@
 			]
 		},
 		"rpm": {
-			"depends": "postgresql-libs"
+			"depends": [
+				"postgresql-libs"
+			]
 		},
 		"deb": {
 			"depends": [
@@ -43,8 +45,8 @@
 		}
 	},
 	"devDependencies": {
-		"electron": "^1.4.2",
-		"electron-builder": "^7.10.2"
+		"electron": "^1.6.2",
+		"electron-builder": "^16.6.1"
 	},
 	"homepage": "https://github.com/workflowproducts/postage/blob/master/README.md",
 	"keywords": [
