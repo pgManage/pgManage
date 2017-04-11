@@ -38,27 +38,7 @@ char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_tab
 		ptr_table_name, ptr_end_table_name - ptr_table_name
 	);
 
-	SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "g");
-
-	str_temp1 = bunescape_value(str_temp, &int_temp_len);
-	SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
-	SFREE(str_temp);
-	str_temp = str_temp1;
-	str_temp1 = NULL;
-
-	SERROR_SNCAT(str_table_name, ptr_int_table_name_len,
-		"\"", (size_t)1,
-		str_temp, int_temp_len,
-		"\"", (size_t)1);
-	SFREE(str_temp);
-
-	if (bol_schema) {
-		ptr_table_name = ptr_end_table_name + 1;
-		ptr_end_table_name = bstrstr(ptr_table_name, int_query_len - (size_t)(ptr_table_name - str_query), "\012", (size_t)1);
-		SERROR_CHECK(ptr_end_table_name != NULL, "bstrstr failed");
-		*ptr_end_table_name = 0;
-
-		SERROR_SNCAT(str_temp, &int_temp_len, ptr_table_name, ptr_end_table_name - ptr_table_name);
+	if (str_temp[0] != '(') {
 		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "g");
 
 		str_temp1 = bunescape_value(str_temp, &int_temp_len);
@@ -67,10 +47,35 @@ char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_tab
 		str_temp = str_temp1;
 		str_temp1 = NULL;
 
-		SERROR_SNFCAT(str_table_name, ptr_int_table_name_len,
-			".\"", (size_t)2,
+		SERROR_SNCAT(str_table_name, ptr_int_table_name_len,
+			"\"", (size_t)1,
 			str_temp, int_temp_len,
 			"\"", (size_t)1);
+		SFREE(str_temp);
+
+		if (bol_schema) {
+			ptr_table_name = ptr_end_table_name + 1;
+			ptr_end_table_name = bstrstr(ptr_table_name, int_query_len - (size_t)(ptr_table_name - str_query), "\012", (size_t)1);
+			SERROR_CHECK(ptr_end_table_name != NULL, "bstrstr failed");
+			*ptr_end_table_name = 0;
+
+			SERROR_SNCAT(str_temp, &int_temp_len, ptr_table_name, ptr_end_table_name - ptr_table_name);
+			SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "g");
+
+			str_temp1 = bunescape_value(str_temp, &int_temp_len);
+			SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
+			SFREE(str_temp);
+			str_temp = str_temp1;
+			str_temp1 = NULL;
+
+			SERROR_SNFCAT(str_table_name, ptr_int_table_name_len,
+				".\"", (size_t)2,
+				str_temp, int_temp_len,
+				"\"", (size_t)1);
+			SFREE(str_temp);
+		}
+	} else {
+		SERROR_SNCAT(str_table_name, ptr_int_table_name_len, str_temp, int_temp_len);
 		SFREE(str_temp);
 	}
 

@@ -16,7 +16,6 @@ struct sock_ev_client_select {
 	char *str_sql;
 	char *str_row_count;
 	char *str_where;
-	char *str_group_by;
 	char *str_order_by;
 	char *str_limit;
 	char *str_offset;
