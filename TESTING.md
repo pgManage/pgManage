@@ -2,10 +2,7 @@
 ```
 su -
 pkg install
-pkg install unzip
-pkg install postgresql96-server
-pkg install gmake
-pkg install wget
+pkg install unzip postgresql96-server gmake wget
 exit
 wget https://github.com/workflowproducts/postage/archive/master.zip
 unzip master.zip
@@ -16,7 +13,7 @@ gmake test
 ```
 
 On your desktop computer's browser go to:
-http://\<ip>:8080/postage/test.html
+http://\<ip>:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in FreeBSD:
 ```
@@ -29,7 +26,7 @@ exit
 ```
 
 On your desktop computer's browser go to:
-http://\<ip>:8080/postage/test.html
+http://\<ip>:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
@@ -44,10 +41,7 @@ gmake uninstall
 ```
 su -
 pkg install
-pkg install unzip
-pkg install postgresql96-server
-pkg install gmake
-pkg install wget
+pkg install unzip postgresql96-server gmake wget
 exit
 wget https://github.com/workflowproducts/envelope/archive/master.zip
 unzip master.zip
@@ -82,10 +76,7 @@ gmake uninstall
 # OpenBSD Postage
 ```
 su -
-pkg_add unzip
-pkg_add postgresql-server
-pkg_add gmake
-pkg_add wget
+pkg_add unzip postgresql-server gmake wget
 exit
 wget https://github.com/workflowproducts/postage/archive/master.zip
 unzip master.zip
@@ -96,7 +87,7 @@ gmake test
 ```
 
 On your desktop computer's browser go to:
-http://\<ip>:8080/postage/test.html
+http://\<ip>:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in OpenBSD:
 ```
@@ -109,7 +100,7 @@ exit
 ```
 
 On your desktop computer's browser go to:
-http://\<ip>:8080/postage/test.html
+http://\<ip>:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
@@ -123,10 +114,7 @@ gmake uninstall
 # OpenBSD Envelope
 ```
 su -
-pkg_add unzip
-pkg_add postgresql-server
-pkg_add gmake
-pkg_add wget
+pkg_add unzip postgresql-server gmake wget
 exit
 wget https://github.com/workflowproducts/envelope/archive/master.zip
 unzip master.zip
@@ -161,8 +149,7 @@ gmake uninstall
 # Ubuntu Postage
 In terminal:
 ```
-sudo apt-get install postgresql-server-dev-9.5
-sudo apt-get install postgresql-9.5
+sudo apt-get install postgresql-server-dev-9.5 postgresql-9.5
 export PATH="/usr/lib/postgresql/9.5/bin:$PATH"
 wget https://github.com/workflowproducts/postage/archive/master.zip
 unzip master.zip 
@@ -172,7 +159,7 @@ make test
 ```
 
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/postage/test.html
+Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in Terminal:
 ```
@@ -185,7 +172,7 @@ make test-common
 ```
 
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/postage/test.html
+Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
@@ -199,6 +186,7 @@ make uninstall
 # Ubuntu Envelope
 In terminal:
 ```
+sudo apt-get install postgresql-server-dev-9.5 postgresql-9.5
 export PATH="/usr/lib/postgresql/9.5/bin:$PATH"
 wget https://github.com/workflowproducts/envelope/archive/master.zip
 unzip master.zip 
@@ -242,7 +230,7 @@ make test
 ```
 
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/postage/test.html
+Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in Terminal:
 ```
@@ -254,7 +242,7 @@ make test-common
 /usr/local/sbin/postage
 ```
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/postage/test.html
+Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
@@ -312,7 +300,7 @@ make all test
 ```
 
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/test.html
+Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Back in Terminal:
 ```
@@ -325,7 +313,7 @@ make test-common
 ```
 
 In your browser:
-Go to the Postage testing page: http://127.0.0.1:8080/test.html
+Go to the Postage testing page: http://127.0.0.1:8080/postage/test/index.html?seq_numbers=true&_http_auth=true&http_file=true&http_upload=true&http_export=true&ws_raw=true&ws_tab=true&ws_select=true&ws_insert=true&ws_update=true&ws_delete=true
 
 Make sure to kill the PostgreSQL process from `make test-common` before moving on.
 
