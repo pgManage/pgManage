@@ -269,8 +269,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                 if (autocompleteTempList.length === 1) {
                     strCurrent = autocompleteTempList[0][0];
                     // create a search string (normalize to double quoted and lowercase)
-                    //strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
-                    strSearch = strCurrent;
+                    strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
+                    //strSearch = strCurrent;
                     strText += '\n' + strCurrent;
                     autocompleteGlobals.arrSearch.push(strSearch);
                     autocompleteGlobals.arrValues.push(strCurrent);
@@ -312,10 +312,9 @@ function autocompletePopupLoad(editor, arrQueries) {
 
                         if (bolIsFunction) {
                             nextItem = nextItem.replace('{', '(').replace('}',  ')');
-                            
                             // create a search string (normalize to double quoted and lowercase)
-                            //strSearch = (nextItem[0] === '"' ? nextItem.toLowerCase() : '"' + nextItem.toLowerCase() + '"');
-                            strSearch = nextItem;
+                            strSearch = (nextItem[0] === '"' ? nextItem.toLowerCase() : '"' + nextItem.toLowerCase() + '"');
+
                             strText += '\n' + nextItem;
                             autocompleteGlobals.arrSearch.push(strSearch);
                             autocompleteGlobals.arrValues.push(nextItem);
@@ -334,8 +333,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                                 bolFinalRecord = true
                             }
                             // create a search string (normalize to double quoted and lowercase)
-                            //strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
-                            strSearch = strCurrent;
+                            strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
+                            //strSearch = strCurrent;
                             strText += '\n' + strCurrent;
                             autocompleteGlobals.arrSearch.push(strSearch);
                             autocompleteGlobals.arrValues.push(strCurrent);
@@ -365,8 +364,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                         strCurrent = currSnippet[2] + ' (Snippet)';
 
                         // create a search string (normalize to double quoted and lowercase)
-                        //strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
-                        strSearch = strCurrent;
+                        strSearch = (strCurrent[0] === '"' ? strCurrent.toLowerCase() : '"' + strCurrent.toLowerCase() + '"');
+                        //strSearch = strCurrent;
                         strText += '\n' + strCurrent;
                         autocompleteGlobals.arrSearch.push(strSearch);
                         autocompleteGlobals.arrValues.push(strCurrent);
@@ -408,8 +407,8 @@ function autocompletePopupLoad(editor, arrQueries) {
                     for (var i = 0, len = autocompleteGlobals.arrVariables.length; i < len; i++) {
                         var strCurrentVar = autocompleteGlobals.arrVariables[i];
 
-                        //strSearch = (strCurrentVar[0] === '"' ? strCurrentVar.toLowerCase() : '"' + strCurrentVar.toLowerCase() + '"');
-                        strSearch = strCurrentVar;
+                        strSearch = (strCurrentVar[0] === '"' ? strCurrentVar.toLowerCase() : '"' + strCurrentVar.toLowerCase() + '"');
+                        //strSearch = strCurrentVar;
                         autocompleteGlobals.arrSearch.push(strSearch);
                         autocompleteGlobals.arrValues.push(strCurrentVar);
                         autocompleteGlobals.arrSearchMaster.push(strSearch);
@@ -419,13 +418,14 @@ function autocompletePopupLoad(editor, arrQueries) {
                     }
                 }
 
-
-                var distinctValues = [];
-                for (var i = 0, len = autocompleteGlobals.arrValuesMaster.length; i < len; i++) {
-                    if (distinctValues.indexOf(autocompleteGlobals.arrValuesMaster[i]) === -1) {
-                        distinctValues.push(autocompleteGlobals.arrValuesMaster[i]);
-                    }
-                }
+                // console.log(autocompleteGlobals.arrValuesMaster);
+                // console.log(autocompleteGlobals.arrSearchMaster);
+                // var distinctValues = [];
+                // for (var i = 0, len = autocompleteGlobals.arrValuesMaster.length; i < len; i++) {
+                //     if (distinctValues.indexOf(autocompleteGlobals.arrValuesMaster[i]) === -1) {
+                //         distinctValues.push(autocompleteGlobals.arrValuesMaster[i]);
+                //     }
+                // }
 
                 // var distinctSearch= [];
                 // for (var i = 0, len = autocompleteGlobals.arrSearchMaster.length; i < len; i++) {
@@ -434,49 +434,33 @@ function autocompletePopupLoad(editor, arrQueries) {
                 //     }
                 // }
                 
-                function CompareStrs (a, b) {
-                    if (a.toLowerCase() < b.toLowerCase()) {
-                        return -1;
-                    } else if (a.toLowerCase() > b.toLowerCase()) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }
+                // function CompareStrs (a, b) {
+                //     if (a.toLowerCase() < b.toLowerCase()) return -1;
+                //     if (a.toLowerCase() > b.toLowerCase()) return 1;
+                //     return 0;
+                // }
                 
                 
-                function CompareStrsForArray (a, b) {
-                    if (a[1].toLowerCase() < b[1].toLowerCase()) return 1;
-                    if (a[1].toLowerCase() > b[1].toLowerCase()) return -1;
-                    return 0;
-                }
+                // function CompareStrsForArray (a, b) {
+                //     if (a[1].toLowerCase() < b[1].toLowerCase()) return -1;
+                //     if (a[1].toLowerCase() > b[1].toLowerCase()) return 1;
+                //     return 0;
+                // }
                 //autocompleteGlobals.arrObjType = autocompleteGlobals.arrObjType.sort(CompareStrsForArray);
                 
                 
-                autocompleteGlobals.arrValuesMaster = distinctValues.sort();
-                autocompleteGlobals.arrSearchMaster = distinctValues.sort();
+                // autocompleteGlobals.arrValuesMaster = distinctValues.sort(CompareStrs);
+                // autocompleteGlobals.arrSearchMaster = distinctSearch.sort(CompareStrs);
                 // autocompleteGlobals.arrValues = distinctValues.sort(CompareStrs);
-                // autocompleteGlobals.arrSearch = distinctValues.sort(CompareStrs);
+                // autocompleteGlobals.arrSearch = distinctSearch.sort(CompareStrs);
 
-                
-                // console.log(autocompleteGlobals.arrValues.length);
-                // console.log(autocompleteGlobals.arrSearch.length);
-                // console.log(autocompleteGlobals.arrValuesMaster.length);
-                // console.log(autocompleteGlobals.arrSearchMaster.length);
-                
-                var currSearchVal;
-                for (var i = 0, len = autocompleteGlobals.arrValues.length; i < len; i++) {
-                    currSearchVal = autocompleteGlobals.arrValues[i];
-                    strSearch = (currSearchVal[0] === '"' ? currSearchVal.toLowerCase() : '"' + currSearchVal.toLowerCase() + '"');
-                    autocompleteGlobals.arrSearchMaster[i] = strSearch;
-                    autocompleteGlobals.arrSearch[i] = strSearch;
-                }
-                
-                // console.log(autocompleteGlobals.arrValues);
-                // console.log(autocompleteGlobals.arrSearch);
-                // console.log(autocompleteGlobals.arrValuesMaster);
-                // console.log(autocompleteGlobals.arrSearchMaster);
-                
+
+                // var currSearchVal;
+                // for (var i = 0, len = autocompleteGlobals.arrSearchMaster.length; i < len; i++) {
+                //     currSearchVal = autocompleteGlobals.arrSearchMaster[i];
+                //     strSearch = (currSearchVal[0] === '"' ? currSearchVal.toLowerCase() : '"' + currSearchVal.toLowerCase() + '"');
+                //     autocompleteGlobals.arrSearchMaster[i] = strSearch;
+                // }
 
                 // autocompleteGlobals.arrValuesMaster = autocompleteGlobals.arrValuesMaster
                 // autocompleteGlobals.arrSearchMaster = autocompleteGlobals.arrSearchMaster
@@ -632,6 +616,7 @@ function autocompletePopupClose(editor) {
 // complete using the selected choice in the autocomplete popup
 function autocompleteComplete(editor) {
     'use strict';
+    console.log('test');
     var intSearchStringStart = (autocompleteGlobals.intSearchStart + autocompleteGlobals.intSearchOffset)
       , intSearchStringEnd = (autocompleteGlobals.intSearchEnd)
       , jsnSearchStringRange, strScript
@@ -851,24 +836,21 @@ function autocompletePopupSearch(editor, strMode) {
             // console.log(autocompleteGlobals.arrValues);
             // console.log(strSearch);
             for (i = 0, len = autocompleteGlobals.arrSearch.length, strNewValue = ''; i < len; i += 1) {
+
                 // if the current item doesn't match: remove from ace, arrSearch and arrValues
-                if (autocompleteGlobals.arrSearch[i]) {
-                    if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
-                        autocompleteGlobals.arrSearch.splice(i, 1);
-                        autocompleteGlobals.arrValues.splice(i, 1);
-                        // console.log('reject', i);
-    
-    
-                        i -= 1;
-                        len -= 1;
-                    } else {
-                        // console.log('match', i);
-                        //arrNewValue.push(autocompleteGlobals.arrValues[i]);
-                        strNewValue += '\n';
-                        strNewValue += autocompleteGlobals.arrValues[i];
-                    }
+                if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
+                    autocompleteGlobals.arrSearch.splice(i, 1);
+                    autocompleteGlobals.arrValues.splice(i, 1);
+                    // console.log('reject', i);
+
+
+                    i -= 1;
+                    len -= 1;
                 } else {
-                    break;
+                    // console.log('match', i);
+                    //arrNewValue.push(autocompleteGlobals.arrValues[i]);
+                    strNewValue += '\n';
+                    strNewValue += autocompleteGlobals.arrValues[i];
                 }
             }
             

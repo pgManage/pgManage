@@ -523,6 +523,15 @@ ORDER BY	LIMIT
 */
             })], {type: 'application/x-binary'}),
 			["../db_framework_pq/db_framework.c:DB_get_column_types_for_query2: DB_get_column_types_for_query failed\nQuery failed:\nFATAL\nerror_text\tERROR:  zero-length delimited identifier at or near \"\"\"\"\\nLINE 1: SELECT \"rtesting_table\".\"\"\\n                                ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t25\n"]],
+			['SELECT FAIL 8', 'websocket', '', ml(function () {/*SELECT	(SELECT * FROM rtesting_table) em) TO STDOUT; --
+RETURN	*/
+			}) + ml(function () {/*
+
+ORDER BY	LIMIT
+1 ASC	10
+*/
+            }),
+			["../common/common_util_sql.c:query_is_safe: SQL Injection detected!\nSQL Injection detected"]],
 			['SELECT 1', 'websocket', '', ml(function () {/*SELECT	pg_database
 RETURN	datname	datistemplate
 
@@ -573,15 +582,7 @@ LIMIT
 */
 			}),
 			['id\ttest_name\tTestName\ninteger\tcharacter varying(150)\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
-			['SELECT 8', 'websocket', '', ml(function () {/*SELECT	public	ttesting_large_view2
-RETURN	*
-
-GROUP BY	ORDER BY
-id, test1, test2	id DESC
-*/
-			}),
-			["id\ttest1\ttest2\ninteger\ttext\ttext\n"].concat(createTestDataResponse('', 200, false)).concat(['TRANSACTION COMPLETED'])],
-			['SELECT 9', 'websocket send from', '', ml(function () {/*SELECT	public	ttesting_large_view2
+			['SELECT 8', 'websocket send from', '', ml(function () {/*SELECT	public	ttesting_large_view2
 RETURN	*
 
 ORDER BY
@@ -590,8 +591,16 @@ id DESC
 			}),
 			["id\ttest1\ttest2\ninteger\ttext\ttext\n"].concat(createTestDataResponse('', 200, false))
 			],
-			['SELECT 10', 'websocket', '', ml(function () {/*SELECT	WFP's "Testing" Table
+			['SELECT 9', 'websocket', '', ml(function () {/*SELECT	WFP's "Testing" Table
 RETURN	id	WFP's First "Testing" Column	WFP's Second "Testing" Column
+
+LIMIT
+0
+*/
+			}),
+			['id\tWFP\'s First "Testing" Column\tWFP\'s Second "Testing" Column\ninteger\tcharacter varying(150)\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
+			['SELECT 10', 'websocket', '', ml(function () {/*SELECT	(SELECT id, "WFP's First ""Testing"" Column", "WFP's Second ""Testing"" Column" FROM public."WFP's ""Testing"" Table") em
+RETURN	*
 
 LIMIT
 0

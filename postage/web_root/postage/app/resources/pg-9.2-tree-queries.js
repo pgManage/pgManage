@@ -1773,7 +1773,7 @@ SELECT '-- Constraint: ' || conname || E';\n\n' ||
                 (SELECT pg_constraint.oid, *
                    FROM pg_constraint
                    LEFT JOIN pg_catalog.pg_statio_user_tables ON pg_statio_user_tables.relid = {{INTOID}}
-                  WHERE pg_constraint.conrelid = {{INTOID}}
+                  WHERE pg_constraint.conrelid = {{INTOID}} AND conname = '{{STRRELNAME}}'::text
                ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
                               WHEN contype = 'c' THEN 3 WHEN contype = 'f' THEN 4
                               WHEN contype = 't' THEN 5 WHEN contype = 'x' THEN 6 END) ASC,

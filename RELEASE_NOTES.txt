@@ -1,3 +1,16 @@
+Changes since 3.2.3:
+Postage:
+Fix punctuation in an error
+Fix cursor query split
+Fix proccess manager button layout
+Fix beautify to not mangle column names with certain keywords in their name
+Fix beautify to work with copy data
+Fix beautify on INSERT and UPDATE
+
+Envelope:
+Add horizontal parameters for scroll functions
+
+
 Changes since 3.2.2
 Postage:
 Add depesz based explain (closed workflowproducts/postage#176)
