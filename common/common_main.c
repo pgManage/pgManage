@@ -24,14 +24,14 @@
 #pragma comment(lib, "Ws2_32.lib")
 #ifdef _WIN64
 #pragma comment(lib, "../lib/x64/libpq.lib")
-#pragma comment(lib, "../lib/x64/libtls-11.lib")
-#pragma comment(lib, "../lib/x64/libssl-39.lib")
-#pragma comment(lib, "../lib/x64/libcrypto-38.lib")
+#pragma comment(lib, "../lib/x64/libtls-15.lib")
+#pragma comment(lib, "../lib/x64/libssl-3943lib")
+#pragma comment(lib, "../lib/x64/libcrypto-41.lib")
 #else
 #pragma comment(lib, "../lib/x86/libpq.lib")
-#pragma comment(lib, "../lib/x86/libtls-11.lib")
-#pragma comment(lib, "../lib/x86/libssl-39.lib")
-#pragma comment(lib, "../lib/x86/libcrypto-38.lib")
+#pragma comment(lib, "../lib/x86/libtls-15.lib")
+#pragma comment(lib, "../lib/x86/libssl-43.lib")
+#pragma comment(lib, "../lib/x86/libcrypto-41.lib")
 #endif
 #endif
 
