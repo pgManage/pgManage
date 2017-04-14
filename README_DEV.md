@@ -6,7 +6,7 @@ At this time, Postage is under an Apache license. The Apache license seems to ha
 
 We'd love to accept your patches, but before we can take them, we need you to sign a legal document called a "Contributor License Agreement"(CLA).
 
-The Workflow Products, L.L.C. CLA must be signed by all contributors. 
+The Workflow Products, L.L.C. CLA must be signed by all contributors.
 
 Once you are CLA'ed, we'll be able to accept your pull requests. For any issues that you face during this process, please add an issue on the project at Github explaining the problem or notify us via email at justin@wfprod.com and we will get it fixed.
 
@@ -58,7 +58,7 @@ Using valgrind (this has the effect of make test, just using valgrind with some 
 
     make all valgrind
 
-Note that valgrind is going to detect a lot if uninitialized reads/jumps from libpq, this is not something that we can fix easily.
+Note that valgrind is going to detect a few of uninitialized reads/jumps from libpq, this is not something that we can fix easily.
 
 Using GDB and Valgrind at the same time (Yikes!), I found some related information here: http://tromey.com/blog/?p=731
 
