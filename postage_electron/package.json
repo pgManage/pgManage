@@ -10,7 +10,8 @@
 		},
 		"nsis": {
 			"oneClick": false,
-			"allowToChangeInstallationDirectory": true
+			"allowToChangeInstallationDirectory": true,
+			"menuCategory": "Workflow Products"
 		},
 		"linux": {
 			"category": "Development",
@@ -46,7 +47,7 @@
 	},
 	"devDependencies": {
 		"electron": "^1.6.2",
-		"electron-builder": "^16.6.1"
+		"electron-builder": "^17.0.1"
 	},
 	"homepage": "https://github.com/workflowproducts/postage/blob/master/README.md",
 	"keywords": [
@@ -64,6 +65,6 @@
 		"debug": "electron app --debug=5858",
 		"pack": "build --dir",
 		"dist": "build",
-		"dist-win": "build --arch all"
+		"dist-win": "build --ia32"
 	}
 }
