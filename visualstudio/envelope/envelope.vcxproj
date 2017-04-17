@@ -93,7 +93,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalOptions>/D ssize_t=SSIZE_T  /D _CRT_SECURE_NO_WARNINGS /D _CRT_NONSTDC_NO_WARNINGS /D HAVE_INET_PTON /D WIN32_LEAN_AND_MEAN /D FD_SETSIZE=4096 /D POSTAGE_INTERFACE_LIBPQ /D HAVE_STRNLEN /D HAVE_STRCASECMP /FS /D ENVELOPE /D TRE_REGEX_T_FIELD=value /D TRE_VERSION="\"0.8.0\"" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D ssize_t=SSIZE_T  /D _CRT_SECURE_NO_WARNINGS /D _CRT_NONSTDC_NO_WARNINGS /D HAVE_INET_PTON /D WIN32_LEAN_AND_MEAN /D FD_SETSIZE=4096 /D POSTAGE_INTERFACE_LIBPQ /D HAVE_STRNLEN /D HAVE_STRCASECMP /FS /D ENVELOPE /D TRE_REGEX_T_FIELD=value /D TRE_VERSION="\"0.8.0\""  /D HAVE_INET_NTOP %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -127,7 +127,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalOptions>/D ssize_t=SSIZE_T  /D _CRT_SECURE_NO_WARNINGS /D _CRT_NONSTDC_NO_WARNINGS /D HAVE_INET_PTON /D WIN32_LEAN_AND_MEAN /D FD_SETSIZE=4096 /D POSTAGE_INTERFACE_LIBPQ /D HAVE_STRNLEN /D HAVE_STRCASECMP /FS /D ENVELOPE /D TRE_REGEX_T_FIELD=value /D TRE_VERSION="\"0.8.0\"" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D ssize_t=SSIZE_T  /D _CRT_SECURE_NO_WARNINGS /D _CRT_NONSTDC_NO_WARNINGS /D HAVE_INET_PTON /D WIN32_LEAN_AND_MEAN /D FD_SETSIZE=4096 /D POSTAGE_INTERFACE_LIBPQ /D HAVE_STRNLEN /D HAVE_STRCASECMP /FS /D ENVELOPE /D TRE_REGEX_T_FIELD=value /D TRE_VERSION="\"0.8.0\""  /D HAVE_INET_NTOP %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>

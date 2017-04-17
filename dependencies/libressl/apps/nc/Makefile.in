@@ -92,12 +92,10 @@ host_triplet = @host@
 @BUILD_NC_TRUE@@ENABLE_NC_TRUE@bin_PROGRAMS = nc$(EXEEXT)
 @BUILD_NC_TRUE@@ENABLE_NC_FALSE@noinst_PROGRAMS = nc$(EXEEXT)
 @BUILD_NC_TRUE@am__append_1 = -I$(top_srcdir)/apps/nc/compat
-@BUILD_NC_TRUE@@OPENSSLDIR_DEFINED_TRUE@am__append_2 = -DDEFAULT_CA_FILE=\"@OPENSSLDIR@/cert.pem\"
-@BUILD_NC_TRUE@@OPENSSLDIR_DEFINED_FALSE@am__append_3 = -DDEFAULT_CA_FILE=\"$(sysconfdir)/ssl/cert.pem\"
-@BUILD_NC_TRUE@@HAVE_B64_NTOP_FALSE@am__append_4 = compat/base64.c
-@BUILD_NC_TRUE@@HAVE_ACCEPT4_FALSE@am__append_5 = compat/accept4.c
-@BUILD_NC_TRUE@@HAVE_READPASSPHRASE_FALSE@am__append_6 = compat/readpassphrase.c
-@BUILD_NC_TRUE@@HAVE_STRTONUM_FALSE@am__append_7 = compat/strtonum.c
+@BUILD_NC_TRUE@@HAVE_B64_NTOP_FALSE@am__append_2 = compat/base64.c
+@BUILD_NC_TRUE@@HAVE_ACCEPT4_FALSE@am__append_3 = compat/accept4.c
+@BUILD_NC_TRUE@@HAVE_READPASSPHRASE_FALSE@am__append_4 = compat/readpassphrase.c
+@BUILD_NC_TRUE@@HAVE_STRTONUM_FALSE@am__append_5 = compat/strtonum.c
 subdir = apps/nc
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/check-hardening-options.m4 \
@@ -133,11 +131,11 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @BUILD_NC_TRUE@	$(am__objects_3) $(am__objects_4)
 nc_OBJECTS = $(am_nc_OBJECTS)
 am__DEPENDENCIES_1 =
-@BUILD_NC_TRUE@nc_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-@BUILD_NC_TRUE@	$(am__DEPENDENCIES_1) \
+@BUILD_NC_TRUE@nc_DEPENDENCIES =  \
 @BUILD_NC_TRUE@	$(abs_top_builddir)/crypto/libcrypto.la \
 @BUILD_NC_TRUE@	$(abs_top_builddir)/ssl/libssl.la \
-@BUILD_NC_TRUE@	$(abs_top_builddir)/tls/libtls.la
+@BUILD_NC_TRUE@	$(abs_top_builddir)/tls/libtls.la \
+@BUILD_NC_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -332,16 +330,16 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = 
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/include/compat \
-	-DLIBRESSL_INTERNAL $(am__append_1) $(am__append_2) \
-	$(am__append_3)
+	-DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= \
+	-D__END_HIDDEN_DECLS= $(am__append_1)
 @BUILD_NC_TRUE@EXTRA_DIST = nc.1 CMakeLists.txt
-@BUILD_NC_TRUE@nc_LDADD = $(PLATFORM_LDADD) $(PROG_LDADD) \
-@BUILD_NC_TRUE@	$(abs_top_builddir)/crypto/libcrypto.la \
+@BUILD_NC_TRUE@nc_LDADD = $(abs_top_builddir)/crypto/libcrypto.la \
 @BUILD_NC_TRUE@	$(abs_top_builddir)/ssl/libssl.la \
-@BUILD_NC_TRUE@	$(abs_top_builddir)/tls/libtls.la
+@BUILD_NC_TRUE@	$(abs_top_builddir)/tls/libtls.la \
+@BUILD_NC_TRUE@	$(PLATFORM_LDADD) $(PROG_LDADD)
 @BUILD_NC_TRUE@nc_SOURCES = atomicio.c netcat.c socks.c \
-@BUILD_NC_TRUE@	compat/socket.c $(am__append_4) $(am__append_5) \
-@BUILD_NC_TRUE@	$(am__append_6) $(am__append_7)
+@BUILD_NC_TRUE@	compat/socket.c $(am__append_2) $(am__append_3) \
+@BUILD_NC_TRUE@	$(am__append_4) $(am__append_5)
 @BUILD_NC_TRUE@noinst_HEADERS = atomicio.h compat/sys/socket.h
 all: all-am
 

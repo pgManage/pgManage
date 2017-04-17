@@ -158,6 +158,23 @@ $BODY$
 	COST 100;
 ALTER FUNCTION net.uri_to_text(text) OWNER TO postgres;
 
+CREATE OR REPLACE FUNCTION net.interval_nullable(str_input text)
+  RETURNS interval AS
+$BODY$
+DECLARE
+
+BEGIN
+    RETURN str_input::interval;
+EXCEPTION WHEN OTHERS THEN
+    RETURN NULL::interval;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+ALTER FUNCTION net.interval_nullable(str_input text) OWNER TO postgres;
+GRANT EXECUTE ON FUNCTION net.interval_nullable(str_input text) TO public;
+
 CREATE OR REPLACE FUNCTION net.jsonify(anyelement)
 	RETURNS text AS
 $BODY$
