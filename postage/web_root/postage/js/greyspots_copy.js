@@ -6512,70 +6512,33 @@ GS.isElementFocusable = function (element) {
 //    }
 //    return undefined;
 //};
-// see function in 006-utl.js
+
 // scroll an element to the middle of its scrollparent
-// GS.scrollIntoView = function (element) {
-//     var scrollingContainer = GS.scrollParent(element), arrSiblings, i, len, intScrollTop;
-//     console.log(scrollingContainer);
-//     if (scrollingContainer) {
-//         //console.log(scrollingContainer);
-        
-//         arrSiblings = element.parentNode.children;
-        
-//         for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
-//             if (arrSiblings[i] === element) {
-//                 intScrollTop += arrSiblings[i].offsetHeight / 2;
-                
-//                 break;
-//             } else {
-//                 intScrollTop += arrSiblings[i].offsetHeight;
-//             }
-//         }
-        
-//         intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
-        
-//         //console.log(intScrollTop);
-        
-//         scrollingContainer.scrollTop = intScrollTop;
-//     }
-// };
-
-
-// GS.scrollIntoView = function (element, strDirection) {
-//     var strDirectionText;
-//     if (strDirection) {
-//         strDirectionText = strDirection;
-//     } else {
-//         strDirectionText = 'vertical';
-//     }
-//     var scrollingContainer = GS.scrollParent(element, strDirectionText), arrSiblings, i, len, intScrollTop;
+GS.scrollIntoView = function (element) {
+    var scrollingContainer = GS.scrollParent(element), arrSiblings, i, len, intScrollTop;
     
-    
-//     if (scrollingContainer) {
+    if (scrollingContainer) {
+        //console.log(scrollingContainer);
         
-//         arrSiblings = element.parentNode.children;
+        arrSiblings = element.parentNode.children;
         
-//         for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
-//             if (arrSiblings[i] === element) {
-//                 intScrollTop += arrSiblings[i].offsetHeight / 2;
+        for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
+            if (arrSiblings[i] === element) {
+                intScrollTop += arrSiblings[i].offsetHeight / 2;
                 
-//                 break;
-//             } else {
-//                 intScrollTop += arrSiblings[i].offsetHeight;
-//             }
-//         }
+                break;
+            } else {
+                intScrollTop += arrSiblings[i].offsetHeight;
+            }
+        }
         
-//         intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
+        intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
         
-//         //console.log(intScrollTop);
+        //console.log(intScrollTop);
         
-//         scrollingContainer.scrollTop = intScrollTop;
-//     }
-// };
-
-
-
-
+        scrollingContainer.scrollTop = intScrollTop;
+    }
+};
 
 
 // #################################################################
@@ -8594,14 +8557,10 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                 for (key in jsnMessages) {
                     jsnMessage = jsnMessages[key];
                     
-                    if (
-                        jsnMessage &&
-                        (
+                    if ((
                             jsnMessage.session === socket.GSSessionID ||
                             jsnMessage.session === socket.oldSessionID
-                        ) &&
-                        jsnMessage.bolFinished === false
-                    ) {
+                        ) && jsnMessage.bolFinished === false) {
                         
                         jsnMessage.session = socket.GSSessionID;
                         
@@ -8693,11 +8652,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                     } else {
                         jsnMessage.callback.apply(null, [message]);
                     }
-
-                    if (jsnMessage.bolFinished === true) {
-                        delete jsnMessages[messageID];
-                    }
-
+                    
                 // else if the messageID is 'NULL': notification from the server
                 } else if (messageID === 'NULL') {
                     socket.notifications.push(message);
@@ -10190,104 +10145,55 @@ GS.getTextWidth = function (scope, strText, bolWhitePreserve) {
 
 
 
-GS.scrollParent = function (element, strDirection) {
-    "use strict";
-    var strDirectionText;
-    if (strDirection) {
-        strDirectionText = strDirection;
-    } else {
-        strDirectionText = 'vertical';
-    }
-    var i = 0;
-    var currentElement = element;
-    var bolFoundScrollable = false;
-    var strOverflow;
-
+GS.scrollParent = function (element) {
+    var i = 0, currentElement = element, bolFoundScrollable = false, strOverflow;
+    
     if (currentElement) {
-        while (
-            currentElement &&
-            currentElement.nodeName !== 'HTML' &&
-            bolFoundScrollable === false &&
-            i < 75
-        ) {
+        while (currentElement && currentElement.nodeName !== 'HTML' && bolFoundScrollable === false && i < 75) {
             strOverflow = GS.getStyle(currentElement, 'overflow');
-            if (
-                strOverflow === 'scroll' ||
-                (
-                    strOverflow === 'auto' &&
-                    strDirectionText === 'vertical' &&
-                    currentElement.clientHeight < currentElement.scrollHeight
-                ) ||
-                (
-                    strOverflow === 'auto' &&
-                    strDirectionText === 'horizontal' &&
-                    currentElement.clientWidth < currentElement.scrollWidth
-                )
-            ) {
+            
+            if (strOverflow === 'scroll' || (strOverflow === 'auto' && currentElement.clientHeight < currentElement.scrollHeight)) {
                 bolFoundScrollable = true;
             } else {
                 currentElement = currentElement.parentNode;
                 i += 1;
             }
         }
-
+        
         //console.log(currentElement.nodeName);
         if (!currentElement || currentElement.nodeName === 'HTML') {
             return document.body;
         }
-
-        return (
-            bolFoundScrollable
-                ? currentElement
-                : undefined
-        );
+        
+        return bolFoundScrollable ? currentElement : undefined;
     }
     return undefined;
-}
-
+};
 
 //
-GS.scrollIntoView = function (element, strDirection) {
-    var strDirectionText;
-    if (strDirection) {
-        strDirectionText = strDirection;
-    } else {
-        strDirectionText = 'vertical';
-    }
-    var scrollingContainer = GS.scrollParent(element, strDirectionText), arrSiblings, i, len, intScrollTop, intScrollLeft;
+GS.scrollIntoView = function (element) {
+    var scrollingContainer = GS.scrollParent(element), arrSiblings, i, len, intScrollTop;
+    
     if (scrollingContainer) {
         //console.log(scrollingContainer);
-        if (strDirectionText === 'horizontal') {
-            arrSiblings = element.parentNode.children;
-            
-            for (i = 0, intScrollLeft = 0, len = arrSiblings.length; i < len; i += 1) {
-                if (arrSiblings[i] === element) {
-                    intScrollLeft += arrSiblings[i].offsetWidth / 2;
-                    
-                    break;
-                } else {
-                    intScrollLeft += arrSiblings[i].offsetWidth;
-                }
+        
+        arrSiblings = element.parentNode.children;
+        
+        for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
+            if (arrSiblings[i] === element) {
+                intScrollTop += arrSiblings[i].offsetHeight / 2;
+                
+                break;
+            } else {
+                intScrollTop += arrSiblings[i].offsetHeight;
             }
-            
-            intScrollLeft = intScrollLeft - (scrollingContainer.offsetWidth / 2);
-            scrollingContainer.scrollLeft = intScrollLeft;
-        } else {
-            arrSiblings = element.parentNode.children;
-            
-            for (i = 0, intScrollTop = 0, len = arrSiblings.length; i < len; i += 1) {
-                if (arrSiblings[i] === element) {
-                    intScrollTop += arrSiblings[i].offsetHeight / 2;
-                    
-                    break;
-                } else {
-                    intScrollTop += arrSiblings[i].offsetHeight;
-                }
-            }
-            
-            intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
-            scrollingContainer.scrollTop = intScrollTop;
         }
+        
+        intScrollTop = intScrollTop - (scrollingContainer.offsetHeight / 2);
+        
+        //console.log(intScrollTop);
+        
+        scrollingContainer.scrollTop = intScrollTop;
     }
 };
 
@@ -27165,13 +27071,6 @@ document.addEventListener('DOMContentLoaded', function () {
             column: function (strColumn) {
                 //console.log(this.lastSuccessData);
                 return GS.envGetCell(this.lastSuccessData, 0, strColumn);
-            },
-            
-            addMessage: function (strMessageName) {
-                return addMessage(this, strMessageName);
-            },
-            removeMessage: function (strMessageName) {
-                return removeMessage(this, strMessageName);
             }
         }
     });

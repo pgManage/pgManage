@@ -34,7 +34,7 @@
                 document.getElementById('user-name-label').textContent = userData.username;
                 
                 if (userData.groups.indexOf('ghi_job_g') !== -1 && userData.groups.indexOf('developer_g') === -1) {
-                    window.location = '/env/app/ghi_job_g/main_menu.html'
+                    window.location = '/env/app/ghi_job_g/main_menu.html';
                 }
                 
                 if (userData.groups.indexOf('twi_g') !== -1) {
@@ -217,6 +217,21 @@
                 <div id="user-app-list-container">
                     
                     
+                    <div class="group-container" data-group="klr_g">
+                        <h4><i>Klear Drilling Technologies BRDB Demo</i></h4>
+                        <span class="space"></span>
+                        
+                        <gs-grid widths="1,1,1" reflow-at="500px" gutter>
+                            <gs-block>
+                                <gs-button jumbo bg-primary target="_self" href="../klr_g/bit_record_list.html">Bit Records</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button jumbo bg-primary target="_self" href="../klr_g/bit_search.html">Search</gs-button>
+                            </gs-block>
+                        </gs-grid>
+                    </div>
+                    <br data-group="klr_g" />
+                    
                     
                     <gs-button target="_blank" data-group="developer_g" href="/env/app/developer_g/greyspots-1.1.1/test/new-datasheet/test.html" jumbo bg-primary>Datasheet Prototype</gs-button>
                     <br />
@@ -317,6 +332,7 @@
                             </gs-grid>
                         </div>
                     </div>
+                    <br data-group="twi_g" />
                     
                     
                     <!--
@@ -393,6 +409,10 @@
                         <h4><i>Foundation ERP</i></h4>
                         <span class="space"></span>
                         
+                        <style>
+                            
+                        </style>
+                        
                         <gs-grid widths="1,1,1" reflow-at="500px" gutter>
                             <gs-block>
                                 <gs-button jumbo bg-primary target="_self" href="../fdn_g/account_search.html">Account Search</gs-button>
@@ -400,8 +420,18 @@
                             <gs-block>
                                 <gs-button jumbo bg-primary target="_self" href="../fdn_g/po_search.html">PO Search</gs-button>
                             </gs-block>
+                            <gs-block>
+                                <gs-button jumbo bg-primary target="_self" href="../fdn_g/so_search.html">SO Search</gs-button>
+                            </gs-block>
+                        </gs-grid>
+                        <br />
+                        <gs-grid widths="1,1,1" reflow-at="500px" gutter>
+                            <gs-block>
+                                <gs-button jumbo bg-primary target="_self" href="../fdn_g/item_master.html">Item Master</gs-button>
+                            </gs-block>
                         </gs-grid>
                     </div>
+                    <br data-group="fdn_g" />
 
                     <gs-grid widths="1,1" reflow-at="500px" gutter>
                         <gs-block>
@@ -411,23 +441,23 @@
                             <gs-button jumbo target="_blank" data-group="cal2_g" href="../cal2_g/calendar.html">Calendar</gs-button>
                             <gs-button jumbo target="_blank" data-group="days_g" href="../days_g/index.html">Countdown</gs-button>
                             <gs-button jumbo target="_blank" data-group="adr_g" href="../adr_g/clist/index.html">Craigslist ads</gs-button>
-                            <gs-form src="post.rptdownload_new">
-                                <template>
-                                    <gs-button jumbo target="_blank" data-group="tocci_g" href="../all/splashcount.html">
-                                        <gs-static inline column="day_new_users"></gs-static>/<gs-static inline column="today_users"></gs-static>Splash Page Count
-                                    </gs-button>
-                                </template>
-                            </gs-form>
-                            <gs-button jumbo target="_blank" data-group="tst_g" href="../tst_g/index.html">Testing Facility Monitor</gs-button>
-                        </gs-block>
-                        <gs-block>
                             <gs-button jumbo target="_blank" data-group="a8g_g" href="../a8g_g/index.html">EasyBooks</gs-button>
                             <gs-button jumbo target="_blank" data-group="school_g" href="../school_g/index.html">Learning App</gs-button>
                             <gs-button jumbo target="_blank" data-group="school_g" href="../school_g/math.html">Learning Latin Math</gs-button>
                             <!--<gs-button jumbo target="_blank" data-group="lph_g" href="../lph_g/lph.html">LPH</gs-button>-->
                             <gs-button jumbo target="_blank" data-group="meal_g" href="../meal_g/calendar.html">Meals 3.0</gs-button>
                             <gs-button jumbo target="_blank" data-group="trkng_g" href="../trkng_g/index.html">Packages</gs-button>
+                        </gs-block>
+                        <gs-block>
+                            <gs-form src="post.rptdownload_new">
+                                <template>
+                                    <gs-button jumbo target="_blank" data-group="tocci_g" href="../all/splashcount.html">
+                                        Splash Page Downloads (<gs-static mini inline column="day_new_users"></gs-static> New / <gs-static mini inline column="today_users"></gs-static> Total)
+                                    </gs-button>
+                                </template>
+                            </gs-form>
                             <gs-button jumbo target="_blank" data-group="shop_g" href="../shop_g/index.html">TEMP</gs-button>
+                            <gs-button jumbo target="_blank" data-group="tst_g" href="../tst_g/index.html">Testing Facility Monitor</gs-button>
                             <gs-button jumbo target="_blank" data-group="wtkv2_g" href="../wtkv2_g/index.html">Timekeeping</gs-button>
                             <gs-button jumbo target="_blank" data-group="wtkv2_g" href="../wtkv2_g/productivity.html">Timekeeping Productivity</gs-button>
                             <gs-button jumbo target="_blank" data-group="days_g" href="../days_g/toccical.html">TocciCal</gs-button>

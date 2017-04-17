@@ -331,10 +331,14 @@
                 for (key in jsnMessages) {
                     jsnMessage = jsnMessages[key];
                     
-                    if ((
+                    if (
+                        jsnMessage &&
+                        (
                             jsnMessage.session === socket.GSSessionID ||
                             jsnMessage.session === socket.oldSessionID
-                        ) && jsnMessage.bolFinished === false) {
+                        ) &&
+                        jsnMessage.bolFinished === false
+                    ) {
                         
                         jsnMessage.session = socket.GSSessionID;
                         
@@ -426,7 +430,11 @@
                     } else {
                         jsnMessage.callback.apply(null, [message]);
                     }
-                    
+
+                    if (jsnMessage.bolFinished === true) {
+                        delete jsnMessages[messageID];
+                    }
+
                 // else if the messageID is 'NULL': notification from the server
                 } else if (messageID === 'NULL') {
                     socket.notifications.push(message);

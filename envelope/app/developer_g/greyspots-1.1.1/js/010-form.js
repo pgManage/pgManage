@@ -1331,6 +1331,13 @@ document.addEventListener('DOMContentLoaded', function () {
             column: function (strColumn) {
                 //console.log(this.lastSuccessData);
                 return GS.envGetCell(this.lastSuccessData, 0, strColumn);
+            },
+            
+            addMessage: function (strMessageName) {
+                return addMessage(this, strMessageName);
+            },
+            removeMessage: function (strMessageName) {
+                return removeMessage(this, strMessageName);
             }
         }
     });

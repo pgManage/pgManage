@@ -167,10 +167,10 @@ function menuUser(target) {
 }
 
 function buttonReloadWindow() {
-	GS.closeAllSockets();
-	window.location.reload(true);
-	//no GS.loader in postage?
-	//GS.loader('reload-lodaer','Reloading the page');
+    GS.closeAllSockets();
+    window.location.reload(true);
+    //no GS.loader in postage?
+    //GS.loader('reload-lodaer','Reloading the page');
 }
 
 function menuTools(target) {
@@ -220,12 +220,12 @@ function menuTools(target) {
     // dialogAbout()
 
     GS.openDialogToElement(target, templateElement, 'down', function () {
-	    //if we are in electron, remove the clear cache button
-	    if (window.process && window.process.type === 'renderer') {
-	        var element = document.getElementById('clear-cache-button');
-			element.parentNode.removeChild(element);
-	    }
-	});
+        //if we are in electron, remove the clear cache button
+        if (window.process && window.process.type === 'renderer') {
+            var element = document.getElementById('clear-cache-button');
+            element.parentNode.removeChild(element);
+        }
+    });
 }
 
 function menuTab(target) {
@@ -234,68 +234,68 @@ function menuTab(target) {
 
     templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
-	if (window.process && window.process.type === 'renderer') {
-		var app = require('electron').remote.app;
-		var path = require('path');
-		if (window.opn === undefined) {
-			window.opn = require(path.normalize(app.getAppPath() + '/node_modules/opn'));
-		}
-	    templateElement.innerHTML = ml(function () {/*
-	        <gs-page>
-	            <gs-body>
-	                <gs-button class="postage-menu-item-button" dialogclose iconleft
-	                        onclick="dialogScriptOpen()" icon="folder-open-o"
-	                        title="Open a .sql file to a tab" no-focus>Open File...</gs-button>
-					<gs-button onclick="saveCurrentScript()" icon="save" iconleft  class="postage-menu-item-button" title="Save" no-focus>Save File</gs-button>
-					<gs-button id="button-tab-current-save-as" onclick="saveCurrentScript(true)" icon="save" iconleft class="postage-menu-item-button button-save-as" title="Save As..." remove-all no-focus>
-	                    <span class="save-as-pencil">&#xf040;</span>
-						Save As...
-					</gs-button>
-	                <gs-button class="postage-menu-item-button" dialogclose iconleft
-	                        onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icon="folder-o"
-	                        title="Create a blank script tab" no-focus id="menu-button-new-tab">
-	                    <span id="menu-button-new-tab-plus">+</span>
-	                    New Tab
-	                </gs-button>
-	                <gs-button class="postage-menu-item-button" dialogclose iconleft
-	                        onclick="dialogOpenTabs()" no-focus icon="list"
-	                        title="All open tabs">View All Open Tabs</gs-button>
-	                <gs-button class="postage-menu-item-button" dialogclose iconleft
-	                        onclick="dialogClosedTabs()" no-focus icon="clock-o"
-	                        title="All closed tabs">View All Closed Tabs</gs-button>
-	                <gs-button class="postage-menu-item-button" dialogclose
-	                        onclick="window.opn('{{TABPATH}}')" no-focus
-	                        title="Open tab Folder">Open tab Folder</gs-button>
-	            </gs-body>
-	        </gs-page>
-	    */}).replace(/\{\{TABPATH\}\}/gi,
-				  process.platform === 'win32'
-				? path.normalize(app.getPath('userData') + '\\sql\\').replace(/\\/g, '\\\\')
-				: path.normalize(app.getPath('home') + '/.postage/sql/').replace(/\\/g, '\\\\')
-			);
-	} else {
-	    templateElement.innerHTML = ml(function () {/*
-	        <gs-page>
-	            <gs-body>
-	                <gs-button class="postage-menu-item-button" dialogclose iconleft
-	                        onclick="dialogScriptUpload()" icon="upload"
-	                        title="Upload a .sql file to create a script" no-focus>Upload File To Tab</gs-button>
-	                <gs-button class="postage-menu-item-button" dialogclose iconleft
-	                        onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icon="folder-o"
-	                        title="Create a blank script tab" no-focus id="menu-button-new-tab">
-	                    <span id="menu-button-new-tab-plus">+</span>
-	                    New Tab
-	                </gs-button>
-	                <gs-button class="postage-menu-item-button" dialogclose iconleft
-	                        onclick="dialogOpenTabs()" no-focus icon="list"
-	                        title="All open tabs">View All Open Tabs</gs-button>
-	                <gs-button class="postage-menu-item-button" dialogclose iconleft
-	                        onclick="dialogClosedTabs()" no-focus icon="clock-o"
-	                        title="All closed tabs">View All Closed Tabs</gs-button>
-	            </gs-body>
-	        </gs-page>
-	    */});
-	}
+    if (window.process && window.process.type === 'renderer') {
+        var app = require('electron').remote.app;
+        var path = require('path');
+        if (window.opn === undefined) {
+            window.opn = require(path.normalize(app.getAppPath() + '/node_modules/opn'));
+        }
+        templateElement.innerHTML = ml(function () {/*
+            <gs-page>
+                <gs-body>
+                    <gs-button class="postage-menu-item-button" dialogclose iconleft
+                            onclick="dialogScriptOpen()" icon="folder-open-o"
+                            title="Open a .sql file to a tab" no-focus>Open File...</gs-button>
+                    <gs-button onclick="saveCurrentScript()" icon="save" iconleft  class="postage-menu-item-button" title="Save" no-focus>Save File</gs-button>
+                    <gs-button id="button-tab-current-save-as" onclick="saveCurrentScript(true)" icon="save" iconleft class="postage-menu-item-button button-save-as" title="Save As..." remove-all no-focus>
+                        <span class="save-as-pencil">&#xf040;</span>
+                        Save As...
+                    </gs-button>
+                    <gs-button class="postage-menu-item-button" dialogclose iconleft
+                            onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icon="folder-o"
+                            title="Create a blank script tab" no-focus id="menu-button-new-tab">
+                        <span id="menu-button-new-tab-plus">+</span>
+                        New Tab
+                    </gs-button>
+                    <gs-button class="postage-menu-item-button" dialogclose iconleft
+                            onclick="dialogOpenTabs()" no-focus icon="list"
+                            title="All open tabs">View All Open Tabs</gs-button>
+                    <gs-button class="postage-menu-item-button" dialogclose iconleft
+                            onclick="dialogClosedTabs()" no-focus icon="clock-o"
+                            title="All closed tabs">View All Closed Tabs</gs-button>
+                    <gs-button class="postage-menu-item-button" dialogclose
+                            onclick="window.opn('{{TABPATH}}')" no-focus
+                            title="Open tab Folder">Open tab Folder</gs-button>
+                </gs-body>
+            </gs-page>
+        */}).replace(/\{\{TABPATH\}\}/gi,
+                  process.platform === 'win32'
+                ? path.normalize(app.getPath('userData') + '\\sql\\').replace(/\\/g, '\\\\')
+                : path.normalize(app.getPath('home') + '/.postage/sql/').replace(/\\/g, '\\\\')
+            );
+    } else {
+        templateElement.innerHTML = ml(function () {/*
+            <gs-page>
+                <gs-body>
+                    <gs-button class="postage-menu-item-button" dialogclose iconleft
+                            onclick="dialogScriptUpload()" icon="upload"
+                            title="Upload a .sql file to create a script" no-focus>Upload File To Tab</gs-button>
+                    <gs-button class="postage-menu-item-button" dialogclose iconleft
+                            onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icon="folder-o"
+                            title="Create a blank script tab" no-focus id="menu-button-new-tab">
+                        <span id="menu-button-new-tab-plus">+</span>
+                        New Tab
+                    </gs-button>
+                    <gs-button class="postage-menu-item-button" dialogclose iconleft
+                            onclick="dialogOpenTabs()" no-focus icon="list"
+                            title="All open tabs">View All Open Tabs</gs-button>
+                    <gs-button class="postage-menu-item-button" dialogclose iconleft
+                            onclick="dialogClosedTabs()" no-focus icon="clock-o"
+                            title="All closed tabs">View All Closed Tabs</gs-button>
+                </gs-body>
+            </gs-page>
+        */});
+    }
 
     GS.openDialogToElement(target, templateElement, 'down');
 }
@@ -1412,29 +1412,29 @@ var strHomeToken =  ((localStorage.ShortcutHome.split(',')[0]) ? localStorage.Sh
                 <ul>
                     <li>You can open a hidden preferences panel using the <kbd>CMD-COMMA</kbd> shortcut (might be <kbd>CTRL-COMMA</kbd> on Windows).</li>
 
-                	<li>In the hidden preferences, you can change the input type to "vim" or "emacs" by clicking the dropdown called "Keyboard Handler".</li>
+                    <li>In the hidden preferences, you can change the input type to "vim" or "emacs" by clicking the dropdown called "Keyboard Handler".</li>
 
-                	<li>Queries won't be syntax highlighted unless the first character of the query is at the beginning of its line or if it's inside a <code>BEGIN...END</code> statement.</li>
+                    <li>Queries won't be syntax highlighted unless the first character of the query is at the beginning of its line or if it's inside a <code>BEGIN...END</code> statement.</li>
 
-                	<li>Ace is double dollar sign aware. When the first character inside a dollar quote is a <kbd>RETURN</kbd>, the contents of the string are syntax highlighted. When the first character is not a return, everything inside is colored as a quoted string.</li>
+                    <li>Ace is double dollar sign aware. When the first character inside a dollar quote is a <kbd>RETURN</kbd>, the contents of the string are syntax highlighted. When the first character is not a return, everything inside is colored as a quoted string.</li>
 
-                	<li>You can type using multiple cursors at once. To select in multiple places, hold down <kbd>CMD</kbd> (might be <kbd>CTRL</kbd> on Windows) and click in several places. To put a cursor in the same place on multiple lines, hold <kbd>OPTION</kbd> and then click and drag.</li>
+                    <li>You can type using multiple cursors at once. To select in multiple places, hold down <kbd>CMD</kbd> (might be <kbd>CTRL</kbd> on Windows) and click in several places. To put a cursor in the same place on multiple lines, hold <kbd>OPTION</kbd> and then click and drag.</li>
                 </ul>
                 Tab Shortcuts: (Configurable in "Postage Options" <a style="text-decoration: underline; cursor: pointer; color: #0000FF;" onclick="dialogOptions();" dialogclose>Here</a>)<br />
                 <ul>
                     <li>Use "{{F5TOKEN}}" to run Queries inside the Ace Editor.</li>
 
-                	<li>Use "{{CTRLOTOKEN}}" to open a new editor tab.</li>
+                    <li>Use "{{CTRLOTOKEN}}" to open a new editor tab.</li>
 
-                	<li>Use "{{CTRLSTOKEN}}" to save the currently opened tab.</li>
+                    <li>Use "{{CTRLSTOKEN}}" to save the currently opened tab.</li>
 
-                	<li>Use "{{DOCSTOKEN}}" to find the PostgreSQL documentation of the currently highlighted keyword.</li>
+                    <li>Use "{{DOCSTOKEN}}" to find the PostgreSQL documentation of the currently highlighted keyword.</li>
 
-                	<li>Use "{{EXPTOKEN}}" to run the PostgreSQL Explain function.</li>
+                    <li>Use "{{EXPTOKEN}}" to run the PostgreSQL Explain function.</li>
 
-                	<li>Use "{{EXPANTOKEN}}" to run the PostgreSQL Explain Analyze function.</li>
+                    <li>Use "{{EXPANTOKEN}}" to run the PostgreSQL Explain Analyze function.</li>
 
-                	<li>Use "{{HOMETOKEN}}" to switch between the current tab and the home page.</li>
+                    <li>Use "{{HOMETOKEN}}" to switch between the current tab and the home page.</li>
                 </ul>
 
             </gs-body>
@@ -2313,44 +2313,180 @@ function removeMarkerHighlighted() {
     }
 }
 
+
+
+
+// this function is run when we send the queries through the websocket,
+//      it adds a loader, disables the "Clear" button and shows/binds the "Stop Execution" button
+function executeHelperStartExecute() {
+    var currentTab = document.getElementsByClassName('current-tab')[0];
+    var editor = currentTab.relatedEditor;
+
+    GS.addLoader(editor.container.parentNode.parentNode, 'Executing Query...');
+    currentTab.relatedClearButton.setAttribute('hidden', '');
+    currentTab.relatedCopyOptionsButton.setAttribute('hidden', '');
+    currentTab.handlingQuery = true;
+    currentTab.bolIgnoreMessages = false;
+
+    currentTab.relatedResultsHeaderElement.classList.add('executing');
+    currentTab.relatedStopButton.removeAttribute('hidden');
+    currentTab.relatedStopButton.addEventListener('click', executeHelperCancelSignalHandler);
+    currentTab.relatedStopSocketButton.addEventListener('click', executeHelperStopSocket);
+}
+
+// this function is run when we encounter an error or we've recieved the last transmission,
+//      it enables the "Clear" button and hides/unbinds the "Stop Loading" button
+function executeHelperEndLoading() {
+    var currentTab = document.getElementsByClassName('current-tab')[0];
+    var editor = currentTab.relatedEditor;
+
+    currentTab.relatedClearButton.removeAttribute('hidden');
+    currentTab.relatedResultsHeaderElement.classList.remove('executing');
+    currentTab.handlingQuery = false;
+    currentTab.relatedStopSocketButton.setAttribute('hidden', '');
+    currentTab.relatedStopSocketButton.removeEventListener('click', executeHelperStopLoadingHandler);
+    //currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
+    //currentTab.relatedStopLoadingButton.removeEventListener('click', executeHelperStopLoadingHandler);
+}
+
+// this function is going to be bound to the "Stop Execution" button,
+//      it uses the "currentTab.currentMessageID" variable to send a "CANCEL" signal
+//      through the websocket
+function executeHelperCancelSignalHandler() {
+    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.requestFromSocket(GS.querySocket, 'CANCEL', '', currentTab.currentMessageID);
+}
+
+// this function is run when the user clicks "Show Query",
+//      it opens a dialog with the query in it
+function executeHelperBindShowQueryButton(element, strQuery) {
+    element.addEventListener('click', function () {
+        var templateElement = document.createElement('template');
+
+        templateElement.setAttribute('data-overlay-close', 'true');
+        templateElement.innerHTML = ml(function () {/*
+            <gs-page>
+                <gs-body padded>
+                    <pre>{{STRHTML}}</pre>
+                </gs-body>
+            </gs-page>
+        */}).replace(/\{\{STRHTML\}\}/gim, encodeHTML(strQuery));
+
+        GS.openDialogToElement(element, templateElement, 'left');
+    });
+}
+
+// this function is going to be bound to the "Stop Execution" button,
+//      it sets the "bolIgnoreMessages" variable to true, meaning the callback for the query execution will not do anything
+//      it also changes the results pane header (the tally results portion) to "(Loading Stopped)"
+//      it also runs the "executeHelperEndExecute" and "executeHelperEndLoading" functions
+function executeHelperStopLoadingHandler() {
+    var currentTab = document.getElementsByClassName('current-tab')[0];
+    currentTab.bolIgnoreMessages = true;
+    currentTab.relatedResultsTallyElement.innerHTML = ' (Loading Stopped)';
+    executeHelperEndExecute();
+    executeHelperEndLoading();
+}
+
+// this function is run when we get our first callback,
+//      it removes the loader, hides/unbinds the "Stop Execution" button
+function executeHelperEndExecute() {
+    var currentTab = document.getElementsByClassName('current-tab')[0];
+    var editor = currentTab.relatedEditor;
+
+    GS.removeLoader(editor.container.parentNode.parentNode);
+
+    currentTab.relatedStopButton.setAttribute('hidden', '');
+    currentTab.relatedStopButton.removeEventListener('click', executeHelperCancelSignalHandler);
+    currentTab.relatedStopSocketButton.removeEventListener('click', executeHelperStopSocket);
+}
+
+// This function updates the results header Success/Error tally
+function executeHelperUpdateTally(intQuery, intError) {
+    var currentTab = document.getElementsByClassName('current-tab')[0];
+
+    currentTab.relatedResultsTallyElement.innerHTML = (
+        ' (<b>Pass: ' + (intQuery - intError) + '</b>, <b>Fail: ' + (intError) + '</b>)'
+    );
+}
+
+// this function is run when we get our first callback,
+//      it shows and binds the "Stop Loading" button
+function executeHelperStartLoading() {
+    var currentTab = document.getElementsByClassName('current-tab')[0];
+
+    currentTab.relatedClearButton.setAttribute('hidden', '');
+    currentTab.relatedStopSocketButton.removeAttribute('hidden');
+    //currentTab.relatedStopLoadingButton.removeAttribute('hidden');
+    //currentTab.relatedStopLoadingButton.addEventListener('click', executeHelperStopLoadingHandler);
+}
+
+function executeHelperStopSocket() {
+    var currentTab = document.getElementsByClassName('current-tab')[0];
+
+    GS.requestFromSocket(GS.querySocket, 'CANCEL', '', currentTab.currentMessageID);
+    executeHelperStopLoadingHandler();
+    currentTab.bolIgnoreMessages = true;
+    //document.getElementById('RowCountSmall').innerHTML = (
+    //        '' + (
+    //            parseInt(
+    //                (data.intCallbackNumberThisQuery * 10),
+    //                10
+    //            ) +
+    //            10
+    //        ) + ' loaded of ' + data.intRows
+    //    );
+
+}
+
+
 // executes SQL in current tab
 var arrExecuteHistory = [];
 function executeScript(bolCursorQuery) {
     'use strict';
-    var currentTab           = document.getElementsByClassName('current-tab')[0]
-      , editor               = currentTab.relatedEditor
-      , resultsContainer     = currentTab.relatedResultsArea
-      , resultsTallyElement  = currentTab.relatedResultsTallyElement
-      , resultsHeaderElement = currentTab.relatedResultsHeaderElement
-      , bolAutocommit        = currentTab.relatedAutocommitCheckbox.value === 'true'
-      , jsnCurrentQuery, startExecute, endExecute, startLoading, endLoading, updateTally
-      , stopLoadingHandler, bolIgnoreMessages = false, cancelSignalHandler
-      , messageID, currentTargetTbody, intRecordsThisQuery, intError, intQuery
-      , divElement, intErrorStartLine, bindShowQueryButton, jsnQueryStart, jsnQueryEnd;
+    var currentTab = document.getElementsByClassName('current-tab')[0];
+    var editor = currentTab.relatedEditor;
+    var resultsContainer = currentTab.relatedResultsArea;
+    var resultsTallyElement = currentTab.relatedResultsTallyElement;
+    var resultsHeaderElement = currentTab.relatedResultsHeaderElement;
+    var bolAutocommit = (currentTab.relatedAutocommitCheckbox.value === 'true');
+    var jsnCurrentQuery;
+    var currentTargetTbody;
+    var intRecordsThisQuery;
+    var intError;
+    var intQuery;
+    var divElement;
+    var intErrorStartLine;
+    var jsnQueryStart;
+    var jsnQueryEnd;
+    var intCursorPos;
+    var strScript;
+    var jsnSelection;
 
     // if we found an editor to get the query from and the current tab is not already running a query
     if (editor && currentTab.handlingQuery !== true) {
         // get current query
         if (bolCursorQuery) {
             strScript = editor.getValue();
-            var strScript = editor.getValue();
-            var jsnSelection = editor.getSelectionRange();
-            if (jsnSelection.start.column === 0 ||
+            jsnSelection = editor.getSelectionRange();
+
+            if (
+                jsnSelection.start.column === 0 ||
                 jsnSelection.start.column === 1
             ) {
-                var intCursorPos = rowAndColumnToIndex(strScript, jsnSelection.start.row, jsnSelection.start.column);
+                intCursorPos = rowAndColumnToIndex(strScript, jsnSelection.start.row, jsnSelection.start.column);
             } else {
-                var intCursorPos = rowAndColumnToIndex(strScript, jsnSelection.start.row, jsnSelection.start.column - 1);
+                intCursorPos = rowAndColumnToIndex(strScript, jsnSelection.start.row, jsnSelection.start.column - 1);
             }
+
             jsnCurrentQuery = findSqlQueryFromCursor(strScript, intCursorPos);
-            console.log(jsnCurrentQuery.strQuery);
             jsnQueryStart = {
-                 'row':        jsnCurrentQuery.start_row
-                ,'column':     jsnCurrentQuery.start_column
+                'row': jsnCurrentQuery.start_row,
+                'column': jsnCurrentQuery.start_column
             };
             jsnQueryEnd = {
-                 'row':        jsnCurrentQuery.end_row
-                ,'column':     jsnCurrentQuery.end_column
+                'row': jsnCurrentQuery.end_row,
+                'column': jsnCurrentQuery.end_column
             };
             highlightCurrentCursorQuery(currentTab, jsnQueryStart, jsnQueryEnd);
         } else {
@@ -2375,127 +2511,34 @@ function executeScript(bolCursorQuery) {
         intQuery = 0;            // number query the callback is on
         intErrorStartLine = 0;   // number of lines in the queries that successfully ran, so that we can offset the error annotation
 
-        // this function is going to be bound to the "Stop Execution" button,
-        //      it sets the "bolIgnoreMessages" variable to true, meaning the callback for the query execution will not do anything
-        //      it also changes the results pane header (the tally results portion) to "(Loading Stopped)"
-        //      it also runs the "endExecute" and "endLoading" functions
-        stopLoadingHandler = function () {
-            bolIgnoreMessages = true;
-            resultsTallyElement.innerHTML = ' (Loading Stopped)';
-            endExecute();
-            endLoading();
-        };
-
-        // this function is going to be bound to the "Stop Execution" button,
-        //      it uses the "messageID" variable to send a "CANCEL" signal through the websocket
-        cancelSignalHandler = function () {
-            GS.requestFromSocket(GS.querySocket, 'CANCEL', '', messageID);
-        };
-
-        // this function is run when we send the queries through the websocket,
-        //      it adds a loader, disables the "Clear" button and shows/binds the "Stop Execution" button
-        startExecute = function () {
-            GS.addLoader(editor.container.parentNode.parentNode, 'Executing Query...');
-            currentTab.relatedClearButton.setAttribute('hidden', '');
-            currentTab.relatedCopyOptionsButton.setAttribute('hidden', '');
-            currentTab.handlingQuery = true;
-
-            resultsHeaderElement.classList.add('executing');
-            currentTab.relatedStopButton.removeAttribute('hidden');
-            currentTab.relatedStopButton.addEventListener('click', cancelSignalHandler);
-        };
-
-        // this function is run when we get our first callback,
-        //      it removes the loader, hides/unbinds the "Stop Execution" button
-        endExecute = function () {
-            GS.removeLoader(editor.container.parentNode.parentNode);
-
-            currentTab.relatedStopButton.setAttribute('hidden', '');
-            currentTab.relatedStopButton.removeEventListener('click', cancelSignalHandler);
-        };
-
-        // this function is run when we get our first callback,
-        //      it shows and binds the "Stop Loading" button
-        startLoading = function () {
-            currentTab.relatedClearButton.setAttribute('hidden', '');
-            currentTab.relatedStopSocketButton.removeAttribute('hidden');
-            //currentTab.relatedStopLoadingButton.removeAttribute('hidden');
-            //currentTab.relatedStopLoadingButton.addEventListener('click', stopLoadingHandler);
-        };
-
-        // this function is run when we encounter an error or we've recieved the last transmission,
-        //      it enables the "Clear" button and hides/unbinds the "Stop Loading" button
-        endLoading = function () {
-            currentTab.relatedClearButton.removeAttribute('hidden');
-            resultsHeaderElement.classList.remove('executing');
-            currentTab.handlingQuery = false;
-            currentTab.relatedStopSocketButton.setAttribute('hidden', '');
-            currentTab.relatedStopSocketButton.removeEventListener('click', stopLoadingHandler);
-            //currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
-            //currentTab.relatedStopLoadingButton.removeEventListener('click', stopLoadingHandler);
-        };
-
-        // this function is run when the user clicks "Show Query",
-        //      it opens a dialog with the query in it
-        bindShowQueryButton = function (element, strQuery) {
-            element.addEventListener('click', function () {
-                var templateElement = document.createElement('template');
-
-                templateElement.setAttribute('data-overlay-close', 'true');
-                templateElement.innerHTML = ml(function () {/*
-                    <gs-page>
-                        <gs-body padded>
-                            <pre>{{STRHTML}}</pre>
-                        </gs-body>
-                    </gs-page>
-                */}).replace(/\{\{STRHTML\}\}/gim, encodeHTML(strQuery));
-
-                GS.openDialogToElement(element, templateElement, 'left');
-            });
-        };
-
-        // This function updates the results header Success/Error tally
-        updateTally = function (intQuery, intError) {
-            resultsTallyElement.innerHTML = ' (<b>Pass: ' + (intQuery - intError) + '</b>, <b>Fail: ' + (intError) + '</b>)';
-            //resultsTallyElement.innerHTML = ' (<b>Success: ' + (intQuery - intError) + '</b>, <b>Error: ' + (intError) + '</b>)';
-        };
-
         // begin
-        startExecute();
-        messageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
+        executeHelperStartExecute();
+        currentTab.currentMessageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
             var tableElement, scrollElement, trElement, arrRecords
               , arrCells, intRows, strHTML, arrLines, strError
               , intLine, i, len, col_i, col_len, rec_i, rec_len
               , warningHTML, buttonContainerElement, strCSS
               , styleElement;
 
-            if (bolIgnoreMessages === false) {
+            if (currentTab.bolIgnoreMessages === false) {
                 // get name of query if applicable
                 var strQueryName = "";
                 if (data.strQuery) {
                     var arrStrMatches = data.strQuery.match(/\-\-[ \t]*Name\:(.*)$/im);
 
                     if (arrStrMatches && arrStrMatches.length > 1) {
-                    	strQueryName = ", " + arrStrMatches[1].trim();
+                        strQueryName = ", " + arrStrMatches[1].trim();
                     }
                 }
 
                 if (!error) {
                     if (data.intCallbackNumber === 0) {
-                        endExecute();
-                        startLoading();
+                        executeHelperEndExecute();
+                        executeHelperStartLoading();
                     }
 
-                    currentTab.relatedStopSocketButton.addEventListener('click', function () {
-                        GS.requestFromSocket(GS.querySocket, 'CANCEL', function () {});
-                        stopLoadingHandler();
-                        bolIgnoreMessages = true;
-                        document.getElementById('RowCountSmall').innerHTML = '' + (parseInt(data.intCallbackNumberThisQuery * 10, 10) + 10) + ' loaded of ' + data.intRows;
-                        console.log(data.intCallbackNumberThisQuery * 10 + 10);
-                    });
-
                     if (data.bolLastMessage) {
-                        endLoading();
+                        executeHelperEndLoading();
                     }
                     if (data.intCallbackNumberThisQuery === 0) {
                         if (data.strQuery.trim()) {
@@ -2556,11 +2599,11 @@ function executeScript(bolCursorQuery) {
                             divElement.innerHTML =  strHTML + '<pre>' + intRows + ' Row' + (intRows === 1 ? '' : 's') + ' Affected</pre><br />';
 
                             resultsContainer.appendChild(divElement);
-                            bindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
+                            executeHelperBindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
                             intQuery += 1;
 
                             // update the success and error tally
-                            updateTally(intQuery, intError);
+                            executeHelperUpdateTally(intQuery, intError);
 
                         // else if empty
                         } else if (data.strMessage === 'EMPTY') {
@@ -2598,11 +2641,11 @@ function executeScript(bolCursorQuery) {
                             divElement.innerHTML = strHTML + '<pre>Empty Query</pre><br />';
 
                             resultsContainer.appendChild(divElement);
-                            bindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
+                            executeHelperBindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
                             intQuery += 1;
 
                             // update the success and error tally
-                            updateTally(intQuery, intError);
+                            executeHelperUpdateTally(intQuery, intError);
 
                         // else if result query
                         } else if (data.arrColumnNames.length > 0) {
@@ -2636,9 +2679,9 @@ function executeScript(bolCursorQuery) {
 
                                 strHTML += '<br />';
 
-                                if (data.intRows !== undefined) {
-                                    strHTML += '<small id="RowCountSmall">' + data.intRows + ' rows</small>';
-                                }
+                                //if (data.intRows !== undefined) {
+                                //    strHTML += '<small id="RowCountSmall">' + data.intRows + ' rows</small>';
+                                //}
 
 
                                 strHTML +=      '</div>' +
@@ -2650,7 +2693,7 @@ function executeScript(bolCursorQuery) {
 
                                 divElement.appendChild(scrollElement);
                                 resultsContainer.appendChild(divElement);
-                                bindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
+                                executeHelperBindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
 
                                 strHTML = '<thead><tr><th>#</th>';
                                 strCSS = '';
@@ -2800,18 +2843,18 @@ function executeScript(bolCursorQuery) {
                                 intQuery += 1;
 
                                 // update the success and error tally
-                                updateTally(intQuery, intError);
+                                executeHelperUpdateTally(intQuery, intError);
 
                                 intRecordsThisQuery = 0;
                                 currentTab.relatedClearButton.removeAttribute('disabled');
                                 currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
-                                currentTab.relatedStopLoadingButton.removeEventListener('click', stopLoadingHandler);
+                                currentTab.relatedStopLoadingButton.removeEventListener('click', executeHelperStopLoadingHandler);
                             }
                         }
                     }
                 } else {
-                    endExecute();
-                    endLoading();
+                    executeHelperEndExecute();
+                    executeHelperEndLoading();
 
                     arrExecuteHistory.push({
                         'strQuery': jsnCurrentQuery.strQuery,
@@ -2864,7 +2907,7 @@ function executeScript(bolCursorQuery) {
                     }
 
                     // update the success and error tally
-                    updateTally(intQuery, intError);
+                    executeHelperUpdateTally(intQuery, intError);
 
                     //editor.gotoLine(
                     //    (jsnCurrentQuery.start_row + intLine),
@@ -3312,165 +3355,165 @@ function exportCSV() {
 
 function openInNewWindow() {
     var currentTab = document.getElementsByClassName('current-tab')[0];
-	window.open('index.html?leftpanel=false&view=tab:' + encodeURIComponent(currentTab.filePath), Math.random().toString(), 'left=' + (window.screenX + 100) + ',width=' + window.innerWidth + ',height=' + window.innerHeight);
+    window.open('index.html?leftpanel=false&view=tab:' + encodeURIComponent(currentTab.filePath), Math.random().toString(), 'left=' + (window.screenX + 100) + ',width=' + window.innerWidth + ',height=' + window.innerHeight);
 }
 
 function docButtonForQuery(strQuery) {
     'use strict';
     var strPrefix = 'http://www.postgresql.org/docs/' + contextData.minorVersionNumber + '/static/', strDocButton;
 
-	var docLinks = [
-	    {'test': (/^VALUES/gi).test(strQuery), 'link': strPrefix + 'sql-values.html'},
-    	{'test': (/^VACUUM/gi).test(strQuery), 'link': strPrefix + 'sql-vacuum.html'},
-    	{'test': (/^UPDATE/gi).test(strQuery), 'link': strPrefix + 'sql-update.html'},
-    	{'test': (/^UNLISTEN/gi).test(strQuery), 'link': strPrefix + 'sql-unlisten.html'},
-    	{'test': (/^TRUNCATE/gi).test(strQuery), 'link': strPrefix + 'sql-truncate.html'},
-    	{'test': (/^START\s*TRANSACTION/gi).test(strQuery), 'link': strPrefix + 'sql-start-transaction.html'},
-    	{'test': (/^SHOW/gi).test(strQuery), 'link': strPrefix + 'sql-show.html'},
-    	{'test': (/^SET\s*TRANSACTION/gi).test(strQuery), 'link': strPrefix + 'sql-set-transaction.html'},
-    	{'test': (/^SET\s*SESSION\s*AUTHORIZATION/gi).test(strQuery), 'link': strPrefix + 'sql-set-session-authorization.html'},
-    	{'test': (/^SET\s*ROLE/gi).test(strQuery), 'link': strPrefix + 'sql-set-role.html'},
-    	{'test': (/^SET\s*CONSTRAINTS/gi).test(strQuery), 'link': strPrefix + 'sql-set-constraints.html'},
-    	{'test': (/^SET/gi).test(strQuery), 'link': strPrefix + 'sql-set.html'},
-    	{'test': (/^SELECT\s*INTO/gi).test(strQuery), 'link': strPrefix + 'sql-selectinto.html'},
-    	{'test': (/^SELECT/gi).test(strQuery), 'link': strPrefix + 'sql-select.html'},
-    	{'test': (/^SECURITY\s*LABEL/gi).test(strQuery), 'link': strPrefix + 'sql-security-label.html'},
-    	{'test': (/^SAVEPOINT/gi).test(strQuery), 'link': strPrefix + 'sql-savepoint.html'},
-    	{'test': (/^ROLLBACK\s*TO\s*SAVEPOINT/gi).test(strQuery), 'link': strPrefix + 'sql-rollback-to.html'},
-    	{'test': (/^ROLLBACK\s*PREPARED/gi).test(strQuery), 'link': strPrefix + 'sql-rollback-prepared.html'},
-    	{'test': (/^ROLLBACK/gi).test(strQuery), 'link': strPrefix + 'sql-rollback.html'},
-    	{'test': (/^REVOKE/gi).test(strQuery), 'link': strPrefix + 'sql-revoke.html'},
-    	{'test': (/^RESET/gi).test(strQuery), 'link': strPrefix + 'sql-reset.html'},
-    	{'test': (/^RELEASE\s*SAVEPOINT/gi).test(strQuery), 'link': strPrefix + 'sql-release-savepoint.html'},
-    	{'test': (/^REINDEX/gi).test(strQuery), 'link': strPrefix + 'sql-reindex.html'},
-    	{'test': (/^REASSIGN\s*OWNED/gi).test(strQuery), 'link': strPrefix + 'sql-reassign-owned.html'},
-    	{'test': (/^PREPARE\s*TRANSACTION/gi).test(strQuery), 'link': strPrefix + 'sql-prepare-transaction.html'},
-    	{'test': (/^PREPARE/gi).test(strQuery), 'link': strPrefix + 'sql-prepare.html'},
-    	{'test': (/^NOTIFY/gi).test(strQuery), 'link': strPrefix + 'sql-notify.html'},
-    	{'test': (/^MOVE/gi).test(strQuery), 'link': strPrefix + 'sql-move.html'},
-    	{'test': (/^LOCK/gi).test(strQuery), 'link': strPrefix + 'sql-lock.html'},
-    	{'test': (/^LOAD/gi).test(strQuery), 'link': strPrefix + 'sql-load.html'},
-    	{'test': (/^LISTEN/gi).test(strQuery), 'link': strPrefix + 'sql-listen.html'},
-    	{'test': (/^INSERT/gi).test(strQuery), 'link': strPrefix + 'sql-insert.html'},
-    	{'test': (/^GRANT/gi).test(strQuery), 'link': strPrefix + 'sql-grant.html'},
-    	{'test': (/^FETCH/gi).test(strQuery), 'link': strPrefix + 'sql-fetch.html'},
-    	{'test': (/^EXPLAIN/gi).test(strQuery), 'link': strPrefix + 'sql-explain.html'},
-    	{'test': (/^EXECUTE/gi).test(strQuery), 'link': strPrefix + 'sql-execute.html'},
-    	{'test': (/^END/gi).test(strQuery), 'link': strPrefix + 'sql-end.html'},
-    	{'test': (/^DROP\s*VIEW/gi).test(strQuery), 'link': strPrefix + 'sql-dropview.html'},
-    	{'test': (/^DROP\s*USER\s*MAPPING/gi).test(strQuery), 'link': strPrefix + 'sql-dropusermapping.html'},
-    	{'test': (/^DROP\s*USER/gi).test(strQuery), 'link': strPrefix + 'sql-dropuser.html'},
-    	{'test': (/^DROP\s*TYPE/gi).test(strQuery), 'link': strPrefix + 'sql-droptype.html'},
-    	{'test': (/^DROP\s*TRIGGER/gi).test(strQuery), 'link': strPrefix + 'sql-droptrigger.html'},
-    	{'test': (/^DROP\s*TEXT\s*SEARCH\s*TEMPLATE/gi).test(strQuery), 'link': strPrefix + 'sql-droptstemplate.html'},
-    	{'test': (/^DROP\s*TEXT\s*SEARCH\s*PARSER/gi).test(strQuery), 'link': strPrefix + 'sql-droptsparser.html'},
-    	{'test': (/^DROP\s*TEXT\s*SEARCH\s*DICTIONARY/gi).test(strQuery), 'link': strPrefix + 'sql-droptsdictionary.html'},
-    	{'test': (/^DROP\s*TEXT\s*SEARCH\s*CONFIGURATION/gi).test(strQuery), 'link': strPrefix + 'sql-droptsconfig.html'},
-    	{'test': (/^DROP\s*TABLESPACE/gi).test(strQuery), 'link': strPrefix + 'sql-droptablespace.html'},
-    	{'test': (/^DROP\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-droptable.html'},
-    	{'test': (/^DROP\s*SERVER/gi).test(strQuery), 'link': strPrefix + 'sql-dropserver.html'},
-    	{'test': (/^DROP\s*SEQUENCE/gi).test(strQuery), 'link': strPrefix + 'sql-dropsequence.html'},
-    	{'test': (/^DROP\s*SCHEMA/gi).test(strQuery), 'link': strPrefix + 'sql-dropschema.html'},
-    	{'test': (/^DROP\s*RULE/gi).test(strQuery), 'link': strPrefix + 'sql-droprule.html'},
-    	{'test': (/^DROP\s*ROLE/gi).test(strQuery), 'link': strPrefix + 'sql-droprole.html'},
-    	{'test': (/^DROP\s*OWNED/gi).test(strQuery), 'link': strPrefix + 'sql-drop-owned.html'},
-    	{'test': (/^DROP\s*OPERATOR\s*FAMILY/gi).test(strQuery), 'link': strPrefix + 'sql-dropopfamily.html'},
-    	{'test': (/^DROP\s*OPERATOR\s*CLASS/gi).test(strQuery), 'link': strPrefix + 'sql-dropopclass.html'},
-    	{'test': (/^DROP\s*OPERATOR/gi).test(strQuery), 'link': strPrefix + 'sql-dropoperator.html'},
-    	{'test': (/^DROP\s*LANGUAGE/gi).test(strQuery), 'link': strPrefix + 'sql-droplanguage.html'},
-    	{'test': (/^DROP\s*INDEX/gi).test(strQuery), 'link': strPrefix + 'sql-dropindex.html'},
-    	{'test': (/^DROP\s*GROUP/gi).test(strQuery), 'link': strPrefix + 'sql-dropgroup.html'},
-    	{'test': (/^DROP\s*FUNCTION/gi).test(strQuery), 'link': strPrefix + 'sql-dropfunction.html'},
-    	{'test': (/^DROP\s*FOREIGN\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-dropforeigntable.html'},
-    	{'test': (/^DROP\s*FOREIGN\s*DATA\s*WRAPPER/gi).test(strQuery), 'link': strPrefix + 'sql-dropforeigndatawrapper.html'},
-    	{'test': (/^DROP\s*EXTENSION/gi).test(strQuery), 'link': strPrefix + 'sql-dropextension.html'},
-    	{'test': (/^DROP\s*DOMAIN/gi).test(strQuery), 'link': strPrefix + 'sql-dropdomain.html'},
-    	{'test': (/^DROP\s*DATABASE/gi).test(strQuery), 'link': strPrefix + 'sql-dropdatabase.html'},
-    	{'test': (/^DROP\s*CONVERSION/gi).test(strQuery), 'link': strPrefix + 'sql-dropconversion.html'},
-    	{'test': (/^DROP\s*COLLATION/gi).test(strQuery), 'link': strPrefix + 'sql-dropcollation.html'},
-    	{'test': (/^DROP\s*CAST/gi).test(strQuery), 'link': strPrefix + 'sql-dropcast.html'},
-    	{'test': (/^DROP\s*AGGREGATE/gi).test(strQuery), 'link': strPrefix + 'sql-dropaggregate.html'},
-    	{'test': (/^DO/gi).test(strQuery), 'link': strPrefix + 'sql-do.html'},
-    	{'test': (/^DISCARD/gi).test(strQuery), 'link': strPrefix + 'sql-discard.html'},
-    	{'test': (/^DELETE/gi).test(strQuery), 'link': strPrefix + 'sql-delete.html'},
-    	{'test': (/^DECLARE/gi).test(strQuery), 'link': strPrefix + 'sql-declare.html'},
-    	{'test': (/^DEALLOCATE/gi).test(strQuery), 'link': strPrefix + 'sql-deallocate.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*VIEW/gi).test(strQuery), 'link': strPrefix + 'sql-createview.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*USER\s*MAPPING/gi).test(strQuery), 'link': strPrefix + 'sql-createusermapping.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*USER/gi).test(strQuery), 'link': strPrefix + 'sql-createuser.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TYPE/gi).test(strQuery), 'link': strPrefix + 'sql-createtype.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TRIGGER/gi).test(strQuery), 'link': strPrefix + 'sql-createtrigger.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TEXT\s*SEARCH\s*TEMPLATE/gi).test(strQuery), 'link': strPrefix + 'sql-createtstemplate.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TEXT\s*SEARCH\s*PARSER/gi).test(strQuery), 'link': strPrefix + 'sql-createtsparser.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TEXT\s*SEARCH\s*DICTIONARY/gi).test(strQuery), 'link': strPrefix + 'sql-createtsdictionary.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TEXT\s*SEARCH\s*CONFIGURATION/gi).test(strQuery), 'link': strPrefix + 'sql-createtsconfig.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TABLESPACE/gi).test(strQuery), 'link': strPrefix + 'sql-createtablespace.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TABLE\s*AS/gi).test(strQuery), 'link': strPrefix + 'sql-createtableas.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-createtable.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*SERVER/gi).test(strQuery), 'link': strPrefix + 'sql-createserver.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*SEQUENCE/gi).test(strQuery), 'link': strPrefix + 'sql-createsequence.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*SCHEMA/gi).test(strQuery), 'link': strPrefix + 'sql-createschema.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*RULE/gi).test(strQuery), 'link': strPrefix + 'sql-createrule.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*ROLE/gi).test(strQuery), 'link': strPrefix + 'sql-createrole.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*OPERATOR\s*FAMILY/gi).test(strQuery), 'link': strPrefix + 'sql-createopfamily.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*OPERATOR\s*CLASS/gi).test(strQuery), 'link': strPrefix + 'sql-createopclass.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*OPERATOR/gi).test(strQuery), 'link': strPrefix + 'sql-createoperator.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*LANGUAGE/gi).test(strQuery), 'link': strPrefix + 'sql-createlanguage.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*INDEX/gi).test(strQuery), 'link': strPrefix + 'sql-createindex.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*GROUP/gi).test(strQuery), 'link': strPrefix + 'sql-creategroup.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*FUNCTION/gi).test(strQuery), 'link': strPrefix + 'sql-createfunction.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*FOREIGN\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-createforeigntable.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*FOREIGN\s*DATA\s*WRAPPER/gi).test(strQuery), 'link': strPrefix + 'sql-createforeigndatawrapper.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*EXTENSION/gi).test(strQuery), 'link': strPrefix + 'sql-createextension.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*DOMAIN/gi).test(strQuery), 'link': strPrefix + 'sql-createdomain.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*DATABASE/gi).test(strQuery), 'link': strPrefix + 'sql-createdatabase.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*CONVERSION/gi).test(strQuery), 'link': strPrefix + 'sql-createconversion.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*COLLATION/gi).test(strQuery), 'link': strPrefix + 'sql-createcollation.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*CAST/gi).test(strQuery), 'link': strPrefix + 'sql-createcast.html'},
-    	{'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*AGGREGATE/gi).test(strQuery), 'link': strPrefix + 'sql-createaggregate.html'},
-    	{'test': (/^COPY/gi).test(strQuery), 'link': strPrefix + 'sql-copy.html'},
-    	{'test': (/^COMMIT\s*PREPARED/gi).test(strQuery), 'link': strPrefix + 'sql-commit-prepared.html'},
-    	{'test': (/^COMMIT/gi).test(strQuery), 'link': strPrefix + 'sql-commit.html'},
-    	{'test': (/^COMMENT/gi).test(strQuery), 'link': strPrefix + 'sql-comment.html'},
-    	{'test': (/^CLUSTER/gi).test(strQuery), 'link': strPrefix + 'sql-cluster.html'},
-    	{'test': (/^CLOSE/gi).test(strQuery), 'link': strPrefix + 'sql-close.html'},
-    	{'test': (/^CHECKPOINT/gi).test(strQuery), 'link': strPrefix + 'sql-checkpoint.html'},
-    	{'test': (/^BEGIN/gi).test(strQuery), 'link': strPrefix + 'sql-begin.html'},
-    	{'test': (/^ANALYZE/gi).test(strQuery), 'link': strPrefix + 'sql-analyze.html'},
-    	{'test': (/^ALTER\s*VIEW/gi).test(strQuery), 'link': strPrefix + 'sql-alterview.html'},
-    	{'test': (/^ALTER\s*USER\s*MAPPING/gi).test(strQuery), 'link': strPrefix + 'sql-alterusermapping.html'},
-    	{'test': (/^ALTER\s*USER/gi).test(strQuery), 'link': strPrefix + 'sql-alteruser.html'},
-    	{'test': (/^ALTER\s*TYPE/gi).test(strQuery), 'link': strPrefix + 'sql-altertype.html'},
-    	{'test': (/^ALTER\s*TRIGGER/gi).test(strQuery), 'link': strPrefix + 'sql-altertrigger.html'},
-    	{'test': (/^ALTER\s*TEXT\s*SEARCH\s*TEMPLATE/gi).test(strQuery), 'link': strPrefix + 'sql-altertstemplate.html'},
-    	{'test': (/^ALTER\s*TEXT\s*SEARCH\s*PARSER/gi).test(strQuery), 'link': strPrefix + 'sql-altertsparser.html'},
-    	{'test': (/^ALTER\s*TEXT\s*SEARCH\s*DICTIONARY/gi).test(strQuery), 'link': strPrefix + 'sql-altertsdictionary.html'},
-    	{'test': (/^ALTER\s*TEXT\s*SEARCH\s*CONFIGURATION/gi).test(strQuery), 'link': strPrefix + 'sql-altertsconfig.html'},
-    	{'test': (/^ALTER\s*TABLESPACE/gi).test(strQuery), 'link': strPrefix + 'sql-altertablespace.html'},
-    	{'test': (/^ALTER\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-altertable.html'},
-    	{'test': (/^ALTER\s*SERVER/gi).test(strQuery), 'link': strPrefix + 'sql-alterserver.html'},
-    	{'test': (/^ALTER\s*SEQUENCE/gi).test(strQuery), 'link': strPrefix + 'sql-altersequence.html'},
-    	{'test': (/^ALTER\s*SCHEMA/gi).test(strQuery), 'link': strPrefix + 'sql-alterschema.html'},
-    	{'test': (/^ALTER\s*ROLE/gi).test(strQuery), 'link': strPrefix + 'sql-alterrole.html'},
-    	{'test': (/^ALTER\s*OPERATOR\s*FAMILY/gi).test(strQuery), 'link': strPrefix + 'sql-alteropfamily.html'},
-    	{'test': (/^ALTER\s*OPERATOR\s*CLASS/gi).test(strQuery), 'link': strPrefix + 'sql-alteropclass.html'},
-    	{'test': (/^ALTER\s*OPERATOR/gi).test(strQuery), 'link': strPrefix + 'sql-alteroperator.html'},
-    	{'test': (/^ALTER\s*LARGE\s*OBJECT/gi).test(strQuery), 'link': strPrefix + 'sql-alterlargeobject.html'},
-    	{'test': (/^ALTER\s*LANGUAGE/gi).test(strQuery), 'link': strPrefix + 'sql-alterlanguage.html'},
-    	{'test': (/^ALTER\s*INDEX/gi).test(strQuery), 'link': strPrefix + 'sql-alterindex.html'},
-    	{'test': (/^ALTER\s*GROUP/gi).test(strQuery), 'link': strPrefix + 'sql-altergroup.html'},
-    	{'test': (/^ALTER\s*FUNCTION/gi).test(strQuery), 'link': strPrefix + 'sql-alterfunction.html'},
-    	{'test': (/^ALTER\s*FOREIGN\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-alterforeigntable.html'},
-    	{'test': (/^ALTER\s*FOREIGN\s*DATA\s*WRAPPER/gi).test(strQuery), 'link': strPrefix + 'sql-alterforeigndatawrapper.html'},
-    	{'test': (/^ALTER\s*EXTENSION/gi).test(strQuery), 'link': strPrefix + 'sql-alterextension.html'},
-    	{'test': (/^ALTER\s*DOMAIN/gi).test(strQuery), 'link': strPrefix + 'sql-alterdomain.html'},
-    	{'test': (/^ALTER\s*DEFAULT\s*PRIVILEGES/gi).test(strQuery), 'link': strPrefix + 'sql-alterdefaultprivileges.html'},
-    	{'test': (/^ALTER\s*DATABASE/gi).test(strQuery), 'link': strPrefix + 'sql-alterdatabase.html'},
-    	{'test': (/^ALTER\s*CONVERSION/gi).test(strQuery), 'link': strPrefix + 'sql-alterconversion.html'},
-    	{'test': (/^ALTER\s*COLLATION/gi).test(strQuery), 'link': strPrefix + 'sql-altercollation.html'},
-    	{'test': (/^ALTER\s*AGGREGATE/gi).test(strQuery), 'link': strPrefix + 'sql-alteraggregate.html'},
-    	{'test': (/^ABORT/gi).test(strQuery), 'link': strPrefix + 'sql-abort.html'}
-	], i, len;
+    var docLinks = [
+        {'test': (/^VALUES/gi).test(strQuery), 'link': strPrefix + 'sql-values.html'},
+        {'test': (/^VACUUM/gi).test(strQuery), 'link': strPrefix + 'sql-vacuum.html'},
+        {'test': (/^UPDATE/gi).test(strQuery), 'link': strPrefix + 'sql-update.html'},
+        {'test': (/^UNLISTEN/gi).test(strQuery), 'link': strPrefix + 'sql-unlisten.html'},
+        {'test': (/^TRUNCATE/gi).test(strQuery), 'link': strPrefix + 'sql-truncate.html'},
+        {'test': (/^START\s*TRANSACTION/gi).test(strQuery), 'link': strPrefix + 'sql-start-transaction.html'},
+        {'test': (/^SHOW/gi).test(strQuery), 'link': strPrefix + 'sql-show.html'},
+        {'test': (/^SET\s*TRANSACTION/gi).test(strQuery), 'link': strPrefix + 'sql-set-transaction.html'},
+        {'test': (/^SET\s*SESSION\s*AUTHORIZATION/gi).test(strQuery), 'link': strPrefix + 'sql-set-session-authorization.html'},
+        {'test': (/^SET\s*ROLE/gi).test(strQuery), 'link': strPrefix + 'sql-set-role.html'},
+        {'test': (/^SET\s*CONSTRAINTS/gi).test(strQuery), 'link': strPrefix + 'sql-set-constraints.html'},
+        {'test': (/^SET/gi).test(strQuery), 'link': strPrefix + 'sql-set.html'},
+        {'test': (/^SELECT\s*INTO/gi).test(strQuery), 'link': strPrefix + 'sql-selectinto.html'},
+        {'test': (/^SELECT/gi).test(strQuery), 'link': strPrefix + 'sql-select.html'},
+        {'test': (/^SECURITY\s*LABEL/gi).test(strQuery), 'link': strPrefix + 'sql-security-label.html'},
+        {'test': (/^SAVEPOINT/gi).test(strQuery), 'link': strPrefix + 'sql-savepoint.html'},
+        {'test': (/^ROLLBACK\s*TO\s*SAVEPOINT/gi).test(strQuery), 'link': strPrefix + 'sql-rollback-to.html'},
+        {'test': (/^ROLLBACK\s*PREPARED/gi).test(strQuery), 'link': strPrefix + 'sql-rollback-prepared.html'},
+        {'test': (/^ROLLBACK/gi).test(strQuery), 'link': strPrefix + 'sql-rollback.html'},
+        {'test': (/^REVOKE/gi).test(strQuery), 'link': strPrefix + 'sql-revoke.html'},
+        {'test': (/^RESET/gi).test(strQuery), 'link': strPrefix + 'sql-reset.html'},
+        {'test': (/^RELEASE\s*SAVEPOINT/gi).test(strQuery), 'link': strPrefix + 'sql-release-savepoint.html'},
+        {'test': (/^REINDEX/gi).test(strQuery), 'link': strPrefix + 'sql-reindex.html'},
+        {'test': (/^REASSIGN\s*OWNED/gi).test(strQuery), 'link': strPrefix + 'sql-reassign-owned.html'},
+        {'test': (/^PREPARE\s*TRANSACTION/gi).test(strQuery), 'link': strPrefix + 'sql-prepare-transaction.html'},
+        {'test': (/^PREPARE/gi).test(strQuery), 'link': strPrefix + 'sql-prepare.html'},
+        {'test': (/^NOTIFY/gi).test(strQuery), 'link': strPrefix + 'sql-notify.html'},
+        {'test': (/^MOVE/gi).test(strQuery), 'link': strPrefix + 'sql-move.html'},
+        {'test': (/^LOCK/gi).test(strQuery), 'link': strPrefix + 'sql-lock.html'},
+        {'test': (/^LOAD/gi).test(strQuery), 'link': strPrefix + 'sql-load.html'},
+        {'test': (/^LISTEN/gi).test(strQuery), 'link': strPrefix + 'sql-listen.html'},
+        {'test': (/^INSERT/gi).test(strQuery), 'link': strPrefix + 'sql-insert.html'},
+        {'test': (/^GRANT/gi).test(strQuery), 'link': strPrefix + 'sql-grant.html'},
+        {'test': (/^FETCH/gi).test(strQuery), 'link': strPrefix + 'sql-fetch.html'},
+        {'test': (/^EXPLAIN/gi).test(strQuery), 'link': strPrefix + 'sql-explain.html'},
+        {'test': (/^EXECUTE/gi).test(strQuery), 'link': strPrefix + 'sql-execute.html'},
+        {'test': (/^END/gi).test(strQuery), 'link': strPrefix + 'sql-end.html'},
+        {'test': (/^DROP\s*VIEW/gi).test(strQuery), 'link': strPrefix + 'sql-dropview.html'},
+        {'test': (/^DROP\s*USER\s*MAPPING/gi).test(strQuery), 'link': strPrefix + 'sql-dropusermapping.html'},
+        {'test': (/^DROP\s*USER/gi).test(strQuery), 'link': strPrefix + 'sql-dropuser.html'},
+        {'test': (/^DROP\s*TYPE/gi).test(strQuery), 'link': strPrefix + 'sql-droptype.html'},
+        {'test': (/^DROP\s*TRIGGER/gi).test(strQuery), 'link': strPrefix + 'sql-droptrigger.html'},
+        {'test': (/^DROP\s*TEXT\s*SEARCH\s*TEMPLATE/gi).test(strQuery), 'link': strPrefix + 'sql-droptstemplate.html'},
+        {'test': (/^DROP\s*TEXT\s*SEARCH\s*PARSER/gi).test(strQuery), 'link': strPrefix + 'sql-droptsparser.html'},
+        {'test': (/^DROP\s*TEXT\s*SEARCH\s*DICTIONARY/gi).test(strQuery), 'link': strPrefix + 'sql-droptsdictionary.html'},
+        {'test': (/^DROP\s*TEXT\s*SEARCH\s*CONFIGURATION/gi).test(strQuery), 'link': strPrefix + 'sql-droptsconfig.html'},
+        {'test': (/^DROP\s*TABLESPACE/gi).test(strQuery), 'link': strPrefix + 'sql-droptablespace.html'},
+        {'test': (/^DROP\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-droptable.html'},
+        {'test': (/^DROP\s*SERVER/gi).test(strQuery), 'link': strPrefix + 'sql-dropserver.html'},
+        {'test': (/^DROP\s*SEQUENCE/gi).test(strQuery), 'link': strPrefix + 'sql-dropsequence.html'},
+        {'test': (/^DROP\s*SCHEMA/gi).test(strQuery), 'link': strPrefix + 'sql-dropschema.html'},
+        {'test': (/^DROP\s*RULE/gi).test(strQuery), 'link': strPrefix + 'sql-droprule.html'},
+        {'test': (/^DROP\s*ROLE/gi).test(strQuery), 'link': strPrefix + 'sql-droprole.html'},
+        {'test': (/^DROP\s*OWNED/gi).test(strQuery), 'link': strPrefix + 'sql-drop-owned.html'},
+        {'test': (/^DROP\s*OPERATOR\s*FAMILY/gi).test(strQuery), 'link': strPrefix + 'sql-dropopfamily.html'},
+        {'test': (/^DROP\s*OPERATOR\s*CLASS/gi).test(strQuery), 'link': strPrefix + 'sql-dropopclass.html'},
+        {'test': (/^DROP\s*OPERATOR/gi).test(strQuery), 'link': strPrefix + 'sql-dropoperator.html'},
+        {'test': (/^DROP\s*LANGUAGE/gi).test(strQuery), 'link': strPrefix + 'sql-droplanguage.html'},
+        {'test': (/^DROP\s*INDEX/gi).test(strQuery), 'link': strPrefix + 'sql-dropindex.html'},
+        {'test': (/^DROP\s*GROUP/gi).test(strQuery), 'link': strPrefix + 'sql-dropgroup.html'},
+        {'test': (/^DROP\s*FUNCTION/gi).test(strQuery), 'link': strPrefix + 'sql-dropfunction.html'},
+        {'test': (/^DROP\s*FOREIGN\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-dropforeigntable.html'},
+        {'test': (/^DROP\s*FOREIGN\s*DATA\s*WRAPPER/gi).test(strQuery), 'link': strPrefix + 'sql-dropforeigndatawrapper.html'},
+        {'test': (/^DROP\s*EXTENSION/gi).test(strQuery), 'link': strPrefix + 'sql-dropextension.html'},
+        {'test': (/^DROP\s*DOMAIN/gi).test(strQuery), 'link': strPrefix + 'sql-dropdomain.html'},
+        {'test': (/^DROP\s*DATABASE/gi).test(strQuery), 'link': strPrefix + 'sql-dropdatabase.html'},
+        {'test': (/^DROP\s*CONVERSION/gi).test(strQuery), 'link': strPrefix + 'sql-dropconversion.html'},
+        {'test': (/^DROP\s*COLLATION/gi).test(strQuery), 'link': strPrefix + 'sql-dropcollation.html'},
+        {'test': (/^DROP\s*CAST/gi).test(strQuery), 'link': strPrefix + 'sql-dropcast.html'},
+        {'test': (/^DROP\s*AGGREGATE/gi).test(strQuery), 'link': strPrefix + 'sql-dropaggregate.html'},
+        {'test': (/^DO/gi).test(strQuery), 'link': strPrefix + 'sql-do.html'},
+        {'test': (/^DISCARD/gi).test(strQuery), 'link': strPrefix + 'sql-discard.html'},
+        {'test': (/^DELETE/gi).test(strQuery), 'link': strPrefix + 'sql-delete.html'},
+        {'test': (/^DECLARE/gi).test(strQuery), 'link': strPrefix + 'sql-declare.html'},
+        {'test': (/^DEALLOCATE/gi).test(strQuery), 'link': strPrefix + 'sql-deallocate.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*VIEW/gi).test(strQuery), 'link': strPrefix + 'sql-createview.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*USER\s*MAPPING/gi).test(strQuery), 'link': strPrefix + 'sql-createusermapping.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*USER/gi).test(strQuery), 'link': strPrefix + 'sql-createuser.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TYPE/gi).test(strQuery), 'link': strPrefix + 'sql-createtype.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TRIGGER/gi).test(strQuery), 'link': strPrefix + 'sql-createtrigger.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TEXT\s*SEARCH\s*TEMPLATE/gi).test(strQuery), 'link': strPrefix + 'sql-createtstemplate.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TEXT\s*SEARCH\s*PARSER/gi).test(strQuery), 'link': strPrefix + 'sql-createtsparser.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TEXT\s*SEARCH\s*DICTIONARY/gi).test(strQuery), 'link': strPrefix + 'sql-createtsdictionary.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TEXT\s*SEARCH\s*CONFIGURATION/gi).test(strQuery), 'link': strPrefix + 'sql-createtsconfig.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TABLESPACE/gi).test(strQuery), 'link': strPrefix + 'sql-createtablespace.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TABLE\s*AS/gi).test(strQuery), 'link': strPrefix + 'sql-createtableas.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-createtable.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*SERVER/gi).test(strQuery), 'link': strPrefix + 'sql-createserver.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*SEQUENCE/gi).test(strQuery), 'link': strPrefix + 'sql-createsequence.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*SCHEMA/gi).test(strQuery), 'link': strPrefix + 'sql-createschema.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*RULE/gi).test(strQuery), 'link': strPrefix + 'sql-createrule.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*ROLE/gi).test(strQuery), 'link': strPrefix + 'sql-createrole.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*OPERATOR\s*FAMILY/gi).test(strQuery), 'link': strPrefix + 'sql-createopfamily.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*OPERATOR\s*CLASS/gi).test(strQuery), 'link': strPrefix + 'sql-createopclass.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*OPERATOR/gi).test(strQuery), 'link': strPrefix + 'sql-createoperator.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*LANGUAGE/gi).test(strQuery), 'link': strPrefix + 'sql-createlanguage.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*INDEX/gi).test(strQuery), 'link': strPrefix + 'sql-createindex.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*GROUP/gi).test(strQuery), 'link': strPrefix + 'sql-creategroup.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*FUNCTION/gi).test(strQuery), 'link': strPrefix + 'sql-createfunction.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*FOREIGN\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-createforeigntable.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*FOREIGN\s*DATA\s*WRAPPER/gi).test(strQuery), 'link': strPrefix + 'sql-createforeigndatawrapper.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*EXTENSION/gi).test(strQuery), 'link': strPrefix + 'sql-createextension.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*DOMAIN/gi).test(strQuery), 'link': strPrefix + 'sql-createdomain.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*DATABASE/gi).test(strQuery), 'link': strPrefix + 'sql-createdatabase.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*CONVERSION/gi).test(strQuery), 'link': strPrefix + 'sql-createconversion.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*COLLATION/gi).test(strQuery), 'link': strPrefix + 'sql-createcollation.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*CAST/gi).test(strQuery), 'link': strPrefix + 'sql-createcast.html'},
+        {'test': (/^CREATE\s*(OR\s*REPLACE)?\s*(TEMP|TEMPORARY)?\s*AGGREGATE/gi).test(strQuery), 'link': strPrefix + 'sql-createaggregate.html'},
+        {'test': (/^COPY/gi).test(strQuery), 'link': strPrefix + 'sql-copy.html'},
+        {'test': (/^COMMIT\s*PREPARED/gi).test(strQuery), 'link': strPrefix + 'sql-commit-prepared.html'},
+        {'test': (/^COMMIT/gi).test(strQuery), 'link': strPrefix + 'sql-commit.html'},
+        {'test': (/^COMMENT/gi).test(strQuery), 'link': strPrefix + 'sql-comment.html'},
+        {'test': (/^CLUSTER/gi).test(strQuery), 'link': strPrefix + 'sql-cluster.html'},
+        {'test': (/^CLOSE/gi).test(strQuery), 'link': strPrefix + 'sql-close.html'},
+        {'test': (/^CHECKPOINT/gi).test(strQuery), 'link': strPrefix + 'sql-checkpoint.html'},
+        {'test': (/^BEGIN/gi).test(strQuery), 'link': strPrefix + 'sql-begin.html'},
+        {'test': (/^ANALYZE/gi).test(strQuery), 'link': strPrefix + 'sql-analyze.html'},
+        {'test': (/^ALTER\s*VIEW/gi).test(strQuery), 'link': strPrefix + 'sql-alterview.html'},
+        {'test': (/^ALTER\s*USER\s*MAPPING/gi).test(strQuery), 'link': strPrefix + 'sql-alterusermapping.html'},
+        {'test': (/^ALTER\s*USER/gi).test(strQuery), 'link': strPrefix + 'sql-alteruser.html'},
+        {'test': (/^ALTER\s*TYPE/gi).test(strQuery), 'link': strPrefix + 'sql-altertype.html'},
+        {'test': (/^ALTER\s*TRIGGER/gi).test(strQuery), 'link': strPrefix + 'sql-altertrigger.html'},
+        {'test': (/^ALTER\s*TEXT\s*SEARCH\s*TEMPLATE/gi).test(strQuery), 'link': strPrefix + 'sql-altertstemplate.html'},
+        {'test': (/^ALTER\s*TEXT\s*SEARCH\s*PARSER/gi).test(strQuery), 'link': strPrefix + 'sql-altertsparser.html'},
+        {'test': (/^ALTER\s*TEXT\s*SEARCH\s*DICTIONARY/gi).test(strQuery), 'link': strPrefix + 'sql-altertsdictionary.html'},
+        {'test': (/^ALTER\s*TEXT\s*SEARCH\s*CONFIGURATION/gi).test(strQuery), 'link': strPrefix + 'sql-altertsconfig.html'},
+        {'test': (/^ALTER\s*TABLESPACE/gi).test(strQuery), 'link': strPrefix + 'sql-altertablespace.html'},
+        {'test': (/^ALTER\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-altertable.html'},
+        {'test': (/^ALTER\s*SERVER/gi).test(strQuery), 'link': strPrefix + 'sql-alterserver.html'},
+        {'test': (/^ALTER\s*SEQUENCE/gi).test(strQuery), 'link': strPrefix + 'sql-altersequence.html'},
+        {'test': (/^ALTER\s*SCHEMA/gi).test(strQuery), 'link': strPrefix + 'sql-alterschema.html'},
+        {'test': (/^ALTER\s*ROLE/gi).test(strQuery), 'link': strPrefix + 'sql-alterrole.html'},
+        {'test': (/^ALTER\s*OPERATOR\s*FAMILY/gi).test(strQuery), 'link': strPrefix + 'sql-alteropfamily.html'},
+        {'test': (/^ALTER\s*OPERATOR\s*CLASS/gi).test(strQuery), 'link': strPrefix + 'sql-alteropclass.html'},
+        {'test': (/^ALTER\s*OPERATOR/gi).test(strQuery), 'link': strPrefix + 'sql-alteroperator.html'},
+        {'test': (/^ALTER\s*LARGE\s*OBJECT/gi).test(strQuery), 'link': strPrefix + 'sql-alterlargeobject.html'},
+        {'test': (/^ALTER\s*LANGUAGE/gi).test(strQuery), 'link': strPrefix + 'sql-alterlanguage.html'},
+        {'test': (/^ALTER\s*INDEX/gi).test(strQuery), 'link': strPrefix + 'sql-alterindex.html'},
+        {'test': (/^ALTER\s*GROUP/gi).test(strQuery), 'link': strPrefix + 'sql-altergroup.html'},
+        {'test': (/^ALTER\s*FUNCTION/gi).test(strQuery), 'link': strPrefix + 'sql-alterfunction.html'},
+        {'test': (/^ALTER\s*FOREIGN\s*TABLE/gi).test(strQuery), 'link': strPrefix + 'sql-alterforeigntable.html'},
+        {'test': (/^ALTER\s*FOREIGN\s*DATA\s*WRAPPER/gi).test(strQuery), 'link': strPrefix + 'sql-alterforeigndatawrapper.html'},
+        {'test': (/^ALTER\s*EXTENSION/gi).test(strQuery), 'link': strPrefix + 'sql-alterextension.html'},
+        {'test': (/^ALTER\s*DOMAIN/gi).test(strQuery), 'link': strPrefix + 'sql-alterdomain.html'},
+        {'test': (/^ALTER\s*DEFAULT\s*PRIVILEGES/gi).test(strQuery), 'link': strPrefix + 'sql-alterdefaultprivileges.html'},
+        {'test': (/^ALTER\s*DATABASE/gi).test(strQuery), 'link': strPrefix + 'sql-alterdatabase.html'},
+        {'test': (/^ALTER\s*CONVERSION/gi).test(strQuery), 'link': strPrefix + 'sql-alterconversion.html'},
+        {'test': (/^ALTER\s*COLLATION/gi).test(strQuery), 'link': strPrefix + 'sql-altercollation.html'},
+        {'test': (/^ALTER\s*AGGREGATE/gi).test(strQuery), 'link': strPrefix + 'sql-alteraggregate.html'},
+        {'test': (/^ABORT/gi).test(strQuery), 'link': strPrefix + 'sql-abort.html'}
+    ], i, len;
 
     for (i = 0, len = docLinks.length; i < len; i += 1) {
         if (docLinks[i].test) {
