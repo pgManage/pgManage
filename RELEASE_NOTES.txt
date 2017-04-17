@@ -1,3 +1,13 @@
+Changes since 3.2.4:
+Postage:
+Fix constraint query (closed workflowproducts/postage#205)
+Fix header buttons in configuration editor (closed workflowproducts/postage#203)
+Update windows libpq (9.6.2) and windows libressl (2.5.3)
+Fix memory issues in JS
+
+Both:
+Add arbitrary FROM to ws_select, remove group by from ws_select
+
 Changes since 3.2.3:
 Postage:
 Fix punctuation in an error
