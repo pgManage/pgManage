@@ -24,6 +24,7 @@ var autocompleteLoaded = true
       , 'bolBound':        false
       , 'searchString':    ''
       , 'searchLength':    0
+      , 'bolQueryRunning': false
     };
 var strSearchFixed;
 var curr_run_search = 0;
@@ -104,10 +105,12 @@ function autocompleteBindEditor(tabElement, editor) {
                                     selectionRanges.end.row === event.end.row &&
                                     selectionRanges.end.column + 1 === event.end.column
                                 ) {
+                                    autocompletePopupClose(editor);
                                     autocompleteChangeHandler(tabElement, editor, event);
                                     //console.log('running');
                                 }
                             } else {
+                                autocompletePopupClose(editor);
                                 autocompleteChangeHandler(tabElement, editor, event);
                             }
 
@@ -125,9 +128,11 @@ function autocompleteBindEditor(tabElement, editor) {
                                 selectionRanges.end.row === event.end.row &&
                                 selectionRanges.end.column + 1 === event.end.column
                             ) {
+                                autocompletePopupClose(editor);
                                 snippetHandler(event.lines[0], event, editor);
                             }
                         } else {
+                            autocompletePopupClose(editor);
                             snippetHandler(event.lines[0], event, editor);
                         }
 
@@ -156,9 +161,11 @@ function autocompleteBindEditor(tabElement, editor) {
                                     selectionRanges.end.row === event.end.row &&
                                     selectionRanges.end.column === event.end.column
                                 ) {
+                                    autocompletePopupClose(editor);
                                     autocompleteChangeHandler(tabElement, editor, event);
                                 }
                             } else {
+                                autocompletePopupClose(editor);
                                 autocompleteChangeHandler(tabElement, editor, event);
                             }
 
@@ -593,7 +600,7 @@ function autocompletePopupClose(editor) {
     'use strict';
     strSearchFixed = false;
     // if the autocomplete query is still running: cancel it
-    if (autocompleteGlobals.strQueryID) {
+    if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning) {
         GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
         autocompleteGlobals.popupLoading = false;
     }
@@ -1175,6 +1182,7 @@ function autocompleteLoadTypes() {
                AND (pg_type.typtype <> 'd')
     */});
 
+    autocompleteGlobals.bolQueryRunning = true;
     GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
         var arrRows, i, len;
 
@@ -1187,6 +1195,7 @@ function autocompleteLoadTypes() {
         } else {
             GS.webSocketErrorDialog(data);
         }
+        autocompleteGlobals.bolQueryRunning = false;
     });
 }
 
@@ -1203,6 +1212,7 @@ function autocompleteLoadKeywords() {
           ORDER BY catcode
     */});
 
+    autocompleteGlobals.bolQueryRunning = true;
     GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
         var arrRows, i, len;
 
@@ -1231,6 +1241,7 @@ function autocompleteLoadKeywords() {
         } else {
             GS.webSocketErrorDialog(data);
         }
+        autocompleteGlobals.bolQueryRunning = false;
     });
 }
 
@@ -1269,7 +1280,8 @@ function autocompleteGetObjectType(strName, arrQueries, callback, schemaOID) {
     strQuery =  'SELECT * FROM (\n' +
                     arrQueries.join('\n     UNION ALL\n') + '\n' +
                 ') em;';
-
+    
+    autocompleteGlobals.bolQueryRunning = true;
     GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
         var arrRows, i, len;
 
@@ -1290,6 +1302,7 @@ function autocompleteGetObjectType(strName, arrQueries, callback, schemaOID) {
         }// else {
         //    GS.webSocketErrorDialog(data);
         //}
+        autocompleteGlobals.bolQueryRunning = false;
     });
 }
 
@@ -1310,10 +1323,11 @@ function autocompleteGetList(arrQueries, callback) {
     strQuery = 'SELECT * FROM (\n' + arrQueries.join('\n     UNION ALL\n') + '\n' + ') em;';
 //    console.log(strQuery);
     // if the autocomplete query is still running: cancel it
-    if (autocompleteGlobals.strQueryID) {
+    if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning) {
         GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
     }
 
+    autocompleteGlobals.bolQueryRunning = true;
     // make the request
     autocompleteGlobals.strQueryID = GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
         var arrRows, i, len;
@@ -1335,6 +1349,7 @@ function autocompleteGetList(arrQueries, callback) {
         }// else {
         //    GS.webSocketErrorDialog(data);
         //}
+        autocompleteGlobals.bolQueryRunning = false;
     });
 }
 
