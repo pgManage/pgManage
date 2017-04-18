@@ -2537,6 +2537,19 @@ function SQLBeautify(strInput) {
             bolNoExtraWhitespace = true;
             //console.log(">END IF;|" + intTabLevel + "<");
 
+        // ELSIF
+        } else if (int_qs === 0 && strInput.substr(i).match(/^ELSIF\b/i)) {
+            
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+            intTabLevel -= 1;
+            strResult += 'ELSIF '
+            i = i + (-1) + (strInput.substr(i).match(/^ELSIF\b/i)[0].length);
+            bolNoExtraWhitespace = true;
+            console.log(">ELSIF;|" + intTabLevel + "<");
+
         // Not an END IF, at this point it has to be a BEGIN END
         } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^END\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace

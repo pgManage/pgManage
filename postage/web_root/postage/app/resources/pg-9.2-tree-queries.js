@@ -363,7 +363,7 @@ SELECT {{INTOID}} AS oid, 'Columns (' || COUNT(attname) || ')' AS caption, 'obje
          FROM 
             (SELECT oid, *
                FROM pg_constraint
-              WHERE pg_constraint.conrelid = {{INTOID}}
+              WHERE pg_constraint.conrelid = {{INTOID}} AND contype <> 't'
            ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
                           WHEN contype = 'c' THEN 3 WHEN contype = 'f' THEN 4
                           WHEN contype = 't' THEN 5 WHEN contype = 'x' THEN 6 END) ASC,
@@ -434,7 +434,7 @@ SELECT {{INTOID}} AS oid, 'Columns (' || COUNT(attname) || ')' AS caption, 'obje
          FROM 
             (SELECT oid, *
                FROM pg_constraint
-              WHERE pg_constraint.conrelid = {{INTOID}}
+              WHERE pg_constraint.conrelid = {{INTOID}} AND contype <> 't'
            ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
                           WHEN contype = 'c' THEN 3 WHEN contype = 'f' THEN 4
                           WHEN contype = 't' THEN 5 WHEN contype = 'x' THEN 6 END) ASC,
@@ -572,7 +572,7 @@ SELECT count(conname || ' ' || pg_get_constraintdef(oid, true)) AS result
              FROM 
                 (SELECT oid, *
                    FROM pg_constraint
-                  WHERE pg_constraint.conrelid = 'test.caps_ID'::regclass
+                  WHERE pg_constraint.conrelid = {{INTOID}} AND contype <> 't'
                ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
                               WHEN contype = 'c' THEN 3 WHEN contype = 'f' THEN 4
                               WHEN contype = 't' THEN 5 WHEN contype = 'x' THEN 6 END) ASC,
@@ -701,7 +701,7 @@ SELECT {{INTOID}}, quote_ident(conname) AS name, '{{SCHEMA}}' AS schema_name, 'C
              FROM 
                 (SELECT oid, *
                    FROM pg_constraint
-                  WHERE pg_constraint.conrelid = {{INTOID}}
+                  WHERE pg_constraint.conrelid = {{INTOID}} AND contype <> 't'
                ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
                               WHEN contype = 'c' THEN 3 WHEN contype = 'f' THEN 4
                               WHEN contype = 't' THEN 5 WHEN contype = 'x' THEN 6 END) ASC,
