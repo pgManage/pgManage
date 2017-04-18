@@ -34,6 +34,11 @@ envelope_OBJECTS = $(envelope_SOURCES:.c=.o)
 
 .PHONY: libressl libressl-install
 
+# this needs to be at the top to be the default target
+all: $(BINARY)
+	@echo
+	@echo "Compilation Successful"
+
 #### DEPENDENCIES
 libressl: ../dependencies/libressl/Makefile
 	$(MAKE) -C ../dependencies/libressl/
@@ -54,10 +59,6 @@ libtre_SOURCES = $(wildcard ../dependencies/tre/lib/*.c)
 libtre_OBJECTS = $(libtre_SOURCES:.c=.o)
 
 #### BUILDING
-all: $(BINARY)
-	@echo
-	@echo "Compilation Successful"
-
 $(BINARY): $(BUILD_DEPS) $(envelope_OBJECTS) $(libtre_OBJECTS)
 	$(CC) $(envelope_OBJECTS) $(libtre_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
 
