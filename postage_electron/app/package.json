@@ -12,7 +12,7 @@
 		"hidefile": "^1.1.0",
 		"fs-extra": "^0.30.0",
 		"electron-window-state": "^3.0.4",
-		"electron-context-menu": "^0.6.0",
+		"electron-is-dev": "0.1.2",
 		"opn": "^4.0.2",
 		"tcp-port-used": "0.1.2"
 	},

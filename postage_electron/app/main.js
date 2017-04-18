@@ -6,6 +6,7 @@ const hidefile = require('hidefile');
 const windowStateKeeper = require('electron-window-state');
 const tcpPortUsed = require('tcp-port-used');
 const ipcMain = electron.ipcMain;
+const isDev = require('electron-is-dev');
 // Module to control application life.
 const app = electron.app;
 // Module to create native browser window.
@@ -151,8 +152,6 @@ try {
 const child_process = require('child_process');
 var proc = null;
 
-require('electron-context-menu')({});
-
 ipcMain.on('postage', function (event, arg) {
 	if (arg === 'restart') {
 		proc.kill();
@@ -258,8 +257,6 @@ function setMenu() {
 					role: 'copy'
 				}, {
 					role: 'paste'
-				}, {
-					role: 'pasteandmatchstyle'
 				}, {
 					role: 'delete'
 				}, {
@@ -371,8 +368,8 @@ function setMenu() {
 		];
 	}
 
-	const menu = Menu.buildFromTemplate(template)
-	Menu.setApplicationMenu(menu)
+	const menu = Menu.buildFromTemplate(template);
+	Menu.setApplicationMenu(menu);
 }
 
 function openWindow() {
@@ -398,6 +395,34 @@ function openWindow() {
 
 		curWindow.webContents.on('will-navigate', handleRedirect);
 		curWindow.webContents.on('new-window', handleRedirect);
+		curWindow.webContents.on('context-menu', function (event, props) {
+			const contextMenu = electron.Menu.buildFromTemplate([
+				{
+					role: 'undo'
+				}, {
+					role: 'redo'
+				}, {
+					type: 'separator'
+				}, {
+					role: 'cut',
+					enabled: props.canCut
+				}, {
+					role: 'copy',
+					enabled: props.canCopy
+				}, {
+					role: 'paste',
+					enabled: props.canPaste
+				}, {
+					role: 'delete',
+					enabled: props.canDelete
+				}, {
+					role: 'selectall',
+					enabled: props.canSellectAll
+				}
+			]);
+
+			contextMenu.popup(curWindow);
+		});
 
 		setMenu();
 	});
