@@ -29,6 +29,11 @@ postage_OBJECTS = $(postage_SOURCES:.c=.o)
 
 .PHONY: libressl libressl-install destroy check
 
+# this needs to be at the top to be the default target
+all: $(BINARY)
+	@echo
+	@echo "Compilation Successful"
+
 #### DEPENDENCIES
 libressl: ../dependencies/libressl/Makefile
 	$(MAKE) -C ../dependencies/libressl/
@@ -49,10 +54,6 @@ libtre_SOURCES = $(wildcard ../dependencies/tre/lib/*.c)
 libtre_OBJECTS = $(libtre_SOURCES:.c=.o)
 
 #### BUILDING
-all: $(BINARY)
-	@echo
-	@echo "Compilation Successful"
-
 $(BINARY): $(BUILD_DEPS) $(postage_OBJECTS)
 	$(CC) $(postage_OBJECTS) $(LDFLAGS) $(CFLAGS) \
 		-o ./$(BINARY)

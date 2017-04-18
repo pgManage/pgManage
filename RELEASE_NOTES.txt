@@ -1,3 +1,7 @@
+Changes since 3.2.5:
+Postage:
+Fix typing bugs
+
 Changes since 3.2.4:
 Postage:
 Fix constraint query (closed workflowproducts/postage#205)
