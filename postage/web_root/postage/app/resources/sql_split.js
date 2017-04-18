@@ -20,6 +20,8 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 	var query_end_row = 1;
 	var query_start_col = 1;
 	var query_end_col = 0;
+	var query_start_char = 0;
+	var query_end_char = 0;
 	var currRow = 1;
 	var currCol = 1;
 	var bolIgnoreWhiteSpace = true;
@@ -30,16 +32,16 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 	//   So don't copy the entire item into a new variable, it could be large.
 	var int_loop = 0;  // increments by one character per loop
 	var int_start = 0; // increments when we push SQL to array
-    
+
     //change from array to String
     //keep track of query start and end
-    //when we find an unquoted SEMICOLON then 
+    //when we find an unquoted SEMICOLON then
     //if the next number is cursorPos
     //  return the String
     //if we find the cursor in the query elsewhere then
     //  set bolLastQuery to true
     // when we get to the if bolLastQuery is true return the query text
-    
+
 	// quote status
 	// 0 => no quotes
 	// 1 => start a dollar tag
@@ -55,14 +57,14 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 		//SDEBUG("int_loop: %s", int_loop);
 		int_chunk_len = 1;
 		int_element_len += int_chunk_len;
-		
+
 		if (cursorPos === 0) {
 		    if (intNotReset === cursorPos + 1) {
     		    bolLastQuery = true;
     		    //console.log(cursorIsInQuery);
     		}
 		}
-		
+
 		if (bolFirstQuery) {
     		if (intNotReset === cursorPos) {
         		bolLastQuery = true;
@@ -77,7 +79,7 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
         		bolLastQuery = true;
         	}
 		}
-		
+
 // 		if (!bolFirstQuery) {
 //     		console.log('str_form_data[intNotReset]:  ' + str_form_data[intNotReset]);
 //     		console.log('str_form_data[int_loop]:  ' + str_form_data[int_loop]);
@@ -86,7 +88,7 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 //     		console.log(' ');
 //     		console.log(' ');
 // 		}
-		
+
 		if (bolIgnoreWhiteSpace) {
 		    while (str_form_data.substr(int_loop, 1) === ' ' || str_form_data.substr(int_loop, 1) === "\n" || str_form_data.substr(int_loop, 1) === "\t" || str_form_data.substr(int_loop, 1) === "\r") {
                 if (str_form_data.substr(int_loop, 1) === "\n") {
@@ -107,7 +109,7 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
             intNotReset -= 1;
 		    bolIgnoreWhiteSpace = false;
 		}
-		
+
 // 		console.log(str_form_data.substr(int_loop, 1), int_loop, 'not whitespace');
 		//console.log(str_form_data.substr(int_loop, 1), int_loop);
 		//console.log((str_form_data.substr(int_loop, 1)));
@@ -128,7 +130,7 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
         } else {
             currCol += 1;
         }
-        
+
 		// FOUND MULTILINE COMMENT:
 		if (int_qs === 0 && int_inputstring_len > 1 && str_form_data.substr(int_loop, 2) === "/*") {
 			int_qs = 5;
@@ -208,7 +210,7 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
             while (int_test_loop < int_inputstring_len && str_form_data.substr(int_test_loop, 1).match("^[a-zA-Z0-9_]$")) {
                 int_test_loop += 1;
             }
-            
+
 			if (str_form_data.substr(int_test_loop, 1) === '$') {
 				int_tag = (int_test_loop - (int_loop - 1));
 				str_tag = str_form_data.substr(int_loop, int_tag);
@@ -240,7 +242,7 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 			// stash away this array element
 
 			str_temp = str_form_data.substr(int_start, int_element_len);
-			
+
 			//console.log(cursorIsInQuery);
 			//if (cursorIsInQuery) {
 			if (bolLastQuery) {
@@ -248,10 +250,12 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 			    //console.log(str_temp);
 			    query_end_row = currRow - 1;
                 query_end_col = currCol;
+				query_end_char = int_loop;
 			    break;
 			} else {
     		    query_start_row = currRow;
                 query_start_col = 0;
+				query_start_char = int_loop;
 			}
 			bolFirstQuery = false;
 			int_start = int_loop + int_chunk_len;
@@ -275,15 +279,17 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 		// SDEBUG("int_loop: %i", int_loop);
 		// SDEBUG("int_element_len: %i", int_element_len);
 	}
-    
+
     //console.log(query_start_col, query_start_row, query_end_col, query_end_row);
-    
+
 	return {
 	     'strQuery':       strQuery.trim()
 	    ,'end_column':     query_end_col
 	    ,'end_row':        query_end_row
+	    ,'end_char':       query_end_char
 	    ,'start_column':   query_start_col
 	    ,'start_row':      query_start_row
+	    ,'start_char':     query_start_char
 	};
 
 
@@ -332,7 +338,7 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 // 	var int_tag_len = 0;
 // 	var str_tag = '', str_temp = '', str_trailing = '';
 // 	var arr_list = [];
-	
+
 
 // 	int_inputstring_len = str_form_data.length;
 // 	// I considered copying input to local memory but we don't change it.
@@ -442,7 +448,7 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 //             while (int_test_loop < int_inputstring_len && str_form_data.substr(int_test_loop, 1).match("^[a-zA-Z0-9_]$")) {
 //                 int_test_loop += 1;
 //             }
-            
+
 // 			if (str_form_data.substr(int_test_loop, 1) === '$') {
 // 				int_tag = (int_test_loop - (int_loop - 1));
 // 				// SDEBUG("int_tag: %i", int_tag);
@@ -479,7 +485,7 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 
 // 			str_temp = str_form_data.substr(int_start, int_element_len);
 // 			arr_list.push(str_temp);
-			
+
 // // 			memcpy(str_tag, int_loop, int_tag);
 // // 			str_tag = str_form_data.substr(int_loop, int_tag);
 // 			// SDEBUG("arr_list[%i]: %s", DArray_count(arr_list), str_temp);
@@ -596,14 +602,14 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 //         }
 //     }
 //     }
-    
+
 
 
 // window.addEventListener('load', function () {
 //   console.log("CHECKING SINGLE QUOTES");
 //   // check that single quotes work
 //   var strText, strCompText;
-  
+
 // strText = "SELECT sql.untaint('test;'); SELECT sql.untaint('test;');";
 // strCompText = ["SELECT sql.untaint('test;');", " SELECT sql.untaint('test;');"];
 // sql_split_test(strText, strCompText);
@@ -765,42 +771,5 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 // strCompText = ["--SELECT sql.untaint();\r\n SELECT sql.untaint();", " SELECT current_date;"];
 // sql_split_test(strText, strCompText);
 
-    
+
 // });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

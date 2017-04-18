@@ -396,7 +396,7 @@ function openWindow() {
 		curWindow.webContents.on('will-navigate', handleRedirect);
 		curWindow.webContents.on('new-window', handleRedirect);
 		curWindow.webContents.on('context-menu', function (event, props) {
-			const contextMenu = electron.Menu.buildFromTemplate([
+			const template = [
 				{
 					role: 'undo'
 				}, {
@@ -419,7 +419,23 @@ function openWindow() {
 					role: 'selectall',
 					enabled: props.canSellectAll
 				}
-			]);
+			];
+
+			if (isDev) {
+				template.push({
+					type: 'separator'
+				}, {
+					label: 'Inspect Element',
+					click: function (item, win) {
+						win.webContents.inspectElement(props.x, props.y);
+						if (win.webContents.isDevToolsOpened()) {
+							win.webContents.devToolsWebContents.focus();
+						}
+					}
+				});
+			}
+
+			const contextMenu = electron.Menu.buildFromTemplate(template);
 
 			contextMenu.popup(curWindow);
 		});

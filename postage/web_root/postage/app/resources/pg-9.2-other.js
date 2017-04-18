@@ -2897,12 +2897,34 @@ function executeScript(bolCursorQuery) {
                     resultsHeaderElement.classList.add('error');
 
                     //console.log(intLine, jsnCurrentQuery.start_row, intErrorStartLine);
-                    if (intLine) {
+                    if (data.error_position) {
+						var arrLines = jsnCurrentQuery.strQuery.substring(jsnCurrentQuery.start_char, data.error_position).split('\n');
+						var intErrorLine = arrLines.length;
+						var intErrorCol = parseInt(data.error_position, 10);
+						var i = 0;
+						var len = arrLines.length - 1;
+						while (i < len) {
+							intErrorCol -= arrLines[i].length + 1;
+							i += 1
+						}
+
                         editor.getSession().setAnnotations([
-                            {'row': jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1), 'column': parseInt(data.error_position, 10) || 0,
+                            {'row': jsnCurrentQuery.start_row + intErrorStartLine + (intErrorLine - 1), 'column': intErrorCol || 0,
                                 'text': strError, 'type': 'error'}
                         ]);
 
+						editor.getSelection().setSelectionRange({
+							start: {
+								row: jsnCurrentQuery.start_row + intErrorStartLine + (intErrorLine - 1),
+								column: intErrorCol || 0
+							},
+							end: {
+								row: jsnCurrentQuery.start_row + intErrorStartLine + (intErrorLine - 1),
+								column: intErrorCol || 0
+							}
+						});
+					}
+                    if (intLine) {
                         editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1)), true, true);
                     }
 
