@@ -175,7 +175,7 @@ finish:
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 500 Internal Server Error\015\012Content-Length: ", (size_t)52,
 			str_length, strlen(str_length),
-			"\015\012Connection: close\015\012\015\012", (size_t)21,
+			"\015\012Connection: close\015\012\015\012", (size_t)23,
 			_str_response, strlen(_str_response));
 		SFREE(_str_response);
 		if (CLIENT_WRITE(client, str_response, int_response_len) < int_response_len) {
