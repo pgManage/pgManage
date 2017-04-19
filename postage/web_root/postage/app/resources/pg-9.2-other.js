@@ -202,6 +202,30 @@ function menuTools(target) {
                             no-focus iconleft onclick="dialogSettings()" icon="cogs">Server Settings</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft onclick="dialogDatabaseInfo()" icon="plug">Connection Info</gs-button>
+            </gs-body>
+        </gs-page>
+    */});
+
+    // dialogAbout()
+
+    GS.openDialogToElement(target, templateElement, 'down', function () {
+        //if we are in electron, remove the clear cache button
+        if (window.process && window.process.type === 'renderer') {
+            var element = document.getElementById('clear-cache-button');
+            element.parentNode.removeChild(element);
+        }
+    });
+}
+
+function menuOptions(target) {
+    'use strict';
+    var templateElement = document.createElement('template');
+
+    templateElement.setAttribute('data-max-width', '11em');
+    templateElement.setAttribute('data-overlay-close', 'true');
+    templateElement.innerHTML = ml(function () {/*
+        <gs-page>
+            <gs-body>
                 <gs-button class="postage-menu-item-button" dialogclose
                             no-focus iconleft onclick="dialogSplash()" icon="info">About Postage</gs-button>
                 <gs-button class="postage-menu-item-button" dialogclose

@@ -405,7 +405,7 @@
                             if (buttons.indexOf('dataObjectButtons') !== -1) {
                                 strButtons += dataObjectButtons(strTemplate, strOID, strSchema, strObjectName);
                             }
-                            
+
                             if (strTemplate === 'objectView') {
                                 getScript(strFinalName, strButtons, strScript, false, true);
                             } else {
@@ -512,10 +512,10 @@
             .ace-cursor-query {
                 position: absolute;
                 background-image:none !important;
-                -webkit-animation: ace-fade-cursor-query 2s ease-in-out; 
-                   -moz-animation: ace-fade-cursor-query 2s ease-in-out; 
-                     -o-animation: ace-fade-cursor-query 2s ease-in-out; 
-                        animation: ace-fade-cursor-query 2s ease-in-out; 
+                -webkit-animation: ace-fade-cursor-query 2s ease-in-out;
+                   -moz-animation: ace-fade-cursor-query 2s ease-in-out;
+                     -o-animation: ace-fade-cursor-query 2s ease-in-out;
+                        animation: ace-fade-cursor-query 2s ease-in-out;
             }
             @-webkit-keyframes ace-fade-cursor-query {
               0%   { background-color: #91ffb2; }
@@ -599,11 +599,13 @@
                                     icon="arrow-right" onclick="showLeftBar();" title="Show the left panel"></gs-button>
                     <div flex></div>
 
-                    <gs-button class="header-button-text" onclick="menuUser(this);" no-focus icon="angle-down" inline title="Links related to the user.">User</gs-button>
+                    <gs-button class="header-button-text" onclick="menuUser(this);" no-focus icon="angle-down" inline title="Links related to the user." style="width: 5em;">User</gs-button>
 
-                    <gs-button class="header-button-text" onclick="menuTab(this);" no-focus icon="angle-down" inline title="Tools for handling Tabs.">Tab</gs-button>
+                    <gs-button class="header-button-text" onclick="menuTab(this);" no-focus icon="angle-down" inline title="Tools for handling Tabs." style="width: 4em;">Tab</gs-button>
 
-                    <gs-button class="header-button-text" onclick="menuTools(this);" no-focus icon="angle-down" inline title="Tools for Processes and Information.">Tools</gs-button>
+                    <gs-button class="header-button-text" onclick="menuTools(this);" no-focus icon="angle-down" inline title="Tools for Processes and Information." style="width: 5em;">Tools</gs-button>
+
+                    <gs-button class="header-button-text" onclick="menuOptions(this);" no-focus icon="angle-down" inline title="Tools for Processes and Information." style="width: 7em;">Options</gs-button>
 
                     <gs-button id="button-history" class="header-button-text" onclick="dialogExecuteHistory();" no-focus
                                     icon="book" inline title="Query history for this session">History</gs-button>
