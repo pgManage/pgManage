@@ -1167,7 +1167,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     				'<div class="ace-toolbar" style="background-color: #cccccc; width: 100%; padding-top: 1px; padding-bottom: 2px;" id="sql-ace-toolbar-' + intTabNumber + '">' +
     					'<gs-button inline remove-all icon="external-link" onclick="openInNewWindow()" ' +
     								'title="Open this tab in a new window" remove-all no-focus>New Window</gs-button>' +
-    					'<gs-button inline remove-all icon="play" onclick="executeScript()" ' +
+    					'<gs-button inline remove-all icon="play" onclick="executeScript(); document.getElementsByClassName(\'current-tab\')[0].relatedEditor.focus();" ' +
     								'title="Execute Script [F5]" remove-bottom no-focus>Run</gs-button>' +
     					'<gs-checkbox inline style="border-radius: 0; border: 1px solid #ccc; height: 2.35em" id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"><label>Autocommit</label></gs-checkbox>' +
     					'<gs-button inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
@@ -1224,7 +1224,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     			    '<div class="ace-toolbar" style="background-color: #cccccc; width: 100%; padding-top: 1px; padding-bottom: 2px;" id="sql-ace-toolbar-' + intTabNumber + '">' +
     					'<gs-button style="padding-right: 0.25em;" icononly inline remove-all icon="external-link" onclick="openInNewWindow()" ' +
     								'title="Open this tab in a new window" remove-all no-focus></gs-button>' +
-                        '<gs-button style="padding-right: 0.25em; " icononly inline remove-all icon="play" onclick="executeScript()" ' +
+                        '<gs-button style="padding-right: 0.25em; " icononly inline remove-all icon="play" onclick="executeScript(); document.getElementsByClassName(\'current-tab\')[0].relatedEditor.focus();" ' +
     								'title="Execute Script [F5]" remove-bottom no-focus></gs-button>' +
     					'<gs-checkbox style="padding-right: 0.35em; height: 2.35em;" icononly inline id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit" remove-all><label></label></gs-checkbox>' +
     					'<gs-button style="height: 2.35em; padding-left: 0.5em !important; padding-right: 0.5em !important;" inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
@@ -1761,9 +1761,9 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     // increment tab number
     intNumberOfTabs += 1;
     intTabNumber += 1;
-    
+
     refreshButtons(localStorage.labeledButtons);
-    
+
     return tabElement;
 }
 
@@ -2361,7 +2361,7 @@ function SQLBeautify(strInput) {
                 // we found the end of the tag, now look for the close tag
                 i += (int_tag - 1); //We've already incremented by one
                 int_qs = 2;
-                
+
                 strResult += str_tag;
                 console.log('int_qs = 2');
                 // SDEBUG("after int_loop: %s", int_loop);
@@ -2415,7 +2415,7 @@ function SQLBeautify(strInput) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === ";") {
             // Remove semicolon and whitespace
             strResult = strResult.trim();
-            
+
             //if state is a copy, from stdin, then we need to ignore the data after wards
             if (bolStdin) {
                 strResult += ';\n' + strInput.substr(i + 2, strInput.substr(i + 2).indexOf('\n\\.')) +
@@ -2431,8 +2431,8 @@ function SQLBeautify(strInput) {
             }
             bolGrant = false;
             bolNoExtraWhitespace = true;
-            
-            
+
+
             //console.log(">;|" + intTabLevel + "<");
 
         // Function Declare
@@ -2539,7 +2539,7 @@ function SQLBeautify(strInput) {
 
         // ELSIF
         } else if (int_qs === 0 && strInput.substr(i).match(/^ELSIF\b/i)) {
-            
+
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
@@ -2608,31 +2608,31 @@ function SQLBeautify(strInput) {
     TODO:
     add keywords
     */
-        
+
         // FOUND a main keyword, no newline INSIDE A GRANT STATEMENT
         } else if (int_qs === 0 && strInput.substr(i).match(/^((SELECT|FROM))\b/i) && bolGrant) {
                 // Remove previous tab if previous character is whitespace
                 if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                     strResult = strResult.substr(0, strResult.length - 1);
                 }
-                
+
                 strResult += ' ' + strInput.substr(i).match(/^((SELECT|FROM))\b/i)[0].toUpperCase().trim() + ' ';
                 i += (strInput.substr(i).match(/^((SELECT|FROM))\b/i)[0].length - 1);
                 bolNoExtraWhitespace = true;
                 //console.log(">KEYWORD|" + intTabLevel + "<");
-    
+
             // FOUND a main keyword, newline before
         } else if (int_qs === 0 && strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN)\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
-            
+
             //if state is a copy, from stdin, then we need to ignore the data after wards
             if (strInput.substr(i).match(/^FROM[\ \t\n\r]+STDIN/i)) {
                 bolStdin = true;
             }
-            
+
             strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN)\b/i)[0].toUpperCase().trim() + ' ';
             i += (strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|WHERE|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN)\b/i)[0].length - 1);
             bolNoExtraWhitespace = true;
@@ -2671,4 +2671,3 @@ function SQLBeautify(strInput) {
 
     return strResult;
 }
-
