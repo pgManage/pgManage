@@ -1,16 +1,26 @@
+//global addProp, encodeHTML, window, GS, setOrRemoveBooleanAttribute, setOrRemoveTextAttribute, addFlexProps, registerDesignSnippet, designRegisterElement
 
 window.addEventListener('design-register-element', function () {
     'use strict';
 
-    registerDesignSnippet('<gs-checkbox>', '<gs-checkbox>', 'gs-checkbox type="smallint" column="${1:ready_to_ship}">${2}</gs-checkbox>');
-    registerDesignSnippet('<gs-checkbox> With Label', '<gs-checkbox>',
-                    'label for="${1:date-insert-ready_to_ship}">${2:Ready To Ship?}:</label>\n' +
-                    '<gs-checkbox id="${1:date-insert-ready_to_ship}" type="smallint" column="${3:ready_to_ship}"></gs-checkbox>');
+    registerDesignSnippet(
+        '<gs-checkbox>',
+        '<gs-checkbox>',
+        'gs-checkbox type="smallint" column="${1:ready_to_ship}">${2}</gs-checkbox>'
+    );
+    registerDesignSnippet(
+        '<gs-checkbox> With Label',
+        '<gs-checkbox>',
+        'label for="${1:date-insert-ready_to_ship}">${2:Ready To Ship?}:</label>\n' +
+                '<gs-checkbox id="${1:date-insert-ready_to_ship}" type="smallint" column="${3:ready_to_ship}"></gs-checkbox>'
+    );
 
-    designRegisterElement('gs-checkbox',
-                            '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-checkbox.html');
+    designRegisterElement(
+        'gs-checkbox',
+        '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-checkbox.html'
+    );
 
-    window.designElementProperty_GSCHECKBOX = function(selectedElement) {
+    window.designElementProperty_GSCHECKBOX = function (selectedElement) {
         var strVisibilityAttribute;
 
         addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
@@ -57,75 +67,104 @@ window.addEventListener('design-register-element', function () {
 
         // visibility attributes
         strVisibilityAttribute = '';
-        if (selectedElement.hasAttribute('hidden'))                   { strVisibilityAttribute = 'hidden'; }
-        if (selectedElement.hasAttribute('hide-on-desktop'))  { strVisibilityAttribute = 'hide-on-desktop'; }
-        if (selectedElement.hasAttribute('hide-on-tablet'))   { strVisibilityAttribute = 'hide-on-tablet'; }
-        if (selectedElement.hasAttribute('hide-on-phone'))    { strVisibilityAttribute = 'hide-on-phone'; }
-        if (selectedElement.hasAttribute('show-on-desktop'))   { strVisibilityAttribute = 'show-on-desktop'; }
-        if (selectedElement.hasAttribute('show-on-tablet'))    { strVisibilityAttribute = 'show-on-tablet'; }
-        if (selectedElement.hasAttribute('show-on-phone'))     { strVisibilityAttribute = 'show-on-phone'; }
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
 
-        addProp('Visibility', true, '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
-                                        '<option value="">Visible</option>' +
-                                        '<option value="hidden">Invisible</option>' +
-                                        '<option value="hide-on-desktop">Invisible at desktop size</option>' +
-                                        '<option value="hide-on-tablet">Invisible at tablet size</option>' +
-                                        '<option value="hide-on-phone">Invisible at phone size</option>' +
-                                        '<option value="show-on-desktop">Visible at desktop size</option>' +
-                                        '<option value="show-on-tablet">Visible at tablet size</option>' +
-                                        '<option value="show-on-phone">Visible at phone size</option>' +
-                                    '</gs-select>', function () {
-            selectedElement.removeAttribute('hidden');
-            selectedElement.removeAttribute('hide-on-desktop');
-            selectedElement.removeAttribute('hide-on-tablet');
-            selectedElement.removeAttribute('hide-on-phone');
-            selectedElement.removeAttribute('show-on-desktop');
-            selectedElement.removeAttribute('show-on-tablet');
-            selectedElement.removeAttribute('show-on-phone');
-            
-            if (this.value) {
-                selectedElement.setAttribute(this.value, '');
+        addProp(
+            'Visibility',
+            true,
+            '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
+                    '    <option value="">Visible</option>' +
+                    '    <option value="hidden">Invisible</option>' +
+                    '    <option value="hide-on-desktop">Invisible at desktop size</option>' +
+                    '    <option value="hide-on-tablet">Invisible at tablet size</option>' +
+                    '    <option value="hide-on-phone">Invisible at phone size</option>' +
+                    '    <option value="show-on-desktop">Visible at desktop size</option>' +
+                    '    <option value="show-on-tablet">Visible at tablet size</option>' +
+                    '    <option value="show-on-phone">Visible at phone size</option>' +
+                    '</gs-select>',
+            function () {
+                selectedElement.removeAttribute('hidden');
+                selectedElement.removeAttribute('hide-on-desktop');
+                selectedElement.removeAttribute('hide-on-tablet');
+                selectedElement.removeAttribute('hide-on-phone');
+                selectedElement.removeAttribute('show-on-desktop');
+                selectedElement.removeAttribute('show-on-tablet');
+                selectedElement.removeAttribute('show-on-phone');
+
+                if (this.value) {
+                    selectedElement.setAttribute(this.value, '');
+                }
+
+                return selectedElement;
             }
-            
-            return selectedElement;
-        });
-        
+        );
+
         // DISABLED attribute
-        addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
-            return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
-        });
-        
-        addProp('Corners', true,   '<div class="target">' +
+        addProp(
+            'Disabled',
+            true,
+            '<gs-checkbox class="target" value="' + (
+                selectedElement.hasAttribute('disabled') || ''
+            ) +
+                    '" mini></gs-checkbox>',
+            function () {
+                return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
+            }
+        );
+
+        addProp('Corners', true, '<div class="target">' +
                     '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                                                 selectedElement.hasAttribute('remove-top') ||
                                                 selectedElement.hasAttribute('remove-left') ||
                                                 selectedElement.hasAttribute('remove-top-left'))).toString() + 
                             '" remove-right remove-bottom id="round-top-left-corner________" inline></gs-checkbox>' +
-                            
+
                     '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                                                 selectedElement.hasAttribute('remove-top') ||
                                                 selectedElement.hasAttribute('remove-right') ||
                                                 selectedElement.hasAttribute('remove-top-right'))).toString() + 
                             '" remove-left remove-bottom id="round-top-right-corner________" inline></gs-checkbox><br />' +
-                            
+
                     '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                                                 selectedElement.hasAttribute('remove-bottom') ||
                                                 selectedElement.hasAttribute('remove-left') ||
                                                 selectedElement.hasAttribute('remove-bottom-left'))).toString() + 
                             '" remove-right remove-top id="round-bottom-left-corner________" inline></gs-checkbox>' +
-                            
+
                     '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
                                                 selectedElement.hasAttribute('remove-bottom') ||
                                                 selectedElement.hasAttribute('remove-right') ||
                                                 selectedElement.hasAttribute('remove-bottom-right'))).toString() + 
                             '" remove-left remove-top id="round-bottom-right-corner________" inline></gs-checkbox>' +
                 '</div>', function () {
-            var topLeft =       document.getElementById('round-top-left-corner________').value === 'true',
-                topRight =    document.getElementById('round-top-right-corner________').value === 'true',
-                bottomLeft =    document.getElementById('round-bottom-left-corner________').value === 'true',
-                bottomRight = document.getElementById('round-bottom-right-corner________').value === 'true',
-                arrStrAttr = [], i, len;
-            
+            var topLeft = document.getElementById('round-top-left-corner________').value === 'true';
+            var topRight = document.getElementById('round-top-right-corner________').value === 'true';
+            var bottomLeft = document.getElementById('round-bottom-left-corner________').value === 'true';
+            var bottomRight = document.getElementById('round-bottom-right-corner________').value === 'true';
+            var arrStrAttr = [];
+            var i;
+            var len;
+
             selectedElement.removeAttribute('remove-all');
             selectedElement.removeAttribute('remove-top');
             selectedElement.removeAttribute('remove-bottom');
@@ -135,21 +174,19 @@ window.addEventListener('design-register-element', function () {
             selectedElement.removeAttribute('remove-top-right');
             selectedElement.removeAttribute('remove-bottom-left');
             selectedElement.removeAttribute('remove-bottom-right');
-            
+
             if (!topLeft && !topRight && !bottomLeft && !bottomRight) {
                 arrStrAttr.push('remove-all');
-                
             } else if (!topLeft && !topRight) {
                 arrStrAttr.push('remove-top');
             } else if (!bottomLeft && !bottomRight) {
                 arrStrAttr.push('remove-bottom');
-                
             } else if (!topLeft && !bottomLeft) {
                 arrStrAttr.push('remove-left');
             } else if (!topRight && !bottomRight) {
                 arrStrAttr.push('remove-right');
             }
-            
+
             if (!topLeft && !bottomLeft && arrStrAttr[0] !== 'remove-all') {
                 arrStrAttr.push('remove-left');
             } else if (!topLeft && topRight) {
@@ -157,7 +194,7 @@ window.addEventListener('design-register-element', function () {
             } else if (!bottomLeft && bottomRight) {
                 arrStrAttr.push('remove-bottom-left');
             }
-            
+
             if (!topRight && !bottomRight && arrStrAttr[0] !== 'remove-all') {
                 arrStrAttr.push('remove-right');
             } else if (topLeft && !topRight) {
@@ -165,22 +202,25 @@ window.addEventListener('design-register-element', function () {
             } else if (bottomLeft && !bottomRight) {
                 arrStrAttr.push('remove-bottom-right');
             }
-            
-            for (i = 0, len = arrStrAttr.length; i < len; i += 1) {
+
+            i = 0;
+            len = arrStrAttr.length;
+            while (i < len) {
                 selectedElement.setAttribute(arrStrAttr[i], '');
+                i += 1;
             }
-            
+
             return selectedElement;
         });
-        
+
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
-        
+
         //// SUSPEND-CREATED attribute
         //addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
         //    return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
         //});
-        
+
         // SUSPEND-INSERTED attribute
         addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
@@ -331,26 +371,29 @@ document.addEventListener('DOMContentLoaded', function () {
     xtag.register('gs-checkbox', {
         lifecycle: {
             created: function () {
+                var element = this;
                 // if the value was set before the "created" lifecycle code runs: set attribute
                 //      (discovered when trying to set a value of a date control in the after_open of a dialog)
                 //      ("delete" keyword added because of firefox)
-                if (!this.getAttribute('value') &&
-                    this.value !== null &&
-                    this.value !== undefined &&
+                if (
+                    !element.getAttribute('value') &&
+                    element.value !== null &&
+                    element.value !== undefined &&
                     (
-                        typeof this.value === 'boolean' ||
-                        this.value === '-1' ||
-                        this.value === '0' ||
-                        this.value === 'true' ||
-                        this.value === 'false' ||
-                        this.value === 'null' ||
-                        this.value === 'n'
-                    )) {
-                    this.setAttribute('value', this.value);
-                    delete this.value;
+                        typeof element.value === 'boolean' ||
+                        element.value === '-1' ||
+                        element.value === '0' ||
+                        element.value === 'true' ||
+                        element.value === 'false' ||
+                        element.value === 'null' ||
+                        element.value === 'n'
+                    )
+                ) {
+                    element.setAttribute('value', element.value);
+                    delete element.value;
                 }
 
-                elementCreated(this);
+                elementCreated(element);
             },
 
             inserted: function () {

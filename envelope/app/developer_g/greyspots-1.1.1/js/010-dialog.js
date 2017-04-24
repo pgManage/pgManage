@@ -115,23 +115,23 @@ window.addEventListener('design-register-element', function () {
                             '</gs-button>' +
                         '</gs-block>';
                 }
-                
+
                 strHTML += '</gs-grid>';
-                
+
             } else {
                 strHTML = '<gs-button dialogclose>Done</gs-button>';
             }
         } else {
             strHTML = buttons;
         }
-        
+
         return strHTML;
     }
-    
+
     // GS.msgbox('test1', 'test2', ['cancel', 'ok'], function (strAnswer) { console.log(strAnswer); });
     GS.msgbox = function (strTitle, strMessage, buttons, callback) {
         var templateElement = document.createElement('template');
-        
+
         templateElement.innerHTML = '<gs-page>' +
                                     '    <gs-header><center><h3>' + strTitle + '</h3></center></gs-header>' +
                                     '    <gs-body padded>' +
@@ -139,18 +139,18 @@ window.addEventListener('design-register-element', function () {
                                     '    </gs-body>' +
                                     '    <gs-footer>' + buttonHTML(buttons) + '</gs-footer>' +
                                     '</gs-page>';
-        
+
         GS.openDialog(templateElement, '', function (event, strAnswer) {
             if (typeof callback === 'function') {
                 callback(strAnswer);
             }
         });
     };
-    
+
     // GS.inputbox('test1', 'test2', function (strAnswer) { console.log(strAnswer); });
     GS.inputbox = function (strTitle, strMessage, callback) {
         var templateElement = document.createElement('template');
-        
+
         templateElement.innerHTML = '<gs-page>' +
                                     '    <gs-header><center><h3>' + strTitle + '</h3></center></gs-header>' +
                                     '    <gs-body padded>' +
@@ -159,7 +159,7 @@ window.addEventListener('design-register-element', function () {
                                     '    </gs-body>' +
                                     '    <gs-footer>' + buttonHTML(['Cancel', 'Ok']) + '</gs-footer>' +
                                     '</gs-page>';
-        
+
         GS.openDialog(templateElement, '', function (event, strAnswer) {
             if (strAnswer === 'Ok') {
                 callback(document.getElementById('dialog-inputbox-control').value);
@@ -178,11 +178,11 @@ GS.dialogClose = function (dialog, strAnswer) {
 
 GS.closeDialog = function (dialog, strAnswer) {
     'use strict';
-    
+
     if (typeof dialog === 'string') {
         dialog = document.getElementById('dialog-from-' + dialog);
     }
-    
+
     if (dialog) {
         dialog.destroy(strAnswer);
     } else {
@@ -192,17 +192,17 @@ GS.closeDialog = function (dialog, strAnswer) {
 
 (function () {
     'use strict';
-    
+
     // on focus: if the currently focus element is not in the frontmost dialog: focus first control of the frontmost dialog
     document.addEventListener('focus', function (event) {
-        var arrDialog = document.getElementsByTagName('gs-dialog');
+        var arrDialog = xtag.queryChildren(document.body, 'gs-dialog[focus-lock]');
         var frontDialog;
         var parentFind;
         var arrElements;
         var i;
         var len;
 
-        //console.log('1*** focus: ', document.activeElement);
+        //console.log('1*** focus: ', document.activeElement, arrDialog);
         if (arrDialog.length > 0) {
             frontDialog = arrDialog[arrDialog.length - 1];
             parentFind = GS.findParentElement(document.activeElement, frontDialog);
@@ -226,29 +226,29 @@ GS.closeDialog = function (dialog, strAnswer) {
     GS.dialog = function (options) {
         var strHTML, dialogOverlay, dialog, strContent = '', strButtons = '', i, len, gridEach,
             arrElements, tapHandler, strHeader, sizingFunction, observer, returnTarget;
-        
+
         // change button parameter to array format if it is string format (and the string is recognized)
         if (typeof options.buttons === 'string') {
             if (options.buttons === 'okcancel' || options.buttons === 'cancelok') {
                 options.buttons = ['Cancel', 'Ok'];
-                
+
             } else if (options.buttons === 'ok' || options.buttons === 'okonly') {
                 options.buttons = ['Ok'];
-                
+
             } else if (options.buttons === 'cancel' || options.buttons === 'cancelonly') {
                 options.buttons = ['Cancel'];
-                
+
             } else if (options.buttons === 'yesno' || options.buttons === 'noyes') {
                 options.buttons = ['No', 'Yes'];
-                
+
             } else if (options.buttons === 'Yes' || options.buttons === 'yesonly') {
                 options.buttons = ['Yes'];
-                
+
             } else if (options.buttons === 'No' || options.buttons === 'noonly') {
                 options.buttons = ['No'];
             }
         }
-        
+
         // option defaults
         options.theme      = options.theme        || 'regular';
         options.type       = options.type         || 'html';
@@ -260,39 +260,39 @@ GS.closeDialog = function (dialog, strAnswer) {
         options.mode       = options.mode         || 'detect'; // phone, touch, constrained, full, detect
         options.padded     = options.padded       || false;
         options.autofocus  = (options.autofocus === undefined ? true : false);
-        
+
         // if type is html or, use content as is
         if (options.type === 'html') {
             strContent = options.content;
             strHeader = options.header;
-            
+
         // if type is formatted-html, wrap content with a <pre>
         } else if (options.type === 'formatted-html') {
             strContent = '<pre gs-dynamic>' + options.content + '</pre>';
             strHeader = '<pre gs-dynamic>' + options.header + '</pre>';
-            
+
         // if type is text, encode to be text only
         } else if (options.type === 'text') {
             strContent = encodeHTML(options.content);
             strHeader = encodeHTML(options.header);
-            
+
         // if type is formatted-text, encode to be text only, and wrap with a <pre>
         } else if (options.type === 'formatted-text') {
             strContent = '<pre gs-dynamic>' + encodeHTML(options.content) + '</pre>';
             strHeader = '<pre gs-dynamic>' + encodeHTML(options.header) + '</pre>';
-            
+
         // if type is unrecognized, use content as is
         } else {
             console.warn('Dialog type not recognized... Defaulting to \'html\'.');
             strContent = options.content;
             strHeader = options.header;
         }
-        
+
         // if buttons is an array, build array into button html
         if (typeof options.buttons === 'object') {
             if (options.buttons.length > 0) {
                 strButtons = '<gs-grid gs-dynamic>';
-                
+
                 for (i = 0, len = options.buttons.length; i < len; i += 1) {
                     strButtons +=
                         '<gs-block gs-dynamic>' +
@@ -305,58 +305,58 @@ GS.closeDialog = function (dialog, strAnswer) {
             } else {
                 strButtons = '';
             }
-        
+
         // if buttons is not an array, use as html
         } else {
             strButtons = options.buttons;
         }
-        
+
         // append dialog overlay element
         dialogOverlay = GS.stringToElement('<gs-dialog-overlay gs-dynamic></gs-dialog-overlay>');
         document.body.appendChild(dialogOverlay);
-        
+
         dialogOverlay.addEventListener(evt.mousedown, function (event) {
             event.preventDefault();
         });
         dialogOverlay.addEventListener(evt.mousemove, function (event) {
             event.preventDefault();
         });
-        
+
         // build dialog html
-        strHTML = '<gs-dialog class="' + encodeHTML(options.theme) + '" gs-dynamic ';
-        
+        strHTML = '<gs-dialog class="' + encodeHTML(options.theme) + '" gs-dynamic focus-lock ';
+
         // if mode is set to phone or touch and we are not on those types of devices: change mode to detect
         if ((options.mode === 'touch' && !evt.touchDevice) || (options.mode === 'phone' && evt.deviceType !== 'phone')) {
             options.mode = 'detect';
         }
-        
+
         // deal with full page mode
         if ((options.mode === 'touch' && evt.touchDevice) || (options.mode === 'phone' && evt.deviceType === 'phone') || options.mode === 'full') {
             strHTML += 'style="width: 100%; height: 100%; top: 0;">';
-            
+
         } else if (options.mode === 'constrained') {
             strHTML += 'style="max-width: ' + options.max_width + '; max-height: ' + options.max_height + '; width: 94%; height: 90%;">';// auto
                              //width: ' + options.width + '; ' +
                              //'height: ' + options.height + '; ' +
                              //'top: ' + options.top + '; ' +
                              //'margin-left: -' + ((parseInt(options.width, 10) / 2) + options.width.replace(/[0-9]/g, '')) + ';">' +
-            
+
         } else { // if (options.mode === 'constrained')
             strHTML += 'style="max-width: ' + options.max_width + '; width: 94%;">';
         }
-        
+
         strHTML +=      '<gs-page gs-dynamic>' +
                             (options.header ? '<gs-header gs-dynamic>' + strHeader + '</gs-header>' : '') +
                             '<gs-body' + (options.padded ? ' padded' : '') + ' gs-dynamic>' + strContent + '</gs-body>' +
                            (strButtons ? '<gs-footer gs-dynamic>' + strButtons + '</gs-footer>' : '') +
                         '</gs-page>' +
                     '</gs-dialog>';
-        
+
         // append dialog
         dialog = GS.stringToElement(strHTML);
         document.body.appendChild(dialog);
         document.body.parentNode.classList.add('no-scroll-except-for-dialog');
-        
+
         // bind dialog
         dialog.addEventListener('beforeclose', function (event) {
             if (typeof options.before_close === 'function') {
@@ -368,40 +368,41 @@ GS.closeDialog = function (dialog, strAnswer) {
                 options.after_close.apply(dialog, [event.originalEvent, event.data]);
             }
         });
-        
-        
-        // focus autofocus element if there is one
-        arrElements = xtag.query(dialog, '[autofocus]');
-        
-        if (arrElements.length > 0) {
-            arrElements[0].focus();
-            
-        // else if there is a listen-for-return: focus that
-        } else {
-            arrElements = xtag.query(dialog, '[listen-for-return]');
-            
+
+        if (!template.hasAttribute('no-focus-lock')) {
+            // focus autofocus element if there is one
+            arrElements = xtag.query(dialog, '[autofocus]');
+
             if (arrElements.length > 0) {
                 arrElements[0].focus();
+
+            // else if there is a listen-for-return: focus that
+            } else {
+                arrElements = xtag.query(dialog, '[listen-for-return]');
+
+                if (arrElements.length > 0) {
+                    arrElements[0].focus();
+                }
             }
         }
-        
+
         // bind listening for return if there is an element with the "listen-for-return"
         arrElements = xtag.query(dialog, '[listen-for-return]');
-        
+
         if (arrElements.length > 0) {
             returnTarget = arrElements[0];
-            
+
             dialog.addEventListener('keydown', function (event) {
                 if (event.target !== returnTarget && (event.keyCode === 13 || event.which === 13)) {
                     GS.triggerEvent(returnTarget, 'click');
                 }
             });
-            
+
             if (arrElements.length > 1) {
                 console.warn('dialog Warning: Too many [listen-for-return] elements, defaulting to the first one. Please have only one [listen-for-return] element per dialog.');
             }
         }
-        
+
         // if mode is detect: do/bind detection
         if (options.mode === 'detect') {
             sizingFunction = function () {
@@ -409,71 +410,73 @@ GS.closeDialog = function (dialog, strAnswer) {
                     window.removeEventListener('resize', sizingFunction);
                     window.removeEventListener('orientationchange', sizingFunction);
                     observer.disconnect();
-                    
+
                     return;
                 }
-                
+
                 // if dialog is taller than 98% of the window: add max-height and height
                 if (dialog.offsetHeight > ((window.innerHeight / 100) * 98)) {
                     dialog.style.height = '98%';
                     dialog.style.maxHeight = options.max_height;
                 }
             };
-            
+
             sizingFunction();
-            
+
             window.addEventListener('resize', sizingFunction);
             window.addEventListener('orientationchange', sizingFunction);
-            
+
             observer = new MutationObserver(sizingFunction);
             observer.observe(dialog, {childList: true, subtree: true, attributes: true});
         }
-        
+
         // after open function call
         if (typeof options.after_open === 'function') {
             options.after_open.apply(dialog, []);
         }
-        
+
         return dialog;
     };
-    
-    
+
+
     GS.openDialog = function (templateLink, afterOpenFunction, beforeCloseFunction, afterCloseFunction) {
         var template, templateID, strHTML, dialogOverlay, dialog, i, len, arrCloseButtons, clickHandler, sizingFunction,
             observer, arrElements, strTag, returnTarget, strTheme, strMaxWidth, strMaxHeight, strMode, refocusElement,
             scrollTarget, jsnInitalMousePos, scrollProtectorTouchStart, scrollProtectorTouchMove, scrollProtectorMouseWheel,
             strTag, xtagSelector, intervalID, intervalI;
-        
-        // save and blur currently focused element
-        refocusElement = document.activeElement;
-        refocusElement.blur();
-        
+
         // get template
         if (typeof templateLink === 'string') {
             template = document.getElementById(templateLink);
         } else {
             template = templateLink;
         }
-        
+
+        // save and blur currently focused element
+        refocusElement = document.activeElement;
+        if (!template.hasAttribute('no-focus-lock')) {
+            refocusElement.blur();
+        }
+
         // save template ID
         templateID = template.getAttribute('id');
-        
+
         // warn if a dialog already uses this ID
         if (templateID && document.getElementById('dialog-from-' + templateID)) {
             console.warn('GS.openDialog Warning: A dialog using the ID "' + templateID + '" is already open.');
         }
-        
+
         // handle autofocus
         arrElements = xtag.query(template.content, '[autofocus]');
-        
+
         // if there are not autofocus elements: add autofocus to first control in the template
         if (arrElements.length === 0) {
             arrElements = xtag.query(template.content, '*');
-            
+
             if (arrElements.length > 0) {
                 for (i = 0, len = arrElements.length; i < len; i += 1) {
                     strTag = arrElements[i].nodeName.toLowerCase();
-                    
+
                     if (GS.isElementFocusable(arrElements[i]) ||
                         (
                             xtag.tags[strTag] &&
@@ -485,60 +488,72 @@ GS.closeDialog = function (dialog, strAnswer) {
                     }
                 }
             }
-            
+
         // warn if there are too many autofocus elements
         } else if (arrElements.length > 1) {
             for (i = 1, len = arrElements.length; i < len; i += 1) {
                 arrElements[i].removeAttribute('autofocus');
             }
-            
+
             console.warn('dialog Warning: Too many [autofocus] elements, defaulting to the first one. Please have only one [autofocus] element per dialog.');
         }
-        
+
         // get and default parameters
         strTheme     = (template.getAttribute('data-theme') === 'error' ? 'error' : 'regular');
         strMaxWidth  = template.getAttribute('data-max-width')  || '700px';
         strMaxHeight = template.getAttribute('data-max-height') || '700px';
         strMode      = template.getAttribute('data-mode')       || 'detect'; // phone, touch, constrained, full, detect
-        
+
         // build full dialog html
         strHTML = '<gs-dialog ' + (templateID ? 'id="dialog-from-' + templateID + '" ' : '') + 'class="' + strTheme + '" gs-dynamic ';
-        
+
+        if (!template.hasAttribute('no-focus-lock')) {
+            strHTML += 'focus-lock ';
+        }
+
         // if mode is set to phone or touch and we are not on those types of devices: change mode to detect
         if ((strMode === 'touch' && !evt.touchDevice) || (strMode === 'phone' && evt.deviceType !== 'phone')) {
             strMode = 'detect';
         }
-        
+
         // deal with full page mode
         if ((strMode === 'touch' && evt.touchDevice) || (strMode === 'phone' && evt.deviceType === 'phone') || strMode === 'full') {
             strHTML += 'style="width: 100%; height: 100%; top: 0;">';
-            
+
         } else if (strMode === 'constrained') {
             strHTML += 'style="max-width: ' + strMaxWidth + '; max-height: ' + strMaxHeight + '; width: 94%; height: 90%;">';
-            
+
         } else {
             strHTML += 'style="max-width: ' + strMaxWidth + '; width: 94%;">';
         }
-        
+
         strHTML +=      '<gs-page gs-dynamic>' +
                             template.innerHTML +
                         '</gs-page>' +
                     '</gs-dialog>';
-        
+
         // get elements
-        dialogOverlay = GS.stringToElement('<gs-dialog-overlay gs-dynamic></gs-dialog-overlay>');
+        dialogOverlay = GS.stringToElement(
+            '<gs-dialog-overlay gs-dynamic' +
+            (
+                template.hasAttribute('no-background')
+                    ? ' no-background '
+                    : ''
+            ) +
+            '></gs-dialog-overlay>'
+        );
         dialog = GS.stringToElement(strHTML);
-        
+
         // append overlay element
         document.body.appendChild(dialogOverlay);
-        
+
         // if the template has: data-overlay-close="true": bind overlay
         if (template.getAttribute('data-overlay-close') === 'true') {
             dialogOverlay.addEventListener(evt.mousedown, function (event) {
                 GS.closeDialog(dialog, 'overlay');
             });
         }
-        
+
         // bind overlay element
         dialogOverlay.addEventListener(evt.mousedown, function (event) {
             event.preventDefault();
@@ -549,54 +564,54 @@ GS.closeDialog = function (dialog, strAnswer) {
         dialogOverlay.addEventListener('mousewheel', function (event) {
             event.preventDefault();
         });
-        
+
         // append dialog
         document.body.appendChild(dialog);
         //document.body.parentNode.classList.add('no-scroll-except-for-dialog');
-        
+
         // bind dialog
         scrollProtectorTouchStart = function (event) {
             if (dialog.parentNode !== document.body) {
                 dialog.removeEventListener('touchstart', scrollProtectorTouchStart);
                 return true;
             }
-            
+
             scrollTarget = GS.scrollParent(event.target);
-            
+
             //console.log(scrollTarget);
-            
+
             if (!scrollTarget || !GS.findParentTag(scrollTarget, 'gs-dialog')) {
                 scrollTarget = dialog;
             }
-            
+
             //console.log(scrollTarget);
-            
+
             jsnInitalMousePos = GS.mousePosition(event);
         };
-        
+
         scrollProtectorTouchMove = function (event) {
             var jsnMousePos = GS.mousePosition(event), bolVertical, bolHorizontal;
-            
+
             if (dialog.parentNode !== document.body) {
                 dialog.removeEventListener('touchmove', scrollProtectorTouchMove);
                 return true;
             }
-            
+
             //console.log('2***', scrollTarget, jsnInitalMousePos, jsnMousePos);
-            
+
             if (Math.abs(jsnInitalMousePos.top - jsnMousePos.top) > Math.abs(jsnInitalMousePos.left - jsnMousePos.left)) {
                 bolVertical = true;
             } else {
                 bolHorizontal = true;
             }
-            
+
             //console.log(bolVertical, bolHorizontal);
-            
+
             // if down  AND we are already at the top
             // if up    AND we are already at the bottom
             // if right AND we are already at the left
             // if left  AND we are already at the right
-            
+
             if ((bolVertical && (
                     (jsnInitalMousePos.top < jsnMousePos.top && scrollTarget.scrollTop <= 0) ||
                     (jsnInitalMousePos.top > jsnMousePos.top &&
@@ -609,59 +624,59 @@ GS.closeDialog = function (dialog, strAnswer) {
                 event.stopPropagation();
             }
         };
-        
+
         scrollProtectorMouseWheel = function (event) {
             var target = GS.scrollParent(event.target); //event.target;
-            
+
             //console.log(target);
-            
+
             if (dialog.parentNode !== document.body) {
                 dialog.removeEventListener('mousewheel', scrollProtectorMouseWheel);
                 return true;
             }
-            
+
             //console.log(event.deltaY, event.deltaX,
             //            target.scrollTop, target.scrollLeft,
             //            target.scrollHeight, target.scrollWidth,
             //            target.clientHeight, target.clientWidth);
-            
+
             // if event.deltaY < 0 AND we are already at the top
             // if event.deltaY > 0 AND we are already at the bottom
             // if event.deltaX < 0 AND we are already at the left
             // if event.deltaX > 0 AND we are already at the right
-            
+
             if ((event.deltaY < 0 && target.scrollTop <= 0) ||
                 (event.deltaY > 0 && (target.scrollTop + target.clientHeight) >= target.scrollHeight) ||
                 (event.deltaX < 0 && target.scrollLeft <= 0) ||
                 (event.deltaX > 0 && (target.scrollLeft + target.clientWidth) >= target.scrollWidth)) {
                 //console.log('prevented');
-                
+
                 event.preventDefault();
                 event.stopPropagation();
             }
         };
-        
+
         if (evt.touchDevice) {
             window.addEventListener('touchstart', scrollProtectorTouchStart);
             window.addEventListener('touchmove', scrollProtectorTouchMove);
         }
-        
+
         dialog.addEventListener('mousewheel', scrollProtectorMouseWheel);
-        
+
         dialog.addEventListener('beforeclose', function (event) {
             if (typeof beforeCloseFunction === 'function') {
                 beforeCloseFunction.apply(dialog, [event.originalEvent, event.data]);
             }
         });
-        
+
         dialog.addEventListener('afterclose', function (event) {
             refocusElement.focus();
             if (typeof afterCloseFunction === 'function') {
                 afterCloseFunction.apply(dialog, [event.originalEvent, event.data]);
             }
         });
-        
-        
+
+
         // if mode equals 'detect'
         //console.log(strMode);
         if (strMode === 'detect') {
@@ -671,71 +686,73 @@ GS.closeDialog = function (dialog, strAnswer) {
                     window.removeEventListener('resize', sizingFunction);
                     window.removeEventListener('orientationchange', sizingFunction);
                     observer.disconnect();
-                    
+
                     return;
                 }
-                
+
                 // if dialog is taller than 98% of the window: add max-height and height
                 if (dialog.offsetHeight > ((window.innerHeight / 100) * 98)) {
                     dialog.style.height = '98%';
                     dialog.style.maxHeight = strMaxHeight;
                 }
             };
-            
+
             sizingFunction();
-            
+
             window.addEventListener('resize', sizingFunction);
             window.addEventListener('orientationchange', sizingFunction);
-            
+
             observer = new MutationObserver(sizingFunction);
             observer.observe(dialog, {childList: true, subtree: true, attributes: true});
         }
-        
-        
+
+
         var elementReadyCallback = function () {
-            // focus autofocus element if there is one
-            arrElements = xtag.query(dialog, '[autofocus]');
-            
-            if (arrElements.length > 0) {
-                arrElements[0].focus();
-                
-            // else if there is a listen-for-return: focus that
-            } else {
-                arrElements = xtag.query(dialog, '[listen-for-return]');
-                
+            if (!template.hasAttribute('no-focus-lock')) {
+                // focus autofocus element if there is one
+                arrElements = xtag.query(dialog, '[autofocus]');
+
                 if (arrElements.length > 0) {
                     arrElements[0].focus();
+
+                // else if there is a listen-for-return: focus that
+                } else {
+                    arrElements = xtag.query(dialog, '[listen-for-return]');
+
+                    if (arrElements.length > 0) {
+                        arrElements[0].focus();
+                    }
                 }
             }
-            
+
             // bind listening for return if there is an element with the "listen-for-return"
             arrElements = xtag.query(dialog, '[listen-for-return]');
-            
+
             if (arrElements.length > 0) {
                 returnTarget = arrElements[0];
-                
+
                 dialog.addEventListener('keydown', function (event) { // keydown, keyup, keypress
                     if (event.target !== returnTarget && (event.keyCode === 13 || event.which === 13)) {
                         //event.stopPropagation();
                         GS.triggerEvent(returnTarget, 'click');
                     }
                 });
-                
+
                 if (arrElements.length > 1) {
                     console.warn('dialog Warning: Too many [listen-for-return] elements, defaulting to the first one. Please have only one [listen-for-return] element per dialog.');
                 }
             }
-            
+
             if (typeof afterOpenFunction === 'function') {
                 afterOpenFunction.apply(dialog, []);
             }
         };
-        
-        
+
+
         // get a list of all the xtag elements
         // if they are not all instantiated check: on an interval until they are all instantiated
-        
-        
+
+
         // if element registration is shimmed: we need to wait to run the callback
         //      until after the elements are ready. to do this we'll get a list of
         //      the current elements that are xtag-defined and on a 30ms loop we'll
@@ -747,12 +764,12 @@ GS.closeDialog = function (dialog, strAnswer) {
                 xtagSelector += (xtagSelector ? ',' : '');
                 xtagSelector += strTag;
             }
-            
+
             // get all xtag elements
             var elem_wait = xtag.query(dialog, xtagSelector);
             var elem_i;
             var elem_len;
-            
+
             // begin interval (max out at 1 second)
             intervalI = 0;
             intervalID = setInterval(function () {
@@ -773,14 +790,14 @@ GS.closeDialog = function (dialog, strAnswer) {
                 }
                 intervalI += 1;
             }, 30);
-            
+
         // else: element instantiation blocks JS execution until the elements
         //      are ready, so we don't need to wait to run the after open callback
         } else {
             elementReadyCallback();
         }
-        
-        
+
+
         //// after open function call
         //if (typeof afterOpenFunction === 'function') {
         //    if (dialog.inserted === true) {
@@ -793,13 +810,11 @@ GS.closeDialog = function (dialog, strAnswer) {
         //            afterOpenFunction.apply(dialog, []);
         //        });
         //    }
-        //    
-        //    
         //}
-        
+
         return dialog;
     };
-    
+
     GS.openDialogToElement = function (elementTarget, templateLink, strDirectionRequest, afterOpenFunction, beforeCloseFunction, afterCloseFunction) {
         'use strict';
         var positionHandlingFunction, jsnPositionData, divElement = document.createElement('div'), dialogElement, observer,
@@ -808,37 +823,39 @@ GS.closeDialog = function (dialog, strAnswer) {
             strMaxHeight, strTag, dialogOverlay, refocusElement, jsnInitalMousePos, scrollTarget, returnTarget,
             scrollProtectorTouchStart, scrollProtectorTouchMove, scrollProtectorMouseWheel, templateID,
             strTag, xtagSelector, intervalID, intervalI;
-        
-        // save and blur currently focused element
-        refocusElement = document.activeElement;
-        refocusElement.blur();
-        
+
         // get template
         if (typeof templateLink === 'string') {
             template = document.getElementById(templateLink);
         } else {
             template = templateLink;
         }
-        
+
+        // save and blur currently focused element
+        refocusElement = document.activeElement;
+        if (!template.hasAttribute('no-focus-lock')) {
+            refocusElement.blur();
+        }
+
         // save template ID
         templateID = template.getAttribute('id');
-        
+
         // warn if a dialog already uses this ID
         if (templateID && document.getElementById('dialog-from-' + templateID)) {
             console.warn('GS.openDialog Warning: A dialog using the ID "' + templateID + '" is already open.');
         }
-        
+
         // handle autofocus
         arrElements = xtag.query(template.content, '[autofocus]');
-        
+
         // if there are not autofocus elements: add autofocus to first control in the template
         if (arrElements.length === 0) {
             arrElements = xtag.query(template.content, '*');
-            
+
             if (arrElements.length > 0) {
                 for (i = 0, len = arrElements.length; i < len; i += 1) {
                     strTag = arrElements[i].nodeName.toLowerCase();
-                    
+
                     if (GS.isElementFocusable(arrElements[i]) ||
                         (
                             xtag.tags[strTag] &&
@@ -850,92 +867,115 @@ GS.closeDialog = function (dialog, strAnswer) {
                     }
                 }
             }
-            
+
         // warn if there are too many autofocus elements
         } else if (arrElements.length > 1) {
             for (i = 1, len = arrElements.length; i < len; i += 1) {
                 arrElements[i].removeAttribute('autofocus');
             }
-            
+
             console.warn('dialog Warning: Too many [autofocus] elements, defaulting to the first one. Please have only one [autofocus] element per dialog.');
         }
-        
+
         // get and default parameters
         strTheme     = (template.getAttribute('data-theme') === 'error' ? 'error' : 'regular');
         strMaxWidth  = template.getAttribute('data-max-width')  || '700px';
         strMaxHeight = template.getAttribute('data-max-height') || '700px';
-        
+
         // create dialog element
-        divElement.innerHTML =  '<gs-dialog ' + (templateID ? 'id="dialog-from-' + templateID + '" ' : '') + 'class="' + strTheme + '" style="width: 94%; max-width: ' + strMaxWidth + ';" no-window-listen gs-dynamic>' +
-                                    '<gs-page gs-dynamic>' +
-                                        template.innerHTML +
-                                    '</gs-page>' +
-                                '</gs-dialog>';
-        
+        divElement.innerHTML =
+            '<gs-dialog ' +
+                    (
+                        templateID
+                            ? 'id="dialog-from-' + templateID + '" '
+                            : ''
+                    ) +
+                    'class="' + strTheme + '" ' +
+                    'style="width: 94%; max-width: ' + strMaxWidth + ';" ' +
+                    'no-window-listen ' +
+                    (
+                        template.hasAttribute('no-focus-lock')
+                            ? ''
+                            : 'focus-lock '
+                    ) +
+                    'gs-dynamic>' +
+                '<gs-page gs-dynamic>' +
+                    template.innerHTML +
+                '</gs-page>' +
+            '</gs-dialog>';
+
         dialogElement = divElement.children[0];
-        
+
         // append dialog overlay element to the body
-        dialogOverlay = GS.stringToElement('<gs-dialog-overlay gs-dynamic></gs-dialog-overlay>');
+        dialogOverlay = GS.stringToElement(
+            '<gs-dialog-overlay gs-dynamic' +
+                    (
+                        template.hasAttribute('no-background')
+                            ? ' no-background '
+                            : ''
+                    ) +
+                '></gs-dialog-overlay>'
+        );
         document.body.appendChild(dialogOverlay);
-        
+
         // if the template has: data-overlay-close="true": bind overlay
         if (template.getAttribute('data-overlay-close') === 'true') {
             dialogOverlay.addEventListener('click', function (event) {
                 GS.closeDialog(dialogElement, 'overlay');
             });
         }
-        
+
         // bind dialog overlay
         dialogOverlay.addEventListener('mousewheel', function (event) {
             event.preventDefault();
         });
-        
+
         // append dialog element to the body
         document.body.appendChild(dialogElement);
-        
+
         // bind dialog
         scrollProtectorTouchStart = function (event) {
             if (dialogElement.parentNode !== document.body) {
                 dialogElement.removeEventListener('touchstart', scrollProtectorTouchStart);
                 return true;
             }
-            
+
             scrollTarget = GS.scrollParent(event.target);
-            
+
             //console.log(scrollTarget);
-            
+
             if (!scrollTarget || !GS.findParentTag(scrollTarget, 'gs-dialog')) {
                 scrollTarget = dialogElement;
             }
-            
+
             //console.log(scrollTarget);
-            
+
             jsnInitalMousePos = GS.mousePosition(event);
         };
-        
+
         scrollProtectorTouchMove = function (event) {
             var jsnMousePos = GS.mousePosition(event), bolVertical, bolHorizontal;
-            
+
             if (dialogElement.parentNode !== document.body) {
                 dialogElement.removeEventListener('touchmove', scrollProtectorTouchMove);
                 return true;
             }
-            
+
             //console.log('2***', scrollTarget, jsnInitalMousePos, jsnMousePos);
-            
+
             if (Math.abs(jsnInitalMousePos.top - jsnMousePos.top) > Math.abs(jsnInitalMousePos.left - jsnMousePos.left)) {
                 bolVertical = true;
             } else {
                 bolHorizontal = true;
             }
-            
+
             //console.log(bolVertical, bolHorizontal);
-            
+
             // if down  AND we are already at the top
             // if up    AND we are already at the bottom
             // if right AND we are already at the left
             // if left  AND we are already at the right
-            
+
             if ((bolVertical && (
                     (jsnInitalMousePos.top < jsnMousePos.top && scrollTarget.scrollTop <= 0) ||
                     (jsnInitalMousePos.top > jsnMousePos.top &&
@@ -948,7 +988,7 @@ GS.closeDialog = function (dialog, strAnswer) {
                 event.stopPropagation();
             }
         };
-        
+
         scrollProtectorMouseWheel = function (event) {
             var target = GS.scrollParent(event.target); //event.target;
             
@@ -994,34 +1034,36 @@ GS.closeDialog = function (dialog, strAnswer) {
                 afterCloseFunction.apply(dialogElement, [event.originalEvent, event.data]);
             }
         });
-        
-        // focus autofocus element if there is one
-        arrElements = xtag.query(dialogElement, '[autofocus]');
-        
-        if (arrElements.length > 0) {
-            arrElements[0].focus();
-            
-        // else if there is a listen-for-return: focus that
-        } else {
-            arrElements = xtag.query(dialogElement, '[listen-for-return]');
-            
+
+        if (!template.hasAttribute('no-focus-lock')) {
+            // focus autofocus element if there is one
+            arrElements = xtag.query(dialogElement, '[autofocus]');
+
             if (arrElements.length > 0) {
                 arrElements[0].focus();
+
+            // else if there is a listen-for-return: focus that
+            } else {
+                arrElements = xtag.query(dialogElement, '[listen-for-return]');
+
+                if (arrElements.length > 0) {
+                    arrElements[0].focus();
+                }
             }
         }
-        
+
         // bind listening for return if there is an element with the "listen-for-return"
         arrElements = xtag.query(dialogElement, '[listen-for-return]');
-        
+
         if (arrElements.length > 0) {
             returnTarget = arrElements[0];
-            
+
             dialogElement.addEventListener('keydown', function (event) {
                 if (event.target !== returnTarget && (event.keyCode === 13 || event.which === 13)) {
                     GS.triggerEvent(returnTarget, 'click');
                 }
             });
-            
+
             if (arrElements.length > 1) {
                 console.warn('dialog Warning: Too many [listen-for-return] elements, defaulting to the first one. Please have only one [listen-for-return] element per dialog.');
             }
@@ -1219,18 +1261,18 @@ GS.closeDialog = function (dialog, strAnswer) {
                 } else if (strResolvedDirection === 'right') {
                     intDialogLeft = (jsnPositionData.intElementLeft + jsnPositionData.intElementWidth);
                 }
-                
+
                 // prevent the dialog from vertically going outside the viewport
                 if (intDialogTop + intDialogResolvedHeight > window.innerHeight) {
                     intDialogTop -= (intDialogTop + intDialogResolvedHeight) - window.innerHeight;
                     
                 }
-                
+
                 // prevent the dialog from horizontally going outside the viewport
                 if (intDialogLeft + intDialogResolvedWidth > window.innerWidth) {
                     intDialogLeft -= (intDialogLeft + intDialogResolvedWidth) - window.innerWidth;
                 }
-                
+
                 // apply CSS to the dialog
                 dialogElement.style.top        = intDialogTop + 'px';
                 dialogElement.style.left       = intDialogLeft + 'px';
@@ -1238,58 +1280,60 @@ GS.closeDialog = function (dialog, strAnswer) {
                 dialogElement.style.marginLeft = intDialogMarginLeft + 'px';
             }
         };
-        
+
         positionHandlingFunction();
         window.addEventListener('resize', positionHandlingFunction);
         window.addEventListener('orientationchange', positionHandlingFunction);
-        
+
         // observer: on childlist update: recalculate positioning/sizing
         observer = new MutationObserver(positionHandlingFunction);
-        
+
         // the observer is on "dialogElement.children[0]" because when we refresh the position of the dialog:
         //      the "style" attribute is changed which causes the observer to run again ergo: infinite loop
         observer.observe(dialogElement.children[0], {childList: true, subtree: true, attributes: true});
-        
-        
+
+
         var elementReadyCallback = function () {
-            // focus autofocus element if there is one
-            arrElements = xtag.query(dialogElement, '[autofocus]');
-            
-            if (arrElements.length > 0) {
-                arrElements[0].focus();
-                
-            // else if there is a listen-for-return: focus that
-            } else {
-                arrElements = xtag.query(dialogElement, '[listen-for-return]');
-                
+            if (!template.hasAttribute('no-focus-lock')) {
+                // focus autofocus element if there is one
+                arrElements = xtag.query(dialogElement, '[autofocus]');
+
                 if (arrElements.length > 0) {
                     arrElements[0].focus();
+
+                // else if there is a listen-for-return: focus that
+                } else {
+                    arrElements = xtag.query(dialogElement, '[listen-for-return]');
+
+                    if (arrElements.length > 0) {
+                        arrElements[0].focus();
+                    }
                 }
             }
-            
+
             // bind listening for return if there is an element with the "listen-for-return"
             arrElements = xtag.query(dialogElement, '[listen-for-return]');
-            
+
             if (arrElements.length > 0) {
                 returnTarget = arrElements[0];
-                
+
                 dialogElement.addEventListener('keydown', function (event) { // keydown, keyup, keypress
                     if (event.target !== returnTarget && (event.keyCode === 13 || event.which === 13)) {
                         //event.stopPropagation();
                         GS.triggerEvent(returnTarget, 'click');
                     }
                 });
-                
+
                 if (arrElements.length > 1) {
                     console.warn('dialog Warning: Too many [listen-for-return] elements, defaulting to the first one. Please have only one [listen-for-return] element per dialog.');
                 }
             }
-            
+
             if (typeof afterOpenFunction === 'function') {
                 afterOpenFunction.apply(dialogElement, []);
             }
         };
-        
+
         // if element registration is shimmed: we need to wait to run the callback
         //      until after the elements are ready. to do this we'll get a list of
         //      the current elements that are xtag-defined and on a 30ms loop we'll
@@ -1327,47 +1371,48 @@ GS.closeDialog = function (dialog, strAnswer) {
                 }
                 intervalI += 1;
             }, 30);
-            
+
         // else: element instantiation blocks JS execution until the elements
         //      are ready, so we don't need to wait to run the after open callback
         } else {
             elementReadyCallback();
         }
-        
+
         //// after open function call
         //if (typeof afterOpenFunction === 'function') {
         //    afterOpenFunction.apply(dialogElement, []);
         //}
-        
+
         return dialogElement;
     };
 })();
 
 (function () {
     'use strict';
-    
     xtag.register('gs-dialog', {
         lifecycle: {
             created: function () {
-                document.body.focus();
-                
+                if (this.hasAttribute('focus-lock')) {
+                    document.body.focus();
+                }
+
                 //document.body.parentNode.classList.add('no-scroll-except-for-dialog');
             },
-            
+
             inserted: function () {
                 if (this.inserted !== true) {
                     this.inserted = true;
-                    
+
                     if (!this.hasAttribute('no-window-listen')) {
                         this.bind();
-                        
+
                         this.windowResizeHandler();
                     }
-                    
+
                     GS.triggerEvent(this, 'dialog-inserted');
                 }
             },
-            
+
             removed: function () {
                 this.unbind();
             }
@@ -1375,7 +1420,7 @@ GS.closeDialog = function (dialog, strAnswer) {
         events: {
             'click:delegate([dialogclose])': function (event) {
                 var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
-                
+
                 GS.findParentTag(event.target, 'gs-dialog')
                         .destroy(dialogcloseElement.textContent, event);
             }
@@ -1384,7 +1429,7 @@ GS.closeDialog = function (dialog, strAnswer) {
         methods: {
             bind: function () {
                 var element = this;
-                
+
                 if (!element.hasAttribute('no-window-listen')) {
                     element.windowResizeHandler = function () {
                         element.style.left = (window.innerWidth / 2) - (element.offsetWidth / 2) + 'px';

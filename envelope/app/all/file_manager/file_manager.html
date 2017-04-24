@@ -618,7 +618,7 @@
             function useQueryString() {
                 var strQueryString = GS.getQueryString(), arrQSKeys = GS.qryGetKeys(strQueryString);
 
-                bolWebSocket = (GS.qryGetVal(strQueryString, 'socket') === "true");
+                bolWebSocket = true; //(GS.qryGetVal(strQueryString, 'socket') === "true");
 
                 if (strQueryString && arrQSKeys.indexOf('path') >= 0) {
                     arrCurrentPath = GS.qryGetVal(strQueryString, 'path').split('/');

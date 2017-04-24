@@ -1231,7 +1231,31 @@ gs-email-button[icon]:after,
 gs-tracking-button[icon]:after,
 gs-delete-button[icon]:after,
 gs-option[icon]:after,
-gs-dialog-button[icon]:after {
+gs-dialog-button[icon]:after,
+
+gs-button[special-icon]:before,
+gs-toggle[special-icon]:before,
+gs-phone-button:not([not-supported])[special-icon]:before,
+gs-map-button[special-icon]:before,
+gs-skype-button[special-icon]:before,
+gs-facetime-button[special-icon]:before,
+gs-email-button[special-icon]:before,
+gs-tracking-button[special-icon]:before,
+gs-delete-button[special-icon]:before,
+gs-option[special-icon]:before,
+gs-dialog-button[special-icon]:before,
+
+gs-button[special-icon]:after,
+gs-toggle[special-icon]:after,
+gs-phone-button:not([not-supported])[special-icon]:after,
+gs-map-button[special-icon]:after,
+gs-skype-button[special-icon]:after,
+gs-facetime-button[special-icon]:after,
+gs-email-button[special-icon]:after,
+gs-tracking-button[special-icon]:after,
+gs-delete-button[special-icon]:after,
+gs-option[special-icon]:after,
+gs-dialog-button[special-icon]:after {
     position: absolute;
     display: block;
     
@@ -1415,6 +1439,19 @@ gs-option[icontop],
 gs-dialog-button[icontop] {
     padding-top: 1.4em;
 }
+
+gs-button[icontop]:before,
+gs-toggle[icontop]:before,
+gs-phone-button:not([not-supported])[icontop]:before,
+gs-map-button[icontop]:before,
+gs-skype-button[icontop]:before,
+gs-facetime-button[icontop]:before,
+gs-email-button[icontop]:before,
+gs-tracking-button[icontop]:before,
+gs-delete-button[icontop]:before,
+gs-option[icontop]:before,
+gs-dialog-button[icontop]:before,
+
 gs-button[icontop]:after,
 gs-toggle[icontop]:after,
 gs-phone-button:not([not-supported])[icontop]:after,
@@ -1445,6 +1482,19 @@ gs-option[iconbottom],
 gs-dialog-button[iconbottom] {
     padding-bottom: 1.5em;
 }
+
+gs-button[iconbottom]:before,
+gs-toggle[iconbottom]:before,
+gs-phone-button:not([not-supported])[iconbottom]:before,
+gs-map-button[iconbottom]:before,
+gs-skype-button[iconbottom]:before,
+gs-facetime-button[iconbottom]:before,
+gs-email-button[iconbottom]:before,
+gs-tracking-button[iconbottom]:before,
+gs-delete-button[iconbottom]:before,
+gs-option[iconbottom]:before,
+gs-dialog-button[iconbottom]:before,
+
 gs-button[iconbottom]:after,
 gs-toggle[iconbottom]:after,
 gs-phone-button:not([not-supported])[iconbottom]:after,
@@ -1480,6 +1530,19 @@ gs-dialog-button[icononly] {
     
     width: 2.35em;
 }
+
+gs-button[icononly]:before,
+gs-toggle[icononly]:before,
+gs-phone-button:not([not-supported])[icononly]:before,
+gs-map-button[icononly]:before,
+gs-skype-button[icononly]:before,
+gs-facetime-button[icononly]:before,
+gs-email-button[icononly]:before,
+gs-tracking-button[icononly]:before,
+gs-delete-button[icononly]:before,
+gs-option[icononly]:before,
+gs-dialog-button[icononly]:before,
+
 gs-button[icononly]:after,
 gs-toggle[icononly]:after,
 gs-phone-button:not([not-supported])[icononly]:after,
@@ -1490,7 +1553,19 @@ gs-email-button[icononly]:after,
 gs-tracking-button[icononly]:after,
 gs-delete-button[icononly]:after,
 gs-option[icononly]:after,
-gs-dialog-button[icononly]:after {
+gs-dialog-button[icononly]:after,
+
+gs-button[icononly][special-icon]:before,
+gs-toggle[icononly][special-icon]:before,
+gs-phone-button:not([not-supported])[icononly][special-icon]:before,
+gs-map-button[icononly][special-icon]:before,
+gs-skype-button[icononly][special-icon]:before,
+gs-facetime-button[icononly][special-icon]:before,
+gs-email-button[icononly][special-icon]:before,
+gs-tracking-button[icononly][special-icon]:before,
+gs-delete-button[icononly][special-icon]:before,
+gs-option[icononly][special-icon]:before,
+gs-dialog-button[icononly][special-icon]:before {
     top: 50%;
     left: 50%;
     margin-top: -0.57em; /* -0.66em; */
@@ -1504,6 +1579,10 @@ gs-dialog-button[icononly]:after {
     margin-left: -0.575em;
     */
 }
+
+
+
+
 
 /* ###################################################################################### */
 /* ################################### ICON  ROTATION ################################### */
@@ -1566,6 +1645,45 @@ gs-dialog-button[iconrotatedown]:after {
 /* ###################################################################################### */
 /* #################################### ICON CONTENT #################################### */
 /* ###################################################################################### */
+
+gs-button[special-icon="skip-to-insert"]:before,
+gs-toggle[special-icon="skip-to-insert"]:before,
+gs-phone-button:not([not-supported])[special-icon="skip-to-insert"]:before,
+gs-map-button[special-icon="skip-to-insert"]:before,
+gs-skype-button[special-icon="skip-to-insert"]:before,
+gs-facetime-button[special-icon="skip-to-insert"]:before,
+gs-email-button[special-icon="skip-to-insert"]:before,
+gs-tracking-button[special-icon="skip-to-insert"]:before,
+gs-delete-button[special-icon="skip-to-insert"]:before,
+gs-option[special-icon="skip-to-insert"]:before,
+gs-dialog-button[special-icon="skip-to-insert"]:before {
+    /*caret-right*/
+    content: '\f0da';
+    font-size: 2em;
+    color: #555;
+}
+
+gs-button[special-icon="skip-to-insert"]:after,
+gs-toggle[special-icon="skip-to-insert"]:after,
+gs-phone-button:not([not-supported])[special-icon="skip-to-insert"]:after,
+gs-map-button[special-icon="skip-to-insert"]:after,
+gs-skype-button[special-icon="skip-to-insert"]:after,
+gs-facetime-button[special-icon="skip-to-insert"]:after,
+gs-email-button[special-icon="skip-to-insert"]:after,
+gs-tracking-button[special-icon="skip-to-insert"]:after,
+gs-delete-button[special-icon="skip-to-insert"]:after,
+gs-option[special-icon="skip-to-insert"]:after,
+gs-dialog-button[special-icon="skip-to-insert"]:after {
+    /*asterisk*/
+    content: '\f069';
+    font-size: 1em;
+    margin-top: -1em;
+    margin-left: -0.1em;
+    color: #18ad00;
+}
+
+
+
 
 /*
 javascript get array of icons (go to http://fontawesome.io/cheatsheet/)
@@ -1684,6 +1802,8 @@ gs-toggle[icon="bar-chart-o"]:after {
     
     line-height: 1.15;
 }
+
+
 
 
 

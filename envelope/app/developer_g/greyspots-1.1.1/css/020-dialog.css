@@ -119,3 +119,9 @@ gs-dialog-overlay {
     z-index: 100;
 }
 
+
+gs-dialog-overlay[no-background] {
+    background-color: transparent;
+    opacity: 1;
+}
+

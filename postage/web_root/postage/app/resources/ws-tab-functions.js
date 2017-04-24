@@ -2067,7 +2067,7 @@ function setFrame(tabElement, frameElement, bolBringToFirst) {
         arrElements[0].bolPropertyPanelOpen = bolPropertyPanelOpen;
 
         if (arrElements[0].relatedEditor && autocompleteGlobals.popupOpen) {
-            autocompletePopupClose(arrElements[0].relatedEditor);
+            closePopup(arrElements[0].relatedEditor);
         }
     }
 
@@ -2382,14 +2382,14 @@ function SQLBeautify(strInput) {
             i += int_tag;
 
         // FOUND GRANT/REVOKE
-        } else if (int_qs === 0 && strInput.substr(i, 7).match(/^GRANT |REVOKE \b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i, 7).match(/^GRANT\b|REVOKE\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             bolGrant = true;
             if (int_ps > 0) {
                 strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i, 7).match(/^GRANT|REVOKE\b/i) + ' ';
             } else {
-                strResult += '\n' + strInput.substr(i, 7).match(/^GRANT|REVOKE\b/i) + ' ';
+                strResult += '\n' + strInput.substr(i, 7).match(/^GRANT\b|REVOKE\b/i) + ' ';
             }
-            i += (strInput.substr(i, 6).match(/^GRANT|REVOKE\b/i)[0].length - 1);
+            i += (strInput.substr(i, 6).match(/^GRANT\b|REVOKE\b/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
@@ -2505,7 +2505,7 @@ function SQLBeautify(strInput) {
             strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + 'ELSE ';
             i = i + 3 + (strInput.substr(i + 4, 1) === ' ' ? 1 : 0);
             bolNoExtraWhitespace = true;
-            //console.log(">ELSE|" + intTabLevel + "<");
+            //console.log(">C ELSE|" + intTabLevel + "<");
 
         // FOUND CASE... END
         } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^END\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
@@ -2524,15 +2524,46 @@ function SQLBeautify(strInput) {
             bolNoExtraWhitespace = true;
             //console.log(">I THEN|" + intTabLevel + "<");
 
-        // FOUND END IF;
-        } else if (int_qs === 0 && strInput.substr(i).match(/^END[\ \t]+IF[\ \t]*;/i)) {
+        // FOUND THEN... ELSE
+        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^ELSE\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
+            
+            strResult += 'ELSE' +
+                '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+            
+            i = i + 3 + (strInput.substr(i + 4, 1) === ' ' ? 1 : 0);
+            bolNoExtraWhitespace = true;
+            //console.log(">ELSE|" + intTabLevel + "<");
+
+        // FOUND END IF;
+        } else if (int_qs === 0 && strInput.substr(i).match(/^END[\ \t]+IF[\ \t]*;/i)) {
+            /* XLD
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+            */
+            
+            // Remove previous newline
+            while (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t\n]')) {
+                console.log('>' + strResult.substring(strResult.length - 1, strResult.length) + '<');
+                if (strResult.substring(strResult.length - 1, strResult.length).match('[\n]')) {
+                    console.log('break');
+                    strResult = strResult.substr(0, strResult.length - 1);
+                    break;
+                } else {
+                    strResult = strResult.substr(0, strResult.length - 1);
+                }
+            }
+
+            // add tabs for previous line
+            strResult += '\t'.repeat(((intTabLevel - 1 < 0) ? 0 : intTabLevel - 1));
 
             intTabLevel -= 1;
-            strResult += 'END IF;\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+            strResult += 'END IF;\n\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             i = i + (-1) + (strInput.substr(i).match(/^END[\ \t]+IF[\ \t]*;[\ \t]*/i)[0].length);
             bolNoExtraWhitespace = true;
             //console.log(">END IF;|" + intTabLevel + "<");
@@ -2593,7 +2624,7 @@ function SQLBeautify(strInput) {
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE/i)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);

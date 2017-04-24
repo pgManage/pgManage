@@ -599,13 +599,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // set the value of the input and set the value attribute
                 set: function (strNewValue) {
+                    var selection;
                     if (this.control) {
+                        selection = GS.getInputSelection(this.control);
                         this.control.value = strNewValue;
                     } else {
                         this.innerHTML = strNewValue;
                     }
                     handleFormat(this);
                     syncView(this);
+                    if (selection) {
+                        GS.setInputSelection(this.control, selection.start, selection.end);
+                    }
                 }
             }
         },
