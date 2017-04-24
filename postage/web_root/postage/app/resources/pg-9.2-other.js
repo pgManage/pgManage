@@ -2481,6 +2481,7 @@ function executeScript(bolCursorQuery) {
     var intQuery;
     var divElement;
     var intErrorStartLine;
+	var intErrorStartChar;
     var jsnQueryStart;
     var jsnQueryEnd;
     var intCursorPos;
@@ -2534,6 +2535,7 @@ function executeScript(bolCursorQuery) {
         intError = 0;            // number error the callback is on
         intQuery = 0;            // number query the callback is on
         intErrorStartLine = 0;   // number of lines in the queries that successfully ran, so that we can offset the error annotation
+		intErrorStartChar = 0;   // number of chars in the queries that successfully ran, so that we can offset the cursor properly
 
         // begin
         executeHelperStartExecute();
@@ -2579,6 +2581,7 @@ function executeScript(bolCursorQuery) {
 
                         //console.log(((data.strQuery.match(/\n/gim) || []).length), data);
                         intErrorStartLine += (data.strQuery.match(/\n/gim) || []).length;
+						intErrorStartChar += data.strQuery.length;
                     }
 
                     // handle putting the response in the results pane
@@ -2922,33 +2925,36 @@ function executeScript(bolCursorQuery) {
 
                     //console.log(intLine, jsnCurrentQuery.start_row, intErrorStartLine);
                     if (data.error_position) {
-						var arrLines = jsnCurrentQuery.strQuery.substring(jsnCurrentQuery.start_char, data.error_position).split('\n');
-						var intErrorLine = arrLines.length;
-						var intErrorCol = parseInt(data.error_position, 10);
+						var arrLines = jsnCurrentQuery.strQuery.substring(intErrorStartChar, intErrorStartChar + parseInt(data.error_position, 10)).split('\n');
+						var intErrorCol = parseInt(data.error_position, 10) - 1;
 						var i = 0;
-						var len = arrLines.length - 1;
+						var len = intLine - 1;
+					    console.log(len, intLine, arrLines.length);
+					    console.log(jsnCurrentQuery.strQuery);
+					    console.log(intErrorStartChar);
+					    console.log(intErrorStartChar);
 						while (i < len) {
+						    console.log(i, arrLines[i], arrLines[i].length);
 							intErrorCol -= arrLines[i].length + 1;
 							i += 1
 						}
 
-                        editor.getSession().setAnnotations([
-                            {'row': jsnCurrentQuery.start_row + intErrorStartLine + (intErrorLine - 1), 'column': intErrorCol || 0,
-                                'text': strError, 'type': 'error'}
-                        ]);
-
 						editor.getSelection().setSelectionRange({
 							start: {
-								row: jsnCurrentQuery.start_row + intErrorStartLine + (intErrorLine - 1),
+								row: jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1),
 								column: intErrorCol || 0
 							},
 							end: {
-								row: jsnCurrentQuery.start_row + intErrorStartLine + (intErrorLine - 1),
+								row: jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1),
 								column: intErrorCol || 0
 							}
 						});
 					}
                     if (intLine) {
+                        editor.getSession().setAnnotations([
+                            {'row': jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1), 'column': intErrorCol || 0,
+                                'text': strError, 'type': 'error'}
+                        ]);
                         editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1)), true, true);
                     }
 

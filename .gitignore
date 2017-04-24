@@ -2,6 +2,10 @@
 
 *.o
 
+*.sym
+
+/dependencies/libressl/apps/ocspcheck/ocspcheck
+
 /visualstudio/.vs
 /visualstudio/Release
 /visualstudio/Debug

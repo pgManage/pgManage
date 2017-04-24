@@ -20,8 +20,6 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 	var query_end_row = 1;
 	var query_start_col = 1;
 	var query_end_col = 0;
-	var query_start_char = 0;
-	var query_end_char = 0;
 	var currRow = 1;
 	var currCol = 1;
 	var bolIgnoreWhiteSpace = true;
@@ -250,12 +248,10 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 			    //console.log(str_temp);
 			    query_end_row = currRow - 1;
                 query_end_col = currCol;
-				query_end_char = int_loop;
 			    break;
 			} else {
     		    query_start_row = currRow;
                 query_start_col = 0;
-				query_start_char = int_loop;
 			}
 			bolFirstQuery = false;
 			int_start = int_loop + int_chunk_len;
@@ -286,10 +282,8 @@ function findSqlQueryFromCursor(str_form_data, cursorPos) {
 	     'strQuery':       strQuery.trim()
 	    ,'end_column':     query_end_col
 	    ,'end_row':        query_end_row
-	    ,'end_char':       query_end_char
 	    ,'start_column':   query_start_col
 	    ,'start_row':      query_start_row
-	    ,'start_char':     query_start_char
 	};
 
 

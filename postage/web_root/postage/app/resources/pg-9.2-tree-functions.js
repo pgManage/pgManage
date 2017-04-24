@@ -43,6 +43,8 @@ function treeStart() {
     treeGlobals.ace = ace.edit('object-list-ace');
     treeGlobals.aceSession = treeGlobals.ace.getSession();
 
+	treeGlobals.ace.textInput.getElement().disabled = true;
+
     if (!evt.touchDevice) {
         // get and save state
         var dragstartcursorX, dragstartcursorY;
@@ -1399,16 +1401,16 @@ function dialogAddSchema(target) {
             // console.log(GS.qryGetVal(GS.getQueryString(), 'schemas-all'));
             // console.log(GS.qryGetVal(querystringShownObj, 'show'));
             // console.log(GS.qryGetVal(GS.getQueryString(), 'show'));
-            
+
             localStorage.shownObjects = querystringShownObj;
-            
+
             // save to querystring
             GS.pushQueryString('schemas=' + (strSchema || '') +
                               '&schemas-all=' + strSchemaAll +
                               '&show=' + arrShown.join(','));
-                              
-            
-            
+
+
+
             //localStorage.shownObjects = querystringShownObj;
         }
     };
@@ -1481,7 +1483,7 @@ function treeGetLineChildren(index) {
 function treeLoad(data, index, intColumn) {
     'use strict';
     var arrType = data.type.split(','), intLine, arrLine, strName, strSqlSafeName, arrChildren;
-    
+
     if (arrType.indexOf('folder') !== -1 &&
         (
             (
@@ -1738,7 +1740,7 @@ function dependDialog(intOid, bolGraph) {
 
 function propertyButton(strPropName, intOid, strNamePartOne, strNamePartTwo) {
     'use strict';
-    
+
     return '<gs-button iconleft inline remove-all icon="list" no-focus title="Object properties" ' +
                 'onclick="' +
                     'propertyDialog(propQuery.' + strPropName + ',' +

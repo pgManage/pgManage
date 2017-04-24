@@ -88,6 +88,9 @@ static int handler(void *str_user, const char *str_section, const char *str_name
 		SFREE(str_global_login_group);
 		SERROR_SNCAT(str_global_login_group, &int_len,
 			str_value, strlen(str_value));
+		if (strncmp(str_value, "", 1) == 0) {
+			SFREE(str_global_login_group);
+		}
 
 #ifdef ENVELOPE
 	} else if (SMATCH("", "app_path")) {
