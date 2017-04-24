@@ -1,4 +1,4 @@
-.TH "ENVELOPE" "1" "February 2017" "" ""
+.TH "ENVELOPE" "1" "April 2017" "" ""
 .SH "NAME"
 \fBenvelope\fR \- PostgreSQL Interface for the web
 .SH FULL PATH
@@ -23,6 +23,7 @@ envelope
        [\-t <login\-timeout> | \-\-login\-timeout=<login\-timeout>]
        [\-u <public\-username> | \-\-public\-username=<public\-username>]
        [\-w <public\-password> | \-\-public\-password=<public\-password>]
+       [\-x <local\-only> | \-\-local\-only=<local\-only>]
 .fi
 .RE
 .SH DESCRIPTION
@@ -90,7 +91,7 @@ The following options can be specified on the command line or in the configurati
 .P
 \fB\-p\fP or \fB\-\-envelope\-port=\fP or \fBenvelope_port=\fP
 .br
-       \fBInteger;\fP defaults to 8080
+       \fBInteger;\fP defaults to 8888
 .br
        This tells Envelope what port to listen on for browser requests\.
 .P
@@ -128,6 +129,12 @@ The following options can be specified on the command line or in the configurati
 .br
        \fBString;\fP no defaults
        This option tells \fBenvelope\fP than public actions should use these credentials, if they are unset, then public actions are disabled\.
+.P
+\fB\-x\fP or \fB\-\-local\-only=\fP or \fBlocal\-only=\fP
+.br
+       \fBBoolean;\fP defaults to false
+.br
+       This tells Postage whether or not to set the listening socket to local addresses only\.
 .SH SETTING UP A CONNECTION TO A POSTGRESQL SERVER
 .P
 Envelope requires at least one PostgreSQL server be listed in the envelope\-connections\.conf file\. This version of Envelope doesn't allow you to specify a server from the command line\. Enter only one PostgreSQL server per line\. For envelope, only the first server is used\.

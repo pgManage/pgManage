@@ -71,7 +71,7 @@ The following options can be specified on the command line or in the configurati
        This tells Envelope where the role DATA files have been installed to.
 
 `-p` or `--envelope-port=` or `envelope_port=`  
-       `Integer;` defaults to 8080  
+       `Integer;` defaults to 8888  
        This tells Envelope what port to listen on for browser requests.
 
 `-j` or `--tls-cert=` or `tls_cert=`  
