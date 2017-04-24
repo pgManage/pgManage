@@ -1340,7 +1340,7 @@ function openPopup(editor, optionlist, bolKeepOpen) {
     // set scroll to top
     autocompleteGlobals.popupAce.scrollToLine(0);
     
-    loadPopuplist(editor, optionlist, event);
+    loadPopuplist(editor, optionlist);
 }
 
 function loadPopuplist(editor, optionlist) {

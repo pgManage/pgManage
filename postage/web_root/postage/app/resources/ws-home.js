@@ -102,7 +102,7 @@ function openHome() {
     for (i = 0, len = arrElements.length; i < len; i += 1) {
         arrElements[i].classList.remove('current-tab');
         if (arrElements[i].relatedEditor && autocompleteGlobals.popupOpen) {
-            autocompletePopupClose(arrElements[i].relatedEditor);
+            closePopup(arrElements[i].relatedEditor);
         }
     }
 
