@@ -167,32 +167,6 @@ var $ = {
 					data = data.replace(' (0x0000274D/10061)', '');
                 }
 
-				if (strExpectedOutput === ml(function () {/*FATAL
-Connect failed: FATAL:  password authentication failed for user "doesntexist"
-*/ }).replace(/\r\n/gi, '\n') && data === ml(function () {/*FATAL
-Connect failed: FATAL:  role "doesntexist" does not exist
-*/ }).replace(/\r\n/gi, '\n')) {
-					strExpectedOutput = data;
-				} else if (strExpectedOutput === ml(function () {/*FATAL
-Connect failed: FATAL:  password authentication failed for user "test"test"
-*/ }).replace(/\r\n/gi, '\n') && data === ml(function () {/*FATAL
-Connect failed: FATAL:  role "test"test" does not exist
-*/ }).replace(/\r\n/gi, '\n')) {
-					strExpectedOutput = data;
-				} else if (strExpectedOutput === ml(function () {/*FATAL
-Connect failed: FATAL:  password authentication failed for user "test"tes't2"
-*/ }).replace(/\r\n/gi, '\n') && data === ml(function () {/*FATAL
-Connect failed: FATAL:  role "test"tes't2" does not exist
-*/ }).replace(/\r\n/gi, '\n')) {
-					strExpectedOutput = data;
-				} else if (strExpectedOutput === ml(function () {/*FATAL
-Connect failed: FATAL:  password authentication failed for user "test"test3"
-*/ }).replace(/\r\n/gi, '\n') && data === ml(function () {/*FATAL
-Connect failed: FATAL:  role "test"test3" does not exist
-*/ }).replace(/\r\n/gi, '\n')) {
-					strExpectedOutput = data;
-				}
-
                 if (strExpectedOutput === data && intStatusCode === ajax.status) {
                     $.changeStatus(key, intCurrent, 'running', 'pass');
                     $.runTest(key, intCurrent + 1);
