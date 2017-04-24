@@ -32,7 +32,7 @@ envelope_OBJECTS = $(envelope_SOURCES:.c=.o)
 #envelope_OBJECTS3 = $(patsubst ../util/%, obj/%, $(envelope_OBJECTS2))
 #envelope_OBJECTS = $(patsubst ../db_framework_pq/%, obj/%, $(envelope_OBJECTS3))
 
-.PHONY: libressl libressl-install
+.PHONY: all all-format destroy check
 
 # this needs to be at the top to be the default target
 all: $(BINARY)
@@ -40,11 +40,15 @@ all: $(BINARY)
 	@echo "Compilation Successful"
 
 #### DEPENDENCIES
-libressl: ../dependencies/libressl/Makefile
+../dependencies/libressl/apps/openssl/openssl: ../dependencies/libressl/Makefile
 	$(MAKE) -C ../dependencies/libressl/
 
-libressl-install: ../dependencies/libressl/Makefile
+/usr/local/bin/openssl:
 	$(MAKE) install -C ../dependencies/libressl/
+
+libressl: ../dependencies/libressl/apps/openssl/openssl
+
+libressl-install: /usr/local/bin/openssl
 
 ../dependencies/libressl/Makefile: ../dependencies/libressl/Makefile.in
 	cd ../dependencies/libressl/; ./configure; cd ../../$(BINARY)
