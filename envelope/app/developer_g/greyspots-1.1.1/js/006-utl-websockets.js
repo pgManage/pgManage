@@ -861,6 +861,64 @@
         });
     };
     
+    GS.requestArbitrarySelectFromSocket = function (socket, strSQL, strWhere, strOrd, strLimit, strOffset, finalCallback) {
+        var strMessage = (
+            'SELECT\t' + encodeForTabDelimited(strSQL) +
+            '\nRETURN\t*\n\n' +
+            'where\t' +
+            (strOrd ? 'order by\t' : '') +
+            'limit\t' +
+            'offset\n' +
+            encodeForTabDelimited(strWhere || '1=1') + '\t' +
+            (strOrd ? encodeForTabDelimited(strOrd) + '\t' : '') +
+            encodeForTabDelimited(strLimit || 'ALL') + '\t' +
+            encodeForTabDelimited(strOffset || '0')
+        );
+        var intResponse = 0;
+        var intCallback = 0;
+        var arrColumnNames;
+        var arrColumnTypes;
+        var arrDecodedColumnNames;
+        var arrDecodedColumnTypes;
+        
+        //console.log(strMessage);
+        
+        GS.requestFromSocket(socket, strMessage, function (data, error, errorData) {
+            var arrLines, i, len;
+            if (!error) {
+                if (intResponse === 0) {
+                    arrLines = data.split('\n');
+                    arrColumnNames = arrLines[0].split('\t');
+                    arrColumnTypes = arrLines[1].split('\t');
+                    arrDecodedColumnNames = [];
+                    arrDecodedColumnTypes = [];
+                    
+                    for (i = 0, len = arrColumnNames.length; i < len; i += 1) {
+                        arrDecodedColumnNames.push(GS.decodeFromTabDelimited(arrColumnNames[i]));
+                    }
+                    
+                    for (i = 0, len = arrColumnTypes.length; i < len; i += 1) {
+                        arrDecodedColumnTypes.push(GS.decodeFromTabDelimited(arrColumnTypes[i]));
+                    }
+                    
+                } else {
+                    finalCallback({
+                        'arrColumnNames': arrColumnNames,
+                        'arrColumnTypes': arrColumnTypes,
+                        'arrDecodedColumnNames': arrDecodedColumnNames,
+                        'arrDecodedColumnTypes': arrDecodedColumnTypes,
+                        'intCallback': intCallback,
+                        'strMessage': data
+                    }, error);
+                    intCallback += 1;
+                }
+                
+            } else {
+                finalCallback(errorData, error);
+            }
+            intResponse += 1;
+        });
+    };
     
     /*
         INSERT	test	rmultiple_pk_test

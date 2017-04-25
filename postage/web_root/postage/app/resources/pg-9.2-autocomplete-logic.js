@@ -154,7 +154,7 @@ function autocompleteBindEditor(tabElement, editor) {
         editor.focus();
     };
     // autocompleteGlobals.bolBound = true;
-    // autocompleteGlobals.popupAce.focusElement.addEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
+    autocompleteGlobals.popupAce.focusElement.addEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
 
     
     
@@ -1390,7 +1390,7 @@ function autocompleteComplete(editor) {
     var currSelectionRange = editor.selection.getRange();
     autocompleteGlobals.ignoreNext = 1;
     
-    if (currentValue[0].indexOf(' (Snippet)') !== -1) {
+    if (currentValue && currentValue[0].indexOf(' (Snippet)') !== -1) {
         var currSearchSnippet;
         for (var i = 0, len = snippets.length; i < len; i++) {
             currSearchSnippet = snippets[i];        
@@ -1412,7 +1412,7 @@ function autocompleteComplete(editor) {
                 break;
             }
         }
-    } else {
+    } else if (currentValue) {
         autocompleteGlobals.ignoreNext = 2;
         //autocompleteGlobals
         editor.getSelection().setSelectionRange(new Range(
