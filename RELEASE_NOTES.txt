@@ -1,3 +1,26 @@
+Changes since 3.2.6:
+Postage:
+Fix beautify issue
+Fix context menu (close workflowproducts/postage/#200)
+Move cursor to error position (close workflowproducts/postage#208)
+Focus editor after clicking RUN button (close workflowproducts/postage#202)
+Split 'Tools' menu into 'Tools' and 'Options' (close workflowproducts/postage#197)
+Set width of history/notify buttons
+Fix object browser line padding (close workflowproducts/postage#210)
+Make clicks in the object browser not affect the focus (close workflowproducts/postage#209)
+Fix 'too many levels of symbolic links error' (close workflowproducts/postage#215)
+Restructured autocomplete
+Fix issue where autocomplete popup would not insert when you clicked it
+
+Envelope:
+Add electron tester to envelope test.sh
+Fix default port in config file
+Fix NC errors (close workflowproducts/envelope#53)
+
+Both:
+Fix empty login_group
+Fix makefiles to have all target at the top
+
 Changes since 3.2.5:
 Postage:
 Fix typing bugs
