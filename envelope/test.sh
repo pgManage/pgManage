@@ -18,7 +18,7 @@ cat << EOF > package.json
 }
 EOF
 
-cat << EOF > index.json
+cat << EOF > index.js
 const electron = require('electron');
 let window = null;
 
