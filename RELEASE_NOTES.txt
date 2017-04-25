@@ -1,7 +1,7 @@
 Changes since 3.2.6:
 Postage:
 Fix beautify issue
-Fix context menu (close workflowproducts/postage/#200)
+Fix context menu (close workflowproducts/postage#200)
 Move cursor to error position (close workflowproducts/postage#208)
 Focus editor after clicking RUN button (close workflowproducts/postage#202)
 Split 'Tools' menu into 'Tools' and 'Options' (close workflowproducts/postage#197)
