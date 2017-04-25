@@ -171,7 +171,7 @@ var $ = {
                     $.changeStatus(key, intCurrent, 'running', 'pass');
                     $.runTest(key, intCurrent + 1);
                 } else {
-				console.log(strExpectedOutput.length, strExpectedOutput.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
+					console.log(strExpectedOutput.length, strExpectedOutput.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
 					console.log(data.length, data.replace(/\n/g, '\\n').replace(/\r/g, '\\r'));
 
                     document.getElementById('actual-status-' + key).value = ajax.status;
