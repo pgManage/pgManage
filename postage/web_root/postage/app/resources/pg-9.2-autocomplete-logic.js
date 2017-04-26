@@ -280,7 +280,6 @@ function autocompleteBindEditor(tabElement, editor) {
                 //console.log('delete');
                 autocompleteKeyEvent = 'delete';
             }
-        
             
             if (autocompleteGlobals.popupOpen && autocompleteKeyEvent === 'alpha_numeric' || autocompleteKeyEvent === 'snippets_filter') {
                 var strScript, intCursorPosition, intStartCursorPosition;
@@ -379,7 +378,11 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         autocompleteGlobals.searchLength = currWord.length;
     }
     
+    autocompleteGlobals.bolAlpha = false;
+    
     if (autocompleteKeyEvent === 'alpha_numeric') {
+
+        autocompleteGlobals.bolAlpha = true;
 
         // extract the current query and subtract from intCursorPosition (because the script will get smaller)
         intStart           = rowAndColumnToIndex(strScript, currentQueryRange.start.row, currentQueryRange.start.column);
@@ -651,10 +654,136 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         closePopup();
     } else if (autocompleteKeyEvent === 'period') {
         closePopup();
+        
+        
+        autocompleteGlobals.bolAlpha = false;
+        
         autocompleteGlobals.bolSnippets = false;
         // get prefixes
         jsnPrefix = autocompleteGetPrefix(strScript, intCursorPosition + 1);
         arrPrefix = jsnPrefix.arrStrings;
+        
+        // remove comments from the current query
+        var strSearchQuery = consumeComments(strScript);
+
+        // make a search query by trimming it the current query and uppercasing it
+        strSearchQuery = strScript.trim().toUpperCase();
+
+        // extract the current query and subtract from intCursorPosition (because the script will get smaller)
+        intStart           = rowAndColumnToIndex(strScript, currentQueryRange.start.row, currentQueryRange.start.column);
+        strScript          = strScript.substring(intStart, intEndCursorPosition + 1); //intCursorPosition + 1
+        intCursorPosition -= intStart;
+
+
+        // remove comments from the current query
+        strScript = consumeComments(strScript);
+    
+        // make a search query by trimming it the current query and uppercasing it
+        strSearchQuery = strScript.trim().toUpperCase();
+    
+        // get parenthesis level of cursor
+        intParenLevel = currentQueryRange.intParenLevel;
+    
+        // get number of parenthesis
+        intOpenParen = (strScript.match(/\(/gi) || []).length;
+        intCloseParen = (strScript.match(/\)/gi) || []).length;
+    
+        // get from cursor to beginning of current line
+        i = ((intEndCursorPosition - intStart) - 1);
+        strCurrentLine = '';
+    
+        // get the current line text
+        while (i > -1) {
+            if (strScript[i] === '\n') { break; }
+            strCurrentLine = (strScript[i] + strCurrentLine);
+            i -= 1;
+        }
+    
+        // get the previous keywords and the previous word
+        i = (intCursorPosition - 1);
+        intStart = null;
+        intEnd = null;
+        arrPreviousWords = [];
+        arrPreviousKeyWords = [];
+    
+        // while we don't have 5 previous keywords and i is greater than the current query start
+        while (arrPreviousKeyWords.length < 6 && i > -1) {
+            strChar = strScript[i] || '';
+    
+            // if we havn't found the previous word end yet and the current character is not whitespace or null
+            if (intEnd === null && strChar.trim() !== '') {
+                // we've found the previous word end: save it
+                intEnd = i + 1;
+    
+            // if we've found the previous word end but not the start and the current character is whitespace or null
+            } else if (intStart === null && intEnd !== null && (strChar.trim() === '' || strScript[i] === '(')) {
+                // we've found the previous word start: save it
+                intStart = i + 1;
+                
+            // if we've found the previous word end but not the start and we've reached the first character of the query
+            } else if (intStart === null && intEnd !== null && i === 0) {
+                // we've found the previous word start: save it
+                intStart = i;
+            }
+            
+            if (intStart !== null && intEnd !== null) {
+                strCurrentWord = strScript.substring(intStart, intEnd).toUpperCase();
+                
+                arrPreviousWords.push(strCurrentWord);
+                
+                strCurrentWord = strCurrentWord.replace(/[\,\(]/gi, '');
+                
+                // if the current word is in the keyword list: add to keyword array
+                if (autocompleteGlobals.jsnKeywords.all.indexOf(strCurrentWord.toLowerCase()) !== -1) {
+                    arrPreviousKeyWords.push(strCurrentWord);
+                }
+                
+                // clear variables for next cycle
+                intStart = null;
+                intEnd = null;
+            }
+
+            i -= 1;
+        }
+
+        // get first 5 words
+        i = 0;
+        len = strScript.length;
+        intStart = null;
+        intEnd = null;
+        arrFirstWords = [];
+
+        while (arrFirstWords.length < 6 && i <= len) {
+            strChar = strScript[i] || '';
+
+            // if we havn't found the previous word start yet and the current character is not whitespace or null
+            if (intStart === null && strChar.trim() !== '') {
+                intStart = i;
+
+            // if we've found the previous word start but not the end and the current character is whitespace or null
+            } else if (intEnd === null && intStart !== null && (strChar.trim() === '' || strScript[i] === '(')) {
+                intEnd = i;
+
+            // if we've found the previous word start but not the end and we've reached the last character of the query
+            } else if (intEnd === null && intStart !== null && i === len) {
+                intEnd = i;
+            }
+
+            if (intEnd !== null && intStart !== null) {
+                strCurrentWord = strScript.substring(intEnd, intStart).toUpperCase();
+                arrFirstWords.push(strCurrentWord);
+
+                // clear variables for next cycle
+                intEnd = null;
+                intStart = null;
+            }
+
+            i += 1;
+        }
+        strPreviousKeyWord = arrPreviousKeyWords[0];
+        strPreviousWord = arrPreviousWords[0];
+        
+        
         
         //console.log('1***', JSON.stringify(arrPrefix));
         
@@ -1050,6 +1179,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
                         
                         }
                         
+                        
                         // if we have queries: open popup
                         if (arrQueries && arrQueries.length > 0) {
                             autocompleteMakeList(arrQueries, '', editor);
@@ -1073,9 +1203,8 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
                                         , function (arrResults) {
                             // if we found an oid: open autocomplete with column list
                             if (arrResults) {
-                                autocompletePopupOpen(editor, [
-                                    autocompleteQuery.columns.replace(/\{\{PARENTOID\}\}/gi, arrResults[0][1])
-                                ]);
+                                autocompleteMakeList([
+                                    autocompleteQuery.columns.replace(/\{\{PARENTOID\}\}/gi, arrResults[0][1])], '', xtag.query(document.body, '.current-tab')[0].relatedEditor);
                             }
                         });
                         break;
@@ -1188,6 +1317,39 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
     if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning) {
         GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
     }
+    
+    if (autocompleteGlobals.bolAlpha) {
+        var strDeclare = editor.getValue(), substrEnd, arrFuncVariables = [];
+        // if there is a declare statement: get variable names;
+        if (strDeclare.toLowerCase().indexOf('declare') !== -1) {
+            // if there is a begin: substring to that;
+            if (strDeclare.toLowerCase().indexOf('begin') !== -1) {
+                substrEnd = strDeclare.toLowerCase().indexOf('begin');
+                strDeclare = strDeclare.substring(strDeclare.toLowerCase().indexOf('declare'), substrEnd);
+                // get variable names
+                arrFuncVariables = strDeclare.match(/([A-Za-z_0-9]+\ )+/ig);
+                // trim variable names
+                if (arrFuncVariables) {
+                    for (var i = 0, len = arrFuncVariables.length; i < len; i++) {
+                        arrFuncVariables[i] = arrFuncVariables[i].trim();
+                        // if arrFuncVariables[i] has a space in it still: substring it off
+                        if (arrFuncVariables[i].indexOf(' ') !== -1) {
+                            arrFuncVariables[i].substring(0, arrFuncVariables[i].indexOf(' '));
+                        }
+                        if (arrFuncVariables[i].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) {
+                            optionList.push(['' + arrFuncVariables[i] + '', 'funcVar']);
+                            if (arrFuncVariables[i].substring(0, 1) === '"') {
+                                autocompleteGlobals.arrSearch.push(arrFuncVariables[i].toLowerCase());
+                            } else {
+                                autocompleteGlobals.arrSearch.push('"' + arrFuncVariables[i].toLowerCase() + '"');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 
     autocompleteGlobals.bolQueryRunning = true;
     // make the request
@@ -1221,7 +1383,7 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
                 autocompleteGlobals.arrSearchMaster.shift();
                 autocompleteGlobals.arrValuesMaster = optionList;
                 
-                if ((optionList.length === 1 && optionList[0][0].toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
+                if ((optionList.length === 1 && searchWord && optionList[0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
                     closePopup();
                 } else if (autocompleteGlobals.popupOpen === false) {
                     openPopup(editor, optionList);
