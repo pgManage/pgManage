@@ -654,7 +654,17 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         closePopup();
     } else if (autocompleteKeyEvent === 'period') {
         closePopup();
+
+        // get current query range
+        currentQueryRange = editor.currentQueryRange;
+    
+        // get full script
+        strScript = editor.getValue();
         
+        // get event cursor position start/end
+        intStartCursorPosition = rowAndColumnToIndex(strScript, event.start.row, event.start.column);
+        intEndCursorPosition = rowAndColumnToIndex(strScript, event.end.row, event.end.column);
+        intCursorPosition = intStartCursorPosition;        
         
         autocompleteGlobals.bolAlpha = false;
         
