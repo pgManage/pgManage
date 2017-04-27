@@ -1,88 +1,92 @@
 /*global ml, GS, xtag, evt, ace, Range, newTab, clearPropertyList, getScriptForAce*/
 'use strict';
 var bolHomeLoaded = true
+  , bolHomeIframeLoaded = false
   , arrTargets = [], arrScripts = [], arrBeautify = [], arrNames = []
   , arrVersions = [], arrToolbarAddons = [], homeEditor;
 
 
 function loadHome() {
-    // make home the current tab
-    if (GS.getQueryString().indexOf('view=') === -1) {
-        GS.replaceState({}, '', '?view=home');
-    }
-    if (GS.qryGetVal(GS.getQueryString(), 'view') === 'home') {
-        openHome();
-    }
-
-    // fill home
-    document.getElementById('home-frame').innerHTML = ml(function () {/*
-		<div id="home-ace-toolbar" hidden style="background-color: #cccccc; width: 100%; padding-top: 2px; padding-bottom: 2px;" >
-			<gs-button id="button-home-open-to-new-tab" onclick="openToTab()" title="Open SQL to new tab" inline remove-all>Open SQL to new tab</gs-button><div id="toolbar-addon-container"></div>
-			<gs-button id="button-home-back" icononly icon="times" hidden title="Back" style="float: right;" inline remove-all>Back</gs-button>
-		</div>
-        <div class="ace-container-position-container" style="height: 100%;">
-            <div class="ace-container">
-                <div id="sql-ace-area-home" class="ace-area"></div>
+    if (bolHomeIframeLoaded === false) {
+        bolHomeIframeLoaded = true;
+        // make home the current tab
+        if (GS.getQueryString().indexOf('view=') === -1) {
+            GS.replaceState({}, '', '?view=home');
+        }
+        if (GS.qryGetVal(GS.getQueryString(), 'view') === 'home') {
+            openHome();
+        }
+    
+        // fill home
+        document.getElementById('home-frame').innerHTML = ml(function () {/*
+    		<div id="home-ace-toolbar" hidden style="background-color: #cccccc; width: 100%; padding-top: 2px; padding-bottom: 2px;" >
+    			<gs-button id="button-home-open-to-new-tab" onclick="openToTab()" title="Open SQL to new tab" inline remove-all>Open SQL to new tab</gs-button><div id="toolbar-addon-container"></div>
+    			<gs-button id="button-home-back" icononly icon="times" hidden title="Back" style="float: right;" inline remove-all>Back</gs-button>
+    		</div>
+            <div class="ace-container-position-container" style="height: 100%;">
+                <div class="ace-container">
+                    <div id="sql-ace-area-home" class="ace-area"></div>
+                </div>
+                <div style="width: 100%; height: 100%;" id="iframe-news">
+                    <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
+                </div>
+    			<div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 200; background-color: #FFFFFF; overflow: auto;" id="object-details-container" hidden></div>
             </div>
-            <div style="width: 100%; height: 100%;" id="iframe-news">
-                <iframe style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 150; background-color: #FFFFFF;" src="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}"></iframe>
-            </div>
-			<div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0 none; z-index: 200; background-color: #FFFFFF; overflow: auto;" id="object-details-container" hidden></div>
-        </div>
-    */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
-
-    // create ace
-    homeEditor = ace.edit('sql-ace-area-home');
-    homeEditor.setTheme('ace/theme/eclipse');
-    homeEditor.getSession().setMode('ace/mode/pgsql');
-    homeEditor.setShowPrintMargin(false);
-    homeEditor.setDisplayIndentGuides(true);
-    homeEditor.setShowFoldWidgets(false);
-    homeEditor.session.setUseWrapMode('free');
-    homeEditor.setBehavioursEnabled(false);
-    homeEditor.$blockScrolling = Infinity; // <== blocks a warning
-    homeEditor.setReadOnly(true);
-    document.getElementById('sql-ace-area-home').style.backgroundColor = '#EEEEEE';
-
-    homeEditor.setOptions({
-        'enableBasicAutocompletion': true,
-        'enableSnippets'           : true,
-        'enableLiveAutocompletion' : true
-    });
-
-    homeEditor.addEventListener('mousewheel', function () {
-        currTab = ['home', homeEditor.getFirstVisibleRow()];
-    });
-
-    // if we're on a touch device: make the ace grow with it's content
-    if (evt.touchDevice) {
+        */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
+    
+        // create ace
+        homeEditor = ace.edit('sql-ace-area-home');
+        homeEditor.setTheme('ace/theme/eclipse');
+        homeEditor.getSession().setMode('ace/mode/pgsql');
+        homeEditor.setShowPrintMargin(false);
+        homeEditor.setDisplayIndentGuides(true);
+        homeEditor.setShowFoldWidgets(false);
+        homeEditor.session.setUseWrapMode('free');
+        homeEditor.setBehavioursEnabled(false);
+        homeEditor.$blockScrolling = Infinity; // <== blocks a warning
+        homeEditor.setReadOnly(true);
+        document.getElementById('sql-ace-area-home').style.backgroundColor = '#EEEEEE';
+    
         homeEditor.setOptions({
-            maxLines: Infinity
+            'enableBasicAutocompletion': true,
+            'enableSnippets'           : true,
+            'enableLiveAutocompletion' : true
         });
-        document.getElementById('sql-ace-area-home').classList.add('childrenneedsclick');
-        document.getElementById('sql-ace-area-home').style.borderBottom = '1px solid #AAAAAA';
-
-    // else: full height
-    } else {
-        document.getElementById('sql-ace-area-home').style.height = '100%';
-    }
-
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            if (xhr.status !== 200) {
-                document.getElementById('iframe-news').innerHTML = ml(function () {/*
-                    <gs-container padded>
-                        <h2>Postage Version Information & News could not load.</h2>
-                        <h3><a href="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}">https://news.workflowproducts.com/splash/postage.html</a></h3>
-                        <h3>This may be an issue with your firewall. Does it block SSL-enabled websites?</h3>
-                    </gs-container>
-                */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
+    
+        homeEditor.addEventListener('mousewheel', function () {
+            currTab = ['home', homeEditor.getFirstVisibleRow()];
+        });
+    
+        // if we're on a touch device: make the ace grow with it's content
+        if (evt.touchDevice) {
+            homeEditor.setOptions({
+                maxLines: Infinity
+            });
+            document.getElementById('sql-ace-area-home').classList.add('childrenneedsclick');
+            document.getElementById('sql-ace-area-home').style.borderBottom = '1px solid #AAAAAA';
+    
+        // else: full height
+        } else {
+            document.getElementById('sql-ace-area-home').style.height = '100%';
+        }
+    
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status !== 200) {
+                    document.getElementById('iframe-news').innerHTML = ml(function () {/*
+                        <gs-container padded>
+                            <h2>Postage Version Information & News could not load.</h2>
+                            <h3><a href="https://news.workflowproducts.com/splash/postage.html?app=postage&version={{POSTAGE}}&postgres={{POSTGRES}}">https://news.workflowproducts.com/splash/postage.html</a></h3>
+                            <h3>This may be an issue with your firewall. Does it block SSL-enabled websites?</h3>
+                        </gs-container>
+                    */}).replace(/\{\{POSTAGE\}\}/g, contextData.postageVersion).replace(/\{\{POSTGRES\}\}/g, contextData.versionNumber);
+                };
             };
         };
-    };
-    xhr.open('HEAD', "https://news.workflowproducts.com/splash/postage.html?app=postage");
-    xhr.send();
+        xhr.open('HEAD', "https://news.workflowproducts.com/splash/postage.html?app=postage");
+        xhr.send();
+    }
 }
 
 

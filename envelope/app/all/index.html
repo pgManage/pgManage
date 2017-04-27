@@ -413,7 +413,7 @@
                             
                         </style>
                         
-                        <gs-grid widths="1,1,1" reflow-at="500px" gutter>
+                        <gs-grid widths="1,1,1,1,1" reflow-at="500px" gutter>
                             <gs-block>
                                 <gs-button jumbo bg-primary target="_self" href="../fdn_g/account_search.html">Account Search</gs-button>
                             </gs-block>
@@ -423,14 +423,33 @@
                             <gs-block>
                                 <gs-button jumbo bg-primary target="_self" href="../fdn_g/so_search.html">SO Search</gs-button>
                             </gs-block>
+                            <gs-block>
+                                <gs-button jumbo bg-primary target="_self" href="../fdn_g/inv_search.html">Inventory Search</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button jumbo bg-primary target="_self" href="../fdn_g/ship_search.html">Shipment Search</gs-button>
+                            </gs-block>
                         </gs-grid>
                         <br />
-                        <gs-grid widths="1,1,1" reflow-at="500px" gutter>
+                        <gs-grid widths="1,1,1,1,1" reflow-at="500px" gutter>
                             <gs-block>
                                 <gs-button jumbo bg-primary target="_self" href="../fdn_g/item_master.html">Item Master</gs-button>
                             </gs-block>
                             <gs-block>
                                 <gs-button jumbo bg-primary target="_self" href="../fdn_g/receive.html">Receive</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <div flex-horizontal>
+                                    <gs-text style="padding: 6.5px;" id="goToLotInput" onkeyup="((event.keyCode === 13) ? window.location = '../fdn_g/inv.html?id=' + this.value + '' : '')" flex placeholder="Enter Lot"></gs-text>
+                                </div>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button jumbo bg-primary target="_self" href="../fdn_g/pick.html">Pick</gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <div flex-horizontal>
+                                    <gs-combo src="fdn.tship_header" hide="id" cols="id,ref_no AS &#34;Ref #&#34;, invoice_no AS &#34;Invoice #&#34;" style="padding: 6.5px;" flex placeholder="Pack" onchange="window.location = '../fdn_g/pack.html?id=' + this.value" where="packed IS NULL"></gs-combo>
+                                </div>
                             </gs-block>
                         </gs-grid>
                     </div>
@@ -449,9 +468,9 @@
                             <gs-button jumbo target="_blank" data-group="school_g" href="../school_g/math.html">Learning Latin Math</gs-button>
                             <!--<gs-button jumbo target="_blank" data-group="lph_g" href="../lph_g/lph.html">LPH</gs-button>-->
                             <gs-button jumbo target="_blank" data-group="meal_g" href="../meal_g/calendar.html">Meals 3.0</gs-button>
-                            <gs-button jumbo target="_blank" data-group="trkng_g" href="../trkng_g/index.html">Packages</gs-button>
                         </gs-block>
                         <gs-block>
+                            <gs-button jumbo target="_blank" data-group="trkng_g" href="../trkng_g/index.html">Packages</gs-button>
                             <gs-form src="post.rptdownload_new">
                                 <template>
                                     <gs-button jumbo target="_blank" data-group="tocci_g" href="../all/splashcount.html">
