@@ -18,6 +18,7 @@ var autocompleteGlobals = {
       , 'loadId':          0
       , 'arrCancelledIds': []
       , 'bolSnippets':     false
+      , 'bolAlpha':        false
       , 'bolBound':        false
       , 'ignoreNext':      1
       , 'searchLength':    0
