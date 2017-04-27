@@ -1,0 +1,57 @@
+Check Find/Replace
+
+Check Typing with multiple cursors
+
+Check that period code doesn't error on a nonexistant object
+
+Backspace:
+    close popup
+
+Typing space:
+    close popup
+
+Typing period:
+    list appropriate object list under schema
+
+Typing quotes:
+    close popup
+
+Typing colon:
+    if there is another colon preceding, show type list
+
+Typing comma:
+    close popup
+
+Typing slash:
+    close popup
+
+letter while autocomplete is open
+    filter popup
+
+period while autocomplete is open
+    clear popup and load new list
+
+return
+    close popup, allow return to pass through
+
+tab
+    insert currently selected completion
+
+paste
+    close popup
+
+Finish typing the only word in the popup
+    close popup
+
+no query detected:
+    Display snippets
+    
+click option:
+    insert clicked completion
+    
+Check that variables show up in a function
+
+Check that variables DON'T show up in a function after a period
+
+Typing parenthesis:
+    close popup
