@@ -1435,7 +1435,7 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
                 autocompleteGlobals.arrSearchMaster.shift();
                 autocompleteGlobals.arrValuesMaster = optionList;
                 
-                if ((optionList.length === 1 && searchWord && optionList[0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
+                if ((optionList.length === 1 && searchWord && optionList[0][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
                     closePopup();
                 } else if (autocompleteGlobals.popupOpen === false) {
                     openPopup(editor, optionList);
