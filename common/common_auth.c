@@ -10,7 +10,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	char *str_response = NULL;
 	SDEFINE_VAR_ALL(str_cookie_encrypted, str_cookie_decrypted, str_password, str_uri, str_temp, str_conn_index);
 	SDEFINE_VAR_MORE(str_conn_debug, str_username, str_connname, str_database, str_uri_temp, str_context_data);
-	SDEFINE_VAR_MORE(str_host, str_uri_ip_address, str_uri_host);
+	SDEFINE_VAR_MORE(str_host, str_uri_ip_address, str_uri_host, str_user_agent, str_uri_user_agent);
 	char *str_conn = NULL;
 	ssize_t int_i = 0;
 	ssize_t int_len = 0;
@@ -25,10 +25,12 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	size_t int_password_length = 0;
 	size_t int_cookie_len = 0;
 	size_t int_host_len = 0;
+	size_t int_user_agent_len = 0;
 	size_t int_response_len = 0;
 	size_t int_context_data_len = 0;
 	size_t int_uri_ip_address_len = 0;
 	size_t int_uri_host_len = 0;
+	size_t int_uri_user_agent_len = 0;
 	ListNode *other_client_node = NULL;
 
 	str_uri_temp = str_uri_path(client->str_request, client->int_request_len, &int_uri_length);
@@ -374,11 +376,23 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 		str_uri_host = snuri(str_host, int_host_len, &int_uri_host_len);
 		SFINISH_CHECK(str_uri_host != NULL, "snuri failed on string \"%s\"", str_host);
 
+		str_user_agent = request_header(client->str_request, client->int_request_len, "User-Agent", &int_user_agent_len);
+		if (str_user_agent == NULL) {
+			SFINISH_SNCAT(
+				str_user_agent, &int_user_agent_len,
+				"", (size_t)0
+			);
+		}
+		str_uri_user_agent = snuri(str_user_agent, int_user_agent_len, &int_uri_user_agent_len);
+		SFINISH_CHECK(str_uri_user_agent != NULL, "snuri failed on string \"%s\"", str_user_agent);
+
 		SFINISH_SNCAT(str_context_data, &int_context_data_len,
 			"request_ip_address=", (size_t)19,
 			str_uri_ip_address, int_uri_ip_address_len,
 			"&request_host=", (size_t)14,
-			str_uri_host, int_uri_host_len
+			str_uri_host, int_uri_host_len,
+			"&user_agent=", (size_t)12,
+			str_uri_user_agent, int_uri_user_agent_len
 		);
 
 #if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)

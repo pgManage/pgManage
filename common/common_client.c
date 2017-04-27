@@ -343,8 +343,10 @@ void client_cb(EV_P, ev_io *w, int revents) {
 #ifdef _WIN32
 	char *str_temp = NULL;
 #endif
-	SDEFINE_VAR_ALL(
-		str_response, str_conninfo, str_query, str_session_id, str_client_cookie, str_session_client_cookie, str_upper_request, str_conn_index, str_uri_temp);
+	SDEFINE_VAR_ALL(str_response, str_conninfo, str_query);
+	SDEFINE_VAR_MORE(str_session_id, str_client_cookie, str_session_client_cookie);
+	SDEFINE_VAR_MORE(str_ip_address, str_upper_request, str_conn_index, str_uri_temp);
+
 	SERROR_SALLOC(str_buffer, MAX_BUFFER + 1);
 
 	SDEBUG("revents: %x", revents);
@@ -479,6 +481,15 @@ void client_cb(EV_P, ev_io *w, int revents) {
 		}
 
 		if (bol_request_finished) {
+			size_t int_ip_address_len = 0;
+			str_ip_address = request_header(client->str_request, client->int_request_len, "x-forwarded-for", &int_ip_address_len);
+			if (str_ip_address != NULL && int_ip_address_len < (INET_ADDRSTRLEN - 1)) {
+				SINFO("str_ip_address: %s", str_ip_address);
+				memcpy(client->str_client_ip, str_ip_address, int_ip_address_len);
+				SFREE(str_ip_address);
+			}
+
+
 			size_t int_i = 0, int_header_len = client->int_request_len;
 			SDEBUG("client->bol_upload: %s", client->bol_upload ? "true" : "false");
 			if (client->bol_upload) {
