@@ -766,6 +766,10 @@ char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...) {
 	size_t int_offset = 0;
 	char *ptr_temp = NULL;
 
+	if (int_num_arg % 2 != 0) {
+		SERROR("Odd number of arguments to _sncat");
+	}
+
 	*ptr_int_len = 0;
 
 	// Two va_start()s don't always work
