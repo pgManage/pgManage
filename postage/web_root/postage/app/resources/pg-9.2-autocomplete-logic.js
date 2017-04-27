@@ -162,7 +162,7 @@ function autocompleteBindEditor(tabElement, editor) {
         //console.log(event.lines.length, autocompleteGlobals.ignoreNext);
         if (autocompleteGlobals.ignoreNext === 0) {
             if (event.action === 'insert') {
-                if (event.lines.length === 1) {
+                if (event.lines[0].length === 1) {
                     if (!editor.currentQueryRange === false) {
                         //console.log(event.lines);
                         if (isAlpha(event.lines)) {
@@ -194,6 +194,11 @@ function autocompleteBindEditor(tabElement, editor) {
                             
                             //console.log('colon');
                             autocompleteKeyEvent = 'colon';
+                            
+                        } else if (event.lines[0] === '(' || event.lines[0] === ')') {
+                            
+                            //console.log('semi-colon');
+                            autocompleteKeyEvent = 'parenthesis';
                             
                         } else if (event.lines[0] === ' ') {
                             
@@ -268,6 +273,11 @@ function autocompleteBindEditor(tabElement, editor) {
                             //console.log('semi-colon');
                             autocompleteKeyEvent = 'semi-colon';
                             
+                        } else if (event.lines[0] === '(' || event.lines[0] === ')') {
+                            
+                            //console.log('semi-colon');
+                            autocompleteKeyEvent = 'parenthesis';
+                            
                         } else {
                             autocompleteKeyEvent = 'snippets';
                         }
@@ -280,6 +290,8 @@ function autocompleteBindEditor(tabElement, editor) {
                 //console.log('delete');
                 autocompleteKeyEvent = 'delete';
             }
+            
+            var selectionRanges = editor.currentSelections[0];
             
             if (autocompleteGlobals.popupOpen && autocompleteKeyEvent === 'alpha_numeric' || autocompleteKeyEvent === 'snippets_filter') {
                 var strScript, intCursorPosition, intStartCursorPosition;
@@ -307,17 +319,45 @@ function autocompleteBindEditor(tabElement, editor) {
                 currWord = currWord.reverse();
                 currWord = currWord.join('');
                 
-                    autocompleteGlobals.searchLength = currWord.length;
+                autocompleteGlobals.searchLength = currWord.length;
                 
-                autocompleteFilterList(autocompleteGlobals.arrValues, currWord, editor);
+                if (editor.currentSelections.length > 1) {
+                    if (
+                        selectionRanges.start.row === event.start.row &&
+                        selectionRanges.start.column === event.start.column &&
+                        selectionRanges.end.row === event.end.row &&
+                        selectionRanges.end.column + 1 === event.end.column
+                    ) {
+                        autocompleteFilterList(autocompleteGlobals.arrValues, currWord, editor);
+                        //console.log('running');
+                    }
+                } else {
+                    autocompleteFilterList(autocompleteGlobals.arrValues, currWord, editor);
+                }
+                
+                //autocompleteFilterList(autocompleteGlobals.arrValues, currWord, editor);
             } else {
-                autocompleteLogic(editor, autocompleteKeyEvent, event);
+                if (editor.currentSelections.length > 1) {
+                    if (
+                        selectionRanges.start.row === event.start.row &&
+                        selectionRanges.start.column === event.start.column &&
+                        selectionRanges.end.row === event.end.row &&
+                        selectionRanges.end.column + 1 === event.end.column
+                    ) {
+                        autocompleteLogic(editor, autocompleteKeyEvent, event);
+                    }
+                } else {
+                    autocompleteLogic(editor, autocompleteKeyEvent, event);
+                }
+                //autocompleteLogic(editor, autocompleteKeyEvent, event);
             }
         }
         
         if (autocompleteKeyEvent !== 'delete' && autocompleteKeyEvent && autocompleteGlobals.ignoreNext > 0 || autocompleteGlobals.ignoreNext > 0) {
             autocompleteGlobals.ignoreNext -= 1;
         }
+        
+        
     });
 }
 function autocompleteLogic(editor, autocompleteKeyEvent, event) {
@@ -1258,6 +1298,8 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     } else if (autocompleteKeyEvent === 'paste') {
         closePopup();
     } else if (autocompleteKeyEvent === 'delete') {
+        closePopup();
+    } else if (autocompleteKeyEvent === 'parenthesis') {
         closePopup();
     }
 }
