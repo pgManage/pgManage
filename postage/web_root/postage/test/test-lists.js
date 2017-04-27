@@ -399,6 +399,26 @@ SELECT pg_terminate_backend(pg_backend_pid())
 			['SOCKET CLOSE', 'websocket end'],
 			['SOCKET OPEN', 'websocket start'],
 
+			['RAW 6', 'websocket', '', ml(function () {/*RAW
+SELECT 'This is some test sql';;
+*/
+			}),
+			[
+				'QUERY\tSELECT \'This is some test sql\';',
+				'START',
+				'END',
+				'ROWS\t1',
+				'COLUMNS\n?column?\nunknown\n',
+				'This is some test sql',
+				'\\.',
+				"QUERY\t;",
+				"START",
+				"END",
+				"EMPTY",
+				'\\.',
+				"TRANSACTION COMPLETED"
+			]],
+
 			['RAW W/NOTIFY', 'websocket', '', ml(function () {/*RAW
 LISTEN postgres;
 NOTIFY postgres, 'testing';

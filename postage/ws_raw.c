@@ -368,7 +368,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			SFINISH_SNCAT(str_response, &int_response_len,
 				"messageid = ", (size_t)12,
 				client_request->str_message_id, strlen(client_request->str_message_id),
-				"\012");
+				"\012", (size_t)1);
 			if (client_request->str_transaction_id) {
 				SFINISH_SNFCAT(str_response, &int_response_len,
 					"transactionid = ", (size_t)16,
