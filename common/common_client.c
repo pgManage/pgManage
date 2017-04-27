@@ -2158,7 +2158,7 @@ void client_close_immediate(struct sock_ev_client *client) {
 			} else if (client_request->int_req_type == POSTAGE_REQ_TAB) {
 				ws_tab_free(client_request->vod_request_data);
 			} else if (client->cur_request->int_req_type == POSTAGE_REQ_RAW) {
-				ws_raw_free(client->cur_request->vod_request_data);
+				ws_raw_free(client_request->vod_request_data);
 #endif
 			} else if (client_request->int_req_type == POSTAGE_REQ_AUTH) {
 				http_auth_free(client_request->vod_request_data);
