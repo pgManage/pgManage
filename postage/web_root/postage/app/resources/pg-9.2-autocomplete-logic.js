@@ -14,7 +14,7 @@ var queryVars = {
     , 'bolTablespace': false
 };
 
-var curr_run_down = 0, curr_run_up = 0;
+var curr_run_down = 0, curr_run_up = 0, curr_run_complete = 0;
 
 var TOAST_id, CATALOG_id;
 
@@ -114,11 +114,24 @@ function autocompleteBindEditor(tabElement, editor) {
     
 
     editor.commands.commands.indent.exec = function () {
-        if (autocompleteGlobals.bolBound) {
-            autocompleteComplete(xtag.query(document.body, '.current-tab')[0].relatedEditor);
-            return;
+        if (xtag.query(document.body, '.current-tab')[0].relatedEditor.currentSelections.length > 1) {
+            curr_run_complete += 1;
+            if (curr_run_complete === xtag.query(document.body, '.current-tab')[0].relatedEditor.currentSelections.length) {
+                curr_run_complete = 0;
+                if (autocompleteGlobals.bolBound) {
+                    autocompleteComplete(xtag.query(document.body, '.current-tab')[0].relatedEditor);
+                    return;
+                } else {
+                    editor.standardIndentExec.apply(this, arguments)
+                }
+            }
         } else {
-            editor.standardIndentExec.apply(this, arguments)
+            if (autocompleteGlobals.bolBound) {
+                autocompleteComplete(xtag.query(document.body, '.current-tab')[0].relatedEditor);
+                return;
+            } else {
+                editor.standardIndentExec.apply(this, arguments)
+            } 
         }
     };
     
@@ -1656,13 +1669,33 @@ function autocompleteComplete(editor) {
     } else if (currentValue) {
         autocompleteGlobals.ignoreNext = 2;
         //autocompleteGlobals
-        editor.getSelection().setSelectionRange(new Range(
-            currSelectionRange.start.row,
-            ((currSelectionRange.start.column === 1)? 0 : currSelectionRange.start.column - autocompleteGlobals.searchLength),
-            currSelectionRange.end.row,
-            currSelectionRange.end.column
-        ));
-        editor.insert(currentValue[0]);
+        if (editor.currentSelections.length > 1) {
+            var currSelections = editor.currentSelections;
+            
+            for (var i = 0, len = editor.currentSelections.length; i < len; i += 1) {
+                if (autocompleteGlobals.searchLength !== 1) {
+                    insertText = currentValue[0].trim().substring(autocompleteGlobals.searchLength - 1, currentValue[0].trim().length);
+                } else {
+                    insertText = currentValue[0].trim().substring(autocompleteGlobals.searchLength, currentValue[0].trim().length);
+                }
+                insertObj = {
+                    row: editor.currentSelections[i].start.row,
+                    column: editor.currentSelections[i].start.column
+                };
+                console.log(insertObj);
+                //editor.moveCursorToPosition(insertObj);
+
+                editor.env.document.insert(insertObj, insertText);
+            }
+        } else {
+            editor.getSelection().setSelectionRange(new Range(
+                currSelectionRange.start.row,
+                ((currSelectionRange.start.column === 1)? 0 : currSelectionRange.start.column - autocompleteGlobals.searchLength),
+                currSelectionRange.end.row,
+                currSelectionRange.end.column
+            ));
+            editor.insert(currentValue[0]);
+        }
     }
 }
 
