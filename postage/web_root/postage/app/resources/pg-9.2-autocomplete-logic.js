@@ -291,7 +291,10 @@ function autocompleteBindEditor(tabElement, editor) {
                 autocompleteKeyEvent = 'delete';
             }
             
+            if (editor.currentSelections) {
             var selectionRanges = editor.currentSelections[0];
+            
+            }
             
             if (autocompleteGlobals.popupOpen && autocompleteKeyEvent === 'alpha_numeric' || autocompleteKeyEvent === 'snippets_filter') {
                 var strScript, intCursorPosition, intStartCursorPosition;
