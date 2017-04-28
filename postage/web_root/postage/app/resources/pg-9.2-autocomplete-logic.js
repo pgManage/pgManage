@@ -292,8 +292,8 @@ function autocompleteBindEditor(tabElement, editor) {
                             
                         } else if (event.lines[0] === '.') {
                             
-                            //console.log('period');
-                            autocompleteKeyEvent = 'period';
+                            //console.log('comma');
+                            autocompleteKeyEvent = 'comma';
                             
                         } else if (event.lines[0] === ':') {
                             
@@ -1682,7 +1682,6 @@ function autocompleteComplete(editor) {
                     row: editor.currentSelections[i].start.row,
                     column: editor.currentSelections[i].start.column
                 };
-                console.log(insertObj);
                 //editor.moveCursorToPosition(insertObj);
 
                 editor.env.document.insert(insertObj, insertText);

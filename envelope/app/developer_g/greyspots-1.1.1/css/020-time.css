@@ -111,10 +111,12 @@ gs-time[mini] .time-picker-button:after {
     z-index: 110;
 }
 
+/*
 html.no-scroll-except-for-dialog > body > div.gs-time-time-picker-container,
 html.no-scroll-except-for-dialog > body > div.gs-time-time-picker-container * {
     overflow: visible !important
 }
+*/
 
 .gs-time-time-picker-container .gs-time-time-picker-overlay {
     position: absolute;
@@ -136,6 +138,9 @@ html.no-scroll-except-for-dialog > body > div.gs-time-time-picker-container * {
     border: 1px solid #000000;
 }
 
+.gs-time-time-picker-container td {
+    text-align: right;
+}
 
 /* ##################################################################################### */
 /* ######################################## MODAL ###################################### */
