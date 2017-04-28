@@ -24620,6 +24620,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strQSValue = GS.qryGetVal(strQS, strQSCol);
     
                 if (element.internal.bolQSFirstRun !== true) {
+                    console.log(element.getAttribute('value'));
                     if (strQSValue !== '' || !element.getAttribute('value')) {
                         element.setAttribute('where', 'id=' + (isNaN(strQSValue) ? '$WHEREQuoTE$' + strQSValue + '$WHEREQuoTE$' : strQSValue));
                         bolRefresh = true;

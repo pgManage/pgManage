@@ -45,6 +45,8 @@ function autocompleteBindEditor(tabElement, editor) {
     editor.standardGoLineDownExec = editor.commands.commands.golinedown.exec;
     editor.standardGoLineUpExec   = editor.commands.commands.golineup.exec;
     editor.standardIndentExec     = editor.commands.commands.indent.exec;
+    editor.standardgotoright      = editor.commands.commands.gotoright.exec
+    editor.standardgotoleft       = editor.commands.commands.gotoleft.exec
     
     editor.commands.commands.golinedown.exec = function () {
         if (autocompleteGlobals.bolBound) {
@@ -119,6 +121,28 @@ function autocompleteBindEditor(tabElement, editor) {
             editor.standardIndentExec.apply(this, arguments)
         }
     };
+    
+    editor.commands.commands.gotoright.exec = function () {
+        if (autocompleteGlobals.bolBound) {
+            closePopup(editor);
+            editor.standardgotoright.apply(this, arguments);
+        } else {
+            editor.standardgotoright.apply(this, arguments);
+        }
+    };
+    
+    editor.commands.commands.gotoleft.exec = function () {
+        if (autocompleteGlobals.bolBound) {
+            closePopup(editor);
+            editor.standardgotoleft.apply(this, arguments);
+        } else {
+            editor.standardgotoleft.apply(this, arguments);
+        }
+    };
+    
+    
+    
+    //gotoright, gotoleft
 
     editor.commands.addCommand({
         name: 'autocomplete',
@@ -324,7 +348,7 @@ function autocompleteBindEditor(tabElement, editor) {
                 
                 autocompleteGlobals.searchLength = currWord.length;
                 
-                if (editor.currentSelections.length > 1) {
+                if (editor.currentSelections && editor.currentSelections.length > 1) {
                     if (
                         selectionRanges.start.row === event.start.row &&
                         selectionRanges.start.column === event.start.column &&
@@ -340,7 +364,7 @@ function autocompleteBindEditor(tabElement, editor) {
                 
                 //autocompleteFilterList(autocompleteGlobals.arrValues, currWord, editor);
             } else {
-                if (editor.currentSelections.length > 1) {
+                if (editor.currentSelections && editor.currentSelections.length > 1) {
                     if (
                         selectionRanges.start.row === event.start.row &&
                         selectionRanges.start.column === event.start.column &&
