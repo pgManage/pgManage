@@ -4,6 +4,8 @@ Check Typing with multiple cursors
 
 Check that period code doesn't error on a nonexistant object
 
+Check that opening a new tab works
+
 Backspace:
     close popup
 
