@@ -2,6 +2,8 @@ Check Find/Replace
 
 Check Typing with multiple cursors
 
+Check that arrowing left and right closes popup
+
 Check that period code doesn't error on a nonexistant object
 
 Check that opening a new tab works
