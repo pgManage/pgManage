@@ -1,3 +1,7 @@
+Changes since 3.2.8:
+Postage:
+- Repackage all installers with latest JavaScript
+
 Changes since 3.2.7:
 Postage:
 - Fixed autocomplete after dot
