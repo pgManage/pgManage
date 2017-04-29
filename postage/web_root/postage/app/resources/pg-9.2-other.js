@@ -2355,6 +2355,7 @@ function executeHelperStartExecute() {
     currentTab.relatedResultsHeaderElement.classList.add('executing');
     currentTab.relatedStopButton.removeAttribute('hidden');
     currentTab.relatedStopButton.addEventListener('click', executeHelperCancelSignalHandler);
+	console.log('test1');
     currentTab.relatedStopSocketButton.addEventListener('click', executeHelperStopSocket);
 }
 
@@ -2368,9 +2369,8 @@ function executeHelperEndLoading() {
     currentTab.relatedResultsHeaderElement.classList.remove('executing');
     currentTab.handlingQuery = false;
     currentTab.relatedStopSocketButton.setAttribute('hidden', '');
-    currentTab.relatedStopSocketButton.removeEventListener('click', executeHelperStopLoadingHandler);
-    //currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
-    //currentTab.relatedStopLoadingButton.removeEventListener('click', executeHelperStopLoadingHandler);
+	console.log('test2');
+    currentTab.relatedStopSocketButton.removeEventListener('click', executeHelperStopSocket);
 }
 
 // this function is going to be bound to the "Stop Execution" button,
@@ -2422,7 +2422,6 @@ function executeHelperEndExecute() {
 
     currentTab.relatedStopButton.setAttribute('hidden', '');
     currentTab.relatedStopButton.removeEventListener('click', executeHelperCancelSignalHandler);
-    currentTab.relatedStopSocketButton.removeEventListener('click', executeHelperStopSocket);
 }
 
 // This function updates the results header Success/Error tally
@@ -2447,20 +2446,11 @@ function executeHelperStartLoading() {
 
 function executeHelperStopSocket() {
     var currentTab = document.getElementsByClassName('current-tab')[0];
+	console.log('test3');
 
     GS.requestFromSocket(GS.querySocket, 'CANCEL', '', currentTab.currentMessageID);
     executeHelperStopLoadingHandler();
     currentTab.bolIgnoreMessages = true;
-    //document.getElementById('RowCountSmall').innerHTML = (
-    //        '' + (
-    //            parseInt(
-    //                (data.intCallbackNumberThisQuery * 10),
-    //                10
-    //            ) +
-    //            10
-    //        ) + ' loaded of ' + data.intRows
-    //    );
-
 }
 
 
@@ -2706,9 +2696,9 @@ function executeScript(bolCursorQuery) {
 
                                 strHTML += '<br />';
 
-                                //if (data.intRows !== undefined) {
-                                //    strHTML += '<small id="RowCountSmall">' + data.intRows + ' rows</small>';
-                                //}
+                                if (data.intRows !== undefined) {
+                                    strHTML += '<small id="row-count-' + data.intQueryNumber + '"><span id="loaded-row-count-' + data.intQueryNumber + '">0</span> of ' + data.intRows + ' rows loaded</small>';
+                                }
 
 
                                 strHTML +=      '</div>' +
@@ -2785,6 +2775,9 @@ function executeScript(bolCursorQuery) {
                             //console.log('0***', data);
                             // if not end query, therefore: results
                             if (data.strMessage !== '\\.') {
+								var loadedRowCount = document.getElementById('loaded-row-count-' + data.intQueryNumber);
+								loadedRowCount.innerHTML = (parseInt(loadedRowCount.innerHTML, 10) + 10).toString();
+
                                 arrRecords = data.strMessage.split('\n');
                                 strHTML = '';
 
@@ -2863,6 +2856,9 @@ function executeScript(bolCursorQuery) {
 
                             // else if end message
                             } else if (data.strMessage === '\\.') {
+								var rowCount = document.getElementById('row-count-' + data.intQueryNumber);
+								rowCount.innerHTML = data.intRows + ' rows';
+
                                 //console.log('5***');
                                 // add a br for spacing/padding
                                 resultsContainer.appendChild(document.createElement('br'));
