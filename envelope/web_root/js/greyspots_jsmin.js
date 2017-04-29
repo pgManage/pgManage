@@ -3241,7 +3241,7 @@ return intColumnParents;}
 function saveDefaultAttributes(element){var i;var len;var arrAttr;var jsnAttr;element.internal.defaultAttributes={};arrAttr=element.attributes;i=0;len=arrAttr.length;while(i<len){jsnAttr=arrAttr[i];element.internal.defaultAttributes[jsnAttr.nodeName]=(jsnAttr.nodeValue||'');i+=1;}}
 function pushReplacePopHandler(element){var i;var len;var strQS=GS.getQueryString();var strQSCol=element.getAttribute('qs');var strQSValue;var strQSAttr;var arrQSParts;var arrAttrParts;var arrPopKeys;var currentValue;var bolRefresh;var strOperator;if(strQSCol){if(strQSCol.indexOf('=')!==-1){arrAttrParts=strQSCol.split(',');i=0;len=arrAttrParts.length;while(i<len){strQSCol=arrAttrParts[i];if(strQSCol.indexOf('!=')!==-1){strOperator='!=';arrQSParts=strQSCol.split('!=');}else{strOperator='=';arrQSParts=strQSCol.split('=');}
 strQSCol=arrQSParts[0];strQSAttr=arrQSParts[1]||arrQSParts[0];if(strOperator==='!='){if(GS.qryGetKeys(strQS).indexOf(strQSCol)===-1){element.setAttribute(strQSAttr,'');}else{element.removeAttribute(strQSAttr);}}else{if(GS.qryGetKeys(strQS).indexOf(strQSCol)===-1){if(element.internal.defaultAttributes[strQSAttr]!==undefined){element.setAttribute(strQSAttr,(element.internal.defaultAttributes[strQSAttr]||''));}else{element.removeAttribute(strQSAttr);}}else{element.setAttribute(strQSAttr,(GS.qryGetVal(strQS,strQSCol)||element.internal.defaultAttributes[strQSAttr]||''));}}
-i+=1;}}else if(GS.qryGetKeys(strQS).indexOf(strQSCol)>-1){strQSValue=GS.qryGetVal(strQS,strQSCol);if(element.internal.bolQSFirstRun!==true){if(strQSValue!==''||!element.getAttribute('value')){element.setAttribute('where','id='+(isNaN(strQSValue)?'$WHEREQuoTE$'+strQSValue+'$WHEREQuoTE$':strQSValue));bolRefresh=true;}}else{element.setAttribute('where','id='+(isNaN(strQSValue)?'$WHEREQuoTE$'+strQSValue+'$WHEREQuoTE$':strQSValue));bolRefresh=true;}}}
+i+=1;}}else if(GS.qryGetKeys(strQS).indexOf(strQSCol)>-1){strQSValue=GS.qryGetVal(strQS,strQSCol);if(element.internal.bolQSFirstRun!==true){console.log(element.getAttribute('value'));if(strQSValue!==''||!element.getAttribute('value')){element.setAttribute('where','id='+(isNaN(strQSValue)?'$WHEREQuoTE$'+strQSValue+'$WHEREQuoTE$':strQSValue));bolRefresh=true;}}else{element.setAttribute('where','id='+(isNaN(strQSValue)?'$WHEREQuoTE$'+strQSValue+'$WHEREQuoTE$':strQSValue));bolRefresh=true;}}}
 if(element.internal.bolQSFirstRun===true){if(element.hasAttribute('refresh-on-querystring-values')){arrPopKeys=element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);for(i=0,len=arrPopKeys.length;i<len;i+=1){currentValue=GS.qryGetVal(strQS,arrPopKeys[i]);if(element.popValues[arrPopKeys[i]]!==currentValue){bolRefresh=true;}
 element.popValues[arrPopKeys[i]]=currentValue;}}else if(element.hasAttribute('refresh-on-querystring-change')){bolRefresh=true;}}else{if(element.hasAttribute('refresh-on-querystring-values')){arrPopKeys=element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);for(i=0,len=arrPopKeys.length;i<len;i+=1){element.popValues[arrPopKeys[i]]=GS.qryGetVal(strQS,arrPopKeys[i]);}}
 if(GS.getQueryString()||element.hasAttribute('refresh-on-querystring-change')||element.hasAttribute('src')){bolRefresh=true;}}
@@ -4090,51 +4090,100 @@ pickerContainerElement=document.createElement('div');pickerContainerElement.clas
                             <gs-text class="time-modal-control" flex></gs-text>
                             <gs-button class="modal-done">Done</gs-button>
                         </div>
-                        <div class="time-inner-container">
-                            <div class="time-top-toolbar">
-                                <div flex-horizontal align-bottom>
-                                    <gs-button class="decrement-time" icononly icon="arrow-left"></gs-button>
-                                    <div flex></div>
-                                    <gs-button class="increment-time" icononly icon="arrow-right"></gs-button>
-                                </div>
-                            </div>
-                            <div class="gs-time-clock-container" prevent-text-selection>
-                                <div class="gs-time-bezel">
-                                    <div class="clock-face-layer layer-1">
-                                        <div class="clock-line" style="top: 0%;"><div class="clock-button clock-hour" data-value="12"><span class="content">12</span></div></div><div class="clock-line" style="top: 5.9%;"><div class="clock-split" style="width: 45.25%;
-left: 4.5%;"><div class="clock-button clock-hour" data-value="11"><span class="content">11</span></div></div><div class="clock-split" style="width: 45.25%;
-left: 46.75%;"><div class="clock-button clock-hour" data-value="1">&nbsp;<span class="content">1</span></div></div></div><div class="clock-line" style="top: 22.5%;"><div class="clock-split" style="width: 22%;
-left: 0%;"><div class="clock-button clock-hour" data-value="10"><span class="content">10</span></div></div><div class="clock-split" style="width: 22%;
-left: 78%;"><div class="clock-button clock-hour" data-value="2">&nbsp;<span class="content">2</span></div></div></div><div class="clock-line" style="top: 45.3%;"><div class="clock-split" style="width: 14%;
-left: 0%;"><div class="clock-button clock-hour" data-value="9"><span class="content">9</span>&nbsp;</div></div><div class="clock-split" style="width: 14%;
-left: 86%;"><div class="clock-button clock-hour" data-value="3">&nbsp;<span class="content">3</span></div></div></div><div class="clock-line" style="top: 67.8%;"><div class="clock-split" style="width: 22%;
-left: 0%;"><div class="clock-button clock-hour" data-value="8"><span class="content">8</span>&nbsp;</div></div><div class="clock-split" style="width: 22%;
-left: 78%"><div class="clock-button clock-hour" data-value="4">&nbsp;<span class="content">4</span></div></div></div><div class="clock-line" style="top: 83.5%;"><div class="clock-split" style="width: 45.25%;
-left: 4.5%;"><div class="clock-button clock-hour" data-value="7"><span class="content">7</span>&nbsp;</div></div><div class="clock-split" style="width: 45.25%;
-left: 46.75%;"><div class="clock-button clock-hour" data-value="5">&nbsp;<span class="content">5</span></div></div></div><div class="clock-line" style="top: 90%;"><div class="clock-button clock-hour" data-value="6"><span class="content">6</span></div></div>
-                                    </div>
-                                    <div class="clock-face-layer layer-2">
-                                        <div class="clock-line" style="top: 0%;"><div class="clock-button clock-minute" data-value="0"><span class="content">00</span></div></div>
-                                        <div class="clock-line" style="top: 5.9%;"><div class="clock-split" style="width: 45.25%;
-left: 4.5%;"><div class="clock-button clock-minute" data-value="55"><span class="content">55</span></div></div><div class="clock-split" style="width: 45.25%;
-left: 49.75%;"><div class="clock-button clock-minute" data-value="5"><span class="content">05</span></div></div></div>
-                                        <div class="clock-line" style="top: 22.5%;"><div class="clock-split" style="width: 22%;
-left: 0%;"><div class="clock-button clock-minute" data-value="50"><span class="content">50</span></div></div><div class="clock-split" style="width: 22%;
-left: 78%;"><div class="clock-button clock-minute" data-value="10"><span class="content">10</span></div></div></div>
-                                        <div class="clock-line" style="top: 45.3%;"><div class="clock-split" style="width: 16%;
-left: 0%;"><div class="clock-button clock-minute" data-value="45"><span class="content">45</span></div></div><div class="clock-split" style="width: 16%;
-left: 84%;"><div class="clock-button clock-minute" data-value="15"><span class="content">15</span></div></div></div>
-                                        <div class="clock-line" style="top: 67.8%;"><div class="clock-split" style="width: 22%;
-left: 0%;"><div class="clock-button clock-minute" data-value="40"><span class="content">40</span></div></div><div class="clock-split" style="width: 22%;
-left: 78%;"><div class="clock-button clock-minute" data-value="20"><span class="content">20</span></div></div></div>
-                                        <div class="clock-line" style="top: 83.5%;"><div class="clock-split" style="width: 45.25%;
-left: 4.5%;"><div class="clock-button clock-minute" data-value="35"><span class="content">35</span></div></div><div class="clock-split" style="width: 45.25%;
-left: 49.75%;"><div class="clock-button clock-minute" data-value="25"><span class="content">25</span></div></div></div>
-                                        <div class="clock-line" style="top: 90%;"><div class="clock-button clock-minute" data-value="30"><span class="content">30</span></div></div>
-                                        <div class="clock-center"><div class="clock-period-switch am"><span class="content">AM</span></div><div class="clock-period-switch pm"><span class="content">PM</span></div></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="time-inner-container" style="height: 25px;">
+                            <gs-grid widths="2,2,1">
+                                <gs-block>
+                                    <table>
+                                        <tr><td>1</td></tr>
+                                        <tr><td>2</td></tr>
+                                        <tr><td>3</td></tr>
+                                        <tr><td>4</td></tr>
+                                        <tr><td>5</td></tr>
+                                        <tr><td>6</td></tr>
+                                        <tr><td>7</td></tr>
+                                        <tr><td>8</td></tr>
+                                        <tr><td>9</td></tr>
+                                        <tr><td>10</td></tr>
+                                        <tr><td>11</td></tr>
+                                        <tr><td>12</td></tr>
+                                    </table>
+                                </gs-block>
+                                <gs-block>
+                                    <table>
+                                        <tr><td>0</td></tr>
+                                        <tr><td>1</td></tr>
+                                        <tr><td>2</td></tr>
+                                        <tr><td>3</td></tr>
+                                        <tr><td>4</td></tr>
+                                        <tr><td>5</td></tr>
+                                        <tr><td>6</td></tr>
+                                        <tr><td>7</td></tr>
+                                        <tr><td>8</td></tr>
+                                        <tr><td>9</td></tr>
+
+                                        <tr><td>10</td></tr>
+                                        <tr><td>11</td></tr>
+                                        <tr><td>12</td></tr>
+                                        <tr><td>13</td></tr>
+                                        <tr><td>14</td></tr>
+                                        <tr><td>15</td></tr>
+                                        <tr><td>16</td></tr>
+                                        <tr><td>17</td></tr>
+                                        <tr><td>18</td></tr>
+                                        <tr><td>19</td></tr>
+
+                                        <tr><td>20</td></tr>
+                                        <tr><td>21</td></tr>
+                                        <tr><td>22</td></tr>
+                                        <tr><td>23</td></tr>
+                                        <tr><td>24</td></tr>
+                                        <tr><td>25</td></tr>
+                                        <tr><td>26</td></tr>
+                                        <tr><td>27</td></tr>
+                                        <tr><td>28</td></tr>
+                                        <tr><td>29</td></tr>
+
+                                        <tr><td>30</td></tr>
+                                        <tr><td>31</td></tr>
+                                        <tr><td>32</td></tr>
+                                        <tr><td>33</td></tr>
+                                        <tr><td>34</td></tr>
+                                        <tr><td>35</td></tr>
+                                        <tr><td>36</td></tr>
+                                        <tr><td>37</td></tr>
+                                        <tr><td>38</td></tr>
+                                        <tr><td>39</td></tr>
+
+                                        <tr><td>40</td></tr>
+                                        <tr><td>41</td></tr>
+                                        <tr><td>42</td></tr>
+                                        <tr><td>43</td></tr>
+                                        <tr><td>44</td></tr>
+                                        <tr><td>45</td></tr>
+                                        <tr><td>46</td></tr>
+                                        <tr><td>47</td></tr>
+                                        <tr><td>48</td></tr>
+                                        <tr><td>49</td></tr>
+
+                                        <tr><td>50</td></tr>
+                                        <tr><td>51</td></tr>
+                                        <tr><td>52</td></tr>
+                                        <tr><td>53</td></tr>
+                                        <tr><td>54</td></tr>
+                                        <tr><td>55</td></tr>
+                                        <tr><td>56</td></tr>
+                                        <tr><td>57</td></tr>
+                                        <tr><td>58</td></tr>
+                                        <tr><td>59</td></tr>
+                                    </table>
+                                </gs-block>
+                                <gs-block>
+                                    <table>
+                                        <tr><td>AM</td></tr>
+                                        <tr><td>PM</td></tr>
+                                    </table>
+                                </gs-block>
+                            </gs-grid>
                         </div>
                     */});strHTML+='<div class="time-bottom-toolbar">'+'<div flex-horizontal align-top>';if(!element.hasAttribute('no-now-button')){strHTML+='<gs-button class="now-time">Now</gs-button>';}
 strHTML+='<gs-button class="done" flex>Done</gs-button>';if(!element.hasAttribute('non-empty')){strHTML+='<gs-button class="clear-time">Clear</gs-button>';}
