@@ -1910,7 +1910,7 @@ gs-delete-button,
 gs-option,
 gs-dialog-button {
     color: #333;
-    background-color: #fff;
+    background-color: #fff; !important
     border-color: #ccc;
 }
 
@@ -1930,7 +1930,7 @@ gs-dialog-button:focus {
     text-decoration: none;
     outline-offset: -3px;
     color: #333;
-    background-color: #F5F5F5;
+    background-color: #F5F5F5 !important;
     border-color: #8c8c8c;
 }
 
@@ -1948,7 +1948,7 @@ gs-option.hover,
 gs-dialog-button.hover {
     text-decoration: none;
     color: #333;
-    background-color: #F5F5F5;
+    background-color: #F5F5F5 !important;
     border-color: #adadad;
 }
 
@@ -1970,7 +1970,7 @@ gs-dialog-button.down {
     -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
             box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
     color: #333;
-    background-color: #e6e6e6;
+    background-color: #e6e6e6 !important;
     border-color: #adadad;
 }
 
@@ -1988,7 +1988,7 @@ gs-delete-button.down.hover,
 gs-option.down.hover,
 gs-dialog-button.down.hover {
     color: #333;
-    background-color: #d4d4d4;
+    background-color: #d4d4d4 !important;
     border-color: #8c8c8c;
 }
 
@@ -2010,7 +2010,7 @@ gs-dialog-button[disabled] {
     -webkit-box-shadow: none;
             box-shadow: none;
     opacity: 0.65;
-    background-color: #fff;
+    background-color: #fff !important;
     border-color: #ccc;
 }
 
@@ -2028,7 +2028,7 @@ gs-delete-button[bg-primary],
 gs-option[bg-primary],
 gs-dialog-button[bg-primary] {
     color: #fff;
-    background-color: #337ab7;
+    background-color: #337ab7 !important;
     border-color: #2e6da4;
 }
 
@@ -2048,7 +2048,7 @@ gs-dialog-button[bg-primary]:focus {
     text-decoration: none;
     outline-offset: -3px;
     color: #fff;
-    background-color: #286090;
+    background-color: #286090 !important;
     border-color: #122b40;
 }
 
@@ -2066,7 +2066,7 @@ gs-option[bg-primary].hover,
 gs-dialog-button[bg-primary].hover {
     text-decoration: none;
     color: #fff;
-    background-color: #286090;
+    background-color: #286090 !important;
     border-color: #204d74;
 }
 
@@ -2088,7 +2088,7 @@ gs-dialog-button[bg-primary].down {
     -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
             box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
     color: #fff;
-    background-color: #286090;
+    background-color: #286090 !important;
     border-color: #204d74;
 }
 
@@ -2106,7 +2106,7 @@ gs-delete-button[bg-primary].down.hover,
 gs-option[bg-primary].down.hover,
 gs-dialog-button[bg-primary].down.hover {
     color: #fff;
-    background-color: #204d74;
+    background-color: #204d74 !important;
     border-color: #122b40;
 }
 
@@ -2128,7 +2128,7 @@ gs-dialog-button[bg-primary][disabled] {
     -webkit-box-shadow: none;
             box-shadow: none;
     opacity: .65;
-    background-color: #337ab7;
+    background-color: #337ab7 !important;
     border-color: #2e6da4;
 }
 
@@ -2146,7 +2146,7 @@ gs-delete-button[bg-success],
 gs-option[bg-success],
 gs-dialog-button[bg-success] {
     color: #fff;
-    background-color: #5cb85c;
+    background-color: #5cb85c !important;
     border-color: #4cae4c;
 }
 
@@ -2166,7 +2166,7 @@ gs-dialog-button[bg-success]:focus {
     text-decoration: none;
     outline-offset: -3px;
     color: #fff;
-    background-color: #449d44;
+    background-color: #449d44 !important;
     border-color: #255625;
 }
 
@@ -2184,7 +2184,7 @@ gs-option[bg-success].hover,
 gs-dialog-button[bg-success].hover {
     text-decoration: none;
     color: #fff;
-    background-color: #449d44;
+    background-color: #449d44 !important;
     border-color: #398439;
 }
 
@@ -2206,7 +2206,7 @@ gs-dialog-button[bg-success].down {
     -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
             box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
     color: #fff;
-    background-color: #449d44;
+    background-color: #449d44 !important;
     border-color: #398439;
 }
 
@@ -2224,7 +2224,7 @@ gs-delete-button[bg-success].down.hover,
 gs-option[bg-success].down.hover,
 gs-dialog-button[bg-success].down.hover {
     color: #fff;
-    background-color: #398439;
+    background-color: #398439 !important;
     border-color: #255625;
 }
 
@@ -2246,7 +2246,7 @@ gs-dialog-button[bg-success][disabled] {
     -webkit-box-shadow: none;
             box-shadow: none;
     opacity: 0.65;
-    background-color: #5cb85c;
+    background-color: #5cb85c !important;
     border-color: #4cae4c;
 }
 
@@ -2264,7 +2264,7 @@ gs-delete-button[bg-info],
 gs-option[bg-info],
 gs-dialog-button[bg-info] {
     color: #fff;
-    background-color: #5bc0de;
+    background-color: #5bc0de !important;
     border-color: #46b8da;
 }
 
@@ -2284,7 +2284,7 @@ gs-dialog-button[bg-info]:focus {
     text-decoration: none;
     outline-offset: -3px;
     color: #fff;
-    background-color: #31b0d5;
+    background-color: #31b0d5 !important;
     border-color: #1b6d85;
 }
 
@@ -2302,7 +2302,7 @@ gs-option[bg-info].hover,
 gs-dialog-button[bg-info].hover {
     text-decoration: none;
     color: #fff;
-    background-color: #31b0d5;
+    background-color: #31b0d5 !important;
     border-color: #269abc;
 }
 
@@ -2324,7 +2324,7 @@ gs-dialog-button[bg-info].down {
     -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
             box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
     color: #fff;
-    background-color: #31b0d5;
+    background-color: #31b0d5 !important;
     border-color: #269abc;
 }
 
@@ -2342,7 +2342,7 @@ gs-delete-button[bg-info].down.hover,
 gs-option[bg-info].down.hover,
 gs-dialog-button[bg-info].down.hover {
     color: #fff;
-    background-color: #269abc;
+    background-color: #269abc !important;
     border-color: #1b6d85;
 }
 
@@ -2364,7 +2364,7 @@ gs-dialog-button[bg-info][disabled] {
     -webkit-box-shadow: none;
             box-shadow: none;
     opacity: .65;
-    background-color: #5bc0de;
+    background-color: #5bc0de !important;
     border-color: #46b8da;
 }
 
@@ -2402,7 +2402,7 @@ gs-dialog-button[bg-warning]:focus {
     text-decoration: none;
     outline-offset: -3px;
     color: #fff;
-    background-color: #ec971f;
+    background-color: #ec971f !important;
     border-color: #985f0d;
 }
 
@@ -2420,7 +2420,7 @@ gs-option[bg-warning].hover,
 gs-dialog-button[bg-warning].hover {
     text-decoration: none;
     color: #fff;
-    background-color: #ec971f;
+    background-color: #ec971f !important;
     border-color: #d58512;
 }
 
@@ -2442,7 +2442,7 @@ gs-dialog-button[bg-warning].down {
     -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
             box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
     color: #fff;
-    background-color: #ec971f;
+    background-color: #ec971f !important;
     border-color: #d58512;
 }
 
@@ -2460,7 +2460,7 @@ gs-delete-button[bg-warning].down.hover,
 gs-option[bg-warning].down.hover,
 gs-dialog-button[bg-warning].down.hover {
     color: #fff;
-    background-color: #d58512;
+    background-color: #d58512 !important;
     border-color: #985f0d;
 }
 
@@ -2482,7 +2482,7 @@ gs-dialog-button[bg-warning][disabled] {
     -webkit-box-shadow: none;
             box-shadow: none;
     opacity: .65;
-    background-color: #f0ad4e;
+    background-color: #f0ad4e !important;
     border-color: #eea236;
 }
 
@@ -2500,7 +2500,7 @@ gs-delete-button[bg-danger],
 gs-option[bg-danger],
 gs-dialog-button[bg-danger] {
     color: #fff;
-    background-color: #d9534f;
+    background-color: #d9534f !important;
     border-color: #d43f3a;
 }
 
@@ -2520,7 +2520,7 @@ gs-dialog-button[bg-danger]:focus {
     text-decoration: none;
     outline-offset: -3px;
     color: #fff;
-    background-color: #c9302c;
+    background-color: #c9302c !important;
     border-color: #761c19;
 }
 
@@ -2538,7 +2538,7 @@ gs-option[bg-danger].hover,
 gs-dialog-button[bg-danger].hover {
     text-decoration: none;
     color: #fff;
-    background-color: #c9302c;
+    background-color: #c9302c !important;
     border-color: #ac2925;
 }
 
@@ -2560,7 +2560,7 @@ gs-dialog-button[bg-danger].down {
     -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
             box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
     color: #fff;
-    background-color: #c9302c;
+    background-color: #c9302c !important;
     border-color: #ac2925;
 }
 
@@ -2578,7 +2578,7 @@ gs-delete-button[bg-danger].down.hover,
 gs-option[bg-danger].down.hover,
 gs-dialog-button[bg-danger].down.hover {
     color: #fff;
-    background-color: #ac2925;
+    background-color: #ac2925 !important;
     border-color: #761c19;
 }
 /*
@@ -2604,7 +2604,7 @@ gs-dialog-button[bg-danger][disabled] {
     -webkit-box-shadow: none;
             box-shadow: none;
     opacity: .65;
-    background-color: #d9534f;
+    background-color: #d9534f !important;
     border-color: #d43f3a;
 }
 
@@ -16260,12 +16260,10 @@ gs-time[mini] .time-picker-button:after {
     z-index: 110;
 }
 
-/*
 html.no-scroll-except-for-dialog > body > div.gs-time-time-picker-container,
 html.no-scroll-except-for-dialog > body > div.gs-time-time-picker-container * {
     overflow: visible !important
 }
-*/
 
 .gs-time-time-picker-container .gs-time-time-picker-overlay {
     position: absolute;
@@ -16287,9 +16285,6 @@ html.no-scroll-except-for-dialog > body > div.gs-time-time-picker-container * {
     border: 1px solid #000000;
 }
 
-.gs-time-time-picker-container td {
-    text-align: right;
-}
 
 /* ##################################################################################### */
 /* ######################################## MODAL ###################################### */
@@ -16460,8 +16455,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3f3f3', end
 
 .gs-time-time-picker-container .time-bottom-toolbar {
     margin-top: 0.4em;
-}
-gs-timestamp {
+}gs-timestamp {
     display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
     display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
     display: -ms-flexbox;      /* TWEENER - IE 10 */
