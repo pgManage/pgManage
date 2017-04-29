@@ -1,3 +1,18 @@
+Changes since 3.2.7:
+Postage:
+- Fixed autocomplete after dot
+- Fix crash when running empty query
+- Fix crash when closing socket while raw is running
+- Fixed beautify
+- Fixed autocomplete when arrowing left and right
+- Fixed autcomplete with multiple cursors
+- Readd rowcount to results pane
+
+Both:
+- Add error checking to sncat
+- Add X-Forwarded-For handling
+- Add user-agent to context info
+
 Changes since 3.2.6:
 Postage:
 Fix beautify issue
