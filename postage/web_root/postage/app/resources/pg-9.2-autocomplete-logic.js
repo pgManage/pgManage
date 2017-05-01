@@ -130,6 +130,7 @@ function autocompleteBindEditor(tabElement, editor) {
                             row: editor.currentSelections[i].start.row,
                             column: editor.currentSelections[i].start.column
                         };
+                        closePopup();
                         editor.env.document.insert(insertObj, '\t');
                     }
                 }
@@ -139,6 +140,7 @@ function autocompleteBindEditor(tabElement, editor) {
                 autocompleteComplete(xtag.query(document.body, '.current-tab')[0].relatedEditor);
                 return;
             } else {
+                closePopup();
                 editor.standardIndentExec.apply(this, arguments)
             } 
         }
@@ -209,7 +211,8 @@ function autocompleteBindEditor(tabElement, editor) {
     };
     // autocompleteGlobals.bolBound = true;
     autocompleteGlobals.popupAce.focusElement.addEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
-
+    //console.log(editor.onSelectionChange);
+    
     
     
     editor.addEventListener('change', function (event) {
@@ -1719,6 +1722,21 @@ function autocompletePopupHeightRefresh(optionlist) {
 function autocompleteComplete(editor) {
     var intFocusedLine = autocompleteGlobals.popupAce.getSelectionRange().start.row;
     var currentValue = autocompleteGlobals.arrValues[intFocusedLine];
+    
+    var strScript, intCursorPosition, intStartCursorPosition;
+    strScript = editor.getValue();
+    intStartCursorPosition = rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column);
+    intCursorPosition = intStartCursorPosition;
+    var wordLength = 0;
+    for (var i = 0, len = intCursorPosition; i <= len; i++) {
+        if (isAlpha(strScript[intCursorPosition - i]) || strScript[intCursorPosition - i] === '_') {
+            wordLength += 1;
+        } else if (wordLength >= 1) {
+            break;
+        }
+    }
+    autocompleteGlobals.searchLength = wordLength;
+    
     closePopup();
     var currSelectionRange = editor.selection.getRange();
     autocompleteGlobals.ignoreNext = 1;
