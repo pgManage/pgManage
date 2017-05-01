@@ -487,6 +487,9 @@ void client_cb(EV_P, ev_io *w, int revents) {
 				SINFO("str_ip_address: %s", str_ip_address);
 				memcpy(client->str_client_ip, str_ip_address, int_ip_address_len);
 				SFREE(str_ip_address);
+			} else {
+				bol_error_state = false;
+				SFREE(str_global_error);
 			}
 
 
