@@ -2,6 +2,8 @@ Check Find/Replace
 
 Check multiple cursor autocomplete
 
+Check typing really quickly
+
 Check Typing with multiple cursors
 
 Check that arrowing left and right closes popup
