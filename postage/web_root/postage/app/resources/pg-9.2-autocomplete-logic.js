@@ -45,8 +45,10 @@ function autocompleteBindEditor(tabElement, editor) {
     editor.standardGoLineDownExec = editor.commands.commands.golinedown.exec;
     editor.standardGoLineUpExec   = editor.commands.commands.golineup.exec;
     editor.standardIndentExec     = editor.commands.commands.indent.exec;
-    editor.standardgotoright      = editor.commands.commands.gotoright.exec
-    editor.standardgotoleft       = editor.commands.commands.gotoleft.exec
+    editor.standardgotoright      = editor.commands.commands.gotoright.exec;
+    editor.standardgotoleft       = editor.commands.commands.gotoleft.exec;
+    editor.standardReturn         = editor.commands.commands.inserttext.exec;
+    
     
     editor.commands.commands.golinedown.exec = function () {
         if (autocompleteGlobals.bolBound) {
@@ -122,7 +124,14 @@ function autocompleteBindEditor(tabElement, editor) {
                     autocompleteComplete(xtag.query(document.body, '.current-tab')[0].relatedEditor);
                     return;
                 } else {
-                    editor.standardIndentExec.apply(this, arguments)
+                    var currSelections = editor.currentSelections;
+                    for (var i = 0, len = editor.currentSelections.length; i < len; i += 1) {
+                        insertObj = {
+                            row: editor.currentSelections[i].start.row,
+                            column: editor.currentSelections[i].start.column
+                        };
+                        editor.env.document.insert(insertObj, '\t');
+                    }
                 }
             }
         } else {
@@ -155,16 +164,27 @@ function autocompleteBindEditor(tabElement, editor) {
     
     
     
-    //gotoright, gotoleft
+    
+    
+    // //gotoright, gotoleft
 
     editor.commands.addCommand({
         name: 'autocomplete',
         bindKey: 'Return',
         exec: function () {
             closePopup(editor);
-            editor.insert('\n');
-            //autocompleteComplete(editor);
-            //return;
+            if (editor.currentSelections.length > 1) {
+                var currSelections = editor.currentSelections;
+                for (var i = 0, len = editor.currentSelections.length; i < len; i += 1) {
+                    insertObj = {
+                        row: editor.currentSelections[i].start.row,
+                        column: editor.currentSelections[i].start.column
+                    };
+                    editor.env.document.insert(insertObj, '\n');
+                }
+            } else {
+                editor.insert('\n');
+            }
         }
     });
     
@@ -201,7 +221,6 @@ function autocompleteBindEditor(tabElement, editor) {
             if (event.action === 'insert') {
                 if (event.lines[0].length === 1) {
                     if (!editor.currentQueryRange === false) {
-                        //console.log(event.lines);
                         if (isAlpha(event.lines)) {
                             
                             //console.log('alpha_numeric');
@@ -578,8 +597,9 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         strPreviousKeyWord = arrPreviousKeyWords[0];
         strPreviousWord = arrPreviousWords[0];
         
-        
-        bolAfterComma = (strPreviousWord[strPreviousWord.length - 1] === ',');
+        if (strPreviousWord) {
+            bolAfterComma = (strPreviousWord[strPreviousWord.length - 1] === ',');
+        }
 
         if (arrPreviousKeyWords[1] === 'INSERT' && strPreviousKeyWord === 'INTO') {
             //console.log('schema');
@@ -1505,10 +1525,14 @@ function autocompleteFilterList(list, searchWord, editor) {
         // if the current item doesn't match: remove from ace, arrSearch and arrValues
         if (autocompleteGlobals.arrSearch[i]) {
             if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
+                console.log(autocompleteGlobals.arrSearch[i].indexOf(strSearch), autocompleteGlobals.arrSearch[i], strSearch);
                 autocompleteGlobals.arrSearch.splice(i, 1);
                 autocompleteGlobals.arrValues.splice(i, 1);
+                console.log(autocompleteGlobals.arrValues[i]);
                 i -= 1;
                 len -= 1;
+            } else {
+                console.log(autocompleteGlobals.arrSearch[i].indexOf(strSearch), autocompleteGlobals.arrSearch[i], strSearch);
             }
         } else {
             break;
