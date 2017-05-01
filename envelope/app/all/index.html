@@ -192,7 +192,7 @@
         </style>
     </head>
     <body>
-        <gs-page>
+        <gs-page inset>
             <gs-header>
                 <div flex-horizontal>
                     <h3 class="title" flex>Main Menu</h3>
@@ -440,7 +440,7 @@
                             </gs-block>
                             <gs-block>
                                 <div flex-horizontal>
-                                    <gs-text style="padding: 6.5px;" id="goToLotInput" onkeyup="((event.keyCode === 13) ? window.location = '../fdn_g/inv.html?id=' + this.value + '' : '')" flex placeholder="Enter Lot"></gs-text>
+                                    <gs-text id="goToLotInput" onkeyup="((event.keyCode === 13) ? window.location = '../fdn_g/inv.html?id=' + this.value + '' : '')" flex placeholder="Enter Lot"></gs-text>
                                 </div>
                             </gs-block>
                             <gs-block>
@@ -448,7 +448,7 @@
                             </gs-block>
                             <gs-block>
                                 <div flex-horizontal>
-                                    <gs-combo src="fdn.tship_header" hide="id" cols="id,ref_no AS &#34;Ref #&#34;, invoice_no AS &#34;Invoice #&#34;" style="padding: 6.5px;" flex placeholder="Pack" onchange="window.location = '../fdn_g/pack.html?id=' + this.value" where="packed IS NULL"></gs-combo>
+                                    <gs-combo src="fdn.tship_header" hide="id" cols="id,ref_no AS &#34;Ref #&#34;, invoice_no AS &#34;Invoice #&#34;" flex placeholder="Pack" onchange="window.location = '../fdn_g/pack.html?id=' + this.value" where="packed IS NULL"></gs-combo>
                                 </div>
                             </gs-block>
                         </gs-grid>

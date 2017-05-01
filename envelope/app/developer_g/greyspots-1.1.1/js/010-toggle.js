@@ -464,6 +464,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.internal = {};
                 saveDefaultAttributes(element);
 
+                if (!evt.touchDevice) {
+                    element.addEventListener(evt.mousedown, function (event) {
+                        element.classList.add('down');
+                    });
+                    
+                    element.addEventListener(evt.mouseout, function (event) {
+                        element.classList.remove('down');
+                        element.classList.remove('hover');
+                    });
+                    
+                    element.addEventListener(evt.mouseover, function (event) {
+                        element.classList.remove('down');
+                        element.classList.add('hover');
+                    });
+                    
+                    element.addEventListener('keydown', function (event) {
+                        if (!element.hasAttribute('disabled') && !element.classList.contains('down') &&
+                            (event.keyCode === 13 || event.keyCode === 32)) {
+                            
+                            element.classList.add('down');
+                        }
+                    });
+                    
+                    element.addEventListener('keyup', function (event) {
+                        // if we are not disabled and we pressed return (13) or space (32): trigger click
+                        if (!element.hasAttribute('disabled') && element.classList.contains('down') &&
+                            (event.keyCode === 13 || event.keyCode === 32)) {
+                            GS.triggerEvent(element, 'click');
+                        }
+                    });
+                }
+                
+
                 // add a tabindex to allow focus
                 if (!element.hasAttribute('tabindex')) {
                     element.tabIndex = 0;
@@ -527,6 +560,8 @@ document.addEventListener('DOMContentLoaded', function () {
         events: {
             'click': function (event) {
                 if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                    this.classList.remove('down');
+                    
                     if (this.hasAttribute('selected')) {
                         this.removeAttribute('selected');
                         
@@ -550,21 +585,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         bubbles: true,
                         cancelable: true
                     });
-                }
-            },
-            
-            'keypress': function (event) {
-                if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
-                    // if we are not disabled and we pressed return (13) or space (32): trigger tap
-                    if (!this.hasAttribute('disabled') && (event.keyCode === 13 || event.keyCode === 32)) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        
-                        xtag.fireEvent(this, 'click', {
-                            bubbles: true,
-                            cancelable: true
-                        });
-                    }
                 }
             }
         },

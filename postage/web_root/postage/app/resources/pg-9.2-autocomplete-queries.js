@@ -117,7 +117,7 @@ autocompleteQuery.triggers = ml(function () {/*
 */});
 
 autocompleteQuery.rules = ml(function () {/*
-    SELECT * FROM (
+    SELECT DISTINCT * FROM (
           SELECT quote_ident(rulename) AS obj_name, 'Rule'::text AS obj_meta
             FROM (SELECT DISTINCT rulename FROM pg_rewrite) em
         ORDER BY rulename ASC
@@ -755,7 +755,7 @@ autocompleteQuery.casts = ml(function () {/*
 */});
 
 autocompleteQuery.tables = ml(function () {/*
-    SELECT * FROM (
+    SELECT DISTINCT * FROM (
           SELECT quote_ident(pg_class.relname) AS obj_name,
                  'Table'::text AS obj_meta
             FROM pg_class
@@ -785,7 +785,7 @@ autocompleteQuery.allcolumns = ml(function () {/*
 */});
 
 autocompleteQuery.views = ml(function () {/*
-    SELECT * FROM (
+    SELECT DISTINCT * FROM (
           SELECT quote_ident(c.relname) AS obj_name,
                  'View'::text AS obj_meta
             FROM pg_class c
@@ -802,7 +802,7 @@ autocompleteQuery.views = ml(function () {/*
 */});
 
 autocompleteQuery.types2 = ml(function () {/*
-    SELECT * FROM (
+    SELECT DISTINCT * FROM (
         SELECT pg_type.typname AS obj_name, 'Type'::text AS obj_meta
           FROM pg_catalog.pg_type
      LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_type.typnamespace
@@ -864,7 +864,7 @@ autocompleteQuery.foreign_data_wrapper = ml(function () {/*
 */});
 
 autocompleteQuery.language = ml(function () {/*
-    SELECT * FROM (
+    SELECT DISTINCT * FROM (
           SELECT lanname AS obj_name, 'Language'::text AS obj_meta
             FROM pg_catalog.pg_language
             WHERE lanname LIKE '{{searchStr}}'
@@ -873,7 +873,7 @@ autocompleteQuery.language = ml(function () {/*
 */});
 
 autocompleteQuery.tablespace = ml(function () {/*
-    SELECT * FROM (
+    SELECT DISTINCT * FROM (
           SELECT spcname AS obj_name, 'Tablespace'::text AS obj_meta
             FROM pg_catalog.pg_tablespace
             WHERE spcname LIKE '{{searchStr}}'
@@ -925,7 +925,7 @@ autocompleteQuery.roles = ml(function () {/*
     ) list_roles
 */});
 autocompleteQuery.logins = ml(function () {/*
-    SELECT * FROM (
+    SELECT DISTINCT * FROM (
         SELECT quote_ident(pg_roles.rolname) AS obj_name, 'Role'::text AS obj_meta
           FROM pg_catalog.pg_roles
          WHERE rolcanlogin = TRUE AND pg_roles.rolname LIKE '{{searchStr}}'
@@ -933,7 +933,7 @@ autocompleteQuery.logins = ml(function () {/*
     ) list_logins
 */});
 autocompleteQuery.groups = ml(function () {/*
-    SELECT * FROM (
+    SELECT DISTINCT * FROM (
         SELECT pg_roles.rolname AS obj_name, 'Role'::text AS obj_meta
           FROM pg_catalog.pg_roles
          WHERE rolcanlogin = FALSE AND pg_roles.rolname LIKE '{{searchStr}}'

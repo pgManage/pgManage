@@ -156,13 +156,12 @@
 /* ########################################################### */
 
 *:focus {
-    /*outline: 1px dashed #000000;
-    outline-offset: -1px;/* this is a default that but each element is allow to have its own setting of this particular property */
+    /* this is a default that but each element is allow to have its own setting of this particular property */
+    /*outline-offset: -1px;*/
     
-    outline: 0 none;
-	outline-style: none;
-	box-shadow: 0 0 0 1px #FFB000;
-	/*box-shadow: 0 0 0 2pt rgb(255, 176, 0) inset;*/
+    outline-offset: -3px;
+    background-color: #FFFDEC;
+    outline: dashed 1px #FFB000;
 }
 
 input:focus,
@@ -185,11 +184,14 @@ select:focus {
 
 html body *[disabled],
 *[disabled] {
-    opacity: 0.8;
+    opacity: 0.6;
     pointer-events: none;
     cursor: default;
+    
+    /*
     background-color: #D5D5D5;
     color: #444444;
+    */
 }
 
 

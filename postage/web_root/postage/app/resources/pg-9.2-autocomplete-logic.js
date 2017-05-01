@@ -162,10 +162,7 @@ function autocompleteBindEditor(tabElement, editor) {
         }
     };
     
-    
-    
-    
-    
+
     // //gotoright, gotoleft
 
     editor.commands.addCommand({
@@ -253,13 +250,18 @@ function autocompleteBindEditor(tabElement, editor) {
                             
                         } else if (event.lines[0] === '(' || event.lines[0] === ')') {
                             
-                            //console.log('semi-colon');
+                            //console.log('parenthesis');
                             autocompleteKeyEvent = 'parenthesis';
                             
                         } else if (event.lines[0] === ' ') {
                             
                             //console.log('space');
                             autocompleteKeyEvent = 'space';
+                            
+                        } else if (event.lines[0] === ';') {
+                            
+                            //console.log('semi-colon');
+                            autocompleteKeyEvent = 'semi-colon';
                             
                         }
                     } else {
@@ -331,7 +333,7 @@ function autocompleteBindEditor(tabElement, editor) {
                             
                         } else if (event.lines[0] === '(' || event.lines[0] === ')') {
                             
-                            //console.log('semi-colon');
+                            //console.log('parenthesis');
                             autocompleteKeyEvent = 'parenthesis';
                             
                         } else {
@@ -419,6 +421,7 @@ function autocompleteBindEditor(tabElement, editor) {
         
     });
 }
+
 function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     "use strict";
      queryVars = {
@@ -1407,24 +1410,28 @@ function autocompleteStart() {
 
 function autocompleteMakeList(arrQueries, searchWord, editor) {
     'use strict';
+    if (autocompleteGlobals.bolQueryRunning) {
+        autocompleteGlobals.bolSpecialFilter = true;
+    }
     //queryVars
     var optionList = ['hidden'];
+    autocompleteGlobals.popupLoading = true;
     autocompleteGlobals.arrSearch = ['hidden'];
     autocompleteGlobals.arrSearchMaster = ['hidden'];
     var strQuery, i, len, arrSuggestion, suggestion_i, suggestion_len;
-
+    
     for (i = 0, len = arrQueries.length; i < len; i += 1) {
         if (typeof arrQueries[i] !== 'string') {
             for (suggestion_i = 0, suggestion_len = arrQueries[i].length; suggestion_i < suggestion_len; suggestion_i += 1) {
                 arrQueries[i][suggestion_i] = 'SELECT $token$' + arrQueries[i][suggestion_i] + '$token$::text AS obj_name, \'\'::text AS obj_meta';
             }
-
+    
             arrQueries[i] = 'SELECT * FROM (' + arrQueries[i].join('\nUNION ALL\n') + ') list_suggestions_' + i;
         }
     }
-
+    
     strQuery = 'SELECT * FROM (\n' + arrQueries.join('\n     UNION ALL\n') + '\n' + ') em;';
-//    //console.log(strQuery);
+    //    //console.log(strQuery);
     // if the autocomplete query is still running: cancel it
     if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning) {
         GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
@@ -1460,9 +1467,10 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
                 }
             }
         }
-
+    
     }
-
+    
+    
     autocompleteGlobals.bolQueryRunning = true;
     // make the request
     autocompleteGlobals.strQueryID = GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
@@ -1495,53 +1503,96 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
                 autocompleteGlobals.arrSearchMaster.shift();
                 autocompleteGlobals.arrValuesMaster = optionList;
                 
-                if ((optionList.length === 1 && searchWord && optionList[0][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
-                    closePopup();
-                } else if (autocompleteGlobals.popupOpen === false) {
-                    openPopup(editor, optionList);
-                } else if (autocompleteGlobals.popupOpen === true) {
-                    loadPopuplist(editor, optionList);
+                //console.log('bolSpecialFilter: ' + autocompleteGlobals.bolSpecialFilter);
+                if (autocompleteGlobals.bolSpecialFilter) {
+                    autocompleteGlobals.bolSpecialFilter = false;
+                    if ((optionList.length === 1 && searchWord && optionList[0][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
+                        closePopup();
+                    } else {
+                        var strScript, intCursorPosition, intStartCursorPosition;
+                    
+                        // get full script
+                        strScript = editor.getValue();
+                        
+                        // get event cursor position start/end
+                        intStartCursorPosition = rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column);
+                        intCursorPosition = intStartCursorPosition;
+                        
+                        var currWord = [];
+                        for (var i = 0, len = intCursorPosition; i <= len; i++) {
+                            if (isAlpha(strScript[intCursorPosition - i]) || strScript[intCursorPosition - i] === '_') {
+                                if (currWord === []) {
+                                    currWord = strScript[intCursorPosition - i].toLowerCase()
+                                } else {
+                                    currWord.push(strScript[intCursorPosition - i].toLowerCase());
+                                }
+                            } else if (currWord !== []) {
+                                break;
+                            }
+                        }
+                    
+                        currWord = currWord.reverse();
+                        currWord = currWord.join('');
+                        
+                        autocompleteGlobals.searchLength = currWord.length;
+                        
+                        autocompleteFilterList(optionList, currWord, editor)
+                    }
+                } else {
+                    if ((optionList.length === 1 && searchWord && optionList[0][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
+                        closePopup();
+                    } else if (autocompleteGlobals.popupOpen === false) {
+                        openPopup(editor, optionList);
+                    } else if (autocompleteGlobals.popupOpen === true) {
+                        loadPopuplist(editor, optionList);
+                    }
                 }
+                
+                autocompleteGlobals.bolQueryRunning = false;
             }
         }// else {
         //    GS.webSocketErrorDialog(data);
         //}
-        autocompleteGlobals.bolQueryRunning = false;
     });
 }
 
 function autocompleteFilterList(list, searchWord, editor) {
-    var arrNewValue = [], strSearch;
-    autocompleteGlobals.popupAce.setValue('');
-    
-    
-    if (searchWord[0] === '"') {
-        strSearch = searchWord.toLowerCase();
+    if (autocompleteGlobals.bolQueryRunning) {
+        autocompleteGlobals.bolSpecialFilter = true;
     } else {
-        strSearch = '"' + searchWord.toLowerCase();
-    }
-    
-    for (i = 0, len = autocompleteGlobals.arrSearch.length, strNewValue = ''; i < len; i += 1) {
-        // if the current item doesn't match: remove from ace, arrSearch and arrValues
-        if (autocompleteGlobals.arrSearch[i]) {
-            if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
-                console.log(autocompleteGlobals.arrSearch[i].indexOf(strSearch), autocompleteGlobals.arrSearch[i], strSearch);
-                autocompleteGlobals.arrSearch.splice(i, 1);
-                autocompleteGlobals.arrValues.splice(i, 1);
-                console.log(autocompleteGlobals.arrValues[i]);
-                i -= 1;
-                len -= 1;
-            } else {
-                console.log(autocompleteGlobals.arrSearch[i].indexOf(strSearch), autocompleteGlobals.arrSearch[i], strSearch);
-            }
+        autocompleteGlobals.popupLoading = true;
+        var arrNewValue = [], strSearch;
+        autocompleteGlobals.popupAce.setValue('');
+        
+        
+        if (searchWord[0] === '"') {
+            strSearch = searchWord.toLowerCase();
         } else {
-            break;
+            strSearch = '"' + searchWord.toLowerCase();
         }
-    }
-    if (autocompleteGlobals.arrSearch.length === 0 || (autocompleteGlobals.arrSearch.length === 1 && autocompleteGlobals.arrSearch[0] === (strSearch + '"'))) {
-        closePopup();
-    } else {
-        openPopup(editor, autocompleteGlobals.arrValues, true);
+        
+        for (i = 0, len = autocompleteGlobals.arrSearch.length, strNewValue = ''; i < len; i += 1) {
+            // if the current item doesn't match: remove from ace, arrSearch and arrValues
+            //console.log(autocompleteGlobals.arrSearch);
+            if (autocompleteGlobals.arrSearch[i]) {
+                //console.log(strSearch, autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1);
+                if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
+                    //console.log(autocompleteGlobals.arrSearch[i].indexOf(strSearch), autocompleteGlobals.arrSearch[i], strSearch);
+                    autocompleteGlobals.arrSearch.splice(i, 1);
+                    autocompleteGlobals.arrValues.splice(i, 1);
+                    //console.log(autocompleteGlobals.arrValues[i]);
+                    i -= 1;
+                    len -= 1;
+                }
+            } else {
+                break;
+            }
+        }
+        if (autocompleteGlobals.arrSearch.length === 0 || autocompleteGlobals.arrValues.length === 0 || (autocompleteGlobals.arrSearch.length === 1 && autocompleteGlobals.arrSearch[0] === (strSearch + '"'))) {
+            closePopup();
+        } else {
+            openPopup(editor, autocompleteGlobals.arrValues, true);
+        }
     }
 }
 
@@ -1563,6 +1614,7 @@ function closePopup() {
 
         autocompleteGlobals.popupAce.setValue('');
         
+        autocompleteGlobals.popupLoading = false;
         autocompleteGlobals.arrSearch = [];
         autocompleteGlobals.arrValues = [];
         autocompleteGlobals.arrSearchMaster = [];
@@ -1573,6 +1625,7 @@ function closePopup() {
 //bolKeepOpen allows autocompleteFilterList to not close the popup which emptys the variables
 function openPopup(editor, optionlist, bolKeepOpen) {
 'use strict';
+    //console.log(optionlist.join('\n'));
     var //jsnSearchStart = indexToRowAndColumn(editor.getValue(), editor.selection.getRange().start.column)
       jsnPosition = editor.renderer.textToScreenCoordinates(editor.selection.getRange().start.row, editor.selection.getRange().start.column + 1)
       , intLeft = jsnPosition.pageX
@@ -1643,6 +1696,8 @@ function loadPopuplist(editor, optionlist) {
                              document.getElementById('autocomplete-popup-instruction').style.height;
         document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
     }
+    
+    autocompleteGlobals.popupLoading = false;
 }
 
 
