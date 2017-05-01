@@ -8,6 +8,8 @@ Check Typing with multiple cursors
 
 Check that arrowing left and right closes popup
 
+Check "SELECT rtime" only shows one rtime (there are three)
+
 Check that period code doesn't error on a nonexistant object
 
 Check that opening a new tab works
