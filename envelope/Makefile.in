@@ -148,7 +148,6 @@ test-common:
 	-rm -rf data_test
 	initdb -D data_test -E UTF8 -U postgres
 	echo $(SOCK_DIR_PARAMETER)"='/tmp'" >> data_test/postgresql.conf
-	echo "max_connections = 200" >> data_test/postgresql.conf
 	{ postgres -D data_test -p 5431 2> output.txt > output.txt & }; \
 	echo $$! > postgres.pid; \
 	sleep 3
