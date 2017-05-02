@@ -1,6 +1,8 @@
+/*
 gs-checkbox:not([readonly]):not([mini]):not(:focus) {
     box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
 }
+*/
 
 gs-checkbox[readonly] {
     opacity: 0.9;

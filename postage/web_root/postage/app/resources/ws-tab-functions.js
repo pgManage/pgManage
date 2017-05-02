@@ -2281,6 +2281,15 @@ function SQLBeautify(strInput) {
             int_E_quote = (i - 1) === 'E';
             //console.log("found single quote");
 
+        // FOUND TWO SINGLE QUOTES INSIDE STRING:
+        } else if (int_qs === 3 && strInput.substr(i, 2) === "''") {
+            strResult += strInput[i];
+            
+            //add next character
+            i += 1;
+            strResult += strInput[i];
+            //console.log("found two single quote");
+
         // ENDING SINGLE QUOTE
         } else if (int_qs === 3 && strInput.substr(i, 1) === "'") {
             strResult += strInput[i] + " ";

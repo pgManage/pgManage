@@ -37,11 +37,8 @@ gs-dialog-button {
     position: relative;
     display: block;
     
-    padding: 0.42857143em 0.85714286em; /* 6px 12px */
     margin-bottom: 0;
-    font-size: 0.8em; /* 14px */
     font-weight: normal;
-    line-height: 1.42857143;
     text-align: center;
     white-space: nowrap;
     vertical-align: middle;
@@ -49,24 +46,10 @@ gs-dialog-button {
       touch-action: manipulation;
     cursor: pointer;
     background-image: none;
-    border: 1px solid transparent;
-    border-radius: 4px;
     
     color: #333;
-    background-color: #fff;
-    border-color: #ccc;
-    /*
-    color: #0E8F41;
-    cursor: pointer;
-    text-align: center;
-    padding: 0.2em;
     
-    background-color: #E9F1E9;
     
-    border: 1px solid #0E8F41;
-    border-radius: 2em;
-    
-    */
     user-select: none;
     -o-user-select: none;
     -ms-user-select: none;
@@ -75,19 +58,40 @@ gs-dialog-button {
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     
-    /*padding: 0.2em;*/
-    min-height: 2.35em;
-    
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
+    
+    
+    
+    /*Theme*/
+    line-height: 1em;
+    min-height: 1em;
+    font-size: 1em;
+    
+    padding: 0.2em;
+    
+    box-shadow: none;
+    
+    border-radius: 0;
+    
+    
+    background-color: #eeeeee;
+    
+    border: 2px solid #000000;
+    
+    border-top-color: #dddddd;
+    border-left-color: #dddddd;
+    
+    border-bottom-color: #000000;
+    border-right-color: #000000;
 }
 
 gs-checkbox {
     /* make the same height as gs-text and gs-button */
-    padding: 0.3575em 0.85714286em;
+    padding: 0.1em;
 }
 
 [flex-vertical]   > gs-button,
@@ -142,8 +146,8 @@ gs-tracking-button.blue,
 gs-delete-button.blue,
 gs-option.blue,
 gs-dialog-button.blue {
-    background-color: #E9EFF7;
-    border-color: #3B99BE;
+    /*background-color: #E9EFF7;*/
+    /*border-color: #3B99BE;*/
     color: #3B99BE;
 }
 
@@ -232,9 +236,13 @@ gs-tracking-button,
 gs-delete-button,
 gs-option,
 gs-dialog-button {
-    color: #333;
-    background-color: #fff; !important
-    border-color: #ccc;
+    background-color: #eeeeee;
+    
+    border-top-color: #dddddd;
+    border-left-color: #dddddd;
+    
+    border-bottom-color: #000000;
+    border-right-color: #000000;
 }
 
 /* # FOCUS # */
@@ -249,12 +257,20 @@ gs-email-button:focus,
 gs-tracking-button:focus,
 gs-delete-button:focus,
 gs-option:focus,
-gs-dialog-button:focus {
-    text-decoration: none;
-    outline-offset: -3px;
-    color: #333;
-    background-color: #F5F5F5 !important;
-    border-color: #8c8c8c;
+gs-dialog-button:focus,
+gs-button[selected]:focus:not(.hover),
+gs-checkbox[selected]:focus:not(.hover),
+gs-toggle[selected]:focus:not(.hover),
+gs-phone-button:not([not-supported])[selected]:focus:not(.hover),
+gs-map-button[selected]:focus:not(.hover),
+gs-skype-button[selected]:focus:not(.hover),
+gs-facetime-button[selected]:focus:not(.hover),
+gs-email-button[selected]:focus:not(.hover),
+gs-tracking-button[selected]:focus:not(.hover),
+gs-delete-button[selected]:focus:not(.hover),
+gs-option[selected]:focus:not(.hover),
+gs-dialog-button[selected]:focus:not(.hover) {
+    background-color: #FFFDEC !important;
 }
 
 /* # HOVER # */
@@ -270,9 +286,14 @@ gs-delete-button.hover,
 gs-option.hover,
 gs-dialog-button.hover {
     text-decoration: none;
-    color: #333;
-    background-color: #F5F5F5 !important;
-    border-color: #adadad;
+    
+    background-color: #bbbbbb !important;
+    
+    border-top-color: #bbbbbb;
+    border-left-color: #bbbbbb;
+    
+    border-bottom-color: #444444;
+    border-right-color: #444444;
 }
 
 /* # DOWN # */
@@ -287,14 +308,28 @@ gs-email-button.down,
 gs-tracking-button.down,
 gs-delete-button.down,
 gs-option.down,
-gs-dialog-button.down {
+gs-dialog-button.down,
+gs-button[selected],
+gs-checkbox[selected],
+gs-toggle[selected],
+gs-phone-button:not([not-supported])[selected],
+gs-map-button[selected],
+gs-skype-button[selected],
+gs-facetime-button[selected],
+gs-email-button[selected],
+gs-tracking-button[selected],
+gs-delete-button[selected],
+gs-option[selected],
+gs-dialog-button[selected] {
     background-image: none;
-    outline: 0;
-    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-    color: #333;
+    
     background-color: #e6e6e6 !important;
-    border-color: #adadad;
+    
+    border-top-color: #000000;
+    border-left-color: #000000;
+    
+    border-bottom-color: #dddddd;
+    border-right-color: #dddddd;
 }
 
 /* # DOWN AND HOVER # */
@@ -310,9 +345,13 @@ gs-tracking-button.down.hover,
 gs-delete-button.down.hover,
 gs-option.down.hover,
 gs-dialog-button.down.hover {
-    color: #333;
-    background-color: #d4d4d4 !important;
-    border-color: #8c8c8c;
+    background-color: #bbbbbb !important;
+    
+    border-top-color: #444444;
+    border-left-color: #444444;
+    
+    border-bottom-color: #bbbbbb;
+    border-right-color: #bbbbbb;
 }
 
 /* # DISABLED # */
@@ -328,13 +367,15 @@ gs-tracking-button[disabled],
 gs-delete-button[disabled],
 gs-option[disabled],
 gs-dialog-button[disabled] {
-    cursor: not-allowed;
-    filter: alpha(opacity=65);
-    -webkit-box-shadow: none;
-            box-shadow: none;
-    opacity: 0.65;
-    background-color: #fff !important;
-    border-color: #ccc;
+    background-color: #dddddd !important;
+    
+    border-top-color: #dddddd;
+    border-left-color: #dddddd;
+    
+    border-bottom-color: #222222;
+    border-right-color: #222222;
+    
+    color: #888888;
 }
 
 /* ## PRIMARY ## */
@@ -352,7 +393,12 @@ gs-option[bg-primary],
 gs-dialog-button[bg-primary] {
     color: #fff;
     background-color: #337ab7 !important;
-    border-color: #2e6da4;
+    
+    border-top-color: #7EB1DC;
+    border-left-color: #7EB1DC;
+    
+    border-bottom-color: #094C83;
+    border-right-color: #094C83;
 }
 
 /* # FOCUS # */
@@ -367,12 +413,24 @@ gs-email-button[bg-primary]:focus,
 gs-tracking-button[bg-primary]:focus,
 gs-delete-button[bg-primary]:focus,
 gs-option[bg-primary]:focus,
-gs-dialog-button[bg-primary]:focus {
+gs-dialog-button[bg-primary]:focus,
+gs-button[bg-primary][selected]:focus:not(.hover),
+gs-checkbox[bg-primary][selected]:focus:not(.hover),
+gs-toggle[bg-primary][selected]:focus:not(.hover),
+gs-phone-button[bg-primary]:not([not-supported])[selected]:focus:not(.hover),
+gs-map-button[bg-primary][selected]:focus:not(.hover),
+gs-skype-button[bg-primary][selected]:focus:not(.hover),
+gs-facetime-button[bg-primary][selected]:focus:not(.hover),
+gs-email-button[bg-primary][selected]:focus:not(.hover),
+gs-tracking-button[bg-primary][selected]:focus:not(.hover),
+gs-delete-button[bg-primary][selected]:focus:not(.hover),
+gs-option[bg-primary][selected]:focus:not(.hover),
+gs-dialog-button[bg-primary][selected]:focus:not(.hover) {
     text-decoration: none;
     outline-offset: -3px;
-    color: #fff;
-    background-color: #286090 !important;
-    border-color: #122b40;
+    color: #337ab7;
+    
+    background-color: #FFFDEC !important;
 }
 
 /* # HOVER # */
@@ -390,7 +448,12 @@ gs-dialog-button[bg-primary].hover {
     text-decoration: none;
     color: #fff;
     background-color: #286090 !important;
-    border-color: #204d74;
+    
+    border-top-color: #7EB1DC;
+    border-left-color: #7EB1DC;
+    
+    border-bottom-color: #286090;
+    border-right-color: #286090;
 }
 
 /* # DOWN # */
@@ -405,14 +468,28 @@ gs-email-button[bg-primary].down,
 gs-tracking-button[bg-primary].down,
 gs-delete-button[bg-primary].down,
 gs-option[bg-primary].down,
-gs-dialog-button[bg-primary].down {
+gs-dialog-button[bg-primary].down,
+gs-button[bg-primary][selected],
+gs-checkbox[bg-primary][selected],
+gs-toggle[bg-primary][selected],
+gs-phone-button[bg-primary]:not([not-supported])[selected],
+gs-map-button[bg-primary][selected],
+gs-skype-button[bg-primary][selected],
+gs-facetime-button[bg-primary][selected],
+gs-email-button[bg-primary][selected],
+gs-tracking-button[bg-primary][selected],
+gs-delete-button[bg-primary][selected],
+gs-option[bg-primary][selected],
+gs-dialog-button[bg-primary][selected] {
     background-image: none;
-    outline: 0;
-    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
     color: #fff;
     background-color: #286090 !important;
-    border-color: #204d74;
+    
+    border-top-color: #094C83;
+    border-left-color: #094C83;
+    
+    border-bottom-color: #7EB1DC;
+    border-right-color: #7EB1DC;
 }
 
 /* # DOWN AND HOVER # */
@@ -430,7 +507,6 @@ gs-option[bg-primary].down.hover,
 gs-dialog-button[bg-primary].down.hover {
     color: #fff;
     background-color: #204d74 !important;
-    border-color: #122b40;
 }
 
 /* # DISABLED # */
@@ -447,12 +523,26 @@ gs-delete-button[bg-primary][disabled],
 gs-option[bg-primary][disabled],
 gs-dialog-button[bg-primary][disabled] {
     cursor: not-allowed;
-    filter: alpha(opacity=65);
-    -webkit-box-shadow: none;
-            box-shadow: none;
-    opacity: .65;
     background-color: #337ab7 !important;
-    border-color: #2e6da4;
+    
+    color: #aaaaaa;
+}
+
+/* # TXT DISABLED # */
+gs-button[txt-primary][disabled],
+gs-toggle[txt-primary][disabled],
+gs-checkbox[txt-primary][disabled],
+gs-phone-button[txt-primary]:not([not-supported])[disabled],
+gs-map-button[txt-primary][disabled],
+gs-skype-button[txt-primary][disabled],
+gs-facetime-button[txt-primary][disabled],
+gs-email-button[txt-primary][disabled],
+gs-tracking-button[txt-primary][disabled],
+gs-delete-button[txt-primary][disabled],
+gs-option[txt-primary][disabled],
+gs-dialog-button[txt-primary][disabled] {
+    cursor: not-allowed;
+    color: #337ab7;
 }
 
 /* ## SUCCESS ## */
@@ -470,7 +560,12 @@ gs-option[bg-success],
 gs-dialog-button[bg-success] {
     color: #fff;
     background-color: #5cb85c !important;
-    border-color: #4cae4c;
+    
+    border-top-color: #BAE8BA;
+    border-left-color: #BAE8BA;
+    
+    border-bottom-color: #1B7C1B;
+    border-right-color: #1B7C1B;
 }
 
 /* # FOCUS # */
@@ -485,12 +580,24 @@ gs-email-button[bg-success]:focus,
 gs-tracking-button[bg-success]:focus,
 gs-delete-button[bg-success]:focus,
 gs-option[bg-success]:focus,
-gs-dialog-button[bg-success]:focus {
+gs-dialog-button[bg-success]:focus,
+gs-button[bg-success][selected]:focus:not(.hover),
+gs-checkbox[bg-success][selected]:focus:not(.hover),
+gs-toggle[bg-success][selected]:focus:not(.hover),
+gs-phone-button[bg-success]:not([not-supported])[selected]:focus:not(.hover),
+gs-map-button[bg-success][selected]:focus:not(.hover),
+gs-skype-button[bg-success][selected]:focus:not(.hover),
+gs-facetime-button[bg-success][selected]:focus:not(.hover),
+gs-email-button[bg-success][selected]:focus:not(.hover),
+gs-tracking-button[bg-success][selected]:focus:not(.hover),
+gs-delete-button[bg-success][selected]:focus:not(.hover),
+gs-option[bg-success][selected]:focus:not(.hover),
+gs-dialog-button[bg-success][selected]:focus:not(.hover) {
     text-decoration: none;
     outline-offset: -3px;
-    color: #fff;
-    background-color: #449d44 !important;
-    border-color: #255625;
+    color: #5cb85c;
+    
+    background-color: #FFFDEC !important;
 }
 
 /* # HOVER # */
@@ -508,7 +615,12 @@ gs-dialog-button[bg-success].hover {
     text-decoration: none;
     color: #fff;
     background-color: #449d44 !important;
-    border-color: #398439;
+    
+    border-top-color: #BAE8BA;
+    border-left-color: #BAE8BA;
+    
+    border-bottom-color: #449d44;
+    border-right-color: #449d44;
 }
 
 /* # DOWN # */
@@ -523,14 +635,28 @@ gs-email-button[bg-success].down,
 gs-tracking-button[bg-success].down,
 gs-delete-button[bg-success].down,
 gs-option[bg-success].down,
-gs-dialog-button[bg-success].down {
+gs-dialog-button[bg-success].down,
+gs-button[bg-success][selected],
+gs-checkbox[bg-success][selected],
+gs-toggle[bg-success][selected],
+gs-phone-button[bg-success]:not([not-supported])[selected],
+gs-map-button[bg-success][selected],
+gs-skype-button[bg-success][selected],
+gs-facetime-button[bg-success][selected],
+gs-email-button[bg-success][selected],
+gs-tracking-button[bg-success][selected],
+gs-delete-button[bg-success][selected],
+gs-option[bg-success][selected],
+gs-dialog-button[bg-success][selected] {
     background-image: none;
-    outline: 0;
-    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
     color: #fff;
     background-color: #449d44 !important;
-    border-color: #398439;
+    
+    border-top-color: #1B7C1B;
+    border-left-color: #1B7C1B;
+    
+    border-bottom-color: #BAE8BA;
+    border-right-color: #BAE8BA;
 }
 
 /* # DOWN AND HOVER # */
@@ -548,7 +674,6 @@ gs-option[bg-success].down.hover,
 gs-dialog-button[bg-success].down.hover {
     color: #fff;
     background-color: #398439 !important;
-    border-color: #255625;
 }
 
 /* # DISABLED # */
@@ -565,12 +690,26 @@ gs-delete-button[bg-success][disabled],
 gs-option[bg-success][disabled],
 gs-dialog-button[bg-success][disabled] {
     cursor: not-allowed;
-    filter: alpha(opacity=65);
-    -webkit-box-shadow: none;
-            box-shadow: none;
-    opacity: 0.65;
     background-color: #5cb85c !important;
-    border-color: #4cae4c;
+    
+    color: #666666;
+}
+
+/* # TXT DISABLED # */
+gs-button[txt-success][disabled],
+gs-toggle[txt-success][disabled],
+gs-checkbox[txt-success][disabled],
+gs-phone-button[txt-success]:not([not-supported])[disabled],
+gs-map-button[txt-success][disabled],
+gs-skype-button[txt-success][disabled],
+gs-facetime-button[txt-success][disabled],
+gs-email-button[txt-success][disabled],
+gs-tracking-button[txt-success][disabled],
+gs-delete-button[txt-success][disabled],
+gs-option[txt-success][disabled],
+gs-dialog-button[txt-success][disabled] {
+    cursor: not-allowed;
+    color: #5cb85c;
 }
 
 /* ## INFO ## */
@@ -588,7 +727,12 @@ gs-option[bg-info],
 gs-dialog-button[bg-info] {
     color: #fff;
     background-color: #5bc0de !important;
-    border-color: #46b8da;
+    
+    border-top-color: #BAEAF8;
+    border-left-color: #BAEAF8;
+    
+    border-bottom-color: #1993B6;
+    border-right-color: #1993B6;
 }
 
 /* # FOCUS # */
@@ -603,12 +747,24 @@ gs-email-button[bg-info]:focus,
 gs-tracking-button[bg-info]:focus,
 gs-delete-button[bg-info]:focus,
 gs-option[bg-info]:focus,
-gs-dialog-button[bg-info]:focus {
+gs-dialog-button[bg-info]:focus,
+gs-button[bg-info][selected]:focus:not(.hover),
+gs-checkbox[bg-info][selected]:focus:not(.hover),
+gs-toggle[bg-info][selected]:focus:not(.hover),
+gs-phone-button[bg-info]:not([not-supported])[selected]:focus:not(.hover),
+gs-map-button[bg-info][selected]:focus:not(.hover),
+gs-skype-button[bg-info][selected]:focus:not(.hover),
+gs-facetime-button[bg-info][selected]:focus:not(.hover),
+gs-email-button[bg-info][selected]:focus:not(.hover),
+gs-tracking-button[bg-info][selected]:focus:not(.hover),
+gs-delete-button[bg-info][selected]:focus:not(.hover),
+gs-option[bg-info][selected]:focus:not(.hover),
+gs-dialog-button[bg-info][selected]:focus:not(.hover) {
     text-decoration: none;
     outline-offset: -3px;
-    color: #fff;
-    background-color: #31b0d5 !important;
-    border-color: #1b6d85;
+    color: #5bc0de;
+    
+    background-color: #FFFDEC !important;
 }
 
 /* # HOVER # */
@@ -626,7 +782,12 @@ gs-dialog-button[bg-info].hover {
     text-decoration: none;
     color: #fff;
     background-color: #31b0d5 !important;
-    border-color: #269abc;
+    
+    border-top-color: #BAEAF8;
+    border-left-color: #BAEAF8;
+    
+    border-bottom-color: #31b0d5;
+    border-right-color: #31b0d5;
 }
 
 /* # DOWN # */
@@ -641,14 +802,28 @@ gs-email-button[bg-info].down,
 gs-tracking-button[bg-info].down,
 gs-delete-button[bg-info].down,
 gs-option[bg-info].down,
-gs-dialog-button[bg-info].down {
+gs-dialog-button[bg-info].down,
+gs-button[bg-info][selected],
+gs-checkbox[bg-info][selected],
+gs-toggle[bg-info][selected],
+gs-phone-button[bg-info]:not([not-supported])[selected],
+gs-map-button[bg-info][selected],
+gs-skype-button[bg-info][selected],
+gs-facetime-button[bg-info][selected],
+gs-email-button[bg-info][selected],
+gs-tracking-button[bg-info][selected],
+gs-delete-button[bg-info][selected],
+gs-option[bg-info][selected],
+gs-dialog-button[bg-info][selected] {
     background-image: none;
-    outline: 0;
-    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
     color: #fff;
     background-color: #31b0d5 !important;
-    border-color: #269abc;
+    
+    border-top-color: #1993B6;
+    border-left-color: #1993B6;
+    
+    border-bottom-color: #BAEAF8;
+    border-right-color: #BAEAF8;
 }
 
 /* # DOWN AND HOVER # */
@@ -666,7 +841,6 @@ gs-option[bg-info].down.hover,
 gs-dialog-button[bg-info].down.hover {
     color: #fff;
     background-color: #269abc !important;
-    border-color: #1b6d85;
 }
 
 /* # DISABLED # */
@@ -683,12 +857,26 @@ gs-delete-button[bg-info][disabled],
 gs-option[bg-info][disabled],
 gs-dialog-button[bg-info][disabled] {
     cursor: not-allowed;
-    filter: alpha(opacity=65);
-    -webkit-box-shadow: none;
-            box-shadow: none;
-    opacity: .65;
     background-color: #5bc0de !important;
-    border-color: #46b8da;
+    
+    color: #666666;
+}
+
+/* # TXT DISABLED # */
+gs-button[txt-info][disabled],
+gs-toggle[txt-info][disabled],
+gs-checkbox[txt-info][disabled],
+gs-phone-button[txt-info]:not([not-supported])[disabled],
+gs-map-button[txt-info][disabled],
+gs-skype-button[txt-info][disabled],
+gs-facetime-button[txt-info][disabled],
+gs-email-button[txt-info][disabled],
+gs-tracking-button[txt-info][disabled],
+gs-delete-button[txt-info][disabled],
+gs-option[txt-info][disabled],
+gs-dialog-button[txt-info][disabled] {
+    cursor: not-allowed;
+    color: #269abc;
 }
 
 /* ## WARNING ## */
@@ -706,7 +894,12 @@ gs-option[bg-warning],
 gs-dialog-button[bg-warning] {
     color: #fff;
     background-color: #f0ad4e;
-    border-color: #eea236;
+    
+    border-top-color: #FFD8A0;
+    border-left-color: #FFD8A0;
+    
+    border-bottom-color: #AD6D11;
+    border-right-color: #AD6D11;
 }
 
 /* # FOCUS # */
@@ -721,12 +914,24 @@ gs-email-button[bg-warning]:focus,
 gs-tracking-button[bg-warning]:focus,
 gs-delete-button[bg-warning]:focus,
 gs-option[bg-warning]:focus,
-gs-dialog-button[bg-warning]:focus {
+gs-dialog-button[bg-warning]:focus,
+gs-button[bg-warning][selected]:focus:not(.hover),
+gs-checkbox[bg-warning][selected]:focus:not(.hover),
+gs-toggle[bg-warning][selected]:focus:not(.hover),
+gs-phone-button[bg-warning]:not([not-supported])[selected]:focus:not(.hover),
+gs-map-button[bg-warning][selected]:focus:not(.hover),
+gs-skype-button[bg-warning][selected]:focus:not(.hover),
+gs-facetime-button[bg-warning][selected]:focus:not(.hover),
+gs-email-button[bg-warning][selected]:focus:not(.hover),
+gs-tracking-button[bg-warning][selected]:focus:not(.hover),
+gs-delete-button[bg-warning][selected]:focus:not(.hover),
+gs-option[bg-warning][selected]:focus:not(.hover),
+gs-dialog-button[bg-warning][selected]:focus:not(.hover) {
     text-decoration: none;
     outline-offset: -3px;
-    color: #fff;
-    background-color: #ec971f !important;
-    border-color: #985f0d;
+    color: #f0ad4e;
+    
+    background-color: #FFFDEC !important;
 }
 
 /* # HOVER # */
@@ -744,7 +949,12 @@ gs-dialog-button[bg-warning].hover {
     text-decoration: none;
     color: #fff;
     background-color: #ec971f !important;
-    border-color: #d58512;
+    
+    border-top-color: #FFD8A0;
+    border-left-color: #FFD8A0;
+    
+    border-bottom-color: #ec971f;
+    border-right-color: #ec971f;
 }
 
 /* # DOWN # */
@@ -759,14 +969,28 @@ gs-email-button[bg-warning].down,
 gs-tracking-button[bg-warning].down,
 gs-delete-button[bg-warning].down,
 gs-option[bg-warning].down,
-gs-dialog-button[bg-warning].down {
+gs-dialog-button[bg-warning].down,
+gs-button[bg-warning][selected],
+gs-checkbox[bg-warning][selected],
+gs-toggle[bg-warning][selected],
+gs-phone-button[bg-warning]:not([not-supported])[selected],
+gs-map-button[bg-warning][selected],
+gs-skype-button[bg-warning][selected],
+gs-facetime-button[bg-warning][selected],
+gs-email-button[bg-warning][selected],
+gs-tracking-button[bg-warning][selected],
+gs-delete-button[bg-warning][selected],
+gs-option[bg-warning][selected],
+gs-dialog-button[bg-warning][selected] {
     background-image: none;
-    outline: 0;
-    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
     color: #fff;
     background-color: #ec971f !important;
-    border-color: #d58512;
+    
+    border-top-color: #AD6D11;
+    border-left-color: #AD6D11;
+    
+    border-bottom-color: #FFD8A0;
+    border-right-color: #FFD8A0;
 }
 
 /* # DOWN AND HOVER # */
@@ -784,7 +1008,6 @@ gs-option[bg-warning].down.hover,
 gs-dialog-button[bg-warning].down.hover {
     color: #fff;
     background-color: #d58512 !important;
-    border-color: #985f0d;
 }
 
 /* # DISABLED # */
@@ -801,12 +1024,26 @@ gs-delete-button[bg-warning][disabled],
 gs-option[bg-warning][disabled],
 gs-dialog-button[bg-warning][disabled] {
     cursor: not-allowed;
-    filter: alpha(opacity=65);
-    -webkit-box-shadow: none;
-            box-shadow: none;
-    opacity: .65;
     background-color: #f0ad4e !important;
-    border-color: #eea236;
+    
+    color: #666666;
+}
+
+/* # DISABLED # */
+gs-button[txt-warning][disabled],
+gs-toggle[txt-warning][disabled],
+gs-checkbox[txt-warning][disabled],
+gs-phone-button[txt-warning]:not([not-supported])[disabled],
+gs-map-button[txt-warning][disabled],
+gs-skype-button[txt-warning][disabled],
+gs-facetime-button[txt-warning][disabled],
+gs-email-button[txt-warning][disabled],
+gs-tracking-button[txt-warning][disabled],
+gs-delete-button[txt-warning][disabled],
+gs-option[txt-warning][disabled],
+gs-dialog-button[txt-warning][disabled] {
+    cursor: not-allowed;
+    color: #d58512;
 }
 
 /* ## DANGER ## */
@@ -824,7 +1061,12 @@ gs-option[bg-danger],
 gs-dialog-button[bg-danger] {
     color: #fff;
     background-color: #d9534f !important;
-    border-color: #d43f3a;
+    
+    border-top-color: #FFADAB;
+    border-left-color: #FFADAB;
+    
+    border-bottom-color: #961512;
+    border-right-color: #961512;
 }
 
 /* # FOCUS # */
@@ -839,12 +1081,24 @@ gs-email-button[bg-danger]:focus,
 gs-tracking-button[bg-danger]:focus,
 gs-delete-button[bg-danger]:focus,
 gs-option[bg-danger]:focus,
-gs-dialog-button[bg-danger]:focus {
+gs-dialog-button[bg-danger]:focus,
+gs-button[bg-danger][selected]:focus:not(.hover),
+gs-checkbox[bg-danger][selected]:focus:not(.hover),
+gs-toggle[bg-danger][selected]:focus:not(.hover),
+gs-phone-button[bg-danger]:not([not-supported])[selected]:focus:not(.hover),
+gs-map-button[bg-danger][selected]:focus:not(.hover),
+gs-skype-button[bg-danger][selected]:focus:not(.hover),
+gs-facetime-button[bg-danger][selected]:focus:not(.hover),
+gs-email-button[bg-danger][selected]:focus:not(.hover),
+gs-tracking-button[bg-danger][selected]:focus:not(.hover),
+gs-delete-button[bg-danger][selected]:focus:not(.hover),
+gs-option[bg-danger][selected]:focus:not(.hover),
+gs-dialog-button[bg-danger][selected]:focus:not(.hover) {
     text-decoration: none;
     outline-offset: -3px;
-    color: #fff;
-    background-color: #c9302c !important;
-    border-color: #761c19;
+    color: #d9534f;
+    
+    background-color: #FFFDEC !important;
 }
 
 /* # HOVER # */
@@ -862,7 +1116,12 @@ gs-dialog-button[bg-danger].hover {
     text-decoration: none;
     color: #fff;
     background-color: #c9302c !important;
-    border-color: #ac2925;
+    
+    border-top-color: #FFADAB;
+    border-left-color: #FFADAB;
+    
+    border-bottom-color: #c9302c;
+    border-right-color: #c9302c;
 }
 
 /* # DOWN # */
@@ -877,14 +1136,28 @@ gs-email-button[bg-danger].down,
 gs-tracking-button[bg-danger].down,
 gs-delete-button[bg-danger].down,
 gs-option[bg-danger].down,
-gs-dialog-button[bg-danger].down {
+gs-dialog-button[bg-danger].down,
+gs-button[bg-danger][selected],
+gs-checkbox[bg-danger][selected],
+gs-toggle[bg-danger][selected],
+gs-phone-button[bg-danger]:not([not-supported])[selected],
+gs-map-button[bg-danger][selected],
+gs-skype-button[bg-danger][selected],
+gs-facetime-button[bg-danger][selected],
+gs-email-button[bg-danger][selected],
+gs-tracking-button[bg-danger][selected],
+gs-delete-button[bg-danger][selected],
+gs-option[bg-danger][selected],
+gs-dialog-button[bg-danger][selected] {
     background-image: none;
-    outline: 0;
-    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
     color: #fff;
     background-color: #c9302c !important;
-    border-color: #ac2925;
+    
+    border-top-color: #961512;
+    border-left-color: #961512;
+    
+    border-bottom-color: #FFADAB;
+    border-right-color: #FFADAB;
 }
 
 /* # DOWN AND HOVER # */
@@ -902,13 +1175,8 @@ gs-option[bg-danger].down.hover,
 gs-dialog-button[bg-danger].down.hover {
     color: #fff;
     background-color: #ac2925 !important;
-    border-color: #761c19;
 }
-/*
 
-<gs-button></gs-button>
-
-*/
 /* # DISABLED # */
 gs-button[bg-danger][disabled],
 gs-toggle[bg-danger][disabled],
@@ -923,12 +1191,26 @@ gs-delete-button[bg-danger][disabled],
 gs-option[bg-danger][disabled],
 gs-dialog-button[bg-danger][disabled] {
     cursor: not-allowed;
-    filter: alpha(opacity=65);
-    -webkit-box-shadow: none;
-            box-shadow: none;
-    opacity: .65;
     background-color: #d9534f !important;
-    border-color: #d43f3a;
+    
+    color: #aaaaaa;
+}
+
+/* # TXT DISABLED # */
+gs-button[txt-danger][disabled],
+gs-toggle[txt-danger][disabled],
+gs-checkbox[txt-danger][disabled],
+gs-phone-button[txt-danger]:not([not-supported])[disabled],
+gs-map-button[txt-danger][disabled],
+gs-skype-button[txt-danger][disabled],
+gs-facetime-button[txt-danger][disabled],
+gs-email-button[txt-danger][disabled],
+gs-tracking-button[txt-danger][disabled],
+gs-delete-button[txt-danger][disabled],
+gs-option[txt-danger][disabled],
+gs-dialog-button[txt-danger][disabled] {
+    cursor: not-allowed;
+    color: #ac2925;
 }
 
 
@@ -1269,9 +1551,9 @@ gs-dialog-button[special-icon]:after {
     text-align: center;
 	text-indent: 0;
     
-    line-height: 1.25; /*1.3;*/
     font-size: 1.4em;
     
+    line-height: 1.25; /*1.3;*/
     /*border-radius: 50%;
     border: 1px solid #000000;
     
@@ -1357,8 +1639,9 @@ gs-option[icon]:not([iconleft]):not([iconright]):not([icontop]):not([iconbottom]
 gs-option[iconleft]:after,
 gs-dialog-button[icon]:not([iconleft]):not([iconright]):not([icontop]):not([iconbottom]):not([icononly]):after,
 gs-dialog-button[iconleft]:after {
-    top: 0.25em;
     left: 0; /* 0.1em; */
+    top: 0.05em;
+    line-height: 1em;
 }
 /*gs-button[mini][icon]:not([iconleft]):not([iconright]):not([icontop]):not([iconbottom]):not([icononly]):after,
 gs-button[mini][iconleft]:after,

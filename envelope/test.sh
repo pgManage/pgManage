@@ -69,7 +69,7 @@ rm -rf ~/.mozilla ~/.envelope
 
 sudo $MAKE install
 
-sudo chown -R super:wheel /usr/local/etc/envelope/
+sudo chown -R super /usr/local/etc/envelope/
 
 /usr/local/sbin/envelope & export ENVELOPEPID="$!"
 sleep 5
