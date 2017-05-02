@@ -2,6 +2,8 @@ Check Find/Replace
 
 Check multiple cursor autocomplete
 
+Check that selecting a line up or down closes popup
+
 Check typing really quickly
 
 Check Typing with multiple cursors
