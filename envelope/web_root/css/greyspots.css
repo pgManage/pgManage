@@ -1479,6 +1479,7 @@ gs-memo textarea {
     -o-box-sizing: border-box;
     box-sizing: border-box;
     
+    line-height: 1em;
     padding: 0.2em;
 }
 
@@ -16434,7 +16435,7 @@ gs-text[mini] input {
 
 gs-text[disabled],
 gs-text[disabled] .control {
-    height: 1.35em;
+    /*height: 1.35em;*/
     background-color: #D5D5D5;
     pointer-events: auto;
 }

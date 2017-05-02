@@ -48,31 +48,62 @@ function autocompleteBindEditor(tabElement, editor) {
     editor.standardgotoright      = editor.commands.commands.gotoright.exec;
     editor.standardgotoleft       = editor.commands.commands.gotoleft.exec;
     editor.standardReturn         = editor.commands.commands.inserttext.exec;
-    editor.standardSelectdown     = editor.commands.commands.selectdown.exec
-    editor.standardSelectup       = editor.commands.commands.selectup.exec
+    editor.standardgotowordright  = editor.commands.commands.gotowordright.exec;
+    editor.standardgotowordleft   = editor.commands.commands.gotowordleft.exec;
+    editor.standardgotolinestart  = editor.commands.commands.gotolinestart.exec;
+    editor.standardgotolineend    = editor.commands.commands.gotolineend.exec;
     
     
     
-    editor.commands.commands.selectdown.exec = function () {
-        //console.log('if: ' + autocompleteGlobals.bolBound);
-        if (autocompleteGlobals.bolBound) {
-            closePopup();
-            editor.standardSelectdown.apply(this, arguments);
-        } else {
-            editor.standardSelectdown.apply(this, arguments);
-        }
-    }
     
     
-    editor.commands.commands.selectup.exec = function () {
-        //console.log('if: ' + autocompleteGlobals.bolBound);
-        if (autocompleteGlobals.bolBound) {
-            closePopup();
-            editor.standardSelectup.apply(this, arguments);
-        } else {
-            editor.standardSelectup.apply(this, arguments);
-        }
-    }
+    
+    // editor.standardSelectdown     = editor.commands.commands.selectdown.exec
+    // editor.standardSelectup       = editor.commands.commands.selectup.exec
+    // editor.standardSelectright    = editor.commands.commands.selectright.exec
+    // editor.standardSelectleft     = editor.commands.commands.selectleft.exec
+    
+    
+    
+    // editor.commands.commands.selectdown.exec = function () {
+    //     //console.log('if: ' + autocompleteGlobals.bolBound);
+    //     if (autocompleteGlobals.bolBound) {
+    //         closePopup();
+    //         editor.standardSelectdown.apply(this, arguments);
+    //     } else {
+    //         editor.standardSelectdown.apply(this, arguments);
+    //     }
+    // }
+
+    // editor.commands.commands.selectup.exec = function () {
+    //     //console.log('if: ' + autocompleteGlobals.bolBound);
+    //     if (autocompleteGlobals.bolBound) {
+    //         closePopup();
+    //         editor.standardSelectup.apply(this, arguments);
+    //     } else {
+    //         editor.standardSelectup.apply(this, arguments);
+    //     }
+    // }  
+    
+    // editor.commands.commands.selectright.exec = function () {
+    //     //console.log('if: ' + autocompleteGlobals.bolBound);
+    //     if (autocompleteGlobals.bolBound) {
+    //         closePopup();
+    //         editor.standardSelectright.apply(this, arguments);
+    //     } else {
+    //         editor.standardSelectright.apply(this, arguments);
+    //     }
+    // }
+
+    // editor.commands.commands.selectleft.exec = function () {
+    //     //console.log('if: ' + autocompleteGlobals.bolBound);
+    //     if (autocompleteGlobals.bolBound) {
+    //         closePopup();
+    //         editor.standardSelectleft.apply(this, arguments);
+    //     } else {
+    //         editor.standardSelectleft.apply(this, arguments);
+    //     }
+    // }
     
     
     
@@ -107,6 +138,7 @@ function autocompleteBindEditor(tabElement, editor) {
             editor.standardGoLineDownExec.apply(this, arguments)
         }
     };
+    
     editor.commands.commands.golineup.exec = function () {
         if (autocompleteGlobals.bolBound) {
             var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
@@ -190,6 +222,43 @@ function autocompleteBindEditor(tabElement, editor) {
         }
     };
     
+    editor.commands.commands.gotowordright.exec = function () {
+        if (autocompleteGlobals.bolBound) {
+            closePopup(editor);
+            editor.standardgotowordright.apply(this, arguments);
+        } else {
+            editor.standardgotowordright.apply(this, arguments);
+        }
+    };
+    
+    editor.commands.commands.gotowordleft.exec = function () {
+        if (autocompleteGlobals.bolBound) {
+            closePopup(editor);
+            editor.standardgotowordleft.apply(this, arguments);
+        } else {
+            editor.standardgotowordleft.apply(this, arguments);
+        }
+    };
+    
+    editor.commands.commands.gotolinestart.exec = function () {
+        if (autocompleteGlobals.bolBound) {
+            closePopup(editor);
+            editor.standardgotolinestart.apply(this, arguments);
+        } else {
+            editor.standardgotolinestart.apply(this, arguments);
+        }
+    };
+    
+    editor.commands.commands.gotolineend.exec = function () {
+        if (autocompleteGlobals.bolBound) {
+            closePopup(editor);
+            editor.standardgotolineend.apply(this, arguments);
+        } else {
+            editor.standardgotolineend.apply(this, arguments);
+        }
+    };
+    
+
 
     // //gotoright, gotoleft
 
@@ -238,18 +307,26 @@ function autocompleteBindEditor(tabElement, editor) {
     // autocompleteGlobals.bolBound = true;
     autocompleteGlobals.popupAce.focusElement.addEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
     //console.log(editor.onSelectionChange);
-    
-    // editor.selection.addEventListener('changeSelection', function () {
-    //     console.log('close');
-    //     closePopup();
-    // });
-    
+
+    editor.textInput.getElement().addEventListener('keyup', function () {
+        if (editor.currentSelections) {
+            var currSelections = editor.currentSelections;
+            //console.log(currSelections);
+            for (var i = 0, len = currSelections.length; i < len; i++) {
+            //console.log(currSelections[i].start.row, currSelections[i].end.row, currSelections[i].start.column, currSelections[i].end.column);
+                if (currSelections[i].start.row !== currSelections[i].end.row || currSelections[i].start.column !== currSelections[i].end.column) {
+                    closePopup();
+                }
+            }
+        }
+    });
+
     // editor.textInput.getElement().addEventListener('keydown', function (event) {
     //     if (event.shiftKey && event.keyCode === 38) {
     //         closePopup();
     //     }
     // });
-    
+
     editor.addEventListener('change', function (event) {
         //console.log(event.lines.length, autocompleteGlobals.ignoreNext);
         if (autocompleteGlobals.ignoreNext === 0) {
