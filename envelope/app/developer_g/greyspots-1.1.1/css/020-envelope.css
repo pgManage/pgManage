@@ -34,7 +34,7 @@ gs-envelope table > thead > tr > td,
 gs-envelope table > tbody > tr > td,
 gs-envelope table > tfoot > tr > td {
   padding: 8px;
-  line-height: 1.42857143;
+  /*line-height: 1.42857143;*/
   vertical-align: top;
   border-top: 1px solid #ddd;
 }

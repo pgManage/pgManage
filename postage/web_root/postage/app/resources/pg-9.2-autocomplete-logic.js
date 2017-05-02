@@ -48,6 +48,32 @@ function autocompleteBindEditor(tabElement, editor) {
     editor.standardgotoright      = editor.commands.commands.gotoright.exec;
     editor.standardgotoleft       = editor.commands.commands.gotoleft.exec;
     editor.standardReturn         = editor.commands.commands.inserttext.exec;
+    editor.standardSelectdown     = editor.commands.commands.selectdown.exec
+    editor.standardSelectup       = editor.commands.commands.selectup.exec
+    
+    
+    
+    editor.commands.commands.selectdown.exec = function () {
+        //console.log('if: ' + autocompleteGlobals.bolBound);
+        if (autocompleteGlobals.bolBound) {
+            closePopup();
+            editor.standardSelectdown.apply(this, arguments);
+        } else {
+            editor.standardSelectdown.apply(this, arguments);
+        }
+    }
+    
+    
+    editor.commands.commands.selectup.exec = function () {
+        //console.log('if: ' + autocompleteGlobals.bolBound);
+        if (autocompleteGlobals.bolBound) {
+            closePopup();
+            editor.standardSelectup.apply(this, arguments);
+        } else {
+            editor.standardSelectup.apply(this, arguments);
+        }
+    }
+    
     
     
     editor.commands.commands.golinedown.exec = function () {
@@ -213,7 +239,16 @@ function autocompleteBindEditor(tabElement, editor) {
     autocompleteGlobals.popupAce.focusElement.addEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
     //console.log(editor.onSelectionChange);
     
+    // editor.selection.addEventListener('changeSelection', function () {
+    //     console.log('close');
+    //     closePopup();
+    // });
     
+    // editor.textInput.getElement().addEventListener('keydown', function (event) {
+    //     if (event.shiftKey && event.keyCode === 38) {
+    //         closePopup();
+    //     }
+    // });
     
     editor.addEventListener('change', function (event) {
         //console.log(event.lines.length, autocompleteGlobals.ignoreNext);
@@ -604,6 +639,9 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         strPreviousWord = arrPreviousWords[0];
         
         if (strPreviousWord) {
+            bolAfterComma = (strPreviousWord[strPreviousWord.length - 1] === ',');
+        } else {
+            currWord = strPreviousWord;
             bolAfterComma = (strPreviousWord[strPreviousWord.length - 1] === ',');
         }
 

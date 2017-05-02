@@ -1735,7 +1735,7 @@ gs-dialog-button {
 
 gs-checkbox {
     /* make the same height as gs-text and gs-button */
-    padding: 0.3575em 0.85714286em;
+    padding: 0.1em;
 }
 
 [flex-vertical]   > gs-button,
@@ -12882,9 +12882,11 @@ gs-body {
 
 gs-body[padded] {
     padding: 1em;
-}gs-checkbox:not([readonly]):not([mini]):not(:focus) {
+}/*
+gs-checkbox:not([readonly]):not([mini]):not(:focus) {
     box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
 }
+*/
 
 gs-checkbox[readonly] {
     opacity: 0.9;
@@ -13666,10 +13668,11 @@ gs-date .date-picker-button:after {
     font-size: 1em;
 }
 
-
+/*
 gs-date[no-picker] {
     padding: 0.2em;
 }
+*/
 gs-date[no-picker] .date-picker-button {
     display: none;
 }
@@ -13956,7 +13959,7 @@ gs-envelope table > thead > tr > td,
 gs-envelope table > tbody > tr > td,
 gs-envelope table > tfoot > tr > td {
   padding: 8px;
-  line-height: 1.42857143;
+  /*line-height: 1.42857143;*/
   vertical-align: top;
   border-top: 1px solid #ddd;
 }

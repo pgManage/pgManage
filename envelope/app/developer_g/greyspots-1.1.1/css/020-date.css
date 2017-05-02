@@ -31,10 +31,11 @@ gs-date .date-picker-button:after {
     font-size: 1em;
 }
 
-
+/*
 gs-date[no-picker] {
     padding: 0.2em;
 }
+*/
 gs-date[no-picker] .date-picker-button {
     display: none;
 }

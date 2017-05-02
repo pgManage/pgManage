@@ -91,7 +91,7 @@ gs-dialog-button {
 
 gs-checkbox {
     /* make the same height as gs-text and gs-button */
-    padding: 0.3575em 0.85714286em;
+    padding: 0.1em;
 }
 
 [flex-vertical]   > gs-button,
