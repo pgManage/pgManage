@@ -83,12 +83,13 @@ sudo chown -R super /usr/local/etc/envelope/
 sleep 5
 if test $(uname -s) = "OpenBSD"; then
 	xdg-open "http://127.0.0.1:8888/test.html" &
+	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 else
 	npm start & export ELECTRONPID="$!"
+	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
+	kill $ELECTRONPID
 fi
-printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 kill $ENVELOPEPID
-kill $ELECTRONPID
 
 sudo $MAKE uninstall
 
