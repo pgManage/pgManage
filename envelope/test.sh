@@ -17,36 +17,39 @@ fi
 mkdir test-envelope
 cd test-envelope
 
-cat << EOF > package.json
-{
-  "name": "test-envelope",
-  "scripts": {
-    "start": "electron ."
-  },
-  "devDependencies": {
-    "electron": "^1.6.2"
-  },
-  "main": "index.js"
-}
-EOF
+if test $(uname -s) = "OpenBSD"; then
+else
+	cat << EOF > package.json
+	{
+	  "name": "test-envelope",
+	  "scripts": {
+	    "start": "electron ."
+	  },
+	  "devDependencies": {
+	    "electron": "^1.6.2"
+	  },
+	  "main": "index.js"
+	}
+	EOF
 
-cat << EOF > index.js
-const electron = require('electron');
-let window = null;
+	cat << EOF > index.js
+	const electron = require('electron');
+	let window = null;
 
-electron.app.on('ready', function () {
-        window = new electron.BrowserWindow();
-        window.loadURL('http://127.0.0.1:8888/test.html');
-});
+	electron.app.on('ready', function () {
+	        window = new electron.BrowserWindow();
+	        window.loadURL('http://127.0.0.1:8888/test.html');
+	});
 
 
-electron.app.on('window-all-closed', function () {
-        electron.app.quit();
-});
+	electron.app.on('window-all-closed', function () {
+	        electron.app.quit();
+	});
 
-EOF
+	EOF
 
-npm install
+	npm install
+fi
 
 rm -rf envelope-master master.zip ~/.mozilla
 
@@ -59,8 +62,12 @@ $MAKE test-common
 
 ./envelope/envelope -c ./envelope/config/envelope.conf -d ./envelope/config/envelope-connections.conf -t 300 -r ./envelope/web_root -y ./envelope/app -z ./envelope/role -l info & export ENVELOPEPID="$!"
 sleep 5
-#xdg-open "http://127.0.0.1:8888/test.html"
-npm start & export ELECTRONPID="$!"
+
+if test $(uname -s) = "OpenBSD"; then
+	xdg-open "http://127.0.0.1:8888/test.html" &
+else
+	npm start & export ELECTRONPID="$!"
+fi
 printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 kill $ENVELOPEPID
 kill $ELECTRONPID
@@ -73,8 +80,11 @@ sudo chown -R super /usr/local/etc/envelope/
 
 /usr/local/sbin/envelope & export ENVELOPEPID="$!"
 sleep 5
-#xdg-open "http://127.0.0.1:8888/test.html"
-npm start & export ELECTRONPID="$!"
+if test $(uname -s) = "OpenBSD"; then
+	xdg-open "http://127.0.0.1:8888/test.html" &
+else
+	npm start & export ELECTRONPID="$!"
+fi
 printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 kill $ENVELOPEPID
 kill $ELECTRONPID
