@@ -2,6 +2,18 @@
 
 set -e
 
+if test $(uname -s) = "Linux"; then
+	MAKE=make
+elif test $(uname -s) = "Darwin"; then
+	MAKE=make
+elif test $(uname -s) = "FreeBSD"; then
+	MAKE=gmake
+elif test $(uname -s) = "OpenBSD"; then
+	MAKE=gmake
+else
+	MAKE=make
+fi
+
 mkdir test-envelope
 cd test-envelope
 
@@ -42,8 +54,8 @@ wget https://github.com/workflowproducts/envelope/archive/master.zip
 unzip master.zip
 cd envelope-master/
 
-./configure && make -j32
-make test-common
+./configure && $MAKE -j32
+$MAKE test-common
 
 ./envelope/envelope -c ./envelope/config/envelope.conf -d ./envelope/config/envelope-connections.conf -t 300 -r ./envelope/web_root -y ./envelope/app -z ./envelope/role -l info & export ENVELOPEPID="$!"
 sleep 5
@@ -55,9 +67,9 @@ kill $ELECTRONPID
 
 rm -rf ~/.mozilla ~/.envelope
 
-sudo make install
+sudo $MAKE install
 
-sudo chown -R super:wheel /usr/local/etc/envelope/
+sudo chown -R super /usr/local/etc/envelope/
 
 /usr/local/sbin/envelope & export ENVELOPEPID="$!"
 sleep 5
@@ -67,7 +79,7 @@ printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 kill $ENVELOPEPID
 kill $ELECTRONPID
 
-sudo make uninstall
+sudo $MAKE uninstall
 
 kill -9 $(cat envelope/postgres.pid)
 
