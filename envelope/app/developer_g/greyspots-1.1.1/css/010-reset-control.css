@@ -27,8 +27,24 @@ gs-memo textarea {
     -o-box-sizing: border-box;
     box-sizing: border-box;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0.2em;
+}
+
+gs-date input:focus,
+gs-text input:focus,
+gs-search input:focus,
+gs-number input:focus,
+gs-memo input:focus,
+gs-combo input:focus,
+gs-time input:focus,
+gs-select select:focus,
+gs-interval input:focus,
+gs-memo textarea:focus {
+    /* this is a default that but each element is allow to have its own setting of this particular property */
+    outline-offset: -1px;
+    background-color: #FFFDEC;
+    outline: dashed 1px #FFB000;
 }
 
 gs-memo textarea {

@@ -2,11 +2,13 @@ gs-date {
     position: relative;
     display: block;
     padding: 0;
-    line-height: 1em;
+    line-height: 1.2em;
     background-color: #FFFFFF;
     border: 1px solid #AEAEAE;
     border-radius: 0.2em;
     min-height: 1em;
+    
+    margin-top: -1px;
 }
 
 gs-date .date-picker-button {

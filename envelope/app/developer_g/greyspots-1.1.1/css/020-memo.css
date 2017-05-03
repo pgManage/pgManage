@@ -12,9 +12,11 @@ gs-memo {
     -o-box-sizing: border-box;
     box-sizing: border-box;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0;
     box-shadow: none;
+    
+    margin-top: -1px;
 }
 
 /* ###################################################################################### */

@@ -8,9 +8,11 @@ gs-time {
     border: 1px solid #AEAEAE;
     border-radius: 0.2em;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0;
     box-shadow: none;
+    
+    margin-top: -1px;
 }
 
 gs-time .time-picker-button {
