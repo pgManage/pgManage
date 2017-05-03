@@ -18,6 +18,7 @@ mkdir test-envelope
 cd test-envelope
 
 if test $(uname -s) = "OpenBSD"; then
+	echo "skipping electron tester"
 else
 	cat << EOF > package.json
 	{
