@@ -14,7 +14,18 @@ var queryVars = {
     , 'bolTablespace': false
 };
 
+
+
+
 var curr_run_down = 0, curr_run_up = 0, curr_run_complete = 0;
+
+var searchPath;
+
+getListData(ml(function () {/*SELECT current_schemas(true);*/}), '', function (arrRecords) {
+    searchPath = arrRecords[1][0];
+    searchPath = searchPath.substring(1, searchPath.length);
+    searchPath = searchPath.substring(0, searchPath.length - 1);
+});
 
 var TOAST_id, CATALOG_id;
 
@@ -718,7 +729,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         if (strPreviousWord) {
             bolAfterComma = (strPreviousWord[strPreviousWord.length - 1] === ',');
         } else {
-            currWord = strPreviousWord;
+            strPreviousWord = currWord;
             bolAfterComma = (strPreviousWord[strPreviousWord.length - 1] === ',');
         }
 
@@ -1447,7 +1458,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     } else if (autocompleteKeyEvent === 'colon') {
         if (strScript[intCursorPosition - 1] === ':') {
             arrQueries = [autocompleteQuery.types];
-            
+            autocompleteGlobals.searchLength = 0;
             autocompleteMakeList(arrQueries, currWord, editor);
         } else {
             closePopup();
@@ -1532,6 +1543,7 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
         autocompleteGlobals.bolSpecialFilter = true;
     }
     //queryVars
+    
     var optionList = ['hidden'];
     autocompleteGlobals.popupLoading = true;
     autocompleteGlobals.arrSearch = ['hidden'];
@@ -1846,7 +1858,7 @@ function autocompleteComplete(editor) {
     for (var i = 0, len = intCursorPosition; i <= len; i++) {
         if (isAlpha(strScript[intCursorPosition - i]) || strScript[intCursorPosition - i] === '_') {
             wordLength += 1;
-        } else if (wordLength >= 1) {
+        } else if (wordLength >= 1 || strScript[intCursorPosition - i].trim() !== '') {
             break;
         }
     }
@@ -1899,9 +1911,10 @@ function autocompleteComplete(editor) {
                 editor.env.document.insert(insertObj, insertText);
             }
         } else {
+            console.log(autocompleteGlobals.searchLength);
             editor.getSelection().setSelectionRange(new Range(
                 currSelectionRange.start.row,
-                ((currSelectionRange.start.column === 1)? 0 : currSelectionRange.start.column - autocompleteGlobals.searchLength),
+                ((currSelectionRange.start.column === 1) ? 0 : currSelectionRange.start.column - autocompleteGlobals.searchLength),
                 currSelectionRange.end.row,
                 currSelectionRange.end.column
             ));

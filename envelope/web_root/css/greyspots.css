@@ -1479,7 +1479,7 @@ gs-memo textarea {
     -o-box-sizing: border-box;
     box-sizing: border-box;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0.2em;
 }
 
@@ -1712,7 +1712,7 @@ gs-dialog-button {
     
     
     /*Theme*/
-    line-height: 1em;
+    line-height: 1.2em;
     min-height: 1em;
     font-size: 1em;
     
@@ -12941,7 +12941,7 @@ gs-combo {
     -o-box-sizing: border-box;
     box-sizing: border-box;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0;
     box-shadow: none;
 }
@@ -13640,7 +13640,7 @@ gs-date {
     position: relative;
     display: block;
     padding: 0;
-    line-height: 1em;
+    line-height: 1.2em;
     background-color: #FFFFFF;
     border: 1px solid #AEAEAE;
     border-radius: 0.2em;
@@ -15160,7 +15160,7 @@ gs-img[image-cover] {
     border: 1px solid #AEAEAE;
     border-radius: 0.2em;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0;
     box-shadow: none;
 }
@@ -15777,7 +15777,7 @@ gs-memo {
     -o-box-sizing: border-box;
     box-sizing: border-box;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0;
     box-shadow: none;
 }
@@ -15905,7 +15905,7 @@ gs-number {
     border-radius: 0.2em;
     min-height: 1em;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0;
     box-shadow: none;
 }
@@ -16239,7 +16239,7 @@ gs-search {
     border-radius: 0.2em;
     min-height: 1em;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0;
     box-shadow: none;
 }
@@ -16289,7 +16289,7 @@ gs-select {
     border-radius: 0.2em;
     min-height: 1em;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0;
     box-shadow: none;
 }
@@ -16406,7 +16406,7 @@ gs-text {
     border-radius: 0.2em;
     min-height: 1em;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0;
     box-shadow: none;
 }
@@ -16460,7 +16460,7 @@ gs-text[readonly] {
     border: 1px solid #AEAEAE;
     border-radius: 0.2em;
     
-    line-height: 1em;
+    line-height: 1.2em;
     padding: 0;
     box-shadow: none;
 }
