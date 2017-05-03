@@ -18,7 +18,8 @@ gs-checkbox[readonly] {
 
 gs-checkbox:before {
     font-family: fontawesome;
-    font-size: 1.1em;
+    /*font-size: 14px;*/
+    font-size: 0.8em;
     content: '\f096'; /* fa-square-o */
 }
 

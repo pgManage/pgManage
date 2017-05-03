@@ -9,6 +9,8 @@ gs-text {
     line-height: 1.2em;
     padding: 0;
     box-shadow: none;
+    
+    margin-top: -1px;
 }
 
 

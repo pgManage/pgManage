@@ -77,21 +77,56 @@ gs-dialog-button {
     
     border-radius: 0;
     
+    margin-top: -1px;
     
     background-color: #eeeeee;
     
-    border: 2px solid #000000;
+    border: 1px solid #444444;
+}
+
+
+gs-button.down,
+gs-toggle.down,
+gs-phone-button:not([not-supported]).down,
+gs-map-button.down,
+gs-skype-button.down,
+gs-facetime-button.down,
+gs-email-button.down,
+gs-tracking-button.down,
+gs-delete-button.down,
+gs-option.down,
+gs-dialog-button.down,
+gs-button[selected],
+gs-checkbox[selected],
+gs-toggle[selected],
+gs-phone-button:not([not-supported])[selected],
+gs-map-button[selected],
+gs-skype-button[selected],
+gs-facetime-button[selected],
+gs-email-button[selected],
+gs-tracking-button[selected],
+gs-delete-button[selected],
+gs-option[selected],
+gs-dialog-button[selected] {
+    padding-top: 0.3em;
+    padding-left: 0.3em;
     
-    border-top-color: #dddddd;
-    border-left-color: #dddddd;
-    
-    border-bottom-color: #000000;
-    border-right-color: #000000;
+    padding-bottom: 0.1em;
+    padding-right: 0.1em;
 }
 
 gs-checkbox {
     /* make the same height as gs-text and gs-button */
-    padding: 0.1em;
+    padding: 0.175em;
+}
+
+gs-checkbox.down {
+    /* make the same height as gs-text and gs-button */
+    padding-top: 0.275em;
+    padding-left: 0.275em;
+    
+    padding-bottom: 0.075em;
+    padding-right: 0.075em;
 }
 
 [flex-vertical]   > gs-button,
@@ -236,13 +271,31 @@ gs-tracking-button,
 gs-delete-button,
 gs-option,
 gs-dialog-button {
-    background-color: #eeeeee;
+    background-color: #dddddd;
     
-    border-top-color: #dddddd;
-    border-left-color: #dddddd;
+    border-color: #bbbbbb;
     
-    border-bottom-color: #000000;
-    border-right-color: #000000;
+    /*border-color: #000000;*/
+}
+
+/* ## A TAG COLOR ## */
+gs-button,
+gs-toggle,
+gs-checkbox,
+gs-phone-button:not([not-supported]),
+gs-map-button,
+gs-skype-button,
+gs-facetime-button,
+gs-email-button,
+gs-tracking-button,
+gs-delete-button,
+gs-option,
+gs-dialog-button {
+    background-color: #dddddd;
+    
+    border-color: #bbbbbb;
+    
+    /*border-color: #000000;*/
 }
 
 /* # FOCUS # */
@@ -289,11 +342,9 @@ gs-dialog-button.hover {
     
     background-color: #bbbbbb !important;
     
-    border-top-color: #bbbbbb;
-    border-left-color: #bbbbbb;
+    border-color: #bbbbbb;
     
-    border-bottom-color: #444444;
-    border-right-color: #444444;
+    /*border-color: #444444;*/
 }
 
 /* # DOWN # */
@@ -325,11 +376,9 @@ gs-dialog-button[selected] {
     
     background-color: #e6e6e6 !important;
     
-    border-top-color: #000000;
-    border-left-color: #000000;
+    border-color: #000000;
     
-    border-bottom-color: #dddddd;
-    border-right-color: #dddddd;
+    /*border-color: #dddddd;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -347,11 +396,9 @@ gs-option.down.hover,
 gs-dialog-button.down.hover {
     background-color: #bbbbbb !important;
     
-    border-top-color: #444444;
-    border-left-color: #444444;
+    border-color: #444444;
     
-    border-bottom-color: #bbbbbb;
-    border-right-color: #bbbbbb;
+    /*border-color: #bbbbbb;*/
 }
 
 /* # DISABLED # */
@@ -369,11 +416,9 @@ gs-option[disabled],
 gs-dialog-button[disabled] {
     background-color: #dddddd !important;
     
-    border-top-color: #dddddd;
-    border-left-color: #dddddd;
+    border-color: #dddddd;
     
-    border-bottom-color: #222222;
-    border-right-color: #222222;
+    /*border-color: #222222;*/
     
     color: #888888;
 }
@@ -394,11 +439,9 @@ gs-dialog-button[bg-primary] {
     color: #fff;
     background-color: #337ab7 !important;
     
-    border-top-color: #7EB1DC;
-    border-left-color: #7EB1DC;
+    border-color: #7EB1DC;
     
-    border-bottom-color: #094C83;
-    border-right-color: #094C83;
+    /*border-color: #094C83;*/
 }
 
 /* # FOCUS # */
@@ -427,7 +470,7 @@ gs-delete-button[bg-primary][selected]:focus:not(.hover),
 gs-option[bg-primary][selected]:focus:not(.hover),
 gs-dialog-button[bg-primary][selected]:focus:not(.hover) {
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
     color: #337ab7;
     
     background-color: #FFFDEC !important;
@@ -449,11 +492,9 @@ gs-dialog-button[bg-primary].hover {
     color: #fff;
     background-color: #286090 !important;
     
-    border-top-color: #7EB1DC;
-    border-left-color: #7EB1DC;
+    border-color: #7EB1DC;
     
-    border-bottom-color: #286090;
-    border-right-color: #286090;
+    /*border-color: #286090;*/
 }
 
 /* # DOWN # */
@@ -485,11 +526,9 @@ gs-dialog-button[bg-primary][selected] {
     color: #fff;
     background-color: #286090 !important;
     
-    border-top-color: #094C83;
-    border-left-color: #094C83;
+    border-color: #094C83;
     
-    border-bottom-color: #7EB1DC;
-    border-right-color: #7EB1DC;
+    /*border-color: #7EB1DC;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -561,11 +600,9 @@ gs-dialog-button[bg-success] {
     color: #fff;
     background-color: #5cb85c !important;
     
-    border-top-color: #BAE8BA;
-    border-left-color: #BAE8BA;
+    border-color: #BAE8BA;
     
-    border-bottom-color: #1B7C1B;
-    border-right-color: #1B7C1B;
+    /*border-color: #1B7C1B;*/
 }
 
 /* # FOCUS # */
@@ -594,7 +631,7 @@ gs-delete-button[bg-success][selected]:focus:not(.hover),
 gs-option[bg-success][selected]:focus:not(.hover),
 gs-dialog-button[bg-success][selected]:focus:not(.hover) {
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
     color: #5cb85c;
     
     background-color: #FFFDEC !important;
@@ -616,11 +653,9 @@ gs-dialog-button[bg-success].hover {
     color: #fff;
     background-color: #449d44 !important;
     
-    border-top-color: #BAE8BA;
-    border-left-color: #BAE8BA;
+    border-color: #BAE8BA;
     
-    border-bottom-color: #449d44;
-    border-right-color: #449d44;
+    /*border-color: #449d44;*/
 }
 
 /* # DOWN # */
@@ -652,11 +687,9 @@ gs-dialog-button[bg-success][selected] {
     color: #fff;
     background-color: #449d44 !important;
     
-    border-top-color: #1B7C1B;
-    border-left-color: #1B7C1B;
+    border-color: #1B7C1B;
     
-    border-bottom-color: #BAE8BA;
-    border-right-color: #BAE8BA;
+    /*border-color: #BAE8BA;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -728,11 +761,9 @@ gs-dialog-button[bg-info] {
     color: #fff;
     background-color: #5bc0de !important;
     
-    border-top-color: #BAEAF8;
-    border-left-color: #BAEAF8;
+    border-color: #BAEAF8;
     
-    border-bottom-color: #1993B6;
-    border-right-color: #1993B6;
+    /*border-color: #1993B6;*/
 }
 
 /* # FOCUS # */
@@ -761,7 +792,39 @@ gs-delete-button[bg-info][selected]:focus:not(.hover),
 gs-option[bg-info][selected]:focus:not(.hover),
 gs-dialog-button[bg-info][selected]:focus:not(.hover) {
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
+    color: #5bc0de;
+    
+    background-color: #FFFDEC !important;
+}
+
+/* # FOCUS INSIDE # */
+gs-button[bg-info] :focus,
+gs-toggle[bg-info]:focus,
+gs-checkbox[bg-info]:focus,
+gs-phone-button[bg-info]:not([not-supported]):focus,
+gs-map-button[bg-info]:focus,
+gs-skype-button[bg-info]:focus,
+gs-facetime-button[bg-info]:focus,
+gs-email-button[bg-info]:focus,
+gs-tracking-button[bg-info]:focus,
+gs-delete-button[bg-info]:focus,
+gs-option[bg-info]:focus,
+gs-dialog-button[bg-info]:focus,
+gs-button[bg-info][selected]:focus:not(.hover),
+gs-checkbox[bg-info][selected]:focus:not(.hover),
+gs-toggle[bg-info][selected]:focus:not(.hover),
+gs-phone-button[bg-info]:not([not-supported])[selected]:focus:not(.hover),
+gs-map-button[bg-info][selected]:focus:not(.hover),
+gs-skype-button[bg-info][selected]:focus:not(.hover),
+gs-facetime-button[bg-info][selected]:focus:not(.hover),
+gs-email-button[bg-info][selected]:focus:not(.hover),
+gs-tracking-button[bg-info][selected]:focus:not(.hover),
+gs-delete-button[bg-info][selected]:focus:not(.hover),
+gs-option[bg-info][selected]:focus:not(.hover),
+gs-dialog-button[bg-info][selected]:focus:not(.hover) {
+    text-decoration: none;
+    outline-offset: -2px;
     color: #5bc0de;
     
     background-color: #FFFDEC !important;
@@ -783,11 +846,9 @@ gs-dialog-button[bg-info].hover {
     color: #fff;
     background-color: #31b0d5 !important;
     
-    border-top-color: #BAEAF8;
-    border-left-color: #BAEAF8;
+    border-color: #BAEAF8;
     
-    border-bottom-color: #31b0d5;
-    border-right-color: #31b0d5;
+    /*border-color: #31b0d5;*/
 }
 
 /* # DOWN # */
@@ -819,11 +880,9 @@ gs-dialog-button[bg-info][selected] {
     color: #fff;
     background-color: #31b0d5 !important;
     
-    border-top-color: #1993B6;
-    border-left-color: #1993B6;
+    border-color: #1993B6;
     
-    border-bottom-color: #BAEAF8;
-    border-right-color: #BAEAF8;
+    /*border-color: #BAEAF8;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -895,11 +954,9 @@ gs-dialog-button[bg-warning] {
     color: #fff;
     background-color: #f0ad4e;
     
-    border-top-color: #FFD8A0;
-    border-left-color: #FFD8A0;
+    border-color: #FFD8A0;
     
-    border-bottom-color: #AD6D11;
-    border-right-color: #AD6D11;
+    /*border-color: #AD6D11;*/
 }
 
 /* # FOCUS # */
@@ -928,7 +985,7 @@ gs-delete-button[bg-warning][selected]:focus:not(.hover),
 gs-option[bg-warning][selected]:focus:not(.hover),
 gs-dialog-button[bg-warning][selected]:focus:not(.hover) {
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
     color: #f0ad4e;
     
     background-color: #FFFDEC !important;
@@ -950,11 +1007,9 @@ gs-dialog-button[bg-warning].hover {
     color: #fff;
     background-color: #ec971f !important;
     
-    border-top-color: #FFD8A0;
-    border-left-color: #FFD8A0;
+    border-color: #FFD8A0;
     
-    border-bottom-color: #ec971f;
-    border-right-color: #ec971f;
+    /*border-color: #ec971f;*/
 }
 
 /* # DOWN # */
@@ -986,11 +1041,9 @@ gs-dialog-button[bg-warning][selected] {
     color: #fff;
     background-color: #ec971f !important;
     
-    border-top-color: #AD6D11;
-    border-left-color: #AD6D11;
+    border-color: #AD6D11;
     
-    border-bottom-color: #FFD8A0;
-    border-right-color: #FFD8A0;
+    /*border-color: #FFD8A0;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -1062,11 +1115,9 @@ gs-dialog-button[bg-danger] {
     color: #fff;
     background-color: #d9534f !important;
     
-    border-top-color: #FFADAB;
-    border-left-color: #FFADAB;
+    border-color: #FFADAB;
     
-    border-bottom-color: #961512;
-    border-right-color: #961512;
+    /*border-color: #961512;*/
 }
 
 /* # FOCUS # */
@@ -1095,7 +1146,7 @@ gs-delete-button[bg-danger][selected]:focus:not(.hover),
 gs-option[bg-danger][selected]:focus:not(.hover),
 gs-dialog-button[bg-danger][selected]:focus:not(.hover) {
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
     color: #d9534f;
     
     background-color: #FFFDEC !important;
@@ -1117,11 +1168,9 @@ gs-dialog-button[bg-danger].hover {
     color: #fff;
     background-color: #c9302c !important;
     
-    border-top-color: #FFADAB;
-    border-left-color: #FFADAB;
+    border-color: #FFADAB;
     
-    border-bottom-color: #c9302c;
-    border-right-color: #c9302c;
+    /*border-color: #c9302c;*/
 }
 
 /* # DOWN # */
@@ -1153,11 +1202,9 @@ gs-dialog-button[bg-danger][selected] {
     color: #fff;
     background-color: #c9302c !important;
     
-    border-top-color: #961512;
-    border-left-color: #961512;
+    border-color: #961512;
     
-    border-bottom-color: #FFADAB;
-    border-right-color: #FFADAB;
+    /*border-color: #FFADAB;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -1230,7 +1277,7 @@ gs-tracking-button:focus,
 gs-delete-button:focus {
     color: #333;
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
     background-color: #e6e6e6;
     border-color: #8c8c8c;
 }
