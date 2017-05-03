@@ -1,11 +1,11 @@
 gs-date {
     position: relative;
     display: block;
-    padding: 0.2em 2.2em 0.2em 0.2em;
+    padding: 0;
+    line-height: 1.2em;
     background-color: #FFFFFF;
     border: 1px solid #AEAEAE;
     border-radius: 0.2em;
-    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
     min-height: 1em;
 }
 
@@ -31,10 +31,11 @@ gs-date .date-picker-button:after {
     font-size: 1em;
 }
 
-
+/*
 gs-date[no-picker] {
     padding: 0.2em;
 }
+*/
 gs-date[no-picker] .date-picker-button {
     display: none;
 }
@@ -59,6 +60,10 @@ gs-date[mini] .date-picker-button:after {
     font-size: 0.8em;
 }
 
+gs-date[mini] input {
+    padding: 0;
+    border: 0;
+}
 
 /* ########################################################## */
 /* ##################### READONLY STATE ##################### */

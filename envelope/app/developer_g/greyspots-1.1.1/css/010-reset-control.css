@@ -12,7 +12,6 @@ gs-memo textarea {
     width: 100%;
     border: 0 none;
     margin: 0;
-    padding: 0;
     font-size: 1em;
     font-family: inherit;
     
@@ -21,6 +20,15 @@ gs-memo textarea {
     
     -webkit-border-radius: inherit;
     /*-moz-border-radius: none;*/
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    
+    line-height: 1.2em;
+    padding: 0.2em;
 }
 
 gs-memo textarea {

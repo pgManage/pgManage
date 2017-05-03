@@ -23,6 +23,7 @@ var autocompleteGlobals = {
       , 'ignoreNext':      1
       , 'searchLength':    0
       , 'bolQueryRunning': false
+      , 'bolSpecialFilter':  false
     };
     
     

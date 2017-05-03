@@ -2,13 +2,15 @@ gs-time {
     position: relative;
     display: block;
     
-    padding: 0.2em 2.2em 0.2em 0.2em;
     min-height: 1em;
     background-color: #FFFFFF;
     
     border: 1px solid #AEAEAE;
     border-radius: 0.2em;
-    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+    
+    line-height: 1.2em;
+    padding: 0;
+    box-shadow: none;
 }
 
 gs-time .time-picker-button {
@@ -97,6 +99,11 @@ gs-time[mini] .time-picker-button {
 
 gs-time[mini] .time-picker-button:after {
     font-size: 0.8em;
+}
+
+gs-time[mini] input {
+    padding: 0;
+    border: 0;
 }
 
 

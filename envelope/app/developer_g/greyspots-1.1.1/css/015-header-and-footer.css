@@ -41,13 +41,6 @@ gs-footer {
     bottom: 0;
     border-top: 2px solid #000000;
 }
-
-.blue gs-header,
-.blue gs-footer,
-gs-header.blue,
-gs-footer.blue {
-    border-color: #3B99BE;
-}
 /*
 gs-page > gs-header {
     padding-bottom: 1em;
