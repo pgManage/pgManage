@@ -20,36 +20,36 @@ cd test-envelope
 if test $(uname -s) = "OpenBSD"; then
 	echo "skipping electron tester"
 else
-	cat << EOF > package.json
-	{
-	  "name": "test-envelope",
-	  "scripts": {
-	    "start": "electron ."
-	  },
-	  "devDependencies": {
-	    "electron": "^1.6.2"
-	  },
-	  "main": "index.js"
-	}
-	EOF
+cat << EOF > package.json
+{
+  "name": "test-envelope",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^1.6.2"
+  },
+  "main": "index.js"
+}
+EOF
 
-	cat << EOF > index.js
-	const electron = require('electron');
-	let window = null;
+cat << EOF > index.js
+const electron = require('electron');
+let window = null;
 
-	electron.app.on('ready', function () {
-	        window = new electron.BrowserWindow();
-	        window.loadURL('http://127.0.0.1:8888/test.html');
-	});
+electron.app.on('ready', function () {
+        window = new electron.BrowserWindow();
+        window.loadURL('http://127.0.0.1:8888/test.html');
+});
 
 
-	electron.app.on('window-all-closed', function () {
-	        electron.app.quit();
-	});
+electron.app.on('window-all-closed', function () {
+        electron.app.quit();
+});
 
-	EOF
+EOF
 
-	npm install
+npm install
 fi
 
 rm -rf envelope-master master.zip ~/.mozilla
