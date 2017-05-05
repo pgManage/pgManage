@@ -21,7 +21,7 @@ body {
     margin: 0;
     padding: 0;
     
-    background-color: #f5f5f5;
+    background-color: #eeeeee;
 }
 
 
@@ -158,7 +158,7 @@ template {
  */
 
 a {
-  background-color: transparent;
+  background-color: transparent !important;
 }
 
 /**
@@ -1264,8 +1264,7 @@ pre code{
 *:focus {
     /* this is a default that but each element is allow to have its own setting of this particular property */
     /*outline-offset: -1px;*/
-    
-    outline-offset: -3px;
+    outline-offset: -1px;
     background-color: #FFFDEC;
     outline: dashed 1px #FFB000;
 }
@@ -1481,6 +1480,22 @@ gs-memo textarea {
     
     line-height: 1.2em;
     padding: 0.2em;
+}
+
+gs-date input:focus,
+gs-text input:focus,
+gs-search input:focus,
+gs-number input:focus,
+gs-memo input:focus,
+gs-combo input:focus,
+gs-time input:focus,
+gs-select select:focus,
+gs-interval input:focus,
+gs-memo textarea:focus {
+    /* this is a default that but each element is allow to have its own setting of this particular property */
+    outline-offset: -1px;
+    background-color: #FFFDEC;
+    outline: dashed 1px #FFB000;
 }
 
 gs-memo textarea {
@@ -1722,21 +1737,56 @@ gs-dialog-button {
     
     border-radius: 0;
     
+    margin-top: -1px;
     
     background-color: #eeeeee;
     
-    border: 2px solid #000000;
+    border: 1px solid #444444;
+}
+
+
+gs-button.down,
+gs-toggle.down,
+gs-phone-button:not([not-supported]).down,
+gs-map-button.down,
+gs-skype-button.down,
+gs-facetime-button.down,
+gs-email-button.down,
+gs-tracking-button.down,
+gs-delete-button.down,
+gs-option.down,
+gs-dialog-button.down,
+gs-button[selected],
+gs-checkbox[selected],
+gs-toggle[selected],
+gs-phone-button:not([not-supported])[selected],
+gs-map-button[selected],
+gs-skype-button[selected],
+gs-facetime-button[selected],
+gs-email-button[selected],
+gs-tracking-button[selected],
+gs-delete-button[selected],
+gs-option[selected],
+gs-dialog-button[selected] {
+    padding-top: 0.3em;
+    padding-left: 0.3em;
     
-    border-top-color: #dddddd;
-    border-left-color: #dddddd;
-    
-    border-bottom-color: #000000;
-    border-right-color: #000000;
+    padding-bottom: 0.1em;
+    padding-right: 0.1em;
 }
 
 gs-checkbox {
     /* make the same height as gs-text and gs-button */
-    padding: 0.1em;
+    padding: 0.175em;
+}
+
+gs-checkbox.down {
+    /* make the same height as gs-text and gs-button */
+    padding-top: 0.275em;
+    padding-left: 0.275em;
+    
+    padding-bottom: 0.075em;
+    padding-right: 0.075em;
 }
 
 [flex-vertical]   > gs-button,
@@ -1881,13 +1931,31 @@ gs-tracking-button,
 gs-delete-button,
 gs-option,
 gs-dialog-button {
-    background-color: #eeeeee;
+    background-color: #dddddd;
     
-    border-top-color: #dddddd;
-    border-left-color: #dddddd;
+    border-color: #bbbbbb;
     
-    border-bottom-color: #000000;
-    border-right-color: #000000;
+    /*border-color: #000000;*/
+}
+
+/* ## A TAG COLOR ## */
+gs-button,
+gs-toggle,
+gs-checkbox,
+gs-phone-button:not([not-supported]),
+gs-map-button,
+gs-skype-button,
+gs-facetime-button,
+gs-email-button,
+gs-tracking-button,
+gs-delete-button,
+gs-option,
+gs-dialog-button {
+    background-color: #dddddd;
+    
+    border-color: #bbbbbb;
+    
+    /*border-color: #000000;*/
 }
 
 /* # FOCUS # */
@@ -1934,11 +2002,9 @@ gs-dialog-button.hover {
     
     background-color: #bbbbbb !important;
     
-    border-top-color: #bbbbbb;
-    border-left-color: #bbbbbb;
+    border-color: #bbbbbb;
     
-    border-bottom-color: #444444;
-    border-right-color: #444444;
+    /*border-color: #444444;*/
 }
 
 /* # DOWN # */
@@ -1970,11 +2036,9 @@ gs-dialog-button[selected] {
     
     background-color: #e6e6e6 !important;
     
-    border-top-color: #000000;
-    border-left-color: #000000;
+    border-color: #000000;
     
-    border-bottom-color: #dddddd;
-    border-right-color: #dddddd;
+    /*border-color: #dddddd;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -1992,11 +2056,9 @@ gs-option.down.hover,
 gs-dialog-button.down.hover {
     background-color: #bbbbbb !important;
     
-    border-top-color: #444444;
-    border-left-color: #444444;
+    border-color: #444444;
     
-    border-bottom-color: #bbbbbb;
-    border-right-color: #bbbbbb;
+    /*border-color: #bbbbbb;*/
 }
 
 /* # DISABLED # */
@@ -2014,11 +2076,9 @@ gs-option[disabled],
 gs-dialog-button[disabled] {
     background-color: #dddddd !important;
     
-    border-top-color: #dddddd;
-    border-left-color: #dddddd;
+    border-color: #dddddd;
     
-    border-bottom-color: #222222;
-    border-right-color: #222222;
+    /*border-color: #222222;*/
     
     color: #888888;
 }
@@ -2039,11 +2099,9 @@ gs-dialog-button[bg-primary] {
     color: #fff;
     background-color: #337ab7 !important;
     
-    border-top-color: #7EB1DC;
-    border-left-color: #7EB1DC;
+    border-color: #7EB1DC;
     
-    border-bottom-color: #094C83;
-    border-right-color: #094C83;
+    /*border-color: #094C83;*/
 }
 
 /* # FOCUS # */
@@ -2072,7 +2130,7 @@ gs-delete-button[bg-primary][selected]:focus:not(.hover),
 gs-option[bg-primary][selected]:focus:not(.hover),
 gs-dialog-button[bg-primary][selected]:focus:not(.hover) {
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
     color: #337ab7;
     
     background-color: #FFFDEC !important;
@@ -2094,11 +2152,9 @@ gs-dialog-button[bg-primary].hover {
     color: #fff;
     background-color: #286090 !important;
     
-    border-top-color: #7EB1DC;
-    border-left-color: #7EB1DC;
+    border-color: #7EB1DC;
     
-    border-bottom-color: #286090;
-    border-right-color: #286090;
+    /*border-color: #286090;*/
 }
 
 /* # DOWN # */
@@ -2130,11 +2186,9 @@ gs-dialog-button[bg-primary][selected] {
     color: #fff;
     background-color: #286090 !important;
     
-    border-top-color: #094C83;
-    border-left-color: #094C83;
+    border-color: #094C83;
     
-    border-bottom-color: #7EB1DC;
-    border-right-color: #7EB1DC;
+    /*border-color: #7EB1DC;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -2206,11 +2260,9 @@ gs-dialog-button[bg-success] {
     color: #fff;
     background-color: #5cb85c !important;
     
-    border-top-color: #BAE8BA;
-    border-left-color: #BAE8BA;
+    border-color: #BAE8BA;
     
-    border-bottom-color: #1B7C1B;
-    border-right-color: #1B7C1B;
+    /*border-color: #1B7C1B;*/
 }
 
 /* # FOCUS # */
@@ -2239,7 +2291,7 @@ gs-delete-button[bg-success][selected]:focus:not(.hover),
 gs-option[bg-success][selected]:focus:not(.hover),
 gs-dialog-button[bg-success][selected]:focus:not(.hover) {
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
     color: #5cb85c;
     
     background-color: #FFFDEC !important;
@@ -2261,11 +2313,9 @@ gs-dialog-button[bg-success].hover {
     color: #fff;
     background-color: #449d44 !important;
     
-    border-top-color: #BAE8BA;
-    border-left-color: #BAE8BA;
+    border-color: #BAE8BA;
     
-    border-bottom-color: #449d44;
-    border-right-color: #449d44;
+    /*border-color: #449d44;*/
 }
 
 /* # DOWN # */
@@ -2297,11 +2347,9 @@ gs-dialog-button[bg-success][selected] {
     color: #fff;
     background-color: #449d44 !important;
     
-    border-top-color: #1B7C1B;
-    border-left-color: #1B7C1B;
+    border-color: #1B7C1B;
     
-    border-bottom-color: #BAE8BA;
-    border-right-color: #BAE8BA;
+    /*border-color: #BAE8BA;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -2373,11 +2421,9 @@ gs-dialog-button[bg-info] {
     color: #fff;
     background-color: #5bc0de !important;
     
-    border-top-color: #BAEAF8;
-    border-left-color: #BAEAF8;
+    border-color: #BAEAF8;
     
-    border-bottom-color: #1993B6;
-    border-right-color: #1993B6;
+    /*border-color: #1993B6;*/
 }
 
 /* # FOCUS # */
@@ -2406,7 +2452,7 @@ gs-delete-button[bg-info][selected]:focus:not(.hover),
 gs-option[bg-info][selected]:focus:not(.hover),
 gs-dialog-button[bg-info][selected]:focus:not(.hover) {
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
     color: #5bc0de;
     
     background-color: #FFFDEC !important;
@@ -2428,11 +2474,9 @@ gs-dialog-button[bg-info].hover {
     color: #fff;
     background-color: #31b0d5 !important;
     
-    border-top-color: #BAEAF8;
-    border-left-color: #BAEAF8;
+    border-color: #BAEAF8;
     
-    border-bottom-color: #31b0d5;
-    border-right-color: #31b0d5;
+    /*border-color: #31b0d5;*/
 }
 
 /* # DOWN # */
@@ -2464,11 +2508,9 @@ gs-dialog-button[bg-info][selected] {
     color: #fff;
     background-color: #31b0d5 !important;
     
-    border-top-color: #1993B6;
-    border-left-color: #1993B6;
+    border-color: #1993B6;
     
-    border-bottom-color: #BAEAF8;
-    border-right-color: #BAEAF8;
+    /*border-color: #BAEAF8;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -2540,11 +2582,9 @@ gs-dialog-button[bg-warning] {
     color: #fff;
     background-color: #f0ad4e;
     
-    border-top-color: #FFD8A0;
-    border-left-color: #FFD8A0;
+    border-color: #FFD8A0;
     
-    border-bottom-color: #AD6D11;
-    border-right-color: #AD6D11;
+    /*border-color: #AD6D11;*/
 }
 
 /* # FOCUS # */
@@ -2573,7 +2613,7 @@ gs-delete-button[bg-warning][selected]:focus:not(.hover),
 gs-option[bg-warning][selected]:focus:not(.hover),
 gs-dialog-button[bg-warning][selected]:focus:not(.hover) {
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
     color: #f0ad4e;
     
     background-color: #FFFDEC !important;
@@ -2595,11 +2635,9 @@ gs-dialog-button[bg-warning].hover {
     color: #fff;
     background-color: #ec971f !important;
     
-    border-top-color: #FFD8A0;
-    border-left-color: #FFD8A0;
+    border-color: #FFD8A0;
     
-    border-bottom-color: #ec971f;
-    border-right-color: #ec971f;
+    /*border-color: #ec971f;*/
 }
 
 /* # DOWN # */
@@ -2631,11 +2669,9 @@ gs-dialog-button[bg-warning][selected] {
     color: #fff;
     background-color: #ec971f !important;
     
-    border-top-color: #AD6D11;
-    border-left-color: #AD6D11;
+    border-color: #AD6D11;
     
-    border-bottom-color: #FFD8A0;
-    border-right-color: #FFD8A0;
+    /*border-color: #FFD8A0;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -2707,11 +2743,9 @@ gs-dialog-button[bg-danger] {
     color: #fff;
     background-color: #d9534f !important;
     
-    border-top-color: #FFADAB;
-    border-left-color: #FFADAB;
+    border-color: #FFADAB;
     
-    border-bottom-color: #961512;
-    border-right-color: #961512;
+    /*border-color: #961512;*/
 }
 
 /* # FOCUS # */
@@ -2740,7 +2774,7 @@ gs-delete-button[bg-danger][selected]:focus:not(.hover),
 gs-option[bg-danger][selected]:focus:not(.hover),
 gs-dialog-button[bg-danger][selected]:focus:not(.hover) {
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
     color: #d9534f;
     
     background-color: #FFFDEC !important;
@@ -2762,11 +2796,9 @@ gs-dialog-button[bg-danger].hover {
     color: #fff;
     background-color: #c9302c !important;
     
-    border-top-color: #FFADAB;
-    border-left-color: #FFADAB;
+    border-color: #FFADAB;
     
-    border-bottom-color: #c9302c;
-    border-right-color: #c9302c;
+    /*border-color: #c9302c;*/
 }
 
 /* # DOWN # */
@@ -2798,11 +2830,9 @@ gs-dialog-button[bg-danger][selected] {
     color: #fff;
     background-color: #c9302c !important;
     
-    border-top-color: #961512;
-    border-left-color: #961512;
+    border-color: #961512;
     
-    border-bottom-color: #FFADAB;
-    border-right-color: #FFADAB;
+    /*border-color: #FFADAB;*/
 }
 
 /* # DOWN AND HOVER # */
@@ -2875,7 +2905,7 @@ gs-tracking-button:focus,
 gs-delete-button:focus {
     color: #333;
     text-decoration: none;
-    outline-offset: -3px;
+    outline-offset: -2px;
     background-color: #e6e6e6;
     border-color: #8c8c8c;
 }
@@ -12903,7 +12933,8 @@ gs-checkbox[readonly] {
 
 gs-checkbox:before {
     font-family: fontawesome;
-    font-size: 1.1em;
+    /*font-size: 14px;*/
+    font-size: 0.8em;
     content: '\f096'; /* fa-square-o */
 }
 
@@ -12944,6 +12975,8 @@ gs-combo {
     line-height: 1.2em;
     padding: 0;
     box-shadow: none;
+    
+    margin-top: -1px;
 }
 
 gs-combo > .root {
@@ -13645,6 +13678,8 @@ gs-date {
     border: 1px solid #AEAEAE;
     border-radius: 0.2em;
     min-height: 1em;
+    
+    margin-top: -1px;
 }
 
 gs-date .date-picker-button {
@@ -15163,6 +15198,8 @@ gs-img[image-cover] {
     line-height: 1.2em;
     padding: 0;
     box-shadow: none;
+    
+    margin-top: -1px;
 }
 
 gs-interval .time-picker-button {
@@ -15780,6 +15817,8 @@ gs-memo {
     line-height: 1.2em;
     padding: 0;
     box-shadow: none;
+    
+    margin-top: -1px;
 }
 
 /* ###################################################################################### */
@@ -15908,6 +15947,8 @@ gs-number {
     line-height: 1.2em;
     padding: 0;
     box-shadow: none;
+    
+    margin-top: -1px;
 }
 
 /* ###################################################################################### */
@@ -15969,7 +16010,7 @@ gs-number[readonly] {
 }
 
 gs-optionbox gs-option {
-    margin-top: 2px;
+    margin-top: -1px;
 }
 
 gs-optionbox gs-option:first-child {
@@ -16242,6 +16283,8 @@ gs-search {
     line-height: 1.2em;
     padding: 0;
     box-shadow: none;
+    
+    margin-top: -1px;
 }
 
 
@@ -16292,6 +16335,8 @@ gs-select {
     line-height: 1.2em;
     padding: 0;
     box-shadow: none;
+    
+    margin-top: -1px;
 }
 
 gs-select > select {
@@ -16409,6 +16454,8 @@ gs-text {
     line-height: 1.2em;
     padding: 0;
     box-shadow: none;
+    
+    margin-top: -1px;
 }
 
 
@@ -16463,6 +16510,8 @@ gs-text[readonly] {
     line-height: 1.2em;
     padding: 0;
     box-shadow: none;
+    
+    margin-top: -1px;
 }
 
 gs-time .time-picker-button {
@@ -16880,7 +16929,8 @@ gs-tutorial-overlay {
     opacity: 0.1;
     
     z-index: 100;
-}/* Theme: Make Inputs Inset */
+}/* Theme: Inset */
+/* Fields */
 [inset] gs-date,
 [inset] gs-text,
 [inset] gs-search,
@@ -16934,4 +16984,1713 @@ gs-interval[inset] input {
     
     border-bottom-color: #dddddd;
     border-right-color: #dddddd;
+}
+
+/* Buttons */
+[inset] gs-button,
+[inset] gs-toggle,
+[inset] gs-checkbox,
+[inset] gs-phone-button:not([not-supported]),
+[inset] gs-map-button,
+[inset] gs-skype-button,
+[inset] gs-facetime-button,
+[inset] gs-email-button,
+[inset] gs-tracking-button,
+[inset] gs-delete-button,
+[inset] gs-option,
+[inset] gs-dialog-button,
+
+gs-button[inset],
+gs-toggle[inset],
+gs-checkbox[inset],
+gs-phone-button:not([not-supported])[inset],
+gs-map-button[inset],
+gs-skype-button[inset],
+gs-facetime-button[inset],
+gs-email-button[inset],
+gs-tracking-button[inset],
+gs-delete-button[inset],
+gs-option[inset],
+gs-dialog-button[inset] {
+    line-height: 1.2em;
+    min-height: 1em;
+    font-size: 1em;
+    
+    padding: 0.2em;
+    
+    box-shadow: none;
+    
+    border-radius: 0;
+    
+    
+    background-color: #dddddd;
+    
+    border: 2px solid #000000;
+    
+    border-top-color: #bbbbbb;
+    border-left-color: #bbbbbb;
+    
+    border-bottom-color: #000000;
+    border-right-color: #000000;
+}
+
+/* ## DEFAULT COLOR ## */
+[inset] gs-button,
+[inset] gs-toggle,
+[inset] gs-checkbox,
+[inset] gs-phone-button:not([not-supported]),
+[inset] gs-map-button,
+[inset] gs-skype-button,
+[inset] gs-facetime-button,
+[inset] gs-email-button,
+[inset] gs-tracking-button,
+[inset] gs-delete-button,
+[inset] gs-option,
+[inset] gs-dialog-button,
+
+gs-button[inset],
+gs-toggle[inset],
+gs-checkbox[inset],
+gs-phone-button:not([not-supported])[inset],
+gs-map-button[inset],
+gs-skype-button[inset],
+gs-facetime-button[inset],
+gs-email-button[inset],
+gs-tracking-button[inset],
+gs-delete-button[inset],
+gs-option[inset],
+gs-dialog-button[inset] {
+    background-color: #eeeeee;
+    
+    border-top-color: #dddddd;
+    border-left-color: #dddddd;
+    
+    border-bottom-color: #000000;
+    border-right-color: #000000;
+}
+
+/* # FOCUS # */
+[inset] gs-button:focus,
+[inset] gs-toggle:focus,
+[inset] gs-checkbox:focus,
+[inset] gs-phone-button:not([not-supported]):focus,
+[inset] gs-map-button:focus,
+[inset] gs-skype-button:focus,
+[inset] gs-facetime-button:focus,
+[inset] gs-email-button:focus,
+[inset] gs-tracking-button:focus,
+[inset] gs-delete-button:focus,
+[inset] gs-option:focus,
+[inset] gs-dialog-button:focus,
+[inset] gs-button[selected]:focus:not(.hover),
+[inset] gs-checkbox[selected]:focus:not(.hover),
+[inset] gs-toggle[selected]:focus:not(.hover),
+[inset] gs-phone-button:not([not-supported])[selected]:focus:not(.hover),
+[inset] gs-map-button[selected]:focus:not(.hover),
+[inset] gs-skype-button[selected]:focus:not(.hover),
+[inset] gs-facetime-button[selected]:focus:not(.hover),
+[inset] gs-email-button[selected]:focus:not(.hover),
+[inset] gs-tracking-button[selected]:focus:not(.hover),
+[inset] gs-delete-button[selected]:focus:not(.hover),
+[inset] gs-option[selected]:focus:not(.hover),
+[inset] gs-dialog-button[selected]:focus:not(.hover),
+
+gs-button:focus[inset],
+gs-toggle:focus[inset],
+gs-checkbox:focus[inset],
+gs-phone-button:not([not-supported]):focus[inset],
+gs-map-button:focus[inset],
+gs-skype-button:focus[inset],
+gs-facetime-button:focus[inset],
+gs-email-button:focus[inset],
+gs-tracking-button:focus[inset],
+gs-delete-button:focus[inset],
+gs-option:focus[inset],
+gs-dialog-button:focus[inset],
+gs-button[selected]:focus:not(.hover)[inset],
+gs-checkbox[selected]:focus:not(.hover)[inset],
+gs-toggle[selected]:focus:not(.hover)[inset],
+gs-phone-button:not([not-supported])[selected]:focus:not(.hover)[inset],
+gs-map-button[selected]:focus:not(.hover)[inset],
+gs-skype-button[selected]:focus:not(.hover)[inset],
+gs-facetime-button[selected]:focus:not(.hover)[inset],
+gs-email-button[selected]:focus:not(.hover)[inset],
+gs-tracking-button[selected]:focus:not(.hover)[inset],
+gs-delete-button[selected]:focus:not(.hover)[inset],
+gs-option[selected]:focus:not(.hover)[inset],
+gs-dialog-button[selected]:focus:not(.hover)[inset] {
+    background-color: #FFFDEC !important;
+}
+
+/* # HOVER # */
+[inset] gs-button.hover,
+[inset] gs-toggle.hover,
+[inset] gs-phone-button:not([not-supported]).hover,
+[inset] gs-map-button.hover,
+[inset] gs-skype-button.hover,
+[inset] gs-facetime-button.hover,
+[inset] gs-email-button.hover,
+[inset] gs-tracking-button.hover,
+[inset] gs-delete-button.hover,
+[inset] gs-option.hover,
+[inset] gs-dialog-button.hover,
+
+gs-button.hover[inset],
+gs-toggle.hover[inset],
+gs-phone-button:not([not-supported]).hover[inset],
+gs-map-button.hover[inset],
+gs-skype-button.hover[inset],
+gs-facetime-button.hover[inset],
+gs-email-button.hover[inset],
+gs-tracking-button.hover[inset],
+gs-delete-button.hover[inset],
+gs-option.hover[inset],
+gs-dialog-button.hover[inset] {
+    text-decoration: none;
+    
+    background-color: #bbbbbb !important;
+    
+    border-top-color: #bbbbbb;
+    border-left-color: #bbbbbb;
+    
+    border-bottom-color: #444444;
+    border-right-color: #444444;
+}
+
+/* # DOWN # */
+[inset] gs-button.down,
+[inset] gs-checkbox.down,
+[inset] gs-toggle.down,
+[inset] gs-phone-button:not([not-supported]).down,
+[inset] gs-map-button.down,
+[inset] gs-skype-button.down,
+[inset] gs-facetime-button.down,
+[inset] gs-email-button.down,
+[inset] gs-tracking-button.down,
+[inset] gs-delete-button.down,
+[inset] gs-option.down,
+[inset] gs-dialog-button.down,
+[inset] gs-button[selected],
+[inset] gs-checkbox[selected],
+[inset] gs-toggle[selected],
+[inset] gs-phone-button:not([not-supported])[selected],
+[inset] gs-map-button[selected],
+[inset] gs-skype-button[selected],
+[inset] gs-facetime-button[selected],
+[inset] gs-email-button[selected],
+[inset] gs-tracking-button[selected],
+[inset] gs-delete-button[selected],
+[inset] gs-option[selected],
+[inset] gs-dialog-button[selected],
+
+gs-button.down[inset],
+gs-checkbox.down[inset],
+gs-toggle.down[inset],
+gs-phone-button:not([not-supported]).down[inset],
+gs-map-button.down[inset],
+gs-skype-button.down[inset],
+gs-facetime-button.down[inset],
+gs-email-button.down[inset],
+gs-tracking-button.down[inset],
+gs-delete-button.down[inset],
+gs-option.down[inset],
+gs-dialog-button.down[inset],
+gs-button[selected][inset],
+gs-checkbox[selected][inset],
+gs-toggle[selected][inset],
+gs-phone-button:not([not-supported])[selected][inset],
+gs-map-button[selected][inset],
+gs-skype-button[selected][inset],
+gs-facetime-button[selected][inset],
+gs-email-button[selected][inset],
+gs-tracking-button[selected][inset],
+gs-delete-button[selected][inset],
+gs-option[selected][inset],
+gs-dialog-button[selected][inset] {
+    background-image: none;
+    
+    background-color: #e6e6e6 !important;
+    
+    border-top-color: #000000;
+    border-left-color: #000000;
+    
+    border-bottom-color: #dddddd;
+    border-right-color: #dddddd;
+}
+
+/* # DOWN AND HOVER # */
+[inset] gs-button.down.hover,
+[inset] gs-checkbox.down.hover,
+[inset] gs-toggle.down.hover,
+[inset] gs-phone-button:not([not-supported]).down.hover,
+[inset] gs-map-button.down.hover,
+[inset] gs-skype-button.down.hover,
+[inset] gs-facetime-button.down.hover,
+[inset] gs-email-button.down.hover,
+[inset] gs-tracking-button.down.hover,
+[inset] gs-delete-button.down.hover,
+[inset] gs-option.down.hover,
+[inset] gs-dialog-button.down.hover,
+
+gs-button.down.hover[inset],
+gs-checkbox.down.hover[inset],
+gs-toggle.down.hover[inset],
+gs-phone-button:not([not-supported]).down.hover[inset],
+gs-map-button.down.hover[inset],
+gs-skype-button.down.hover[inset],
+gs-facetime-button.down.hover[inset],
+gs-email-button.down.hover[inset],
+gs-tracking-button.down.hover[inset],
+gs-delete-button.down.hover[inset],
+gs-option.down.hover[inset],
+gs-dialog-button.down.hover[inset] {
+    background-color: #bbbbbb !important;
+    
+    border-top-color: #444444;
+    border-left-color: #444444;
+    
+    border-bottom-color: #bbbbbb;
+    border-right-color: #bbbbbb;
+}
+
+/* # DISABLED # */
+[inset] gs-button[disabled],
+[inset] gs-toggle[disabled],
+[inset] gs-checkbox[disabled],
+[inset] gs-phone-button:not([not-supported])[disabled],
+[inset] gs-map-button[disabled],
+[inset] gs-skype-button[disabled],
+[inset] gs-facetime-button[disabled],
+[inset] gs-email-button[disabled],
+[inset] gs-tracking-button[disabled],
+[inset] gs-delete-button[disabled],
+[inset] gs-option[disabled],
+[inset] gs-dialog-button[disabled],
+
+gs-button[disabled][inset],
+gs-toggle[disabled][inset],
+gs-checkbox[disabled][inset],
+gs-phone-button:not([not-supported])[disabled][inset],
+gs-map-button[disabled][inset],
+gs-skype-button[disabled][inset],
+gs-facetime-button[disabled][inset],
+gs-email-button[disabled][inset],
+gs-tracking-button[disabled][inset],
+gs-delete-button[disabled][inset],
+gs-option[disabled][inset],
+gs-dialog-button[disabled][inset] {
+    background-color: #dddddd !important;
+    
+    border-top-color: #dddddd;
+    border-left-color: #dddddd;
+    
+    border-bottom-color: #222222;
+    border-right-color: #222222;
+    
+    color: #888888;
+}
+
+/* ## PRIMARY ## */
+[inset] gs-button[bg-primary],
+[inset] gs-toggle[bg-primary],
+[inset] gs-checkbox[bg-primary],
+[inset] gs-phone-button:not([not-supported])[bg-primary],
+[inset] gs-map-button[bg-primary],
+[inset] gs-skype-button[bg-primary],
+[inset] gs-facetime-button[bg-primary],
+[inset] gs-email-button[bg-primary],
+[inset] gs-tracking-button[bg-primary],
+[inset] gs-delete-button[bg-primary],
+[inset] gs-option[bg-primary],
+[inset] gs-dialog-button[bg-primary],
+
+gs-button[bg-primary][inset],
+gs-toggle[bg-primary][inset],
+gs-checkbox[bg-primary][inset],
+gs-phone-button:not([not-supported])[bg-primary][inset],
+gs-map-button[bg-primary][inset],
+gs-skype-button[bg-primary][inset],
+gs-facetime-button[bg-primary][inset],
+gs-email-button[bg-primary][inset],
+gs-tracking-button[bg-primary][inset],
+gs-delete-button[bg-primary][inset],
+gs-option[bg-primary][inset],
+gs-dialog-button[bg-primary][inset] {
+    color: #fff;
+    background-color: #337ab7 !important;
+    
+    border-top-color: #7EB1DC;
+    border-left-color: #7EB1DC;
+    
+    border-bottom-color: #094C83;
+    border-right-color: #094C83;
+}
+
+/* # FOCUS # */
+[inset] gs-button[bg-primary]:focus,
+[inset] gs-toggle[bg-primary]:focus,
+[inset] gs-checkbox[bg-primary]:focus,
+[inset] gs-phone-button[bg-primary]:not([not-supported]):focus,
+[inset] gs-map-button[bg-primary]:focus,
+[inset] gs-skype-button[bg-primary]:focus,
+[inset] gs-facetime-button[bg-primary]:focus,
+[inset] gs-email-button[bg-primary]:focus,
+[inset] gs-tracking-button[bg-primary]:focus,
+[inset] gs-delete-button[bg-primary]:focus,
+[inset] gs-option[bg-primary]:focus,
+[inset] gs-dialog-button[bg-primary]:focus,
+[inset] gs-button[bg-primary][selected]:focus:not(.hover),
+[inset] gs-checkbox[bg-primary][selected]:focus:not(.hover),
+[inset] gs-toggle[bg-primary][selected]:focus:not(.hover),
+[inset] gs-phone-button[bg-primary]:not([not-supported])[selected]:focus:not(.hover),
+[inset] gs-map-button[bg-primary][selected]:focus:not(.hover),
+[inset] gs-skype-button[bg-primary][selected]:focus:not(.hover),
+[inset] gs-facetime-button[bg-primary][selected]:focus:not(.hover),
+[inset] gs-email-button[bg-primary][selected]:focus:not(.hover),
+[inset] gs-tracking-button[bg-primary][selected]:focus:not(.hover),
+[inset] gs-delete-button[bg-primary][selected]:focus:not(.hover),
+[inset] gs-option[bg-primary][selected]:focus:not(.hover),
+[inset] gs-dialog-button[bg-primary][selected]:focus:not(.hover),
+
+gs-button[bg-primary]:focus[inset],
+gs-toggle[bg-primary]:focus[inset],
+gs-checkbox[bg-primary]:focus[inset],
+gs-phone-button[bg-primary]:not([not-supported]):focus[inset],
+gs-map-button[bg-primary]:focus[inset],
+gs-skype-button[bg-primary]:focus[inset],
+gs-facetime-button[bg-primary]:focus[inset],
+gs-email-button[bg-primary]:focus[inset],
+gs-tracking-button[bg-primary]:focus[inset],
+gs-delete-button[bg-primary]:focus[inset],
+gs-option[bg-primary]:focus[inset],
+gs-dialog-button[bg-primary]:focus[inset],
+gs-button[bg-primary][selected]:focus:not(.hover)[inset],
+gs-checkbox[bg-primary][selected]:focus:not(.hover)[inset],
+gs-toggle[bg-primary][selected]:focus:not(.hover)[inset],
+gs-phone-button[bg-primary]:not([not-supported])[selected]:focus:not(.hover)[inset],
+gs-map-button[bg-primary][selected]:focus:not(.hover)[inset],
+gs-skype-button[bg-primary][selected]:focus:not(.hover)[inset],
+gs-facetime-button[bg-primary][selected]:focus:not(.hover)[inset],
+gs-email-button[bg-primary][selected]:focus:not(.hover)[inset],
+gs-tracking-button[bg-primary][selected]:focus:not(.hover)[inset],
+gs-delete-button[bg-primary][selected]:focus:not(.hover)[inset],
+gs-option[bg-primary][selected]:focus:not(.hover)[inset],
+gs-dialog-button[bg-primary][selected]:focus:not(.hover)[inset] {
+    text-decoration: none;
+    outline-offset: -3px;
+    color: #337ab7;
+    
+    background-color: #FFFDEC !important;
+}
+
+/* # HOVER # */
+[inset] gs-button[bg-primary].hover,
+[inset] gs-toggle[bg-primary].hover,
+[inset] gs-phone-button[bg-primary]:not([not-supported]).hover,
+[inset] gs-map-button[bg-primary].hover,
+[inset] gs-skype-button[bg-primary].hover,
+[inset] gs-facetime-button[bg-primary].hover,
+[inset] gs-email-button[bg-primary].hover,
+[inset] gs-tracking-button[bg-primary].hover,
+[inset] gs-delete-button[bg-primary].hover,
+[inset] gs-option[bg-primary].hover,
+[inset] gs-dialog-button[bg-primary].hover,
+
+gs-button[bg-primary].hover[inset],
+gs-toggle[bg-primary].hover[inset],
+gs-phone-button[bg-primary]:not([not-supported]).hover[inset],
+gs-map-button[bg-primary].hover[inset],
+gs-skype-button[bg-primary].hover[inset],
+gs-facetime-button[bg-primary].hover[inset],
+gs-email-button[bg-primary].hover[inset],
+gs-tracking-button[bg-primary].hover[inset],
+gs-delete-button[bg-primary].hover[inset],
+gs-option[bg-primary].hover[inset],
+gs-dialog-button[bg-primary].hover[inset] {
+    text-decoration: none;
+    color: #fff;
+    background-color: #286090 !important;
+    
+    border-top-color: #7EB1DC;
+    border-left-color: #7EB1DC;
+    
+    border-bottom-color: #286090;
+    border-right-color: #286090;
+}
+
+/* # DOWN # */
+[inset] gs-button[bg-primary].down,
+[inset] gs-checkbox[bg-primary].down,
+[inset] gs-toggle[bg-primary].down,
+[inset] gs-phone-button[bg-primary]:not([not-supported]).down,
+[inset] gs-map-button[bg-primary].down,
+[inset] gs-skype-button[bg-primary].down,
+[inset] gs-facetime-button[bg-primary].down,
+[inset] gs-email-button[bg-primary].down,
+[inset] gs-tracking-button[bg-primary].down,
+[inset] gs-delete-button[bg-primary].down,
+[inset] gs-option[bg-primary].down,
+[inset] gs-dialog-button[bg-primary].down,
+[inset] gs-button[bg-primary][selected],
+[inset] gs-checkbox[bg-primary][selected],
+[inset] gs-toggle[bg-primary][selected],
+[inset] gs-phone-button[bg-primary]:not([not-supported])[selected],
+[inset] gs-map-button[bg-primary][selected],
+[inset] gs-skype-button[bg-primary][selected],
+[inset] gs-facetime-button[bg-primary][selected],
+[inset] gs-email-button[bg-primary][selected],
+[inset] gs-tracking-button[bg-primary][selected],
+[inset] gs-delete-button[bg-primary][selected],
+[inset] gs-option[bg-primary][selected],
+[inset] gs-dialog-button[bg-primary][selected],
+
+gs-button[bg-primary].down[inset],
+gs-checkbox[bg-primary].down[inset],
+gs-toggle[bg-primary].down[inset],
+gs-phone-button[bg-primary]:not([not-supported]).down[inset],
+gs-map-button[bg-primary].down[inset],
+gs-skype-button[bg-primary].down[inset],
+gs-facetime-button[bg-primary].down[inset],
+gs-email-button[bg-primary].down[inset],
+gs-tracking-button[bg-primary].down[inset],
+gs-delete-button[bg-primary].down[inset],
+gs-option[bg-primary].down[inset],
+gs-dialog-button[bg-primary].down[inset],
+gs-button[bg-primary][selected][inset],
+gs-checkbox[bg-primary][selected][inset],
+gs-toggle[bg-primary][selected][inset],
+gs-phone-button[bg-primary]:not([not-supported])[selected][inset],
+gs-map-button[bg-primary][selected][inset],
+gs-skype-button[bg-primary][selected][inset],
+gs-facetime-button[bg-primary][selected][inset],
+gs-email-button[bg-primary][selected][inset],
+gs-tracking-button[bg-primary][selected][inset],
+gs-delete-button[bg-primary][selected][inset],
+gs-option[bg-primary][selected][inset],
+gs-dialog-button[bg-primary][selected][inset] {
+    background-image: none;
+    color: #fff;
+    background-color: #286090 !important;
+    
+    border-top-color: #094C83;
+    border-left-color: #094C83;
+    
+    border-bottom-color: #7EB1DC;
+    border-right-color: #7EB1DC;
+}
+
+/* # DOWN AND HOVER # */
+[inset] gs-button[bg-primary].down.hover,
+[inset] gs-checkbox[bg-primary].down.hover,
+[inset] gs-toggle[bg-primary].down.hover,
+[inset] gs-phone-button[bg-primary]:not([not-supported]).down.hover,
+[inset] gs-map-button[bg-primary].down.hover,
+[inset] gs-skype-button[bg-primary].down.hover,
+[inset] gs-facetime-button[bg-primary].down.hover,
+[inset] gs-email-button[bg-primary].down.hover,
+[inset] gs-tracking-button[bg-primary].down.hover,
+[inset] gs-delete-button[bg-primary].down.hover,
+[inset] gs-option[bg-primary].down.hover,
+[inset] gs-dialog-button[bg-primary].down.hover,
+
+gs-button[bg-primary].down.hover[inset],
+gs-checkbox[bg-primary].down.hover[inset],
+gs-toggle[bg-primary].down.hover[inset],
+gs-phone-button[bg-primary]:not([not-supported]).down.hover[inset],
+gs-map-button[bg-primary].down.hover[inset],
+gs-skype-button[bg-primary].down.hover[inset],
+gs-facetime-button[bg-primary].down.hover[inset],
+gs-email-button[bg-primary].down.hover[inset],
+gs-tracking-button[bg-primary].down.hover[inset],
+gs-delete-button[bg-primary].down.hover[inset],
+gs-option[bg-primary].down.hover[inset],
+gs-dialog-button[bg-primary].down.hover[inset] {
+    color: #fff;
+    background-color: #204d74 !important;
+}
+
+/* # DISABLED # */
+[inset] gs-button[bg-primary][disabled],
+[inset] gs-toggle[bg-primary][disabled],
+[inset] gs-checkbox[bg-primary][disabled],
+[inset] gs-phone-button[bg-primary]:not([not-supported])[disabled],
+[inset] gs-map-button[bg-primary][disabled],
+[inset] gs-skype-button[bg-primary][disabled],
+[inset] gs-facetime-button[bg-primary][disabled],
+[inset] gs-email-button[bg-primary][disabled],
+[inset] gs-tracking-button[bg-primary][disabled],
+[inset] gs-delete-button[bg-primary][disabled],
+[inset] gs-option[bg-primary][disabled],
+[inset] gs-dialog-button[bg-primary][disabled],
+
+gs-button[bg-primary][disabled][inset],
+gs-toggle[bg-primary][disabled][inset],
+gs-checkbox[bg-primary][disabled][inset],
+gs-phone-button[bg-primary]:not([not-supported])[disabled][inset],
+gs-map-button[bg-primary][disabled][inset],
+gs-skype-button[bg-primary][disabled][inset],
+gs-facetime-button[bg-primary][disabled][inset],
+gs-email-button[bg-primary][disabled][inset],
+gs-tracking-button[bg-primary][disabled][inset],
+gs-delete-button[bg-primary][disabled][inset],
+gs-option[bg-primary][disabled][inset],
+gs-dialog-button[bg-primary][disabled][inset] {
+    cursor: not-allowed;
+    background-color: #337ab7 !important;
+    
+    color: #aaaaaa;
+}
+
+/* # TXT DISABLED # */
+[inset] gs-button[txt-primary][disabled],
+[inset] gs-toggle[txt-primary][disabled],
+[inset] gs-checkbox[txt-primary][disabled],
+[inset] gs-phone-button[txt-primary]:not([not-supported])[disabled],
+[inset] gs-map-button[txt-primary][disabled],
+[inset] gs-skype-button[txt-primary][disabled],
+[inset] gs-facetime-button[txt-primary][disabled],
+[inset] gs-email-button[txt-primary][disabled],
+[inset] gs-tracking-button[txt-primary][disabled],
+[inset] gs-delete-button[txt-primary][disabled],
+[inset] gs-option[txt-primary][disabled],
+[inset] gs-dialog-button[txt-primary][disabled],
+
+gs-button[txt-primary][disabled][inset],
+gs-toggle[txt-primary][disabled][inset],
+gs-checkbox[txt-primary][disabled][inset],
+gs-phone-button[txt-primary]:not([not-supported])[disabled][inset],
+gs-map-button[txt-primary][disabled][inset],
+gs-skype-button[txt-primary][disabled][inset],
+gs-facetime-button[txt-primary][disabled][inset],
+gs-email-button[txt-primary][disabled][inset],
+gs-tracking-button[txt-primary][disabled][inset],
+gs-delete-button[txt-primary][disabled][inset],
+gs-option[txt-primary][disabled][inset],
+gs-dialog-button[txt-primary][disabled][inset] {
+    cursor: not-allowed;
+    color: #337ab7;
+}
+
+/* ## SUCCESS ## */
+[inset] gs-button[bg-success],
+[inset] gs-toggle[bg-success],
+[inset] gs-checkbox[bg-success],
+[inset] gs-phone-button:not([not-supported])[bg-success],
+[inset] gs-map-button[bg-success],
+[inset] gs-skype-button[bg-success],
+[inset] gs-facetime-button[bg-success],
+[inset] gs-email-button[bg-success],
+[inset] gs-tracking-button[bg-success],
+[inset] gs-delete-button[bg-success],
+[inset] gs-option[bg-success],
+[inset] gs-dialog-button[bg-success],
+
+gs-button[bg-success][inset],
+gs-toggle[bg-success][inset],
+gs-checkbox[bg-success][inset],
+gs-phone-button:not([not-supported])[bg-success][inset],
+gs-map-button[bg-success][inset],
+gs-skype-button[bg-success][inset],
+gs-facetime-button[bg-success][inset],
+gs-email-button[bg-success][inset],
+gs-tracking-button[bg-success][inset],
+gs-delete-button[bg-success][inset],
+gs-option[bg-success][inset],
+gs-dialog-button[bg-success][inset] {
+    color: #fff;
+    background-color: #5cb85c !important;
+    
+    border-top-color: #BAE8BA;
+    border-left-color: #BAE8BA;
+    
+    border-bottom-color: #1B7C1B;
+    border-right-color: #1B7C1B;
+}
+
+/* # FOCUS # */
+[inset] gs-button[bg-success]:focus,
+[inset] gs-toggle[bg-success]:focus,
+[inset] gs-checkbox[bg-success]:focus,
+[inset] gs-phone-button[bg-success]:not([not-supported]):focus,
+[inset] gs-map-button[bg-success]:focus,
+[inset] gs-skype-button[bg-success]:focus,
+[inset] gs-facetime-button[bg-success]:focus,
+[inset] gs-email-button[bg-success]:focus,
+[inset] gs-tracking-button[bg-success]:focus,
+[inset] gs-delete-button[bg-success]:focus,
+[inset] gs-option[bg-success]:focus,
+[inset] gs-dialog-button[bg-success]:focus,
+[inset] gs-button[bg-success][selected]:focus:not(.hover),
+[inset] gs-checkbox[bg-success][selected]:focus:not(.hover),
+[inset] gs-toggle[bg-success][selected]:focus:not(.hover),
+[inset] gs-phone-button[bg-success]:not([not-supported])[selected]:focus:not(.hover),
+[inset] gs-map-button[bg-success][selected]:focus:not(.hover),
+[inset] gs-skype-button[bg-success][selected]:focus:not(.hover),
+[inset] gs-facetime-button[bg-success][selected]:focus:not(.hover),
+[inset] gs-email-button[bg-success][selected]:focus:not(.hover),
+[inset] gs-tracking-button[bg-success][selected]:focus:not(.hover),
+[inset] gs-delete-button[bg-success][selected]:focus:not(.hover),
+[inset] gs-option[bg-success][selected]:focus:not(.hover),
+[inset] gs-dialog-button[bg-success][selected]:focus:not(.hover),
+
+gs-button[bg-success]:focus[inset],
+gs-toggle[bg-success]:focus[inset],
+gs-checkbox[bg-success]:focus[inset],
+gs-phone-button[bg-success]:not([not-supported]):focus[inset],
+gs-map-button[bg-success]:focus[inset],
+gs-skype-button[bg-success]:focus[inset],
+gs-facetime-button[bg-success]:focus[inset],
+gs-email-button[bg-success]:focus[inset],
+gs-tracking-button[bg-success]:focus[inset],
+gs-delete-button[bg-success]:focus[inset],
+gs-option[bg-success]:focus[inset],
+gs-dialog-button[bg-success]:focus[inset],
+gs-button[bg-success][selected]:focus:not(.hover)[inset],
+gs-checkbox[bg-success][selected]:focus:not(.hover)[inset],
+gs-toggle[bg-success][selected]:focus:not(.hover)[inset],
+gs-phone-button[bg-success]:not([not-supported])[selected]:focus:not(.hover)[inset],
+gs-map-button[bg-success][selected]:focus:not(.hover)[inset],
+gs-skype-button[bg-success][selected]:focus:not(.hover)[inset],
+gs-facetime-button[bg-success][selected]:focus:not(.hover)[inset],
+gs-email-button[bg-success][selected]:focus:not(.hover)[inset],
+gs-tracking-button[bg-success][selected]:focus:not(.hover)[inset],
+gs-delete-button[bg-success][selected]:focus:not(.hover)[inset],
+gs-option[bg-success][selected]:focus:not(.hover)[inset],
+gs-dialog-button[bg-success][selected]:focus:not(.hover)[inset] {
+    text-decoration: none;
+    outline-offset: -3px;
+    color: #5cb85c;
+    
+    background-color: #FFFDEC !important;
+}
+
+/* # HOVER # */
+[inset] gs-button[bg-success].hover,
+[inset] gs-toggle[bg-success].hover,
+[inset] gs-phone-button[bg-success]:not([not-supported]).hover,
+[inset] gs-map-button[bg-success].hover,
+[inset] gs-skype-button[bg-success].hover,
+[inset] gs-facetime-button[bg-success].hover,
+[inset] gs-email-button[bg-success].hover,
+[inset] gs-tracking-button[bg-success].hover,
+[inset] gs-delete-button[bg-success].hover,
+[inset] gs-option[bg-success].hover,
+[inset] gs-dialog-button[bg-success].hover,
+
+gs-button[bg-success].hover[inset],
+gs-toggle[bg-success].hover[inset],
+gs-phone-button[bg-success]:not([not-supported]).hover[inset],
+gs-map-button[bg-success].hover[inset],
+gs-skype-button[bg-success].hover[inset],
+gs-facetime-button[bg-success].hover[inset],
+gs-email-button[bg-success].hover[inset],
+gs-tracking-button[bg-success].hover[inset],
+gs-delete-button[bg-success].hover[inset],
+gs-option[bg-success].hover[inset],
+gs-dialog-button[bg-success].hover[inset] {
+    text-decoration: none;
+    color: #fff;
+    background-color: #449d44 !important;
+    
+    border-top-color: #BAE8BA;
+    border-left-color: #BAE8BA;
+    
+    border-bottom-color: #449d44;
+    border-right-color: #449d44;
+}
+
+/* # DOWN # */
+[inset] gs-button[bg-success].down,
+[inset] gs-checkbox[bg-success].down,
+[inset] gs-toggle[bg-success].down,
+[inset] gs-phone-button[bg-success]:not([not-supported]).down,
+[inset] gs-map-button[bg-success].down,
+[inset] gs-skype-button[bg-success].down,
+[inset] gs-facetime-button[bg-success].down,
+[inset] gs-email-button[bg-success].down,
+[inset] gs-tracking-button[bg-success].down,
+[inset] gs-delete-button[bg-success].down,
+[inset] gs-option[bg-success].down,
+[inset] gs-dialog-button[bg-success].down,
+[inset] gs-button[bg-success][selected],
+[inset] gs-checkbox[bg-success][selected],
+[inset] gs-toggle[bg-success][selected],
+[inset] gs-phone-button[bg-success]:not([not-supported])[selected],
+[inset] gs-map-button[bg-success][selected],
+[inset] gs-skype-button[bg-success][selected],
+[inset] gs-facetime-button[bg-success][selected],
+[inset] gs-email-button[bg-success][selected],
+[inset] gs-tracking-button[bg-success][selected],
+[inset] gs-delete-button[bg-success][selected],
+[inset] gs-option[bg-success][selected],
+[inset] gs-dialog-button[bg-success][selected],
+
+gs-button[bg-success].down[inset],
+gs-checkbox[bg-success].down[inset],
+gs-toggle[bg-success].down[inset],
+gs-phone-button[bg-success]:not([not-supported]).down[inset],
+gs-map-button[bg-success].down[inset],
+gs-skype-button[bg-success].down[inset],
+gs-facetime-button[bg-success].down[inset],
+gs-email-button[bg-success].down[inset],
+gs-tracking-button[bg-success].down[inset],
+gs-delete-button[bg-success].down[inset],
+gs-option[bg-success].down[inset],
+gs-dialog-button[bg-success].down[inset],
+gs-button[bg-success][selected][inset],
+gs-checkbox[bg-success][selected][inset],
+gs-toggle[bg-success][selected][inset],
+gs-phone-button[bg-success]:not([not-supported])[selected][inset],
+gs-map-button[bg-success][selected][inset],
+gs-skype-button[bg-success][selected][inset],
+gs-facetime-button[bg-success][selected][inset],
+gs-email-button[bg-success][selected][inset],
+gs-tracking-button[bg-success][selected][inset],
+gs-delete-button[bg-success][selected][inset],
+gs-option[bg-success][selected][inset],
+gs-dialog-button[bg-success][selected][inset] {
+    background-image: none;
+    color: #fff;
+    background-color: #449d44 !important;
+    
+    border-top-color: #1B7C1B;
+    border-left-color: #1B7C1B;
+    
+    border-bottom-color: #BAE8BA;
+    border-right-color: #BAE8BA;
+}
+
+/* # DOWN AND HOVER # */
+[inset] gs-button[bg-success].down.hover,
+[inset] gs-checkbox[bg-success].down.hover,
+[inset] gs-toggle[bg-success].down.hover,
+[inset] gs-phone-button[bg-success]:not([not-supported]).down.hover,
+[inset] gs-map-button[bg-success].down.hover,
+[inset] gs-skype-button[bg-success].down.hover,
+[inset] gs-facetime-button[bg-success].down.hover,
+[inset] gs-email-button[bg-success].down.hover,
+[inset] gs-tracking-button[bg-success].down.hover,
+[inset] gs-delete-button[bg-success].down.hover,
+[inset] gs-option[bg-success].down.hover,
+[inset] gs-dialog-button[bg-success].down.hover,
+
+gs-button[bg-success].down.hover[inset],
+gs-checkbox[bg-success].down.hover[inset],
+gs-toggle[bg-success].down.hover[inset],
+gs-phone-button[bg-success]:not([not-supported]).down.hover[inset],
+gs-map-button[bg-success].down.hover[inset],
+gs-skype-button[bg-success].down.hover[inset],
+gs-facetime-button[bg-success].down.hover[inset],
+gs-email-button[bg-success].down.hover[inset],
+gs-tracking-button[bg-success].down.hover[inset],
+gs-delete-button[bg-success].down.hover[inset],
+gs-option[bg-success].down.hover[inset],
+gs-dialog-button[bg-success].down.hover[inset] {
+    color: #fff;
+    background-color: #398439 !important;
+}
+
+/* # DISABLED # */
+[inset] gs-button[bg-success][disabled],
+[inset] gs-toggle[bg-success][disabled],
+[inset] gs-checkbox[bg-success][disabled],
+[inset] gs-phone-button[bg-success]:not([not-supported])[disabled],
+[inset] gs-map-button[bg-success][disabled],
+[inset] gs-skype-button[bg-success][disabled],
+[inset] gs-facetime-button[bg-success][disabled],
+[inset] gs-email-button[bg-success][disabled],
+[inset] gs-tracking-button[bg-success][disabled],
+[inset] gs-delete-button[bg-success][disabled],
+[inset] gs-option[bg-success][disabled],
+[inset] gs-dialog-button[bg-success][disabled],
+
+gs-button[bg-success][disabled][inset],
+gs-toggle[bg-success][disabled][inset],
+gs-checkbox[bg-success][disabled][inset],
+gs-phone-button[bg-success]:not([not-supported])[disabled][inset],
+gs-map-button[bg-success][disabled][inset],
+gs-skype-button[bg-success][disabled][inset],
+gs-facetime-button[bg-success][disabled][inset],
+gs-email-button[bg-success][disabled][inset],
+gs-tracking-button[bg-success][disabled][inset],
+gs-delete-button[bg-success][disabled][inset],
+gs-option[bg-success][disabled][inset],
+gs-dialog-button[bg-success][disabled][inset] {
+    cursor: not-allowed;
+    background-color: #5cb85c !important;
+    
+    color: #666666;
+}
+
+/* # TXT DISABLED # */
+[inset] gs-button[txt-success][disabled],
+[inset] gs-toggle[txt-success][disabled],
+[inset] gs-checkbox[txt-success][disabled],
+[inset] gs-phone-button[txt-success]:not([not-supported])[disabled],
+[inset] gs-map-button[txt-success][disabled],
+[inset] gs-skype-button[txt-success][disabled],
+[inset] gs-facetime-button[txt-success][disabled],
+[inset] gs-email-button[txt-success][disabled],
+[inset] gs-tracking-button[txt-success][disabled],
+[inset] gs-delete-button[txt-success][disabled],
+[inset] gs-option[txt-success][disabled],
+[inset] gs-dialog-button[txt-success][disabled],
+
+gs-button[txt-success][disabled][inset],
+gs-toggle[txt-success][disabled][inset],
+gs-checkbox[txt-success][disabled][inset],
+gs-phone-button[txt-success]:not([not-supported])[disabled][inset],
+gs-map-button[txt-success][disabled][inset],
+gs-skype-button[txt-success][disabled][inset],
+gs-facetime-button[txt-success][disabled][inset],
+gs-email-button[txt-success][disabled][inset],
+gs-tracking-button[txt-success][disabled][inset],
+gs-delete-button[txt-success][disabled][inset],
+gs-option[txt-success][disabled][inset],
+gs-dialog-button[txt-success][disabled][inset] {
+    cursor: not-allowed;
+    color: #5cb85c;
+}
+
+/* ## INFO ## */
+[inset] gs-button[bg-info],
+[inset] gs-toggle[bg-info],
+[inset] gs-checkbox[bg-info],
+[inset] gs-phone-button:not([not-supported])[bg-info],
+[inset] gs-map-button[bg-info],
+[inset] gs-skype-button[bg-info],
+[inset] gs-facetime-button[bg-info],
+[inset] gs-email-button[bg-info],
+[inset] gs-tracking-button[bg-info],
+[inset] gs-delete-button[bg-info],
+[inset] gs-option[bg-info],
+[inset] gs-dialog-button[bg-info],
+
+gs-button[bg-info][inset],
+gs-toggle[bg-info][inset],
+gs-checkbox[bg-info][inset],
+gs-phone-button:not([not-supported])[bg-info][inset],
+gs-map-button[bg-info][inset],
+gs-skype-button[bg-info][inset],
+gs-facetime-button[bg-info][inset],
+gs-email-button[bg-info][inset],
+gs-tracking-button[bg-info][inset],
+gs-delete-button[bg-info][inset],
+gs-option[bg-info][inset],
+gs-dialog-button[bg-info][inset] {
+    color: #fff;
+    background-color: #5bc0de !important;
+    
+    border-top-color: #BAEAF8;
+    border-left-color: #BAEAF8;
+    
+    border-bottom-color: #1993B6;
+    border-right-color: #1993B6;
+}
+
+/* # FOCUS # */
+[inset] gs-button[bg-info]:focus,
+[inset] gs-toggle[bg-info]:focus,
+[inset] gs-checkbox[bg-info]:focus,
+[inset] gs-phone-button[bg-info]:not([not-supported]):focus,
+[inset] gs-map-button[bg-info]:focus,
+[inset] gs-skype-button[bg-info]:focus,
+[inset] gs-facetime-button[bg-info]:focus,
+[inset] gs-email-button[bg-info]:focus,
+[inset] gs-tracking-button[bg-info]:focus,
+[inset] gs-delete-button[bg-info]:focus,
+[inset] gs-option[bg-info]:focus,
+[inset] gs-dialog-button[bg-info]:focus,
+[inset] gs-button[bg-info][selected]:focus:not(.hover),
+[inset] gs-checkbox[bg-info][selected]:focus:not(.hover),
+[inset] gs-toggle[bg-info][selected]:focus:not(.hover),
+[inset] gs-phone-button[bg-info]:not([not-supported])[selected]:focus:not(.hover),
+[inset] gs-map-button[bg-info][selected]:focus:not(.hover),
+[inset] gs-skype-button[bg-info][selected]:focus:not(.hover),
+[inset] gs-facetime-button[bg-info][selected]:focus:not(.hover),
+[inset] gs-email-button[bg-info][selected]:focus:not(.hover),
+[inset] gs-tracking-button[bg-info][selected]:focus:not(.hover),
+[inset] gs-delete-button[bg-info][selected]:focus:not(.hover),
+[inset] gs-option[bg-info][selected]:focus:not(.hover),
+[inset] gs-dialog-button[bg-info][selected]:focus:not(.hover),
+
+gs-button[bg-info]:focus[inset],
+gs-toggle[bg-info]:focus[inset],
+gs-checkbox[bg-info]:focus[inset],
+gs-phone-button[bg-info]:not([not-supported]):focus[inset],
+gs-map-button[bg-info]:focus[inset],
+gs-skype-button[bg-info]:focus[inset],
+gs-facetime-button[bg-info]:focus[inset],
+gs-email-button[bg-info]:focus[inset],
+gs-tracking-button[bg-info]:focus[inset],
+gs-delete-button[bg-info]:focus[inset],
+gs-option[bg-info]:focus[inset],
+gs-dialog-button[bg-info]:focus[inset],
+gs-button[bg-info][selected]:focus:not(.hover)[inset],
+gs-checkbox[bg-info][selected]:focus:not(.hover)[inset],
+gs-toggle[bg-info][selected]:focus:not(.hover)[inset],
+gs-phone-button[bg-info]:not([not-supported])[selected]:focus:not(.hover)[inset],
+gs-map-button[bg-info][selected]:focus:not(.hover)[inset],
+gs-skype-button[bg-info][selected]:focus:not(.hover)[inset],
+gs-facetime-button[bg-info][selected]:focus:not(.hover)[inset],
+gs-email-button[bg-info][selected]:focus:not(.hover)[inset],
+gs-tracking-button[bg-info][selected]:focus:not(.hover)[inset],
+gs-delete-button[bg-info][selected]:focus:not(.hover)[inset],
+gs-option[bg-info][selected]:focus:not(.hover)[inset],
+gs-dialog-button[bg-info][selected]:focus:not(.hover)[inset] {
+    text-decoration: none;
+    outline-offset: -3px;
+    color: #5bc0de;
+    
+    background-color: #FFFDEC !important;
+}
+
+/* # HOVER # */
+[inset] gs-button[bg-info].hover,
+[inset] gs-toggle[bg-info].hover,
+[inset] gs-phone-button[bg-info]:not([not-supported]).hover,
+[inset] gs-map-button[bg-info].hover,
+[inset] gs-skype-button[bg-info].hover,
+[inset] gs-facetime-button[bg-info].hover,
+[inset] gs-email-button[bg-info].hover,
+[inset] gs-tracking-button[bg-info].hover,
+[inset] gs-delete-button[bg-info].hover,
+[inset] gs-option[bg-info].hover,
+[inset] gs-dialog-button[bg-info].hover,
+
+gs-button[bg-info].hover[inset],
+gs-toggle[bg-info].hover[inset],
+gs-phone-button[bg-info]:not([not-supported]).hover[inset],
+gs-map-button[bg-info].hover[inset],
+gs-skype-button[bg-info].hover[inset],
+gs-facetime-button[bg-info].hover[inset],
+gs-email-button[bg-info].hover[inset],
+gs-tracking-button[bg-info].hover[inset],
+gs-delete-button[bg-info].hover[inset],
+gs-option[bg-info].hover[inset],
+gs-dialog-button[bg-info].hover[inset] {
+    text-decoration: none;
+    color: #fff;
+    background-color: #31b0d5 !important;
+    
+    border-top-color: #BAEAF8;
+    border-left-color: #BAEAF8;
+    
+    border-bottom-color: #31b0d5;
+    border-right-color: #31b0d5;
+}
+
+/* # DOWN # */
+[inset] gs-button[bg-info].down,
+[inset] gs-checkbox[bg-info].down,
+[inset] gs-toggle[bg-info].down,
+[inset] gs-phone-button[bg-info]:not([not-supported]).down,
+[inset] gs-map-button[bg-info].down,
+[inset] gs-skype-button[bg-info].down,
+[inset] gs-facetime-button[bg-info].down,
+[inset] gs-email-button[bg-info].down,
+[inset] gs-tracking-button[bg-info].down,
+[inset] gs-delete-button[bg-info].down,
+[inset] gs-option[bg-info].down,
+[inset] gs-dialog-button[bg-info].down,
+[inset] gs-button[bg-info][selected],
+[inset] gs-checkbox[bg-info][selected],
+[inset] gs-toggle[bg-info][selected],
+[inset] gs-phone-button[bg-info]:not([not-supported])[selected],
+[inset] gs-map-button[bg-info][selected],
+[inset] gs-skype-button[bg-info][selected],
+[inset] gs-facetime-button[bg-info][selected],
+[inset] gs-email-button[bg-info][selected],
+[inset] gs-tracking-button[bg-info][selected],
+[inset] gs-delete-button[bg-info][selected],
+[inset] gs-option[bg-info][selected],
+[inset] gs-dialog-button[bg-info][selected],
+
+gs-button[bg-info].down[inset],
+gs-checkbox[bg-info].down[inset],
+gs-toggle[bg-info].down[inset],
+gs-phone-button[bg-info]:not([not-supported]).down[inset],
+gs-map-button[bg-info].down[inset],
+gs-skype-button[bg-info].down[inset],
+gs-facetime-button[bg-info].down[inset],
+gs-email-button[bg-info].down[inset],
+gs-tracking-button[bg-info].down[inset],
+gs-delete-button[bg-info].down[inset],
+gs-option[bg-info].down[inset],
+gs-dialog-button[bg-info].down[inset],
+gs-button[bg-info][selected][inset],
+gs-checkbox[bg-info][selected][inset],
+gs-toggle[bg-info][selected][inset],
+gs-phone-button[bg-info]:not([not-supported])[selected][inset],
+gs-map-button[bg-info][selected][inset],
+gs-skype-button[bg-info][selected][inset],
+gs-facetime-button[bg-info][selected][inset],
+gs-email-button[bg-info][selected][inset],
+gs-tracking-button[bg-info][selected][inset],
+gs-delete-button[bg-info][selected][inset],
+gs-option[bg-info][selected][inset],
+gs-dialog-button[bg-info][selected][inset] {
+    background-image: none;
+    color: #fff;
+    background-color: #31b0d5 !important;
+    
+    border-top-color: #1993B6;
+    border-left-color: #1993B6;
+    
+    border-bottom-color: #BAEAF8;
+    border-right-color: #BAEAF8;
+}
+
+/* # DOWN AND HOVER # */
+[inset] gs-button[bg-info].down.hover,
+[inset] gs-checkbox[bg-info].down.hover,
+[inset] gs-toggle[bg-info].down.hover,
+[inset] gs-phone-button[bg-info]:not([not-supported]).down.hover,
+[inset] gs-map-button[bg-info].down.hover,
+[inset] gs-skype-button[bg-info].down.hover,
+[inset] gs-facetime-button[bg-info].down.hover,
+[inset] gs-email-button[bg-info].down.hover,
+[inset] gs-tracking-button[bg-info].down.hover,
+[inset] gs-delete-button[bg-info].down.hover,
+[inset] gs-option[bg-info].down.hover,
+[inset] gs-dialog-button[bg-info].down.hover,
+
+gs-button[bg-info].down.hover[inset],
+gs-checkbox[bg-info].down.hover[inset],
+gs-toggle[bg-info].down.hover[inset],
+gs-phone-button[bg-info]:not([not-supported]).down.hover[inset],
+gs-map-button[bg-info].down.hover[inset],
+gs-skype-button[bg-info].down.hover[inset],
+gs-facetime-button[bg-info].down.hover[inset],
+gs-email-button[bg-info].down.hover[inset],
+gs-tracking-button[bg-info].down.hover[inset],
+gs-delete-button[bg-info].down.hover[inset],
+gs-option[bg-info].down.hover[inset],
+gs-dialog-button[bg-info].down.hover[inset] {
+    color: #fff;
+    background-color: #269abc !important;
+}
+
+/* # DISABLED # */
+[inset] gs-button[bg-info][disabled],
+[inset] gs-toggle[bg-info][disabled],
+[inset] gs-checkbox[bg-info][disabled],
+[inset] gs-phone-button[bg-info]:not([not-supported])[disabled],
+[inset] gs-map-button[bg-info][disabled],
+[inset] gs-skype-button[bg-info][disabled],
+[inset] gs-facetime-button[bg-info][disabled],
+[inset] gs-email-button[bg-info][disabled],
+[inset] gs-tracking-button[bg-info][disabled],
+[inset] gs-delete-button[bg-info][disabled],
+[inset] gs-option[bg-info][disabled],
+[inset] gs-dialog-button[bg-info][disabled],
+
+gs-button[bg-info][disabled][inset],
+gs-toggle[bg-info][disabled][inset],
+gs-checkbox[bg-info][disabled][inset],
+gs-phone-button[bg-info]:not([not-supported])[disabled][inset],
+gs-map-button[bg-info][disabled][inset],
+gs-skype-button[bg-info][disabled][inset],
+gs-facetime-button[bg-info][disabled][inset],
+gs-email-button[bg-info][disabled][inset],
+gs-tracking-button[bg-info][disabled][inset],
+gs-delete-button[bg-info][disabled][inset],
+gs-option[bg-info][disabled][inset],
+gs-dialog-button[bg-info][disabled][inset] {
+    cursor: not-allowed;
+    background-color: #5bc0de !important;
+    
+    color: #666666;
+}
+
+/* # TXT DISABLED # */
+[inset] gs-button[txt-info][disabled],
+[inset] gs-toggle[txt-info][disabled],
+[inset] gs-checkbox[txt-info][disabled],
+[inset] gs-phone-button[txt-info]:not([not-supported])[disabled],
+[inset] gs-map-button[txt-info][disabled],
+[inset] gs-skype-button[txt-info][disabled],
+[inset] gs-facetime-button[txt-info][disabled],
+[inset] gs-email-button[txt-info][disabled],
+[inset] gs-tracking-button[txt-info][disabled],
+[inset] gs-delete-button[txt-info][disabled],
+[inset] gs-option[txt-info][disabled],
+[inset] gs-dialog-button[txt-info][disabled],
+
+gs-button[txt-info][disabled][inset],
+gs-toggle[txt-info][disabled][inset],
+gs-checkbox[txt-info][disabled][inset],
+gs-phone-button[txt-info]:not([not-supported])[disabled][inset],
+gs-map-button[txt-info][disabled][inset],
+gs-skype-button[txt-info][disabled][inset],
+gs-facetime-button[txt-info][disabled][inset],
+gs-email-button[txt-info][disabled][inset],
+gs-tracking-button[txt-info][disabled][inset],
+gs-delete-button[txt-info][disabled][inset],
+gs-option[txt-info][disabled][inset],
+gs-dialog-button[txt-info][disabled][inset] {
+    cursor: not-allowed;
+    color: #269abc;
+}
+
+/* ## WARNING ## */
+[inset] gs-button[bg-warning],
+[inset] gs-toggle[bg-warning],
+[inset] gs-checkbox[bg-warning],
+[inset] gs-phone-button:not([not-supported])[bg-warning],
+[inset] gs-map-button[bg-warning],
+[inset] gs-skype-button[bg-warning],
+[inset] gs-facetime-button[bg-warning],
+[inset] gs-email-button[bg-warning],
+[inset] gs-tracking-button[bg-warning],
+[inset] gs-delete-button[bg-warning],
+[inset] gs-option[bg-warning],
+[inset] gs-dialog-button[bg-warning],
+
+gs-button[bg-warning][inset],
+gs-toggle[bg-warning][inset],
+gs-checkbox[bg-warning][inset],
+gs-phone-button:not([not-supported])[bg-warning][inset],
+gs-map-button[bg-warning][inset],
+gs-skype-button[bg-warning][inset],
+gs-facetime-button[bg-warning][inset],
+gs-email-button[bg-warning][inset],
+gs-tracking-button[bg-warning][inset],
+gs-delete-button[bg-warning][inset],
+gs-option[bg-warning][inset],
+gs-dialog-button[bg-warning][inset] {
+    color: #fff;
+    background-color: #f0ad4e;
+    
+    border-top-color: #FFD8A0;
+    border-left-color: #FFD8A0;
+    
+    border-bottom-color: #AD6D11;
+    border-right-color: #AD6D11;
+}
+
+/* # FOCUS # */
+[inset] gs-button[bg-warning]:focus,
+[inset] gs-toggle[bg-warning]:focus,
+[inset] gs-checkbox[bg-warning]:focus,
+[inset] gs-phone-button[bg-warning]:not([not-supported]):focus,
+[inset] gs-map-button[bg-warning]:focus,
+[inset] gs-skype-button[bg-warning]:focus,
+[inset] gs-facetime-button[bg-warning]:focus,
+[inset] gs-email-button[bg-warning]:focus,
+[inset] gs-tracking-button[bg-warning]:focus,
+[inset] gs-delete-button[bg-warning]:focus,
+[inset] gs-option[bg-warning]:focus,
+[inset] gs-dialog-button[bg-warning]:focus,
+[inset] gs-button[bg-warning][selected]:focus:not(.hover),
+[inset] gs-checkbox[bg-warning][selected]:focus:not(.hover),
+[inset] gs-toggle[bg-warning][selected]:focus:not(.hover),
+[inset] gs-phone-button[bg-warning]:not([not-supported])[selected]:focus:not(.hover),
+[inset] gs-map-button[bg-warning][selected]:focus:not(.hover),
+[inset] gs-skype-button[bg-warning][selected]:focus:not(.hover),
+[inset] gs-facetime-button[bg-warning][selected]:focus:not(.hover),
+[inset] gs-email-button[bg-warning][selected]:focus:not(.hover),
+[inset] gs-tracking-button[bg-warning][selected]:focus:not(.hover),
+[inset] gs-delete-button[bg-warning][selected]:focus:not(.hover),
+[inset] gs-option[bg-warning][selected]:focus:not(.hover),
+[inset] gs-dialog-button[bg-warning][selected]:focus:not(.hover),
+
+gs-button[bg-warning]:focus[inset],
+gs-toggle[bg-warning]:focus[inset],
+gs-checkbox[bg-warning]:focus[inset],
+gs-phone-button[bg-warning]:not([not-supported]):focus[inset],
+gs-map-button[bg-warning]:focus[inset],
+gs-skype-button[bg-warning]:focus[inset],
+gs-facetime-button[bg-warning]:focus[inset],
+gs-email-button[bg-warning]:focus[inset],
+gs-tracking-button[bg-warning]:focus[inset],
+gs-delete-button[bg-warning]:focus[inset],
+gs-option[bg-warning]:focus[inset],
+gs-dialog-button[bg-warning]:focus[inset],
+gs-button[bg-warning][selected]:focus:not(.hover)[inset],
+gs-checkbox[bg-warning][selected]:focus:not(.hover)[inset],
+gs-toggle[bg-warning][selected]:focus:not(.hover)[inset],
+gs-phone-button[bg-warning]:not([not-supported])[selected]:focus:not(.hover)[inset],
+gs-map-button[bg-warning][selected]:focus:not(.hover)[inset],
+gs-skype-button[bg-warning][selected]:focus:not(.hover)[inset],
+gs-facetime-button[bg-warning][selected]:focus:not(.hover)[inset],
+gs-email-button[bg-warning][selected]:focus:not(.hover)[inset],
+gs-tracking-button[bg-warning][selected]:focus:not(.hover)[inset],
+gs-delete-button[bg-warning][selected]:focus:not(.hover)[inset],
+gs-option[bg-warning][selected]:focus:not(.hover)[inset],
+gs-dialog-button[bg-warning][selected]:focus:not(.hover)[inset] {
+    text-decoration: none;
+    outline-offset: -3px;
+    color: #f0ad4e;
+    
+    background-color: #FFFDEC !important;
+}
+
+/* # HOVER # */
+[inset] gs-button[bg-warning].hover,
+[inset] gs-toggle[bg-warning].hover,
+[inset] gs-phone-button[bg-warning]:not([not-supported]).hover,
+[inset] gs-map-button[bg-warning].hover,
+[inset] gs-skype-button[bg-warning].hover,
+[inset] gs-facetime-button[bg-warning].hover,
+[inset] gs-email-button[bg-warning].hover,
+[inset] gs-tracking-button[bg-warning].hover,
+[inset] gs-delete-button[bg-warning].hover,
+[inset] gs-option[bg-warning].hover,
+[inset] gs-dialog-button[bg-warning].hover,
+
+gs-button[bg-warning].hover[inset],
+gs-toggle[bg-warning].hover[inset],
+gs-phone-button[bg-warning]:not([not-supported]).hover[inset],
+gs-map-button[bg-warning].hover[inset],
+gs-skype-button[bg-warning].hover[inset],
+gs-facetime-button[bg-warning].hover[inset],
+gs-email-button[bg-warning].hover[inset],
+gs-tracking-button[bg-warning].hover[inset],
+gs-delete-button[bg-warning].hover[inset],
+gs-option[bg-warning].hover[inset],
+gs-dialog-button[bg-warning].hover[inset] {
+    text-decoration: none;
+    color: #fff;
+    background-color: #ec971f !important;
+    
+    border-top-color: #FFD8A0;
+    border-left-color: #FFD8A0;
+    
+    border-bottom-color: #ec971f;
+    border-right-color: #ec971f;
+}
+
+/* # DOWN # */
+[inset] gs-button[bg-warning].down,
+[inset] gs-checkbox[bg-warning].down,
+[inset] gs-toggle[bg-warning].down,
+[inset] gs-phone-button[bg-warning]:not([not-supported]).down,
+[inset] gs-map-button[bg-warning].down,
+[inset] gs-skype-button[bg-warning].down,
+[inset] gs-facetime-button[bg-warning].down,
+[inset] gs-email-button[bg-warning].down,
+[inset] gs-tracking-button[bg-warning].down,
+[inset] gs-delete-button[bg-warning].down,
+[inset] gs-option[bg-warning].down,
+[inset] gs-dialog-button[bg-warning].down,
+[inset] gs-button[bg-warning][selected],
+[inset] gs-checkbox[bg-warning][selected],
+[inset] gs-toggle[bg-warning][selected],
+[inset] gs-phone-button[bg-warning]:not([not-supported])[selected],
+[inset] gs-map-button[bg-warning][selected],
+[inset] gs-skype-button[bg-warning][selected],
+[inset] gs-facetime-button[bg-warning][selected],
+[inset] gs-email-button[bg-warning][selected],
+[inset] gs-tracking-button[bg-warning][selected],
+[inset] gs-delete-button[bg-warning][selected],
+[inset] gs-option[bg-warning][selected],
+[inset] gs-dialog-button[bg-warning][selected],
+
+gs-button[bg-warning].down[inset],
+gs-checkbox[bg-warning].down[inset],
+gs-toggle[bg-warning].down[inset],
+gs-phone-button[bg-warning]:not([not-supported]).down[inset],
+gs-map-button[bg-warning].down[inset],
+gs-skype-button[bg-warning].down[inset],
+gs-facetime-button[bg-warning].down[inset],
+gs-email-button[bg-warning].down[inset],
+gs-tracking-button[bg-warning].down[inset],
+gs-delete-button[bg-warning].down[inset],
+gs-option[bg-warning].down[inset],
+gs-dialog-button[bg-warning].down[inset],
+gs-button[bg-warning][selected][inset],
+gs-checkbox[bg-warning][selected][inset],
+gs-toggle[bg-warning][selected][inset],
+gs-phone-button[bg-warning]:not([not-supported])[selected][inset],
+gs-map-button[bg-warning][selected][inset],
+gs-skype-button[bg-warning][selected][inset],
+gs-facetime-button[bg-warning][selected][inset],
+gs-email-button[bg-warning][selected][inset],
+gs-tracking-button[bg-warning][selected][inset],
+gs-delete-button[bg-warning][selected][inset],
+gs-option[bg-warning][selected][inset],
+gs-dialog-button[bg-warning][selected][inset] {
+    background-image: none;
+    color: #fff;
+    background-color: #ec971f !important;
+    
+    border-top-color: #AD6D11;
+    border-left-color: #AD6D11;
+    
+    border-bottom-color: #FFD8A0;
+    border-right-color: #FFD8A0;
+}
+
+/* # DOWN AND HOVER # */
+[inset] gs-button[bg-warning].down.hover,
+[inset] gs-checkbox[bg-warning].down.hover,
+[inset] gs-toggle[bg-warning].down.hover,
+[inset] gs-phone-button[bg-warning]:not([not-supported]).down.hover,
+[inset] gs-map-button[bg-warning].down.hover,
+[inset] gs-skype-button[bg-warning].down.hover,
+[inset] gs-facetime-button[bg-warning].down.hover,
+[inset] gs-email-button[bg-warning].down.hover,
+[inset] gs-tracking-button[bg-warning].down.hover,
+[inset] gs-delete-button[bg-warning].down.hover,
+[inset] gs-option[bg-warning].down.hover,
+[inset] gs-dialog-button[bg-warning].down.hover,
+
+gs-button[bg-warning].down.hover[inset],
+gs-checkbox[bg-warning].down.hover[inset],
+gs-toggle[bg-warning].down.hover[inset],
+gs-phone-button[bg-warning]:not([not-supported]).down.hover[inset],
+gs-map-button[bg-warning].down.hover[inset],
+gs-skype-button[bg-warning].down.hover[inset],
+gs-facetime-button[bg-warning].down.hover[inset],
+gs-email-button[bg-warning].down.hover[inset],
+gs-tracking-button[bg-warning].down.hover[inset],
+gs-delete-button[bg-warning].down.hover[inset],
+gs-option[bg-warning].down.hover[inset],
+gs-dialog-button[bg-warning].down.hover[inset] {
+    color: #fff;
+    background-color: #d58512 !important;
+}
+
+/* # DISABLED # */
+[inset] gs-button[bg-warning][disabled],
+[inset] gs-toggle[bg-warning][disabled],
+[inset] gs-checkbox[bg-warning][disabled],
+[inset] gs-phone-button[bg-warning]:not([not-supported])[disabled],
+[inset] gs-map-button[bg-warning][disabled],
+[inset] gs-skype-button[bg-warning][disabled],
+[inset] gs-facetime-button[bg-warning][disabled],
+[inset] gs-email-button[bg-warning][disabled],
+[inset] gs-tracking-button[bg-warning][disabled],
+[inset] gs-delete-button[bg-warning][disabled],
+[inset] gs-option[bg-warning][disabled],
+[inset] gs-dialog-button[bg-warning][disabled],
+
+gs-button[bg-warning][disabled][inset],
+gs-toggle[bg-warning][disabled][inset],
+gs-checkbox[bg-warning][disabled][inset],
+gs-phone-button[bg-warning]:not([not-supported])[disabled][inset],
+gs-map-button[bg-warning][disabled][inset],
+gs-skype-button[bg-warning][disabled][inset],
+gs-facetime-button[bg-warning][disabled][inset],
+gs-email-button[bg-warning][disabled][inset],
+gs-tracking-button[bg-warning][disabled][inset],
+gs-delete-button[bg-warning][disabled][inset],
+gs-option[bg-warning][disabled][inset],
+gs-dialog-button[bg-warning][disabled][inset] {
+    cursor: not-allowed;
+    background-color: #f0ad4e !important;
+    
+    color: #666666;
+}
+
+/* # DISABLED # */
+[inset] gs-button[txt-warning][disabled],
+[inset] gs-toggle[txt-warning][disabled],
+[inset] gs-checkbox[txt-warning][disabled],
+[inset] gs-phone-button[txt-warning]:not([not-supported])[disabled],
+[inset] gs-map-button[txt-warning][disabled],
+[inset] gs-skype-button[txt-warning][disabled],
+[inset] gs-facetime-button[txt-warning][disabled],
+[inset] gs-email-button[txt-warning][disabled],
+[inset] gs-tracking-button[txt-warning][disabled],
+[inset] gs-delete-button[txt-warning][disabled],
+[inset] gs-option[txt-warning][disabled],
+[inset] gs-dialog-button[txt-warning][disabled],
+
+gs-button[txt-warning][disabled][inset],
+gs-toggle[txt-warning][disabled][inset],
+gs-checkbox[txt-warning][disabled][inset],
+gs-phone-button[txt-warning]:not([not-supported])[disabled][inset],
+gs-map-button[txt-warning][disabled][inset],
+gs-skype-button[txt-warning][disabled][inset],
+gs-facetime-button[txt-warning][disabled][inset],
+gs-email-button[txt-warning][disabled][inset],
+gs-tracking-button[txt-warning][disabled][inset],
+gs-delete-button[txt-warning][disabled][inset],
+gs-option[txt-warning][disabled][inset],
+gs-dialog-button[txt-warning][disabled][inset] {
+    cursor: not-allowed;
+    color: #d58512;
+}
+
+/* ## DANGER ## */
+[inset] gs-button[bg-danger],
+[inset] gs-toggle[bg-danger],
+[inset] gs-checkbox[bg-danger],
+[inset] gs-phone-button:not([not-supported])[bg-danger],
+[inset] gs-map-button[bg-danger],
+[inset] gs-skype-button[bg-danger],
+[inset] gs-facetime-button[bg-danger],
+[inset] gs-email-button[bg-danger],
+[inset] gs-tracking-button[bg-danger],
+[inset] gs-delete-button[bg-danger],
+[inset] gs-option[bg-danger],
+[inset] gs-dialog-button[bg-danger],
+
+gs-button[bg-danger][inset],
+gs-toggle[bg-danger][inset],
+gs-checkbox[bg-danger][inset],
+gs-phone-button:not([not-supported])[bg-danger][inset],
+gs-map-button[bg-danger][inset],
+gs-skype-button[bg-danger][inset],
+gs-facetime-button[bg-danger][inset],
+gs-email-button[bg-danger][inset],
+gs-tracking-button[bg-danger][inset],
+gs-delete-button[bg-danger][inset],
+gs-option[bg-danger][inset],
+gs-dialog-button[bg-danger][inset] {
+    color: #fff;
+    background-color: #d9534f !important;
+    
+    border-top-color: #FFADAB;
+    border-left-color: #FFADAB;
+    
+    border-bottom-color: #961512;
+    border-right-color: #961512;
+}
+
+/* # FOCUS # */
+[inset] gs-button[bg-danger]:focus,
+[inset] gs-toggle[bg-danger]:focus,
+[inset] gs-checkbox[bg-danger]:focus,
+[inset] gs-phone-button[bg-danger]:not([not-supported]):focus,
+[inset] gs-map-button[bg-danger]:focus,
+[inset] gs-skype-button[bg-danger]:focus,
+[inset] gs-facetime-button[bg-danger]:focus,
+[inset] gs-email-button[bg-danger]:focus,
+[inset] gs-tracking-button[bg-danger]:focus,
+[inset] gs-delete-button[bg-danger]:focus,
+[inset] gs-option[bg-danger]:focus,
+[inset] gs-dialog-button[bg-danger]:focus,
+[inset] gs-button[bg-danger][selected]:focus:not(.hover),
+[inset] gs-checkbox[bg-danger][selected]:focus:not(.hover),
+[inset] gs-toggle[bg-danger][selected]:focus:not(.hover),
+[inset] gs-phone-button[bg-danger]:not([not-supported])[selected]:focus:not(.hover),
+[inset] gs-map-button[bg-danger][selected]:focus:not(.hover),
+[inset] gs-skype-button[bg-danger][selected]:focus:not(.hover),
+[inset] gs-facetime-button[bg-danger][selected]:focus:not(.hover),
+[inset] gs-email-button[bg-danger][selected]:focus:not(.hover),
+[inset] gs-tracking-button[bg-danger][selected]:focus:not(.hover),
+[inset] gs-delete-button[bg-danger][selected]:focus:not(.hover),
+[inset] gs-option[bg-danger][selected]:focus:not(.hover),
+[inset] gs-dialog-button[bg-danger][selected]:focus:not(.hover),
+
+gs-button[bg-danger]:focus[inset],
+gs-toggle[bg-danger]:focus[inset],
+gs-checkbox[bg-danger]:focus[inset],
+gs-phone-button[bg-danger]:not([not-supported]):focus[inset],
+gs-map-button[bg-danger]:focus[inset],
+gs-skype-button[bg-danger]:focus[inset],
+gs-facetime-button[bg-danger]:focus[inset],
+gs-email-button[bg-danger]:focus[inset],
+gs-tracking-button[bg-danger]:focus[inset],
+gs-delete-button[bg-danger]:focus[inset],
+gs-option[bg-danger]:focus[inset],
+gs-dialog-button[bg-danger]:focus[inset],
+gs-button[bg-danger][selected]:focus:not(.hover)[inset],
+gs-checkbox[bg-danger][selected]:focus:not(.hover)[inset],
+gs-toggle[bg-danger][selected]:focus:not(.hover)[inset],
+gs-phone-button[bg-danger]:not([not-supported])[selected]:focus:not(.hover)[inset],
+gs-map-button[bg-danger][selected]:focus:not(.hover)[inset],
+gs-skype-button[bg-danger][selected]:focus:not(.hover)[inset],
+gs-facetime-button[bg-danger][selected]:focus:not(.hover)[inset],
+gs-email-button[bg-danger][selected]:focus:not(.hover)[inset],
+gs-tracking-button[bg-danger][selected]:focus:not(.hover)[inset],
+gs-delete-button[bg-danger][selected]:focus:not(.hover)[inset],
+gs-option[bg-danger][selected]:focus:not(.hover)[inset],
+gs-dialog-button[bg-danger][selected]:focus:not(.hover)[inset] {
+    text-decoration: none;
+    outline-offset: -3px;
+    color: #d9534f;
+    
+    background-color: #FFFDEC !important;
+}
+
+/* # HOVER # */
+[inset] gs-button[bg-danger].hover,
+[inset] gs-toggle[bg-danger].hover,
+[inset] gs-phone-button[bg-danger]:not([not-supported]).hover,
+[inset] gs-map-button[bg-danger].hover,
+[inset] gs-skype-button[bg-danger].hover,
+[inset] gs-facetime-button[bg-danger].hover,
+[inset] gs-email-button[bg-danger].hover,
+[inset] gs-tracking-button[bg-danger].hover,
+[inset] gs-delete-button[bg-danger].hover,
+[inset] gs-option[bg-danger].hover,
+[inset] gs-dialog-button[bg-danger].hover,
+
+gs-button[bg-danger].hover[inset],
+gs-toggle[bg-danger].hover[inset],
+gs-phone-button[bg-danger]:not([not-supported]).hover[inset],
+gs-map-button[bg-danger].hover[inset],
+gs-skype-button[bg-danger].hover[inset],
+gs-facetime-button[bg-danger].hover[inset],
+gs-email-button[bg-danger].hover[inset],
+gs-tracking-button[bg-danger].hover[inset],
+gs-delete-button[bg-danger].hover[inset],
+gs-option[bg-danger].hover[inset],
+gs-dialog-button[bg-danger].hover[inset] {
+    text-decoration: none;
+    color: #fff;
+    background-color: #c9302c !important;
+    
+    border-top-color: #FFADAB;
+    border-left-color: #FFADAB;
+    
+    border-bottom-color: #c9302c;
+    border-right-color: #c9302c;
+}
+
+/* # DOWN # */
+[inset] gs-button[bg-danger].down,
+[inset] gs-checkbox[bg-danger].down,
+[inset] gs-toggle[bg-danger].down,
+[inset] gs-phone-button[bg-danger]:not([not-supported]).down,
+[inset] gs-map-button[bg-danger].down,
+[inset] gs-skype-button[bg-danger].down,
+[inset] gs-facetime-button[bg-danger].down,
+[inset] gs-email-button[bg-danger].down,
+[inset] gs-tracking-button[bg-danger].down,
+[inset] gs-delete-button[bg-danger].down,
+[inset] gs-option[bg-danger].down,
+[inset] gs-dialog-button[bg-danger].down,
+[inset] gs-button[bg-danger][selected],
+[inset] gs-checkbox[bg-danger][selected],
+[inset] gs-toggle[bg-danger][selected],
+[inset] gs-phone-button[bg-danger]:not([not-supported])[selected],
+[inset] gs-map-button[bg-danger][selected],
+[inset] gs-skype-button[bg-danger][selected],
+[inset] gs-facetime-button[bg-danger][selected],
+[inset] gs-email-button[bg-danger][selected],
+[inset] gs-tracking-button[bg-danger][selected],
+[inset] gs-delete-button[bg-danger][selected],
+[inset] gs-option[bg-danger][selected],
+[inset] gs-dialog-button[bg-danger][selected],
+
+gs-button[bg-danger].down[inset],
+gs-checkbox[bg-danger].down[inset],
+gs-toggle[bg-danger].down[inset],
+gs-phone-button[bg-danger]:not([not-supported]).down[inset],
+gs-map-button[bg-danger].down[inset],
+gs-skype-button[bg-danger].down[inset],
+gs-facetime-button[bg-danger].down[inset],
+gs-email-button[bg-danger].down[inset],
+gs-tracking-button[bg-danger].down[inset],
+gs-delete-button[bg-danger].down[inset],
+gs-option[bg-danger].down[inset],
+gs-dialog-button[bg-danger].down[inset],
+gs-button[bg-danger][selected][inset],
+gs-checkbox[bg-danger][selected][inset],
+gs-toggle[bg-danger][selected][inset],
+gs-phone-button[bg-danger]:not([not-supported])[selected][inset],
+gs-map-button[bg-danger][selected][inset],
+gs-skype-button[bg-danger][selected][inset],
+gs-facetime-button[bg-danger][selected][inset],
+gs-email-button[bg-danger][selected][inset],
+gs-tracking-button[bg-danger][selected][inset],
+gs-delete-button[bg-danger][selected][inset],
+gs-option[bg-danger][selected][inset],
+gs-dialog-button[bg-danger][selected][inset] {
+    background-image: none;
+    color: #fff;
+    background-color: #c9302c !important;
+    
+    border-top-color: #961512;
+    border-left-color: #961512;
+    
+    border-bottom-color: #FFADAB;
+    border-right-color: #FFADAB;
+}
+
+/* # DOWN AND HOVER # */
+[inset] gs-button[bg-danger].down.hover,
+[inset] gs-checkbox[bg-danger].down.hover,
+[inset] gs-toggle[bg-danger].down.hover,
+[inset] gs-phone-button[bg-danger]:not([not-supported]).down.hover,
+[inset] gs-map-button[bg-danger].down.hover,
+[inset] gs-skype-button[bg-danger].down.hover,
+[inset] gs-facetime-button[bg-danger].down.hover,
+[inset] gs-email-button[bg-danger].down.hover,
+[inset] gs-tracking-button[bg-danger].down.hover,
+[inset] gs-delete-button[bg-danger].down.hover,
+[inset] gs-option[bg-danger].down.hover,
+[inset] gs-dialog-button[bg-danger].down.hover,
+
+gs-button[bg-danger].down.hover[inset],
+gs-checkbox[bg-danger].down.hover[inset],
+gs-toggle[bg-danger].down.hover[inset],
+gs-phone-button[bg-danger]:not([not-supported]).down.hover[inset],
+gs-map-button[bg-danger].down.hover[inset],
+gs-skype-button[bg-danger].down.hover[inset],
+gs-facetime-button[bg-danger].down.hover[inset],
+gs-email-button[bg-danger].down.hover[inset],
+gs-tracking-button[bg-danger].down.hover[inset],
+gs-delete-button[bg-danger].down.hover[inset],
+gs-option[bg-danger].down.hover[inset],
+gs-dialog-button[bg-danger].down.hover[inset] {
+    color: #fff;
+    background-color: #ac2925 !important;
+}
+
+/* # DISABLED # */
+[inset] gs-button[bg-danger][disabled],
+[inset] gs-toggle[bg-danger][disabled],
+[inset] gs-checkbox[bg-danger][disabled],
+[inset] gs-phone-button[bg-danger]:not([not-supported])[disabled],
+[inset] gs-map-button[bg-danger][disabled],
+[inset] gs-skype-button[bg-danger][disabled],
+[inset] gs-facetime-button[bg-danger][disabled],
+[inset] gs-email-button[bg-danger][disabled],
+[inset] gs-tracking-button[bg-danger][disabled],
+[inset] gs-delete-button[bg-danger][disabled],
+[inset] gs-option[bg-danger][disabled],
+[inset] gs-dialog-button[bg-danger][disabled],
+
+gs-button[bg-danger][disabled][inset],
+gs-toggle[bg-danger][disabled][inset],
+gs-checkbox[bg-danger][disabled][inset],
+gs-phone-button[bg-danger]:not([not-supported])[disabled][inset],
+gs-map-button[bg-danger][disabled][inset],
+gs-skype-button[bg-danger][disabled][inset],
+gs-facetime-button[bg-danger][disabled][inset],
+gs-email-button[bg-danger][disabled][inset],
+gs-tracking-button[bg-danger][disabled][inset],
+gs-delete-button[bg-danger][disabled][inset],
+gs-option[bg-danger][disabled][inset],
+gs-dialog-button[bg-danger][disabled][inset] {
+    cursor: not-allowed;
+    background-color: #d9534f !important;
+    
+    color: #aaaaaa;
+}
+
+/* # TXT DISABLED # */
+[inset] gs-button[txt-danger][disabled],
+[inset] gs-toggle[txt-danger][disabled],
+[inset] gs-checkbox[txt-danger][disabled],
+[inset] gs-phone-button[txt-danger]:not([not-supported])[disabled],
+[inset] gs-map-button[txt-danger][disabled],
+[inset] gs-skype-button[txt-danger][disabled],
+[inset] gs-facetime-button[txt-danger][disabled],
+[inset] gs-email-button[txt-danger][disabled],
+[inset] gs-tracking-button[txt-danger][disabled],
+[inset] gs-delete-button[txt-danger][disabled],
+[inset] gs-option[txt-danger][disabled],
+[inset] gs-dialog-button[txt-danger][disabled],
+
+gs-button[txt-danger][disabled][inset],
+gs-toggle[txt-danger][disabled][inset],
+gs-checkbox[txt-danger][disabled][inset],
+gs-phone-button[txt-danger]:not([not-supported])[disabled][inset],
+gs-map-button[txt-danger][disabled][inset],
+gs-skype-button[txt-danger][disabled][inset],
+gs-facetime-button[txt-danger][disabled][inset],
+gs-email-button[txt-danger][disabled][inset],
+gs-tracking-button[txt-danger][disabled][inset],
+gs-delete-button[txt-danger][disabled][inset],
+gs-option[txt-danger][disabled][inset],
+gs-dialog-button[txt-danger][disabled][inset] {
+    cursor: not-allowed;
+    color: #ac2925;
 }

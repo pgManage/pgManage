@@ -15,6 +15,7 @@ var autocompleteGlobals = {
       , 'strQueryID':      null
       , 'jsnKeywords':     {} // <-- filled in by the "autocompleteLoadKeywords" function
       , 'arrTypes':        [] // <-- filled in by the "autocompleteLoadTypes" function
+      , 'arrSearchPath':   []
       , 'loadId':          0
       , 'arrCancelledIds': []
       , 'bolSnippets':     false

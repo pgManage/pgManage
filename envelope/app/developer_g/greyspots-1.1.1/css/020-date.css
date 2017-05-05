@@ -7,6 +7,8 @@ gs-date {
     border: 1px solid #AEAEAE;
     border-radius: 0.2em;
     min-height: 1em;
+    
+    margin-top: -1px;
 }
 
 gs-date .date-picker-button {

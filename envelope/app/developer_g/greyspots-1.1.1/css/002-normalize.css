@@ -87,7 +87,7 @@ template {
  */
 
 a {
-  background-color: transparent;
+  background-color: transparent !important;
 }
 
 /**

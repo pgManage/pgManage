@@ -25,6 +25,38 @@ getListData(ml(function () {/*SELECT current_schemas(true);*/}), '', function (a
     searchPath = arrRecords[1][0];
     searchPath = searchPath.substring(1, searchPath.length);
     searchPath = searchPath.substring(0, searchPath.length - 1);
+    searchPath = searchPath.split(',');
+    for (var i = 0, len = searchPath.length; i < len; i++) {
+        getListData(ml(function () {/*
+            SELECT * FROM (
+                SELECT quote_ident(pg_class.relname) AS obj_name, 'Table'::text AS obj_meta
+                    FROM pg_class
+              LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                WHERE relkind IN ('r','s','t')
+                    AND pg_namespace.nspname = '{{SCHEMA}}'
+            ORDER BY pg_namespace.nspname ASC, pg_class.relname ASC
+            ) list_tables
+            UNION
+            SELECT * FROM (
+                SELECT quote_ident(c.relname) AS obj_name, 'View'::text AS obj_meta
+                    FROM pg_class c
+            LEFT JOIN pg_namespace ON pg_namespace.oid = c.relnamespace
+                WHERE ((c.relhasrules AND
+                    (EXISTS (SELECT r.rulename
+                        FROM pg_rewrite r
+                        WHERE ((r.ev_class = c.oid)
+                            AND (bpchar(r.ev_type) = '1'::bpchar)) ))) OR (c.relkind = 'v'::char))
+                    AND pg_namespace.nspname = '{{SCHEMA}}'
+            ORDER BY pg_namespace.nspname ASC, c.relname ASC
+            ) list_views
+            ORDER BY obj_name
+            */}).replace(/\{\{SCHEMA\}\}/g, searchPath[i]).replace(/\{\{SCHEMA\}\}/g, searchPath[i]), '', function (arrRecords) {
+            if (arrRecords.length > 1) {
+                autocompleteGlobals.arrSearchPath = arrRecords;
+            }
+        });
+    }
+
 });
 
 var TOAST_id, CATALOG_id;
@@ -1600,6 +1632,21 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
     
     }
     
+    // console.log(autocompleteGlobals.arrSearchPath, queryVars.bolSearchPath);
+    if (autocompleteGlobals.arrSearchPath && queryVars.bolSchemas) {
+        for (var i = 0, len = autocompleteGlobals.arrSearchPath.length; i < len; i++) {
+            if (autocompleteGlobals.arrSearchPath[i][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) {
+                optionList.push(autocompleteGlobals.arrSearchPath[i]);
+                if (autocompleteGlobals.arrSearchPath[i][0].substring(0, 1) === '"') {
+                    autocompleteGlobals.arrSearch.push(autocompleteGlobals.arrSearchPath[i][0].toLowerCase());
+                } else {
+                    autocompleteGlobals.arrSearch.push('"' + autocompleteGlobals.arrSearchPath[i][0].toLowerCase() + '"');
+                }
+            }
+        }    
+    }
+    
+    //autocompleteGlobals.arrSearchPath
     
     autocompleteGlobals.bolQueryRunning = true;
     // make the request
