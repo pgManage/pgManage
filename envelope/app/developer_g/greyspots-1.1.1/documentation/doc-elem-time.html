@@ -51,7 +51,22 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Value Attribute Example:</span>
+                        <span class="h3">Attribute <code>[column=""]</code>:</span>
+                        <p>When you have a <code>gs-time</code> inside a data element and you want to use it to display cell data you use the <code>column</code> attribute.</p>
+                    </div>
+                    <gs-doc-example>
+                    <template for="html" height="10">
+                        <gs-form src="gsdoc.tpeople" where="id=2341">
+                            <template>
+                                <b>Birth Time:</b>
+                                <gs-time column="birth_time" disabled></gs-time>
+                            </template>
+                        </gs-form>
+                    </template>
+                    </gs-doc-example>
+                    
+                    <div class="doc-example-description">
+                        <span class="h3">Attribute <code>[value=""]</code>:</span>
                         <p>To set the value for the gs-time, use the "value" attribute.</p>
                     </div>
                     <gs-doc-example>
@@ -110,7 +125,7 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Placeholder Attribute Example:</span>
+                        <span class="h3">Attribute <code>[Placeholder=""]</code>:</span>
                         <p>The "placeholder" attribute specifies some placeholder text for when the control is empty.</p>
                     </div>
                     <gs-doc-example>
@@ -120,7 +135,7 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Mini Attribute Example:</span>
+                        <span class="h3">Attribute <code>[mini]</code>:</span>
                         <p>Sometimes you are limited on space. The mini attribute is used to make the gs-time smaller.</p>
                     </div>
                     <gs-doc-example>
@@ -131,7 +146,7 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">No Picker Attribute Example:</span>
+                        <span class="h3">Attribute <code>[no-picker]</code>:</span>
                         <p>If you want to remove the date picker button: add the "no-picker" attribute.</p>
                     </div>
                     <gs-doc-example>
@@ -142,7 +157,7 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">No Now Button Attribute Example:</span>
+                        <span class="h3">Attribute <code>[no-now-button]</code>:</span>
                         <p>If you want to remove the "Now" button from the picker: add the "no-now-button" attribute.</p>
                     </div>
                     <gs-doc-example>
@@ -153,7 +168,7 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Non-Empty Attribute Example:</span>
+                        <span class="h3">Attribute <code>[non-empty]</code>:</span>
                         <p>If you want to force the user to input a value: add the non-empty attribute. Note: if a default value is not provided then the control defaults to "12:00 PM".</p>
                     </div>
                     <gs-doc-example>
@@ -164,7 +179,7 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Display Format Attribute:</span>
+                        <span class="h3">Attribute <code>[format=""]</code>:</span>
                         <p>The "format" attribute determines the display format of the control. This attribute can take two different values: "regular" and "military". "regular" is normal 12-hour time and "military" is 24-hour time.</p>
                     </div>
                     <gs-doc-example>
@@ -177,7 +192,7 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Output Format Attribute Example:</span>
+                        <span class="h3">Attribute <code>[output-format=""]</code>:</span>
                         <p>The "output-format" attribute determines the internal format of the control. This attribute can take two different values: "regular" and "military". "regular" is normal 12-hour time and "military" is 24-hour time. When getting the value of the control in javascript "output-format" is the format it will get.</p>
                     </div>
                     <gs-doc-example>
@@ -197,7 +212,7 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Tabindex Attribute Example:</span>
+                        <span class="h3">Attribute <code>[tabindex=""]</code>:</span>
                         <p>With the "tabindex" attribute, you can control what order your controls are tabbed to.</p>
                     </div>
                     <gs-doc-example>
@@ -222,6 +237,26 @@
                             <gs-time readonly value="1:30 PM"></gs-time>
                         </template>
                     </gs-doc-example>
+                
+                    <div class="doc-example-description">
+                        <span class="h3">Javascript Methods:</span>
+                        <p>These functions can be run on individual <code>&lt;gs-time&gt;</code> elements:<br />
+                        <i>TIME</i>.open() &lt;-- This method opens the <code>&lt;gs-time&gt;</code>.<br />
+                    </div>
+                    <gs-doc-example>
+                        <template for="html" height="10">
+                            <gs-button onclick="testOpen()">Open Interval</gs-button>
+                            <br />
+                            <gs-time id="test-elem"></gs-time>
+                        </template>
+                        <template for="js" height="10">
+                            function testOpen() {
+                                document.getElementById('test-elem').open();
+                            }
+                        </template>
+                    </gs-doc-example>
+                    
+                    
                 </div>
         </gs-container>
         <br />

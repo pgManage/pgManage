@@ -140,6 +140,11 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
         
+        // READONLY attribute
+        addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
+        });
+        
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
         
@@ -180,7 +185,27 @@ document.addEventListener('DOMContentLoaded', function () {
     // re-target focus event from control to element
     function focusFunction(event) {
         GS.triggerEvent(event.target.parentNode, 'focus');
+        event.target.parentNode.classList.add('focus');
     }
+
+    // re-target blur event from control to element
+    function blurFunction(event) {
+        GS.triggerEvent(event.target.parentNode, 'blur');
+        event.target.parentNode.classList.remove('focus');
+    }
+
+    // mouseout, remove hover class
+    function mouseoutFunction(event) {
+        GS.triggerEvent(event.target.parentNode, evt.mouseout);
+        event.target.parentNode.classList.remove('hover');
+    }
+
+    // mouseover, add hover class
+    function mouseoverFunction(event) {
+        GS.triggerEvent(event.target.parentNode, evt.mouseover);
+        event.target.parentNode.classList.add('hover');
+    }
+
 
     function buttonClickFunction(event) {
         openDatePicker(event.target.parentNode);
@@ -823,6 +848,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.inserted = true;
                 element.internal = {};
                 saveDefaultAttributes(element)
+                
+                /*
+                element.addEventListener(evt.mouseout, function (event) {
+                    element.classList.remove('hover');
+                });
+                
+                element.addEventListener(evt.mouseover, function (event) {
+                    element.classList.add('hover');
+                });
+                */
                 
                 if (element.hasAttribute('tabindex')) {
                     element.oldTabIndex = element.getAttribute('tabindex');
@@ -1719,6 +1754,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     element.control.removeEventListener('focus', focusFunction);
                     element.control.addEventListener('focus', focusFunction);
+
+                    element.control.removeEventListener('blur', blurFunction);
+                    element.control.addEventListener('blur', blurFunction);
+
+                    element.control.removeEventListener(evt.mouseout, mouseoutFunction);
+                    element.control.addEventListener(evt.mouseout, mouseoutFunction);
+                    
+                    element.control.removeEventListener(evt.mouseout, mouseoverFunction);
+                    element.control.addEventListener(evt.mouseover, mouseoverFunction);
                 }
                 if (element.datePickerButton) {
                     element.datePickerButton.addEventListener('click', buttonClickFunction);

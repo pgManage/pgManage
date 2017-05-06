@@ -100,7 +100,27 @@ document.addEventListener('DOMContentLoaded', function () {
     // re-target focus event from control to element
     function focusFunction(event) {
         GS.triggerEvent(event.target.parentNode, 'focus');
+        event.target.parentNode.classList.add('focus');
     }
+
+    // re-target blur event from control to element
+    function blurFunction(event) {
+        GS.triggerEvent(event.target.parentNode, 'blur');
+        event.target.parentNode.classList.remove('focus');
+    }
+
+    // mouseout, remove hover class
+    function mouseoutFunction(event) {
+        GS.triggerEvent(event.target.parentNode, evt.mouseout);
+        event.target.parentNode.classList.remove('hover');
+    }
+
+    // mouseover, add hover class
+    function mouseoverFunction(event) {
+        GS.triggerEvent(event.target.parentNode, evt.mouseover);
+        event.target.parentNode.classList.add('hover');
+    }
+
 
     //function createPushReplacePopHandler(element) {
     //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
@@ -267,6 +287,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 //element.control.removeEventListener('focus', focusFunction);
                 element.control.addEventListener('focus', focusFunction);
+
+                //element.control.removeEventListener('blur', blurFunction);
+                element.control.addEventListener('blur', blurFunction);
+
+                //element.control.removeEventListener(evt.mouseout, mouseoutFunction);
+                element.control.addEventListener(evt.mouseout, mouseoutFunction);
+
+                //element.control.removeEventListener(evt.mouseover, mouseoverFunction);
+                element.control.addEventListener(evt.mouseover, mouseoverFunction);
 
                 // set the value from the value attribute (if it exists)
                 if (element.getAttribute('value')) {

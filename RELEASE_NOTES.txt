@@ -1,3 +1,17 @@
+Changes since 3.2.9:
+Postage:
+- Fix autocomplete casting popup cutting out a colon when you insert
+- Fix autocomplete not closing when you "wordleft"
+- Fix Beautify handling double single quotes in strings
+- Fix Text selection not dismissing the autocomplete dropdown
+- Remove autocomplete drop down on semicolon
+- Fix tab when using multiple cursors
+- Fix autocomplete not sorting alpha when two tables have the same name (different schemas)
+- Add search path tables to schema dropdown
+
+Both:
+- Fix file handling on OpenBSD 6.1
+
 Changes since 3.2.8:
 Postage:
 - Repackage all installers with latest JavaScript

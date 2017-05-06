@@ -43,8 +43,8 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "<code>path</code>":</span>
-                    <p>The "<code>path</code>" attribute is for defining what directory the element should start in. Users cannot navigate to folders above the "<code>path</code>" setting (this is merely a front-end limitation, do not depend on this as a security measure).</p>
+                    <span class="h3">Attribute <code>[path=""]</code>:</span>
+                    <p>The <code>[path]</code> attribute is for defining what directory the element should start in. Users cannot navigate to folders above the <code>[path=""]</code> setting (this is merely a front-end limitation, do not depend on this as a security measure).</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="30">
@@ -53,8 +53,8 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "<code>horizontal</code>":</span>
-                    <p>The "<code>horizontal</code>" attribute is for putting the file list and the folder list side by side.</p>
+                    <span class="h3">Attribute <code>[horizontal=""]</code>:</span>
+                    <p>The <code>[horizontal]</code> attribute is for putting the file list and the folder list side by side.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="30">
@@ -63,8 +63,8 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "<code>no-folders</code>":</span>
-                    <p>The "<code>no-folders</code>" attribute is for hiding the folder list. This can be used to prevent the user from navigating anywhere other than the folder they start in (this is merely a front-end limitation, do not depend on this as a security measure).</p>
+                    <span class="h3">Attribute <code>[no-folders=""]</code>:</span>
+                    <p>The <code>[no-folders]</code> attribute is for hiding the folder list. This can be used to prevent the user from navigating anywhere other than the folder they start in (this is merely a front-end limitation, do not depend on this as a security measure).</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="30">
@@ -73,8 +73,8 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "<code>no-files</code>":</span>
-                    <p>The "<code>no-files</code>" attribute is for hiding the file list.</p>
+                    <span class="h3">Attribute <code>[no-files=""]</code>:</span>
+                    <p>The <code>[no-files]</code> attribute is for hiding the file list.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="30">
@@ -83,8 +83,8 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "<code>mini</code>":</span>
-                    <p>The "<code>mini</code>" attribute removes the border around the element.</p>
+                    <span class="h3">Attribute <code>[mini=""]</code>:</span>
+                    <p>The <code>[mini]</code> attribute removes the border around the element.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="30">
@@ -93,8 +93,8 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute <code>[qs=""]</code>:</span><br />
-                    <p>The name <code>[qs]</code> stands for "querystring". The querystring is the part in the URL after the "?". The <code>[qs]</code> attribute has two formats, each with their own use.</p>
+                    <span class="h3">Attribute <code>[qs=""=""]</code>:</span><br />
+                    <p>The name <code>[qs=""]</code> stands for "querystring". The querystring is the part in the URL after the "?". The <code>[qs]</code> attribute has two formats, each with their own use.</p>
                     
                     <ul>
                         <li>qs="<i>key1</i>=<i>attribute1</i>". This format allows you to fill any attribute with any key from the querystring. To use multiple keys from the querystring you can put a comma-separated list of these expressions (for example: qs="<i>key1</i>=<i>attribute1</i>,<i>key2</i>=<i>attribute2</i>"). If you need an attribute to be added when a querystring key is not present, replace the "=" with "!=" (for example: qs="<i>key1</i>!=<i>attribute1</i>", attribute1 will only be added if key1 is not in the querystring). As a shorthand, if the key in the querystring is the same name as the attribute you want to fill, you can omit the attribute name in the expression (for example: qs="<i>key1</i>="). If an expression doesn't find it's key in the querystring: it reverts the attribute that it fills to it's original value.</li>
@@ -139,12 +139,22 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "<code>no-list-error</code>":</span>
-                    <p>The "<code>no-list-error</code>" attribute causes errors that occur when the <code>gs-folder</code> attempts to load a folder to be ignored. This attribute is useful because sometimes, the folder that a gs-folder is looking at may not exist yet. <b>Note:</b> Once the user uploads or creates a file inside the folder: the necessary folders will be created automatically.</p>
+                    <span class="h3">Attribute <code>[no-list-error=""]</code>:</span>
+                    <p>The <code>[no-list-error]</code> attribute causes errors that occur when the <code>gs-folder</code> attempts to load a folder to be ignored. This attribute is useful because sometimes, the folder that a gs-folder is looking at may not exist yet. <b>Note:</b> Once the user uploads or creates a file inside the folder: the necessary folders will be created automatically.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="30">
                         <gs-folder no-list-error path="/role/trusted_g/test_{{! Math.random().toString().substring(2) }}/"></gs-folder>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[disabled=""]</code>:</span>
+                    <p>The <code>[disabled]</code> attribute causes the <code>gs-folder</code> to disallow changes.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="30">
+                        <gs-folder disabled path="/role/trusted_g/"></gs-folder>
                     </template>
                 </gs-doc-example>
             </div>

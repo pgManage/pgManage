@@ -132,86 +132,99 @@ window.addEventListener('design-register-element', function () {
             }
         );
 
-        addProp('Corners', true, '<div class="target">' +
-                    '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                selectedElement.hasAttribute('remove-top') ||
-                                                selectedElement.hasAttribute('remove-left') ||
-                                                selectedElement.hasAttribute('remove-top-left'))).toString() + 
-                            '" remove-right remove-bottom id="round-top-left-corner________" inline></gs-checkbox>' +
-
-                    '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                selectedElement.hasAttribute('remove-top') ||
-                                                selectedElement.hasAttribute('remove-right') ||
-                                                selectedElement.hasAttribute('remove-top-right'))).toString() + 
-                            '" remove-left remove-bottom id="round-top-right-corner________" inline></gs-checkbox><br />' +
-
-                    '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                selectedElement.hasAttribute('remove-bottom') ||
-                                                selectedElement.hasAttribute('remove-left') ||
-                                                selectedElement.hasAttribute('remove-bottom-left'))).toString() + 
-                            '" remove-right remove-top id="round-bottom-left-corner________" inline></gs-checkbox>' +
-
-                    '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                selectedElement.hasAttribute('remove-bottom') ||
-                                                selectedElement.hasAttribute('remove-right') ||
-                                                selectedElement.hasAttribute('remove-bottom-right'))).toString() + 
-                            '" remove-left remove-top id="round-bottom-right-corner________" inline></gs-checkbox>' +
-                '</div>', function () {
-            var topLeft = document.getElementById('round-top-left-corner________').value === 'true';
-            var topRight = document.getElementById('round-top-right-corner________').value === 'true';
-            var bottomLeft = document.getElementById('round-bottom-left-corner________').value === 'true';
-            var bottomRight = document.getElementById('round-bottom-right-corner________').value === 'true';
-            var arrStrAttr = [];
-            var i;
-            var len;
-
-            selectedElement.removeAttribute('remove-all');
-            selectedElement.removeAttribute('remove-top');
-            selectedElement.removeAttribute('remove-bottom');
-            selectedElement.removeAttribute('remove-left');
-            selectedElement.removeAttribute('remove-right');
-            selectedElement.removeAttribute('remove-top-left');
-            selectedElement.removeAttribute('remove-top-right');
-            selectedElement.removeAttribute('remove-bottom-left');
-            selectedElement.removeAttribute('remove-bottom-right');
-
-            if (!topLeft && !topRight && !bottomLeft && !bottomRight) {
-                arrStrAttr.push('remove-all');
-            } else if (!topLeft && !topRight) {
-                arrStrAttr.push('remove-top');
-            } else if (!bottomLeft && !bottomRight) {
-                arrStrAttr.push('remove-bottom');
-            } else if (!topLeft && !bottomLeft) {
-                arrStrAttr.push('remove-left');
-            } else if (!topRight && !bottomRight) {
-                arrStrAttr.push('remove-right');
+        // READONLY attribute
+        addProp(
+            'Readonly',
+            true,
+            '<gs-checkbox class="target" value="' + (
+                selectedElement.hasAttribute('readonly') || ''
+            ) +
+                    '" mini></gs-checkbox>',
+            function () {
+                return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
             }
+        );
 
-            if (!topLeft && !bottomLeft && arrStrAttr[0] !== 'remove-all') {
-                arrStrAttr.push('remove-left');
-            } else if (!topLeft && topRight) {
-                arrStrAttr.push('remove-top-left');
-            } else if (!bottomLeft && bottomRight) {
-                arrStrAttr.push('remove-bottom-left');
-            }
+        // addProp('Corners', true, '<div class="target">' +
+        //             '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+        //                                         selectedElement.hasAttribute('remove-top') ||
+        //                                         selectedElement.hasAttribute('remove-left') ||
+        //                                         selectedElement.hasAttribute('remove-top-left'))).toString() + 
+        //                     '" remove-right remove-bottom id="round-top-left-corner________" inline></gs-checkbox>' +
 
-            if (!topRight && !bottomRight && arrStrAttr[0] !== 'remove-all') {
-                arrStrAttr.push('remove-right');
-            } else if (topLeft && !topRight) {
-                arrStrAttr.push('remove-top-right');
-            } else if (bottomLeft && !bottomRight) {
-                arrStrAttr.push('remove-bottom-right');
-            }
+        //             '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+        //                                         selectedElement.hasAttribute('remove-top') ||
+        //                                         selectedElement.hasAttribute('remove-right') ||
+        //                                         selectedElement.hasAttribute('remove-top-right'))).toString() + 
+        //                     '" remove-left remove-bottom id="round-top-right-corner________" inline></gs-checkbox><br />' +
 
-            i = 0;
-            len = arrStrAttr.length;
-            while (i < len) {
-                selectedElement.setAttribute(arrStrAttr[i], '');
-                i += 1;
-            }
+        //             '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+        //                                         selectedElement.hasAttribute('remove-bottom') ||
+        //                                         selectedElement.hasAttribute('remove-left') ||
+        //                                         selectedElement.hasAttribute('remove-bottom-left'))).toString() + 
+        //                     '" remove-right remove-top id="round-bottom-left-corner________" inline></gs-checkbox>' +
 
-            return selectedElement;
-        });
+        //             '<gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+        //                                         selectedElement.hasAttribute('remove-bottom') ||
+        //                                         selectedElement.hasAttribute('remove-right') ||
+        //                                         selectedElement.hasAttribute('remove-bottom-right'))).toString() + 
+        //                     '" remove-left remove-top id="round-bottom-right-corner________" inline></gs-checkbox>' +
+        //         '</div>', function () {
+        //     var topLeft = document.getElementById('round-top-left-corner________').value === 'true';
+        //     var topRight = document.getElementById('round-top-right-corner________').value === 'true';
+        //     var bottomLeft = document.getElementById('round-bottom-left-corner________').value === 'true';
+        //     var bottomRight = document.getElementById('round-bottom-right-corner________').value === 'true';
+        //     var arrStrAttr = [];
+        //     var i;
+        //     var len;
+
+        //     selectedElement.removeAttribute('remove-all');
+        //     selectedElement.removeAttribute('remove-top');
+        //     selectedElement.removeAttribute('remove-bottom');
+        //     selectedElement.removeAttribute('remove-left');
+        //     selectedElement.removeAttribute('remove-right');
+        //     selectedElement.removeAttribute('remove-top-left');
+        //     selectedElement.removeAttribute('remove-top-right');
+        //     selectedElement.removeAttribute('remove-bottom-left');
+        //     selectedElement.removeAttribute('remove-bottom-right');
+
+        //     if (!topLeft && !topRight && !bottomLeft && !bottomRight) {
+        //         arrStrAttr.push('remove-all');
+        //     } else if (!topLeft && !topRight) {
+        //         arrStrAttr.push('remove-top');
+        //     } else if (!bottomLeft && !bottomRight) {
+        //         arrStrAttr.push('remove-bottom');
+        //     } else if (!topLeft && !bottomLeft) {
+        //         arrStrAttr.push('remove-left');
+        //     } else if (!topRight && !bottomRight) {
+        //         arrStrAttr.push('remove-right');
+        //     }
+
+        //     if (!topLeft && !bottomLeft && arrStrAttr[0] !== 'remove-all') {
+        //         arrStrAttr.push('remove-left');
+        //     } else if (!topLeft && topRight) {
+        //         arrStrAttr.push('remove-top-left');
+        //     } else if (!bottomLeft && bottomRight) {
+        //         arrStrAttr.push('remove-bottom-left');
+        //     }
+
+        //     if (!topRight && !bottomRight && arrStrAttr[0] !== 'remove-all') {
+        //         arrStrAttr.push('remove-right');
+        //     } else if (topLeft && !topRight) {
+        //         arrStrAttr.push('remove-top-right');
+        //     } else if (bottomLeft && !bottomRight) {
+        //         arrStrAttr.push('remove-bottom-right');
+        //     }
+
+        //     i = 0;
+        //     len = arrStrAttr.length;
+        //     while (i < len) {
+        //         selectedElement.setAttribute(arrStrAttr[i], '');
+        //         i += 1;
+        //     }
+
+        //     return selectedElement;
+        // });
 
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);

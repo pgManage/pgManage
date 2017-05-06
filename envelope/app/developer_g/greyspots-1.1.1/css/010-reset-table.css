@@ -26,12 +26,14 @@ table thead th {
     */
 }
 
+/*
 table tr * {
     background-color: transparent;
 }
+*/
 
 tr:nth-of-type(odd) {
-  background-color: #f9f9f9;
+  background-color: #eeeeee;
 }
 
 table thead tr {

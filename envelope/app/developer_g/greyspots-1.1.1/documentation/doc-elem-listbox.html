@@ -60,6 +60,33 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[tabindex=""]</code>:</span>
+                    <p>With the <code>[tabindex=""]</code> attribute, you can control what order your controls are tabbed to.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="25">
+                        <label for="control_1">1:</label>
+                        <gs-text tabindex="1" id="control_1"></gs-text>
+                        <label for="control_3">3:</label>
+                        <gs-text tabindex="3" id="control_3"></gs-text>
+                        <label for="control_2">2:</label>
+                        <gs-text tabindex="2" id="control_2"></gs-text>
+                        <gs-listbox tabindex="3" style="height: 10ex;">
+                            <template>
+                                <table>
+                                    <tbody>
+                                        <tr><td>value 1</td></tr>
+                                        <tr value="hidden value"><td>value 2</td></tr>
+                                        <tr><td>value 3</td></tr>
+                                        <tr><td>value 4</td></tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </gs-listbox>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
                     <span class="h3">Static List Example:</span>
                     <p>Sometimes you only want to have a static list, this can be done with a template element inside the listbox. The template needs to contain an HTML table. To have a hidden value: put the hidden value in the <code>[value=""]</code> attribute of the <code>&lt;tr&gt;</code> element.</p>
                 </div>
@@ -311,6 +338,31 @@
                         <gs-listbox src="gsdoc.tpeople_list" qs="test" refresh-on-querystring-change></gs-listbox>
                     </template>
                 </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Javascript Methods:</span>
+                    <p>These functions that can be run on individual <code>&lt;gs-listbox&gt;</code> elements:<br />
+                    <i>LISTBOX</i>.refresh() &lt;-- This method refeshes the <code>&lt;gs-listbox&gt;</code>.<br />
+                    <i>LISTBOX</i>.scrollToSelectedRecord() &lt;-- This method scrolls the <code>&lt;gs-listbox&gt;</code> to the currently selected record.<br />
+                </div>
+                
+                <gs-doc-example>
+                    <template for="html" height="15">
+                        <gs-button onclick="testrefresh()">Refresh Listbox</gs-button>
+                        <gs-button onclick="testscrollToSelectedRecord()">Scroll to Selected Record</gs-button>
+                        <br />
+                        <gs-listbox style="height: 30ex;" src="gsdoc.tpeople_list" id="test-elem"></gs-listbox>
+                    </template>
+                    <template for="js" height="15">
+                        function testrefresh() {
+                            document.getElementById('test-elem').refresh();
+                        }
+                        function testscrollToSelectedRecord() {
+                            document.getElementById('test-elem').scrollToSelectedRecord();
+                        }
+                    </template>
+                </gs-doc-example>
+                
             </div>
         </gs-container>
         <br />

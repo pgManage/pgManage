@@ -1,3 +1,11 @@
+window.addEventListener('design-register-element', function () {
+    window.designElementProperty_GSGROUP = function (selectedElement) {
+        // DISABLED attribute
+        addProp('Padded', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('padded') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'padded', this.value === 'true', true);
+        });
+    };
+});
 
 //global xtag
 //jslint browser:true

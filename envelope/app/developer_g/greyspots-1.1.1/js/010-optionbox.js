@@ -86,6 +86,10 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
         
+        addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
+        });
+        
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
     };

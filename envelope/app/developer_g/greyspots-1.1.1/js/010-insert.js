@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     
                     strLink = '/' +
-                              (element.getAttribute('action-insert') || 'env/action_insert');
+                              (element.getAttribute('action-insert') || 'env/k');
                     
                     // add a loader to the page
                     GS.addLoader('gs-insert', 'Inserting Record...');

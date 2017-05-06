@@ -10,8 +10,6 @@ gs-select select,
 gs-interval input,
 gs-memo textarea {
     width: 100%;
-    border: 0 none;
-    margin: 0;
     font-size: 1em;
     font-family: inherit;
     
@@ -28,25 +26,127 @@ gs-memo textarea {
     box-sizing: border-box;
     
     line-height: 1.2em;
-    padding: 0.2em;
-}
-
-gs-date input:focus,
-gs-text input:focus,
-gs-search input:focus,
-gs-number input:focus,
-gs-memo input:focus,
-gs-combo input:focus,
-gs-time input:focus,
-gs-select select:focus,
-gs-interval input:focus,
-gs-memo textarea:focus {
-    /* this is a default that but each element is allow to have its own setting of this particular property */
-    outline-offset: -1px;
-    background-color: #FFFDEC;
-    outline: dashed 1px #FFB000;
+    
+    
+    background-color: transparent;
+    color: black;
+    
+    padding: 0;
+    border: none;
+    margin: 0;
+    
+    border-radius: 0;
 }
 
 gs-memo textarea {
     display: block;
+    
+    width: 100% !important;
+    /*
+        this prevents the textarea from being resized to become too wide or too tall for it's container.
+        the important flag is required because in Google Chrome (I don't know about other browsers) the browser uses the "style" attribute to set the width/height when resizing the textarea, this means that in order to get precedence you need to use !important.
+    */
 }
+
+
+gs-date,
+gs-text,
+gs-search,
+gs-number,
+gs-memo,
+gs-combo,
+gs-time,
+gs-select,
+gs-interval,
+gs-memo {
+    position: relative;
+    display: block;
+    
+    background-color: white;
+    color: black;
+    
+    padding: 0.25em;
+    border: none;
+    margin: 0;
+    
+    border-radius: 0;
+    
+    min-height: 1em;
+    line-height: 1.2em;
+    
+    /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
+    box-shadow: 0 0 0.1em 0 rgba(0,0,0,0), 0 0 0.2em 0 rgba(0,0,0,.2);
+    transition: box-shadow 0.5s;
+}
+
+gs-date.hover,
+gs-text.hover,
+gs-search.hover,
+gs-number.hover,
+gs-memo.hover,
+gs-combo.hover,
+gs-time.hover,
+gs-select.hover,
+gs-interval.hover,
+gs-memo.hover {
+    
+    /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
+    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);
+    transition: box-shadow 0.5s;
+}
+
+gs-date[disabled],
+gs-text[disabled],
+gs-search[disabled],
+gs-number[disabled],
+gs-memo[disabled],
+gs-combo[disabled],
+gs-time[disabled],
+gs-select[disabled],
+gs-interval[disabled],
+gs-memo[disabled] {
+    opacity: 0.6;
+}
+
+gs-date.focus,
+gs-text.focus,
+gs-search.focus,
+gs-number.focus,
+gs-memo.focus,
+gs-combo.focus,
+gs-time.focus,
+gs-select.focus,
+gs-interval.focus,
+gs-memo.focus {
+    opacity: 0.6;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

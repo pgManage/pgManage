@@ -50,8 +50,32 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "mini":</span>
-                    <p>The "mini" attribute removes the black border around the element.</p>
+                    <span class="h3">Attribute <code>[folder=""]</code>:</span>
+                    <p>The <code>[folder]</code> attribute tells the gs-file-manager what folder the <code>[path]</code> is inside. It can be <code>role</code>, <code>app</code> or <code>web_root</code></p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="20">
+                        <gs-file-manager path="/trusted_g/doc_example_2/" folder="role" mini></gs-file-manager>
+                        <gs-file-manager path="/trusted_g/doc_example_2/" folder="app" mini></gs-file-manager>
+                        <gs-file-manager path="/trusted_g/doc_example_2/" folder="web_root" mini></gs-file-manager>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[path=""]</code>:</span>
+                    <p>The <code>[path]</code> attribute tells the gs-file-manager folder to list</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="20">
+                        <gs-file-manager path="/trusted_g/doc_example_1/" folder="role" mini></gs-file-manager>
+                        <gs-file-manager path="/trusted_g/doc_example_2/" folder="role" mini></gs-file-manager>
+                        <gs-file-manager path="/trusted_g/doc_example_3/" folder="role" mini></gs-file-manager>
+                    </template>
+                </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[mini=""]</code>:</span>
+                    <p>The <code>[mini]</code> attribute removes the black border around the element.</p>
                 </div>
                 <gs-doc-example>
                     <template for="html" height="20">
@@ -60,8 +84,8 @@
                 </gs-doc-example>
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "qs":</span>
-                    <p>The "qs" attribute makes the element listen for changes in the query string. If the column that element listens for is in the query string then it will refresh when the query string changes. <b>Note:</b> The "path" attribute is templated by doT.js and the "qs" variable is a JSON equivalent of the query string.</p>
+                    <span class="h3">Attribute <code>[qs=""]</code>:</span>
+                    <p>The <code>[qs]</code> attribute makes the element listen for changes in the query string. If the column that element listens for is in the query string then it will refresh when the query string changes. <b>Note:</b> The "path" attribute is templated by doT.js and the "qs" variable is a JSON equivalent of the query string.</p>
                 </div>
                 <gs-doc-example query-string="example_id=3">
                     <template for="html" height="20">

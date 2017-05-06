@@ -24,6 +24,10 @@ window.addEventListener('design-register-element', function () {
             this.removeAttribute('refresh-on-querystring-values');
             return setOrRemoveBooleanAttribute(selectedElement, 'refresh-on-querystring-change', this.value === 'true', true);
         });
+        
+        addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
+        });
 
         addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);

@@ -65,6 +65,7 @@ CREATE TABLE gsdoc.rpeople(
   first_name text NOT NULL,
   last_name text,
   birth_date timestamp with time zone,
+  birth_time time,
   change_login name DEFAULT "current_user"(),
   change_stamp timestamp with time zone DEFAULT date_trunc('second'::text, ('now'::text)::timestamp with time zone),
   create_stamp timestamp with time zone DEFAULT date_trunc('second'::text, ('now'::text)::timestamp with time zone),
@@ -114,7 +115,7 @@ CREATE TRIGGER ds_trg_rpeople_line
 
 -- ####### gsdoc.tpeople; #######
 CREATE OR REPLACE VIEW gsdoc.tpeople AS
- SELECT rpeople.id, rpeople.first_name, rpeople.last_name, rpeople.birth_date,
+ SELECT rpeople.id, rpeople.first_name, rpeople.last_name, rpeople.birth_date, rpeople.birth_time,
     date_part('year'::text, age(rpeople.birth_date)) AS age, rpeople.change_stamp,
     count(rpeople_line.id) AS number_of_pets
    FROM gsdoc.rpeople
@@ -132,12 +133,12 @@ CREATE OR REPLACE RULE rpeople_delete AS
 
 -- ####### rpeople_insert ON gsdoc.tpeople; #######
 CREATE OR REPLACE RULE rpeople_insert AS
-    ON INSERT TO gsdoc.tpeople DO INSTEAD  INSERT INTO gsdoc.rpeople (first_name, last_name, birth_date)
-  VALUES (new.first_name, new.last_name, new.birth_date);
+    ON INSERT TO gsdoc.tpeople DO INSTEAD  INSERT INTO gsdoc.rpeople (first_name, last_name, birth_date, birth_time)
+  VALUES (new.first_name, new.last_name, new.birth_date, new.birth_time);
 
 -- ####### rpeople_update ON gsdoc.tpeople; #######
 CREATE OR REPLACE RULE rpeople_update AS
-    ON UPDATE TO gsdoc.tpeople DO INSTEAD  UPDATE gsdoc.rpeople SET first_name = new.first_name, last_name = new.last_name, birth_date = new.birth_date
+    ON UPDATE TO gsdoc.tpeople DO INSTEAD  UPDATE gsdoc.rpeople SET first_name = new.first_name, last_name = new.last_name, birth_date = new.birth_date, birth_time = new.birth_time
   WHERE old.id = rpeople.id;
 
 
@@ -208,7 +209,8 @@ INSERT INTO gsdoc.rpeople
     SELECT nextval(('gsdoc.global_seq'::text)::regclass) AS id,
            arr_names[trunc(random() * 19 + 1)] AS first_name,
            arr_names[trunc(random() * 19 + 1)] AS last_name,
-           now() - (trunc(random() * 10000 + 1) || ' day')::interval AS birth_date
+           now() - (trunc(random() * 10000 + 1) || ' day')::interval AS birth_date,
+           now()::time - (trunc(random() * 43200 + 1) || ' seconds')::interval AS birth_time
      FROM (SELECT generate_series(1,100) AS series_maker,
             ARRAY['Apple', 'Mango', 'Kiwi', 'Pineapple',
                   'Grapefruit', 'Plum', 'Coconut', 'Fig',
@@ -745,6 +747,7 @@ GRANT ALL ON FUNCTION gsdoc.action_ajax_test_timeout(text) TO normal_g;
                     <gs-button href="doc-attr-flex.html">CSS Flexbox</gs-button>
                     <gs-button href="doc-attr-visibility.html">Visibility</gs-button>
                     <gs-button href="doc-attr-text-selection.html">Text Selection</gs-button>
+                    <gs-button href="doc-attr-text-insertion.html">Text Insertion Attributes For Mobile Devices</gs-button>
                 </gs-block>
                 <gs-block>
                     <center><h3>Ajax Functions</h3></center>

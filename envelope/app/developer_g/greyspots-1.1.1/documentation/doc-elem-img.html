@@ -38,7 +38,7 @@
                 <div class="doc-section">
                     <div class="doc-example-description">
                         <span class="h3">Skeleton Example:</span>
-                        <p>A basic gs-img element. This element will have the following behaviors:</p>
+                        <p>A basic <code>gs-img</code> element. This element will have the following behaviors:</p>
                         <ol>
                             <li>The gs-img will center itself</li>
                             <li>The gs-img will always be 272px wide by 478px tall</li>
@@ -51,7 +51,7 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Attribute "min-width":</span>
+                        <span class="h3">Attribute <code>[min-width]</code>:</span>
                         <p>The "min-width" attribute enables you to change the images size depending the minimum width of the screen. The "min-width" attribute takes a list of expressions seperated by semi-colons. The format of an expression is "&lt;WINDOW-WIDTH&gt; {&lt;IMAGE-WIDTH&gt;, &lt;IMAGE-HEIGHT&gt;};". If no image height is specified: the gs-img will use the image width as the image height. Precedence for the expressions is determined by order, so the last expression is more important that the first.</p>
                         
                         Here is a list of shortcuts for some pre-set sizes:
@@ -71,14 +71,14 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Attribute "media":</span>
+                        <span class="h3">Attribute <code>[media]</code>:</span>
                         <p>The "media" attribute enables you to change the image size depending <a href="https://developer.mozilla.org/docs/Web/CSS/Media_Queries/Using_media_queries">CSS Media Queries</a>. The "media" attribute takes a list of expressions seperated by semi-colons. The format of an expression is "&lt;MEDIA-SELECTOR&gt; {&lt;IMAGE-WIDTH&gt;, &lt;IMAGE-HEIGHT&gt;};". Precedence for the expressions is determined by order, so the last expression is more important that the first.</p>
                         
                         There are several shortcuts for some pre-set sizes:
                         <ol>
-                            <li>All instances of "small" or "sml" are replaced with "768px"</li>
-                            <li>All instances of "medium" or "med" are replaced with "992px"</li>
-                            <li>All instances of "large" or "lrg" are replaced with "1200px"</li>
+                            <li>All instances of "small" or <code>[sml]</code> are replaced with "768px"</li>
+                            <li>All instances of "medium" or <code>[med]</code> are replaced with "992px"</li>
+                            <li>All instances of "large" or <code>[lrg]</code> are replaced with "1200px"</li>
                         </ol>
                         
                         In this example the gs-font element will change the font-size at 4 media conditions.<br />
@@ -90,7 +90,7 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Attribute "image-cover":</span>
+                        <span class="h3">Attribute <code>[image-cover]</code>:</span>
                         <p>The "image-cover" attribute enables you to fill the gs-img even if some of the image will get chopped off.</p>
                     </div>
                     <gs-doc-example>
@@ -100,7 +100,7 @@
                     </gs-doc-example>
                     
                     <div class="doc-example-description">
-                        <span class="h3">Attribute "align":</span>
+                        <span class="h3">Attribute <code>[align]</code>:</span>
                         <p>The "align" attribute enables you to make the image go to the left or right instead of center.</p>
                     </div>
                     <gs-doc-example>

@@ -122,6 +122,10 @@ window.addEventListener('design-register-element', function () {
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
+        
+        addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
+        });
 
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
@@ -147,11 +151,25 @@ document.addEventListener('DOMContentLoaded', function () {
     // re-target focus event from control to element
     function focusFunction(event) {
         GS.triggerEvent(event.target.parentNode, 'focus');
+        event.target.parentNode.classList.add('focus');
     }
 
     // re-target blur event from control to element
     function blurFunction(event) {
         GS.triggerEvent(event.target.parentNode, 'blur');
+        event.target.parentNode.classList.remove('focus');
+    }
+
+    // mouseout, remove hover class
+    function mouseoutFunction(event) {
+        GS.triggerEvent(event.target.parentNode, evt.mouseout);
+        event.target.parentNode.classList.remove('hover');
+    }
+
+    // mouseover, add hover class
+    function mouseoverFunction(event) {
+        GS.triggerEvent(event.target.parentNode, evt.mouseover);
+        event.target.parentNode.classList.add('hover');
     }
 
     //function createPushReplacePopHandler(element) {
@@ -416,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var i;
                 var len;
 
-                // if the gs-text element has a tabindex: save the tabindex and remov the attribute
+                // if the gs-text element has a tabindex: save the tabindex and remove the attribute
                 if (element.hasAttribute('tabindex')) {
                     element.savedTabIndex = element.getAttribute('tabindex');
                     element.removeAttribute('tabindex');
@@ -438,6 +456,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     element.control.removeEventListener('blur', blurFunction);
                     element.control.addEventListener('blur', blurFunction);
 
+                    element.control.removeEventListener(evt.mouseout, mouseoutFunction);
+                    element.control.addEventListener(evt.mouseout, mouseoutFunction);
+                    
+                    element.control.removeEventListener(evt.mouseout, mouseoverFunction);
+                    element.control.addEventListener(evt.mouseover, mouseoverFunction);
+                    
                     // copy passthrough attributes to control
                     i = 0;
                     len = arrPassThroughAttributes.length;

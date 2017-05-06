@@ -28,7 +28,7 @@
             <pre>&lt;gs-dialog-button template="..."&gt;&lt;/gs-dialog-button&gt;</pre>
             
             <h3 class="doc-header">Description:</h3>
-            <p>This element is used to open a dialog at the click of a button.</p>
+            <p>This element is used to open a dialog at the click of a button, it accepts all of the same attributes of the normal <code>gs-button</code> except for <code>[target]</code>.</p>
             
             
             
@@ -53,7 +53,7 @@
             </gs-doc-example>
             
             <div class="doc-example-description">
-                <span class="h3">"template" Attribute Example:</span>
+                <span class="h3">Attribute <code>[template=""]</code>:</span>
                 <p>In this example we have a <code>&lt;gs-dialog-button&gt;</code> that opens a dialog by linking to an external <code>&lt;template&gt;</code> element. This is done by putting the <code>&lt;template&gt;</code>'s "<code>id</code>" in the <code>&lt;gs-dialog-button&gt;</code>'s "<code>template</code>" attribute. You would use this if you want to keep all of your templates together or if you want/have multiple elements/javascript functions using the template.</p>
             </div>
             <gs-doc-example>
@@ -99,7 +99,7 @@
             </gs-doc-example>
             
             <div class="doc-example-description">
-                <span class="h3">"target" Attribute Example:</span>
+                <span class="h3">Attribute <code>[target=""]</code>:</span>
                 <p>You can open a dialog and attach it to a target element. This is done by putting a selector in the "<code>target</code>" attribute. This could be used for lists or tooltips.</p>
             </div>
             <gs-doc-example>
@@ -128,7 +128,7 @@
             </gs-doc-example>
             
             <div class="doc-example-description">
-                <span class="h3">"direction" Attribute Example:</span>
+                <span class="h3">Attribute <code>[direction=""]</code>:</span>
                 <p>When you open a dialog and attach it to a target element you can specify a side to attach to. If the dialog doesn't have the room on the chosen side, then it wil try different sides. This is done by putting "left", "right", "up" or "down" in the "<code>direction</code>" attribute.</p>
             </div>
             <gs-doc-example>

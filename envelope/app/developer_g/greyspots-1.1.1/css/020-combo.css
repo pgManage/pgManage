@@ -37,6 +37,10 @@ gs-combo .drop_down_button {
     right: 0;
     width: 1.6em;
     
+    margin-top: 0;
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 0;
     height: 100% !important;
     min-height: 0;
     

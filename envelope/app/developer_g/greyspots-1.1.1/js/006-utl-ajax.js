@@ -27,24 +27,6 @@ window.addEventListener('design-register-element', function () {
                                                   strNormalCallbackContent +
                                               '});');
     
-    registerDesignSnippet('ENV SELECT AJAX', 'ENV SELECT AJAX', 'GS.ajaxJSON(\'/env/action_select\', \'view=${1:test.tpeople}&where=&order_by=&limit=&offset=\', function (data, error) {\n' +
-                                                                    strNormalCallbackContent +
-                                                                '});');
-    
-    registerDesignSnippet('ENV UPDATE AJAX', 'ENV UPDATE AJAX', 'GS.ajaxJSON(\'/env/action_update\', \'view=${1:test.tpeople}\' +\n' +
-                                                                '                                        \'&where=\' + encodeURIComponent(\'id=\' + ${2:strID} + \'&change_stamp=\' + ${3:strChangeStamp}) +\n' +
-                                                                '                                        \'&column=${4:first_name}&value=\' + encodeURIComponent(${5:newValue}), function (data, error) {\n' +
-                                                                    strNormalCallbackContent +
-                                                                '});');
-    
-    registerDesignSnippet('ENV INSERT AJAX', 'ENV INSERT AJAX', 'GS.ajaxJSON(\'/env/action_insert\', \'view=${1:test.tpeople}&data=\' + encodeURIComponent(${2:strInsertString}), function (data, error) {\n' +
-                                                                    strNormalCallbackContent +
-                                                                '});');
-    
-    registerDesignSnippet('ENV DELETE AJAX', 'ENV DELETE AJAX', 'GS.ajaxJSON(\'/env/action_delete\', \'view=${1:test.tpeople}&id=\' + ${2:strIDs}, function (data, error) {\n' +
-                                                                    strNormalCallbackContent +
-                                                                '});');
-    
     registerDesignSnippet('GS.ajaxErrorDialog', 'GS.ajaxErrorDialog', 'GS.ajaxErrorDialog(data,\n' +
               '                   function () {\n' +
               '                       // Try Again Button Callback\n' +
