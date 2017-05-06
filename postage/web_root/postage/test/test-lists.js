@@ -619,7 +619,7 @@ LIMIT
 */
 			}),
 			['id\tWFP\'s First "Testing" Column\tWFP\'s Second "Testing" Column\ninteger\tcharacter varying(150)\tcharacter varying(150)\n', 'TRANSACTION COMPLETED']],
-			['SELECT 10', 'websocket', '', ml(function () {/*SELECT	(SELECT id, "WFP's First ""Testing"" Column", "WFP's Second ""Testing"" Column" FROM public."WFP's ""Testing"" Table") em
+			['SELECT 10', 'websocket', '', ml(function () {/*SELECT	(SELECT id, "WFP's First ""Testing"" Column", "WFP's Second ""Testing"" Column"\n\tFROM public."WFP's ""Testing"" Table") em
 RETURN	*
 
 LIMIT

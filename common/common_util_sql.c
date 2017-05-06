@@ -75,7 +75,13 @@ char *get_table_name(char *_str_query, size_t int_query_len, size_t *ptr_int_tab
 			SFREE(str_temp);
 		}
 	} else {
+		str_temp1 = bunescape_value(str_temp, &int_temp_len);
+		SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
+		SFREE(str_temp);
+		str_temp = str_temp1;
+		str_temp1 = NULL;
 		SERROR_SNCAT(str_table_name, ptr_int_table_name_len, str_temp, int_temp_len);
+
 		SFREE(str_temp);
 	}
 
