@@ -13,10 +13,6 @@ var queryVars = {
     , 'bolRules': false
     , 'bolTablespace': false
 };
-
-
-
-
 var curr_run_down = 0, curr_run_up = 0, curr_run_complete = 0;
 
 var searchPath;
@@ -78,7 +74,7 @@ getListData(ml(function () {/*SELECT DISTINCT c.relnamespace
 
 
 function isAlpha(testStr) {
-    var bolAlphaNumeric = (/^[a-z0-9]+$/i).test(testStr);
+    var bolAlphaNumeric = (/^[a-z0-9_]+$/i).test(testStr);
     return bolAlphaNumeric;
 }
 
@@ -376,143 +372,30 @@ function autocompleteBindEditor(tabElement, editor) {
             if (event.action === 'insert') {
                 if (event.lines[0].length === 1) {
                     if (!editor.currentQueryRange === false) {
-                        if (isAlpha(event.lines)) {
-                            
-                            //console.log('alpha_numeric');
-                            autocompleteKeyEvent = 'alpha_numeric';
-                            
-                        } else if (event.lines[0] === '"' || event.lines[0] === "'") {
-                            
-                            //console.log('quote');
-                            autocompleteKeyEvent = 'quote';
-                            
-                        } else if (event.lines[0] === '/' || event.lines[0] === '\\') {
-                            
-                            //console.log('slash');
-                            autocompleteKeyEvent = 'slash';
-                            
-                        } else if (event.lines[0] === ',') {
-                            
-                            //console.log('comma');
-                            autocompleteKeyEvent = 'comma';
-                            
-                        } else if (event.lines[0] === '.') {
-                            
-                            //console.log('period');
+                        if (event.lines[0] === '.') {
                             autocompleteKeyEvent = 'period';
-                            
                         } else if (event.lines[0] === ':') {
-                            
-                            //console.log('colon');
                             autocompleteKeyEvent = 'colon';
-                            
-                        } else if (event.lines[0] === '(' || event.lines[0] === ')') {
-                            
-                            //console.log('parenthesis');
-                            autocompleteKeyEvent = 'parenthesis';
-                            
-                        } else if (event.lines[0] === ' ') {
-                            
-                            //console.log('space');
-                            autocompleteKeyEvent = 'space';
-                            
-                        } else if (event.lines[0] === ';') {
-                            
-                            //console.log('semi-colon');
-                            autocompleteKeyEvent = 'semi-colon';
-                            
+                        } else {
+                            autocompleteKeyEvent = 'pass';
                         }
                     } else {
-                        //console.log('snippets');
-                        
-                        var strScript, intCursorPosition, intStartCursorPosition;
-                    
-                        // get full script
-                        strScript = editor.getValue();
-                        
-                        // get event cursor position start/end
-                        intStartCursorPosition = rowAndColumnToIndex(strScript, event.start.row, event.start.column);
-                        intCursorPosition = intStartCursorPosition;
-                        
-                        var currWord = [];
-                        for (var i = 0, len = intCursorPosition; i <= len; i++) {
-                            if (isAlpha(strScript[intCursorPosition - i]) || strScript[intCursorPosition - i] === '_') {
-                                if (currWord === []) {
-                                    currWord = strScript[intCursorPosition - i].toLowerCase()
-                                } else {
-                                    currWord.push(strScript[intCursorPosition - i].toLowerCase());
-                                }
-                            } else if (currWord !== []) {
-                                break;
-                            }
-                        }
-                    
-                        currWord = currWord.reverse();
-                        currWord = currWord.join('');
-                        
-                        autocompleteGlobals.searchLength = currWord.length;
-                        
-                        if (currWord && (isAlpha(event.lines) || event.lines === '_') && autocompleteGlobals.popupOpen) {
-                            autocompleteKeyEvent = 'snippets_filter';
-                        } else if (event.lines[0] === '"' || event.lines[0] === "'") {
-                            
-                            //console.log('quote');
-                            autocompleteKeyEvent = 'quote';
-                            
-                        } else if (event.lines[0] === '/' || event.lines[0] === '\\') {
-                            
-                            //console.log('slash');
-                            autocompleteKeyEvent = 'slash';
-                            
-                        } else if (event.lines[0] === ',') {
-                            
-                            //console.log('comma');
-                            autocompleteKeyEvent = 'comma';
-                            
-                        } else if (event.lines[0] === '.') {
-                            
-                            //console.log('comma');
-                            autocompleteKeyEvent = 'comma';
-                            
-                        } else if (event.lines[0] === ':') {
-                            
-                            //console.log('colon');
-                            autocompleteKeyEvent = 'colon';
-                            
-                        } else if (event.lines[0] === ' ') {
-                            
-                            //console.log('space');
-                            autocompleteKeyEvent = 'space';
-                            
-                        } else if (event.lines[0] === ';') {
-                            
-                            //console.log('semi-colon');
-                            autocompleteKeyEvent = 'semi-colon';
-                            
-                        } else if (event.lines[0] === '(' || event.lines[0] === ')') {
-                            
-                            //console.log('parenthesis');
-                            autocompleteKeyEvent = 'parenthesis';
-                            
-                        } else {
-                            autocompleteKeyEvent = 'snippets';
-                        }
+                        autocompleteKeyEvent = 'snippets';
                     }
                 } else {
-                    //console.log('paste');
                     autocompleteKeyEvent = 'paste';
                 }
             } else {
-                //console.log('delete');
                 autocompleteKeyEvent = 'delete';
             }
             
-            if (editor.currentSelections) {
-            var selectionRanges = editor.currentSelections[0];
             
+            
+            if (editor.currentSelections) {
+                var selectionRanges = editor.currentSelections[0];
             }
             
-            if (autocompleteGlobals.popupOpen && autocompleteKeyEvent === 'alpha_numeric' || autocompleteKeyEvent === 'snippets_filter') {
+            if (autocompleteGlobals.popupOpen && autocompleteKeyEvent === 'pass') {
                 var strScript, intCursorPosition, intStartCursorPosition;
             
                 // get full script
@@ -640,7 +523,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     
     autocompleteGlobals.bolAlpha = false;
     
-    if (autocompleteKeyEvent === 'alpha_numeric') {
+    if (autocompleteKeyEvent === 'pass') {
 
         autocompleteGlobals.bolAlpha = true;
 
@@ -909,13 +792,8 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
             arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), currWord.toLowerCase() + '%');
         }
         //console.log(currWord);
+        console.log('123456789 ', event.lines, autocompleteGlobals.bolQueryRunning);
         autocompleteMakeList(arrQueries, currWord, editor);
-    } else if (autocompleteKeyEvent === 'quote') {
-        closePopup();
-    } else if (autocompleteKeyEvent === 'slash') {
-        closePopup();
-    } else if (autocompleteKeyEvent === 'comma') {
-        closePopup();
     } else if (autocompleteKeyEvent === 'period') {
         closePopup();
 
@@ -1495,10 +1373,6 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         } else {
             closePopup();
         }
-    } else if (autocompleteKeyEvent === 'semi-colon') {
-        closePopup();
-    } else if (autocompleteKeyEvent === 'space') {
-        closePopup();
     } else if (autocompleteKeyEvent === 'snippets') {
         var currSnippet, strCurrent, strCurrentName;
         
@@ -1522,8 +1396,6 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     } else if (autocompleteKeyEvent === 'paste') {
         closePopup();
     } else if (autocompleteKeyEvent === 'delete') {
-        closePopup();
-    } else if (autocompleteKeyEvent === 'parenthesis') {
         closePopup();
     }
 }
@@ -1571,169 +1443,189 @@ function autocompleteStart() {
 
 function autocompleteMakeList(arrQueries, searchWord, editor) {
     'use strict';
+        console.log('now',autocompleteGlobals.bolQueryRunning);
     if (autocompleteGlobals.bolQueryRunning) {
         autocompleteGlobals.bolSpecialFilter = true;
-    }
-    //queryVars
-    
-    var optionList = ['hidden'];
-    autocompleteGlobals.popupLoading = true;
-    autocompleteGlobals.arrSearch = ['hidden'];
-    autocompleteGlobals.arrSearchMaster = ['hidden'];
-    var strQuery, i, len, arrSuggestion, suggestion_i, suggestion_len;
-    
-    for (i = 0, len = arrQueries.length; i < len; i += 1) {
-        if (typeof arrQueries[i] !== 'string') {
-            for (suggestion_i = 0, suggestion_len = arrQueries[i].length; suggestion_i < suggestion_len; suggestion_i += 1) {
-                arrQueries[i][suggestion_i] = 'SELECT $token$' + arrQueries[i][suggestion_i] + '$token$::text AS obj_name, \'\'::text AS obj_meta';
+    } else {
+        //queryVars
+        
+        var optionList = ['hidden'];
+        autocompleteGlobals.popupLoading = true;
+        autocompleteGlobals.arrSearch = ['hidden'];
+        autocompleteGlobals.arrSearchMaster = ['hidden'];
+        var strQuery, i, len, arrSuggestion, suggestion_i, suggestion_len;
+        
+        for (i = 0, len = arrQueries.length; i < len; i += 1) {
+            if (typeof arrQueries[i] !== 'string') {
+                for (suggestion_i = 0, suggestion_len = arrQueries[i].length; suggestion_i < suggestion_len; suggestion_i += 1) {
+                    arrQueries[i][suggestion_i] = 'SELECT $token$' + arrQueries[i][suggestion_i] + '$token$::text AS obj_name, \'\'::text AS obj_meta';
+                }
+        
+                arrQueries[i] = 'SELECT * FROM (' + arrQueries[i].join('\nUNION ALL\n') + ') list_suggestions_' + i;
             }
-    
-            arrQueries[i] = 'SELECT * FROM (' + arrQueries[i].join('\nUNION ALL\n') + ') list_suggestions_' + i;
         }
-    }
-    
-    strQuery = 'SELECT * FROM (\n' + arrQueries.join('\n     UNION ALL\n') + '\n' + ') em;';
-    //    //console.log(strQuery);
-    // if the autocomplete query is still running: cancel it
-    if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning) {
-        GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
-    }
-    
-    if (autocompleteGlobals.bolAlpha) {
-        var strDeclare = editor.getValue(), substrEnd, arrFuncVariables = [];
-        // if there is a declare statement: get variable names;
-        if (strDeclare.toLowerCase().indexOf('declare') !== -1) {
-            // if there is a begin: substring to that;
-            if (strDeclare.toLowerCase().indexOf('begin') !== -1) {
-                substrEnd = strDeclare.toLowerCase().indexOf('begin');
-                strDeclare = strDeclare.substring(strDeclare.toLowerCase().indexOf('declare'), substrEnd);
-                // get variable names
-                arrFuncVariables = strDeclare.match(/([A-Za-z_0-9]+\ )+/ig);
-                // trim variable names
-                if (arrFuncVariables) {
-                    for (var i = 0, len = arrFuncVariables.length; i < len; i++) {
-                        arrFuncVariables[i] = arrFuncVariables[i].trim();
-                        // if arrFuncVariables[i] has a space in it still: substring it off
-                        if (arrFuncVariables[i].indexOf(' ') !== -1) {
-                            arrFuncVariables[i].substring(0, arrFuncVariables[i].indexOf(' '));
-                        }
-                        if (arrFuncVariables[i].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) {
-                            optionList.push(['' + arrFuncVariables[i] + '', 'funcVar']);
-                            if (arrFuncVariables[i].substring(0, 1) === '"') {
-                                autocompleteGlobals.arrSearch.push(arrFuncVariables[i].toLowerCase());
-                            } else {
-                                autocompleteGlobals.arrSearch.push('"' + arrFuncVariables[i].toLowerCase() + '"');
+        
+        strQuery = 'SELECT * FROM (\n' + arrQueries.join('\n     UNION ALL\n') + '\n' + ') em ORDER BY obj_name;';
+        //    //console.log(strQuery);
+        // if the autocomplete query is still running: cancel it
+        if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning) {
+            GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
+        }
+        
+        if (autocompleteGlobals.bolAlpha) {
+            var strDeclare = editor.getValue(), substrEnd, arrFuncVariables = [];
+            // if there is a declare statement: get variable names;
+            if (strDeclare.toLowerCase().indexOf('declare') !== -1) {
+                // if there is a begin: substring to that;
+                if (strDeclare.toLowerCase().indexOf('begin') !== -1) {
+                    substrEnd = strDeclare.toLowerCase().indexOf('begin');
+                    strDeclare = strDeclare.substring(strDeclare.toLowerCase().indexOf('declare'), substrEnd);
+                    // get variable names
+                    arrFuncVariables = strDeclare.match(/([A-Za-z_0-9]+\ )+/ig);
+                    // trim variable names
+                    if (arrFuncVariables) {
+                        for (var i = 0, len = arrFuncVariables.length; i < len; i++) {
+                            arrFuncVariables[i] = arrFuncVariables[i].trim();
+                            // if arrFuncVariables[i] has a space in it still: substring it off
+                            if (arrFuncVariables[i].indexOf(' ') !== -1) {
+                                arrFuncVariables[i].substring(0, arrFuncVariables[i].indexOf(' '));
                             }
-                        }
-                    }
-                }
-            }
-        }
-    
-    }
-    
-    // console.log(autocompleteGlobals.arrSearchPath, queryVars.bolSearchPath);
-    if (autocompleteGlobals.arrSearchPath && queryVars.bolSchemas) {
-        for (var i = 0, len = autocompleteGlobals.arrSearchPath.length; i < len; i++) {
-            if (autocompleteGlobals.arrSearchPath[i][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) {
-                optionList.push(autocompleteGlobals.arrSearchPath[i]);
-                if (autocompleteGlobals.arrSearchPath[i][0].substring(0, 1) === '"') {
-                    autocompleteGlobals.arrSearch.push(autocompleteGlobals.arrSearchPath[i][0].toLowerCase());
-                } else {
-                    autocompleteGlobals.arrSearch.push('"' + autocompleteGlobals.arrSearchPath[i][0].toLowerCase() + '"');
-                }
-            }
-        }    
-    }
-    
-    //autocompleteGlobals.arrSearchPath
-    
-    autocompleteGlobals.bolQueryRunning = true;
-    // make the request
-    autocompleteGlobals.strQueryID = GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
-        var arrRows, i, len;
-        if (!error) {
-            if (data.strMessage !== '\\.' && data.strMessage !== '') {
-                arrRows = data.strMessage.split('\n');
-                for (i = 0, len = arrRows.length; i < len; i += 1) {
-                    arrRows[i] = arrRows[i].split('\t');
-                    arrRows[i][0] = GS.decodeFromTabDelimited(arrRows[i][0]);
-                    optionList.push(arrRows[i]);
-                    if (arrRows[i][0].substring(0, 1) === '"') {
-                        autocompleteGlobals.arrSearch.push(arrRows[i][0].toLowerCase());
-                    } else {
-                        autocompleteGlobals.arrSearch.push('"' + arrRows[i][0].toLowerCase() + '"');
-                    }
-                    if (arrRows[i][0].substring(0, 1) === '"') {
-                        autocompleteGlobals.arrSearchMaster.push(arrRows[i][0].toLowerCase());
-                    } else {
-                        autocompleteGlobals.arrSearchMaster.push('"' + arrRows[i][0].toLowerCase() + '"');
-                    }
-                    //console.log(optionList);
-                }
-            } else if (data.strMessage === '\\.') {
-                autocompleteGlobals.strQueryID = null;
-            } else if (data.strMessage === '') {
-                optionList.shift();
-                autocompleteGlobals.arrSearch.shift()
-                autocompleteGlobals.arrValues = optionList;
-                autocompleteGlobals.arrSearchMaster.shift();
-                autocompleteGlobals.arrValuesMaster = optionList;
-                
-                //console.log('bolSpecialFilter: ' + autocompleteGlobals.bolSpecialFilter);
-                if (autocompleteGlobals.bolSpecialFilter) {
-                    autocompleteGlobals.bolSpecialFilter = false;
-                    if ((optionList.length === 1 && searchWord && optionList[0][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
-                        closePopup();
-                    } else {
-                        var strScript, intCursorPosition, intStartCursorPosition;
-                    
-                        // get full script
-                        strScript = editor.getValue();
-                        
-                        // get event cursor position start/end
-                        intStartCursorPosition = rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column);
-                        intCursorPosition = intStartCursorPosition;
-                        
-                        var currWord = [];
-                        for (var i = 0, len = intCursorPosition; i <= len; i++) {
-                            if (isAlpha(strScript[intCursorPosition - i]) || strScript[intCursorPosition - i] === '_') {
-                                if (currWord === []) {
-                                    currWord = strScript[intCursorPosition - i].toLowerCase()
+                            if (arrFuncVariables[i].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) {
+                                optionList.push(['' + arrFuncVariables[i] + '', 'funcVar']);
+                                if (arrFuncVariables[i].substring(0, 1) === '"') {
+                                    autocompleteGlobals.arrSearch.push(arrFuncVariables[i].toLowerCase());
                                 } else {
-                                    currWord.push(strScript[intCursorPosition - i].toLowerCase());
+                                    autocompleteGlobals.arrSearch.push('"' + arrFuncVariables[i].toLowerCase() + '"');
                                 }
-                            } else if (currWord !== []) {
-                                break;
                             }
                         }
-                    
-                        currWord = currWord.reverse();
-                        currWord = currWord.join('');
-                        
-                        autocompleteGlobals.searchLength = currWord.length;
-                        
-                        autocompleteFilterList(optionList, currWord, editor)
-                    }
-                } else {
-                    if ((optionList.length === 1 && searchWord && optionList[0][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
-                        closePopup();
-                    } else if (autocompleteGlobals.popupOpen === false) {
-                        openPopup(editor, optionList);
-                    } else if (autocompleteGlobals.popupOpen === true) {
-                        loadPopuplist(editor, optionList);
                     }
                 }
-                
-                autocompleteGlobals.bolQueryRunning = false;
             }
-        }// else {
-        //    GS.webSocketErrorDialog(data);
-        //}
-    });
+        
+        }
+        
+        // console.log(autocompleteGlobals.arrSearchPath, queryVars.bolSearchPath);
+        if (autocompleteGlobals.arrSearchPath && queryVars.bolSchemas) {
+            for (var i = 0, len = autocompleteGlobals.arrSearchPath.length; i < len; i++) {
+                if (autocompleteGlobals.arrSearchPath[i][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) {
+                    optionList.push(autocompleteGlobals.arrSearchPath[i]);
+                    if (autocompleteGlobals.arrSearchPath[i][0].substring(0, 1) === '"') {
+                        autocompleteGlobals.arrSearch.push(autocompleteGlobals.arrSearchPath[i][0].toLowerCase());
+                    } else {
+                        autocompleteGlobals.arrSearch.push('"' + autocompleteGlobals.arrSearchPath[i][0].toLowerCase() + '"');
+                    }
+                }
+            }    
+        }
+        
+        //autocompleteGlobals.arrSearchPath
+        console.log('query running');
+        autocompleteGlobals.bolQueryRunning = true;
+        // make the request
+        
+        var getlist = function () {
+            autocompleteGlobals.strQueryID = GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
+                var arrRows, i, len;
+                if (!error) {
+                    if (data.strMessage !== '\\.' && data.strMessage !== '') {
+                        arrRows = data.strMessage.split('\n');
+                        for (i = 0, len = arrRows.length; i < len; i += 1) {
+                            arrRows[i] = arrRows[i].split('\t');
+                            arrRows[i][0] = GS.decodeFromTabDelimited(arrRows[i][0]);
+                            optionList.push(arrRows[i]);
+                            if (arrRows[i][0].substring(0, 1) === '"') {
+                                autocompleteGlobals.arrSearch.push(arrRows[i][0].toLowerCase());
+                            } else {
+                                autocompleteGlobals.arrSearch.push('"' + arrRows[i][0].toLowerCase() + '"');
+                            }
+                            if (arrRows[i][0].substring(0, 1) === '"') {
+                                autocompleteGlobals.arrSearchMaster.push(arrRows[i][0].toLowerCase());
+                            } else {
+                                autocompleteGlobals.arrSearchMaster.push('"' + arrRows[i][0].toLowerCase() + '"');
+                            }
+                            //console.log(optionList);
+                        }
+                    } else if (data.strMessage === '\\.') {
+                        autocompleteGlobals.strQueryID = null;
+                    } else if (data.strMessage === '') {
+                        optionList.shift();
+                        autocompleteGlobals.arrSearch.shift()
+                        autocompleteGlobals.arrValues = optionList;
+                        autocompleteGlobals.arrSearchMaster.shift();
+                        autocompleteGlobals.arrValuesMaster = optionList;
+                        
+                        
+                        autocompleteGlobals.bolQueryRunning = false;
+                        console.log('ending the query');
+                        console.log(strQuery);
+                        
+                        if (autocompleteGlobals.bolSpecialFilter) {
+                            autocompleteGlobals.bolSpecialFilter = false;
+                            if ((optionList.length === 1 && searchWord && optionList[0][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
+                                closePopup();
+                            } else {
+                                closePopup();
+                                var strScript, intCursorPosition, intStartCursorPosition;
+                                
+                                // get full script
+                                strScript = editor.getValue();
+                                
+                                // get event cursor position start/end
+                                intStartCursorPosition = rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column);
+                                intCursorPosition = intStartCursorPosition;
+                                
+                                var currWord = [];
+                                for (var i = 1, len = intCursorPosition; i <= len; i++) {
+                                    if (isAlpha(strScript[intCursorPosition - i]) || strScript[intCursorPosition - i] === '_') {
+                                        if (currWord === []) {
+                                            currWord = strScript[intCursorPosition - i].toLowerCase()
+                                        } else {
+                                            currWord.push(strScript[intCursorPosition - i].toLowerCase());
+                                        }
+                                    } else if (currWord !== []) {
+                                        break;
+                                    }
+                                }
+                            
+                                currWord = currWord.reverse();
+                                currWord = currWord.join('');
+                                
+                                console.log('"' + strScript + '"\n' + intCursorPosition + '\n"' + currWord + '"');
+                                
+                                autocompleteGlobals.searchLength = currWord.length;
+                                
+                                autocompleteFilterList(optionList, currWord, editor)
+                            }
+                        } else {
+                            if ((optionList.length === 1 && searchWord && optionList[0][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
+                                closePopup();
+                            } else if (autocompleteGlobals.popupOpen === false) {
+                                openPopup(editor, optionList);
+                            } else if (autocompleteGlobals.popupOpen === true) {
+                                loadPopuplist(editor, optionList);
+                            }
+                        }
+                        
+                    }
+                }
+            });
+        }
+        
+        if (autocompleteGlobals.bolTestSlowDown) {
+            setTimeout(function(){
+                getlist();
+            }, 2000);
+            //autocompleteGlobals.bolTestSlowDown = false;
+        } else {
+            getlist();
+        }
+        
+    }
 }
 
 function autocompleteFilterList(list, searchWord, editor) {
+    //console.log(autocompleteGlobals.bolQueryRunning);
     if (autocompleteGlobals.bolQueryRunning) {
         autocompleteGlobals.bolSpecialFilter = true;
     } else {
@@ -1752,7 +1644,7 @@ function autocompleteFilterList(list, searchWord, editor) {
             // if the current item doesn't match: remove from ace, arrSearch and arrValues
             //console.log(autocompleteGlobals.arrSearch);
             if (autocompleteGlobals.arrSearch[i]) {
-                //console.log(strSearch, autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1);
+                //console.log(strSearch, autocompleteGlobals.arrSearch[i], ((autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) ? 'splice' : 'keep'));
                 if (autocompleteGlobals.arrSearch[i].indexOf(strSearch) === -1) {
                     //console.log(autocompleteGlobals.arrSearch[i].indexOf(strSearch), autocompleteGlobals.arrSearch[i], strSearch);
                     autocompleteGlobals.arrSearch.splice(i, 1);
@@ -1765,6 +1657,8 @@ function autocompleteFilterList(list, searchWord, editor) {
                 break;
             }
         }
+        console.log(autocompleteGlobals.arrSearch);
+        
         if (autocompleteGlobals.arrSearch.length === 0 || autocompleteGlobals.arrValues.length === 0 || (autocompleteGlobals.arrSearch.length === 1 && autocompleteGlobals.arrSearch[0] === (strSearch + '"'))) {
             closePopup();
         } else {
@@ -1774,7 +1668,7 @@ function autocompleteFilterList(list, searchWord, editor) {
 }
 
 function closePopup() {
-    if (autocompleteGlobals.popupOpen === true) {
+    if (autocompleteGlobals.popupOpen === true || autocompleteGlobals.bolQueryRunning) {
         autocompleteGlobals.popupOpen = false;
         //console.log('closed');
         autocompleteUnbind();
@@ -1801,8 +1695,8 @@ function closePopup() {
 
 //bolKeepOpen allows autocompleteFilterList to not close the popup which emptys the variables
 function openPopup(editor, optionlist, bolKeepOpen) {
-'use strict';
-    //console.log(optionlist.join('\n'));
+    'use strict';
+    //console.log(autocompleteGlobals.bolQueryRunning);
     var //jsnSearchStart = indexToRowAndColumn(editor.getValue(), editor.selection.getRange().start.column)
       jsnPosition = editor.renderer.textToScreenCoordinates(editor.selection.getRange().start.row, editor.selection.getRange().start.column + 1)
       , intLeft = jsnPosition.pageX
@@ -1897,19 +1791,21 @@ function autocompleteComplete(editor) {
     var intFocusedLine = autocompleteGlobals.popupAce.getSelectionRange().start.row;
     var currentValue = autocompleteGlobals.arrValues[intFocusedLine];
     
-    var strScript, intCursorPosition, intStartCursorPosition;
-    strScript = editor.getValue();
-    intStartCursorPosition = rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column);
-    intCursorPosition = intStartCursorPosition;
-    var wordLength = 0;
-    for (var i = 0, len = intCursorPosition; i <= len; i++) {
-        if (isAlpha(strScript[intCursorPosition - i]) || strScript[intCursorPosition - i] === '_') {
-            wordLength += 1;
-        } else if (wordLength >= 1 || strScript[intCursorPosition - i].trim() !== '') {
-            break;
-        }
-    }
-    autocompleteGlobals.searchLength = wordLength;
+    // var strScript, intCursorPosition, intStartCursorPosition;
+    // strScript = editor.getValue();
+    // intStartCursorPosition = rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column);
+    // intCursorPosition = intStartCursorPosition;
+    // var wordLength = 0;
+    // for (var i = 0, len = intCursorPosition; i <= len; i++) {
+    //     if (isAlpha(strScript[intCursorPosition - i]) || strScript[intCursorPosition - i] === '_') {
+    //         wordLength += 1;
+    //     } else if (wordLength >= 1 || strScript[intCursorPosition - i].trim() !== '') {
+    //         break;
+    //     }
+    // }
+    // autocompleteGlobals.searchLength = wordLength;
+    console.log(autocompleteGlobals.searchLength);
+    
     
     closePopup();
     var currSelectionRange = editor.selection.getRange();
@@ -1945,7 +1841,7 @@ function autocompleteComplete(editor) {
             
             for (var i = 0, len = editor.currentSelections.length; i < len; i += 1) {
                 if (autocompleteGlobals.searchLength !== 1) {
-                    insertText = currentValue[0].trim().substring(autocompleteGlobals.searchLength - 1, currentValue[0].trim().length);
+                    insertText = currentValue[0].trim().substring(autocompleteGlobals.searchLength, currentValue[0].trim().length);
                 } else {
                     insertText = currentValue[0].trim().substring(autocompleteGlobals.searchLength, currentValue[0].trim().length);
                 }

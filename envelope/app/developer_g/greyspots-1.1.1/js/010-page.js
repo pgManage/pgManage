@@ -1,4 +1,3 @@
-
 window.addEventListener('design-register-element', function () {
     registerDesignSnippet('Empty <gs-page>', '<gs-page>', 'gs-page>\n' +
                                                           '    $0\n' +

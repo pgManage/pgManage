@@ -1,15 +1,3 @@
-gs-date {
-    position: relative;
-    display: block;
-    padding: 0;
-    line-height: 1.2em;
-    background-color: #FFFFFF;
-    border: 1px solid #AEAEAE;
-    border-radius: 0.2em;
-    min-height: 1em;
-    
-    margin-top: -1px;
-}
 
 gs-date .date-picker-button {
     position: absolute;
@@ -18,6 +6,14 @@ gs-date .date-picker-button {
     
     width: 2.4em;
     height: 100%;
+    
+    margin-top: 0;
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 0;
+    
+    /*border-top-right-radius: 0.2px;*/
+    /*border-bottom-right-radius: 0.2px;*/
     
     max-height: 25px;
     min-height: 0px;
@@ -41,13 +37,6 @@ gs-date[no-picker] {
 gs-date[no-picker] .date-picker-button {
     display: none;
 }
-
-
-gs-date[disabled],
-gs-date[disabled] .control {
-    background-color: #D5D5D5;
-}
-
 
 gs-date[mini] {
     padding: 0;

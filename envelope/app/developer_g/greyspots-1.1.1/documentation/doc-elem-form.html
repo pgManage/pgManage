@@ -64,7 +64,46 @@
                 
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "Limit":</span>
+                    <span class="h3">Attribute <code>[suppress-no-record-found]</code>:</span>
+                    <p>The <code>[suppress-no-record-found]</code> attribute prevents the form from erroring when there's is no record found.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="26">
+                        <gs-form src="gsdoc.tpeople" suppress-no-record-found where="id = 123456789">
+                            <template>
+                                <label>First Name:</label>
+                                
+                                <gs-text column="first_name"></gs-text>
+                                <label>Last Name:</label>
+                                <gs-text column="last_name"></gs-text>
+                            </template>
+                        </gs-form>
+                    </template>
+                </gs-doc-example>
+                
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[where]</code>:</span>
+                    <p>The <code>[where]</code> attribute determines which record(s) we get from the database.</p>
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="26">
+                        <gs-form src="gsdoc.tpeople" where="id = 2341">
+                            <template>
+                                <label>First Name:</label>
+                                <gs-text column="first_name"></gs-text>
+                                
+                                <label>Last Name:</label>
+                                <gs-text column="last_name"></gs-text>
+                                <hr />
+                            </template>
+                        </gs-form>
+                    </template>
+                </gs-doc-example>
+                
+                
+                <div class="doc-example-description">
+                    <span class="h3">Attribute <code>[limit]</code>:</span>
                     <p>By setting the limit attribute we are allowing multiple records in the form. The limit attribute defaults to: "1".</p>
                 </div>
                 <gs-doc-example>
@@ -84,7 +123,7 @@
                 
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "offset":</span>
+                    <span class="h3">Attribute <code>[offset]</code>:</span>
                     <p>By setting the offset attribute we are shifting the records we see.</p>
                 </div>
                 <gs-doc-example>
@@ -104,7 +143,7 @@
                 
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "ord":</span>
+                    <span class="h3">Attribute <code>[ord]</code>:</span>
                     <p>The "ord" attribute sets the ORDER BY that we get the records using.</p>
                 </div>
                 <gs-doc-example>
@@ -124,7 +163,7 @@
                 
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "lock":</span>
+                    <span class="h3">Attribute <code>[lock]</code>:</span>
                     <p>The "lock" attribute changes what column the form uses to make sure the record it's updating hasn't been updated by someone else first. Default of this attribute is "change_stamp".</p>
                 </div>
                 <gs-doc-example>
@@ -209,7 +248,7 @@
                 
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "refresh-on-querystring-values":</span>
+                    <span class="h3">Attribute <code>[refresh-on-querystring-values]</code>:</span>
                     <p>The "refresh-on-querystring-values" attribute refreshes the form element when any of the columns in the attribute change in the query string. To put multiple columns in the attribute you would just put in comma seperated list.</p>
                 </div>
                 <gs-doc-example query-string="id=2341&unrelatedparameter=test">
@@ -230,7 +269,7 @@
                 
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "refresh-on-querystring-change":</span>
+                    <span class="h3">Attribute <code>[refresh-on-querystring-change]</code>:</span>
                     <p>The "refresh-on-querystring-change" attribute refreshes the form element when anything changes in the query string.</p>
                 </div>
                 <gs-doc-example query-string="id=2341&unrelatedparameter=test">
@@ -251,7 +290,7 @@
                 
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "cols":</span>
+                    <span class="h3">Attribute <code>[cols]</code>:</span>
                     <p>The "cols" attribute is for limiting the columns you get back from the database. Notice how the last_name column is not in the list and the last_name column is not filled in.</p>
                 </div>
                 <gs-doc-example>
@@ -273,7 +312,7 @@
                 
                 
                 <div class="doc-example-description">
-                    <span class="h3">Attribute "save-while-typing":</span>
+                    <span class="h3">Attribute <code>[save-while-typing]</code>:</span>
                     <p>the "size-while-typing" attribute causes the form to update after the user has stopped typing for a certain period of time. Doing this means the user does not have to leave the field or press return to save.</p>
                 </div>
                 <gs-doc-example>
@@ -307,12 +346,59 @@
                             </template>
                         </gs-form>
                     </template>
-<template for="js" height="10">window.addEventListener('load', function (event) {
-    document.getElementById('form_name').addEventListener('after_update', function (event) {
-        alert(this.column('first_name'));
-    });
-});</template>
+                    <template for="js" height="10">window.addEventListener('load', function (event) {
+                        document.getElementById('form_name').addEventListener('after_update', function (event) {
+                            alert(this.column('first_name'));
+                        });
+                    });</template>
                 </gs-doc-example>
+                
+                <div class="doc-example-description">
+                    <span class="h3">Javascript Methods:</span>
+                    <p>These functions that can be run on individual <code>&lt;gs-form&gt;</code> elements:<br />
+                    <i>FORM</i>.refresh() &lt;-- This method refreshes the <code>&lt;gs-form&gt;</code>.<br />
+                    <i>FORM</i>.column(strColumn) &lt;-- This method get the current value of the column sent in "strColumn".<br />
+                    <i>FORM</i>.addMessage(strMessageName) &lt;-- This method displays a small message at the top of the <code>&lt;gs-form&gt;</code>.<br />
+                    <i>FORM</i>.removeMessage(strMessageName) &lt;-- This method remove the small message at the top of the <code>&lt;gs-form&gt;</code>.<br />
+                </div>
+                <gs-doc-example>
+                    <template for="html" height="30">
+                        <gs-button onclick="testrefresh()">Refresh Form</gs-button>
+                        <gs-button onclick="testcolumn()">Get Column</gs-button>
+                        <gs-button onclick="testaddMessage()">Add Message</gs-button>
+                        <gs-button onclick="testremoveMessage()">Remove Message</gs-button>
+                        <br />
+                        <gs-form src="gsdoc.tpeople" where="id=2341" id="test-elem" cols="id,first_name,change_stamp">
+                            <template>
+                                <label for="text-id">ID:</label>
+                                <gs-text id="text-id" column="id"></gs-text>
+                                
+                                <label for="text-first_name">First Name:</label>
+                                <gs-text id="text-first_name" column="first_name"></gs-text>
+                                
+                                <label for="text-last_name">Last Name:</label>
+                                <gs-text id="text-last_name" column="last_name"></gs-text>
+                            </template>
+                        </gs-form>
+                    </template>
+                    <template for="js" height="30">
+                        function testrefresh() {
+                            document.getElementById('test-elem').refresh();
+                        }
+                        function testcolumn() {
+                            alert(document.getElementById('test-elem').column('first_name'));
+                        }
+                        function testaddMessage() {
+                            document.getElementById('test-elem').addMessage('saving');
+                        }
+                        function testremoveMessage() {
+                            document.getElementById('test-elem').removeMessage('saving');
+                        }
+                    </template>
+                </gs-doc-example>
+                
+                
+                
             </div>
         </gs-container>
         <br />

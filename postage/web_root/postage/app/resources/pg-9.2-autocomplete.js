@@ -25,6 +25,7 @@ var autocompleteGlobals = {
       , 'searchLength':    0
       , 'bolQueryRunning': false
       , 'bolSpecialFilter':  false
+      , 'bolTestSlowDown':   false
     };
     
     
@@ -316,6 +317,7 @@ function autocompleteLoadTypes() {
             GS.webSocketErrorDialog(data);
         }
         autocompleteGlobals.bolQueryRunning = false;
+        console.log('ending the query');
     });
 }
 
@@ -362,6 +364,7 @@ function autocompleteLoadKeywords() {
             GS.webSocketErrorDialog(data);
         }
         autocompleteGlobals.bolQueryRunning = false;
+        console.log('ending the query');
     });
 }
 
@@ -389,7 +392,7 @@ function autocompleteGetObjectType(strName, arrQueries, callback, schemaOID) {
                     arrQueries.join('\n     UNION ALL\n') + '\n' +
                 ') em;';
     
-    autocompleteGlobals.bolQueryRunning = true;
+    //autocompleteGlobals.bolQueryRunning = true;
     GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
         var arrRows, i, len;
 
@@ -410,7 +413,8 @@ function autocompleteGetObjectType(strName, arrQueries, callback, schemaOID) {
         }// else {
         //    GS.webSocketErrorDialog(data);
         //}
-        autocompleteGlobals.bolQueryRunning = false;
+        //autocompleteGlobals.bolQueryRunning = false;
+        console.log('ending the query');
     });
 }
 

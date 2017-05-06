@@ -256,87 +256,87 @@
                     return selectedElement;
                 });
                 
-                addProp('Corners', true,   '<div class="target">' +
-                                                '<gs-grid>\n' +
-                                                '    <gs-block>\n' +
-                                                '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                                            selectedElement.hasAttribute('remove-top') ||
-                                                                            selectedElement.hasAttribute('remove-left') ||
-                                                                            selectedElement.hasAttribute('remove-top-left'))).toString() + 
-                                                            '" remove-right remove-bottom id="round-top-left-corner________"></gs-checkbox>' +
+                // addProp('Corners', true,   '<div class="target">' +
+                //                                 '<gs-grid>\n' +
+                //                                 '    <gs-block>\n' +
+                //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+                //                                                             selectedElement.hasAttribute('remove-top') ||
+                //                                                             selectedElement.hasAttribute('remove-left') ||
+                //                                                             selectedElement.hasAttribute('remove-top-left'))).toString() + 
+                //                                             '" remove-right remove-bottom id="round-top-left-corner________"></gs-checkbox>' +
                                                         
-                                                '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                                            selectedElement.hasAttribute('remove-bottom') ||
-                                                                            selectedElement.hasAttribute('remove-left') ||
-                                                                            selectedElement.hasAttribute('remove-bottom-left'))).toString() + 
-                                                            '" remove-right remove-top id="round-bottom-left-corner________"></gs-checkbox>' +
-                                                '    </gs-block>\n' +
-                                                '    <gs-block>\n' +
-                                                '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                                            selectedElement.hasAttribute('remove-top') ||
-                                                                            selectedElement.hasAttribute('remove-right') ||
-                                                                            selectedElement.hasAttribute('remove-top-right'))).toString() + 
-                                                            '" remove-left remove-bottom id="round-top-right-corner________"></gs-checkbox>' +
+                //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+                //                                                             selectedElement.hasAttribute('remove-bottom') ||
+                //                                                             selectedElement.hasAttribute('remove-left') ||
+                //                                                             selectedElement.hasAttribute('remove-bottom-left'))).toString() + 
+                //                                             '" remove-right remove-top id="round-bottom-left-corner________"></gs-checkbox>' +
+                //                                 '    </gs-block>\n' +
+                //                                 '    <gs-block>\n' +
+                //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+                //                                                             selectedElement.hasAttribute('remove-top') ||
+                //                                                             selectedElement.hasAttribute('remove-right') ||
+                //                                                             selectedElement.hasAttribute('remove-top-right'))).toString() + 
+                //                                             '" remove-left remove-bottom id="round-top-right-corner________"></gs-checkbox>' +
                                                         
-                                                '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                                            selectedElement.hasAttribute('remove-bottom') ||
-                                                                            selectedElement.hasAttribute('remove-right') ||
-                                                                            selectedElement.hasAttribute('remove-bottom-right'))).toString() + 
-                                                            '" remove-left remove-top id="round-bottom-right-corner________"></gs-checkbox>' +
-                                                '    </gs-block>\n' +
-                                                '</gs-grid>\n' +
-                                            '</div>', function () {
-                    var topLeft     = document.getElementById('round-top-left-corner________').value === 'true',
-                        topRight    = document.getElementById('round-top-right-corner________').value === 'true',
-                        bottomLeft  = document.getElementById('round-bottom-left-corner________').value === 'true',
-                        bottomRight = document.getElementById('round-bottom-right-corner________').value === 'true',
-                        arrStrAttr = [], i, len;
+                //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+                //                                                             selectedElement.hasAttribute('remove-bottom') ||
+                //                                                             selectedElement.hasAttribute('remove-right') ||
+                //                                                             selectedElement.hasAttribute('remove-bottom-right'))).toString() + 
+                //                                             '" remove-left remove-top id="round-bottom-right-corner________"></gs-checkbox>' +
+                //                                 '    </gs-block>\n' +
+                //                                 '</gs-grid>\n' +
+                //                             '</div>', function () {
+                //     var topLeft     = document.getElementById('round-top-left-corner________').value === 'true',
+                //         topRight    = document.getElementById('round-top-right-corner________').value === 'true',
+                //         bottomLeft  = document.getElementById('round-bottom-left-corner________').value === 'true',
+                //         bottomRight = document.getElementById('round-bottom-right-corner________').value === 'true',
+                //         arrStrAttr = [], i, len;
                     
-                    selectedElement.removeAttribute('remove-all');
-                    selectedElement.removeAttribute('remove-top');
-                    selectedElement.removeAttribute('remove-bottom');
-                    selectedElement.removeAttribute('remove-left');
-                    selectedElement.removeAttribute('remove-right');
-                    selectedElement.removeAttribute('remove-top-left');
-                    selectedElement.removeAttribute('remove-top-right');
-                    selectedElement.removeAttribute('remove-bottom-left');
-                    selectedElement.removeAttribute('remove-bottom-right');
+                //     selectedElement.removeAttribute('remove-all');
+                //     selectedElement.removeAttribute('remove-top');
+                //     selectedElement.removeAttribute('remove-bottom');
+                //     selectedElement.removeAttribute('remove-left');
+                //     selectedElement.removeAttribute('remove-right');
+                //     selectedElement.removeAttribute('remove-top-left');
+                //     selectedElement.removeAttribute('remove-top-right');
+                //     selectedElement.removeAttribute('remove-bottom-left');
+                //     selectedElement.removeAttribute('remove-bottom-right');
                     
-                    if (!topLeft && !topRight && !bottomLeft && !bottomRight) {
-                        arrStrAttr.push('remove-all');
-                    } else if (!topLeft && !topRight) {
-                        arrStrAttr.push('remove-top');
-                    } else if (!bottomLeft && !bottomRight) {
-                        arrStrAttr.push('remove-bottom');
+                //     if (!topLeft && !topRight && !bottomLeft && !bottomRight) {
+                //         arrStrAttr.push('remove-all');
+                //     } else if (!topLeft && !topRight) {
+                //         arrStrAttr.push('remove-top');
+                //     } else if (!bottomLeft && !bottomRight) {
+                //         arrStrAttr.push('remove-bottom');
                         
-                    } else if (!topLeft && !bottomLeft) {
-                        arrStrAttr.push('remove-left');
-                    } else if (!topRight && !bottomRight) {
-                        arrStrAttr.push('remove-right');
-                    }
+                //     } else if (!topLeft && !bottomLeft) {
+                //         arrStrAttr.push('remove-left');
+                //     } else if (!topRight && !bottomRight) {
+                //         arrStrAttr.push('remove-right');
+                //     }
                     
-                    if (!topLeft && !bottomLeft && arrStrAttr[0] !== 'remove-all') {
-                        arrStrAttr.push('remove-left');
-                    } else if (!topLeft && topRight) {
-                        arrStrAttr.push('remove-top-left');
-                    } else if (!bottomLeft && bottomRight) {
-                        arrStrAttr.push('remove-bottom-left');
-                    }
+                //     if (!topLeft && !bottomLeft && arrStrAttr[0] !== 'remove-all') {
+                //         arrStrAttr.push('remove-left');
+                //     } else if (!topLeft && topRight) {
+                //         arrStrAttr.push('remove-top-left');
+                //     } else if (!bottomLeft && bottomRight) {
+                //         arrStrAttr.push('remove-bottom-left');
+                //     }
 
-                    if (!topRight && !bottomRight && arrStrAttr[0] !== 'remove-all') {
-                        arrStrAttr.push('remove-right');
-                    } else if (topLeft && !topRight) {
-                        arrStrAttr.push('remove-top-right');
-                    } else if (bottomLeft && !bottomRight) {
-                        arrStrAttr.push('remove-bottom-right');
-                    }
+                //     if (!topRight && !bottomRight && arrStrAttr[0] !== 'remove-all') {
+                //         arrStrAttr.push('remove-right');
+                //     } else if (topLeft && !topRight) {
+                //         arrStrAttr.push('remove-top-right');
+                //     } else if (bottomLeft && !bottomRight) {
+                //         arrStrAttr.push('remove-bottom-right');
+                //     }
 
-                    for (i = 0, len = arrStrAttr.length; i < len; i += 1) {
-                        selectedElement.setAttribute(arrStrAttr[i], '');
-                    }
+                //     for (i = 0, len = arrStrAttr.length; i < len; i += 1) {
+                //         selectedElement.setAttribute(arrStrAttr[i], '');
+                //     }
 
-                    return selectedElement;
-                });
+                //     return selectedElement;
+                // });
 
                 designAdditionalFunction(selectedElement);
             };
@@ -502,6 +502,15 @@
                         }
                         
                         if (!evt.touchDevice) {
+                            element.addEventListener('focus', function (event) {
+                                element.classList.add('focus');
+                            });
+                            
+                            element.addEventListener('blur', function (event) {
+                                element.classList.remove('focus');
+                            });
+                            
+                            
                             element.addEventListener(evt.mousedown, function (event) {
                                 element.classList.add('down');
                             });
@@ -774,126 +783,101 @@
         
     }, function (element) {
         if (element.getAttribute('value')) {
-            if (window.bolSocket === true) {
-                var arrSrcParts = element.getAttribute('src').split('.')
-                  , strSchema = arrSrcParts[0]
-                  , strObject = arrSrcParts[1]
-                  , strPkColumn, strLockColumn
-                  , deleteRecordData, strHashColumns, strRoles, strColumns, strRecord
-                  , strDeleteData, strHash, strPkValue, strLockValue;
-                
-                element.classList.remove('down');
-                
-                strPkColumn = element.getAttribute('column') || 'id';
-                strLockColumn = strPkColumn;
-                strHashColumns = strLockColumn;
-                
-                strPkValue = GS.encodeForTabDelimited(element.getAttribute('value') || '');
-                strLockValue = element.getAttribute('value') || '';
-                
-                strRoles = 'pk\thash';
-                strColumns = strPkColumn + '\thash';
-                
-                strHash = CryptoJS.MD5(strLockValue === 'NULL' ? '' : strLockValue).toString();
-                
-                strDeleteData = strPkValue + '\t' + strHash + '\n';
-                strDeleteData = strRoles + '\n' + strColumns + '\n' + strDeleteData;
-                
-                // create delete transaction
-                GS.addLoader(element, 'Creating Delete Transaction...');
-                GS.requestDeleteFromSocket(
-                    GS.envSocket, strSchema, strObject, strHashColumns, strDeleteData
-                    , function (data, error, transactionID) {
-                        if (error) {
-                            GS.removeLoader(element);
-                            GS.webSocketErrorDialog(data);
-                        }
-                    }
-                    , function (data, error, transactionID, commitFunction, rollbackFunction) {
-                        var arrElements, i, len, templateElement;
+            var arrSrcParts = element.getAttribute('src').split('.')
+              , strSchema = arrSrcParts[0]
+              , strObject = arrSrcParts[1]
+              , strPkColumn, strLockColumn
+              , deleteRecordData, strHashColumns, strRoles, strColumns, strRecord
+              , strDeleteData, strHash, strPkValue, strLockValue;
+            
+            element.classList.remove('down');
+            
+            strPkColumn = element.getAttribute('column') || 'id';
+            strLockColumn = strPkColumn;
+            strHashColumns = strLockColumn;
+            
+            strPkValue = GS.encodeForTabDelimited(element.getAttribute('value') || '');
+            strLockValue = element.getAttribute('value') || '';
+            
+            strRoles = 'pk\thash';
+            strColumns = strPkColumn + '\thash';
+            
+            strHash = CryptoJS.MD5(strLockValue === 'NULL' ? '' : strLockValue).toString();
+            
+            strDeleteData = strPkValue + '\t' + strHash + '\n';
+            strDeleteData = strRoles + '\n' + strColumns + '\n' + strDeleteData;
+            
+            // create delete transaction
+            GS.addLoader(element, 'Creating Delete Transaction...');
+            GS.requestDeleteFromSocket(
+                GS.envSocket, strSchema, strObject, strHashColumns, strDeleteData
+                , function (data, error, transactionID) {
+                    if (error) {
                         GS.removeLoader(element);
-                        
-                        if (!error) {
-                            if (data !== 'TRANSACTION COMPLETED') {
-                                
-                            } else {
-                                templateElement = document.createElement('template');
-                                templateElement.innerHTML = ml(function () {/*
-                                    <gs-page>
-                                        <gs-header><center><h3>Are you sure...</h3></center></gs-header>
-                                        <gs-body padded>
-                                            <center>Are you sure you want to delete?</center>
-                                        </gs-body>
-                                        <gs-footer>
-                                            <gs-grid>
-                                                <gs-block><gs-button dialogclose>No</gs-button></gs-block>
-                                                <gs-block><gs-button id="datasheet-focus-me" dialogclose bg-primary tabindex="0">Yes</gs-button></gs-block>
-                                            </gs-grid>
-                                        </gs-footer>
-                                    </gs-page>
-                                */});
-                                
-                                GS.openDialog(templateElement, function () {
-                                    document.getElementById('datasheet-focus-me').focus();
-                                    
-                                }, function (event, strAnswer) {
-                                    if (strAnswer === 'Yes') {
-                                        commitFunction();
-                                        GS.addLoader(element, 'Commiting Delete Transaction...');
-                                    } else {
-                                        rollbackFunction();
-                                        GS.addLoader(element, 'Rolling Back Delete Transaction...');
-                                    }
-                                });
-                            }
-                            
+                        GS.webSocketErrorDialog(data);
+                    }
+                }
+                , function (data, error, transactionID, commitFunction, rollbackFunction) {
+                    var arrElements, i, len, templateElement;
+                    GS.removeLoader(element);
+
+                    if (!error) {
+                        if (data !== 'TRANSACTION COMPLETED') {
+
                         } else {
-                            rollbackFunction();
-                            GS.webSocketErrorDialog(data);
-                        }
-                    }
-                    , function (strAnswer, data, error) {
-                        var arrElements, i, len;
-                        GS.removeLoader(element);
-                        
-                        if (!error) {
-                            if (strAnswer === 'COMMIT') {
-                                GS.triggerEvent(element, 'success');
-                                if (element.hasAttribute('onsuccess')) {
-                                    new Function(element.getAttribute('onsuccess')).apply(element);
+                            templateElement = document.createElement('template');
+                            templateElement.innerHTML = ml(function () {/*
+                                <gs-page>
+                                    <gs-header><center><h3>Are you sure...</h3></center></gs-header>
+                                    <gs-body padded>
+                                        <center>Are you sure you want to delete?</center>
+                                    </gs-body>
+                                    <gs-footer>
+                                        <gs-grid>
+                                            <gs-block><gs-button dialogclose>No</gs-button></gs-block>
+                                            <gs-block><gs-button id="datasheet-focus-me" dialogclose bg-primary tabindex="0">Yes</gs-button></gs-block>
+                                        </gs-grid>
+                                    </gs-footer>
+                                </gs-page>
+                            */});
+
+                            GS.openDialog(templateElement, function () {
+                                document.getElementById('datasheet-focus-me').focus();
+
+                            }, function (event, strAnswer) {
+                                if (strAnswer === 'Yes') {
+                                    commitFunction();
+                                    GS.addLoader(element, 'Commiting Delete Transaction...');
+                                } else {
+                                    rollbackFunction();
+                                    GS.addLoader(element, 'Rolling Back Delete Transaction...');
                                 }
-                            }
-                            
-                        } else {
-                            getData(element);
-                            GS.webSocketErrorDialog(data);
+                            });
                         }
+
+                    } else {
+                        rollbackFunction();
+                        GS.webSocketErrorDialog(data);
                     }
-                );
-            } else {
-                GS.msgbox('Are you sure...', '<center>Are you sure you want to delete?</center>', ['No', 'Yes'], function (strAnswer) {
-                    if (strAnswer === 'Yes') {
-                        GS.addLoader('gs-delete', 'Deleting Record...');
-                        
-                        GS.ajaxJSON('/' + (element.getAttribute('action-delete') || 'env/action_delete'),
-                                    'src=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src')))) +
-                                    '&id=' + element.getAttribute('value'),
-                                    function (data, error) {
-                            GS.removeLoader('gs-delete');
-                            
-                            if (!error) {
-                                GS.triggerEvent(element, 'success');
-                                if (element.hasAttribute('onsuccess')) {
-                                    new Function(element.getAttribute('onsuccess')).apply(element);
-                                }
-                                
-                            } else {
-                                GS.ajaxErrorDialog(data);
+                }
+                , function (strAnswer, data, error) {
+                    var arrElements, i, len;
+                    GS.removeLoader(element);
+
+                    if (!error) {
+                        if (strAnswer === 'COMMIT') {
+                            GS.triggerEvent(element, 'success');
+                            if (element.hasAttribute('onsuccess')) {
+                                new Function(element.getAttribute('onsuccess')).apply(element);
                             }
-                        });
+                        }
+
+                    } else {
+                        getData(element);
+                        GS.webSocketErrorDialog(data);
                     }
-                });
-            }
+                }
+            );
         }
     });
     
@@ -1290,86 +1274,86 @@ window.addEventListener('design-register-element', function () {
             return selectedElement;
         });
         
-        addProp('Corners', true,   '<div class="target">' +
-                                        '<gs-grid>\n' +
-                                        '    <gs-block>\n' +
-                                        '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                                    selectedElement.hasAttribute('remove-top') ||
-                                                                    selectedElement.hasAttribute('remove-left') ||
-                                                                    selectedElement.hasAttribute('remove-top-left'))).toString() + 
-                                                    '" remove-right remove-bottom id="round-top-left-corner________"></gs-checkbox>' +
+        // addProp('Corners', true,   '<div class="target">' +
+        //                                 '<gs-grid>\n' +
+        //                                 '    <gs-block>\n' +
+        //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+        //                                                             selectedElement.hasAttribute('remove-top') ||
+        //                                                             selectedElement.hasAttribute('remove-left') ||
+        //                                                             selectedElement.hasAttribute('remove-top-left'))).toString() + 
+        //                                             '" remove-right remove-bottom id="round-top-left-corner________"></gs-checkbox>' +
                                                 
-                                        '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                                    selectedElement.hasAttribute('remove-bottom') ||
-                                                                    selectedElement.hasAttribute('remove-left') ||
-                                                                    selectedElement.hasAttribute('remove-bottom-left'))).toString() + 
-                                                    '" remove-right remove-top id="round-bottom-left-corner________"></gs-checkbox>' +
-                                        '    </gs-block>\n' +
-                                        '    <gs-block>\n' +
-                                        '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                                    selectedElement.hasAttribute('remove-top') ||
-                                                                    selectedElement.hasAttribute('remove-right') ||
-                                                                    selectedElement.hasAttribute('remove-top-right'))).toString() + 
-                                                    '" remove-left remove-bottom id="round-top-right-corner________"></gs-checkbox>' +
+        //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+        //                                                             selectedElement.hasAttribute('remove-bottom') ||
+        //                                                             selectedElement.hasAttribute('remove-left') ||
+        //                                                             selectedElement.hasAttribute('remove-bottom-left'))).toString() + 
+        //                                             '" remove-right remove-top id="round-bottom-left-corner________"></gs-checkbox>' +
+        //                                 '    </gs-block>\n' +
+        //                                 '    <gs-block>\n' +
+        //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+        //                                                             selectedElement.hasAttribute('remove-top') ||
+        //                                                             selectedElement.hasAttribute('remove-right') ||
+        //                                                             selectedElement.hasAttribute('remove-top-right'))).toString() + 
+        //                                             '" remove-left remove-bottom id="round-top-right-corner________"></gs-checkbox>' +
                                                 
-                                        '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
-                                                                    selectedElement.hasAttribute('remove-bottom') ||
-                                                                    selectedElement.hasAttribute('remove-right') ||
-                                                                    selectedElement.hasAttribute('remove-bottom-right'))).toString() + 
-                                                    '" remove-left remove-top id="round-bottom-right-corner________"></gs-checkbox>' +
-                                        '    </gs-block>\n' +
-                                        '</gs-grid>\n' +
-                                    '</div>', function () {
-            var topLeft     = document.getElementById('round-top-left-corner________').value === 'true',
-                topRight    = document.getElementById('round-top-right-corner________').value === 'true',
-                bottomLeft  = document.getElementById('round-bottom-left-corner________').value === 'true',
-                bottomRight = document.getElementById('round-bottom-right-corner________').value === 'true',
-                arrStrAttr = [], i, len;
+        //                                 '        <gs-checkbox value="' + (!(selectedElement.hasAttribute('remove-all') ||
+        //                                                             selectedElement.hasAttribute('remove-bottom') ||
+        //                                                             selectedElement.hasAttribute('remove-right') ||
+        //                                                             selectedElement.hasAttribute('remove-bottom-right'))).toString() + 
+        //                                             '" remove-left remove-top id="round-bottom-right-corner________"></gs-checkbox>' +
+        //                                 '    </gs-block>\n' +
+        //                                 '</gs-grid>\n' +
+        //                             '</div>', function () {
+        //     var topLeft     = document.getElementById('round-top-left-corner________').value === 'true',
+        //         topRight    = document.getElementById('round-top-right-corner________').value === 'true',
+        //         bottomLeft  = document.getElementById('round-bottom-left-corner________').value === 'true',
+        //         bottomRight = document.getElementById('round-bottom-right-corner________').value === 'true',
+        //         arrStrAttr = [], i, len;
             
-            selectedElement.removeAttribute('remove-all');
-            selectedElement.removeAttribute('remove-top');
-            selectedElement.removeAttribute('remove-bottom');
-            selectedElement.removeAttribute('remove-left');
-            selectedElement.removeAttribute('remove-right');
-            selectedElement.removeAttribute('remove-top-left');
-            selectedElement.removeAttribute('remove-top-right');
-            selectedElement.removeAttribute('remove-bottom-left');
-            selectedElement.removeAttribute('remove-bottom-right');
+        //     selectedElement.removeAttribute('remove-all');
+        //     selectedElement.removeAttribute('remove-top');
+        //     selectedElement.removeAttribute('remove-bottom');
+        //     selectedElement.removeAttribute('remove-left');
+        //     selectedElement.removeAttribute('remove-right');
+        //     selectedElement.removeAttribute('remove-top-left');
+        //     selectedElement.removeAttribute('remove-top-right');
+        //     selectedElement.removeAttribute('remove-bottom-left');
+        //     selectedElement.removeAttribute('remove-bottom-right');
             
-            if (!topLeft && !topRight && !bottomLeft && !bottomRight) {
-                arrStrAttr.push('remove-all');
-            } else if (!topLeft && !topRight) {
-                arrStrAttr.push('remove-top');
-            } else if (!bottomLeft && !bottomRight) {
-                arrStrAttr.push('remove-bottom');
-            } else if (!topLeft && !bottomLeft) {
-                arrStrAttr.push('remove-left');
-            } else if (!topRight && !bottomRight) {
-                arrStrAttr.push('remove-right');
-            }
+        //     if (!topLeft && !topRight && !bottomLeft && !bottomRight) {
+        //         arrStrAttr.push('remove-all');
+        //     } else if (!topLeft && !topRight) {
+        //         arrStrAttr.push('remove-top');
+        //     } else if (!bottomLeft && !bottomRight) {
+        //         arrStrAttr.push('remove-bottom');
+        //     } else if (!topLeft && !bottomLeft) {
+        //         arrStrAttr.push('remove-left');
+        //     } else if (!topRight && !bottomRight) {
+        //         arrStrAttr.push('remove-right');
+        //     }
             
-            if (!topLeft && !bottomLeft && arrStrAttr[0] !== 'remove-all') {
-                arrStrAttr.push('remove-left');
-            } else if (!topLeft && topRight) {
-                arrStrAttr.push('remove-top-left');
-            } else if (!bottomLeft && bottomRight) {
-                arrStrAttr.push('remove-bottom-left');
-            }
+        //     if (!topLeft && !bottomLeft && arrStrAttr[0] !== 'remove-all') {
+        //         arrStrAttr.push('remove-left');
+        //     } else if (!topLeft && topRight) {
+        //         arrStrAttr.push('remove-top-left');
+        //     } else if (!bottomLeft && bottomRight) {
+        //         arrStrAttr.push('remove-bottom-left');
+        //     }
             
-            if (!topRight && !bottomRight && arrStrAttr[0] !== 'remove-all') {
-                arrStrAttr.push('remove-right');
-            } else if (topLeft && !topRight) {
-                arrStrAttr.push('remove-top-right');
-            } else if (bottomLeft && !bottomRight) {
-                arrStrAttr.push('remove-bottom-right');
-            }
+        //     if (!topRight && !bottomRight && arrStrAttr[0] !== 'remove-all') {
+        //         arrStrAttr.push('remove-right');
+        //     } else if (topLeft && !topRight) {
+        //         arrStrAttr.push('remove-top-right');
+        //     } else if (bottomLeft && !bottomRight) {
+        //         arrStrAttr.push('remove-bottom-right');
+        //     }
             
-            for (i = 0, len = arrStrAttr.length; i < len; i += 1) {
-                selectedElement.setAttribute(arrStrAttr[i], '');
-            }
+        //     for (i = 0, len = arrStrAttr.length; i < len; i += 1) {
+        //         selectedElement.setAttribute(arrStrAttr[i], '');
+        //     }
             
-            return selectedElement;
-        });
+        //     return selectedElement;
+        // });
         
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
@@ -1556,6 +1540,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.classList.remove('hover');
                 
                 if (!evt.touchDevice) {
+                    element.addEventListener('focus', function (event) {
+                        element.classList.add('focus');
+                    });
+                    
+                    element.addEventListener('blur', function (event) {
+                        element.classList.remove('focus');
+                    });
+                    
                     element.addEventListener(evt.mousedown, function (event) {
                         element.classList.add('down');
                     });

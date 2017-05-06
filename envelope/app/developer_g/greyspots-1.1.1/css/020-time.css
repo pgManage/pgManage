@@ -23,6 +23,11 @@ gs-time .time-picker-button {
     width: 2em;
     height: 100%;
     
+    margin-top: 0;
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 0;
+    
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;

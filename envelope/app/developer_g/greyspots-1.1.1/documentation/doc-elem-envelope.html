@@ -62,7 +62,7 @@
                 </template>
             </gs-doc-example>
             <div class="doc-example-description">
-                <span class="h3">Attribute "cols":</span>
+                <span class="h3">Attribute <code>[cols=""]</code>:</span>
                 <p>In this example we are limiting the columns we get back from the database by using the "cols" attribute. The "cols" attribute is a comma-seperated list of columns that you want from the database. You can see we did not include the "last_name" column so it is empty.</p>
             </div>
             <gs-doc-example>
@@ -268,7 +268,7 @@
                 </template>
             </gs-doc-example>
             <div class="doc-example-description">
-                <span class="h3">Attribute "scroll-to-bottom":</span>
+                <span class="h3">Attribute <code>[scroll-to-bottom=""]</code>:</span>
                 <p>This is an example of an envelope that has been set to scroll to the bottom on the first load. This is done by adding the "scroll-to-bottom" attribute.</p>
             </div>
             <gs-doc-example>
@@ -310,7 +310,7 @@
                 </template>
             </gs-doc-example>
             <div class="doc-example-description">
-                <span class="h3">Attribute "reflow-at":</span>
+                <span class="h3">Attribute <code>[reflow-at"="]</code>:</span>
                 <p>In this example the envelope has the "reflow-at" attribute. The "reflow-at" attribute is for telling the envelope when to reflow the table. When a table is "reflowed" that means that each record is essentially turned to be vertical. To put a heading above each of the controls you must have the "heading" attribute set for each cell.</p>
             </div>
             <gs-doc-example>
@@ -331,7 +331,7 @@
                 </template>
             </gs-doc-example>
             <div class="doc-example-description">
-                <span class="h3">Attribute "expand-to-content":</span>
+                <span class="h3">Attribute <code>[expand-to-content=""]</code>:</span>
                 <p>In this example the envelope has the "expand-to-content" attribute. The "expand-to-content" attribute is for telling the envelope have it's height be determined by the height of it's content.</p>
             </div>
             <gs-doc-example>
@@ -352,7 +352,7 @@
                 </template>
             </gs-doc-example>
             <div class="doc-example-description">
-                <span class="h3">Attribute "primary-keys":</span>
+                <span class="h3">Attribute <code>[primary-keys=""]</code>:</span>
                 <p>In this example the envelope has the "primary-keys" attribute. The "primary-keys" attribute is for telling the envelope what columns are supposed to be sent with every update for a where clause. The default primary keys are: "id,change_stamp".</p>
                 <br /><br />
                 <p>Note: if you inspect the record element of the envelope in this example and an envelope without "primary-keys" set: you can see that this envelope has the "data-id" attribute on every record and in the other you can see that each record has a "data-id" and a "data-change_stamp" attribute.</p>
@@ -382,10 +382,10 @@
             <gs-doc-example>
                 <template for="html" height="27">
                     <gs-envelope src="gsdoc.tpeople"
-                                 action-select="cluster/gsdoc.action_select"
-                                 action-insert="cluster/gsdoc.action_insert"
-                                 action-update="cluster/gsdoc.action_update"
-                                 action-delete="cluster/gsdoc.action_delete">
+                                 action-select="env/gsdoc.action_select"
+                                 action-insert="env/gsdoc.action_insert"
+                                 action-update="env/gsdoc.action_update"
+                                 action-delete="env/gsdoc.action_delete">
                         <template for="table">
                             <table>
                                 <tbody>
@@ -395,6 +395,10 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </template>
+                        <template for="insert">
+                            <label for="text-insert-name">Name:</label>
+                            <gs-text id="text-insert-name" column="name"></gs-text>
                         </template>
                     </gs-envelope>
                 </template>
@@ -443,7 +447,7 @@
                 </template>
             </gs-doc-example>
             <div class="doc-example-description">
-                <span class="h3">Attribute "refresh-on-querystring-values":</span>
+                <span class="h3">Attribute <code>[refresh-on-querystring-values=""]</code>:</span>
                 <p>The "refresh-on-querystring-values" attribute refreshes the envelope when any of the columns in the attribute change in the query string. To put multiple columns in the attribute you would just put in a comma seperated list.</p>
             </div>
             <gs-doc-example query-string="first_name=Apple&unrelatedparameter=test">
@@ -470,7 +474,7 @@
                 </template>
             </gs-doc-example>
             <div class="doc-example-description">
-                <span class="h3">Attribute "refresh-on-querystring-change":</span>
+                <span class="h3">Attribute <code>[refresh-on-querystring-change=""]</code>:</span>
                 <p>The "refresh-on-querystring-change" attribute refreshes the form element when anything changes in the query string.</p>
             </div>
             <gs-doc-example query-string="first_name=Apple&unrelatedparameter=test">
@@ -498,7 +502,7 @@
             </gs-doc-example>
             <div class="doc-example-description">
                 <span class="h3">Javascript Methods:</span>
-                <p>These functions that can be run on individual envelope elements:<br />
+                <p>These functions can be run on individual envelope elements:<br />
                 <i>ENVELOPE</i>.refresh() &lt;-- This method refreshes the data inside the envelope.<br />
                 <i>ENVELOPE</i>.refreshReflow() &lt;-- This method recalculates to see if the envelope should be reflowed or not. The effects of this method are only visible when for some reason the envelope changed width to the point of needing to reflow or un-reflow but was not refreshed because the window "resize" event was not triggered.<br />
                 <i>ENVELOPE</i>.refreshFixedHeader() &lt;-- This method refreshes the widths of the envelope header. The effects of this method are only visible when for some reason the envelope changed width but the headers were not refreshed because the window "resize" event was not triggered.</p>
@@ -623,8 +627,9 @@
                     }
                 </template>
             </gs-doc-example>
+            
             <div class="doc-example-description">
-                <span class="h3">Getting The Current Selection:</span>
+                <span class="h3">Javascript Events:</span>
                 <p>In this example we have an envelope that logs every event that we have built in:<br />
                 <b>after_selection</b>: This event is triggered when the cell selection of the envelope changes.<br />
                 <b>after_select</b>: This event is triggered when the element receives the data, if there is not error.<br />
@@ -761,7 +766,7 @@
             </gs-doc-example>
             
             <div class="doc-example-description">
-                <span class="h3"><code>[no-insert]</code> Example:</span>
+                <span class="h3">Attribute <code>[no-insert=""]</code>:</span>
                 <p>This is an example of an envelope with the <code>[no-insert]</code> attribute.</p>
             </div>
             <gs-doc-example>
@@ -795,7 +800,7 @@
             </gs-doc-example>
             
             <div class="doc-example-description">
-                <span class="h3"><code>[no-update]</code> Example:</span>
+                <span class="h3">Attribute <code>[no-update=""]</code>:</span>
                 <p>This is an example of an envelope with the <code>[no-update]</code> attribute.</p>
             </div>
             <gs-doc-example>
@@ -829,7 +834,7 @@
             </gs-doc-example>
             
             <div class="doc-example-description">
-                <span class="h3"><code>[template]</code> Example:</span>
+                <span class="h3">Attribute <code>[template=""]</code>:</span>
                 <p>This is an example of an envelope with the <code>[template]</code> attribute.</p>
             </div>
             <gs-doc-example>

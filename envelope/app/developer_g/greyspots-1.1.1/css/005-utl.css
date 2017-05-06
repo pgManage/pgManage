@@ -158,9 +158,14 @@
 *:focus {
     /* this is a default that but each element is allow to have its own setting of this particular property */
     /*outline-offset: -1px;*/
-    outline-offset: -1px;
-    background-color: #FFFDEC;
-    outline: dashed 1px #FFB000;
+    /*background-color: #FFFDEC;*/
+    /*outline: dashed 1px #FFB000;*/
+    
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    outline: none;
+    background: none;
 }
 
 input:focus,

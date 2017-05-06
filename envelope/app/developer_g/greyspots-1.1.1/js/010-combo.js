@@ -133,6 +133,11 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
         
+        // READONLY attribute
+        addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
+        });
+        
         addProp('Refresh On Querystring Columns', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('refresh-on-querystring-values') || '') + '" mini></gs-text>', function () {
             this.removeAttribute('refresh-on-querystring-change');
             return setOrRemoveTextAttribute(selectedElement, 'refresh-on-querystring-values', this.value);
@@ -852,9 +857,7 @@ document.addEventListener('DOMContentLoaded', function () {
             //</gs-combo>
             
             if (xtag.queryChildren(xtag.queryChildren(element.dropDownTable, 'tbody')[0], 'tr').length > 2000) {
-                var strSearchCol = '', templateElement = element.tableTemplate, strWhereLink = '', data, strLink, dataFunction,
-                    strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') || element.getAttribute('source') || '')),
-                    strCols = element.getAttribute('cols') || '';
+                var strSearchCol = '', templateElement = element.tableTemplate;
                 
                 templateElement = templateElement.substring(templateElement.indexOf('td'), templateElement.indexOf('/td') - 1);
                 templateElement = templateElement.substring(templateElement.indexOf('{'), templateElement.length);
@@ -871,53 +874,47 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 strSearchCol = templateElement;
                 
-                strLink = 'src=' + encodeURIComponent(strSource);
-                
-                if (element.getAttribute('where')) {
-                    strWhereLink = '' + element.getAttribute('where') + ' AND ' + strSearchCol + '::text ILIKE $UnCOPYQTE$' + strSearch + '%$UnCOPYQTE$';
-                } else {
-                    strWhereLink = strSearchCol + '::text ILIKE $UnCOPYQTE$' + strSearch + '%$UnCOPYQTE$';
-                }
-                
-                strLink += '&where='    + encodeURIComponent(GS.templateWithQuerystring(strWhereLink)) +
-                           '&limit='    + encodeURIComponent(GS.templateWithQuerystring(1)) +
-                           '&offset='   + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('offset') || ''))) +
-                           '&order_by=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('ord') || ''))) +
-                           '&cols='     + encodeURIComponent(strCols);
+                var srcParts   = GS.templateWithQuerystring(element.getAttribute('src')).split('.')
+                  , strSchema  = srcParts[0]
+                  , strObject  = srcParts[1]
+                  , strColumns = GS.templateWithQuerystring(element.getAttribute('cols') || '*').split(',').join('\t')
+                  , strWhere   = (
+                      element.hasAttribute('where')
+                        ? GS.templateWithQuerystring(element.getAttribute('where') || '') + ' AND ' + strSearchCol + '::text ILIKE $UnCOPYQTE$' + strSearch + '%$UnCOPYQTE$'
+                        : strSearchCol + '::text ILIKE $UnCOPYQTE$' + strSearch + '%$UnCOPYQTE$'
+                      )
+                  , strOrd     = GS.templateWithQuerystring(element.getAttribute('ord') || '')
+                  , strLimit   = '1'
+                  , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
+                  , response_i = 0, response_len = 0, arrTotalRecords = [];
                 
                 //console.log(strLink);
                 //console.log(strSearchCol);
                 
                 
                 if (strSearchCol) {
-                    GS.ajaxJSON('/env/action_select', strLink, function (data, error) {
+                    GS.requestSelectFromSocket(GS.envSocket, strSchema, strObject, strColumns
+                                             , strWhere, strOrd, strLimit, strOffset
+                                             , function (data, error) {
+                        var arrCells, cell_i, cell_len;
+                        
                         if (!error) {
-                            //console.log(data.dat.dat[0][0]);
-                            if (data && data.dat && data.dat.dat && data.dat.dat[0] && data.dat.dat[0][0]) {
-                                //console.log(data.dat.dat[0][0]);
+                            if (data.strMessage !== 'TRANSACTION COMPLETED') {
+                                arrCells = arrRecords[i].split('\t');
                                 
-                                // console.log(1);
-                                element.control.value = data.dat.dat[0][0];
-                                // console.log(2);
+                                element.control.value = GS.decodeFromTabDelimited(arrCells[0]);
                                 GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
-                                // console.log(3);
-                                //console.log(element.open);
                                 if (element.open) {
                                     matchRecord = findRecordFromString(element, strSearch, true);
-                                    // console.log(4);
                                     if (matchRecord) {
-                                    // console.log(5);
                                         highlightRecord(element, matchRecord);
-                                    // console.log(6);
                                         scrollToSelectedRecord(element);
-                                    // console.log(7);
                                     }
-                                    // console.log(8);
                                 }
-                                
                             }
                         } else {
-                            GS.ajaxErrorDialog(data);
+                            handleData(element, bolInitalLoad, data, error);
+                            //GS.removeLoader(element);
                         }
                     });
                 }
@@ -956,101 +953,58 @@ document.addEventListener('DOMContentLoaded', function () {
     //      else
     //          use: source query
     function getData(element, bolInitalLoad, bolClearPrevious, callback) {
-        if (window.bolSocket === true) {
-            var srcParts   = GS.templateWithQuerystring(
-                                (bolInitalLoad && element.getAttribute('initialize')
-                                    ? element.getAttribute('initialize')
-                                    : element.getAttribute('src')
-                                )
-                            ).split('.')
-              , strSchema  = srcParts[0]
-              , strObject  = srcParts[1]
-              , strColumns = GS.templateWithQuerystring(element.getAttribute('cols') || '*').split(',').join('\t')
-              , strWhere   = GS.templateWithQuerystring(element.getAttribute('where') || '')
-              , strOrd     = GS.templateWithQuerystring(element.getAttribute('ord') || '')
-              , strLimit   = GS.templateWithQuerystring(element.getAttribute('limit') || '')
-              , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
-              , response_i = 0, response_len = 0, arrTotalRecords = [];
+        var srcParts   = GS.templateWithQuerystring(
+                            (bolInitalLoad && element.getAttribute('initialize')
+                                ? element.getAttribute('initialize')
+                                : element.getAttribute('src')
+                            )
+                        ).split('.')
+          , strSchema  = srcParts[0]
+          , strObject  = srcParts[1]
+          , strColumns = GS.templateWithQuerystring(element.getAttribute('cols') || '*').split(',').join('\t')
+          , strWhere   = GS.templateWithQuerystring(element.getAttribute('where') || '')
+          , strOrd     = GS.templateWithQuerystring(element.getAttribute('ord') || '')
+          , strLimit   = GS.templateWithQuerystring(element.getAttribute('limit') || '')
+          , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
+          , response_i = 0, response_len = 0, arrTotalRecords = [];
+        
+        
+        //GS.addLoader(element, 'Loading...');
+        GS.requestCachingSelect(GS.envSocket, strSchema, strObject, strColumns
+                                 , strWhere, strOrd, strLimit, strOffset
+                                 , function (data, error) {
+            var arrRecords, arrCells, envData
+              , i, len, cell_i, cell_len;
             
-            
-            //GS.addLoader(element, 'Loading...');
-            GS.requestCachingSelect(GS.envSocket, strSchema, strObject, strColumns
-                                     , strWhere, strOrd, strLimit, strOffset
-                                     , function (data, error) {
-                var arrRecords, arrCells, envData
-                  , i, len, cell_i, cell_len;
-                
-                if (!error) {
-                    if (data.strMessage !== 'TRANSACTION COMPLETED') {
-                        arrRecords = GS.trim(data.strMessage, '\n').split('\n');
+            if (!error) {
+                if (data.strMessage !== 'TRANSACTION COMPLETED') {
+                    arrRecords = GS.trim(data.strMessage, '\n').split('\n');
+                    
+                    for (i = 0, len = arrRecords.length; i < len; i += 1) {
+                        arrCells = arrRecords[i].split('\t');
                         
-                        for (i = 0, len = arrRecords.length; i < len; i += 1) {
-                            arrCells = arrRecords[i].split('\t');
-                            
-                            for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
-                                arrCells[cell_i] = GS.decodeFromTabDelimited(arrCells[cell_i]);
-                            }
-                            
-                            arrTotalRecords.push(arrCells);
+                        for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
+                            arrCells[cell_i] = GS.decodeFromTabDelimited(arrCells[cell_i]);
                         }
-                    } else {
-                        //GS.removeLoader(element);
-                        element.arrColumnNames = data.arrColumnNames;
                         
-                        envData = {'arr_column': element.arrColumnNames, 'dat': arrTotalRecords};
-                        
-                        handleData(element, bolInitalLoad, envData);
-                        GS.triggerEvent(element, 'after_select');
-                        if (typeof callback === 'function') {
-                            callback();
-                        }
+                        arrTotalRecords.push(arrCells);
                     }
                 } else {
-                    handleData(element, bolInitalLoad, data, error);
                     //GS.removeLoader(element);
-                }
-            }, bolClearPrevious);
-            
-        } else {
-            var data, strLink, dataFunction,
-                strInitalize = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('initialize') || '')),
-                strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') || element.getAttribute('source') || '')),
-                strCols = element.getAttribute('cols') || '';
-            
-            // if there is a initial query and this is the inital load: prepare the parameters for a fetch that would use the initial query
-            if (strInitalize && bolInitalLoad) {
-                strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strInitalize);
-                
-            // else: use the source query and prepare the parameters for a fetch that would use the source query
-            } else {
-                strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
-            }
-            
-            
-            
-            strLink += '&where='    + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('where') || ''))) +
-                       '&limit='    + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('limit') || ''))) +
-                       '&offset='   + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('offset') || ''))) +
-                       '&order_by=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('ord') || ''))) +
-                       '&cols='     + encodeURIComponent(strCols);
-            
-            
-            if (GS.dataFetch(strLink, bolClearPrevious)) {
-                data = GS.dataFetch(strLink, bolClearPrevious);
-                
-                handleData(element, bolInitalLoad, data.response, data.error); // (data.status === 'error' ? 'error' : null)
-            } else {
-                dataFunction = function (event) {
-                    document.removeEventListener('dataready_' + encodeURIComponent(strLink), dataFunction);
-                    handleData(element, bolInitalLoad, event.detail.response, event.detail.error);
+                    element.arrColumnNames = data.arrColumnNames;
+                    
+                    envData = {'arr_column': element.arrColumnNames, 'dat': arrTotalRecords};
+                    
+                    handleData(element, bolInitalLoad, envData);
                     if (typeof callback === 'function') {
                         callback();
                     }
-                };
-                
-                document.addEventListener('dataready_' + encodeURIComponent(strLink), dataFunction);
+                }
+            } else {
+                handleData(element, bolInitalLoad, data, error);
+                //GS.removeLoader(element);
             }
-        }
+        }, bolClearPrevious);
     }
     
     // handles data result from method function: getData 
@@ -1284,6 +1238,8 @@ document.addEventListener('DOMContentLoaded', function () {
         
         element.control.addEventListener('focus', function (event) {
             element.lastValue = element.control.value;
+            
+            event.target.parentNode.parentNode.classList.add('focus');
         });
         
         element.control.addEventListener('blur', function (event) {
@@ -1292,6 +1248,16 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (element.control.value !== element.lastValue) {
                 GS.triggerEvent(element.control, 'change');
             }
+            
+            event.target.parentNode.parentNode.classList.remove('focus');
+        });
+        
+        element.control.addEventListener(evt.mouseout, function (event) {
+            event.target.parentNode.parentNode.classList.remove('hover');
+        });
+        
+        element.control.addEventListener(evt.mouseover, function (event) {
+            event.target.parentNode.parentNode.classList.add('hover');
         });
         
         element.control.addEventListener('keyup', function (event) {

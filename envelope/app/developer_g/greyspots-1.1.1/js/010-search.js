@@ -20,6 +20,10 @@ window.addEventListener('design-register-element', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
 
+        addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
+        });
+
         addProp('Autocorrect', true, '<gs-checkbox class="target" value="' + (selectedElement.getAttribute('autocorrect') !== 'off') + '" mini></gs-checkbox>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'autocorrect', (this.value === 'false' ? 'off' : ''));
         });
@@ -85,6 +89,10 @@ window.addEventListener('design-register-element', function () {
         addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
             return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
         });
+        
+        addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
+        });
 
         //addFlexContainerProps(selectedElement);
         addFlexProps(selectedElement);
@@ -110,6 +118,25 @@ document.addEventListener('DOMContentLoaded', function () {
     // re-target focus event from control to element
     function focusFunction(event) {
         GS.triggerEvent(event.target.parentNode, 'focus');
+        event.target.parentNode.classList.add('focus');
+    }
+
+    // re-target blur event from control to element
+    function blurFunction(event) {
+        GS.triggerEvent(event.target.parentNode, 'blur');
+        event.target.parentNode.classList.remove('focus');
+    }
+
+    // mouseout, remove hover class
+    function mouseoutFunction(event) {
+        GS.triggerEvent(event.target.parentNode, evt.mouseout);
+        event.target.parentNode.classList.remove('hover');
+    }
+
+    // mouseover, add hover class
+    function mouseoverFunction(event) {
+        GS.triggerEvent(event.target.parentNode, evt.mouseover);
+        event.target.parentNode.classList.add('hover');
     }
 
     //function loadPushReplacePopHandler(element) {
@@ -354,6 +381,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 element.control.removeEventListener('focus', focusFunction);
                 element.control.addEventListener('focus', focusFunction);
+
+                element.control.removeEventListener('blur', blurFunction);
+                element.control.addEventListener('blur', blurFunction);
+
+                element.control.removeEventListener(evt.mouseout, mouseoutFunction);
+                element.control.addEventListener(evt.mouseout, mouseoutFunction);
+
+                element.control.removeEventListener(evt.mouseout, mouseoverFunction);
+                element.control.addEventListener(evt.mouseover, mouseoverFunction);
 
                 // if there is a value already in the attributes of the element: set the control value
                 if (element.hasAttribute('value')) {
