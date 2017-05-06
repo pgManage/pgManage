@@ -611,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function () {
           , strUpdateData =
             'pk\tset\thash\n' +
             'id\t' + GS.encodeForTabDelimited(strColumn) + '\thash\n' +
-            GS.encodeForTabDelimited(record.getAttribute('data-' + element.arrWhereColumns[i])) + GS.encodeForTabDelimited(newValue)
+            GS.encodeForTabDelimited(record.getAttribute('data-' + element.arrWhereColumns[i])) + '\t' + GS.encodeForTabDelimited(newValue)
           , i, len, arrTotalRecords = [], callbackFunction;
 
         for (i = 0, len = element.arrWhereColumns.length; i < len; i += 1) {
