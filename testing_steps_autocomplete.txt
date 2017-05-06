@@ -4,7 +4,14 @@ Check multiple cursor autocomplete
 
 Check that selecting a line up or down closes popup
 
-Check typing really quickly
+Check typing really quickly:
+    in the console: autocompleteGlobals.bolTestSlowDown = true
+    type:
+        SELECT *
+        FROM usr.rorder_line
+        WHERE so_no = rorder_line
+     then type "factname" quickly
+     if everything goes correctly try a similar test again until you have done it succesfully at least three times
 
 Check Typing with multiple cursors
 
@@ -19,25 +26,13 @@ Check that opening a new tab works
 Backspace:
     close popup
 
-Typing space:
-    close popup
-
 Typing period:
     list appropriate object list under schema
 
-Typing quotes:
-    close popup
-
 Typing colon:
     if there is another colon preceding, show type list
-
-Typing comma:
-    close popup
-
-Typing slash:
-    close popup
-
-letter while autocomplete is open
+    
+typing while autocomplete is open
     filter popup
 
 period while autocomplete is open
@@ -65,5 +60,7 @@ Check that variables show up in a function
 
 Check that variables DON'T show up in a function after a period
 
-Typing parenthesis:
-    close popup
+
+
+
+
