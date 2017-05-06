@@ -17,6 +17,9 @@ fi
 mkdir test-envelope
 cd test-envelope
 
+if test $(uname -s) = "OpenBSD"; then
+	echo "skipping electron tester"
+else
 cat << EOF > package.json
 {
   "name": "test-envelope",
@@ -47,6 +50,7 @@ electron.app.on('window-all-closed', function () {
 EOF
 
 npm install
+fi
 
 rm -rf envelope-master master.zip ~/.mozilla
 
@@ -59,11 +63,16 @@ $MAKE test-common
 
 ./envelope/envelope -c ./envelope/config/envelope.conf -d ./envelope/config/envelope-connections.conf -t 300 -r ./envelope/web_root -y ./envelope/app -z ./envelope/role -l info & export ENVELOPEPID="$!"
 sleep 5
-#xdg-open "http://127.0.0.1:8888/test.html"
-npm start & export ELECTRONPID="$!"
-printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
+
+if test $(uname -s) = "OpenBSD"; then
+	xdg-open "http://127.0.0.1:8888/test.html" &
+	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
+else
+	npm start & export ELECTRONPID="$!"
+	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
+	kill $ELECTRONPID
+fi
 kill $ENVELOPEPID
-kill $ELECTRONPID
 
 rm -rf ~/.mozilla ~/.envelope
 
@@ -73,11 +82,15 @@ sudo chown -R super /usr/local/etc/envelope/
 
 /usr/local/sbin/envelope & export ENVELOPEPID="$!"
 sleep 5
-#xdg-open "http://127.0.0.1:8888/test.html"
-npm start & export ELECTRONPID="$!"
-printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
+if test $(uname -s) = "OpenBSD"; then
+	xdg-open "http://127.0.0.1:8888/test.html" &
+	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
+else
+	npm start & export ELECTRONPID="$!"
+	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
+	kill $ELECTRONPID
+fi
 kill $ENVELOPEPID
-kill $ELECTRONPID
 
 sudo $MAKE uninstall
 
