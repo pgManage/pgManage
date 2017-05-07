@@ -513,6 +513,9 @@ bool parse_options(int argc, char *const *argv) {
 
 	SERROR_SNCAT(str_global_port, &int_global_len,
 		"8888", (size_t)4);
+
+	SERROR_SNCAT(str_global_login_group, &int_global_len,
+		"envelope_g", (size_t)10);
 #else
 	SERROR_SNCAT(str_global_port, &int_global_len,
 		"8080", (size_t)4);
@@ -686,11 +689,6 @@ bool parse_options(int argc, char *const *argv) {
 	char *str_temp = NULL;
 
 #ifdef ENVELOPE
-	if (str_global_login_group == NULL) {
-		SERROR_SNCAT(str_global_login_group, &int_global_len,
-			"envelope_g", (size_t)10);
-	}
-
 	if (str_global_app_path == NULL) {
 #ifdef _WIN32
 		SERROR_SNCAT(str_global_app_path, &int_global_len,
