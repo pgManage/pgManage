@@ -60,7 +60,7 @@ Check that variables show up in a function
 
 Check that variables DON'T show up in a function after a period
 
-
+Check quoted entities
 
 
 
