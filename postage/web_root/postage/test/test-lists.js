@@ -399,7 +399,19 @@ SELECT pg_terminate_backend(pg_backend_pid())
 			['SOCKET CLOSE', 'websocket end'],
 			['SOCKET OPEN', 'websocket start'],
 
-			['RAW 6', 'websocket', '', ml(function () {/*RAW
+			['RAW 6', 'websocket', '', ml(function () {/*RAW	AUTOCOMMIT
+SELECT pg_sleep(3)*/
+			}),
+			[]],
+			['RAW 7', 'websocket', '', ml(function () {/*RAW	AUTOCOMMIT
+SELECT pg_sleep(3)*/
+			}),
+			[]],
+
+			['SOCKET CLOSE', 'websocket end'],
+			['SOCKET OPEN', 'websocket start'],
+
+			['RAW 8', 'websocket', '', ml(function () {/*RAW
 SELECT 'This is some test sql';;
 */
 			}),

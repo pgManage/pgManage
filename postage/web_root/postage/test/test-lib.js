@@ -345,6 +345,10 @@ var $ = {
                     }
                 }
             });
+			if (arrStrExpectedOutput.length === 0) {
+				$.changeStatus(key, intCurrent, 'running', 'pass', 0, JSON.stringify(arrStrActualOutput));
+				$.runTest(key, intCurrent + 1);
+			}
         } else if (strType === 'websocket send from') {
             if (typeof arrCurrent[3] === 'string') {
                 arrCurrent[3] = arrCurrent[3].replace(/\r\n/gi, '\n').replace(/\{\{test_random\}\}/g, $.test_random);
