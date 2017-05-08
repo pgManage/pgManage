@@ -2765,7 +2765,10 @@ void ws_file_free(struct sock_ev_client_file *to_free) {
 		Queue_clear_destroy(to_free->que_file);
 		to_free->que_file = NULL;
 	}
-	tre_regfree(&to_free->reg);
+	if (to_free->bol_regex) {
+		to_free->bol_regex = false;
+		tre_regfree(&to_free->reg);
+	}
 	SFREE(to_free->str_line);
 }
 #endif
