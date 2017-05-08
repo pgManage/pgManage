@@ -230,11 +230,13 @@ document.addEventListener('DOMContentLoaded', function () {
             strQSValue = GS.qryGetVal(strQS, strQSCol);
 
             if (element.internal.bolQSFirstRun !== true) {
-                if (strQSValue !== '' || !element.getAttribute('value')) {
+                if (strQSValue !== element.getAttribute('value') && (strQSValue !== '' || !element.getAttribute('value'))) {
                     element.setAttribute('value', strQSValue);
                 }
             } else {
-                element.value = strQSValue;
+                if (strQSValue !== element.getAttribute('value')) {
+                    element.value = strQSValue;
+                }
             }
         }
 
@@ -343,7 +345,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 set: function (strNewValue) {
                     var element = this;
                     if (element.control) {
-                        element.control.value = strNewValue;
+                        if (element.control.value !== strNewValue) {
+                            element.control.value = strNewValue;
+                        }
                     } else {
                         element.innerHTML = strNewValue;
                     }

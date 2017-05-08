@@ -1,21 +1,5 @@
-
-gs-select {
-    position: relative;
-    display: block;
-    background-color: #FFFFFF;
-    border: 1px solid #AEAEAE;
-    border-radius: 0.2em;
-    min-height: 1em;
-    
-    line-height: 1.2em;
-    padding: 0;
-    box-shadow: none;
-    
-    margin-top: -1px;
-}
-
 gs-select > select {
-    background-color: #FFFFFF;
+    background-color: transparent;
 }
 
 gs-select > option {
@@ -40,6 +24,7 @@ gs-select:after {
     text-align: center;
     
     background-color: #FFFFFF;
+    color: #000000;
     pointer-events: none;
 }
 

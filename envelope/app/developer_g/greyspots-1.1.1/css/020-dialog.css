@@ -10,34 +10,31 @@ html.no-scroll-except-for-dialog > body > *:not(gs-dialog) * {
 /* ################################################################## */
 
 gs-dialog {
-    display: block;
-    
-    /*position: fixed;
-    left: 50%;
-    top: 8%;
-    
-    width: 70%;
-    height: 70%;*/
-    
-    /*position: relative;
-    margin: 0 auto;*/
-    
     position: fixed;
-    top: 1%;
-    
-    border-radius: 0.25em;
-    
-    box-shadow: 0 0 0.5em 0.1em #C5C5C5;
-    
-    z-index: 100;
     
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
+    display: block;
     
-    background-color: #F0F0F0;
+    background-color: white;
+    color: black;
+    
+    padding: 0;
+    border: none;
+    margin: 0;
+    
+    border-radius: 0;
+    
+    
+    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);
+    
+    top: 1%;
+    
+    z-index: 100;
+    
 }
 
 
@@ -53,24 +50,6 @@ gs-dialog > gs-page {
 /* ################################################################### */
 /* ########################## DIALOG THEMES ########################## */
 /* ################################################################### */
-
-/* ########################## */
-/* ## DEFAULT AND  REGULAR ## */
-/* ########################## */
-gs-dialog gs-header,
-gs-dialog.regular gs-header {
-    background-color: #F5F5F5;
-}
-
-gs-dialog gs-body,
-gs-dialog.regular gs-body {
-    background-color: #EEEEEE;
-}
-
-gs-dialog gs-footer,
-gs-dialog.regular gs-footer {
-    background-color: #F5F5F5;
-}
 
 /* ########################## */
 /* ########## INFO ########## */
@@ -113,8 +92,8 @@ gs-dialog-overlay {
     width: 100%;
     height: 100%;
     
-    background-color: #000000;
-    opacity: 0.4;
+    background-color: #FFFFFF;
+    opacity: 0.6;
     
     z-index: 100;
 }

@@ -3,30 +3,6 @@
 /* ###################### NORMAL STATE ###################### */
 /* ########################################################## */
 
-gs-combo {
-    display: block;
-    position: relative;
-    
-    background-color: #FFFFFF;
-    
-    border: 1px solid #AEAEAE;
-    border-radius: 0.2em;
-    
-    min-height: 1.4em;
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-    
-    line-height: 1.2em;
-    padding: 0;
-    box-shadow: none;
-    
-    margin-top: -1px;
-}
-
 gs-combo > .root {
     padding-right: 1.6em;
 }
@@ -108,20 +84,6 @@ gs-combo[readonly] .drop_down_button {
     cursor: default;
     opacity: 0.9;
     pointer-events: none;
-}
-
-
-/* ########################################################## */
-/* ##################### DISABLED STATE ##################### */
-/* ########################################################## */
-
-gs-combo[disabled],
-gs-combo[disabled] .control,
-gs-combo[disabled] .drop_down_button {
-    color: rgb(68, 68, 68);
-    opacity: 0.9;
-    pointer-events: none;
-    background: rgb(205, 205, 205);
 }
 
 

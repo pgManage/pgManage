@@ -505,7 +505,7 @@ gs-envelope .gs-envelope-copy-focus-target {
 gs-envelope .hud-container-top,
 gs-envelope .hud-container-bottom {
     background-color: #FFFFFF;
-    min-height: 1.4em;
+    min-height: 2.2em;
 }
 
 gs-envelope .hud-container-top {

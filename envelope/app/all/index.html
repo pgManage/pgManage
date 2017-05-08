@@ -196,6 +196,7 @@
             <gs-header>
                 <div flex-horizontal>
                     <h3 class="title" flex>Main Menu</h3>
+                    <label><center id="user-name-label"></center></label>
                     <gs-button id="button-logout-user" href="/env/auth/?action=logout" title="Sign out" icononly icon="sign-out" iconrotatedown target="_self"></gs-button>
                 </div>
             </gs-header>
@@ -448,7 +449,7 @@
                             </gs-block>
                             <gs-block>
                                 <div flex-horizontal>
-                                    <gs-combo src="fdn.tship_header" hide="id" cols="id,ref_no AS &#34;Ref #&#34;, invoice_no AS &#34;Invoice #&#34;" flex placeholder="Pack" onchange="window.location = '../fdn_g/pack.html?id=' + this.value" where="packed IS NULL"></gs-combo>
+                                    <gs-combo src="fdn.tship_header" hide="id" cols="id,ref_no,invoice_no" flex placeholder="Pack" onchange="window.location = '../fdn_g/pack.html?id=' + this.value" where="packed IS NULL"></gs-combo>
                                 </div>
                             </gs-block>
                         </gs-grid>
@@ -470,7 +471,7 @@
                         </gs-block>
                         <gs-block>
                             <gs-button jumbo target="_blank" data-group="trkng_g" href="../trkng_g/index.html">Packages</gs-button>
-                            <gs-form src="post.rptdownload_new">
+                            <gs-form src="post.rptdownload_new" style="overflow: visible;">
                                 <template>
                                     <gs-button jumbo target="_blank" data-group="tocci_g" href="../all/splashcount.html">
                                         Splash Page Downloads (<gs-static mini inline column="day_new_users"></gs-static> New / <gs-static mini inline column="today_users"></gs-static> Total)
@@ -560,9 +561,6 @@
                         </gs-grid>
                     </div>
                 </div>
-                <br />
-                <center id="user-name-label"></center>
-                <br />
             </gs-body>
         </gs-page>
     </body>

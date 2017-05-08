@@ -22,7 +22,7 @@ gs-page > gs-footer {
     width: 100%;
     
     padding: 0.6em;
-    box-shadow: 0 0 0.25em 0 #AAAAAA;
+    /*box-shadow: 0 0 0.25em 0 #AAAAAA;*/
     
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -34,12 +34,12 @@ gs-page > gs-footer {
 
 gs-header {
     top: 0;
-    border-bottom: 2px solid #000000;
+    border-bottom: 1px solid #888888;
 }
 
 gs-footer {
     bottom: 0;
-    border-top: 2px solid #000000;
+    border-top: 1px solid #888888;
 }
 /*
 gs-page > gs-header {

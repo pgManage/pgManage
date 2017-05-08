@@ -21,7 +21,7 @@ body {
     margin: 0;
     padding: 0;
     
-    background-color: #eeeeee;
+    background-color: #ffffff;
 }
 
 
@@ -499,6 +499,21 @@ body {
     font-size: 14px;
     line-height: 1.42857;
     color: #333;
+}
+
+/* typography */
+/*TODO: michael should look over this, I don't know if this is even taking effect or should take effect */
+.typography, .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6, .h1 .small, .h1 small, .h2 .small, .h2 small, .h3 .small, .h3 small, .h4 .small, .h4 small, .h5 .small, .h5 small, .h6 .small, .h6 small, h1 .small, h1 small, h2 .small, h2 small, h3 .small, h3 small, h4 .small, h4 small, h5 .small, h5 small, h6 .small, h6 small, p, label {
+    display: block;
+    
+    background-color: tranparent;
+    color: black;
+    
+    padding: 0.25em;
+    border: none;
+    margin: 0;
+    
+    border-radius: 0;
 }
 
 /* Headings */
@@ -1274,12 +1289,6 @@ pre code{
     background: none;
 }
 
-input:focus,
-textarea:focus,
-select:focus {
-    background-color: #FFFDDB;
-}
-
 *[selected] {
     background-color: #FFFFCC !important;
 }
@@ -1484,7 +1493,7 @@ gs-memo textarea {
     line-height: 1.2em;
     
     
-    background-color: transparent;
+    background-color: white;
     color: black;
     
     padding: 0;
@@ -1514,7 +1523,8 @@ gs-combo,
 gs-time,
 gs-select,
 gs-interval,
-gs-memo {
+gs-memo,
+gs-checkbox {
     position: relative;
     display: block;
     
@@ -1523,15 +1533,17 @@ gs-memo {
     
     padding: 0.25em;
     border: none;
-    margin: 0;
+    margin: 0.25em;
     
     border-radius: 0;
     
     min-height: 1em;
     line-height: 1.2em;
+    font-size: 1em;
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    box-shadow: 0 0 0.1em 0 rgba(0,0,0,0), 0 0 0.2em 0 rgba(0,0,0,.2);
+    /*box-shadow: 0 0 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
+    box-shadow: 0 0 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
     transition: box-shadow 0.5s;
 }
 
@@ -1544,10 +1556,12 @@ gs-combo.hover,
 gs-time.hover,
 gs-select.hover,
 gs-interval.hover,
-gs-memo.hover {
+gs-memo.hover,
+gs-checkbox.hover {
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);
+    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
+    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
     transition: box-shadow 0.5s;
 }
 
@@ -1560,7 +1574,10 @@ gs-combo[disabled],
 gs-time[disabled],
 gs-select[disabled],
 gs-interval[disabled],
-gs-memo[disabled] {
+gs-memo[disabled],
+gs-checkbox[disabled] {
+    pointer-events: auto;
+    
     opacity: 0.6;
 }
 
@@ -1573,10 +1590,30 @@ gs-combo.focus,
 gs-time.focus,
 gs-select.focus,
 gs-interval.focus,
-gs-memo.focus {
-    opacity: 0.6;
+gs-memo.focus,
+gs-checkbox.focus {
+    
+    /*box-shadow: 0 0.3em 0.5em -0.125em rgba(230,138,84,.1), 0 0.2em 0.5em 0 rgba(230,138,84,.14), 0 0.0625em 0.3125em 0 rgba(230,138,84,.12);*/
+    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.5);*/
+    box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.5), 0 0 0.2em 0 rgba(230,138,84,1);
+    transition: box-shadow 0.5s;
 }
 
+
+gs-date[mini],
+gs-text[mini],
+gs-search[mini],
+gs-number[mini],
+gs-memo[mini],
+gs-combo[mini],
+gs-time[mini],
+gs-select[mini],
+gs-interval[mini],
+gs-memo[mini],
+gs-checkbox[mini] {
+    background-color: transparent;
+    box-shadow: none !important;
+}
 
 
 
@@ -1792,7 +1829,6 @@ gs-button > a[gs-dynamic] {
 
 gs-button,
 gs-toggle,
-gs-checkbox,
 gs-phone-button:not([not-supported]),
 gs-map-button,
 gs-skype-button,
@@ -1836,18 +1872,26 @@ gs-dialog-button {
     
     padding: 0.25em;
     border: none;
-    margin: 0;
+    margin: 0.25em;
     
-    border-radius: 0;
+    /*border-radius: 0;*/
+    border-radius: 0.5em;
     
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);
+    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
+    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
     transition: box-shadow 0.125s;
     
     line-height: 1.2em;
     min-height: 1em;
     font-size: 1em;
+}
+
+gs-option {
+    margin: 0;
+    box-shadow: 0 0 0.2em 0 rgba(0,0,0,.2) !important;
+    border-radius: 0;
 }
 
 gs-checkbox {
@@ -1951,12 +1995,59 @@ gs-email-button[mini],
 gs-tracking-button[mini],
 gs-delete-button[mini],
 gs-option[mini],
-gs-dialog-button[mini] {
+gs-dialog-button[mini],
+gs-button[embed],
+gs-toggle[embed],
+gs-checkbox[embed],
+gs-phone-button:not([not-supported])[embed],
+gs-map-button[embed],
+gs-skype-button[embed],
+gs-facetime-button[embed],
+gs-email-button[embed],
+gs-tracking-button[embed],
+gs-delete-button[embed],
+gs-option[embed],
+gs-dialog-button[embed],
+.drop_down_button,
+.date-picker-button,
+.time-picker-button {
     border: 0;
     padding: 0;
+    box-shadow: none !important;
+    margin: 0;
 }
 
-gs-checkbox[mini] {
+gs-button[mini-border],
+gs-toggle[mini-border],
+gs-checkbox[mini-border],
+gs-phone-button:not([not-supported])[mini-border],
+gs-map-button[mini-border],
+gs-skype-button[mini-border],
+gs-facetime-button[mini-border],
+gs-email-button[mini-border],
+gs-tracking-button[mini-border],
+gs-delete-button[mini-border],
+gs-option[mini-border],
+gs-dialog-button[mini-border],
+gs-button[embed-border],
+gs-toggle[embed-border],
+gs-checkbox[embed-border],
+gs-phone-button:not([not-supported])[embed-border],
+gs-map-button[embed-border],
+gs-skype-button[embed-border],
+gs-facetime-button[embed-border],
+gs-email-button[embed-border],
+gs-tracking-button[embed-border],
+gs-delete-button[embed-border],
+gs-option[embed-border],
+gs-dialog-button[embed-border] {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+gs-checkbox[mini], gs-checkbox[mini-border],
+gs-checkbox[embed], gs-checkbox[embed-border] {
     min-height: 0;
 }
 
@@ -1987,7 +2078,6 @@ gs-dialog-button[inline] {
 /* ## FOCUS ## */
 gs-button.focus,
 gs-toggle.focus,
-gs-checkbox.focus,
 gs-phone-button:not([not-supported]).focus,
 gs-map-button.focus,
 gs-skype-button.focus,
@@ -2000,7 +2090,6 @@ gs-dialog-button.focus,
 
 gs-button.focus.hover,
 gs-toggle.focus.hover,
-gs-checkbox.focus.hover,
 gs-phone-button:not([not-supported]).focus.hover,
 gs-map-button.focus.hover,
 gs-skype-button.focus.hover,
@@ -2012,14 +2101,14 @@ gs-option.focus.hover,
 gs-dialog-button.focus.hover {
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(230,138,84,.1), 0 0.2em 0.5em 0 rgba(230,138,84,.14), 0 0.0625em 0.3125em 0 rgba(230,138,84);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.5);
+    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.5);*/
+    box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.5), 0 0 0.2em 0 rgba(230,138,84,1);
     transition: box-shadow 0.125s;
 }
 
 /* ## HOVER ## */
 gs-button.hover,
 gs-toggle.hover,
-gs-checkbox.hover,
 gs-phone-button:not([not-supported]).hover,
 gs-map-button.hover,
 gs-skype-button.hover,
@@ -2031,14 +2120,14 @@ gs-option.hover,
 gs-dialog-button.hover {
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);
+    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
+    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
     transition: box-shadow 0.125s;
 }
 
 /* ## SELECTED/HOVER opacitry ## */
 gs-button[selected]:before,
 gs-toggle[selected]:before,
-gs-checkbox[selected]:before,
 gs-phone-button:not([not-supported])[selected]:before,
 gs-map-button[selected]:before,
 gs-skype-button[selected]:before,
@@ -2051,7 +2140,6 @@ gs-dialog-button[selected]:before,
 
 gs-button.hover:before,
 gs-toggle.hover:before,
-gs-checkbox.hover:before,
 gs-phone-button:not([not-supported]).hover:before,
 gs-map-button.hover:before,
 gs-skype-button.hover:before,
@@ -2065,8 +2153,9 @@ gs-dialog-button.hover:before {
     
     position: absolute;
     
-    left: 0;
-    top: 0;
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0 !important;
     width: 100%;
     height: 100%;
     
@@ -2078,7 +2167,6 @@ gs-dialog-button.hover:before {
 /* ## DOWN/SELECTED ## */
 gs-button.down,
 gs-toggle.down,
-gs-checkbox.down,
 gs-phone-button:not([not-supported]).down,
 gs-map-button.down,
 gs-skype-button.down,
@@ -2091,7 +2179,6 @@ gs-dialog-button.down,
 
 gs-button.down.hover,
 gs-toggle.down.hover,
-gs-checkbox.down.hover,
 gs-phone-button:not([not-supported]).down.hover,
 gs-map-button.down.hover,
 gs-skype-button.down.hover,
@@ -2104,7 +2191,6 @@ gs-dialog-button.down.hover,
 
 gs-button[selected].focus,
 gs-toggle[selected].focus,
-gs-checkbox[selected].focus,
 gs-phone-button:not([not-supported])[selected].focus,
 gs-map-button[selected].focus,
 gs-skype-button[selected].focus,
@@ -2117,7 +2203,6 @@ gs-dialog-button[selected].focus,
 
 gs-button[selected].focus.hover,
 gs-toggle[selected].focus.hover,
-gs-checkbox[selected].focus.hover,
 gs-phone-button:not([not-supported])[selected].focus.hover,
 gs-map-button[selected].focus.hover,
 gs-skype-button[selected].focus.hover,
@@ -2127,18 +2212,16 @@ gs-tracking-button[selected].focus.hover,
 gs-delete-button[selected].focus.hover,
 gs-option[selected].focus.hover,
 gs-dialog-button[selected].focus.hover {
-    padding: 0.25em;
-    
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(230,138,84,.1), 0 0.2em 0.5em 0 rgba(230,138,84,.14), 0 0.0625em 0.3125em 0 rgba(230,138,84);*/
-    box-shadow: 0 0 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.25);
+    /*box-shadow: 0 0 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.25);*/
+    box-shadow: 0 0 0.1em 0 rgba(230,138,84,.5), 0 0 0.2em 0 rgba(230,138,84,1);
     transition: box-shadow 0.125s;
 }
 
 /* ## SELECTED ## */
 gs-button[selected],
 gs-toggle[selected],
-gs-checkbox[selected],
 gs-phone-button:not([not-supported])[selected],
 gs-map-button[selected],
 gs-skype-button[selected],
@@ -2151,7 +2234,6 @@ gs-dialog-button[selected],
 
 gs-button[selected].hover,
 gs-toggle[selected].hover,
-gs-checkbox[selected].hover,
 gs-phone-button:not([not-supported])[selected].hover,
 gs-map-button[selected].hover,
 gs-skype-button[selected].hover,
@@ -2161,11 +2243,10 @@ gs-tracking-button[selected].hover,
 gs-delete-button[selected].hover,
 gs-option[selected].hover,
 gs-dialog-button[selected].hover {
-    padding: 0.25em;
-    
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    box-shadow: 0 0 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);
+    /*box-shadow: 0 0 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
+    box-shadow: 0 0 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
     transition: box-shadow 0.125s;
 }
 
@@ -12198,7 +12279,7 @@ gs-page > gs-footer {
     width: 100%;
     
     padding: 0.6em;
-    box-shadow: 0 0 0.25em 0 #AAAAAA;
+    /*box-shadow: 0 0 0.25em 0 #AAAAAA;*/
     
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -12210,12 +12291,12 @@ gs-page > gs-footer {
 
 gs-header {
     top: 0;
-    border-bottom: 2px solid #000000;
+    border-bottom: 1px solid #888888;
 }
 
 gs-footer {
     bottom: 0;
-    border-top: 2px solid #000000;
+    border-top: 1px solid #888888;
 }
 /*
 gs-page > gs-header {
@@ -12343,30 +12424,6 @@ gs-checkbox[value="N"]:before {
 /* ###################### NORMAL STATE ###################### */
 /* ########################################################## */
 
-gs-combo {
-    display: block;
-    position: relative;
-    
-    background-color: #FFFFFF;
-    
-    border: 1px solid #AEAEAE;
-    border-radius: 0.2em;
-    
-    min-height: 1.4em;
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-    
-    line-height: 1.2em;
-    padding: 0;
-    box-shadow: none;
-    
-    margin-top: -1px;
-}
-
 gs-combo > .root {
     padding-right: 1.6em;
 }
@@ -12448,20 +12505,6 @@ gs-combo[readonly] .drop_down_button {
     cursor: default;
     opacity: 0.9;
     pointer-events: none;
-}
-
-
-/* ########################################################## */
-/* ##################### DISABLED STATE ##################### */
-/* ########################################################## */
-
-gs-combo[disabled],
-gs-combo[disabled] .control,
-gs-combo[disabled] .drop_down_button {
-    color: rgb(68, 68, 68);
-    opacity: 0.9;
-    pointer-events: none;
-    background: rgb(205, 205, 205);
 }
 
 
@@ -13225,34 +13268,31 @@ html.no-scroll-except-for-dialog > body > *:not(gs-dialog) * {
 /* ################################################################## */
 
 gs-dialog {
-    display: block;
-    
-    /*position: fixed;
-    left: 50%;
-    top: 8%;
-    
-    width: 70%;
-    height: 70%;*/
-    
-    /*position: relative;
-    margin: 0 auto;*/
-    
     position: fixed;
-    top: 1%;
-    
-    border-radius: 0.25em;
-    
-    box-shadow: 0 0 0.5em 0.1em #C5C5C5;
-    
-    z-index: 100;
     
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
+    display: block;
     
-    background-color: #F0F0F0;
+    background-color: white;
+    color: black;
+    
+    padding: 0;
+    border: none;
+    margin: 0;
+    
+    border-radius: 0;
+    
+    
+    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);
+    
+    top: 1%;
+    
+    z-index: 100;
+    
 }
 
 
@@ -13268,24 +13308,6 @@ gs-dialog > gs-page {
 /* ################################################################### */
 /* ########################## DIALOG THEMES ########################## */
 /* ################################################################### */
-
-/* ########################## */
-/* ## DEFAULT AND  REGULAR ## */
-/* ########################## */
-gs-dialog gs-header,
-gs-dialog.regular gs-header {
-    background-color: #F5F5F5;
-}
-
-gs-dialog gs-body,
-gs-dialog.regular gs-body {
-    background-color: #EEEEEE;
-}
-
-gs-dialog gs-footer,
-gs-dialog.regular gs-footer {
-    background-color: #F5F5F5;
-}
 
 /* ########################## */
 /* ########## INFO ########## */
@@ -13328,8 +13350,8 @@ gs-dialog-overlay {
     width: 100%;
     height: 100%;
     
-    background-color: #000000;
-    opacity: 0.4;
+    background-color: #FFFFFF;
+    opacity: 0.6;
     
     z-index: 100;
 }
@@ -13847,7 +13869,7 @@ gs-envelope .gs-envelope-copy-focus-target {
 gs-envelope .hud-container-top,
 gs-envelope .hud-container-bottom {
     background-color: #FFFFFF;
-    min-height: 1.4em;
+    min-height: 2.2em;
 }
 
 gs-envelope .hud-container-top {
@@ -14571,24 +14593,7 @@ gs-img[image-cover] {
     background-size: cover;
 }gs-insert {
     display: block;
-}gs-interval {
-    position: relative;
-    display: block;
-    
-    min-height: 1em;
-    background-color: #FFFFFF;
-    
-    border: 1px solid #AEAEAE;
-    border-radius: 0.2em;
-    
-    line-height: 1.2em;
-    padding: 0;
-    box-shadow: none;
-    
-    margin-top: -1px;
-}
-
-gs-interval .time-picker-button {
+}gs-interval .time-picker-button {
     position: absolute;
     right: 0;
     top: 0;
@@ -14643,21 +14648,6 @@ gs-interval[readonly] .time-picker-button {
     display: none;
 }
 
-
-/* ###################################################################################### */
-/* ################################ ATTRIBUTE:  "disabled" ############################## */
-/* ###################################################################################### */
-
-gs-interval[disabled],
-gs-interval[disabled] .control {
-    background-color: #D5D5D5;
-}
-
-gs-interval[disabled]:not([mini]) {
-    min-height: 1.358em;
-}
-
-
 /* ###################################################################################### */
 /* ################################## ATTRIBUTE:  "mini" ################################ */
 /* ###################################################################################### */
@@ -14711,8 +14701,8 @@ html.no-scroll-except-for-dialog > body > div.gs-interval-time-picker-container 
     top: 0;
     left: 0;
     
-    background-color: #000000;
-    opacity: 0.4;
+    background-color: #FFFFFF;
+    opacity: 0.6;
 }
 
 .gs-interval-time-picker-container .gs-interval-time-picker {
@@ -14720,7 +14710,7 @@ html.no-scroll-except-for-dialog > body > div.gs-interval-time-picker-container 
     
     padding: 5px;
     
-    background-color: #F5F5F5;
+    background-color: #FFFFFF;
     
     border: 1px solid #000000;
 }
@@ -15191,27 +15181,6 @@ gs-loader .loader-positioning .loader-spinner {
     -moz-animation: spin-forwards 1810ms linear infinite;
     animation: spin-forwards 1810ms linear infinite;
 }
-
-gs-memo {
-    display: block;
-    background-color: #FFFFFF;
-    border: 1px solid #AEAEAE;
-    border-radius: 0.2em;
-    min-height: 1.4em;
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-    
-    line-height: 1.2em;
-    padding: 0;
-    box-shadow: none;
-    
-    margin-top: -1px;
-}
-
 /* ###################################################################################### */
 /* #################################### NORESIZE STATE ################################## */
 /* ###################################################################################### */
@@ -15292,15 +15261,6 @@ gs-memo[readonly] {
     resize: none;
 }
 
-
-/* ###################################################################################### */
-/* #################################### DISABLED STATE ################################## */
-/* ###################################################################################### */
-
-gs-memo[disabled],
-gs-memo[disabled] .control {
-    background-color: #D5D5D5;
-}
 gs-scroller {
     display: block;
     position: relative;
@@ -15327,21 +15287,6 @@ gs-scroller-inner.down {
     cursor: drag;
     cursor: move;
 }
-
-gs-number {
-    display: block;
-    background-color: #FFFFFF;
-    border: 1px solid #AEAEAE;
-    border-radius: 0.2em;
-    min-height: 1em;
-    
-    line-height: 1.2em;
-    padding: 0;
-    box-shadow: none;
-    
-    margin-top: -1px;
-}
-
 /* ###################################################################################### */
 /* ###################################### MINI STATE #################################### */
 /* ###################################################################################### */
@@ -15359,16 +15304,6 @@ gs-number[mini] input {
 }
 
 /* ###################################################################################### */
-/* #################################### DISABLED STATE ################################## */
-/* ###################################################################################### */
-
-gs-number[disabled],
-gs-number[disabled] .control {
-    background-color: #D5D5D5;
-}
-
-
-/* ###################################################################################### */
 /* #################################### READONLY STATE ################################## */
 /* ###################################################################################### */
 
@@ -15380,7 +15315,7 @@ gs-number[readonly] {
     padding: 0.2em;
 }gs-optionbox {
     display: block;
-    border: 1px solid #AEAEAE;
+    /*border: 1px solid #AEAEAE;*/
     /*
     overflow: auto;
     -webkit-overflow-scrolling: touch;
@@ -15398,14 +15333,6 @@ gs-number[readonly] {
     -o-user-select: none;
     user-select: none;
     */
-}
-
-gs-optionbox gs-option {
-    margin-top: -1px;
-}
-
-gs-optionbox gs-option:first-child {
-    margin-top: 0;
 }
 
 gs-optionbox[mini] {
@@ -15518,6 +15445,8 @@ gs-panel {
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
+    
+    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
 }
 
 
@@ -15527,7 +15456,7 @@ gs-panel {
 
 gs-panel > [flex],
 gs-panel > [panel-set-width] {
-    border-right: 2px solid #000000;
+    border-right: 1px solid #888888;
 }
 
 .blue gs-panel > [flex],
@@ -15597,8 +15526,8 @@ gs-panel > *[panel-set-width] {
     width: 0;
     height: 0;
     z-index: 50;
-    background-color: #555555;
-    opacity: 0.4;
+    background-color: #FFFFFF;
+    opacity: 0.6;
 }
 
 
@@ -15663,22 +15592,6 @@ gs-pushmessage {
     /* background with opacity */
     background: rgba(244, 244, 244, 0.8);
 }
-
-gs-search {
-    display: block;
-    background-color: #FFFFFF;
-    border: 1px solid #AEAEAE;
-    border-radius: 0.2em;
-    min-height: 1em;
-    
-    line-height: 1.2em;
-    padding: 0;
-    box-shadow: none;
-    
-    margin-top: -1px;
-}
-
-
 /* ###################################################################################### */
 /* ###################################### MINI STATE #################################### */
 /* ###################################################################################### */
@@ -15695,15 +15608,6 @@ gs-search[mini] input {
     border: 0;
 }
 
-/* ###################################################################################### */
-/* #################################### DISABLED STATE ################################## */
-/* ###################################################################################### */
-
-gs-search[disabled],
-gs-search[disabled] .control {
-    background-color: #D5D5D5;
-}
-
 
 /* ###################################################################################### */
 /* #################################### READONLY STATE ################################## */
@@ -15714,24 +15618,8 @@ gs-search[readonly] {
     opacity: 0.9;
     border-color: #E6E6E6;
     cursor: default;
-}
-gs-select {
-    position: relative;
-    display: block;
-    background-color: #FFFFFF;
-    border: 1px solid #AEAEAE;
-    border-radius: 0.2em;
-    min-height: 1em;
-    
-    line-height: 1.2em;
-    padding: 0;
-    box-shadow: none;
-    
-    margin-top: -1px;
-}
-
-gs-select > select {
-    background-color: #FFFFFF;
+}gs-select > select {
+    background-color: transparent;
 }
 
 gs-select > option {
@@ -15756,6 +15644,7 @@ gs-select:after {
     text-align: center;
     
     background-color: #FFFFFF;
+    color: #000000;
     pointer-events: none;
 }
 
@@ -15853,18 +15742,6 @@ gs-text[mini] input {
 
 
 /* ###################################################################################### */
-/* #################################### DISABLED STATE ################################## */
-/* ###################################################################################### */
-
-gs-text[disabled],
-gs-text[disabled] .control {
-    /*height: 1.35em;*/
-    background-color: #D5D5D5;
-    pointer-events: auto;
-}
-
-
-/* ###################################################################################### */
 /* #################################### READONLY STATE ################################## */
 /* ###################################################################################### */
 
@@ -15873,24 +15750,7 @@ gs-text[readonly] {
     opacity: 0.9;
     border-color: #E6E6E6;
     cursor: default;
-}gs-time {
-    position: relative;
-    display: block;
-    
-    min-height: 1em;
-    background-color: #FFFFFF;
-    
-    border: 1px solid #AEAEAE;
-    border-radius: 0.2em;
-    
-    line-height: 1.2em;
-    padding: 0;
-    box-shadow: none;
-    
-    margin-top: -1px;
-}
-
-gs-time .time-picker-button {
+}gs-time .time-picker-button {
     position: absolute;
     right: 0;
     top: 0;
@@ -15942,21 +15802,6 @@ gs-time[readonly] .time-picker-button {
     opacity: 0.9;
     pointer-events: none;
 }
-
-
-/* ###################################################################################### */
-/* ################################ ATTRIBUTE:  "disabled" ############################## */
-/* ###################################################################################### */
-
-gs-time[disabled],
-gs-time[disabled] .control {
-    background-color: #D5D5D5;
-}
-
-gs-time[disabled]:not([mini]) {
-    min-height: 1.358em;
-}
-
 
 /* ###################################################################################### */
 /* ################################## ATTRIBUTE:  "mini" ################################ */
@@ -16306,8 +16151,8 @@ gs-tutorial-overlay {
     width: 100%;
     height: 100%;
     
-    background-color: #000000;
-    opacity: 0.1;
+    background-color: #FFFFFF;
+    opacity: 0.6;
     
     z-index: 100;
 }

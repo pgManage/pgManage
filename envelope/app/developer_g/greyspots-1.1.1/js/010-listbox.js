@@ -359,14 +359,14 @@ document.addEventListener('DOMContentLoaded', function () {
     //      else
     //          use: source query
     function getData(element, callback, bolInitalLoad, bolClearPrevious) {
-        
         if (window.bolSocket === true) {
-            var srcParts   = GS.templateWithQuerystring(
+            var strSrc     = GS.templateWithQuerystring(
                                 (bolInitalLoad && element.getAttribute('initialize')
                                     ? element.getAttribute('initialize')
                                     : element.getAttribute('src')
                                 )
-                            ).split('.')
+                            )
+              , srcParts   = strSrc[0] === '(' ? [strSrc, ''] : strSrc.split('.')
               , strSchema  = srcParts[0]
               , strObject  = srcParts[1]
               , strColumns = GS.templateWithQuerystring(element.getAttribute('cols') || '*').split(',').join('\t')
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             arrCells = arrRecords[i].split('\t');
                             
                             for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
-                                arrCells[cell_i] = GS.decodeFromTabDelimited(arrCells[cell_i]);
+                                arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
                             }
                             
                             arrTotalRecords.push(arrCells);

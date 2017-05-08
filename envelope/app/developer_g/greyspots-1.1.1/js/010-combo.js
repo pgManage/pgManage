@@ -874,7 +874,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 strSearchCol = templateElement;
                 
-                var srcParts   = GS.templateWithQuerystring(element.getAttribute('src')).split('.')
+                var strSrc     = GS.templateWithQuerystring(element.getAttribute('src'))
+                  , srcParts   = strSrc[0] === '(' ? [strSrc, ''] : strSrc.split('.')
                   , strSchema  = srcParts[0]
                   , strObject  = srcParts[1]
                   , strColumns = GS.templateWithQuerystring(element.getAttribute('cols') || '*').split(',').join('\t')
@@ -902,7 +903,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (data.strMessage !== 'TRANSACTION COMPLETED') {
                                 arrCells = arrRecords[i].split('\t');
                                 
-                                element.control.value = GS.decodeFromTabDelimited(arrCells[0]);
+                                element.control.value = arrCells[0] = arrCells[0] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[0]);
                                 GS.setInputSelection(element.control, strSearch.length, element.control.value.length);
                                 if (element.open) {
                                     matchRecord = findRecordFromString(element, strSearch, true);
@@ -953,12 +954,13 @@ document.addEventListener('DOMContentLoaded', function () {
     //      else
     //          use: source query
     function getData(element, bolInitalLoad, bolClearPrevious, callback) {
-        var srcParts   = GS.templateWithQuerystring(
+        var strSrc     = GS.templateWithQuerystring(
                             (bolInitalLoad && element.getAttribute('initialize')
                                 ? element.getAttribute('initialize')
                                 : element.getAttribute('src')
                             )
-                        ).split('.')
+                        )
+          , srcParts   = strSrc[0] === '(' ? [strSrc, ''] : strSrc.split('.')
           , strSchema  = srcParts[0]
           , strObject  = srcParts[1]
           , strColumns = GS.templateWithQuerystring(element.getAttribute('cols') || '*').split(',').join('\t')
@@ -984,7 +986,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         arrCells = arrRecords[i].split('\t');
                         
                         for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
-                            arrCells[cell_i] = GS.decodeFromTabDelimited(arrCells[cell_i]);
+                            arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
                         }
                         
                         arrTotalRecords.push(arrCells);

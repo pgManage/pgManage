@@ -51,18 +51,22 @@
     }
     
     function webSocketNormalizeError(event) {
-        var i, len, arrLines, arrLine, strData,
-            jsnRet = {
-                'error_title': '',
-                'error_text': '',
-                'error_detail': '',
-                'error_hint': '',
-                'error_query': '',
-                'error_context': '',
-                'error_position': '',
-                'error_notice': '',
-                'original_data': event
-            };
+        var i;
+        var len;
+        var arrLines;
+        var arrLine;
+        var strData;
+        var jsnRet = {
+            'error_title': '',
+            'error_text': '',
+            'error_detail': '',
+            'error_hint': '',
+            'error_query': '',
+            'error_context': '',
+            'error_position': '',
+            'error_notice': '',
+            'original_data': event
+        };
         
         event = event || {};
         
@@ -71,33 +75,33 @@
         // if there is message data: parse it
         if (event.data) {
             strData = event.data;
-            
+
             // strip out messageid
             if (strData.substring(0, strData.indexOf(' ')) === 'messageid') {
                 strData = strData.substring(strData.indexOf('\n') + 1);
             }
-            
+
             // strip out response number
             if (strData.substring(0, strData.indexOf(' ')) === 'responsenumber') {
                 strData = strData.substring(strData.indexOf('\n') + 1);
             }
-            
+
             // strip out fatal
             if (strData.indexOf('FATAL\n') === 0) {
                 strData = strData.substring(strData.indexOf('\n') + 1);
             }
-            
+
             // strip out "Query failed: "
             if (strData.indexOf('Query failed: ') === 0) {
                 strData = strData.substring('Query failed: '.length);
             }
-            
+
             // save error text in case we dont find any error part labels
             jsnRet.error_text = strData;
             
             // trim and split on return for parsing
             arrLines = strData.trim().split('\n');
-            
+
             for (i = 0, len = arrLines.length; i < len; i += 1) {
                 arrLine = arrLines[i].split('\t');
                 
@@ -181,6 +185,7 @@
     }
     
     function errorJSONToHTML(errorJSON) {
+        console.log(errorJSON);
         return '<pre style="word-break: break-all; white-space: pre-wrap;">' +
                     (errorJSON.error_title ?
                         'There was ' +
@@ -193,19 +198,14 @@
                             ' "' + encodeHTML(errorJSON.error_title) + '" error:' :
                         'There was an error:') +
                         (
-                            !errorJSON.error_hint &&
-                            !errorJSON.error_query &&
-                            !errorJSON.error_context &&
-                            !errorJSON.error_notice
-                                ? '<br /><br />' + encodeHTML(errorJSON.error_text)
-                                : ''
+                            errorJSON.error_text     ? '<br /><br />' + encodeHTML(errorJSON.error_text)
+                            :   (errorJSON.error_hint     ? '<br /><br />HINT: ' + encodeHTML(errorJSON.error_hint) : '') +
+                                (errorJSON.error_detail   ? '<br /><br />DETAIL: ' + encodeHTML(errorJSON.error_detail) : '') +
+                                (errorJSON.error_query    ? '<br /><br />QUERY: ' + encodeHTML(errorJSON.error_query) : '') +
+                                (errorJSON.error_position ? '<br /><br />ERROR POSITION: ' + encodeHTML(errorJSON.error_position) : '') +
+                                (errorJSON.error_context  ? '<br /><br />CONTEXT: ' + encodeHTML(errorJSON.error_context) : '') +
+                                (errorJSON.error_notice   ? '<br /><br /><br />' + encodeHTML(errorJSON.error_notice) : '')
                         ) +
-                        (errorJSON.error_hint     ? '<br /><br />HINT: ' + encodeHTML(errorJSON.error_hint) : '') +
-                      //(errorJSON.error_detail   ? '<br /><br />DETAIL: ' + encodeHTML(errorJSON.error_detail) : '') +
-                        (errorJSON.error_query    ? '<br /><br />QUERY: ' + encodeHTML(errorJSON.error_query) : '') +
-                        (errorJSON.error_position ? '<br /><br />ERROR POSITION: ' + encodeHTML(errorJSON.error_position) : '') +
-                        (errorJSON.error_context  ? '<br /><br />CONTEXT: ' + encodeHTML(errorJSON.error_context) : '') +
-                        (errorJSON.error_notice   ? '<br /><br /><br />' + encodeHTML(errorJSON.error_notice) : '') +
                 '</pre>';
     }
     
@@ -1143,6 +1143,52 @@
     };
     
     
+    var cacheLedger = [];
+    window.testtesttest = cacheLedger;
+    GS.requestCachingSelect = function (socket, strSchema, strObject, strColumns, strWhere, strOrd, strLimit, strOffset, callback, bolClearCache) {
+        var strKey = (strSchema + strObject + strColumns + strWhere + strOrd + strLimit + strOffset)
+          , intQueryIndex, i, len, currentEntry;
+        
+        console.log(strKey, bolClearCache, cacheLedger[strKey]);
+        
+        if (bolClearCache) {
+            cacheLedger[strKey] = null;
+        }
+        
+        if (cacheLedger[strKey]) {
+            for (i = 0, len = cacheLedger[strKey].results.length; i < len; i += 1) {
+                callback(cacheLedger[strKey].results[i][0], cacheLedger[strKey].results[i][1]);
+            }
+            cacheLedger[strKey].callbacks.push({'callback': callback, 'ready': true});
+            
+        } else {
+            currentEntry = cacheLedger[strKey] = {
+                results: [],
+                callbacks: [
+                    {'callback': callback, 'ready': true}
+                ]
+            };
+            
+            //console.log('cache:' + bolClearCache);
+            GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
+                                     , strWhere, strOrd, strLimit, strOffset
+                                     , function (data, error) {
+                var i, len;
+                
+                //console.log('data:', data);
+                currentEntry.results.push([data, error]);
+                
+                for (i = 0, len = currentEntry.callbacks.length; i < len; i += 1) {
+                    if (currentEntry.callbacks[i].ready) {
+                        currentEntry.callbacks[i].callback(data, error);
+                    }
+                }
+            });
+        }
+    };
+
+    // Nunzio removed on 2017-05-06 
+    /*
     var cacheQueries = [], cacheCallbacks = [], cacheResults = [];
     GS.requestCachingSelect = function (socket, strSchema, strObject, strColumns, strWhere, strOrd, strLimit, strOffset, callback, bolClearCache) {
         var strKey = (strSchema + strObject + strColumns + strWhere + strOrd + strLimit + strOffset)
@@ -1165,10 +1211,14 @@
             cacheCallbacks[intQueryIndex].push({'callback': callback, 'ready': true});
             
         } else {
+            console.log(strKey);
+            console.log(cacheQueries.length);
             cacheQueries.push(strKey);
             cacheCallbacks.push([{'callback': callback, 'ready': true}]);
             cacheResults.push([]);
+            console.log(cacheQueries.length);
             intQueryIndex = (cacheQueries.length - 1);
+            console.log(intQueryIndex);
             
             GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
                                      , strWhere, strOrd, strLimit, strOffset
@@ -1184,7 +1234,7 @@
                 }
             });
         }
-    };
+    };*/
 })();
 
 

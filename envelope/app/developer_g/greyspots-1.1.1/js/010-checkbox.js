@@ -366,6 +366,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
                 }
 
+                element.addEventListener('focus', function (event) {
+                    element.classList.add('focus');
+                });
+
+                element.addEventListener('blur', function (event) {
+                    element.classList.remove('focus');
+                });
+
+                element.addEventListener(evt.mouseout, function (event) {
+                    element.classList.remove('hover');
+                });
+
+                element.addEventListener(evt.mouseover, function (event) {
+                    element.classList.add('hover');
+                });
+
                 // default value to false
                 if (element.getAttribute('type') === 'smallint') {
                     element.value = element.getAttribute('value') || 0;

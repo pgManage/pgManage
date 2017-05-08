@@ -168,12 +168,6 @@
     background: none;
 }
 
-input:focus,
-textarea:focus,
-select:focus {
-    background-color: #FFFDDB;
-}
-
 *[selected] {
     background-color: #FFFFCC !important;
 }

@@ -115,11 +115,11 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
     intNeedle = intSearchFromPos;
     strChar = strScript[intNeedle];
     
-    //if (!strChar) {
-    //    intNeedle -= 1;
-    //    intSearchFromPos -= 1;
-    //    strChar = strScript[intNeedle];
-    //}
+    if (strChar === '"') {
+        intNeedle += 1;
+        intSearchFromPos += 1;
+        strChar = strScript[intNeedle];
+    }
     
     //if (!strScript[intNeedle + 1]) {
     //    strChar = '\n';

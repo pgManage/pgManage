@@ -1,6 +1,6 @@
 gs-optionbox {
     display: block;
-    border: 1px solid #AEAEAE;
+    /*border: 1px solid #AEAEAE;*/
     /*
     overflow: auto;
     -webkit-overflow-scrolling: touch;
@@ -18,14 +18,6 @@ gs-optionbox {
     -o-user-select: none;
     user-select: none;
     */
-}
-
-gs-optionbox gs-option {
-    margin-top: -1px;
-}
-
-gs-optionbox gs-option:first-child {
-    margin-top: 0;
 }
 
 gs-optionbox[mini] {

@@ -141,439 +141,241 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     function updateData(element, updateElement, strColumn, newValue) {
-        if (window.bolSocket === true) {
+        var data, parentRecord, strID, strHash
+          , srcParts = GS.templateWithQuerystring(element.getAttribute('src')).split('.')
+          , strSchema = srcParts[0]
+          , strObject = srcParts[1]
+          , strReturnCols = element.arrColumns.join('\t')
+          , strHashCols = element.lockColumn
+          , updateFrameData, strRoles, strColumns, arrTotalRecords = [];
+        
+        parentRecord = GS.findParentElement(updateElement, '.form-record');
+        
+        strID = parentRecord.getAttribute('data-id');
+        strHash = CryptoJS.MD5(parentRecord.getAttribute('data-' + element.lockColumn)).toString();
+        
+        strRoles   = 'pk\thash\tset';
+        strColumns = 'id\thash\t' + GS.encodeForTabDelimited(strColumn);
+        updateFrameData = strID + '\t' + strHash + '\t' + GS.encodeForTabDelimited(newValue);
+        
+        updateFrameData = (strRoles + '\n' + strColumns + '\n' + updateFrameData);
+        GS.triggerEvent(element, 'before_update');
+        
+        GS.requestUpdateFromSocket(
+            GS.envSocket, strSchema, strObject
+          , strReturnCols, strHashCols, updateFrameData
+            
+          , function (data, error, transactionID) {
+                if (error) {
+                    getData(element);
+                    GS.removeLoader(element);
+                    GS.webSocketErrorDialog(data);
+                }
+            }
+          , function (data, error, transactionID, commitFunction, rollbackFunction) {
+                GS.removeLoader(element);
+                
+                if (!error) {
+                    if (data === 'TRANSACTION COMPLETED') {
+                        commitFunction();
+                    } else {
+                        var arrRecords, arrCells, i, len, cell_i, cell_len;
+                        
+                        arrRecords = GS.trim(data, '\n').split('\n');
+                        
+                        for (i = 0, len = arrRecords.length; i < len; i += 1) {
+                            arrCells = arrRecords[i].split('\t');
+                            
+                            for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
+                                arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
+                            }
+                            
+                            arrTotalRecords.push(arrCells);
+                        }
+                    }
+                    
+                } else {
+                    rollbackFunction();
+                    getData(element);
+                    GS.webSocketErrorDialog(data);
+                }
+            }
+          , function (strAnswer, data, error) {
+                GS.removeLoader(element);
+                
+                if (!error) {
+                    if (strAnswer === 'COMMIT') {
+                        var idIndex, i, len;
+                        
+                        idIndex = element.lastSuccessData.arr_column.indexOf('id');
+                        
+                        for (i = 0, len = element.lastSuccessData.dat.length; i < len; i += 1) {
+                            if (String(element.lastSuccessData.dat[i][idIndex]) === strID) {
+                                element.lastSuccessData.dat[i] = arrTotalRecords[0];
+                                break;
+                            }
+                        }
+                        
+                        triggerAfterUpdate(element);
+                        handleData(element, element.lastSuccessData);
+                        
+                        GS.triggerEvent(element, 'after_update');
+                    } else {
+                        getData(element);
+                    }
+                } else {
+                    getData(element);
+                    GS.webSocketErrorDialog(data);
+                }
+            }
+        );
+    }
+    
+    function updateDataWithoutTemplate(element, bolErrorHandling) {
+        if (element.bolCurrentlySaving === false && !element.bolErrorOpen) {
             var data, parentRecord, strID, strHash
               , srcParts = GS.templateWithQuerystring(element.getAttribute('src')).split('.')
               , strSchema = srcParts[0]
               , strObject = srcParts[1]
               , strReturnCols = element.arrColumns.join('\t')
               , strHashCols = element.lockColumn
-              , updateFrameData, strRoles, strColumns, arrTotalRecords = [];
+              , updateFrameData, strRoles, strColumns, arrTotalRecords = [], functionUpdateRecord, col_key, key, strColumn, newValue, idIndex, i, len;
             
-            parentRecord = GS.findParentElement(updateElement, '.form-record');
-            
-            strID = parentRecord.getAttribute('data-id');
-            strHash = CryptoJS.MD5(parentRecord.getAttribute('data-' + element.lockColumn)).toString();
-            
-            strRoles   = 'pk\thash\tset';
-            strColumns = 'id\thash\t' + GS.encodeForTabDelimited(strColumn);
-            updateFrameData = strID + '\t' + strHash + '\t' + GS.encodeForTabDelimited(newValue);
-            
-            updateFrameData = (strRoles + '\n' + strColumns + '\n' + updateFrameData);
-            GS.triggerEvent(element, 'before_update');
-            
-            GS.requestUpdateFromSocket(
-                GS.envSocket, strSchema, strObject
-              , strReturnCols, strHashCols, updateFrameData
+            functionUpdateRecord = function (strID, strColumn, recordIndex, strParameters) {
+                var strWhere, strChangeStamp, strValue;
                 
-              , function (data, error, transactionID) {
-                    if (error) {
-                        getData(element);
-                        GS.removeLoader(element);
-                        GS.webSocketErrorDialog(data);
-                    }
-                }
-              , function (data, error, transactionID, commitFunction, rollbackFunction) {
-                    GS.removeLoader(element);
+                element.bolCurrentlySaving = true;
+                element.jsnUpdate[strID][strColumn] = undefined;
+                
+                // run ajax
+                removeMessage(element, 'waiting');
+                addMessage(element, 'saving');
+                element.state = 'saving';
+                
+                strWhere        = GS.qryGetVal(strParameters, 'where');
+                strColumn       = GS.qryGetVal(strParameters, 'column');
+                strValue        = GS.qryGetVal(strParameters, 'value');
+                
+                strID           = GS.qryGetVal(strWhere,      'id');
+                strChangeStamp  = GS.qryGetVal(strWhere,      element.lockColumn);
+                
+                strHash = CryptoJS.MD5(strChangeStamp).toString();
+                
+                //parentRecord = GS.findParentElement(updateElement, '.form-record');
+                
+                strRoles   = 'pk\thash\tset';
+                strColumns = 'id\thash\t' + GS.encodeForTabDelimited(strColumn);
+                updateFrameData = strID + '\t' + strHash + '\t' + GS.encodeForTabDelimited(strValue);
+                
+                updateFrameData = (strRoles + '\n' + strColumns + '\n' + updateFrameData);
+                
+                
+                
+                console.log(strParameters);
+                console.log(updateFrameData);
+                console.log(strSchema, strObject, strReturnCols, strHashCols);
+                
+                GS.requestUpdateFromSocket(
+                    GS.envSocket, strSchema, strObject
+                  , strReturnCols, strHashCols, updateFrameData
                     
-                    if (!error) {
-                        if (data === 'TRANSACTION COMPLETED') {
-                            commitFunction();
-                        } else {
-                            var arrRecords, arrCells, i, len, cell_i, cell_len;
-                            
-                            arrRecords = GS.trim(data, '\n').split('\n');
-                            
-                            for (i = 0, len = arrRecords.length; i < len; i += 1) {
-                                arrCells = arrRecords[i].split('\t');
-                                
-                                for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
-                                    arrCells[cell_i] = GS.decodeFromTabDelimited(arrCells[cell_i]);
-                                }
-                                
-                                arrTotalRecords.push(arrCells);
-                            }
-                        }
-                        
-                    } else {
-                        rollbackFunction();
-                        getData(element);
-                        GS.webSocketErrorDialog(data);
-                    }
-                }
-              , function (strAnswer, data, error) {
-                    GS.removeLoader(element);
-                    
-                    if (!error) {
-                        if (strAnswer === 'COMMIT') {
-                            var idIndex, i, len;
-                            
-                            idIndex = element.lastSuccessData.arr_column.indexOf('id');
-                            
-                            for (i = 0, len = element.lastSuccessData.dat.length; i < len; i += 1) {
-                                if (String(element.lastSuccessData.dat[i][idIndex]) === strID) {
-                                    element.lastSuccessData.dat[i] = arrTotalRecords[0];
-                                    break;
-                                }
-                            }
-                            
-                            triggerAfterUpdate(element);
-                            handleData(element, element.lastSuccessData);
-                            
-                            GS.triggerEvent(element, 'after_update');
-                        } else {
+                  , function (data, error, transactionID) {
+                        if (error) {
                             getData(element);
-                        }
-                    } else {
-                        getData(element);
-                        GS.webSocketErrorDialog(data);
-                    }
-                }
-            );
-        } else {
-            var data, strLink, parentRecordElement, strID,
-                strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') ||
-                                                                        element.getAttribute('source') || ''));
-            
-            strLink = '/' + (element.getAttribute('action-update') || 'env/action_update') + '?src=' + encodeURIComponent(strSource);
-            
-            parentRecordElement = GS.findParentElement(updateElement, '.form-record');
-            
-            strID = parentRecordElement.getAttribute('data-id');
-            
-            strLink +=  '&where=' + encodeURIComponent(
-                                        'id=' + strID +
-                                       '&' + element.lockColumn + '=' + parentRecordElement.getAttribute('data-' + element.lockColumn)
-                                    ) +
-                        '&column=' + strColumn +
-                        '&value=' +  encodeURIComponent(newValue);
-            
-            GS.triggerEvent(element, 'before_update');
-            // run ajax
-            GS.dataFetch(strLink, true);
-            
-            // when the ajax is finished
-            document.addEventListener('dataready_' + encodeURIComponent(strLink), function __THIS_FUNCTION__(event) {
-                var idIndex, i, len;
-                
-                if (!event.detail.error) {
-                    idIndex = element.lastSuccessData.arr_column.indexOf('id');
-                    
-                    for (i = 0, len = element.lastSuccessData.dat.length; i < len; i += 1) {
-                        if (String(element.lastSuccessData.dat[i][idIndex]) === strID) {
-                            element.lastSuccessData.dat[i] = event.detail.response;
-                            break;
+                            GS.webSocketErrorDialog(data);
                         }
                     }
-                    
-                    //element.lastSuccessData.dat[0] = event.detail.response;
-                    triggerAfterUpdate(element);
-                    handleData(element, element.lastSuccessData);
-                } else {
-                    GS.ajaxErrorDialog(event.detail.response);
-                }
-                
-                document.removeEventListener('dataready_' + encodeURIComponent(strLink), __THIS_FUNCTION__);
-            });
-        }
-    }
-    
-    function updateDataWithoutTemplate(element, bolErrorHandling) {
-        if (window.bolSocket === true) {
-            if (element.bolCurrentlySaving === false && !element.bolErrorOpen) {
-                var data, parentRecord, strID, strHash
-                  , srcParts = GS.templateWithQuerystring(element.getAttribute('src')).split('.')
-                  , strSchema = srcParts[0]
-                  , strObject = srcParts[1]
-                  , strReturnCols = element.arrColumns.join('\t')
-                  , strHashCols = element.lockColumn
-                  , updateFrameData, strRoles, strColumns, arrTotalRecords = [];
-                
-                functionUpdateRecord = function (strID, strColumn, recordIndex, strParameters) {
-                    var strWhere, strChangeStamp, strValue;
-                    
-                    element.bolCurrentlySaving = true;
-                    element.jsnUpdate[strID][strColumn] = undefined;
-                    
-                    // run ajax
-                    removeMessage(element, 'waiting');
-                    addMessage(element, 'saving');
-                    element.state = 'saving';
-                    
-                    strWhere        = GS.qryGetVal(strParameters, 'where');
-                    strColumn       = GS.qryGetVal(strParameters, 'column');
-                    strValue        = GS.qryGetVal(strParameters, 'value');
-                    
-                    strID           = GS.qryGetVal(strWhere,      'id');
-                    strChangeStamp  = GS.qryGetVal(strWhere,      element.lockColumn);
-                    
-                    strHash = CryptoJS.MD5(strChangeStamp).toString();
-                    
-                    //parentRecord = GS.findParentElement(updateElement, '.form-record');
-                    
-                    strRoles   = 'pk\thash\tset';
-                    strColumns = 'id\thash\t' + GS.encodeForTabDelimited(strColumn);
-                    updateFrameData = strID + '\t' + strHash + '\t' + GS.encodeForTabDelimited(strValue);
-                    
-                    updateFrameData = (strRoles + '\n' + strColumns + '\n' + updateFrameData);
-                    
-                    
-                    
-                    console.log(strParameters);
-                    console.log(updateFrameData);
-                    console.log(strSchema, strObject, strReturnCols, strHashCols);
-                    
-                    GS.requestUpdateFromSocket(
-                        GS.envSocket, strSchema, strObject
-                      , strReturnCols, strHashCols, updateFrameData
-                        
-                      , function (data, error, transactionID) {
-                            if (error) {
-                                getData(element);
-                                GS.removeLoader(element);
-                                GS.webSocketErrorDialog(data);
-                            }
-                        }
-                      , function (data, error, transactionID, commitFunction, rollbackFunction) {
-                            GS.removeLoader(element);
-                            
-                            if (!error) {
-                                if (data === 'TRANSACTION COMPLETED') {
-                                    commitFunction();
-                                } else {
-                                    var arrRecords, arrCells, i, len, cell_i, cell_len;
-                                    
-                                    arrRecords = GS.trim(data, '\n').split('\n');
-                                    
-                                    for (i = 0, len = arrRecords.length; i < len; i += 1) {
-                                        arrCells = arrRecords[i].split('\t');
-                                        
-                                        for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
-                                            arrCells[cell_i] = GS.decodeFromTabDelimited(arrCells[cell_i]);
-                                        }
-                                        
-                                        arrTotalRecords.push(arrCells);
-                                    }
-                                }
+                  , function (data, error, transactionID, commitFunction, rollbackFunction) {
+                        if (!error) {
+                            if (data === 'TRANSACTION COMPLETED') {
+                                commitFunction();
+                            } else {
+                                var arrRecords, arrCells, i, len, cell_i, cell_len;
                                 
-                            } else {
-                                rollbackFunction();
-                                getData(element);
-                                GS.webSocketErrorDialog(data);
-                            }
-                        }
-                      , function (strAnswer, data, error) {
-                            var col_key, key, bolSaveWaiting;
-                            removeMessage(element, 'saving');
-                            element.state = 'saved';
-                            
-                            GS.removeLoader(element);
-                            
-                            if (!error) {
-                                if (strAnswer === 'COMMIT') {
-                                    element.lastSuccessData.dat[recordIndex] = arrTotalRecords[0];
-                                    element.bolCurrentlySaving = false;
+                                arrRecords = GS.trim(data, '\n').split('\n');
+                                
+                                for (i = 0, len = arrRecords.length; i < len; i += 1) {
+                                    arrCells = arrRecords[i].split('\t');
                                     
-                                    // if there is another save in the pipeline: bolSaveWaiting = true
-                                    for (key in element.jsnUpdate) {
-                                        for (col_key in element.jsnUpdate[key]) {
-                                            if (element.jsnUpdate[key][col_key] !== undefined) {
-                                                bolSaveWaiting = true;
-                                                break;
-                                            }
-                                        }
+                                    for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
+                                        arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
                                     }
                                     
-                                    // if there is a save waiting: update again
-                                    if (bolSaveWaiting) {
-                                        updateDataWithoutTemplate(element);
-                                        
-                                    } else {
-                                        triggerAfterUpdate(element);
-                                    }
-                                } else {
-                                    getData(element);
-                                }
-                            } else {
-                                GS.webSocketErrorDialog(data);
-                            }
-                        }
-                    );
-                    
-                    
-                    //element.currentSaveAjax = GS.ajaxJSON(strLink, strParameters, function (data, error) {
-                    //    var col_key, key, bolSaveWaiting;
-                    //    removeMessage(element, 'saving');
-                    //    element.state = 'saved';
-                    //    
-                    //    if (!error) {
-                    //        element.lastSuccessData.dat[recordIndex] = data.dat;
-                    //        element.bolCurrentlySaving = false;
-                    //        
-                    //        // if there is another save in the pipeline: bolSaveWaiting = true
-                    //        for (key in element.jsnUpdate) {
-                    //            for (col_key in element.jsnUpdate[key]) {
-                    //                if (element.jsnUpdate[key][col_key] !== undefined) {
-                    //                    bolSaveWaiting = true;
-                    //                    break;
-                    //                }
-                    //            }
-                    //        }
-                    //        
-                    //        // if there is a save waiting: update again
-                    //        if (bolSaveWaiting) {
-                    //            updateDataWithoutTemplate(element);
-                    //            
-                    //        } else {
-                    //            triggerAfterUpdate(element);
-                    //        }
-                    //        
-                    //    } else if (bolErrorHandling !== false) {
-                    //        element.bolCurrentlySaving = false;
-                    //        element.bolSaveWaiting = false;
-                    //        element.bolErrorOpen = true;
-                    //        
-                    //        GS.ajaxErrorDialog(data, function () {
-                    //            if (element.saveTimerID) {
-                    //                clearTimeout(element.saveTimerID);
-                    //                element.saveTimerID = undefined;
-                    //            }
-                    //            
-                    //            element.bolErrorOpen = false;
-                    //            functionUpdateRecord(strID, strColumn, recordIndex, strParameters);
-                    //        }, function () {
-                    //            element.bolErrorOpen = false;
-                    //        });
-                    //    }
-                    //});
-                };
-                
-                // loop through the jsnUpdate variable and make one update for every record that needs an update
-                console.log(JSON.stringify(element.jsnUpdate));
-                
-                for (key in element.jsnUpdate) {
-                    for (col_key in element.jsnUpdate[key]) {
-                        if (element.jsnUpdate[key][col_key] !== undefined) {
-                            strID = key;
-                            strColumn = col_key;
-                            newValue = element.jsnUpdate[key][col_key];
-                            idIndex = element.lastSuccessData.arr_column.indexOf('id');
-                            
-                            for (i = 0, len = element.lastSuccessData.dat.length; i < len; i += 1) {
-                                if (String(element.lastSuccessData.dat[i][idIndex]) === strID) {
-                                    functionUpdateRecord(strID, strColumn, i,
-                                                'src=' + encodeURIComponent(strSource) +
-                                                '&where=' + encodeURIComponent(
-                                                    'id=' + strID +
-                                                    '&' + element.lockColumn + '=' + GS.envGetCell(element.lastSuccessData, i, element.lockColumn)
-                                                ) +
-                                                '&column=' + strColumn +
-                                                '&value=' +  encodeURIComponent(newValue));
-                                    
-                                    break;
+                                    arrTotalRecords.push(arrCells);
                                 }
                             }
                             
-                            break;
+                        } else {
+                            rollbackFunction();
+                            getData(element);
+                            GS.webSocketErrorDialog(data);
                         }
                     }
-                }
-            }
-            
-        } else {
-            var data, strLink, strParameters, strSource, strUpdate, key, col_key, functionUpdateRecord,
-                idIndex, i, len, strID, strColumn, newValue;
-            
-            //console.trace('updateDataWithoutTemplate');
-            
-            if (element.bolCurrentlySaving === false && !element.bolErrorOpen) {
-                strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') || element.getAttribute('source') || ''));
-                strLink = '/' + (element.getAttribute('action-update') || 'env/action_update');
-                
-                functionUpdateRecord = function (strID, strColumn, recordIndex, strParameters) {
-                    element.bolCurrentlySaving = true;
-                    
-                    element.jsnUpdate[strID][strColumn] = undefined;
-                    
-                    // run ajax
-                    removeMessage(element, 'waiting');
-                    addMessage(element, 'saving');
-                    element.state = 'saving';
-                    
-                    element.currentSaveAjax = GS.ajaxJSON(strLink, strParameters, function (data, error) {
+                  , function (strAnswer, data, error) {
                         var col_key, key, bolSaveWaiting;
                         removeMessage(element, 'saving');
                         element.state = 'saved';
                         
+                        GS.removeLoader(element);
+                        
                         if (!error) {
-                            element.lastSuccessData.dat[recordIndex] = data.dat;
-                            
-                            element.bolCurrentlySaving = false;
-                            
-                            // if there is another save in the pipeline: bolSaveWaiting = true
-                            for (key in element.jsnUpdate) {
-                                for (col_key in element.jsnUpdate[key]) {
-                                    if (element.jsnUpdate[key][col_key] !== undefined) {
-                                        bolSaveWaiting = true;
-                                        break;
+                            if (strAnswer === 'COMMIT') {
+                                element.lastSuccessData.dat[recordIndex] = arrTotalRecords[0];
+                                element.bolCurrentlySaving = false;
+                                
+                                // if there is another save in the pipeline: bolSaveWaiting = true
+                                for (key in element.jsnUpdate) {
+                                    for (col_key in element.jsnUpdate[key]) {
+                                        if (element.jsnUpdate[key][col_key] !== undefined) {
+                                            bolSaveWaiting = true;
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            
-                            // if there is a save waiting: update again
-                            if (bolSaveWaiting) {
-                                updateDataWithoutTemplate(element);
                                 
-                            } else {
-                                triggerAfterUpdate(element);
-                            }
-                            
-                        } else if (bolErrorHandling !== false) {
-                            element.bolCurrentlySaving = false;
-                            element.bolSaveWaiting = false;
-                            element.bolErrorOpen = true;
-                            
-                            GS.ajaxErrorDialog(data, function () {
-                                if (element.saveTimerID) {
-                                    clearTimeout(element.saveTimerID);
-                                    element.saveTimerID = undefined;
-                                }
-                                
-                                element.bolErrorOpen = false;
-                                functionUpdateRecord(strID, strColumn, recordIndex, strParameters);
-                            }, function () {
-                                element.bolErrorOpen = false;
-                            });
-                        }
-                    });
-                };
-                
-                // loop through the jsnUpdate variable and make one update for every record that needs an update
-                for (key in element.jsnUpdate) {
-                    for (col_key in element.jsnUpdate[key]) {
-                        if (element.jsnUpdate[key][col_key] !== undefined) {
-                            strID = key;
-                            strColumn = col_key;
-                            newValue = element.jsnUpdate[key][col_key];
-                            idIndex = element.lastSuccessData.arr_column.indexOf('id');
-                            
-                            for (i = 0, len = element.lastSuccessData.dat.length; i < len; i += 1) {
-                                if (String(element.lastSuccessData.dat[i][idIndex]) === strID) {
-                                    functionUpdateRecord(strID, strColumn, i,
-                                                'src=' + encodeURIComponent(strSource) +
-                                                '&where=' + encodeURIComponent(
-                                                    'id=' + strID +
-                                                    '&' + element.lockColumn + '=' + GS.envGetCell(element.lastSuccessData, i, element.lockColumn)
-                                                ) +
-                                                '&column=' + strColumn +
-                                                '&value=' +  encodeURIComponent(newValue));
+                                // if there is a save waiting: update again
+                                if (bolSaveWaiting) {
+                                    updateDataWithoutTemplate(element);
                                     
-                                    break;
+                                } else {
+                                    triggerAfterUpdate(element);
                                 }
+                            } else {
+                                getData(element);
                             }
-                            
-                            break;
+                        } else {
+                            GS.webSocketErrorDialog(data);
                         }
+                    }
+                );
+            };
+            
+            // loop through the jsnUpdate variable and make one update for every record that needs an update
+            console.log(JSON.stringify(element.jsnUpdate));
+            
+            for (key in element.jsnUpdate) {
+                for (col_key in element.jsnUpdate[key]) {
+                    if (element.jsnUpdate[key][col_key] !== undefined) {
+                        strID = key;
+                        strColumn = col_key;
+                        newValue = element.jsnUpdate[key][col_key];
+                        idIndex = element.lastSuccessData.arr_column.indexOf('id');
+                        
+                        for (i = 0, len = element.lastSuccessData.dat.length; i < len; i += 1) {
+                            if (String(element.lastSuccessData.dat[i][idIndex]) === strID) {
+                                functionUpdateRecord(strID, strColumn, i,
+                                            'where=' + encodeURIComponent(
+                                                'id=' + strID +
+                                                '&' + element.lockColumn + '=' + GS.envGetCell(element.lastSuccessData, i, element.lockColumn)
+                                            ) +
+                                            '&column=' + strColumn +
+                                            '&value=' +  encodeURIComponent(newValue));
+                                
+                                break;
+                            }
+                        }
+                        
+                        break;
                     }
                 }
             }
@@ -591,88 +393,49 @@ document.addEventListener('DOMContentLoaded', function () {
     //      else
     //          use: source query
     function getData(element) { //bolClearPrevious
-        if (window.bolSocket === true) {
-            var srcParts   = GS.templateWithQuerystring(element.getAttribute('src')).split('.')
-              , strSchema  = srcParts[0]
-              , strObject  = srcParts[1]
-              , strColumns = GS.templateWithQuerystring(element.getAttribute('cols') || '*').split(',').join('\t')
-              , strWhere   = GS.templateWithQuerystring(element.getAttribute('where') || '')
-              , strOrd     = GS.templateWithQuerystring(element.getAttribute('ord') || '')
-              , strLimit   = GS.templateWithQuerystring(element.getAttribute('limit') || '1')
-              , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
-              , response_i = 0, response_len = 0, arrTotalRecords = [];
+        var strSrc     = GS.templateWithQuerystring(element.getAttribute('src'))
+          , srcParts   = strSrc[0] === '(' ? [strSrc, ''] : strSrc.split('.')
+          , strSchema  = srcParts[0]
+          , strObject  = srcParts[1]
+          , strColumns = GS.templateWithQuerystring(element.getAttribute('cols') || '*').split(',').join('\t')
+          , strWhere   = GS.templateWithQuerystring(element.getAttribute('where') || '')
+          , strOrd     = GS.templateWithQuerystring(element.getAttribute('ord') || '')
+          , strLimit   = GS.templateWithQuerystring(element.getAttribute('limit') || '1')
+          , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
+          , response_i = 0, response_len = 0, arrTotalRecords = [];
+        
+        GS.triggerEvent(element, 'before_select');
+        GS.requestSelectFromSocket(GS.envSocket, strSchema, strObject, strColumns
+                                 , strWhere, strOrd, strLimit, strOffset
+                                 , function (data, error) {
+            var arrRecords, arrCells, i, len, cell_i, cell_len;
             
-            GS.triggerEvent(element, 'before_select');
-            GS.requestSelectFromSocket(GS.envSocket, strSchema, strObject, strColumns
-                                     , strWhere, strOrd, strLimit, strOffset
-                                     , function (data, error) {
-                var arrRecords, arrCells, i, len, cell_i, cell_len;
-                
-                if (!error) {
-                    if (data.strMessage !== 'TRANSACTION COMPLETED') {
-                        arrRecords = GS.trim(data.strMessage, '\n').split('\n');
+            if (!error) {
+                if (data.strMessage !== 'TRANSACTION COMPLETED') {
+                    arrRecords = GS.trim(data.strMessage, '\n').split('\n');
+                    
+                    for (i = 0, len = arrRecords.length; i < len; i += 1) {
+                        arrCells = arrRecords[i].split('\t');
                         
-                        for (i = 0, len = arrRecords.length; i < len; i += 1) {
-                            arrCells = arrRecords[i].split('\t');
-                            
-                            for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
-                                arrCells[cell_i] = GS.decodeFromTabDelimited(arrCells[cell_i]);
-                            }
-                            
-                            arrTotalRecords.push(arrCells);
+                        for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
+                            arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
                         }
-                    } else {
-                        element.arrColumns = data.arrColumnNames;
                         
-                        handleData(element, {
-                            "arr_column": data.arrColumnNames
-                          , "dat": arrTotalRecords
-                          , "row_count": arrTotalRecords.length
-                        }, '', 'load');
+                        arrTotalRecords.push(arrCells);
                     }
                 } else {
-                    GS.webSocketErrorDialog(data);
+                    element.arrColumns = data.arrColumnNames;
+                    
+                    handleData(element, {
+                        "arr_column": data.arrColumnNames
+                      , "dat": arrTotalRecords
+                      , "row_count": arrTotalRecords.length
+                    }, '', 'load');
                 }
-            });
-            
-        } else {
-            var data, strLink,
-                strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') ||
-                    element.getAttribute('source') || '')),
-                strCols = element.getAttribute('cols') || '';
-            
-            //// use the source query and prepare the parameters for a fetch that would use the source query
-            //if (strSource.trim().toLowerCase().indexOf('select') === 0) {
-            //    strLink = '/env/action_select_sql?select=' + encodeURIComponent(strSource);
-            //} else {
-            //    strLink = '/env/action_select?view=' + encodeURIComponent(strSource);
-            //}
-            
-            if (element.getAttribute('where') !== 'false') {
-                strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') + '?src=' + encodeURIComponent(strSource);
-                
-                strLink += '&where='    + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('where') || ''))) +
-                           '&limit='    + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('limit') || '1'))) +
-                           '&offset='   + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('offset') || ''))) +
-                           '&order_by=' + encodeURIComponent(GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('ord') || ''))) +
-                           '&cols='     + encodeURIComponent(strCols);
-                
-                GS.triggerEvent(element, 'before_select');
-                GS.addLoader('refresh_' + encodeURIComponent(strLink));
-                //if (GS.dataFetch(strLink, bolClearPrevious)) {
-                //    data = GS.dataFetch(strLink, bolClearPrevious);
-                //    
-                //    handleData(element, data.response, data.error);
-                //} else {
-                GS.dataFetch(strLink, true);
-                
-                document.addEventListener('dataready_' + encodeURIComponent(strLink), function __THIS_FUNCTION__(event) {
-                    GS.removeLoader('refresh_' + encodeURIComponent(strLink));
-                    handleData(element, event.detail.response, event.detail.error, 'load');
-                    document.removeEventListener('dataready_' + encodeURIComponent(strLink), __THIS_FUNCTION__);
-                });
+            } else {
+                GS.webSocketErrorDialog(data);
             }
-        }
+        });
     }
     
     // handles data result from method function: getData 

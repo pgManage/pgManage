@@ -24,7 +24,6 @@ gs-button > a[gs-dynamic] {
 
 gs-button,
 gs-toggle,
-gs-checkbox,
 gs-phone-button:not([not-supported]),
 gs-map-button,
 gs-skype-button,
@@ -68,18 +67,26 @@ gs-dialog-button {
     
     padding: 0.25em;
     border: none;
-    margin: 0;
+    margin: 0.25em;
     
-    border-radius: 0;
+    /*border-radius: 0;*/
+    border-radius: 0.5em;
     
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);
+    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
+    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
     transition: box-shadow 0.125s;
     
     line-height: 1.2em;
     min-height: 1em;
     font-size: 1em;
+}
+
+gs-option {
+    margin: 0;
+    box-shadow: 0 0 0.2em 0 rgba(0,0,0,.2) !important;
+    border-radius: 0;
 }
 
 gs-checkbox {
@@ -183,12 +190,59 @@ gs-email-button[mini],
 gs-tracking-button[mini],
 gs-delete-button[mini],
 gs-option[mini],
-gs-dialog-button[mini] {
+gs-dialog-button[mini],
+gs-button[embed],
+gs-toggle[embed],
+gs-checkbox[embed],
+gs-phone-button:not([not-supported])[embed],
+gs-map-button[embed],
+gs-skype-button[embed],
+gs-facetime-button[embed],
+gs-email-button[embed],
+gs-tracking-button[embed],
+gs-delete-button[embed],
+gs-option[embed],
+gs-dialog-button[embed],
+.drop_down_button,
+.date-picker-button,
+.time-picker-button {
     border: 0;
     padding: 0;
+    box-shadow: none !important;
+    margin: 0;
 }
 
-gs-checkbox[mini] {
+gs-button[mini-border],
+gs-toggle[mini-border],
+gs-checkbox[mini-border],
+gs-phone-button:not([not-supported])[mini-border],
+gs-map-button[mini-border],
+gs-skype-button[mini-border],
+gs-facetime-button[mini-border],
+gs-email-button[mini-border],
+gs-tracking-button[mini-border],
+gs-delete-button[mini-border],
+gs-option[mini-border],
+gs-dialog-button[mini-border],
+gs-button[embed-border],
+gs-toggle[embed-border],
+gs-checkbox[embed-border],
+gs-phone-button:not([not-supported])[embed-border],
+gs-map-button[embed-border],
+gs-skype-button[embed-border],
+gs-facetime-button[embed-border],
+gs-email-button[embed-border],
+gs-tracking-button[embed-border],
+gs-delete-button[embed-border],
+gs-option[embed-border],
+gs-dialog-button[embed-border] {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+gs-checkbox[mini], gs-checkbox[mini-border],
+gs-checkbox[embed], gs-checkbox[embed-border] {
     min-height: 0;
 }
 
@@ -219,7 +273,6 @@ gs-dialog-button[inline] {
 /* ## FOCUS ## */
 gs-button.focus,
 gs-toggle.focus,
-gs-checkbox.focus,
 gs-phone-button:not([not-supported]).focus,
 gs-map-button.focus,
 gs-skype-button.focus,
@@ -232,7 +285,6 @@ gs-dialog-button.focus,
 
 gs-button.focus.hover,
 gs-toggle.focus.hover,
-gs-checkbox.focus.hover,
 gs-phone-button:not([not-supported]).focus.hover,
 gs-map-button.focus.hover,
 gs-skype-button.focus.hover,
@@ -244,14 +296,14 @@ gs-option.focus.hover,
 gs-dialog-button.focus.hover {
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(230,138,84,.1), 0 0.2em 0.5em 0 rgba(230,138,84,.14), 0 0.0625em 0.3125em 0 rgba(230,138,84);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.5);
+    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.5);*/
+    box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.5), 0 0 0.2em 0 rgba(230,138,84,1);
     transition: box-shadow 0.125s;
 }
 
 /* ## HOVER ## */
 gs-button.hover,
 gs-toggle.hover,
-gs-checkbox.hover,
 gs-phone-button:not([not-supported]).hover,
 gs-map-button.hover,
 gs-skype-button.hover,
@@ -263,14 +315,14 @@ gs-option.hover,
 gs-dialog-button.hover {
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);
+    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
+    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
     transition: box-shadow 0.125s;
 }
 
 /* ## SELECTED/HOVER opacitry ## */
 gs-button[selected]:before,
 gs-toggle[selected]:before,
-gs-checkbox[selected]:before,
 gs-phone-button:not([not-supported])[selected]:before,
 gs-map-button[selected]:before,
 gs-skype-button[selected]:before,
@@ -283,7 +335,6 @@ gs-dialog-button[selected]:before,
 
 gs-button.hover:before,
 gs-toggle.hover:before,
-gs-checkbox.hover:before,
 gs-phone-button:not([not-supported]).hover:before,
 gs-map-button.hover:before,
 gs-skype-button.hover:before,
@@ -297,8 +348,9 @@ gs-dialog-button.hover:before {
     
     position: absolute;
     
-    left: 0;
-    top: 0;
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0 !important;
     width: 100%;
     height: 100%;
     
@@ -310,7 +362,6 @@ gs-dialog-button.hover:before {
 /* ## DOWN/SELECTED ## */
 gs-button.down,
 gs-toggle.down,
-gs-checkbox.down,
 gs-phone-button:not([not-supported]).down,
 gs-map-button.down,
 gs-skype-button.down,
@@ -323,7 +374,6 @@ gs-dialog-button.down,
 
 gs-button.down.hover,
 gs-toggle.down.hover,
-gs-checkbox.down.hover,
 gs-phone-button:not([not-supported]).down.hover,
 gs-map-button.down.hover,
 gs-skype-button.down.hover,
@@ -336,7 +386,6 @@ gs-dialog-button.down.hover,
 
 gs-button[selected].focus,
 gs-toggle[selected].focus,
-gs-checkbox[selected].focus,
 gs-phone-button:not([not-supported])[selected].focus,
 gs-map-button[selected].focus,
 gs-skype-button[selected].focus,
@@ -349,7 +398,6 @@ gs-dialog-button[selected].focus,
 
 gs-button[selected].focus.hover,
 gs-toggle[selected].focus.hover,
-gs-checkbox[selected].focus.hover,
 gs-phone-button:not([not-supported])[selected].focus.hover,
 gs-map-button[selected].focus.hover,
 gs-skype-button[selected].focus.hover,
@@ -359,18 +407,16 @@ gs-tracking-button[selected].focus.hover,
 gs-delete-button[selected].focus.hover,
 gs-option[selected].focus.hover,
 gs-dialog-button[selected].focus.hover {
-    padding: 0.25em;
-    
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(230,138,84,.1), 0 0.2em 0.5em 0 rgba(230,138,84,.14), 0 0.0625em 0.3125em 0 rgba(230,138,84);*/
-    box-shadow: 0 0 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.25);
+    /*box-shadow: 0 0 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.25);*/
+    box-shadow: 0 0 0.1em 0 rgba(230,138,84,.5), 0 0 0.2em 0 rgba(230,138,84,1);
     transition: box-shadow 0.125s;
 }
 
 /* ## SELECTED ## */
 gs-button[selected],
 gs-toggle[selected],
-gs-checkbox[selected],
 gs-phone-button:not([not-supported])[selected],
 gs-map-button[selected],
 gs-skype-button[selected],
@@ -383,7 +429,6 @@ gs-dialog-button[selected],
 
 gs-button[selected].hover,
 gs-toggle[selected].hover,
-gs-checkbox[selected].hover,
 gs-phone-button:not([not-supported])[selected].hover,
 gs-map-button[selected].hover,
 gs-skype-button[selected].hover,
@@ -393,11 +438,10 @@ gs-tracking-button[selected].hover,
 gs-delete-button[selected].hover,
 gs-option[selected].hover,
 gs-dialog-button[selected].hover {
-    padding: 0.25em;
-    
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    box-shadow: 0 0 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);
+    /*box-shadow: 0 0 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
+    box-shadow: 0 0 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
     transition: box-shadow 0.125s;
 }
 
