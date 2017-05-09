@@ -104,8 +104,10 @@ div#header-text-container {
 
 .header-button-text[icon]:not([iconright]) {
     padding-left: 2em !important;
+    padding-right: 2em !important;
 }
 .header-button-text[icon][iconright] {
+    padding-left: 2em !important;
     padding-right: 2em !important;
 }
 
@@ -214,6 +216,14 @@ gs-button {
 
 .ace_search.right {
     right: 15px;
+}
+
+.ace_searchbtn:hover {
+    background-color: #eee;
+}
+
+.ace_searchbtn:active {
+    background-color: #ccc;
 }
 
 /* ########################################################## */

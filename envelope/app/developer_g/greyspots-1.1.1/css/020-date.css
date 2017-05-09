@@ -141,6 +141,10 @@ gs-date[readonly] .date-picker-button {
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
+    
+    box-shadow: none;
+    margin: 0;
+    border-radius: 0;
 }
 
 .gs-date-date-picker-container .gs-date-date-picker .day-marker.other-month {
@@ -148,5 +152,6 @@ gs-date[readonly] .date-picker-button {
 }
 
 .gs-date-date-picker-container .gs-date-date-picker .day-marker.today {
-    border-color: #00FF00;
+    color: #F7990C;
+    font-weight: bold;
 }

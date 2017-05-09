@@ -4,6 +4,11 @@ gs-checkbox:not([readonly]):not([mini]):not(:focus) {
 }
 */
 
+gs-checkbox {
+    line-height: normal;
+    /*min-height: 1.2em;*/
+}
+
 gs-checkbox[readonly] {
     opacity: 0.9;
     border-color: #E6E6E6;
@@ -21,6 +26,7 @@ gs-checkbox:before {
     /*font-size: 14px;*/
     font-size: 0.8em;
     content: '\f096'; /* fa-square-o */
+    padding-right: 0.5em;
 }
 
 gs-checkbox[value="true"]:before,

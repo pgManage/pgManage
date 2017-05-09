@@ -1290,7 +1290,7 @@ pre code{
 }
 
 *[selected] {
-    background-color: #FFFFCC !important;
+    background-color: #84D4FF !important; /* FFFFCC */
 }
 
 *[selected-secondary] {
@@ -1874,7 +1874,6 @@ gs-dialog-button {
     border: none;
     margin: 0.25em;
     
-    /*border-radius: 0;*/
     border-radius: 0.5em;
     
     
@@ -2125,43 +2124,31 @@ gs-dialog-button.hover {
     transition: box-shadow 0.125s;
 }
 
-/* ## SELECTED/HOVER opacitry ## */
-gs-button[selected]:before,
-gs-toggle[selected]:before,
-gs-phone-button:not([not-supported])[selected]:before,
-gs-map-button[selected]:before,
-gs-skype-button[selected]:before,
-gs-facetime-button[selected]:before,
-gs-email-button[selected]:before,
-gs-tracking-button[selected]:before,
-gs-delete-button[selected]:before,
-gs-option[selected]:before,
-gs-dialog-button[selected]:before,
+/* ## SELECTED/HOVER shading ## */
+/*gs-button[selected],
+gs-toggle[selected],
+gs-phone-button:not([not-supported])[selected],
+gs-map-button[selected],
+gs-skype-button[selected],
+gs-facetime-button[selected],
+gs-email-button[selected],
+gs-tracking-button[selected],
+gs-delete-button[selected],
+gs-option[selected],
+gs-dialog-button[selected],*/
 
-gs-button.hover:before,
-gs-toggle.hover:before,
-gs-phone-button:not([not-supported]).hover:before,
-gs-map-button.hover:before,
-gs-skype-button.hover:before,
-gs-facetime-button.hover:before,
-gs-email-button.hover:before,
-gs-tracking-button.hover:before,
-gs-delete-button.hover:before,
-gs-option.hover:before,
-gs-dialog-button.hover:before {
-    content: "";
-    
-    position: absolute;
-    
-    left: 0 !important;
-    top: 0 !important;
-    margin: 0 !important;
-    width: 100%;
-    height: 100%;
-    
-    background-color: black;
-    
-    opacity: 0.05;
+gs-button.hover,
+gs-toggle.hover,
+gs-phone-button:not([not-supported]).hover,
+gs-map-button.hover,
+gs-skype-button.hover,
+gs-facetime-button.hover,
+gs-email-button.hover,
+gs-tracking-button.hover,
+gs-delete-button.hover,
+gs-option.hover,
+gs-dialog-button.hover {
+    filter: invert(15%);
 }
 
 /* ## DOWN/SELECTED ## */
@@ -2354,130 +2341,6 @@ gs-dialog-button[bg-danger] {
     
     /*border-color: #961512;*/
 }
-
-
-/* ###################################################################################### */
-/* ###################################### FOCUS MOD ##################################### */
-/* ###################################################################################### */
-/*
-gs-button:focus,
-gs-toggle:focus,
-gs-checkbox:focus,
-gs-phone-button:not([not-supported]):focus,
-gs-map-button:focus,
-gs-skype-button:focus,
-gs-facetime-button:focus,
-gs-email-button:focus,
-gs-tracking-button:focus,
-gs-delete-button:focus {
-    color: #333;
-    text-decoration: none;
-    outline-offset: -2px;
-    background-color: #e6e6e6;
-    border-color: #8c8c8c;
-}
-*/
-
-
-/* ##################################################################################### */
-/* #################################### HOVER STATE #################################### */
-/* ##################################################################################### */
-/* MOVED TO JAVASCRIPT
-gs-button:hover,
-gs-toggle:hover,
-gs-phone-button:not([not-supported]):hover,
-gs-map-button:hover,
-gs-skype-button:hover,
-gs-facetime-button:hover,
-gs-email-button:hover,
-gs-tracking-button:hover {
-    background-color: #f3f3f3;
-}*/
-/*
-gs-button.hover,
-gs-toggle.hover,
-gs-phone-button:not([not-supported]).hover,
-gs-map-button.hover,
-gs-skype-button.hover,
-gs-facetime-button.hover,
-gs-email-button.hover,
-gs-tracking-button.hover,
-gs-delete-button.hover {
-  text-decoration: none;
-  color: #333;
-  background-color: #d4d4d4;
-  border-color: #8c8c8c;
-}
-*/
-
-/* ###################################################################################### */
-/* #################################### ACTIVE STATE #################################### */
-/* ###################################################################################### */
-
-/*
-gs-button.down,
-gs-checkbox.down,
-gs-toggle.down,
-gs-phone-button:not([not-supported]).down,
-gs-map-button.down,
-gs-skype-button.down,
-gs-facetime-button.down,
-gs-email-button.down,
-gs-tracking-button.down,
-gs-delete-button.down {
-    background-image: none;
-    outline: 0;
-    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-    color: #333;
-    background-color: #e6e6e6;
-    border-color: #adadad;
-}
-*/
-
-/* #################################################################################### */
-/* ################################## DISABLED STATE ################################## */
-/* #################################################################################### */
-/*
-gs-button[disabled],
-gs-toggle[disabled],
-gs-checkbox[disabled],
-gs-phone-button:not([not-supported])[disabled],
-gs-map-button[disabled],
-gs-skype-button[disabled],
-gs-facetime-button[disabled],
-gs-email-button[disabled],
-gs-tracking-button[disabled],
-gs-delete-button[disabled],
-.blue gs-button[disabled],
-.blue gs-toggle[disabled],
-.blue gs-checkbox[disabled],
-.blue gs-phone-button:not([not-supported])[disabled],
-.blue gs-map-button[disabled],
-.blue gs-skype-button[disabled],
-.blue gs-facetime-button[disabled],
-.blue gs-email-button[disabled],
-.blue gs-tracking-button[disabled],
-.blue gs-delete-button[disabled],
-gs-button[disabled].blue,
-gs-toggle[disabled].blue,
-gs-checkbox[disabled].blue,
-gs-phone-button:not([not-supported])[disabled].blue,
-gs-map-button[disabled].blue,
-gs-skype-button[disabled].blue,
-gs-facetime-button[disabled].blue,
-gs-email-button[disabled].blue,
-gs-tracking-button[disabled].blue
-gs-delete-button[disabled].blue {
-  cursor: not-allowed;
-  filter: alpha(opacity=65);
-  -webkit-box-shadow: none;
-          box-shadow: none;
-  opacity: .65;
-  background-color: #fff;
-  border-color: #ccc;
-}
-*/
 
 /* ################################################################################### */
 /* ################################# JUMBO ATTRIBUTE ################################# */
@@ -2951,6 +2814,11 @@ gs-dialog-button[icononly] {
     content: "";
     
     text-indent: -9999px;
+    
+    
+    /*line-height: 1.65em;*/
+    line-height: normal;
+    min-height: 1.65em;
     
     /*min-width: 1.2em;
     min-height: 1.2em;*/
@@ -12388,6 +12256,11 @@ gs-checkbox:not([readonly]):not([mini]):not(:focus) {
 }
 */
 
+gs-checkbox {
+    line-height: normal;
+    /*min-height: 1.2em;*/
+}
+
 gs-checkbox[readonly] {
     opacity: 0.9;
     border-color: #E6E6E6;
@@ -12405,6 +12278,7 @@ gs-checkbox:before {
     /*font-size: 14px;*/
     font-size: 0.8em;
     content: '\f096'; /* fa-square-o */
+    padding-right: 0.5em;
 }
 
 gs-checkbox[value="true"]:before,
@@ -12797,8 +12671,8 @@ gs-datasheet .hud-container gs-button {
     margin-left: 0.5em;
     float: left;
     display: inline-block;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+    /*border-bottom-right-radius: 0;*/
+    /*border-bottom-left-radius: 0;*/
     
     
     -webkit-font-smoothing: antialiased;
@@ -12813,11 +12687,13 @@ gs-datasheet .hud-container gs-button[remove-left] {
     border-left: 0 none;
     margin-left: 0;
     border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 gs-datasheet .hud-container gs-button[remove-right] {
     border-right: 0 none;
     border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 gs-datasheet .hud-container gs-button:first-child {
@@ -13049,15 +12925,15 @@ gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr:nth-child
 }
 
 gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr > [selected][not-editable] {
-    background-color: #f7f7c2 !important;
+    background-color: #59C4FD !important;
 }
 
 gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr:nth-child(odd) > [selected][not-editable] {
-    background-color: #f1f1ba !important;
+    background-color: #59C4FD !important;
 }
 
 gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr:nth-child(odd) > [selected] {
-    background-color: #f7f7c4 !important;
+    background-color: #84D4FF !important;
 }
 
 
@@ -13247,6 +13123,10 @@ gs-date[readonly] .date-picker-button {
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
+    
+    box-shadow: none;
+    margin: 0;
+    border-radius: 0;
 }
 
 .gs-date-date-picker-container .gs-date-date-picker .day-marker.other-month {
@@ -13254,7 +13134,8 @@ gs-date[readonly] .date-picker-button {
 }
 
 .gs-date-date-picker-container .gs-date-date-picker .day-marker.today {
-    border-color: #00FF00;
+    color: #F7990C;
+    font-weight: bold;
 }
 html.no-scroll-except-for-dialog,
 html.no-scroll-except-for-dialog > body,
@@ -13377,10 +13258,12 @@ gs-dialog-overlay[no-background] {
     }
 }
 
+/*
 gs-envelope:focus {
     background-color: #FFF;
     outline: none;
 }
+*/
 
 gs-envelope caption {
   padding-top: 8px;
