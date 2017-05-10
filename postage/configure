@@ -92,8 +92,8 @@ else
 	echo "Unknown"
 fi
 
-LDFLAGS="$LDFLAGS -L$(pg_config --libdir | sed -e 's/\//\\\//g')"
-CPPFLAGS="$CPPFLAGS -I$(pg_config --includedir | sed -e 's/\//\\\//g')"
+LDFLAGS="$LDFLAGS -L$(pg_config --libdir)"
+CPPFLAGS="$CPPFLAGS -I$(pg_config --includedir)"
 
 BUILD_DEPS=""
 
@@ -114,19 +114,17 @@ fi
 
 if test $libtls = "build"; then
 	WHICH_SSL=$(which openssl)
-	SSL_INCLUDEDIR1="${WHICH_SSL%bin/openssl}include"
-	SSL_INCLUDEDIR=$(echo $SSL_INCLUDEDIR1 | sed -e 's/\//\\\//g')
+	SSL_INCLUDEDIR="${WHICH_SSL%bin/openssl}include"
 	CPPFLAGS="$CPPFLAGS -I$SSL_INCLUDEDIR -DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS= -DSSL_OP_NO_CLIENT_RENEGOTIATION=0x00020000L -DX509_V_FLAG_NO_CHECK_TIME=0x200000 -DSSL_CTRL_SET_DH_AUTO=118 -DX509_L_MEM=3"
-	SSL_LIBDIR1="${WHICH_SSL%bin/openssl}lib"
-	SSL_LIBDIR=$(echo $SSL_LIBDIR1 | sed -e 's/\//\\\//g')
-	LDFLAGS="$LDFLAGS -L$SSL_LIBDIR ..\\/dependencies\\/libtls\\/libtls.a -lssl -lcrypto"
+	SSL_LIBDIR="${WHICH_SSL%bin/openssl}lib"
+	LDFLAGS="$LDFLAGS -L$SSL_LIBDIR ../dependencies/libtls/libtls.a -lssl -lcrypto"
 
 	FUNCTION="getentropy"
 	. scripts/check_function
 	CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
 	CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
 	if test "x$HAVE_FUNCTION" != "x1"; then
-		COMPAT="$COMPAT ..\\/dependencies\\/libtls\\/compat\\/getentropy_${ARC4RANDOM}.c"
+		COMPAT="$COMPAT ../dependencies/libtls/compat/getentropy_${ARC4RANDOM}.c"
 	fi
 
 	FUNCTION="arc4random"
@@ -134,8 +132,7 @@ if test $libtls = "build"; then
 	CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
 	CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
 	if test "x$HAVE_FUNCTION" != "x1"; then
-		COMPAT="$COMPAT ..\\/dependencies\\/libtls\\/compat\\/arc4random.c"
-		# ..\\/dependencies\\/libtls\\/compat\\/arc4random_uniform.c
+		COMPAT="$COMPAT ../dependencies/libtls/compat/arc4random.c"
 	fi
 
 	FUNCTION="asprintf"
@@ -143,7 +140,7 @@ if test $libtls = "build"; then
 	CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
 	CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
 	if test "x$HAVE_FUNCTION" != "x1"; then
-		COMPAT="$COMPAT ..\\/dependencies\\/libtls\\/compat\\/bsd-asprintf.c"
+		COMPAT="$COMPAT ../dependencies/libtls/compat/bsd-asprintf.c"
 	fi
 
 	CHECK_FUNCTIONS="explicit_bzero getpagesize inet_pton reallocarray recallocarray strcasecmp strlcat strlcpy strndup strnlen strsep timegm timingsafe_bcmp timingsafe_memcmp"
@@ -152,7 +149,7 @@ if test $libtls = "build"; then
 		CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
 		CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
 		if test "x$HAVE_FUNCTION" != "x1"; then
-			COMPAT="$COMPAT ..\\/dependencies\\/libtls\\/compat\\/${FUNCTION}.c"
+			COMPAT="$COMPAT ../dependencies/libtls/compat/${FUNCTION}.c"
 		fi
 	done
 
@@ -165,9 +162,8 @@ if test $libtls = "build"; then
 	BUILD_DEPS="$BUILD_DEPS libtls"
 elif test $libtls = "use"; then
 	WHICH_SSL=$(which openssl)
-	SSL_LIBDIR1="${WHICH_SSL%bin/openssl}lib"
-	SSL_LIBDIR=$(echo $SSL_LIBDIR1 | sed -e 's/\//\\\//g')
-	LDFLAGS="$LDFLAGS $SSL_LIBDIR\\/libtls.a $SSL_LIBDIR\\/libssl.a $SSL_LIBDIR\\/libcrypto.a"
+	SSL_LIBDIR="${WHICH_SSL%bin/openssl}lib"
+	LDFLAGS="$LDFLAGS $SSL_LIBDIR/libtls.a $SSL_LIBDIR/libssl.a $SSL_LIBDIR/libcrypto.a"
 fi
 
 #### LIBEV
@@ -313,16 +309,16 @@ fi
 echo "$has_new_sock_directory_parameter_postgres"
 
 #### CONFIGURE MAKEFILE
-sed -e "s/@sock_dir_parameter@/$directory_parameter/g" \
-	-e "s/@LDFLAGS@/$LDFLAGS/g" \
-	-e "s/@CPPFLAGS@/$CPPFLAGS/g" \
-	-e "s/@BUILD_DEPS@/$BUILD_DEPS/g" \
+sed -e "s|@sock_dir_parameter@|$directory_parameter|g" \
+	-e "s|@LDFLAGS@|$LDFLAGS|g" \
+	-e "s|@CPPFLAGS@|$CPPFLAGS|g" \
+	-e "s|@BUILD_DEPS@|$BUILD_DEPS|g" \
 	-e "s|@prefix@|$PREFIX|g" \
-	-e "s/@MANDIR@/$MANDIR/g" \
-	-e "s/@libev_CPPFLAGS@/$libev_CPPFLAGS/g" \
-	-e "s/@libtre_CPPFLAGS@/$libtre_CPPFLAGS/g" \
-	-e "s/@compat@/$COMPAT/g" \
-	-e "s/@make@/$MAKE/g" < Makefile.in > Makefile
+	-e "s|@MANDIR@|$MANDIR|g" \
+	-e "s|@libev_CPPFLAGS@|$libev_CPPFLAGS|g" \
+	-e "s|@libtre_CPPFLAGS@|$libtre_CPPFLAGS|g" \
+	-e "s|@compat@|$COMPAT|g" \
+	-e "s|@make@|$MAKE|g" < Makefile.in > Makefile
 
 #### CONFIGURE MAN PAGE
 sed -e "s/@prefix@/\/usr\/local/g" < man/man1/postage.1.in > man/man1/postage.1
