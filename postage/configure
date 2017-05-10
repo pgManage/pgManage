@@ -46,7 +46,7 @@ fi
 
 #### OS CHECK
 ## COMPILATION IS A LITTLE DIFFERENT FOR THE OS'S
-libressl="install"
+libtls="build"
 libev="no"
 libtre="notused" #NOT FOR POSTAGE
 MAKE="make"
@@ -58,20 +58,25 @@ if test $(uname -s) = "Linux"; then
 	echo "Linux"
 
 	# On linux it is easy to check for libressl
-	printf "checking for LibreSSL..."
+	printf "checking for LibTLS..."
 	if test $(ldconfig -p | grep "libtls.so " | wc -l) = "1"; then
-		libressl="yes"
+		libtls="use"
+		echo "yes"
+	else
+		echo "no"
 	fi
-	echo $libressl
+	ARC4RANDOM="linux"
 elif test $(uname -s) = "Darwin"; then
 	LDFLAGS="-L\/usr\/local\/lib -lpq -lm -L\/usr\/local\/opt\/gettext\/lib"
 	CPPFLAGS="-I\/usr\/local\/opt\/gettext\/include"
 	echo "Darwin"
+	ARC4RANDOM="osx"
 elif test $(uname -s) = "FreeBSD"; then
 	LDFLAGS="-lpq -lm -lintl"
 	MAKE=gmake
 	MANDIR="man"
 	echo "FreeBSD"
+	ARC4RANDOM="freebsd"
 elif test $(uname -s) = "OpenBSD"; then
 	LDFLAGS="-lpq -lm -lintl"
 	CPPFLAGS=""
@@ -79,200 +84,201 @@ elif test $(uname -s) = "OpenBSD"; then
 	MANDIR="man"
 	echo "OpenBSD"
 
-	## On OpenBSD it is easy to check for libev
-	#printf "checking for Libev..."
-	#if test $(pkg_info | grep "libev-4.22" | wc -l) = "1"; then
-	#	libev="yes"
-	#	echo $libev
-	#else
-	#	libev="no"
-	#	echo $libev
-	#	echo
-	#	echo "Run \`pkg_add libev-4.22\` and then run ./configure again."
-	#	echo "Alternatively the makefile will ATTEMPT compile it from source,"
-	#	echo "But we do not recommend it."
-	#	echo
-	#fi
-
-	# and even easier to check for libressl
-	printf "checking for LibreSSL..."
-	libressl="yes"
-	echo $libressl
+	printf "checking for LibTLS..."
+	libtls="use"
+	echo "yes"
 else
 	LDFLAGS="-lpq -lm"
 	echo "Unknown"
 fi
 
-LDFLAGS="$LDFLAGS -L$(pg_config --libdir | sed -e 's/\//\\\//g')"
-CPPFLAGS="$CPPFLAGS -I$(pg_config --includedir | sed -e 's/\//\\\//g')"
+LDFLAGS="$LDFLAGS -L$(pg_config --libdir)"
+CPPFLAGS="$CPPFLAGS -I$(pg_config --includedir)"
 
 BUILD_DEPS=""
 
 #### CHECK LIBRESSL VERSION
 ## if we have libressl, we need to check for 2.3.2 or newer (the api changed slightly)
-if test $libressl = "yes"; then
-	printf "checking for LibreSSL version >= 2.3.2..."
+if test $libtls = "use"; then
+	printf "checking for LibTLS version >= 2.3.2..."
 	# check LibreSSL version
 	has_good_libressl=$(openssl version | awk ' { split($2,a,"."); print (a[1] > 1) && (a[2] > 2) && (a[2] > 3 || a[3] > 1) } ')
 	if test "x$has_good_libressl" = "x1"; then
-		libressl="yes"
+		libtls="use"
+		echo "yes"
 	else
-		libressl="install"
+		libtls="build"
+		echo "no"
 	fi
-	echo "$libressl"
 fi
 
-INSTALL_DEPS=""
-## add compile flags for libressl
-if test $libressl = "yes"; then
+if test $libtls = "build"; then
 	WHICH_SSL=$(which openssl)
-	SSL_LIBDIR1="${WHICH_SSL%bin/openssl}lib"
-	SSL_LIBDIR=$(echo $SSL_LIBDIR1 | sed -e 's/\//\\\//g')
-	LDFLAGS="$LDFLAGS  $SSL_LIBDIR\\/libtls.a $SSL_LIBDIR\\/libssl.a $SSL_LIBDIR\\/libcrypto.a"
-elif test $libressl = "install"; then
-	LDFLAGS="$LDFLAGS ..\\/dependencies\\/libressl\\/tls\\/.libs\\/libtls.a ..\\/dependencies\\/libressl\\/ssl\\/.libs\\/libssl.a ..\\/dependencies\\/libressl\\/crypto\\/.libs\\/libcrypto.a"
-	BUILD_DEPS="$BUILD_DEPS libressl"
-	INSTALL_DEPS="$INSTALL_DEPS libressl-install"
-	printf "resetting modify times for libressl..."
-	if test $(uname -s) = "Darwin"; then
-		DATE=$(date +%Y%m%d%H%M.%S)
-		find ../dependencies/libressl/ -name "*.in" | xargs touch -t "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -t "$DATE" && touch -t "$DATE" ../dependencies/libressl/configure
-	else
-		DATE=$(date)
-		find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
-	fi
-	echo "done"
-else
-	LDFLAGS="$LDFLAGS ..\\/dependencies\\/libressl\\/tls\\/.libs\\/libtls.a ..\\/dependencies\\/libressl\\/ssl\\/.libs\\/libssl.a ..\\/dependencies\\/libressl\\/crypto\\/.libs\\/libcrypto.a"
-	BUILD_DEPS="$BUILD_DEPS libressl"
-	printf "resetting modify times for libressl..."
-	if test $(uname -s) = "Darwin"; then
-		DATE=$(date +%Y%m%d%H%M.%S)
-		find ../dependencies/libressl/ -name "*.in" | xargs touch -t "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -t "$DATE" && touch -t "$DATE" ../dependencies/libressl/configure
-	else
-		DATE=$(date)
-		find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
-	fi
-	echo "done"
-fi
+	SSL_INCLUDEDIR="${WHICH_SSL%bin/openssl}include"
+	CPPFLAGS="$CPPFLAGS -I$SSL_INCLUDEDIR -DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS= -DSSL_OP_NO_CLIENT_RENEGOTIATION=0x00020000L -DX509_V_FLAG_NO_CHECK_TIME=0x200000 -DSSL_CTRL_SET_DH_AUTO=118 -DX509_L_MEM=3"
+	SSL_LIBDIR="${WHICH_SSL%bin/openssl}lib"
+	LDFLAGS="$LDFLAGS -L$SSL_LIBDIR ../dependencies/libtls/libtls.a -lssl -lcrypto"
 
-#### CHECK FOR LIBEV
-## if we are on openbsd, we can use package libev if it is 4.22
-if test $libev = "yes"; then
-	CPPFLAGS="$CPPFLAGS -I\\/usr\\/local\\/include"
-	LDFLAGS="$LDFLAGS -lev"
-else
-	USE_LRT="no"
-	libev_CPPFLAGS=""
-	LDFLAGS="$LDFLAGS ev.o"
-	BUILD_DEPS="$BUILD_DEPS ev.o"
-	CHECK_HEADERS="sys/inotify.h sys/epoll.h sys/event.h port.h poll.h sys/select.h sys/eventfd.h sys/signalfd.h"
-	for HEADER in $CHECK_HEADERS; do
-		. scripts/check_header
-		HEADER_VAR_NAME="HAVE_"$(echo "$HEADER" | tr '[a-z]' '[A-Z]' | tr '.' '_' | tr '/' '_')
-		libev_CPPFLAGS="$libev_CPPFLAGS -D$HEADER_VAR_NAME""=$HAVE_HEADER"
-	done
-	CHECK_FUNCTIONS="inotify_init epoll_ctl kqueue port_create poll select eventfd signalfd"
+	FUNCTION="getentropy"
+	. scripts/check_function
+	CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
+	CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
+	if test "x$HAVE_FUNCTION" != "x1"; then
+		COMPAT="$COMPAT ../dependencies/libtls/compat/getentropy_${ARC4RANDOM}.c"
+	fi
+
+	FUNCTION="arc4random"
+	. scripts/check_function
+	CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
+	CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
+	if test "x$HAVE_FUNCTION" != "x1"; then
+		COMPAT="$COMPAT ../dependencies/libtls/compat/arc4random.c"
+	fi
+
+	FUNCTION="asprintf"
+	. scripts/check_function
+	CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
+	CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
+	if test "x$HAVE_FUNCTION" != "x1"; then
+		COMPAT="$COMPAT ../dependencies/libtls/compat/bsd-asprintf.c"
+	fi
+
+	CHECK_FUNCTIONS="explicit_bzero getpagesize inet_pton reallocarray recallocarray strcasecmp strlcat strlcpy strndup strnlen strsep timegm timingsafe_bcmp timingsafe_memcmp"
 	for FUNCTION in $CHECK_FUNCTIONS; do
 		. scripts/check_function
 		CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
-		libev_CPPFLAGS="$libev_CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
+		CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
+		if test "x$HAVE_FUNCTION" != "x1"; then
+			COMPAT="$COMPAT ../dependencies/libtls/compat/${FUNCTION}.c"
+		fi
 	done
-	FUNCTION="clock_gettime"
+
+	CHECK_CPPFLAGS="-I$SSL_INCLUDEDIR"
+	HEADER="openssl/ssl.h"
+	. scripts/check_header
+	if test "x$HAVE_HEADER" != "x1"; then
+		echo "Could not find OpenSSL headers! Install them and re-run configure."
+		exit 1
+	fi
+	BUILD_DEPS="$BUILD_DEPS libtls"
+elif test $libtls = "use"; then
+	WHICH_SSL=$(which openssl)
+	SSL_LIBDIR="${WHICH_SSL%bin/openssl}lib"
+	LDFLAGS="$LDFLAGS $SSL_LIBDIR/libtls.a $SSL_LIBDIR/libssl.a $SSL_LIBDIR/libcrypto.a"
+fi
+
+#### LIBEV
+
+USE_LRT="no"
+libev_CPPFLAGS=""
+LDFLAGS="$LDFLAGS ev.o"
+BUILD_DEPS="$BUILD_DEPS ev.o"
+CHECK_HEADERS="sys/inotify.h sys/epoll.h sys/event.h port.h poll.h sys/select.h sys/eventfd.h sys/signalfd.h"
+for HEADER in $CHECK_HEADERS; do
+	. scripts/check_header
+	HEADER_VAR_NAME="HAVE_"$(echo "$HEADER" | tr '[a-z]' '[A-Z]' | tr '.' '_' | tr '/' '_')
+	libev_CPPFLAGS="$libev_CPPFLAGS -D$HEADER_VAR_NAME""=$HAVE_HEADER"
+done
+CHECK_FUNCTIONS="inotify_init epoll_ctl kqueue port_create poll select eventfd signalfd"
+for FUNCTION in $CHECK_FUNCTIONS; do
 	. scripts/check_function
-	HAVE_SYSCALL_FUNCTION=0
-	if test $HAVE_FUNCTION = 1; then
-		if test $(uname -s) = "Linux"; then
-			printf "checking for clock_gettime syscall..."
-			echo "#include <unistd.h>" > test.c
-			echo "#include <sys/syscall.h>" >> test.c
-			echo "#include <time.h>" >> test.c
-			echo "int main(int argc) {" >> test.c
-			echo "    struct timespec ts;" >> test.c
-			echo "    int status = syscall(SYS_clock_gettime, CLOCK_REALTIME, &ts);" >> test.c
-			echo "    return status == -1;" >> test.c
-			echo "}" >> test.c
-			cc -o test.o test.c > /dev/null 2> /dev/null
+	CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
+	libev_CPPFLAGS="$libev_CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
+done
+FUNCTION="clock_gettime"
+. scripts/check_function
+HAVE_SYSCALL_FUNCTION=0
+if test $HAVE_FUNCTION = 1; then
+	if test $(uname -s) = "Linux"; then
+		printf "checking for clock_gettime syscall..."
+		echo "#include <unistd.h>" > test.c
+		echo "#include <sys/syscall.h>" >> test.c
+		echo "#include <time.h>" >> test.c
+		echo "int main(int argc) {" >> test.c
+		echo "    struct timespec ts;" >> test.c
+		echo "    int status = syscall(SYS_clock_gettime, CLOCK_REALTIME, &ts);" >> test.c
+		echo "    return status == -1;" >> test.c
+		echo "}" >> test.c
+		cc -o test.o test.c > /dev/null 2> /dev/null
+		if test $? = 0; then
+			./test.o
 			if test $? = 0; then
-				./test.o
-				if test $? = 0; then
-					libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_CLOCK_GETTIME_SYSCALL""=1"
-					echo "yes"
-				else
-					echo "no"
-				fi
-			else
-				echo "no"
-			    if test -z "$LIBEV_M4_AVOID_LIBRT"; then
-					LIBRARY="rt"
-					. scripts/check_library
-					if test $HAVE_LIBRARY = 1; then
-						LDFLAGS="$LDFLAGS -lrt"
-						CHECK_CFLAGS="-lrt"
-						FUNCTION="clock_gettime"
-						. scripts/check_function "clock_gettime"
-						USE_LRT="yes"
-					fi
-				fi
-			fi
-			rm -f test.c test.o
-		elif test $(uname -s) = "Darwin"; then
-			printf "checking for clock_gettime at runtime""..."
-			echo "#include <time.h>" > test.c
-			echo "int main(int argc) {" >> test.c
-			echo "    struct timespec test = {0};" >> test.c
-			echo "    clock_gettime(CLOCK_REALTIME, &test);" >> test.c
-			echo "    return 0;" >> test.c
-			echo "}" >> test.c
-			cc -o test.o test.c > /dev/null 2> /dev/null
-			./test.o > /dev/null 2> /dev/null
-			if test $? = 0; then
-				HAVE_FUNCTION=1
+				libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_CLOCK_GETTIME_SYSCALL""=1"
 				echo "yes"
 			else
-				HAVE_FUNCTION=0
 				echo "no"
-				echo "WARNING: It seems that the linker reports clock_gettime is present, but at runtime it isn't."
-				echo "It is possible to encounter this on OS X 10.11 (El Capitan) if you have the macOS 10.12 (Sierra) SDK installed."
-				echo "This is an unsupported configuration and you should wither upgrade to 10.12, or downgrade your SDK."
-				echo "Press [ENTER] to continue anyway."
-				read
 			fi
-			rm -f test.c test.o
-		fi
-	fi
-	libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_CLOCK_GETTIME""=$HAVE_FUNCTION"
-	FUNCTION="nanosleep"
-	. scripts/check_function
-	if test -z "$LIBEV_M4_AVOID_LIBRT" && test $USE_LRT = "no"; then
-		LIBRARY="rt"
-		. scripts/check_library
-		if test $HAVE_LIBRARY = 1; then
-			LDFLAGS="$LDFLAGS -lrt"
-			FUNCTION="nanosleep"
-			. scripts/check_function
-			libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_NANOSLEEP""=$HAVE_FUNCTION"
-		fi
-	fi
-	if test -z "$LIBEV_M4_AVOID_LIBM"; then
-		LIBRARY="m"
-		. scripts/check_library "m"
-		if test $HAVE_LIBRARY = 1; then
-			LDFLAGS="$LDFLAGS -lm"
-			CHECK_CFLAGS="-lm"
-			FUNCTION="floor"
-			. scripts/check_function
-			libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_FLOOR""=$HAVE_FUNCTION"
 		else
-			FUNCTION="floor"
-			. scripts/check_function
-			libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_FLOOR""=$HAVE_FUNCTION"
+			echo "no"
+		    if test -z "$LIBEV_M4_AVOID_LIBRT"; then
+				LIBRARY="rt"
+				. scripts/check_library
+				if test $HAVE_LIBRARY = 1; then
+					LDFLAGS="$LDFLAGS -lrt"
+					CHECK_CFLAGS="-lrt"
+					FUNCTION="clock_gettime"
+					. scripts/check_function "clock_gettime"
+					USE_LRT="yes"
+				fi
+			fi
 		fi
+		rm -f test.c test.o
+	elif test $(uname -s) = "Darwin"; then
+		printf "checking for clock_gettime at runtime""..."
+		echo "#include <time.h>" > test.c
+		echo "int main(int argc) {" >> test.c
+		echo "    struct timespec test = {0};" >> test.c
+		echo "    clock_gettime(CLOCK_REALTIME, &test);" >> test.c
+		echo "    return 0;" >> test.c
+		echo "}" >> test.c
+		cc -o test.o test.c > /dev/null 2> /dev/null
+		./test.o > /dev/null 2> /dev/null
+		if test $? = 0; then
+			HAVE_FUNCTION=1
+			echo "yes"
+		else
+			HAVE_FUNCTION=0
+			echo "no"
+			echo "WARNING: It seems that the linker reports clock_gettime is present, but at runtime it isn't."
+			echo "It is possible to encounter this on OS X 10.11 (El Capitan) if you have the macOS 10.12 (Sierra) SDK installed."
+			echo "This is an unsupported configuration and you should wither upgrade to 10.12, or downgrade your SDK."
+			echo "Press [ENTER] to continue anyway."
+			read
+		fi
+		rm -f test.c test.o
+	fi
+fi
+libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_CLOCK_GETTIME""=$HAVE_FUNCTION"
+FUNCTION="nanosleep"
+. scripts/check_function
+if test -z "$LIBEV_M4_AVOID_LIBRT" && test $USE_LRT = "no"; then
+	LIBRARY="rt"
+	. scripts/check_library
+	if test $HAVE_LIBRARY = 1; then
+		LDFLAGS="$LDFLAGS -lrt"
+		FUNCTION="nanosleep"
+		. scripts/check_function
+		libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_NANOSLEEP""=$HAVE_FUNCTION"
+	fi
+fi
+if test -z "$LIBEV_M4_AVOID_LIBM"; then
+	LIBRARY="m"
+	. scripts/check_library "m"
+	if test $HAVE_LIBRARY = 1; then
+		LDFLAGS="$LDFLAGS -lm"
+		CHECK_CFLAGS="-lm"
+		FUNCTION="floor"
+		. scripts/check_function
+		libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_FLOOR""=$HAVE_FUNCTION"
 	else
 		FUNCTION="floor"
 		. scripts/check_function
 		libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_FLOOR""=$HAVE_FUNCTION"
 	fi
+else
+	FUNCTION="floor"
+	. scripts/check_function
+	libev_CPPFLAGS="$libev_CPPFLAGS -DHAVE_FLOOR""=$HAVE_FUNCTION"
 fi
 
 #### ADD LIBTRE FLAGS
@@ -289,7 +295,7 @@ if test $libtre = "no"; then
 fi
 
 #### POSTGRESQL CHECK
-## POSTGRES CHANGED THE NAME OF A CONFIG FILE PARAMETER, WHEN WE TEST WE NEED TO KNOW WHICH ONE TO USE
+## POSTGRES CHANGED THE NAME OF A CONFIG FILE PARAMETER, WHEN WE TEST WE NEED TO KNOW WHICH ONE TO USE (for `make test`)
 printf "checking for PostgreSQL version >= 9.3.0 (parameter rename)..."
 # check PostgreSQL version
 has_new_sock_directory_parameter_postgres=$(pg_config --version | awk "{split(\$2,a,\".\"); print (a[1] >= 9) && (a[2] >= 3) && (a[3] >= 0)}")
@@ -304,37 +310,33 @@ fi
 echo "$has_new_sock_directory_parameter_postgres"
 
 #### CONFIGURE MAKEFILE
-sed -e "s/@sock_dir_parameter@/$directory_parameter/g" \
-	-e "s/@LDFLAGS@/$LDFLAGS/g" \
-	-e "s/@CPPFLAGS@/$CPPFLAGS/g" \
-	-e "s/@BUILD_DEPS@/$BUILD_DEPS/g" \
+sed -e "s|@sock_dir_parameter@|$directory_parameter|g" \
+	-e "s|@LDFLAGS@|$LDFLAGS|g" \
+	-e "s|@CPPFLAGS@|$CPPFLAGS|g" \
+	-e "s|@BUILD_DEPS@|$BUILD_DEPS|g" \
 	-e "s|@prefix@|$PREFIX|g" \
-	-e "s/@MANDIR@/$MANDIR/g" \
-	-e "s/@libev_CPPFLAGS@/$libev_CPPFLAGS/g" \
-	-e "s/@libtre_CPPFLAGS@/$libtre_CPPFLAGS/g" \
-	-e "s/@INSTALL_DEPS@/$INSTALL_DEPS/g" \
-	-e "s/@make@/$MAKE/g" < Makefile.in > Makefile
+	-e "s|@MANDIR@|$MANDIR|g" \
+	-e "s|@libev_CPPFLAGS@|$libev_CPPFLAGS|g" \
+	-e "s|@libtre_CPPFLAGS@|$libtre_CPPFLAGS|g" \
+	-e "s|@compat@|$COMPAT|g" \
+	-e "s|@make@|$MAKE|g" < Makefile.in > Makefile
 
 #### CONFIGURE MAN PAGE
 sed -e "s/@prefix@/\/usr\/local/g" < man/man1/postage.1.in > man/man1/postage.1
 
 echo
 echo
-echo "   ###############################################################"
-echo "   #                                                             #"
-echo "   #               Thank you for choosing postage!               #"
-echo "   #                                                             #"
-echo "   #         If you have any trouble installing postage,         #"
-echo "   #     don't hesitate to email nunzio@workflowproducts.com     #"
-echo "   #                  or call 817-503-9545 CST                   #"
-echo "   #                      for free support                       #"
-echo "   #       NOTICE: You are about to compile the WEB SERVER       #"
-echo "   #      version of Postage. The desktop version is easier!     #"
-echo "   #                      You can get it at:                     #"
-echo "   #     https://github.com/workflowproducts/postage/releases    #"
-echo "   #                                                             #"
-echo "   ###############################################################"
-
-if test $libressl != "yes"; then
-	. scripts/libressl_warn
-fi
+echo "   #############################################################"
+echo "   #                                                           #"
+echo "   #              Thank you for choosing postage!              #"
+echo "   #                                                           #"
+echo "   #        If you have any trouble installing postage,        #"
+echo "   #    don't hesitate to email nunzio@workflowproducts.com    #"
+echo "   #                 or call 817-503-9545 CST                  #"
+echo "   #                     for free support                      #"
+echo "   #      NOTICE: You are about to compile the WEB SERVER      #"
+echo "   #     version of Postage. The desktop version is easier!    #"
+echo "   #                     You can get it at:                    #"
+echo "   #    https://github.com/workflowproducts/postage/releases   #"
+echo "   #                                                           #"
+echo "   #############################################################"

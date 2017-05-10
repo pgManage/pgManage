@@ -46,7 +46,7 @@ fi
 
 #### OS CHECK
 ## COMPILATION IS A LITTLE DIFFERENT FOR THE OS'S
-libressl="install"
+libtls="build"
 libev="no"
 libtre="no"
 MAKE="make"
@@ -58,20 +58,25 @@ if test $(uname -s) = "Linux"; then
 	echo "Linux"
 
 	# On linux it is easy to check for libressl
-	printf "checking for LibreSSL..."
+	printf "checking for LibTLS..."
 	if test $(ldconfig -p | grep "libtls.so " | wc -l) = "1"; then
-		libressl="yes"
+		libtls="use"
+		echo "yes"
+	else
+		echo "no"
 	fi
-	echo $libressl
+	ARC4RANDOM="linux"
 elif test $(uname -s) = "Darwin"; then
 	LDFLAGS="-L\/usr\/local\/lib -lpq -lm -L\/usr\/local\/opt\/gettext\/lib"
 	CPPFLAGS="-I\/usr\/local\/opt\/gettext\/include"
 	echo "Darwin"
+	ARC4RANDOM="osx"
 elif test $(uname -s) = "FreeBSD"; then
 	LDFLAGS="-lpq -lm -lintl"
 	MAKE=gmake
 	MANDIR="man"
 	echo "FreeBSD"
+	ARC4RANDOM="freebsd"
 elif test $(uname -s) = "OpenBSD"; then
 	LDFLAGS="-lpq -lm -lintl"
 	CPPFLAGS=""
@@ -79,88 +84,93 @@ elif test $(uname -s) = "OpenBSD"; then
 	MANDIR="man"
 	echo "OpenBSD"
 
-	## On OpenBSD it is easy to check for libev
-	#printf "checking for Libev..."
-	#if test $(pkg_info | grep "libev-4.22" | wc -l) = "1"; then
-	#	libev="yes"
-	#	echo $libev
-	#else
-	#	libev="no"
-	#	echo $libev
-	#	echo
-	#	echo "Run \`pkg_add libev-4.22\` and then run ./configure again."
-	#	echo "Alternatively the makefile will ATTEMPT compile it from source,"
-	#	echo "But we do not recommend it."
-	#	echo
-	#fi
-
-	# and even easier to check for libressl
-	printf "checking for LibreSSL..."
-	libressl="yes"
-	echo $libressl
+	printf "checking for LibTLS..."
+	libtls="use"
+	echo "yes"
 else
 	LDFLAGS="-lpq -lm"
 	echo "Unknown"
 fi
 
-LDFLAGS="$LDFLAGS -L$(pg_config --libdir | sed -e 's/\//\\\//g')"
-CPPFLAGS="$CPPFLAGS -I$(pg_config --includedir | sed -e 's/\//\\\//g')"
+LDFLAGS="$LDFLAGS -L$(pg_config --libdir)"
+CPPFLAGS="$CPPFLAGS -I$(pg_config --includedir)"
 
 BUILD_DEPS=""
 
 #### CHECK LIBRESSL VERSION
 ## if we have libressl, we need to check for 2.3.2 or newer (the api changed slightly)
-if test $libressl = "yes"; then
-	printf "checking for LibreSSL version >= 2.3.2..."
+if test $libtls = "use"; then
+	printf "checking for LibTLS version >= 2.3.2..."
 	# check LibreSSL version
 	has_good_libressl=$(openssl version | awk ' { split($2,a,"."); print (a[1] > 1) && (a[2] > 2) && (a[2] > 3 || a[3] > 1) } ')
 	if test "x$has_good_libressl" = "x1"; then
-		libressl="yes"
+		libtls="use"
+		echo "yes"
 	else
-		libressl="install"
+		libtls="build"
+		echo "no"
 	fi
-	echo "$libressl"
 fi
 
-INSTALL_DEPS=""
-## add compile flags for libressl
-if test $libressl = "yes"; then
+if test $libtls = "build"; then
 	WHICH_SSL=$(which openssl)
-	SSL_LIBDIR1="${WHICH_SSL%bin/openssl}lib"
-	SSL_LIBDIR=$(echo $SSL_LIBDIR1 | sed -e 's/\//\\\//g')
-	LDFLAGS="$LDFLAGS  $SSL_LIBDIR\\/libtls.a $SSL_LIBDIR\\/libssl.a $SSL_LIBDIR\\/libcrypto.a"
-elif test $libressl = "install"; then
-	LDFLAGS="$LDFLAGS ..\\/dependencies\\/libressl\\/tls\\/.libs\\/libtls.a ..\\/dependencies\\/libressl\\/ssl\\/.libs\\/libssl.a ..\\/dependencies\\/libressl\\/crypto\\/.libs\\/libcrypto.a"
-	BUILD_DEPS="$BUILD_DEPS libressl"
-	INSTALL_DEPS="$INSTALL_DEPS libressl-install"
-	printf "resetting modify times for libressl..."
-	if test $(uname -s) = "Darwin"; then
-		DATE=$(date +%Y%m%d%H%M.%S)
-		find ../dependencies/libressl/ -name "*.in" | xargs touch -t "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -t "$DATE" && touch -t "$DATE" ../dependencies/libressl/configure
-	else
-		DATE=$(date)
-		find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
+	SSL_INCLUDEDIR="${WHICH_SSL%bin/openssl}include"
+	CPPFLAGS="$CPPFLAGS -I$SSL_INCLUDEDIR -DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS= -DSSL_OP_NO_CLIENT_RENEGOTIATION=0x00020000L -DX509_V_FLAG_NO_CHECK_TIME=0x200000 -DSSL_CTRL_SET_DH_AUTO=118 -DX509_L_MEM=3"
+	SSL_LIBDIR="${WHICH_SSL%bin/openssl}lib"
+	LDFLAGS="$LDFLAGS -L$SSL_LIBDIR ../dependencies/libtls/libtls.a -lssl -lcrypto"
+
+	FUNCTION="getentropy"
+	. scripts/check_function
+	CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
+	CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
+	if test "x$HAVE_FUNCTION" != "x1"; then
+		COMPAT="$COMPAT ../dependencies/libtls/compat/getentropy_${ARC4RANDOM}.c"
 	fi
-	echo "done"
-else
-	LDFLAGS="$LDFLAGS ..\\/dependencies\\/libressl\\/tls\\/.libs\\/libtls.a ..\\/dependencies\\/libressl\\/ssl\\/.libs\\/libssl.a ..\\/dependencies\\/libressl\\/crypto\\/.libs\\/libcrypto.a"
-	BUILD_DEPS="$BUILD_DEPS libressl"
-	printf "resetting modify times for libressl..."
-	DATE=$(date)
-	if test $(uname -s) = "Darwin"; then
-		DATE=$(date +%Y%m%d%H%M.%S)
-		find ../dependencies/libressl/ -name "*.in" | xargs touch -t "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -t "$DATE" && touch -t "$DATE" ../dependencies/libressl/configure
-	else
-		DATE=$(date)
-		find ../dependencies/libressl/ -name "*.in" | xargs touch -d "$DATE" && find ../dependencies/libressl/ -name "*.m4" | xargs touch -d "$DATE" && touch -d "$DATE" ../dependencies/libressl/configure
+
+	FUNCTION="arc4random"
+	. scripts/check_function
+	CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
+	CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
+	if test "x$HAVE_FUNCTION" != "x1"; then
+		COMPAT="$COMPAT ../dependencies/libtls/compat/arc4random.c"
 	fi
-	echo "done"
+
+	FUNCTION="asprintf"
+	. scripts/check_function
+	CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
+	CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
+	if test "x$HAVE_FUNCTION" != "x1"; then
+		COMPAT="$COMPAT ../dependencies/libtls/compat/bsd-asprintf.c"
+	fi
+
+	CHECK_FUNCTIONS="explicit_bzero getpagesize inet_pton reallocarray recallocarray strcasecmp strlcat strlcpy strndup strnlen strsep timegm timingsafe_bcmp timingsafe_memcmp"
+	for FUNCTION in $CHECK_FUNCTIONS; do
+		. scripts/check_function
+		CUR_FUNCTION_VAR_NAME="HAVE_"$(echo "$FUNCTION" | tr '[a-z]' '[A-Z]')
+		CPPFLAGS="$CPPFLAGS -D$CUR_FUNCTION_VAR_NAME""=$HAVE_FUNCTION"
+		if test "x$HAVE_FUNCTION" != "x1"; then
+			COMPAT="$COMPAT ../dependencies/libtls/compat/${FUNCTION}.c"
+		fi
+	done
+
+	CHECK_CPPFLAGS="-I$SSL_INCLUDEDIR"
+	HEADER="openssl/ssl.h"
+	. scripts/check_header
+	if test "x$HAVE_HEADER" != "x1"; then
+		echo "Could not find OpenSSL headers! Install them and re-run configure."
+		exit 1
+	fi
+	BUILD_DEPS="$BUILD_DEPS libtls"
+elif test $libtls = "use"; then
+	WHICH_SSL=$(which openssl)
+	SSL_LIBDIR="${WHICH_SSL%bin/openssl}lib"
+	LDFLAGS="$LDFLAGS $SSL_LIBDIR/libtls.a $SSL_LIBDIR/libssl.a $SSL_LIBDIR/libcrypto.a"
 fi
 
 #### CHECK FOR LIBEV
 ## if we are on openbsd, we can use package libev if it is 4.22
 if test $libev = "yes"; then
-	CPPFLAGS="$CPPFLAGS -I\\/usr\\/local\\/include"
+	CPPFLAGS="$CPPFLAGS -I/usr/local/include"
 	LDFLAGS="$LDFLAGS -lev"
 else
 	USE_LRT="no"
@@ -304,16 +314,16 @@ fi
 echo "$has_new_sock_directory_parameter_postgres"
 
 #### CONFIGURE MAKEFILE
-sed -e "s/@sock_dir_parameter@/$directory_parameter/g" \
-	-e "s/@LDFLAGS@/$LDFLAGS/g" \
-	-e "s/@CPPFLAGS@/$CPPFLAGS/g" \
-	-e "s/@BUILD_DEPS@/$BUILD_DEPS/g" \
+sed -e "s|@sock_dir_parameter@|$directory_parameter|g" \
+	-e "s|@LDFLAGS@|$LDFLAGS|g" \
+	-e "s|@CPPFLAGS@|$CPPFLAGS|g" \
+	-e "s|@BUILD_DEPS@|$BUILD_DEPS|g" \
 	-e "s|@prefix@|$PREFIX|g" \
-	-e "s/@MANDIR@/$MANDIR/g" \
-	-e "s/@libev_CPPFLAGS@/$libev_CPPFLAGS/g" \
-	-e "s/@libtre_CPPFLAGS@/$libtre_CPPFLAGS/g" \
-	-e "s/@INSTALL_DEPS@/$INSTALL_DEPS/g" \
-	-e "s/@make@/$MAKE/g" < Makefile.in > Makefile
+	-e "s|@MANDIR@|$MANDIR|g" \
+	-e "s|@libev_CPPFLAGS@|$libev_CPPFLAGS|g" \
+	-e "s|@libtre_CPPFLAGS@|$libtre_CPPFLAGS|g" \
+	-e "s|@compat@|$COMPAT|g" \
+	-e "s|@make@|$MAKE|g" < Makefile.in > Makefile
 
 #### CONFIGURE MAN PAGE
 sed -e "s/@prefix@/\/usr\/local/g" < man/man1/envelope.1.in > man/man1/envelope.1
@@ -346,7 +356,3 @@ echo "   #         ##                                                           
 echo "   #     ##                                                                                      ##     #"
 echo "   # ##                                                                                              ## #"
 echo "   ######################################################################################################"
-
-if test $libressl != "yes"; then
-	. scripts/libressl_warn
-fi

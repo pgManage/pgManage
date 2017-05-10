@@ -729,7 +729,6 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 	int int_status2 = 1;
 	size_t int_i = 0, int_j = 0, int_len = 0;
 	query_cb_t query_cb = NULL;
-	bool bol_result;
 
 	SDEFINE_VAR_ALL(str_error);
 
@@ -819,7 +818,7 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 				}
 				int_i++;
 			}
-			
+
 			DArray_destroy(arr_res);
 			SFREE_ALL();
 			SDEBUG("w->active: %d", w->active);
@@ -866,16 +865,15 @@ static void db_query_cb(EV_P, ev_io *w, int revents) {
 
 			if (res_poll->copy_cb != NULL) {
 				str_error = _DB_get_diagnostic(conn, res);
-				bol_result = res_poll->copy_cb(EV_A, false, true, res_poll->cb_data, str_error, strlen(str_error));
+				res_poll->copy_cb(EV_A, false, true, res_poll->cb_data, str_error, strlen(str_error));
 				SFREE(str_global_error);
 				SFREE(str_error);
 				DB_free_result(db_res);
 			} else if (query_cb != NULL) {
-				bol_result = query_cb(EV_A, res_poll->cb_data, db_res);
+				query_cb(EV_A, res_poll->cb_data, db_res);
 				SFREE(str_global_error);
 			} else {
 				DB_free_result(db_res);
-				bol_result = true;
 			}
 
 			int_i += 1;

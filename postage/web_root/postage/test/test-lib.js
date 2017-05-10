@@ -296,6 +296,7 @@ var $ = {
 	                data = data.replace(/\\(?![rnt])/g, '/');
 					data = data.replace(/\/Users\\nunzio\/AppData\/Roaming\//g, '/home/super/.');
 					data = data.replace(/\/Users\/Admin\/AppData\/Roaming\//g, '/home/super/.');
+					data = data.replace(/\/home\/nunzio\//g, '/home/super/');
 					data = data.replace(/\/Users\/joseph\//g, '/home/super/');
 					data = data.replace(/\/Users\/super\//g, '/home/super/');
 					data = data.replace(/\/Users\/nunzio\//g, '/home/super/');

@@ -36,9 +36,6 @@
     <ClCompile Include="..\..\postage\ws_raw.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dependencies\libressl\crypto\compat\bsd-asprintf.c">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\common\common_auth.c">
       <Filter>Source Files\common</Filter>
     </ClCompile>
@@ -76,9 +73,6 @@
       <Filter>Source Files\common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\common\http_upload.c">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dependencies\libressl\crypto\compat\posix_win.c">
       <Filter>Source Files\common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\common\ws_delete.c">
@@ -146,6 +140,12 @@
     </ClCompile>
     <ClCompile Include="..\..\util\util_strptime.c">
       <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dependencies\libtls\compat\posix_win.c">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dependencies\libtls\compat\bsd-asprintf.c">
+      <Filter>Source Files\common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

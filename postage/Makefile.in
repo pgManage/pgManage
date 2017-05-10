@@ -1,19 +1,18 @@
 BINARY = postage
 CONFIGS = -c config/postage.conf -d config/postage-connections.conf -n true -t 300
 WEBROOTS = -r ./web_root
-INSTALL_DEPS = @prefix@/sbin/ @prefix@/etc/$(BINARY)/ @prefix@/etc/postage/postage.conf @prefix@/etc/postage/postage-connections.conf @INSTALL_DEPS@
+INSTALL_DEPS = @prefix@/sbin/ @prefix@/etc/$(BINARY)/ @prefix@/etc/postage/postage.conf @prefix@/etc/postage/postage-connections.conf
 SOCK_DIR_PARAMETER = @sock_dir_parameter@
 MAKE = @make@
 
 VERSION = \"$(shell cat ../VERSION)\"
 CC = cc
-CFLAGS = -Wall -Wextra -Wconversion \
-	-O3 -g \
-	-I../db_framework_pq -I../ -I../common -I../dependencies/tre/include -I../dependencies/libev -I../dependencies/libressl/include \
-	-fno-strict-aliasing \
-	-DVERSION=$(VERSION) -DPOSTAGE_PREFIX=\"@prefix@\" -DPOSTAGE_INTERFACE_LIBPQ
+CFLAGS = -O3 -g \
+	-fno-strict-aliasing
 LDFLAGS = @LDFLAGS@
-CPPFLAGS = @CPPFLAGS@
+CPPFLAGS = @CPPFLAGS@ -Wall -Wextra -Wconversion \
+	-I../db_framework_pq -I../ -I../common -I../dependencies/tre/include -I../dependencies/libev -I../dependencies/libtls/include \
+	-DVERSION=$(VERSION) -DPOSTAGE_PREFIX=\"@prefix@\" -DPOSTAGE_INTERFACE_LIBPQ
 BUILD_DEPS = @BUILD_DEPS@
 
 common_SOURCES = $(wildcard ../common/*.c) $(filter-out ../util/util_getopt.c, $(filter-out ../util/util_strptime.c, $(filter-out ../util/util_exec.c, $(wildcard ../util/*.c))))
@@ -21,6 +20,10 @@ db_framework_pq_SOURCES = $(wildcard ../db_framework_pq/*.c)
 
 postage_SOURCES = $(common_SOURCES) $(db_framework_pq_SOURCES) $(wildcard *.c)
 postage_OBJECTS = $(postage_SOURCES:.c=.o)
+
+libtls_SOURCES = $(wildcard ../dependencies/libtls/*.c) @compat@
+
+libtls_OBJECTS = $(libtls_SOURCES:.c=.o)
 
 #postage_OBJECTS1 = $(postage_SOURCES:.c=.o)
 #postage_OBJECTS2 = $(postage_OBJECTS1:../common/=)
@@ -35,18 +38,10 @@ all: $(BINARY)
 	@echo "Compilation Successful"
 
 #### DEPENDENCIES
-../dependencies/libressl/apps/openssl/openssl: ../dependencies/libressl/Makefile
-	$(MAKE) -C ../dependencies/libressl/
+../dependencies/libtls/libtls.a: $(libtls_OBJECTS)
+	ar -rc ../dependencies/libtls/libtls.a $(libtls_OBJECTS)
 
-/usr/local/bin/openssl:
-	$(MAKE) install -C ../dependencies/libressl/
-
-libressl: ../dependencies/libressl/apps/openssl/openssl
-
-libressl-install: /usr/local/bin/openssl
-
-../dependencies/libressl/Makefile: ../dependencies/libressl/Makefile.in
-	cd ../dependencies/libressl/; ./configure; cd ../../$(BINARY)
+libtls: ../dependencies/libtls/libtls.a
 
 ev.o: ../dependencies/libev/ev.c
 	$(CC) ../dependencies/libev/ev.c @libev_CPPFLAGS@ -c -o ev.o
@@ -59,8 +54,7 @@ libtre_OBJECTS = $(libtre_SOURCES:.c=.o)
 
 #### BUILDING
 $(BINARY): $(BUILD_DEPS) $(postage_OBJECTS)
-	$(CC) $(postage_OBJECTS) $(LDFLAGS) $(CFLAGS) \
-		-o ./$(BINARY)
+	$(CC) $(postage_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
 
 all-format:
 	cd ..; ./cleanup_format.sh; cd $(BINARY)
@@ -71,7 +65,7 @@ all-format:
 
 #### CLEAN
 clean:
-	rm -f $(postage_OBJECTS) $(libtre_OBJECTS) ../check/*.o ev.o $(BINARY)
+	rm -f $(postage_OBJECTS) $(libtre_OBJECTS) $(libtls_OBJECTS) ../check/*.o ev.o ../dependencies/libtls/libtls.a $(BINARY)
 	@echo
 	@echo "Clean Successful"
 

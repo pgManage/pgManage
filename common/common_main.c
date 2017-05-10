@@ -364,25 +364,7 @@ int main(int argc, char *const *argv) {
 		if (tls_config_set_key_file(_server.tls_postage_config, str_global_tls_key) != 0) {
 			SERROR_LIBTLS_NOCONTEXT("tls_config_set_key_file() failed");
 		}
-
-		// int protocols = 0;
-		// if(tls_config_parse_protocols(&protocols, "secure") < 0) {
-		//	printf("tls_config_parse_protocols error\n");
-		//	exit(1);
-		//}
-
-		// tls_config_set_protocols(_server.tls_postage_config, protocols);
-
-		// Set the allowed ciphers in the configuration context
-		// if (tls_config_set_ciphers(_server.tls_postage_config,
-		// "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-"
-		//                                                      "GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-"
-		//                                                      "ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-"
-		//                                                      "SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-"
-		//                                                      "SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!"
-		//                                                      "MD5:!PSK") != 0) {
-		// this is done by default
-		// if (tls_config_set_ciphers(_server.tls_postage_config, "secure") != 0) {
+		
 		if (tls_config_set_ciphers(_server.tls_postage_config, "compat") != 0) {
 			SERROR_LIBTLS_NOCONTEXT("tls_config_set_ciphers() failed");
 		}
