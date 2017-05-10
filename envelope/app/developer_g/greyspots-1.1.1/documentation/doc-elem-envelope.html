@@ -310,7 +310,7 @@
                 </template>
             </gs-doc-example>
             <div class="doc-example-description">
-                <span class="h3">Attribute <code>[reflow-at"="]</code>:</span>
+                <span class="h3">Attribute <code>[reflow-at=""]</code>:</span>
                 <p>In this example the envelope has the "reflow-at" attribute. The "reflow-at" attribute is for telling the envelope when to reflow the table. When a table is "reflowed" that means that each record is essentially turned to be vertical. To put a heading above each of the controls you must have the "heading" attribute set for each cell.</p>
             </div>
             <gs-doc-example>
@@ -370,35 +370,6 @@
                                     </tr>
                                 </tbody>
                             </table>
-                        </template>
-                    </gs-envelope>
-                </template>
-            </gs-doc-example>
-            <div class="doc-example-description">
-                <span class="h3">Link Override Attributes:</span>
-                <p>In this example we have overridden the links that the envelope uses to call the database by setting the "action-select", "action-insert", "action-update" and the "action-delete" attributes to links of custom actions that return as the element expects. For the envelope to work the links that it calls have to at least return the same way as the Envelope API, an added bonus would be if it could also get it's parameters the same way. For a reference to how the default calls take parameters and return their data: see the <a href="doc-api-envelope.html" target="_blank">Envelope API Documentation</a>.</p>
-                <p>Note: This example will not update, insert, delete or select dynamic data, it's only to show how to connect postgres functions to the envelope element.</p>
-            </div>
-            <gs-doc-example>
-                <template for="html" height="27">
-                    <gs-envelope src="gsdoc.tpeople"
-                                 action-select="env/gsdoc.action_select"
-                                 action-insert="env/gsdoc.action_insert"
-                                 action-update="env/gsdoc.action_update"
-                                 action-delete="env/gsdoc.action_delete">
-                        <template for="table">
-                            <table>
-                                <tbody>
-                                    <tr>
-                                        <th heading="#"><gs-static column="row_number"></gs-static></th>
-                                        <td heading="Name"><gs-text mini column="name"></gs-text></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </template>
-                        <template for="insert">
-                            <label for="text-insert-name">Name:</label>
-                            <gs-text id="text-insert-name" column="name"></gs-text>
                         </template>
                     </gs-envelope>
                 </template>

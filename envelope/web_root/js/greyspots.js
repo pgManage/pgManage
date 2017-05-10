@@ -28299,91 +28299,61 @@ document.addEventListener('DOMContentLoaded', function () {
     //      else
     //          use: source query
     function getData(element, callback, bolInitalLoad, bolClearPrevious) {
-        if (window.bolSocket === true) {
-            var strSrc     = GS.templateWithQuerystring(
-                                (bolInitalLoad && element.getAttribute('initialize')
-                                    ? element.getAttribute('initialize')
-                                    : element.getAttribute('src')
-                                )
+        var strSrc     = GS.templateWithQuerystring(
+                            (bolInitalLoad && element.getAttribute('initialize')
+                                ? element.getAttribute('initialize')
+                                : element.getAttribute('src')
                             )
-              , srcParts   = strSrc[0] === '(' ? [strSrc, ''] : strSrc.split('.')
-              , strSchema  = srcParts[0]
-              , strObject  = srcParts[1]
-              , strColumns = GS.templateWithQuerystring(element.getAttribute('cols') || '*').split(',').join('\t')
-              , strWhere   = GS.templateWithQuerystring(element.getAttribute('where') || '')
-              , strOrd     = GS.templateWithQuerystring(element.getAttribute('ord') || '')
-              , strLimit   = GS.templateWithQuerystring(element.getAttribute('limit') || '1')
-              , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
-              , response_i = 0, response_len = 0, arrTotalRecords = [];
+                        )
+          , srcParts   = strSrc[0] === '(' ? [strSrc, ''] : strSrc.split('.')
+          , strSchema  = srcParts[0]
+          , strObject  = srcParts[1]
+          , strColumns = GS.templateWithQuerystring(element.getAttribute('cols') || '*').split(',').join('\t')
+          , strWhere   = GS.templateWithQuerystring(element.getAttribute('where') || '')
+          , strOrd     = GS.templateWithQuerystring(element.getAttribute('ord') || '')
+          , strLimit   = GS.templateWithQuerystring(element.getAttribute('limit') || '')
+          , strOffset  = GS.templateWithQuerystring(element.getAttribute('offset') || '')
+          , response_i = 0, response_len = 0, arrTotalRecords = [];
+        
+        GS.addLoader(element, 'Loading...');
+        GS.requestSelectFromSocket(GS.envSocket, strSchema, strObject, strColumns
+                                 , strWhere, strOrd, strLimit, strOffset
+                                 , function (data, error) {
+            var arrRecords, arrCells, envData
+              , i, len, cell_i, cell_len;
             
-            GS.addLoader(element, 'Loading...');
-            GS.requestSelectFromSocket(GS.envSocket, strSchema, strObject, strColumns
-                                     , strWhere, strOrd, strLimit, strOffset
-                                     , function (data, error) {
-                var arrRecords, arrCells, envData
-                  , i, len, cell_i, cell_len;
-                
-                //console.log(data);
-                
-                if (!error) {
-                    if (data.strMessage !== 'TRANSACTION COMPLETED') {
-                        arrRecords = GS.trim(data.strMessage, '\n').split('\n');
+            //console.log(data);
+            
+            if (!error) {
+                if (data.strMessage !== 'TRANSACTION COMPLETED') {
+                    arrRecords = GS.trim(data.strMessage, '\n').split('\n');
+                    
+                    for (i = 0, len = arrRecords.length; i < len; i += 1) {
+                        arrCells = arrRecords[i].split('\t');
                         
-                        for (i = 0, len = arrRecords.length; i < len; i += 1) {
-                            arrCells = arrRecords[i].split('\t');
-                            
-                            for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
-                                arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
-                            }
-                            
-                            arrTotalRecords.push(arrCells);
+                        for (cell_i = 0, cell_len = arrCells.length; cell_i < cell_len; cell_i += 1) {
+                            arrCells[cell_i] = arrCells[cell_i] === '\\N' ? null : GS.decodeFromTabDelimited(arrCells[cell_i]);
                         }
-                    } else {
-                        GS.removeLoader(element);
-                        element.arrColumnNames = data.arrColumnNames;
                         
-                        envData = {'arr_column': element.arrColumnNames, 'dat': arrTotalRecords};
-                        
-                        handleData(element, bolInitalLoad, envData);
-                        GS.triggerEvent(element, 'after_select');
-                        if (typeof callback === 'function') {
-                            callback();
-                        }
+                        arrTotalRecords.push(arrCells);
                     }
                 } else {
-                    handleData(element, bolInitalLoad, data, error);
                     GS.removeLoader(element);
+                    element.arrColumnNames = data.arrColumnNames;
+                    
+                    envData = {'arr_column': element.arrColumnNames, 'dat': arrTotalRecords};
+                    
+                    handleData(element, bolInitalLoad, envData);
+                    GS.triggerEvent(element, 'after_select');
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
                 }
-            });
-        } else {
-            var strLink,
-                strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') ||
-                                                                   element.getAttribute('source') || ''));
-            
-            strLink = '/' + (element.getAttribute('action-select') || 'env/action_select') +
-                    '?src=' + encodeURIComponent(strSource) +
-                    '&where='    + encodeURIComponent(GS.templateWithQuerystring(element.getAttribute('where') || '')) +
-                    '&limit='    + encodeURIComponent(GS.templateWithQuerystring(element.getAttribute('limit') || '')) +
-                    '&offset='   + encodeURIComponent(GS.templateWithQuerystring(element.getAttribute('offset') || '')) +
-                    '&order_by=' + encodeURIComponent(GS.templateWithQuerystring(element.getAttribute('ord') || '')) +
-                    '&cols='     + encodeURIComponent(element.getAttribute('cols') || '');
-            
-            document.addEventListener('dataready_' + encodeURIComponent(strLink), function __THIS_FUNCTION__(event) {
+            } else {
+                handleData(element, bolInitalLoad, data, error);
                 GS.removeLoader(element);
-                
-                handleData(element, bolInitalLoad, event.detail.response, event.detail.error);
-                GS.triggerEvent(element, 'after_select');
-                if (typeof callback === 'function') {
-                    callback();
-                }
-                
-                document.removeEventListener('dataready_' + encodeURIComponent(strLink), __THIS_FUNCTION__);
-            });
-            
-            GS.dataFetch(strLink, true);
-            
-            GS.addLoader(element, 'Loading...');
-        }
+            }
+        });
     }
     
     // handles data result from method function: getData 

@@ -32,7 +32,7 @@
             <h3 class="doc-header">Description:</h3>
             <div class="doc-section">
                 <p>On receiving the click event, this button deletes a record from a table. 
-                On the click event, this button will run an action_delete. An action_delete is part of the Envelope API. It converts the browser request into a SQL DELETE query and executes it, thereby dropping a record or records. Default functionality includes a popup for confirming you wish to delete the record as well as an error popup if the delete fails to occur.</p>
+                On the click event, this button will run an Websocket DELETE call. A Websocket DELETE is part of the Envelope API. It converts the browser request into a SQL DELETE query and executes it, thereby dropping a record or records. Default functionality includes a popup for confirming you wish to delete the record as well as an error popup if the delete fails to occur.</p>
                 <p>The gs-delete-button is both click and tap aware and works as expected across desktop and mobile browsers. Note that href, target, and dialogclose attributes won't work for gs-delete-button but other button attributes should work as expected.</p>
             </div>
             
@@ -50,16 +50,35 @@
                     </template>
                     <template for="js" height="20">
                         function insertPerson() { /* Add record button */
-                            GS.ajaxJSON('/env/action_insert'
-                                , 'view=gsdoc.tpeople&data=' 
-                                    + encodeURIComponent('first_name=John&last_name=Smith')
-                                , function (data, error) {
-                                    document.getElementById('example').setAttribute('value'
-                                        , data.dat.lastval);
-                                    document.getElementById('example').innerHTML 
-                                        = 'Delete record ID#' + data.dat.lastval;
-                                    GS.pushMessage('ID#' 
-                                        + data.dat.lastval + ' Inserted.', 1500);
+                            GS.requestInsertFromSocket(
+                                GS.envSocket
+                              , 'gsdoc', 'tpeople', 'id'
+                              , 'id', '', 'first_name\tlast_name\nJohn\tSmith\n'
+                              , function (data, error) {
+                                    if (error) {
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                              , function (data, error, transactionID, commitFunction, rollbackFunction) {
+                                    if (!error) {
+                                        if (data !== 'TRANSACTION COMPLETED') {
+                                            document.getElementById('example').setAttribute('value', data);
+                                            document.getElementById('example').innerHTML = 'Delete record ID#' + data;
+                                            GS.pushMessage('ID#' + data + ' Inserted.', 1500);
+                                        } else {
+                                            commitFunction();
+                                        }
+                                        
+                                    } else {
+                                        rollbackFunction();
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                              , function (strAnswer, data, error) {
+                                    if (!error) {
+                                    } else {
+                                        GS.webSocketErrorDialog(data);
+                                    }
                                 }
                             );
                         }
@@ -77,16 +96,35 @@
                     </template>
                     <template for="js" height="auto">
                         function insertPerson() { /* Add record button */
-                            GS.ajaxJSON('/env/action_insert'
-                                , 'view=gsdoc.tpeople&data=' 
-                                    + encodeURIComponent('first_name=John&last_name=Smith')
-                                , function (data, error) {
-                                    document.getElementById('example').setAttribute('value'
-                                        , data.dat.lastval);
-                                    document.getElementById('example').innerHTML 
-                                        = 'Delete record ID#' + data.dat.lastval;
-                                    GS.pushMessage('ID#' 
-                                        + data.dat.lastval + ' Inserted.', 1500);
+                            GS.requestInsertFromSocket(
+                                GS.envSocket
+                              , 'gsdoc', 'tpeople', 'id'
+                              , 'id', '', 'first_name\tlast_name\nJohn\tSmith\n'
+                              , function (data, error) {
+                                    if (error) {
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                              , function (data, error, transactionID, commitFunction, rollbackFunction) {
+                                    if (!error) {
+                                        if (data !== 'TRANSACTION COMPLETED') {
+                                            document.getElementById('example').setAttribute('value', data);
+                                            document.getElementById('example').innerHTML = 'Delete record ID#' + data;
+                                            GS.pushMessage('ID#' + data + ' Inserted.', 1500);
+                                        } else {
+                                            commitFunction();
+                                        }
+                                        
+                                    } else {
+                                        rollbackFunction();
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                              , function (strAnswer, data, error) {
+                                    if (!error) {
+                                    } else {
+                                        GS.webSocketErrorDialog(data);
+                                    }
                                 }
                             );
                         }
@@ -104,16 +142,35 @@
                     </template>
                     <template for="js" height="auto">
                         function insertPerson() { /* Add record button */
-                            GS.ajaxJSON('/env/action_insert'
-                                , 'view=gsdoc.tpeople&data=' 
-                                    + encodeURIComponent('first_name=John&last_name=Smith')
-                                , function (data, error) {
-                                    document.getElementById('example').setAttribute('value'
-                                        , data.dat.lastval);
-                                    document.getElementById('example').innerHTML 
-                                        = 'Delete record ID#' + data.dat.lastval;
-                                    GS.pushMessage('ID#' 
-                                        + data.dat.lastval + ' Inserted.', 1500);
+                            GS.requestInsertFromSocket(
+                                GS.envSocket
+                              , 'gsdoc', 'tpeople', 'id'
+                              , 'id', '', 'first_name\tlast_name\nJohn\tSmith\n'
+                              , function (data, error) {
+                                    if (error) {
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                              , function (data, error, transactionID, commitFunction, rollbackFunction) {
+                                    if (!error) {
+                                        if (data !== 'TRANSACTION COMPLETED') {
+                                            document.getElementById('example').setAttribute('value', data);
+                                            document.getElementById('example').innerHTML = 'Delete record ID#' + data;
+                                            GS.pushMessage('ID#' + data + ' Inserted.', 1500);
+                                        } else {
+                                            commitFunction();
+                                        }
+                                        
+                                    } else {
+                                        rollbackFunction();
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                              , function (strAnswer, data, error) {
+                                    if (!error) {
+                                    } else {
+                                        GS.webSocketErrorDialog(data);
+                                    }
                                 }
                             );
                         }
@@ -131,13 +188,35 @@
                     </template>
                     <template for="js" height="15">
                         function insertPerson() { /* Add record button */
-                            GS.ajaxJSON('/env/action_insert'
-                                , 'view=gsdoc.tpeople&data=' 
-                                    + encodeURIComponent('first_name=John&last_name=Smith')
-                                , function (data, error) {
-                                    GS.pushQueryString('id=' + data.dat.lastval);
-                                    GS.pushMessage('ID#' 
-                                        + data.dat.lastval + ' Inserted.', 1500);
+                            GS.requestInsertFromSocket(
+                                GS.envSocket
+                              , 'gsdoc', 'tpeople', 'id'
+                              , 'id', '', 'first_name\tlast_name\nJohn\tSmith\n'
+                              , function (data, error) {
+                                    if (error) {
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                              , function (data, error, transactionID, commitFunction, rollbackFunction) {
+                                    if (!error) {
+                                        if (data !== 'TRANSACTION COMPLETED') {
+                                            document.getElementById('example').setAttribute('value', data);
+                                            document.getElementById('example').innerHTML = 'Delete record ID#' + data;
+                                            GS.pushMessage('ID#' + data + ' Inserted.', 1500);
+                                        } else {
+                                            commitFunction();
+                                        }
+                                        
+                                    } else {
+                                        rollbackFunction();
+                                        GS.webSocketErrorDialog(data);
+                                    }
+                                }
+                              , function (strAnswer, data, error) {
+                                    if (!error) {
+                                    } else {
+                                        GS.webSocketErrorDialog(data);
+                                    }
                                 }
                             );
                         }
