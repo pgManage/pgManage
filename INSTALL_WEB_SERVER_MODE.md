@@ -7,8 +7,13 @@
 #### LIBPQ
 In order for Postage to talk to PostgreSQL you need to have the libpq library installed. If you don't have LibPQ or the Postage compile process can't find it, please consult the file INSTALL_LIBPQ for some OS-specific advice on how to get libpq.
 
-#### LIBRESSL
-Postage uses the new TLS API found in LibreSSL. It can take some time to compile LibreSSL. If LibreSSL is already installed on your machine, then the compile process dynamically loads that one. This way you can avoid the wait. If not, it's compiled in statically. Please be patient. 
+#### SSL
+Postage works with OpenSSL or LibreSSL, if you wish to use OpenSSL:
+```
+sudo apt install libssl-devel # Ubuntu
+sudo dnf install openssl-devel # Fedora
+```
+Or if you choose LibreSSL, make sure its `openssl` is first in the $PATH (On OpenBSD you don't need to worry about this).
 
 ####DOWNLOADING POSTAGE
 
@@ -17,8 +22,6 @@ https://github.com/workflowproducts/postage/releases
 ####INSTALLING POSTAGE
 
 If you'd like to test Postage before you install, see the section "Testing Postage Before Installing" further down.
-
-*`make` will take a while as it builds libressl.*
 
     cd postage
     ./configure
