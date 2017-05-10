@@ -18,7 +18,7 @@ CFLAGS = -O3 -g \
 	-fno-strict-aliasing
 LDFLAGS = @LDFLAGS@
 CPPFLAGS = @CPPFLAGS@ -DTRE_VERSION=\"0.8.0\" -DVERSION=$(VERSION) -D_GNU_SOURCE -DPOSTAGE_PREFIX=\"/usr/local\" -DPOSTAGE_INTERFACE_LIBPQ -DENVELOPE \
-		-I../db_framework_pq -I../ -I../common -I../dependencies/tre/include -I../dependencies/libev -I../dependencies/libressl/include
+		-I../db_framework_pq -I../ -I../common -I../dependencies/tre/include -I../dependencies/libev -I../dependencies/libtls/include
 BUILD_DEPS = @BUILD_DEPS@
 
 common_SOURCES = $(wildcard ../common/*.c) $(filter-out ../util/util_getopt.c, $(filter-out ../util/util_strptime.c, $(filter-out ../util/util_exec.c, $(wildcard ../util/*.c))))
@@ -26,6 +26,10 @@ db_framework_pq_SOURCES = $(wildcard ../db_framework_pq/*.c)
 
 envelope_SOURCES = $(common_SOURCES) $(db_framework_pq_SOURCES) $(wildcard *.c)
 envelope_OBJECTS = $(envelope_SOURCES:.c=.o)
+
+libtls_SOURCES = $(wildcard ../dependencies/libtls/*.c) @compat@
+
+libtls_OBJECTS = $(libtls_SOURCES:.c=.o)
 
 #envelope_OBJECTS1 = $(envelope_SOURCES:.c=.o)
 #envelope_OBJECTS2 = $(patsubst ../common/%, obj/%, $(envelope_OBJECTS1))
@@ -40,18 +44,10 @@ all: $(BINARY)
 	@echo "Compilation Successful"
 
 #### DEPENDENCIES
-../dependencies/libressl/apps/openssl/openssl: ../dependencies/libressl/Makefile
-	$(MAKE) -C ../dependencies/libressl/
+../dependencies/libtls/libtls.a: $(libtls_OBJECTS)
+	ar -rc ../dependencies/libtls/libtls.a $(libtls_OBJECTS)
 
-/usr/local/bin/openssl:
-	$(MAKE) install -C ../dependencies/libressl/
-
-libressl: ../dependencies/libressl/apps/openssl/openssl
-
-libressl-install: /usr/local/bin/openssl
-
-../dependencies/libressl/Makefile: ../dependencies/libressl/Makefile.in
-	cd ../dependencies/libressl/; ./configure; cd ../../$(BINARY)
+libtls: ../dependencies/libtls/libtls.a
 
 ev.o:
 	$(CC) ../dependencies/libev/ev.c @libev_CPPFLAGS@ -c -o ev.o
@@ -75,7 +71,7 @@ $(envelope_OBJECTS): %.o: %.c
 
 #### CLEAN
 clean:
-	rm -f $(envelope_OBJECTS) $(BINARY) ev.o $(libtre_OBJECTS)
+	rm -f $(envelope_OBJECTS) $(libtre_OBJECTS) $(libtls_OBJECTS) ../check/*.o ev.o ../dependencies/libtls/libtls.a $(BINARY)
 	@echo
 	@echo "Clean Successful"
 
@@ -151,7 +147,7 @@ test-common:
 	{ postgres -D data_test -p 5431 2> output.txt > output.txt & }; \
 	echo $$! > postgres.pid; \
 	sleep 3
-	psql -U postgres -h 127.0.0.1 -p 5431 postgres -1f test.sql
+	psql -U postgres -h 127.0.0.1 -p 5431 postgres -f test.sql
 	cat app/developer_g/greyspots-1.1.1/documentation/index.html | sed 's/normal_g/envelope_g/' | sed '/    var strPostgreSQL = ml(function () {\/\*/,/\*\//!d' | tail -n +2 | head -n -1 | psql -U postgres -h 127.0.0.1 -p 5431 postgres -1
 	kill `cat postgres.pid`; rm postgres.pid; sleep 3
 	cp data_test/pg_hba.conf data_test/pg_hba.bak

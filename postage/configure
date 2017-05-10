@@ -84,7 +84,6 @@ elif test $(uname -s) = "OpenBSD"; then
 	MANDIR="man"
 	echo "OpenBSD"
 
-	# and even easier to check for libtls
 	printf "checking for LibTLS..."
 	libtls="use"
 	echo "yes"
@@ -117,7 +116,7 @@ if test $libtls = "build"; then
 	WHICH_SSL=$(which openssl)
 	SSL_INCLUDEDIR1="${WHICH_SSL%bin/openssl}include"
 	SSL_INCLUDEDIR=$(echo $SSL_INCLUDEDIR1 | sed -e 's/\//\\\//g')
-	CPPFLAGS="$CPPFLAGS -ISSL_INCLUDEDIR -DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS= -DSSL_OP_NO_CLIENT_RENEGOTIATION=0x00020000L -DX509_V_FLAG_NO_CHECK_TIME=0x200000 -DSSL_CTRL_SET_DH_AUTO=118 -DX509_L_MEM=3"
+	CPPFLAGS="$CPPFLAGS -I$SSL_INCLUDEDIR -DLIBRESSL_INTERNAL -D__BEGIN_HIDDEN_DECLS= -D__END_HIDDEN_DECLS= -DSSL_OP_NO_CLIENT_RENEGOTIATION=0x00020000L -DX509_V_FLAG_NO_CHECK_TIME=0x200000 -DSSL_CTRL_SET_DH_AUTO=118 -DX509_L_MEM=3"
 	SSL_LIBDIR1="${WHICH_SSL%bin/openssl}lib"
 	SSL_LIBDIR=$(echo $SSL_LIBDIR1 | sed -e 's/\//\\\//g')
 	LDFLAGS="$LDFLAGS -L$SSL_LIBDIR ..\\/dependencies\\/libtls\\/libtls.a -lssl -lcrypto"
