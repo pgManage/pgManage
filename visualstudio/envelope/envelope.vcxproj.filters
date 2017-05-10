@@ -192,10 +192,10 @@
     <ClCompile Include="..\..\dependencies\tre\lib\tre-ast.c">
       <Filter>Source Files\tre</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dependencies\libressl\crypto\compat\posix_win.c">
+    <ClCompile Include="..\..\dependencies\libtls\compat\posix_win.c">
       <Filter>Source Files\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dependencies\libressl\crypto\compat\bsd-asprintf.c">
+    <ClCompile Include="..\..\dependencies\libtls\compat\bsd-asprintf.c">
       <Filter>Source Files\common</Filter>
     </ClCompile>
   </ItemGroup>

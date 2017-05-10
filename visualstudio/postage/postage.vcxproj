@@ -37,8 +37,8 @@
     <ClCompile Include="..\..\common\ws_select.c" />
     <ClCompile Include="..\..\common\ws_update.c" />
     <ClCompile Include="..\..\db_framework_pq\db_framework.c" />
-    <ClCompile Include="..\..\dependencies\libressl\crypto\compat\bsd-asprintf.c" />
-    <ClCompile Include="..\..\dependencies\libressl\crypto\compat\posix_win.c" />
+    <ClCompile Include="..\..\dependencies\libtls\compat\bsd-asprintf.c" />
+    <ClCompile Include="..\..\dependencies\libtls\compat\posix_win.c" />
     <ClCompile Include="..\..\postage\postage_callback.c" />
     <ClCompile Include="..\..\postage\ws_raw.c" />
     <ClCompile Include="..\..\postage\ws_tab.c" />
@@ -161,7 +161,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\..\dependencies\libev;..\include;..\..\db_framework_pq;..\..\common;..\..;..\..\dependencies\libressl\include;..\..\dependencies\libressl\include\compat;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\dependencies\libev;..\include\compat;..\include;..\..\db_framework_pq;..\..\common;..\..;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -169,7 +169,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\..\dependencies\libev;..\include;..\..\db_framework_pq;..\..\common;..\..;..\..\dependencies\libressl\include;..\..\dependencies\libressl\include\compat;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\dependencies\libev;..\include\compat;..\include;..\..\db_framework_pq;..\..\common;..\..;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
