@@ -15,7 +15,7 @@ Releases marked "3.x.x" are Application mode packages. They run in a desktop win
 **NOTE:** We do not sign the Windows releases, but we do sign the macOS releases.
 
 ### Web Server mode
-Releases marked "Source code" run like a web server. This enables you to connect to Postage from any browser, even on a phone. Remember to set your firewall appropriately, or even better, use a VPN. This mode is the only mode available for phone/tablet access. This mode makes it easy to install Postage on one box, then have multiple developers log in and work. We also find it convenient when we're at a client site and need to work from whatever workstation we're in front of at that moment. The names of these packages start with "Source Code". Compiling Postage from source is very time consuming since most of the time you need to compile LibreSSL. If you have trouble please file an issue (even if you know how to get around it) and we'll get right on it. 
+Releases marked "Source code" run like a web server. This enables you to connect to Postage from any browser, even on a phone. Remember to set your firewall appropriately, or even better, use a VPN. This mode is the only mode available for phone/tablet access. This mode makes it easy to install Postage on one box, then have multiple developers log in and work. We also find it convenient when we're at a client site and need to work from whatever workstation we're in front of at that moment. The names of these packages start with "Source Code". If you have trouble please file an issue (even if you know how to get around it) and we'll get right on it. 
 
 ## Release Schedule
 
