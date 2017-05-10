@@ -153,6 +153,7 @@ if test $libtls = "build"; then
 		fi
 	done
 
+	CHECK_CPPFLAGS="-I$SSL_INCLUDEDIR"
 	HEADER="openssl/ssl.h"
 	. scripts/check_header
 	if test "x$HAVE_HEADER" != "x1"; then
