@@ -97,10 +97,10 @@ function getCurrWord(editor, bolPeriod) {
                 }
             }
         } else {
-            if (strScript[intCursorPosition + 1].trim() !== '') {
+            if (strScript[intCursorPosition + 1] && strScript[intCursorPosition + 1].trim() !== '') {
                 intCursorPosition += 1;
             }
-            if (strScript[intCursorPosition].trim() === '') {
+            if (strScript[intCursorPosition] && strScript[intCursorPosition].trim() === '') {
                 intCursorPosition -= 1;
             }
             for (var i = 0, len = intCursorPosition; i <= len; i++) {
