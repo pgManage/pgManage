@@ -51,7 +51,10 @@ Finish typing the only word in the popup
     close popup
 
 no query detected:
-    Display snippets
+    if there is a shcema dot:
+        dot code
+    else:
+        Display snippets
     
 click option:
     insert clicked completion
