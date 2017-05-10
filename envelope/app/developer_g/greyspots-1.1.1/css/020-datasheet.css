@@ -124,8 +124,8 @@ gs-datasheet .hud-container gs-button {
     margin-left: 0.5em;
     float: left;
     display: inline-block;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+    /*border-bottom-right-radius: 0;*/
+    /*border-bottom-left-radius: 0;*/
     
     
     -webkit-font-smoothing: antialiased;
@@ -140,11 +140,13 @@ gs-datasheet .hud-container gs-button[remove-left] {
     border-left: 0 none;
     margin-left: 0;
     border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 gs-datasheet .hud-container gs-button[remove-right] {
     border-right: 0 none;
     border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 gs-datasheet .hud-container gs-button:first-child {
@@ -376,15 +378,15 @@ gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr:nth-child
 }
 
 gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr > [selected][not-editable] {
-    background-color: #f7f7c2 !important;
+    background-color: #59C4FD !important;
 }
 
 gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr:nth-child(odd) > [selected][not-editable] {
-    background-color: #f1f1ba !important;
+    background-color: #59C4FD !important;
 }
 
 gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr:nth-child(odd) > [selected] {
-    background-color: #f7f7c4 !important;
+    background-color: #84D4FF !important;
 }
 
 

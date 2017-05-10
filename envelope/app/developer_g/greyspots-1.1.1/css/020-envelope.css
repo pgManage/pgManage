@@ -13,10 +13,12 @@
     }
 }
 
+/*
 gs-envelope:focus {
     background-color: #FFF;
     outline: none;
 }
+*/
 
 gs-envelope caption {
   padding-top: 8px;

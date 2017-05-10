@@ -9163,7 +9163,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.open('https://www.royalmail.com/track-your-item?trackNumber=' + strTrackingNumber);
                 
             } else if (element.hasAttribute('amz') === true) {
-                window.open(strTrackingNumber);
+                window.open(decodeURIComponent(strTrackingNumber));
                 
             } else {
                 GS.msgbox('Please Choose...',

@@ -69,7 +69,6 @@ gs-dialog-button {
     border: none;
     margin: 0.25em;
     
-    /*border-radius: 0;*/
     border-radius: 0.5em;
     
     
@@ -320,43 +319,31 @@ gs-dialog-button.hover {
     transition: box-shadow 0.125s;
 }
 
-/* ## SELECTED/HOVER opacitry ## */
-gs-button[selected]:before,
-gs-toggle[selected]:before,
-gs-phone-button:not([not-supported])[selected]:before,
-gs-map-button[selected]:before,
-gs-skype-button[selected]:before,
-gs-facetime-button[selected]:before,
-gs-email-button[selected]:before,
-gs-tracking-button[selected]:before,
-gs-delete-button[selected]:before,
-gs-option[selected]:before,
-gs-dialog-button[selected]:before,
+/* ## SELECTED/HOVER shading ## */
+/*gs-button[selected],
+gs-toggle[selected],
+gs-phone-button:not([not-supported])[selected],
+gs-map-button[selected],
+gs-skype-button[selected],
+gs-facetime-button[selected],
+gs-email-button[selected],
+gs-tracking-button[selected],
+gs-delete-button[selected],
+gs-option[selected],
+gs-dialog-button[selected],*/
 
-gs-button.hover:before,
-gs-toggle.hover:before,
-gs-phone-button:not([not-supported]).hover:before,
-gs-map-button.hover:before,
-gs-skype-button.hover:before,
-gs-facetime-button.hover:before,
-gs-email-button.hover:before,
-gs-tracking-button.hover:before,
-gs-delete-button.hover:before,
-gs-option.hover:before,
-gs-dialog-button.hover:before {
-    content: "";
-    
-    position: absolute;
-    
-    left: 0 !important;
-    top: 0 !important;
-    margin: 0 !important;
-    width: 100%;
-    height: 100%;
-    
-    background-color: black;
-    
-    opacity: 0.05;
+gs-button.hover,
+gs-toggle.hover,
+gs-phone-button:not([not-supported]).hover,
+gs-map-button.hover,
+gs-skype-button.hover,
+gs-facetime-button.hover,
+gs-email-button.hover,
+gs-tracking-button.hover,
+gs-delete-button.hover,
+gs-option.hover,
+gs-dialog-button.hover {
+    filter: invert(15%);
 }
 
 /* ## DOWN/SELECTED ## */
@@ -549,130 +536,6 @@ gs-dialog-button[bg-danger] {
     
     /*border-color: #961512;*/
 }
-
-
-/* ###################################################################################### */
-/* ###################################### FOCUS MOD ##################################### */
-/* ###################################################################################### */
-/*
-gs-button:focus,
-gs-toggle:focus,
-gs-checkbox:focus,
-gs-phone-button:not([not-supported]):focus,
-gs-map-button:focus,
-gs-skype-button:focus,
-gs-facetime-button:focus,
-gs-email-button:focus,
-gs-tracking-button:focus,
-gs-delete-button:focus {
-    color: #333;
-    text-decoration: none;
-    outline-offset: -2px;
-    background-color: #e6e6e6;
-    border-color: #8c8c8c;
-}
-*/
-
-
-/* ##################################################################################### */
-/* #################################### HOVER STATE #################################### */
-/* ##################################################################################### */
-/* MOVED TO JAVASCRIPT
-gs-button:hover,
-gs-toggle:hover,
-gs-phone-button:not([not-supported]):hover,
-gs-map-button:hover,
-gs-skype-button:hover,
-gs-facetime-button:hover,
-gs-email-button:hover,
-gs-tracking-button:hover {
-    background-color: #f3f3f3;
-}*/
-/*
-gs-button.hover,
-gs-toggle.hover,
-gs-phone-button:not([not-supported]).hover,
-gs-map-button.hover,
-gs-skype-button.hover,
-gs-facetime-button.hover,
-gs-email-button.hover,
-gs-tracking-button.hover,
-gs-delete-button.hover {
-  text-decoration: none;
-  color: #333;
-  background-color: #d4d4d4;
-  border-color: #8c8c8c;
-}
-*/
-
-/* ###################################################################################### */
-/* #################################### ACTIVE STATE #################################### */
-/* ###################################################################################### */
-
-/*
-gs-button.down,
-gs-checkbox.down,
-gs-toggle.down,
-gs-phone-button:not([not-supported]).down,
-gs-map-button.down,
-gs-skype-button.down,
-gs-facetime-button.down,
-gs-email-button.down,
-gs-tracking-button.down,
-gs-delete-button.down {
-    background-image: none;
-    outline: 0;
-    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-    color: #333;
-    background-color: #e6e6e6;
-    border-color: #adadad;
-}
-*/
-
-/* #################################################################################### */
-/* ################################## DISABLED STATE ################################## */
-/* #################################################################################### */
-/*
-gs-button[disabled],
-gs-toggle[disabled],
-gs-checkbox[disabled],
-gs-phone-button:not([not-supported])[disabled],
-gs-map-button[disabled],
-gs-skype-button[disabled],
-gs-facetime-button[disabled],
-gs-email-button[disabled],
-gs-tracking-button[disabled],
-gs-delete-button[disabled],
-.blue gs-button[disabled],
-.blue gs-toggle[disabled],
-.blue gs-checkbox[disabled],
-.blue gs-phone-button:not([not-supported])[disabled],
-.blue gs-map-button[disabled],
-.blue gs-skype-button[disabled],
-.blue gs-facetime-button[disabled],
-.blue gs-email-button[disabled],
-.blue gs-tracking-button[disabled],
-.blue gs-delete-button[disabled],
-gs-button[disabled].blue,
-gs-toggle[disabled].blue,
-gs-checkbox[disabled].blue,
-gs-phone-button:not([not-supported])[disabled].blue,
-gs-map-button[disabled].blue,
-gs-skype-button[disabled].blue,
-gs-facetime-button[disabled].blue,
-gs-email-button[disabled].blue,
-gs-tracking-button[disabled].blue
-gs-delete-button[disabled].blue {
-  cursor: not-allowed;
-  filter: alpha(opacity=65);
-  -webkit-box-shadow: none;
-          box-shadow: none;
-  opacity: .65;
-  background-color: #fff;
-  border-color: #ccc;
-}
-*/
 
 /* ################################################################################### */
 /* ################################# JUMBO ATTRIBUTE ################################# */
@@ -1146,6 +1009,11 @@ gs-dialog-button[icononly] {
     content: "";
     
     text-indent: -9999px;
+    
+    
+    /*line-height: 1.65em;*/
+    line-height: normal;
+    min-height: 1.65em;
     
     /*min-width: 1.2em;
     min-height: 1.2em;*/

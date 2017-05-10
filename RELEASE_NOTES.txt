@@ -1,3 +1,21 @@
+Changes since 3.2.10:
+Postage:
+- Fix crash when raw request is pending and socket is closed
+- Find and replace buttons now give feedback (closes workflowproducts/postage#239)
+- Object Browser vertical scroll bar stops working (closes workflowproducts/postage#242)
+- Beautify RULES improvements (closes workflowproducts/postage#241)
+- Beautify remove some extra spacing (closes workflowproducts/postage#249)
+- Fix autocomplete PL/PGSQL variables (closes workflowproducts/postage#247)
+- Fix autocomplete inserts entire word instead of completing word (closes workflowproducts/postage#244)
+- Fix autocomplete not sorting alphabetically (closes workflowproducts/postage#245)
+
+Envelope:
+- Fix crash when ws_file_free called twice
+- Fix login_group default
+
+Both:
+- Unescape source of SELECT request when it's arbitrary
+
 Changes since 3.2.9:
 Postage:
 - Fix autocomplete casting popup cutting out a colon when you insert

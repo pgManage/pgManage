@@ -169,7 +169,7 @@
 }
 
 *[selected] {
-    background-color: #FFFFCC !important;
+    background-color: #84D4FF !important; /* FFFFCC */
 }
 
 *[selected-secondary] {
