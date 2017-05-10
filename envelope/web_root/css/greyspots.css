@@ -1290,11 +1290,11 @@ pre code{
 }
 
 *[selected] {
-    background-color: #84D4FF !important; /* FFFFCC */
+    background-color: #F1FAFF !important; /* B3E4FF, FFFFCC */
 }
 
 *[selected-secondary] {
-    background-color: #B3E4FF !important; /* FFFFEE */
+    background-color: #F1FAFF !important; /* B3E4FF, FFFFEE */
 }
 
 *[tempselect] {

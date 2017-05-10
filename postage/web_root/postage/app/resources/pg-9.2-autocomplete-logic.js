@@ -74,11 +74,10 @@ getListData(ml(function () {/*SELECT DISTINCT c.relnamespace
     CATALOG_id = arrRecords[1][0];
 });
 
-function getCurrWord(editor) {
+function getCurrWord(editor, bolPeriod) {
     if (editor && editor.currentSelections) {
-        var strScript = editor.getValue(), intCursorPosition = rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column);
+        var strScript = editor.getValue(), intCursorPosition = ((bolPeriod) ? rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column - 1) : rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column));
         autocompleteGlobals.quoteLevel = findQuoteLevel(editor.getValue().substring(0, intCursorPosition + 1), intCursorPosition + 1);
-        //console.log(editor.getValue().substring(0, intCursorPosition), intCursorPosition);
         var currWord = [];
         //console.log(autocompleteGlobals.quoteLevel);
         
@@ -98,11 +97,14 @@ function getCurrWord(editor) {
                 }
             }
         } else {
+            if (strScript[intCursorPosition + 1].trim() !== '') {
+                intCursorPosition += 1;
+            }
             if (strScript[intCursorPosition].trim() === '') {
                 intCursorPosition -= 1;
             }
             for (var i = 0, len = intCursorPosition; i <= len; i++) {
-                //console.log(strScript, intCursorPosition + ' : ' + strScript[intCursorPosition - i] + ' : ' + isAlpha(strScript[intCursorPosition - i]));
+                //console.log(strScript[intCursorPosition]);//strScript, intCursorPosition + ' : ' + strScript[intCursorPosition - i] + ' : ' + isAlpha(strScript[intCursorPosition - i]));
                 if (strScript[intCursorPosition - i] && isAlpha(strScript[intCursorPosition - i])) {
                     if (currWord === []) {
                         currWord = strScript[intCursorPosition - i].toLowerCase()
@@ -117,7 +119,7 @@ function getCurrWord(editor) {
         currWord = currWord.reverse();
         currWord = currWord.join('');
         autocompleteGlobals.searchLength = currWord.length;
-        console.log(currWord);
+        //console.log(currWord);
         return currWord;
     }
 }
@@ -277,9 +279,9 @@ function autocompleteBindEditor(tabElement, editor) {
                             row: editor.currentSelections[i].start.row,
                             column: editor.currentSelections[i].start.column
                         };
-                        closePopup();
                         editor.env.document.insert(insertObj, '\t');
                     }
+                    closePopup();
                 }
             }
         } else {
@@ -425,10 +427,13 @@ function autocompleteBindEditor(tabElement, editor) {
         if (autocompleteGlobals.ignoreNext === 0) {
             if (autocompleteGlobals.bolQueryRunning === true) {
                 autocompleteGlobals.bolSpecialFilter = true;
-            } else if (event.action === 'insert') {
+            }
+            if (event.action === 'insert') {
                 if (event.lines[0].length === 1) {
                     if (!editor.currentQueryRange === false || (!editor.currentQueryRange === false && autocompleteGlobals.quoteLevel === 4 && autocompleteGlobals.popupOpen)) {
-                        if (event.lines[0] === '.') {
+                        if (autocompleteGlobals.quoteLevel !== 4 && event.lines[0] === ' ') {
+                            autocompleteKeyEvent = 'close';
+                        } else if (event.lines[0] === '.') {
                             autocompleteKeyEvent = 'period';
                         } else if (event.lines[0] === ';') {
                             autocompleteKeyEvent = 'close';
@@ -438,7 +443,12 @@ function autocompleteBindEditor(tabElement, editor) {
                             autocompleteKeyEvent = 'pass';
                         }
                     } else {
-                        autocompleteKeyEvent = 'snippets';
+                        if (event.lines[0] === '.') {
+                            //console.log(getCurrWord(editor, true));
+                            autocompleteKeyEvent = 'allSchema';
+                        } else {
+                            autocompleteKeyEvent = 'snippets';
+                        }
                     }
                 } else {
                     autocompleteKeyEvent = 'paste';
@@ -446,6 +456,8 @@ function autocompleteBindEditor(tabElement, editor) {
             } else {
                 autocompleteKeyEvent = 'delete';
             }
+            
+            
             
             if (editor.currentSelections) {
                 var selectionRanges = editor.currentSelections[0];
@@ -476,6 +488,13 @@ function autocompleteBindEditor(tabElement, editor) {
                         selectionRanges.start.column === event.start.column &&
                         selectionRanges.end.row === event.end.row &&
                         selectionRanges.end.column + 1 === event.end.column
+                    ) {
+                        autocompleteLogic(editor, autocompleteKeyEvent, event);
+                    } else if (
+                        selectionRanges.start.row === event.start.row &&
+                        selectionRanges.start.column - 1 === event.start.column &&
+                        selectionRanges.end.row === event.end.row &&
+                        selectionRanges.end.column === event.end.column
                     ) {
                         autocompleteLogic(editor, autocompleteKeyEvent, event);
                     }
@@ -1413,6 +1432,35 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         closePopup();
     } else if (autocompleteKeyEvent === 'close') {
         closePopup();
+    } else if (autocompleteKeyEvent === 'allSchema') {
+        autocompleteGetObjectType(getCurrWord(editor, true)
+            , [
+                  autocompleteSearchQuery.schema
+                , autocompleteSearchQuery.table
+                , autocompleteSearchQuery.view
+              ]
+            , function (arrResults) {
+                if (arrResults[0] && arrResults[0][0]) {
+                    if (arrResults[0][2] === 'table' || arrResults[0][2] === 'view') {
+                        //table/view code
+                        //console.log(autocompleteQuery.columns.replace(/\{\{PARENTOID\}\}/gi, arrResults[0][0]));
+                        autocompleteMakeList([
+                            autocompleteQuery.columns.replace(/\{\{PARENTOID\}\}/gi, arrResults[0][0])], '', editor);
+                    } else if (arrResults[0][2] === 'schema') {
+                        //schema code
+                        autocompleteMakeList([
+                                autocompleteQuery.qualified_views.replace(/\{\{SCHEMAOID\}\}/gi, arrResults[0][0])
+                              , autocompleteQuery.qualified_tables.replace(/\{\{SCHEMAOID\}\}/gi, arrResults[0][0])
+                              , autocompleteQuery.qualified_functions.replace(/\{\{SCHEMAOID\}\}/gi, arrResults[0][0])
+                            ], '', editor);
+                    } else {
+                        closePopup();
+                    }
+                    //console.log(arrResults[0][0]);
+                    //console.log(arrResults[0][2]);
+                }
+        });
+        autocompleteGlobals.searchLength = 0;
     }
 }
 
@@ -1540,12 +1588,12 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
         //console.log('query running');
         autocompleteGlobals.bolQueryRunning = true;
         // make the request
-        
         var getlist = function () {
             autocompleteGlobals.strQueryID = GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
                 var arrRows, i, len;
                 if (!error) {
-                    if (data.strMessage !== '\\.' && data.strMessage !== '') {
+                    //console.log(data.strMessage);
+                    if (data.strMessage !== '\\.' && !data.bolLastMessage) {
                         arrRows = data.strMessage.split('\n');
                         for (i = 0, len = arrRows.length; i < len; i += 1) {
                             arrRows[i] = arrRows[i].split('\t');
@@ -1565,7 +1613,7 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
                         }
                     } else if (data.strMessage === '\\.') {
                         autocompleteGlobals.strQueryID = null;
-                    } else if (data.strMessage === '') {
+                    } else if (data.bolLastMessage) {
                         optionList.shift();
                         autocompleteGlobals.arrSearch.shift()
                         autocompleteGlobals.arrValues = optionList;
@@ -1606,6 +1654,7 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
             setTimeout(function(){
                 getlist();
             }, 2000);
+            autocompleteGlobals.bolQueryRunning = false;
             //autocompleteGlobals.bolTestSlowDown = false;
         } else {
             getlist();
@@ -1688,6 +1737,11 @@ function closePopup() {
 //bolKeepOpen allows autocompleteFilterList to not close the popup which emptys the variables
 function openPopup(editor, optionlist, bolKeepOpen) {
     'use strict';
+    
+    // if (autocompleteGlobals.searchLength !==  getCurrWord(editor).length) {
+    //     autocompleteFilterList(optionlist, getCurrWord(editor), editor)
+    // }
+    
     //console.log(autocompleteGlobals.bolQueryRunning);
     var //jsnSearchStart = indexToRowAndColumn(editor.getValue(), editor.selection.getRange().start.column)
       jsnPosition = editor.renderer.textToScreenCoordinates(editor.selection.getRange().start.row, editor.selection.getRange().start.column + 1)
@@ -1842,6 +1896,7 @@ function autocompleteComplete(editor) {
                 editor.env.document.insert(insertObj, insertText);
             }
         } else {
+            //console.log(autocompleteGlobals.searchLength, currSelectionRange.start.column);
             editor.getSelection().setSelectionRange(new Range(
                 currSelectionRange.start.row,
                 ((currSelectionRange.start.column === 1) ? 0 : currSelectionRange.start.column - autocompleteGlobals.searchLength),
@@ -1863,10 +1918,6 @@ function autocompleteBind(editor) {
     'use strict';
     autocompleteGlobals.bolBound = true
 }
-
-
-
-
 
 
 

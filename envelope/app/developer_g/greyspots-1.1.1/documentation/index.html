@@ -505,67 +505,6 @@ GRANT EXECUTE ON FUNCTION gsdoc.actionnc_test(str_args text) TO postgres;
 GRANT EXECUTE ON FUNCTION gsdoc.actionnc_test(str_args text) TO public_g;
 REVOKE ALL ON FUNCTION gsdoc.actionnc_test(str_args text) FROM public;
 
--- ###########################################
--- ###### gsdoc.action_select ######
-CREATE OR REPLACE FUNCTION gsdoc.action_select(text)
-    RETURNS text AS
-$BODY$
-BEGIN
-    RETURN
-        '{' ||
-        ' "arr_column": ["id","name","change_stamp"],' ||
-        ' "row_count":1,' ||
-        ' "dat": [[1234,"Fig","2015-01-09 14:15:41-06"]]' ||
-        '}';
-END;
-
-$BODY$
-LANGUAGE plpgsql IMMUTABLE COST 100;
-ALTER FUNCTION gsdoc.action_select(text) OWNER TO postgres;
-GRANT ALL ON FUNCTION gsdoc.action_select(text) TO normal_g;
-
--- ###########################################
--- ###### gsdoc.action_insert ######
-CREATE OR REPLACE FUNCTION gsdoc.action_insert(text)
-    RETURNS text AS
-$BODY$
-BEGIN
-    RETURN '1235';
-END;
-
-$BODY$
-LANGUAGE plpgsql IMMUTABLE COST 100;
-ALTER FUNCTION gsdoc.action_insert(text) OWNER TO postgres;
-GRANT ALL ON FUNCTION gsdoc.action_insert(text) TO normal_g;
-
--- ###########################################
--- ###### gsdoc.action_update ######
-CREATE OR REPLACE FUNCTION gsdoc.action_update(text)
-    RETURNS text AS
-$BODY$
-BEGIN
-    RETURN '[1234,"Fig Updated","2015-01-09 14:15:41-06"]';
-END;
-
-$BODY$
-LANGUAGE plpgsql IMMUTABLE COST 100;
-ALTER FUNCTION gsdoc.action_update(text) OWNER TO postgres;
-GRANT ALL ON FUNCTION gsdoc.action_update(text) TO normal_g;
-
--- ###########################################
--- ###### gsdoc.action_delete ######
-CREATE OR REPLACE FUNCTION gsdoc.action_delete(text)
-    RETURNS text AS
-$BODY$
-BEGIN
-    RETURN '"Item deleted."';
-END;
-
-$BODY$
-LANGUAGE plpgsql IMMUTABLE COST 100;
-ALTER FUNCTION gsdoc.action_delete(text) OWNER TO postgres;
-GRANT ALL ON FUNCTION gsdoc.action_delete(text) TO normal_g;
-
 CREATE OR REPLACE FUNCTION gsdoc.action_ajax_test(str_args text)
     RETURNS text AS
 $BODY$
@@ -797,7 +736,6 @@ GRANT ALL ON FUNCTION gsdoc.action_ajax_test_timeout(text) TO normal_g;
                     <gs-button href="doc-jslib-px-em-conversion.html">Pixel and EM conversion</gs-button>
                     <gs-button href="doc-jslib-list-add.html">Add Unique To Array</gs-button>
                     <gs-button href="doc-jslib-guid.html">GUID</gs-button>
-                    <gs-button href="doc-jslib-get-cell.html">Get Cell</gs-button>
                     <gs-button href="doc-jslib-cookie.html">Cookie Functions</gs-button>
                     <gs-button href="doc-jslib-account.html">Account Functions</gs-button>
                     <gs-button href="doc-jslib-version.html">GS Library Version</gs-button>
