@@ -155,7 +155,7 @@ GS.qryGetVals = function (strQueryString) {
         for (i = 0, len = arrKeyValueList.length; i < len; i += 1) {
             strKeyValue = arrKeyValueList[i];
             
-            arrValues.push(strKeyValue.substring(strKeyValue.indexOf('=') + 1));
+            arrValues.push(decodeURIComponent(strKeyValue.substring(strKeyValue.indexOf('=') + 1)));
         }
     }
     

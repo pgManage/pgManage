@@ -5357,7 +5357,7 @@ GS.qryGetVals = function (strQueryString) {
         for (i = 0, len = arrKeyValueList.length; i < len; i += 1) {
             strKeyValue = arrKeyValueList[i];
             
-            arrValues.push(strKeyValue.substring(strKeyValue.indexOf('=') + 1));
+            arrValues.push(decodeURIComponent(strKeyValue.substring(strKeyValue.indexOf('=') + 1)));
         }
     }
     
@@ -18381,8 +18381,8 @@ GS.closeDialog = function (dialog, strAnswer) {
         // append overlay element
         document.body.appendChild(dialogOverlay);
 
-        // if the template has: data-overlay-close="true": bind overlay
-        if (template.getAttribute('data-overlay-close') === 'true') {
+        // if the template has: data-overlay-close: bind overlay
+        if (template.hasAttribute('data-overlay-close')) {
             dialogOverlay.addEventListener(evt.mousedown, function (event) {
                 GS.closeDialog(dialog, 'overlay');
             });
@@ -18752,8 +18752,8 @@ GS.closeDialog = function (dialog, strAnswer) {
         );
         document.body.appendChild(dialogOverlay);
 
-        // if the template has: data-overlay-close="true": bind overlay
-        if (template.getAttribute('data-overlay-close') === 'true') {
+        // if the template has: data-overlay-close: bind overlay
+        if (template.hasAttribute('data-overlay-close')) {
             dialogOverlay.addEventListener('click', function (event) {
                 GS.closeDialog(dialogElement, 'overlay');
             });

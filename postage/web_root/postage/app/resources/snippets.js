@@ -2,78 +2,78 @@ var snippets = [];
 
 
 snippets.push(['CREATE_TABLE (Snippet)', 'SQLSnippet', ml(function () {/*CREATE TABLE ${1:schema}.${2:table} (
-		id integer NOT NULL DEFAULT nextval(('${3:schema}.${4:global_seq}'::text)::regclass),
-		${5}
-		create_login name DEFAULT "session_user"(),
-		change_login name DEFAULT "session_user"(),
-		create_stamp timestamp with time zone DEFAULT date_trunc('second'::text, ('now'::text)::timestamp with time zone),
-		change_stamp timestamp with time zone DEFAULT date_trunc('second'::text, ('now'::text)::timestamp with time zone),
-		CONSTRAINT ${6:table}_pk PRIMARY KEY (id)
-	) WITH (
-		OIDS=FALSE
-	);
+	id integer NOT NULL DEFAULT nextval(('${1:schema}.${3:global_seq}'::text)::regclass),
+	${4}
+	create_login name DEFAULT "session_user"(),
+	change_login name DEFAULT "session_user"(),
+	create_stamp timestamp with time zone DEFAULT date_trunc('second'::text, ('now'::text)::timestamp with time zone),
+	change_stamp timestamp with time zone DEFAULT date_trunc('second'::text, ('now'::text)::timestamp with time zone),
+	CONSTRAINT ${2:table}_pk PRIMARY KEY (id)
+) WITH (
+	OIDS=FALSE
+);
 
-	ALTER TABLE ${7:schema}.${8:view} OWNER TO postgres;
+ALTER TABLE ${1:schema}.${2:table} OWNER TO postgres;
 */})]);
 
 snippets.push(['CREATE_VIEW (Snippet)', 'SQLSnippet', ml(function () {/*CREATE OR REPLACE VIEW ${1:schema}.${2:view} AS
 	${3}
 
-	ALTER TABLE ${4:schema}.${5:view} OWNER TO postgres;
-	GRANT SELECT,UPDATE,INSERT,DELETE,TRUNCATE,REFERENCES,TRIGGER ON TABLE ${6:schema}.${7:view} TO ${8:trusted_g};
+ALTER TABLE ${1:schema}.${2:view} OWNER TO postgres;
+GRANT SELECT,UPDATE,INSERT,DELETE,TRUNCATE,REFERENCES,TRIGGER ON TABLE ${1:schema}.${2:view} TO ${4:trusted_g};
 */})]);
 
 // you need to escape dollar signs in the ml function because they are used for substitutions!!
 snippets.push(['CREATE_FUNCTION (Snippet)', 'SQLSnippet', ml(function () {/*CREATE OR REPLACE FUNCTION ${1:schema}.${2:function}(str_args text)
 	RETURNS text AS
-	\$BODY\$
-	DECLARE
-		${3}
-	BEGIN
-		${4}
-	END;
-	\$BODY\$
-	LANGUAGE plpgsql VOLATILE
-	COST 100;
+\$BODY\$
+DECLARE
+	${3}
+BEGIN
+	${4}
+END;
+\$BODY\$
+LANGUAGE plpgsql VOLATILE
+COST 100;
 
-	ALTER FUNCTION ${5:schema}.${6:function}(str_args text) OWNER TO postgres;
-	GRANT EXECUTE ON FUNCTION ${7:schema}.${8:function}(str_args text) TO ${9:trusted_g};
+ALTER FUNCTION ${1:schema}.${2:function}(str_args text) OWNER TO postgres;
+GRANT EXECUTE ON FUNCTION ${1:schema}.${2:function}(str_args text) TO ${5:trusted_g};
 */})]);
 
 snippets.push(['CREATE_GROUP (Snippet)', 'SQLSnippet', ml(function () {/*CREATE ROLE ${1:trusted_g}
-		NOLOGIN
-		NOCREATEROLE
-		NOSUPERUSER
-		INHERIT
-		NOCREATEDB
-		NOREPLICATION
-		CONNECTION LIMIT -1
-		VALID UNTIL 'infinity';
+	NOLOGIN
+	NOCREATEROLE
+	NOSUPERUSER
+	INHERIT
+	NOCREATEDB
+	NOREPLICATION
+	CONNECTION LIMIT -1
+	VALID UNTIL 'infinity';
 */})]);
 
 snippets.push(['CREATE_ROLE (Snippet)', 'SQLSnippet', ml(function () {/*CREATE ROLE ${1:user_name}
-		LOGIN PASSWORD '${2:password}'
-		NOCREATEROLE
-		NOSUPERUSER
-		INHERIT
-		NOCREATEDB
-		NOREPLICATION
-		CONNECTION LIMIT -1
-		VALID UNTIL 'infinity';
+	LOGIN PASSWORD '${2:password}'
+	NOCREATEROLE
+	NOSUPERUSER
+	INHERIT
+	NOCREATEDB
+	NOREPLICATION
+	CONNECTION LIMIT -1
+	VALID UNTIL 'infinity';
 
-	GRANT ${3:trusted_g} TO ${4:user_name};
+GRANT ${3:trusted_g} TO ${1:user_name};
 */})]);
 
 snippets.push(['CREATE_SEQUENCE (Snippet)', 'SQLSnippet', ml(function () {/*CREATE SEQUENCE ${1:schema}.${2:sequence}
-		INCREMENT 1
-		MINVALUE 1
-		MAXVALUE 9223372036854775807
-		CACHE 1
-		NO CYCLE;
+	INCREMENT 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	CACHE 1
+	NO CYCLE;
 
-	ALTER SEQUENCE ${3:schema}.${4:sequence} OWNER TO postgres;
+ALTER SEQUENCE ${1:schema}.${2:sequence} OWNER TO postgres;
 
-	GRANT ALL ON TABLE ${5:schema}.${6:sequence} TO postgres;
+GRANT ALL ON TABLE ${1:schema}.${2:sequence} TO postgres;
 */})]);
 
 snippets.push(['RESTART_SEQUENCE (Snippet)', 'SQLSnippet', ml(function () {/*ALTER SEQUENCE ${1:schema}.${2:sequence} RESTART;
@@ -154,11 +154,11 @@ snippets.push(['DELETE_USING (Snippet)', 'SQLSnippet', ml(function () {/*DELETE 
 */})]);
 
 snippets.push(['CREATE_UNIQUE_INDEX (Snippet)', 'SQLSnippet', ml(function () {/*CREATE UNIQUE INDEX ${1:table}_pk ON ${2:schema}.${3:table} USING btree (id);
-	CREATE UNIQUE INDEX ${4:CONCURRENTLY }${5:IF NOT EXISTS }${6:table}_idx ON ${7:schema}.${8:table} USING ${9:btree} (${10:columns});
+CREATE UNIQUE INDEX ${4:CONCURRENTLY }${5:IF NOT EXISTS }${6:table}_idx ON ${2:schema}.${3:table} USING ${7:btree} (${8:columns});
 */})]);
 
-snippets.push(['CREATE_INDEX (Snippet)', 'SQLSnippet', ml(function () {/*CREATE INDEX ${1:table}_pk ON ${2:schema}.${3:table} USING btree (${4:column});
-	CREATE INDEX ${5:CONCURRENTLY }${6:IF NOT EXISTS }${7:table}_idx ON ${8:schema}.${9:table} USING ${10:btree} (${11:columns});
+snippets.push(['CREATE_INDEX (Snippet)', 'SQLSnippet', ml(function () {/*CREATE INDEX ${1:table}_pk ON ${2:schema}.${4:table} USING btree (${4:column});
+CREATE INDEX ${5:CONCURRENTLY }${6:IF NOT EXISTS }${7:table}_idx ON ${2:schema}.${4:table} USING ${10:btree} (${8:columns});
 */})]);
 
 //console.log(snippets);

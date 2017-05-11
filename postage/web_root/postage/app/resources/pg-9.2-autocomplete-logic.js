@@ -1,5 +1,5 @@
 /*jslint browser:true, white:true, multivar:true, for:true*/
-/*global window, document, GS, console, evt*/
+/*global window, document, GS, //console, evt*/
 var bolAutocompleteLogicLoaded = true;
 var queryVars = {
       'bolCols': false
@@ -123,7 +123,7 @@ function getCurrWord(editor, bolPeriod) {
         currWord = currWord.reverse();
         currWord = currWord.join('');
         autocompleteGlobals.searchLength = currWord.length;
-        //console.log('getCurrWord: return>' + currWord + '<, ' + currWord.length);
+        console.log('getCurrWord: return>' + currWord + '<, ' + currWord.length);
         return currWord;
     }
 }
@@ -424,8 +424,8 @@ function autocompleteBindEditor(tabElement, editor) {
             }
             if (event.action === 'insert') {
                 if (event.lines[0].length === 1) {
-                    console.log(editor.currentQueryRange);
-                    console.log(event.lines);
+                    //console.log(editor.currentQueryRange);
+                    //console.log(event.lines);
                     if (editor.currentQueryRange) { // || (editor.currentQueryRange && autocompleteGlobals.quoteLevel === 4 && autocompleteGlobals.popupOpen)
                         if (autocompleteGlobals.quoteLevel !== 4 && event.lines[0] === ' ') {
                             autocompleteKeyEvent = 'close';
@@ -453,12 +453,14 @@ function autocompleteBindEditor(tabElement, editor) {
                 autocompleteKeyEvent = 'delete';
             }
             
+            console.log('autocompleteKeyEvent', autocompleteKeyEvent);
             
             
             if (editor.currentSelections) {
                 var selectionRanges = editor.currentSelections[0];
             }
             
+            console.log('autocompleteGlobals.popupOpen', autocompleteGlobals.popupOpen);
             if (autocompleteGlobals.popupOpen && (autocompleteKeyEvent === 'pass' || autocompleteKeyEvent === 'snippets')) {
                 var currWord = getCurrWord(editor, false);
                 
@@ -789,7 +791,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
             queryVars.bolBuiltins = true;
         } else {
             queryVars.bolSchemas = true;
-            console.log('default');
+            //console.log('default');
         }
         
         if (queryVars.bolCols) {
@@ -819,7 +821,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         }
         
         for (var i = 0, len = arrQueries.length; i < len; i++) {
-            console.log(arrQueries[i]);
+            //console.log(arrQueries[i]);
             arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), currWord.toLowerCase() + '%');
         }
         //console.log('123456789 ', event.lines, autocompleteGlobals.bolQueryRunning);
@@ -1408,9 +1410,13 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     } else if (autocompleteKeyEvent === 'snippets') {
         var currSnippet, strCurrent, strCurrentName;
         
+        
+        //prevents duplicates
+        autocompleteGlobals.arrValues = [];
+        
         for (var i = 0, len = snippets.length; i < len; i++) {
             currSnippet = snippets[i];
-            if (currSnippet[0].substring(0,1).toLowerCase().indexOf(currWord.toLowerCase()) !== -1) {
+            if (currSnippet[0].substring(0,currWord.length).toLowerCase().indexOf(currWord.toLowerCase()) !== -1) {
                 strCurrent = currSnippet;
                 strCurrentName = currSnippet[0];
                 strSearch = (strCurrentName[0] === '"' ? strCurrentName.toLowerCase() : '"' + strCurrentName.toLowerCase() + '"');
@@ -1421,7 +1427,9 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
             }
         }
         
-        if (autocompleteGlobals.arrValues.length >= 1) {
+        console.log('autocompleteGlobals.arrValues.length: ', autocompleteGlobals.arrValues.length);
+        
+        if (autocompleteGlobals.arrValues.length >= 1 && currWord !== '') {
             openPopup(editor, autocompleteGlobals.arrValues);
         }
         
@@ -1569,7 +1577,7 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
         
         }
         
-        // console.log(autocompleteGlobals.arrSearchPath, queryVars.bolSearchPath);
+        // //console.log(autocompleteGlobals.arrSearchPath, queryVars.bolSearchPath);
         if (autocompleteGlobals.arrSearchPath && queryVars.bolSchemas) {
             for (var i = 0, len = autocompleteGlobals.arrSearchPath.length; i < len; i++) {
                 if (autocompleteGlobals.arrSearchPath[i][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) {
@@ -1669,7 +1677,8 @@ function autocompleteFilterList(list, searchWord, editor) {
     if (autocompleteGlobals.bolQueryRunning) {
         autocompleteGlobals.bolSpecialFilter = true;
     } else if (searchWord === "") {
-        closePopup();
+        //closePopup();
+        openPopup(editor, list)
     } else {
         autocompleteGlobals.popupLoading = true;
         var arrNewValue = [], strSearch;
@@ -1717,7 +1726,7 @@ function closePopup() {
         autocompleteUnbind();
         // if the autocomplete query is still running: cancel it
         if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning && !autocompleteGlobals.bolQueryCanceled) {
-            console.log(autocompleteGlobals.strQueryID);
+            //console.log(autocompleteGlobals.strQueryID);
             GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
             autocompleteGlobals.bolQueryCanceled = true;
             autocompleteGlobals.popupLoading = false;
@@ -1741,6 +1750,7 @@ function closePopup() {
 //bolKeepOpen allows autocompleteFilterList to not close the popup which emptys the variables
 function openPopup(editor, optionlist, bolKeepOpen) {
     'use strict';
+    //console.trace('openPopup');
     
     //console.log(optionlist);
     
@@ -1895,11 +1905,11 @@ function autocompleteComplete(editor) {
         if (editor.currentSelections.length > 1) {
             var currSelections = editor.currentSelections;
             
-            for (var i = 0, len = editor.currentSelections.length; i < len; i += 1) {
+            for (var i = 0, len = currSelections.length; i < len; i += 1) {
                 insertText = currentValue[0].trim().substring(autocompleteGlobals.searchLength, currentValue[0].trim().length);
                 insertObj = {
-                    row: editor.currentSelections[i].start.row,
-                    column: editor.currentSelections[i].start.column
+                    row: currSelections[i].start.row,
+                    column: currSelections[i].start.column
                 };
                 //editor.moveCursorToPosition(insertObj);
 
