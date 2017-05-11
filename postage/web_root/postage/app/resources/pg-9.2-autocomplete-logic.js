@@ -76,58 +76,56 @@ getListData(ml(function () {/*SELECT DISTINCT c.relnamespace
 
 function getCurrWord(editor, bolPeriod) {
     if (editor && editor.currentSelections) {
-        var strScript = editor.getValue(), intCursorPosition = ((bolPeriod) ? rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column - 1) : rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column));
+        var strScript = editor.getValue()
+            , intCursorPosition = ((bolPeriod) 
+                ? rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column - 1) 
+                : rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column));
         autocompleteGlobals.quoteLevel = findQuoteLevel(editor.getValue().substring(0, intCursorPosition + 1), intCursorPosition + 1);
         var currWord = [];
-        //console.log(autocompleteGlobals.quoteLevel);
+        //console.log('bolPeriod: ' + bolPeriod + '; autocompleteGlobals.quoteLevel: ' + autocompleteGlobals.quoteLevel);
         
         // if (strScript[intCursorPosition] === '"') {
         //     autocompleteGlobals.quoteLevel = findQuoteLevel(editor.getValue().substring(0, intCursorPosition), intCursorPosition);
         // }
         
-        if (autocompleteGlobals.quoteLevel === 4) {
-            //single quote
-            for (var i = 0, len = intCursorPosition; i <= len; i++) {
-                //console.log(strScript[intCursorPosition - i] + ' : ' + isAlpha(strScript[intCursorPosition - i]));
+        // //if next character is whitespace
+        // if (strScript[intCursorPosition + 1] && strScript[intCursorPosition + 1].trim() !== '') {
+        //     intCursorPosition += 1;
+        // }
+        
+        // //if current character is whitespace
+        // if (strScript[intCursorPosition] && strScript[intCursorPosition].trim() === '') {
+        //     intCursorPosition -= 1;
+        // }
+        // why are we doing this loop?
+        for (var i = 0, len = intCursorPosition; i <= len; i++) {
+            //console.log('getCurrWord: ' + strScript[intCursorPosition - i], intCursorPosition, i);
+            
+            if (
+                (intCursorPosition > i && strScript[intCursorPosition - i].trim() === '')
+                || (strScript[intCursorPosition - i] === '"')
+                || ((/^\W$/i).test(strScript[intCursorPosition - (i)]))
+            ) {
+                //console.log('break(' + intCursorPosition + '|' + i + ')>' + strScript[intCursorPosition - i] + '<');
+                //console.log('test1>' + (intCursorPosition > i && strScript[intCursorPosition - i].trim() === ''));
+                //console.log('test2>' + (autocompleteGlobals.quoteLevel === 2 && strScript[intCursorPosition - i] === '$'));
+                //console.log('test3>' + (strScript[intCursorPosition - i] === '"'));
+                //console.log('test>' + strScript[intCursorPosition - (i)] + '<');
+                //console.log('test4>' + (/^\W$/i).test(strScript[intCursorPosition - (i)]));
                 if (strScript[intCursorPosition - i] === '"') {
                     currWord.push(strScript[intCursorPosition - i].toLowerCase());
-                    break;
-                } else {
-                    currWord.push(strScript[intCursorPosition - i].toLowerCase());
                 }
-            }
-        } else {
-            if (strScript[intCursorPosition + 1] && strScript[intCursorPosition + 1].trim() !== '') {
-                intCursorPosition += 1;
-            }
-            if (strScript[intCursorPosition] && strScript[intCursorPosition].trim() === '') {
-                intCursorPosition -= 1;
-            }
-            for (var i = 0, len = intCursorPosition; i <= len; i++) {
-                //console.log(strScript[intCursorPosition]);//strScript, intCursorPosition + ' : ' + strScript[intCursorPosition - i] + ' : ' + isAlpha(strScript[intCursorPosition - i]));
-                if (strScript[intCursorPosition - i] && isAlpha(strScript[intCursorPosition - i])) {
-                    if (currWord === []) {
-                        currWord = strScript[intCursorPosition - i].toLowerCase()
-                    } else {
-                        currWord.push(strScript[intCursorPosition - i].toLowerCase());
-                    }
-                } else if (strScript[intCursorPosition - i].trim() === '' || currWord !== []) {
-                    break;
-                }
+                break;
+            } else /*if (i > 0) */{
+                currWord.push(strScript[intCursorPosition - i].toLowerCase());
             }
         }
         currWord = currWord.reverse();
         currWord = currWord.join('');
         autocompleteGlobals.searchLength = currWord.length;
-        //console.log(currWord);
+        //console.log('getCurrWord: return>' + currWord + '<, ' + currWord.length);
         return currWord;
     }
-}
-
-
-function isAlpha(testStr) {
-    var bolAlphaNumeric = (/^[a-z0-9_]+$/i).test(testStr);
-    return bolAlphaNumeric;
 }
 
 
@@ -399,16 +397,11 @@ function autocompleteBindEditor(tabElement, editor) {
     autocompleteGlobals.popupAce.focusElement.addEventListener('focus', autocompleteGlobals.popupAce.focusFunction);
     //console.log(editor.onSelectionChange);
 
-    editor.textInput.getElement().addEventListener('keyup', function () {
-        if (editor.currentSelections) {
-            var currSelections = editor.currentSelections;
-            //console.log(currSelections);
-            for (var i = 0, len = currSelections.length; i < len; i++) {
-            //console.log(currSelections[i].start.row, currSelections[i].end.row, currSelections[i].start.column, currSelections[i].end.column);
-                if (currSelections[i].start.row !== currSelections[i].end.row || currSelections[i].start.column !== currSelections[i].end.column) {
-                    closePopup();
-                }
-            }
+    // This closes the popup if you select while the popup is open
+    editor.textInput.getElement().addEventListener('keyup', function (event) {
+        var bolArrow = (event.which >= 37 && event.which <= 40);
+        if (bolArrow && event.shiftKey) {
+            closePopup();
         }
     });
 
@@ -419,6 +412,7 @@ function autocompleteBindEditor(tabElement, editor) {
     // });
 
     editor.addEventListener('change', function (event) {
+        selectionFindRange(xtag.query(document.body, '.current-tab')[0], editor);
         if (editor.currentSelections) {
             var strScript = editor.getValue(), intCursorPosition = rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column);
             autocompleteGlobals.quoteLevel = findQuoteLevel(editor.getValue().substring(0, intCursorPosition), intCursorPosition)
@@ -430,7 +424,9 @@ function autocompleteBindEditor(tabElement, editor) {
             }
             if (event.action === 'insert') {
                 if (event.lines[0].length === 1) {
-                    if (!editor.currentQueryRange === false || (!editor.currentQueryRange === false && autocompleteGlobals.quoteLevel === 4 && autocompleteGlobals.popupOpen)) {
+                    console.log(editor.currentQueryRange);
+                    console.log(event.lines);
+                    if (editor.currentQueryRange) { // || (editor.currentQueryRange && autocompleteGlobals.quoteLevel === 4 && autocompleteGlobals.popupOpen)
                         if (autocompleteGlobals.quoteLevel !== 4 && event.lines[0] === ' ') {
                             autocompleteKeyEvent = 'close';
                         } else if (event.lines[0] === '.') {
@@ -464,7 +460,7 @@ function autocompleteBindEditor(tabElement, editor) {
             }
             
             if (autocompleteGlobals.popupOpen && (autocompleteKeyEvent === 'pass' || autocompleteKeyEvent === 'snippets')) {
-                var currWord = getCurrWord(editor);
+                var currWord = getCurrWord(editor, false);
                 
                 if (editor.currentSelections && editor.currentSelections.length > 1) {
                     if (
@@ -551,7 +547,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     intCursorPosition = intStartCursorPosition;
     
     if (autocompleteKeyEvent !== 'delete') {
-        var currWord = getCurrWord(editor);
+        var currWord = getCurrWord(editor, false);
     }
     
     autocompleteGlobals.bolAlpha = false;
@@ -793,6 +789,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
             queryVars.bolBuiltins = true;
         } else {
             queryVars.bolSchemas = true;
+            console.log('default');
         }
         
         if (queryVars.bolCols) {
@@ -822,11 +819,13 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         }
         
         for (var i = 0, len = arrQueries.length; i < len; i++) {
+            console.log(arrQueries[i]);
             arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), currWord.toLowerCase() + '%');
         }
-        //console.log(currWord);
         //console.log('123456789 ', event.lines, autocompleteGlobals.bolQueryRunning);
-        autocompleteMakeList(arrQueries, currWord, editor);
+        if (currWord && !((/\S/).test(strScript[intCursorPosition + 1]))) {
+            autocompleteMakeList(arrQueries, currWord, editor);
+        }
     } else if (autocompleteKeyEvent === 'period') {
         closePopup();
 
@@ -1530,7 +1529,7 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
         }
         
         strQuery = 'SELECT DISTINCT * FROM (\n' + arrQueries.join('\n     UNION ALL\n') + '\n' + ') em ORDER BY obj_name;';
-        //    //console.log(strQuery);
+        //console.log(strQuery);
         // if the autocomplete query is still running: cancel it
         if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning) {
             GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
@@ -1622,21 +1621,22 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
                         
                         
                         autocompleteGlobals.bolQueryRunning = false;
+                        autocompleteGlobals.bolQueryCanceled = false;
                         //console.log('ending the query');
                         //console.log(strQuery);
                         
                         if (autocompleteGlobals.bolSpecialFilter) {
                             autocompleteGlobals.bolSpecialFilter = false;
-                            if ((optionList.length === 1 && searchWord && optionList[0][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
+                            if (optionList.length === 0) {
                                 closePopup();
                             } else {
                                 closePopup();
-                                var currWord = getCurrWord(editor);
+                                var currWord = getCurrWord(editor, false);
                                 
                                 autocompleteFilterList(optionList, currWord, editor)
                             }
                         } else {
-                            if ((optionList.length === 1 && searchWord && optionList[0][0].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) || optionList.length === 0) {
+                            if (optionList.length === 0) {
                                 closePopup();
                             } else if (autocompleteGlobals.popupOpen === false) {
                                 openPopup(editor, optionList);
@@ -1655,6 +1655,7 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
                 getlist();
             }, 2000);
             autocompleteGlobals.bolQueryRunning = false;
+            autocompleteGlobals.bolQueryCanceled = false;
             //autocompleteGlobals.bolTestSlowDown = false;
         } else {
             getlist();
@@ -1709,13 +1710,16 @@ function autocompleteFilterList(list, searchWord, editor) {
 }
 
 function closePopup() {
+    //console.trace('closePopup');
     if (autocompleteGlobals.popupOpen === true || autocompleteGlobals.bolQueryRunning) {
         autocompleteGlobals.popupOpen = false;
         //console.log('closed');
         autocompleteUnbind();
         // if the autocomplete query is still running: cancel it
-        if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning) {
-            GS.requestFromSocket(GS.envSocket, 'CANCEL', '');
+        if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning && !autocompleteGlobals.bolQueryCanceled) {
+            console.log(autocompleteGlobals.strQueryID);
+            GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
+            autocompleteGlobals.bolQueryCanceled = true;
             autocompleteGlobals.popupLoading = false;
         }
 
@@ -1737,6 +1741,8 @@ function closePopup() {
 //bolKeepOpen allows autocompleteFilterList to not close the popup which emptys the variables
 function openPopup(editor, optionlist, bolKeepOpen) {
     'use strict';
+    
+    //console.log(optionlist);
     
     // if (autocompleteGlobals.searchLength !==  getCurrWord(editor).length) {
     //     autocompleteFilterList(optionlist, getCurrWord(editor), editor)
@@ -1792,6 +1798,10 @@ function openPopup(editor, optionlist, bolKeepOpen) {
 }
 
 function loadPopuplist(editor, optionlist) {
+    'use strict';
+    
+    //console.log(optionlist);
+    
     var strNewValue = '';
     for (var i = 0, len = optionlist.length; i < len; i++) {
         strNewValue += '\n';
@@ -1809,9 +1819,9 @@ function loadPopuplist(editor, optionlist) {
     autocompleteGlobals.popupAce.scrollToLine(0);
     
     if (document.getElementById('autocomplete-popup')) {
-        popup_instruct_top = document.getElementById('autocomplete-popup').style.height +
-                             document.getElementById('autocomplete-popup-instruction').style.height;
-        document.getElementById('autocomplete-popup-instruction').style.top = popup_instruct_top;
+        document.getElementById('autocomplete-popup-instruction').style.top = 
+                            document.getElementById('autocomplete-popup').style.height +
+                            document.getElementById('autocomplete-popup-instruction').style.height;
     }
     
     autocompleteGlobals.popupLoading = false;

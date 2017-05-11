@@ -25,6 +25,7 @@ var autocompleteGlobals = {
       , 'ignoreNext':      1
       , 'searchLength':    0
       , 'bolQueryRunning': false
+      , 'bolQueryCanceled': false
       , 'bolSpecialFilter':  false
       , 'bolTestSlowDown':   false
       , 'quoteLevel':      0

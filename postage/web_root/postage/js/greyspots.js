@@ -8314,18 +8314,22 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
     }
     
     function webSocketNormalizeError(event) {
-        var i, len, arrLines, arrLine, strData,
-            jsnRet = {
-                'error_title': '',
-                'error_text': '',
-                'error_detail': '',
-                'error_hint': '',
-                'error_query': '',
-                'error_context': '',
-                'error_position': '',
-                'error_notice': '',
-                'original_data': event
-            };
+        var i;
+        var len;
+        var arrLines;
+        var arrLine;
+        var strData;
+        var jsnRet = {
+            'error_title': '',
+            'error_text': '',
+            'error_detail': '',
+            'error_hint': '',
+            'error_query': '',
+            'error_context': '',
+            'error_position': '',
+            'error_notice': '',
+            'original_data': event
+        };
         
         event = event || {};
         
@@ -8334,33 +8338,33 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         // if there is message data: parse it
         if (event.data) {
             strData = event.data;
-            
+
             // strip out messageid
             if (strData.substring(0, strData.indexOf(' ')) === 'messageid') {
                 strData = strData.substring(strData.indexOf('\n') + 1);
             }
-            
+
             // strip out response number
             if (strData.substring(0, strData.indexOf(' ')) === 'responsenumber') {
                 strData = strData.substring(strData.indexOf('\n') + 1);
             }
-            
+
             // strip out fatal
             if (strData.indexOf('FATAL\n') === 0) {
                 strData = strData.substring(strData.indexOf('\n') + 1);
             }
-            
+
             // strip out "Query failed: "
             if (strData.indexOf('Query failed: ') === 0) {
                 strData = strData.substring('Query failed: '.length);
             }
-            
+
             // save error text in case we dont find any error part labels
             jsnRet.error_text = strData;
             
             // trim and split on return for parsing
             arrLines = strData.trim().split('\n');
-            
+
             for (i = 0, len = arrLines.length; i < len; i += 1) {
                 arrLine = arrLines[i].split('\t');
                 
@@ -8444,6 +8448,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
     }
     
     function errorJSONToHTML(errorJSON) {
+        console.log(errorJSON);
         return '<pre style="word-break: break-all; white-space: pre-wrap;">' +
                     (errorJSON.error_title ?
                         'There was ' +
@@ -8456,19 +8461,14 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                             ' "' + encodeHTML(errorJSON.error_title) + '" error:' :
                         'There was an error:') +
                         (
-                            !errorJSON.error_hint &&
-                            !errorJSON.error_query &&
-                            !errorJSON.error_context &&
-                            !errorJSON.error_notice
-                                ? '<br /><br />' + encodeHTML(errorJSON.error_text)
-                                : ''
+                            errorJSON.error_text     ? '<br /><br />' + encodeHTML(errorJSON.error_text)
+                            :   (errorJSON.error_hint     ? '<br /><br />HINT: ' + encodeHTML(errorJSON.error_hint) : '') +
+                                (errorJSON.error_detail   ? '<br /><br />DETAIL: ' + encodeHTML(errorJSON.error_detail) : '') +
+                                (errorJSON.error_query    ? '<br /><br />QUERY: ' + encodeHTML(errorJSON.error_query) : '') +
+                                (errorJSON.error_position ? '<br /><br />ERROR POSITION: ' + encodeHTML(errorJSON.error_position) : '') +
+                                (errorJSON.error_context  ? '<br /><br />CONTEXT: ' + encodeHTML(errorJSON.error_context) : '') +
+                                (errorJSON.error_notice   ? '<br /><br /><br />' + encodeHTML(errorJSON.error_notice) : '')
                         ) +
-                        (errorJSON.error_hint     ? '<br /><br />HINT: ' + encodeHTML(errorJSON.error_hint) : '') +
-                      //(errorJSON.error_detail   ? '<br /><br />DETAIL: ' + encodeHTML(errorJSON.error_detail) : '') +
-                        (errorJSON.error_query    ? '<br /><br />QUERY: ' + encodeHTML(errorJSON.error_query) : '') +
-                        (errorJSON.error_position ? '<br /><br />ERROR POSITION: ' + encodeHTML(errorJSON.error_position) : '') +
-                        (errorJSON.error_context  ? '<br /><br />CONTEXT: ' + encodeHTML(errorJSON.error_context) : '') +
-                        (errorJSON.error_notice   ? '<br /><br /><br />' + encodeHTML(errorJSON.error_notice) : '') +
                 '</pre>';
     }
     
@@ -9124,6 +9124,64 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         });
     };
     
+    GS.requestArbitrarySelectFromSocket = function (socket, strSQL, strWhere, strOrd, strLimit, strOffset, finalCallback) {
+        var strMessage = (
+            'SELECT\t' + encodeForTabDelimited(strSQL) +
+            '\nRETURN\t*\n\n' +
+            'where\t' +
+            (strOrd ? 'order by\t' : '') +
+            'limit\t' +
+            'offset\n' +
+            encodeForTabDelimited(strWhere || '1=1') + '\t' +
+            (strOrd ? encodeForTabDelimited(strOrd) + '\t' : '') +
+            encodeForTabDelimited(strLimit || 'ALL') + '\t' +
+            encodeForTabDelimited(strOffset || '0')
+        );
+        var intResponse = 0;
+        var intCallback = 0;
+        var arrColumnNames;
+        var arrColumnTypes;
+        var arrDecodedColumnNames;
+        var arrDecodedColumnTypes;
+        
+        //console.log(strMessage);
+        
+        GS.requestFromSocket(socket, strMessage, function (data, error, errorData) {
+            var arrLines, i, len;
+            if (!error) {
+                if (intResponse === 0) {
+                    arrLines = data.split('\n');
+                    arrColumnNames = arrLines[0].split('\t');
+                    arrColumnTypes = arrLines[1].split('\t');
+                    arrDecodedColumnNames = [];
+                    arrDecodedColumnTypes = [];
+                    
+                    for (i = 0, len = arrColumnNames.length; i < len; i += 1) {
+                        arrDecodedColumnNames.push(GS.decodeFromTabDelimited(arrColumnNames[i]));
+                    }
+                    
+                    for (i = 0, len = arrColumnTypes.length; i < len; i += 1) {
+                        arrDecodedColumnTypes.push(GS.decodeFromTabDelimited(arrColumnTypes[i]));
+                    }
+                    
+                } else {
+                    finalCallback({
+                        'arrColumnNames': arrColumnNames,
+                        'arrColumnTypes': arrColumnTypes,
+                        'arrDecodedColumnNames': arrDecodedColumnNames,
+                        'arrDecodedColumnTypes': arrDecodedColumnTypes,
+                        'intCallback': intCallback,
+                        'strMessage': data
+                    }, error);
+                    intCallback += 1;
+                }
+                
+            } else {
+                finalCallback(errorData, error);
+            }
+            intResponse += 1;
+        });
+    };
     
     /*
         INSERT	test	rmultiple_pk_test
@@ -9348,6 +9406,52 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
     };
     
     
+    var cacheLedger = [];
+    window.testtesttest = cacheLedger;
+    GS.requestCachingSelect = function (socket, strSchema, strObject, strColumns, strWhere, strOrd, strLimit, strOffset, callback, bolClearCache) {
+        var strKey = (strSchema + strObject + strColumns + strWhere + strOrd + strLimit + strOffset)
+          , intQueryIndex, i, len, currentEntry;
+        
+        console.log(strKey, bolClearCache, cacheLedger[strKey]);
+        
+        if (bolClearCache) {
+            cacheLedger[strKey] = null;
+        }
+        
+        if (cacheLedger[strKey]) {
+            for (i = 0, len = cacheLedger[strKey].results.length; i < len; i += 1) {
+                callback(cacheLedger[strKey].results[i][0], cacheLedger[strKey].results[i][1]);
+            }
+            cacheLedger[strKey].callbacks.push({'callback': callback, 'ready': true});
+            
+        } else {
+            currentEntry = cacheLedger[strKey] = {
+                results: [],
+                callbacks: [
+                    {'callback': callback, 'ready': true}
+                ]
+            };
+            
+            //console.log('cache:' + bolClearCache);
+            GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
+                                     , strWhere, strOrd, strLimit, strOffset
+                                     , function (data, error) {
+                var i, len;
+                
+                //console.log('data:', data);
+                currentEntry.results.push([data, error]);
+                
+                for (i = 0, len = currentEntry.callbacks.length; i < len; i += 1) {
+                    if (currentEntry.callbacks[i].ready) {
+                        currentEntry.callbacks[i].callback(data, error);
+                    }
+                }
+            });
+        }
+    };
+
+    // Nunzio removed on 2017-05-06 
+    /*
     var cacheQueries = [], cacheCallbacks = [], cacheResults = [];
     GS.requestCachingSelect = function (socket, strSchema, strObject, strColumns, strWhere, strOrd, strLimit, strOffset, callback, bolClearCache) {
         var strKey = (strSchema + strObject + strColumns + strWhere + strOrd + strLimit + strOffset)
@@ -9370,10 +9474,14 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
             cacheCallbacks[intQueryIndex].push({'callback': callback, 'ready': true});
             
         } else {
+            console.log(strKey);
+            console.log(cacheQueries.length);
             cacheQueries.push(strKey);
             cacheCallbacks.push([{'callback': callback, 'ready': true}]);
             cacheResults.push([]);
+            console.log(cacheQueries.length);
             intQueryIndex = (cacheQueries.length - 1);
+            console.log(intQueryIndex);
             
             GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
                                      , strWhere, strOrd, strLimit, strOffset
@@ -9389,8 +9497,76 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                 }
             });
         }
-    };
+    };*/
 })();
+
+
+// GS.encodeForTabDelimited('asdf\\asdf\\asdf\r\nasdf\r\nasdf\tasdf\tasdf')
+GS.encodeForTabDelimited = function (strValue, nullValue) {
+    'use strict';
+    strValue = String(strValue || '');
+    
+    if (strValue === '\\N') {
+        return strValue;
+    } else {
+        strValue = strValue.replace(/\\/g, '\\\\') // double up backslashes
+                        .replace(/\n/g, '\\n')     // replace newline with the text representation '\n'
+                        .replace(/\r/g, '\\r')     // replace carriage return with the text representation '\r'
+                        .replace(/\t/g, '\\t');    // replace tab with the text representation '\t'
+        
+        if (strValue === nullValue) {
+            strValue = '\\N';
+        }
+        
+        return strValue;
+    }
+};
+
+// GS.decodeFromTabDelimited('asdf\\\\asdf\\\\asdf\\r\\nasdf\\r\\nasdf\\tasdf\\tasdf')
+GS.decodeFromTabDelimited = function (strValue, nullValue) {
+    'use strict';
+    var i, len, strRet = '';
+    
+    if (nullValue === undefined) {
+        nullValue = '\\N';
+    }
+    
+    for (i = 0, len = strValue.length; i < len; i += 1) {
+        if (strValue[i] === '\\' && strValue[i + 1]) {
+            i += 1;
+            
+            if (strValue[i] === 'n') {
+                strRet += '\n';
+                
+            } else if (strValue[i] === 'r') {
+                strRet += '\r';
+                
+            } else if (strValue[i] === 't') {
+                strRet += '\t';
+                
+            } else if (strValue[i] === 'N') {
+                strRet += nullValue;
+                
+            } else if (strValue[i] === '\\') {
+                strRet += '\\';
+                
+            } else {
+                strRet += '\\' + strValue[i];
+            }
+            
+        } else {
+            strRet += strValue[i];
+        }
+    }
+    
+    return strRet;
+    
+    //return strValue.replace(/\\\\/g, '\\')
+    //               .replace(/\\n/g, '\n')
+    //               .replace(/\\r/g, '\r')
+    //               .replace(/\\t/g, '\t')
+    //               .replace(/\\N/g, 'NULL');
+};
 
 
 // GS.encodeForTabDelimited('asdf\\asdf\\asdf\r\nasdf\r\nasdf\tasdf\tasdf')

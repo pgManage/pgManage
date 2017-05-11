@@ -23,15 +23,16 @@ snippets.push(['CREATE_VIEW (Snippet)', 'SQLSnippet', ml(function () {/*CREATE O
 	GRANT SELECT,UPDATE,INSERT,DELETE,TRUNCATE,REFERENCES,TRIGGER ON TABLE ${6:schema}.${7:view} TO ${8:trusted_g};
 */})]);
 
+// you need to escape dollar signs in the ml function because they are used for substitutions!!
 snippets.push(['CREATE_FUNCTION (Snippet)', 'SQLSnippet', ml(function () {/*CREATE OR REPLACE FUNCTION ${1:schema}.${2:function}(str_args text)
 	RETURNS text AS
-	$BODY$
+	\$BODY\$
 	DECLARE
 		${3}
 	BEGIN
 		${4}
 	END;
-	$BODY$
+	\$BODY\$
 	LANGUAGE plpgsql VOLATILE
 	COST 100;
 
