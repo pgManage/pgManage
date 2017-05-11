@@ -117,6 +117,46 @@ GS.inputbox(&lt;TITLE&gt;, &lt;MESSAGE&gt;, &lt;CALLBACK&gt;);</code></pre>
             </gs-doc-example>
             
             <div class="doc-example-description">
+                <span class="h3">Attribute <code>[data-overlay-close]</code>:</span>
+                <p>When the viewport is small enough to cause the panel to overlap the content, a shadow will fall over the content. The default behavior of gs-panel is to allow a user to dismiss the panel by clicking on the shadow. To prevent "click on shadow to dismiss" behavior, add the no-shadow-dismiss attribute to the gs-panel tag.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <template data-overlay-close id="dialog-Overlay-documentation">
+                        <gs-page>
+                            <gs-body padded>
+                                <gs-text id="test-control"></gs-text>
+                            </gs-body>
+                            <gs-footer>
+                                <gs-button dialogclose>Done</gs-button>
+                            </gs-footer>
+                        </gs-page>
+                    </template>
+                    <template data-overlay-close id="dialog-documentation">
+                        <gs-page>
+                            <gs-body padded>
+                                <gs-text id="test-control"></gs-text>
+                            </gs-body>
+                            <gs-footer>
+                                <gs-button dialogclose>Done</gs-button>
+                            </gs-footer>
+                        </gs-page>
+                    </template>
+                    <gs-button onclick="testDialog()">Dialog (With <code>[data-overlay-close]</code>)</gs-button>
+                    <gs-button onclick="testDialogNoOverlay()">Dialog (Without <code>[data-overlay-close]</code>)</gs-button>
+                </template>
+                <template for="js" height="auto">
+                    function testDialog() {
+                        GS.openDialog('dialog-Overlay-documentation');
+                    }
+                    function testDialogNoOverlay() {
+                        GS.openDialog('dialog-documentation');
+                    }
+                </template>
+            </gs-doc-example>
+            
+            
+            <div class="doc-example-description">
                 <span class="h3">Before Close Example:</span>
                 <p>In this example we have a dialog that has two close buttons. Once one of the buttons is clicked a function will run and that function will be sent the click event and the text of the element that was clicked.</p>
             </div>
