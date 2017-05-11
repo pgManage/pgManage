@@ -8,7 +8,7 @@ INSTALL_DEPS = @prefix@/sbin/ @prefix@/etc/envelope/ \
 @prefix@/etc/envelope/app/developer_g/greyspots-1.1.1/ \
 @prefix@/etc/envelope/web_root/ \
 @prefix@/etc/envelope/app/all/file_manager/ \
-@prefix@/etc/envelope/app/all/index.html @INSTALL_DEPS@
+@prefix@/etc/envelope/app/all/index.html
 SOCK_DIR_PARAMETER = @sock_dir_parameter@
 MAKE = @make@
 
