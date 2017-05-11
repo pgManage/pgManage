@@ -2181,7 +2181,7 @@ function menuExplain(target) {
                     <span class="explain-letter" icon="play-circle-o">E</span>
                     Explain
                 </gs-button>
-                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" title="Query explanation. Note that the query will run, meaning that you\'ll get run times." remove-top no-focus>
+                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" title="Query explanation. Note that the query will run, meaning that you'll get run times." remove-top no-focus>
                 	<span class="explain-letter" icon="play">E</span>
                 	Explain Analyze
                 </gs-button>
@@ -2288,7 +2288,7 @@ function SQLBeautify(strInput) {
         // FOUND TWO SINGLE QUOTES INSIDE STRING:
         } else if (int_qs === 3 && strInput.substr(i, 2) === "''") {
             strResult += strInput[i];
-            
+
             //add next character
             i += 1;
             strResult += strInput[i];
@@ -2428,7 +2428,7 @@ function SQLBeautify(strInput) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === ";") {
             // Remove semicolon and whitespace
             strResult = strResult.trim();
-            
+
             if (bolRule) {
                 intTabLevel -= 1;
             }
@@ -2557,10 +2557,10 @@ function SQLBeautify(strInput) {
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
-            
+
             strResult += 'ELSE' +
                 '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
-            
+
             i = i + 3 + (strInput.substr(i + 4, 1) === ' ' ? 1 : 0);
             bolNoExtraWhitespace = true;
             //console.log(">ELSE|" + intTabLevel + "<");
@@ -2573,7 +2573,7 @@ function SQLBeautify(strInput) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
             */
-            
+
             // Remove previous newline
             if (bolLastComment) {
                 strResult += '\n';
@@ -2608,7 +2608,7 @@ function SQLBeautify(strInput) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
             */
-            
+
             // Remove previous newline
             if (bolLastComment) {
                 strResult += '\n';
@@ -2674,7 +2674,7 @@ function SQLBeautify(strInput) {
         } else if (int_qs === 0 && bolRule && strInput.substr(i,3).match(/^TO\b|DO\b|ON\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove whitespace
             strResult = strResult.trim();
-            
+
             strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i,3).match(/^TO\b|DO\b|ON\b/i) + ' ';
             i += (strInput.substr(i,3).match(/^TO\b|DO\b|ON\b/i)[0].length - 1);
             bolNoExtraWhitespace = true;
