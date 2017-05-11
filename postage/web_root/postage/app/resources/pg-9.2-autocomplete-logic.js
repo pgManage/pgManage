@@ -1715,7 +1715,7 @@ function closePopup() {
         autocompleteUnbind();
         // if the autocomplete query is still running: cancel it
         if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning) {
-            GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
+            GS.requestFromSocket(GS.envSocket, 'CANCEL', '');
             autocompleteGlobals.popupLoading = false;
         }
 
