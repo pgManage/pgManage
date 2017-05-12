@@ -1,16 +1,17 @@
+-- AS OF VERSION 3.2.12
 
 -- Check Find/Replace
 
 -- Check multiple cursor autocomplete
 -- you need to choose an area non-contiguous with existing text or it won't show the drop down.
 -- 
-select raccount.account_industry FROM utl ;-- <<broken on tab 
-select raccount.account_industry FROM utl ;
-select raccount.account_industry FROM utl ;
-select raccount.account_industry FROM utl ;
-select raccount.account_industry FROM utl ;
-select raccount.account_industry FROM utl ;
-select raccount.account_industry FROM utl ;
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
 
 -- Check that selecting a line up or down closes popup
 select w ;
@@ -25,12 +26,12 @@ select w ;
 --      if everything goes correctly try a similar test again until you have done it succesfully at least three times
 
 -- Check Typing with multiple cursors
-select ; -- need to 
-select ; 
-select ; 
-select ; 
-select ; 
-select ; 
+SELECT raccount. ; -- need to 
+SELECT raccount. ; 
+SELECT raccount. ; 
+SELECT raccount. ; 
+SELECT raccount. ; 
+SELECT raccount. ; 
 
 -- Check that arrowing left and right closes popup
 select ra ;
@@ -39,7 +40,7 @@ select ra ;
 select rtime ;
 
 -- Check that period code doesn't error on a nonexistant object
-select * FROM u ;  -- < broken, shows empty drop down.
+select * FROM  ; 
 
 -- Check that opening a new tab works 
 -- ?? you mean the button to open a script in a new window?
@@ -60,7 +61,7 @@ select '1/1/2017'::abstime ;
 --     filter popup
 select net.geto ;
 
--- period while autocomplete is open
+-- type a period while autocomplete is open
 --     clear popup and load new list
 select net. ;
 
@@ -70,15 +71,15 @@ select net;
 
 -- tab
 --     insert currently selected completion
-select netmask(inet) ;  --<<< broken, duplicates letters when you backspace and then tab to complete
+select netmask(inet) ; 
 
 -- paste
 --     close popup
-select netm ; -- paste 'm'
+select netm ; -- paste 'm' << broken. doesn't remove popup
 
 -- Finish typing the only word in the popup
 --     close popup
-select raccount.id ;
+select raccount.id  ;
 
 -- no query detected:
 --     if there is a shcema dot:
@@ -89,7 +90,7 @@ select raccount.id ;
 
 -- click option:
 --      click on drop down to choose item
-select raccount ;
+select raccounts ;
 
 -- Check that variables show up in a function
 -- Check that variables DON'T show up in a function after a period
@@ -102,7 +103,7 @@ DECLARE
 BEGIN
     int_test := int_test;
 
-    SELECT * FROM wiki.
+    SELECT * FROM wiki. ; -- << broken. doesn't drop for the period
     
 END;
 $BODY$
@@ -113,8 +114,4 @@ ALTER FUNCTION schema.function(str_args text) OWNER TO postgres;
 GRANT EXECUTE ON FUNCTION schema.function(str_args text) TO trusted_g;
 
 -- Check quoted entities
-select * FROM test." ;
-
-
-
-
+select * FROM test." ;  -- works fine. requires user to type a quote to get a list of quoted objects.
