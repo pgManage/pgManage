@@ -822,7 +822,7 @@ autocompleteQuery.types = ml(function () {/*
            AND (NOT EXISTS (SELECT TRUE FROM pg_catalog.pg_type elem WHERE elem.oid = pg_type.typelem AND elem.typarray = pg_type.oid))
            AND (pg_type.typtype <> 'd')
       ORDER BY pg_type.typname
-    ) list_types--this is working
+    ) list_types --this is working
 */});
 
 autocompleteQuery.schemas = ml(function () {/*
@@ -841,7 +841,7 @@ autocompleteQuery.columns = ml(function () {/*
     SELECT * FROM (
             SELECT attname AS obj_name, 'Column'::text AS obj_meta
              FROM pg_attribute
-            WHERE attrelid = '{{PARENTOID}}' AND attnum >= 0
+            WHERE attrelid = '{{PARENTOID}}' AND attnum >= 0 AND attisdropped = false
          ORDER BY attnum ASC
     ) list_columns
 */});

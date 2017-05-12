@@ -2181,7 +2181,7 @@ function menuExplain(target) {
                     <span class="explain-letter" icon="play-circle-o">E</span>
                     Explain
                 </gs-button>
-                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" title="Query explanation. Note that the query will run, meaning that you\'ll get run times." remove-top no-focus>
+                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" title="Query explanation. Note that the query will run, meaning that you'll get run times." remove-top no-focus>
                 	<span class="explain-letter" icon="play">E</span>
                 	Explain Analyze
                 </gs-button>
@@ -2288,7 +2288,7 @@ function SQLBeautify(strInput) {
         // FOUND TWO SINGLE QUOTES INSIDE STRING:
         } else if (int_qs === 3 && strInput.substr(i, 2) === "''") {
             strResult += strInput[i];
-            
+
             //add next character
             i += 1;
             strResult += strInput[i];
@@ -2355,17 +2355,17 @@ function SQLBeautify(strInput) {
 
         // FOUND DOLLAR TAG START:
         } else if (int_qs === 0 && strInput.substr(i, 1) === "$") {
-            console.log('start dollar tag');
+            //console.log('start dollar tag');
             // we should be looking ahead here. get the tag or if false start then
             // just continue
             var int_test_loop = i + 1;
 
-            console.log('int_test_loop = ' + int_test_loop);
-            console.log('strInput.length = ' + strInput.length);
-            console.log('strInput.substr(int_test_loop, 1) = ' + strInput.substr(int_test_loop, 1));
+            //console.log('int_test_loop = ' + int_test_loop);
+            //console.log('strInput.length = ' + strInput.length);
+            //console.log('strInput.substr(int_test_loop, 1) = ' + strInput.substr(int_test_loop, 1));
             while (int_test_loop < strInput.length && strInput.substr(int_test_loop, 1).match("^[a-zA-Z0-9_]$")) {
                 int_test_loop += 1;
-                console.log('int_test_loop = ' + int_test_loop);
+                //console.log('int_test_loop = ' + int_test_loop);
             }
 
             if (strInput.substr(int_test_loop, 1) === '$') {
@@ -2376,10 +2376,10 @@ function SQLBeautify(strInput) {
                 int_qs = 2;
 
                 strResult += str_tag;
-                console.log('int_qs = 2');
+                //console.log('int_qs = 2');
                 // SDEBUG("after int_loop: %s", int_loop);
             } else {
-                console.log('false alarm');
+                //console.log('false alarm');
                 // false alarm, do nothing
                 strResult += strInput[i];
             }
@@ -2388,7 +2388,7 @@ function SQLBeautify(strInput) {
         } else if (int_qs === 2 && strInput.substr(i, str_tag.length) === str_tag) {
             strResult += str_tag + " ";
             bolNoExtraWhitespace = true;
-            console.log('end dollar tag');
+            //console.log('end dollar tag');
             int_qs = 0;
             // move pointer to end of end dollar tag
             int_tag -= 1;
@@ -2428,7 +2428,7 @@ function SQLBeautify(strInput) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === ";") {
             // Remove semicolon and whitespace
             strResult = strResult.trim();
-            
+
             if (bolRule) {
                 intTabLevel -= 1;
             }
@@ -2557,10 +2557,10 @@ function SQLBeautify(strInput) {
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
-            
+
             strResult += 'ELSE' +
                 '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
-            
+
             i = i + 3 + (strInput.substr(i + 4, 1) === ' ' ? 1 : 0);
             bolNoExtraWhitespace = true;
             //console.log(">ELSE|" + intTabLevel + "<");
@@ -2573,15 +2573,15 @@ function SQLBeautify(strInput) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
             */
-            
+
             // Remove previous newline
             if (bolLastComment) {
                 strResult += '\n';
             } else {
                 while (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t\n\r]')) {
-                    console.log('>' + strResult.substring(strResult.length - 1, strResult.length) + '<');
+                    //console.log('>' + strResult.substring(strResult.length - 1, strResult.length) + '<');
                     if (strResult.substring(strResult.length - 1, strResult.length).match('[\n]')) {
-                        console.log('break');
+                        //console.log('break');
                         strResult = strResult.substr(0, strResult.length - 1);
                         break;
                     } else {
@@ -2608,15 +2608,15 @@ function SQLBeautify(strInput) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
             */
-            
+
             // Remove previous newline
             if (bolLastComment) {
                 strResult += '\n';
             } else {
                 while (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t\n\r]')) {
-                    console.log('>' + strResult.substring(strResult.length - 1, strResult.length) + '<');
+                    //console.log('>' + strResult.substring(strResult.length - 1, strResult.length) + '<');
                     if (strResult.substring(strResult.length - 1, strResult.length).match('[\n]')) {
-                        console.log('break');
+                        //console.log('break');
                         strResult = strResult.substr(0, strResult.length - 1);
                         break;
                     } else {
@@ -2646,7 +2646,7 @@ function SQLBeautify(strInput) {
             strResult += 'ELSIF '
             i = i + (-1) + (strInput.substr(i).match(/^ELSIF\b/i)[0].length);
             bolNoExtraWhitespace = true;
-            console.log(">ELSIF;|" + intTabLevel + "<");
+            //console.log(">ELSIF;|" + intTabLevel + "<");
 
         // Not an END IF, at this point it has to be a BEGIN END
         } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^END\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
@@ -2668,24 +2668,24 @@ function SQLBeautify(strInput) {
             i += (strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE[\ \t]+)?RULE/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             intTabLevel += 1;
-            console.log(">CREATE OR REPLACE RULE|" + intTabLevel + "<");
+            //console.log(">CREATE OR REPLACE RULE|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE RULE... TO/DO/ON
         } else if (int_qs === 0 && bolRule && strInput.substr(i,3).match(/^TO\b|DO\b|ON\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove whitespace
             strResult = strResult.trim();
-            
+
             strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i,3).match(/^TO\b|DO\b|ON\b/i) + ' ';
             i += (strInput.substr(i,3).match(/^TO\b|DO\b|ON\b/i)[0].length - 1);
             bolNoExtraWhitespace = true;
-            console.log(">TO/DO/ON|" + intTabLevel + "<");
+            //console.log(">TO/DO/ON|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE RULE... INSTEAD
         } else if (int_qs === 0 && bolRule && strInput.substr(i,8).match(/^INSTEAD\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             strResult += strInput.substr(i,8).match(/^INSTEAD\b/i) + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             i += (strInput.substr(i,8).match(/^INSTEAD\b/i)[0].length - 1);
             bolNoExtraWhitespace = true;
-            console.log(">INSTEAD|" + intTabLevel + "<");
+            //console.log(">INSTEAD|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE FUNCTION
         } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+FUNCTION/i)) {
