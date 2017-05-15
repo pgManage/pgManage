@@ -4,9 +4,11 @@
 
 #include <arpa/inet.h>
 #include <ev.h>
-#include <tls.h>
+#include <inttypes.h>
+#include <stdint.h>
 #include <unistd.h>
 
+#include "common_ssl.h"
 #include "common_client_struct.h"
 #include "db_framework.h"
 
@@ -118,13 +120,6 @@ bool ws_client_info_cb(EV_P, void *cb_data, DB_result *res);
 This function finishes up BEGIN, COMMIT, and ROLLBACK requests
 */
 bool client_cmd_cb(EV_P, void *cb_data, DB_result *res);
-
-/*
-These macros abstract reading and writing to the socket so that we use tls if we
-need it without too much duplicate code
-*/
-#define CLIENT_READ(C, V, L) (bol_tls ? tls_read(C->tls_postage_io_context, V, L) : (ssize_t)read((int)C->_int_sock, V, L))
-#define CLIENT_WRITE(C, V, L) (bol_tls ? tls_write(C->tls_postage_io_context, V, L) : (ssize_t)write((int)C->_int_sock, V, L))
 
 #ifdef _WIN32
 // Windows won't let us do it though...

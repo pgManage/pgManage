@@ -13,14 +13,11 @@ Handles encryption/decryption of cookies.
 #include <string.h>
 #include <time.h>
 
-#include "openssl/aes.h"
 #include "util_base64.h"
 #include "util_string.h"
 
-// if LIBRESSL_INTERNAL is defined when this file is included, it doesn't
-// declare the function we need
-#undef LIBRESSL_INTERNAL
-#include "openssl/rand.h"
+#include <openssl/aes.h>
+#include <openssl/rand.h>
 
 /*
 Encrypts plaintext. The second argument is a pointer to the length. The length

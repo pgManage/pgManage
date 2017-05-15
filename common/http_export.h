@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common_ssl.h"
 #include "common_client_struct.h"
 #include "http_main.h"
 

@@ -565,13 +565,8 @@ bool http_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, ch
 			_str_response[client_request->int_current_response_length + int_header_len] = '\0';
 
 			SDEBUG("_str_response: %s", _str_response);
-			if ((int_response_write_len = CLIENT_WRITE(
-					 client_request->parent, _str_response, client_request->int_current_response_length + int_header_len)) < 0) {
-				if (bol_tls) {
-					SFINISH_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
-				} else {
-					SERROR_NORESPONSE("write() failed");
-				}
+			if ((int_response_write_len = client_write(client, _str_response, client_request->int_current_response_length + int_header_len)) < 0) {
+				SERROR_NORESPONSE("client_write() failed");
 			}
 			SDEBUG("int_response_write_len: %d", int_response_write_len);
 			SFREE(_str_response);
@@ -600,12 +595,8 @@ finish:
 			"\015\012\015\012", (size_t)4,
 			str_response, int_response_len);
 
-		if ((int_response_write_len = CLIENT_WRITE(client_request->parent, _str_response, strlen(_str_response))) < 0) {
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if ((int_response_write_len = client_write(client, _str_response, strlen(_str_response) + int_header_len)) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		SFREE(_str_response);
 

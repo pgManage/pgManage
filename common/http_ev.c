@@ -252,13 +252,8 @@ finish:
 	}
 	SFREE_ALL();
 	ssize_t int_len_response = 0;
-	if (str_response != NULL && (int_len_response = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
-		SFREE(str_response);
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+	if (str_response != NULL && (int_len_response = client_write(client, str_response, strlen(str_response))) < 0) {
+		SERROR_NORESPONSE("client_write() failed");
 		ev_io_stop(global_loop, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
@@ -278,22 +273,14 @@ void http_ev_step2(EV_P, ev_io *w, int revents) {
 	SDEBUG("client_copy_check->str_response: %s", client_copy_check->str_response);
 
 	ssize_t int_response_len =
-		CLIENT_WRITE(client_request->parent, client_copy_check->str_response + client_copy_check->int_written,
+		client_write(client_request->parent, client_copy_check->str_response + client_copy_check->int_written,
 			(size_t)(client_copy_check->int_response_len - client_copy_check->int_written));
 
 	SDEBUG("write(%i, %p, %i): %z", client_request->parent->int_sock,
 		client_copy_check->str_response + client_copy_check->int_written,
 		client_copy_check->int_response_len - client_copy_check->int_written, int_response_len);
 
-	if (int_response_len == -1 && errno != EAGAIN) {
-		if (bol_tls) {
-			SFINISH_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SFINISH("write(%i, %p, %i) failed: %i", client_request->parent->int_sock,
-				client_copy_check->str_response + client_copy_check->int_written,
-				client_copy_check->int_response_len - client_copy_check->int_written, int_response_len);
-		}
-	} else if (int_response_len == TLS_WANT_POLLIN) {
+	if (int_response_len == SOCK_WANT_READ) {
 		ev_io_stop(EV_A, w);
 		ev_io_set(w, GET_CLIENT_SOCKET(client_request->parent), EV_READ);
 		ev_io_start(EV_A, w);
@@ -301,7 +288,7 @@ void http_ev_step2(EV_P, ev_io *w, int revents) {
 		errno = 0;
 		return;
 
-	} else if (int_response_len == TLS_WANT_POLLOUT) {
+	} else if (int_response_len == SOCK_WANT_WRITE) {
 		ev_io_stop(EV_A, w);
 		ev_io_set(w, GET_CLIENT_SOCKET(client_request->parent), EV_WRITE);
 		ev_io_start(EV_A, w);
@@ -309,6 +296,10 @@ void http_ev_step2(EV_P, ev_io *w, int revents) {
 		errno = 0;
 		return;
 
+	} else if (int_response_len < 0 && errno != EAGAIN) {
+		SFINISH("client_write(%i, %p, %i) failed: %i", client_request->parent->int_sock,
+			client_copy_check->str_response + client_copy_check->int_written,
+			client_copy_check->int_response_len - client_copy_check->int_written, int_response_len);
 	} else {
 		// int_response_len can't be negative at this point
 		client_copy_check->int_written += (ssize_t)int_response_len;
@@ -350,14 +341,10 @@ finish:
 		SFREE(_str_response);
 	}
 	if (str_response != NULL) {
-		int_response_len = CLIENT_WRITE(client_request->parent, str_response, strlen(str_response));
+		int_response_len = client_write(client_request->parent, str_response, strlen(str_response));
 		SDEBUG("int_response_len: %d", int_response_len);
 		if (int_response_len < 0) {
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		ev_io_stop(EV_A, &client_request->parent->io);
 		SFREE(client_request->parent->str_request);

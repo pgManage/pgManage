@@ -296,15 +296,11 @@ finish:
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp), _str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}
-	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
+	if (str_response != NULL && client_write(client, str_response, int_response_len) < 0) {
 		SFREE(str_response);
 		http_file_free(client_http_file);
 		client_http_file = NULL;
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	SFREE(str_response);
 	if (int_response_len != 0) {
@@ -407,16 +403,11 @@ finish:
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp), _str_response, strlen(_str_response));
 		SFREE(_str_response);
 	}
-	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
+	if (str_response != NULL && client_write(client, str_response, int_response_len) < 0) {
 		SFREE(str_response);
 		http_file_free(client_http_file);
 		client_http_file = NULL;
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		}
-		else {
-			SERROR_NORESPONSE("write() failed");
-		}
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	SFREE(str_response);
 	if (int_response_len != 0) {
@@ -441,8 +432,6 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 	struct sock_ev_client_copy_check *client_copy_check = (struct sock_ev_client_copy_check *)w;
 	struct sock_ev_client_http_file *client_http_file = (struct sock_ev_client_http_file *)(client_copy_check->client_request);
 	struct sock_ev_client *client = client_http_file->parent;
-	time_t tim_if_modified_by = 0;
-	time_t tim_change_stamp = 0;
 	bool bol_not_modified = false;
 
 	struct stat *statdata = NULL;
@@ -679,19 +668,12 @@ void http_file_write_cb(EV_P, ev_io *w, int revents) {
 	//              client->int_sock,
 	//              client->str_response + int_written,
 	//              client->int_response_length - int_written);
-	int_response_len = CLIENT_WRITE(client, client->str_response + client_http_file->int_written, (size_t)int_response_len);
+	int_response_len = client_write(client, client->str_response + client_http_file->int_written, (size_t)int_response_len);
 
 	SDEBUG("write(%i, %p, %i): %i", client->int_sock, client->str_response + client_http_file->int_written,
 		client_http_file->int_response_len - client_http_file->int_written, int_response_len);
 
-	if (int_response_len == -1 && errno != EAGAIN) {
-		if (bol_tls) {
-			SERROR_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR("write(%i, %p, %i) failed: %i", client->int_sock, client->str_response + client_http_file->int_written,
-				client_http_file->int_response_len - client_http_file->int_written, int_response_len);
-		}
-	} else if (int_response_len == TLS_WANT_POLLIN) {
+	if (int_response_len == SOCK_WANT_READ) {
 		ev_io_stop(EV_A, w);
 		ev_io_set(w, GET_CLIENT_SOCKET(client), EV_READ);
 		ev_io_start(EV_A, w);
@@ -699,7 +681,7 @@ void http_file_write_cb(EV_P, ev_io *w, int revents) {
 		errno = 0;
 		return;
 
-	} else if (int_response_len == TLS_WANT_POLLOUT) {
+	} else if (int_response_len == SOCK_WANT_WRITE) {
 		ev_io_stop(EV_A, w);
 		ev_io_set(w, GET_CLIENT_SOCKET(client), EV_WRITE);
 		ev_io_start(EV_A, w);
@@ -707,6 +689,9 @@ void http_file_write_cb(EV_P, ev_io *w, int revents) {
 		errno = 0;
 		return;
 
+	} else if (int_response_len < 0 && errno != EAGAIN) {
+		SERROR("client_write(%i, %p, %i) failed: %i", client->int_sock, client->str_response + client_http_file->int_written,
+				client_http_file->int_response_len - client_http_file->int_written, int_response_len);
 	} else {
 		client_http_file->int_written += (size_t)int_response_len;
 	}

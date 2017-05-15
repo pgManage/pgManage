@@ -69,11 +69,6 @@ var $ = {
         } else {
             document.getElementById('status-note-' + key).textContent = '(RUNNING)';
         }
-		if (strNewClass === 'pass') {
-			$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=success&id=' + $.intID, 'POST', function (data) {
-
-			});
-		}
         objLabel.strStatus = strStatus;
         objLabel.strErrorText = strErrorText;
     },
@@ -109,6 +104,9 @@ var $ = {
 					$.changeStatus(key, i, 'pass', 'waiting');
 				}
 
+				$.ajax('https://www.sunnyserve.com/env/tst.acceptnc_test', 'action=success&id=' + $.intID, 'POST', function (data) {
+
+				});
                 $.runTest(key, 0);
             } else {
 				$.tests[key].running = false;

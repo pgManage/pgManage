@@ -143,12 +143,8 @@ finish:
 		);
 		SFREE(_str_response);
 
-		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if (client_write(client, str_response, int_response_len) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		// This prevents an infinite loop if CLIENT_CLOSE fails
 		SFREE(str_response);

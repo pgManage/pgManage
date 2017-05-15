@@ -88,12 +88,8 @@ finish:
 			_str_response, strlen(_str_response));
 
 		SFREE(_str_response);
-		if (CLIENT_WRITE(client, str_response, int_response_len) < int_response_len) {
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if (client_write(client, str_response, int_response_len) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		// Unlikely, but possible
 		if (client_upload != NULL) {
@@ -179,12 +175,8 @@ finish:
 			_str_response, strlen(_str_response));
 
 		SFREE(_str_response);
-		if (CLIENT_WRITE(client, str_response, int_response_len) < int_response_len) {
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if (client_write(client, str_response, int_response_len) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		// Unlikely, but possible
 		if (client_upload != NULL) {
@@ -244,12 +236,8 @@ void http_upload_step3(EV_P, ev_check *w, int revents) {
 				"Content-Length: 17\015\012"
 				"\015\012"
 				"Upload Succeeded\012"));
-		if (CLIENT_WRITE(client, str_response, int_response_len) < int_response_len) {
-			if (bol_tls) {
-				SFINISH_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if (client_write(client, str_response, int_response_len) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		SFREE(str_response);
 
@@ -279,12 +267,8 @@ finish:
 			"\015\012\015\012", (size_t)4,
 			_str_response, strlen(_str_response));
 		SFREE(_str_response);
-		if (CLIENT_WRITE(client, str_response, int_response_len) < 0) {
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if (client_write(client, str_response, int_response_len) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		decrement_idle(EV_A);
 		ev_check_stop(EV_A, &client_upload->check);

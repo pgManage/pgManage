@@ -709,13 +709,8 @@ finish:
 	}
 
 	if (str_response != NULL) {
-		if ((int_write_len = CLIENT_WRITE(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
-			SFREE(str_response);
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if ((int_write_len = client_write(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		SFREE(str_response);
 
@@ -814,13 +809,8 @@ finish:
 		SFREE(_str_response);
 	}
 	if (str_response != NULL) {
-		if ((int_len2 = CLIENT_WRITE(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
-			SFREE(str_response);
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if ((int_len2 = client_write(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		SFREE(str_response);
 
@@ -916,13 +906,8 @@ finish:
 	}
 
 	if (str_response != NULL) {
-		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
-			SFREE(str_response);
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if ((int_len = client_write(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		SFREE(str_response);
 
@@ -991,13 +976,8 @@ finish:
 	}
 
 	if (str_response != NULL) {
-		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
-			SFREE(str_response);
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if ((int_len = client_write(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		SFREE(str_response);
 
@@ -1159,13 +1139,8 @@ finish:
 		SFREE(_str_response);
 	}
 	if (str_response != NULL) {
-		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
-			SFREE(str_response);
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if ((int_len = client_write(client_auth->parent, str_response, (int_response_len != 0 ? int_response_len : strlen(str_response)))) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		SFREE(str_response);
 
@@ -1491,12 +1466,8 @@ finish:
 		SFREE(client_request->parent->conn->str_response);
 	}
 
-	if ((int_len = CLIENT_WRITE(client_request->parent, str_response, strlen(str_response))) < 0) {
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+	if ((int_len = client_write(client_auth->parent, str_response, strlen(str_response))) < 0) {
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	SFREE(str_response);
 	struct sock_ev_client *client = client_request->parent;
@@ -1606,14 +1577,8 @@ finish:
 			"\015\012\015\012", (size_t)4,
 			_str_response, strlen(_str_response)
 		);
-		SFREE(_str_response);
-		if ((int_len = CLIENT_WRITE(client_auth->parent, str_response, int_response_len)) < 0) {
-			SFREE(str_response);
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if ((int_len = client_write(client_auth->parent, str_response, int_response_len)) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		// This prevents an infinite loop if CLIENT_CLOSE fails
 		SFREE(str_response);
@@ -1738,12 +1703,8 @@ finish:
 	}
 	DB_free_result(res);
 
-	if (CLIENT_WRITE(client_request->parent, str_response, int_response_len) < 0) {
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client_request->parent->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+	if (client_write(client_auth->parent, str_response, int_response_len) < 0) {
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	SFREE(str_response);
 	struct sock_ev_client *client = client_request->parent;
@@ -1964,12 +1925,8 @@ finish:
 		SFREE(_str_response);
 	}
 
-	if (CLIENT_WRITE(client_auth->parent, str_response, int_response_len) < 0) {
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client_auth->parent->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+	if (client_write(client_auth->parent, str_response, int_response_len) < 0) {
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	SFREE(str_response);
 	struct sock_ev_client *client = client_auth->parent;

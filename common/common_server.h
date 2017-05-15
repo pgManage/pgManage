@@ -15,7 +15,6 @@
 
 #include "db_framework.h"
 
-#include <tls.h>
 #include <unistd.h>
 
 #ifdef _WIN32
@@ -24,6 +23,7 @@
 #define INVALID_SOCKET -1
 #endif
 
+#include "common_ssl.h"
 #include "common_client.h"
 #include "common_config.h"
 #include "http_main.h"
@@ -32,15 +32,6 @@
 
 // 1MB
 #define MAX_BUFFER 1048576
-
-#define SERROR_LIBTLS_NOCONTEXT(M, ...) SERROR("LIBTLS: " M, ##__VA_ARGS__);
-#define SERROR_NORESPONSE_LIBTLS_NOCONTEXT(M, ...) SERROR_NORESPONSE("LIBTLS: " M, ##__VA_ARGS__);
-#define SERROR_LIBTLS_CONTEXT(C, M, ...) SERROR("LIBTLS: %s " M, tls_error(C), ##__VA_ARGS__);
-#define SERROR_NORESPONSE_LIBTLS_CONTEXT(C, M, ...) SERROR_NORESPONSE("LIBTLS: %s " M, tls_error(C), ##__VA_ARGS__);
-
-#define SFINISH_LIBTLS_NOCONTEXT(M, ...) SFINISH_ERROR("LIBTLS: " M "\n", ##__VA_ARGS__);
-//#define SFINISH_LIBTLS_CONTEXT are you sure?
-#define SFINISH_LIBTLS_CONTEXT(C, M, ...) SFINISH_ERROR("LIBTLS: %s " M "\n", tls_error(C), ##__VA_ARGS__);
 
 extern struct ev_loop *global_loop;
 extern bool bol_tls;
@@ -73,8 +64,7 @@ struct sock_ev_serv {
 	SOCKET int_sock;
 	List *list_client;
 	DArray *arr_client_last_activity;
-	struct tls_config *tls_postage_config;
-	struct tls *tls_postage_context;
+	SSL_CTX *ssl_ctx;
 };
 
 //#define _close(A) SDEBUG("_close(%s (%d))", #A, A); _close(A);

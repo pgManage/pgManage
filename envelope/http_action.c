@@ -247,7 +247,7 @@ void http_action_step3(EV_P, ev_io *w, int revents) {
 				client_copy_check->str_response + client_copy_check->int_written,
 				client_copy_check->int_response_len - client_copy_check->int_written, int_client_write_len);
 		}
-	} else if (int_client_write_len == TLS_WANT_POLLIN) {
+	} else if (int_client_write_len == SOCK_WANT_READ) {
 		ev_io_stop(EV_A, w);
 		ev_io_set(w, GET_CLIENT_SOCKET(client_request->parent), EV_READ);
 		ev_io_start(EV_A, w);
@@ -255,7 +255,7 @@ void http_action_step3(EV_P, ev_io *w, int revents) {
 		errno = 0;
 		return;
 
-	} else if (int_client_write_len == TLS_WANT_POLLOUT) {
+	} else if (int_client_write_len == SOCK_WANT_WRITE) {
 		ev_io_stop(EV_A, w);
 		ev_io_set(w, GET_CLIENT_SOCKET(client_request->parent), EV_WRITE);
 		ev_io_start(EV_A, w);

@@ -358,31 +358,13 @@ void client_cb(EV_P, ev_io *w, int revents) {
 	// we haven't done the handshake yet
 	if (client->bol_handshake == false) {
 		errno = 0;
-		int_len = CLIENT_READ(client, str_buffer, MAX_BUFFER);
+		int_len = client_read(client, str_buffer, MAX_BUFFER);
 		SDEBUG("client->int_request_len: %zu", client->int_request_len);
 		SDEBUG("int_len: %zd", int_len);
 		SWARN_CHECK(
-			client->int_request_len != 0 || int_len != 0, "Libev said EV_READ, but there is nothing to read. Closing socket");
+			client->int_request_len > 0 || int_len != 0, "Libev said EV_READ, but there is nothing to read. Closing socket");
 
-		if (int_len == -1) {
-			if (errno == EAGAIN) {
-				SDEBUG("Should never get to EAGAIN");
-			}
-			/*
-			if (client->cnxn != NULL) {
-				PGcancel *cancel = PQgetCancel(client->cnxn);
-				if (cancel != NULL) {
-					SERROR_CHECK(PQcancel(cancel, str_buffer, MAX_BUFFER), "Error canceling query: %s", str_buffer);
-					PQfreeCancel(cancel);
-				}
-			}*/
-
-			if (bol_tls) {
-				SERROR_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_read() failed");
-			} else {
-				SERROR("read() failed");
-			}
-		} else if (int_len >= 0) {
+		if (int_len >= 0) {
 			if (bol_tls == false && (client->int_request_len == 0 || int_len == 0) && bstrstr(str_buffer, (size_t)int_len, "HTTP", 4) == NULL) {
 				SERROR("Someone is trying to connect with TLS!");
 			}
@@ -391,14 +373,16 @@ void client_cb(EV_P, ev_io *w, int revents) {
 			memcpy(client->str_request + client->int_request_len, str_buffer, (size_t)int_len);
 			client->int_request_len += (size_t)int_len;
 			client->str_request[client->int_request_len] = '\0';
-		} else if (int_len == TLS_WANT_POLLIN) {
+		} else if (int_len == SOCK_WANT_READ) {
 			ev_io_stop(EV_A, w);
 			ev_io_set(w, w->fd, EV_READ);
 			ev_io_start(EV_A, w);
-		} else if (int_len == TLS_WANT_POLLOUT) {
+		} else if (int_len == SOCK_WANT_WRITE) {
 			ev_io_stop(EV_A, w);
 			ev_io_set(w, w->fd, EV_WRITE);
 			ev_io_start(EV_A, w);
+		} else if (int_len < 0) {
+			SERROR("client_read() failed");
 		}
 
 		if (client->bol_upload == false) {
@@ -526,12 +510,8 @@ void client_cb(EV_P, ev_io *w, int revents) {
 
 					SBFREE_PWORD(str_upper_request, client->int_request_len);
 
-					if ((int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
-						if (bol_tls) {
-							SERROR_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-						} else {
-							SERROR_NORESPONSE("write() failed");
-						}
+					if ((int_len = client_write(client, str_response, strlen(str_response))) < 0) {
+						SERROR_NORESPONSE("client_write() failed");
 					}
 
 					SERROR_CLIENT_CLOSE(client);
@@ -690,18 +670,14 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					SDEBUG("str_response       : %s", str_response);
 					SDEBUG("client->str_request: %s", client->str_request);
 					// return handshake response
-					if ((int_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
+					if ((int_len = client_write(client, str_response, strlen(str_response))) < 0) {
 						SERROR_CLIENT_CLOSE(client);
-						if (bol_tls) {
-							SERROR_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-						} else {
-							SERROR("write() failed");
-						}
+						SERROR("client_write() failed");
 					}
 					SFREE(str_response);
 
 					SERROR_SALLOC(client->str_session_id, 10 + 1);
-					snprintf(client->str_session_id, 11, "0x%08llx", int_global_session_id++);
+					snprintf(client->str_session_id, 11, "0x%08" PRIu64, int_global_session_id++);
 					SERROR_SNCAT(str_response, &int_response_len, "sessionid = ", (size_t)12, client->str_session_id, (size_t)10, "\n", (size_t)1);
 
 					SERROR_CHECK(
@@ -1832,14 +1808,12 @@ bool client_close(struct sock_ev_client *client) {
 		}
 		// This must be done NOW, or else the browser will hang
 		if (bol_tls) {
-			if (tls_close(client->tls_postage_io_context) != 0) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_close() failed");
+			if (SSL_shutdown(client->ssl) != 0) {
+				SERROR_NORESPONSE("SSL_shutdown() failed");
 			}
 			SFREE(str_global_error);
-			tls_free(client->tls_postage_io_context);
-			// The documentation (poorly) states that IF tls_close is called on a
-			// CLIENT context, it will close the socket, but
-			// it won't on a server context
+			SSL_free(client->ssl);
+
 			close(client->int_sock);
 		} else {
 			shutdown(client->int_sock, SHUT_RDWR);
@@ -2093,13 +2067,12 @@ void client_close_immediate(struct sock_ev_client *client) {
 		}
 
 		if (bol_tls) {
-			if (tls_close(client->tls_postage_io_context) != 0) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_close() failed");
+			if (SSL_shutdown(client->ssl) != 0) {
+				SERROR_NORESPONSE("SSL_shutdown() failed");
 			}
-			tls_free(client->tls_postage_io_context);
-			// The documentation states that IF tls_close is called on a
-			// CLIENT context, it will close the socket, but
-			// it won't on a server context
+			SFREE(str_global_error);
+			SSL_free(client->ssl);
+
 			close(client->int_sock);
 		} else {
 			shutdown(client->int_sock, SHUT_RDWR);

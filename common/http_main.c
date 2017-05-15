@@ -178,12 +178,8 @@ finish:
 			"\015\012Connection: close\015\012\015\012", (size_t)23,
 			_str_response, strlen(_str_response));
 		SFREE(_str_response);
-		if (CLIENT_WRITE(client, str_response, int_response_len) < int_response_len) {
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if (client_write(client, str_response, int_response_len) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 		}
 		if (str_response == client->str_response) {
 			client->str_response = NULL;
@@ -316,12 +312,8 @@ finish:
 	bol_error_state = false;
 	SFREE_PWORD_ALL();
 	ssize_t int_client_write_len = 0;
-	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+	if (str_response != NULL && (int_client_write_len = client_write(client, str_response, strlen(str_response))) < 0) {
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	SFREE(str_response);
 	if (int_client_write_len != 0) {
@@ -451,12 +443,8 @@ finish:
 			_str_response, strlen(_str_response));
 	}
 	SFREE(_str_response);
-	if (CLIENT_WRITE(client, str_response, strlen(str_response)) < 0) {
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+	if (client_write(client, str_response, strlen(str_response)) < 0) {
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	DB_free_result(res);
 

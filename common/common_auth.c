@@ -487,12 +487,8 @@ finish:
 	SFREE_ALL();
 
 	if (str_response != NULL) {
-		if ((int_len = CLIENT_WRITE(client, str_response, strlen(str_response))) < 0) {
-			if (bol_tls) {
-				SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-			} else {
-				SERROR_NORESPONSE("write() failed");
-			}
+		if ((int_len = client_write(client, str_response, strlen(str_response))) < 0) {
+			SERROR_NORESPONSE("client_write() failed");
 			SFINISH_CLIENT_CLOSE(client);
 		}
 		SFREE_PWORD(str_response);

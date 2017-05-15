@@ -105,7 +105,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 	memset(buf, 0, BUF_LEN + 1);
 
 	if (client_message->bol_have_header == false) {
-		int_request_len = CLIENT_READ(frame->parent, buf, WEBSOCKET_HEADER_LENGTH);
+		int_request_len = client_read(frame->parent, buf, WEBSOCKET_HEADER_LENGTH);
 		if (int_request_len < -1) {
 			// This is a state where we want to read (or write) but can't
 			// Silently ignore it, it will be taken care of below
@@ -132,7 +132,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 
 	// Extended lengths
 	if (frame->int_length == 126) {
-		int_request_len = CLIENT_READ(frame->parent, buf, 2);
+		int_request_len = client_read(frame->parent, buf, 2);
 		if (int_request_len < -1) {
 			// This is a state where we want to read (or write) but can't
 			// Silently ignore it, it will be taken care of below
@@ -144,7 +144,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 		frame->int_length = (((uint64_t)buf[0]) << 8) | (((uint64_t)buf[1]) << 0);
 
 	} else if (frame->int_length == 127) {
-		int_request_len = CLIENT_READ(frame->parent, buf, 8);
+		int_request_len = client_read(frame->parent, buf, 8);
 		if (int_request_len < -1) {
 			// This is a state where we want to read (or write) but can't
 			// Silently ignore it
@@ -162,7 +162,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 
 	if (frame->bol_mask == true && frame->str_mask == NULL) {
 		// the mask is four bytes long
-		int_request_len = CLIENT_READ(frame->parent, buf, 4);
+		int_request_len = client_read(frame->parent, buf, 4);
 		if (int_request_len < -1) {
 			// This is a state where we want to read (or write) but can't
 			// Silently ignore it, it will be taken care of below
@@ -189,7 +189,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 	uint64_t int_expected_length = BUF_LEN < int_temp_length ? BUF_LEN : int_temp_length;
 
 	if (int_expected_length > 0) {
-		int_request_len = CLIENT_READ(frame->parent, buf, int_expected_length);
+		int_request_len = client_read(frame->parent, buf, int_expected_length);
 		if (int_request_len < -1) {
 			// This is a state where we want to read (or write) but can't
 			// Silently ignore it, it will be taken care of below
@@ -243,7 +243,7 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 error:
 	SFREE(buf);
 	if (bol_tls) {
-		if (int_request_len == TLS_WANT_POLLIN) {
+		if (int_request_len == SOCK_WANT_READ) {
 			ev_io_stop(EV_A, w);
 			ev_io_set(w, GET_CLIENT_SOCKET(frame->parent), EV_READ);
 			ev_io_start(EV_A, w);
@@ -251,7 +251,7 @@ error:
 			errno = 0;
 			return;
 
-		} else if (int_request_len == TLS_WANT_POLLOUT) {
+		} else if (int_request_len == SOCK_WANT_WRITE) {
 			ev_io_stop(EV_A, w);
 			ev_io_set(w, GET_CLIENT_SOCKET(frame->parent), EV_WRITE);
 			ev_io_start(EV_A, w);
@@ -388,27 +388,23 @@ void WS_sendFrame_step2(EV_P, ev_io *w, int revents) {
 	SDEBUG("attempting to write %d bytes at offset %d",
 		(client_message->int_message_header_length + client_message->int_length) - client_message->int_written,
 		client_message->int_written);
-	ssize_t int_len = CLIENT_WRITE(frame->parent, frame->str_message + client_message->int_written,
+	ssize_t int_len = client_write(frame->parent, frame->str_message + client_message->int_written,
 		(client_message->int_message_header_length + client_message->int_length) - client_message->int_written);
-	if (int_len == -1) {
-		if (bol_tls) {
-			SERROR_LIBTLS_CONTEXT(frame->parent->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR("write() failed");
-		}
-	} else if (int_len == TLS_WANT_POLLIN) {
+	if (int_len == SOCK_WANT_READ) {
 		ev_io_stop(EV_A, w);
 		ev_io_set(w, GET_CLIENT_SOCKET(frame->parent), EV_READ);
 		ev_io_start(EV_A, w);
 		bol_error_state = false;
 		return;
 
-	} else if (int_len == TLS_WANT_POLLOUT) {
+	} else if (int_len == SOCK_WANT_WRITE) {
 		ev_io_stop(EV_A, w);
 		ev_io_set(w, GET_CLIENT_SOCKET(frame->parent), EV_WRITE);
 		ev_io_start(EV_A, w);
 		bol_error_state = false;
 		return;
+	} else if (int_len < 0) {
+		SERROR("client_write() failed");
 	}
 	client_message->int_written += (uint64_t)int_len;
 	if (client_message->int_written < client_message->int_length) {

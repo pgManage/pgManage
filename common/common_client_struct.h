@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common_ssl.h"
 #include "db_framework.h"
 #include "util/util_darray.h"
 #include "util/util_list_queue.h"
@@ -148,7 +149,8 @@ struct sock_ev_client {
 #define GET_CLIENT_SOCKET(A) A->int_sock
 	int int_sock;
 	struct sock_ev_serv *server;
-	struct tls *tls_postage_io_context;
+	void *tls_postage_io_context; // TEMPORARY, I HOPE HOPE HOPE
+	SSL *ssl;
 
 	char *str_message;
 	size_t int_message_len;
