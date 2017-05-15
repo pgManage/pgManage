@@ -202,12 +202,12 @@ void http_main(struct sock_ev_client *client) {
 #ifdef ENVELOPE
 #else
 	SDEFINE_VAR_MORE(str_full_uri);
+	size_t int_full_uri_len = 0;
+	char *str_uri_temp = NULL;
 #endif
 	char *str_response = NULL;
 	char *ptr_end_uri = NULL;
-	char *str_uri_temp = NULL;
 	size_t int_uri_len = 0;
-	size_t int_full_uri_len = 0;
 #ifdef ENVELOPE
 #else
 	size_t int_response_len = 0;

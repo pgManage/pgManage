@@ -46,11 +46,9 @@ fi
 
 #### OS CHECK
 ## COMPILATION IS A LITTLE DIFFERENT FOR THE OS'S
-libtls="build"
 libev="no"
 libtre="notused" #NOT FOR POSTAGE
-MAKE="make"
-MANDIR="share\/man"
+MANDIR="share/man"
 printf "checking for platform..."
 if test $(uname -s) = "Linux"; then
 	LDFLAGS="-lm -lrt"
@@ -79,7 +77,6 @@ elif test $(uname -s) = "Darwin"; then
 
 elif test $(uname -s) = "FreeBSD"; then
 	LDFLAGS="-lm -lintl"
-	MAKE=gmake
 	MANDIR="man"
 	echo "FreeBSD"
 
@@ -93,8 +90,6 @@ elif test $(uname -s) = "FreeBSD"; then
 
 elif test $(uname -s) = "OpenBSD"; then
 	LDFLAGS="-lm -lintl"
-	CPPFLAGS=""
-	MAKE=gmake
 	MANDIR="man"
 	echo "OpenBSD"
 

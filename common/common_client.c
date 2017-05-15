@@ -2008,6 +2008,8 @@ void client_close_cancel_query_cb(EV_P, ev_io *w, int revents) {
 	}
 }
 bool client_close_close_cnxn_cb(EV_P, void *cb_data, DB_result *res) {
+	if (EV_A) { // for unused variable warning
+	}
 	SINFO("RESET SESSION AUTHORIZATION finished!");
 	struct sock_ev_client *client = cb_data;
 	DB_finish(client->conn);

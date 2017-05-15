@@ -158,13 +158,8 @@ finish:
 		);
 		SFREE(_str_response);
 	}
-	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
-		SFREE(str_response);
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+	if (str_response != NULL && client_write(client, str_response, int_response_len) < 0) {
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	SFREE(str_response);
 	if (int_response_len != 0) {
@@ -447,13 +442,8 @@ finish:
 		SFREE(_str_response2);
 	}
 	ssize_t int_client_write_len = 0;
-	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
-		SFREE(str_response);
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+	if (str_response != NULL && (int_client_write_len = client_write(client, str_response, int_response_len)) < 0) {
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	SFREE(str_response);
 	DB_free_result(res);
@@ -562,13 +552,8 @@ finish:
 		SFREE(_str_response1);
 		SFREE(_str_response2);
 	}
-	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
-		SFREE(str_response);
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+	if (str_response != NULL && client_write(client, str_response, int_response_len) < 0) {
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	SFREE(str_response);
 	DB_free_result(res);
@@ -638,13 +623,8 @@ finish:
 		SFREE(_str_response2);
 	}
 	ssize_t int_client_write_len = 0;
-	if (str_response != NULL && (int_client_write_len = CLIENT_WRITE(client, str_response, int_response_len)) < 0) {
-		SFREE(str_response);
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+	if (str_response != NULL && (int_client_write_len = client_write(client, str_response, int_response_len)) < 0) {
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	SFREE(str_response);
 	DB_free_result(res);
@@ -760,13 +740,8 @@ finish:
 		);
 		SFREE(_str_response);
 	}
-	if (str_response != NULL && CLIENT_WRITE(client, str_response, int_response_len) < 0) {
-		SFREE(str_response);
-		if (bol_tls) {
-			SERROR_NORESPONSE_LIBTLS_CONTEXT(client->tls_postage_io_context, "tls_write() failed");
-		} else {
-			SERROR_NORESPONSE("write() failed");
-		}
+	if (str_response != NULL && client_write(client, str_response, int_response_len) < 0) {
+		SERROR_NORESPONSE("client_write() failed");
 	}
 	SFREE(str_response);
 	DB_free_result(res);

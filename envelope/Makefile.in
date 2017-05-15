@@ -10,31 +10,28 @@ INSTALL_DEPS = @prefix@/sbin/ @prefix@/etc/envelope/ \
 @prefix@/etc/envelope/app/all/file_manager/ \
 @prefix@/etc/envelope/app/all/index.html
 SOCK_DIR_PARAMETER = @sock_dir_parameter@
-MAKE = @make@
 
 VERSION = \"$(shell cat ../VERSION)\"
 CC = cc
 CFLAGS = -O3 -g \
 	-fno-strict-aliasing
 LDFLAGS = @LDFLAGS@
-CPPFLAGS = @CPPFLAGS@ -DTRE_VERSION=\"0.8.0\" -DVERSION=$(VERSION) -D_GNU_SOURCE -DPOSTAGE_PREFIX=\"/usr/local\" -DPOSTAGE_INTERFACE_LIBPQ -DENVELOPE \
-		-I../db_framework_pq -I../ -I../common -I../dependencies/tre/include -I../dependencies/libev -I../dependencies/libtls/include
-BUILD_DEPS = @BUILD_DEPS@
+CPPFLAGS = @CPPFLAGS@ \
+	-I../db_framework_pq -I../ -I../common -I../dependencies/tre/include -I../dependencies/libev \
+	-DVERSION=$(VERSION) -DPOSTAGE_PREFIX=\"@prefix@\" -DPOSTAGE_INTERFACE_LIBPQ -DENVELOPE -DTRE_VERSION=\"0.8.0\"
+V=0
 
 common_SOURCES = $(wildcard ../common/*.c) $(filter-out ../util/util_getopt.c, $(filter-out ../util/util_strptime.c, $(filter-out ../util/util_exec.c, $(wildcard ../util/*.c))))
 db_framework_pq_SOURCES = $(wildcard ../db_framework_pq/*.c)
 
-envelope_SOURCES = $(common_SOURCES) $(db_framework_pq_SOURCES) $(wildcard *.c)
+envelope_SOURCES = $(sort $(common_SOURCES) $(db_framework_pq_SOURCES) $(wildcard *.c))
 envelope_OBJECTS = $(envelope_SOURCES:.c=.o)
 
-libtls_SOURCES = $(wildcard ../dependencies/libtls/*.c) @compat@
+libtre_SOURCES = $(wildcard ../dependencies/tre/lib/*.c)
+libtre_OBJECTS = $(libtre_SOURCES:.c=.o)
 
-libtls_OBJECTS = $(libtls_SOURCES:.c=.o)
-
-#envelope_OBJECTS1 = $(envelope_SOURCES:.c=.o)
-#envelope_OBJECTS2 = $(patsubst ../common/%, obj/%, $(envelope_OBJECTS1))
-#envelope_OBJECTS3 = $(patsubst ../util/%, obj/%, $(envelope_OBJECTS2))
-#envelope_OBJECTS = $(patsubst ../db_framework_pq/%, obj/%, $(envelope_OBJECTS3))
+libev_SOURCES = ../dependencies/libev/ev.c
+libev_OBJECTS = $(libev_SOURCES:.c=.o)
 
 .PHONY: all all-format destroy check
 
@@ -44,34 +41,46 @@ all: $(BINARY)
 	@echo "Compilation Successful"
 
 #### DEPENDENCIES
-../dependencies/libtls/libtls.a: $(libtls_OBJECTS)
-	ar -rc ../dependencies/libtls/libtls.a $(libtls_OBJECTS)
-
-libtls: ../dependencies/libtls/libtls.a
-
-ev.o:
-	$(CC) ../dependencies/libev/ev.c @libev_CPPFLAGS@ -c -o ev.o
+$(libev_OBJECTS): %.o: %.c
+ifeq ($(V), 1)
+	$(CC) $(CFLAGS) $(CPPFLAGS) @libev_CPPFLAGS@ $< -c -o $@
+else
+	@echo " CC $@"
+	@$(CC) $(CFLAGS) $(CPPFLAGS) @libev_CPPFLAGS@ $< -c -o $@
+endif
 
 $(libtre_OBJECTS): %.o: %.c
+ifeq ($(V), 1)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $< -c -o $@
-
-libtre_SOURCES = $(wildcard ../dependencies/tre/lib/*.c)
-libtre_OBJECTS = $(libtre_SOURCES:.c=.o)
+else
+	@echo " CC $@"
+	@$(CC) $(CFLAGS) $(CPPFLAGS) $< -c -o $@
+endif
 
 #### BUILDING
-$(BINARY): $(BUILD_DEPS) $(envelope_OBJECTS) $(libtre_OBJECTS)
-	$(CC) $(envelope_OBJECTS) $(libtre_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
+$(BINARY): $(BUILD_DEPS) $(libtre_OBJECTS) $(libev_OBJECTS) $(envelope_OBJECTS)
+ifeq ($(V), 1)
+	$(CC) $(libtre_OBJECTS) $(libev_OBJECTS) $(envelope_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
+else
+	@echo " CCLD $(BINARY)"
+	@$(CC) $(libtre_OBJECTS) $(libev_OBJECTS) $(envelope_OBJECTS) $(LDFLAGS) $(CFLAGS) -o ./$(BINARY)
+endif
 
 all-format:
 	cd ..; ./cleanup_format.sh; cd $(BINARY)
 	$(MAKE) all
 
 $(envelope_OBJECTS): %.o: %.c
+ifeq ($(V), 1)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -Wall -Wextra -Wconversion $< -c -o $@
+else
+	@echo " CC $@"
+	@$(CC) $(CFLAGS) $(CPPFLAGS) -Wall -Wextra -Wconversion $< -c -o $@
+endif
 
 #### CLEAN
 clean:
-	rm -f $(envelope_OBJECTS) $(libtre_OBJECTS) $(libtls_OBJECTS) ../check/*.o ev.o ../dependencies/libtls/libtls.a $(BINARY)
+	rm -f $(envelope_OBJECTS) $(libev_OBJECTS) $(libtre_OBJECTS) ../check/*.o $(BINARY)
 	@echo
 	@echo "Clean Successful"
 

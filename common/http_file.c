@@ -377,9 +377,9 @@ bool http_file_step15_envelope(EV_P, void *cb_data, bool bol_group) {
 	SFINISH_SALLOC(client_copy_check, sizeof(struct sock_ev_client_copy_check));
 	client_copy_check->client_request = (struct sock_ev_client_request *)client_http_file;
 
-	increment_idle(global_loop);
+	increment_idle(EV_A);
 	ev_check_init(&client_copy_check->check, http_file_step2);
-	ev_check_start(global_loop, &client_copy_check->check);
+	ev_check_start(EV_A, &client_copy_check->check);
 
 	bol_error_state = false;
 finish:
