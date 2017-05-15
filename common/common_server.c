@@ -80,6 +80,7 @@ void server_cb(EV_P, ev_io *w, int revents) {
 		client->bol_request_in_progress = false;
 		client->notify_watcher = NULL;
 		client->int_request_len = 0;
+		client->bol_ssl_handshake = false;
 
 		if (inet_ntop(AF_INET, &client_address.sin_addr.s_addr, client->str_client_ip, sizeof(client->str_client_ip)) != NULL) {
 			SDEBUG("Got connection from %s:%d", client->str_client_ip, ntohs(client_address.sin_port));
@@ -89,14 +90,12 @@ void server_cb(EV_P, ev_io *w, int revents) {
 
 		errno = 0;
 
+		setnonblock(client->int_sock);
+
 		if (bol_tls) {
 			client->ssl = SSL_new(client->server->ssl_ctx);
 			SSL_set_fd(client->ssl, client->int_sock);
-			int int_status = SSL_accept(client->ssl);
-			SERROR_CHECK(int_status > 0, "SSL_accept failed: %d", SSL_get_error(client->ssl, int_status));
 		}
-
-		setnonblock(client->int_sock);
 
 #ifdef _WIN32
 		client->int_sock = _open_osfhandle(client->_int_sock, 0);

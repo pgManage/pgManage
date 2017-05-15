@@ -112,6 +112,7 @@ struct sock_ev_client {
 
 	bool bol_is_open;
 	bool bol_socket_is_open;
+	bool bol_ssl_handshake;
 
 	char *str_username;
 	char *str_database;
