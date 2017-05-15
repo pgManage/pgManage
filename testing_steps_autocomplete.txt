@@ -75,6 +75,8 @@ select netmask(inet) ;
 
 -- paste
 --     close popup
+-- Currently if multiple characters are added with a change event then we call it a paste, but if we paste one character then it doesn't know that it's a paste event
+--TODO: is there a better way to determine if there is a paste event?
 select netm ; -- paste 'm' << broken. doesn't remove popup
 
 -- Finish typing the only word in the popup
@@ -82,7 +84,7 @@ select netm ; -- paste 'm' << broken. doesn't remove popup
 select raccount.id  ;
 
 -- no query detected:
---     if there is a shcema dot:
+--     if there is a schema dot:
 --         dot code
 --     else:
 --         Display snippets
