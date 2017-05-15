@@ -1,3 +1,17 @@
+Changes since 3.2.11:
+Postage:
+- Fix HTML in explain table
+- Stop drop down showing up for SPACE (closes workflowproducts/postage#257)
+- Fix autocomplete with double-quoted entity names (closes workflowproducts/postage#246)
+- Fix tab suddenly not working in code editor (closes workflowproducts/postage#255)
+- Fix CREATE FUNCTION listed twice in autocomplete dropdown (closes workflowproducts/postage#253)
+- Fix duplicate letters when typing (closes workflowproducts/postage#252)
+- Fix CREATE FUNCTION to have a $BODY$ tag (closes workflowproducts/postage#254)
+
+Both:
+- Remove LibreSSL Source (closes workflowproducts/envelope#59)
+- Update Windows LibreSSL
+
 Changes since 3.2.10:
 Postage:
 - Fix crash when raw request is pending and socket is closed

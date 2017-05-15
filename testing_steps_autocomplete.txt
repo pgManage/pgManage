@@ -1,69 +1,119 @@
-Check Find/Replace
+-- AS OF VERSION 3.2.12
 
-Check multiple cursor autocomplete
+-- Check Find/Replace
 
-Check that selecting a line up or down closes popup
+-- Check multiple cursor autocomplete
+-- you need to choose an area non-contiguous with existing text or it won't show the drop down.
+-- 
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
+select raccount.account_industry FROM utl.filea ;
 
-Check typing really quickly:
-    in the console: autocompleteGlobals.bolTestSlowDown = true
-    type:
-        SELECT *
-        FROM usr.rorder_line
-        WHERE so_no = rorder_line
-     then type "factname" quickly
-     if everything goes correctly try a similar test again until you have done it succesfully at least three times
+-- Check that selecting a line up or down closes popup
+select w ;
 
-Check Typing with multiple cursors
+-- Check typing really quickly:
+--     in the console: autocompleteGlobals.bolTestSlowDown = true
+--     type:
+--         select *
+--         FROM usr.rorder_line
+--         WHERE so_no = rorder_line
+--      then type "factname" quickly
+--      if everything goes correctly try a similar test again until you have done it succesfully at least three times
 
-Check that arrowing left and right closes popup
+-- Check Typing with multiple cursors
+SELECT raccount. ; -- need to 
+SELECT raccount. ; 
+SELECT raccount. ; 
+SELECT raccount. ; 
+SELECT raccount. ; 
+SELECT raccount. ; 
 
-Check "SELECT rtime" only shows one rtime (there are three)
+-- Check that arrowing left and right closes popup
+select ra ;
 
-Check that period code doesn't error on a nonexistant object
+-- Check "select rtime" only shows one rtime (there are three)
+select rtime ;
 
-Check that opening a new tab works
+-- Check that period code doesn't error on a nonexistant object
+select * FROM  ; 
 
-Backspace:
-    close popup
+-- Check that opening a new tab works 
+-- ?? you mean the button to open a script in a new window?
 
-Typing period:
-    list appropriate object list under schema
+-- Backspace:
+--     close popup
+select * FROM  ;
 
-Typing colon:
-    if there is another colon preceding, show type list
+-- Typing period:
+--     list appropriate object list under schema
+select * FROM net. ;
+ 
+-- Typing colon:
+--     if there is another colon preceding, show type list
+select '1/1/2017'::abstime ; 
+
+-- typing while autocomplete is open
+--     filter popup
+select net.geto ;
+
+-- type a period while autocomplete is open
+--     clear popup and load new list
+select net. ;
+
+-- return
+--     clicking return should close popup and add a \r to the line
+select net;
+
+-- tab
+--     insert currently selected completion
+select netmask(inet) ; 
+
+-- paste
+--     close popup
+-- Currently if multiple characters are added with a change event then we call it a paste, but if we paste one character then it doesn't know that it's a paste event
+--TODO: is there a better way to determine if there is a paste event?
+select netm ; -- paste 'm' << broken. doesn't remove popup
+
+-- Finish typing the only word in the popup
+--     close popup
+select raccount.id  ;
+
+-- no query detected:
+--     if there is a schema dot:
+--         dot code
+--     else:
+--         Display snippets
+-- ?? what does this mean ??
+
+-- click option:
+--      click on drop down to choose item
+select raccounts ;
+
+-- Check that variables show up in a function
+-- Check that variables DON'T show up in a function after a period
+; CREATE OR REPLACE FUNCTION schema.function(str_args text)
+    RETURNS text AS
+$BODY$
+DECLARE
+    int_test integer;
     
-typing while autocomplete is open
-    filter popup
+BEGIN
+    int_test := int_test;
 
-period while autocomplete is open
-    clear popup and load new list
-
-return
-    close popup, allow return to pass through
-
-tab
-    insert currently selected completion
-
-paste
-    close popup
-
-Finish typing the only word in the popup
-    close popup
-
-no query detected:
-    if there is a shcema dot:
-        dot code
-    else:
-        Display snippets
+    SELECT * FROM wiki. ; -- << broken. doesn't drop for the period
     
-click option:
-    insert clicked completion
-    
-Check that variables show up in a function
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE
+COST 100;
 
-Check that variables DON'T show up in a function after a period
+ALTER FUNCTION schema.function(str_args text) OWNER TO postgres;
+GRANT EXECUTE ON FUNCTION schema.function(str_args text) TO trusted_g;
 
-Check quoted entities
-
-
-
+-- Check quoted entities
+select * FROM test." ;  -- works fine. requires user to type a quote to get a list of quoted objects.
