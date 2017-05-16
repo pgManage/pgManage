@@ -25,6 +25,9 @@
     <Filter Include="Source Files\tre">
       <UniqueIdentifier>{9885c256-3616-47b8-9877-e0fc02d1166e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\compat">
+      <UniqueIdentifier>{b0e6a91d-bdfd-4ff8-919a-6f204f6356c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\common\common_auth.c">
@@ -192,10 +195,13 @@
     <ClCompile Include="..\..\dependencies\tre\lib\tre-ast.c">
       <Filter>Source Files\tre</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dependencies\libtls\compat\posix_win.c">
-      <Filter>Source Files\common</Filter>
+    <ClCompile Include="..\compat\bsd-asprintf.c">
+      <Filter>Source Files\compat</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dependencies\libtls\compat\bsd-asprintf.c">
+    <ClCompile Include="..\compat\posix_win.c">
+      <Filter>Source Files\compat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\common_ssl.c">
       <Filter>Source Files\common</Filter>
     </ClCompile>
   </ItemGroup>
@@ -367,6 +373,9 @@
     </ClInclude>
     <ClInclude Include="..\..\dependencies\tre\lib\tre.h">
       <Filter>Source Files\tre</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\common_ssl.h">
+      <Filter>Source Files\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -25,6 +25,9 @@
     <Filter Include="Resource Files\test">
       <UniqueIdentifier>{25fae25d-bae0-42d4-a64f-f4cb5e7f5f80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\compat">
+      <UniqueIdentifier>{5ea8da49-58ca-430f-8c6f-348493a45124}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\postage\ws_tab.c">
@@ -141,11 +144,14 @@
     <ClCompile Include="..\..\util\util_strptime.c">
       <Filter>Source Files\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dependencies\libtls\compat\posix_win.c">
+    <ClCompile Include="..\..\common\common_ssl.c">
       <Filter>Source Files\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dependencies\libtls\compat\bsd-asprintf.c">
-      <Filter>Source Files\common</Filter>
+    <ClCompile Include="..\compat\posix_win.c">
+      <Filter>Source Files\compat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\compat\bsd-asprintf.c">
+      <Filter>Source Files\compat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +271,9 @@
     </ClInclude>
     <ClInclude Include="..\..\util\util_strptime.h">
       <Filter>Source Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\common_ssl.h">
+      <Filter>Source Files\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
