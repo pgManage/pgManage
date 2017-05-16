@@ -12,8 +12,12 @@ Postage works with OpenSSL or LibreSSL, if you wish to use OpenSSL:
 ```
 sudo apt install libssl-devel # Ubuntu
 sudo dnf install openssl-devel # Fedora
+sudo yum install openssl-devel # CentOS/RHEL
+brew install openssl # macOS *
 ```
 Or if you choose LibreSSL, make sure its `openssl` is first in the $PATH (On OpenBSD you don't need to worry about this).
+
+*\* Apple does not include a good enough version of OpenSSL. We officially support the `brew` versions of OpenSSL. If installing OpenSSL from source (untested) make sure to install static libraries.*
 
 ####DOWNLOADING POSTAGE
 
