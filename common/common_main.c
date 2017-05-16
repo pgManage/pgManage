@@ -112,14 +112,11 @@ void program_exit() {
 
 		if (bol_tls) {
 			SSL_CTX_free(_server.ssl_ctx);
-			EVP_cleanup();
-			CRYPTO_cleanup_all_ex_data();
-			ERR_free_strings();
-			ERR_remove_state(0);
-			ERR_remove_thread_state(NULL);
-			CRYPTO_set_locking_callback(NULL);
-			CRYPTO_set_id_callback(NULL);
 		}
+		EVP_cleanup();
+		CRYPTO_cleanup_all_ex_data();
+		ERR_free_strings();
+		ERR_remove_thread_state(NULL);
 
 		ev_break(global_loop, EVBREAK_ALL);
 		ev_loop_destroy(global_loop);
