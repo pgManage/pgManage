@@ -112,9 +112,15 @@ void program_exit() {
 		}
 		DArray_destroy(darr_global_connection);
 
-		EVP_cleanup();
 		if (bol_tls) {
 			SSL_CTX_free(_server.ssl_ctx);
+			EVP_cleanup();
+			CRYPTO_cleanup_all_ex_data();
+			ERR_free_strings();
+			ERR_remove_state(0);
+			ERR_remove_thread_state(NULL);
+			CRYPTO_set_locking_callback(NULL);
+			CRYPTO_set_id_callback(NULL);
 		}
 
 		ev_break(global_loop, EVBREAK_ALL);
@@ -310,6 +316,7 @@ int main(int argc, char *const *argv) {
 	}
 
 	// Initialize AES
+	SSL_library_init();
 	init_aes_key_iv();
 
 	// Get address info
@@ -344,9 +351,6 @@ int main(int argc, char *const *argv) {
 	_server.list_client = List_create();
 	_server.arr_client_last_activity = DArray_create(sizeof(struct sock_ev_client_last_activity), 128);
 	_server.int_sock = int_sock;
-
-	SSL_load_error_strings();
-	OpenSSL_add_ssl_algorithms();
 
 	if (bol_tls) {
 		// Initialize an SSL context

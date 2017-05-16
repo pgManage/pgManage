@@ -986,9 +986,6 @@ static void db_copy_out_check_cb(EV_P, ev_check *w, int revents) {
 	bol_error_state = false;
 finish:
 	if (bol_error_state == true || int_status == -2 || result == PGRES_FATAL_ERROR) {
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_insert);
 		bol_error_state = false;
 
 		str_response = _DB_get_diagnostic(copy_check->conn, res ? res : PQgetResult(copy_check->conn->conn));

@@ -114,6 +114,7 @@ CPPFLAGS="$CPPFLAGS -I$(pg_config --includedir)"
 #### OPENSSL
 OPENSSL_PATH=$(command -v openssl)
 SSL_INCLUDEDIR="${OPENSSL_PATH%bin/openssl}include"
+SSL_LIBDIR="${OPENSSL_PATH%bin/openssl}lib"
 
 CHECK_CPPFLAGS="-I$SSL_INCLUDEDIR"
 HEADER="openssl/ssl.h"
@@ -124,7 +125,11 @@ if test "x$HAVE_HEADER" = "x0"; then
 fi
 
 CPPFLAGS="$CPPFLAGS -I$SSL_INCLUDEDIR"
-LDFLAGS="$LDFLAGS -lssl -lcrypto"
+if test $(uname -s) = "Darwin"; then
+	LDFLAGS="$LDFLAGS $SSL_LIBDIR/libssl.a $SSL_LIBDIR/libcrypto.a"
+else
+	LDFLAGS="$LDFLAGS -L$SSL_LIBDIR -lssl -lcrypto"
+fi
 
 #### LIBEV
 

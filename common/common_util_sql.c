@@ -595,6 +595,7 @@ finish:
 			"\015\012\015\012", (size_t)4,
 			str_response, int_response_len);
 
+		SFREE(str_response);
 		if ((int_response_write_len = client_write(client, _str_response, strlen(_str_response) + int_header_len)) < 0) {
 			SERROR_NORESPONSE("client_write() failed");
 		}

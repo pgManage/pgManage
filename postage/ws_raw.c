@@ -825,6 +825,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 	if (close_client_if_needed(client_request->parent, (ev_watcher *)w, revents)) {
 		SDEBUG("Client %p closed", client_request->parent);
 		ev_check_stop(EV_A, w);
+		SFREE_ALL();
 		return;
 	}
 

@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "common_ssl.h"
 
 extern bool bol_tls;

@@ -1577,6 +1577,7 @@ finish:
 			"\015\012\015\012", (size_t)4,
 			_str_response, strlen(_str_response)
 		);
+		SFREE(_str_response);
 		if ((int_len = client_write(client_auth->parent, str_response, int_response_len)) < 0) {
 			SERROR_NORESPONSE("client_write() failed");
 		}
