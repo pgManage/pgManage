@@ -356,7 +356,7 @@ int main(int argc, char *const *argv) {
 		if (!_server.ssl_ctx) {
 			perror("Unable to create SSL context");
 			ERR_print_errors_fp(stderr);
-			exit(EXIT_FAILURE);
+			goto error;
 		}
 
 		// Set the certificate file

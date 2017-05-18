@@ -1004,12 +1004,15 @@ finish:
 			PQclear(res);
 		}
 
-		copy_cb_t copy_cb = copy_check->copy_cb;
-		decrement_idle(EV_A);
-		ev_check_stop(EV_A, &copy_check->check);
-		copy_check->conn->copy_check = NULL;
-		copy_cb(EV_A, false, true, copy_check->cb_data, str_response, strlen(str_response));
-		SFREE(copy_check);
+		if (copy_check) {
+			copy_cb_t copy_cb = copy_check->copy_cb;
+			decrement_idle(EV_A);
+			ev_check_stop(EV_A, &copy_check->check);
+			PQclear(copy_check->res);
+			copy_check->conn->copy_check = NULL;
+			copy_cb(EV_A, false, true, copy_check->cb_data, str_response, strlen(str_response));
+			SFREE(copy_check);
+		}
 	}
 	SFREE(str_response);
 }
