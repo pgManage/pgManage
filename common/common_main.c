@@ -359,9 +359,6 @@ int main(int argc, char *const *argv) {
 			exit(EXIT_FAILURE);
 		}
 
-		// Set automatic curve selection for ECDH temporary keys during key exchange
-		SSL_CTX_set_ecdh_auto(_server.ssl_ctx, 1);
-
 		// Set the certificate file
 		if (SSL_CTX_use_certificate_file(_server.ssl_ctx, str_global_tls_cert, SSL_FILETYPE_PEM) <= 0) {
 			ERR_print_errors_fp(stderr);
