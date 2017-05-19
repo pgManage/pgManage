@@ -78,7 +78,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 #else
 		SFINISH("No Cookie.");
 #endif
-}
+	}
 #ifdef ENVELOPE
 	if (client->bol_public == false) {
 #endif

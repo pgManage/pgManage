@@ -124,6 +124,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 
 		SFINISH_SNCAT(
 			str_cookie_decrypted, &int_cookie_len,
+			"valid=true&", (size_t)11,
 			str_form_data, int_query_length,
 			"&expiration=", (size_t)12,
 			str_uri_expires, int_uri_expires_len,
@@ -280,7 +281,8 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_CHECK(str_uri_expiration != NULL, "snuri failed!");
 		SFINISH_SNCAT(
 			str_new_cookie, &int_cookie_len,
-			"username=", (size_t)9,
+			"valid=true", (size_t)10,
+			"&username=", (size_t)10,
 			client_auth->str_user, client_auth->int_user_length,
 			"&connname=", (size_t)10,
 			client_auth->str_connname, client_auth->int_connname_length,
@@ -471,7 +473,8 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_CHECK(str_uri_expiration != NULL, "snuri failed!");
 		SFINISH_SNCAT(
 			str_new_cookie, &int_cookie_len,
-			"username=", (size_t)9,
+			"valid=true", (size_t)10,
+			"&username=", (size_t)10,
 			client_auth->str_user, client_auth->int_user_length,
 			"&connname=", (size_t)10,
 			client_auth->str_connname, client_auth->int_connname_length,
