@@ -1,7 +1,7 @@
 #include "ws_delete.h"
 
 void ws_delete_step1(struct sock_ev_client_request *client_request) {
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->vod_request_data);
+	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->client_request_data);
 	SDEBUG("DELETE BEGIN");
 	char *str_response = NULL;
 	char *str_temp = NULL;
@@ -357,7 +357,7 @@ finish:
 #ifndef POSTAGE_INTERFACE_LIBPQ
 bool ws_delete_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->vod_request_data);
+	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->client_request_data);
 	char str_temp[101];
 	memset(str_temp, 0, 101);
 	SDEFINE_VAR_ALL(str_sql);
@@ -432,7 +432,7 @@ finish:
 
 bool ws_delete_step2(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->vod_request_data);
+	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->client_request_data);
 	size_t int_len_content;
 	char str_temp[101];
 	memset(str_temp, 0, 101);
@@ -523,7 +523,7 @@ finish:
 
 bool ws_delete_step4(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->vod_request_data);
+	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->client_request_data);
 	char str_temp[101];
 	memset(str_temp, 0, 101);
 	bool bol_ret = true;
@@ -641,7 +641,7 @@ finish:
 
 bool ws_delete_step5(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->vod_request_data);
+	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->client_request_data);
 	SDEFINE_VAR_ALL(str_sql);
 	bool bol_ret = true;
 	char *str_response = NULL;
@@ -753,7 +753,7 @@ finish:
 
 bool ws_delete_step6(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->vod_request_data);
+	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->client_request_data);
 
 	bool bol_ret = true;
 	char *str_response = NULL;
@@ -863,15 +863,16 @@ finish:
 	return bol_ret;
 }
 
-void ws_delete_free(struct sock_ev_client_delete *to_free) {
-	SFREE(to_free->str_pk_where_clause);
-	SFREE(to_free->str_hash_where_clause);
-	SFREE(to_free->str_real_table_name);
-	SFREE(to_free->str_temp_table_name);
+void ws_delete_free(struct sock_ev_client_request_data *client_request_data) {
+	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)client_request_data;
+	SFREE(client_delete->str_pk_where_clause);
+	SFREE(client_delete->str_hash_where_clause);
+	SFREE(client_delete->str_real_table_name);
+	SFREE(client_delete->str_temp_table_name);
 #ifndef POSTAGE_INTERFACE_LIBPQ
-	SFREE(to_free->str_insert_column_names);
-	SFREE(to_free->str_insert_parameter_markers);
+	SFREE(client_delete->str_insert_column_names);
+	SFREE(client_delete->str_insert_parameter_markers);
 #endif
-	SFREE(to_free->str_identity_column_name);
-	SFREE(to_free->str_sql);
+	SFREE(client_delete->str_identity_column_name);
+	SFREE(client_delete->str_sql);
 }

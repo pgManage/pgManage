@@ -1108,9 +1108,10 @@ void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 	SFREE(str_group_literal);
 
 	struct sock_ev_client_request *client_request =
-		create_request(client_auth->parent, NULL, NULL, NULL, NULL, 0, POSTAGE_REQ_AUTH);
+		create_request(client_auth->parent, NULL, NULL, NULL, NULL, 0, POSTAGE_REQ_AUTH, NULL);
 	SFINISH_CHECK(client_request != NULL, "Could not create request data!");
-	client_request->vod_request_data = client_auth;
+	client_request->client_request_data = client_auth;
+	client_auth->self.free = http_auth_free;
 	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(DB_exec(EV_A, client_auth->parent->conn, client_request, str_sql, http_auth_login_step3), "DB_exec failed");
 	SFREE(str_sql);
@@ -1154,7 +1155,7 @@ finish:
 
 bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_auth *client_auth = (struct sock_ev_client_auth *)(client_request->vod_request_data);
+	struct sock_ev_client_auth *client_auth = (struct sock_ev_client_auth *)(client_request->client_request_data);
 	SDEFINE_VAR_ALL(str_user_literal, str_temp1, str_expires, str_int_len);
 	SDEFINE_VAR_MORE(str_content_length, str_connstring, str_user, str_open);
 	SDEFINE_VAR_MORE(str_closed, str_temp_connstring, str_rolsuper, str_rolgroup, str_temp);
@@ -1540,9 +1541,10 @@ void http_auth_change_pw_step2(EV_P, void *cb_data, DB_conn *conn) {
 	str_new_password_literal = NULL;
 
 	struct sock_ev_client_request *client_request =
-		create_request(client_auth->parent, NULL, NULL, NULL, NULL, 0, POSTAGE_REQ_AUTH);
+		create_request(client_auth->parent, NULL, NULL, NULL, NULL, 0, POSTAGE_REQ_AUTH, NULL);
 	SFINISH_CHECK(client_request != NULL, "Could not create request data!");
-	client_request->vod_request_data = client_auth;
+	client_request->client_request_data = client_auth;
+	client_auth->self.free = http_auth_free;
 
 	SFINISH_CHECK(query_is_safe(str_sql), "SQL Injection detected");
 	SFINISH_CHECK(
@@ -1592,7 +1594,7 @@ finish:
 
 bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_auth *client_auth = (struct sock_ev_client_auth *)(client_request->vod_request_data);
+	struct sock_ev_client_auth *client_auth = (struct sock_ev_client_auth *)(client_request->client_request_data);
 	char *str_response = NULL;
 	size_t int_response_len = 0;
 	size_t int_temp = 0;
@@ -1937,11 +1939,9 @@ finish:
 	bol_error_state = false;
 }
 
-void http_auth_free(struct sock_ev_client_auth *client_auth) {
+void http_auth_free(struct sock_ev_client_request_data *client_request_data) {
+	struct sock_ev_client_auth *client_auth = (struct sock_ev_client_auth *)client_request_data;
 	if (client_auth != NULL) {
-		if (client_auth->io.fd != 0) {
-			ev_io_stop(global_loop, &client_auth->io);
-		}
 		SFREE(client_auth->str_action);
 		SFREE_PWORD(client_auth->str_cookie_encrypted);
 		SFREE(client_auth->str_connname);

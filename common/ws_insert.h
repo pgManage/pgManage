@@ -6,6 +6,8 @@
 #include "util/util_idle.h"
 
 struct sock_ev_client_insert {
+	struct sock_ev_client_request_data self;
+
 	char *ptr_values;
 
 	char *str_return_columns;
@@ -124,4 +126,4 @@ bool ws_insert_step7(EV_P, void *cb_data, DB_result *res);
 /*
 This function will free the data associated with the client_insert struct
 */
-void ws_insert_free(struct sock_ev_client_insert *to_free);
+void ws_insert_free(struct sock_ev_client_request_data *client_request_data);

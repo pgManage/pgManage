@@ -312,11 +312,11 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 			client_request->int_current_response_length = 0;
 
 			if (client_request->int_req_type == POSTAGE_REQ_INSERT) {
-				ws_insert_free(client_request->vod_request_data);
+				ws_insert_free(client_request->client_request_data);
 			} else if (client_request->int_req_type == POSTAGE_REQ_UPDATE) {
-				ws_update_free(client_request->vod_request_data);
+				ws_update_free(client_request->client_request_data);
 			} else if (client_request->int_req_type == POSTAGE_REQ_SELECT) {
-				ws_select_free(client_request->vod_request_data);
+				ws_select_free(client_request->client_request_data);
 			}
 		}
 
@@ -365,7 +365,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 			// If copy_check is null, that means we are on the last message of the request
 			if (client_request->parent->conn->copy_check != NULL && close_client_if_needed(client_request->parent, (ev_watcher *)&client_request->parent->conn->copy_check->check, EV_CHECK)) {
 				ev_check_stop(EV_A, &client_request->parent->conn->copy_check->check);
-				client_request->parent->client_paused_request->bol_is_db_framework = true;
+				client_request->parent->client_paused_request->bol_free_watcher = true;
 				SDEBUG("client_request->parent->cur_request: %p", client_request->parent->cur_request);
 				decrement_idle(EV_A);
 				SFREE(str_response);
@@ -404,11 +404,11 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 				client_request->int_current_response_length = 0;
 
 				if (client_request->int_req_type == POSTAGE_REQ_INSERT) {
-					ws_insert_free(client_request->vod_request_data);
+					ws_insert_free(client_request->client_request_data);
 				} else if (client_request->int_req_type == POSTAGE_REQ_UPDATE) {
-					ws_update_free(client_request->vod_request_data);
+					ws_update_free(client_request->client_request_data);
 				} else if (client_request->int_req_type == POSTAGE_REQ_SELECT) {
-					ws_select_free(client_request->vod_request_data);
+					ws_select_free(client_request->client_request_data);
 				}
 			}
 
@@ -463,11 +463,11 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 			client_request->int_current_response_length = 0;
 
 			if (client_request->int_req_type == POSTAGE_REQ_INSERT) {
-				ws_insert_free(client_request->vod_request_data);
+				ws_insert_free(client_request->client_request_data);
 			} else if (client_request->int_req_type == POSTAGE_REQ_UPDATE) {
-				ws_update_free(client_request->vod_request_data);
+				ws_update_free(client_request->client_request_data);
 			} else if (client_request->int_req_type == POSTAGE_REQ_SELECT) {
-				ws_select_free(client_request->vod_request_data);
+				ws_select_free(client_request->client_request_data);
 			}
 		}
 	}
@@ -499,11 +499,11 @@ finish:
 		str_response = NULL;
 
 		if (client_request->int_req_type == POSTAGE_REQ_INSERT) {
-			ws_insert_free(client_request->vod_request_data);
+			ws_insert_free(client_request->client_request_data);
 		} else if (client_request->int_req_type == POSTAGE_REQ_UPDATE) {
-			ws_update_free(client_request->vod_request_data);
+			ws_update_free(client_request->client_request_data);
 		} else if (client_request->int_req_type == POSTAGE_REQ_SELECT) {
-			ws_select_free(client_request->vod_request_data);
+			ws_select_free(client_request->client_request_data);
 		}
 		return false;
 	}

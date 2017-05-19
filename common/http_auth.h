@@ -10,7 +10,8 @@ struct sock_ev_client_auth_cnxn {
 };
 
 struct sock_ev_client_auth {
-	ev_io io;
+	struct sock_ev_client_request_data self;
+
 	char *str_action;
 	char *str_cookie_encrypted;
 	char *str_connname;
@@ -107,4 +108,4 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn);
 This function free()s the members of the struct that you give it, and then
 free()s the struct
 */
-void http_auth_free(struct sock_ev_client_auth *client_auth);
+void http_auth_free(struct sock_ev_client_request_data *client_request_data);

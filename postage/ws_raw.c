@@ -9,7 +9,7 @@ static const char *str_time_format = "%H:%M:%S";
 extern char *_DB_get_diagnostic(DB_conn *conn, PGresult *res);
 
 void ws_raw_step1(struct sock_ev_client_request *client_request) {
-	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->vod_request_data;
+	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->client_request_data;
 	SDEFINE_VAR_ALL(str_escaped_sql, str_sql_temp);
 	char *ptr_query = NULL;
 	char *str_response = NULL;
@@ -240,7 +240,7 @@ finish:
 }
 
 bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_client_request *client_request) {
-	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->vod_request_data;
+	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->client_request_data;
 	SDEBUG("ws_raw_step2");
 	char *str_response = NULL;
 	char *str_sql = NULL;
@@ -664,7 +664,7 @@ bool ws_raw_step3(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 }
 
 bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_client_request *client_request) {
-	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->vod_request_data;
+	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->client_request_data;
 	if (result != 0) {
 	} // get rid of unused parameter warning
 	SDEBUG("_raw_tuples_callback");
@@ -804,7 +804,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 	SDEBUG("_raw_tuples_check_callback");
 	struct sock_ev_client_copy_check *client_copy_check = (struct sock_ev_client_copy_check *)w;
 	struct sock_ev_client_request *client_request = client_copy_check->client_request;
-	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->vod_request_data;
+	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->client_request_data;
 	struct sock_ev_client *client = client_request->parent;
 	PGresult *res = client_raw->res;
 
@@ -824,6 +824,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 
 	if (close_client_if_needed(client_request->parent, (ev_watcher *)w, revents)) {
 		SDEBUG("Client %p closed", client_request->parent);
+		client_request->parent->client_paused_request->bol_free_watcher = true;
 		ev_check_stop(EV_A, w);
 		SFREE_ALL();
 		return;
@@ -1017,14 +1018,16 @@ finish:
 }
 
 
-void ws_raw_free(struct sock_ev_client_raw *to_free) {
-	if (to_free->copy_check != NULL) {
+void ws_raw_free(struct sock_ev_client_request_data *client_request_data) {
+	struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request_data;
+	if (client_raw->copy_check != NULL) {
 		decrement_idle(global_loop);
-		ev_check_stop(global_loop, &to_free->copy_check->check);
-		SFREE(to_free->copy_check);
+		ev_check_stop(global_loop, &client_raw->copy_check->check);
+		SFREE(client_raw->copy_check);
 	}
-	if (to_free->res != NULL) {
-		PQclear(to_free->res);
+	if (client_raw->res != NULL) {
+		PQclear(client_raw->res);
+		client_raw->res = NULL;
 	}
 }
 #endif

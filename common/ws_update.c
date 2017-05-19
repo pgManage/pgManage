@@ -1,7 +1,7 @@
 #include "ws_update.h"
 
 void ws_update_step1(struct sock_ev_client_request *client_request) {
-	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->vod_request_data);
+	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->client_request_data);
 	// DEBUG("UPDATE BEGIN");
 	SDEFINE_VAR_ALL(str_col_name, str_sql, str_temp);
 	char *str_response = NULL;
@@ -446,7 +446,7 @@ finish:
 #ifndef POSTAGE_INTERFACE_LIBPQ
 bool ws_update_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->vod_request_data);
+	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->client_request_data);
 	char str_temp[101];
 	bool bol_ret = true;
 	char *str_response = NULL;
@@ -522,7 +522,7 @@ finish:
 
 bool ws_update_step2(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->vod_request_data);
+	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->client_request_data);
 	size_t int_len_content;
 	size_t int_response_len = 0;
 	size_t int_sql_len = 0;
@@ -613,7 +613,7 @@ finish:
 
 bool ws_update_step4(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->vod_request_data);
+	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->client_request_data);
 	SDEFINE_VAR_ALL(str_sql, str_hash_where_clause);
 	char *str_response = NULL;
 	bool bol_ret = true;
@@ -728,7 +728,7 @@ finish:
 
 bool ws_update_step5(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->vod_request_data);
+	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->client_request_data);
 	SDEFINE_VAR_ALL(str_sql);
 	size_t int_response_len = 0;
 	size_t int_sql_len = 0;
@@ -846,7 +846,7 @@ finish:
 
 bool ws_update_step6(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->vod_request_data);
+	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client_request->client_request_data);
 	bool bol_ret = true;
 	char *str_response = NULL;
 	size_t int_sql_len = 0;
@@ -967,38 +967,39 @@ finish:
 	return bol_ret;
 }
 
-void ws_update_free(struct sock_ev_client_update *to_free) {
-	SFREE(to_free->str_return_columns);
+void ws_update_free(struct sock_ev_client_request_data *client_request_data) {
+	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)client_request_data;
+	SFREE(client_update->str_return_columns);
 #ifndef POSTAGE_INTERFACE_LIBPQ
-	SFREE(to_free->str_return_escaped_columns);
-	SFREE(to_free->str_insert_column_names);
-	SFREE(to_free->str_insert_parameter_markers);
+	SFREE(client_update->str_return_escaped_columns);
+	SFREE(client_update->str_insert_column_names);
+	SFREE(client_update->str_insert_parameter_markers);
 #endif
-	SFREE(to_free->str_pk_where_clause);
-	SFREE(to_free->str_pk_join_clause);
-	SFREE(to_free->str_temp_col_list);
-	SFREE(to_free->str_set_col_list);
-	SFREE(to_free->str_real_table_name);
-	SFREE(to_free->str_temp_table_name);
-	SFREE(to_free->str_sql);
-	SFREE(to_free->str_hash_where_clause);
-	SFREE(to_free->str_columns);
-	SFREE(to_free->str_type_sql);
-	SFREE(to_free->str_col);
-	SFREE(to_free->str_value);
-	SFREE(to_free->str_col_data_type);
-	SFREE(to_free->str_u_where);
-	SFREE(to_free->str_where);
-	SFREE(to_free->str_return_order_by);
-	SFREE(to_free->str_identity_column_name);
-	SFREE(to_free->str_pk_return_join_clause);
-	SFREE(to_free->str_pk_return_where_clause);
-	if (to_free->darr_where_column != NULL) {
-		DArray_clear_destroy(to_free->darr_where_column);
-		to_free->darr_where_column = NULL;
+	SFREE(client_update->str_pk_where_clause);
+	SFREE(client_update->str_pk_join_clause);
+	SFREE(client_update->str_temp_col_list);
+	SFREE(client_update->str_set_col_list);
+	SFREE(client_update->str_real_table_name);
+	SFREE(client_update->str_temp_table_name);
+	SFREE(client_update->str_sql);
+	SFREE(client_update->str_hash_where_clause);
+	SFREE(client_update->str_columns);
+	SFREE(client_update->str_type_sql);
+	SFREE(client_update->str_col);
+	SFREE(client_update->str_value);
+	SFREE(client_update->str_col_data_type);
+	SFREE(client_update->str_u_where);
+	SFREE(client_update->str_where);
+	SFREE(client_update->str_return_order_by);
+	SFREE(client_update->str_identity_column_name);
+	SFREE(client_update->str_pk_return_join_clause);
+	SFREE(client_update->str_pk_return_where_clause);
+	if (client_update->darr_where_column != NULL) {
+		DArray_clear_destroy(client_update->darr_where_column);
+		client_update->darr_where_column = NULL;
 	}
-	if (to_free->darr_where_value != NULL) {
-		DArray_clear_destroy(to_free->darr_where_value);
-		to_free->darr_where_value = NULL;
+	if (client_update->darr_where_value != NULL) {
+		DArray_clear_destroy(client_update->darr_where_value);
+		client_update->darr_where_value = NULL;
 	}
 }

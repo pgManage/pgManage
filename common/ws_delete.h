@@ -5,6 +5,8 @@
 #include "common_websocket.h"
 
 struct sock_ev_client_delete {
+	struct sock_ev_client_request_data self;
+
 	char *ptr_query;
 
 	char *str_pk_where_clause;
@@ -88,4 +90,4 @@ bool ws_delete_step6(EV_P, void *cb_data, DB_result *res);
 /*
 This function will free the data associated with the client_delete struct
 */
-void ws_delete_free(struct sock_ev_client_delete *to_free);
+void ws_delete_free(struct sock_ev_client_request_data *client_request_data);

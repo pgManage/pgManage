@@ -20,7 +20,7 @@ void http_delete_step1(struct sock_ev_client *client) {
 	client->cur_request =
 		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_delete), POSTAGE_REQ_DELETE);
 	SFINISH_CHECK(client->cur_request != NULL, "create_request failed!");
-	client_delete = (struct sock_ev_client_delete *)(client->cur_request->vod_request_data);
+	client_delete = (struct sock_ev_client_delete *)(client->cur_request->client_request_data);
 
 	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_len);
 	SFINISH_CHECK(str_uri != NULL, "str_uri_path() failed");
@@ -117,7 +117,7 @@ finish:
 
 bool http_delete_step2(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client->cur_request->vod_request_data);
+	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	ssize_t int_len = 0;
 	size_t int_response_len = 0;
@@ -177,7 +177,7 @@ finish:
 
 bool http_delete_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client->cur_request->vod_request_data);
+	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	ssize_t int_len = 0;
 	size_t int_response_len = 0;
@@ -239,7 +239,7 @@ finish:
 
 bool http_delete_step4(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client->cur_request->vod_request_data);
+	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	ssize_t int_len = 0;
 	size_t int_response_len = 0;

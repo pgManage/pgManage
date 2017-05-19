@@ -6,6 +6,8 @@
 #include "util/util_idle.h"
 
 struct sock_ev_client_update {
+	struct sock_ev_client_request_data self;
+
 	char *ptr_query;
 
 	char *str_return_columns;
@@ -123,4 +125,4 @@ bool ws_update_step6(EV_P, void *cb_data, DB_result *res);
 /*
 This function will free the data associated with the client_update struct
 */
-void ws_update_free(struct sock_ev_client_update *to_free);
+void ws_update_free(struct sock_ev_client_request_data *client_request_data);

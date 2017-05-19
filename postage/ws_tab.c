@@ -11,7 +11,7 @@ struct custom_check_callback {
 
 void ws_tab_step1(struct sock_ev_client_request *client_request) {
 	SDEFINE_VAR_ALL(str_path_temp, str_local_path_root, str_change_stamp, str_query);
-	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
+	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->client_request_data);
 	char *str_response = NULL;
 	char *str_temp = NULL;
 	char *ptr_change_stamp = NULL;
@@ -240,7 +240,7 @@ int ws_tab_list_sort(const void *arg1, const void *arg2) {
 
 void ws_tab_list_step2(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
-	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
+	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->client_request_data);
 	client_tab->arr_contents = DArray_create(sizeof(struct list_dirent_ent), 100);
 	SDEFINE_VAR_ALL(str_temp_path, str_temp1, str_name, str_canonical_name);
 	struct list_dirent_ent *ent = NULL;
@@ -379,7 +379,7 @@ finish:
 
 void ws_tab_read_step2(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
-	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
+	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->client_request_data);
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
 #else
@@ -525,7 +525,7 @@ void ws_tab_read_step3(EV_P, ev_check *w, int revents) {
 	} // get rid of unused parameter warning
 	char *str_response = NULL;
 	struct sock_ev_client_request *client_request = (struct sock_ev_client_request *)w;
-	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
+	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->client_request_data);
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
 #endif
@@ -610,7 +610,7 @@ finish:
 
 void ws_tab_read_step4(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
-	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
+	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->client_request_data);
 	size_t int_response_len = 0;
 
 	client_request->int_response_id += 1;
@@ -712,7 +712,7 @@ finish:
 
 void ws_tab_write_step2(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
-	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
+	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->client_request_data);
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
 #else
@@ -892,7 +892,7 @@ void ws_tab_write_step3(EV_P, ev_check *w, int revents) {
 	} // get rid of unused parameter warning
 	char *str_response = NULL;
 	struct sock_ev_client_request *client_request = (struct sock_ev_client_request *)w;
-	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
+	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->client_request_data);
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
 #endif
@@ -979,7 +979,7 @@ finish:
 
 void ws_tab_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
-	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
+	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->client_request_data);
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
 #else
@@ -1155,7 +1155,7 @@ void ws_tab_move_step2(EV_P, ev_check *w, int revents) {
 	} // get rid of unused parameter warning
 	struct custom_check_callback *cb_data = (struct custom_check_callback *)w;
 	struct sock_ev_client_request *client_request = cb_data->client_request;
-	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->vod_request_data);
+	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)(client_request->client_request_data);
 #ifdef _WIN32
 	LPTSTR strErrorText = NULL;
 #else
@@ -1322,31 +1322,32 @@ finish:
 	}
 }
 
-void ws_tab_free(struct sock_ev_client_tab *to_free) {
-	SFREE(to_free->str_path);
-	SFREE(to_free->str_path_to);
-	SFREE(to_free->str_content);
-	SFREE(to_free->str_change_stamp);
+void ws_tab_free(struct sock_ev_client_request_data *client_request_data) {
+	struct sock_ev_client_tab *client_tab = (struct sock_ev_client_tab *)client_request_data;
+	SFREE(client_tab->str_path);
+	SFREE(client_tab->str_path_to);
+	SFREE(client_tab->str_content);
+	SFREE(client_tab->str_change_stamp);
 #ifdef _WIN32
-	if (to_free->h_file != INVALID_HANDLE_VALUE) {
-		CloseHandle(to_free->h_file);
-		to_free->h_file = INVALID_HANDLE_VALUE;
+	if (client_tab->h_file != INVALID_HANDLE_VALUE) {
+		CloseHandle(client_tab->h_file);
+		client_tab->h_file = INVALID_HANDLE_VALUE;
 	}
 #else
-	if (to_free->int_fd > -1) {
-		close(to_free->int_fd);
-		to_free->int_fd = -1;
+	if (client_tab->int_fd > -1) {
+		close(client_tab->int_fd);
+		client_tab->int_fd = -1;
 	}
 #endif
-	if (to_free->arr_contents) {
+	if (client_tab->arr_contents) {
 		size_t int_i, int_len;
-		for (int_i = 0, int_len = DArray_end(to_free->arr_contents); int_i < int_len; int_i += 1) {
-			struct list_dirent_ent *ent = DArray_get(to_free->arr_contents, int_i);
+		for (int_i = 0, int_len = DArray_end(client_tab->arr_contents); int_i < int_len; int_i += 1) {
+			struct list_dirent_ent *ent = DArray_get(client_tab->arr_contents, int_i);
 			SFREE(ent->str_name);
 			SFREE(ent);
 		}
-		DArray_destroy(to_free->arr_contents);
-		to_free->arr_contents = NULL;
+		DArray_destroy(client_tab->arr_contents);
+		client_tab->arr_contents = NULL;
 	};
 }
 

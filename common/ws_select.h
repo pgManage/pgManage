@@ -6,6 +6,8 @@
 #include "util/util_idle.h"
 
 struct sock_ev_client_select {
+	struct sock_ev_client_request_data self;
+
 	char *str_real_table_name;
 	char *str_return_columns;
 #ifndef POSTAGE_INTERFACE_LIBPQ
@@ -69,4 +71,4 @@ bool ws_select_step4(EV_P, void *cb_data, DB_result *_res);
 /*
 This function will free the data associated with the client_select struct
 */
-void ws_select_free(struct sock_ev_client_select *to_free);
+void ws_select_free(struct sock_ev_client_request_data *client_request_data);

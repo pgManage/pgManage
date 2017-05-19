@@ -9,6 +9,8 @@
 #include "util/util_sql_split.h"
 
 struct sock_ev_client_raw {
+	struct sock_ev_client_request_data self;
+
 	bool bol_autocommit;
 	PGresult *res;
 	struct sock_ev_client_copy_check *copy_check;
@@ -57,5 +59,5 @@ This function just sends data to the client
 */
 void _raw_tuples_check_callback(EV_P, ev_check *w, int revents);
 
-void ws_raw_free(struct sock_ev_client_raw *to_free);
+void ws_raw_free(struct sock_ev_client_request_data *client_request_data);
 #endif

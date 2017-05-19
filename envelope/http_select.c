@@ -14,7 +14,7 @@ void http_select_step1(struct sock_ev_client *client) {
 	client->cur_request =
 		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_select), POSTAGE_REQ_SELECT);
 	SFINISH_CHECK(client->cur_request != NULL, "create_request failed!");
-	client_select = (struct sock_ev_client_select *)(client->cur_request->vod_request_data);
+	client_select = (struct sock_ev_client_select *)(client->cur_request->client_request_data);
 	client->cur_request->parent = client;
 
 	str_uri = str_uri_path(client->str_request, client->int_request_len, &int_uri_len);
@@ -174,7 +174,7 @@ finish:
 
 bool http_select_step2(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client->cur_request->vod_request_data);
+	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	size_t int_i = 0;
 	size_t int_len = 0;
@@ -351,7 +351,7 @@ finish:
 
 bool http_select_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client->cur_request->vod_request_data);
+	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	size_t int_len = 0, i = 0;
 	SDEFINE_VAR_ALL(str_json_columns, str_json_one_column, str_row_count);
@@ -462,7 +462,7 @@ void http_select_step4(EV_P, ev_check *w, int revents) {
 	} // get rid of unused parameter warning
 	struct sock_ev_client_copy_check *client_copy_check = (struct sock_ev_client_copy_check *)w;
 	struct sock_ev_client_request *client_request = client_copy_check->client_request;
-	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client_request->vod_request_data);
+	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client_request->client_request_data);
 	DArray *arr_row_values = NULL;
 	DArray *arr_row_lengths = NULL;
 	SDEFINE_VAR_ALL(str_rows, str_one_column);
@@ -641,7 +641,7 @@ void http_select_step5(EV_P, ev_io *w, int revents) {
 	struct sock_ev_client_copy_io *client_copy_io = (struct sock_ev_client_copy_io *)w;
 	struct sock_ev_client_copy_check *client_copy_check = client_copy_io->client_copy_check;
 	struct sock_ev_client_request *client_request = client_copy_check->client_request;
-	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client_request->vod_request_data);
+	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client_request->client_request_data);
 	char *str_response = NULL;
 	size_t int_response_len = 0;
 

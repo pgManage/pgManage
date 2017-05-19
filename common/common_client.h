@@ -89,7 +89,7 @@ This function allocates space for a client_request struct then
 request string
 */
 struct sock_ev_client_request *create_request(struct sock_ev_client *client, WSFrame *frame, char *str_message_id,
-	char *str_transaction_id, char *ptr_query, size_t siz_data, size_t int_req_type);
+	char *str_transaction_id, char *ptr_query, size_t siz_data, size_t int_req_type, sock_ev_client_request_data_free_func free_func);
 
 /*
 This function free()s the memory associated with a client_request struct and

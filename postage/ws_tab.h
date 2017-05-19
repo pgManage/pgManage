@@ -11,6 +11,8 @@
 #endif
 
 struct sock_ev_client_tab {
+	struct sock_ev_client_request_data self;
+
 	char *str_path;
 	char *str_path_to;
 	time_t int_change_stamp;
@@ -132,4 +134,4 @@ void ws_tab_move_step2(EV_P, ev_check *w, int revents);
 /*
 This function will free the data associated with the client_tab struct
 */
-void ws_tab_free(struct sock_ev_client_tab *to_free);
+void ws_tab_free(struct sock_ev_client_request_data *client_request_data);

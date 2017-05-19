@@ -11,7 +11,7 @@ struct custom_check_callback {
 void ws_file_step1(struct sock_ev_client_request *client_request) {
 	SDEFINE_VAR_ALL(str_path_temp, str_path, str_connstring, str_local_path_root, str_temp_connstring, str_change_stamp,
 		str_query, str_search_temp);
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	char *str_response = NULL;
 	char *str_temp = NULL;
 	char *ptr_change_stamp = NULL;
@@ -430,7 +430,7 @@ bool ws_file_list_step2(EV_P, void *cb_data, bool bol_group) {
 	char *str_response = NULL;
 	SDEFINE_VAR_ALL(str_temp_path, str_temp1, str_name, str_canonical_name);
 
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	client_file->arr_contents = DArray_create(sizeof(struct list_dirent_ent), 100);
 	struct list_dirent_ent *ent = NULL;
 	struct stat *statdata = NULL;
@@ -602,7 +602,7 @@ finish:
 bool ws_file_read_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
 	char *str_response = NULL;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
 #else
@@ -751,7 +751,7 @@ void ws_file_read_step3(EV_P, ev_check *w, int revents) {
 	} // get rid of unused parameter warning
 	char *str_response = NULL;
 	struct sock_ev_client_request *client_request = (struct sock_ev_client_request *)w;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
 #endif
@@ -836,7 +836,7 @@ finish:
 
 void ws_file_read_step4(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	size_t int_response_len = 0;
 
 	client_request->int_response_id += 1;
@@ -937,7 +937,7 @@ finish:
 bool ws_file_write_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
 	char *str_response = NULL;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	char *str_change_stamp = NULL;
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
@@ -1127,7 +1127,7 @@ void ws_file_write_step3(EV_P, ev_check *w, int revents) {
 	char *str_response = NULL;
 	char str_temp[101] = {0};
 	struct sock_ev_client_request *client_request = (struct sock_ev_client_request *)w;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
 #endif
@@ -1212,7 +1212,7 @@ finish:
 
 void ws_file_write_step4(EV_P, struct sock_ev_client_request *client_request) {
 	char *str_response = NULL;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 #ifdef _WIN32
 	LPSTR strErrorText = NULL;
 #else
@@ -1392,7 +1392,7 @@ finish:
 
 bool ws_file_move_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 
 	char *str_response = NULL;
 	size_t int_response_len = 0;
@@ -1436,7 +1436,7 @@ finish:
 
 bool ws_file_move_step3(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	size_t int_response_len = 0;
 
 	char *str_response = NULL;
@@ -1699,7 +1699,7 @@ finish:
 bool ws_file_copy_step4(EV_P, void *cb_data, char *str_path) {
 	SDEBUG("ws_file_copy_step4");
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	bool bol_ret = true;
 	char *str_response = NULL;
 	size_t int_response_len = 0;
@@ -1803,7 +1803,7 @@ finish:
 bool ws_file_copy_step5(EV_P, void *cb_data, bool bol_success) {
 	SDEBUG("ws_file_copy_step5");
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 
 	struct tm *tm_change_stamp = NULL;
 	struct stat statbuf;
@@ -1912,7 +1912,7 @@ finish:
 bool ws_file_delete_step2(EV_P, void *cb_data, bool bol_group) {
 	SDEBUG("ws_file_delete_step2");
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 
 	char *str_response = NULL;
 	size_t int_response_len = 0;
@@ -2023,7 +2023,7 @@ finish:
 bool ws_file_delete_step3(EV_P, void *cb_data, char *str_path) {
 	SDEBUG("ws_file_delete_step3");
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	bool bol_ret = true;
 	char *str_response = NULL;
 	size_t int_response_len = 0;
@@ -2103,7 +2103,7 @@ finish:
 bool ws_file_delete_step4(EV_P, void *cb_data, bool bol_success) {
 	SDEBUG("ws_file_delete_step4");
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 
 	char *str_response = NULL;
 	size_t int_response_len = 0;
@@ -2205,7 +2205,7 @@ finish:
 
 bool ws_file_create_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	SDEFINE_VAR_ALL(str_path_temp);
 
 	char *str_response = NULL;
@@ -2320,7 +2320,7 @@ finish:
 
 bool ws_file_search_step2(EV_P, void *cb_data, bool bol_group) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 
 	DIR *dirp = NULL;
 	struct stat *statdata = NULL;
@@ -2432,7 +2432,7 @@ finish:
 
 bool ws_file_search_step3(EV_P, void *cb_data, char *_str_file_name) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	char *str_response = NULL;
 	char *str_file_name = NULL;
 	char *ptr_extension = NULL;
@@ -2508,7 +2508,7 @@ finish:
 
 bool ws_file_search_step4(EV_P, void *cb_data, bool bol_success) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	char *str_response = NULL;
 	size_t int_response_len = 0;
 	struct sock_ev_client_request_watcher *client_request_watcher = NULL;
@@ -2559,7 +2559,7 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 	} // get rid of unused parameter warning
 	struct sock_ev_client_request_watcher *client_request_watcher = (void *)w;
 	struct sock_ev_client_request *client_request = client_request_watcher->parent->cur_request;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->vod_request_data);
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	char *str_response = NULL;
 	size_t int_response_len = 0;
 	char *str_current_file_name = NULL;

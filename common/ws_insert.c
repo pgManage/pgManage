@@ -1,7 +1,7 @@
 #include "ws_insert.h"
 
 void ws_insert_step1(struct sock_ev_client_request *client_request) {
-	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
+	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->client_request_data);
 	SDEFINE_VAR_ALL(str_temp, str_temp1, str_sql, str_col_name, str_col_seq);
 	char *str_response = NULL;
 	char *ptr_pk = NULL;
@@ -366,7 +366,7 @@ finish:
 #ifndef POSTAGE_INTERFACE_LIBPQ
 bool ws_insert_step15_sql_server(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
+	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->client_request_data);
 	char str_temp[101];
 	bool bol_ret = true;
 	char *str_response = NULL;
@@ -442,7 +442,7 @@ finish:
 bool ws_insert_step2(EV_P, void *cb_data, DB_result *res) {
 	SDEBUG("ws_insert_step2: TEMP TABLE CREATED, STARTING COPY IN");
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
+	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->client_request_data);
 	size_t int_len_content;
 	SDEFINE_VAR_ALL(str_sql);
 	size_t int_response_len = 0;
@@ -533,7 +533,7 @@ finish:
 bool ws_insert_step4(EV_P, void *cb_data, DB_result *res) {
 	SDEBUG("ws_insert_step4: COPY IN FINISHED, CREATE SECOND TEMP TABLE");
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
+	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->client_request_data);
 	SDEFINE_VAR_ALL(str_sql);
 	char *str_response = NULL;
 	bool bol_ret = true;
@@ -649,7 +649,7 @@ finish:
 #ifndef POSTAGE_INTERFACE_LIBPQ
 bool ws_insert_step45_sql_server(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
+	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->client_request_data);
 	char str_temp[101];
 	bool bol_ret = true;
 	char *str_response = NULL;
@@ -726,7 +726,7 @@ finish:
 bool ws_insert_step5(EV_P, void *cb_data, DB_result *res) {
 	SDEBUG("ws_insert_step5: SECOND TEMP TABLE CREATED, CREATING INSERT QUERIES");
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
+	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->client_request_data);
 	char *str_response = NULL;
 	bool bol_ret = true;
 	size_t int_i = 0;
@@ -894,7 +894,7 @@ finish:
 bool ws_insert_step6(EV_P, void *cb_data, DB_result *res) {
 	//SDEBUG("ws_insert_step6: INSERT ROW...");
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
+	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->client_request_data);
 	SDEFINE_VAR_ALL(str_temp, str_sql);
 	char *str_response = NULL;
 	size_t int_response_len = 0;
@@ -967,7 +967,7 @@ finish:
 bool ws_insert_step7(EV_P, void *cb_data, DB_result *res) {
 	SDEBUG("ws_insert_step6: ALL ROWS INSERTED, STARTING COPY OUT");
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->vod_request_data);
+	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)(client_request->client_request_data);
 	char *str_response = NULL;
 	bool bol_ret = true;
 	size_t int_temp_len = 0;
@@ -1072,33 +1072,34 @@ finish:
 	return bol_ret;
 }
 
-void ws_insert_free(struct sock_ev_client_insert *to_free) {
-	if (to_free->darr_insert_queries != NULL) {
-		DArray_clear_destroy(to_free->darr_insert_queries);
-		to_free->darr_insert_queries = NULL;
+void ws_insert_free(struct sock_ev_client_request_data *client_request_data) {
+	struct sock_ev_client_insert *client_insert = (struct sock_ev_client_insert *)client_request_data;
+	if (client_insert->darr_insert_queries != NULL) {
+		DArray_clear_destroy(client_insert->darr_insert_queries);
+		client_insert->darr_insert_queries = NULL;
 	}
-	SFREE(to_free->str_return_columns);
+	SFREE(client_insert->str_return_columns);
 #ifndef POSTAGE_INTERFACE_LIBPQ
-	SFREE(to_free->str_return_escaped_columns);
-	SFREE(to_free->str_insert_column_names);
-	SFREE(to_free->str_insert_parameter_markers);
+	SFREE(client_insert->str_return_escaped_columns);
+	SFREE(client_insert->str_insert_column_names);
+	SFREE(client_insert->str_insert_parameter_markers);
 #endif
-	SFREE(to_free->str_pk_where_clause);
-	SFREE(to_free->str_pk_join_clause);
-	SFREE(to_free->str_column_names);
-	SFREE(to_free->str_real_table_name);
-	SFREE(to_free->str_temp_table_name);
-	SFREE(to_free->str_sequence_name);
-	SFREE(to_free->str_sql);
-	SFREE(to_free->str_return_order_by);
-	if (to_free->darr_column_types != NULL) {
-		DArray_clear_destroy(to_free->darr_column_types);
-		to_free->darr_column_types = NULL;
+	SFREE(client_insert->str_pk_where_clause);
+	SFREE(client_insert->str_pk_join_clause);
+	SFREE(client_insert->str_column_names);
+	SFREE(client_insert->str_real_table_name);
+	SFREE(client_insert->str_temp_table_name);
+	SFREE(client_insert->str_sequence_name);
+	SFREE(client_insert->str_sql);
+	SFREE(client_insert->str_return_order_by);
+	if (client_insert->darr_column_types != NULL) {
+		DArray_clear_destroy(client_insert->darr_column_types);
+		client_insert->darr_column_types = NULL;
 	}
-	if (to_free->darr_column_values != NULL) {
-		DArray_clear_destroy(to_free->darr_column_values);
-		to_free->darr_column_values = NULL;
+	if (client_insert->darr_column_values != NULL) {
+		DArray_clear_destroy(client_insert->darr_column_values);
+		client_insert->darr_column_values = NULL;
 	}
-	SFREE(to_free->str_result);
-	SFREE(to_free->str_identity_column_name);
+	SFREE(client_insert->str_result);
+	SFREE(client_insert->str_identity_column_name);
 }

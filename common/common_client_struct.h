@@ -66,7 +66,7 @@ void _client_timeout_prepare_free(struct sock_ev_client_timeout_prepare *client_
 struct sock_ev_client_paused_request {
 	ev_watcher *watcher;
 	int revents;
-	bool bol_is_db_framework;
+	bool bol_free_watcher;
 };
 void client_paused_request_free(struct sock_ev_client_paused_request *client_paused_request);
 
@@ -200,6 +200,11 @@ enum {
 	POSTAGE_REQ_STANDARD = 13
 };
 
+typedef void(*sock_ev_client_request_data_free_func)(struct sock_ev_client_request_data *);
+struct sock_ev_client_request_data {
+	sock_ev_client_request_data_free_func free;
+};
+
 struct sock_ev_client_request {
 	ev_check check;
 	struct sock_ev_client *parent;
@@ -217,7 +222,7 @@ struct sock_ev_client_request {
 
 	bool bol_cancel_return;
 
-	void *vod_request_data;
+	struct sock_ev_client_request_data *client_request_data;
 	size_t int_req_type;
 
 	// copy out stuff goes here

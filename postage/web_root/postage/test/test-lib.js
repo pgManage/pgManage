@@ -160,7 +160,8 @@ var $ = {
             // console.log('P##########################', strArgs);
             var ajax = $.ajax(strLink, strArgs, 'POST', function (data) {
                 if (data.indexOf('<!DOCTYPE html>') !== 0) {
-                    data = data.replace(/..\\..\\/gi, '../');
+                    data = data.replace(/c\:\\users\\nunzio\\repos\\postage\\/gi, '../');
+                    data = data.replace(/\.\.\\\.\.\\/gi, '../');
                     data = data.replace(/\\(?![rnt])/gi, '/');
 					data = data.replace(' (0x0000274D/10061)', '');
                 }
@@ -289,9 +290,10 @@ var $ = {
                     return;
                 }
                 //console.log(i, data);
-				if (data !== '\\.') {
+                if (data !== '\\.') {
+                    data = data.replace(/c\:\\users\\nunzio\\repos\\postage\\/gi, '../');
 	                data = data.replace(/\.\.\\\.\.\\/g, '../');
-	                data = data.replace(/\\(?![rnt])/g, '/');
+                    data = data.replace(/\\(?![rnt])/g, '/');
 					data = data.replace(/\/Users\\nunzio\/AppData\/Roaming\//g, '/home/super/.');
 					data = data.replace(/\/Users\/Admin\/AppData\/Roaming\//g, '/home/super/.');
 					data = data.replace(/\/home\/nunzio\//g, '/home/super/');

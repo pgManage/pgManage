@@ -15,7 +15,7 @@ void http_update_step1(struct sock_ev_client *client) {
 	client->cur_request =
 		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_update), POSTAGE_REQ_UPDATE);
 	SFINISH_CHECK(client->cur_request != NULL, "create_request failed!");
-	client_update = (struct sock_ev_client_update *)(client->cur_request->vod_request_data);
+	client_update = (struct sock_ev_client_update *)(client->cur_request->client_request_data);
 
 	str_args = query(client->str_request, client->int_request_len, &int_query_length);
 	SFINISH_CHECK(str_args != NULL, "query() failed");
@@ -172,7 +172,7 @@ finish:
 
 bool http_update_step2(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->vod_request_data);
+	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	size_t int_i = 0, int_len = 0;
 	DArray *darr_column_names = NULL;
@@ -458,7 +458,7 @@ finish:
 
 bool http_update_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->vod_request_data);
+	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	DArray *darr_count = NULL;
 	size_t int_response_len = 0;
@@ -568,7 +568,7 @@ finish:
 
 bool http_update_step4(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->vod_request_data);
+	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	size_t int_response_len = 0;
 	size_t int_temp_len = 0;
@@ -639,7 +639,7 @@ finish:
 
 bool http_update_step5(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->vod_request_data);
+	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	char *_str_response = NULL;
 	size_t y = 0;
