@@ -436,10 +436,6 @@ finish:
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
-		ws_update_free(client_update);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_update);
 	}
 	SFREE_ALL();
 }
@@ -506,11 +502,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_update_free(client_update);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_update);
 	} else {
 		SFREE(str_response);
 	}
@@ -599,10 +590,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-		ws_update_free(client_update);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_update);
 	} else {
 		SFREE(str_response);
 	}
@@ -717,10 +704,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-		ws_update_free(client_update);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_insert);
 	}
 	DB_free_result(res);
 	return bol_ret;
@@ -832,10 +815,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-		ws_update_free(client_update);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_update);
 	} else {
 		SFREE(str_response);
 	}
@@ -955,10 +934,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-		ws_update_free(client_update);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_update);
 	} else {
 		SFREE(str_response);
 	}

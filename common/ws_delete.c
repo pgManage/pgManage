@@ -347,10 +347,6 @@ finish:
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
-		ws_delete_free(client_delete);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_delete);
 	}
 	SFREE_ALL();
 }
@@ -416,11 +412,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_delete_free(client_delete);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_delete);
 	} else {
 		SFREE(str_response);
 	}
@@ -508,11 +499,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_delete_free(client_delete);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_delete);
 	} else {
 		SFREE(str_response);
 	}
@@ -627,11 +613,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_delete_free(client_delete);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_delete);
 	} else {
 		SFREE(str_response);
 	}
@@ -738,11 +719,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_delete_free(client_delete);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_delete);
 	} else {
 		SFREE(str_response);
 	}
@@ -753,7 +729,8 @@ finish:
 
 bool ws_delete_step6(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->client_request_data);
+	// UNNEEDED IN THIS FUNCTION
+	//struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->client_request_data);
 
 	bool bol_ret = true;
 	char *str_response = NULL;
@@ -855,10 +832,6 @@ finish:
 		SFREE(str_response);
 	}
 	DB_free_result(res);
-	ws_delete_free(client_delete);
-	// client_request_free(client_request);
-	// client_request_free takes care of this
-	// SFREE(client_delete);
 	SFREE_ALL();
 	return bol_ret;
 }

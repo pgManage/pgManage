@@ -237,10 +237,6 @@ finish:
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
-		ws_select_free(client_select);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_select);
 	}
 	SFREE_ALL();
 }
@@ -491,11 +487,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_select_free(client_select);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_select);
 	} else {
 		SFREE(str_response);
 	}

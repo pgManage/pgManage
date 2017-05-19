@@ -200,7 +200,9 @@ enum {
 	POSTAGE_REQ_STANDARD = 13
 };
 
-typedef void(*sock_ev_client_request_data_free_func)(struct sock_ev_client_request_data *);
+
+typedef struct sock_ev_client_request_data *sock_ev_client_request_datap;
+typedef void(*sock_ev_client_request_data_free_func)(sock_ev_client_request_datap);
 struct sock_ev_client_request_data {
 	sock_ev_client_request_data_free_func free;
 };

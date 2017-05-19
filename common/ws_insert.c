@@ -359,7 +359,6 @@ finish:
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
-		ws_insert_free(client_insert);
 	}
 	SFREE_ALL();
 }
@@ -425,11 +424,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_insert_free(client_insert);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_insert);
 	} else {
 		SFREE(str_response);
 	}
@@ -519,10 +513,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-		ws_insert_free(client_insert);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_insert);
 	} else {
 		SFREE(str_response);
 	}
@@ -637,10 +627,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-		ws_insert_free(client_insert);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_insert);
 	}
 	DB_free_result(res);
 	return bol_ret;
@@ -708,11 +694,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_insert_free(client_insert);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_insert);
 	}
 	else {
 		SFREE(str_response);
@@ -880,10 +861,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-		ws_insert_free(client_insert);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_insert);
 	} else {
 		SFREE(str_response);
 	}
@@ -953,10 +930,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-		ws_insert_free(client_insert);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_insert);
 	} else {
 		SFREE(str_response);
 	}
@@ -1061,10 +1034,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, strlen(str_response));
 		DArray_push(client_request->arr_response, str_response);
-		ws_insert_free(client_insert);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_insert);
 	} else {
 		SFREE(str_response);
 	}

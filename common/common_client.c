@@ -1036,7 +1036,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 				struct sock_ev_client_request *client_request = client->cur_request;
 
 				if (client_request->int_req_type == POSTAGE_REQ_RAW && client_request->client_request_data != NULL) {
-					struct sock_ev_client_raw *client_raw = client_request->client_request_data;
+					struct sock_ev_client_raw *client_raw = (struct sock_ev_client_raw *)client_request->client_request_data;
 
 					if (client_raw->copy_check != NULL) {
 						char str_temp[101] = { 0 };
@@ -1070,8 +1070,6 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 						} else {
 							query_callback(EV_A, client_request, ws_raw_step3);
 						}
-
-						ws_raw_free(client_raw);
 					}
 				}
 			}

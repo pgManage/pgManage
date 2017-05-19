@@ -177,13 +177,7 @@ finish:
 	SFREE_ALL();
 
 	SDEBUG("bol_error_state == %s", bol_error_state == true ? "true" : "false");
-	if (bol_error_state == true) {
-		ws_tab_free(client_tab);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_tab);
-		bol_error_state = false;
-	}
+	bol_error_state = false;
 
 	if (str_response != NULL) {
 		char *_str_response = str_response;
@@ -337,10 +331,6 @@ void ws_tab_list_step2(EV_P, struct sock_ev_client_request *client_request) {
 finish:
 	SFREE(ent);
 	SFREE_ALL();
-	ws_tab_free(client_tab);
-	// client_request_free(client_request);
-	// client_request_free takes care of this
-	// SFREE(client_tab);
 	if (bol_error_state == true) {
 		bol_error_state = false;
 
@@ -512,11 +502,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_tab_free(client_tab);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_tab);
 	}
 }
 
@@ -600,11 +585,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_tab_free(client_tab);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_tab);
 	}
 }
 
@@ -692,14 +672,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_tab_free(client_tab);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_tab);
-	} else {
-		ws_tab_free(client_tab);
-		// client_request_free(client_request);
 	}
 }
 
@@ -879,11 +851,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_tab_free(client_tab);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_tab);
 	}
 }
 
@@ -969,11 +936,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_tab_free(client_tab);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_tab);
 	}
 }
 
@@ -1099,11 +1061,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_tab_free(client_tab);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_tab);
 	} else {
 		client_request->int_response_id += 1;
 		char str_temp[101] = {0};
@@ -1137,9 +1094,6 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
-
-		ws_tab_free(client_tab);
-		// client_request_free(client_request);
 	}
 }
 
@@ -1278,11 +1232,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_tab_free(client_tab);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_tab);
 	} else {
 		client_request->int_response_id += 1;
 		char str_temp[101] = {0};
@@ -1316,9 +1265,6 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
-
-		ws_tab_free(client_tab);
-		// client_request_free(client_request);
 	}
 }
 
