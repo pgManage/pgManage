@@ -1,70 +1,81 @@
 {
-	"build": {
-		"appId": "com.workflowproducts.postage",
-		"asar": false,
-		"mac": {
-			"category": "public.app-category.developer-tools"
-		},
-		"win": {
-			"target": "nsis"
-		},
-		"nsis": {
-			"oneClick": false,
-			"allowToChangeInstallationDirectory": true,
-			"menuCategory": "Workflow Products"
-		},
-		"linux": {
-			"category": "Development",
-			"target": [
-				"deb",
-				"rpm"
-			]
-		},
-		"rpm": {
-			"depends": [
-				"postgresql-libs"
-			]
-		},
-		"deb": {
-			"depends": [
-				"libxss1",
-				"libpq5",
-				"gconf2",
-				"gconf-service",
-				"libnotify4",
-				"libappindicator1",
-				"libxtst6",
-				"libnss3"
-			]
-		},
-		"dmg": {
-			"icon": null,
-			"contents": [
-				{ "x": 353, "y": 372, "type": "link", "path": "/Applications" },
-				{ "x": 97, "y": 372 }
-			]
-		}
-	},
-	"devDependencies": {
-		"electron": "^1.6.2",
-		"electron-builder": "^17.0.1"
-	},
-	"homepage": "https://github.com/workflowproducts/postage/blob/master/README.md",
-	"keywords": [
-		"Postage",
-		"Electron",
-		"PostgreSQL"
-	],
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/workflowproducts/postage.git"
-	},
-	"scripts": {
-		"start": "electron app",
-		"test": "electron app --postage-test",
-		"debug": "electron app --debug=5858",
-		"pack": "build --dir",
-		"dist": "build",
-		"dist-win": "build --ia32"
-	}
+  "build": {
+    "appId": "com.workflowproducts.postage",
+    "asar": true,
+    "extraResources": [
+      "app/postage"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "menuCategory": "Workflow Products"
+    },
+    "linux": {
+      "category": "Development",
+      "target": [
+        "deb",
+        "rpm"
+      ]
+    },
+    "rpm": {
+      "depends": [
+        "postgresql-libs"
+      ]
+    },
+    "deb": {
+      "depends": [
+        "libxss1",
+        "libpq5",
+        "gconf2",
+        "gconf-service",
+        "libnotify4",
+        "libappindicator1",
+        "libxtst6",
+        "libnss3"
+      ]
+    },
+    "dmg": {
+      "icon": null,
+      "contents": [
+        {
+          "x": 353,
+          "y": 372,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 97,
+          "y": 372
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^1.6.2",
+    "electron-builder": "^17.9.0"
+  },
+  "homepage": "https://github.com/workflowproducts/postage/blob/master/README.md",
+  "keywords": [
+    "Postage",
+    "Electron",
+    "PostgreSQL"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/workflowproducts/postage.git"
+  },
+  "scripts": {
+    "start": "electron app",
+    "test": "electron app --postage-test",
+    "debug": "electron app --debug=5858",
+    "pack": "build --dir",
+    "dist": "build",
+    "dist-win": "build --ia32"
+  }
 }

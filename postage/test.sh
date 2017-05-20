@@ -41,6 +41,29 @@ kill $POSTAGEPID
 
 sudo $MAKE uninstall
 
+cd postage_electron
+rm -rf node_modules app/node_modules
+npm install && cd app && npm install && cd ..
+./update.sh
+if test $(uname -s) = "Linux"; then
+	command -v apt-get >/dev/null 2>&1 && {
+		node_modules/.bin/build --linux deb
+		sudo apt-get -y install ./dist/*.deb
+	}
+	command -v yum >/dev/null 2>&1 && {
+		node_modules/.bin/build --linux rpm
+		sudo yum -y install ./dist/*.rpm
+	}
+	/opt/Postage/postage --postage-test &
+	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
+
+#elif test $(uname -s) = "Darwin"; then
+
+#elif test $(uname -s) = "FreeBSD"; then
+
+fi
+cd ..
+
 kill -9 $(cat postage/postgres.pid)
 
 cd ..

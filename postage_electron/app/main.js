@@ -33,8 +33,8 @@ try {
 	hidefile.hideSync(os.homedir() + '/.postage/');
 
 	console.log('copying config');
-	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync(app.getAppPath() + '/postage/config/postage.conf', 'utf8'), 'utf8');
-	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync(app.getAppPath() + '/postage/config/postage-connections.conf', 'utf8'), 'utf8');
+	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync(process.resourcesPath + '/app/postage/config/postage.conf', 'utf8'), 'utf8');
+	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync(process.resourcesPath + '/app/postage/config/postage-connections.conf', 'utf8'), 'utf8');
 }
 
 if (process.platform == 'win32') {
@@ -54,12 +54,13 @@ if (process.platform == 'win32') {
 }
 
 function spawnPostage() {
+	console.log(process.resourcesPath, '/postage/postage');
 	proc = child_process.spawn(
-		path.normalize(app.getAppPath() + '/postage/postage' + (process.platform == 'win32' ? '.exe' : '')),
+		path.normalize(process.resourcesPath + '/app/postage/postage' + (process.platform == 'win32' ? '.exe' : '')),
 		[
 			'-c', path.normalize(os.homedir() + '/.postage/postage.conf'),
 			'-d', path.normalize(os.homedir() + '/.postage/postage-connections.conf'),
-			'-r', app.getAppPath() + path.normalize('/postage/web_root'),
+			'-r', process.resourcesPath + path.normalize('/app/postage/web_root'),
 			'-x', 't',
 			'-p', int_postage_port
 		].concat((process.platform == 'win32' ? ['-o', 'stderr'] : [])), {
