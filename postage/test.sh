@@ -41,6 +41,7 @@ kill $POSTAGEPID
 
 sudo $MAKE uninstall
 
+rm -rf ~/.postage
 cd postage_electron
 rm -rf node_modules app/node_modules
 npm install && cd app && npm install && cd ..
