@@ -193,6 +193,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 		// **** WARNING ****
 
 		SFINISH_CHECK(str_cookie_decrypted != NULL, "aes_decrypt failed");
+		SFINISH_CHECK(strncmp(str_cookie_decrypted, "valid=true&", 11) == 0, "Invalid cookie");
 
 		////GET THINGS FOR CONNECTION STRING
 		str_username = getpar(str_cookie_decrypted, "username", int_cookie_len, &int_user_length);
