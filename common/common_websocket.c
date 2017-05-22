@@ -261,7 +261,7 @@ error:
 		}
 	}
 
-	if (int_request_len == 0 || errno != EAGAIN) {
+	if (int_request_len < 0 && errno != EAGAIN) {
 		SERROR_NORESPONSE("disconnect");
 		SFREE(str_global_error);
 
@@ -275,7 +275,7 @@ error:
 		bol_error_state = false;
 		errno = 0;
 
-	} else if (errno == EAGAIN) {
+	} else if (int_request_len == 0 || errno == EAGAIN) {
 		SERROR_NORESPONSE("should never get to EAGAIN with libev");
 		SFREE(str_global_error);
 		bol_error_state = false;
