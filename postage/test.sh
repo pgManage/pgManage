@@ -48,15 +48,25 @@ npm install && cd app && npm install && cd ..
 ./update.sh
 if test $(uname -s) = "Linux"; then
 	command -v apt-get >/dev/null 2>&1 && {
-		node_modules/.bin/build --linux deb
+		node_modules/.bin/build --linux=deb
 		sudo apt-get -y install ./dist/*.deb
 	}
 	command -v yum >/dev/null 2>&1 && {
-		node_modules/.bin/build --linux rpm
+		node_modules/.bin/build --linux=rpm
 		sudo yum -y install ./dist/*.rpm
 	}
-	/opt/Postage/postage --postage-test &
+	/opt/Postage/postage --postage-test & export POSTAGEPID="$!"
 	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
+	kill $POSTAGEPID
+
+	command -v apt-get >/dev/null 2>&1 && {
+		sudo apt-get -y remove Postage
+		cp -f ./dist/*.deb /mnt/Groups/wfprod_group/postage/packages/
+	}
+	command -v yum >/dev/null 2>&1 && {
+		sudo yum -y remove Postage
+		cp -f ./dist/*.rpm /mnt/Groups/wfprod_group/postage/packages/
+	}
 
 #elif test $(uname -s) = "Darwin"; then
 
