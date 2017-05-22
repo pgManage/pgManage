@@ -12,7 +12,7 @@ void http_select_step1(struct sock_ev_client *client) {
 	size_t int_response_len = 0;
 
 	client->cur_request =
-		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_select), POSTAGE_REQ_SELECT);
+		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_select), POSTAGE_REQ_SELECT, ws_select_free);
 	SFINISH_CHECK(client->cur_request != NULL, "create_request failed!");
 	client_select = (struct sock_ev_client_select *)(client->cur_request->client_request_data);
 	client->cur_request->parent = client;
@@ -165,7 +165,6 @@ finish:
 	}
 	SFREE(str_response);
 	if (int_client_write_len != 0) {
-		ws_select_free(client_select);
 		ev_io_stop(global_loop, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
@@ -341,7 +340,6 @@ finish:
 	SFREE(str_response);
 	DB_free_result(res);
 	if (int_client_write_len != 0) {
-		ws_select_free(client_select);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
@@ -448,7 +446,6 @@ finish:
 	}
 	SFREE(str_response);
 	if (int_client_write_len != 0) {
-		ws_select_free(client_select);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
@@ -627,7 +624,6 @@ finish:
 	}
 	SFREE(str_response);
 	if (int_client_write_len != 0) {
-		ws_select_free(client_select);
 		ev_io_stop(EV_A, &client_request->parent->io);
 		SFREE(client_request->parent->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client_request->parent), "Error closing Client");
@@ -641,7 +637,6 @@ void http_select_step5(EV_P, ev_io *w, int revents) {
 	struct sock_ev_client_copy_io *client_copy_io = (struct sock_ev_client_copy_io *)w;
 	struct sock_ev_client_copy_check *client_copy_check = client_copy_io->client_copy_check;
 	struct sock_ev_client_request *client_request = client_copy_check->client_request;
-	struct sock_ev_client_select *client_select = (struct sock_ev_client_select *)(client_request->client_request_data);
 	char *str_response = NULL;
 	size_t int_response_len = 0;
 
@@ -737,7 +732,6 @@ finish:
 		}
 		SFREE(str_response);
 
-		ws_select_free(client_select);
 		ev_io_stop(EV_A, &client_request->parent->io);
 		SFREE(client_request->parent->str_request);
 		SDEBUG("ERROR");

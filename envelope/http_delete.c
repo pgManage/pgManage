@@ -18,7 +18,7 @@ void http_delete_step1(struct sock_ev_client *client) {
 	size_t int_data_len = 0;
 
 	client->cur_request =
-		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_delete), POSTAGE_REQ_DELETE);
+		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_delete), POSTAGE_REQ_DELETE, ws_delete_free);
 	SFINISH_CHECK(client->cur_request != NULL, "create_request failed!");
 	client_delete = (struct sock_ev_client_delete *)(client->cur_request->client_request_data);
 
@@ -108,7 +108,6 @@ finish:
 	}
 	SFREE(str_response);
 	if (int_len != 0) {
-		ws_delete_free(client_delete);
 		ev_io_stop(global_loop, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
@@ -166,7 +165,6 @@ finish:
 	SFREE(str_response);
 	DB_free_result(res);
 	if (int_len != 0) {
-		ws_delete_free(client_delete);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
@@ -177,7 +175,6 @@ finish:
 
 bool http_delete_step3(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	ssize_t int_len = 0;
 	size_t int_response_len = 0;
@@ -228,7 +225,6 @@ finish:
 	SFREE(str_response);
 	DB_free_result(res);
 	if (int_len != 0) {
-		ws_delete_free(client_delete);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
@@ -239,7 +235,6 @@ finish:
 
 bool http_delete_step4(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	ssize_t int_len = 0;
 	size_t int_response_len = 0;
@@ -294,7 +289,6 @@ finish:
 	}
 	SFREE(str_response);
 	DB_free_result(res);
-	ws_delete_free(client_delete);
 	if (int_len != 0) {
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);

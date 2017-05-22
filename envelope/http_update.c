@@ -13,7 +13,7 @@ void http_update_step1(struct sock_ev_client *client) {
 	size_t int_temp = 0;
 
 	client->cur_request =
-		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_update), POSTAGE_REQ_UPDATE);
+		create_request(client, NULL, NULL, NULL, NULL, sizeof(struct sock_ev_client_update), POSTAGE_REQ_UPDATE, ws_update_free);
 	SFINISH_CHECK(client->cur_request != NULL, "create_request failed!");
 	client_update = (struct sock_ev_client_update *)(client->cur_request->client_request_data);
 
@@ -163,7 +163,6 @@ finish:
 	}
 	SFREE(str_response);
 	if (int_response_len != 0) {
-		ws_update_free(client_update);
 		ev_io_stop(global_loop, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
@@ -448,7 +447,6 @@ finish:
 	SFREE(str_response);
 	DB_free_result(res);
 	if (int_client_write_len != 0) {
-		ws_update_free(client_update);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
@@ -558,7 +556,6 @@ finish:
 	SFREE(str_response);
 	DB_free_result(res);
 	if (int_response_len != 0) {
-		ws_update_free(client_update);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
@@ -629,7 +626,6 @@ finish:
 	SFREE(str_response);
 	DB_free_result(res);
 	if (int_client_write_len != 0) {
-		ws_update_free(client_update);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
@@ -639,7 +635,6 @@ finish:
 
 bool http_update_step5(EV_P, void *cb_data, DB_result *res) {
 	struct sock_ev_client *client = cb_data;
-	struct sock_ev_client_update *client_update = (struct sock_ev_client_update *)(client->cur_request->client_request_data);
 	char *str_response = NULL;
 	char *_str_response = NULL;
 	size_t y = 0;
@@ -746,7 +741,6 @@ finish:
 	SFREE(str_response);
 	DB_free_result(res);
 	if (int_response_len != 0) {
-		ws_update_free(client_update);
 		ev_io_stop(EV_A, &client->io);
 		SFREE(client->str_request);
 		SERROR_CHECK_NORESPONSE(client_close(client), "Error closing Client");
