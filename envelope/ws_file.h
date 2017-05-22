@@ -24,6 +24,8 @@ typedef enum {
 	POSTAGE_FILE_SEARCH
 } POSTAGE_FILE_TYPES;
 struct sock_ev_client_file {
+	struct sock_ev_client_request_data self;
+
 	char *str_input_path;
 	char *str_partial_path;
 	char *str_canonical_start;
