@@ -276,8 +276,8 @@ error:
 		errno = 0;
 
 	} else if (int_request_len == 0) {
-		SERROR_NORESPONSE("int_request_len == 0? disconnecting");
-		SFREE(str_global_error);
+		SERROR_NORESPONSE("int_request_len == 0?");//" disconnecting");
+		/*SFREE(str_global_error);
 
 		ev_io_stop(EV_A, w);
 
@@ -285,7 +285,7 @@ error:
 		WS_client_message_free(client_message);
 		WS_freeFrame(frame);
 
-		SERROR_CLIENT_CLOSE_NORESPONSE(client);
+		SERROR_CLIENT_CLOSE_NORESPONSE(client);*/
 		bol_error_state = false;
 		errno = 0;
 
