@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sys/ioctl.h>
 #include <openssl/sha.h>
 #include <stdbool.h>
 #include <time.h>
