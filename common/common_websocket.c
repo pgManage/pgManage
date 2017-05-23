@@ -275,7 +275,22 @@ error:
 		bol_error_state = false;
 		errno = 0;
 
-	} else if (int_request_len == 0 || errno == EAGAIN) {
+	} else if (int_request_len == 0) {
+		SERROR_NORESPONSE("int_request_len == 0? disconnecting");
+		SFREE(str_global_error);
+
+		ev_io_stop(EV_A, w);
+
+		struct sock_ev_client *client = frame->parent;
+		WS_client_message_free(client_message);
+		WS_freeFrame(frame);
+
+		SERROR_CLIENT_CLOSE_NORESPONSE(client);
+		bol_error_state = false;
+		errno = 0;
+
+
+	} else if (errno == EAGAIN) {
 		SERROR_NORESPONSE("should never get to EAGAIN with libev");
 		SFREE(str_global_error);
 		bol_error_state = false;
