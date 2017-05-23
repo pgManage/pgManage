@@ -277,9 +277,9 @@ error:
 
 	} else if (int_request_len == 0) {
 		SERROR_NORESPONSE("int_request_len == 0?");//" disconnecting");
-		/*SFREE(str_global_error);
+		SFREE(str_global_error);
 
-		ev_io_stop(EV_A, w);
+		/*ev_io_stop(EV_A, w);
 
 		struct sock_ev_client *client = frame->parent;
 		WS_client_message_free(client_message);
