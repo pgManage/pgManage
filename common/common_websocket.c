@@ -106,7 +106,11 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 
 	if (client_message->bol_have_header == false) {
 		int int_avail = 0;
+#ifdef _WIN32
+		SERROR_CHECK(ioctlsocket(frame->parent->_int_sock, FIONREAD, &int_avail) == 0, "ioctlsocket() failed: %d", WSAGetLastError());
+#else
 		SERROR_CHECK(ioctl(frame->parent->int_sock, FIONREAD, &int_avail) != -1, "ioctl() failed!");
+#endif
 		if (int_avail < WEBSOCKET_HEADER_LENGTH) {
         		bol_error_state = false;
 		        SFREE(buf);
