@@ -60,7 +60,7 @@ if test $(uname -s) = "Linux"; then
 	kill $POSTAGEPID
 
 	command -v apt-get >/dev/null 2>&1 && {
-		sudo apt-get -y remove Postage
+		sudo apt-get -y remove postage
 		cp -f ./dist/*.deb /mnt/Groups/wfprod_group/postage/packages/
 	}
 	command -v yum >/dev/null 2>&1 && {
