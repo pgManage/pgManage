@@ -479,7 +479,7 @@ void WS_client_message_free(struct sock_ev_client_message *client_message) {
 	SFREE(client_message);
 }
 
-void WS_freeFrame(WSFrame *frame) {
+void _WS_freeFrame(WSFrame *frame) {
 	if (frame != NULL) {
 		SFREE(frame->str_message);
 		SFREE(frame->str_mask);

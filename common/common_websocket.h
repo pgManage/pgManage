@@ -49,4 +49,5 @@ void WS_sendFrame_step2(EV_P, ev_io *w, int revents);
 These functions free the memory of the given structs
 */
 void WS_client_message_free(struct sock_ev_client_message *client_message);
-void WS_freeFrame(WSFrame *frame);
+#define WS_freeFrame(frame) _WS_freeFrame(frame); frame = NULL
+void _WS_freeFrame(WSFrame *frame);
