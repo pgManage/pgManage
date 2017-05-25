@@ -22,18 +22,6 @@ if (shouldQuit) {
 	return;
 }
 
-fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
-var lastTime = new Date().getTime();
-fs.watch(os.homedir() + '/.postage/postage-SIGHUP', function (eventType) {
-	if (eventType === 'change') {
-		var currTime = new Date().getTime();
-		if ((currTime - lastTime) > 1000) {
-			openWindow();
-		}
-		lastTime = currTime;
-	}
-});
-
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -54,6 +42,18 @@ try {
 } catch (e) {
 	fs.mkdirsSync(os.homedir() + '/.postage/');
 	hidefile.hideSync(os.homedir() + '/.postage/');
+
+	fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
+	var lastTime = new Date().getTime();
+	fs.watch(os.homedir() + '/.postage/postage-SIGHUP', function (eventType) {
+		if (eventType === 'change') {
+			var currTime = new Date().getTime();
+			if ((currTime - lastTime) > 1000) {
+				openWindow();
+			}
+			lastTime = currTime;
+		}
+	});
 
 	console.log('copying config');
 	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync(process.resourcesPath + '/app/postage/config/postage.conf', 'utf8'), 'utf8');
