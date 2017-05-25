@@ -72,7 +72,7 @@ void _WS_readFrame(EV_P, struct sock_ev_client *client, void (*cb)(EV_P, WSFrame
 	if (bol_tls) {
 		ev_feed_event(EV_A, &client_message->io, EV_READ | EV_WRITE);
 	}
-	SDEBUG("client->str_request: %s", client->str_request);
+	//SDEBUG("client->str_request: %s", client->str_request);
 
 	bol_error_state = false;
 	return;
@@ -105,6 +105,17 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 	memset(buf, 0, BUF_LEN + 1);
 
 	if (client_message->bol_have_header == false) {
+		int int_avail = 0;
+#ifdef _WIN32
+		SERROR_CHECK(ioctlsocket(frame->parent->_int_sock, FIONREAD, &int_avail) == 0, "ioctlsocket() failed: %d", WSAGetLastError());
+#else
+		SERROR_CHECK(ioctl(frame->parent->int_sock, FIONREAD, &int_avail) != -1, "ioctl() failed!");
+#endif
+		if (int_avail < WEBSOCKET_HEADER_LENGTH) {
+        		bol_error_state = false;
+		        SFREE(buf);
+		        return;
+		}
 		int_request_len = client_read(frame->parent, buf, WEBSOCKET_HEADER_LENGTH);
 		if (int_request_len < -1) {
 			// This is a state where we want to read (or write) but can't
@@ -112,6 +123,8 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 			goto error;
 		}
 		SDEBUG("int_request_len    : %d", int_request_len);
+		SDEBUG("buf[0]: 0x%02x", buf[0]);
+		SDEBUG("buf[1]: 0x%02x", buf[1]);
 		SERROR_CHECK(int_request_len == WEBSOCKET_HEADER_LENGTH, "FAILED TO READ WEBSOCKET HEADER");
 		// 0x79 == 0b01110000 (RSV bits)
 		SERROR_CHECK((buf[0] & 0x70) == 0, "RSV bit set!");
@@ -261,7 +274,7 @@ error:
 		}
 	}
 
-	if (int_request_len == 0 || errno != EAGAIN) {
+	if (int_request_len < 0 && errno != EAGAIN) {
 		SERROR_NORESPONSE("disconnect");
 		SFREE(str_global_error);
 
@@ -274,6 +287,21 @@ error:
 		SERROR_CLIENT_CLOSE_NORESPONSE(client);
 		bol_error_state = false;
 		errno = 0;
+
+	} else if (int_request_len == 0) {
+		SERROR_NORESPONSE("int_request_len == 0?");//" disconnecting");
+		SFREE(str_global_error);
+
+		ev_io_stop(EV_A, w);
+
+		struct sock_ev_client *client = frame->parent;
+		WS_client_message_free(client_message);
+		WS_freeFrame(frame);
+
+		SERROR_CLIENT_CLOSE_NORESPONSE(client);
+		bol_error_state = false;
+		errno = 0;
+
 
 	} else if (errno == EAGAIN) {
 		SERROR_NORESPONSE("should never get to EAGAIN with libev");
@@ -464,7 +492,7 @@ void WS_client_message_free(struct sock_ev_client_message *client_message) {
 	SFREE(client_message);
 }
 
-void WS_freeFrame(WSFrame *frame) {
+void _WS_freeFrame(WSFrame *frame) {
 	if (frame != NULL) {
 		SFREE(frame->str_message);
 		SFREE(frame->str_mask);

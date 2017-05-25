@@ -94,7 +94,6 @@ void ws_file_step1(struct sock_ev_client_request *client_request) {
 				str_response, &int_response_len,
 				"/app/\tfolder\012/role/\tfolder\012/web_root/\tfolder\012", strlen("/app/\tfolder\012/role/\tfolder\012/web_root/\tfolder\012")
 			);
-			ws_file_free(client_file);
 		}
 
 	} else if (strcmp(str_request_type, "READ") == 0) {
@@ -364,13 +363,7 @@ finish:
 	SFREE_ALL();
 
 	SDEBUG("bol_error_state == %s", bol_error_state == true ? "true" : "false");
-	if (bol_error_state == true) {
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
-		bol_error_state = false;
-	}
+	bol_error_state = false;
 
 	if (str_response != NULL) {
 		char *_str_response = str_response;
@@ -589,7 +582,6 @@ finish:
 	} else {
 		SFREE(str_response);
 	}
-	ws_file_free(client_file);
 	return true;
 }
 
@@ -737,11 +729,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	}
 	return true;
 }
@@ -826,11 +813,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	}
 }
 
@@ -917,14 +899,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
-	} else {
-		ws_file_free(client_file);
-		// client_request_free(client_request);
 	}
 }
 
@@ -1112,11 +1086,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	}
 	return true;
 }
@@ -1202,11 +1171,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	}
 }
 
@@ -1337,11 +1301,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	} else {
 		client_request->int_response_id += 1;
 		char str_temp[101] = {0};
@@ -1378,9 +1337,6 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
 	}
 }
 
@@ -1425,11 +1381,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	}
 	return true;
 }
@@ -1646,13 +1597,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		if (client_file != NULL) {
-			ws_file_free(client_file);
-		}
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	} else {
 		if (str_response != NULL) {
 			client_request->int_response_id += 1;
@@ -1688,9 +1632,6 @@ finish:
 
 			str_response = NULL;
 			// client_request_free(client_request);
-		}
-		if (client_file != NULL) {
-			ws_file_free(client_file);
 		}
 	}
 	return true;
@@ -1787,13 +1728,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		// This is handled in step5
-		// ws_file_free(client_file);
-
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 		bol_ret = false;
 	}
 	SFREE_ALL();
@@ -1858,11 +1792,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	} else {
 		client_request->int_response_id += 1;
 		char str_temp[101] = {0};
@@ -1896,9 +1825,6 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
 	}
 	return true;
 }
@@ -1975,11 +1901,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	} else if (str_response != NULL) {
 		client_request->int_response_id += 1;
 		char str_temp[101] = {0};
@@ -2013,9 +1934,6 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
 	}
 	return true;
 }
@@ -2089,11 +2007,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 		bol_ret = false;
 	}
 	SFREE_ALL();
@@ -2152,11 +2065,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	} else if (str_response != NULL) {
 		client_request->int_response_id += 1;
 		char str_temp[101] = { 0 };
@@ -2190,9 +2098,6 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
 	}
 	return true;
 }
@@ -2267,11 +2172,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	} else {
 		client_request->int_response_id += 1;
 		char str_temp[101] = {0};
@@ -2305,9 +2205,6 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 
 		str_response = NULL;
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
 	}
 	return true;
 }
@@ -2422,10 +2319,6 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 
 		SFREE(client_request_watcher);
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	}
 	return true;
 }
@@ -2497,18 +2390,12 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	}
 	return true;
 }
 
 bool ws_file_search_step4(EV_P, void *cb_data, bool bol_success) {
 	struct sock_ev_client_request *client_request = cb_data;
-	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)(client_request->client_request_data);
 	char *str_response = NULL;
 	size_t int_response_len = 0;
 	struct sock_ev_client_request_watcher *client_request_watcher = NULL;
@@ -2544,11 +2431,6 @@ finish:
 
 		WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	}
 	return false;
 }
@@ -2600,8 +2482,6 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents) {
 		ev_check_stop(EV_A, w);
 		client_request->parent->client_request_watcher_search = NULL;
 		SFREE(client_request_watcher);
-
-		ws_file_free(client_file);
 
 	} else if (client_file->fp == NULL) {
 		errno = 0;
@@ -2720,55 +2600,51 @@ finish:
 		ev_check_stop(EV_A, w);
 		client_request->parent->client_request_watcher_search = NULL;
 		SFREE(client_request_watcher);
-
-		ws_file_free(client_file);
-		// client_request_free(client_request);
-		// client_request_free takes care of this
-		// SFREE(client_file);
 	}
 }
 
-void ws_file_free(struct sock_ev_client_file *to_free) {
-	SFREE(to_free->str_input_path);
-	SFREE(to_free->str_partial_path);
-	SFREE(to_free->str_canonical_start);
-	SFREE(to_free->str_path);
-	SFREE(to_free->str_search);
-	SFREE(to_free->str_input_path_to);
-	SFREE(to_free->str_partial_path_to);
-	SFREE(to_free->str_canonical_start_to);
-	SFREE(to_free->str_path_to);
-	SFREE(to_free->str_content);
-	SFREE(to_free->str_change_stamp);
+void ws_file_free(struct sock_ev_client_request_data *client_request_data) {
+	struct sock_ev_client_file *client_file = (struct sock_ev_client_file *)client_request_data;
+	SFREE(client_file->str_input_path);
+	SFREE(client_file->str_partial_path);
+	SFREE(client_file->str_canonical_start);
+	SFREE(client_file->str_path);
+	SFREE(client_file->str_search);
+	SFREE(client_file->str_input_path_to);
+	SFREE(client_file->str_partial_path_to);
+	SFREE(client_file->str_canonical_start_to);
+	SFREE(client_file->str_path_to);
+	SFREE(client_file->str_content);
+	SFREE(client_file->str_change_stamp);
 	size_t int_i, int_len;
 #ifdef _WIN32
-	if (to_free->h_file != INVALID_HANDLE_VALUE) {
-		CloseHandle(to_free->h_file);
-		to_free->h_file = INVALID_HANDLE_VALUE;
+	if (client_file->h_file != INVALID_HANDLE_VALUE) {
+		CloseHandle(client_file->h_file);
+		client_file->h_file = INVALID_HANDLE_VALUE;
 	}
 #else
-	if (to_free->int_fd > -1) {
-		close(to_free->int_fd);
-		to_free->int_fd = -1;
+	if (client_file->int_fd > -1) {
+		close(client_file->int_fd);
+		client_file->int_fd = -1;
 	}
 #endif
-	if (to_free->arr_contents != NULL) {
-		for (int_i = 0, int_len = DArray_end(to_free->arr_contents); int_i < int_len; int_i += 1) {
-			struct list_dirent_ent *ent = DArray_get(to_free->arr_contents, int_i);
+	if (client_file->arr_contents != NULL) {
+		for (int_i = 0, int_len = DArray_end(client_file->arr_contents); int_i < int_len; int_i += 1) {
+			struct list_dirent_ent *ent = DArray_get(client_file->arr_contents, int_i);
 			SFREE(ent->str_name);
 			SFREE(ent);
 		}
-		DArray_destroy(to_free->arr_contents);
-		to_free->arr_contents = NULL;
+		DArray_destroy(client_file->arr_contents);
+		client_file->arr_contents = NULL;
 	}
-	if (to_free->que_file) {
-		Queue_clear_destroy(to_free->que_file);
-		to_free->que_file = NULL;
+	if (client_file->que_file) {
+		Queue_clear_destroy(client_file->que_file);
+		client_file->que_file = NULL;
 	}
-	if (to_free->bol_regex) {
-		to_free->bol_regex = false;
-		tre_regfree(&to_free->reg);
+	if (client_file->bol_regex) {
+		client_file->bol_regex = false;
+		tre_regfree(&client_file->reg);
 	}
-	SFREE(to_free->str_line);
+	SFREE(client_file->str_line);
 }
 #endif

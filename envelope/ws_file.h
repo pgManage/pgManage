@@ -24,6 +24,8 @@ typedef enum {
 	POSTAGE_FILE_SEARCH
 } POSTAGE_FILE_TYPES;
 struct sock_ev_client_file {
+	struct sock_ev_client_request_data self;
+
 	char *str_input_path;
 	char *str_partial_path;
 	char *str_canonical_start;
@@ -226,4 +228,4 @@ void ws_file_search_step5(EV_P, ev_check *w, int revents);
 /*
 This function will free the data associated with the client_file struct
 */
-void ws_file_free(struct sock_ev_client_file *to_free);
+void ws_file_free(struct sock_ev_client_request_data *client_request_data);

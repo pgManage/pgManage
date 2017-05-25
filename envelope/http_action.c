@@ -148,7 +148,7 @@ bool http_action_step2(EV_P, void *cb_data, DB_result *res) {
 	SFREE(_str_response);
 	SDEBUG("str_response: %s", str_response);
 
-	client->cur_request = create_request(client, NULL, NULL, NULL, NULL, 0, POSTAGE_REQ_ACTION);
+	client->cur_request = create_request(client, NULL, NULL, NULL, NULL, 0, POSTAGE_REQ_ACTION, NULL);
 	SFINISH_CHECK(client->cur_request != NULL, "create_request failed!");
 	SFINISH_SALLOC(client_copy_check, sizeof(struct sock_ev_client_copy_check));
 

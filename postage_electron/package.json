@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "electron": "^1.6.2",
-    "electron-builder": "^17.9.0"
+    "electron-builder": "^17.10.0"
   },
   "homepage": "https://github.com/workflowproducts/postage/blob/master/README.md",
   "keywords": [
