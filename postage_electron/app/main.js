@@ -209,7 +209,6 @@ ipcMain.on('postage', function (event, arg) {
 })
 
 app.on('quit', function () {
-	fs.unlinkSync(os.homedir() + '/.postage/postage-pid');
 	proc.kill();
 });
 
