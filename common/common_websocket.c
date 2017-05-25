@@ -91,7 +91,6 @@ error:
 void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 	if (revents != 0) {
 	} // get rid of unused parameter warning
-	SDEBUG("WS_readFrame_step2");
 	struct sock_ev_client_message *client_message = (struct sock_ev_client_message *)w;
 	SDEBUG("client_message: %p", client_message);
 	WSFrame *frame = client_message->frame;
@@ -105,16 +104,19 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 	memset(buf, 0, BUF_LEN + 1);
 
 	if (client_message->bol_have_header == false) {
-		int int_avail = 0;
+		if (!bol_tls) {
+			int int_avail = 0;
 #ifdef _WIN32
-		SERROR_CHECK(ioctlsocket(frame->parent->_int_sock, FIONREAD, &int_avail) == 0, "ioctlsocket() failed: %d", WSAGetLastError());
+			SERROR_CHECK(ioctlsocket(frame->parent->_int_sock, FIONREAD, &int_avail) == 0, "ioctlsocket() failed: %d", WSAGetLastError());
 #else
-		SERROR_CHECK(ioctl(frame->parent->int_sock, FIONREAD, &int_avail) != -1, "ioctl() failed!");
+			SERROR_CHECK(ioctl(frame->parent->int_sock, FIONREAD, &int_avail) != -1, "ioctl() failed!");
 #endif
-		if (int_avail < WEBSOCKET_HEADER_LENGTH) {
-        		bol_error_state = false;
-		        SFREE(buf);
-		        return;
+			SINFO("int_avail: %d", int_avail);
+			if (int_avail < WEBSOCKET_HEADER_LENGTH) {
+				bol_error_state = false;
+				SFREE(buf);
+				return;
+			}
 		}
 		int_request_len = client_read(frame->parent, buf, WEBSOCKET_HEADER_LENGTH);
 		if (int_request_len < -1) {
@@ -249,6 +251,9 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 		frame->cb(EV_A, frame);
 	}
 
+	SINFO("int_request_len: %d", int_request_len);
+	SINFO("client_message->int_position: %d", client_message->int_position);
+	SINFO("frame->int_length: %d", frame->int_length);
 	bol_error_state = false;
 	SFREE(buf);
 	return;
