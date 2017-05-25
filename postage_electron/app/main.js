@@ -22,18 +22,6 @@ if (shouldQuit) {
 	return;
 }
 
-fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
-var lastTime = new Date().getTime();
-fs.watch(os.homedir() + '/.postage/postage-SIGHUP', function (eventType) {
-	if (eventType === 'change') {
-		var currTime = new Date().getTime();
-		if ((currTime - lastTime) > 1000) {
-			openWindow();
-		}
-		lastTime = currTime;
-	}
-});
-
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -59,6 +47,18 @@ try {
 	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync(process.resourcesPath + '/app/postage/config/postage.conf', 'utf8'), 'utf8');
 	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync(process.resourcesPath + '/app/postage/config/postage-connections.conf', 'utf8'), 'utf8');
 }
+
+fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
+var lastTime = new Date().getTime();
+fs.watch(os.homedir() + '/.postage/postage-SIGHUP', function (eventType) {
+	if (eventType === 'change') {
+		var currTime = new Date().getTime();
+		if ((currTime - lastTime) > 1000) {
+			openWindow();
+		}
+		lastTime = currTime;
+	}
+});
 
 if (process.platform == 'win32') {
 	try {
