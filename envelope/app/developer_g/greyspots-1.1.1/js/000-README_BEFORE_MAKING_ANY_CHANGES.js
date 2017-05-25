@@ -38,7 +38,9 @@
         if (deviceIsAndroid) {
     
     
-    ######## BEFORE UPDATING X-TAGS: ######## ~michael
+    ######## BEFORE UPDATING X-TAGS: ######## ~michael and nunzio
+    nunzio: the below warning now seems to be outdated
+    nunzio: you have to delete '"function"==typeof define&&define.amd?define(X):"undefined"!=typeof module&&module.exports?module.exports=X:' from xtags for electron
     make sure you include the polyfills and make sure that there isn't still a duplicated block of code in the source, if there is remove it, here is how to find out:
     
     do a find in textedit for: "scope.upgradeDocumentTree = nop;" (excluding the quotes of course)
