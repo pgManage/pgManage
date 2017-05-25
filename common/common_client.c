@@ -1916,7 +1916,7 @@ bool client_close(struct sock_ev_client *client) {
 
 	if (client_node != NULL && (client->bol_handshake == true || client->bol_is_open == true)) {
 		client->bol_is_open = false;
-		if (client->bol_handshake == false || bol_authorized == false) {
+		if (client->bol_handshake == false || bol_authorized == false || client->cur_request == NULL) {
 			SDEBUG("client_close_immediate");
 			client_close_immediate(client);
 		} else {
