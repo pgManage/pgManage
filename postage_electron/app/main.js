@@ -43,6 +43,8 @@ try {
 	fs.mkdirsSync(os.homedir() + '/.postage/');
 	hidefile.hideSync(os.homedir() + '/.postage/');
 
+	fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
+
 	console.log('copying config');
 	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync(process.resourcesPath + '/app/postage/config/postage.conf', 'utf8'), 'utf8');
 	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync(process.resourcesPath + '/app/postage/config/postage-connections.conf', 'utf8'), 'utf8');
