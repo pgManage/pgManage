@@ -12,6 +12,17 @@ const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
+var shouldQuit = app.makeSingleInstance(function (commandLine, workingDirectory) {
+	// Someone tried to run a second instance, we should create a new window
+	fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
+});
+
+if (shouldQuit) {
+	app.quit();
+	return;
+}
+
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindows = [];
@@ -32,10 +43,24 @@ try {
 	fs.mkdirsSync(os.homedir() + '/.postage/');
 	hidefile.hideSync(os.homedir() + '/.postage/');
 
+	fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
+
 	console.log('copying config');
 	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync(process.resourcesPath + '/app/postage/config/postage.conf', 'utf8'), 'utf8');
 	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync(process.resourcesPath + '/app/postage/config/postage-connections.conf', 'utf8'), 'utf8');
 }
+
+fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
+var lastTime = new Date().getTime();
+fs.watch(os.homedir() + '/.postage/postage-SIGHUP', function (eventType) {
+	if (eventType === 'change') {
+		var currTime = new Date().getTime();
+		if ((currTime - lastTime) > 1000) {
+			openWindow();
+		}
+		lastTime = currTime;
+	}
+});
 
 if (process.platform == 'win32') {
 	try {
@@ -184,6 +209,7 @@ ipcMain.on('postage', function (event, arg) {
 })
 
 app.on('quit', function () {
+	fs.unlinkSync(os.homedir() + '/.postage/postage-pid');
 	proc.kill();
 });
 
