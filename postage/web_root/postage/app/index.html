@@ -426,7 +426,8 @@
 
                             if (currentElement) {
                                 setFrame(currentElement, currentElement.relatedFrame, false);
-                                GS.triggerEvent(window, 'resize');
+                                //console.log('1');
+                                //GS.triggerEvent(window, 'resize');
                             } else {
                                 addHomeQuery('', 'Couldn\'t Load Tab'
                                            , 'SELECT E\'\n\n-- Couldn\'\'t Load Tab: The tab "' + strCurrentTab + '" is no longer open.\n\n\'', '');
@@ -533,6 +534,26 @@
               0%   { background-color: #91ffb2; }
               100% { background-color: white; }
             }
+            
+            
+            label {
+                padding: 0.268em;
+            }
+            gs-cell > label > input {
+                width: 100%;
+                border: 0 none;
+                margin: 0;
+                padding: 0;
+                font-size: 1em;
+                font-family: inherit;
+                
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                
+                -webkit-border-radius: inherit;
+                /*-moz-border-radius: none;*/
+            }
+            
         </style>
     </head>
     <body>

@@ -697,7 +697,7 @@ code.google.com/p/crypto-js/wiki/License
 if(c_start===-1){c_value=null;}else{c_start=c_value.indexOf("=",c_start)+1;c_end=c_value.indexOf(";",c_start);if(c_end===-1){c_end=c_value.length;}
 c_value=decodeURIComponent(c_value.substring(c_start,c_end));}
 return c_value;};if((getCookie('DB')||'PG').toUpperCase()==='PG'){GS.utfSafeMD5=CryptoJS.MD5;}else{GS.utfSafeMD5=function(str){"use strict";var buf=new ArrayBuffer(str.length*2);var bufView=new Uint16Array(buf);var i;var strLen;for(i=0,strLen=str.length;i<strLen;i+=1){bufView[i]=str.charCodeAt(i);}
-return CryptoJS.MD5(CryptoJS.lib.WordArray.create(bufView));}}}());window.addEventListener('design-register-element',function(){registerDesignSnippet('Lorem Ipsum','Lorem Ipsum','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.');registerDesignSnippet('Document Start','Document Start','<!DOCTYPE html>\n'+'<html>\n'+'    <head>\n'+'        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\n'+'        <meta name="apple-mobile-web-app-capable" content="yes" />\n'+'        <meta name="apple-mobile-web-app-status-bar-style" content="black" />\n'+'        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />\n'+'        <!-- Make this page use standard caching procedure when used as an iframe -->\n'+'        <meta http-equiv="Cache-control" content="no-store, must-revalidate" />\n'+'        \n'+'        <title>${1:New Page}</title>\n'+'        \n'+'        <script src="/js/greyspots.js" type="text/javascript"></script>\n'+'        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />\n'+'    </head>\n'+'    <body>\n'+'        $0\n'+'    </body>\n'+'</html>');registerDesignSnippet('Centered H1','Centered H1','<center><h1>$0</h1></center>');registerDesignSnippet('Centered H2','Centered H2','<center><h2>$0</h2></center>');registerDesignSnippet('Centered H3','Centered H3','<center><h3>$0</h3></center>');registerDesignSnippet('Centered H4','Centered H4','<center><h4>$0</h4></center>');registerDesignSnippet('Centered H5','Centered H5','<center><h5>$0</h5></center>');registerDesignSnippet('Centered H6','Centered H6','<center><h6>$0</h6></center>');registerDesignSnippet('Window Load','window.addEventListener','window.addEventListener(\'load\', function () {\n'+'    $0\n'+'});');registerDesignSnippet('Multiline String','Multiline String','ml(function () {/*\n'+'    ${0}\n'+'})');registerDesignSnippet('ml()','ml()','ml(function () {/*\n'+'    ${0}\n'+'})');registerDesignSnippet('<style>','<style>','style>\n'+'    $0\n'+'</style>');registerDesignSnippet('<script>','<script>','script>\n'+'    $0\n'+'</script>');registerDesignSnippet('<link>','<link>','link href="${1}" type="text/css" rel="stylesheet" />');registerDesignSnippet('Curved Borders','Curved Borders','-webkit-border-radius: ${1:50%};\n'+'-moz-border-radius: ${1:50%};\n'+'-ms-border-radius: ${1:50%};\n'+'-o-border-radius: ${1:50%};\n'+'border-radius: ${1:50%};');registerDesignSnippet('border-radius','border-radius','-webkit-border-radius: ${1:50%};\n'+'-moz-border-radius: ${1:50%};\n'+'-ms-border-radius: ${1:50%};\n'+'-o-border-radius: ${1:50%};\n'+'border-radius: ${1:50%};');registerDesignSnippet('box-sizing','box-sizing','-webkit-box-sizing: ${1:border-box};\n'+'-moz-box-sizing: ${1:border-box};\n'+'-ms-box-sizing: ${1:border-box};\n'+'-o-box-sizing: ${1:border-box};\n'+'box-sizing: ${1:border-box};');registerDesignSnippet('transform','transform','-webkit-transform: ${1:rotate(42deg)};\n'+'-moz-transform: ${1:rotate(42deg)};\n'+'-ms-transform: ${1:rotate(42deg)};\n'+'-o-transform: ${1:rotate(42deg)};\n'+'transform: ${1:rotate(42deg)};');registerDesignSnippet('Desktop Media Query','Desktop Media Query','@media only screen and (max-width: 5000px) {\n'+'    $0\n'+'}');registerDesignSnippet('Tablet Media Query','Tablet Media Query','@media only screen and (max-width: 768px) {\n'+'    $0\n'+'}');registerDesignSnippet('Phone Media Query','Phone Media Query','@media only screen and (max-width: 321px) {\n'+'    $0\n'+'}');});window.addEventListener('design-register-element',function(){var strNormalCallbackContent='    if (!error) {\n'+'        $0\n'+'    } else {\n'+'        GS.ajaxErrorDialog(data);\n'+'    }\n';registerDesignSnippet('JSON Ajax','JSON Ajax','GS.ajaxJSON(\'/env/${1:test.action_ship}\', \'${2:action=ship&id=}\', function (data, error) {\n'+
+return CryptoJS.MD5(CryptoJS.lib.WordArray.create(bufView));}}}());window.addEventListener('design-register-element',function(){registerDesignSnippet('Lorem Ipsum','Lorem Ipsum','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.');registerDesignSnippet('Document Start','Document Start','<!DOCTYPE html>\n'+'<html>\n'+'    <head>\n'+'        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />\n'+'        <meta name="apple-mobile-web-app-capable" content="yes" />\n'+'        <meta name="apple-mobile-web-app-status-bar-style" content="black" />\n'+'        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />\n'+'        <!-- Make this page use standard caching procedure when used as an iframe -->\n'+'        <meta http-equiv="Cache-control" content="no-store, must-revalidate" />\n'+'        \n'+'        <title>${1:New Page}</title>\n'+'        \n'+'        <script src="/js/greyspots.js" type="text/javascript"></script>\n'+'        <link href="/css/greyspots.css" type="text/css" rel="stylesheet" />\n'+'    </head>\n'+'    <body>\n'+'        $0\n'+'    </body>\n'+'</html>');registerDesignSnippet('Centered H1','Centered H1','<center><h1>$0</h1></center>');registerDesignSnippet('Centered H2','Centered H2','<center><h2>$0</h2></center>');registerDesignSnippet('Centered H3','Centered H3','<center><h3>$0</h3></center>');registerDesignSnippet('Centered H4','Centered H4','<center><h4>$0</h4></center>');registerDesignSnippet('Centered H5','Centered H5','<center><h5>$0</h5></center>');registerDesignSnippet('Centered H6','Centered H6','<center><h6>$0</h6></center>');registerDesignSnippet('Window Load','window.addEventListener','window.addEventListener(\'load\', function () {\n'+'    $0\n'+'});');registerDesignSnippet('Multiline String','Multiline String','ml(function () {/*\n'+'    ${0}\n'+'})');registerDesignSnippet('ml()','ml()','ml(function () {/*\n'+'    ${0}\n'+'*/})');registerDesignSnippet('<style>','<style>','style>\n'+'    $0\n'+'</style>');registerDesignSnippet('<script>','<script>','script>\n'+'    $0\n'+'</script>');registerDesignSnippet('<link>','<link>','link href="${1}" type="text/css" rel="stylesheet" />');registerDesignSnippet('Curved Borders','Curved Borders','-webkit-border-radius: ${1:50%};\n'+'-moz-border-radius: ${1:50%};\n'+'-ms-border-radius: ${1:50%};\n'+'-o-border-radius: ${1:50%};\n'+'border-radius: ${1:50%};');registerDesignSnippet('border-radius','border-radius','-webkit-border-radius: ${1:50%};\n'+'-moz-border-radius: ${1:50%};\n'+'-ms-border-radius: ${1:50%};\n'+'-o-border-radius: ${1:50%};\n'+'border-radius: ${1:50%};');registerDesignSnippet('box-sizing','box-sizing','-webkit-box-sizing: ${1:border-box};\n'+'-moz-box-sizing: ${1:border-box};\n'+'-ms-box-sizing: ${1:border-box};\n'+'-o-box-sizing: ${1:border-box};\n'+'box-sizing: ${1:border-box};');registerDesignSnippet('transform','transform','-webkit-transform: ${1:rotate(42deg)};\n'+'-moz-transform: ${1:rotate(42deg)};\n'+'-ms-transform: ${1:rotate(42deg)};\n'+'-o-transform: ${1:rotate(42deg)};\n'+'transform: ${1:rotate(42deg)};');registerDesignSnippet('Desktop Media Query','Desktop Media Query','@media only screen and (max-width: 5000px) {\n'+'    $0\n'+'}');registerDesignSnippet('Tablet Media Query','Tablet Media Query','@media only screen and (max-width: 768px) {\n'+'    $0\n'+'}');registerDesignSnippet('Phone Media Query','Phone Media Query','@media only screen and (max-width: 321px) {\n'+'    $0\n'+'}');});window.addEventListener('design-register-element',function(){var strNormalCallbackContent='    if (!error) {\n'+'        $0\n'+'    } else {\n'+'        GS.ajaxErrorDialog(data);\n'+'    }\n';registerDesignSnippet('JSON Ajax','JSON Ajax','GS.ajaxJSON(\'/env/${1:test.action_ship}\', \'${2:action=ship&id=}\', function (data, error) {\n'+
 strNormalCallbackContent+'});');registerDesignSnippet('GS.ajaxJSON','GS.ajaxJSON','GS.ajaxJSON(\'/env/${1:test.action_ship}\', \'${2:action=ship&id=}\', function (data, error) {\n'+
 strNormalCallbackContent+'});');registerDesignSnippet('TEXT Ajax','TEXT Ajax','GS.ajaxText(\'/env/${1:test.action_description}\', \'${2:action=get&id=}\', function (data, error) {\n'+
 strNormalCallbackContent+'});');registerDesignSnippet('GS.ajaxText','GS.ajaxText','GS.ajaxText(\'/env/${1:test.action_description}\', \'${2:action=get&id=}\', function (data, error) {\n'+
@@ -1652,7 +1652,17 @@ document.getElementById('gs-dynamic-css').innerHTML+='\n/* container #'+intConta
 this.classList.add('container-id-'+intContainerID);},handleMediaCSS:function(){var strMedia=this.getAttribute('media'),arrMedias,strCSS,i,len,arrClassesToRemove,arrParts,strCurrentMedia,strWidth,intContainerID;arrClassesToRemove=String(this.classList).match(/container-id-[0-9]*/g)||[];for(i=0,len=arrClassesToRemove.length;i<len;i+=1){this.classList.remove(arrClassesToRemove[i]);}
 strMedia=GS.trim(strMedia.trim().replace(/\}/g,'').toLowerCase(),';');strMedia=strMedia.replace(/small|sml/g,'768px').replace(/medium|med/g,'992px').replace(/large|lrg/g,'1200px');arrMedias=strMedia.split(';');if(arrTakenContainers.indexOf(strMedia)===-1){arrTakenContainers.push(strMedia);intContainerID=arrTakenContainers.length-1;strCSS='';for(i=0,len=arrMedias.length;i<len;i+=1){arrParts=arrMedias[i].split('{');strCurrentMedia=arrParts[0].trim()||'all';strWidth=arrParts[1].trim()||'900px';strCSS+='\n@media '+strCurrentMedia+' {\n'+'    gs-container.container-id-'+intContainerID+' '+'{ width:'+strWidth+'; margin-left:auto; margin-right:auto; }\n'+'}\n';}
 document.getElementById('gs-dynamic-css').innerHTML+='\n/* container #'+intContainerID+' */\n'+strCSS;}else{intContainerID=arrTakenContainers.indexOf(strMinWidth);}
-this.classList.add('container-id-'+intContainerID);}}});});window.addEventListener('design-register-element',function(event){'use strict';registerDesignSnippet('<gs-datasheet>','<gs-datasheet>','gs-datasheet src="${1:test.tpeople}">\n'+'    <template for="hud"></template>\n'+'    <template for="table">\n'+'        <table>\n'+'            <tbody>\n'+'                <tr>\n'+'                    <th heading="#"><gs-static column="row_number"></gs-static></th>\n'+'                    <td heading="">$0</td>\n'+'                </tr>\n'+'            </tbody>\n'+'        </table>\n'+'    </template>\n'+'    <template for="insert"></template>\n'+'</gs-datasheet>');designRegisterElement('gs-datasheet','/env/app/developer_g/greyspots-'+GS.version()+'/documentation/doc-elem-datasheet.html');window.designElementProperty_GSDATASHEET=function(selectedElement){addProp('Source',true,'<gs-memo class="target" autoresize rows="1" value="'+
+this.classList.add('container-id-'+intContainerID);}}});});window.addEventListener('design-register-element',function(){registerDesignSnippet('<gs-current-record>','<gs-current-record>','gs-current-record for="${1:for}"></gs-current-record>');window.designElementProperty_GSCURRENT_RECORD=function(selectedElement){addProp('For',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('for')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'for',this.value);});addProp('Inline',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('inline')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'inline',this.value==='true',true);});};});document.addEventListener("DOMContentLoaded",function(){"use strict";function buildElement(element){element.forTable=document.getElementById(element.getAttribute('for'));element.forTable.addEventListener('selection_change',function(){element.refresh(element);});element.forTable.addEventListener('after_select',function(){element.refresh(element);});element.forTable.addEventListener('after_selection',function(){element.refresh(element);});element.firstChild.addEventListener('change',function(event){var tableElem=element.forTable;var strValue=event.target.value;var intValue=parseInt(strValue.substring(0,strValue.indexOf(' ')),10);var intMaxRecord=tableElem.internalData.records.length;var intMinColumn=(tableElem.internalDisplay.recordSelectorVisible?-1:0);if(isNaN(intValue)){intValue=1;}
+if(intMaxRecord===0){intValue=undefined;}
+if(intValue>intMaxRecord){intValue=intMaxRecord;}
+if(!isNaN(intValue)){intValue-=1;}
+if(intValue!==undefined){tableElem.internalSelection.ranges=[{"start":{"row":intValue,"column":intMinColumn},"end":{"row":intValue,"column":intMinColumn},"negator":false}];}else{tableElem.internalSelection.ranges=[];}
+tableElem.goToLine(intValue+1);event.target.parentNode.refresh(event.target.parentNode);});}
+function elementInserted(element){if(element.children.length===0){var gsText=document.createElement("gs-text");element.appendChild(gsText);}
+if(!element.hasAttribute("suspend-created")&&!element.hasAttribute("suspend-inserted")){if(!element.inserted){element.inserted=true;if(!element.children[0].classList.contains('root')){buildElement(element);}}}}
+xtag.register("gs-current-record",{lifecycle:{inserted:function(){elementInserted(this);},attributeChanged:function(strAttrName,oldValue,newValue){var element=this;if(strAttrName==="suspend-created"&&newValue===null){elementInserted(element);}else if(strAttrName==="suspend-inserted"&&newValue===null){elementInserted(element);}}},events:{},accessors:{},methods:{'refresh':function(element){element.bolRefreshing=true;var tableElem=element.forTable;var intOriginRecord=(tableElem.internalSelection.originRecord);var statusElement=element.firstChild;if(statusElement){if(intOriginRecord!==undefined){statusElement.value=((intOriginRecord+1)+' of '+
+tableElem.internalData.records.length);}else{statusElement.value=('nothing selected');}}
+element.bolRefreshing=false;}}});});window.addEventListener('design-register-element',function(event){'use strict';registerDesignSnippet('<gs-datasheet>','<gs-datasheet>','gs-datasheet src="${1:test.tpeople}">\n'+'    <template for="hud"></template>\n'+'    <template for="table">\n'+'        <table>\n'+'            <tbody>\n'+'                <tr>\n'+'                    <th heading="#"><gs-static column="row_number"></gs-static></th>\n'+'                    <td heading="">$0</td>\n'+'                </tr>\n'+'            </tbody>\n'+'        </table>\n'+'    </template>\n'+'    <template for="insert"></template>\n'+'</gs-datasheet>');designRegisterElement('gs-datasheet','/env/app/developer_g/greyspots-'+GS.version()+'/documentation/doc-elem-datasheet.html');window.designElementProperty_GSDATASHEET=function(selectedElement){addProp('Source',true,'<gs-memo class="target" autoresize rows="1" value="'+
 encodeHTML(decodeURIComponent(selectedElement.getAttribute('src')))+'" mini></gs-memo>',function(){return setOrRemoveTextAttribute(selectedElement,'src',encodeURIComponent(this.value));});addProp('Columns',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('cols')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'cols',this.value);});addProp('Lock Columns',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('lock')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'lock',this.value);});addProp('Primary Keys',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('pk')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'pk',this.value);});addProp('Where',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('where')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'where',(this.value));});addProp('Order By',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('ord')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'ord',this.value);});addProp('Limit',true,'<gs-number class="target" value="'+encodeHTML(selectedElement.getAttribute('limit')||'')+'" mini></gs-number>',function(){return setOrRemoveTextAttribute(selectedElement,'limit',this.value);});addProp('Offset',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('offset')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'offset',this.value);});addProp('Column In Querystring',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('qs')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'qs',this.value,false);});addProp('Parent&nbsp;Column',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('column')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'column',this.value);});addProp('Line Column',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('child-column')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'child-column',this.value);});addProp('Reflow At',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('reflow-at')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'reflow-at',this.value);});addProp('Scroll To Bottom',true,'<gs-checkbox class="target" value="'+encodeHTML(selectedElement.hasAttribute('scroll-to-bottom')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'scroll-to-bottom',(this.value==='true'),true);});addProp('HUD Paginate',true,'<gs-checkbox class="target" value="'+(!selectedElement.hasAttribute('no-hudpaginate'))+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'no-hudpaginate',(this.value==='true'),false);});addProp('HUD Refresh',true,'<gs-checkbox class="target" value="'+(!selectedElement.hasAttribute('no-hudrefresh'))+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'no-hudrefresh',(this.value==='true'),false);});addProp('HUD Delete',true,'<gs-checkbox class="target" value="'+(!selectedElement.hasAttribute('no-huddelete'))+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'no-huddelete',(this.value==='true'),false);});addProp('Expand&nbsp;To&nbsp;Content',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('expand-to-content'))+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'expand-to-content',(this.value==='true'),true);});addProp('Null String',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('null-string')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'null-string',this.value);});addProp('Filter Popup',true,'<gs-checkbox class="target" value="'+(!selectedElement.hasAttribute('no-filter'))+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'no-filter',(this.value==='true'),false);});addProp('Title',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('title')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'title',this.value);});var strVisibilityAttribute='';if(selectedElement.hasAttribute('hidden')){strVisibilityAttribute='hidden';}
 if(selectedElement.hasAttribute('hide-on-desktop')){strVisibilityAttribute='hide-on-desktop';}
 if(selectedElement.hasAttribute('hide-on-tablet')){strVisibilityAttribute='hide-on-tablet';}
@@ -2723,7 +2733,7 @@ element.selectionSelectedCells=arrCellsToAffect;arrNewSelection=element.selected
 for(i=0,len=arrCellsToRemoveFromSelection.length;i<len;i+=1){arrNewSelection.splice(arrNewSelection.indexOf(arrCellsToRemoveFromSelection[i]),1);}
 element.selectedCells=arrNewSelection;}else{arrNewSelection=element.selectedCells;for(i=0,len=arrCellsToAffect.length;i<len;i+=1){if(arrNewSelection.indexOf(arrCellsToAffect[i])>-1){arrNewSelection.splice(arrNewSelection.indexOf(arrCellsToAffect[i]),1);}}
 element.selectedCells=arrNewSelection;}}}
-function getData(element){element.refreshing=true;var strSrc=GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src')||element.getAttribute('source')||'')),srcParts=strSrc[0]==='('?[strSrc,'']:strSrc.split('.'),strSchema=srcParts[0],strObject=srcParts[1],strWhere=GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('where')||'')),strOrd=GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('ord')||'')),strLimit=GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('limit')||'')),strOffset=GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('offset')||'')),response_i=0,response_len=0,arrTotalRecords=[],strWhereColumn;if((element.getAttribute('column')||element.getAttribute('qs'))&&element.value){strWhereColumn=element.getAttribute('child-column')||element.getAttribute('column')||element.getAttribute('qs');if(isNaN(element.value)){strWhere='CAST('+strWhereColumn+' AS '+GS.database.type.text+') = '+'CAST($WhereQUOTE$'+(element.value)+'$WhereQUOTE$ AS '+GS.database.type.text+')'+
+function getData(element){element.refreshing=true;var strSrc=GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src')||element.getAttribute('source')||'')),srcParts=strSrc[0]==='('?[strSrc,'']:strSrc.split('.'),strSchema=srcParts[0],strObject=srcParts[1],strWhere=GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('where')||'')),strOrd=GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('ord')||'')),strLimit=GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('limit')||'')),strOffset=GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('offset')||'')),response_i=0,response_len=0,arrTotalRecords=[],strWhereColumn,i,len;if((element.getAttribute('column')||element.getAttribute('qs'))&&element.value){strWhereColumn=element.getAttribute('child-column')||element.getAttribute('column')||element.getAttribute('qs');if(isNaN(element.value)){strWhere='CAST('+strWhereColumn+' AS '+GS.database.type.text+') = '+'CAST($WhereQUOTE$'+(element.value)+'$WhereQUOTE$ AS '+GS.database.type.text+')'+
 (strWhere!==''?' AND ('+strWhere+')':'');}else{strWhere=strWhereColumn+'='+(element.value)+(strWhere!==''?' AND ('+strWhere+')':'');}}
 if(element.user_order_bys&&element.user_order_bys.columns.length>0){for(i=0,len=element.user_order_bys.columns.length,strOrd='';i<len;i+=1){strOrd+=(strOrd!==''?', ':'')+element.user_order_bys.columns[i]+' '+element.user_order_bys.directions[i].toUpperCase();}}
 element.oldScrollTop=element.scrollContainerElement.scrollTop;addLoader(element,'Loading...');GS.requestCachingSelect(GS.envSocket,strSchema,strObject,'*',strWhere,strOrd,strLimit,strOffset,function(data,error){element.refreshing=false;var arrRecords,arrCells,envData,i,len,cell_i,cell_len;if(!error){if(data.strMessage!=='TRANSACTION COMPLETED'){arrRecords=GS.trim(data.strMessage,'\n').split('\n');for(i=0,len=arrRecords.length;i<len;i+=1){arrCells=arrRecords[i].split('\t');for(cell_i=0,cell_len=arrCells.length;cell_i<cell_len;cell_i+=1){arrCells[cell_i]=arrCells[cell_i]==='\\N'?null:GS.decodeFromTabDelimited(arrCells[cell_i]);}
@@ -3397,15 +3407,10 @@ if(selectedElement.hasAttribute('show-on-desktop')){strVisibilityAttribute='show
 if(selectedElement.hasAttribute('show-on-tablet')){strVisibilityAttribute='show-on-tablet';}
 if(selectedElement.hasAttribute('show-on-phone')){strVisibilityAttribute='show-on-phone';}
 addProp('Visibility',true,'<gs-select class="target" value="'+strVisibilityAttribute+'" mini>'+'<option value="">Visible</option>'+'<option value="hidden">Invisible</option>'+'<option value="hide-on-desktop">Invisible at desktop size</option>'+'<option value="hide-on-tablet">Invisible at tablet size</option>'+'<option value="hide-on-phone">Invisible at phone size</option>'+'<option value="show-on-desktop">Visible at desktop size</option>'+'<option value="show-on-tablet">Visible at tablet size</option>'+'<option value="show-on-phone">Visible at phone size</option>'+'</gs-select>',function(){selectedElement.removeAttribute('hidden');selectedElement.removeAttribute('hide-on-desktop');selectedElement.removeAttribute('hide-on-tablet');selectedElement.removeAttribute('hide-on-phone');selectedElement.removeAttribute('show-on-desktop');selectedElement.removeAttribute('show-on-tablet');selectedElement.removeAttribute('show-on-phone');if(this.value){selectedElement.setAttribute(this.value,'');}
-return selectedElement;});addFlexContainerProps(selectedElement);addFlexProps(selectedElement);};});document.addEventListener('DOMContentLoaded',function(){'use strict';xtag.register('gs-insert',{lifecycle:{},events:{},accessors:{},methods:{submit:function(callback){if(window.bolSocket===true){var element=this,srcParts=GS.templateWithQuerystring(element.getAttribute('src')||'').split('.'),strSchema=srcParts[0],strObject=srcParts[1],strSeqCols,strPkCols,strAddIn,strColumns='',strResponseColumns,strInsertRecord='',strInsertData,arrElement,arrKey,arrValue,i,len,strResponse,parentSrcElement;strAddIn=GS.templateWithQuerystring(element.getAttribute('addin'));if(strAddIn){arrKey=GS.qryGetKeys(strAddIn);arrValue=GS.qryGetKeys(strAddIn);for(i=0,len=arrKey.length;i<len;i+=1){strColumns+=(strColumns?'\t':'')+GS.encodeForTabDelimited(arrKey[i]);strInsertRecord+=(strInsertRecord?'\t':'')+GS.encodeForTabDelimited(arrValue[i]);}}
+return selectedElement;});addFlexContainerProps(selectedElement);addFlexProps(selectedElement);};});document.addEventListener('DOMContentLoaded',function(){'use strict';xtag.register('gs-insert',{lifecycle:{},events:{},accessors:{},methods:{submit:function(callback){var element=this,srcParts=GS.templateWithQuerystring(element.getAttribute('src')||'').split('.'),strSchema=srcParts[0],strObject=srcParts[1],strSeqCols,strPkCols,strAddIn,strColumns='',strResponseColumns,strInsertRecord='',strInsertData,arrElement,arrKey,arrValue,i,len,strResponse,parentSrcElement;strAddIn=GS.templateWithQuerystring(element.getAttribute('addin'));if(strAddIn){arrKey=GS.qryGetKeys(strAddIn);arrValue=GS.qryGetKeys(strAddIn);for(i=0,len=arrKey.length;i<len;i+=1){strColumns+=(strColumns?'\t':'')+GS.encodeForTabDelimited(arrKey[i]);strInsertRecord+=(strInsertRecord?'\t':'')+GS.encodeForTabDelimited(arrValue[i]);}}
 arrElement=xtag.query(element,'[column]');for(i=0,len=arrElement.length;i<len;i+=1){parentSrcElement=GS.findParentElement(arrElement[i].parentNode,'[src]');if(parentSrcElement===element&&(arrElement[i].value!==undefined&&arrElement[i].value!==null&&arrElement[i].value!=='')){strColumns+=(strColumns?'\t':'')+GS.encodeForTabDelimited(arrElement[i].getAttribute('column'));strInsertRecord+=(strInsertRecord?'\t':'')+GS.encodeForTabDelimited(arrElement[i].value);}}
 strPkCols=GS.templateWithQuerystring(element.getAttribute('pk')||'id');strSeqCols=GS.templateWithQuerystring(element.getAttribute('seq')||'');strInsertData=(strColumns+'\n'+strInsertRecord);strResponseColumns=(strPkCols+(strPkCols?'\t':'')+strColumns);GS.requestInsertFromSocket(GS.envSocket,strSchema,strObject,strResponseColumns,strPkCols,strSeqCols,strInsertData,function(){},function(data,error,transactionID,commitFunction,rollbackFunction){var arrCells,i,len,arrElements,jsnSelection,focusElement,focusColumnParent,focusColumnParentIndex;if(data!=='TRANSACTION COMPLETED'){if(!error){strResponse=data;commitFunction();}else{GS.webSocketErrorDialog(data);rollbackFunction();}}else{commitFunction();}},function(strType,data,error){var arrColumns,arrCells,jsnRow={},i,len;if(strType==='COMMIT'){arrColumns=strResponseColumns.split('\t');arrCells=(strResponse||'').split('\n')[0].split('\t');if(arrColumns.length!==arrCells.length){throw'gs-insert Error: Insert API call isn\'t returning correctly. ('+arrColumns.join(',')+') -> ('+arrCells.join(',')+')';}else{for(i=0,len=arrColumns.length;i<len;i+=1){jsnRow[GS.decodeFromTabDelimited(arrColumns[i])]=GS.decodeFromTabDelimited(arrCells[i]);}
-GS.triggerEvent(element,'after_insert');if(typeof callback==='function'){callback(GS.decodeFromTabDelimited(arrCells[0]),jsnRow);}}}});}else{var element=this,strInsertString='',arrElement,i,len,jsnRow={},parentSrcElement,strSource=GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src')||element.getAttribute('source')||'')),strParameters,strLink;if(element.getAttribute('addin')){strInsertString+=GS.templateWithQuerystring(element.getAttribute('addin'));}
-arrElement=xtag.query(element,'[column]');for(i=0,len=arrElement.length;i<len;i+=1){parentSrcElement=GS.findParentElement(arrElement[i].parentNode,'[src]');if(parentSrcElement===element&&(arrElement[i].value!==undefined&&arrElement[i].value!==null&&arrElement[i].value!=='')){jsnRow[arrElement[i].getAttribute('column')]=arrElement[i].value;strInsertString+=(strInsertString?'&':'')+arrElement[i].getAttribute('column')+'='+
-encodeURIComponent(arrElement[i].value);}}
-strInsertString=encodeURIComponent(strInsertString);strParameters='src='+encodeURIComponent(strSource)+'&data='+strInsertString;if(element.getAttribute('seq')){strParameters+='&currval='+element.getAttribute('seq');}
-strLink='/'+
-(element.getAttribute('action-insert')||'env/k');GS.addLoader('gs-insert','Inserting Record...');GS.ajaxJSON(strLink,strParameters,function(data,error){GS.removeLoader('gs-insert');if(!error){GS.triggerEvent(element,'after_insert');if(typeof callback==='function'){callback(data.dat.lastval,jsnRow);}}else{GS.ajaxErrorDialog(data);}});}}}});});window.addEventListener('design-register-element',function(){'use strict';registerDesignSnippet('<gs-interval>','<gs-interval>','gs-interval column="${1:complete_time}"></gs-interval>');registerDesignSnippet('<gs-interval> With Label','<gs-interval>','label for="${1:interval-insert-complete_time}">${2:Time to complete}:</label>\n'+'<gs-interval id="${1:interval-insert-complete_time}" column="${3:complete_time}"></gs-interval>');designRegisterElement('gs-interval','/env/app/developer_g/greyspots-'+GS.version()+'/documentation/doc-elem-interval.html');window.designElementProperty_GSINTERVAL=function(selectedElement){addProp('Column',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('column')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'column',this.value);});addProp('Value',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('value')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'value',this.value);});addProp('Column In Querystring',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('qs')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'qs',this.value,false);});addProp('Mini',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('mini'))+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'mini',(this.value==='true'),true);});addProp('Time Picker',true,'<gs-checkbox class="target" value="'+(!selectedElement.hasAttribute('no-picker'))+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'no-picker',(this.value==='true'),false);});addProp('Unit',true,'        <gs-select class="target" value="'+encodeHTML(selectedElement.getAttribute('unit')||'hours')+'" mini>'+'    <option value="hours">Hours</option>'+'    <option value="minutes">Minutes</option>'+'    <option value="seconds">Seconds</option>'+'</gs-select>',function(){return setOrRemoveTextAttribute(selectedElement,'unit',this.value);});addProp('Hour Places',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('hour-places')||'3')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'hour-places',this.value);});addProp('Title',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('title')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'title',this.value);});addProp('Tabindex',true,'<gs-number class="target" value="'+encodeHTML(selectedElement.getAttribute('tabindex')||'')+'" mini></gs-number>',function(){return setOrRemoveTextAttribute(selectedElement,'tabindex',this.value);});var strVisibilityAttribute='';if(selectedElement.hasAttribute('hidden')){strVisibilityAttribute='hidden';}
+GS.triggerEvent(element,'after_insert');if(typeof callback==='function'){callback(GS.decodeFromTabDelimited(arrCells[0]),jsnRow);}}}});}}});});window.addEventListener('design-register-element',function(){'use strict';registerDesignSnippet('<gs-interval>','<gs-interval>','gs-interval column="${1:complete_time}"></gs-interval>');registerDesignSnippet('<gs-interval> With Label','<gs-interval>','label for="${1:interval-insert-complete_time}">${2:Time to complete}:</label>\n'+'<gs-interval id="${1:interval-insert-complete_time}" column="${3:complete_time}"></gs-interval>');designRegisterElement('gs-interval','/env/app/developer_g/greyspots-'+GS.version()+'/documentation/doc-elem-interval.html');window.designElementProperty_GSINTERVAL=function(selectedElement){addProp('Column',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('column')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'column',this.value);});addProp('Value',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('value')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'value',this.value);});addProp('Column In Querystring',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('qs')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'qs',this.value,false);});addProp('Mini',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('mini'))+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'mini',(this.value==='true'),true);});addProp('Time Picker',true,'<gs-checkbox class="target" value="'+(!selectedElement.hasAttribute('no-picker'))+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'no-picker',(this.value==='true'),false);});addProp('Unit',true,'        <gs-select class="target" value="'+encodeHTML(selectedElement.getAttribute('unit')||'hours')+'" mini>'+'    <option value="hours">Hours</option>'+'    <option value="minutes">Minutes</option>'+'    <option value="seconds">Seconds</option>'+'</gs-select>',function(){return setOrRemoveTextAttribute(selectedElement,'unit',this.value);});addProp('Hour Places',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('hour-places')||'3')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'hour-places',this.value);});addProp('Title',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('title')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'title',this.value);});addProp('Tabindex',true,'<gs-number class="target" value="'+encodeHTML(selectedElement.getAttribute('tabindex')||'')+'" mini></gs-number>',function(){return setOrRemoveTextAttribute(selectedElement,'tabindex',this.value);});var strVisibilityAttribute='';if(selectedElement.hasAttribute('hidden')){strVisibilityAttribute='hidden';}
 if(selectedElement.hasAttribute('hide-on-desktop')){strVisibilityAttribute='hide-on-desktop';}
 if(selectedElement.hasAttribute('hide-on-tablet')){strVisibilityAttribute='hide-on-tablet';}
 if(selectedElement.hasAttribute('hide-on-phone')){strVisibilityAttribute='hide-on-phone';}
@@ -4054,7 +4059,1631 @@ i+=1;}}
 element.attributesFromTemplate=[];if(element.templates[templateName].arrAttrNames.length>0){i=0;len=element.templates[templateName].arrAttrNames.length;while(i<len){element.attributesFromTemplate.push({'name':element.templates[templateName].arrAttrNames[i],'initallySet':element.hasAttribute(element.templates[templateName].arrAttrNames[i]),'initalValue':element.getAttribute(element.templates[templateName].arrAttrNames[i])});element.setAttribute(element.templates[templateName].arrAttrNames[i],GS.templateWithQuerystring(this.templates[templateName].arrAttrValues[i]));i+=1;}}
 if(element.templates[templateName].templated){element.innerHTML=subsafeTemplate(element.templates[templateName].content);}else{element.innerHTML=element.templates[templateName].content;}
 if(shimmed.HTMLTemplateElement){window.HTMLTemplateElement.bootstrap(element);}
-GS.triggerEvent(element,'templatechange',{'templateName':templateName});GS.triggerEvent(element,'template_change',{'templateName':templateName});}else{element.innerHTML='';}}}});});window.addEventListener('design-register-element',function(){registerDesignSnippet('<gs-text>','<gs-text>','gs-text column="${1:name}"></gs-text>');registerDesignSnippet('<gs-text> With Label','<gs-text>','label for="${1:text-insert-last_name}">${2:Last Name}:</label>\n'+'<gs-text id="${1:text-insert-last_name}" column="${3:last_name}"></gs-text>');designRegisterElement('gs-text','/env/app/developer_g/greyspots-'+GS.version()+'/documentation/doc-elem-text.html');window.designElementProperty_GSTEXT=function(selectedElement){addProp('Column',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('column')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'column',this.value);});addProp('Value',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('value')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'value',this.value);});addProp('Column In Querystring',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('qs')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'qs',this.value,false);});addProp('Placeholder',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('placeholder')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'placeholder',this.value);});addProp('Mini',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('mini'))+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'mini',(this.value==='true'),true);});addProp('Title',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('title')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'title',this.value);});addProp('Tabindex',true,'<gs-number class="target" value="'+encodeHTML(selectedElement.getAttribute('tabindex')||'')+'" mini></gs-number>',function(){return setOrRemoveTextAttribute(selectedElement,'tabindex',this.value);});addProp('Autocorrect',true,'<gs-checkbox class="target" value="'+(selectedElement.getAttribute('autocorrect')!=='off')+'" mini></gs-checkbox>',function(){return setOrRemoveTextAttribute(selectedElement,'autocorrect',(this.value==='false'?'off':''));});addProp('Autocapitalize',true,'<gs-checkbox class="target" value="'+(selectedElement.getAttribute('autocapitalize')!=='off')+'" mini></gs-checkbox>',function(){return setOrRemoveTextAttribute(selectedElement,'autocapitalize',(this.value==='false'?'off':''));});addProp('Autocomplete',true,'<gs-checkbox class="target" value="'+(selectedElement.getAttribute('autocomplete')!=='off')+'" mini></gs-checkbox>',function(){return setOrRemoveTextAttribute(selectedElement,'autocomplete',(this.value==='false'?'off':''));});addProp('Spellcheck',true,'<gs-checkbox class="target" value="'+(selectedElement.getAttribute('spellcheck')!=='false')+'" mini></gs-checkbox>',function(){return setOrRemoveTextAttribute(selectedElement,'spellcheck',(this.value==='false'?'false':''));});addProp('suspend-created',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('suspend-created')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'suspend-created',this.value==='true',true);});addProp('suspend-inserted',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('suspend-inserted')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'suspend-inserted',this.value==='true',true);});var strVisibilityAttribute='';if(selectedElement.hasAttribute('hidden')){strVisibilityAttribute='hidden';}
+GS.triggerEvent(element,'templatechange',{'templateName':templateName});GS.triggerEvent(element,'template_change',{'templateName':templateName});}else{element.innerHTML='';}}}});});/*
+new datasheet
+    select, insert, update,
+        delete, copy, paste and selection events (prevent default)
+    programatic select, insert, update,
+        delete, copy, paste and selection (events marked as programatic)
+
+    fixed headers/record selectors
+    ace scrolling
+    insert record
+
+    data source is not required (column list is required if no data source)
+
+    header, record, insert record templating (dot.js)
+
+    placeholder for null values
+    value to set value as null
+
+    headers, record selectors, insert record are all optional
+
+    copy settings (
+        headers always|never|whenselected
+        record selectors always|never|whenselected
+        quote char
+        quote when never|strings|always
+        record delim char
+        cell delim char
+        null value string
+    )
+    no more table element
+
+    selection is stored as ranges
+    backwards compatible attributes (transfer to new names and warn)
+
+
+element name:
+    <gs-table></gs-table>
+
+helper elements:
+    <gs-cell></gs-cell>
+
+attributes:
+    pk
+    lock
+    seq
+    cols (required if no src)
+    src
+    where
+    session-filter (where clause that can be overridden by the user)
+    ord
+    limit
+    offset
+    column
+    child-column
+    qs
+    refresh-on-querystring-values
+    refresh-on-querystring-change
+
+    reflow-at (future)
+    scroll-past-bottom
+        (allows you to scroll until only the bottom record is seen)
+    scroll-to-bottom (scrolls all the way down on initial load)
+    expand-to-content
+
+    no-hudpaginate
+    no-hudrefresh
+    no-huddelete
+    no-filter
+
+    suspend-created
+    suspend-inserted
+
+    no-header
+    no-record-selector
+    no-selection
+
+    null-string (defaults to "")
+    null-set-string (defaults to null-string attribute)
+
+    no-resize-column
+    no-resize-record
+
+    default-record-height (pixels, defaults if not present)
+    default-column-width (pixels, defaults if not present)
+    column-border-width (pixels, defaults if not present)
+    record-border-height (pixels, defaults if not present)
+
+    socket (name of a property stored on the GS object, needs to be a socket)
+
+    copy-header           always|never|selected
+    copy-selectors        always|never|selected
+    copy-quote-char       text
+    copy-escape-char      text
+    copy-quote-when       never|strings|always|delimiter-in-content
+    copy-delimiter-record text
+    copy-delimiter-cell   text
+    copy-null-cell        text
+
+templates: (all are dot.js templated before use)
+    for="hud" (snippet contains default
+                    insert/update/delete/refresh/filter/paginate elements)
+    for="header-record"
+        <gs-cell>HEADERTEXT</gs-cell>
+    for="data-record"
+        <gs-cell header="HEADERTEXT">
+            <gs-text mini column="COLUMNNAME"></gs-text>
+        </gs-cell>
+    for="insert-record"
+        <gs-cell header="HEADERTEXT" target="COLUMNNAME"></gs-cell>
+    for="insert-dialog"
+
+accessors:
+    selection (contains JS array of selection ranges)
+    data (contains TSV of all data)
+    value (value attribute)
+
+events:
+    before_select (contains TSV of selection under "records" key)
+    before_insert (contains TSV of insert under "records" key)
+    before_update (contains TSV of old/new under "records" key ("old", "new"))
+    before_delete (contains TSV of delete under "records" key)
+    before_selection (contains TSV of selection ranges under "selection" key)
+
+    after_select (contains TSV of selection under "records" key)
+    after_insert (contains TSV of insert under "records" key)
+    after_update (contains TSV of old/new under "records" key ("old", "new"))
+    after_delete (contains TSV of delete under "records" key)
+    after_selection (contains TSV of selection ranges under "selection" key)
+
+    insert_dialog_open (event.relatedTarget = insert dialog)
+    copy
+    paste
+
+methods:
+    refresh
+    render
+    scrollToIndex(cell_number, record_number)
+    clearSelection()
+    addSelectionRange(
+        fromCell_number,
+        fromRecord_number,
+        toCell_number,
+        toRecord_number,
+        bolNegate (default false)
+    )
+    getCopyString(
+        strMimeType text|html
+    )
+    paste(paste_string)
+    filter(
+        filterColumn,
+        filterType contains|starts|ends|equals|greaterthan|lessthan,
+        showIfMatch true|false,
+        filterValue
+    )
+    selectData
+    insertData
+    updateData
+    deleteData
+
+click behavior:
+    if click results in focused input/textarea
+            and start/end locations are in the same place:
+        select all control contents
+    if not no-filter and click results in focused control: filter popup tooltip
+
+mousedown-drag:
+    if shift:
+        move latest selection range's endpoint
+    if no shift:
+        clear all selections
+        start new selection
+    if command/control:
+        start new selection
+        if selection started on an already selected cell:
+            selection is a negator selection
+
+selection behavior:
+    if selection origin and end is on a record selector:
+        select entire records
+    if selection origin and end is on a header selector:
+        select entire columns
+    if selection origin starts and ends on the top-left selector:
+        select all cells
+    if selection endpoint is off-screen:
+        scroll it to middle
+
+focus behavior:
+    cell/record focus location is saved
+        (if cell is visible after a render, focus into it)
+        (removed on blur)
+    on selection with no focused control: focus hidden control
+    on mousedown inside the element (on unfocusable element):
+        focus hidden control
+    on blur after cell change: cause update
+    on focus of single cell: set selection to focused cell
+
+copy behavior:
+    never copy insert record
+    on copy event and hidden focus control is focused:
+        copy to html mime type (using applicable copy attributes)
+        copy to text mime type (using applicable copy attributes)
+    if a record is not selected: no space is made for it in the copy
+    if a column is not selected: no space is made for it in the copy
+
+key behavior:
+    arrowing around selects the cell, doesn't focus the control
+    return on selection focuses selection origin cell control
+    "delete"/"forward delete" when no control is focused causes record delete
+    on return after cell change: cause update
+
+    if arrow:
+        if shift:
+            "selection" means selection end of latest selection range
+        if no shift:
+            clear all selection ranges
+            "selection" means selection origin/end of new selection range
+
+        if all contents selected because of arrow
+            or
+        if cursor is at boundary in the direction of the arrow:
+            if there is a cell in the direction of the arrow:
+                move selection in direction of arrow
+            else:
+                if right at last cell of record: first cell of next record
+                if right at last cell of table: first cell of table
+                if left at first cell of record: last cell of previous record
+                if left at first cell of table: last cell of table
+                if up at first cell of column: previous column of bottom record
+                if down at last cell of column: next column of first record
+
+scrollbar behavior:
+    whenever the record count is changed: the scrollbar is rerendered
+    the scrollbar has a maximum range, stop growing around this height
+    if scrollbar is past max height, you'll need to translate the top
+        into (1px of scroll height will = >1px of motion)
+    after scroll: rerender location
+    phone scroll: no scrollbar, needs elastic motion
+    scroll render:
+        if scrollTop is >0     header shadow
+        if scrollLeft is >0    record selector shadow
+        if scrollBottom is >0  insert record shadow
+        if scrollRight is >0   right side shadow
+
+loader behavior:
+    when enabled: a small spinner shows at the top-right of the data area
+
+delete behavior:
+    always asks if you're sure
+    after success:
+        remove record from internal data,
+        render current location,
+        clear selection range if it's now out of bounds
+    during delete: enable element loader
+    after delete is initiated: record is no longer clickable
+
+insert behavior:
+    asks if you're sure only when inserting multiple records (using paste)
+    after success:
+        append new data to the end of internal data,
+        scroll to bottom,
+        render current location,
+        clear selection range
+    during insert: enable element loader
+
+update behavior:
+    asks if you're sure only when updating multiple records (using paste)
+    after success:
+        update whole record in internal data,
+        render current location,
+        clear selection range
+    during update: enable element loader
+    if an update is caused while another update is still resolving: add to queue
+
+select behavior:
+    first load: if scroll-to-bottom: scroll to reveal bottom record
+    reload: always returns to previous scroll/focus/textselection situation
+    during load: enable element loader
+*/
+document.addEventListener('DOMContentLoaded',function(){'use strict';var intDefaultRecordHeight=27;var intDefaultColumnWidth=75;var globalIDSeq=0;var globalStyleElement=document.createElement("style");globalStyleElement.setAttribute("id","gs-table-style-container");document.head.appendChild(globalStyleElement);function getScrollBarWidth(){var container=document.createElement("div");var detector=document.createElement("div");var ret;document.body.appendChild(container);container.appendChild(detector);container.style.width="100px";container.style.height="100px";container.style.opacity="0.2";container.style.overflow="scroll";detector.style.display="inline-block";detector.style.width="10px";detector.style.height="100%";ret=100-detector.offsetHeight;document.body.removeChild(container);return ret;}
+var intScrollbarWidth=getScrollBarWidth();function createGlobalScrollbarStyles(){var intScrollbarWidthPadded;intScrollbarWidthPadded=(intScrollbarWidth+1);if(intScrollbarWidth===0){return'gs-table > '+'        .table-root > '+'        .table-table-container > '+'        .table-data-container {\n'+'    padding-bottom: 0px;\n'+'    padding-right: 0px;\n'+'}\n'+'gs-table > '+'        .table-root > '+'        .table-table-container > '+'        .table-v-scroll-bar-container {\n'+'    width: 0px;\n'+'    padding-bottom: 0px;\n'+'    display: none;\n'+'}\n'+'gs-table > '+'        .table-root > '+'        .table-table-container > '+'        .table-h-scroll-bar-container {\n'+'    height: 0px;\n'+'    padding-right: 0px;\n'+'    display: none;\n'+'}\n'+'gs-table >\n'+'        .table-root >\n'+'        .table-table-container >\n'+'        .table-data-container >\n'+'        .table-data-viewport {\n'+'    border-right: 0 none;\n'+'    border-bottom: 0 none;\n'+'}';}
+return'gs-table > '+'        .table-root > '+'        .table-table-container > '+'        .table-data-container {\n'+'    padding-bottom: '+intScrollbarWidth+'px;\n'+'    padding-right: '+intScrollbarWidth+'px;\n'+'}\n'+'gs-table > '+'        .table-root > '+'        .table-table-container > '+'        .table-v-scroll-bar-container {\n'+'    width: '+intScrollbarWidth+'px;\n'+'    padding-bottom: '+intScrollbarWidthPadded+'px;\n'+'}\n'+'gs-table > '+'        .table-root > '+'        .table-table-container > '+'        .table-h-scroll-bar-container {\n'+'    height: '+intScrollbarWidth+'px;\n'+'    padding-right: '+intScrollbarWidthPadded+'px;\n'+'}';}
+globalStyleElement.innerHTML+=createGlobalScrollbarStyles();function cellDimensionDetector(element){var testDataCell=element.elems.testDataCell;var testHeader=element.elems.testHeader;var testInsert=element.elems.testInsert;var testRecordSelector=element.elems.testRecordSelector;element.internalDisplay.columnBorderWidth=parseInt((GS.getStyle(testDataCell,'border-right-width')||'0'),10);element.internalDisplay.recordBorderHeight=parseInt((GS.getStyle(testDataCell,'border-bottom-width')||'0'),10);element.internalDisplay.defaultColumnWidth=parseInt((GS.getStyle(testDataCell,'width')||'0'),10);element.internalDisplay.defaultRecordHeight=parseInt((GS.getStyle(testDataCell,'height')||'0'),10);element.internalDisplay.headerBorderHeight=parseInt((GS.getStyle(testHeader,'border-bottom-width')||'0'),10);element.internalDisplay.insertRecordBorderHeight=parseInt((GS.getStyle(testInsert,'border-bottom-width')||'0'),10);element.internalDisplay.recordSelectorBorderWidth=parseInt((GS.getStyle(testRecordSelector,'border-right-width')||'0'),10);}
+function visibilityDetector(element){element.internalDisplay.headerVisible=true;element.internalDisplay.recordSelectorVisible=true;element.internalDisplay.insertRecordVisible=true;if(!element.internalTemplates.header||!element.internalTemplates.header.trim()){element.internalDisplay.headerVisible=false;}
+if(element.hasAttribute('no-record-selector')){element.internalDisplay.recordSelectorVisible=false;}
+if(!element.internalTemplates.insertRecord||!element.internalTemplates.insertRecord.trim()){element.internalDisplay.insertRecordVisible=false;}}
+function offsetDetector(element){element.internalScrollOffsets.top=0;element.internalScrollOffsets.left=0;element.internalScrollOffsets.bottom=0;element.internalScrollOffsets.right=0;if(element.internalDisplay.headerVisible&&element.internalDisplay.headerStick==='top'){element.internalScrollOffsets.top+=(element.internalDisplay.headerHeight+
+element.internalDisplay.headerBorderHeight);}
+if(element.internalDisplay.recordSelectorVisible&&element.internalDisplay.selectorStick==='left'){element.internalScrollOffsets.left+=(element.internalDisplay.recordSelectorWidth+
+element.internalDisplay.recordSelectorBorderWidth);}
+if(element.internalDisplay.insertRecordVisible&&element.internalDisplay.insertRecordStick==='bottom'){element.internalScrollOffsets.bottom+=(element.internalDisplay.insertRecordHeight+
+element.internalDisplay.insertRecordBorderHeight);}}
+/*
+    ORIGINAL LICENSE FOR getPlainText():
+
+    This is free and unencumbered software released into the public domain.
+
+    Anyone is free to copy, modify, publish, use, compile, sell, or
+    distribute this software, either in source code form or as a compiled
+    binary, for any purpose, commercial or non-commercial, and by any
+    means.
+
+    In jurisdictions that recognize copyright laws, the author or authors
+    of this software dedicate any and all copyright interest in the
+    software to the public domain. We make this dedication for the benefit
+    of the public at large and to the detriment of our heirs and
+    successors. We intend this dedication to be an overt act of
+    relinquishment in perpetuity of all present and future rights to this
+    software under copyright law.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+    OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+    ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+    */
+function getPlainText(node,bolConsumable){var plainText="";function normalize(a){if(!a){return"";}
+return a.replace(/\ +/g," ").replace(/[\t]+/gm,"").replace(/[\ ]+$/gm,"").replace(/^[\ ]+/gm,"").replace(/\n+/g,"\n").replace(/\n+$/,"").replace(/^\n+/,"").replace(/\nNEWLINE\n/g,"\n\n").replace(/NEWLINE\n/g,"\n\n");}
+function removeWhiteSpace(node){var ws_i;var ws_len;var ws_node;var ws=[];function findWhite(node){var i=0;var len=node.childNodes.length;var n;while(i<len){n=node.childNodes[i];if(n.nodeType===3&&!(/[^\t\n\r\ ]/).test(n.nodeValue)){ws.push(n);}else if(n.hasChildNodes()){findWhite(n);}
+i+=1;}}
+findWhite(node);ws_i=0;ws_len=ws.length;while(ws_i<ws_len){ws_node=ws[ws_i];ws_node.parentNode.removeChild(ws_node);ws_i+=1;}}
+function sty(n,prop){var s;var bolAssumeBlock;if(n.style[prop]){return n.style[prop];}
+s=(n.currentStyle||window.getComputedStyle(n,null));if(n.tagName==="SCRIPT"){return"none";}
+if(!s[prop]){bolAssumeBlock="LI,P,TR".indexOf(n.tagName);if(bolAssumeBlock){return"block";}
+return n.style[prop];}
+if(s[prop]==="block"&&n.tagName==="TD"){return"feaux-inline";}
+return s[prop];}
+var blockTypeNodes="table-row,block,list-item";function isBlock(n){var s=sty(n,"display")||"feaux-inline";if(blockTypeNodes.indexOf(s)>-1){return true;}
+return false;}
+function recurse(n){var strCSSWhite=sty(n,"whiteSpace");var strCSSDisplay=sty(n,"display");var gap;var i;var len;var c;if(strCSSWhite.indexOf('pre')!==-1){plainText+=n.innerHTML.replace(/\t/g," ").replace(/\n/g," ");return"";}
+if(strCSSDisplay==="none"){return"";}
+gap=(isBlock(n)?"\n":" ");plainText+=gap;i=0;len=n.childNodes.length;while(i<len){c=n.childNodes[i];if(c.nodeType===3){plainText+=c.nodeValue;}
+if(c.childNodes.length){recurse(c);}
+i+=1;}
+plainText+=gap;return plainText;}
+if(bolConsumable!==true){node=node.cloneNode(true);}
+node.innerHTML=node.innerHTML.replace(/<br>/g,"\n");removeWhiteSpace(node);return normalize(recurse(node));}
+function encodeHTML(text){var encode={"&":"&#38;","<":"&#60;",">":"&#62;",'"':"&#34;","'":"&#39;","/":"&#47;"};if(text){return text.toString().replace(/&|<|>|"|'|\//g,function(letter){return encode[letter]||letter;});}
+return text;}
+function templateCellAddStyleToken(templateElement){var arrCell=xtag.query(templateElement.content,'gs-cell');var i=0;var len=arrCell.length;var strStyle;while(i<len){strStyle=(arrCell[i].getAttribute('style')||'');strStyle=strStyle.trim();if(strStyle&&strStyle[strStyle.length-1]!==';'){strStyle+=';';}
+arrCell[i].setAttribute('style','$$CSSREPLACETOKEN$$ '+strStyle);i+=1;}}
+function templateCellAddClass(templateElement,strClass){var arrCell=xtag.query(templateElement.content,'gs-cell');var i=0;var len=arrCell.length;while(i<len){arrCell[i].classList.add(strClass);i+=1;}}
+function templateCellAddRowNumber(templateElement,strOverride){var arrCell=xtag.query(templateElement.content,'gs-cell');var i=0;var len=arrCell.length;while(i<len){arrCell[i].setAttribute('data-row-number',(strOverride||'{{! row_number - 1 }}'));i+=1;}}
+function templateCellAddColumnNumber(templateElement){var arrCell=xtag.query(templateElement.content,'gs-cell');var i=0;var len=arrCell.length;while(i<len){arrCell[i].setAttribute('data-col-number',i);i+=1;}}
+function templateExtractVisibleCellRange(element,strTemplate,fromColumn,toColumn){var jsnRange;if(fromColumn===undefined||toColumn===undefined){jsnRange=element.internalDisplay.currentRange;fromColumn=jsnRange.fromColumn;toColumn=jsnRange.toColumn;}
+var templateElement=document.createElement('template');templateElement.innerHTML=strTemplate;var arrCell=xtag.query(templateElement.content,'gs-cell');var i=fromColumn;var len=toColumn;var strCells='';var arrColumnWidths=element.internalDisplay.columnWidths;while(i<len){if(arrColumnWidths[i]>0){strCells+=arrCell[i].outerHTML;}
+i+=1;}
+return strCells;}
+function templateDetermineCopyHeaderList(element,templateElement){var arrHeading=[];var arrCell=xtag.query(templateElement.content,'gs-cell');var i=0;var len=arrCell.length;var bolHeaderFound=false;var strHeading;while(i<len){strHeading=arrCell[i].getAttribute('header')||'';arrHeading.push(strHeading);if(arrCell[i].hasAttribute('header')){bolHeaderFound=true;}
+i+=1;}
+if(!bolHeaderFound&&element.getAttribute('copy-header')!=='Never'){console.warn('GS-TABLE Warning: No headers found in "copy" '+'template. Please define headers for the copy by using '+'the "header" attribute on the gs-cell elements of the '+'"copy" template. If no headers are defined: when a '+'user copies they will not get any headers. To dismiss '+'this warning and prevent users from copying the '+'header: set the "copy-header" attribute to "never."');}
+element.internalClip.headerList=arrHeading;}
+function templateDetermineCopyColumnList(element,templateElement){var arrColumn=[];var arrCell=xtag.query(templateElement.content,'gs-cell');var i=0;var len=arrCell.length;while(i<len){arrColumn.push(arrCell[i].textContent);i+=1;}
+element.internalClip.columnList=arrColumn;}
+function templateGetColumnList(templateElement){var arrColumn=[];var arrElement=xtag.query(templateElement.content,'[column]');var i=0;var len=arrElement.length;var strColumn;while(i<len){strColumn=arrElement[i].getAttribute('column');if(strColumn&&arrColumn.indexOf(strColumn)===-1){arrColumn.push(strColumn);}
+i+=1;}
+return arrColumn;}
+function getSocket(element){if(element.getAttribute('socket')){return GS[element.getAttribute('socket')];}
+return GS.envSocket;}
+function stringReplaceAll(str,find,replace){return str.replace(new RegExp(find.replace(/([\.\*\+\?\^\=\!\:\$\{\}\(\)\|\[\]\/\\])/g,'\\$1'),'g'),replace);}
+function getCurrentCellRange(element){var scrollTop;var scrollLeft;var arrColumnWidths;var arrRecordHeights;var columnBorderWidth;var recordBorderHeight;var fromColumn;var toColumn;var fromRecord;var toRecord;var i;var len;var intTemp;var intViewportWidth;var intViewportHeight;var intCellOriginLeft;var intRecordOriginTop;var bolRecordSelector;var bolInsertRecord;var bolHeaderRecord;intViewportWidth=element.elems.dataViewport.clientWidth;intViewportHeight=element.elems.dataViewport.clientHeight;arrColumnWidths=element.internalDisplay.columnWidths;arrRecordHeights=element.internalDisplay.recordHeights;columnBorderWidth=element.internalDisplay.columnBorderWidth;recordBorderHeight=element.internalDisplay.recordBorderHeight;scrollTop=element.internalScroll.top;scrollLeft=element.internalScroll.left;intViewportHeight-=(element.internalScrollOffsets.top+
+element.internalScrollOffsets.bottom);intViewportWidth-=(element.internalScrollOffsets.left+
+element.internalScrollOffsets.right);i=0;len=arrColumnWidths.length;intTemp=0;intCellOriginLeft=0;while(i<len){if(arrColumnWidths[i]>0){intTemp+=arrColumnWidths[i];intTemp+=columnBorderWidth;}
+if(fromColumn===undefined&&intTemp>scrollLeft){fromColumn=i;intCellOriginLeft=(intCellOriginLeft-scrollLeft);}
+if(toColumn===undefined&&intTemp>(scrollLeft+intViewportWidth)){toColumn=i;break;}
+if(fromColumn===undefined){intCellOriginLeft=intTemp;}
+i+=1;}
+fromColumn=Math.max(0,(fromColumn||0));toColumn=(toColumn||i)+1;intCellOriginLeft=intCellOriginLeft||0;if(toColumn>arrColumnWidths.length){toColumn=arrColumnWidths.length;}
+i=0;len=arrRecordHeights.length;intTemp=0;intRecordOriginTop=0;while(i<len){intTemp+=arrRecordHeights[i];intTemp+=recordBorderHeight;if(fromRecord===undefined&&intTemp>scrollTop){fromRecord=i;intRecordOriginTop=(intRecordOriginTop-scrollTop);}
+if(toRecord===undefined&&intTemp>(scrollTop+intViewportHeight)){toRecord=i;break;}
+if(fromRecord===undefined){intRecordOriginTop=intTemp;}
+i+=1;}
+toRecord=((toRecord||i)+1);intRecordOriginTop=(intRecordOriginTop||0);bolInsertRecord=false;if(toRecord>arrRecordHeights.length){bolInsertRecord=(element.internalDisplay.insertRecordVisible&&element.internalDisplay.insertRecordStick===null);if(element.internalDisplay.insertRecordVisible&&element.internalDisplay.insertRecordStick===null&&fromRecord===undefined){toRecord=(arrRecordHeights.length+1);fromRecord=toRecord;}else{toRecord=arrRecordHeights.length;}}
+fromRecord=Math.max(0,(fromRecord||0));bolHeaderRecord=element.internalDisplay.headerVisible;bolRecordSelector=element.internalDisplay.recordSelectorVisible;element.internalScroll.displayTop=(scrollTop+intRecordOriginTop);element.internalScroll.displayLeft=(scrollLeft+intCellOriginLeft);intCellOriginLeft=element.internalScrollOffsets.left;intRecordOriginTop=element.internalScrollOffsets.top;return{"originTop":intRecordOriginTop,"originLeft":intCellOriginLeft,"fromRecord":fromRecord,"fromColumn":fromColumn,"toRecord":toRecord,"toColumn":toColumn,"headerRecord":bolHeaderRecord,"recordSelector":bolRecordSelector,"insertRecord":bolInsertRecord};}
+function getInsertAddin(element){var jsnRet={};if(element.getAttribute('column')||element.getAttribute('qs')){jsnRet.link_column=(element.getAttribute('child-column')||element.getAttribute('column')||element.getAttribute('qs'));jsnRet.link_value=element.value;}
+return jsnRet;}
+function delimitedStringToHTML(element,valueText,fieldDelimiter,recordDelimiter,quoteChar,decodeFunction){var i=0;var len=valueText.length;var col_i;var col_len;var arrRecords=[];var arrRecord=[];var bolInQuote=false;var strCell='';var strRecord;var strHTML='';var strPreviousChar;var strChar;var strNullString;if(element.hasAttribute('null-string')){strNullString=element.getAttribute('null-string')||'';}else{strNullString=undefined;}
+if(valueText[0]===recordDelimiter){i+=1;}
+if(valueText[len-1]!==recordDelimiter){valueText+=recordDelimiter;len=valueText.length;}
+while(i<len){strChar=valueText[i];if(strChar===quoteChar&&bolInQuote===false&&(strPreviousChar===fieldDelimiter||strPreviousChar===recordDelimiter||strPreviousChar===undefined)){bolInQuote=true;}else if(strChar===quoteChar&&bolInQuote===true){bolInQuote=false;}else if(strChar===fieldDelimiter&&bolInQuote===false){arrRecord.push(decodeFunction(strCell,strNullString));strCell='';}else if(strChar===recordDelimiter&&bolInQuote===false){arrRecord.push(decodeFunction(strCell,strNullString));strCell='';arrRecords.push(arrRecord);arrRecord=[];}else{strCell+=strChar;}
+strPreviousChar=strChar;i+=1;}
+i=0;len=arrRecords.length;while(i<len){strRecord='';col_i=0;col_len=arrRecords[i].length;while(col_i<col_len){strRecord+=('<td>'+
+encodeHTML(arrRecords[i][col_i])+'</td>');col_i+=1;}
+strHTML+='<tr>'+strRecord+'</tr>';i+=1;}
+return'<table>'+strHTML+'</table>';}
+function getSelectionCopy(element){var jsnOriginal;var jsnCopy;var jsnRange;var i;var len;jsnOriginal=element.internalSelection;jsnCopy={"ranges":[],"insertRecord":jsnOriginal.insertRecord};i=0;len=jsnOriginal.ranges.length;while(i<len){jsnRange=jsnOriginal.ranges[i];jsnCopy.ranges.push({"start":{"row":jsnRange.start.row,"column":jsnRange.start.column},"end":{"row":jsnRange.end.row,"column":jsnRange.end.column}});i+=1;}
+return jsnCopy;}
+function getCell(element,strColumn,intRow,bolDecode,strNullStringOverride){var strRecord;var rec_i;var rec_len;var strChar;var strCell;var strNullString;var intCurrentColumn;var intTargetColumn;intTargetColumn=(element.internalData.columnNames.indexOf(strColumn));strRecord=element.internalData.records[intRow];intCurrentColumn=0;strCell='';rec_i=0;rec_len=strRecord.length;while(rec_i<rec_len){strChar=strRecord[rec_i];if(strChar!=='\t'){strCell+=strChar;}
+if(strChar==='\t'||rec_i===(rec_len-1)){intCurrentColumn+=1;if(intCurrentColumn===(intTargetColumn+1)){break;}
+strCell='';}
+rec_i+=1;}
+if(bolDecode!==false){if(strNullStringOverride!==undefined){strNullString=strNullStringOverride;}else if(element.hasAttribute('null-string')){strNullString=element.getAttribute('null-string')||'';}else{strNullString=undefined;}
+return GS.decodeFromTabDelimited(strCell,strNullString);}
+return strCell;}
+function getConnectedSelectedColumns(element,intStartColumn){var arrCurrentColumns;var arrSelection;var i;arrSelection=(element.internalSelection.columns);arrCurrentColumns=[];i=intStartColumn;while(i<9999){if(arrSelection.indexOf(i)>-1){arrCurrentColumns.push(i);}else{break;}
+i+=1;}
+i=(intStartColumn-1);while(i>=0){if(arrSelection.indexOf(i)>-1){arrCurrentColumns.push(i);}else{break;}
+i-=1;}
+arrCurrentColumns.sort();return arrCurrentColumns;}
+function handleHeaderTemplateTokens(element,strTemplate,fromColumn,toColumn){var col_i;var col_len;var filter_i;var filter_len;var columnIndex;var strDataColumn;var strTitle;var strClass;var arrColumnWidths;var arrColumnOrders;var arrColumnFilters;arrColumnOrders=element.internalData.columnOrders;arrColumnFilters=element.internalData.columnFilters;arrColumnWidths=element.internalDisplay.columnWidths;col_i=fromColumn;col_len=toColumn;while(col_i<col_len){if(arrColumnWidths[col_i]>0){strDataColumn=(element.internalDisplay.dataColumnName[col_i]);columnIndex=(element.internalData.columnNames.indexOf(strDataColumn));strClass='';if(arrColumnOrders[columnIndex]!=='neutral'){strClass+=(' sort-'+
+arrColumnOrders[columnIndex]);}
+if(arrColumnFilters[columnIndex]&&arrColumnFilters[columnIndex].length>0){strClass+=' filtered';}
+strTemplate=strTemplate.replace('$$HDRBTNCLASS_'+strDataColumn+'$$',strClass);strTitle='';if(arrColumnFilters[columnIndex]){filter_i=0;filter_len=arrColumnFilters[columnIndex].length;while(filter_i<filter_len){strTitle+=(strTitle?' ':'');strTitle+=(arrColumnFilters[columnIndex][filter_i].name);filter_i+=1;}}
+if(arrColumnOrders[columnIndex]==='desc'){strTitle+=(strTitle?' ':'');strTitle+='sorted descending';}else if(arrColumnOrders[columnIndex]==='asc'){strTitle+=(strTitle?' ':'');strTitle+='sorted ascending';}
+strTemplate=strTemplate.replace('$$HDR_TITLE_'+strDataColumn+'$$',encodeHTML(strTitle));}
+col_i+=1;}
+return strTemplate;}
+function directionStringBreakdown(strDirectionString){var bolTop;var bolLeft;var bolBottom;var bolRight;strDirectionString=strDirectionString.toLowerCase();bolTop=(strDirectionString.indexOf('top')!==-1);bolLeft=(strDirectionString.indexOf('left')!==-1);bolBottom=(strDirectionString.indexOf('bottom')!==-1);bolRight=(strDirectionString.indexOf('right')!==-1);if(bolTop&&bolBottom){console.warn('GS-TABLE Warning: Contradictory parameter sent'+' to directionStringBreakdown.'+' "Down" direction will be cancelled.'+' Parameter Text: "'+strDirectionString+'"');bolBottom=false;}
+if(bolLeft&&bolRight){console.warn('GS-TABLE Warning: Contradictory parameter sent'+' to directionStringBreakdown.'+' the left and the right at the same time.'+' "Right" direction will be cancelled.'+' Parameter Text: "'+strDirectionString+'"');bolRight=false;}
+strDirectionString='';if(bolTop){strDirectionString+='top';}
+if(bolLeft){strDirectionString+='left';}
+if(bolBottom){strDirectionString+='bottom';}
+if(bolRight){strDirectionString+='right';}
+return{"bolTop":bolTop,"bolLeft":bolLeft,"bolBottom":bolBottom,"bolRight":bolRight,"resolvedString":strDirectionString};}
+function findHudElement(element,strClass){var hudElement;hudElement=xtag.query(element.elems.bottomHudContainer,'.'+strClass)[0];if(!hudElement){hudElement=xtag.query(element.elems.topHudContainer,'.'+strClass)[0];}
+return hudElement;}
+function getSelectedDataColumns(element){var arrSelectedColumns;var arrDataColumns;var i;var len;var index;arrSelectedColumns=(element.internalSelection.columns);arrDataColumns=[];i=0;len=arrSelectedColumns.length;while(i<len){index=arrSelectedColumns[i];if(element.internalDisplay.dataColumnName[index]){arrDataColumns.push(element.internalData.columnNames.indexOf(element.internalDisplay.dataColumnName[index]));}
+i+=1;}
+return arrDataColumns;}
+function focusHiddenControl(element){element.elems.hiddenFocusControl.focus();GS.triggerEvent(element.elems.hiddenFocusControl,'focus');}
+function getCellFromMouseEvent(element,event){var jsnMousePos;var jsnElementPos;var intMouseX;var intMouseY;var row;var column;var jsnRange;var arrColumnWidths;var arrRecordHeights;var i;var len;var intLeft;var intTop;var intColBorderWidth;var intRowBorderHeight;var intRowSelectorWidth;var intHeaderHeight;var bolHeader;var bolInsertRecord;var bolRecordSelector;jsnRange=element.internalDisplay.currentRange;bolHeader=element.internalDisplay.headerVisible;bolInsertRecord=(element.internalDisplay.insertRecordVisible&&jsnRange.insertRecord);bolRecordSelector=element.internalDisplay.recordSelectorVisible;arrColumnWidths=element.internalDisplay.columnWidths;arrRecordHeights=element.internalDisplay.recordHeights;intColBorderWidth=element.internalDisplay.columnBorderWidth;intRowBorderHeight=element.internalDisplay.recordBorderHeight;intRowSelectorWidth=(bolRecordSelector?(element.internalDisplay.recordSelectorWidth+
+element.internalDisplay.recordSelectorBorderWidth):0);intHeaderHeight=(bolHeader?(element.internalDisplay.headerHeight+
+element.internalDisplay.headerBorderHeight):0);jsnMousePos=GS.mousePosition(event);jsnElementPos=GS.getElementOffset(element.elems.dataViewport);intMouseX=(jsnMousePos.left-jsnElementPos.left);intMouseY=(jsnMousePos.top-jsnElementPos.top);if(bolRecordSelector&&intMouseX<=intRowSelectorWidth){column='selector';}else{intLeft=intRowSelectorWidth;i=jsnRange.fromColumn;len=jsnRange.toColumn;while(i<len){if(intMouseX>=intLeft){column=i;}else{break;}
+intLeft+=arrColumnWidths[i];intLeft+=intColBorderWidth;i+=1;}}
+if(bolHeader&&intMouseY<=intHeaderHeight){row='header';}else{intTop=intHeaderHeight;i=jsnRange.fromRecord;len=jsnRange.toRecord;while(i<len){if(intMouseY>=intTop){row=i;}else{break;}
+intTop+=arrRecordHeights[i];intTop+=intRowBorderHeight;i+=1;}
+if(bolInsertRecord&&intMouseY>=intTop){row='insert';}}
+return{"row":row,"column":column};}
+function resolveElementAttributes(element){var arrParts;if(element.getAttribute('src')){arrParts=GS.templateWithQuerystring(element.getAttribute('src')).split('.');element.setAttribute('schema',arrParts[0]);element.setAttribute('object',arrParts[1]);element.setAttribute('pk',(element.getAttribute('pk')||'id'));element.setAttribute('lock',(element.getAttribute('lock')||'change_stamp'));}
+element.setAttribute('null-string',(element.getAttribute('null-string')||''));}
+function prepareElement(element){var rootElement;var i;if(!element.getAttribute('id')){globalIDSeq+=1;i=0;while(i<500&&document.getElementById('table-dynamic-id-'+globalIDSeq)){globalIDSeq+=1;i+=1;}
+element.setAttribute('id','table-dynamic-id-'+globalIDSeq);console.warn('GS-TABLE Warning: All gs-table elements must have'+' an ID. Adding dynamic ID:'+' "table-dynamic-id-'+globalIDSeq+'". Do not use'+' this ID for anything. Do not use it for HTML, CSS or'+' JS or anything else as it can change between page'+' loads.');}
+rootElement=document.createElement('div');rootElement.classList.add('table-root');element.appendChild(rootElement);rootElement.innerHTML='<div class="table-hud-container hud-top"></div>'+'<div class="table-table-container">'+'    <div class="table-data-container">'+'        <div class="table-data-viewport"></div>'+'    </div>'+'    <div class="table-v-scroll-bar-container">'+'        <div class="table-v-scroll-bar">'+'            <div class="table-scroll-causer"></div>'+'        </div>'+'    </div>'+'    <div class="table-h-scroll-bar-container">'+'        <div class="table-h-scroll-bar">'+'            <div class="table-scroll-causer"></div>'+'        </div>'+'    </div>'+'</div>'+'<textarea class="hidden-focus-control"'+'    value="text makes this textarea Firefox worthy">'+'</textarea>'+'<div class="table-loader-container"></div>'+'<div class="table-cell-test-container">'+'    <gs-cell class="table-cell"></gs-cell>'+'    <gs-cell class="table-header"></gs-cell>'+'    <gs-cell class="table-insert"></gs-cell>'+'    <gs-cell class="table-record-selector"></gs-cell>'+'</div>'+'<div class="table-hud-container hud-bottom"></div>'+'<style class="cell-position" style="display:none;"></style>';element.elems={};element.elems.root=rootElement;element.elems.topHudContainer=element.elems.root.children[0];element.elems.tableViewport=element.elems.root.children[1];element.elems.hiddenFocusControl=element.elems.root.children[2];element.elems.loaderContainer=element.elems.root.children[3];element.elems.cellTestContainer=element.elems.root.children[4];element.elems.bottomHudContainer=element.elems.root.children[5];element.elems.cellPositionStyle=element.elems.root.children[6];element.elems.dataContainer=element.elems.tableViewport.children[0];element.elems.yScrollContainer=element.elems.tableViewport.children[1];element.elems.xScrollContainer=element.elems.tableViewport.children[2];element.elems.dataViewport=element.elems.dataContainer.children[0];element.elems.yScrollBar=element.elems.yScrollContainer.children[0];element.elems.xScrollBar=element.elems.xScrollContainer.children[0];element.elems.yScrollBarCauser=element.elems.yScrollBar.children[0];element.elems.xScrollBarCauser=element.elems.xScrollBar.children[0];element.elems.testDataCell=(element.elems.cellTestContainer.children[0]);element.elems.testHeader=(element.elems.cellTestContainer.children[1]);element.elems.testInsert=(element.elems.cellTestContainer.children[2]);element.elems.testRecordSelector=(element.elems.cellTestContainer.children[3]);element.elems.handleColumn=document.createElement('div');element.elems.handleColumn.classList.add('resize-column-handle');element.elems.handleRecord=document.createElement('div');element.elems.handleRecord.classList.add('resize-record-handle');element.elems.handleReorder=document.createElement('div');element.elems.handleReorder.classList.add('reorder-column-handle');element.elems.pixel=document.createElement('div');element.elems.pixel.classList.add('pixel-element');element.elems.root.appendChild(element.elems.pixel);element.internalData={"records":[],"columnFilterStatuses":[],"columnFilters":[],"columnListFilters":[],"columnOrders":[],"columnNames":[],"columnTypes":[],"insertRecord":{},"insertRecordRetainedColumns":[],"bolFirstLoadFinished":false};element.internalScrollOffsets={"top":0,"bottom":0,"left":0,"right":0};element.internalEvents={};element.internalEventCancelled={"scrollbarY":false,"scrollbarX":false};element.internalScroll={"top":0,"left":0,"maxTop":0,"maxLeft":0,"displayTop":0,"displayLeft":0,"prevTop":0,"prevLeft":0};element.internalTimerIDs={"scrollIntervalID":null,"visibilityIntervalID":null};element.internalTemplates={"topHUD":"","bottomHUD":"","header":"","originalRecord":"","record":{},"insertRecord":"","insertDialog":""};element.internalDisplay={"columnPlainTextNames":[],"dataColumnName":[],"columnWidths":[],"minColumnWidths":[],"maxColumnWidth":999,"recordHeights":[],"maxRecordHeight":999,"columnHandles":[],"recordHandles":[],"currentRange":{},"prevRange":{},"headerStick":"top","headerVisible":false,"headerHeight":undefined,"headerBorderHeight":0,"selectorStick":"left","recordSelectorVisible":false,"recordSelectorWidth":0,"recordSelectorBorderWidth":0,"insertRecordStick":null,"insertRecordVisible":false,"insertRecordHeight":undefined,"insertRecordBorderHeight":0,"fullRenderRequired":true,"defaultColumnWidths":[],"defaultColumnWidth":0,"defaultRecordHeight":0,"defaultRecordSelectorWidth":27,"defaultHeaderHeight":27,"defaultInsertRecordHeight":27,"focus":{"column":null,"row":null,"nodeName":null,"columnAttribute":null,"latest":null,"selectionRange":{}}};element.internalDisplay.recordSelectorWidth=(element.internalDisplay.defaultRecordSelectorWidth);element.internalSelection={"ranges":[],"insertRecord":false,"originRecord":null,"resolvedSelection":[],"columns":[],"rows":[],"currentlySelecting":false};element.internalClip={"columnList":[],"headerList":[]};element.internalWorker={"worker":"","ready":false};element.internalLoaders={"loaderIDs":[],"loaderElements":[]};element.internalResize={"currentlyResizing":false,"showThrottleID":null,"resizeStarted":false,"cellOriginX":0,"cellOriginY":0,"resizeColumn":false,"resizeRecord":false,"resizeColumnHandleIndex":0,"resizeRecordHandleIndex":0,"resizeColumnIndex":null,"resizeRecordIndex":null,"resizingRecordSelectors":false,"resizingHeader":false,"resizingInsert":false,"scrollOriginTop":null,"scrollOriginLeft":null,"lastX":0,"lastY":0,"lastWidth":0,"lastHeight":0};element.internalReorder={"currentlyReordering":false,"reorderStarted":false,"currentColumns":[],"dropLocation":0,"scrollIntervalID":null,"scrollDirection":null,"scrolling":false,"originColumn":null};element.internalPollingCache={"elementWidth":null,"elementHeight":null,"elementVisibility":null,"fontSize":null};cellDimensionDetector(element);}
+function siphonElement(element){var topHudTemplate;var bottomHudTemplate;var headerRecordTemplate;var dataRecordTemplate;var copyTemplate;var insertRecordTemplate;var insertDialogTemplate;var strHTML;var arrColumnPlainTextNames;var arrColumnDataNames;var arrColumnElements;var columnElement;var intColumnWidth;var buttonElement;var i;var len;topHudTemplate=xtag.queryChildren(element,'[for="top-hud"]')[0];bottomHudTemplate=xtag.queryChildren(element,'[for="bottom-hud"]')[0];headerRecordTemplate=xtag.queryChildren(element,'[for="header-record"]')[0];dataRecordTemplate=xtag.queryChildren(element,'[for="data-record"]')[0];copyTemplate=xtag.queryChildren(element,'[for="copy"]')[0];insertRecordTemplate=xtag.queryChildren(element,'[for="insert-record"]')[0];insertDialogTemplate=xtag.queryChildren(element,'[for="insert-dialog"]')[0];if(!dataRecordTemplate){throw'GS-TABLE Error: no "data-record" template found. '+'The "data-record" must be a immediate child in '+'order to be found.';}
+if(!copyTemplate){console.warn('GS-TABLE Warning: no "copy" template found. '+'The "copy" template enables copying a selection '+'from the gs-table. The "copy" template must be a '+'immediate child in order to be found.');}
+if(headerRecordTemplate||dataRecordTemplate||insertRecordTemplate){if(headerRecordTemplate){arrColumnElements=xtag.query(headerRecordTemplate.content,'gs-cell');}else if(dataRecordTemplate){arrColumnElements=xtag.query(dataRecordTemplate.content,'gs-cell');}else if(insertRecordTemplate){arrColumnElements=xtag.query(insertRecordTemplate.content,'gs-cell');}
+i=0;len=arrColumnElements.length;intColumnWidth=(parseInt(element.getAttribute('default-column-width'),10)||intDefaultColumnWidth);while(i<len){element.internalDisplay.columnWidths.push(parseInt(arrColumnElements[i].style.width,10)||intColumnWidth);element.internalDisplay.defaultColumnWidths.push(parseInt(arrColumnElements[i].style.width,10)||intColumnWidth);if(arrColumnElements[i].style.width){arrColumnElements[i].style.width='';}
+i+=1;}}
+if(headerRecordTemplate){arrColumnElements=xtag.query(headerRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){if(arrColumnElements[i].style.height){element.internalDisplay.headerHeight=(parseInt(arrColumnElements[i].style.height,10));}
+i+=1;}
+if(element.internalDisplay.headerHeight===undefined){element.internalDisplay.headerHeight=(element.internalDisplay.defaultHeaderHeight);}}
+if(insertRecordTemplate){arrColumnElements=xtag.query(insertRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){if(arrColumnElements[i].style.height){element.internalDisplay.insertRecordHeight=(parseInt(arrColumnElements[i].style.height,10));}
+i+=1;}
+if(element.internalDisplay.insertRecordHeight===undefined){element.internalDisplay.insertRecordHeight=(element.internalDisplay.defaultInsertRecordHeight);}}
+arrColumnPlainTextNames=[];if(copyTemplate&&(arrColumnPlainTextNames.length===0||arrColumnPlainTextNames.indexOf(null)!==-1)){arrColumnElements=xtag.query(copyTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){if(!arrColumnPlainTextNames[i]){arrColumnPlainTextNames[i]=(arrColumnElements[i].getAttribute('header'));}
+i+=1;}}
+if(dataRecordTemplate&&(arrColumnPlainTextNames.length===0||arrColumnPlainTextNames.indexOf(null)!==-1)){arrColumnElements=xtag.query(dataRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){if(!arrColumnPlainTextNames[i]){arrColumnPlainTextNames[i]=(arrColumnElements[i].getAttribute('header'));}
+i+=1;}}
+if(insertRecordTemplate&&(arrColumnPlainTextNames.length===0||arrColumnPlainTextNames.indexOf(null)!==-1)){arrColumnElements=xtag.query(insertRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){if(!arrColumnPlainTextNames[i]){arrColumnPlainTextNames[i]=(arrColumnElements[i].getAttribute('header'));}
+i+=1;}}
+if(headerRecordTemplate&&(arrColumnPlainTextNames.length===0||arrColumnPlainTextNames.indexOf(null)!==-1)){arrColumnElements=xtag.query(headerRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){if(!arrColumnPlainTextNames[i]){arrColumnPlainTextNames[i]=(arrColumnElements[i].textContent.trim()||null);}
+i+=1;}}
+element.internalDisplay.columnPlainTextNames=arrColumnPlainTextNames;arrColumnDataNames=[];if(insertRecordTemplate&&(arrColumnDataNames.length===0||arrColumnDataNames.indexOf(null)!==-1)){arrColumnElements=xtag.query(insertRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){if(!arrColumnDataNames[i]){columnElement=xtag.query(arrColumnElements[i],'[column]')[0];if(columnElement){arrColumnDataNames[i]=(columnElement.getAttribute('column'));}else{arrColumnDataNames[i]=null;}}
+i+=1;}}
+if(dataRecordTemplate&&(arrColumnDataNames.length===0||arrColumnDataNames.indexOf(null)!==-1)){arrColumnElements=xtag.query(dataRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){if(!arrColumnDataNames[i]){columnElement=xtag.query(arrColumnElements[i],'[column]')[0];if(columnElement){arrColumnDataNames[i]=(columnElement.getAttribute('column'));}else{arrColumnDataNames[i]=null;}}
+i+=1;}}
+element.internalDisplay.dataColumnName=arrColumnDataNames;if(topHudTemplate){element.internalTemplates.topHUD=topHudTemplate.innerHTML;}
+if(bottomHudTemplate){element.internalTemplates.bottomHUD=bottomHudTemplate.innerHTML;}
+if(headerRecordTemplate){buttonElement=document.createElement('div');arrColumnElements=xtag.query(headerRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){if(arrColumnDataNames[i]){buttonElement.setAttribute('class','header-button '+'$$HDRBTNCLASS_'+arrColumnDataNames[i]+'$$');arrColumnElements[i].classList.add('right-button');arrColumnElements[i].appendChild(buttonElement.cloneNode(true));}
+i+=1;}}
+if(headerRecordTemplate){arrColumnElements=xtag.query(headerRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){if(arrColumnDataNames[i]){arrColumnElements[i].setAttribute('title','$$HDR_TITLE_'+arrColumnDataNames[i]+'$$');}
+i+=1;}}
+if(headerRecordTemplate){arrColumnElements=xtag.query(headerRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){intColumnWidth=(GS.getTextWidth(element.elems.testHeader,arrColumnElements[i].textContent,true)+
+3);if(arrColumnDataNames[i]){intColumnWidth+=(GS.emToPx(element.elems.testHeader,1.25));}
+element.internalDisplay.minColumnWidths.push(intColumnWidth);if(intColumnWidth>element.internalDisplay.columnWidths[i]){element.internalDisplay.columnWidths[i]=(intColumnWidth);}
+i+=1;}}
+if(headerRecordTemplate){templateCellAddStyleToken(headerRecordTemplate);templateCellAddClass(headerRecordTemplate,'table-header');templateCellAddColumnNumber(headerRecordTemplate);element.internalTemplates.header=(headerRecordTemplate.innerHTML.trim());element.removeChild(headerRecordTemplate);}
+if(dataRecordTemplate){templateCellAddStyleToken(dataRecordTemplate);templateCellAddClass(dataRecordTemplate,'table-cell');templateCellAddColumnNumber(dataRecordTemplate);templateCellAddRowNumber(dataRecordTemplate);strHTML=GS.templateColumnToValue(dataRecordTemplate.innerHTML.trim());element.internalTemplates.originalRecord=strHTML;element.internalTemplates.record=(GS.templateHideSubTemplates(strHTML,false));element.removeChild(dataRecordTemplate);}
+if(copyTemplate){templateDetermineCopyColumnList(element,copyTemplate);templateDetermineCopyHeaderList(element,copyTemplate);element.removeChild(copyTemplate);}
+if(insertRecordTemplate){templateCellAddStyleToken(insertRecordTemplate);templateCellAddClass(insertRecordTemplate,'table-insert');templateCellAddColumnNumber(insertRecordTemplate);templateCellAddRowNumber(insertRecordTemplate,'insert');element.internalTemplates.insertRecord=(insertRecordTemplate.innerHTML.trim());element.removeChild(insertRecordTemplate);}
+if(insertDialogTemplate){element.internalTemplates.insertDialog=(insertDialogTemplate.innerHTML.trim());element.removeChild(insertDialogTemplate);}}
+function createWebWorker(element){dataSELECT(element);}
+function getCopyParameters(element){var headerMode;var selectorMode;var quoteChar;var escapeChar;var quoteMode;var recordDelimiter;var cellDelimiter;var nullString;if(element.getAttribute('copy-header')){headerMode=element.getAttribute('copy-header')||'';}else{headerMode='selected';}
+if(element.getAttribute('copy-selectors')){selectorMode=element.getAttribute('copy-selectors')||'';}else{selectorMode='selected';}
+if(element.getAttribute('copy-quote-char')){quoteChar=element.getAttribute('copy-quote-char')||'';}else{quoteChar='"';}
+if(element.getAttribute('copy-escape-char')){escapeChar=element.getAttribute('copy-escape-char')||'';}else{escapeChar=quoteChar;}
+if(element.getAttribute('copy-quote-when')){quoteMode=element.getAttribute('copy-quote-when')||'';}else{quoteMode='delimiter-in-content';}
+if(element.getAttribute('copy-delimiter-record')){recordDelimiter=element.getAttribute('copy-delimiter-record')||'';}else{recordDelimiter='\n';}
+if(element.getAttribute('copy-delimiter-cell')){cellDelimiter=element.getAttribute('copy-delimiter-cell')||'';}else{cellDelimiter='\t';}
+if(element.getAttribute('copy-null-cell')){nullString=element.getAttribute('copy-null-cell')||'';}else{nullString='';}
+return{"headerMode":headerMode,"selectorMode":selectorMode,"quoteChar":quoteChar,"escapeChar":escapeChar,"quoteMode":quoteMode,"recordDelimiter":recordDelimiter,"cellDelimiter":cellDelimiter,"nullString":nullString};}
+function validateCopyParameters(element){var jsnCopyParameters;jsnCopyParameters=getCopyParameters(element);if(!(/^(always|never|selected)$/gi).test(jsnCopyParameters.headerMode)){throw'GS-TABLE Error: Copy parameter "copy-header" invalid, '+'valid values are "always", "never" or "selected" ';}
+if(!(/^(always|never|selected)$/gi).test(jsnCopyParameters.selectorMode)){throw'GS-TABLE Error: Copy parameter "copy-selectors" invalid, '+'valid values are "always", "never" or "selected" ';}
+if(!(/^(never|strings|always|delimiter-in-content)$/gi).test(jsnCopyParameters.quoteMode)){throw'GS-TABLE Error: Copy parameter "copy-quote-when" invalid, '+'valid values are "never", "strings", "always" or '+'"delimiter-in-content".';}
+if(jsnCopyParameters.recordDelimiter.length===0){throw'GS-TABLE Error: Copy parameter "copy-delimiter-record" '+'cannot be empty.';}
+if(jsnCopyParameters.cellDelimiter.length===0){throw'GS-TABLE Error: Copy parameter "copy-delimiter-cell" '+'cannot be empty.';}
+return jsnCopyParameters;}
+function handleClipboardData(event,strCopyString,strType){var clipboardData=event.clipboardData||window.clipboardData;var strMime;if(!clipboardData){return;}
+if(!clipboardData.setData){return;}
+if(strType==='text'){if(window.clipboardData&&window.clipboardData.getData){strMime='Text';}else if(event.clipboardData&&event.clipboardData.getData){strMime='text/plain';}}else if(strType==='html'){if(window.clipboardData&&window.clipboardData.getData){strMime='';}else if(event.clipboardData&&event.clipboardData.getData){strMime='text/html';}}else{throw'handleClipboardData Error: Type "'+strType+'" not '+'recognized, recognized types are "text" and "html".';}
+if(strMime){if(strCopyString&&strMime){return clipboardData.setData(strMime,strCopyString)!==false;}else{return clipboardData.getData(strMime);}}}
+function getCopyStrings(element){var strTextCopyString;var strHTMLCopyString;var strHTMLRecordCopyString;var row_i;var row_len;var col_i;var col_len;var cell;var row;var char;var record_i;var record_len;var cell_i;var jsnCopyParameters;var quoteChar;var escapeChar;var quoteMode;var selectorMode;var headerMode;var recordDelimiter;var cellDelimiter;var nullString;var arrColumns;var arrRows;var bolHeader;var bolSelector;var arrHeaders;var arrColumnTemplates;var arrColumnNames;var arrSelection;var intRow;var intCol;var intSel;var handleCell;var jsnQS;var jsnRow;var strRow;var strHeader;var arrSelectedStates=['B','D','F','H','J','L'];var cell_len;var delim;strTextCopyString='';strHTMLCopyString='<'+'style>'+'br { mso-data-placement:same-cell; } '+'th, td { white-space: pre-wrap; }'+'<'+'/style>'+'<'+'table border="0" cellpadding="0" cellspacing="0">';strHTMLRecordCopyString='';arrColumnTemplates=element.internalClip.columnList.slice(0);col_i=0;col_len=arrColumnTemplates.length;while(col_i<col_len){arrColumnTemplates[col_i]='{{ var qs = jo.qs'+', row = jo.row'+', i = jo.i'+', len = jo.len; }}'+
+arrColumnTemplates[col_i];arrColumnTemplates[col_i]=doT.template(arrColumnTemplates[col_i]);col_i+=1;}
+jsnCopyParameters=getCopyParameters(element);quoteChar=jsnCopyParameters.quoteChar;escapeChar=jsnCopyParameters.escapeChar;quoteMode=jsnCopyParameters.quoteMode;selectorMode=jsnCopyParameters.selectorMode;headerMode=jsnCopyParameters.headerMode;recordDelimiter=jsnCopyParameters.recordDelimiter;cellDelimiter=jsnCopyParameters.cellDelimiter;nullString=jsnCopyParameters.nullString;jsnQS=GS.qryToJSON(GS.getQueryString());arrColumnNames=element.internalData.columnNames;arrSelection=element.internalSelection.resolvedSelection.slice(0);arrColumns=element.internalSelection.columns.slice(0);arrRows=element.internalSelection.rows.slice(0);arrHeaders=element.internalClip.headerList.slice(0);if((headerMode==='selected'&&arrRows[0]==='header')||(headerMode==='always')){bolHeader=true;}
+if(arrRows[0]==='header'){arrRows.shift();}
+if(element.internalDisplay.headerVisible){strHeader=arrSelection[0];}
+if((selectorMode==='selected'&&arrColumns[0]==='selector')||(selectorMode==='always')){bolSelector=true;}
+if(arrColumns[0]==='selector'){arrColumns.shift();}
+if(arrRows[arrRows.length-1]==='insert'){arrRows.pop();}
+col_i=0;col_len=arrHeaders.length;while(col_i<col_len){arrHeaders[col_i]=doT.template('{{ var qs = jo.qs; }}'+
+arrHeaders[col_i]);col_i+=1;}
+if(quoteMode==='never'){handleCell=function(cellTemplate,i,len,jsnRow){var strCell=cellTemplate({'qs':jsnQS,'row':jsnRow,'i':i,'len':len});strHTMLRecordCopyString+='<'+'td rowspan="1" colspan="1">'+
+strCell+'</td>';strTextCopyString+=strCell;};}else if(quoteMode==='strings'){handleCell=function(cellTemplate,i,len,jsnRow){var strCell=cellTemplate({'qs':jsnQS,'row':jsnRow,'i':i,'len':len});strHTMLRecordCopyString+='<'+'td rowspan="1" colspan="1">'+
+strCell+'</td>';if(escapeChar!==quoteChar){strCell=stringReplaceAll(strCell,escapeChar,escapeChar+escapeChar);}
+strCell=stringReplaceAll(strCell,quoteChar,escapeChar+quoteChar);if(isNaN(strCell)){strCell=quoteChar+strCell+quoteChar;}
+strTextCopyString+=strCell;};}else if(quoteMode==='always'){handleCell=function(cellTemplate,i,len,jsnRow){var strCell=cellTemplate({'qs':jsnQS,'row':jsnRow,'i':i,'len':len});strHTMLRecordCopyString+='<'+'td rowspan="1" colspan="1">'+
+strCell+'</td>';if(escapeChar!==quoteChar){strCell=stringReplaceAll(strCell,escapeChar,escapeChar+escapeChar);}
+strCell=stringReplaceAll(strCell,quoteChar,escapeChar+quoteChar);strCell=quoteChar+strCell+quoteChar;strTextCopyString+=strCell;};}else if(quoteMode==='delimiter-in-content'){handleCell=function(cellTemplate,i,len,jsnRow){var strCell=cellTemplate({'qs':jsnQS,'row':jsnRow,'i':i,'len':len});strHTMLRecordCopyString+='<'+'td rowspan="1" colspan="1">'+
+strCell+'</td>';if(escapeChar!==quoteChar){strCell=stringReplaceAll(strCell,escapeChar,escapeChar+escapeChar);}
+if(strCell.indexOf(quoteChar)!==-1){strCell=stringReplaceAll(strCell,quoteChar,escapeChar+quoteChar);strCell=quoteChar+strCell+quoteChar;}
+strTextCopyString+=strCell;};}
+if(bolHeader&&headerMode!=='never'){if(bolSelector&&selectorMode!=='never'){if(quoteMode==='always'){strTextCopyString+=quoteChar+quoteChar;}
+strTextCopyString+=cellDelimiter;strHTMLRecordCopyString+='<td rowspan="1" colspan="1"></td>';}
+col_i=0;col_len=arrColumns.length;while(col_i<col_len){if(col_i>0){strTextCopyString+=cellDelimiter;}
+intSel=arrColumns[col_i];intCol=intSel;if(element.internalDisplay.recordSelectorVisible){intSel=(arrColumns[col_i]+1);intCol=(intSel-1);}
+if(headerMode==='always'||arrSelectedStates.indexOf(strHeader[intSel])>-1){handleCell(arrHeaders[intCol],0,0);}else{strHTMLRecordCopyString+=('<'+'td rowspan="1" colspan="1"></td>');if(quoteMode==='always'){strTextCopyString+=quoteChar+quoteChar;}}
+col_i+=1;}
+strHTMLCopyString+='<tr>'+strHTMLRecordCopyString+'</tr>';strHTMLRecordCopyString='';if(arrRows.length>0){strTextCopyString+=recordDelimiter;}}
+col_len=arrColumns.length;row_i=0;row_len=arrRows.length;while(row_i<row_len){intSel=arrRows[row_i];intRow=intSel;if(element.internalDisplay.headerVisible){intSel=(arrRows[row_i]+1);intRow=(intSel-1);}
+row=arrSelection[intSel];jsnRow={};strRow=element.internalData.records[intRow]+'\t';cell_i=0;cell_len=9999;while(cell_i<cell_len){delim=strRow.indexOf('\t');cell=strRow.substring(0,delim);strRow=strRow.substring(delim+1);if(cell!==''||strRow!==''){jsnRow[arrColumnNames[cell_i]]=(GS.decodeFromTabDelimited(cell,nullString));}else{break;}
+cell_i+=1;}
+if(bolSelector&&(selectorMode==='always'||(selectorMode==='selected'&&arrSelectedStates.indexOf(row[0])>-1))){strTextCopyString+=(intRow+1);strHTMLRecordCopyString+=('<td rowspan="1" colspan="1">'+(intRow+1)+'</td>');}
+if(bolSelector&&col_len>0){strTextCopyString+=cellDelimiter;}
+col_i=0;while(col_i<col_len){if(col_i>0){strTextCopyString+=cellDelimiter;}
+intSel=arrColumns[col_i];intCol=intSel;if(element.internalDisplay.recordSelectorVisible){intSel=(arrColumns[col_i]+1);intCol=(intSel-1);}
+if(arrSelectedStates.indexOf(row[intSel])>-1){handleCell(arrColumnTemplates[arrColumns[col_i]],row_i,row_len,jsnRow);}else{strHTMLRecordCopyString+=('<'+'td rowspan="1" colspan="1"></td>');if(quoteMode==='always'){strTextCopyString+=quoteChar+quoteChar;}}
+col_i+=1;}
+strHTMLCopyString+='<tr>'+strHTMLRecordCopyString+'</tr>';strHTMLRecordCopyString='';strTextCopyString+=recordDelimiter;row_i+=1;}
+strHTMLCopyString+='</table>';return{"text":strTextCopyString,"html":strHTMLCopyString};}
+function updateHUD(element){var arrDataColumns;var sortASCButton;var sortDESCButton;var sortClearButton;var statusElement;var intOriginRecord;GS.triggerEvent(element,'selection_change');sortASCButton=findHudElement(element,'button-sort-asc');sortDESCButton=findHudElement(element,'button-sort-desc');sortClearButton=findHudElement(element,'button-sort-clear');arrDataColumns=getSelectedDataColumns(element);if(arrDataColumns.length>0){if(sortASCButton){sortASCButton.removeAttribute('disabled');}
+if(sortDESCButton){sortDESCButton.removeAttribute('disabled');}
+if(sortClearButton){sortClearButton.removeAttribute('disabled');}}else{if(sortASCButton){sortASCButton.setAttribute('disabled','');}
+if(sortDESCButton){sortDESCButton.setAttribute('disabled','');}
+if(sortClearButton){sortClearButton.setAttribute('disabled','');}}}
+function renderSelection(element){var bolHeaders;var bolSelectors;var bolInsert;var col_i;var col_len;var rec_i;var rec_len;var strRecord;var arrSelection;var range_i;var range_len;var range;var arrRanges;var arrColumnWidths;var rangeStartRow;var rangeStartColumn;var rangeEndRow;var rangeEndColumn;var intOriginRecord;var jsnSelectedToDeselected;var jsnDeselectedToSelected;var jsnTranslationMatrix;var intRecord;var intColumn;var intChar;var intHeaderIndex;var intSelectorIndex;var intInsertIndex;var arrElements;var i;var len;var cell;var strRow;var strCol;var intRow;var intCol;var arrSelectedStates;var arrColumns;var arrRows;var intMaxColumns;var arrSelectionRows;var arrSelectionCols;var pushValue;bolHeaders=(element.internalDisplay.headerVisible);bolSelectors=(!element.hasAttribute('no-record-selector'));bolInsert=(element.internalDisplay.insertRecordVisible);arrSelection=[];arrSelectedStates=['B','D','F','H','J','L'];col_len=element.internalDisplay.columnWidths.length;if(bolHeaders){strRecord='';if(bolSelectors){strRecord+='G';}
+col_i=0;while(col_i<col_len){strRecord+='A';col_i+=1;}
+arrSelection.push(strRecord);}
+strRecord='';if(bolSelectors){strRecord='I';}
+col_i=0;while(col_i<col_len){strRecord+='C';col_i+=1;}
+rec_i=0;rec_len=element.internalData.records.length;while(rec_i<rec_len){arrSelection.push(strRecord);rec_i+=1;}
+if(bolInsert){strRecord='';if(bolSelectors){strRecord+='K';}
+col_i=0;while(col_i<col_len){strRecord+='E';col_i+=1;}
+arrSelection.push(strRecord);}
+jsnSelectedToDeselected={"A":"A","B":"A","C":"C","D":"C","E":"E","F":"E","G":"G","H":"G","I":"I","J":"I","K":"K","L":"K"};jsnDeselectedToSelected={"A":"B","B":"B","C":"D","D":"D","E":"F","F":"F","G":"H","H":"H","I":"J","J":"J","K":"L","L":"L"};intHeaderIndex=-1;intSelectorIndex=-1;intInsertIndex=(bolInsert?(arrSelection.length-1):null);if(bolHeaders){intInsertIndex-=1;}
+arrRanges=element.internalSelection.ranges;arrColumnWidths=element.internalDisplay.columnWidths;range_i=0;range_len=arrRanges.length;while(range_i<range_len){range=arrRanges[range_i];range={"start":{"row":range.start.row,"column":range.start.column},"end":{"row":range.end.row,"column":range.end.column},"negator":range.negator};if(range.start.row==='header'){range.start.row=intHeaderIndex;}else if(range.start.row==='insert'){range.start.row=intInsertIndex;}
+if(range.end.row==='header'){range.end.row=intHeaderIndex;}else if(range.end.row==='insert'){range.end.row=intInsertIndex;}
+if(range.start.column==='selector'){range.start.column=intSelectorIndex;}
+if(range.end.column==='selector'){range.end.column=intSelectorIndex;}
+rangeStartRow=Math.min(range.start.row,range.end.row);rangeEndRow=Math.max(range.start.row,range.end.row);rangeStartColumn=Math.min(range.start.column,range.end.column);rangeEndColumn=Math.max(range.start.column,range.end.column);if(range_i===0){intOriginRecord=rangeStartRow;if(intOriginRecord===-1){intOriginRecord+=1;}
+element.internalSelection.originRecord=intOriginRecord;}
+if(range.negator===false){jsnTranslationMatrix=jsnDeselectedToSelected;}else{jsnTranslationMatrix=jsnSelectedToDeselected;}
+rec_i=0;rec_len=arrSelection.length;while(rec_i<rec_len){strRecord=arrSelection[rec_i];intRecord=rec_i;if(bolHeaders){intRecord-=1;}
+if((intRecord>=rangeStartRow&&intRecord<=rangeEndRow)||(rangeStartRow===-1&&rangeEndRow===-1)){col_i=0;col_len=strRecord.length;while(col_i<col_len){intChar=col_i;intColumn=col_i;if(bolSelectors){intColumn=(col_i-1);}
+if(((intColumn>=rangeStartColumn&&intColumn<=rangeEndColumn)||(rangeStartColumn===-1&&rangeEndColumn===-1))&&(intColumn===null||intColumn===-1||arrColumnWidths[intColumn]>0)){strRecord=(strRecord.substr(0,intChar)+
+jsnTranslationMatrix[strRecord[intChar]]+
+strRecord.substr(intChar+1));}
+col_i+=1;}
+arrSelection[rec_i]=strRecord;}
+rec_i+=1;}
+range_i+=1;}
+arrRows=[];arrSelectionRows=[];rec_i=0;rec_len=arrSelection.length;while(rec_i<rec_len){if((/[BDFHJL]/gi).test(arrSelection[rec_i])){if(bolHeaders&&rec_i===0){arrRows.push('header');}else if(bolInsert&&rec_i===(rec_len-1)){arrRows.push('insert');}else if(bolHeaders){arrRows.push(rec_i-1);}else{arrRows.push(rec_i);}
+arrSelectionRows.push(rec_i);}
+rec_i+=1;}
+arrColumns=[];arrSelectionCols=[];intMaxColumns=element.internalClip.columnList.length;rec_i=0;rec_len=arrSelectionRows.length;while(rec_i<rec_len){strRecord=arrSelection[arrSelectionRows[rec_i]];col_i=0;col_len=strRecord.length;while(col_i<col_len){if(bolSelectors&&col_i===0){pushValue=('selector');}else if(bolSelectors){pushValue=(col_i-1);}else{pushValue=col_i;}
+if(arrSelectedStates.indexOf(strRecord[col_i])!==-1&&arrColumns.indexOf(pushValue)===-1){arrColumns.push(pushValue);arrSelectionCols.push(col_i);}
+col_i+=1;}
+if(arrColumns.length>=intMaxColumns){break;}
+rec_i+=1;}
+arrElements=xtag.query(element.elems.dataViewport,'gs-cell');i=0;len=arrElements.length;while(i<len){arrElements[i].removeAttribute('selected');arrElements[i].removeAttribute('origin-record');arrElements[i].removeAttribute('auto-selected');i+=1;}
+i=0;len=arrElements.length;while(i<len){cell=arrElements[i];strRow=(cell.getAttribute('data-row-number')||cell.getAttribute('data-row')||'-1');strCol=(cell.getAttribute('data-col-number')||cell.getAttribute('data-col')||'-1');intRow=parseInt(strRow,10);intCol=parseInt(strCol,10);if(bolHeaders){intRow+=1;}
+if(bolSelectors){intCol+=1;}
+if(strRow==='insert'){intRow=(arrSelection.length-1);}
+if(strCol==='selector'){intCol=0;}
+if((!bolHeaders&&intRow===intOriginRecord)||(bolHeaders&&intRow===(intOriginRecord+1))){arrElements[i].setAttribute('origin-record','');}
+strRecord=arrSelection[intRow];if(strRecord){if(arrSelectedStates.indexOf(strRecord[intCol])>-1){cell.setAttribute('selected','');}else if(((cell.classList.contains('table-insert-selector')||cell.classList.contains('table-record-selector'))&&(arrSelectionRows.indexOf(intRow)>-1))||((cell.classList.contains('table-all-selector')||cell.classList.contains('table-header'))&&(arrSelectionCols.indexOf(intCol)>-1))){cell.setAttribute('auto-selected','');}}
+i+=1;}
+element.internalSelection.resolvedSelection=arrSelection;element.internalSelection.rows=arrRows;element.internalSelection.columns=arrColumns;if(arrRows.length===0||arrColumns.length===0){if(element.internalData.records.length>0&&(element.internalSelection.ranges&&(element.internalSelection.ranges.length!==1||element.internalSelection.ranges[0].start.row!==0||element.internalSelection.ranges[0].start.column!==0||element.internalSelection.ranges[0].end.row!==0||element.internalSelection.ranges[0].end.column!==0||element.internalSelection.ranges[0].negator!==false))){element.internalSelection.ranges=[{"start":{"row":0,"column":0},"end":{"row":0,"column":0},"negator":false}];if(element.internalSelection.currentlySelecting){element.internalEvents.selectDragEnd();}
+renderSelection(element);return;}}
+updateHUD(element);}
+function renderEmpty(element){element.elems.dataViewport.innerhtml='';}
+function renderLocationFull(element){var arrColumnWidths;var arrRecordHeights;var columnBorderWidth;var recordBorderHeight;var jsnRange;var fromColumn;var toColumn;var fromRecord;var toRecord;var i;var len;var col_i;var col_len;var record_i;var record_len;var intCellLeft;var intCellOriginLeft;var intRecordTop;var intRecordOriginTop;var arrColumnNames;var strHeaderTemplate;var strDataTemplate;var strInsertTemplate;var arrElements;var strColumn;var strValue;var strRecord;var arrRecord;var jsnRecord;var jsnQS;var intTotalRecords;var strNullString;var strChar;var strCell;var strHTML;var strCSS;var intRecordSelectorBorderWidth;var intInsertRecordBorderHeight;var intHeaderBorderHeight;element.elems.dataViewport.setAttribute('class','table-data-viewport');arrColumnWidths=element.internalDisplay.columnWidths;arrRecordHeights=element.internalDisplay.recordHeights;columnBorderWidth=element.internalDisplay.columnBorderWidth;recordBorderHeight=element.internalDisplay.recordBorderHeight;arrColumnNames=element.internalData.columnNames;jsnQS=GS.qryToJSON(GS.getQueryString());intTotalRecords=element.internalData.records.length;strNullString=element.getAttribute('null-string');jsnRange=element.internalDisplay.currentRange;intCellOriginLeft=jsnRange.originLeft;intRecordOriginTop=jsnRange.originTop;fromColumn=jsnRange.fromColumn;toColumn=jsnRange.toColumn;fromRecord=jsnRange.fromRecord;toRecord=jsnRange.toRecord;intRecordSelectorBorderWidth=(element.internalDisplay.recordSelectorBorderWidth);intInsertRecordBorderHeight=(element.internalDisplay.insertRecordBorderHeight);intHeaderBorderHeight=(element.internalDisplay.headerBorderHeight);strHTML='';if(element.internalTemplates.header.trim()){strHeaderTemplate=templateExtractVisibleCellRange(element,element.internalTemplates.header,fromColumn,toColumn);}
+if(element.internalTemplates.record.templateHTML.trim()){strDataTemplate=templateExtractVisibleCellRange(element,element.internalTemplates.record.templateHTML,fromColumn,toColumn);}
+if(element.internalTemplates.insertRecord.trim()){strInsertTemplate=templateExtractVisibleCellRange(element,element.internalTemplates.insertRecord,fromColumn,toColumn);}
+if(strDataTemplate){var templateFunc=doT.template('{{ '+'var row_number = jo.index + 1;'+'var qs = jo.qs;'+'var row = jo.row;'+'var i = jo.index;'+'var len = jo.len;'+'}}'+
+strDataTemplate);i=fromRecord;len=toRecord;intRecordTop=intRecordOriginTop;while(i<len){strRecord=element.internalData.records[i];record_i=0;record_len=strRecord.length;strCell="";arrRecord=[];while(record_i<record_len){strChar=strRecord[record_i];if(strChar==="\t"){arrRecord.push(GS.decodeFromTabDelimited(strCell,strNullString));strCell="";}else{strCell+=strChar;}
+record_i+=1;}
+arrRecord.push(strCell);col_i=0;col_len=arrRecord.length;jsnRecord={};while(col_i<col_len){jsnRecord[arrColumnNames[col_i]]=arrRecord[col_i];col_i+=1;}
+strRecord=strDataTemplate;strRecord=templateFunc({'qs':jsnQS,'row':jsnRecord,'index':i,'len':intTotalRecords});col_i=fromColumn;col_len=toColumn;intCellLeft=intCellOriginLeft;while(col_i<col_len){if(arrColumnWidths[col_i]>0){strCSS='';strRecord=strRecord.replace('$$CSSREPLACETOKEN$$',strCSS);intCellLeft+=arrColumnWidths[col_i];intCellLeft+=columnBorderWidth;}
+col_i+=1;}
+strHTML+=strRecord;intRecordTop+=arrRecordHeights[i];intRecordTop+=recordBorderHeight;i+=1;}}
+GS.templateShowSubTemplates(strHTML,element.internalTemplates.record);var intHeaderHeight;var intRecordSelectorWidth;var intInsertRecordHeight;intHeaderHeight=element.internalDisplay.headerHeight;intRecordSelectorWidth=element.internalDisplay.recordSelectorWidth;intInsertRecordHeight=element.internalDisplay.insertRecordHeight;if(strHeaderTemplate){strRecord=strHeaderTemplate;col_i=fromColumn;col_len=toColumn;intCellLeft=intCellOriginLeft;while(col_i<col_len){if(arrColumnWidths[col_i]>0){strCSS='';strRecord=strRecord.replace('$$CSSREPLACETOKEN$$',strCSS);intCellLeft+=arrColumnWidths[col_i];intCellLeft+=columnBorderWidth;}
+col_i+=1;}
+strRecord=handleHeaderTemplateTokens(element,strRecord,fromColumn,toColumn);strHTML+=strRecord;}
+GS.templateShowSubTemplates(strHTML,element.internalTemplates.record);if(strInsertTemplate){strRecord=strInsertTemplate;col_i=fromColumn;col_len=toColumn;intCellLeft=intCellOriginLeft;while(col_i<col_len){if(arrColumnWidths[col_i]>0){strCSS='';strRecord=strRecord.replace('$$CSSREPLACETOKEN$$',strCSS);intCellLeft+=arrColumnWidths[col_i];intCellLeft+=columnBorderWidth;}
+col_i+=1;}
+strHTML+=strRecord;}
+if(!element.hasAttribute('no-record-selector')){i=fromRecord;len=toRecord;intRecordTop=intRecordOriginTop;while(i<len){strCSS='';strHTML+='<gs-cell class="table-record-selector" '+'    style="'+strCSS+'" '+'    data-row-number="'+i+'" data-col="selector">'+
+(i+1)+'</gs-cell>';intRecordTop+=arrRecordHeights[i];intRecordTop+=recordBorderHeight;i+=1;}}
+if(strInsertTemplate&&!element.hasAttribute('no-record-selector')){strCSS='';strHTML+='<gs-cell class="table-insert-selector" '+'      style="'+strCSS+'" data-row="insert" '+'      data-col="selector">*'+'</gs-cell>';}
+if(strHeaderTemplate&&!element.hasAttribute('no-record-selector')){strCSS='';strHTML+=('<gs-cell class="table-all-selector" '+'      style="'+strCSS+'" data-col="selector">#</gs-cell>');}
+if(element.internalData.records.length===0){strHTML+='<div class="no-data-label">No Data</div>';}
+element.elems.dataViewport.innerHTML=strHTML;arrElements=xtag.query(element.elems.dataViewport,'.table-insert [column]');col_i=0;col_len=arrElements.length;while(col_i<col_len){strColumn=arrElements[col_i].getAttribute('column');strValue=element.internalData.insertRecord[strColumn];if(strValue){arrElements[col_i].value=strValue;}
+col_i+=1;}
+renderSelection(element);}
+function renderLocationPartial(element){var arrColumnWidths;var arrRecordHeights;var columnBorderWidth;var recordBorderHeight;var intRecordSelectorBorderWidth;var intInsertRecordBorderHeight;var intHeaderBorderHeight;var strRow;var strCol;var jsnOldRange;var jsnRange;var fromColumn;var toColumn;var fromRecord;var toRecord;var bolInsertRecord;var intCellOriginLeft;var intRecordOriginTop;var intCellLeft;var intCellTop;var arrColumnNames;var jsnQS;var intTotalRecords;var strNullString;var intRowNumber;var intColNumber;var arrColumnLeft;var arrRecordTop;var arrElements;var strColumn;var strValue;var bolUp;var bolDown;var bolInsert;var bolLeft;var bolRight;var i;var len;var arrCell;var cell;var cell_i;var cell_len;var col_i;var col_len;var row_i;var row_len;var strDownTemplate;var strUpTemplate;var strInsertTemplate;var strLeftHeaderTemplate;var strLeftRecordTemplate;var strLeftInsertTemplate;var strRightHeaderTemplate;var strRightRecordTemplate;var strRightInsertTemplate;var strHTML;var cellElement;arrColumnWidths=element.internalDisplay.columnWidths;arrRecordHeights=element.internalDisplay.recordHeights;columnBorderWidth=element.internalDisplay.columnBorderWidth;recordBorderHeight=element.internalDisplay.recordBorderHeight;intRecordSelectorBorderWidth=(element.internalDisplay.recordSelectorBorderWidth);intInsertRecordBorderHeight=(element.internalDisplay.insertRecordBorderHeight);intHeaderBorderHeight=(element.internalDisplay.headerBorderHeight);arrColumnNames=element.internalData.columnNames;jsnQS=GS.qryToJSON(GS.getQueryString());intTotalRecords=element.internalData.records.length;strNullString=element.getAttribute('null-string');var intHeaderHeight;var intRecordSelectorWidth;var intInsertRecordHeight;intHeaderHeight=element.internalDisplay.headerHeight;intRecordSelectorWidth=element.internalDisplay.recordSelectorWidth;intInsertRecordHeight=element.internalDisplay.insertRecordHeight;jsnOldRange=element.internalDisplay.prevRange;jsnRange=element.internalDisplay.currentRange;intCellOriginLeft=jsnRange.originLeft;intRecordOriginTop=jsnRange.originTop;fromColumn=jsnRange.fromColumn;toColumn=jsnRange.toColumn;fromRecord=jsnRange.fromRecord;toRecord=jsnRange.toRecord;bolInsertRecord=jsnRange.insertRecord;var createRecordSelector;if(element.hasAttribute('no-record-selector')){createRecordSelector=function(){};}else{createRecordSelector=function(index){cellElement=document.createElement('gs-cell');cellElement.setAttribute('data-row-number',index);cellElement.textContent=(index+1);cellElement.classList.add('table-record-selector');cellElement.setAttribute('data-col','selector');element.elems.dataViewport.appendChild(cellElement);};}
+var createRecord=function(strTemplate,index){var strRecord;var arrRecord;var jsnRecord;var strCell;var delim;var cell_i;var cell_len;strRecord=element.internalData.records[index]+'\t';arrRecord=[];cell_i=0;cell_len=9999;while(cell_i<cell_len){delim=strRecord.indexOf('\t');strCell=strRecord.substring(0,delim);strRecord=strRecord.substring(delim+1);if(strCell!==''||strRecord!==''){arrRecord.push(GS.decodeFromTabDelimited(strCell,strNullString));}else{break;}
+cell_i+=1;}
+col_i=0;col_len=arrRecord.length;jsnRecord={};while(col_i<col_len){jsnRecord[arrColumnNames[col_i]]=arrRecord[col_i];col_i+=1;}
+strRecord=('{{'+'var row_number = jo.index + 1;'+'var qs = jo.qs;'+'var row = jo.row;'+'var i = jo.index;'+'var len = jo.len;'+'}}'+
+strTemplate);strRecord=doT.template(strRecord)({'qs':jsnQS,'row':jsnRecord,'index':index,'len':intTotalRecords});return strRecord;};var createNonDataCells=function(strTemplate){var strRecord;strRecord=strTemplate.replace(/\$\$CSSREPLACETOKEN\$\$/gi,'');strRecord='{{ var qs = jo.qs; }}'+strRecord;strRecord=doT.template(strRecord)({'qs':jsnQS});return strRecord;};var arrDoomed=[];arrCell=xtag.queryChildren(element.elems.dataViewport,'[data-row-number], [data-col-number], [data-row]');cell_i=0;cell_len=arrCell.length;while(cell_i<cell_len){cell=arrCell[cell_i];strRow=(cell.getAttribute('data-row-number')||cell.getAttribute('data-row'));strCol=cell.getAttribute('data-col-number');intRowNumber=parseInt(strRow,10);intColNumber=parseInt(strCol,10);if(intColNumber<fromColumn||intRowNumber<fromRecord||intColNumber>=toColumn||intRowNumber>=toRecord||(bolInsertRecord===false&&strRow==='insert')){arrDoomed.push(arrCell[cell_i]);}
+cell_i+=1;}
+var deleteNext=function(){cell_i=0;cell_len=arrDoomed.length;while(cell_i<cell_len){if(arrDoomed[cell_i].parentNode===element.elems.dataViewport){element.elems.dataViewport.removeChild(arrDoomed[cell_i]);}
+cell_i+=1;}};if(window.requestAnimationFrame){window.requestAnimationFrame(deleteNext);}else{deleteNext();}
+bolUp=(fromRecord<jsnOldRange.fromRecord);bolDown=(toRecord>jsnOldRange.toRecord);bolInsert=(bolInsertRecord===true&&bolInsertRecord!==jsnOldRange.insertRecord);bolLeft=(fromColumn<jsnOldRange.fromColumn);bolRight=(toColumn>jsnOldRange.toColumn);if(bolUp||bolDown){if(element.internalTemplates.record.templateHTML.trim()){strUpTemplate=templateExtractVisibleCellRange(element,element.internalTemplates.record.templateHTML,fromColumn,toColumn);strUpTemplate=(strUpTemplate.replace(/\$\$CSSREPLACETOKEN\$\$/gi,''));strDownTemplate=strUpTemplate;}}
+if(bolLeft){if(element.internalTemplates.header.trim()){strLeftHeaderTemplate=templateExtractVisibleCellRange(element,element.internalTemplates.header,jsnRange.fromColumn,jsnOldRange.fromColumn);strLeftHeaderTemplate=handleHeaderTemplateTokens(element,strLeftHeaderTemplate,jsnRange.fromColumn,jsnOldRange.fromColumn);strLeftHeaderTemplate=(strLeftHeaderTemplate.replace(/\$\$CSSREPLACETOKEN\$\$/gi,''));}
+if(element.internalTemplates.record.templateHTML.trim()){strLeftRecordTemplate=templateExtractVisibleCellRange(element,element.internalTemplates.record.templateHTML,jsnRange.fromColumn,jsnOldRange.fromColumn);strLeftRecordTemplate=(strLeftRecordTemplate.replace(/\$\$CSSREPLACETOKEN\$\$/gi,''));}
+if(element.internalTemplates.insertRecord.trim()&&!bolInsert){strLeftInsertTemplate=templateExtractVisibleCellRange(element,element.internalTemplates.insertRecord,jsnRange.fromColumn,jsnOldRange.fromColumn);strLeftInsertTemplate=(strLeftInsertTemplate.replace(/\$\$CSSREPLACETOKEN\$\$/gi,''));}}
+if(bolRight){if(element.internalTemplates.header.trim()){strRightHeaderTemplate=templateExtractVisibleCellRange(element,element.internalTemplates.header,jsnOldRange.toColumn,jsnRange.toColumn);strRightHeaderTemplate=handleHeaderTemplateTokens(element,strRightHeaderTemplate,jsnOldRange.toColumn,jsnRange.toColumn);strRightHeaderTemplate=(strRightHeaderTemplate.replace(/\$\$CSSREPLACETOKEN\$\$/gi,''));}
+if(element.internalTemplates.record.templateHTML.trim()){strRightRecordTemplate=templateExtractVisibleCellRange(element,element.internalTemplates.record.templateHTML,jsnOldRange.toColumn,jsnRange.toColumn);strRightRecordTemplate=(strRightRecordTemplate.replace(/\$\$CSSREPLACETOKEN\$\$/gi,''));}
+if(element.internalTemplates.insertRecord.trim()&&!bolInsert){strRightInsertTemplate=templateExtractVisibleCellRange(element,element.internalTemplates.insertRecord,jsnOldRange.toColumn,jsnRange.toColumn);strRightInsertTemplate=(strRightInsertTemplate.replace(/\$\$CSSREPLACETOKEN\$\$/gi,''));}}
+strHTML='';if(bolUp){i=jsnRange.fromRecord;len=jsnOldRange.fromRecord;while(i<len){createRecordSelector(i);strHTML+=createRecord(strUpTemplate,i);i+=1;}}
+if(bolDown){i=jsnOldRange.toRecord;len=jsnRange.toRecord;while(i<len){createRecordSelector(i);strHTML+=createRecord(strDownTemplate,i);i+=1;}}
+if(bolInsert){strInsertTemplate='';if(!element.hasAttribute('no-record-selector')){strInsertTemplate+=('<gs-cell class="table-insert-selector"'+' data-row="insert" data-col="selector">*'+'</gs-cell>');}
+strInsertTemplate+=(templateExtractVisibleCellRange(element,element.internalTemplates.insertRecord,jsnRange.fromColumn,jsnRange.toColumn));strInsertTemplate=(strInsertTemplate.replace(/\$\$CSSREPLACETOKEN\$\$/gi,''));strHTML+=createNonDataCells(strInsertTemplate);}
+if(bolLeft){if(strLeftHeaderTemplate){strHTML+=createNonDataCells(strLeftHeaderTemplate);}
+if(strLeftRecordTemplate){if(bolUp){i=jsnOldRange.fromRecord;len=jsnRange.toRecord;}else if(bolDown){i=jsnRange.fromRecord;len=jsnOldRange.toRecord;}else{i=jsnRange.fromRecord;len=jsnRange.toRecord;}
+while(i<len){strHTML+=createRecord(strLeftRecordTemplate,i);i+=1;}}
+if(strLeftInsertTemplate){strHTML+=createNonDataCells(strLeftInsertTemplate);}}
+if(bolRight){if(strRightHeaderTemplate){strHTML+=createNonDataCells(strRightHeaderTemplate);}
+if(strRightRecordTemplate){if(bolUp){i=jsnOldRange.fromRecord;len=jsnRange.toRecord;}else if(bolDown){i=jsnRange.fromRecord;len=jsnOldRange.toRecord;}else{i=jsnRange.fromRecord;len=jsnRange.toRecord;}
+while(i<len){strHTML+=createRecord(strRightRecordTemplate,i);i+=1;}}
+if(strRightInsertTemplate){strHTML+=createNonDataCells(strRightInsertTemplate);}}
+strHTML=GS.templateShowSubTemplates(strHTML,element.internalTemplates.record);element.elems.dataViewport.insertAdjacentHTML('beforeend',strHTML);arrElements=xtag.query(element.elems.dataViewport,'.table-insert [column]');col_i=0;col_len=arrElements.length;while(col_i<col_len){strColumn=arrElements[col_i].getAttribute('column');strValue=element.internalData.insertRecord[strColumn];if(strValue){arrElements[col_i].value=strValue;}
+col_i+=1;}
+renderSelection(element);}
+function renderLocation(element){var i;var len;var intMaximum;var intTraversed;var intExtremeSide;var intViewportWidth;var intViewportHeight;var jsnOldRange;var jsnRange;var focusElement;jsnOldRange=element.internalDisplay.currentRange;jsnRange=getCurrentCellRange(element);element.internalDisplay.currentRange=jsnRange;element.internalDisplay.prevRange=jsnOldRange;intViewportWidth=(element.elems.dataViewport.clientWidth);intViewportHeight=(element.elems.dataViewport.clientHeight);if(intViewportHeight<3||intViewportWidth<3){renderEmpty(element);}else if(element.internalDisplay.fullRenderRequired===true||jsnOldRange.fromRecord===undefined||jsnRange.fromRecord>jsnOldRange.toRecord||jsnRange.fromColumn>jsnOldRange.toColumn||jsnRange.toRecord<jsnOldRange.fromRecord||jsnRange.toColumn<jsnOldRange.fromColumn){renderLocationFull(element);}else{renderLocationPartial(element);}
+element.internalDisplay.fullRenderRequired=false;element.elems.cellPositionStyle.innerHTML='';var intCellLeft=0;var intCellTop=0;var arrMinColumnWidths=element.internalDisplay.minColumnWidths;var arrColumnWidths=element.internalDisplay.columnWidths;var arrRecordHeights=element.internalDisplay.recordHeights;var columnBorderWidth=element.internalDisplay.columnBorderWidth;var recordBorderHeight=element.internalDisplay.recordBorderHeight;var strCSS='';var strCell='#'+element.getAttribute('id')+' gs-cell';intCellLeft=jsnRange.originLeft;i=jsnRange.fromColumn;len=jsnRange.toColumn;while(i<len){strCSS+=(strCell+'[data-col-number="'+i+'"] {'+'left: '+intCellLeft+'px;'+'width: '+(arrColumnWidths[i]+columnBorderWidth)+'px;'+'}');intCellLeft+=(arrColumnWidths[i]+columnBorderWidth);i+=1;}
+intCellTop=jsnRange.originTop;i=jsnRange.fromRecord;len=jsnRange.toRecord;while(i<len){strCSS+=(strCell+'[data-row-number="'+i+'"] {'+'top: '+intCellTop+'px;'+'height: '+(arrRecordHeights[i]+recordBorderHeight)+'px;'+'}');intCellTop+=(arrRecordHeights[i]+recordBorderHeight);i+=1;}
+if(element.internalDisplay.insertRecordVisible){strCSS+=(strCell+'[data-row="insert"],'+
+strCell+'[data-row-number="insert"] {'+'top: '+intCellTop+'px;'+'height: '+(element.internalDisplay.insertRecordHeight+
+element.internalDisplay.insertRecordBorderHeight)+'px;'+'}');}
+strCSS+=(strCell+'[data-col="selector"] {'+'left: 0px;'+'width: '+(element.internalDisplay.recordSelectorWidth+
+element.internalDisplay.recordSelectorBorderWidth)+'px;'+'}'+
+strCell+'.table-all-selector,'+
+strCell+'.table-header {'+'top: 0px;'+'height: '+(element.internalDisplay.headerHeight+
+element.internalDisplay.headerBorderHeight)+'px;'+'}');element.elems.cellPositionStyle.innerHTML=strCSS;element.internalDisplay.columnHandles=[];element.internalDisplay.recordHandles=[];intMaximum=((intViewportWidth-
+element.internalScrollOffsets.right)+
+3);if(element.internalDisplay.recordSelectorVisible===true){element.internalDisplay.columnHandles.push(element.internalScrollOffsets.left);}
+intTraversed=0;i=jsnRange.fromColumn;len=jsnRange.toColumn;while(i<len){if(element.internalDisplay.columnWidths[i]===0){intExtremeSide=0;}else{intExtremeSide=(element.internalDisplay.columnWidths[i]+
+element.internalDisplay.columnBorderWidth);}
+if(intTraversed<=0&&intExtremeSide>0){intExtremeSide+=jsnRange.originLeft;}
+intTraversed+=intExtremeSide;if(intTraversed<intMaximum){if(intExtremeSide===0){element.internalDisplay.columnHandles.push(null);}else{element.internalDisplay.columnHandles.push(intTraversed);}}else{break;}
+i+=1;}
+intMaximum=(intViewportHeight-
+element.internalScrollOffsets.bottom);if(element.internalDisplay.headerVisible===true){element.internalDisplay.recordHandles.push(element.internalScrollOffsets.top);}
+intTraversed=0;i=jsnRange.fromRecord;len=jsnRange.toRecord;while(i<len){intExtremeSide=(element.internalDisplay.recordHeights[i]);if(intTraversed<=0){intExtremeSide+=(jsnRange.originTop);}
+intTraversed+=intExtremeSide;if(intTraversed<intMaximum){element.internalDisplay.recordHandles.push(intTraversed);}else{break;}
+intTraversed+=element.internalDisplay.recordBorderHeight;i+=1;}
+if(element.internalDisplay.insertRecordVisible===true&&jsnRange){element.internalDisplay.recordHandles.push(element.internalDisplay.insertRecordHeight+
+intTraversed);}
+if(element.internalDisplay.focus.latest===false&&!isNaN(element.internalDisplay.focus.row)&&!isNaN(element.internalDisplay.focus.column)&&element.internalDisplay.focus.row>=jsnRange.fromRecord&&element.internalDisplay.focus.row<=jsnRange.toRecord&&element.internalDisplay.focus.column>=jsnRange.fromColumn&&element.internalDisplay.focus.column<=jsnRange.toColumn){focusElement=xtag.query(element.elems.dataViewport,('gs-cell'+'[data-col-number="'+
+element.internalDisplay.focus.column+'"]'+'[data-row-number="'+
+element.internalDisplay.focus.row+'"] '+
+(element.internalDisplay.focus.nodeName||'').toLowerCase()))[0];if(focusElement){focusElement.focus();if(element.internalDisplay.focus.selectionRange){GS.setInputSelection(focusElement,element.internalDisplay.focus.selectionRange.start,element.internalDisplay.focus.selectionRange.end);}}}}
+function renderScrollLocation(element){var intViewportWidth;var intViewportHeight;var virtualScrollHeight;var virtualScrollWidth;var virtualScrollTop;var virtualScrollLeft;var trueScrollHeight;var trueScrollWidth;var trueScrollTop;var trueScrollLeft;intViewportWidth=element.elems.dataViewport.clientWidth;intViewportHeight=element.elems.dataViewport.clientHeight;virtualScrollHeight=element.internalScroll.maxTop;virtualScrollWidth=element.internalScroll.maxLeft;virtualScrollTop=element.internalScroll.top;virtualScrollLeft=element.internalScroll.left;trueScrollWidth=element.elems.xScrollBar.scrollWidth;trueScrollHeight=element.elems.yScrollBar.scrollHeight;trueScrollWidth-=intViewportWidth;trueScrollHeight-=intViewportHeight;trueScrollTop=0;if(virtualScrollHeight>0){trueScrollTop=(virtualScrollTop/(virtualScrollHeight/trueScrollHeight));}
+trueScrollLeft=0;if(virtualScrollWidth>0){trueScrollLeft=(virtualScrollLeft/(virtualScrollWidth/trueScrollWidth));}
+element.internalEventCancelled.scrollbarY=true;element.internalEventCancelled.scrollbarX=true;if(Math.abs(element.elems.yScrollBar.scrollTop-trueScrollTop)>=1){element.elems.yScrollBar.scrollTop=trueScrollTop;}
+if(Math.abs(element.elems.xScrollBar.scrollLeft-trueScrollLeft)>=1){element.elems.xScrollBar.scrollLeft=trueScrollLeft;}
+renderLocation(element);}
+function renderScrollDimensions(element){var i;var len;var arrColumnWidths;var arrRecordHeights;var columnBorderWidth;var recordBorderHeight;var intViewportWidth;var intViewportHeight;var intMaxColumnWidth;var intMaxRecordHeight;var intTotalDataWidth;var intTotalDataHeight;var intOverscrollWidth;var intOverscrollHeight;var intNoOverscrollHeight;var intNoOverscrollWidth;cellDimensionDetector(element);visibilityDetector(element);offsetDetector(element);columnBorderWidth=element.internalDisplay.columnBorderWidth;recordBorderHeight=element.internalDisplay.recordBorderHeight;arrColumnWidths=element.internalDisplay.columnWidths;arrRecordHeights=element.internalDisplay.recordHeights;intViewportWidth=element.elems.dataViewport.clientWidth;intViewportHeight=element.elems.dataViewport.clientHeight;intMaxColumnWidth=(intViewportWidth-(element.internalScrollOffsets.left+
+element.internalScrollOffsets.right+
+columnBorderWidth+
+5));intMaxRecordHeight=(intViewportHeight-(element.internalScrollOffsets.top+
+element.internalScrollOffsets.bottom+
+recordBorderHeight+
+5));element.internalDisplay.maxColumnWidth=intMaxColumnWidth;element.internalDisplay.maxRecordHeight=intMaxRecordHeight;intTotalDataWidth=0;intOverscrollWidth=0;i=0;len=arrColumnWidths.length;while(i<len){if(intMaxColumnWidth>3&&arrColumnWidths[i]>intMaxColumnWidth){arrColumnWidths[i]=intMaxColumnWidth;}
+intTotalDataWidth+=arrColumnWidths[i];intTotalDataWidth+=columnBorderWidth;if(i<(len-1)){intOverscrollWidth=intTotalDataWidth;}
+i+=1;}
+intTotalDataHeight=0;intOverscrollHeight=0;i=0;len=arrRecordHeights.length;while(i<len){if(intMaxRecordHeight>3&&arrRecordHeights[i]>intMaxRecordHeight){arrRecordHeights[i]=intMaxRecordHeight;}
+intTotalDataHeight+=arrRecordHeights[i];intTotalDataHeight+=recordBorderHeight;if((element.internalDisplay.insertRecordVisible&&element.internalDisplay.insertRecordStick===null&&i===(len-1))||((!element.internalDisplay.insertRecordVisible||element.internalDisplay.insertRecordStick!==null)&&i<(len-1))){intOverscrollHeight=intTotalDataHeight;}
+i+=1;}
+if(element.hasAttribute('no-y-overscroll')){intNoOverscrollHeight=0;i=0;len=arrRecordHeights.length;while(i<len){if((intNoOverscrollHeight+
+intViewportHeight)>(intTotalDataHeight+
+element.internalScrollOffsets.top+
+element.internalScrollOffsets.bottom)){break;}
+intNoOverscrollHeight+=arrRecordHeights[i];intNoOverscrollHeight+=recordBorderHeight;i+=1;}
+if(element.internalDisplay.insertRecordVisible&&element.internalDisplay.insertRecordStick===null){intNoOverscrollHeight+=(element.internalDisplay.insertRecordHeight+
+element.internalDisplay.insertRecordBorderHeight);}
+element.internalScroll.maxTop=Math.max(0,intNoOverscrollHeight);}else{element.internalScroll.maxTop=Math.max(0,intOverscrollHeight);}
+if(element.hasAttribute('no-x-overscroll')){intNoOverscrollWidth=0;i=0;len=arrColumnWidths.length;while(i<len){if((intNoOverscrollWidth+
+intViewportWidth)>(intTotalDataWidth+
+element.internalScrollOffsets.left+
+element.internalScrollOffsets.right)){break;}
+intNoOverscrollWidth+=arrColumnWidths[i];intNoOverscrollWidth+=columnBorderWidth;i+=1;}
+element.internalScroll.maxLeft=Math.max(0,intNoOverscrollWidth);}else{element.internalScroll.maxLeft=Math.max(0,intOverscrollWidth);}
+if(element.internalScroll.top>element.internalScroll.maxTop){element.internalScroll.top=element.internalScroll.maxTop;}
+if(element.internalScroll.left>element.internalScroll.maxLeft){element.internalScroll.left=element.internalScroll.maxLeft;}
+element.elems.yScrollBarCauser.style.top=(Math.min(((element.internalScroll.maxTop+
+intViewportHeight)-1),100000)+"px");element.elems.xScrollBarCauser.style.left=(Math.min(((element.internalScroll.maxLeft+
+intViewportWidth)-1),100000)+"px");renderScrollLocation(element);}
+function renderHUD(element){var oldTopHUDHeight;var newTopHUDHeight;var oldBottomHUDHeight;var newBottomHUDHeight;oldTopHUDHeight=element.elems.topHudContainer.offsetHeight;if(element.internalTemplates.topHUD.trim()){element.elems.root.classList.add('show-top-hud');element.elems.topHudContainer.innerHTML=(element.internalTemplates.topHUD);newTopHUDHeight=element.elems.topHudContainer.offsetHeight;element.elems.root.style.paddingTop=newTopHUDHeight+'px';}else{element.elems.root.classList.remove('show-top-hud');element.elems.topHudContainer.innerHTML='';newTopHUDHeight=0;}
+oldBottomHUDHeight=element.elems.bottomHudContainer.offsetHeight;if(element.internalTemplates.bottomHUD.trim()){element.elems.root.classList.add('show-bottom-hud');element.elems.bottomHudContainer.innerHTML=(element.internalTemplates.bottomHUD);newBottomHUDHeight=element.elems.bottomHudContainer.offsetHeight;element.elems.root.style.paddingBottom=newBottomHUDHeight+'px';}else{element.elems.root.classList.remove('show-bottom-hud');element.elems.bottomHudContainer.innerHTML='';newBottomHUDHeight=0;}
+if(oldTopHUDHeight!==newTopHUDHeight||oldBottomHUDHeight!==newBottomHUDHeight){element.internalDisplay.fullRenderRequired=true;renderScrollDimensions(element);}}
+function resizeColumnsToHeader(element,arrColumnIndexes){var i;var len;var intIndex;i=0;len=arrColumnIndexes.length;while(i<len){intIndex=arrColumnIndexes[i];element.internalDisplay.columnWidths[intIndex]=(element.internalDisplay.minColumnWidths[intIndex]);i+=1;}
+renderLocation(element);}
+function resizeColumnsToContent(element,arrColumnIndexes){var i;var len;var elem_i;var elem_len;var intIndex;var arrElements;var controlElement;var intWidth;var jsnRange;var scopeElement;var controlText;var intTextWidth;var intColumnWidth;var intScopeElementWidth;jsnRange=element.internalDisplay.currentRange;i=0;len=arrColumnIndexes.length;while(i<len){intIndex=arrColumnIndexes[i];if(intIndex>=jsnRange.fromColumn&&intIndex<=jsnRange.toColumn){intWidth=element.internalDisplay.minColumnWidths[intIndex];intColumnWidth=element.internalDisplay.columnWidths[intIndex];arrElements=xtag.query(element.elems.dataViewport,'gs-cell.table-cell[data-col-number="'+intIndex+'"]');elem_i=0;elem_len=arrElements.length;while(elem_i<elem_len){controlElement=xtag.query(arrElements[elem_i],'input, textarea, select')[0];if(controlElement&&(controlElement.nodeName==='INPUT'||controlElement.nodeName==='TEXTAREA'||controlElement.nodeName==='SELECT')){scopeElement=controlElement.parentNode;controlText=controlElement.value;}else{scopeElement=(arrElements[elem_i].children[0]||arrElements[elem_i]);controlText=arrElements[elem_i].textContent;}
+intTextWidth=GS.getTextWidth(scopeElement,controlText,true);intScopeElementWidth=Math.ceil(scopeElement.clientWidth-(parseFloat(GS.getStyle(scopeElement,'padding-left'))+
+parseFloat(GS.getStyle(scopeElement,'padding-right'))));intTextWidth+=(intColumnWidth-intScopeElementWidth);intTextWidth+=10;if(intTextWidth>intWidth){intWidth=intTextWidth;}
+elem_i+=1;}
+element.internalDisplay.columnWidths[intIndex]=intWidth;}
+i+=1;}
+renderLocation(element);}
+function moveLoaderToTop(element,loaderElement){}
+function adjustLoaderWidth(element,loaderElement){var intWidth;intWidth=GS.getTextWidth(element,loaderElement.textContent);intWidth+=25;loaderElement.style.width=intWidth+'px';loaderElement.style.marginLeft='-'+intWidth+'px';}
+function addLoader(element,strID,strContent){var loaderElement;loaderElement=document.createElement('div');loaderElement.classList.add('table-loader');loaderElement.innerHTML=strContent;element.elems.loaderContainer.appendChild(loaderElement);element.internalLoaders.loaderIDs.push(strID);element.internalLoaders.loaderElements.push(loaderElement);adjustLoaderWidth(element,loaderElement);moveLoaderToTop(element,loaderElement);}
+function removeLoader(element,strID,strFinishedContent){var loaderIndex;var loaderElement;var fadeOut;var removeFunction;loaderIndex=element.internalLoaders.loaderIDs.indexOf(strID);loaderElement=element.internalLoaders.loaderElements[loaderIndex];element.internalLoaders.loaderIDs.splice(loaderIndex,1);element.internalLoaders.loaderElements.splice(loaderIndex,1);fadeOut=function(){loaderElement.classList.add('table-fade-out');removeFunction=function(){if(element.elems&&element.elems.loaderContainer){element.elems.loaderContainer.removeChild(loaderElement);}
+removeFunction=null;};setTimeout(removeFunction,1000);fadeOut=null;};if(strFinishedContent){loaderElement.innerHTML=strFinishedContent;adjustLoaderWidth(element,loaderElement);moveLoaderToTop(element,loaderElement);setTimeout(fadeOut,1000);}else{fadeOut();}}
+function dataSELECTcallback(element){var intDifference;var i;var len;var bolFirstLoad;bolFirstLoad=(element.internalData.bolFirstLoadFinished===false);intDifference=(element.internalDisplay.recordHeights.length-
+element.internalData.records.length);if(intDifference>0){i=0;len=intDifference;while(i<len){element.internalDisplay.recordHeights.pop();i+=1;}}else if(intDifference<0){i=0;len=Math.abs(intDifference);while(i<len){element.internalDisplay.recordHeights.push(element.internalDisplay.defaultRecordHeight);i+=1;}}
+if(element.internalData.bolFirstLoadFinished===false){element.internalData.bolFirstLoadFinished=true;}
+element.internalDisplay.fullRenderRequired=true;renderScrollDimensions(element);if(element.hasAttribute('focus-on-load')&&bolFirstLoad&&element.internalSelection.ranges.length===0){if(element.internalData.records.length>0){element.internalSelection.ranges=[{"start":{"row":0,"column":0},"end":{"row":0,"column":0},"negator":false}];focusIntoCell(element,0,0);}else if(element.internalDisplay.recordSelectorVisible&&element.internalDisplay.headerVisible){element.internalSelection.ranges=[{"start":{"row":"header","column":"selector"},"end":{"row":"header","column":"selector"},"negator":false}];}
+renderSelection(element);}
+GS.triggerEvent(element,'after_select');}
+function dataINSERTcallback(element){element.internalDisplay.fullRenderRequired=true;renderScrollDimensions(element);element.internalScroll.top=(element.internalScroll.maxTop-(element.elems.dataViewport.clientHeight-(element.internalScrollOffsets.top+
+element.internalScrollOffsets.bottom+
+element.internalDisplay.defaultRecordHeight)));renderScrollLocation(element);}
+function dataUPDATEcallback(element){element.internalDisplay.fullRenderRequired=true;renderLocation(element);}
+function dataDELETEcallback(element){element.internalSelection.ranges=[];element.internalDisplay.fullRenderRequired=true;renderScrollDimensions(element);}
+function getWhereClause(element){var strWhere;var strUserWhere;strWhere=GS.templateWithQuerystring(element.getAttribute('where')||'1=1');if(element.getAttribute('session-filter')){strWhere='('+element.getAttribute('session-filter')+')';strWhere+=(strWhere?' AND '+strWhere:'');}
+if(element.getAttribute('value')&&(element.getAttribute('column')||element.getAttribute('qs'))){var strWhereColumn=element.getAttribute('child-column')||element.getAttribute('column')||element.getAttribute('qs');if(isNaN(element.value)){strWhere='CAST('+
+strWhereColumn+' AS '+
+GS.database.type.text+') = '+'CAST('+'$WhereQUOTE$'+(element.value)+'$WhereQUOTE$ AS '+
+GS.database.type.text+')';strWhere+=(strWhere!==''?' AND ('+strWhere+')':'');}else{strWhere=strWhereColumn+'='+(element.value);strWhere+=(strWhere!==''?' AND ('+strWhere+')':'');}}
+var arrOldColumnNames=element.internalData.columnNames;var arrOldColumnTypes=element.internalData.columnTypes;var arrOldColumnFilterStatuses=element.internalData.columnFilterStatuses;var arrOldColumnFilters=element.internalData.columnFilters;var arrOldColumnListFilters=element.internalData.columnListFilters;strUserWhere='';var i=0;var len=arrOldColumnFilters.length;var arrFilter;var strColumn;var filter_i;var filter_len;var strFilter;while(i<len){arrFilter=arrOldColumnFilters[i];strColumn=arrOldColumnNames[i];if(arrOldColumnFilterStatuses[i]==='on'){filter_i=0;filter_len=arrFilter.length;while(filter_i<filter_len){strFilter=arrFilter[filter_i].text;strUserWhere+=(strUserWhere?' AND ':'');strUserWhere+=strFilter;filter_i+=1;}}
+i+=1;}
+i=0;len=arrOldColumnListFilters.length;var jsnFilter;var strListWhere;while(i<len){jsnFilter=arrOldColumnListFilters[i];strColumn=arrOldColumnNames[i];strListWhere='';if(arrOldColumnFilterStatuses[i]==='on'&&jsnFilter.type&&jsnFilter.values){if(jsnFilter.type==='inclusion'){filter_i=0;filter_len=jsnFilter.values.length;while(filter_i<filter_len){strListWhere+=(strListWhere?' OR ':'');strListWhere+=(strColumn+' = CAST($werequote$'+
+jsnFilter.values[filter_i]+'$werequote$ AS '+arrOldColumnTypes[i]+')');filter_i+=1;}
+if(filter_len===0){strListWhere='1=2';}}else if(jsnFilter.type==='exclusion'){if(jsnFilter.values.length>0){filter_i=0;filter_len=jsnFilter.values.length;while(filter_i<filter_len){strListWhere+=(strListWhere?' AND ':'');strListWhere+=(strColumn+' != CAST($werequote$'+
+jsnFilter.values[filter_i]+'$werequote$ AS '+arrOldColumnTypes[i]+')');filter_i+=1;}}}
+if((strListWhere&&!(jsnFilter.type==='exclusion'&&jsnFilter.values.length===0))||jsnFilter.blanks===false){if(strListWhere){strListWhere='('+strListWhere+') ';}
+if(jsnFilter.blanks===true){if(strListWhere){strListWhere+=' OR';}
+strListWhere+=(' NULLIF('+'CAST('+
+strColumn+' AS '+
+GS.database.type.text+'), \'\') IS NULL');}else{if(strListWhere){strListWhere+=' AND';}
+strListWhere+=(' NULLIF('+'CAST('+
+strColumn+' AS '+
+GS.database.type.text+'), \'\') IS NOT NULL');}
+strUserWhere+=(strUserWhere?' AND ':'');strUserWhere+='('+strListWhere+')';}}
+i+=1;}
+if(strUserWhere&&strWhere){strWhere=strUserWhere+' AND ('+strWhere+')';}else if(strUserWhere){strWhere=strUserWhere;}
+return strWhere;}
+function databaseWSSELECT(element){var socket;var strSchema;var strObject;var strWhere;var strOrd;var strLimit;var strOffset;var strReturn;var strWhereColumn;var bolLoadNewRecordHeights;var intRecordHeight;var arrOldColumnNames;var arrOldColumnTypes;var arrOldColumnFilterStatuses;var arrOldColumnFilters;var arrOldColumnListFilters;var arrOldColumnOrders;var arrOldDisplayColumns;var i;var len;var strFilter;var strSort;var strColumn;var strUserOrd;var strUserWhere;var strListWhere;var filter_i;var filter_len;var arrFilter;var jsnFilter;var index;var arrRecords;var arrRecordHeights;socket=getSocket(element);strSchema=GS.templateWithQuerystring(element.getAttribute('schema')||'');strObject=GS.templateWithQuerystring(element.getAttribute('object')||'');strWhere=getWhereClause(element);strOrd=GS.templateWithQuerystring(element.getAttribute('ord')||'');strLimit=GS.templateWithQuerystring(element.getAttribute('limit')||'');strOffset=GS.templateWithQuerystring(element.getAttribute('offset')||'0');strReturn='*';bolLoadNewRecordHeights=(element.internalDisplay.recordHeights.length===0);intRecordHeight=(parseInt(element.getAttribute('default-record-height'),10)||intDefaultRecordHeight);element.internalData.records=[];arrOldColumnNames=element.internalData.columnNames;arrOldColumnTypes=element.internalData.columnTypes;arrOldColumnFilterStatuses=element.internalData.columnFilterStatuses;arrOldColumnFilters=element.internalData.columnFilters;arrOldColumnListFilters=element.internalData.columnListFilters;arrOldColumnOrders=element.internalData.columnOrders;arrOldDisplayColumns=element.internalDisplay.dataColumnName;strUserOrd='';i=0;len=arrOldDisplayColumns.length;while(i<len){strColumn=arrOldDisplayColumns[i];if(strColumn){index=arrOldColumnNames.indexOf(strColumn);strSort=arrOldColumnOrders[index];if(strSort==='asc'){strUserOrd+=(strUserOrd?', ':'');strUserOrd+=strColumn+' ASC';}else if(strSort==='desc'){strUserOrd+=(strUserOrd?', ':'');strUserOrd+=strColumn+' DESC';}}
+i+=1;}
+if(strUserOrd&&strOrd){strOrd=strUserOrd+', '+strOrd;}else if(strUserOrd){strOrd=strUserOrd;}
+console.time('data load');arrRecords=element.internalData.records;arrRecordHeights=element.internalDisplay.recordHeights;addLoader(element,'data-select','Loading Data...');GS.requestSelectFromSocket(socket,strSchema,strObject,strReturn,strWhere,strOrd,strLimit,strOffset,function(data,error){var col_i;var col_len;var strCol;var strRecord;var strMessage;if(!error){if(data.strMessage==='TRANSACTION COMPLETED'){console.timeEnd('data load');console.log('record count:',element.internalData.records.length);removeLoader(element,'data-select','Data Loaded');dataSELECTcallback(element);}else{if(data.intCallback===0){element.internalData.columnNames=[];element.internalData.columnTypes=[];element.internalData.columnFilterStatuses=[];element.internalData.columnFilters=[];element.internalData.columnListFilters=[];element.internalData.columnOrders=[];col_i=0;col_len=data.arrDecodedColumnNames.length;while(col_i<col_len){strCol=data.arrDecodedColumnNames[col_i];index=arrOldColumnNames.indexOf(strCol);element.internalData.columnNames.push(strCol);element.internalData.columnTypes.push(data.arrDecodedColumnTypes[col_i]);if(index>-1){element.internalData.columnFilterStatuses.push(arrOldColumnFilterStatuses[index]);element.internalData.columnFilters.push(arrOldColumnFilters[index]);element.internalData.columnListFilters.push(arrOldColumnListFilters[index]);element.internalData.columnOrders.push(arrOldColumnOrders[index]);}else{element.internalData.columnFilterStatuses.push('on');element.internalData.columnFilters.push([]);element.internalData.columnListFilters.push({});element.internalData.columnOrders.push('neutral');}
+col_i+=1;}}
+if(data.intCallback===3&&element.internalData.bolFirstLoadFinished===false){element.internalDisplay.fullRenderRequired=true;renderScrollDimensions(element);}
+strMessage=data.strMessage;strRecord='';i=0;while(i<15){index=strMessage.indexOf('\n');strRecord=strMessage.substring(0,index);strMessage=strMessage.substring(index+1);if(strRecord!==''||strMessage!==''){arrRecords.push(strRecord);if(bolLoadNewRecordHeights){arrRecordHeights.push(intRecordHeight);}}else{break;}
+i+=1;}}}else{dataSELECTcallback(element);removeLoader(element,'data-select','Data Failed To Load');GS.webSocketErrorDialog(data);}});}
+function databaseWSINSERT(element,strMode,jsnInsert){var rec_i;var rec_len;var col_i;var col_len;var strColumn;var strPostfix;var insertStep;var beforeEvent;var arrPK;var arrSeq;var strPK;var strSeq;var strInsertColumns;var strInsertData;var strSchema;var strObject;var strReturn;var strNullString;var intRecordHeight;strSchema=GS.templateWithQuerystring(element.getAttribute('schema')||'');strObject=GS.templateWithQuerystring(element.getAttribute('object')||'');strReturn='';col_i=0;col_len=element.internalData.columnNames.length;while(col_i<col_len){strReturn+=(strReturn?'\t':'');strReturn+=element.internalData.columnNames[col_i];col_i+=1;}
+strPK=GS.templateWithQuerystring(element.getAttribute('pk')||'');strSeq=GS.templateWithQuerystring(element.getAttribute('seq')||'');arrPK=strPK.split(/[\s]*,[\s]*/);arrSeq=strSeq.split(/[\s]*,[\s]*/);if(element.hasAttribute('null-string')){strNullString=element.getAttribute('null-string')||'';}else{strNullString=undefined;}
+intRecordHeight=(parseInt(element.getAttribute('default-record-height'),10)||intDefaultRecordHeight);if(strMode==='single-record'){if(jsnInsert.data.addin&&jsnInsert.data.addin.link_column&&jsnInsert.data.addin.link_value&&jsnInsert.data.columns.indexOf(jsnInsert.data.addin.link_column)===-1){strColumn=jsnInsert.data.addin.link_column;jsnInsert.data.columns.push(jsnInsert.data.addin.link_column);jsnInsert.data.values[strColumn]=(jsnInsert.data.addin.link_value);}
+strInsertColumns='';strInsertData='';col_i=0;col_len=jsnInsert.data.columns.length;while(col_i<col_len){strColumn=jsnInsert.data.columns[col_i];strInsertColumns+=(strInsertColumns?'\t':'');strInsertColumns+=strColumn;strInsertData+=(strInsertData?'\t':'');strInsertData+=GS.encodeForTabDelimited((jsnInsert.data.values[strColumn]||'NULL'),strNullString);col_i+=1;}
+strInsertData+='\n';}else if(strMode==='multi-record'){if(jsnInsert.data.addin&&jsnInsert.data.addin.link_column&&jsnInsert.data.addin.link_value&&jsnInsert.data.columns.indexOf(jsnInsert.data.addin.link_column)===-1){strColumn=jsnInsert.data.addin.link_column;jsnInsert.data.columns.push(jsnInsert.data.addin.link_column);rec_i=0;rec_len=jsnInsert.data.columns.length;while(rec_i<rec_len){jsnInsert.data.values[rec_i]+='\t';jsnInsert.data.values[rec_i]+=GS.encodeForTabDelimited(jsnInsert.data.addin.link_value);rec_i+=1;}}
+strInsertColumns='';col_i=0;col_len=jsnInsert.data.columns.length;while(col_i<col_len){strColumn=jsnInsert.data.columns[col_i];strInsertColumns+=(strInsertColumns?'\t':'');strInsertColumns+=strColumn;col_i+=1;}
+strInsertData='';rec_i=0;rec_len=jsnInsert.data.values.length;while(rec_i<rec_len){strInsertData+=jsnInsert.data.values[rec_i];strInsertData+='\n';rec_i+=1;}}else{throw'GS-TABLE Error: Invalid insert type: "'+strMode+'".';}
+col_i=0;col_len=arrSeq.length;while(col_i<col_len){if(jsnInsert.data.columns.indexOf(arrSeq[col_i])!==-1){arrSeq[col_i]='';}
+col_i+=1;}
+strPK='';col_i=0;col_len=arrPK.length;while(col_i<col_len){strPK+=(strPK?'\t':'');strPK+=GS.encodeForTabDelimited(arrPK[col_i],strNullString);col_i+=1;}
+strSeq='';col_i=0;col_len=arrSeq.length;while(col_i<col_len){strSeq+=(col_i===0?'':'\t');if(jsnInsert.data.columns.indexOf(arrPK[col_i])===-1){strSeq+=arrSeq[col_i]||'';}
+col_i+=1;}
+strInsertData=strInsertColumns+'\n'+strInsertData;beforeEvent=GS.triggerEvent(element,'before_insert',{"schema":strSchema,"object":strObject,"insertMode":strMode,"insertData":jsnInsert.data});if(beforeEvent.defaultPrevented){return;}
+insertStep=function(){var insertedRecords;insertedRecords='';addLoader(element,'data-insert','Inserting Data...');GS.requestInsertFromSocket(getSocket(element),strSchema,strObject,strReturn,strPK,strSeq,strInsertData,function(data,error){if(error){removeLoader(element,'data-insert','Insert Failed');GS.webSocketErrorDialog(data);}},function(data,error,ignore,commit,rollback){if(!error){if(data==='TRANSACTION COMPLETED'){commit();}else{insertedRecords+=data;}}else{GS.webSocketErrorDialog(data);rollback();}},function(strAnswer,data,error){var arrRecords;var i;var len;removeLoader(element,'data-insert',(error?'Insert Failed':'Insert Successful'));if(!error){if(strAnswer==='COMMIT'){arrRecords=insertedRecords.split('\n');i=0;len=arrRecords.length-1;while(i<len){element.internalData.records.push(arrRecords[i]);element.internalDisplay.recordHeights.push(intRecordHeight);i+=1;}
+dataINSERTcallback(element);GS.triggerEvent(element,'after_insert',{"insertMode":strMode,"insertData":jsnInsert.data});}}else{GS.webSocketErrorDialog(data);}});};if((strMode!=='single-record'&&jsnInsert.data.values.length===0)||jsnInsert.data.columns.length===0){GS.msgbox('Nothing To Create','<center>'+'Please input data to create.'+'</center>',['Ok']);}else if(jsnInsert.insertConfirmed===true){insertStep();}else{strPostfix=((strMode==='single-record'||jsnInsert.data.values.length===1)?'this record':'these records');GS.msgbox('Are you sure...','<center>'+'Are you sure you want to create '+strPostfix+'?'+'</center>',['No','Yes'],function(strAnswer){if(strAnswer==='Yes'){insertStep();}});}}
+function databaseWSUPDATE(element,strMode,jsnUpdate){var i;var len;var pk_i;var pk_len;var lock_i;var lock_len;var col_i;var col_len;var strPostfix;var beforeEvent;var updateStep;var jsnCurrentData;var strSchema;var strObject;var strReturn;var strHashColumns;var strRecord;var strUpdateData;var intUpdateColumnIndex;var arrPK;var arrLock;var startingIndex;var arrRecordIndexes;var strRow;var jsnRow;var cell_i;var cell;var char;var strRoles;var strColumns;var arrColumnNames;var strHashString;var strTemp;strSchema=GS.templateWithQuerystring(element.getAttribute('schema')||'');strObject=GS.templateWithQuerystring(element.getAttribute('object')||'');strReturn='';col_i=0;col_len=element.internalData.columnNames.length;while(col_i<col_len){strReturn+=(strReturn?'\t':'');strReturn+=element.internalData.columnNames[col_i];col_i+=1;}
+arrColumnNames=element.internalData.columnNames;if(strMode==='single-cell'){jsnCurrentData={"columnName":jsnUpdate.data.columnName,"recordNumber":jsnUpdate.data.recordNumber,"oldValue":""};strHashColumns='';strUpdateData='';startingIndex='';intUpdateColumnIndex=(element.internalData.columnNames.indexOf(jsnUpdate.data.columnName));startingIndex=jsnUpdate.data.recordNumber;jsnCurrentData.oldValue=GS.decodeFromTabDelimited(element.internalData.records[startingIndex].split('\t')[intUpdateColumnIndex]);if(element.getAttribute('pk')){arrPK=(GS.templateWithQuerystring(element.getAttribute('pk')||'')).split(/[\s]*,[\s]*/);}else{arrPK=[];}
+if(element.getAttribute('lock')){arrLock=(GS.templateWithQuerystring(element.getAttribute('lock')||'')).split(/[\s]*,[\s]*/);}else{arrLock=[];}
+strHashColumns='';strHashString='';strRoles='';strColumns='';strUpdateData='';strRow=element.internalData.records[startingIndex];jsnRow={};i=0;len=strRow.length;cell_i=0;cell="";while(i<len){char=strRow[i];if(char==="\t"){jsnRow[arrColumnNames[cell_i]]=GS.decodeFromTabDelimited(cell,'\\N');cell="";cell_i+=1;}else{cell+=char;}
+i+=1;}
+jsnRow[arrColumnNames[cell_i]]=GS.decodeFromTabDelimited(cell,'\\N');i=0;len=arrPK.length;while(i<len){strRoles+=(strRoles?'\t':'');strRoles+='pk';strColumns+=(strColumns?'\t':'');strColumns+=arrPK[i];strUpdateData+=(strUpdateData?'\t':'');strUpdateData+=jsnRow[arrPK[i]];i+=1;}
+i=0;len=arrLock.length;while(i<len){strHashColumns+=(strHashColumns?'\t':'');strHashColumns+=arrLock[i];strHashString+=(strHashString?'\t':'');strTemp=jsnRow[arrLock[i]];strHashString+=(strTemp==='NULL'?'':strTemp);i+=1;}
+if(strHashString){strRoles+=(strRoles?'\t':'');strRoles+='hash';strColumns+=(strColumns?'\t':'');strColumns+='hash';strUpdateData+=(strUpdateData?'\t':'');strUpdateData+=GS.utfSafeMD5(strHashString).toString();}
+strRoles+=(strRoles?'\t':'');strRoles+='set';strColumns+=(strColumns?'\t':'');strColumns+=jsnUpdate.data.columnName;strUpdateData+=(strUpdateData?'\t':'');strUpdateData+=GS.encodeForTabDelimited(jsnUpdate.data.newValue);strUpdateData+='\n';strUpdateData=(strRoles+'\n'+
+strColumns+'\n'+
+strUpdateData);arrRecordIndexes=[jsnUpdate.data.recordNumber];}else if(strMode==='cell-range'){jsnCurrentData={"columns":"","records":"","oldValues":"","newValues":""};strHashColumns='';strUpdateData='';strColumns='';strRoles='';if(element.getAttribute('pk')){arrPK=(GS.templateWithQuerystring(element.getAttribute('pk')||'')).split(/[\s]*,[\s]*/);}else{arrPK=[];}
+if(element.getAttribute('lock')){arrLock=(GS.templateWithQuerystring(element.getAttribute('lock')||'')).split(/[\s]*,[\s]*/);}else{arrLock=[];}
+i=0;len=arrLock.length;while(i<len){strHashColumns+=(strHashColumns?'\t':'');strHashColumns+=arrLock[i];i+=1;}
+i=0;len=arrPK.length;while(i<len){strColumns+=(strColumns?'\t':'');strColumns+=arrPK[i];i+=1;}
+i=0;len=jsnUpdate.data.columns.length;while(i<len){strColumns+=(strColumns?'\t':'');strColumns+=jsnUpdate.data.columns[i];i+=1;}
+strColumns+='\t';strColumns+='hash';i=0;len=arrPK.length;while(i<len){strRoles+=(strRoles?'\tpk':'pk');i+=1;}
+i=0;len=jsnUpdate.data.columns.length;while(i<len){strRoles+=(strRoles?'\tset':'set');i+=1;}
+strRoles+='\t';strRoles+='hash';i=0;len=jsnUpdate.data.records.length;while(i<len){strRecord='';pk_i=0;pk_len=arrPK.length;while(pk_i<pk_len){strRecord+=(strRecord?'\t':'');strRecord+=getCell(element,arrPK[pk_i],jsnUpdate.data.records[i],false);pk_i+=1;}
+strRecord+=(strRecord?'\t':'');strRecord+=jsnUpdate.data.values[i];strHashString='';lock_i=0;lock_len=arrPK.length;while(lock_i<lock_len){strHashString+=(strHashString?'\t':'');strTemp=getCell(element,arrLock[lock_i],jsnUpdate.data.records[i],false);strHashString+=(strTemp==='\\N'?'':strTemp);lock_i+=1;}
+strRecord+=(strRecord?'\t':'');strRecord+=GS.utfSafeMD5(strHashString).toString();strUpdateData+=strRecord;strUpdateData+='\n';i+=1;}
+strUpdateData=(strRoles+'\n'+
+strColumns+'\n'+
+strUpdateData);arrRecordIndexes=jsnUpdate.data.records;}else{throw'GS-TABLE Error: Invalid update type. Update type "'+
+strMode+'" is not valid, please use "single-cell" '+'or "cell-range".';}
+beforeEvent=GS.triggerEvent(element,'before_update',{"schema":strSchema,"object":strObject,"updateMode":strMode,"oldData":jsnCurrentData,"newData":jsnUpdate.data});if(beforeEvent.defaultPrevented){return;}
+updateStep=function(){var updatedRecords;updatedRecords='';addLoader(element,'data-update','Updating Data...');GS.requestUpdateFromSocket(getSocket(element),strSchema,strObject,strReturn,strHashColumns,strUpdateData,function(data,error){if(error){removeLoader(element,'data-update','Change Failed');GS.webSocketErrorDialog(data);}},function(data,error,ignore,commit,rollback){if(!error){if(data==='TRANSACTION COMPLETED'){commit();}else{updatedRecords+=data;}}else{GS.webSocketErrorDialog(data);rollback();}},function(strAnswer,data,error){var arrRecords;removeLoader(element,'data-update',(error?'Change Failed':'Change Saved'));if(!error){if(strAnswer==='COMMIT'){arrRecords=updatedRecords.split('\n');i=0;len=arrRecords.length-1;while(i<len){element.internalData.records[arrRecordIndexes[i]]=(arrRecords[i]);i+=1;}
+dataUPDATEcallback(element);GS.triggerEvent(element,'after_update',{"updateMode":strMode,"oldData":jsnCurrentData,"newData":jsnUpdate.data});}else{}}else{GS.webSocketErrorDialog(data);}});};if(jsnUpdate.updateConfirmed===true){updateStep();}else{strPostfix=((!jsnUpdate.data.records||jsnUpdate.data.records.length===1)?'this record':'these records');GS.msgbox('Are you sure...','<center>'+'Are you sure you want to update '+strPostfix+'?'+'</center>',['No','Yes'],function(strAnswer){if(strAnswer==='Yes'){updateStep();}});}}
+function databaseWSDELETE(element,jsnDelete){var i;var len;var col_i;var col_len;var strSchema;var strObject;var strPostfix;var beforeEvent;var deleteStep;var strPK;var strLock;var arrPK;var arrLock;var intIndex;var arrColumns;var strColumnNames;var strColumnRoles;var strHashColumns;var strRecordToHash;var strTemp;var strDeleteData;var strDeleteRecords;var arrDeleteRecord;var strRecord;var strNullString;strSchema=GS.templateWithQuerystring(element.getAttribute("schema")||"");strObject=GS.templateWithQuerystring(element.getAttribute("object")||"");if(element.hasAttribute('null-string')){strNullString=element.getAttribute('null-string')||'';}else{strNullString=undefined;}
+strPK=(element.getAttribute("pk")||"");strLock=(element.getAttribute("lock")||"");arrPK=strPK.split(/[\s]*,[\s]*/);arrLock=strLock.split(/[\s]*,[\s]*/);arrColumns=element.internalData.columnNames;strColumnRoles='';strColumnNames='';i=0;len=arrPK.length;while(i<len){strColumnNames+=(strColumnNames?"\t":"");strColumnNames+=arrPK[i];strColumnRoles+=(strColumnRoles?"\t":"");strColumnRoles+="pk";i+=1;}
+strColumnNames+=(strColumnNames?"\t":"");strColumnNames+="hash";strColumnRoles+=(strColumnRoles?"\t":"");strColumnRoles+="hash";strHashColumns='';i=0;len=arrLock.length;while(i<len){strHashColumns+=(strHashColumns?"\t":"");strHashColumns+=arrLock[i];i+=1;}
+strDeleteRecords='';i=0;len=jsnDelete.recordIndexes.length;while(i<len){strRecord='';arrDeleteRecord=element.internalData.records[jsnDelete.recordIndexes[i]].split("\t");col_i=0;col_len=arrPK.length;while(col_i<col_len){intIndex=arrColumns.indexOf(arrPK[col_i]);strRecord+=(strRecord?"\t":"");strRecord+=GS.encodeForTabDelimited(arrDeleteRecord[intIndex],strNullString);col_i+=1;}
+strRecordToHash="";col_i=0;col_len=arrLock.length;while(col_i<col_len){intIndex=arrColumns.indexOf(arrLock[col_i]);strRecordToHash+=(strRecordToHash?"\t":"");strTemp=arrDeleteRecord[intIndex];strRecordToHash+=(strTemp==="NULL"?"":strTemp);col_i+=1;}
+strDeleteRecords+=strRecord;strDeleteRecords+=(strRecord?'\t':'');strDeleteRecords+=GS.utfSafeMD5(strRecordToHash).toString();strDeleteRecords+='\n';i+=1;}
+strDeleteData=(strColumnRoles+'\n'+
+strColumnNames+'\n'+
+strDeleteRecords);beforeEvent=GS.triggerEvent(element,'before_delete',{"schema":strSchema,"object":strObject,"recordIndexes":jsnDelete.recordIndexes,"deleteConfirmed":jsnDelete.deleteConfirmed,"strColumnRoles":strColumnRoles,"strColumnNames":strColumnNames,"strDeleteRecords":strDeleteRecords});if(beforeEvent.defaultPrevented){return;}
+deleteStep=function(){addLoader(element,'data-delete','Deleting Data...');GS.requestDeleteFromSocket(getSocket(element),strSchema,strObject,strHashColumns,strDeleteData,function(data,error){if(error){removeLoader(element,'data-delete','Delete Failed');GS.webSocketErrorDialog(data);}},function(data,error,ignore,commit,rollback){if(!error){if(data==='TRANSACTION COMPLETED'){commit();}}else{GS.webSocketErrorDialog(data);rollback();}},function(strAnswer,data,error){var arrRecords;var arrRecordHeights;removeLoader(element,'data-delete',(error?'Delete Failed':'Delete Successful'));if(!error){if(strAnswer==='COMMIT'){arrRecords=[];arrRecordHeights=[];i=0;len=element.internalData.records.length;while(i<len){if(jsnDelete.recordIndexes.indexOf(i)===-1){arrRecords.push(element.internalData.records[i]);arrRecordHeights.push(element.internalDisplay.recordHeights[i]);}
+i+=1;}
+element.internalData.records=arrRecords;element.internalDisplay.recordHeights=arrRecordHeights;dataDELETEcallback(element);GS.triggerEvent(element,'after_delete',{"schema":strSchema,"object":strObject,"recordIndexes":jsnDelete.recordIndexes,"strColumnRoles":strColumnRoles,"strColumnNames":strColumnNames,"strDeleteRecords":strDeleteRecords});}}else{GS.webSocketErrorDialog(data);}});};if(jsnDelete.recordIndexes.length===0){GS.msgbox('No Records To Delete','<center>'+'Please choose a record to delete.'+'</center>',['Ok']);}else if(jsnDelete.deleteConfirmed===true){deleteStep();}else{strPostfix=(jsnDelete.recordIndexes.length===1?'this record':'these records');GS.msgbox('Are you sure...','<center>'+'Are you sure you want to delete '+strPostfix+'?'+'</center>',['No','Yes'],function(strAnswer){if(strAnswer==='Yes'){deleteStep();}});}}
+function internalSELECT(element){var templateElement;var arrColumns;if(element.internalData.columnNames.length===0){templateElement=document.createElement('template');templateElement.innerHTML=element.internalTemplates.insertDialog;arrColumns=templateGetColumnList(templateElement);arrColumns.forEach(function(strColumn){if(element.internalData.columnNames.indexOf(strColumn)===-1){element.internalData.columnNames.push(strColumn);element.internalData.columnTypes.push('text');element.internalData.columnFilterStatuses.push('on');element.internalData.columnFilters.push([]);element.internalData.columnListFilters.push({});element.internalData.columnOrders.push('neutral');}});templateElement.innerHTML=element.internalTemplates.insertRecord;arrColumns=templateGetColumnList(templateElement);arrColumns.forEach(function(strColumn){if(element.internalData.columnNames.indexOf(strColumn)===-1){element.internalData.columnNames.push(strColumn);element.internalData.columnTypes.push('text');element.internalData.columnFilterStatuses.push('on');element.internalData.columnFilters.push([]);element.internalData.columnListFilters.push({});element.internalData.columnOrders.push('neutral');}});templateElement.innerHTML=element.internalTemplates.record;arrColumns=templateGetColumnList(templateElement);arrColumns.forEach(function(strColumn){if(element.internalData.columnNames.indexOf(strColumn)===-1){element.internalData.columnNames.push(strColumn);element.internalData.columnTypes.push('text');element.internalData.columnFilterStatuses.push('on');element.internalData.columnFilters.push([]);element.internalData.columnListFilters.push({});element.internalData.columnOrders.push('neutral');}});}
+dataSELECTcallback(element);}
+function internalINSERT(element,strMode,jsnInsert){var beforeEvent;var insertStep;var strPostfix;var strNullString;var intRecordHeight;var strRecord;var arrRecords;var arrRecord;var arrColumns;var strColumn;var strValue;var index;var i;var len;var col_i;var col_len;if(element.hasAttribute('null-string')){strNullString=element.getAttribute('null-string')||'';}else{strNullString=undefined;}
+intRecordHeight=(parseInt(element.getAttribute('default-record-height'),10)||intDefaultRecordHeight);beforeEvent=GS.triggerEvent(element,'before_insert',{"insertMode":strMode,"insertData":jsnInsert.data});if(beforeEvent.defaultPrevented){return;}
+insertStep=function(){addLoader(element,'data-insert','Inserting Data...');if(strMode==="single-record"){/*
+                jsnInsert = {
+                    "data": {
+                        "addin": {
+                            "link_column": "columnname4",
+                            "link_value": "value"
+                        },
+                        "columns": [
+                            "columnname1",
+                            "columnname2",
+                            "columnname3"
+                            ...
+                        ],
+                        "values": {
+                            "columnname1": "value",
+                            "columnname2": "value",
+                            "columnname3": "value"
+                            ...
+                        }
+                    },
+                    "insertConfirmed": boolean
+                }
+                */
+strRecord="";arrColumns=element.internalData.columnNames;i=0;len=arrColumns.length;while(i<len){strColumn=arrColumns[i];if(i>0){strRecord+="\t";}
+strValue=jsnInsert.data.values[strColumn];if(strValue!==undefined){strRecord+=GS.encodeForTabDelimited(strValue,strNullString);}else if(jsnInsert.data.addin.link_column===strColumn){strRecord+=GS.encodeForTabDelimited(jsnInsert.data.addin.link_value,strNullString);}else{strRecord+='\\N';}
+i+=1;}
+element.internalData.records.push(strRecord);element.internalDisplay.recordHeights.push(intRecordHeight);}else if(strMode==="multi-record"){/*
+                jsnInsert = {
+                    "data": {
+                        "addin": {
+                            "link_column": "columnname4",
+                            "link_value": "value"
+                        },
+                        "columns": [
+                            "columnname1",
+                            "columnname2"
+                            ...
+                        ],
+                        "values": [
+                            "value1\tvalue1",
+                            "value2\tvalue2",
+                            "value3\tvalue3"
+                            ...
+                        ]
+                    },
+                    "insertConfirmed": boolean
+                }
+                */
+arrRecords=[];arrColumns=element.internalData.columnNames;i=0;len=jsnInsert.data.values.length;while(i<len){strRecord=jsnInsert.data.values[i];arrRecord=strRecord.split('\t');strRecord="";col_i=0;col_len=arrColumns.length;while(col_i<col_len){strColumn=arrColumns[col_i];index=jsnInsert.data.columns.indexOf(strColumn);strValue=arrRecord[index];if(col_i>0){strRecord+="\t";}
+if(strValue){strRecord+=arrRecord[index];}else if(jsnInsert.data.addin.link_column===strColumn){strRecord+=GS.encodeForTabDelimited(jsnInsert.data.addin.link_value,strNullString);}else{strRecord+='\\N';}
+col_i+=1;}
+arrRecords.push(strRecord);i+=1;}
+i=0;len=arrRecords.length;while(i<len){element.internalData.records.push(arrRecords[i]);element.internalDisplay.recordHeights.push(intRecordHeight);i+=1;}}
+removeLoader(element,'data-insert','New Record Saved');dataINSERTcallback(element);GS.triggerEvent(element,'after_insert',{"insertMode":strMode,"insertData":jsnInsert.data});};if((strMode!=='single-record'&&jsnInsert.data.values.length===0)||jsnInsert.data.columns.length===0){GS.msgbox('Nothing To Create','<center>'+'Please input data to create.'+'</center>',['Ok']);}else if(jsnInsert.insertConfirmed===true){insertStep();}else{strPostfix=((strMode==='single-record'||jsnInsert.data.values.length===1)?'this record':'these records');GS.msgbox('Are you sure...','<center>'+'Are you sure you want to create '+strPostfix+'?'+'</center>',['No','Yes'],function(strAnswer){if(strAnswer==='Yes'){insertStep();}});}}
+function internalUPDATE(element,strMode,jsnUpdate){var i;var len;var row_i;var row_len;var strPostfix;var beforeEvent;var updateStep;var jsnCurrentData;var intUpdateColumnIndex;var arrUpdateColumnIndexes;var startingIndex;var arrUpdatePaste;var update_i;var cell_i;var cell;var char;var strOldRow;var strNewRow;var arrRecordIndexes;var arrRecordReplacements;if(strMode==='single-cell'){jsnCurrentData={"columnName":jsnUpdate.data.columnName,"recordNumber":jsnUpdate.data.recordNumber,"oldValue":""};intUpdateColumnIndex=(element.internalData.columnNames.indexOf(jsnUpdate.data.columnName));startingIndex=jsnUpdate.data.recordNumber;strOldRow=element.internalData.records[startingIndex];strNewRow='';i=0;len=strOldRow.length;cell_i=0;cell="";while(i<len){char=strOldRow[i];if(char==="\t"||i===(len-1)){if(i===(len-1)){cell+=char;}
+if(cell_i===intUpdateColumnIndex){strNewRow+=GS.encodeForTabDelimited(jsnUpdate.data.newValue);jsnCurrentData.oldValue=cell;}else{strNewRow+=cell;}
+cell="";cell_i+=1;}else{cell+=char;}
+if(char==="\t"){strNewRow+='\t';}
+i+=1;}
+arrRecordIndexes=[startingIndex];arrRecordReplacements=[strNewRow];}else if(strMode==='cell-range'){jsnCurrentData={"columns":"","records":"","oldValues":"","newValues":""};arrUpdateColumnIndexes=[];i=0;len=jsnUpdate.data.columns.length;while(i<len){arrUpdateColumnIndexes.push(element.internalData.columnNames.indexOf(jsnUpdate.data.columns[i]));i+=1;}
+i=0;len=jsnUpdate.data.records.length;arrRecordReplacements=[];while(i<len){strOldRow=element.internalData.records[jsnUpdate.data.records[i]];strNewRow='';arrUpdatePaste=jsnUpdate.data.values[i].split('\t');update_i=0;row_i=0;row_len=strOldRow.length;cell_i=0;cell="";while(row_i<row_len){char=strOldRow[row_i];if(char==="\t"||row_i===(row_len-1)){if(arrUpdateColumnIndexes.indexOf(cell_i)>-1){strNewRow+=arrUpdatePaste[update_i]||'\\N';update_i+=1;}else{strNewRow+=cell;}
+cell="";cell_i+=1;}else{cell+=char;}
+if(char==="\t"){strNewRow+='\t';}
+row_i+=1;}
+arrRecordReplacements.push(strNewRow);i+=1;}
+arrRecordIndexes=jsnUpdate.data.records;}else{throw'GS-TABLE Error: Invalid update type. Update type "'+
+strMode+'" is not valid, please use "single-cell" '+'or "cell-range".';}
+beforeEvent=GS.triggerEvent(element,'before_update',{"updateMode":strMode,"oldData":jsnCurrentData,"newData":jsnUpdate.data});if(beforeEvent.defaultPrevented){return;}
+updateStep=function(){addLoader(element,'data-update','Updating Data...');i=0;len=arrRecordIndexes.length;while(i<len){element.internalData.records[arrRecordIndexes[i]]=(arrRecordReplacements[i]);i+=1;}
+dataUPDATEcallback(element);GS.triggerEvent(element,'after_update',{"updateMode":strMode,"oldData":jsnCurrentData,"newData":jsnUpdate.data});removeLoader(element,'data-update','Change Saved');};if(jsnUpdate.updateConfirmed===true){updateStep();}else{strPostfix=((!jsnUpdate.data.records||jsnUpdate.data.records.length===1)?'this record':'these records');GS.msgbox('Are you sure...','<center>'+'Are you sure you want to update '+strPostfix+'?'+'</center>',['No','Yes'],function(strAnswer){if(strAnswer==='Yes'){updateStep();}});}}
+function internalDELETE(element,jsnDelete){var strPostfix;var beforeEvent;var deleteStep;beforeEvent=GS.triggerEvent(element,'before_delete',{"recordIndexes":jsnDelete.recordIndexes,"deleteConfirmed":jsnDelete.deleteConfirmed});if(beforeEvent.defaultPrevented){return;}
+deleteStep=function(){var arrRecords;var arrRecordHeights;var i;var len;addLoader(element,'data-delete','Deleting Data...');arrRecords=[];arrRecordHeights=[];i=0;len=element.internalData.records.length;while(i<len){if(jsnDelete.recordIndexes.indexOf(i)===-1){arrRecords.push(element.internalData.records[i]);arrRecordHeights.push(element.internalDisplay.recordHeights[i]);}
+i+=1;}
+element.internalData.records=arrRecords;element.internalDisplay.recordHeights=arrRecordHeights;removeLoader(element,'data-delete','Delete Successful');dataDELETEcallback(element);GS.triggerEvent(element,'after_delete',{"recordIndexes":jsnDelete.recordIndexes});};if(jsnDelete.recordIndexes.length===0){GS.msgbox('No Records To Delete','<center>'+'Please choose a record to delete.'+'</center>',['Ok']);}else if(jsnDelete.deleteConfirmed===true){deleteStep();}else{strPostfix=(jsnDelete.recordIndexes.length===1?'this record':'these records');GS.msgbox('Are you sure...','<center>'+'Are you sure you want to delete '+strPostfix+'?'+'</center>',['No','Yes'],function(strAnswer){if(strAnswer==='Yes'){deleteStep();}});}}
+function databaseWSSELECTcolumnUnique(element,uniqueFilterElement,valueListElement,strColumn){var socket=getSocket(element);var strSchema;var strObject;var strWhere;strSchema=GS.templateWithQuerystring(element.getAttribute('schema')||'');strObject=GS.templateWithQuerystring(element.getAttribute('object')||'');strWhere=element.getAttribute('where')||'1=1';var strSrc=(ml(function(){/*
+                SELECT count(*) AS count
+                     , COALESCE(
+                            NULLIF(CAST("{{COLUMN}}" AS text), ''),
+                            '(blanks)'
+                       ) AS unique_value
+                  FROM {{SCHEMA}}.{{OBJECT}}
+                  WHERE {{WHERE}}
+              GROUP BY NULLIF(CAST("{{COLUMN}}" AS text), '')
+              ORDER BY NULLIF(CAST("{{COLUMN}}" AS text), '') ASC NULLS FIRST
+            */}).replace(/\{\{WHERE\}\}/gi,strWhere).replace(/\{\{COLUMN\}\}/gi,strColumn).replace(/\{\{SCHEMA\}\}/gi,strSchema).replace(/\{\{OBJECT\}\}/gi,strObject));var bolUncheckedFound=false;var arrData;var jsnFilter;arrData=[''];jsnFilter=(element.internalData.columnListFilters[element.internalData.columnNames.indexOf(strColumn)]);GS.requestArbitrarySelectFromSocket(socket,'('+strSrc+') unique_list','','','','',function(data,error){var i;var tableElement;var index;var strValue;var strMessage=data.strMessage;var strRecord;var arrRecord=[];if(!error&&data.strMessage==='TRANSACTION COMPLETED'){if(bolUncheckedFound){arrData[0]='0\t\tSelect All';}else{arrData[0]='-1\t\tSelect All';}
+uniqueFilterElement.removeAttribute('hidden');valueListElement.addEventListener('initialized',function(){tableElement=valueListElement.children[0];tableElement.internalData.records=arrData;tableElement.internalData.columnNames=['active','count','value'];tableElement.internalData.columnTypes=['text','text','text'];tableElement.internalData.columnFilterStatuses=['on','on','on'];tableElement.internalData.columnFilters=[[],[],[]];tableElement.internalData.columnListFilters=[{},{},{}];tableElement.internalData.columnOrders=['neutral','neutral','neutral'];tableElement.internalDisplay.columnWidths=[27,(valueListElement.clientWidth-80),49];tableElement.refresh();});valueListElement.innerHTML=ml(function(){/*
+    <gs-table style="width: 100%; height: 100%;"
+                no-record-selector
+                no-x-overscroll
+                no-y-overscroll
+                copy-header="always">
+        <template for="data-record">
+            <gs-cell>
+                <label>
+                    <gs-checkbox column="active" mini></gs-checkbox>
+                </label>
+            </gs-cell>
+            <gs-cell>
+                {{? row.value === 'Select All' || row.value === '(blanks)' }}
+                    <span class="gs-table-text-grey">
+                        {{! row.value }}
+                    </span>
+                {{??}}
+                    <label>{{! row.value }}</label>
+                {{?}}
+            </gs-cell>
+            <gs-cell>
+                <center class="gs-table-text-grey">
+                    {{! row.count }}
+                </center>
+            </gs-cell>
+        </template>
+        <template for="copy">
+            <gs-cell header="Include?">{{? row.active==='-1' }}X{{?}}</gs-cell>
+            <gs-cell header="Value">{{! row.value }} </gs-cell>
+            <gs-cell header="Occurences">{{! row.count }}</gs-cell>
+        </template>
+    </gs-table>
+                    */});tableElement.addEventListener('before_update',function(event){var rec_i;var rec_len;var arrRecords;var replaceValue=function(strRecord,strValue){return(strValue+
+strRecord.substring(strRecord.indexOf('\t')));};if(event.newData.columnName==='active'&&event.newData.recordNumber===0&&event.newData.newValue==='-1'){arrRecords=tableElement.internalData.records;rec_i=0;rec_len=arrRecords.length;while(rec_i<rec_len){arrRecords[rec_i]=(replaceValue(arrRecords[rec_i],'-1'));rec_i+=1;}}else if(event.newData.columnName==='active'&&event.newData.recordNumber===0&&event.newData.newValue==='0'){arrRecords=tableElement.internalData.records;rec_i=0;rec_len=arrRecords.length;while(rec_i<rec_len){arrRecords[rec_i]=(replaceValue(arrRecords[rec_i],'0'));rec_i+=1;}}else if(event.newData.columnName==='active'&&event.newData.recordNumber>0&&event.newData.newValue==='0'){tableElement.internalData.records[0]=(replaceValue(tableElement.internalData.records[0],'0'));}});}else if(!error){i=0;while(i<15){index=strMessage.indexOf('\n');strRecord=strMessage.substring(0,index);strMessage=strMessage.substring(index+1);if(strRecord!==''||strMessage!==''){arrRecord=strRecord.split('\t');strValue=arrRecord[1];if(!jsnFilter||!jsnFilter.type){arrData.push('-1\t'+strRecord);}else if(jsnFilter.type==='inclusion'&&jsnFilter.values.length===0){if(jsnFilter.blanks&&strValue==='(blanks)'){arrData.push('-1\t'+strRecord);}else if(jsnFilter.blanks===false&&strValue==='(blanks)'){arrData.push('0\t'+strRecord);bolUncheckedFound=true;}else{arrData.push('0\t'+strRecord);bolUncheckedFound=true;}}else if(jsnFilter.type==='exclusion'&&jsnFilter.values.length===0){if(jsnFilter.blanks&&strValue==='(blanks)'){arrData.push('-1\t'+strRecord);}else if(jsnFilter.blanks===false&&strValue==='(blanks)'){arrData.push('0\t'+strRecord);bolUncheckedFound=true;}else{arrData.push('-1\t'+strRecord);}}else if(jsnFilter&&jsnFilter.type==='inclusion'){if(jsnFilter.blanks&&strValue==='(blanks)'){arrData.push('-1\t'+strRecord);}else if(jsnFilter.blanks===false&&strValue==='(blanks)'){arrData.push('0\t'+strRecord);bolUncheckedFound=true;}else if(jsnFilter.values.indexOf(strValue)!==-1){arrData.push('-1\t'+strRecord);}else{arrData.push('0\t'+strRecord);bolUncheckedFound=true;}}else if(jsnFilter&&jsnFilter.type==='exclusion'){if(jsnFilter.blanks&&strValue==='(blanks)'){arrData.push('-1\t'+strRecord);}else if(jsnFilter.blanks===false&&strValue==='(blanks)'){arrData.push('0\t'+strRecord);bolUncheckedFound=true;}else if(jsnFilter.values.indexOf(strValue)!==-1){arrData.push('0\t'+strRecord);bolUncheckedFound=true;}else{arrData.push('-1\t'+strRecord);}}}else{break;}
+i+=1;}}});}
+function internalSELECTcolumnUnique(){}
+function dataSELECTcolumnUnique(element,uniqueFilterElement,valueListElement,strColumn){if(element.hasAttribute("src")){databaseWSSELECTcolumnUnique(element,uniqueFilterElement,valueListElement,strColumn);}else{internalSELECTcolumnUnique(element,uniqueFilterElement,valueListElement,strColumn);}}
+function dataSELECT(element){if(element.hasAttribute("src")){databaseWSSELECT(element);}else{internalSELECT(element);}}
+function dataINSERT(element,strMode,jsnInsert){if(element.hasAttribute("src")){databaseWSINSERT(element,strMode,jsnInsert);}else{internalINSERT(element,strMode,jsnInsert);}}
+function dataUPDATE(element,strMode,jsnUpdate){if(!element.hasAttribute('no-update')){element.internalDisplay.focus.selectionRange=null;if(element.internalDisplay.focus.latest&&(document.activeElement.nodeName==='INPUT'||document.activeElement.nodeName==='TEXTAREA')){element.internalDisplay.focus.selectionRange=(GS.getInputSelection(document.activeElement));}
+if(element.hasAttribute("src")){databaseWSUPDATE(element,strMode,jsnUpdate);}else{internalUPDATE(element,strMode,jsnUpdate);}}}
+function dataDELETE(element,jsnDeleteData){if(element.hasAttribute("src")){databaseWSDELETE(element,jsnDeleteData);}else{internalDELETE(element,jsnDeleteData);}}
+function getSelectedRecordIndexes(element){var arrRows=element.internalSelection.rows.slice(0);if(arrRows[0]==='header'){arrRows.shift();}
+if(arrRows[arrRows.length-1]==='insert'){arrRows.pop();}
+return arrRows;}
+function focusIntoCell(element,record,column,iterationNumber){var jsnViewportRange;var cellElement;var focusElement;var strTag;var strValue;if(iterationNumber===undefined){iterationNumber=0;}
+jsnViewportRange=element.internalDisplay.currentRange;if((!jsnViewportRange.insertRecord&&(record<jsnViewportRange.fromRecord||record>jsnViewportRange.toRecord||column<jsnViewportRange.fromColumn||column>jsnViewportRange.toColumn))||(jsnViewportRange.insertRecord&&(column<jsnViewportRange.fromColumn||column>jsnViewportRange.toColumn))){console.warn('GS-TABLE Warning: "focusIntoCell" was called to'+' focus into a cell that is not rendered. Stopping'+' execution of "focusIntoCell".');return;}
+if(record==='insert'&&jsnViewportRange.insertRecord){cellElement=xtag.query(element.elems.dataViewport,'gs-cell'+'.table-insert'+'[data-col-number="'+column+'"]')[0];}else{cellElement=xtag.query(element.elems.dataViewport,'gs-cell'+'.table-cell'+'[data-row-number="'+record+'"]'+'[data-col-number="'+column+'"]')[0];}
+if(!cellElement){if(iterationNumber<1){console.warn('GS-TABLE Warning: "focusIntoCell" was called to'+' focus into a cell that is not rendered. Stopping'+' execution of "focusIntoCell".');element.internalDisplay.fullRenderRequired=true;renderScrollDimensions(element);focusIntoCell(element,record,column,(iterationNumber+1));}else{console.warn('GS-TABLE Warning: infinite loop detected'+' in "focusIntoCell". Stopping execution of'+' "focusIntoCell".');}
+return;}
+focusElement=xtag.query(cellElement,'input, textarea, select, [tabindex]')[0];if(focusElement){focusElement.focus();strTag=focusElement.nodeName;strValue=(focusElement.value||'');if((strTag==='INPUT'||strTag==='TEXTAREA')&&strValue.length>0){GS.setInputSelection(focusElement,0,strValue.length);}}}
+function scrollCellIntoView(element,cellRecord,cellColumn,strStickMode){var i;var len;var columnBorderWidth;var recordBorderHeight;var arrColumnWidths;var arrRecordHeights;var intCellWidth;var intCellHeight;var intCellTop;var intCellBottom;var intCellLeft;var intCellRight;var intViewportWidth;var intViewportHeight;var intViewportTop;var intViewportBottom;var intViewportLeft;var intViewportRight;var bolScrollMoved;var bolStickTop;var bolStickLeft;var bolStickBottom;var bolStickRight;columnBorderWidth=element.internalDisplay.columnBorderWidth;recordBorderHeight=element.internalDisplay.recordBorderHeight;arrColumnWidths=element.internalDisplay.columnWidths;arrRecordHeights=element.internalDisplay.recordHeights;if(strStickMode){bolStickTop=(strStickMode.indexOf('top')!==-1);bolStickLeft=(strStickMode.indexOf('left')!==-1);bolStickBottom=(strStickMode.indexOf('bottom')!==-1);bolStickRight=(strStickMode.indexOf('right')!==-1);if(bolStickTop&&bolStickBottom){console.warn('GS-TABLE Warning: Contradictory parameter sent'+' to scrollCellIntoView, you can\'t scroll a'+' cell to the top and the bottom of the viewport at'+' the same time. Stick to bottom will be cancelled.'+' Parameter Text: "'+strStickMode+'"');bolStickBottom=false;}
+if(bolStickLeft&&bolStickRight){console.warn('GS-TABLE Warning: Contradictory parameter sent'+' to scrollCellIntoView, you can\'t scroll a'+' cell to the left and the right of the viewport at'+' the same time. Stick to right will be cancelled.'+' Parameter Text: "'+strStickMode+'"');bolStickRight=false;}}
+if(cellRecord==='header'){intCellHeight=element.internalDisplay.headerHeight;}else if(cellRecord==='insert'){intCellHeight=element.internalDisplay.insertRecordHeight;}else{intCellHeight=arrRecordHeights[cellRecord];}
+intCellTop=0;if(cellRecord==='header'){intCellTop=0;}else if(cellRecord==='insert'){i=0;len=arrRecordHeights.length;while(i<len){intCellTop+=arrRecordHeights[i];intCellTop+=recordBorderHeight;i+=1;}}else{i=0;len=cellRecord;while(i<len){intCellTop+=arrRecordHeights[i];intCellTop+=recordBorderHeight;i+=1;}}
+if(cellColumn==='selector'){intCellWidth=element.internalDisplay.recordSelectorWidth;}else{intCellWidth=arrColumnWidths[cellColumn];}
+intCellLeft=0;if(cellColumn!=='selector'){i=0;len=cellColumn;while(i<len){intCellLeft+=arrColumnWidths[i];intCellLeft+=columnBorderWidth;i+=1;}}
+intCellBottom=(intCellTop+intCellHeight);intCellRight=(intCellLeft+intCellWidth);intViewportWidth=(element.elems.dataViewport.clientWidth-(element.internalScrollOffsets.left+
+element.internalScrollOffsets.right));intViewportHeight=(element.elems.dataViewport.clientHeight-(element.internalScrollOffsets.top+
+element.internalScrollOffsets.bottom));intViewportTop=(element.internalScroll.top);intViewportLeft=(element.internalScroll.left);intViewportBottom=(intViewportTop+intViewportHeight);intViewportRight=(intViewportLeft+intViewportWidth);bolScrollMoved=false;if(intCellTop<intViewportTop||bolStickTop){element.internalScroll.top=intCellTop;bolScrollMoved=true;}else if(intCellBottom>intViewportBottom||bolStickBottom){element.internalScroll.top=(intCellBottom-intViewportHeight);bolScrollMoved=true;}
+if(intCellLeft<intViewportLeft||bolStickLeft){element.internalScroll.left=intCellLeft;bolScrollMoved=true;}else if(intCellRight>intViewportRight||bolStickRight){element.internalScroll.left=(intCellRight-intViewportWidth);bolScrollMoved=true;}
+if(element.internalScroll.left>element.internalScroll.maxLeft){element.internalScroll.left=element.internalScroll.maxLeft;}else if(element.internalScroll.left<0){element.internalScroll.left=0;}
+if(element.internalScroll.top>element.internalScroll.maxTop){element.internalScroll.top=element.internalScroll.maxTop;}else if(element.internalScroll.top<0){element.internalScroll.top=0;}
+if(bolScrollMoved){renderScrollLocation(element);}else{renderSelection(element);}}
+function scrollSelectionIntoView(element,strStickMode){var jsnRange;var cellColumn;var cellRecord;jsnRange=element.internalSelection.ranges[element.internalSelection.ranges.length-1];if(!jsnRange){console.warn('GS-TABLE Warning: scrollSelectionIntoView was '+'called when there was no selection to scroll into view.');return;}
+cellRecord=(jsnRange.end.row);cellColumn=(jsnRange.end.column);scrollCellIntoView(element,cellRecord,cellColumn,strStickMode);}
+function focusIntoSelectedCell(element){var jsnRange;var bolReWriteSelection;jsnRange=element.internalSelection.ranges[element.internalSelection.ranges.length-1];if(element.internalSelection.ranges.length>1){console.warn('GS-TABLE Warning: "focusIntoSelectedCell" called'+' when multiple selections were present. Now clearing all'+' selections and creating new selection at last'+' selection\'s endpoint.');bolReWriteSelection=true;}else if(jsnRange&&(jsnRange.start.column!==jsnRange.end.column||jsnRange.start.row!==jsnRange.end.row)){console.warn('GS-TABLE Warning: "focusIntoSelectedCell" called'+' when the selection contained multiple cells. Now'+' clearing all selections and creating new selection at'+' last selection\'s endpoint.');bolReWriteSelection=true;}else if(!jsnRange){console.warn('GS-TABLE Warning: "focusIntoSelectedCell" called'+' when there was no selection to focus into. Stopping'+' execution of "focusIntoSelectedCell".');focusHiddenControl(element);return;}
+if(bolReWriteSelection){element.internalSelection.ranges=[{"start":{"row":jsnRange.end.row,"column":jsnRange.end.column},"end":{"row":jsnRange.end.row,"column":jsnRange.end.column},"negator":false}];jsnRange=element.internalSelection.ranges[0];renderSelection(element);}
+focusIntoCell(element,jsnRange.end.row,jsnRange.end.column);}
+function deleteSelectedRecords(element){if(element.internalSelection.ranges.length===0){GS.msgbox('No Records To Delete','<center>'+'Please choose a record to delete.'+'</center>',['Ok']);}else if(!element.hasAttribute('no-delete')){dataDELETE(element,{"recordIndexes":getSelectedRecordIndexes(element),"deleteConfirmed":false});}}
+function dragScrollEnd(element){if(element.internalTimerIDs.scrollIntervalID!==null){clearInterval(element.internalTimerIDs.scrollIntervalID);element.internalTimerIDs.scrollIntervalID=null;}
+element.internalScroll.dragScrollingDirection=null;element.internalScroll.dragScrolling=false;}
+function dragScrollStart(element,callback,strScrollDirection){var jsnDirection;var bolScrollTop;var bolScrollLeft;var bolScrollBottom;var bolScrollRight;element.internalScroll.dragScrolling=true;jsnDirection=directionStringBreakdown(strScrollDirection);bolScrollTop=jsnDirection.bolTop;bolScrollLeft=jsnDirection.bolLeft;bolScrollBottom=jsnDirection.bolBottom;bolScrollRight=jsnDirection.bolRight;strScrollDirection=jsnDirection.resolvedString;element.internalScroll.dragScrollingDirection=(strScrollDirection);element.internalTimerIDs.scrollIntervalID=setInterval(function(){var newScrollingDirection;var intLeftScrollAmount;var intLeftScroll;var intLeftMax;var intTopScrollAmount;var intTopScroll;var intTopMax;newScrollingDirection=(element.internalScroll.dragScrollingDirection);if(newScrollingDirection!==strScrollDirection){jsnDirection=directionStringBreakdown(newScrollingDirection);bolScrollTop=jsnDirection.bolTop;bolScrollLeft=jsnDirection.bolLeft;bolScrollBottom=jsnDirection.bolBottom;bolScrollRight=jsnDirection.bolRight;strScrollDirection=jsnDirection.resolvedString;element.internalScroll.dragScrollingDirection=(strScrollDirection);}
+if(bolScrollLeft||bolScrollRight){intLeftScrollAmount=10;}
+if(bolScrollTop||bolScrollBottom){intTopScrollAmount=10;}
+if(bolScrollLeft||bolScrollRight){intLeftScroll=(element.internalScroll.left);intLeftMax=(element.internalScroll.maxLeft);}
+if(bolScrollTop||bolScrollBottom){intTopScroll=(element.internalScroll.top);intTopMax=(element.internalScroll.maxTop);}
+if((!bolScrollTop||intLeftScroll===0)&&(!bolScrollLeft||intLeftScroll===0)&&(!bolScrollBottom||intLeftScroll===intTopMax)&&(!bolScrollRight||intLeftScroll===intLeftMax)){dragScrollEnd(element);}else if(!bolScrollTop&&!bolScrollLeft&&!bolScrollBottom&&!bolScrollRight){dragScrollEnd(element);}else{if(bolScrollTop||bolScrollBottom){if(bolScrollTop){intTopScroll-=intTopScrollAmount;}else if(bolScrollBottom){intTopScroll+=intTopScrollAmount;}
+if(intTopScroll>intTopMax){intTopScroll=intTopMax;}
+if(intTopScroll<0){intTopScroll=0;}
+element.internalScroll.top=intTopScroll;}
+if(bolScrollLeft||bolScrollRight){if(bolScrollLeft){intLeftScroll-=intLeftScrollAmount;}else if(bolScrollRight){intLeftScroll+=intLeftScrollAmount;}
+if(intLeftScroll>intLeftMax){intLeftScroll=intLeftMax;}
+if(intLeftScroll<0){intLeftScroll=0;}
+element.internalScroll.left=intLeftScroll;}
+renderScrollLocation(element);if(callback){callback();}}},50);}
+function insertPasteString(element,arrPaste,intMaxPasteColumn){var templateElement;var strSelection;var strOldRecord;var strNewRecord;var strCell;var strChar;var intStart;var intEnd;var intMinPasteColumn;var intPastedColumn;var intColumn;var arrColumnElements;var arrColumns;var i;var len;var rec_i;var rec_len;strSelection=element.internalSelection.resolvedSelection[element.internalSelection.resolvedSelection.length-1];if(element.internalDisplay.recordSelectorVisible){strSelection=strSelection.substring(1);}
+intStart=strSelection.indexOf('F');intEnd=strSelection.lastIndexOf('F');if((intEnd-intStart)<intMaxPasteColumn){intMaxPasteColumn=(intEnd-intStart);}
+intEnd=intStart+intMaxPasteColumn;if(element.internalSelection.columns[0]==='selector'){intMinPasteColumn=1;}else{intMinPasteColumn=0;}
+i=0;len=arrPaste.length;while(i<len){strOldRecord=arrPaste[i];intColumn=0;intPastedColumn=0;strNewRecord='';strCell='';rec_i=0;rec_len=strOldRecord.length;while(rec_i<rec_len){strChar=strOldRecord[rec_i];if(strChar!=='\t'){strCell+=strChar;}
+if(strChar==='\t'||rec_i===(rec_len-1)){if(intColumn>=intMinPasteColumn){if(intPastedColumn>0){strNewRecord+='\t';}
+if(strSelection[intPastedColumn+intStart]==='F'){strNewRecord+=strCell;}else{strNewRecord+='\\N';}
+intPastedColumn+=1;if(intPastedColumn>intMaxPasteColumn){break;}}
+strCell='';intColumn+=1;}
+if(intColumn>((intEnd-intStart)+intMinPasteColumn)){break;}
+rec_i+=1;}
+arrPaste[i]=strNewRecord;i+=1;}
+templateElement=document.createElement('template');templateElement.innerHTML=templateExtractVisibleCellRange(element,element.internalTemplates.insertRecord,intStart,(intEnd+1));arrColumnElements=xtag.query(templateElement.content,'gs-cell [column]');arrColumns=[];i=0;len=arrColumnElements.length;while(i<len){arrColumns.push(arrColumnElements[i].getAttribute('column'));i+=1;}
+dataINSERT(element,'multi-record',{"data":{"values":arrPaste,"columns":arrColumns,"addin":getInsertAddin(element)},"insertConfirmed":false});}
+function updatePasteString(element,arrPaste,intMaxPasteColumn){var arrRecords;var arrColumns;var intStartColumn;var intEndColumn;var arrSelection;var strSelection;var arrUpdateIndexes=[];var arrTranslated=[];var paste_i;var update_i;var i;var len;var rec_i;var rec_len;var strOldRecord;var strNewRecord;var intColumn;var intMinPasteColumn;var strCell;var strChar;var intPasteColumn;var intColumnOffset;var templateElement;var arrCellElements;var arrColumnElements;var arrColumnNames;var arrSelectedStates=['B','D','F','H','J','L'];arrSelection=element.internalSelection.resolvedSelection;if(element.internalDisplay.headerVisible){arrSelection.shift();}
+if(element.internalDisplay.insertRecordVisible){arrSelection.pop();}
+arrRecords=element.internalSelection.rows;if(arrRecords[0]==='header'){arrRecords.shift();}
+if(arrRecords[arrRecords.length-1]==='insert'){arrRecords.pop();}
+arrColumns=element.internalSelection.columns;if(arrColumns[0]==='selector'){arrColumns.shift();}
+intStartColumn=arrColumns[0];intEndColumn=arrColumns[arrColumns.length-1];if((intEndColumn-intStartColumn)<intMaxPasteColumn){intMaxPasteColumn=(intEndColumn-intStartColumn);}
+intEndColumn=(intStartColumn+intMaxPasteColumn);intColumnOffset=0;if(element.internalDisplay.recordSelectorVisible){intColumnOffset=1;}
+templateElement=document.createElement('template');templateElement.innerHTML=element.internalTemplates.insertRecord;arrCellElements=xtag.query(templateElement.content,'gs-cell');arrColumnNames=[];i=0;len=arrColumns.length;while(i<len){arrColumnElements=xtag.query(arrCellElements[arrColumns[i]],'[column]');if(arrColumnElements&&arrColumnElements.length>0){arrColumnNames.push(arrColumnElements[0].getAttribute('column'));if(arrColumnNames.length===(intMaxPasteColumn+1)){break;}}else{arrColumns.splice(i,1);i-=1;len-=1;}
+i+=1;}
+paste_i=0;update_i=0;len=arrPaste.length;if(len>arrRecords.length){len=arrRecords.length;}
+if(element.internalSelection.rows[0]==='header'){paste_i+=1;}
+if(element.internalSelection.columns[0]==='selector'){intMinPasteColumn=1;}else{intMinPasteColumn=0;}
+while(update_i<len){strOldRecord=arrPaste[paste_i];strSelection=arrSelection[arrRecords[update_i]];intColumn=0;strNewRecord='';strCell='';intPasteColumn=0;rec_i=0;rec_len=strOldRecord.length;while(rec_i<rec_len){strChar=strOldRecord[rec_i];if(strChar!=='\t'){strCell+=strChar;}
+if(strChar==='\t'||rec_i===(rec_len-1)){if(intColumn>=intMinPasteColumn){if(intPasteColumn>0){strNewRecord+='\t';}
+if(arrSelectedStates.indexOf(strSelection[(arrColumns[intPasteColumn]+
+intColumnOffset)])>-1){strNewRecord+=strCell;}else{strNewRecord+=getCell(element,arrColumnNames[intPasteColumn],arrRecords[update_i],false);}
+intPasteColumn+=1;if(intPasteColumn>intMaxPasteColumn){break;}}
+strCell='';intColumn+=1;}
+if(intColumn>((intEndColumn-intStartColumn)+intMinPasteColumn)){break;}
+rec_i+=1;}
+arrUpdateIndexes.push(arrRecords[update_i]);arrTranslated.push(strNewRecord);paste_i+=1;update_i+=1;}
+dataUPDATE(element,'cell-range',{"data":{"columns":arrColumnNames,"records":arrUpdateIndexes,"values":arrTranslated},"updateConfirmed":false});}
+function usePasteString(element,strUnnormalizedPasteString){var elementMaker=document.createElement('template');var tableElement;var tbodyElement;var arrRecord;var arrUpdateRecord;var arrInsertRecord;var arrCell;var strRecord;var strCell;var intMaxUpdateRecord;var arrSelectedRows;var rec_i;var rec_len;var col_i;var col_len;addLoader(element,'paste-parse','Parsing Pasted Data...');if(strUnnormalizedPasteString.indexOf('<'+'table')===-1&&strUnnormalizedPasteString.indexOf('<'+'tr')===-1){strUnnormalizedPasteString=delimitedStringToHTML(element,strUnnormalizedPasteString,'\t','\n','"',GS.decodeFromTabDelimited);}
+elementMaker.innerHTML=strUnnormalizedPasteString;tableElement=xtag.query(elementMaker.content,'table')[0];tbodyElement=xtag.queryChildren(tableElement,'tbody')[0];if(tbodyElement){arrRecord=xtag.queryChildren(tbodyElement,'tr');}else{arrRecord=xtag.queryChildren(tableElement,'tr');}
+arrSelectedRows=element.internalSelection.rows;intMaxUpdateRecord=arrSelectedRows.length-1;if(arrSelectedRows[intMaxUpdateRecord]==='insert'){intMaxUpdateRecord-=1;}
+if(arrSelectedRows[0]==='header'){intMaxUpdateRecord-=1;}
+arrUpdateRecord=[];arrInsertRecord=[];rec_i=0;rec_len=arrRecord.length;col_len=arrRecord[0].children.length;while(rec_i<rec_len){strRecord='';arrCell=xtag.toArray(arrRecord[rec_i].children);col_i=0;while(col_i<col_len){strRecord+=(strRecord?'\t':'');if(arrCell[col_i]){strCell=getPlainText(arrCell[col_i],true);if(strCell&&strCell.trim()){strRecord+=GS.encodeForTabDelimited(strCell);}else{strRecord+='\\N';}}else{strRecord+='\\N';}
+col_i+=1;}
+if(rec_i<=intMaxUpdateRecord){arrUpdateRecord.push(strRecord);}else{arrInsertRecord.push(strRecord);}
+rec_i+=1;}
+if(arrInsertRecord.length>0&&element.internalDisplay.insertRecordVisible&&arrSelectedRows[arrSelectedRows.length-1]==='insert'){insertPasteString(element,arrInsertRecord,(col_len-1));}
+if(arrUpdateRecord.length>0){updatePasteString(element,arrUpdateRecord,(col_len-1));}
+removeLoader(element,'paste-parse','Paste Data Parsed');}
+function usePasteEvent(element,event){var clipboardData;var pastePlain;var pasteHTML;if(element.internalSelection.columns.length===0&&element.internalSelection.rows.length===0){addLoader(element,'paste-fail','Can\'t paste, nothing selected...');removeLoader(element,'paste-fail','Can\'t paste, nothing selected...');}else{addLoader(element,'paste-extract','Extracting Pasted Data...');clipboardData=(event.clipboardData||window.clipboardData);if(window.clipboardData){pastePlain=clipboardData.getData('Text');}else{pasteHTML=clipboardData.getData('text/html');pastePlain=clipboardData.getData('Text');}
+removeLoader(element,'paste-extract','Paste Data Extracted');usePasteString(element,(pasteHTML||pastePlain));}}
+function openInsertDialog(element){var strTemplate;var templateElement;var beforeEvent;strTemplate=element.internalTemplates.insertDialog;templateElement=document.createElement("template");templateElement.innerHTML=ml(function(){/*
+            <gs-page gs-dynamic>
+                <gs-header>
+                    <center><h3>Create</h3></center>
+                </gs-header>
+                <gs-body padded>
+                    {{HTML}}
+                </gs-body>
+                <gs-footer>
+                    <gs-grid gutter>
+                        <gs-block>
+                            <gs-button dialogclose>Cancel</gs-button>
+                        </gs-block>
+                        <gs-block>
+                            <gs-button dialogclose
+                                       listen-for-return
+                                       bg-primary>Create</gs-button>
+                        </gs-block>
+                    </gs-grid>
+                </gs-footer>
+            </gs-page>
+        */}).replace("{{HTML}}",strTemplate);beforeEvent=GS.triggerEvent(element,"before_insert_dialog_open");if(beforeEvent.defaultPrevented){return;}
+GS.openDialog(templateElement,function(){var dialog=this;var arrElements;var element_i;var element_len;var strColumn;var strValue;arrElements=xtag.query(dialog,'[column]');element_i=0;element_len=arrElements.length;while(element_i<element_len){strColumn=arrElements[element_i].getAttribute('column');strValue=element.internalData.insertRecord[strColumn];if(strValue){arrElements[element_i].value=strValue;}
+element_i+=1;}
+GS.triggerEvent(element,"after_insert_dialog_open",{"relatedTarget":dialog});},function(ignore,strAnswer){var dialog=this;var arrElements;var element_i;var element_len;var strColumn;var strValue;arrElements=xtag.query(dialog,'[column]');element_i=0;element_len=arrElements.length;while(element_i<element_len){strColumn=arrElements[element_i].getAttribute('column');strValue=arrElements[element_i].value;if(strValue){element.internalData.insertRecord[strColumn]=strValue;if(element.internalData.insertRecordRetainedColumns.indexOf(strColumn)===-1){element.internalData.insertRecordRetainedColumns.push(strColumn);}}else if(!strValue&&element.internalData.insertRecordRetainedColumns.indexOf(strColumn)>-1){element.internalData.insertRecord[strColumn]=undefined;element.internalData.insertRecordRetainedColumns.splice(element.internalData.insertRecordRetainedColumns.indexOf(strColumn));}
+element_i+=1;}
+if(strAnswer!=='Cancel'||strAnswer==='Create'){dataINSERT(element,"single-record",{"data":{"values":(element.internalData.insertRecord),"columns":(element.internalData.insertRecordRetainedColumns),"addin":getInsertAddin(element)},"insertConfirmed":true});element.internalData.insertRecord={};element.internalData.insertRecordRetainedColumns=[];}else{element.internalDisplay.fullRenderRequired=true;renderLocation(element);}});}
+function openColumnHideDialog(element,targetElement,callback){var templateElement;var afterOpenCallback;var beforeCloseCallback;templateElement=document.createElement('template');templateElement.setAttribute('data-max-width','15em');templateElement.setAttribute('no-background','');templateElement.innerHTML=ml(function(){/*
+            <gs-page gs-dynamic class="gs-table-contextmenu">
+                <gs-header><h4>Unhide Columns</h4></gs-header>
+                <gs-body class="gs-table-column-checklist-container" padded>
+                </gs-body>
+                <gs-footer>
+                    <gs-grid gutter>
+                        <gs-block>
+                            <gs-button dialogclose>Cancel</gs-button>
+                        </gs-block>
+                        <gs-block>
+                            <gs-button dialogclose bg-primary>Apply</gs-button>
+                        </gs-block>
+                    </gs-grid>
+                </gs-footer>
+            </gs-page>
+        */});afterOpenCallback=function(){var dialog=this;var containerElement;var i;var len;var strHTML;var bolVisible;var arrColumnNames;var arrColumnWidths;arrColumnWidths=element.internalDisplay.columnWidths;arrColumnNames=element.internalDisplay.columnPlainTextNames;containerElement=xtag.query(dialog,'.gs-table-column-checklist-container')[0];strHTML='';i=0;len=arrColumnWidths.length;while(i<len){bolVisible=(arrColumnWidths[i]>0);strHTML+=('<gs-checkbox '+'        data-col-number="'+i+'"'+'        value="'+bolVisible.toString()+'">&nbsp;'+
+encodeHTML(arrColumnNames[i])+'</gs-checkbox>');i+=1;}
+containerElement.innerHTML=strHTML;dialog.classList.add('gs-table-contextmenu');};beforeCloseCallback=function(ignore,strAnswer){var dialog=this;var arrCheckbox;var arrColumnWidths;var arrDefaultColumnWidths;var i;var len;var colIndex;if(strAnswer!=='Cancel'){arrColumnWidths=(element.internalDisplay.columnWidths);arrDefaultColumnWidths=(element.internalDisplay.defaultColumnWidths);arrCheckbox=xtag.query(dialog,'gs-checkbox');i=0;len=arrCheckbox.length;while(i<len){colIndex=parseInt(arrCheckbox[i].getAttribute('data-col-number'),10);if(arrColumnWidths[colIndex]>0&&arrCheckbox[i].value==='false'){arrColumnWidths[colIndex]=0;}else if(arrColumnWidths[colIndex]===0&&arrCheckbox[i].value==='true'){arrColumnWidths[colIndex]=(arrDefaultColumnWidths[colIndex]);}
+i+=1;}
+element.internalDisplay.fullRenderRequired=true;renderLocation(element);}
+if(callback){callback(strAnswer);}};if(targetElement){GS.openDialogToElement(targetElement,templateElement,'right',afterOpenCallback,beforeCloseCallback);}else{GS.openDialog(templateElement,afterOpenCallback,beforeCloseCallback);}}
+function openDataSettingsDialog(element,buttonElement){var templateElement=document.createElement('template');templateElement.setAttribute('data-max-width','20em');templateElement.setAttribute('no-background','');templateElement.setAttribute('data-overlay-close','true');templateElement.innerHTML=ml(function(){/*
+<gs-page class="gs-table-contextmenu">
+    <gs-body class="gs-table-contextmenu" padded>
+        <div class="context-menu-header">Show Rows:</div>
+<table>
+    <tbody>
+        <tr>
+            <td>From:</td>
+            <td><gs-number class="pref-limit-from" mini></gs-number></td>
+        </tr>
+        <tr>
+            <td>To:</td>
+            <td><gs-number class="pref-limit-to" mini></gs-number></td>
+        </tr>
+    </tbody>
+</table>
+        <hr />
+        <gs-grid gutter>
+            <gs-block>
+                <gs-button dialogclose>Cancel</gs-button>
+            </gs-block>
+            <gs-block>
+                <gs-button dialogclose bg-primary>Apply</gs-button>
+            </gs-block>
+        </gs-grid>
+    </gs-body>
+</gs-page>
+            */}).replace(/\{\{RETURN\}\}/gi,'\n').replace(/\{\{TAB\}\}/gi,'\t');var limitFromControl;var limitToControl;GS.openDialogToElement(buttonElement,templateElement,'down',function(){var dialog=this;var intLimit;var intOffset;dialog.classList.add('gs-table-contextmenu');limitFromControl=xtag.query(dialog,'.pref-limit-from')[0];limitToControl=xtag.query(dialog,'.pref-limit-to')[0];intLimit=parseInt(element.getAttribute('limit'),10);intOffset=parseInt((element.getAttribute('offset')||'0'),10);limitFromControl.value=(intOffset+1);limitToControl.value=((intLimit+intOffset)||element.internalData.records.length);},function(ignore,strAnswer){var intLimitFrom;var intLimitTo;var intLimit;var strOldLimit;var strOldOffset;if(strAnswer==='Apply'){intLimitFrom=parseInt((limitFromControl.value||'0'),10)-1;intLimitTo=parseInt((limitToControl.value||'0'),10);intLimit=(intLimitTo-intLimitFrom);strOldLimit=element.getAttribute('limit');strOldOffset=element.getAttribute('offset');if(!isNaN(intLimit)){element.setAttribute('limit',intLimit);}else{element.removeAttribute('limit');}
+if(!isNaN(intLimitFrom)){element.setAttribute('offset',intLimitFrom);}else{element.removeAttribute('offset');}
+if(element.getAttribute('limit')!==strOldLimit&&element.getAttribute('offset')!==strOldOffset){dataSELECT(element);}}});}
+function openClipboardSettingsDialog(element,buttonElement){var templateElement=document.createElement('template');templateElement.setAttribute('data-max-width','20em');templateElement.setAttribute('no-background','');templateElement.setAttribute('data-overlay-close','true');templateElement.innerHTML=ml(function(){/*
+<gs-page class="gs-table-contextmenu">
+    <gs-body class="gs-table-contextmenu" padded>
+        <div class="context-menu-header">Paste Format:</div>
+        <table>
+            <tbody>
+<tr>
+    <td>Headers?</td>
+    <td>
+        <gs-select class="pref-copy-headers" mini>
+            <option value="always">Always</option>
+            <option value="never">Never</option>
+            <option value="selected">Only when selected</option>
+        </gs-select>
+    </td>
+</tr>
+<tr>
+    <td>Row Numbers?</td>
+    <td>
+        <gs-select class="pref-copy-selectors" mini>
+            <option value="always">Always</option>
+            <option value="never">Never</option>
+            <option value="selected">Only when selected</option>
+        </gs-select>
+    </td>
+</tr>
+<tr>
+    <td>Quote Character:</td>
+    <td>
+        <gs-select class="pref-quote-char" mini>
+            <option value="\">Backslash (\)</option>
+            <option value="/">Forward Slash (/)</option>
+            <option value="|">Pipe (|)</option>
+            <option value="&quot;">Double Quote (&quot;)</option>
+            <option value="'">Single Quote (')</option>
+        </gs-select>
+    </td>
+</tr>
+<tr>
+    <td>Escape Character:</td>
+    <td>
+        <gs-select class="pref-escape-char" mini>
+            <option value="\">Backslash (\)</option>
+            <option value="/">Forward Slash (/)</option>
+            <option value="|">Pipe (|)</option>
+            <option value="&quot;">Double Quote (&quot;)</option>
+            <option value="'">Single Quote (')</option>
+        </gs-select>
+    </td>
+</tr>
+<tr>
+    <td>Quote?</td>
+    <td>
+        <gs-select class="pref-copy-quote" mini>
+            <option value="always">Always</option>
+            <option value="never">Never</option>
+            <option value="strings">Only on strings</option>
+            <option value="delimiter-in-content">
+                Cell contains separator
+            </option>
+        </gs-select>
+    </td>
+</tr>
+<tr>
+    <td>Record Separator:</td>
+    <td>
+        <gs-select class="pref-delimiter-record" mini>
+            <option value="{{RETURN}}">Newline</option>
+            <option value="|">Vertical Bar (|)</option>
+            <option value=",">Comma (,)</option>
+            <option value="{{TAB}}">Tab</option>
+        </gs-select>
+    </td>
+</tr>
+<tr>
+    <td>Cell Separator:</td>
+    <td>
+        <gs-select class="pref-delimiter-cell" mini>
+            <option value="{{RETURN}}">Newline</option>
+            <option value="|">Vertical Bar (|)</option>
+            <option value=",">Comma (,)</option>
+            <option value="{{TAB}}">Tab</option>
+        </gs-select>
+    </td>
+</tr>
+<tr>
+    <td>Empty values:</td>
+    <td>
+        <gs-select class="pref-null-value" mini>
+            <option value="">(nothing)</option>
+            <option value="NULL">"NULL"</option>
+            <option value="null">"null"</option>
+            <option value="EMPTY">"EMPTY"</option>
+            <option value="empty">"empty"</option>
+            <option value="Nothing">"Nothing"</option>
+        </gs-select>
+    </td>
+</tr>
+            </tbody>
+        </table>
+        <hr />
+        <gs-grid gutter>
+            <gs-block>
+                <gs-button dialogclose>Cancel</gs-button>
+            </gs-block>
+            <gs-block>
+                <gs-button dialogclose bg-primary>Apply</gs-button>
+            </gs-block>
+        </gs-grid>
+    </gs-body>
+</gs-page>
+            */}).replace(/\{\{RETURN\}\}/gi,'\n').replace(/\{\{TAB\}\}/gi,'\t');var copyHeadersControl;var copySelectorsControl;var copyQuoteCharControl;var copyEscapeCharControl;var copyQuoteWhenControl;var copyCellDelimiterControl;var copyRecordDelimiterControl;var copyNullControl;GS.openDialogToElement(buttonElement,templateElement,'down',function(){var dialog=this;var jsnCopy;dialog.classList.add('gs-table-contextmenu');jsnCopy=getCopyParameters(element);copyHeadersControl=xtag.query(dialog,'.pref-copy-headers')[0];copySelectorsControl=xtag.query(dialog,'.pref-copy-selectors')[0];copyQuoteCharControl=xtag.query(dialog,'.pref-quote-char')[0];copyEscapeCharControl=xtag.query(dialog,'.pref-escape-char')[0];copyQuoteWhenControl=xtag.query(dialog,'.pref-copy-quote')[0];copyCellDelimiterControl=xtag.query(dialog,'.pref-delimiter-cell')[0];copyRecordDelimiterControl=xtag.query(dialog,'.pref-delimiter-record')[0];copyNullControl=xtag.query(dialog,'.pref-null-value')[0];copyHeadersControl.value=jsnCopy.headerMode;copySelectorsControl.value=jsnCopy.selectorMode;copyQuoteCharControl.value=jsnCopy.quoteChar;copyEscapeCharControl.value=jsnCopy.escapeChar;copyQuoteWhenControl.value=jsnCopy.quoteMode;copyCellDelimiterControl.value=jsnCopy.cellDelimiter;copyRecordDelimiterControl.value=jsnCopy.recordDelimiter;copyNullControl.value=jsnCopy.nullString;},function(ignore,strAnswer){var strCopyHeaders;var strCopySelectors;var strQuoteChar;var strEscapeChar;var strQuoteMode;var strCellDelimiter;var strRecordDelimiter;var strNullValue;if(strAnswer==='Apply'){strCopyHeaders=copyHeadersControl.value;strCopySelectors=copySelectorsControl.value;strQuoteChar=copyQuoteCharControl.value;strEscapeChar=copyEscapeCharControl.value;strQuoteMode=copyQuoteWhenControl.value;strCellDelimiter=copyCellDelimiterControl.value;strRecordDelimiter=copyRecordDelimiterControl.value;strNullValue=copyNullControl.value;element.setAttribute('copy-header',strCopyHeaders);element.setAttribute('copy-selectors',strCopySelectors);element.setAttribute('copy-quote-char',strQuoteChar);element.setAttribute('copy-escape-char',strEscapeChar);element.setAttribute('copy-quote-when',strQuoteMode);element.setAttribute('copy-delimiter-cell',strCellDelimiter);element.setAttribute('copy-delimiter-record',strRecordDelimiter);element.setAttribute('copy-null-cell',strNullValue);}});}
+function openSettingsDialog(element,buttonElement){var templateElement=document.createElement('template');templateElement.setAttribute('data-max-width','15em');templateElement.setAttribute('no-background','');templateElement.setAttribute('data-overlay-close','true');templateElement.innerHTML=ml(function(){/*
+<gs-page class="gs-table-contextmenu">
+    <gs-body class="gs-table-contextmenu" padded>
+        <gs-button dialogclose iconleft remove-bottom
+            icon="database"
+            class="button-column-width">Data Settings</gs-button>
+        <gs-button dialogclose iconleft remove-top
+            icon="clipboard"
+            class="button-column-width">Clipboard Settings</gs-button>
+    </gs-body>
+</gs-page>
+            */});GS.openDialogToElement(buttonElement,templateElement,'down',function(){var dialog=this;dialog.classList.add('gs-table-contextmenu');},function(ignore,strAnswer){if(strAnswer==='Data Settings'){openDataSettingsDialog(element,buttonElement);}else if(strAnswer==='Clipboard Settings'){openClipboardSettingsDialog(element,buttonElement);}});}
+function unbindFocus(element){element.removeEventListener(evt.mousedown,element.internalEvents.focusMouseDown);element.elems.dataViewport.removeEventListener('focus',element.internalEvents.focusInViewport,true);window.removeEventListener('focus',element.internalEvents.focusTracker);element.removeEventListener('focus',element.internalEvents.focusTracker,true);window.removeEventListener('blur',element.internalEvents.focusTracker);window.removeEventListener('focusout',element.internalEvents.focusTracker);}
+function bindFocus(element){element.internalEvents.focusMouseDown=function(event){var blurEventFunction;var target=event.target;var parentCell;parentCell=GS.findParentTag(target,'gs-cell');if(parentCell&&parentCell.nodeName==='GS-CELL'&&target.nodeName==='LABEL'&&parentCell.children.length===1&&parentCell.children[0].nodeName==='LABEL'){event.preventDefault();event.stopPropagation();}
+if(!GS.isElementFocusable(target)&&!evt.touchDevice){focusHiddenControl(element);blurEventFunction=function(){focusHiddenControl(element);element.elems.hiddenFocusControl.removeEventListener('blur',blurEventFunction);};element.elems.hiddenFocusControl.addEventListener('blur',blurEventFunction);}};element.addEventListener(evt.mousedown,element.internalEvents.focusMouseDown);element.internalEvents.focusInViewport=function(){var active=document.activeElement;var parentCell=GS.findParentTag(active,'gs-cell');if(parentCell&&parentCell.nodeName==='GS-CELL'){if(!parentCell.hasAttribute('selected')){focusHiddenControl(element);}}};element.elems.dataViewport.addEventListener('focus',element.internalEvents.focusInViewport,true);element.internalEvents.focusTracker=function(){var active=document.activeElement;var parentTable=GS.findParentElement(active,element);var parentCell;var parentColumn;element.internalDisplay.focus.latest=false;if(parentTable&&parentTable.nodeName==='GS-TABLE'){element.classList.add('focus-in');element.classList.remove('focus-out');parentCell=GS.findParentTag(active,'gs-cell');parentColumn=GS.findParentElement(active,'[column]');if(!parentColumn||parentColumn.nodeName==='HTML'){parentColumn=active;}
+if(parentCell){element.internalDisplay.focus.column=(parseInt((parentCell.getAttribute('data-col-number')||parentCell.getAttribute('data-col')||''),10));element.internalDisplay.focus.row=(parseInt((parentCell.getAttribute('data-row-number')||parentCell.getAttribute('data-row')||''),10));element.internalDisplay.focus.columnAttribute=(parentColumn.getAttribute('column'));element.internalDisplay.focus.nodeName=(active.nodeName);element.internalDisplay.focus.latest=true;}}else{element.classList.add('focus-out');element.classList.remove('focus-in');}};window.addEventListener('focus',element.internalEvents.focusTracker);element.addEventListener('focus',element.internalEvents.focusTracker,true);window.addEventListener('blur',element.internalEvents.focusTracker);window.addEventListener('focusout',element.internalEvents.focusTracker);}
+function unbindScroll(element){if(evt.touchDevice){element.elems.dataViewport.removeEventListener(evt.mousedown,element.internalEvents.scrollDragStartFunction);}else{element.removeEventListener('wheel',element.internalEvents.scrollWheelFunction);}
+window.removeEventListener('resize',element.internalEvents.scrollResizeFunction);element.elems.yScrollBar.removeEventListener('scroll',element.internalEvents.scrollBarYFunction);element.elems.xScrollBar.removeEventListener('scroll',element.internalEvents.scrollBarXFunction);}
+function bindScroll(element){if(evt.touchDevice){var intStartMouseLeft;var intStartMouseTop;var intStartScrollLeft;var intStartScrollTop;var intCurrentMouseLeft;var intCurrentMouseTop;var intCurrentScrollLeft;var intCurrentScrollTop;var dragStarted;element.internalEvents.scrollDragStartFunction=function(event){var jsnMousePos=GS.mousePosition(event);dragStarted=false;intStartMouseLeft=jsnMousePos.left;intStartMouseTop=jsnMousePos.top;intStartScrollLeft=element.internalScroll.left;intStartScrollTop=element.internalScroll.top;event.preventDefault();event.stopPropagation();document.body.addEventListener(evt.mousemove,element.internalEvents.scrollDragMoveFunction);document.body.addEventListener(evt.mouseup,element.internalEvents.scrollDragEndFunction);};var leftPlay=10;var topPlay=10;element.internalEvents.scrollDragMoveFunction=function(event){var jsnMousePos;if(event.which===0&&!evt.touchDevice){event.preventDefault();event.stopPropagation();element.internalEvents.scrollDragEndFunction();}else{jsnMousePos=GS.mousePosition(event);intCurrentMouseLeft=jsnMousePos.left;intCurrentMouseTop=jsnMousePos.top;intCurrentScrollLeft=element.internalScroll.left;intCurrentScrollTop=element.internalScroll.top;if(dragStarted===false&&(Math.abs(intCurrentMouseLeft-intStartMouseLeft)>leftPlay||Math.abs(intCurrentMouseTop-intStartMouseTop)>topPlay)){dragStarted=true;}
+if(dragStarted){event.preventDefault();event.stopPropagation();element.internalScroll.prevTop=element.internalScroll.top;element.internalScroll.prevLeft=element.internalScroll.left;element.internalScroll.left-=(intCurrentMouseLeft-intStartMouseLeft)+
+(intCurrentScrollLeft-intStartScrollLeft);element.internalScroll.top-=(intCurrentMouseTop-intStartMouseTop)+
+(intCurrentScrollTop-intStartScrollTop);element.internalScroll.top=Math.round(element.internalScroll.top);element.internalScroll.left=Math.round(element.internalScroll.left);element.internalScroll.top=Math.min(element.internalScroll.maxTop,element.internalScroll.top);element.internalScroll.left=Math.min(element.internalScroll.maxLeft,element.internalScroll.left);element.internalScroll.top=Math.max(0,element.internalScroll.top);element.internalScroll.left=Math.max(0,element.internalScroll.left);renderScrollLocation(element);}}};element.internalEvents.scrollDragEndFunction=function(){document.body.removeEventListener(evt.mousemove,element.internalEvents.scrollDragMoveFunction);document.body.removeEventListener(evt.mouseup,element.internalEvents.scrollDragEndFunction);};element.elems.dataViewport.addEventListener(evt.mousedown,element.internalEvents.scrollDragStartFunction);}else{element.internalEvents.scrollWheelFunction=function(event){var originalTop;var originalLeft;if((element.internalScroll.top===0&&event.deltaY<0)||(element.internalScroll.top===element.internalScroll.maxTop&&event.deltaY>0)||(element.internalScroll.left===0&&event.deltaX<0)||(element.internalScroll.left===element.internalScroll.maxLeft&&event.deltaX>0)){return;}
+event.preventDefault();originalTop=element.internalScroll.top;originalLeft=element.internalScroll.left;element.internalScroll.top+=event.deltaY;element.internalScroll.left+=event.deltaX;element.internalScroll.prevTop=element.internalScroll.top;element.internalScroll.prevLeft=element.internalScroll.left;element.internalScroll.top=Math.round(element.internalScroll.top);element.internalScroll.left=Math.round(element.internalScroll.left);element.internalScroll.top=Math.min(element.internalScroll.maxTop,element.internalScroll.top);element.internalScroll.left=Math.min(element.internalScroll.maxLeft,element.internalScroll.left);element.internalScroll.top=Math.max(0,element.internalScroll.top);element.internalScroll.left=Math.max(0,element.internalScroll.left);if((element.internalScroll.top!==originalTop)||(element.internalScroll.left!==originalLeft)){renderScrollLocation(element);}};element.addEventListener('wheel',element.internalEvents.scrollWheelFunction);}
+element.internalEvents.scrollResizeFunction=function(){renderScrollDimensions(element);};window.addEventListener('resize',element.internalEvents.scrollResizeFunction);element.internalEvents.scrollBarYFunction=function(){var intViewportHeight;var virtualScrollHeight;var trueScrollHeight;var trueScrollTop;if(!element.internalEventCancelled.scrollbarY){intViewportHeight=element.elems.dataViewport.clientHeight;virtualScrollHeight=element.internalScroll.maxTop;trueScrollHeight=element.elems.yScrollBar.scrollHeight;trueScrollHeight-=intViewportHeight;trueScrollTop=element.elems.yScrollBar.scrollTop;element.internalScroll.top=(trueScrollTop*(virtualScrollHeight/trueScrollHeight));element.internalScroll.top=(element.internalScroll.top||0);element.internalScroll.top=Math.round(element.internalScroll.top);element.internalScroll.top=Math.min(element.internalScroll.maxTop,element.internalScroll.top);element.internalScroll.top=Math.max(0,element.internalScroll.top);renderScrollLocation(element);}
+element.internalEventCancelled.scrollbarY=false;};element.elems.yScrollBar.addEventListener('scroll',element.internalEvents.scrollBarYFunction);element.internalEvents.scrollBarXFunction=function(){var intViewportWidth;var virtualScrollWidth;var trueScrollWidth;var trueScrollLeft;if(!element.internalEventCancelled.scrollbarX){intViewportWidth=element.elems.dataViewport.clientWidth;virtualScrollWidth=element.internalScroll.maxLeft;trueScrollWidth=element.elems.xScrollBar.scrollWidth;trueScrollWidth-=intViewportWidth;trueScrollLeft=element.elems.xScrollBar.scrollLeft;element.internalScroll.left=(trueScrollLeft*(virtualScrollWidth/trueScrollWidth));element.internalScroll.left=(element.internalScroll.left||0);element.internalScroll.left=Math.round(element.internalScroll.left);element.internalScroll.left=Math.min(element.internalScroll.maxLeft,element.internalScroll.left);element.internalScroll.left=Math.max(0,element.internalScroll.left);renderScrollLocation(element);}
+element.internalEventCancelled.scrollbarX=false;};element.elems.xScrollBar.addEventListener('scroll',element.internalEvents.scrollBarXFunction);}
+function unbindSelection(element){if(evt.touchDevice){}else{element.elems.dataContainer.removeEventListener(evt.mousedown,element.internalEvents.selectDragStart);}}
+function bindSelection(element){if(evt.touchDevice){}else{var selectionRangesCopy;var intCurrentSelectionIndex;element.internalEvents.selectDragStart=function(event){var cell;var classList;var intRow;var intColumn;var newRange;var jsnLocation;cell=GS.findParentElement(event.target,'gs-cell');if(cell.nodeName==='GS-CELL'&&element.internalResize.currentlyResizing===false&&element.internalReorder.currentlyReordering===false&&(event.which===1||!cell.hasAttribute('selected'))){element.internalSelection.currentlySelecting=true;newRange={"start":{"row":0,"column":0},"end":{"row":0,"column":0},"negator":false};selectionRangesCopy=JSON.parse(JSON.stringify(element.internalSelection.ranges));jsnLocation=getCellFromMouseEvent(element,event);newRange.start.row=jsnLocation.row;newRange.start.column=jsnLocation.column;newRange.end.row=newRange.start.row;newRange.end.column=newRange.start.column;if(!event.shiftKey&&!event.metaKey&&!event.ctrlKey){element.internalSelection.ranges=[newRange];intCurrentSelectionIndex=0;}else{if(event.shiftKey){intCurrentSelectionIndex=(element.internalSelection.ranges.length-1);if(element.internalSelection.ranges[intCurrentSelectionIndex].negator===false){element.internalSelection.ranges[intCurrentSelectionIndex].end.row=newRange.start.row;element.internalSelection.ranges[intCurrentSelectionIndex].end.column=newRange.start.column;}else{element.internalSelection.ranges.push(newRange);intCurrentSelectionIndex=(element.internalSelection.ranges.length-1);}}else if(event.metaKey||event.ctrlKey){if(cell.hasAttribute('selected')){newRange.negator=true;}
+element.internalSelection.ranges.push(newRange);intCurrentSelectionIndex=(element.internalSelection.ranges.length-1);}}
+renderSelection(element);if(event.which===1){document.body.addEventListener(evt.mousemove,element.internalEvents.selectDragMove);document.body.addEventListener(evt.mouseup,element.internalEvents.selectDragEnd);}else{element.internalEvents.selectDragEnd();}}};element.internalEvents.selectDragMove=function(event){var cell;var classList;var intRow;var intColumn;var intOldEndRow;var intOldEndColumn;var currentRange;getCellFromMouseEvent(element,event);if(event.which===0&&!evt.touchDevice){element.internalEvents.selectDragEnd();}else{var jsnLocation=getCellFromMouseEvent(element,event);currentRange=(element.internalSelection.ranges[intCurrentSelectionIndex]);intOldEndRow=currentRange.end.row;intOldEndColumn=currentRange.end.column;currentRange.end.row=jsnLocation.row;currentRange.end.column=jsnLocation.column;if(currentRange.start.row!==currentRange.end.row||currentRange.start.column!==currentRange.end.column){event.preventDefault();event.stopPropagation();}
+if(document.activeElement!==element.elems.hiddenFocusControl){if(((currentRange.start.row!==currentRange.end.row||currentRange.start.column!==currentRange.end.column)&&(currentRange.start.row===intOldEndRow&&currentRange.start.column===intOldEndColumn))||GS.findParentTag(document.activeElement,'gs-table')!==element||element.internalSelection.ranges.length>1){focusHiddenControl(element);}}
+if(currentRange.end.row!==intOldEndRow||currentRange.end.column!==intOldEndColumn){renderSelection(element);}}};element.internalEvents.selectDragEnd=function(/*event*/){var beforeEvent;beforeEvent=GS.triggerEvent(element,'before_selection');if(beforeEvent.defaultPrevented){element.internalSelection.ranges=selectionRangesCopy;}
+renderSelection(element);if(beforeEvent.defaultPrevented){GS.triggerEvent(element,'after_selection');}
+document.body.removeEventListener(evt.mousemove,element.internalEvents.selectDragMove);document.body.removeEventListener(evt.mouseup,element.internalEvents.selectDragEnd);element.internalSelection.currentlySelecting=false;};element.elems.dataContainer.addEventListener(evt.mousedown,element.internalEvents.selectDragStart);}}
+function unbindCellResize(element){if(!evt.touchDevice){element.elems.dataViewport.removeEventListener(evt.mousemove,element.internalEvents.cellResizeStarter);element.elems.handleColumn.removeEventListener(evt.mousedown,element.internalEvents.cellResizeDragStart);element.elems.handleRecord.removeEventListener(evt.mousedown,element.internalEvents.cellResizeDragStart);element.elems.handleColumn.removeEventListener('dblclick',element.internalEvents.cellResizeToDefault);element.elems.handleRecord.removeEventListener('dblclick',element.internalEvents.cellResizeToDefault);}}
+function bindCellResize(element){var showHandles;var setLineToMouse;if(!evt.touchDevice){showHandles=function(event){if(element.internalResize.showThrottleID!==null){clearTimeout(element.internalResize.showThrottleID);element.internalResize.showThrottleID=null;}
+element.internalResize.showThrottleID=setTimeout(function(){var intPreviousPoint;var jsnElementPos;var jsnMousePos;var intMouseX;var intMouseY;var intPoint;var i;var len;jsnElementPos=GS.getElementOffset(element.elems.dataViewport);jsnMousePos=GS.mousePosition(event);intMouseX=(jsnMousePos.left-jsnElementPos.left);intMouseY=(jsnMousePos.top-jsnElementPos.top);element.internalResize.resizeColumn=false;if(element.internalDisplay.recordSelectorVisible&&intMouseY<=(element.internalDisplay.headerHeight)){i=0;len=element.internalDisplay.columnHandles.length;while(i<len){intPoint=(element.internalDisplay.columnHandles[i]);if(intPoint!==null){if(Math.abs(intMouseX-intPoint)<=5){element.internalResize.resizeColumnHandleIndex=i;element.internalResize.resizeColumn=(true);if(intPreviousPoint!==undefined){element.internalResize.cellOriginX=(intPreviousPoint);}else{element.internalResize.cellOriginX=0;}
+element.internalResize.cellOriginX+=1;break;}
+if(intPoint>intMouseX){break;}
+intPreviousPoint=intPoint;}
+i+=1;}}
+element.internalResize.resizeRecord=false;if(element.internalDisplay.headerVisible&&intMouseX<=(element.internalDisplay.recordSelectorWidth)){i=0;len=element.internalDisplay.recordHandles.length;while(i<len){intPoint=(element.internalDisplay.recordHandles[i]);if(Math.abs(intMouseY-intPoint)<=5){element.internalResize.resizeRecordHandleIndex=i;element.internalResize.resizeRecord=true;if(i===(len-1)&&element.internalDisplay.insertRecordVisible){element.internalResize.cellOriginY=(0);}else if(i>0){element.internalResize.cellOriginY=(element.internalDisplay.recordHandles[i-1]);}else{element.internalResize.cellOriginY=0;}
+element.internalResize.cellOriginY+=1;break;}
+if(intPoint>intMouseY){break;}
+i+=1;}}
+if(element.internalResize.resizeColumn&&element.elems.handleColumn.parentNode!==element.elems.dataViewport){element.elems.dataViewport.appendChild(element.elems.handleColumn);}
+if(element.internalResize.resizeRecord&&element.elems.handleRecord.parentNode!==element.elems.dataViewport){element.elems.dataViewport.appendChild(element.elems.handleRecord);}
+if(element.internalResize.resizeColumn){element.elems.handleColumn.style.left=(element.internalDisplay.columnHandles[element.internalResize.resizeColumnHandleIndex])+'px';}
+if(element.internalResize.resizeRecord){element.elems.handleRecord.style.top=(element.internalDisplay.recordHandles[element.internalResize.resizeRecordHandleIndex])+'px';}
+if(element.internalResize.resizeColumn&&element.internalResize.resizeRecord){element.elems.dataViewport.classList.add('table-cursor-all-resize');}else if(element.internalResize.resizeColumn){element.elems.dataViewport.classList.add('table-cursor-col-resize');}else if(element.internalResize.resizeRecord){element.elems.dataViewport.classList.add('table-cursor-row-resize');}
+element.internalResize.showThrottleID=null;},20);};element.internalEvents.cellResizeStarter=function(event){if((((window.navigator.userAgent.indexOf("Edge")>-1||window.navigator.userAgent.indexOf("Firefox")>-1)&&event.which===1)||((window.navigator.userAgent.indexOf("Edge")===-1||window.navigator.userAgent.indexOf("Firefox")>-1)&&event.which===0))&&element.internalResize.currentlyResizing!==true&&element.internalResize.currentlyReordering!==true){if(element.elems.handleColumn.parentNode===element.elems.dataViewport){element.elems.dataViewport.removeChild(element.elems.handleColumn);}
+if(element.elems.handleRecord.parentNode===element.elems.dataViewport){element.elems.dataViewport.removeChild(element.elems.handleRecord);}
+element.elems.dataViewport.classList.remove('table-cursor-all-resize');element.elems.dataViewport.classList.remove('table-cursor-col-resize');element.elems.dataViewport.classList.remove('table-cursor-row-resize');showHandles(event);}else{if(element.internalResize.showThrottleID!==null){clearTimeout(element.internalResize.showThrottleID);element.internalResize.showThrottleID=null;}}};element.elems.dataViewport.addEventListener(evt.mousemove,element.internalEvents.cellResizeStarter);element.internalEvents.cellResizeDragStart=function(){var recordSelectorVisible;var headerVisible;var insertRecordVisible;var intColumnHandle;var intRecordHandle;element.internalResize.currentlyResizing=true;element.internalResize.resizeStarted=false;element.internalResize.resizeColumnIndex=null;element.internalResize.resizeRecordIndex=null;element.internalResize.resizingRecordSelectors=false;element.internalResize.resizingHeader=false;element.internalResize.resizingInsert=false;recordSelectorVisible=(element.internalDisplay.recordSelectorVisible);headerVisible=(element.internalDisplay.headerVisible);insertRecordVisible=(element.internalDisplay.insertRecordVisible);if(element.internalResize.resizeColumn){intColumnHandle=(element.internalResize.resizeColumnHandleIndex);if(intColumnHandle===0&&recordSelectorVisible===true){element.internalResize.resizingRecordSelectors=true;}else{element.internalResize.resizeColumnIndex=(intColumnHandle+
+element.internalDisplay.currentRange.fromColumn)-(recordSelectorVisible?1:0);}}
+if(element.internalResize.resizeRecord){intRecordHandle=(element.internalResize.resizeRecordHandleIndex);if(intRecordHandle===0&&headerVisible===true){element.internalResize.resizingHeader=true;}}
+element.internalResize.scrollOriginTop=(element.internalScroll.displayTop);element.internalResize.scrollOriginLeft=(element.internalScroll.displayLeft);document.body.addEventListener(evt.mousemove,element.internalEvents.cellResizeDragMove);document.body.addEventListener(evt.mouseup,element.internalEvents.cellResizeDragEnd);};setLineToMouse=function(event){var jsnMousePos;var jsnElementPos;var intMouseX;var intMouseY;var viewportWidth;var viewportHeight;var cellOriginX;var cellOriginY;var intMaxColWidth;var intMaxRowHeight;var intMinColWidth;var intOriginScrollTop;var intOriginScrollLeft;var intCurrentScrollTop;var intCurrentScrollLeft;var intNewWidth;var intNewHeight;var intNewX;var intNewY;var intTopBoundery;intOriginScrollTop=(element.internalResize.scrollOriginTop);intOriginScrollLeft=(element.internalResize.scrollOriginLeft);intCurrentScrollTop=(element.internalScroll.displayTop);intCurrentScrollLeft=(element.internalScroll.displayLeft);jsnMousePos=GS.mousePosition(event);jsnElementPos=GS.getElementOffset(element.elems.dataViewport);if(element.internalResize.resizeColumn){element.elems.handleColumn.classList.add('active');intMouseX=(jsnMousePos.left-jsnElementPos.left);intMaxColWidth=(element.internalDisplay.maxColumnWidth);intMinColWidth=(element.internalDisplay.minColumnWidths[element.internalResize.resizeColumnIndex]);cellOriginX=element.internalResize.cellOriginX;viewportWidth=element.elems.dataViewport.clientWidth;intNewWidth=((intMouseX+
+intCurrentScrollLeft)-
+(cellOriginX+
+intOriginScrollLeft));if(intNewWidth<0){intNewWidth=0;}
+if(intNewWidth>(viewportWidth-10)){intNewWidth=(viewportWidth-10);}
+if(intNewWidth>intMaxColWidth){intNewWidth=intMaxColWidth;}
+if(intNewWidth<10){intNewWidth=10;}
+if(intNewWidth<intMinColWidth){intNewWidth=intMinColWidth;}
+intNewX=((cellOriginX+
+intOriginScrollLeft+
+intNewWidth)-
+(intCurrentScrollLeft));element.elems.handleColumn.style.left=(intNewX)+'px';element.internalResize.lastX=intNewX;element.internalResize.lastWidth=intNewWidth;}
+if(element.internalResize.resizeRecord){element.elems.handleRecord.classList.add('active');intMouseY=(jsnMousePos.top-jsnElementPos.top);intMaxRowHeight=(element.internalDisplay.maxRecordHeight);cellOriginY=element.internalResize.cellOriginY;viewportHeight=element.elems.dataViewport.clientHeight;if(element.internalResize.resizingInsert){intNewHeight=(viewportHeight-
+intMouseY);}else{intNewHeight=((intMouseY+
+intCurrentScrollTop)-
+(cellOriginY+
+intOriginScrollTop));}
+if(intNewHeight<0){intNewHeight=0;}
+intTopBoundery=(viewportHeight-(element.internalScrollOffsets.top+10));if(intNewHeight>intTopBoundery){intNewHeight=intTopBoundery;}
+if(!element.internalResize.resizingInsert&&intNewHeight>intMaxRowHeight){intNewHeight=intMaxRowHeight;}
+if(intNewHeight<10){intNewHeight=10;}
+if(element.internalResize.resizingInsert){intNewY=(viewportHeight-
+intNewHeight);}else{intNewY=((cellOriginY+
+intOriginScrollTop+
+intNewHeight)-
+(intCurrentScrollTop));}
+element.elems.handleRecord.style.top=(intNewY)+'px';element.internalResize.lastY=intNewY;element.internalResize.lastHeight=intNewHeight;}};element.internalEvents.cellResizeDragMove=function(event){var jsnMousePos;var jsnElementPos;var bolScrollTop;var bolScrollLeft;var bolScrollRight;var bolScrollBottom;var colIndex;var rowIndex;var jsnRange;var strScrollDirection;if(event.which===0&&!evt.touchDevice){event.preventDefault();event.stopPropagation();element.internalEvents.cellResizeDragEnd();}else{element.internalResize.resizeStarted=true;jsnMousePos=GS.mousePosition(event);jsnElementPos=GS.getElementOffset(element.elems.dataViewport);colIndex=element.internalResize.resizeColumnIndex;rowIndex=element.internalResize.resizeRecordIndex;jsnRange=(element.internalDisplay.currentRange);bolScrollTop=(jsnMousePos.top<(jsnElementPos.top+
+element.internalScrollOffsets.top));bolScrollLeft=(jsnMousePos.left<(jsnElementPos.left+
+element.internalScrollOffsets.left));bolScrollRight=(jsnMousePos.left>((jsnElementPos.left+
+element.elems.dataViewport.clientWidth)-
+element.internalScrollOffsets.right));bolScrollBottom=(jsnMousePos.top>((jsnElementPos.top+
+element.elems.dataViewport.clientHeight)-
+element.internalScrollOffsets.bottom));if(!element.internalResize.resizeRecord){bolScrollTop=false;bolScrollBottom=false;}
+if(!element.internalResize.resizeColumn){bolScrollLeft=false;bolScrollRight=false;}
+if(element.internalResize.resizingRecordSelectors){bolScrollLeft=false;bolScrollRight=false;}
+if(element.internalResize.resizingHeader||element.internalResize.resizingInsert){bolScrollTop=false;bolScrollBottom=false;}
+if(bolScrollTop&&rowIndex===jsnRange.toRecord){bolScrollTop=false;}
+if(bolScrollLeft&&colIndex===jsnRange.toColumn){bolScrollLeft=false;}
+if(bolScrollBottom&&rowIndex===jsnRange.fromRecord){bolScrollBottom=false;}
+if(bolScrollRight&&colIndex===jsnRange.fromColumn){bolScrollRight=false;}
+if((bolScrollTop||bolScrollLeft||bolScrollRight||bolScrollBottom)&&!element.internalScroll.dragScrolling){dragScrollStart(element,function(){var bolOldScrollTop;var bolOldScrollLeft;var bolOldScrollBottom;var bolOldScrollRight;strScrollDirection=(element.internalScroll.dragScrollingDirection);bolScrollTop=(strScrollDirection.indexOf('top')!==-1);bolScrollLeft=(strScrollDirection.indexOf('left')!==-1);bolScrollBottom=(strScrollDirection.indexOf('bottom')!==-1);bolScrollRight=(strScrollDirection.indexOf('right')!==-1);bolOldScrollTop=bolScrollTop;bolOldScrollLeft=bolScrollLeft;bolOldScrollBottom=bolScrollBottom;bolOldScrollRight=bolScrollRight;setLineToMouse(event);jsnRange=(element.internalDisplay.currentRange);if(bolScrollTop&&rowIndex===jsnRange.toRecord){bolScrollTop=false;}
+if(bolScrollLeft&&colIndex===jsnRange.toColumn){bolScrollLeft=false;}
+if(bolScrollBottom&&rowIndex===jsnRange.fromRecord){bolScrollBottom=false;}
+if(bolScrollRight&&colIndex===jsnRange.fromColumn){bolScrollRight=false;}
+if(bolScrollTop!==bolOldScrollTop||bolScrollLeft!==bolOldScrollLeft||bolScrollBottom!==bolOldScrollBottom||bolScrollRight!==bolOldScrollRight){if(bolScrollTop||bolScrollLeft||bolScrollRight||bolScrollBottom){element.internalScroll.dragScrollingDirection=((bolScrollTop?'top':'')+
+(bolScrollLeft?'left':'')+
+(bolScrollRight?'right':'')+
+(bolScrollBottom?'bottom':''));}else{dragScrollEnd(element);}}},((bolScrollTop?'top':'')+
+(bolScrollLeft?'left':'')+
+(bolScrollRight?'right':'')+
+(bolScrollBottom?'bottom':'')));}else if(element.internalScroll.dragScrolling&&(bolScrollTop||bolScrollLeft||bolScrollRight||bolScrollBottom)){strScrollDirection=(element.internalScroll.dragScrollingDirection);if(bolScrollTop&&strScrollDirection.indexOf('top')===-1){strScrollDirection+='top';}
+if(bolScrollLeft&&strScrollDirection.indexOf('left')===-1){strScrollDirection+='left';}
+if(bolScrollRight&&strScrollDirection.indexOf('right')===-1){strScrollDirection+='right';}
+if(bolScrollBottom&&strScrollDirection.indexOf('bottom')===-1){strScrollDirection+='bottom';}
+if(strScrollDirection!==element.internalScroll.dragScrollingDirection){element.internalScroll.dragScrollingDirection=(strScrollDirection);}}else if(!bolScrollTop&&!bolScrollLeft&&!bolScrollRight&&!bolScrollBottom&&element.internalScroll.dragScrolling){dragScrollEnd(element);}
+setLineToMouse(event);}};element.internalEvents.cellResizeDragEnd=function(){var intNew;var intIndex;var i;var len;var arrRecordHeights;var arrSelectedColumns;var arrColumnWidths;var arrColumns;if(element.internalScroll.dragScrolling){dragScrollEnd(element);}
+element.elems.handleColumn.classList.remove('active');element.elems.handleRecord.classList.remove('active');if(element.internalResize.resizeColumn&&element.internalResize.resizeStarted){intNew=(element.internalResize.lastWidth);if(element.internalResize.resizingRecordSelectors){element.internalDisplay.recordSelectorWidth=intNew;}else{intIndex=(element.internalResize.resizeColumnIndex);arrSelectedColumns=element.internalSelection.columns;arrSelectedColumns=(arrSelectedColumns.slice(arrSelectedColumns[0]==='selector'?1:0));arrColumnWidths=(element.internalDisplay.columnWidths);if(arrSelectedColumns.indexOf(intIndex)>-1){arrColumns=(getConnectedSelectedColumns(element,intIndex));i=0;len=arrColumns.length;while(i<len){arrColumnWidths[arrColumns[i]]=intNew;i+=1;}}else{arrColumnWidths[intIndex]=intNew;}}}
+if(element.internalResize.resizeRecord&&element.internalResize.resizeStarted){intNew=(element.internalResize.lastHeight);if(element.internalResize.resizingHeader){element.internalDisplay.headerHeight=intNew;}else{arrRecordHeights=(element.internalDisplay.recordHeights);i=0;len=arrRecordHeights.length;while(i<len){arrRecordHeights[i]=intNew;i+=1;}
+if(element.internalDisplay.insertRecordVisible){element.internalDisplay.insertRecordHeight=intNew;}}}
+if(element.internalResize.resizeStarted){renderScrollDimensions(element);}
+element.internalResize.currentlyResizing=false;document.body.removeEventListener(evt.mousemove,element.internalEvents.cellResizeDragMove);document.body.removeEventListener(evt.mouseup,element.internalEvents.cellResizeDragEnd);};element.elems.handleColumn.addEventListener(evt.mousedown,element.internalEvents.cellResizeDragStart);element.elems.handleRecord.addEventListener(evt.mousedown,element.internalEvents.cellResizeDragStart);element.internalEvents.cellResizeToDefault=function(){var intIndex;var intNew;var i;var len;var arrRecordHeights;var arrSelectedColumns;var arrColumnWidths;var arrColumns;if(element.internalResize.resizeColumn){if(element.internalResize.resizingRecordSelectors){element.internalDisplay.recordSelectorWidth=(element.internalDisplay.defaultRecordSelectorWidth);}else{arrSelectedColumns=element.internalSelection.columns;arrSelectedColumns=(arrSelectedColumns.slice(arrSelectedColumns[0]==='selector'?1:0));resizeColumnsToContent(element,arrSelectedColumns);}}
+if(element.internalResize.resizeRecord){if(element.internalResize.resizingHeader){element.internalDisplay.headerHeight=(element.internalDisplay.defaultHeaderHeight);}else{intNew=(element.internalDisplay.defaultRecordHeight);arrRecordHeights=(element.internalDisplay.recordHeights);i=0;len=arrRecordHeights.length;while(i<len){arrRecordHeights[i]=intNew;i+=1;}
+if(element.internalDisplay.insertRecordVisible){element.internalDisplay.insertRecordHeight=(element.internalDisplay.defaultInsertRecordHeight);}}}
+if(element.internalResize.resizeColumn){element.elems.dataViewport.removeChild(element.elems.handleColumn);}
+if(element.internalResize.resizeRecord){element.elems.dataViewport.removeChild(element.elems.handleRecord);}
+renderScrollDimensions(element);};element.elems.handleColumn.addEventListener('dblclick',element.internalEvents.cellResizeToDefault);element.elems.handleRecord.addEventListener('dblclick',element.internalEvents.cellResizeToDefault);}}
+function unbindColumnReorder(element){if(!evt.touchDevice){element.elems.dataViewport.removeEventListener('mousedown',element.internalEvents.columnReorderDragStart);}}
+function bindColumnReorder(element){var setLineToMouse;if(!evt.touchDevice){setLineToMouse=function(event){var jsnMousePos;var jsnElementPos;var arrColumnHandles;var intMouse;var intPrevHandle;var intCurrentHandle;var intPrevIndex;var intCurrentIndex;var intHandleIndex;var intInsertionIndex;var i;var len;jsnMousePos=GS.mousePosition(event);jsnElementPos=GS.getElementOffset(element.elems.dataViewport);arrColumnHandles=(element.internalDisplay.columnHandles);intMouse=(jsnMousePos.left-jsnElementPos.left);if(element.internalScroll.dragScrolling&&element.internalScroll.dragScrollingDirection==='left'){i=0;len=arrColumnHandles.length;while(i<len){if(arrColumnHandles[i]!==null){intHandleIndex=i;break;}
+i+=1;}}else if(element.internalScroll.dragScrolling&&element.internalScroll.dragScrollingDirection==='left'){i=(arrColumnHandles.length-1);while(i>=0){if(arrColumnHandles[i]!==null){intHandleIndex=i;break;}
+i-=1;}}else{intPrevHandle=null;intCurrentHandle=null;intPrevIndex=null;intCurrentIndex=null;intHandleIndex=null;i=0;len=arrColumnHandles.length;while(i<len){if(arrColumnHandles[i]!==null){intCurrentHandle=arrColumnHandles[i];intCurrentIndex=i;}
+if(intPrevHandle!==null&&intCurrentHandle!==null){if(intMouse>=intPrevHandle&&intMouse<=intCurrentHandle){if((intCurrentHandle-intMouse)<(intMouse-intPrevHandle)){intHandleIndex=intCurrentIndex;}else{intHandleIndex=intPrevIndex;}}else if(i===(len-1)){if(intMouse>=intCurrentHandle){intHandleIndex=intCurrentIndex;}else{intHandleIndex=intPrevIndex;}}}else if(intCurrentHandle!==null&&intMouse<=intCurrentHandle){intHandleIndex=intCurrentIndex;}
+if(intHandleIndex!==null){break;}
+if(intCurrentHandle!==null){intPrevHandle=intCurrentHandle;intPrevIndex=intCurrentIndex;}
+i+=1;}}
+intInsertionIndex=(intHandleIndex+
+element.internalDisplay.currentRange.fromColumn);if(element.elems.handleReorder.parentNode!==element.elems.dataViewport){element.elems.dataViewport.appendChild(element.elems.handleReorder);}
+element.elems.handleReorder.style.left=((arrColumnHandles[intHandleIndex])+'px');element.internalReorder.dropLocation=intInsertionIndex;};element.internalEvents.columnReorderDragStart=function(event){var target;var parentCell;var intColNumber;var arrCurrentColumns;target=event.target;if(parentCell&&parentCell.nodeName!=='GS-CELL'){parentCell=GS.findParentElement(target,'gs-cell');}else{parentCell=target;}
+if(parentCell&&parentCell.nodeName==='GS-CELL'&&parentCell.classList.contains('table-header')&&parentCell.hasAttribute('selected')){element.internalReorder.currentlyReordering=true;element.internalReorder.reorderStarted=false;intColNumber=parseInt(parentCell.getAttribute('data-col-number'),10);arrCurrentColumns=(getConnectedSelectedColumns(element,intColNumber));element.internalReorder.currentColumns=arrCurrentColumns;element.internalReorder.originColumn=intColNumber;element.internalReorder.dropLocation=null;element.internalSelection.ranges=[{"start":{"row":"header","column":arrCurrentColumns[0]},"end":{"row":"header","column":arrCurrentColumns[arrCurrentColumns.length-1]},"negator":false}];renderSelection(element);setLineToMouse(event);document.body.addEventListener(evt.mousemove,element.internalEvents.columnReorderDragMove);document.body.addEventListener(evt.mouseup,element.internalEvents.columnReorderDragEnd);}};element.internalEvents.columnReorderDragMove=function(event){var jsnMousePos;var jsnElementPos;var bolScrollLeft;var bolScrollRight;if(event.which===0&&!evt.touchDevice){event.preventDefault();event.stopPropagation();element.internalEvents.columnReorderDragEnd();}else{element.internalReorder.reorderStarted=true;jsnMousePos=GS.mousePosition(event);jsnElementPos=GS.getElementOffset(element.elems.dataViewport);bolScrollLeft=(jsnMousePos.left<(jsnElementPos.left+
+element.internalScrollOffsets.left));bolScrollRight=(jsnMousePos.left>((jsnElementPos.left+
+element.elems.dataViewport.clientWidth)-
+element.internalScrollOffsets.right));if((bolScrollLeft||bolScrollRight)&&!element.internalScroll.dragScrolling){dragScrollStart(element,function(){setLineToMouse(event);},(bolScrollLeft?'left':'right'));}else if(!bolScrollLeft&&!bolScrollRight&&element.internalScroll.dragScrolling){dragScrollEnd(element);}
+setLineToMouse(event);}};element.internalEvents.columnReorderDragEnd=function(){var arrOrderCols;var intDropIndex;var headerTemplate;var recordTemplate;var insertTemplate;var arrOldHeaderTemplate;var arrOldRecordTemplate;var arrOldInsertTemplate;var arrOldPlainText;var arrOldDataCol;var arrOldColWidths;var arrOldDefaultColWidths;var arrOldCopyHeaders;var arrOldCopyCol;var strNewHeaderTemplate;var strNewRecordTemplate;var strNewInsertTemplate;var arrNewPlainText;var arrNewDataCol;var arrNewColWidths;var arrNewDefaultColWidths;var arrNewCopyHeaders;var arrNewCopyCol;var i;var len;var intSeqIndex;var unmovedColumns;var pullIndex;var index;var strSort;var strColumn;var strOldSortOrder;var strNewSortOrder;if(element.elems.handleReorder.parentNode===element.elems.dataViewport){element.elems.dataViewport.removeChild(element.elems.handleReorder);}
+if(element.internalScroll.dragScrolling){dragScrollEnd(element);}
+intDropIndex=(element.internalReorder.dropLocation);arrOrderCols=(element.internalReorder.currentColumns);if(!element.internalReorder.reorderStarted){element.internalSelection.ranges=[{"start":{"row":"header","column":element.internalReorder.originColumn},"end":{"row":"header","column":element.internalReorder.originColumn},"negator":false}];renderSelection(element);}
+if(element.internalReorder.reorderStarted&&intDropIndex!==null&&intDropIndex!==undefined&&!isNaN(intDropIndex)&&arrOrderCols.length>0&&intDropIndex<=(element.internalDisplay.columnWidths.length)&&arrOrderCols.indexOf(intDropIndex)===-1&&arrOrderCols.indexOf(intDropIndex-1)===-1){if(element.internalTemplates.header){headerTemplate=document.createElement('template');headerTemplate.innerHTML=(element.internalTemplates.header);arrOldHeaderTemplate=(xtag.query(headerTemplate.content,'gs-cell'));}
+if(element.internalTemplates.originalRecord){recordTemplate=document.createElement('template');recordTemplate.innerHTML=(element.internalTemplates.originalRecord);arrOldRecordTemplate=(xtag.query(recordTemplate.content,'gs-cell'));}
+if(element.internalTemplates.insertRecord){insertTemplate=document.createElement('template');insertTemplate.innerHTML=(element.internalTemplates.insertRecord);arrOldInsertTemplate=(xtag.query(insertTemplate.content,'gs-cell'));}
+arrOldPlainText=(element.internalDisplay.columnPlainTextNames);arrOldDataCol=(element.internalDisplay.dataColumnName);arrOldColWidths=(element.internalDisplay.columnWidths);arrOldDefaultColWidths=(element.internalDisplay.defaultColumnWidths);if(element.internalClip.headerList&&element.internalClip.headerList.length>0){arrOldCopyHeaders=(element.internalClip.headerList);}
+if(element.internalClip.columnList&&element.internalClip.columnList.length>0){arrOldCopyCol=(element.internalClip.columnList);}
+strNewHeaderTemplate='';strNewRecordTemplate='';strNewInsertTemplate='';arrNewPlainText=[];arrNewDataCol=[];arrNewColWidths=[];arrNewDefaultColWidths=[];arrNewCopyHeaders=[];arrNewCopyCol=[];intSeqIndex=0;unmovedColumns=arrOrderCols.slice(0);i=0;len=arrOldColWidths.length;while(i<len){if(intSeqIndex===intDropIndex&&unmovedColumns.length>0){pullIndex=unmovedColumns.shift();}else if(intSeqIndex===arrOrderCols[0]){intSeqIndex+=(arrOrderCols.length);pullIndex=intSeqIndex;intSeqIndex+=1;}else{pullIndex=intSeqIndex;intSeqIndex+=1;}
+if(arrOldHeaderTemplate){strNewHeaderTemplate+=(arrOldHeaderTemplate[pullIndex].outerHTML);}
+if(arrOldRecordTemplate){strNewRecordTemplate+=(arrOldRecordTemplate[pullIndex].outerHTML);}
+if(arrOldInsertTemplate){strNewInsertTemplate+=(arrOldInsertTemplate[pullIndex].outerHTML);}
+arrNewPlainText.push(arrOldPlainText[pullIndex]);arrNewDataCol.push(arrOldDataCol[pullIndex]);arrNewColWidths.push(arrOldColWidths[pullIndex]);arrNewDefaultColWidths.push(arrOldDefaultColWidths[pullIndex]);arrNewCopyHeaders.push(arrOldCopyHeaders[pullIndex]);arrNewCopyCol.push(arrOldCopyCol[pullIndex]);i+=1;}
+if(arrOldHeaderTemplate){headerTemplate.innerHTML=strNewHeaderTemplate;templateCellAddColumnNumber(headerTemplate);strNewHeaderTemplate=headerTemplate.innerHTML;element.internalTemplates.header=(strNewHeaderTemplate);}
+if(arrOldRecordTemplate){recordTemplate.innerHTML=strNewRecordTemplate;templateCellAddColumnNumber(recordTemplate);strNewRecordTemplate=recordTemplate.innerHTML;element.internalTemplates.originalRecord=(strNewRecordTemplate);element.internalTemplates.record=(GS.templateHideSubTemplates(strNewRecordTemplate,false));}
+if(arrOldInsertTemplate){insertTemplate.innerHTML=strNewInsertTemplate;templateCellAddColumnNumber(insertTemplate);strNewInsertTemplate=insertTemplate.innerHTML;element.internalTemplates.insertRecord=(strNewInsertTemplate);}
+element.internalDisplay.columnPlainTextNames=(arrNewPlainText);element.internalDisplay.dataColumnName=(arrNewDataCol);element.internalDisplay.columnWidths=(arrNewColWidths);element.internalDisplay.defaultColumnWidths=(arrNewDefaultColWidths);if(arrOldCopyHeaders){element.internalClip.headerList=(arrNewCopyHeaders);}
+if(arrOldCopyCol){element.internalClip.columnList=(arrNewCopyCol);}
+element.internalSelection.ranges=[];strOldSortOrder='';strNewSortOrder='';i=0;len=arrOldDataCol.length;while(i<len){if(arrOldDataCol[i]){strColumn=arrOldDataCol[i];index=(element.internalData.columnNames.indexOf(strColumn));strSort=element.internalData.columnOrders[index];if(index>-1&&strSort!=='neutral'){strOldSortOrder+=strColumn;}}
+if(arrNewDataCol[i]){strColumn=arrNewDataCol[i];index=(element.internalData.columnNames.indexOf(strColumn));strSort=element.internalData.columnOrders[index];if(index>-1&&strSort!=='neutral'){strNewSortOrder+=strColumn;}}
+i+=1;}
+if(strOldSortOrder!==strNewSortOrder){dataSELECT(element);}else{element.internalDisplay.fullRenderRequired=true;renderScrollDimensions(element);}}
+element.internalReorder.currentlyReordering=false;document.body.removeEventListener(evt.mousemove,element.internalEvents.columnReorderDragMove);document.body.removeEventListener(evt.mouseup,element.internalEvents.columnReorderDragEnd);};element.elems.dataViewport.addEventListener('mousedown',element.internalEvents.columnReorderDragStart);}}
+function unbindUpdate(element){element.removeEventListener('change',element.internalEvents.cellUpdate);}
+function bindUpdate(element){element.internalEvents.cellUpdate=function(event){var target;var columnElement;var cellElement;var newValue;var strColumn;var intRecord;target=event.target;columnElement=GS.findParentElement(target,'[column]');cellElement=GS.findParentElement(columnElement,'gs-cell');if(GS.findParentElement(columnElement,'gs-table')===element&&cellElement.classList.contains('table-cell')){if(columnElement){if(columnElement.value!==null&&columnElement.value!==undefined){newValue=columnElement.value;}else if(target.value!==null&&target.value!==undefined){newValue=target.value;}else if(columnElement.checked!==null&&columnElement.checked!==undefined){newValue=columnElement.checked;}else if(target.checked!==null&&target.checked!==undefined){newValue=target.checked;}else{throw'GS-TABLE Error: Found an element with a '+'"column" attribute, but could not find a '+'value. Please make sure that when a '+'"change" event is fired either the event '+'target or the "column" element has a '+'"value" or "checked" accessor.';}
+strColumn=columnElement.getAttribute('column');intRecord=parseInt(cellElement.getAttribute('data-row-number'),10);dataUPDATE(element,'single-cell',{"data":{"columnName":strColumn,"recordNumber":intRecord,"newValue":newValue},"updateConfirmed":true});}}};element.addEventListener('change',element.internalEvents.cellUpdate);}
+function unbindInsert(element){element.elems.dataViewport.removeEventListener('keydown',element.internalEvents.insertRecordReturn);element.elems.dataViewport.removeEventListener('change',element.internalEvents.insertRecordValueRetain);element.elems.dataViewport.removeEventListener('keyup',element.internalEvents.insertRecordValueRetain);}
+function bindInsert(element){element.internalEvents.insertRecordReturn=function(event){var parentCell=GS.findParentTag(event.target,'gs-cell');var keyCode=(event.keyCode||event.which);if(parentCell.classList.contains('table-insert')&&keyCode===13){dataINSERT(element,'single-record',{"data":{"values":(element.internalData.insertRecord),"columns":(element.internalData.insertRecordRetainedColumns),"addin":getInsertAddin(element)},"insertConfirmed":true});element.internalData.insertRecord={};element.internalData.insertRecordRetainedColumns=[];element.internalDisplay.fullRenderRequired=true;renderLocation(element);}};element.elems.dataViewport.addEventListener('keydown',element.internalEvents.insertRecordReturn);element.internalEvents.insertRecordValueRetain=function(event){var target=event.target;var parentCell=GS.findParentTag(target,'gs-cell');var parentColumn=GS.findParentElement(target,'[column]');var strColumn=parentColumn.getAttribute('column');var strValue=target.value;if(parentCell.classList.contains('table-insert')&&strColumn){if(strValue){element.internalData.insertRecord[strColumn]=strValue;if(element.internalData.insertRecordRetainedColumns.indexOf(strColumn)===-1){element.internalData.insertRecordRetainedColumns.push(strColumn);}}else if(!strValue&&element.internalData.insertRecordRetainedColumns.indexOf(strColumn)>-1){element.internalData.insertRecord[strColumn]=undefined;element.internalData.insertRecordRetainedColumns.splice(element.internalData.insertRecordRetainedColumns.indexOf(strColumn));}}};element.elems.dataViewport.addEventListener('change',element.internalEvents.insertRecordValueRetain);element.elems.dataViewport.addEventListener('keyup',element.internalEvents.insertRecordValueRetain);}
+function unbindHUD(element){}
+function bindHUD(element){}
+function unbindKey(element){element.removeEventListener('keydown',element.internalEvents.keyDown);}
+function bindKey(element){element.internalEvents.keyDown=function(event){var keyCode=(event.keyCode||event.which);var bolCMDorCTRL=(event.ctrlKey||event.metaKey);var bolShift=(event.shiftKey);var active=document.activeElement;var activeValue=document.activeElement.value;var jsnRange;var intOldRecord;var intOldColumn;var intNewRecord;var intNewColumn;var intMaxColumn;var intMaxRecord;var intMinColumn;var intMinRecord;var jsnCursorPos;var intCursorPos;var bolFullSelection;var bolCursorAtFirst;var bolCursorAtTop;var bolCursorAtLast;var bolCursorAtBottom;var bolMaintainSelection;var bolMoveSelectedToTop;var intSpaceToTraverse;var intHeight;var i;var len;var beforeEvent;var selectionCopy;if(active===element.elems.hiddenFocusControl){if(keyCode===8||keyCode===46){deleteSelectedRecords(element);}else if(keyCode===13){focusIntoSelectedCell(element);}else if(bolCMDorCTRL&&keyCode===65){len=element.internalData.records.length;element.internalSelection.ranges=[{"start":{"row":(element.internalDisplay.headerVisible?'header':0),"column":(element.internalDisplay.recordSelectorVisible?'selector':0)},"end":{"row":(len>0?(len-1):'header'),"column":(element.internalDisplay.columnWidths.length-1)},"negator":false}];renderSelection(element);}}
+if((keyCode===38||keyCode===39||keyCode===40||keyCode===37||keyCode===33||keyCode===34||keyCode===36||keyCode===35||keyCode===9)&&!event.defaultPrevented){if((active.nodeName==='INPUT'||active.nodeName==='TEXTAREA')&&active!==element.elems.hiddenFocusControl){jsnCursorPos=GS.getInputSelection(active);}else{jsnCursorPos={'start':0,'end':activeValue.length};}
+bolFullSelection=(jsnCursorPos.start===0&&jsnCursorPos.end===activeValue.length);if(jsnCursorPos&&!bolFullSelection&&jsnCursorPos.start===jsnCursorPos.end){intCursorPos=jsnCursorPos.start;bolCursorAtFirst=(intCursorPos===0);bolCursorAtTop=((intCursorPos<(activeValue.indexOf('\n')===-1?activeValue.length+1:activeValue.indexOf('\n')+1))||(intCursorPos===0));bolCursorAtLast=(intCursorPos===activeValue.length);bolCursorAtBottom=(intCursorPos>activeValue.lastIndexOf('\n'));}
+jsnRange=element.internalSelection.ranges[element.internalSelection.ranges.length-1];if(jsnRange){intOldRecord=jsnRange.end.row;intOldColumn=jsnRange.end.column;if(intOldRecord==='header'){intOldRecord=-1;}else if(intOldRecord==='insert'){intOldRecord=element.internalData.records.length;}
+if(intOldColumn==='selector'){intOldColumn=-1;}}else{intOldRecord=0;intOldColumn=0;}
+intMaxColumn=(element.internalDisplay.columnWidths.length-1);intMaxRecord=(element.internalDisplay.insertRecordVisible?element.internalData.records.length:element.internalData.records.length-1);intMinColumn=(element.internalDisplay.recordSelectorVisible?-1:0);intMinRecord=(element.internalDisplay.headerVisible?-1:0);if(keyCode===36){event.preventDefault();event.stopPropagation();intNewRecord=intOldRecord;intNewColumn=intMinColumn;}else if(keyCode===35){event.preventDefault();event.stopPropagation();intNewRecord=intOldRecord;intNewColumn=intMaxColumn;}else if(keyCode===38){if(bolFullSelection||bolCursorAtTop){event.preventDefault();event.stopPropagation();if(bolCMDorCTRL){intNewRecord=intMinRecord;intNewColumn=intOldColumn;}else if(intOldRecord>intMinRecord){intNewRecord=(intOldRecord-1);intNewColumn=intOldColumn;}}}else if(keyCode===39){if(bolFullSelection||bolCursorAtLast){event.preventDefault();event.stopPropagation();if(bolCMDorCTRL){intNewRecord=intOldRecord;intNewColumn=intMaxColumn;}else if(intOldColumn===intMaxColumn&&intOldRecord<intMaxRecord){intNewRecord=(intOldRecord+1);intNewColumn=intMinColumn;}else if(intOldColumn<intMaxColumn){intNewRecord=intOldRecord;intNewColumn=(intOldColumn+1);}}}else if(keyCode===40){if(bolFullSelection||bolCursorAtBottom){event.preventDefault();event.stopPropagation();if(bolCMDorCTRL){intNewRecord=intMaxRecord;intNewColumn=intOldColumn;}else if(intOldRecord<intMaxRecord){intNewRecord=(intOldRecord+1);intNewColumn=intOldColumn;}}}else if(keyCode===37){if(bolFullSelection||bolCursorAtFirst){event.preventDefault();event.stopPropagation();if(bolCMDorCTRL){intNewRecord=intOldRecord;intNewColumn=intMinColumn;}else if(intOldColumn===intMinColumn&&intOldRecord>intMinRecord){intNewRecord=(intOldRecord-1);intNewColumn=intMaxColumn;}else if(intOldColumn>intMinColumn){intNewRecord=intOldRecord;intNewColumn=(intOldColumn-1);}}}else if(keyCode===33){event.preventDefault();event.stopPropagation();intSpaceToTraverse=(element.elems.dataViewport.clientHeight-(element.internalScrollOffsets.top+
+element.internalScrollOffsets.bottom));i=(element.internalDisplay.currentRange.fromRecord);while(i>=-1){intHeight=(element.internalDisplay.recordHeights[i]);intSpaceToTraverse-=intHeight;if(i===intMinRecord){intNewRecord=i;break;}
+if(intSpaceToTraverse<0){intNewRecord=i;break;}
+i-=1;}
+if(intNewRecord!==undefined){if(bolShift){intNewColumn=intOldColumn;}else{intNewColumn=intMinColumn;}}
+bolMoveSelectedToTop=true;}else if(keyCode===34){event.preventDefault();event.stopPropagation();intSpaceToTraverse=(element.elems.dataViewport.clientHeight-(element.internalScrollOffsets.top+
+element.internalScrollOffsets.bottom));i=(element.internalDisplay.currentRange.fromRecord);len=(intMaxRecord+1);while(i<len){if(i===-1){intHeight=(element.internalDisplay.headerHeight);}else{intHeight=(element.internalDisplay.recordHeights[i]);}
+intSpaceToTraverse-=intHeight;if(i===intMaxRecord){intNewRecord=i;break;}
+if(intSpaceToTraverse<0){intNewRecord=i-1;break;}
+i+=1;}
+if(intNewRecord!==undefined){if(bolShift){intNewColumn=intOldColumn;}else{intNewColumn=intMinColumn;}}
+bolMoveSelectedToTop=true;}else if(keyCode===9){if(bolShift){if(intOldRecord!==intMinColumn||intOldColumn!==intMinRecord){event.preventDefault();event.stopPropagation();if(intOldColumn===intMinColumn){intNewRecord=(intOldRecord-1);intNewColumn=intMaxColumn;}else{intNewRecord=intOldRecord;intNewColumn=intOldColumn-1;}}}else{if(intOldRecord!==intMaxColumn||intOldColumn!==intMaxRecord){event.preventDefault();event.stopPropagation();if(intOldColumn===intMaxColumn){intNewRecord=(intOldRecord+1);intNewColumn=intMinColumn;}else{intNewRecord=intOldRecord;intNewColumn=intOldColumn+1;}}}}
+if(intNewRecord!==undefined&&intNewColumn!==undefined){focusHiddenControl(element);bolMaintainSelection=(bolShift&&jsnRange&&keyCode!==9);selectionCopy=getSelectionCopy(element);var intHeaderIndex;var intSelectorIndex;var intInsertIndex;var newRecord;var newColumn;intHeaderIndex=-1;intSelectorIndex=-1;intInsertIndex=(element.internalData.records.length);if(intNewRecord===intHeaderIndex){newRecord='header';}else if(intNewRecord===intInsertIndex){newRecord='insert';}else{newRecord=intNewRecord;}
+if(intNewColumn===intSelectorIndex){newColumn='selector';}else{newColumn=intNewColumn;}
+if(bolMaintainSelection){jsnRange.end.row=newRecord;jsnRange.end.column=newColumn;}else{jsnRange={"start":{"row":newRecord,"column":newColumn},"end":{"row":newRecord,"column":newColumn},"negator":false};element.internalSelection.ranges=[jsnRange];}
+beforeEvent=GS.triggerEvent(element,'before_selection');if(beforeEvent.defaultPrevented){element.internalSelection.ranges=(selectionCopy.ranges);return;}
+focusHiddenControl(element);if(bolMoveSelectedToTop){scrollSelectionIntoView(element,'top');}else{scrollSelectionIntoView(element);}
+if(!bolMaintainSelection&&intNewRecord>-1&&intNewColumn>-1){focusIntoSelectedCell(element);}
+if(beforeEvent.defaultPrevented){GS.triggerEvent(element,'after_selection');}}}};element.addEventListener('keydown',element.internalEvents.keyDown);}
+function unbindCopy(element){element.removeEventListener('copy',element.internalEvents.copySelection);}
+function bindCopy(element){element.internalEvents.copySelection=function(event){var jsnCopyString;var focusedElement;focusedElement=document.activeElement;if(focusedElement.classList.contains('hidden-focus-control')||focusedElement.selectionStart===focusedElement.selectionEnd){console.time('copy');addLoader(element,'copy-loader','Copying Data...');focusedElement=element.elems.hiddenFocusControl;focusedElement.focus();GS.setInputSelection(focusedElement,0,focusedElement.value.length);jsnCopyString=getCopyStrings(element);if(handleClipboardData(event,jsnCopyString.text,'text')){event.preventDefault(event);}
+if(handleClipboardData(event,jsnCopyString.html,'html')){event.preventDefault(event);}
+removeLoader(element,'copy-loader','Data Copied');console.timeEnd('copy');}};element.addEventListener('copy',element.internalEvents.copySelection);}
+function unbindPaste(element){element.removeEventListener('paste',element.internalEvents.pasteSelection);}
+function bindPaste(element){element.internalEvents.pasteSelection=function(event){if(document.activeElement===element.elems.hiddenFocusControl){event.preventDefault();usePasteEvent(element,event);}};element.addEventListener('paste',element.internalEvents.pasteSelection);}
+function unbindCut(element){element.removeEventListener('cut',element.internalEvents.cutSelection);}
+function bindCut(element){element.internalEvents.cutSelection=function(){if(document.activeElement===element.elems.hiddenFocusControl){event.preventDefault();addLoader(element,'cut-warn','Cut is not supported');removeLoader(element,'cut-warn','Cut is not supported');}};element.addEventListener('cut',element.internalEvents.cutSelection);}
+function unbindContextMenu(element){element.elems.dataViewport.removeEventListener('contextmenu',element.internalEvents.columnContextMenu);}
+function bindContextMenu(element){element.internalEvents.columnContextMenu=function(event){var target=event.target;var parentCell=GS.findParentTag(target,'gs-cell');var templateElement;var strCellType;var bolRange;var arrDataColumns;var arrSelectedColumns;var bolFilterUnique;var bolFilterSelection;var bolColumnWidths;var bolHideAndShow;var bolSort;var intRecord;var intColumn;var strDataValue;var strControlValue;var strColumn;var columnElement;var focusElement;var jsnSelection;var strSelection;var i;var len;var strHTML;parentCell=target;if(target.nodeName!=='GS-CELL'){parentCell=GS.findParentTag(target,'gs-cell');}
+if(parentCell&&parentCell.nodeName==='GS-CELL'&&(parentCell.classList.contains('table-cell')||parentCell.classList.contains('table-header')||parentCell.classList.contains('table-insert'))){if(parentCell.classList.contains('table-cell')){strCellType='data';}else if(parentCell.classList.contains('table-header')){strCellType='header';}else if(parentCell.classList.contains('table-insert')){strCellType='insert';}
+arrSelectedColumns=(element.internalSelection.columns);if(arrSelectedColumns[0]==='selector'){arrSelectedColumns.shift();}
+bolRange=(arrSelectedColumns.length>1||element.internalSelection.rows.length>1);arrDataColumns=getSelectedDataColumns(element);if(strCellType==='data'&&!bolRange&&arrDataColumns.length===1){intRecord=parseInt(parentCell.getAttribute('data-row-number'),10);intColumn=parseInt(parentCell.getAttribute('data-col-number'),10);strColumn=(element.internalDisplay.dataColumnName[intColumn]);strDataValue=getCell(element,strColumn,intRecord,true,'gsTAbleINTERNALNULLSTRING');columnElement=xtag.query(parentCell,'[column]')[0];if(columnElement&&strDataValue!=='gsTAbleINTERNALNULLSTRING'){if((columnElement.nodeName==='INPUT'&&columnElement.getAttribute('type')==='text')||columnElement.nodeName==='TEXTAREA'){focusElement=columnElement;}else{focusElement=xtag.query(columnElement,'input[type="text"], textarea')[0];}
+if(focusElement&&focusElement.value===strDataValue){strControlValue=focusElement.value;jsnSelection=GS.getInputSelection(focusElement);strSelection=strControlValue.substring(jsnSelection.start,jsnSelection.end);}}}
+bolFilterUnique=true;bolFilterSelection=true;bolColumnWidths=true;bolHideAndShow=true;bolSort=true;if(true){bolFilterUnique=false;}
+if(strCellType!=='data'||bolRange||arrSelectedColumns.length!==1||arrDataColumns.length!==1){bolFilterSelection=false;}
+if(false){bolColumnWidths=false;}
+if(false){bolHideAndShow=false;}
+if(arrDataColumns.length===0){bolSort=false;}
+strHTML='';if(bolSort){strHTML+=(strHTML?'<hr />':'');strHTML+=('<div class="context-menu-header">Sorting:</div>'+'<div class="context-menu-indent">'+'    <gs-button dialogclose remove-bottom'+'                iconleft icon="sort-alpha-asc"'+'                class="button-sort-asc">'+'        Sort A to Z'+'    </gs-button>'+'    <gs-button dialogclose remove-all'+'                iconleft icon="sort-alpha-desc"'+'                class="button-sort-desc">'+'        Sort Z to A'+'    </gs-button>'+'    <gs-button dialogclose remove-top'+'                iconleft icon="trash-o"'+'                class="button-sort-clear">'+'        Clear Sort'+'    </gs-button>'+'</div>');}
+if(bolHideAndShow){strHTML+=(strHTML?'<hr />':'');strHTML+=('<div class="context-menu-header">'+'Hide/Unhide Columns:'+'</div>'+'<div class="context-menu-indent">'+'    <gs-button dialogclose remove-bottom'+'                iconleft icon="eye-slash"'+'                class="button-column-hide">'+'        Hide Column(s)'+'    </gs-button>'+'    <gs-button dialogclose remove-top'+'                iconleft icon="eye"'+'                class="button-column-unhide">'+'        Unhide Columns'+'    </gs-button>'+'</div>');}
+if(bolColumnWidths){strHTML+=(strHTML?'<hr />':'');strHTML+=('<div class="context-menu-header">Column Width:</div>'+'<div class="context-menu-indent">'+'    <gs-button dialogclose remove-bottom'+'                iconleft icon="text-width"'+'                class="button-column-width">'+'        Fit To Header'+'    </gs-button>'+'    <gs-button dialogclose remove-top'+'                iconleft icon="text-width"'+'                class="button-column-width">'+'        Fit To Content'+'    </gs-button>'+'</div>');}
+if(bolFilterSelection){strHTML+=(strHTML?'<hr />':'');strHTML+=('<div class="context-menu-header">Filtering:</div>'+'<div class="context-menu-indent">'+'    <gs-button dialogclose remove-bottom'+'                iconleft icon="filter"'+'                class="button-filter-include">'+'        Filter By Selection'+'    </gs-button>'+'    <gs-button dialogclose remove-all'+'                iconleft icon="filter"'+'                class="button-filter-exclude">'+'        Filter Excluding Selection'+'    </gs-button>'+'    <gs-button dialogclose remove-all'+'                iconleft icon="search"'+'                class="button-filter-text">'+'        Text Filters'+'    </gs-button>'+'    <gs-button dialogclose remove-all'+'                iconleft icon="toggle-off"'+'                class="button-filter-toggle">'+'        Toggle Filters'+'    </gs-button>'+'    <gs-button dialogclose remove-top'+'                iconleft icon="trash-o"'+'                class="button-filter-clear">'+'        Clear Filters'+'    </gs-button>'+'</div>');}
+if(bolFilterUnique){strHTML+=(strHTML?'<hr />':'');strHTML+='<div class="gs-table-unique-value-list"></div>';}
+templateElement=document.createElement('template');templateElement.setAttribute('data-max-width','15em');templateElement.setAttribute('data-overlay-close','true');templateElement.setAttribute('no-focus-lock','true');templateElement.setAttribute('no-background','');templateElement.innerHTML=('<gs-page gs-dynamic class="gs-table-contextmenu">'+'    <gs-body padded>'+'        '+strHTML+'    </gs-body>'+'</gs-page>');event.preventDefault();var jsnMousePos=GS.mousePosition(event);var jsnElementPos=GS.getElementOffset(element.elems.root);element.elems.pixel.style.left=(((jsnMousePos.left-
+jsnElementPos.left)+
+(GS.emToPx(document.body,15)/2))+'px');element.elems.pixel.style.top=((jsnMousePos.top-
+jsnElementPos.top)+'px');element.elems.pixel.style.bottom='';element.elems.pixel.style.right='';GS.openDialogToElement(element.elems.pixel,templateElement,'down',function(){var dialog=this;var filterToggleButton;var strStatus;dialog.classList.add('gs-table-contextmenu');if(bolFilterSelection){filterToggleButton=xtag.query(dialog,'.button-filter-toggle')[0];strStatus=(element.internalData.columnFilterStatuses[arrDataColumns[0]]);if(strStatus==='on'){filterToggleButton.textContent=('Toggle Filters Off');filterToggleButton.setAttribute('icon','toggle-on');}else{filterToggleButton.textContent=('Toggle Filters On');filterToggleButton.setAttribute('icon','toggle-off');}}},function(event,strAnswer){var dialog=this;var targetElement;var buttonElement;var strWhere;var strValue;var strNewSort;var col_i;var col_len;if(event&&event.target){targetElement=event.target;}
+if(targetElement){if(targetElement.nodeName==='GS-BUTTON'){buttonElement=targetElement;}else{buttonElement=GS.findParentTag(targetElement,'gs-button');}}
+strAnswer=strAnswer.trim();if(strAnswer==='Sort A to Z'||strAnswer==='Sort Z to A'||strAnswer==='Clear Sort'){if(strAnswer==='Sort A to Z'){strNewSort='asc';}else if(strAnswer==='Sort Z to A'){strNewSort='desc';}else if(strAnswer==='Clear Sort'){strNewSort='neutral';}
+col_i=0;col_len=arrDataColumns.length;while(col_i<col_len){element.internalData.columnOrders[arrDataColumns[col_i]]=strNewSort;col_i+=1;}
+dataSELECT(element);}else if(strAnswer==='Fit To Header'){resizeColumnsToHeader(element,arrSelectedColumns);}else if(strAnswer==='Fit To Content'){resizeColumnsToContent(element,arrSelectedColumns);}else if(strAnswer==='Hide Column(s)'){i=0;len=arrSelectedColumns.length;while(i<len){if(arrSelectedColumns[i]>=0){element.internalDisplay.columnWidths[arrSelectedColumns[i]]=0;}
+i+=1;}
+element.internalDisplay.fullRenderRequired=true;renderLocation(element);}else if(strAnswer==='Unhide Columns'){openColumnHideDialog(element,buttonElement,function(strAnswer){if(strAnswer!=='Cancel'){GS.closeDialog(dialog,'Force');}});event.preventDefault();}else if(strAnswer==='Filter By Selection'){strValue=(strSelection||strDataValue);if(strValue==='gsTAbleINTERNALNULLSTRING'){strWhere=(strColumn+' IS NULL');}else{strWhere=('CAST('+
+strColumn+' AS '+
+GS.database.type.text+') = $$'+strValue+'$$');}
+element.internalData.columnFilters[arrDataColumns[0]].push({"text":strWhere,"name":'equals "'+strValue+'"'});dataSELECT(element);}else if(strAnswer==='Filter Excluding Selection'){strValue=(strSelection||strDataValue);if(strValue==='gsTAbleINTERNALNULLSTRING'){strWhere=(strColumn+' IS NOT NULL');}else{strWhere=('CAST('+
+strColumn+' AS '+
+GS.database.type.text+') != $$'+strValue+'$$');}
+element.internalData.columnFilters[arrDataColumns[0]].push({"text":strWhere,"name":"doesn't equal "+"\""+strValue+"\""});dataSELECT(element);}else if(strAnswer==='Text Filters'){strValue=(strSelection||strDataValue);element.internalEvents.textFilterContextMenu(buttonElement,arrDataColumns[0],strColumn,strValue,function(strAnswer){if(strAnswer!=='Cancel'){GS.closeDialog(dialog,'Force');}});event.preventDefault();}else if(strAnswer==='Toggle Filters On'){element.internalData.columnFilterStatuses[arrDataColumns[0]]=('on');dataSELECT(element);}else if(strAnswer==='Toggle Filters Off'){element.internalData.columnFilterStatuses[arrDataColumns[0]]=('off');dataSELECT(element);}else if(strAnswer==='Clear Filters'){element.internalData.columnFilters[arrDataColumns[0]]=[];element.internalData.columnListFilters[arrDataColumns[0]]={};dataSELECT(element);}});}};element.internalEvents.textFilterContextMenu=function(buttonElement,columnIndex,strColumn,strValue,callback){var templateElement;templateElement=document.createElement('template');templateElement.setAttribute('data-max-width','17em');templateElement.setAttribute('no-background','');templateElement.setAttribute('data-overlay-close','true');templateElement.innerHTML=ml(function(){/*
+                <gs-page gs-dynamic class="gs-table-contextmenu">
+                    <gs-body padded>
+                        <center>
+                            <i>Check each filter you want to apply.</i><br />
+                            <i>
+                                Matching values must pass every<br />
+                                filter you choose.
+                            </i>
+                        </center>
+                        <table>
+                            <tbody>
+                                <tr class="fltr-row fltr-eq">
+                                    <td>
+                                        <gs-checkbox remove-all mini>
+                                            &nbsp;Equals</gs-checkbox>
+                                    </td>
+                                    <td><gs-text mini></gs-text></td>
+                                </tr>
+                                <tr class="fltr-row fltrn-eq">
+                                    <td>
+                                        <gs-checkbox remove-all mini>
+                                            &nbsp;Doesn't Equal</gs-checkbox>
+                                    </td>
+                                    <td><gs-text mini></gs-text></td>
+                                </tr>
+                                <tr class="fltr-row fltr-contain">
+                                    <td>
+                                        <gs-checkbox remove-all mini>
+                                            &nbsp;Contains</gs-checkbox>
+                                    </td>
+                                    <td><gs-text mini></gs-text></td>
+                                </tr>
+                                <tr class="fltr-row fltrn-contain">
+                                    <td>
+                                        <gs-checkbox remove-all mini>
+                                            &nbsp;Doesn't Contain</gs-checkbox>
+                                    </td>
+                                    <td><gs-text mini></gs-text></td>
+                                </tr>
+                                <tr class="fltr-row fltr-starts">
+                                    <td>
+                                        <gs-checkbox remove-all mini>
+                                            &nbsp;Starts With</gs-checkbox>
+                                    </td>
+                                    <td><gs-text mini></gs-text></td>
+                                </tr>
+                                <tr class="fltr-row fltr-ends">
+                                    <td>
+                                        <gs-checkbox remove-all mini>
+                                            &nbsp;Ends With</gs-checkbox>
+                                    </td>
+                                    <td><gs-text mini></gs-text></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!--
+                        <gs-checkbox remove-bottom>
+                            &nbsp;Equals
+                        </gs-checkbox>
+                        <gs-checkbox remove-all>
+                            &nbsp;Doesn't Equal
+                        </gs-checkbox>
+                        <gs-checkbox remove-all>
+                            &nbsp;Contains
+                        </gs-checkbox>
+                        <gs-checkbox remove-all>
+                            &nbsp;Doesn't Contain
+                        </gs-checkbox>
+                        <gs-checkbox remove-all>
+                            &nbsp;Starts With
+                        </gs-checkbox>
+                        <gs-checkbox remove-top>
+                            &nbsp;Ends With
+                        </gs-checkbox>
+                        -->
+                    </gs-body>
+                    <gs-footer>
+                        <gs-grid gutter>
+                            <gs-block>
+                                <gs-button dialogclose>
+                                    Cancel
+                                </gs-button>
+                            </gs-block>
+                            <gs-block>
+                                <gs-button dialogclose bg-primary>
+                                    Apply
+                                </gs-button>
+                            </gs-block>
+                        </gs-grid>
+                    </gs-footer>
+                </gs-page>
+            */});GS.openDialogToElement(buttonElement,templateElement,'right',function(){var dialog=this;var arrElements;var i;var len;arrElements=xtag.query(dialog,'.fltr-row gs-text');i=0;len=arrElements.length;while(i<len){arrElements[i].value=strValue;i+=1;}},function(ignore,strAnswer){var dialog=this;var arrRows;var rowClass;var checkElement;var valueElement;var strWhere;var strName;var strWhereValue;var i;var len;strAnswer=strAnswer.trim();if(strAnswer==='Apply'){arrRows=xtag.query(dialog,'.fltr-row');i=0;len=arrRows.length;while(i<len){checkElement=(arrRows[i].children[0].children[0]);valueElement=(arrRows[i].children[1].children[0]);strWhereValue=valueElement.value;rowClass=arrRows[i].classList;strWhere='';if(checkElement.value==='true'){if(rowClass.contains('fltr-eq')){strWhere='CAST('+
+strColumn+' AS '+
+GS.database.type.text+') '+'= $$'+strWhereValue+'$$';strName='equals "'+strWhereValue+'"';}else if(rowClass.contains('fltrn-eq')){strWhere='CAST('+
+strColumn+' AS '+
+GS.database.type.text+') '+'!= $$'+strWhereValue+'$$';strName='doesn\'t equal '+'"'+strWhereValue+'"';}else if(rowClass.contains('fltr-contain')){strWhere='CAST('+
+strColumn+' AS '+
+GS.database.type.text+') '+'LIKE $$%'+strWhereValue+'%$$';strName='contains '+'"'+strWhereValue+'"';}else if(rowClass.contains('fltrn-contain')){strWhere='CAST('+
+strColumn+' AS '+
+GS.database.type.text+') '+'NOT LIKE '+'$$%'+strWhereValue+'%$$';strName='doesn\'t '+'"'+strWhereValue+'"';}else if(rowClass.contains('fltr-starts')){strWhere='CAST('+
+strColumn+' AS '+
+GS.database.type.text+') '+'LIKE $$'+strWhereValue+'%$$';strName='starts with '+'"'+strWhereValue+'"';}else if(rowClass.contains('fltr-ends')){strWhere='CAST('+
+strColumn+' AS '+
+GS.database.type.text+') '+'LIKE $$%'+strWhereValue+'$$';strName='ends '+'"'+strWhereValue+'"';}}
+if(strWhere){element.internalData.columnFilters[columnIndex].push({"text":strWhere,"name":strName});}
+i+=1;}
+dataSELECT(element);}
+if(callback){callback(strAnswer);}});};element.internalEvents.advancedFilterContextMenu=function(){};element.elems.dataViewport.addEventListener('contextmenu',element.internalEvents.columnContextMenu);}
+function unbindColumnDropdown(element){element.removeEventListener('click',element.internalEvents.columnDropDown);}
+function bindColumnDropdown(element){element.internalEvents.columnDropDown=function(event){var target=event.target;var parentCell;var templateElement;var columnNumber;var strColumn;var columnIndex;var strHTML;var jsnMousePos;var jsnElementPos;var intMouseX;var intMouseY;if(target.classList.contains('header-button')){jsnMousePos=GS.mousePosition(event);jsnElementPos=GS.getElementOffset(element.elems.root);intMouseX=(jsnMousePos.left-jsnElementPos.left);intMouseY=(jsnMousePos.top-jsnElementPos.top);element.elems.pixel.style.left=(intMouseX+'px');element.elems.pixel.style.top=(intMouseY+'px');parentCell=GS.findParentTag(target,'gs-cell');columnNumber=(parseInt(parentCell.getAttribute('data-col-number'),10));strColumn=(element.internalDisplay.dataColumnName[columnNumber]);columnIndex=(element.internalData.columnNames.indexOf(strColumn));strHTML='';strHTML+=('<gs-button dialogclose remove-bottom'+'            iconleft icon="sort-alpha-asc"'+'            class="button-sort-asc">'+'    Sort A to Z'+'</gs-button>');strHTML+=('<gs-button dialogclose remove-all'+'            iconleft icon="sort-alpha-desc"'+'            class="button-sort-desc">'+'    Sort Z to A'+'</gs-button>');strHTML+=('<gs-button dialogclose remove-top'+'            iconleft icon="trash-o"'+'            class="button-sort-clear">'+'    Clear Sort'+'</gs-button>');strHTML+=('<div class="gs-table-unique-filter-container" hidden>'+'    <hr />'+'    <small><i>Filter By Selection:</i></small>'+'    <div class="gs-table-unique-value-list"></div>'+'    <div class="gs-table-unique-value-list-toolbar">'+
+('<gs-button dialogclose remove-right '+'inline>Cancel</gs-button>'+'<gs-button dialogclose remove-left '+'inline bg-primary>Ok</gs-button>')+'    </div>'+'</div>');strHTML+='<hr />';strHTML+=('<gs-button dialogclose'+'            iconleft icon="trash-o"'+'            class="button-sort-clear">'+'    Clear Filters'+'</gs-button>');templateElement=document.createElement('template');templateElement.setAttribute('data-max-width','17em');templateElement.setAttribute('data-overlay-close','true');templateElement.setAttribute('no-background','');templateElement.innerHTML=('<gs-page gs-dynamic class="gs-table-contextmenu">'+'    <gs-body padded>'+'        '+strHTML+'    </gs-body>'+'</gs-page>');GS.openDialogToElement(element.elems.pixel,templateElement,'down',function(){var dialog=this;var uniqueFilterElement=xtag.query(dialog,'.gs-table-unique-filter-container')[0];var valueListElement=xtag.query(dialog,'.gs-table-unique-value-list')[0];if(uniqueFilterElement&&valueListElement){dataSELECTcolumnUnique(element,uniqueFilterElement,valueListElement,strColumn);}},function(ignore,strAnswer){var dialog=this;var tableElement;var valueListElement=xtag.query(dialog,'.gs-table-unique-value-list')[0];var arrRecords;var arrIncluded;var arrExcluded;var strValue;var bolBlanks;var i;var len;strAnswer=strAnswer.trim();tableElement=valueListElement.children[0];if(tableElement&&tableElement.nodeName==='GS-TABLE'){if(strAnswer==='Ok'){arrRecords=tableElement.internalData.records;arrIncluded=[];arrExcluded=[];i=1;len=arrRecords.length;while(i<len){strValue=(arrRecords[i].substring(arrRecords[i].lastIndexOf('\t')+1));if(strValue==='(blanks)'){bolBlanks=(arrRecords[i][0]==='-');}else{if(arrRecords[i][0]==='0'){arrExcluded.push(strValue);}else{arrIncluded.push(strValue);}}
+i+=1;}
+if(!element.internalData.columnListFilters[columnIndex]){element.internalData.columnListFilters[columnIndex]={};}
+if(arrIncluded.length<arrExcluded.length){element.internalData.columnListFilters[columnIndex].type='inclusion';element.internalData.columnListFilters[columnIndex].values=(arrIncluded);}else if(arrExcluded.length>0){element.internalData.columnListFilters[columnIndex].type='exclusion';element.internalData.columnListFilters[columnIndex].values=(arrExcluded);}else{element.internalData.columnListFilters[columnIndex].type='exclusion';element.internalData.columnListFilters[columnIndex].values=([]);}
+element.internalData.columnListFilters[columnIndex].blanks=(bolBlanks||false);arrRecords=[];arrExcluded=[];arrIncluded=[];dataSELECT(element);}
+tableElement.destroy();}
+if(strAnswer==='Sort A to Z'){element.internalData.columnOrders[columnIndex]='asc';dataSELECT(element);}else if(strAnswer==='Sort Z to A'){element.internalData.columnOrders[columnIndex]='desc';dataSELECT(element);}else if(strAnswer==='Clear Sort'){element.internalData.columnOrders[columnIndex]='neutral';dataSELECT(element);}else if(strAnswer==='Clear Filters'){element.internalData.columnFilters[columnIndex]=[];element.internalData.columnListFilters[columnIndex]={};dataSELECT(element);}});}};element.addEventListener('click',element.internalEvents.columnDropDown);}
+function unbindDeveloper(element){element.removeEventListener(evt.mousedown,element.internalEvents.developerMouseDown);}
+function bindDeveloper(element){element.internalEvents.developerMouseDown=function(event){var bolCMDorCTRL=(event.ctrlKey||event.metaKey);var bolShift=(event.shiftKey);var strHTML;var arrAttr;var jsnAttr;var i;var len;if(bolCMDorCTRL&&bolShift){event.preventDefault();event.stopPropagation();strHTML='';arrAttr=element.attributes;i=0;len=arrAttr.length;while(i<len){jsnAttr=arrAttr[i];strHTML+=('<b>Attribute "'+encodeHTML(jsnAttr.name)+'":</b>'+'<pre>'+encodeHTML(jsnAttr.value)+'</pre>');i+=1;}
+GS.msgbox('Developer Info',strHTML,['Ok']);}};element.addEventListener(evt.mousedown,element.internalEvents.developerMouseDown);}
+function unbindVisibilityPolling(element){clearInterval(element.internalTimerIDs.visibilityIntervalID);}
+function bindVisibilityPolling(element){element.internalTimerIDs.visibilityIntervalID=setInterval(function(){var jsnCache;var intWidth;var intHeight;var intFontSize;jsnCache=element.internalPollingCache;intWidth=element.clientWidth;intHeight=element.clientHeight;intFontSize=GS.emToPx(element,1);if(jsnCache.elementWidth!==intWidth||jsnCache.elementHeight!==intHeight||jsnCache.fontSize!==intFontSize){renderScrollDimensions(element);GS.triggerEvent(window,'resize');}
+jsnCache.elementWidth=intWidth;jsnCache.elementHeight=intHeight;jsnCache.fontSize=intFontSize;},75);}
+function unbindElement(element){unbindFocus(element);unbindScroll(element);unbindSelection(element);unbindCellResize(element);unbindColumnReorder(element);unbindUpdate(element);unbindInsert(element);unbindKey(element);unbindHUD(element);unbindCopy(element);unbindPaste(element);unbindContextMenu(element);unbindColumnDropdown(element);unbindCut(element);unbindDeveloper(element);unbindVisibilityPolling(element);}
+function bindElement(element){bindFocus(element);bindScroll(element);bindSelection(element);bindCellResize(element);bindColumnReorder(element);bindUpdate(element);bindInsert(element);bindKey(element);bindHUD(element);bindCopy(element);bindPaste(element);bindContextMenu(element);bindColumnDropdown(element);bindCut(element);bindDeveloper(element);bindVisibilityPolling(element);}
+function elementInserted(element){if(!element.hasAttribute('suspend-created')&&!element.hasAttribute('suspend-inserted')){if(!element.inserted){element.inserted=true;resolveElementAttributes(element);prepareElement(element);siphonElement(element);renderHUD(element);bindElement(element);createWebWorker(element);GS.triggerEvent(element,'initialized');}}}
+xtag.register('gs-table',{lifecycle:{'created':function(){},'inserted':function(){elementInserted(this);},'removed':function(){this.destroy();},'attributeChanged':function(strAttrName){var element=this;if(strAttrName==='suspend-created'||strAttrName==='suspend-inserted'){elementInserted(element);}else if(!element.hasAttribute('suspend-created')&&!element.hasAttribute('suspend-inserted')){if(strAttrName==='value'&&element.root){element.refresh();}}}},accessors:{'selection':{'get':function(){}},'data':{'get':function(){}},'value':{'get':function(){return this.getAttribute('value');},'set':function(newValue){this.setAttribute('value',newValue);}}},methods:{'destroy':function(){var element=this;if(element.elems.dataViewport){unbindElement(element);if(element.internalWorker.worker){element.internalWorker.worker.terminate();}
+element.internalData={};element.internalScrollOffsets={};element.internalEvents={};element.internalEventCancelled={};element.internalScroll={};element.internalTimerIDs={};element.internalTemplates={};element.internalDisplay={};element.internalSelection={};element.internalClip={};element.internalWorker={};element.internalLoaders={};element.internalResize={};element.internalReorder={};element.elems={};element.innerHTML='';}},'refresh':function(){dataSELECT(this);},'selectData':function(){dataSELECT(this);},'insertData':function(jsnInsert){dataINSERT(this,jsnInsert);},'updateData':function(jsnUpdate){dataUPDATE(this,jsnUpdate);},'deleteData':function(jsnDeleteData){dataDELETE(this,jsnDeleteData);},'render':function(){renderScrollDimensions(this);},'toggleFullContainer':function(container,target){if(this.classList.contains('absolute')){this.classList.remove('absolute');document.getElementById(container).classList.remove('relative');target.setAttribute('icon','expand');}else{this.classList.add('absolute');document.getElementById(container).classList.add('relative');target.setAttribute('icon','compress');}
+renderScrollDimensions(this);},'openFullContainer':function(container,target){if(!this.classList.contains('absolute')){this.classList.add('absolute');document.getElementById(container).classList.add('relative');target.setAttribute('icon','compress');}
+renderScrollDimensions(this);},'closeFullContainer':function(container,target){if(this.classList.contains('absolute')){this.classList.remove('absolute');document.getElementById(container).classList.remove('relative');target.setAttribute('icon','expand');}
+renderScrollDimensions(this);},'deleteSelected':function(){deleteSelectedRecords(this);},'clearFilter':function(){var filter_i;var filter_len;filter_i=0;filter_len=this.internalData.columnFilters.length;while(filter_i<filter_len){this.internalData.columnFilters[filter_i]=[];this.internalData.columnListFilters[filter_i]={};filter_i+=1;}
+dataSELECT(this);},'toggleFullscreen':function(target){if(this.classList.contains('table-fullscreen')){this.classList.remove('table-fullscreen');if(target.getAttribute('icon')==='close'){target.setAttribute('icon','arrows-alt');}}else{this.classList.add('table-fullscreen');if(target.getAttribute('icon')==='arrows-alt'){target.setAttribute('icon','close');}}
+renderScrollDimensions(this);},'openFullscreen':function(target){if(!this.classList.contains('table-fullscreen')){this.classList.add('table-fullscreen');if(target.getAttribute('icon')==='arrows-alt'){target.setAttribute('icon','close');}}
+renderScrollDimensions(this);},'closeFullscreen':function(target){if(this.classList.contains('table-fullscreen')){this.classList.remove('table-fullscreen');if(target.getAttribute('icon')==='close'){target.setAttribute('icon','arrows-alt');}}
+renderScrollDimensions(this);},'openPrefs':function(target){openSettingsDialog(this,target);},'sort':function(action){var strNewSort;if(action==='asc'){strNewSort='asc';}else if(action==='desc'){strNewSort='desc';}else if(action==='clear'){strNewSort='neutral';}else{strNewSort='neutral';}
+var arrColumnOrders=(this.internalData.columnOrders);var arrDataColumns=getSelectedDataColumns(this);var i=0;var len=arrDataColumns.length;while(i<len){arrColumnOrders[arrDataColumns[i]]=strNewSort;i+=1;}
+dataSELECT(this);},'openInsertDialog':function(){openInsertDialog(element);},'goToLine':function(action){var intCurrentRecord=(this.internalSelection.originRecord||0);var intMaxRecord=(this.internalData.records.length-1);var intMinColumn=(this.internalDisplay.recordSelectorVisible?-1:0);if(action==='insert'){scrollCellIntoView(this,'insert','0','top');}else{if(action==='first'){intCurrentRecord=0;}else if(action==='previous'){intCurrentRecord-=1;}else if(action==='next'){intCurrentRecord+=1;}else if(action==='plusten'){intCurrentRecord+=10;}else if(action==='minusten'){intCurrentRecord-=10;}else if(action==='last'){intCurrentRecord=intMaxRecord;}else if(typeof action==='number'){intCurrentRecord=action-1;}else{intCurrentRecord=parseInt(action,10)-1;}
+if(intCurrentRecord>intMaxRecord){intCurrentRecord=intMaxRecord;}
+if(intCurrentRecord<0){intCurrentRecord=0;}
+if(intMaxRecord===-1){intCurrentRecord=undefined;}
+if(intCurrentRecord!==undefined){this.internalSelection.ranges=[{"start":{"row":intCurrentRecord,"column":intMinColumn},"end":{"row":intCurrentRecord,"column":intMinColumn},"negator":false}];}else{this.internalSelection.ranges=[];}
+renderSelection(this);scrollSelectionIntoView(this,'top');}},'clearSelection':function(){var element=this;element.internalSelection.ranges=[];renderSelection(element);},'addSelectionRange':function(fromRow,fromColumn,toRow,toColumn,bolNegate){var element=this;if(bolNegate===undefined||typeof bolNegate!=='boolean'){bolNegate=false;}
+element.internalSelection.ranges.push({"start":{"row":fromRow,"column":fromColumn},"end":{"row":toRow,"column":toColumn},"negator":false});renderSelection(element);},'getCopyStrings':function(){return getCopyStrings(this);},'paste':function(strPasteString){usePasteString(this,strPasteString);},'resizeAllColumns':function(){var arrIndexes=[];for(var i=0,len=this.internalDisplay.columnPlainTextNames.length;i<len;i++){arrIndexes.push(i);}
+resizeColumnsToContent(this,arrIndexes);},'addFilter':function(filterColumn,filterType,filterValue){var element=this;var columnIndex;var strWhere;var strName;if(!(/^(contains|starts|ends)$/gi).test(filterType)&&!(/^(equals|greaterthan|lessthan)$/gi).test(filterType)&&!(/^(notcontains|notstarts|notends)$/gi).test(filterType)&&!(/^(notequals|notgreaterthan)$/gi).test(filterType)&&!(/^(notlessthan)$/gi).test(filterType)){throw'GS-TABLE Error: invalid filter type given to '+'ELEMENT.addFilter(filterColumn, filterType, '+'filterValue). Given filter type was '+'"'+filterType+'", must be "contains", '+'"starts", "ends", "equals", "greaterthan", '+'"lessthan", "notcontains", "notstarts", '+'"notends", "notequals", "notgreaterthan" '+'or "notlessthan".';}
+filterType=filterType.toLowerCase();if(filterValue===undefined){throw'GS-TABLE Error: no filter value given to '+'ELEMENT.addFilter(filterColumn, filterType, '+'filterValue)';}
+filterValue=filterValue.toString();if(filterType==='equals'){strWhere='CAST('+
+filterColumn+' AS '+
+GS.database.type.text+') '+'= $$'+filterValue+'$$';strName='equals'+' "'+filterValue+'"';}else if(filterType==='notequals'){strWhere='CAST('+
+filterColumn+' AS '+
+GS.database.type.text+') '+'!= $$'+filterValue+'$$';strName='doesn\'t equal'+' "'+filterValue+'"';}else if(filterType==='contains'){strWhere='CAST('+
+filterColumn+' AS '+
+GS.database.type.text+') '+'LIKE $$%'+filterValue+'%$$';strName='contains'+' "'+filterValue+'"';}else if(filterType==='notcontains'){strWhere='CAST('+
+filterColumn+' AS '+
+GS.database.type.text+') '+'NOT LIKE '+'$$%'+filterValue+'%$$';strName='doesn\'t contain'+' "'+filterValue+'"';}else if(filterType==='starts'){strWhere='CAST('+
+filterColumn+' AS '+
+GS.database.type.text+') '+'LIKE $$'+filterValue+'%$$';strName='starts with'+' "'+filterValue+'"';}else if(filterType==='notstarts'){strWhere='CAST('+
+filterColumn+' AS '+
+GS.database.type.text+') '+'NOT LIKE $$'+filterValue+'%$$';strName=''+' "'+filterValue+'"';}else if(filterType==='ends'){strWhere='CAST('+
+filterColumn+' AS '+
+GS.database.type.text+') '+'LIKE $$%'+filterValue+'$$';strName='ends with'+' "'+filterValue+'"';}else if(filterType==='notends'){strWhere='CAST('+
+filterColumn+' AS '+
+GS.database.type.text+') '+'NOT LIKE $$%'+filterValue+'$$';strName='doesn\'t end with'+' "'+filterValue+'"';}else if(filterType==='greaterthan'){strWhere=(filterColumn+' > '+filterValue);strName='greater than'+' "'+filterValue+'"';}else if(filterType==='notgreaterthan'){strWhere=(filterColumn+' <= '+filterValue);strName='not greater than'+' "'+filterValue+'"';}else if(filterType==='lessthan'){strWhere=(filterColumn+' < '+filterValue);strName='less than'+' "'+filterValue+'"';}else if(filterType==='notlessthan'){strWhere=(filterColumn+' >= '+filterValue);strName='not less than'+' "'+filterValue+'"';}
+columnIndex=(element.internalData.columnNames.indexOf(filterColumn));if(strWhere){element.internalData.columnFilters[columnIndex].push({"text":strWhere,"name":strName});}else{console.warn('GS-TABLE Warning: Unable to create where'+'clause.\n'+'Here are the parameters that failed:\n'+'\tfilterColumn:   "'+filterColumn+'"\n'+'\tfilterType:     "'+filterType+'"\n'+'\tfilterValue:    "'+filterValue+'"');}}}});});window.addEventListener('design-register-element',function(){registerDesignSnippet('<gs-text>','<gs-text>','gs-text column="${1:name}"></gs-text>');registerDesignSnippet('<gs-text> With Label','<gs-text>','label for="${1:text-insert-last_name}">${2:Last Name}:</label>\n'+'<gs-text id="${1:text-insert-last_name}" column="${3:last_name}"></gs-text>');designRegisterElement('gs-text','/env/app/developer_g/greyspots-'+GS.version()+'/documentation/doc-elem-text.html');window.designElementProperty_GSTEXT=function(selectedElement){addProp('Column',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('column')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'column',this.value);});addProp('Value',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('value')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'value',this.value);});addProp('Column In Querystring',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('qs')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'qs',this.value,false);});addProp('Placeholder',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('placeholder')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'placeholder',this.value);});addProp('Mini',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('mini'))+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'mini',(this.value==='true'),true);});addProp('Title',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('title')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'title',this.value);});addProp('Tabindex',true,'<gs-number class="target" value="'+encodeHTML(selectedElement.getAttribute('tabindex')||'')+'" mini></gs-number>',function(){return setOrRemoveTextAttribute(selectedElement,'tabindex',this.value);});addProp('Autocorrect',true,'<gs-checkbox class="target" value="'+(selectedElement.getAttribute('autocorrect')!=='off')+'" mini></gs-checkbox>',function(){return setOrRemoveTextAttribute(selectedElement,'autocorrect',(this.value==='false'?'off':''));});addProp('Autocapitalize',true,'<gs-checkbox class="target" value="'+(selectedElement.getAttribute('autocapitalize')!=='off')+'" mini></gs-checkbox>',function(){return setOrRemoveTextAttribute(selectedElement,'autocapitalize',(this.value==='false'?'off':''));});addProp('Autocomplete',true,'<gs-checkbox class="target" value="'+(selectedElement.getAttribute('autocomplete')!=='off')+'" mini></gs-checkbox>',function(){return setOrRemoveTextAttribute(selectedElement,'autocomplete',(this.value==='false'?'off':''));});addProp('Spellcheck',true,'<gs-checkbox class="target" value="'+(selectedElement.getAttribute('spellcheck')!=='false')+'" mini></gs-checkbox>',function(){return setOrRemoveTextAttribute(selectedElement,'spellcheck',(this.value==='false'?'false':''));});addProp('suspend-created',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('suspend-created')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'suspend-created',this.value==='true',true);});addProp('suspend-inserted',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('suspend-inserted')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'suspend-inserted',this.value==='true',true);});var strVisibilityAttribute='';if(selectedElement.hasAttribute('hidden')){strVisibilityAttribute='hidden';}
 if(selectedElement.hasAttribute('hide-on-desktop')){strVisibilityAttribute='hide-on-desktop';}
 if(selectedElement.hasAttribute('hide-on-tablet')){strVisibilityAttribute='hide-on-tablet';}
 if(selectedElement.hasAttribute('hide-on-phone')){strVisibilityAttribute='hide-on-phone';}

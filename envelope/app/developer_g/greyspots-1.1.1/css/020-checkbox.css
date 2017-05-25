@@ -26,7 +26,12 @@ gs-checkbox:before {
     /*font-size: 14px;*/
     font-size: 0.8em;
     content: '\f096'; /* fa-square-o */
+    padding-left: 0.5em;
     padding-right: 0.5em;
+    
+    width: 1.2em;
+    height: 1.2em;
+    text-align: center;
 }
 
 gs-checkbox[value="true"]:before,

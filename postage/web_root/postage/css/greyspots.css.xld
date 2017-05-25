@@ -1,4 +1,48 @@
-/* ################################################################ */
+/*
+    
+    ################# THEMING #################
+    
+    we have two themes:
+        the production (green) theme (default) and
+        the developer (blue) theme
+    
+    here are the colors:
+        green
+            light background color: #E9F1E9
+            border color and text color: #168216
+        blue
+            light background color: #E9EFF7
+            border color and text color: #3B99BE
+    
+    The coding practice for theming is this:
+        you write your CSS assuming the green theme and then after every block
+            that describes a green background or text color or border you add
+            a blue color override. See the example below (content between double asterisks "**" are notes
+            for aiding your understanding, not part of the example):
+    
+    START OF EXAMPLE
+        gs-whatever {
+            display: block;
+            
+            width: 100%;
+            height: 100%;
+            
+            border: 2px solid #168216; ** NOTICE THIS GREEN BORDER **
+            
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            -o-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        
+        gs-whatever.blue, ** NOTICE THE TWO SELECTORS, ONE FOR WHEN THE ELEMENT ITSELF HAS THE BLUE CLASS AND ONE FOR WHEN THE ELEMENT IS INSIDE AN ELEMENT WITH THE BLUE CLASS **
+        .blue gs-whatever {
+            border-color: #3B99BE; ** OVERRIDES "border-color", NOT "border" SO THAT IF WE CHANGED THE ABOVE "2px" OR "solid" WE DONT HAVE TO MAKE THE SAME CHANGES HERE **
+        }
+    END OF EXAMPLE
+    
+*//* ################################################################ */
 /* #################### DOCUMENT STYLE/SIZING ##################### */
 /* ################################################################ */
 
@@ -20,11 +64,6 @@ body {
     
     margin: 0;
     padding: 0;
-    
-    background-color: #ffffff;
-    
-    /*line-height: 1.25;*/
-    vertical-align: middle;
 }
 
 
@@ -161,7 +200,7 @@ template {
  */
 
 a {
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 /**
@@ -502,21 +541,6 @@ body {
     font-size: 14px;
     line-height: 1.42857;
     color: #333;
-}
-
-/* typography */
-/*TODO: michael should look over this, I don't know if this is even taking effect or should take effect */
-.typography, .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6, .h1 .small, .h1 small, .h2 .small, .h2 small, .h3 .small, .h3 small, .h4 .small, .h4 small, .h5 .small, .h5 small, .h6 .small, .h6 small, h1 .small, h1 small, h2 .small, h2 small, h3 .small, h3 small, h4 .small, h4 small, h5 .small, h5 small, h6 .small, h6 small, p, label {
-    display: block;
-    
-    background-color: tranparent;
-    color: black;
-    
-    padding: 0.25em;
-    border: none;
-    margin: 0;
-    
-    border-radius: 0;
 }
 
 /* Headings */
@@ -1280,24 +1304,27 @@ pre code{
 /* ########################################################### */
 
 *:focus {
-    /* this is a default that but each element is allow to have its own setting of this particular property */
-    /*outline-offset: -1px;*/
-    /*background-color: #FFFDEC;*/
-    /*outline: dashed 1px #FFB000;*/
+    /*outline: 1px dashed #000000;
+    outline-offset: -1px;/* this is a default that but each element is allow to have its own setting of this particular property */
     
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    
-    outline: none;
-    background: none;
+    outline: 0 none;
+	outline-style: none;
+	box-shadow: 0 0 0 1px #FFB000;
+	/*box-shadow: 0 0 0 2pt rgb(255, 176, 0) inset;*/
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    background-color: #FFFDDB;
 }
 
 *[selected] {
-    background-color: #E3F5FF !important; /* F1FAFF, B3E4FF, FFFFCC */
+    background-color: #FFFFCC !important;
 }
 
 *[selected-secondary] {
-    background-color: #E3F5FF !important; /* F1FAFF, B3E4FF, FFFFEE */
+    background-color: #B3E4FF !important; /* FFFFEE */
 }
 
 *[tempselect] {
@@ -1306,14 +1333,11 @@ pre code{
 
 html body *[disabled],
 *[disabled] {
-    opacity: 0.6;
+    opacity: 0.8;
     pointer-events: none;
     cursor: default;
-    
-    /*
     background-color: #D5D5D5;
     color: #444444;
-    */
 }
 
 
@@ -1452,14 +1476,6 @@ html body *[disabled],
     }
 }
 
-[remove-margin-top]         { margin-top: 0; }
-[remove-margin-bottom]      { margin-bottom: 0; }
-[remove-margin-left]        { margin-left: 0; }
-[remove-margin-right]       { margin-right: 0; }
-[remove-margin-horizontal]  { margin-left: 0; margin-right: 0; }
-[remove-margin-vertical]    { margin-top: 0; margin-bottom: 0; }
-[remove-margin-all]         { margin: 0; }
-
 /*
 768px
 hide-sml (from sml to med)
@@ -1486,6 +1502,9 @@ gs-select select,
 gs-interval input,
 gs-memo textarea {
     width: 100%;
+    border: 0 none;
+    margin: 0;
+    padding: 0;
     font-size: 1em;
     font-family: inherit;
     
@@ -1494,180 +1513,11 @@ gs-memo textarea {
     
     -webkit-border-radius: inherit;
     /*-moz-border-radius: none;*/
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-    
-    line-height: 1.2em;
-    
-    background-color: white;
-    color: black;
-    
-    padding: 0;
-    border: none;
-    margin: 0;
-    
-    border-radius: 0;
 }
 
 gs-memo textarea {
     display: block;
-    
-    width: 100% !important;
-    /*
-        this prevents the textarea from being resized to become too wide or too tall for it's container.
-        the important flag is required because in Google Chrome (I don't know about other browsers) the browser uses the "style" attribute to set the width/height when resizing the textarea, this means that in order to get precedence you need to use !important.
-    */
 }
-
-
-gs-date,
-gs-text,
-gs-search,
-gs-number,
-gs-memo,
-gs-combo,
-gs-time,
-gs-select,
-gs-interval,
-gs-memo,
-gs-checkbox {
-    position: relative;
-    display: block;
-    
-    background-color: white;
-    color: black;
-    
-    padding: 0.25em;
-    border: none;
-    margin: 0.25em;
-    
-    border-radius: 0;
-    
-    min-height: 1em;
-    line-height: 1.2em;
-    font-size: 1em;
-    
-    /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    /*box-shadow: 0 0 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
-    box-shadow: 0 0 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
-    transition: box-shadow 0.5s;
-}
-
-gs-date.hover,
-gs-text.hover,
-gs-search.hover,
-gs-number.hover,
-gs-memo.hover,
-gs-combo.hover,
-gs-time.hover,
-gs-select.hover,
-gs-interval.hover,
-gs-memo.hover,
-gs-checkbox.hover {
-    
-    /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
-    transition: box-shadow 0.5s;
-}
-
-gs-date[disabled],
-gs-text[disabled],
-gs-search[disabled],
-gs-number[disabled],
-gs-memo[disabled],
-gs-combo[disabled],
-gs-time[disabled],
-gs-select[disabled],
-gs-interval[disabled],
-gs-memo[disabled],
-gs-checkbox[disabled] {
-    pointer-events: auto;
-    
-    opacity: 0.6;
-}
-
-gs-date.focus,
-gs-text.focus,
-gs-search.focus,
-gs-number.focus,
-gs-memo.focus,
-gs-combo.focus,
-gs-time.focus,
-gs-select.focus,
-gs-interval.focus,
-gs-memo.focus,
-gs-checkbox.focus {
-    
-    /*box-shadow: 0 0.3em 0.5em -0.125em rgba(230,138,84,.1), 0 0.2em 0.5em 0 rgba(230,138,84,.14), 0 0.0625em 0.3125em 0 rgba(230,138,84,.12);*/
-    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.5);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.5), 0 0 0.2em 0 rgba(230,138,84,1);
-    transition: box-shadow 0.5s;
-}
-
-
-gs-date[mini],
-gs-text[mini],
-gs-search[mini],
-gs-number[mini],
-gs-memo[mini],
-gs-combo[mini],
-gs-time[mini],
-gs-select[mini],
-gs-interval[mini],
-gs-memo[mini],
-gs-checkbox[mini] {
-    background-color: transparent;
-    box-shadow: none !important;
-}
-
-gs-date[mini] input,
-gs-text[mini] input,
-gs-search[mini] input,
-gs-number[mini] input,
-gs-memo[mini] input,
-gs-combo[mini] input,
-gs-time[mini] input,
-gs-select[mini] select,
-gs-interval[mini] input,
-gs-memo[mini] textarea {
-    background-color: transparent;
-    box-shadow: none !important;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 label {
     display: block;
     padding: 0.25em;
@@ -1708,14 +1558,12 @@ table thead th {
     */
 }
 
-/*
 table tr * {
     background-color: transparent;
 }
-*/
 
 tr:nth-of-type(odd) {
-  background-color: #eeeeee;
+  background-color: #f9f9f9;
 }
 
 table thead tr {
@@ -1853,6 +1701,7 @@ gs-button > a[gs-dynamic] {
 
 gs-button,
 gs-toggle,
+gs-checkbox,
 gs-phone-button:not([not-supported]),
 gs-map-button,
 gs-skype-button,
@@ -1865,8 +1714,11 @@ gs-dialog-button {
     position: relative;
     display: block;
     
+    padding: 0.42857143em 0.85714286em; /* 6px 12px */
     margin-bottom: 0;
+    font-size: 0.8em; /* 14px */
     font-weight: normal;
+    line-height: 1.42857143;
     text-align: center;
     white-space: nowrap;
     vertical-align: middle;
@@ -1874,7 +1726,24 @@ gs-dialog-button {
       touch-action: manipulation;
     cursor: pointer;
     background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
     
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+    /*
+    color: #0E8F41;
+    cursor: pointer;
+    text-align: center;
+    padding: 0.2em;
+    
+    background-color: #E9F1E9;
+    
+    border: 1px solid #0E8F41;
+    border-radius: 2em;
+    
+    */
     user-select: none;
     -o-user-select: none;
     -ms-user-select: none;
@@ -1883,43 +1752,19 @@ gs-dialog-button {
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     
+    /*padding: 0.2em;*/
+    min-height: 2.35em;
+    
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
-    
-    
-    
-    background-color: white;
-    color: #5474E6;
-    
-    padding: 0.25em;
-    border: none;
-    margin: 0.25em;
-    
-    border-radius: 0.5em;
-    
-    
-    /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
-    transition: box-shadow 0.125s;
-    
-    line-height: 1.2em;
-    min-height: 1em;
-    font-size: 1em;
-}
-
-gs-option {
-    margin: 0;
-    box-shadow: 0 0 0.2em 0 rgba(0,0,0,.2) !important;
-    border-radius: 0;
 }
 
 gs-checkbox {
     /* make the same height as gs-text and gs-button */
-    /*padding: 0.190825em;*/
+    padding: 0.3575em 0.85714286em;
 }
 
 [flex-vertical]   > gs-button,
@@ -1974,8 +1819,8 @@ gs-tracking-button.blue,
 gs-delete-button.blue,
 gs-option.blue,
 gs-dialog-button.blue {
-    /*background-color: #E9EFF7;*/
-    /*border-color: #3B99BE;*/
+    background-color: #E9EFF7;
+    border-color: #3B99BE;
     color: #3B99BE;
 }
 
@@ -1997,12 +1842,11 @@ gs-phone-button[not-supported] {
 /* ############################ GS-CHECKBOX COLOR OVERRIDE ############################ */
 /* #################################################################################### */
 
-/*
 gs-checkbox,
 gs-checkbox:hover {
     background-color: #FFFFFF;
 }
-*/
+
 
 /* #################################################################################### */
 /* #################################### MINI STATE #################################### */
@@ -2019,60 +1863,12 @@ gs-email-button[mini],
 gs-tracking-button[mini],
 gs-delete-button[mini],
 gs-option[mini],
-gs-dialog-button[mini],
-gs-button[embed],
-gs-toggle[embed],
-gs-checkbox[embed],
-gs-phone-button:not([not-supported])[embed],
-gs-map-button[embed],
-gs-skype-button[embed],
-gs-facetime-button[embed],
-gs-email-button[embed],
-gs-tracking-button[embed],
-gs-delete-button[embed],
-gs-option[embed],
-gs-dialog-button[embed],
-.drop_down_button,
-.date-picker-button,
-.time-picker-button {
+gs-dialog-button[mini] {
     border: 0;
     padding: 0;
-    background-color: transparent;
-    box-shadow: none !important;
-    margin: 0;
 }
 
-gs-button[mini-border],
-gs-toggle[mini-border],
-gs-checkbox[mini-border],
-gs-phone-button:not([not-supported])[mini-border],
-gs-map-button[mini-border],
-gs-skype-button[mini-border],
-gs-facetime-button[mini-border],
-gs-email-button[mini-border],
-gs-tracking-button[mini-border],
-gs-delete-button[mini-border],
-gs-option[mini-border],
-gs-dialog-button[mini-border],
-gs-button[embed-border],
-gs-toggle[embed-border],
-gs-checkbox[embed-border],
-gs-phone-button:not([not-supported])[embed-border],
-gs-map-button[embed-border],
-gs-skype-button[embed-border],
-gs-facetime-button[embed-border],
-gs-email-button[embed-border],
-gs-tracking-button[embed-border],
-gs-delete-button[embed-border],
-gs-option[embed-border],
-gs-dialog-button[embed-border] {
-    border: 0;
-    padding: 0;
-    margin: 0;
-}
-
-gs-checkbox[mini], gs-checkbox[mini-border],
-gs-checkbox[embed], gs-checkbox[embed-border] {
+gs-checkbox[mini] {
     min-height: 0;
 }
 
@@ -2100,38 +1896,45 @@ gs-dialog-button[inline] {
 /* ################################## COLORS, STATES ################################## */
 /* #################################################################################### */
 
-/* ## FOCUS ## */
-gs-button.focus,
-gs-toggle.focus,
-gs-phone-button:not([not-supported]).focus,
-gs-map-button.focus,
-gs-skype-button.focus,
-gs-facetime-button.focus,
-gs-email-button.focus,
-gs-tracking-button.focus,
-gs-delete-button.focus,
-gs-option.focus,
-gs-dialog-button.focus,
-
-gs-button.focus.hover,
-gs-toggle.focus.hover,
-gs-phone-button:not([not-supported]).focus.hover,
-gs-map-button.focus.hover,
-gs-skype-button.focus.hover,
-gs-facetime-button.focus.hover,
-gs-email-button.focus.hover,
-gs-tracking-button.focus.hover,
-gs-delete-button.focus.hover,
-gs-option.focus.hover,
-gs-dialog-button.focus.hover {
-    
-    /*box-shadow: 0 0.3em 0.5em -0.125em rgba(230,138,84,.1), 0 0.2em 0.5em 0 rgba(230,138,84,.14), 0 0.0625em 0.3125em 0 rgba(230,138,84);*/
-    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.5);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.5), 0 0 0.2em 0 rgba(230,138,84,1);
-    transition: box-shadow 0.125s;
+/* ## DEFAULT COLOR ## */
+gs-button,
+gs-toggle,
+gs-checkbox,
+gs-phone-button:not([not-supported]),
+gs-map-button,
+gs-skype-button,
+gs-facetime-button,
+gs-email-button,
+gs-tracking-button,
+gs-delete-button,
+gs-option,
+gs-dialog-button {
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
 }
 
-/* ## HOVER ## */
+/* # FOCUS # */
+gs-button:focus,
+gs-toggle:focus,
+gs-checkbox:focus,
+gs-phone-button:not([not-supported]):focus,
+gs-map-button:focus,
+gs-skype-button:focus,
+gs-facetime-button:focus,
+gs-email-button:focus,
+gs-tracking-button:focus,
+gs-delete-button:focus,
+gs-option:focus,
+gs-dialog-button:focus {
+    text-decoration: none;
+    outline-offset: -3px;
+    color: #333;
+    background-color: #F5F5F5;
+    border-color: #8c8c8c;
+}
+
+/* # HOVER # */
 gs-button.hover,
 gs-toggle.hover,
 gs-phone-button:not([not-supported]).hover,
@@ -2143,42 +1946,15 @@ gs-tracking-button.hover,
 gs-delete-button.hover,
 gs-option.hover,
 gs-dialog-button.hover {
-    
-    /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
-    transition: box-shadow 0.125s;
+    text-decoration: none;
+    color: #333;
+    background-color: #F5F5F5;
+    border-color: #adadad;
 }
 
-/* ## SELECTED/HOVER shading ## */
-/*gs-button[selected],
-gs-toggle[selected],
-gs-phone-button:not([not-supported])[selected],
-gs-map-button[selected],
-gs-skype-button[selected],
-gs-facetime-button[selected],
-gs-email-button[selected],
-gs-tracking-button[selected],
-gs-delete-button[selected],
-gs-option[selected],
-gs-dialog-button[selected],*/
-
-gs-button.hover,
-gs-toggle.hover,
-gs-phone-button:not([not-supported]).hover,
-gs-map-button.hover,
-gs-skype-button.hover,
-gs-facetime-button.hover,
-gs-email-button.hover,
-gs-tracking-button.hover,
-gs-delete-button.hover,
-gs-option.hover,
-gs-dialog-button.hover {
-    filter: invert(10%);
-}
-
-/* ## DOWN/SELECTED ## */
+/* # DOWN # */
 gs-button.down,
+gs-checkbox.down,
 gs-toggle.down,
 gs-phone-button:not([not-supported]).down,
 gs-map-button.down,
@@ -2188,9 +1964,19 @@ gs-email-button.down,
 gs-tracking-button.down,
 gs-delete-button.down,
 gs-option.down,
-gs-dialog-button.down,
+gs-dialog-button.down {
+    background-image: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+    color: #333;
+    background-color: #e6e6e6;
+    border-color: #adadad;
+}
 
+/* # DOWN AND HOVER # */
 gs-button.down.hover,
+gs-checkbox.down.hover,
 gs-toggle.down.hover,
 gs-phone-button:not([not-supported]).down.hover,
 gs-map-button.down.hover,
@@ -2200,67 +1986,32 @@ gs-email-button.down.hover,
 gs-tracking-button.down.hover,
 gs-delete-button.down.hover,
 gs-option.down.hover,
-gs-dialog-button.down.hover,
-
-gs-button[selected].focus,
-gs-toggle[selected].focus,
-gs-phone-button:not([not-supported])[selected].focus,
-gs-map-button[selected].focus,
-gs-skype-button[selected].focus,
-gs-facetime-button[selected].focus,
-gs-email-button[selected].focus,
-gs-tracking-button[selected].focus,
-gs-delete-button[selected].focus,
-gs-option[selected].focus,
-gs-dialog-button[selected].focus,
-
-gs-button[selected].focus.hover,
-gs-toggle[selected].focus.hover,
-gs-phone-button:not([not-supported])[selected].focus.hover,
-gs-map-button[selected].focus.hover,
-gs-skype-button[selected].focus.hover,
-gs-facetime-button[selected].focus.hover,
-gs-email-button[selected].focus.hover,
-gs-tracking-button[selected].focus.hover,
-gs-delete-button[selected].focus.hover,
-gs-option[selected].focus.hover,
-gs-dialog-button[selected].focus.hover {
-    
-    /*box-shadow: 0 0.3em 0.5em -0.125em rgba(230,138,84,.1), 0 0.2em 0.5em 0 rgba(230,138,84,.14), 0 0.0625em 0.3125em 0 rgba(230,138,84);*/
-    /*box-shadow: 0 0 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.25);*/
-    box-shadow: 0 0 0.1em 0 rgba(230,138,84,.5), 0 0 0.2em 0 rgba(230,138,84,1);
-    transition: box-shadow 0.125s;
+gs-dialog-button.down.hover {
+    color: #333;
+    background-color: #d4d4d4;
+    border-color: #8c8c8c;
 }
 
-/* ## SELECTED ## */
-gs-button[selected],
-gs-toggle[selected],
-gs-phone-button:not([not-supported])[selected],
-gs-map-button[selected],
-gs-skype-button[selected],
-gs-facetime-button[selected],
-gs-email-button[selected],
-gs-tracking-button[selected],
-gs-delete-button[selected],
-gs-option[selected],
-gs-dialog-button[selected],
-
-gs-button[selected].hover,
-gs-toggle[selected].hover,
-gs-phone-button:not([not-supported])[selected].hover,
-gs-map-button[selected].hover,
-gs-skype-button[selected].hover,
-gs-facetime-button[selected].hover,
-gs-email-button[selected].hover,
-gs-tracking-button[selected].hover,
-gs-delete-button[selected].hover,
-gs-option[selected].hover,
-gs-dialog-button[selected].hover {
-    
-    /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
-    /*box-shadow: 0 0 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
-    box-shadow: 0 0 0.1em 0 rgba(0,0,0,.2), 0 0 0.2em 0 rgba(0,0,0,.4);
-    transition: box-shadow 0.125s;
+/* # DISABLED # */
+gs-button[disabled],
+gs-toggle[disabled],
+gs-checkbox[disabled],
+gs-phone-button:not([not-supported])[disabled],
+gs-map-button[disabled],
+gs-skype-button[disabled],
+gs-facetime-button[disabled],
+gs-email-button[disabled],
+gs-tracking-button[disabled],
+gs-delete-button[disabled],
+gs-option[disabled],
+gs-dialog-button[disabled] {
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+            box-shadow: none;
+    opacity: 0.65;
+    background-color: #fff;
+    border-color: #ccc;
 }
 
 /* ## PRIMARY ## */
@@ -2277,11 +2028,108 @@ gs-delete-button[bg-primary],
 gs-option[bg-primary],
 gs-dialog-button[bg-primary] {
     color: #fff;
-    background-color: #337ab7 !important;
-    
-    border-color: #7EB1DC;
-    
-    /*border-color: #094C83;*/
+    background-color: #337ab7;
+    border-color: #2e6da4;
+}
+
+/* # FOCUS # */
+gs-button[bg-primary]:focus,
+gs-toggle[bg-primary]:focus,
+gs-checkbox[bg-primary]:focus,
+gs-phone-button[bg-primary]:not([not-supported]):focus,
+gs-map-button[bg-primary]:focus,
+gs-skype-button[bg-primary]:focus,
+gs-facetime-button[bg-primary]:focus,
+gs-email-button[bg-primary]:focus,
+gs-tracking-button[bg-primary]:focus,
+gs-delete-button[bg-primary]:focus,
+gs-option[bg-primary]:focus,
+gs-dialog-button[bg-primary]:focus {
+    text-decoration: none;
+    outline-offset: -3px;
+    color: #fff;
+    background-color: #286090;
+    border-color: #122b40;
+}
+
+/* # HOVER # */
+gs-button[bg-primary].hover,
+gs-toggle[bg-primary].hover,
+gs-phone-button[bg-primary]:not([not-supported]).hover,
+gs-map-button[bg-primary].hover,
+gs-skype-button[bg-primary].hover,
+gs-facetime-button[bg-primary].hover,
+gs-email-button[bg-primary].hover,
+gs-tracking-button[bg-primary].hover,
+gs-delete-button[bg-primary].hover,
+gs-option[bg-primary].hover,
+gs-dialog-button[bg-primary].hover {
+    text-decoration: none;
+    color: #fff;
+    background-color: #286090;
+    border-color: #204d74;
+}
+
+/* # DOWN # */
+gs-button[bg-primary].down,
+gs-checkbox[bg-primary].down,
+gs-toggle[bg-primary].down,
+gs-phone-button[bg-primary]:not([not-supported]).down,
+gs-map-button[bg-primary].down,
+gs-skype-button[bg-primary].down,
+gs-facetime-button[bg-primary].down,
+gs-email-button[bg-primary].down,
+gs-tracking-button[bg-primary].down,
+gs-delete-button[bg-primary].down,
+gs-option[bg-primary].down,
+gs-dialog-button[bg-primary].down {
+    background-image: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+    color: #fff;
+    background-color: #286090;
+    border-color: #204d74;
+}
+
+/* # DOWN AND HOVER # */
+gs-button[bg-primary].down.hover,
+gs-checkbox[bg-primary].down.hover,
+gs-toggle[bg-primary].down.hover,
+gs-phone-button[bg-primary]:not([not-supported]).down.hover,
+gs-map-button[bg-primary].down.hover,
+gs-skype-button[bg-primary].down.hover,
+gs-facetime-button[bg-primary].down.hover,
+gs-email-button[bg-primary].down.hover,
+gs-tracking-button[bg-primary].down.hover,
+gs-delete-button[bg-primary].down.hover,
+gs-option[bg-primary].down.hover,
+gs-dialog-button[bg-primary].down.hover {
+    color: #fff;
+    background-color: #204d74;
+    border-color: #122b40;
+}
+
+/* # DISABLED # */
+gs-button[bg-primary][disabled],
+gs-toggle[bg-primary][disabled],
+gs-checkbox[bg-primary][disabled],
+gs-phone-button[bg-primary]:not([not-supported])[disabled],
+gs-map-button[bg-primary][disabled],
+gs-skype-button[bg-primary][disabled],
+gs-facetime-button[bg-primary][disabled],
+gs-email-button[bg-primary][disabled],
+gs-tracking-button[bg-primary][disabled],
+gs-delete-button[bg-primary][disabled],
+gs-option[bg-primary][disabled],
+gs-dialog-button[bg-primary][disabled] {
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+            box-shadow: none;
+    opacity: .65;
+    background-color: #337ab7;
+    border-color: #2e6da4;
 }
 
 /* ## SUCCESS ## */
@@ -2298,11 +2146,108 @@ gs-delete-button[bg-success],
 gs-option[bg-success],
 gs-dialog-button[bg-success] {
     color: #fff;
-    background-color: #5cb85c !important;
-    
-    border-color: #BAE8BA;
-    
-    /*border-color: #1B7C1B;*/
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+}
+
+/* # FOCUS # */
+gs-button[bg-success]:focus,
+gs-toggle[bg-success]:focus,
+gs-checkbox[bg-success]:focus,
+gs-phone-button[bg-success]:not([not-supported]):focus,
+gs-map-button[bg-success]:focus,
+gs-skype-button[bg-success]:focus,
+gs-facetime-button[bg-success]:focus,
+gs-email-button[bg-success]:focus,
+gs-tracking-button[bg-success]:focus,
+gs-delete-button[bg-success]:focus,
+gs-option[bg-success]:focus,
+gs-dialog-button[bg-success]:focus {
+    text-decoration: none;
+    outline-offset: -3px;
+    color: #fff;
+    background-color: #449d44;
+    border-color: #255625;
+}
+
+/* # HOVER # */
+gs-button[bg-success].hover,
+gs-toggle[bg-success].hover,
+gs-phone-button[bg-success]:not([not-supported]).hover,
+gs-map-button[bg-success].hover,
+gs-skype-button[bg-success].hover,
+gs-facetime-button[bg-success].hover,
+gs-email-button[bg-success].hover,
+gs-tracking-button[bg-success].hover,
+gs-delete-button[bg-success].hover,
+gs-option[bg-success].hover,
+gs-dialog-button[bg-success].hover {
+    text-decoration: none;
+    color: #fff;
+    background-color: #449d44;
+    border-color: #398439;
+}
+
+/* # DOWN # */
+gs-button[bg-success].down,
+gs-checkbox[bg-success].down,
+gs-toggle[bg-success].down,
+gs-phone-button[bg-success]:not([not-supported]).down,
+gs-map-button[bg-success].down,
+gs-skype-button[bg-success].down,
+gs-facetime-button[bg-success].down,
+gs-email-button[bg-success].down,
+gs-tracking-button[bg-success].down,
+gs-delete-button[bg-success].down,
+gs-option[bg-success].down,
+gs-dialog-button[bg-success].down {
+    background-image: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+    color: #fff;
+    background-color: #449d44;
+    border-color: #398439;
+}
+
+/* # DOWN AND HOVER # */
+gs-button[bg-success].down.hover,
+gs-checkbox[bg-success].down.hover,
+gs-toggle[bg-success].down.hover,
+gs-phone-button[bg-success]:not([not-supported]).down.hover,
+gs-map-button[bg-success].down.hover,
+gs-skype-button[bg-success].down.hover,
+gs-facetime-button[bg-success].down.hover,
+gs-email-button[bg-success].down.hover,
+gs-tracking-button[bg-success].down.hover,
+gs-delete-button[bg-success].down.hover,
+gs-option[bg-success].down.hover,
+gs-dialog-button[bg-success].down.hover {
+    color: #fff;
+    background-color: #398439;
+    border-color: #255625;
+}
+
+/* # DISABLED # */
+gs-button[bg-success][disabled],
+gs-toggle[bg-success][disabled],
+gs-checkbox[bg-success][disabled],
+gs-phone-button[bg-success]:not([not-supported])[disabled],
+gs-map-button[bg-success][disabled],
+gs-skype-button[bg-success][disabled],
+gs-facetime-button[bg-success][disabled],
+gs-email-button[bg-success][disabled],
+gs-tracking-button[bg-success][disabled],
+gs-delete-button[bg-success][disabled],
+gs-option[bg-success][disabled],
+gs-dialog-button[bg-success][disabled] {
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+            box-shadow: none;
+    opacity: 0.65;
+    background-color: #5cb85c;
+    border-color: #4cae4c;
 }
 
 /* ## INFO ## */
@@ -2319,11 +2264,108 @@ gs-delete-button[bg-info],
 gs-option[bg-info],
 gs-dialog-button[bg-info] {
     color: #fff;
-    background-color: #5bc0de !important;
-    
-    border-color: #BAEAF8;
-    
-    /*border-color: #1993B6;*/
+    background-color: #5bc0de;
+    border-color: #46b8da;
+}
+
+/* # FOCUS # */
+gs-button[bg-info]:focus,
+gs-toggle[bg-info]:focus,
+gs-checkbox[bg-info]:focus,
+gs-phone-button[bg-info]:not([not-supported]):focus,
+gs-map-button[bg-info]:focus,
+gs-skype-button[bg-info]:focus,
+gs-facetime-button[bg-info]:focus,
+gs-email-button[bg-info]:focus,
+gs-tracking-button[bg-info]:focus,
+gs-delete-button[bg-info]:focus,
+gs-option[bg-info]:focus,
+gs-dialog-button[bg-info]:focus {
+    text-decoration: none;
+    outline-offset: -3px;
+    color: #fff;
+    background-color: #31b0d5;
+    border-color: #1b6d85;
+}
+
+/* # HOVER # */
+gs-button[bg-info].hover,
+gs-toggle[bg-info].hover,
+gs-phone-button[bg-info]:not([not-supported]).hover,
+gs-map-button[bg-info].hover,
+gs-skype-button[bg-info].hover,
+gs-facetime-button[bg-info].hover,
+gs-email-button[bg-info].hover,
+gs-tracking-button[bg-info].hover,
+gs-delete-button[bg-info].hover,
+gs-option[bg-info].hover,
+gs-dialog-button[bg-info].hover {
+    text-decoration: none;
+    color: #fff;
+    background-color: #31b0d5;
+    border-color: #269abc;
+}
+
+/* # DOWN # */
+gs-button[bg-info].down,
+gs-checkbox[bg-info].down,
+gs-toggle[bg-info].down,
+gs-phone-button[bg-info]:not([not-supported]).down,
+gs-map-button[bg-info].down,
+gs-skype-button[bg-info].down,
+gs-facetime-button[bg-info].down,
+gs-email-button[bg-info].down,
+gs-tracking-button[bg-info].down,
+gs-delete-button[bg-info].down,
+gs-option[bg-info].down,
+gs-dialog-button[bg-info].down {
+    background-image: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+    color: #fff;
+    background-color: #31b0d5;
+    border-color: #269abc;
+}
+
+/* # DOWN AND HOVER # */
+gs-button[bg-info].down.hover,
+gs-checkbox[bg-info].down.hover,
+gs-toggle[bg-info].down.hover,
+gs-phone-button[bg-info]:not([not-supported]).down.hover,
+gs-map-button[bg-info].down.hover,
+gs-skype-button[bg-info].down.hover,
+gs-facetime-button[bg-info].down.hover,
+gs-email-button[bg-info].down.hover,
+gs-tracking-button[bg-info].down.hover,
+gs-delete-button[bg-info].down.hover,
+gs-option[bg-info].down.hover,
+gs-dialog-button[bg-info].down.hover {
+    color: #fff;
+    background-color: #269abc;
+    border-color: #1b6d85;
+}
+
+/* # DISABLED # */
+gs-button[bg-info][disabled],
+gs-toggle[bg-info][disabled],
+gs-checkbox[bg-info][disabled],
+gs-phone-button[bg-info]:not([not-supported])[disabled],
+gs-map-button[bg-info][disabled],
+gs-skype-button[bg-info][disabled],
+gs-facetime-button[bg-info][disabled],
+gs-email-button[bg-info][disabled],
+gs-tracking-button[bg-info][disabled],
+gs-delete-button[bg-info][disabled],
+gs-option[bg-info][disabled],
+gs-dialog-button[bg-info][disabled] {
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+            box-shadow: none;
+    opacity: .65;
+    background-color: #5bc0de;
+    border-color: #46b8da;
 }
 
 /* ## WARNING ## */
@@ -2341,10 +2383,107 @@ gs-option[bg-warning],
 gs-dialog-button[bg-warning] {
     color: #fff;
     background-color: #f0ad4e;
-    
-    border-color: #FFD8A0;
-    
-    /*border-color: #AD6D11;*/
+    border-color: #eea236;
+}
+
+/* # FOCUS # */
+gs-button[bg-warning]:focus,
+gs-toggle[bg-warning]:focus,
+gs-checkbox[bg-warning]:focus,
+gs-phone-button[bg-warning]:not([not-supported]):focus,
+gs-map-button[bg-warning]:focus,
+gs-skype-button[bg-warning]:focus,
+gs-facetime-button[bg-warning]:focus,
+gs-email-button[bg-warning]:focus,
+gs-tracking-button[bg-warning]:focus,
+gs-delete-button[bg-warning]:focus,
+gs-option[bg-warning]:focus,
+gs-dialog-button[bg-warning]:focus {
+    text-decoration: none;
+    outline-offset: -3px;
+    color: #fff;
+    background-color: #ec971f;
+    border-color: #985f0d;
+}
+
+/* # HOVER # */
+gs-button[bg-warning].hover,
+gs-toggle[bg-warning].hover,
+gs-phone-button[bg-warning]:not([not-supported]).hover,
+gs-map-button[bg-warning].hover,
+gs-skype-button[bg-warning].hover,
+gs-facetime-button[bg-warning].hover,
+gs-email-button[bg-warning].hover,
+gs-tracking-button[bg-warning].hover,
+gs-delete-button[bg-warning].hover,
+gs-option[bg-warning].hover,
+gs-dialog-button[bg-warning].hover {
+    text-decoration: none;
+    color: #fff;
+    background-color: #ec971f;
+    border-color: #d58512;
+}
+
+/* # DOWN # */
+gs-button[bg-warning].down,
+gs-checkbox[bg-warning].down,
+gs-toggle[bg-warning].down,
+gs-phone-button[bg-warning]:not([not-supported]).down,
+gs-map-button[bg-warning].down,
+gs-skype-button[bg-warning].down,
+gs-facetime-button[bg-warning].down,
+gs-email-button[bg-warning].down,
+gs-tracking-button[bg-warning].down,
+gs-delete-button[bg-warning].down,
+gs-option[bg-warning].down,
+gs-dialog-button[bg-warning].down {
+    background-image: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+    color: #fff;
+    background-color: #ec971f;
+    border-color: #d58512;
+}
+
+/* # DOWN AND HOVER # */
+gs-button[bg-warning].down.hover,
+gs-checkbox[bg-warning].down.hover,
+gs-toggle[bg-warning].down.hover,
+gs-phone-button[bg-warning]:not([not-supported]).down.hover,
+gs-map-button[bg-warning].down.hover,
+gs-skype-button[bg-warning].down.hover,
+gs-facetime-button[bg-warning].down.hover,
+gs-email-button[bg-warning].down.hover,
+gs-tracking-button[bg-warning].down.hover,
+gs-delete-button[bg-warning].down.hover,
+gs-option[bg-warning].down.hover,
+gs-dialog-button[bg-warning].down.hover {
+    color: #fff;
+    background-color: #d58512;
+    border-color: #985f0d;
+}
+
+/* # DISABLED # */
+gs-button[bg-warning][disabled],
+gs-toggle[bg-warning][disabled],
+gs-checkbox[bg-warning][disabled],
+gs-phone-button[bg-warning]:not([not-supported])[disabled],
+gs-map-button[bg-warning][disabled],
+gs-skype-button[bg-warning][disabled],
+gs-facetime-button[bg-warning][disabled],
+gs-email-button[bg-warning][disabled],
+gs-tracking-button[bg-warning][disabled],
+gs-delete-button[bg-warning][disabled],
+gs-option[bg-warning][disabled],
+gs-dialog-button[bg-warning][disabled] {
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+            box-shadow: none;
+    opacity: .65;
+    background-color: #f0ad4e;
+    border-color: #eea236;
 }
 
 /* ## DANGER ## */
@@ -2361,12 +2500,237 @@ gs-delete-button[bg-danger],
 gs-option[bg-danger],
 gs-dialog-button[bg-danger] {
     color: #fff;
-    background-color: #d9534f !important;
-    
-    border-color: #FFADAB;
-    
-    /*border-color: #961512;*/
+    background-color: #d9534f;
+    border-color: #d43f3a;
 }
+
+/* # FOCUS # */
+gs-button[bg-danger]:focus,
+gs-toggle[bg-danger]:focus,
+gs-checkbox[bg-danger]:focus,
+gs-phone-button[bg-danger]:not([not-supported]):focus,
+gs-map-button[bg-danger]:focus,
+gs-skype-button[bg-danger]:focus,
+gs-facetime-button[bg-danger]:focus,
+gs-email-button[bg-danger]:focus,
+gs-tracking-button[bg-danger]:focus,
+gs-delete-button[bg-danger]:focus,
+gs-option[bg-danger]:focus,
+gs-dialog-button[bg-danger]:focus {
+    text-decoration: none;
+    outline-offset: -3px;
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #761c19;
+}
+
+/* # HOVER # */
+gs-button[bg-danger].hover,
+gs-toggle[bg-danger].hover,
+gs-phone-button[bg-danger]:not([not-supported]).hover,
+gs-map-button[bg-danger].hover,
+gs-skype-button[bg-danger].hover,
+gs-facetime-button[bg-danger].hover,
+gs-email-button[bg-danger].hover,
+gs-tracking-button[bg-danger].hover,
+gs-delete-button[bg-danger].hover,
+gs-option[bg-danger].hover,
+gs-dialog-button[bg-danger].hover {
+    text-decoration: none;
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #ac2925;
+}
+
+/* # DOWN # */
+gs-button[bg-danger].down,
+gs-checkbox[bg-danger].down,
+gs-toggle[bg-danger].down,
+gs-phone-button[bg-danger]:not([not-supported]).down,
+gs-map-button[bg-danger].down,
+gs-skype-button[bg-danger].down,
+gs-facetime-button[bg-danger].down,
+gs-email-button[bg-danger].down,
+gs-tracking-button[bg-danger].down,
+gs-delete-button[bg-danger].down,
+gs-option[bg-danger].down,
+gs-dialog-button[bg-danger].down {
+    background-image: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #ac2925;
+}
+
+/* # DOWN AND HOVER # */
+gs-button[bg-danger].down.hover,
+gs-checkbox[bg-danger].down.hover,
+gs-toggle[bg-danger].down.hover,
+gs-phone-button[bg-danger]:not([not-supported]).down.hover,
+gs-map-button[bg-danger].down.hover,
+gs-skype-button[bg-danger].down.hover,
+gs-facetime-button[bg-danger].down.hover,
+gs-email-button[bg-danger].down.hover,
+gs-tracking-button[bg-danger].down.hover,
+gs-delete-button[bg-danger].down.hover,
+gs-option[bg-danger].down.hover,
+gs-dialog-button[bg-danger].down.hover {
+    color: #fff;
+    background-color: #ac2925;
+    border-color: #761c19;
+}
+/*
+
+<gs-button></gs-button>
+
+*/
+/* # DISABLED # */
+gs-button[bg-danger][disabled],
+gs-toggle[bg-danger][disabled],
+gs-checkbox[bg-danger][disabled],
+gs-phone-button[bg-danger]:not([not-supported])[disabled],
+gs-map-button[bg-danger][disabled],
+gs-skype-button[bg-danger][disabled],
+gs-facetime-button[bg-danger][disabled],
+gs-email-button[bg-danger][disabled],
+gs-tracking-button[bg-danger][disabled],
+gs-delete-button[bg-danger][disabled],
+gs-option[bg-danger][disabled],
+gs-dialog-button[bg-danger][disabled] {
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+            box-shadow: none;
+    opacity: .65;
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}
+
+
+/* ###################################################################################### */
+/* ###################################### FOCUS MOD ##################################### */
+/* ###################################################################################### */
+/*
+gs-button:focus,
+gs-toggle:focus,
+gs-checkbox:focus,
+gs-phone-button:not([not-supported]):focus,
+gs-map-button:focus,
+gs-skype-button:focus,
+gs-facetime-button:focus,
+gs-email-button:focus,
+gs-tracking-button:focus,
+gs-delete-button:focus {
+    color: #333;
+    text-decoration: none;
+    outline-offset: -3px;
+    background-color: #e6e6e6;
+    border-color: #8c8c8c;
+}
+*/
+
+
+/* ##################################################################################### */
+/* #################################### HOVER STATE #################################### */
+/* ##################################################################################### */
+/* MOVED TO JAVASCRIPT
+gs-button:hover,
+gs-toggle:hover,
+gs-phone-button:not([not-supported]):hover,
+gs-map-button:hover,
+gs-skype-button:hover,
+gs-facetime-button:hover,
+gs-email-button:hover,
+gs-tracking-button:hover {
+    background-color: #f3f3f3;
+}*/
+/*
+gs-button.hover,
+gs-toggle.hover,
+gs-phone-button:not([not-supported]).hover,
+gs-map-button.hover,
+gs-skype-button.hover,
+gs-facetime-button.hover,
+gs-email-button.hover,
+gs-tracking-button.hover,
+gs-delete-button.hover {
+  text-decoration: none;
+  color: #333;
+  background-color: #d4d4d4;
+  border-color: #8c8c8c;
+}
+*/
+
+/* ###################################################################################### */
+/* #################################### ACTIVE STATE #################################### */
+/* ###################################################################################### */
+
+/*
+gs-button.down,
+gs-checkbox.down,
+gs-toggle.down,
+gs-phone-button:not([not-supported]).down,
+gs-map-button.down,
+gs-skype-button.down,
+gs-facetime-button.down,
+gs-email-button.down,
+gs-tracking-button.down,
+gs-delete-button.down {
+    background-image: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+    color: #333;
+    background-color: #e6e6e6;
+    border-color: #adadad;
+}
+*/
+
+/* #################################################################################### */
+/* ################################## DISABLED STATE ################################## */
+/* #################################################################################### */
+/*
+gs-button[disabled],
+gs-toggle[disabled],
+gs-checkbox[disabled],
+gs-phone-button:not([not-supported])[disabled],
+gs-map-button[disabled],
+gs-skype-button[disabled],
+gs-facetime-button[disabled],
+gs-email-button[disabled],
+gs-tracking-button[disabled],
+gs-delete-button[disabled],
+.blue gs-button[disabled],
+.blue gs-toggle[disabled],
+.blue gs-checkbox[disabled],
+.blue gs-phone-button:not([not-supported])[disabled],
+.blue gs-map-button[disabled],
+.blue gs-skype-button[disabled],
+.blue gs-facetime-button[disabled],
+.blue gs-email-button[disabled],
+.blue gs-tracking-button[disabled],
+.blue gs-delete-button[disabled],
+gs-button[disabled].blue,
+gs-toggle[disabled].blue,
+gs-checkbox[disabled].blue,
+gs-phone-button:not([not-supported])[disabled].blue,
+gs-map-button[disabled].blue,
+gs-skype-button[disabled].blue,
+gs-facetime-button[disabled].blue,
+gs-email-button[disabled].blue,
+gs-tracking-button[disabled].blue
+gs-delete-button[disabled].blue {
+  cursor: not-allowed;
+  filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  opacity: .65;
+  background-color: #fff;
+  border-color: #ccc;
+}
+*/
 
 /* ################################################################################### */
 /* ################################# JUMBO ATTRIBUTE ################################# */
@@ -2544,31 +2908,7 @@ gs-email-button[icon]:after,
 gs-tracking-button[icon]:after,
 gs-delete-button[icon]:after,
 gs-option[icon]:after,
-gs-dialog-button[icon]:after,
-
-gs-button[special-icon]:before,
-gs-toggle[special-icon]:before,
-gs-phone-button:not([not-supported])[special-icon]:before,
-gs-map-button[special-icon]:before,
-gs-skype-button[special-icon]:before,
-gs-facetime-button[special-icon]:before,
-gs-email-button[special-icon]:before,
-gs-tracking-button[special-icon]:before,
-gs-delete-button[special-icon]:before,
-gs-option[special-icon]:before,
-gs-dialog-button[special-icon]:before,
-
-gs-button[special-icon]:after,
-gs-toggle[special-icon]:after,
-gs-phone-button:not([not-supported])[special-icon]:after,
-gs-map-button[special-icon]:after,
-gs-skype-button[special-icon]:after,
-gs-facetime-button[special-icon]:after,
-gs-email-button[special-icon]:after,
-gs-tracking-button[special-icon]:after,
-gs-delete-button[special-icon]:after,
-gs-option[special-icon]:after,
-gs-dialog-button[special-icon]:after {
+gs-dialog-button[icon]:after {
     position: absolute;
     display: block;
     
@@ -2582,9 +2922,9 @@ gs-dialog-button[special-icon]:after {
     text-align: center;
 	text-indent: 0;
     
+    line-height: 1.25; /*1.3;*/
     font-size: 1.4em;
     
-    line-height: 1.25; /*1.3;*/
     /*border-radius: 50%;
     border: 1px solid #000000;
     
@@ -2670,9 +3010,8 @@ gs-option[icon]:not([iconleft]):not([iconright]):not([icontop]):not([iconbottom]
 gs-option[iconleft]:after,
 gs-dialog-button[icon]:not([iconleft]):not([iconright]):not([icontop]):not([iconbottom]):not([icononly]):after,
 gs-dialog-button[iconleft]:after {
+    top: 0.25em;
     left: 0; /* 0.1em; */
-    top: 0.13em;
-    line-height: 1em;
 }
 /*gs-button[mini][icon]:not([iconleft]):not([iconright]):not([icontop]):not([iconbottom]):not([icononly]):after,
 gs-button[mini][iconleft]:after,
@@ -2753,19 +3092,6 @@ gs-option[icontop],
 gs-dialog-button[icontop] {
     padding-top: 1.4em;
 }
-
-gs-button[icontop]:before,
-gs-toggle[icontop]:before,
-gs-phone-button:not([not-supported])[icontop]:before,
-gs-map-button[icontop]:before,
-gs-skype-button[icontop]:before,
-gs-facetime-button[icontop]:before,
-gs-email-button[icontop]:before,
-gs-tracking-button[icontop]:before,
-gs-delete-button[icontop]:before,
-gs-option[icontop]:before,
-gs-dialog-button[icontop]:before,
-
 gs-button[icontop]:after,
 gs-toggle[icontop]:after,
 gs-phone-button:not([not-supported])[icontop]:after,
@@ -2796,19 +3122,6 @@ gs-option[iconbottom],
 gs-dialog-button[iconbottom] {
     padding-bottom: 1.5em;
 }
-
-gs-button[iconbottom]:before,
-gs-toggle[iconbottom]:before,
-gs-phone-button:not([not-supported])[iconbottom]:before,
-gs-map-button[iconbottom]:before,
-gs-skype-button[iconbottom]:before,
-gs-facetime-button[iconbottom]:before,
-gs-email-button[iconbottom]:before,
-gs-tracking-button[iconbottom]:before,
-gs-delete-button[iconbottom]:before,
-gs-option[iconbottom]:before,
-gs-dialog-button[iconbottom]:before,
-
 gs-button[iconbottom]:after,
 gs-toggle[iconbottom]:after,
 gs-phone-button:not([not-supported])[iconbottom]:after,
@@ -2837,33 +3150,13 @@ gs-tracking-button[icononly],
 gs-delete-button[icononly],
 gs-option[icononly],
 gs-dialog-button[icononly] {
-    content: "";
-    
     text-indent: -9999px;
-    
-    
-    /*line-height: 1.65em;*/
-    line-height: normal;
-    min-height: 1.65em;
     
     /*min-width: 1.2em;
     min-height: 1.2em;*/
     
     width: 2.35em;
 }
-
-gs-button[icononly]:before,
-gs-toggle[icononly]:before,
-gs-phone-button:not([not-supported])[icononly]:before,
-gs-map-button[icononly]:before,
-gs-skype-button[icononly]:before,
-gs-facetime-button[icononly]:before,
-gs-email-button[icononly]:before,
-gs-tracking-button[icononly]:before,
-gs-delete-button[icononly]:before,
-gs-option[icononly]:before,
-gs-dialog-button[icononly]:before,
-
 gs-button[icononly]:after,
 gs-toggle[icononly]:after,
 gs-phone-button:not([not-supported])[icononly]:after,
@@ -2874,19 +3167,7 @@ gs-email-button[icononly]:after,
 gs-tracking-button[icononly]:after,
 gs-delete-button[icononly]:after,
 gs-option[icononly]:after,
-gs-dialog-button[icononly]:after,
-
-gs-button[icononly][special-icon]:before,
-gs-toggle[icononly][special-icon]:before,
-gs-phone-button:not([not-supported])[icononly][special-icon]:before,
-gs-map-button[icononly][special-icon]:before,
-gs-skype-button[icononly][special-icon]:before,
-gs-facetime-button[icononly][special-icon]:before,
-gs-email-button[icononly][special-icon]:before,
-gs-tracking-button[icononly][special-icon]:before,
-gs-delete-button[icononly][special-icon]:before,
-gs-option[icononly][special-icon]:before,
-gs-dialog-button[icononly][special-icon]:before {
+gs-dialog-button[icononly]:after {
     top: 50%;
     left: 50%;
     margin-top: -0.57em; /* -0.66em; */
@@ -2900,10 +3181,6 @@ gs-dialog-button[icononly][special-icon]:before {
     margin-left: -0.575em;
     */
 }
-
-
-
-
 
 /* ###################################################################################### */
 /* ################################### ICON  ROTATION ################################### */
@@ -2966,45 +3243,6 @@ gs-dialog-button[iconrotatedown]:after {
 /* ###################################################################################### */
 /* #################################### ICON CONTENT #################################### */
 /* ###################################################################################### */
-
-gs-button[special-icon="skip-to-insert"]:before,
-gs-toggle[special-icon="skip-to-insert"]:before,
-gs-phone-button:not([not-supported])[special-icon="skip-to-insert"]:before,
-gs-map-button[special-icon="skip-to-insert"]:before,
-gs-skype-button[special-icon="skip-to-insert"]:before,
-gs-facetime-button[special-icon="skip-to-insert"]:before,
-gs-email-button[special-icon="skip-to-insert"]:before,
-gs-tracking-button[special-icon="skip-to-insert"]:before,
-gs-delete-button[special-icon="skip-to-insert"]:before,
-gs-option[special-icon="skip-to-insert"]:before,
-gs-dialog-button[special-icon="skip-to-insert"]:before {
-    /*caret-right*/
-    content: '\f0da';
-    font-size: 2em;
-    color: #555;
-}
-
-gs-button[special-icon="skip-to-insert"]:after,
-gs-toggle[special-icon="skip-to-insert"]:after,
-gs-phone-button:not([not-supported])[special-icon="skip-to-insert"]:after,
-gs-map-button[special-icon="skip-to-insert"]:after,
-gs-skype-button[special-icon="skip-to-insert"]:after,
-gs-facetime-button[special-icon="skip-to-insert"]:after,
-gs-email-button[special-icon="skip-to-insert"]:after,
-gs-tracking-button[special-icon="skip-to-insert"]:after,
-gs-delete-button[special-icon="skip-to-insert"]:after,
-gs-option[special-icon="skip-to-insert"]:after,
-gs-dialog-button[special-icon="skip-to-insert"]:after {
-    /*asterisk*/
-    content: '\f069';
-    font-size: 1em;
-    margin-top: -1em;
-    margin-left: -0.1em;
-    color: #18ad00;
-}
-
-
-
 
 /*
 javascript get array of icons (go to http://fontawesome.io/cheatsheet/)
@@ -3123,8 +3361,6 @@ gs-toggle[icon="bar-chart-o"]:after {
     
     line-height: 1.15;
 }
-
-
 
 
 
@@ -12173,7 +12409,7 @@ gs-page > gs-footer {
     width: 100%;
     
     padding: 0.6em;
-    /*box-shadow: 0 0 0.25em 0 #AAAAAA;*/
+    box-shadow: 0 0 0.25em 0 #AAAAAA;
     
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -12185,12 +12421,19 @@ gs-page > gs-footer {
 
 gs-header {
     top: 0;
-    border-bottom: 1px solid #888888;
+    border-bottom: 2px solid #000000;
 }
 
 gs-footer {
     bottom: 0;
-    border-top: 1px solid #888888;
+    border-top: 2px solid #000000;
+}
+
+.blue gs-header,
+.blue gs-footer,
+gs-header.blue,
+gs-footer.blue {
+    border-color: #3B99BE;
 }
 /*
 gs-page > gs-header {
@@ -12276,15 +12519,8 @@ gs-body {
 
 gs-body[padded] {
     padding: 1em;
-}/*
-gs-checkbox:not([readonly]):not([mini]):not(:focus) {
+}gs-checkbox:not([readonly]):not([mini]):not(:focus) {
     box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
-}
-*/
-
-gs-checkbox {
-    line-height: normal;
-    /*min-height: 1.2em;*/
 }
 
 gs-checkbox[readonly] {
@@ -12301,15 +12537,8 @@ gs-checkbox[readonly] {
 
 gs-checkbox:before {
     font-family: fontawesome;
-    /*font-size: 14px;*/
-    font-size: 0.8em;
+    font-size: 1.1em;
     content: '\f096'; /* fa-square-o */
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-    
-    width: 1.2em;
-    height: 1.2em;
-    text-align: center;
 }
 
 gs-checkbox[value="true"]:before,
@@ -12329,6 +12558,27 @@ gs-checkbox[value="N"]:before {
 /* ###################### NORMAL STATE ###################### */
 /* ########################################################## */
 
+gs-combo {
+    display: block;
+    position: relative;
+    
+    padding: 0.2em;
+    
+    background-color: #FFFFFF;
+    
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+    
+    min-height: 1.4em;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
 gs-combo > .root {
     padding-right: 1.6em;
 }
@@ -12339,11 +12589,8 @@ gs-combo .drop_down_button {
     right: 0;
     width: 1.6em;
     
-    margin-top: 0;
-    border-top: 0;
-    border-right: 0;
-    border-bottom: 0;
-    height: 100% !important;
+    /*height: 1.6em;*/
+    height: 2.2em;
     min-height: 0;
     
     /*
@@ -12384,11 +12631,6 @@ gs-combo[mini] .drop_down_button {
     min-height: 0;
 }
 
-gs-combo[mini] input {
-    padding: 0;
-    border: 0;
-}
-
 
 /* ########################################################## */
 /* ##################### READONLY STATE ##################### */
@@ -12410,6 +12652,20 @@ gs-combo[readonly] .drop_down_button {
     cursor: default;
     opacity: 0.9;
     pointer-events: none;
+}
+
+
+/* ########################################################## */
+/* ##################### DISABLED STATE ##################### */
+/* ########################################################## */
+
+gs-combo[disabled],
+gs-combo[disabled] .control,
+gs-combo[disabled] .drop_down_button {
+    color: rgb(68, 68, 68);
+    opacity: 0.9;
+    pointer-events: none;
+    background: rgb(205, 205, 205);
 }
 
 
@@ -12702,8 +12958,8 @@ gs-datasheet .hud-container gs-button {
     margin-left: 0.5em;
     float: left;
     display: inline-block;
-    /*border-bottom-right-radius: 0;*/
-    /*border-bottom-left-radius: 0;*/
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
     
     
     -webkit-font-smoothing: antialiased;
@@ -12718,13 +12974,11 @@ gs-datasheet .hud-container gs-button[remove-left] {
     border-left: 0 none;
     margin-left: 0;
     border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
 }
 
 gs-datasheet .hud-container gs-button[remove-right] {
     border-right: 0 none;
     border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
 }
 
 gs-datasheet .hud-container gs-button:first-child {
@@ -12956,15 +13210,15 @@ gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr:nth-child
 }
 
 gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr > [selected][not-editable] {
-    background-color: #59C4FD !important;
+    background-color: #f7f7c2 !important;
 }
 
 gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr:nth-child(odd) > [selected][not-editable] {
-    background-color: #59C4FD !important;
+    background-color: #f1f1ba !important;
 }
 
 gs-datasheet .data-flex-reset > .scroll-container > table > tbody > tr:nth-child(odd) > [selected] {
-    background-color: #84D4FF !important;
+    background-color: #f7f7c4 !important;
 }
 
 
@@ -13011,6 +13265,16 @@ gs-datasheet > .root > .data-container > .data-flex-reset > .scroll-container > 
         background-color: transparent;
     }
 }
+gs-date {
+    position: relative;
+    display: block;
+    padding: 0.2em 2.2em 0.2em 0.2em;
+    background-color: #FFFFFF;
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+    min-height: 1em;
+}
 
 gs-date .date-picker-button {
     position: absolute;
@@ -13019,14 +13283,6 @@ gs-date .date-picker-button {
     
     width: 2.4em;
     height: 100%;
-    
-    margin-top: 0;
-    border-top: 0;
-    border-right: 0;
-    border-bottom: 0;
-    
-    /*border-top-right-radius: 0.2px;*/
-    /*border-bottom-right-radius: 0.2px;*/
     
     max-height: 25px;
     min-height: 0px;
@@ -13042,14 +13298,20 @@ gs-date .date-picker-button:after {
     font-size: 1em;
 }
 
-/*
+
 gs-date[no-picker] {
     padding: 0.2em;
 }
-*/
 gs-date[no-picker] .date-picker-button {
     display: none;
 }
+
+
+gs-date[disabled],
+gs-date[disabled] .control {
+    background-color: #D5D5D5;
+}
+
 
 gs-date[mini] {
     padding: 0;
@@ -13064,10 +13326,6 @@ gs-date[mini] .date-picker-button:after {
     font-size: 0.8em;
 }
 
-gs-date[mini] input {
-    padding: 0;
-    border: 0;
-}
 
 /* ########################################################## */
 /* ##################### READONLY STATE ##################### */
@@ -13154,10 +13412,6 @@ gs-date[readonly] .date-picker-button {
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
-    
-    box-shadow: none;
-    margin: 0;
-    border-radius: 0;
 }
 
 .gs-date-date-picker-container .gs-date-date-picker .day-marker.other-month {
@@ -13165,8 +13419,7 @@ gs-date[readonly] .date-picker-button {
 }
 
 .gs-date-date-picker-container .gs-date-date-picker .day-marker.today {
-    color: #F7990C;
-    font-weight: bold;
+    border-color: #00FF00;
 }
 html.no-scroll-except-for-dialog,
 html.no-scroll-except-for-dialog > body,
@@ -13180,31 +13433,34 @@ html.no-scroll-except-for-dialog > body > *:not(gs-dialog) * {
 /* ################################################################## */
 
 gs-dialog {
+    display: block;
+    
+    /*position: fixed;
+    left: 50%;
+    top: 8%;
+    
+    width: 70%;
+    height: 70%;*/
+    
+    /*position: relative;
+    margin: 0 auto;*/
+    
     position: fixed;
+    top: 1%;
+    
+    border-radius: 0.25em;
+    
+    box-shadow: 0 0 0.5em 0.1em #C5C5C5;
+    
+    z-index: 100;
     
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
-    display: block;
     
-    background-color: white;
-    color: black;
-    
-    padding: 0;
-    border: none;
-    margin: 0;
-    
-    border-radius: 0;
-    
-    
-    box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);
-    
-    top: 1%;
-    
-    z-index: 100;
-    
+    background-color: #F0F0F0;
 }
 
 
@@ -13220,6 +13476,24 @@ gs-dialog > gs-page {
 /* ################################################################### */
 /* ########################## DIALOG THEMES ########################## */
 /* ################################################################### */
+
+/* ########################## */
+/* ## DEFAULT AND  REGULAR ## */
+/* ########################## */
+gs-dialog gs-header,
+gs-dialog.regular gs-header {
+    background-color: #F5F5F5;
+}
+
+gs-dialog gs-body,
+gs-dialog.regular gs-body {
+    background-color: #EEEEEE;
+}
+
+gs-dialog gs-footer,
+gs-dialog.regular gs-footer {
+    background-color: #F5F5F5;
+}
 
 /* ########################## */
 /* ########## INFO ########## */
@@ -13262,16 +13536,10 @@ gs-dialog-overlay {
     width: 100%;
     height: 100%;
     
-    background-color: #FFFFFF;
-    opacity: 0.6;
+    background-color: #000000;
+    opacity: 0.4;
     
     z-index: 100;
-}
-
-
-gs-dialog-overlay[no-background] {
-    background-color: transparent;
-    opacity: 1;
 }
 
 
@@ -13288,13 +13556,6 @@ gs-dialog-overlay[no-background] {
         border: 1px solid #ddd !important;
     }
 }
-
-/*
-gs-envelope:focus {
-    background-color: #FFF;
-    outline: none;
-}
-*/
 
 gs-envelope caption {
   padding-top: 8px;
@@ -13317,7 +13578,7 @@ gs-envelope table > thead > tr > td,
 gs-envelope table > tbody > tr > td,
 gs-envelope table > tfoot > tr > td {
   padding: 8px;
-  /*line-height: 1.42857143;*/
+  line-height: 1.42857143;
   vertical-align: top;
   border-top: 1px solid #ddd;
 }
@@ -13622,14 +13883,12 @@ gs-envelope th[selected-secondary]:first-child:after {
     font-family: fontawesome;
 }
 
-/*
 .blue gs-envelope th[selected]:first-child:after,
 .blue gs-envelope th[selected-secondary]:first-child:after,
 gs-envelope.blue th[selected]:first-child:after,
 gs-envelope.blue th[selected-secondary]:first-child:after {
     color: #3B99BE;
 }
-*/
 
 /*
 gs-envelope th:first-child,
@@ -13785,7 +14044,7 @@ gs-envelope .gs-envelope-copy-focus-target {
 gs-envelope .hud-container-top,
 gs-envelope .hud-container-bottom {
     background-color: #FFFFFF;
-    min-height: 2.2em;
+    min-height: 1.4em;
 }
 
 gs-envelope .hud-container-top {
@@ -14509,7 +14768,20 @@ gs-img[image-cover] {
     background-size: cover;
 }gs-insert {
     display: block;
-}gs-interval .time-picker-button {
+}gs-interval {
+    position: relative;
+    display: block;
+    
+    padding: 0.2em 2.2em 0.2em 0.2em;
+    min-height: 1em;
+    background-color: #FFFFFF;
+    
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+}
+
+gs-interval .time-picker-button {
     position: absolute;
     right: 0;
     top: 0;
@@ -14517,11 +14789,6 @@ gs-img[image-cover] {
     width: 2em;
     height: 100%;
     min-height: 1em;
-    
-    margin-top: 0;
-    border-top: 0;
-    border-right: 0;
-    border-bottom: 0;
     
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -14564,6 +14831,21 @@ gs-interval[readonly] .time-picker-button {
     display: none;
 }
 
+
+/* ###################################################################################### */
+/* ################################ ATTRIBUTE:  "disabled" ############################## */
+/* ###################################################################################### */
+
+gs-interval[disabled],
+gs-interval[disabled] .control {
+    background-color: #D5D5D5;
+}
+
+gs-interval[disabled]:not([mini]) {
+    min-height: 1.358em;
+}
+
+
 /* ###################################################################################### */
 /* ################################## ATTRIBUTE:  "mini" ################################ */
 /* ###################################################################################### */
@@ -14589,11 +14871,6 @@ gs-interval[mini] .time-picker-button:after {
     font-size: 0.8em;
 }
 
-gs-interval[mini] input {
-    padding: 0;
-    border: 0;
-}
-
 
 /* ###################################################################################### */
 /* ####################################### DROPDOWN ##################################### */
@@ -14617,8 +14894,8 @@ html.no-scroll-except-for-dialog > body > div.gs-interval-time-picker-container 
     top: 0;
     left: 0;
     
-    background-color: #FFFFFF;
-    opacity: 0.6;
+    background-color: #000000;
+    opacity: 0.4;
 }
 
 .gs-interval-time-picker-container .gs-interval-time-picker {
@@ -14626,7 +14903,7 @@ html.no-scroll-except-for-dialog > body > div.gs-interval-time-picker-container 
     
     padding: 5px;
     
-    background-color: #FFFFFF;
+    background-color: #F5F5F5;
     
     border: 1px solid #000000;
 }
@@ -15097,6 +15374,23 @@ gs-loader .loader-positioning .loader-spinner {
     -moz-animation: spin-forwards 1810ms linear infinite;
     animation: spin-forwards 1810ms linear infinite;
 }
+
+gs-memo {
+    display: block;
+    padding: 0.2em;
+    background-color: #FFFFFF;
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+    min-height: 1.4em;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
 /* ###################################################################################### */
 /* #################################### NORESIZE STATE ################################## */
 /* ###################################################################################### */
@@ -15133,10 +15427,6 @@ gs-memo[mini] {
     border-radius: 0;
 }
 
-gs-memo[mini] input, gs-memo[mini] textarea {
-    padding: 0;
-    border: 0;
-}
 
 /* ###################################################################################### */
 /* #################################### READONLY STATE ################################## */
@@ -15177,6 +15467,15 @@ gs-memo[readonly] {
     resize: none;
 }
 
+
+/* ###################################################################################### */
+/* #################################### DISABLED STATE ################################## */
+/* ###################################################################################### */
+
+gs-memo[disabled],
+gs-memo[disabled] .control {
+    background-color: #D5D5D5;
+}
 gs-scroller {
     display: block;
     position: relative;
@@ -15203,6 +15502,17 @@ gs-scroller-inner.down {
     cursor: drag;
     cursor: move;
 }
+
+gs-number {
+    display: block;
+    padding: 0.2em;
+    background-color: #FFFFFF;
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+    min-height: 1em;
+}
+
 /* ###################################################################################### */
 /* ###################################### MINI STATE #################################### */
 /* ###################################################################################### */
@@ -15214,10 +15524,16 @@ gs-number[mini] {
     border-radius: 0;
 }
 
-gs-number[mini] input {
-    padding: 0;
-    border: 0;
+
+/* ###################################################################################### */
+/* #################################### DISABLED STATE ################################## */
+/* ###################################################################################### */
+
+gs-number[disabled],
+gs-number[disabled] .control {
+    background-color: #D5D5D5;
 }
+
 
 /* ###################################################################################### */
 /* #################################### READONLY STATE ################################## */
@@ -15231,7 +15547,7 @@ gs-number[readonly] {
     padding: 0.2em;
 }gs-optionbox {
     display: block;
-    /*border: 1px solid #AEAEAE;*/
+    border: 2px solid #AAAAAA;
     /*
     overflow: auto;
     -webkit-overflow-scrolling: touch;
@@ -15361,8 +15677,6 @@ gs-panel {
     -ms-box-sizing: border-box;
     -o-box-sizing: border-box;
     box-sizing: border-box;
-    
-    /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
 }
 
 
@@ -15372,7 +15686,7 @@ gs-panel {
 
 gs-panel > [flex],
 gs-panel > [panel-set-width] {
-    border-right: 1px solid #888888;
+    border-right: 2px solid #000000;
 }
 
 .blue gs-panel > [flex],
@@ -15442,8 +15756,8 @@ gs-panel > *[panel-set-width] {
     width: 0;
     height: 0;
     z-index: 50;
-    background-color: #FFFFFF;
-    opacity: 0.6;
+    background-color: #555555;
+    opacity: 0.4;
 }
 
 
@@ -15486,7 +15800,7 @@ gs-pushmessage-container {
     height: 0;
     top: 0;
     
-    z-index: 110;
+    z-index: 6;
     
     overflow: visible;
 }
@@ -15508,6 +15822,18 @@ gs-pushmessage {
     /* background with opacity */
     background: rgba(244, 244, 244, 0.8);
 }
+
+gs-search {
+    display: block;
+    padding: 0.2em;
+    background-color: #FFFFFF;
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+    min-height: 1em;
+}
+
+
 /* ###################################################################################### */
 /* ###################################### MINI STATE #################################### */
 /* ###################################################################################### */
@@ -15519,9 +15845,14 @@ gs-search[mini] {
     border-radius: 0;
 }
 
-gs-search[mini] input {
-    padding: 0;
-    border: 0;
+
+/* ###################################################################################### */
+/* #################################### DISABLED STATE ################################## */
+/* ###################################################################################### */
+
+gs-search[disabled],
+gs-search[disabled] .control {
+    background-color: #D5D5D5;
 }
 
 
@@ -15534,8 +15865,20 @@ gs-search[readonly] {
     opacity: 0.9;
     border-color: #E6E6E6;
     cursor: default;
-}gs-select > select {
-    background-color: transparent;
+}
+gs-select {
+    position: relative;
+    display: block;
+    padding: 0.2em;
+    background-color: #FFFFFF;
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+    min-height: 1em;
+}
+
+gs-select > select {
+    background-color: #FFFFFF;
 }
 
 gs-select > option {
@@ -15560,7 +15903,6 @@ gs-select:after {
     text-align: center;
     
     background-color: #FFFFFF;
-    color: #000000;
     pointer-events: none;
 }
 
@@ -15570,11 +15912,6 @@ gs-select[mini] {
     border: 0;
     border-radius: 0;
     box-shadow: 0 0 0 0;
-}
-
-gs-select[mini] select {
-    padding: 0;
-    border: 0;
 }
 
 
@@ -15639,1218 +15976,16 @@ gs-sticky[stuck][direction="down"] > gs-sticky-inner {
     display: block;
     height: 100%;
     width: 100%;
-}gs-table {
+}
+gs-text {
     display: block;
-    border: 1px solid #006E00;
-    position: relative;
-    z-index: 4; /* this prevents internally z-indexed items from going
-                    over elements that the parent itself can't go over. */
-
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-}
-gs-cell {
-    display: inline-block;
-}
-
-/*
-gs-cell input {
-    overflow: hidden !important;
-}
-*/
-
-gs-table[mini] {
-    border: 0 none;
-}
-
-gs-table.table-fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-    margin: 0;
-    z-index: 95; /* below dialogs */
-}
-
-gs-table.notHidden {
-    z-index: 95; /* below dialogs */
-}
-
-gs-current-record[inline] {
-    display: inline-block;
-}
-
-.relative {
-    position: relative;
-}
-
-.absolute {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    top: 0;
-    left: 0;
-}
-
-/* #######################################################################
-################################# THEMES #################################
-####################################################################### */
-
-
-/* ##################################################
-###################### DEFAULT ######################
-################################################## */
-gs-table:not([theme]) {
-    border-color: #006E00;
-}
-gs-table:not([theme]) >
-        .table-root.show-top-hud >
-        .table-hud-container.hud-top {
-    background-color: #FFF;
-    border-bottom-color: #006E00;
-}
-
-gs-table:not([theme]) >
-        .table-root.show-bottom-hud >
-        .table-hud-container.hud-bottom {
-    background-color: #FFF;
-    border-top-color: #006E00;
-}
-
-gs-table:not([theme]) >
-        .table-root.show-top-hud >
-        .table-hud-container.hud-top {
-    background-color: #f1f1f1;
-}
-
-gs-table:not([theme]) >
-        .table-root.show-bottom-hud >
-        .table-hud-container.hud-bottom {
-    background-color: #f1f1f1;
-}
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport {
-    background-color: #f1f1f1;
-    border-right-color: #006E00;
-    border-bottom-color: #006E00;
-}
-
-
-
-
-gs-table.focus-in:not([theme]) > .table-root >
-        .table-table-container > .table-data-container >
-        .table-data-viewport > gs-cell[origin-record]:not([selected]):not([auto-selected]) {
-    background-color: #F0F0F0 !important;
-    background: #F0F0F0 !important;
-}
-
-gs-table.focus-in:not([theme]) > .table-root >
-        .table-table-container > .table-data-container >
-        .table-data-viewport > gs-cell[origin-record][selected] {
-    background-color: #f3f3b8 !important;
-    background: #f3f3b8 !important;
-}
-
-gs-table.focus-in:not([theme]) > .table-root >
-        .table-table-container > .table-data-container >
-        .table-data-viewport > gs-cell[selected] {
-    background-color: #f3f3b8 !important;
-    background: #f3f3b8 !important;
-}
-
-gs-table.focus-in:not([theme]) > .table-root >
-        .table-table-container > .table-data-container >
-        .table-data-viewport > gs-cell[origin-record][auto-selected] {
-    background-color: #c2f7c3 !important;
-    background: #c2f7c3 !important;
-}
-
-gs-table.focus-in:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell[auto-selected]:not([origin-record]):not(.table-header):not(.table-all-selector) {
-    background-color: #d6f7d7 !important;
-    background: #d6f7d7 !important;
-}
-
-gs-table.focus-in:not([theme]) > .table-root >
-        .table-table-container > .table-data-container >
-        .table-data-viewport > gs-cell.table-all-selector[auto-selected],
-gs-table.focus-in:not([theme]) > .table-root >
-        .table-table-container > .table-data-container >
-        .table-data-viewport > gs-cell.table-header[auto-selected] {
-    background: #dff3e7;
-    background: -moz-linear-gradient(top, #dff3e7 0%, #beded1 100%);
-    background: -webkit-linear-gradient(top, #dff3e7 0%,#beded1 100%);
-    background: linear-gradient(to bottom, #dff3e7 0%,#beded1 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dff3e7', endColorstr='#beded1',GradientType=0 );
-}
-
-gs-table.focus-in:not([theme]) > .table-root >
-        .table-table-container > .table-data-container >
-        .table-data-viewport > gs-cell.table-all-selector[selected],
-gs-table.focus-in:not([theme]) > .table-root >
-        .table-table-container > .table-data-container >
-        .table-data-viewport > gs-cell.table-header[selected] {
-    background: #fcfae8;
-    background: -moz-linear-gradient(top, #fcfae8 0%, #f1f6d0 100%);
-    background: -webkit-linear-gradient(top, #fcfae8 0%,#f1f6d0 100%);
-    background: linear-gradient(to bottom, #fcfae8 0%,#f1f6d0 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfae8', endColorstr='#f1f6d0',GradientType=0 );
-}
-
-
-gs-table.focus-out:not([theme]) > .table-root >
-        .table-table-container > .table-data-container >
-        .table-data-viewport > gs-cell[selected],
-gs-table.focus-out:not([theme]) > .table-root >
-        .table-table-container > .table-data-container >
-        .table-data-viewport > gs-cell[auto-selected] {
-    background-color: #F0F0F0 !important;
-    background: #F0F0F0 !important;
-}
-
-
-
-
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-cell {
-    background-color: #FFF;
-    border-right-color: #adadad;
-    border-bottom-color: #adadad;
-}
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-header {
-    border-right-color: #006E00;
-    border-bottom-color: #006E00;
-    
-    background: #f8fcf9;
-    background: -moz-linear-gradient(top, #f8fcf9 0%, #d3e9dc 100%);
-    background: -webkit-linear-gradient(top, #f8fcf9 0%,#d3e9dc 100%);
-    background: linear-gradient(to bottom, #f8fcf9 0%,#d3e9dc 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f8fcf9', endColorstr='#d3e9dc',GradientType=0 );
-}
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-all-selector {
-    color: #529c66;
-    border-bottom-color: #006E00;
-    border-right-color: #006E00;
-    
-    background: #f8fcf9;
-    background: -moz-linear-gradient(top, #f8fcf9 0%, #d3e9dc 100%);
-    background: -webkit-linear-gradient(top, #f8fcf9 0%,#d3e9dc 100%);
-    background: linear-gradient(to bottom, #f8fcf9 0%,#d3e9dc 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f8fcf9', endColorstr='#d3e9dc',GradientType=0 );
-}
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-insert {
-    background-color: #FFF;
-    border-right-color: #adadad;
-    border-bottom-color: #adadad;
-}
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-record-selector {
-    background-color: #e4f7ec;
-    color: #CCC;
-    border-bottom-color: #006E00;
-    border-right-color: #006E00;
-}
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-insert-selector {
-    background-color: #e4f7ec;
-    color: #CCC;
-    border-right-color: #006E00;
-    border-bottom-color: #006E00;
-}
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        .no-data-label {
-    color: #efefef;
-}
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-v-scroll-bar-container >
-        .table-v-scroll-bar {
-    border-bottom-color: #A1A1A1; /* 006E00 */
-}
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-h-scroll-bar-container >
-        .table-h-scroll-bar {
-    border-right-color: #A1A1A1; /* 006E00 */
-}
-
-/*
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-h-scroll-bar-container >
-        .table-h-scroll-bar::-webkit-scrollbar {
-    height: 16px;
-}
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-h-scroll-bar-container >
-        .table-h-scroll-bar::-webkit-scrollbar-track {
+    padding: 0.2em;
     background-color: #FFFFFF;
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+    min-height: 1em;
 }
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-table-container >
-        .table-h-scroll-bar-container >
-        .table-h-scroll-bar::-webkit-scrollbar-thumb {
-    background-color: #006E00;
-    border-radius: 15px;
-}
--- themed scrollbars in the future?
-*/
-
-gs-table:not([theme]) >
-        .table-root >
-        .table-loader-container >
-        .table-loader {
-    border-color: #006E00;
-    background-color: #FFF;
-    box-shadow: 0 0 0.5em 0.001em #636363;
-}
-
-gs-table:not([theme]) > 
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        .resize-column-handle.active,
-gs-table:not([theme]) > 
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        .resize-record-handle.active,
-gs-table:not([theme]) > 
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        .reorder-column-handle {
-    background-color: #006E00;
-}
-
-
-.gs-table-contextmenu .gs-table-text-grey {
-    display: block;
-    padding: 0.25em;
-    color: #9c9c9c;
-}
-
-
-/* ##################################################
-####################### SUPER #######################
-################################################## */
-/*
-border-color: #6b34bf;
-background-color: #000000;
-box-shadow: 0 0 0.5em 0.001em #636363;
-*/
-
-/* ################################################### 
-###################### HOMEBREW ######################
-################################################### */
-/*
-border-color: #f5a200;
-background-color: #000000;
-box-shadow: 0 0 0.5em 0.001em #636363;
-*/
-
-/* ###################################################
-######################## DARK ########################
-################################################### */
-
-/* ##################################################
-####################### MOCHA #######################
-################################################## */
-
-
-
-
-
-
-
-/* #######################################################################
-############################### TABLE ROOT ###############################
-####################################################################### */
-gs-table > .table-root {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
-
-/* #######################################################################
-########################## HIDDEN FOCUS CONTROL ##########################
-####################################################################### */
-gs-table > .table-root > .hidden-focus-control {
-    width: 1px;
-    height: 1px;
-    border: 0 none;
-    margin: 0;
-    padding: 0;
-    
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    z-index: -5000;
-    opacity: 0.00000001;
-    
-    -webkit-appearance: none;
-    -moz-appearance: none;
-}
-
-
-/* #######################################################################
-######################## DIMENSION TEST CONTAINER ########################
-####################################################################### */
-gs-table > .table-root > .table-cell-test-container {
-    position: absolute;
-    top: -100%; /* negative prevents this from affecting scrolling */
-    left: -100%; /* negative prevents this from affecting scrolling */
-    z-index: -5000;
-    opacity: 0.00000001;
-}
-
-
-/* #######################################################################
-################################## HUD  ##################################
-####################################################################### */
-gs-table >
-        .table-root >
-        .table-hud-container {
-    display: none;
-}
-gs-table >
-        .table-root.show-top-hud >
-        .table-hud-container.hud-top,
-gs-table >
-        .table-root.show-bottom-hud >
-        .table-hud-container.hud-bottom {
-    display: block;
-    position: absolute;
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    line-height: 1em;
-    padding: 3px;
-    font-size: 0.8em;
-    box-shadow: 0 0 0.25em 0 #b9b9b9 inset;
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
-
-
-
-gs-table >
-        .table-root.show-top-hud >
-        .table-hud-container.hud-top {
-    top: 0;
-    /*height: 2em;*/
-    border-bottom: 1px solid #006E00;
-}
-
-gs-table >
-        .table-root.show-bottom-hud >
-        .table-hud-container.hud-bottom {
-    bottom: 0;
-    /*height: 2em;*/
-    border-top: 1px solid #006E00;
-}
-
-gs-table >
-        .table-root >
-        .table-hud-container >
-        gs-button {
-    line-height: 1.5em;
-}
-
-gs-table >
-        .table-root >
-        .table-hud-container >
-        .text-selection-status {
-    display: inline-block;
-    width: 8em;
-    /*height: 100%;
-    border-top: 0 none;
-    border-bottom: 0 none;
-    margin: 0;*/
-}
-
-
-
-/* #######################################################################
-################## SCROLLBARs AND DATA CONTAINER PARENT ##################
-####################################################################### */
-gs-table >
-        .table-root >
-        .table-table-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
-
-/* #######################################################################
-########################### VIEWPORT CONTAINER ###########################
-####################################################################### */
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
-
-/* #######################################################################
-################################ VIEWPORT ################################
-####################################################################### */
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    
-    border-right: 1px solid #006E00;
-    border-bottom: 1px solid #006E00;
-
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
-
-/* #######################################################################
-################################ GS-CELLs ################################
-####################################################################### */
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell,
-gs-table >
-        .table-root >
-        .table-cell-test-container >
-        gs-cell {
-    position: absolute;
-    overflow: hidden;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-cell,
-gs-table >
-        .table-root >
-        .table-cell-test-container >
-        gs-cell.table-cell {
-    z-index: 40;
-    border-right: 1px solid #006E00;
-    border-bottom: 1px solid #006E00;
-    width: 75px;
-    height: 27px;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-header,
-gs-table >
-        .table-root >
-        .table-cell-test-container >
-        gs-cell.table-header {
-    z-index: 50;
-    background-color: #FFF;
-    text-align: center;
-    font-weight: 900;
-    border-right: 1px solid #006E00;
-    border-bottom: 1px solid #006E00;
-    /*height: 27px;*/
-    line-height: 27px;
-    cursor: s-resize;
-    top: 0;
-    
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-insert,
-gs-table >
-        .table-root >
-        .table-cell-test-container >
-        gs-cell.table-insert {
-    z-index: 60;
-    background-color: #FFF;
-    border-right: 1px solid #006E00;
-    border-bottom: 1px solid #006E00;
-    height: 27px;
-    bottom: 0;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-record-selector,
-gs-table >
-        .table-root >
-        .table-cell-test-container >
-        gs-cell.table-record-selector {
-    z-index: 70;
-    background-color: #FFF;
-    text-align: right;
-    font-size: 0.6em;
-    color: #CCC;
-    cursor: e-resize;
-    left: 0;
-    
-    border-bottom: 1px solid #006E00;
-    border-right: 1px solid #006E00;
-    
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-insert-selector,
-gs-table >
-        .table-root >
-        .table-cell-test-container >
-        gs-cell.table-insert-selector {
-    z-index: 75;
-    background-color: #FFF;
-    text-align: center;
-    color: #CCC;
-    cursor: e-resize;
-    bottom: 0;
-    right: 0;
-    
-    border-right: 1px solid #006E00;
-    border-bottom: 1px solid #006E00;
-    
-    /* asterisk specific */
-    line-height: 1.4em;
-    font-size: 2em;
-    vertical-align:sub;
-    
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-all-selector,
-gs-table >
-        .table-root >
-        .table-cell-test-container >
-        gs-cell.table-all-selector {
-    cursor: se-resize;
-    z-index: 80;
-    background-color: #FFF;
-    text-align: center;
-    color: #CCC;
-    top: 0;
-    right: 0;
-    
-    border-bottom: 1px solid #006E00;
-    border-right: 1px solid #006E00;
-    
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-}
-
-
-/* #######################################################################
-############################# COLUMN BUTTONS #############################
-####################################################################### */
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-header.right-button {
-    padding-right: 1.25em;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-header >
-        .header-button {
-    position: absolute;
-    right: 0;
-    top: 0;
-    height: 100%;
-    width: 1.25em;
-    cursor: pointer;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-header >
-        .header-button:after {
-    content: '\f0d7';/*caret-down*/
-    font-family: FontAwesome;
-    text-align: center;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-header >
-        .header-button.filtered:after {
-    content: '\f0b0'; /*filter*/
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-header >
-        .header-button.sort-asc:before {
-    position: absolute;
-    left: 0.1em;
-    bottom: 0.25em;
-    font-size: 0.75em;
-    height: 1em;
-    line-height: 1em;
-
-    font-family: FontAwesome;
-    content: '\f175'; /*long-arrow-down*/
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-header >
-        .header-button.sort-desc:before {
-    position: absolute;
-    left: 0.1em;
-    bottom: 0.25em;
-    font-size: 0.75em;
-    height: 1em;
-    line-height: 1em;
-
-    font-family: FontAwesome;
-    content: '\f176'; /*long-arrow-up*/
-}
-
-.gs-table-unique-value-list {
-    /*padding: 0.25em 0.25em 0 0.25em;*/
-    height: 15em;
-    /*overflow: auto;*/
-    /*border-left: 1px solid #BBB;
-    border-top: 1px solid #BBB;
-    border-right: 1px solid #BBB;*/
-}
-
-.gs-table-unique-value-list-toolbar {
-    text-align: right;
-    /*padding: 0.25em;*/
-    /*padding: 1px 0.25em 0.25em 0.25em;
-    border-left: 1px solid #BBB;
-    border-bottom: 1px solid #BBB;
-    border-right: 1px solid #BBB;*/
-    margin-bottom: 0.25em;
-}
-.gs-table-unique-value-list-toolbar gs-button {
-    border-top: 0 none;
-}
-.gs-table-unique-value-list-toolbar gs-button:first-child {
-    border-right: 0 none;
-}
-
-
-/* #######################################################################
-############################# COLUMN REORDER #############################
-####################################################################### */
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell.table-header[selected] {
-    /*cursor: ew-resize;*/
-    /*cursor: -moz-grab;
-    cursor: -webkit-grab;
-    cursor: grab;*/
-    cursor: move;
-}
-
-gs-table > 
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        .reorder-column-handle {
-    position: absolute;
-    top: 0;
-    width: 5px;
-    height: 100%;
-    margin-left: -3px;
-
-    z-index: 500;
-    background-color: #006E00;
-}
-
-
-/* #######################################################################
-################################## MISC ##################################
-####################################################################### */
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        .no-data-label {
-    position: absolute;
-    top: 50px;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 4em;
-    color: #efefef;
-    font-style: italic;
-    font-weight: 100;
-}
-
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        gs-cell[selected] * {
-    background-color: transparent;
-}
-
-gs-table > .table-root .pixel-element {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    background-color: transparent;
-}
-
-
-
-
-/* #######################################################################
-############################### SCROLLBAR  ###############################
-####################################################################### */
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-v-scroll-bar-container {
-    position: absolute;
-    right: 0;
-    top: 0;
-    height: 100%;
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-v-scroll-bar-container >
-        .table-v-scroll-bar {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    border-bottom: 1px solid #006E00;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-h-scroll-bar-container {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-h-scroll-bar-container >
-        .table-h-scroll-bar {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow-x: scroll;
-    overflow-y: hidden;
-    border-right: 1px solid #006E00;
-}
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-h-scroll-bar-container >
-        .table-h-scroll-bar >
-        .table-scroll-causer,
-gs-table >
-        .table-root >
-        .table-table-container >
-        .table-v-scroll-bar-container >
-        .table-v-scroll-bar >
-        .table-scroll-causer {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 1px;
-    height: 1px;
-}
-
-
-/* #######################################################################
-################################# LOADER #################################
-####################################################################### */
-gs-table >
-        .table-root >
-        .table-loader-container {
-    position: absolute;
-    right: 1em;
-    top: 1em;
-    width: 1px;
-    height: 1px;
-    overflow: visible;
-    z-index: 98;
-}
-gs-table >
-        .table-root >
-        .table-loader-container >
-        .table-loader {
-    border: 1px solid #006E00;
-    padding: 0.25em;
-    background-color: #FFF;
-    margin-bottom: 0.25em;
-    
-    text-align: center;
-    box-shadow: 0 0 0.5em 0.001em #636363;
-    
-    -webkit-border-radius: 0.5em;
-    -moz-border-radius: 0.5em;
-    -ms-border-radius: 0.5em;
-    -o-border-radius: 0.5em;
-    border-radius: 0.5em;
-}
-gs-table >
-        .table-root >
-        .table-loader-container >
-        .table-loader.table-fade-out {
-    visibility: hidden;
-    opacity: 0;
-    transition: visibility 0s 1s, opacity 1s linear;
-}
-
-/* #######################################################################
-################################ CURSORS  ################################
-####################################################################### */
-gs-table > .table-root .table-cursor-col-resize {
-    cursor: ew-resize;
-}
-gs-table > .table-root .table-cursor-row-resize {
-    cursor: ns-resize;
-}
-gs-table > .table-root .table-cursor-all-resize {
-    cursor: move;
-}
-
-/* #######################################################################
-############################## CELL  RESIZE ##############################
-####################################################################### */
-gs-table > 
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        .resize-column-handle {
-    position: absolute;
-    top: 0;
-    width: 11px;
-    height: 100%;
-    margin-left: -5px;
-    
-    z-index: 500;
-    background-color: transparent;
-}
-gs-table > 
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        .resize-record-handle {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    height: 11px;
-    margin-top: -5px;
-    
-    z-index: 500;
-    background-color: transparent;
-}
-
-gs-table > 
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        .resize-column-handle.active {
-    width: 1px;
-    margin-left: 0;
-    background-color: #006E00;
-}
-gs-table > 
-        .table-root >
-        .table-table-container >
-        .table-data-container >
-        .table-data-viewport >
-        .resize-record-handle.active {
-    height: 1px;
-    margin-top: 0;
-    background-color: #006E00;
-}
-
-
-
-
-/* #######################################################################
-############################## CONTEXT MENU ##############################
-####################################################################### */
-
-.gs-table-contextmenu,
-.gs-table-contextmenu gs-page,
-.gs-table-contextmenu gs-body {
-    border-radius: 0.25em;
-    -webkit-border-radius: 0.25em;
-    -moz-border-radius: 0.25em;
-    -ms-border-radius: 0.25em;
-    -o-border-radius: 0.25em;
-    border-radius: 0.25em;
-}
-.gs-table-contextmenu gs-body {
-    padding: 0.4em;
-}
-
-.gs-table-contextmenu gs-button[icon] {
-    padding-left: 2.2em;
-    text-align: left;
-}
-.gs-table-contextmenu gs-button[icon]:after {
-    color: #006E00;
-    width: 1.6em;
-}
-
-.gs-table-contextmenu gs-checkbox {
-    text-align: left;
-}
-.gs-table-contextmenu gs-checkbox[mini] {
-    padding: 0.2em 0.4em;
-}
-.gs-table-contextmenu table {
-    border-left: 1px solid #DDD;
-    font-size: 0.9em;
-}
-.gs-table-contextmenu table td {
-    padding: 0;
-}
-
-.gs-table-contextmenu [remove-bottom],
-.gs-table-contextmenu [remove-all] {
-    border-bottom: 0 none;
-}
-
-.gs-table-contextmenu .context-menu-header {
-    font-size: 0.75em;
-    color: #777;
-}
-.gs-table-contextmenu .context-menu-indent {
-    padding-left: 0.25em;
-}
-
-
-
-/* #######################################################################
-############################ SETTINGS  DIALOG ############################
-####################################################################### */
-
-
-.gs-table-pref-dialog .pref-limit-from-label,
-.gs-table-pref-dialog .pref-limit-to-label {
-    /*display: inline-block;
-    width: 30%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;*/
-}
-.gs-table-pref-dialog .pref-limit-from,
-.gs-table-pref-dialog .pref-limit-to {
-    /*display: inline-block;
-    width: 70%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;*/
-}
-
-
-
-
-
-
-
-
-
-
 
 
 /* ###################################################################################### */
@@ -16864,9 +15999,15 @@ gs-text[mini] {
     border-radius: 0;
 }
 
-gs-text[mini] input {
-    padding: 0;
-    border: 0;
+
+/* ###################################################################################### */
+/* #################################### DISABLED STATE ################################## */
+/* ###################################################################################### */
+
+gs-text[disabled],
+gs-text[disabled] .control {
+    height: 1.35em;
+    background-color: #D5D5D5;
 }
 
 
@@ -16879,18 +16020,26 @@ gs-text[readonly] {
     opacity: 0.9;
     border-color: #E6E6E6;
     cursor: default;
-}gs-time .time-picker-button {
+}gs-time {
+    position: relative;
+    display: block;
+    
+    padding: 0.2em 2.2em 0.2em 0.2em;
+    min-height: 1em;
+    background-color: #FFFFFF;
+    
+    border: 1px solid #AEAEAE;
+    border-radius: 0.2em;
+    box-shadow: 0 0 0.2em 0.1em #C5C5C5 inset;
+}
+
+gs-time .time-picker-button {
     position: absolute;
     right: 0;
     top: 0;
     
     width: 2em;
     height: 100%;
-    
-    margin-top: 0;
-    border-top: 0;
-    border-right: 0;
-    border-bottom: 0;
     
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -16932,6 +16081,21 @@ gs-time[readonly] .time-picker-button {
     pointer-events: none;
 }
 
+
+/* ###################################################################################### */
+/* ################################ ATTRIBUTE:  "disabled" ############################## */
+/* ###################################################################################### */
+
+gs-time[disabled],
+gs-time[disabled] .control {
+    background-color: #D5D5D5;
+}
+
+gs-time[disabled]:not([mini]) {
+    min-height: 1.358em;
+}
+
+
 /* ###################################################################################### */
 /* ################################## ATTRIBUTE:  "mini" ################################ */
 /* ###################################################################################### */
@@ -16955,11 +16119,6 @@ gs-time[mini] .time-picker-button {
 
 gs-time[mini] .time-picker-button:after {
     font-size: 0.8em;
-}
-
-gs-time[mini] input {
-    padding: 0;
-    border: 0;
 }
 
 
@@ -17169,17 +16328,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3f3f3', end
 
 .gs-time-time-picker-container .time-bottom-toolbar {
     margin-top: 0.4em;
-}gs-timestamp {
-    display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-    display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-    display: -ms-flexbox;      /* TWEENER - IE 10 */
-    display: -webkit-flex;     /* NEW - Chrome */
-    display: flex;
-    
-    flex-direction: row;
-    -ms-flex-direction: row;
-    -webkit-flex-direction: row;
 }
+
 
 gs-tutorial-popup {
     display: block;
@@ -17280,8 +16430,8 @@ gs-tutorial-overlay {
     width: 100%;
     height: 100%;
     
-    background-color: #FFFFFF;
-    opacity: 0.6;
+    background-color: #000000;
+    opacity: 0.1;
     
     z-index: 100;
 }

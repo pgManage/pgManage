@@ -22,8 +22,8 @@ function refreshButtons (bolBtnType) {
             if (curr_toolbar.relatedEditorToolbar) {
                 curr_tab_num = curr_toolbar.relatedEditorToolbar.id.substring(parseInt(curr_toolbar.relatedEditorToolbar.id.lastIndexOf('-'), 10) + 1, curr_toolbar.relatedEditorToolbar.id.length);
 
-                document.getElementById('ace-toolbar-labeled-' + curr_tab_num + '').style.display = 'none';
-                document.getElementById('ace-toolbar-unlabeled-' + curr_tab_num + '').style.display = '';
+                document.getElementById('sql-ace-toolbar-' + curr_tab_num + '').classList.add('ace-toolbar-unlabeled');
+                document.getElementById('sql-ace-toolbar-' + curr_tab_num + '').classList.remove('ace-toolbar-labeled');
             }
         }
     } else {
@@ -33,8 +33,8 @@ function refreshButtons (bolBtnType) {
             if (curr_toolbar.relatedEditorToolbar) {
                 curr_tab_num = curr_toolbar.relatedEditorToolbar.id.substring(parseInt(curr_toolbar.relatedEditorToolbar.id.lastIndexOf('-'), 10) + 1, curr_toolbar.relatedEditorToolbar.id.length);
 
-                document.getElementById('ace-toolbar-labeled-' + curr_tab_num + '').style.display = '';
-                document.getElementById('ace-toolbar-unlabeled-' + curr_tab_num + '').style.display = 'none';
+                document.getElementById('sql-ace-toolbar-' + curr_tab_num + '').classList.remove('ace-toolbar-unlabeled');
+                document.getElementById('sql-ace-toolbar-' + curr_tab_num + '').classList.add('ace-toolbar-labeled');
             }
         }
     // console.log(xtag.query(document.body, '.current-tab')[0].relatedEditorToolbar.parentElement);

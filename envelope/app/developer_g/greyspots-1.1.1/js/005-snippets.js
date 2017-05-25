@@ -49,7 +49,7 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('ml()', 'ml()',
             'ml(function () {/*\n' +
             '    ${0}\n' +
-            '})');
+            '*/})');
 
     // HTML snippets
     registerDesignSnippet('<style>', '<style>', 'style>\n' +

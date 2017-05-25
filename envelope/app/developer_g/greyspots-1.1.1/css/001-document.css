@@ -22,6 +22,9 @@ body {
     padding: 0;
     
     background-color: #ffffff;
+    
+    /*line-height: 1.25;*/
+    vertical-align: middle;
 }
 
 

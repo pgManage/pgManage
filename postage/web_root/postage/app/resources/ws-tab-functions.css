@@ -272,13 +272,6 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     right: 1em;
 }
 
-.ace-toolbar > gs-checkbox {
-	box-shadow: none !important;
-}
-.ace-toolbar > gs-checkbox > label {
-	display: inline;
-}
-
 /* move "x" annotation so that it's never under the ace-toolbar */
 .ace_gutter-cell.ace_error {
     background-position: 87% center !important; /* 30px */
@@ -342,6 +335,10 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     -o-box-sizing: border-box;
     box-sizing: border-box;
 }
+.sql-results-area gs-table {
+    white-space: initial;
+    min-height: 20em;
+}
 
 .sql-results-area .result-table-scroll-container {
     /*overflow: auto; <== this line makes each result table have it's own horizontal scrollbar, it was removed because you want to be able to scroll sideways using the scrollbar even it you're in the middle of a large result. */
@@ -393,28 +390,6 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     -webkit-animation: error-pulsate 1100ms linear infinite;
     -moz-animation: error-pulsate 1100ms linear infinite;
     animation: error-pulsate 1100ms linear infinite;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.ace-toolbar > gs-button:after {
-    top: 0.23em !important;
 }
 
 

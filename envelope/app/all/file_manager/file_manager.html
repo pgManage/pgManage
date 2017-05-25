@@ -118,10 +118,10 @@
 
             function folderLineHTML(strTitle, strNavigateLink) {
                 return '<div flex-horizontal flex-fill link="' + encodeHTML(strNavigateLink) + '">' +
-                                '<gs-checkbox class="check" remove-right type="folder" ' +
+                                '<gs-checkbox inline type="folder" ' +
                                         (arrCheckedPaths.indexOf(strNavigateLink) >= 0 ? 'value="true"' : '') +
                                     '></gs-checkbox>' +
-                                '<gs-button class="folder" remove-left flex>' + encodeHTML(strTitle) + '</a>' +
+                                '<gs-button class="folder" flex>' + encodeHTML(strTitle) + '</a>' +
                             '</div> ';
             }
 
@@ -145,24 +145,24 @@
                 }
 
                 strHTML += '<div flex-horizontal flex-fill link="' + strCurrentPath + '">' +
-                    '<gs-checkbox class="check" type="file" ' +
+                    '<gs-checkbox inline type="file" ' +
 					(arrCheckedPaths.indexOf(strCurrentPath) >= 0 ? 'value="true"' : '') +
-					' remove-right></gs-checkbox>';
+					'></gs-checkbox>';
 
                 if (strCurrentPath.toLowerCase().indexOf('.zip') === strCurrentPath.length - 4) {
                     if (!bolWebSocket) {
                         strHTML += '<gs-button onclick="unzipFile(\'' + strCurrentPath +
-    						'\')" icononly icon="expand" remove-all></gs-button>';
+    						'\')" icononly icon="expand" remove-right remove-margin-right></gs-button>';
                     }
                 } else {
-                    strHTML += '<gs-button "target="_blank" href="file_edit.html?' +
+                    strHTML += '<gs-button remove-margin-right "target="_blank" href="file_edit.html?' +
                         (bolWebSocket === true ? 'socket=true&' : '') +
                         'link=' + encodeURIComponent(strCurrentPath) +
-                		'" icononly icon="pencil" remove-all></gs-button>';
+                		'" icononly icon="pencil" remove-right></gs-button>';
                 }
 
                 strHTML += '<gs-button flex href="' + encodeHTML(strAnchorPath) +
-					'" target="_blank" class="file" remove-left>' + encodeHTML(strTitle) + '</gs-button>' +
+					'" target="_blank" class="file" ' + (strCurrentPath.toLowerCase().indexOf('.zip') === strCurrentPath.length - 4 && bolWebSocket ? '' : 'remove-left remove-margin-left') + '>' + encodeHTML(strTitle) + '</gs-button>' +
                     '</div>';
 
                 return strHTML;
@@ -717,7 +717,7 @@
 
                     for (i = 0, len = arrCheckedPaths.length, strHTML = ''; i < len; i += 1) {
                         strHTML += '<div flex-horizontal>' +
-                                        '<gs-checkbox id="checked-list-checkbox-' + i + '" value="true" ' +
+                                        '<gs-checkbox inline id="checked-list-checkbox-' + i + '" value="true" ' +
                                                     'path="' + encodeHTML(arrCheckedPaths[i]) + '" ' +
                                                     'type="' + encodeHTML(arrCheckedPathTypes[i]) + '"></gs-checkbox>' +
                                         '<label for="checked-list-checkbox-' + i + '" flex>' + encodeHTML(arrCheckedPaths[i]) + '</label>' +
@@ -1108,8 +1108,9 @@
             #file-list {
                 padding: 0.5em;
             }
-            #file-list gs-checkbox {
-                width: 3em;
+            
+            gs-checkbox {
+                border-radius: 100%;
             }
 
             #file-list gs-button {
@@ -1121,16 +1122,8 @@
                 margin-bottom: 0.2em;
             }
 
-            .check {
-                width: 1.5em;
-            }
-
             .font-adjustment {
                 font-size: 0.8em;
-            }
-
-            gs-button, gs-checkbox {
-                border-radius: 0.5em;
             }
 
             body > gs-page > gs-header {
@@ -1278,18 +1271,18 @@
                 <div flex-horizontal>
                     <h4 id="current-path" flex>File Manager</h4>
                     <gs-text id="current-path-edit" flex hidden></gs-text>
-                    <gs-button id="button-refresh" icononly icon="refresh" title="Refresh file list..." remove-right></gs-button>
-                    <gs-button id="button-checked" icononly icon="check" title="Look at all checked files and folders" remove-all disabled></gs-button>
-                    <gs-button id="button-search" target="_blank" icononly icon="search" title="Go to search page..." remove-left></gs-button>
+                    <gs-button id="button-refresh" icononly icon="refresh" title="Refresh file list..." remove-right remove-margin-right></gs-button>
+                    <gs-button id="button-checked" icononly icon="check" title="Look at all checked files and folders" remove-all remove-margin-horizontal disabled></gs-button>
+                    <gs-button id="button-search" target="_blank" icononly icon="search" title="Go to search page..." remove-left remove-margin-left></gs-button>
                 </div>
                 <div class="spacer"></div>
                 <div class="font-adjustment">
                     <gs-grid>
-                        <gs-block><gs-button id="button-top" disabled icontop icon="angle-double-up" remove-right>Top</gs-button></gs-block>
-                        <gs-block><gs-button id="button-up" disabled icontop icon="angle-up" remove-all>Up</gs-button></gs-block>
-                        <gs-block><gs-button id="button-upload-file" icontop icon="upload" remove-all>Upload</gs-button></gs-block>
-                        <gs-block><gs-button id="button-new-file" icontop icon="plus" remove-all>File</gs-button></gs-block>
-                        <gs-block><gs-button id="button-new-folder" icontop icon="plus" remove-left>Folder</gs-button></gs-block>
+                        <gs-block><gs-button id="button-top" disabled icontop icon="angle-double-up" remove-right remove-margin-right>Top</gs-button></gs-block>
+                        <gs-block><gs-button id="button-up" disabled icontop icon="angle-up" remove-all remove-margin-horizontal>Up</gs-button></gs-block>
+                        <gs-block><gs-button id="button-upload-file" icontop icon="upload" remove-all remove-margin-horizontal>Upload</gs-button></gs-block>
+                        <gs-block><gs-button id="button-new-file" icontop icon="plus" remove-all remove-margin-horizontal>File</gs-button></gs-block>
+                        <gs-block><gs-button id="button-new-folder" icontop icon="plus" remove-left remove-margin-left>Folder</gs-button></gs-block>
                     </gs-grid>
                 </div>
             </gs-header>
@@ -1301,15 +1294,15 @@
                     <div id="current-action-container"></div>
                     <gs-grid>
                         <gs-block>
-                            <gs-button id="button-zip" disabled icontop icon="download" remove-right>
+                            <gs-button id="button-zip" disabled icontop icon="download" remove-right remove-margin-right>
                                 <span hide-on-desktop>Zip</span>
                                 <span show-on-desktop>Download Zip</span>
                             </gs-button>
                         </gs-block>
-                        <gs-block><gs-button id="button-move" disabled icontop icon="exchange" remove-all>Move</gs-button></gs-block>
-                        <gs-block><gs-button id="button-rename" disabled icontop icon="keyboard-o" remove-all>Rename</gs-button></gs-block>
-                        <gs-block><gs-button id="button-copy" disabled icontop icon="clipboard" remove-all>Copy</gs-button></gs-block>
-                        <gs-block><gs-button id="button-delete" disabled icontop icon="times" remove-left>Delete</gs-button></gs-block>
+                        <gs-block><gs-button id="button-move" disabled icontop icon="exchange" remove-all remove-margin-horizontal>Move</gs-button></gs-block>
+                        <gs-block><gs-button id="button-rename" disabled icontop icon="keyboard-o" remove-all remove-margin-horizontal>Rename</gs-button></gs-block>
+                        <gs-block><gs-button id="button-copy" disabled icontop icon="clipboard" remove-all remove-margin-horizontal>Copy</gs-button></gs-block>
+                        <gs-block><gs-button id="button-delete" disabled icontop icon="times" remove-left remove-margin-left>Delete</gs-button></gs-block>
                     </gs-grid>
                 </div>
             </gs-footer>
