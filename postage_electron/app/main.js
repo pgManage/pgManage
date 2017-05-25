@@ -12,6 +12,16 @@ const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
 
+var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
+	// Someone tried to run a second instance, we should create a new window
+	
+});
+
+if (shouldQuit) {
+	app.quit();
+	return;
+}
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindows = [];

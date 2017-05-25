@@ -209,6 +209,8 @@ void ws_file_step1(struct sock_ev_client_request *client_request) {
 		client_file->str_path_to = canonical(client_file->str_canonical_start_to, client_file->str_partial_path_to, "valid_path");
 		SFINISH_CHECK(client_file->str_path_to != NULL, "Failed to get canonical path: >%s|%s<",
 			client_file->str_canonical_start_to, client_file->str_partial_path_to);
+		SFINISH_CHECK(access(client_file->str_path_to, F_OK) == -1, "File exists");
+		errno = 0;
 
 		if (client_file->file_type == POSTAGE_FILE_MOVE) {
 			SDEBUG("client_file->str_path: %s", client_file->str_path);
