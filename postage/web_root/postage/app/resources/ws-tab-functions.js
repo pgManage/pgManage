@@ -1161,147 +1161,100 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     // fill frame
     if (strType === 'sql') {
         frameElement.innerHTML =
-            '<div id="frame-' + intTabNumber + '-indicator" class="frame-indicator"></div>' +
-            '<div id="script-window-container-' + intTabNumber + '" class="script-window-container" flex-vertical flex-fill>' +
-                '<div id="ace-toolbar-labeled-' + intTabNumber + '">' +
-    				'<div class="ace-toolbar" style="background-color: #cccccc; width: 100%; padding-top: 1px; padding-bottom: 2px;" id="sql-ace-toolbar-' + intTabNumber + '">' +
-    					'<gs-button inline remove-all icon="external-link" onclick="openInNewWindow()" ' +
-    								'title="Open this tab in a new window" remove-all no-focus>New Window</gs-button>' +
-    					'<gs-button inline remove-all icon="play" onclick="executeScript(); document.getElementsByClassName(\'current-tab\')[0].relatedEditor.focus();" ' +
-    								'title="Execute Script [F5]" remove-bottom no-focus>Run</gs-button>' +
-    					'<gs-checkbox inline style="border-radius: 0; border: 1px solid #ccc; height: 2.35em" id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit"><label>Autocommit</label></gs-checkbox>' +
-    					'<gs-button inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
-    								'title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span> Toggle Comment</gs-button>' +
-    					'<gs-button inline remove-all icon="indent" onclick="indentScript()" ' +
-    								'title="Indent the selected text [TAB]" remove-all no-focus>Indent</gs-button>' +
-    					'<gs-button inline remove-all icon="outdent" onclick="outdentScript()" ' +
-    								'title="Dedent the selected text [SHIFT][TAB]" remove-all no-focus>Dedent</gs-button>' +
-    					(
-    						window.process && window.process.type === 'renderer' ?
-    						'<gs-button inline remove-all id="button-tab-' + intTabNumber + '-save" icon="save" data-filename="' + tabElement.filePath + '" ' +
-    								'title="Save" remove-all no-focus>Save</gs-button>' +
-    						'<gs-button inline remove-all id="button-tab-' + intTabNumber + '-save-as" class="button-save-as" data-filename="' + tabElement.filePath + '" ' +
-    								'title="Save As..." remove-all no-focus>' +
-    								'<span class="save-as-floppy" icon="pencil">&#xf0c7;</span> Save As...</gs-button>'
-    						:
-    						'<gs-button inline remove-all id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
-    								'title="Download as a file" remove-all no-focus>Download</gs-button>'
-    					) +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="menuExplain(event.target)" ' + 'title="Explain menu." no-focus><span class="explain-letter" icon="chevron-down">E</span> Explain</gs-button>' +
-    					/* XLD
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain()" ' +
-    								'title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span> Explain</gs-button>' +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" ' +
-    								'title="Query explanation. Note that the query will run, meaning that you\'ll get run times." ' +
-    								'remove-top no-focus>' +
-    						'<span class="explain-letter" icon="play">E</span> Explain Analyze' +
-    					'</gs-button>' +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(false, true)" ' +
-    								'title="Query explanation. Text format. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">T</span> Explain (Text)</gs-button>' +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px;" onclick="explain(true, true)" ' +
-    								'title="Query explanation. Text format. Note that the query will run, meaning that you\'ll get run times." ' +
-    								'remove-top no-focus>' +
-    						'<span class="explain-letter" icon="play">T</span> Explain Analyze (Text)' +
-    					'</gs-button>' +
-    					*/
-    					'<gs-button inline remove-all class="button-csv" icon="file-text" onclick="exportCSV()" ' +
-    								'title="Download a single query\'s results as a file" remove-all no-focus>Export</gs-button>' +
-    					'<gs-button inline style="height: 2.35em" remove-all class="button-ace-info" onclick="dialogAceInfo()" ' +
-    								'title="Information and tips about the Editor" remove-all no-focus>' +
-    							'<span class="ace-icon-container">' +
-    								'<span class="ace-suit">&#9824;</span>' + //&#9830;
-    								'<span class="ace-letter">A</span>' +
-    							'</span>' +
-    						'<span>Ace Tips</span>' +
-    					'</gs-button>' +
-    					'<gs-button inline remove-all icon="black-tie" onclick="beautifySQL()" ' + 'title="Beautify the Current SQL" no-focus>Beautify</gs-button>' +
-    					'<gs-button hidden id="sql-property-' + intTabNumber + '-button" icononly ' +
-    								'icon="wrench" onclick="propertyWindowDialog()" disabled  ' + //hidden
-    								'title="Edit the current query\'s properties [CMD][.] or [CTRL][.]" remove-top no-focus></gs-button>' +
-    				'</div>' +
-    			'</div>' +
-    			'<div id="ace-toolbar-unlabeled-' + intTabNumber + '" style="display: none;">' +
-    			    '<div class="ace-toolbar" style="background-color: #cccccc; width: 100%; padding-top: 1px; padding-bottom: 2px;" id="sql-ace-toolbar-' + intTabNumber + '">' +
-    					'<gs-button style="padding-right: 0.25em;" icononly inline remove-all icon="external-link" onclick="openInNewWindow()" ' +
-    								'title="Open this tab in a new window" remove-all no-focus></gs-button>' +
-                        '<gs-button style="padding-right: 0.25em; " icononly inline remove-all icon="play" onclick="executeScript(); document.getElementsByClassName(\'current-tab\')[0].relatedEditor.focus();" ' +
-    								'title="Execute Script [F5]" remove-bottom no-focus></gs-button>' +
-    					'<gs-checkbox style="padding-right: 0.35em; height: 2.35em;" icononly inline id="checkbox-autocommit-' + intTabNumber + '" title="Autocommit" remove-all><label></label></gs-checkbox>' +
-    					'<gs-button style="height: 2.35em; padding-left: 0.5em !important; padding-right: 0.5em !important;" inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"' +
-    								'title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span></gs-button>' +
-    					'<gs-button style="padding-right: 0.25em; " icononly inline remove-all icon="indent" onclick="indentScript()" ' +
-    								'title="Indent the selected text [TAB]" remove-all no-focus></gs-button>' +
-    					'<gs-button style="padding-right: 0.25em; " icononly inline remove-all icon="outdent" onclick="outdentScript()" ' +
-    								'title="Dedent the selected text [SHIFT][TAB]" remove-all no-focus></gs-button>' +
-    					(
-    						window.process && window.process.type === 'renderer' ?
-    						'<gs-button style="padding-right: 0.25em; " icononly inline remove-all id="button-tab-' + intTabNumber + '-save" icon="save" data-filename="' + tabElement.filePath + '" ' +
-    								'title="Save" remove-all no-focus></gs-button>' +
-    						'<gs-button style="padding-right: 0.25em; " inline remove-all id="button-tab-' + intTabNumber + '-save-as" class="button-save-as" data-filename="' + tabElement.filePath + '" ' +
-    								'title="Save As..." remove-all no-focus>' +
-    								'<span class="save-as-floppy" icon="pencil">&#xf0c7;</span></gs-button>'
-    						:
-    						'<gs-button style="padding-right: 0.25em;" icononly inline remove-all id="button-tab-' + intTabNumber + '-download" icon="download" href="/postage/' + contextData.connectionID + '/download/' + GS.trim(tabElement.filePath, '/') + '" onclick="downloadScript()" ' +
-    								'title="Download as a file" remove-all no-focus></gs-button>'
-    					) +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(false)" ' +
-    								'title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span></gs-button>' +
-    					'<gs-button inline remove-all class="button-explain" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(true)" ' +
-    								'title="Query explanation. Note that the query will run, meaning that you\'ll get run times." ' +
-    								'remove-top no-focus>' +
-    						'<span class="explain-letter" icon="play">E</span>' +
-    					'</gs-button>' +
-    					'<gs-button style="padding-right: 0.25em;" inline icononly remove-all class="button-csv" icon="file-text" onclick="exportCSV()" ' +
-    								'title="Download a single query\'s results as a file" remove-all no-focus></gs-button>' +
-    					'<gs-button inline style="height: 2.35em" remove-all class="button-ace-info" onclick="dialogAceInfo()" ' +
-    								'title="Information and tips about the Editor" remove-all no-focus>' +
-    							'<span style="width: 2em; font-size: 1em;" class="ace-icon-container">' +
-    								'<span style="top: 0;" class="ace-suit">&#9824;</span>' + //&#9830;
-    								'<span style="top: 0;" class="ace-letter">A</span>' +
-    							'</span>' +
-    					'</gs-button>' +
-    					'<gs-button style="padding-right: 0.25em;" icononly inline remove-all icon="black-tie" onclick="beautifySQL()" ' + 'title="Beautify the Current SQL" no-focus></gs-button>' +
-    					'<gs-button hidden id="sql-property-' + intTabNumber + '-button" icononly ' +
-    								'icon="wrench" onclick="propertyWindowDialog()" disabled  ' + //hidden
-    								'title="Edit the current query\'s properties [CMD][.] or [CTRL][.]" remove-top no-focus></gs-button>' +
-    				'</div>' +
-                '</div>' +
-                '<div id="ace-container-position-container-' + intTabNumber + '" class="ace-container-position-container" flex>' +
-                    '<div class="ace-container">' +
-                    '    <div id="sql-ace-area-' + intTabNumber + '" class="ace-area"></div>' +
-                    '</div>' +
-                '</div>' +
-                '<div id="sql-doc-links-' + intTabNumber + '" style="text-align: center; height: 0;">' +
-                    '<div style="display: inline-block;"></div>' +
-                    '<div style="display: inline-block;"></div>' +
-                '</div>' +
-                '<div class="sql-results-area-container" ' +
-                                  'id="sql-results-area-' + intTabNumber + '-container" ' +
-                                  'style="height: 17em;" flex-vertical flex-fill>' +
-                    '<gs-page>' +
-                        '<gs-header id="sql-results-header-' + intTabNumber + '" class="results-header" flex-horizontal flex-fill>' +
-                            '<b flex  id="sql-results-area-resize-handle-' + intTabNumber + '"' +
-                                    ' class="sql-results-area-resize-handle" icononly' +
-                                    ' title="Drag to resize this window" icon="arrows-v"' +
-                                    ' style="line-height: 2.422em; padding-left: 0.5em;">' +
-                                '<span id="sql-results-title-' + intTabNumber + '">Results</span>' +
-                                '<span id="sql-results-tally-' + intTabNumber + '"></span>' +
-                            '</b>' +
-                            '<gs-button id="sql-results-stop-' + intTabNumber + '" hidden no-focus' +
-                                      ' class="header-button-text" icon="stop" no-focus>Stop Execution</gs-button>' +
-                            '<gs-button id="sql-results-StopSocket-' + intTabNumber + '" hidden no-focus' +
-                                      ' class="header-button-text" no-focus>Stop Loading</gs-button>' +
-                            '<gs-button id="sql-results-stop-loading-' + intTabNumber + '" hidden no-focus' +
-                                      ' class="header-button-text" icon="hand-stop-o" no-focus>Stop Loading</gs-button>' +
-                            '<gs-button id="sql-results-copy-options-' + intTabNumber + '" hidden no-focus' +
-                                      ' class="header-button-text" icon="clipboard" no-focus>Clip Options</gs-button>' +
-                            '<gs-button id="sql-results-clear-' + intTabNumber + '" no-focus' +
-                                      ' class="header-button-text" icon="trash-o" no-focus>Clear</gs-button>' +
-                        '</gs-header>' +
-                        '<gs-body id="sql-results-area-' + intTabNumber + '" class="sql-results-area"></gs-body>' +
-                    '</gs-page>' +
-                '</div>' +
-            '</div>';
+            ml(function () {/*
+                <div id="frame-{{TABNUMBER}}-indicator" class="frame-indicator"></div>
+                    <div id="script-window-container-{{TABNUMBER}}" class="script-window-container" flex-vertical flex-fill>
+                        <div class="ace-toolbar ace-toolbar-{{ELECTRON}} ace-toolbar-{{LABELED}}" style="background-color: #cccccc; width: 100%; padding-top: 1px; padding-bottom: 2px;" id="sql-ace-toolbar-{{TABNUMBER}}">
+                            <gs-button icononly inline remove-all icon="external-link" onclick="openInNewWindow()"
+                                    title="Open this tab in a new window" remove-all no-focus><label>New Window</label></gs-button>
+                            <gs-button icononly inline remove-all icon="play" onclick="executeScript(); document.getElementsByClassName('current-tab')[0].relatedEditor.focus();"
+                                    title="Execute Script [F5]" remove-bottom no-focus><label>Run</label></gs-button>
+                            <gs-checkbox inline style="border-radius: 0;" id="checkbox-autocommit-{{TABNUMBER}}" title="Autocommit"><label>Autocommit</label></gs-checkbox>
+                            <gs-button inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"
+                                    title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span><label> Toggle Comment</label></gs-button>
+                            <gs-button icononly inline remove-all icon="indent" onclick="indentScript()"
+                                    title="Indent the selected text [TAB]" remove-all no-focus><label>Indent</label></gs-button>
+                            <gs-button icononly inline remove-all icon="outdent" onclick="outdentScript()"
+                                    title="Dedent the selected text [SHIFT][TAB]" remove-all no-focus><label>Dedent</label></gs-button>
+
+                            <gs-button icononly inline remove-all id="button-tab-{{TABNUMBER}}-save" icon="save" data-filename="{{FILE}}" class="ace-toolbar-electron-only"
+                                    title="Save" remove-all no-focus><label>Save</label></gs-button>
+                            <gs-button inline remove-all id="button-tab-{{TABNUMBER}}-save-as" class="button-save-as ace-toolbar-electron-only" data-filename="{{FILE}}"
+                                    title="Save As..." remove-all no-focus>
+                                <span class="save-as-floppy" icon="pencil">&#xf0c7;</span><label> Save As</label></gs-button>
+
+                            <gs-button icononly inline remove-all id="button-tab-{{TABNUMBER}}-download" class="ace-toolbar-browser-only" icon="download"
+                                    href="/postage/{{CONNNUM}}/download/{{TRIMMEDFILE}}" onclick="downloadScript()"
+                                    title="Download as a file" remove-all no-focus><label>Download</label></gs-button>
+
+                            <gs-button inline remove-all class="button-explain ace-toolbar-labeled-only" style="padding-bottom: 0px;" onclick="menuExplain(event.target)"
+                                    title="Explain menu." no-focus><span class="explain-letter" icon="chevron-down">E</span><label> Explain</label></gs-button>
+
+                            <gs-button inline remove-all class="button-explain ace-toolbar-unlabeled-only" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(false)"
+                                    title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span></gs-button>
+                            <gs-button icononly inline remove-all class="button-explain ace-toolbar-unlabeled-only" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(true)"
+                                    title="Query explanation. Note that the query will run, meaning that you'll get run times." remove-top no-focus>
+                                <span class="explain-letter" icon="play">E</span></gs-button>
+
+                            <gs-button icononly inline remove-all class="button-csv" icon="file-text" onclick="exportCSV()"
+                                    title="Download a single query's results as a file" remove-all no-focus><label>Export</label></gs-button>
+                            <gs-button inline style="height: 2.35em" remove-all class="button-ace-info" onclick="dialogAceInfo()"
+                                    title="Information and tips about the Editor" remove-all no-focus>
+                                <span class="ace-icon-container">
+                                    <span class="ace-suit">&#9824;</span>
+                                    <span class="ace-letter">A</span>
+                                </span>
+                                <span><label>Ace Tips</label></span>
+                            </gs-button>
+                            <gs-button icononly inline remove-all icon="black-tie" onclick="beautifySQL()" title="Beautify the Current SQL" no-focus><label>Beautify</label></gs-button>
+                            <gs-button icononly hidden id="sql-property-{{TABNUMBER}}-button" icononly
+                                    icon="wrench" onclick="propertyWindowDialog()" disabled
+                                    title="Edit the current query\'s properties [CMD][.] or [CTRL][.]" remove-top no-focus></gs-button>
+                        </div>
+                        <div id="ace-container-position-container-{{TABNUMBER}}" class="ace-container-position-container" flex>
+                            <div class="ace-container">
+                                <div id="sql-ace-area-{{TABNUMBER}}" class="ace-area"></div>
+                            </div>
+                        </div>
+                        <div id="sql-doc-links-{{TABNUMBER}}" style="text-align: center; height: 0;">
+                            <div style="display: inline-block;"></div>
+                            <div style="display: inline-block;"></div>
+                        </div>
+                        <div class="sql-results-area-container"
+                                id="sql-results-area-{{TABNUMBER}}-container"
+                                style="height: 17em;" flex-vertical flex-fill>
+                            <gs-page>
+                                <gs-header id="sql-results-header-{{TABNUMBER}}" class="results-header" flex-horizontal flex-fill>
+                                    <b flex  id="sql-results-area-resize-handle-{{TABNUMBER}}"
+                                             class="sql-results-area-resize-handle" icononly
+                                             title="Drag to resize this window" icon="arrows-v"
+                                             style="line-height: 2.422em; padding-left: 0.5em;">
+                                        <span id="sql-results-title-{{TABNUMBER}}">Results</span>
+                                        <span id="sql-results-tally-{{TABNUMBER}}"></span>
+                                    </b>
+                                    <gs-button id="sql-results-stop-{{TABNUMBER}}" hidden no-focus
+                                               class="header-button-text" icon="stop" no-focus>Stop Execution</gs-button>
+                                    <gs-button id="sql-results-StopSocket-{{TABNUMBER}}" hidden no-focus
+                                               class="header-button-text" no-focus>Stop Loading</gs-button>
+                                    <gs-button id="sql-results-stop-loading-{{TABNUMBER}}" hidden no-focus
+                                               class="header-button-text" icon="hand-stop-o" no-focus>Stop Loading</gs-button>
+                                    <gs-button id="sql-results-copy-options-{{TABNUMBER}}" hidden no-focus
+                                               class="header-button-text" icon="clipboard" no-focus>Clip Options</gs-button>
+                                    <gs-button id="sql-results-clear-{{TABNUMBER}}" no-focus
+                                               class="header-button-text" icon="trash-o" no-focus>Clear</gs-button>
+                                </gs-header>
+                                <gs-body id="sql-results-area-{{TABNUMBER}}" class="sql-results-area"></gs-body>
+                            </gs-page>
+                        </div>
+                    </div>
+                </div>
+            */})
+            .replace(/\{\{TABNUMBER\}\}/g, intTabNumber)
+            .replace(/\{\{LABELED\}\}/g, localStorage.labeledButtons === 'false' ? 'unlabeled' : 'labeled')
+            .replace(/\{\{ELECTRON\}\}/g, window.process && window.process.type === 'renderer' ? 'electron' : 'browser')
+            .replace(/\{\{FILE\}\}/g, tabElement.filePath)
+            .replace(/\{\{TRIMMEDFILE\}\}/g, GS.trim(tabElement.filePath, '/'))
+            .replace(/\{\{CONNNUM\}\}/g, contextData.connectionID);
 
         //<gs-button class="header-button" icononly icon="bug" onclick="debugScript()" remove-all></gs-button>
         //<gs-button class="header-button" icononly icon="text-height" onclick="resultsToText()" remove-right></gs-button>
@@ -1575,6 +1528,11 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                     resizeHandler(event);
                     event.preventDefault();
                 }
+                
+                var gs_table = xtag.query(tabElement.relatedResultsAreaContainer, 'gs-table');
+                for (var i = 0, len = gs_table.length; i < len; i++) {
+                    gs_table[i].render();
+                }
             };
 
             mouseupHandler = function (event) {
@@ -1589,7 +1547,6 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         // handle resizing the results window on window resize
         windowResizeHandler = function (event) {
             var intMin, intMax, intHeight;
-
             //console.trace(event.target);
             //if (event.target === window) {
             if (tabElement.parentNode) {
@@ -2159,6 +2116,10 @@ function beautifySQL() {
     'use strict';
     var editor = document.getElementsByClassName('current-tab')[0].relatedEditor;
     var jsnCurrentQuery = getCurrentQuery();
+    if (jsnCurrentQuery.strQuery === editor.getValue()) {
+        editor.setValue('\n' + jsnCurrentQuery.strQuery + '\n'.repeat(10));
+    }
+    
     var strFormattedSQL = SQLBeautify(jsnCurrentQuery.strQuery);
 
     if (jsnCurrentQuery.strQuery === editor.getValue()) {
@@ -2177,11 +2138,11 @@ function menuExplain(target) {
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-body class="ace-toolbar">
-                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(false)" title="Query explanation. This does not run the query." remove-all no-focus>
+                <gs-button style="width: 100%;" dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(false)" title="Query explanation. This does not run the query." remove-all no-focus>
                     <span class="explain-letter" icon="play-circle-o">E</span>
                     Explain
                 </gs-button>
-                <gs-button dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" title="Query explanation. Note that the query will run, meaning that you'll get run times." remove-top no-focus>
+                <gs-button style="width: 100%;" dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" title="Query explanation. Note that the query will run, meaning that you'll get run times." remove-top no-focus>
                 	<span class="explain-letter" icon="play">E</span>
                 	Explain Analyze
                 </gs-button>
@@ -2230,7 +2191,7 @@ function SQLBeautify(strInput) {
     var i;
 
     var int_qs = 0; // quote status
-    var int_E_quote = 0; // for single quotes and backslash skipping
+    var int_E_quote = 0; // for single quotes and backslash skipping (not being used? only set?)
     var int_ps = 0; // parenthesis level
     var int_tag = 0;
     var str_tag = '';
@@ -2337,7 +2298,7 @@ function SQLBeautify(strInput) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND DOUBLE COLON
-        } else if (int_qs === 0 && strInput.substr(i , 2) === "::") {
+        } else if (int_qs === 0 && strInput.substr(i, 2) === "::") {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substring(0, strResult.length - 1);
@@ -2408,7 +2369,7 @@ function SQLBeautify(strInput) {
 
         // FOUND AN UNQUOTED/UNPARENTHESISED COMMA NOT INSIDE A GRANT/REVOKE STATEMENT:
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === "," && !bolGrant) {
-            // Remove semicolon and whitespace
+            // Remove comma and whitespace
             strResult = strResult.trim();
 
             strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel) + 1) + ', ';
@@ -2671,24 +2632,24 @@ function SQLBeautify(strInput) {
             //console.log(">CREATE OR REPLACE RULE|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE RULE... TO/DO/ON
-        } else if (int_qs === 0 && bolRule && strInput.substr(i,3).match(/^TO\b|DO\b|ON\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && bolRule && strInput.substr(i,3).match(/^TO[\n\r\ \t]+|DO[\n\r\ \t]+|ON[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove whitespace
             strResult = strResult.trim();
 
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i,3).match(/^TO\b|DO\b|ON\b/i) + ' ';
-            i += (strInput.substr(i,3).match(/^TO\b|DO\b|ON\b/i)[0].length - 1);
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i,3).match(/^TO[\n\r\ \t]+|DO[\n\r\ \t]+|ON[\n\r\ \t]+/i) + ' ';
+            i += (strInput.substr(i,3).match(/^TO[\n\r\ \t]+|DO[\n\r\ \t]+|ON[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
-            //console.log(">TO/DO/ON|" + intTabLevel + "<");
+            console.log(">TO/DO/ON|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE RULE... INSTEAD
-        } else if (int_qs === 0 && bolRule && strInput.substr(i,8).match(/^INSTEAD\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            strResult += strInput.substr(i,8).match(/^INSTEAD\b/i) + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
-            i += (strInput.substr(i,8).match(/^INSTEAD\b/i)[0].length - 1);
+        } else if (int_qs === 0 && bolRule && strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            strResult += strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i) + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+            i += (strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">INSTEAD|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE FUNCTION
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+FUNCTION/i)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+FUNCTION/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
@@ -2701,7 +2662,7 @@ function SQLBeautify(strInput) {
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE FUNCTION... AS
-        } else if (int_qs === 0 && bolFunction && strInput.substr(i).match(/^AS\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && bolFunction && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
 
             bolFunction = false;
             strResult += 'AS\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
@@ -2710,7 +2671,7 @@ function SQLBeautify(strInput) {
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
         // FOUND AS
-        } else if (int_qs === 0 && (!bolFunction) && strInput.substr(i).match(/^AS\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && (!bolFunction) && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             strResult += 'AS ';
             i += 1;
             bolNoExtraWhitespace = true;
@@ -2729,14 +2690,14 @@ function SQLBeautify(strInput) {
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE)?/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE([\ \t]+OR[\ \t]+REPLACE)?/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
 
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE)/i)[0] + ' ';
-            i += (strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE)?/i)[0].length - 1);
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^CREATE([\ \t]+OR[\ \t]+REPLACE)?/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^CREATE([\ \t]+OR[\ \t]+REPLACE)?/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
@@ -2746,7 +2707,7 @@ function SQLBeautify(strInput) {
     */
 
         // FOUND a main keyword, no newline INSIDE A GRANT STATEMENT
-        } else if (int_qs === 0 && strInput.substr(i).match(/^((SELECT|FROM))\b/i) && bolGrant) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^((SELECT|FROM))\b/i) && bolGrant && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
                 // Remove previous tab if previous character is whitespace
                 if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                     strResult = strResult.substr(0, strResult.length - 1);
@@ -2758,7 +2719,7 @@ function SQLBeautify(strInput) {
                 //console.log(">KEYWORD|" + intTabLevel + "<");
 
             // FOUND a main keyword, newline before
-        } else if (int_qs === 0 && strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|HAVING|WHERE|AUTHORIZATION|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN)\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|HAVING|WHERE|AUTHORIZATION|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN|UNION)\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
@@ -2775,8 +2736,8 @@ function SQLBeautify(strInput) {
             } else {
                 strResult += ' ';
             }
-            strResult += strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|HAVING|WHERE|AUTHORIZATION|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN)\b/i)[0].toUpperCase().trim() + ' ';
-            i += (strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|HAVING|WHERE|AUTHORIZATION|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN)\b/i)[0].length - 1);
+            strResult += strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|HAVING|WHERE|AUTHORIZATION|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN|UNION)\b/i)[0].toUpperCase().trim() + ' ';
+            i += (strInput.substr(i).match(/^\b(((LEFT|FULL[\ \t]+OUTER|FULL|CROSS|LEFT[\ \t]+OUTER|RIGHT|RIGHT[\ \t]+OUTER|INNER)?[\ \t]+)JOIN|RETURNS|SELECT|FROM|GROUP|ORDER|HAVING|WHERE|AUTHORIZATION|LIMIT|OFFSET|USING|SET|INSERT|VALUES|FROM[\ \t\n\r]+STDIN|UNION)\b/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
@@ -2817,6 +2778,18 @@ function SQLBeautify(strInput) {
         } else {
             strResult += strInput[i];
         }
+    }
+    
+    // Strip all the whitespace between the input and output, then check to see if they match, if they don't then console.error
+    // I tried to wtrip the white space to spaces, and colapse spaces into one, but it didn't work because sometimes beautify
+    // puts whitespace where there isn't, I was trying to make sure beautify didn't take away whitespace where it was needed,
+    // but oh well.
+    // -Joseph
+    var strResultStripped = strResult.replace(/[\n\r\ \t]/g,'');
+    var strInputStripped = strInput.replace(/[\n\r\ \t]/g,'');
+
+    if (strResultStripped !== strInputStripped) {
+        console.error('Beautify mangled the SQL: Before >>>' + strInput + '<<< After >>>' + strResult + '<<<');
     }
 
     return strResult;

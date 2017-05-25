@@ -16,6 +16,8 @@
         <link href="css/postage.css" rel="stylesheet" type="text/css" />
 
         <script>
+            //jslint es6 browser white:true multivar:true for:true
+            /*global ml,require,window,GS,process,ace*/
 			const os = require('os');
 			const fs = require('fs');
 			const path = require('path');
@@ -25,6 +27,7 @@
 			const file = GS.qryGetVal(GS.getQueryString(), 'file');
 
 			function getPGPASSLoc() {
+			    "use strict";
 				if (process.platform == 'win32') {
 					return path.normalize(process.env.APPDATA + '/postgresql/pgpass.conf');
 				} else {
@@ -36,11 +39,13 @@
 			document.title = file;
 
 			function restartPostage() {
+			    "use strict";
 				ipcRenderer.send('postage', 'restart');
 			}
 
 			document.addEventListener('DOMContentLoaded', function () {
-				var 	indicator = document.getElementById('conf-indicator')
+			    "use strict";
+				var indicator = document.getElementById('conf-indicator')
 					,	editor;
 
 				document.getElementById('header-text-container').textContent = file;
@@ -101,9 +106,9 @@
 							fs.writeFile(filePath, editor.getValue(), 'utf8', function (err) {
 								if (err) {
 									var templateElement = document.createElement('template');
-		                            templateElement.innerHTML = ml(function () {/*
-		                                <gs-page>
-		                                    <gs-header><center><h3>Saving failed!</h3></center></gs-header>
+                                    templateElement.innerHTML = ml(function () {/*
+                                        <gs-page>
+                                            <gs-header><center><h3>Saving failed!</h3></center></gs-header>
 		                                    <gs-body padded>
 		                                        <center>{{desc}}/center>
 		                                    </gs-body>
@@ -116,7 +121,7 @@
 		                            GS.openDialog(templateElement, function () {
 										indicator.textContent = '';
 
-		                            }, function (event, strAnswer) {
+	                                }, function (event, strAnswer) {
 		                                save();
 		                            });
 								} else {
@@ -161,8 +166,8 @@
 				<div flex-horizontal>
 					<div id="header-text-container" flex>Configuration Editor</div>
 					<gs-button inline class="header-button-text" style="width: 15em;" hidden href="https://www.postgresql.org/docs/current/static/libpq-pgpass.html" target="_blank" id="pgpass_docs">PGPASS Documentation</gs-button>
-					<gs-button inline class="header-button-text" style="width: 12em;" style="" href="app/postage.1.html" target="_blank" id="man_page">Postage Man Page</gs-button>
-					<gs-button inline class="header-button-text" style="width: 10em;" style="" onclick="restartPostage();">Reload Postage</gs-button>
+					<gs-button inline class="header-button-text" style="width: 12em;" href="app/postage.1.html" target="_blank" id="man_page">Postage Man Page</gs-button>
+					<gs-button inline class="header-button-text" style="width: 10em;" onclick="restartPostage();">Reload Postage</gs-button>
 				</div>
 			</gs-header>
             <gs-body>

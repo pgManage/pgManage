@@ -14,6 +14,7 @@ var queryVars = {
     , 'bolLanguages': false
     , 'bolRules': false
     , 'bolTablespace': false
+    , 'bolSelect': false
 };
 var curr_run_down = 0, curr_run_up = 0, curr_run_complete = 0;
 
@@ -82,7 +83,7 @@ function getCurrWord(editor, bolPeriod) {
                 : rowAndColumnToIndex(strScript, editor.currentSelections[0].start.row, editor.currentSelections[0].start.column));
         autocompleteGlobals.quoteLevel = findQuoteLevel(editor.getValue().substring(0, intCursorPosition + 1), intCursorPosition + 1);
         var currWord = [];
-        console.log('bolPeriod:', bolPeriod, '; autocompleteGlobals.quoteLevel:', autocompleteGlobals.quoteLevel, '; intCursorPosition:', intCursorPosition);
+        //console.log('bolPeriod:', bolPeriod, '; autocompleteGlobals.quoteLevel:', autocompleteGlobals.quoteLevel, '; intCursorPosition:', intCursorPosition);
 
         // if (strScript[intCursorPosition] === '"') {
         //     autocompleteGlobals.quoteLevel = findQuoteLevel(editor.getValue().substring(0, intCursorPosition), intCursorPosition);
@@ -99,7 +100,7 @@ function getCurrWord(editor, bolPeriod) {
         }
         // why are we doing this loop?
         for (var i = 0, len = intCursorPosition; i <= len; i++) {
-            console.log('getCurrWord: ' + strScript[intCursorPosition - i], intCursorPosition, i, strScript, strScript.substring(intCursorPosition - i));
+            //console.log('getCurrWord: ' + strScript[intCursorPosition - i], intCursorPosition, i, strScript, strScript.substring(intCursorPosition - i));
 
             if (strScript.length === intCursorPosition - i) {
                 
@@ -108,12 +109,12 @@ function getCurrWord(editor, bolPeriod) {
                 || (strScript[intCursorPosition - i] === '"')
                 || ((/^\W$/i).test(strScript[intCursorPosition - (i)]))  // \W looks for non-word characters
             ) {
-                console.log('break(' + intCursorPosition + '|' + i + ')>' + strScript[intCursorPosition - i] + '<');
-                console.log('test1>' + (intCursorPosition > i && strScript[intCursorPosition - i].trim() === ''));
-                console.log('test2>' + (autocompleteGlobals.quoteLevel === 2 && strScript[intCursorPosition - i] === '$'));
-                console.log('test3>' + (strScript[intCursorPosition - i] === '"'));
-                console.log('test>' + strScript[intCursorPosition - (i)] + '<');
-                console.log('test4>' + (/^\W$/i).test(strScript[intCursorPosition - (i)]));
+                //console.log('break(' + intCursorPosition + '|' + i + ')>' + strScript[intCursorPosition - i] + '<');
+                //console.log('test1>' + (intCursorPosition > i && strScript[intCursorPosition - i].trim() === ''));
+                //console.log('test2>' + (autocompleteGlobals.quoteLevel === 2 && strScript[intCursorPosition - i] === '$'));
+                //console.log('test3>' + (strScript[intCursorPosition - i] === '"'));
+                //console.log('test>' + strScript[intCursorPosition - (i)] + '<');
+                //console.log('test4>' + (/^\W$/i).test(strScript[intCursorPosition - (i)]));
                 if (strScript[intCursorPosition - i] === '"' || strScript[intCursorPosition - i] === ':') {
                     currWord.push(strScript[intCursorPosition - i].toLowerCase());
                 }
@@ -125,7 +126,7 @@ function getCurrWord(editor, bolPeriod) {
         currWord = currWord.reverse();
         currWord = currWord.join('');
         autocompleteGlobals.searchLength = currWord.length;
-        console.log('getCurrWord: return>' + currWord + '<, ' + currWord.length);
+        //console.log('getCurrWord: return>' + currWord + '<, ' + currWord.length);
         return currWord;
     }
 }
@@ -265,7 +266,7 @@ function autocompleteBindEditor(tabElement, editor) {
 
 
     editor.commands.commands.indent.exec = function () {
-        console.log('test', autocompleteGlobals.bolBound, curr_run_complete);
+        //console.log('test', autocompleteGlobals.bolBound, curr_run_complete);
         if (xtag.query(document.body, '.current-tab')[0].relatedEditor.currentSelections.length > 1) {
             curr_run_complete += 1;
             if (curr_run_complete === xtag.query(document.body, '.current-tab')[0].relatedEditor.currentSelections.length) {
@@ -459,12 +460,12 @@ function autocompleteBindEditor(tabElement, editor) {
             } else {
                 autocompleteKeyEvent = 'delete';
             }            
-            console.log('autocompleteKeyEvent', autocompleteKeyEvent);
+            //console.log('autocompleteKeyEvent', autocompleteKeyEvent);
             if (editor.currentSelections) {
                 var selectionRanges = editor.currentSelections[0];
             }
             
-            console.log('autocompleteGlobals.popupOpen', autocompleteGlobals.popupOpen);
+            //console.log('autocompleteGlobals.popupOpen', autocompleteGlobals.popupOpen);
             if (autocompleteGlobals.popupOpen && (autocompleteKeyEvent === 'pass' || autocompleteKeyEvent === 'snippets')) {
                 var currWord = getCurrWord(editor, false);
 
@@ -530,6 +531,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         , 'bolLanguages': false
         , 'bolRules': false
         , 'bolTablespace': false
+        , 'bolSelect': false
     };
 
     var strScript, intCursorPosition, currentQueryRange, i, len
@@ -561,18 +563,18 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     
     //if pass and period is before
     jsnPrefix = autocompleteGetPrefix(strScript, intCursorPosition + 1);
-    console.log('jsnPrefix', jsnPrefix);
+    //console.log('jsnPrefix', jsnPrefix);
     if (jsnPrefix.arrStrings.length > 1 && autocompleteKeyEvent === 'pass') {
         autocompleteKeyEvent = 'period';
         //console.log('autocompleteKeyEvent', autocompleteKeyEvent);
     }
     
     //if pass and there is a colon at beginning of word
-    console.log(currWord, autocompleteKeyEvent);
+    //console.log(currWord, autocompleteKeyEvent);
     if (currWord && currWord.substring(0,1) === ':' && autocompleteKeyEvent === 'pass') {
         autocompleteKeyEvent = 'colon';
     }
-    console.log(autocompleteKeyEvent);
+    //console.log(autocompleteKeyEvent);
 
     if (autocompleteKeyEvent === 'pass') {
         autocompleteGlobals.bolAlpha = true;
@@ -691,6 +693,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         strPreviousKeyWord = arrPreviousKeyWords[0];
         strPreviousWord = arrPreviousWords[0];
 
+
         if (strPreviousWord) {
             bolAfterComma = (strPreviousWord[strPreviousWord.length - 1] === ',');
         } else {
@@ -714,6 +717,9 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         } else if (arrPreviousKeyWords[1] === 'ALTER') {
             //console.log('schemas');
             queryVars.bolSchemas = true;
+        // } else if ((strPreviousKeyWord === 'FROM' || strPreviousKeyWord === 'IN') && strScript[intCursorPosition] === '(') {
+        //     //console.log('schemas');
+        //     queryVars.bolSelect = true;
         } else if (strPreviousKeyWord === 'REVOKE') {
             //console.log('groups');
             queryVars.bolGroups = true;
@@ -797,7 +803,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
             queryVars.bolReturnTypes = true;
         } else if (strPreviousKeyWord === 'LANGUAGE') {
             //console.log('language');
-            queryVars.bolLanguages =true;
+            queryVars.bolLanguages = true;
         } else if (strPreviousKeyWord === 'CAST') {
             //console.log('types');
             queryVars.bolTypes = true;
@@ -992,7 +998,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
 
 
 
-        console.log('1***', JSON.stringify(arrPrefix));
+        //console.log('1***', JSON.stringify(arrPrefix));
 
         // if we have more than zero prefix elements
         if (arrPrefix.length > 0) {
@@ -1014,7 +1020,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
                                         , function (arrResults) {
                     var currentChoice, i, len, arrQueries;
 
-                    console.log('arrResults: ', arrResults);
+                    //console.log('arrResults: ', arrResults);
                     if (arrResults.length > 0) {
                         // search through choices, stop if we find a schema
                         for (i = 0, len = arrResults.length; i < len; i += 1) {
@@ -1562,7 +1568,7 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
         if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning) {
             GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
         }
-        console.log('autocompleteGlobals.bolAlpha:' + autocompleteGlobals.bolAlpha);
+        //console.log('autocompleteGlobals.bolAlpha:' + autocompleteGlobals.bolAlpha);
         if (autocompleteGlobals.bolAlpha) {
             var strDeclare = editor.getValue(), substrEnd, arrFuncVariables = [];
             // if there is a declare statement: get variable names;
@@ -1573,7 +1579,7 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
                     strDeclare = strDeclare.substring(strDeclare.toLowerCase().indexOf('declare'), substrEnd);
                     // get variable names
                     arrFuncVariables = strDeclare.match(/([A-Za-z_0-9]+\ )+/ig);
-                    console.log('arrFuncVariables: ' + arrFuncVariables);
+                    //console.log('arrFuncVariables: ' + arrFuncVariables);
                     // trim variable names
                     if (arrFuncVariables) {
                         for (var i = 0, len = arrFuncVariables.length; i < len; i++) {
@@ -1660,13 +1666,13 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
                             } else {
                                 closePopup();
                                 var currWord = getCurrWord(editor, false);
-                                console.log(currWord);
+                                //console.log(currWord);
 
                                 autocompleteFilterList(optionList, currWord, editor);
                             }
                         } else {
                             var currWord = getCurrWord(editor, false);
-                            console.log(currWord);
+                            //console.log(currWord);
                             
                             if (optionList.length === 0) {
                                 closePopup();
@@ -1701,9 +1707,9 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
 }
 
 function autocompleteFilterList(list, searchWord, editor) {
-    console.trace('autocompleteFilterList');
+    //console.trace('autocompleteFilterList');
     
-    console.log(searchWord, autocompleteGlobals.searchLength);
+    //console.log(searchWord, autocompleteGlobals.searchLength);
     //console.log(autocompleteGlobals.bolQueryRunning);
     if (autocompleteGlobals.bolQueryRunning) {
         autocompleteGlobals.bolSpecialFilter = true;
@@ -1728,12 +1734,12 @@ function autocompleteFilterList(list, searchWord, editor) {
         //     strSearch = '"' + searchWord.toLowerCase();
         // }
 
-        console.log('autocompleteGlobals.arrValues', autocompleteGlobals.arrValues);
+        //console.log('autocompleteGlobals.arrValues', autocompleteGlobals.arrValues);
         for (i = 0, len = autocompleteGlobals.arrValues.length, strNewValue = ''; i < len; i += 1) {
             // if the current item doesn't match: remove from ace, arrSearch and arrValues
             //console.log(autocompleteGlobals.arrSearch);
             if (autocompleteGlobals.arrValues[i][0]) {
-                console.log(strSearch, autocompleteGlobals.arrValues[i][0], ((autocompleteGlobals.arrValues[i][0].toLowerCase().indexOf(strSearch) === -1) ? 'splice' : 'keep'));
+                //console.log(strSearch, autocompleteGlobals.arrValues[i][0], ((autocompleteGlobals.arrValues[i][0].toLowerCase().indexOf(strSearch) === -1) ? 'splice' : 'keep'));
                 if (autocompleteGlobals.arrValues[i][0].toLowerCase().indexOf(strSearch) !== 0) {
                     //console.log(autocompleteGlobals.arrSearch[i].indexOf(strSearch), autocompleteGlobals.arrSearch[i], strSearch);
                     autocompleteGlobals.arrSearch.splice(i, 1);
@@ -1746,7 +1752,7 @@ function autocompleteFilterList(list, searchWord, editor) {
                 break;
             }
         }
-        console.log('autocompleteGlobals.arrValues', autocompleteGlobals.arrValues);
+        //console.log('autocompleteGlobals.arrValues', autocompleteGlobals.arrValues);
 
         if (autocompleteGlobals.arrSearch.length === 0 || autocompleteGlobals.arrValues.length === 0 || (autocompleteGlobals.arrValues.length === 1 && autocompleteGlobals.arrValues[0][0] === (strSearch))) {
             closePopup();
@@ -1788,7 +1794,7 @@ function closePopup() {
 //bolKeepOpen allows autocompleteFilterList to not close the popup which emptys the variables
 function openPopup(editor, optionlist, bolKeepOpen) {
     'use strict';
-    console.trace('openPopup');
+    //console.trace('openPopup');
     //console.log(optionlist);
 
     // if (autocompleteGlobals.searchLength !==  getCurrWord(editor).length) {
@@ -1891,8 +1897,8 @@ function autocompletePopupHeightRefresh(optionlist) {
 
 
 function autocompleteComplete(editor) {
-    console.trace('autocompleteComplete');
-    console.log(autocompleteGlobals.searchLength);
+    //console.trace('autocompleteComplete');
+    //console.log(autocompleteGlobals.searchLength);
     var intFocusedLine = autocompleteGlobals.popupAce.getSelectionRange().start.row;
     var currentValue = autocompleteGlobals.arrValues[intFocusedLine];
     //console.log(autocompleteGlobals.popupOpen, autocompleteGlobals.arrValuesMaster, intFocusedLine);
@@ -1915,7 +1921,7 @@ function autocompleteComplete(editor) {
     closePopup();
     var currSelectionRange = editor.selection.getRange();
     autocompleteGlobals.ignoreNext = 1;
-    console.log(currentValue);
+    //console.log(currentValue);
     if (currentValue && currentValue[0].indexOf(' (Snippet)') !== -1) {
         var currSearchSnippet;
         for (var i = 0, len = snippets.length; i < len; i++) {
@@ -1941,7 +1947,7 @@ function autocompleteComplete(editor) {
     } else if (currentValue) {
         autocompleteGlobals.ignoreNext = 2;
         //autocompleteGlobals
-        console.log(currentValue[0], autocompleteGlobals.searchLength);
+        //console.log(currentValue[0], autocompleteGlobals.searchLength);
         if (editor.currentSelections.length > 1) {
             var currSelections = editor.currentSelections;
             var insertText = currentValue[0].trim().substring(autocompleteGlobals.searchLength, currentValue[0].trim().length);

@@ -169,11 +169,11 @@
 }
 
 *[selected] {
-    background-color: #F1FAFF !important; /* B3E4FF, FFFFCC */
+    background-color: #E3F5FF !important; /* F1FAFF, B3E4FF, FFFFCC */
 }
 
 *[selected-secondary] {
-    background-color: #F1FAFF !important; /* B3E4FF, FFFFEE */
+    background-color: #E3F5FF !important; /* F1FAFF, B3E4FF, FFFFEE */
 }
 
 *[tempselect] {
@@ -327,6 +327,14 @@ html body *[disabled],
         display: none !important;
     }
 }
+
+[remove-margin-top]         { margin-top: 0; }
+[remove-margin-bottom]      { margin-bottom: 0; }
+[remove-margin-left]        { margin-left: 0; }
+[remove-margin-right]       { margin-right: 0; }
+[remove-margin-horizontal]  { margin-left: 0; margin-right: 0; }
+[remove-margin-vertical]    { margin-top: 0; margin-bottom: 0; }
+[remove-margin-all]         { margin: 0; }
 
 /*
 768px

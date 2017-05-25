@@ -168,11 +168,12 @@ gs-phone-button[not-supported] {
 /* ############################ GS-CHECKBOX COLOR OVERRIDE ############################ */
 /* #################################################################################### */
 
+/*
 gs-checkbox,
 gs-checkbox:hover {
     background-color: #FFFFFF;
 }
-
+*/
 
 /* #################################################################################### */
 /* #################################### MINI STATE #################################### */
@@ -207,6 +208,7 @@ gs-dialog-button[embed],
 .time-picker-button {
     border: 0;
     padding: 0;
+    background-color: transparent;
     box-shadow: none !important;
     margin: 0;
 }
@@ -343,7 +345,7 @@ gs-tracking-button.hover,
 gs-delete-button.hover,
 gs-option.hover,
 gs-dialog-button.hover {
-    filter: invert(15%);
+    filter: invert(10%);
 }
 
 /* ## DOWN/SELECTED ## */

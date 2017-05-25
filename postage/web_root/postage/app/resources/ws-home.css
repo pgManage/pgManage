@@ -13,8 +13,58 @@
 	display: inline;
 }
 
+gs-button, gs-checkbox {
+    color: #111111;
+    margin: 0;
+    box-shadow: none !important;
+    border: 1px solid #eee;
+    line-height: normal;
+    padding: 0.5em;
+}
 
-.ace-toolbar > gs-button[icon],
+.ace-toolbar gs-button,
+.ace-toolbar gs-checkbox {
+    display: inline-block;
+}
+
+.ace-toolbar-labeled gs-button[icon] {
+    width: auto;
+	padding-left: 2.3em !important;
+}
+.ace-toolbar-labeled gs-button[icon]:after {
+    left: 1em;
+}
+.ace-toolbar-labeled label {
+    display: inline;
+    color: #111111;
+}
+
+.ace-toolbar-unlabeled label {
+    display: none;
+}
+/*.ace-toolbar-unlabeled gs-checkbox,*/
+.ace-toolbar-unlabeled gs-button {
+    height: 2.5em;
+}
+
+.ace-toolbar-unlabeled gs-button.button-save-as,
+.ace-toolbar-unlabeled gs-button.button-ace-info {
+    padding-right: 0.35em !important;
+}
+
+ace-toolbar-browser .ace-toolbar-electron-only,
+ace-toolbar-electron .ace-toolbar-browser-only,
+.ace-toolbar-unlabeled .ace-toolbar-labeled-only,
+.ace-toolbar-labeled .ace-toolbar-unlabeled-only {
+    display: none;
+}
+
+.ace-toolbar-labeled .ace-toolbar-labeled-only,
+.ace-toolbar-unlabeled .ace-toolbar-unlabeled-only {
+    display: inline-block;
+}
+
+ace-toolbar-labeled > gs-button[icon],
 #toolbar-addon-container > gs-button,
 #button-home-open-to-new-tab {
 	padding-left: 2.3em !important;
@@ -23,7 +73,7 @@
     position: absolute;
     display: block;
     width: 1.7em;
-    height: 1.12em; /*1.4em;*/
+    height: 1.12em;
     top: 0;
     left: 0;
     font-family: fontawesome;
@@ -34,11 +84,11 @@
     margin: 0;
 }
 
-.ace-toolbar > gs-button:after {
+/*.ace-toolbar > gs-button:after {
     position: absolute;
     display: block;
     width: 1.7em;
-    height: 1.12em; /*1.4em;*/
+    height: 1.12em;
     top: 0;
     left: 0;
     font-family: fontawesome;
@@ -46,27 +96,15 @@
     text-indent: 0;
     font-size: 1.4em;
     margin: 0;
-}
+}*/
 
 #button-home-open-to-new-tab:after {
-    position: absolute;
-    display: block;
-    width: 1.7em;
-    height: 1.12em; /*1.4em;*/
-    top: 0;
-    left: 0;
-    font-family: fontawesome;
-    text-align: center;
-    text-indent: 0;
-    line-height: 2.4em;
-    font-size: 1.4em;
-    margin: 0;
     margin-left: -0.3em;
 
     content: '\f124'; /* location-arrow */
 }
 
-#button-home-open-to-new-tab:before {
+#button-home-open-to-new-tab:after {
     position: absolute;
     display: block;
     width: 1.7em;

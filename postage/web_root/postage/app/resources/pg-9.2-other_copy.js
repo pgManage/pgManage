@@ -1,28 +1,5 @@
 var bolOtherLoaded = true;
 
-
-function hideOtherTables(tabnum, safeid) {
-    var foundHidden = false;
-    var gs_table = xtag.query(document.getElementById('sql-results-area-' + tabnum + '-container'), 'gs-table');
-    for (var i = 0, len = gs_table.length; i < len; i++) {
-        if (gs_table[i].classList.contains('notHidden')) {
-            foundHidden = true;
-        }
-    }
-
-    for (var i = 0, len = gs_table.length; i < len; i++) {
-        if (gs_table[i].getAttribute('id') === safeid) {
-            if (!foundHidden) {
-                gs_table[i].classList.add('notHidden');
-            } else {
-                if (gs_table[i].classList.contains('notHidden')) {
-                    gs_table[i].classList.remove('notHidden');
-                }
-            }
-        }
-    }
-}
-
 // fetch info about the current context so that we dont have to load it in muliple places
 var contextData = {};
 function loadContextData(callback) {
@@ -171,7 +148,7 @@ function menuUser(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '15em');
+    templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -200,7 +177,7 @@ function menuTools(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '15em');
+    templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -244,7 +221,7 @@ function menuOptions(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '15em');
+    templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -279,7 +256,7 @@ function menuTab(target) {
     'use strict';
     var templateElement = document.createElement('template');
 
-    templateElement.setAttribute('data-max-width', '15em');
+    templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
     if (window.process && window.process.type === 'renderer') {
         var app = require('electron').remote.app;
@@ -439,7 +416,7 @@ function dialogSwitchDatabase(target) {
     'use strict';
     var templateElement = document.createElement('template'), afterOpen, beforeClose;
 
-    templateElement.setAttribute('data-max-width', '15em');
+    templateElement.setAttribute('data-max-width', '11em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
@@ -2378,7 +2355,7 @@ function executeHelperStartExecute() {
     currentTab.relatedResultsHeaderElement.classList.add('executing');
     currentTab.relatedStopButton.removeAttribute('hidden');
     currentTab.relatedStopButton.addEventListener('click', executeHelperCancelSignalHandler);
-	//console.log('test1');
+	console.log('test1');
     currentTab.relatedStopSocketButton.addEventListener('click', executeHelperStopSocket);
 }
 
@@ -2392,7 +2369,7 @@ function executeHelperEndLoading() {
     currentTab.relatedResultsHeaderElement.classList.remove('executing');
     currentTab.handlingQuery = false;
     currentTab.relatedStopSocketButton.setAttribute('hidden', '');
-	//console.log('test2');
+	console.log('test2');
     currentTab.relatedStopSocketButton.removeEventListener('click', executeHelperStopSocket);
 }
 
@@ -2549,15 +2526,15 @@ function executeScript(bolCursorQuery) {
         intQuery = 0;            // number query the callback is on
         intErrorStartLine = 0;   // number of lines in the queries that successfully ran, so that we can offset the error annotation
 		intErrorStartChar = 0;   // number of chars in the queries that successfully ran, so that we can offset the cursor properly
-        var arrData = [];
+
         // begin
         executeHelperStartExecute();
         currentTab.currentMessageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
             var tableElement, scrollElement, trElement, arrRecords
               , arrCells, intRows, strHTML, arrLines, strError
-              , intLine, i, len, j, len2, col_i, col_len, rec_i, rec_len
+              , intLine, i, len, col_i, col_len, rec_i, rec_len
               , warningHTML, buttonContainerElement, strCSS
-              , styleElement, tempData = [];
+              , styleElement;
 
             if (currentTab.bolIgnoreMessages === false) {
                 // get name of query if applicable
@@ -2689,7 +2666,10 @@ function executeScript(bolCursorQuery) {
 
                         // else if result query
                         } else if (data.arrColumnNames.length > 0) {
-                            if (data.strMessage === '\\.') {
+
+
+                            // if this is the first callback for this query: set up title, table and header
+                            if (data.intCallbackNumberThisQuery === 0) {
                                 divElement = document.createElement('div');
                                 scrollElement = document.createElement('div');
 
@@ -2717,7 +2697,7 @@ function executeScript(bolCursorQuery) {
                                 strHTML += '<br />';
 
                                 if (data.intRows !== undefined) {
-                                    strHTML += '<small id="row-count-' + data.intQueryNumber + '"><span id="loaded-row-count-' + data.intQueryNumber + '" hidden>0</span>' + data.intRows + ' rows loaded</small>';
+                                    strHTML += '<small id="row-count-' + data.intQueryNumber + '"><span id="loaded-row-count-' + data.intQueryNumber + '">0</span> of ' + data.intRows + ' rows loaded</small>';
                                 }
 
 
@@ -2731,76 +2711,168 @@ function executeScript(bolCursorQuery) {
                                 divElement.appendChild(scrollElement);
                                 resultsContainer.appendChild(divElement);
                                 executeHelperBindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
-                                
-                                var tabNumber = xtag.query(document.body, '.current-tab')[0].relatedEditor.container.getAttribute('id');
-                                tabNumber = tabNumber.substring(tabNumber.length - 1, tabNumber.length);
-                                var idNumber = tabNumber + '' + xtag.query(resultsContainer, 'gs-table').length;
-                                
-                                var strHTML = ml(function () {/*
-                                    <template for="top-hud">
-                                        <gs-button onclick="document.getElementById('{{TOKEN}}').openPrefs(this)" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
-                                        <gs-button onclick="document.getElementById('{{TOKEN}}').toggleFullscreen(this)" inline id="toggleFullscreen-{{IDNUM}}" no-focus icononly icon="arrows-alt">&nbsp;</gs-button>
-                                        <gs-button onclick="hideOtherTables({{IDNUM}}, '{{TOKEN}}'); document.getElementById('{{TOKEN}}').toggleFullContainer('sql-results-area-{{IDNUM}}', this)" inline no-focus icononly icon="expand">&nbsp;</gs-button>
-                                    </template>
-                                    <template for="bottom-hud">
-                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TOKEN}}').goToLine('first')" icon="step-backward">&nbsp;</gs-button>
-                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TOKEN}}').goToLine('previous')" icon="caret-left">&nbsp;</gs-button>
-                                        <gs-current-record inline for="{{TOKEN}}"></gs-current-record>
-                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TOKEN}}').goToLine('next')" icon="caret-right">&nbsp;</gs-button>
-                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TOKEN}}').goToLine('last')" icon="step-forward">&nbsp;</gs-button>
-                                    </template>
-                                */}).replace(/{{TOKEN}}/gi, 'Table' + idNumber + '').replace(/{{IDNUM}}/gi, tabNumber);
-                                
-                                strHTML += '<template for="header-record">';
-                                    for (i = 0, len = data.arrColumnNames.length; i < len; i += 1) {
-                                        strHTML += '<gs-cell>' + data.arrColumnNames[i] + '</gs-cell>';
+
+                                strHTML = '<thead><tr><th>#</th>';
+                                strCSS = '';
+                                for (col_i = 0, col_len = data.arrColumnNames.length; col_i < col_len; col_i += 1) {
+                                    strHTML += '<th>';
+                                    strHTML +=     '<b>';
+                                    strHTML +=     encodeHTML(GS.decodeFromTabDelimited(data.arrColumnNames[col_i]));
+                                    strHTML +=     '</b><br />';
+                                    strHTML +=     '<small>';
+                                    strHTML +=          encodeHTML(GS.decodeFromTabDelimited(data.arrColumnTypes[col_i]));
+                                    strHTML +=     '</small>';
+                                    strHTML += '</th>';
+
+
+                                    //int2 / smallint
+                                    //int4 / integer
+                                    //int8 / bigint
+                                    //numeric
+                                    //float
+                                    //decimal
+                                    //real
+                                    //double
+                                    //money
+                                    //oid
+
+                                    // if this column is a number type: align column text to the right
+                                    if ((/^(int|smallint|bigint|numeric|float|decimal|real|double|money|oid)/gi).test(data.arrColumnTypes[col_i])) {
+                                        strCSS += ' table[data-query-number="' + data.intQueryNumber + '"] tbody tr :nth-child(' + (col_i + 2) + ') { ';
+                                        strCSS += '     text-align: right;';
+                                        strCSS += ' } ';
                                     }
-                                strHTML += '</template>';
-                                strHTML += '<template for="data-record">';
-                                    for (i = 0, len = data.arrColumnNames.length; i < len; i += 1) {
-                                        strHTML += '<gs-cell header="' + data.arrColumnNames[i] + '"><label><gs-static value="{{! row.' + data.arrColumnNames[i] + ' }}"></gs-static></label></gs-cell>';
-                                    }
-                                strHTML += '</template>';
-                                strHTML += '<template for="copy">';
-                                    for (i = 0, len = data.arrColumnNames.length; i < len; i += 1) {
-                                        strHTML += '<gs-cell header="' + data.arrColumnNames[i] + '">' + data.arrColumnNames[i] + '</gs-cell>';
-                                    }
-                                strHTML += '</template>';
-                                
-                                // console.log(arrData);
-                                tableElement = document.createElement('gs-table');
-                                tableElement.innerHTML = strHTML;
-                                tableElement.setAttribute('id', 'Table' + idNumber + '');
-                                tableElement.setAttribute('no-delete', '');
-                                tableElement.setAttribute('no-update', '');
-                                scrollElement.appendChild(tableElement);
-                                
-                                function makeArray(arrLength, value) {
-                                    var tempArr = [];
-                                    for (i = 0, len = arrLength; i < len; i += 1) {
-                                        tempArr.push(value);
-                                    }
-                                    return tempArr;
                                 }
-                                
-                                tableElement.internalData.records = arrData;
-                                tableElement.internalData.columnNames = data.arrColumnNames;
-                                tableElement.internalData.columnTypes = makeArray(data.arrColumnNames.length, 'text');
-                                tableElement.internalData.columnFilterStatuses = makeArray(data.arrColumnNames.length, 'on');
-                                tableElement.internalData.columnFilters = makeArray(data.arrColumnNames.length, []);
-                                tableElement.internalData.columnListFilters = makeArray(data.arrColumnNames.length, {})
-                                tableElement.internalData.columnOrders = makeArray(data.arrColumnNames.length, 'neutral')
-                                //tableElement.internalDisplay.columnWidths = makeArray(data.arrColumnNames.length, 1);
-                                // refresh causes the record heights to be
-                                //      calculated
-                                arrData = [];
-                                tableElement.refresh();
-                            } else {
-                                tempData = data.strMessage.split('\n');
-                                arrData.push.apply(arrData, tempData);
+                                strHTML += '</tr></thead>';
+
+
+                                tableElement = document.createElement('table');
+                                tableElement.classList.add('results-table');
+                                tableElement.setAttribute('data-query-number', data.intQueryNumber);
+                                tableElement.innerHTML = strHTML;
+                                scrollElement.appendChild(tableElement);
+
+                                styleElement = document.createElement('style');
+                                styleElement.innerHTML = strCSS;
+                                scrollElement.appendChild(styleElement);
+
+                                currentTargetTbody = document.createElement('tbody');
+                                tableElement.appendChild(currentTargetTbody);
+
+                                // set table attributes for copy settings
+                                tableElement.setAttribute('quote-type', getClipSetting("quoteType"));
+                                tableElement.setAttribute('quote-char', getClipSetting("quoteChar"));
+                                tableElement.setAttribute('field-delimiter', getClipSetting("fieldDelimiter"));
+                                tableElement.setAttribute('null-values', getClipSetting("nullValues"));
+                                tableElement.setAttribute('column-names', getClipSetting("columnNames"));
+
+                                // make the table selectable
+                                GS.makeTableSelectable(tableElement, evt.touchDevice);
                             }
-                            
-                            
+
+
+
+                            //console.log('0***', data);
+                            // if not end query, therefore: results
+                            if (data.strMessage !== '\\.') {
+								var loadedRowCount = document.getElementById('loaded-row-count-' + data.intQueryNumber);
+								loadedRowCount.innerHTML = (parseInt(loadedRowCount.innerHTML, 10) + 10).toString();
+
+                                arrRecords = data.strMessage.split('\n');
+                                strHTML = '';
+
+                                //console.log(
+                                //    '1***',
+                                //    data.intCallbackNumberThisQuery,
+                                //    data.intQueryNumber,
+                                //    arrRecords
+                                //);
+
+                                for (rec_i = 0, rec_len = arrRecords.length; rec_i < rec_len; rec_i += 1) {
+                                    // if appending this would make more than 10 records: save to data store
+                                    if (data.intCallbackNumberThisQuery >= 1) {
+                                        //console.log(
+                                        //    '2***',
+                                        //    intRecordsThisQuery,
+                                        //    currentTab.arrQueryDataStore[data.intQueryNumber].length,
+                                        //    arrRecords[rec_i]
+                                        //);
+                                        currentTab.arrQueryDataStore[data.intQueryNumber].push((intRecordsThisQuery + 1) + '\t' + arrRecords[rec_i]);
+
+                                        // if this is the first time adding to the data store: add append buttons below the table
+                                        if (currentTab.arrQueryDataStore[data.intQueryNumber].length === 1) {
+                                            //console.log('3***');
+                                            buttonContainerElement = document.createElement('div');
+                                            buttonContainerElement.style.whiteSpace = 'normal';
+
+                                            GS.insertElementAfter(buttonContainerElement, currentTargetTbody.parentNode);
+
+                                            buttonContainerElement.innerHTML = ml(function () {/*
+                                                <gs-grid min-width="all {reflow}; 482px {1,1,1,1};">
+                                                    <gs-block>
+                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 10)">Show 10 More</gs-button>
+                                                    </gs-block>
+                                                    <gs-block>
+                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 100)">Show 100 More</gs-button>
+                                                    </gs-block>
+                                                    <gs-block>
+                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 1000)">Show 1000 More</gs-button>
+                                                    </gs-block>
+                                                    <gs-block>
+                                                        <gs-button onclick="showMoreResults(this, {{QUERY}}, 'all')">Show All</gs-button>
+                                                    </gs-block>
+                                                </gs-grid>
+                                            */}).replace(/\{\{QUERY\}\}/gi, data.intQueryNumber);
+                                        }
+
+                                    // else append to the dom
+                                    } else {
+                                        trElement = document.createElement('tr');
+                                        arrCells = arrRecords[rec_i].split('\t');
+
+                                        //console.log(
+                                        //    '4***',
+                                        //    arrCells
+                                        //);
+
+                                        strHTML = '<th>' + (intRecordsThisQuery + 1) + '</th>';
+                                        for (col_i = 0, col_len = arrCells.length; col_i < col_len; col_i += 1) {
+                                            strHTML += '<td>';
+                                            strHTML += encodeHTML(GS.decodeFromTabDelimited(arrCells[col_i]));
+                                                            //.replace(/&/g, '&amp;')
+                                                            //.replace(/"/g, '&quot;')
+                                                            //.replace(/'/g, '&#39;')
+                                                            //.replace(/</g, '&lt;')
+                                                            //.replace(/>/g, '&gt;');
+                                            strHTML += '</td>';
+                                        }
+                                        trElement.innerHTML = strHTML;
+
+                                        currentTargetTbody.appendChild(trElement);
+                                    }
+
+                                    intRecordsThisQuery += 1;
+                                }
+
+                            // else if end message
+                            } else if (data.strMessage === '\\.') {
+								var rowCount = document.getElementById('row-count-' + data.intQueryNumber);
+								rowCount.innerHTML = data.intRows + ' rows';
+
+                                //console.log('5***');
+                                // add a br for spacing/padding
+                                resultsContainer.appendChild(document.createElement('br'));
+                                // set part number to 0 and add one to the query number
+                                intQuery += 1;
+
+                                // update the success and error tally
+                                executeHelperUpdateTally(intQuery, intError);
+
+                                intRecordsThisQuery = 0;
+                                currentTab.relatedClearButton.removeAttribute('disabled');
+                                currentTab.relatedStopLoadingButton.setAttribute('hidden', '');
+                                currentTab.relatedStopLoadingButton.removeEventListener('click', executeHelperStopLoadingHandler);
+                            }
                         }
                     }
                 } else {

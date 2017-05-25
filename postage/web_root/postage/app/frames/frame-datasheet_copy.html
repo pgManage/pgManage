@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
+        
+        <script src="../../js/greyspots.js" type="text/javascript"></script>
+        <link href="../../css/greyspots.css" type="text/css" rel="stylesheet" />
+        
+        <link href="../../css/postage.css" type="text/css" rel="stylesheet" />
+        <script src="datagrid.js" type="text/javascript"></script>
+        <link href="datagrid.css" type="text/css" rel="stylesheet" />
+        <script src="../../js/page-zoom.js" type="text/javascript"></script>
+
+        
+        <script>
+            //global GS, window, ml
+            //jslint browser:true, white:true, multivar:true, for:true
+            var bolCurl = false;
+            
+            function quote_ident(strName) {
+                'use strict';
+                var bolQuote = !Boolean(strName.match(/^[a-z_]{1,}[a-z_0-9]*$/));
+                
+                //_ is safe
+                //0-9 is safe (except when first char)
+                //a-z is safe
+                
+                // if we need to quote: double up double quotes
+                if (bolQuote) {
+                    return '"' + strName.replace(/\"/g, '""') + '"';
+                }
+                
+                return strName;
+            }
+            
+            window.addEventListener('load', function () {
+                'use strict'
+                var qs = GS.qryToJSON(GS.getQueryString()), strQuery;
+
+                zoomStart();
+
+                GS.addLoader('getting_info');
+                // get pk if possible (else use whole column list)
+                strQuery = ml(function () {/*
+                    SELECT  (
+                                 SELECT array_to_string(array_agg(attname), ',')
+                                   FROM pg_constraint con
+                              LEFT JOIN pg_attribute att ON att.attnum = con.conkey[1] AND att.attrelid = con.conrelid
+                                  WHERE con.contype = 'p' AND con.conrelid = getoid.oid
+                               GROUP BY attnum
+                               ORDER BY attnum ASC
+                            ),
+                            (
+                                 SELECT array_to_string(array_agg(attname), ',')
+                                   FROM pg_attribute
+                                  WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = getoid.oid
+                            ),
+                            (
+                                SELECT array_to_string(array_agg(default_expression), ',')
+                                  FROM (         SELECT pg_catalog.pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid) AS default_expression
+                                                   FROM pg_constraint con
+                                              LEFT JOIN pg_attribute att ON att.attnum = con.conkey[1] AND att.attrelid = con.conrelid
+                                        LEFT OUTER JOIN pg_attrdef ON adrelid = attrelid AND adnum = attnum
+                                                  WHERE attrelid = getoid.oid
+                                                  ORDER BY attnum ASC) em
+                            )
+                      FROM pg_class getoid
+                 LEFT JOIN pg_namespace pg_schema ON pg_schema.oid = getoid.relnamespace
+                     WHERE pg_schema.nspname = $SAFEqUoTE${{NSPNAME}}$SAFEqUoTE$ AND getoid.relname = $SAFEqUoTE${{STRNAME}}$SAFEqUoTE$
+                */}).replace(/\{\{NSPNAME\}\}/gim, qs.schema)
+                    .replace(/\{\{STRNAME\}\}/gim, qs.object);
+                
+                GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
+                    var arrColumns, strPK, strColumns, strSequenceDefaults, arrSequenceDefaults, i, len, strHTML, arrColumns, datasheetElement;
+                    
+                    datasheetElement = document.getElementById('datasheet');
+                    
+                    if (!error) {
+                        if (data.intCallbackNumber === 0) {
+                            arrColumns = data.strMessage.split('\t');
+                            
+                            //console.log(arrColumns.slice(0));
+                            //i = 0;
+                            //len = arrColumns.length;
+                            //while (i < len) {
+                            //    arrColumns[i] = quote_ident(arrColumns[i]);
+                            //    i += 1;
+                            //}
+                            //console.log(arrColumns.slice(0));
+                            
+                            strPK = GS.decodeFromTabDelimited(arrColumns[0]);
+                            
+                            strColumns = GS.decodeFromTabDelimited(arrColumns[1]);
+                            arrColumns = strColumns.split(',');
+                            
+                            strSequenceDefaults = GS.decodeFromTabDelimited(arrColumns[2] || '');
+                            arrSequenceDefaults = strSequenceDefaults.split(',');
+                            
+                            //console.log('              strPK: ', strPK);
+                            //console.log('         strColumns: ', strColumns);
+                            //console.log('strSequenceDefaults: ', strSequenceDefaults);
+                            
+                            datasheetElement.setAttribute('all-cols', strColumns);
+                            datasheetElement.setAttribute('cols', strColumns);
+                            
+                            if (strPK) {
+                                datasheetElement.setAttribute('pk', strPK);
+                                datasheetElement.setAttribute('ord', quote_ident(strPK) + ' DESC');
+                                
+                                for (i = 0, len = arrSequenceDefaults.length; i < len; i += 1) {
+                                    if (arrSequenceDefaults[i].indexOf('nextval') > -1) {
+                                        arrSequenceDefaults[i] =
+                                                arrSequenceDefaults[i]
+                                                        .substring(arrSequenceDefaults[i].indexOf('\'') + 1,
+                                                                   arrSequenceDefaults[i].lastIndexOf('\''))
+                                        arrSequenceDefaults[i] = arrSequenceDefaults[i].replace(/''/gi, '\'');
+                                        
+                                    } else {
+                                        arrSequenceDefaults[i] = '';
+                                    }
+                                }
+                                
+                                strSequenceDefaults = arrSequenceDefaults.join(',');
+                                datasheetElement.setAttribute('seq', strSequenceDefaults);
+                                
+                            } else if (strColumns) {
+                                datasheetElement.setAttribute('lock', strColumns);
+                            }
+                            
+                            // bind controls
+                            for (i = 0, len = arrColumns.length, strHTML = ''; i < len; i += 1) {
+                                strHTML += '<option>' + encodeHTML(arrColumns[i]) + '</option>';
+                            }
+                            document.getElementById('select-pk').innerHTML = '<option value="PKUNKNOWN">Unknown</option>' + strHTML;
+                            document.getElementById('select-pk').value = (datasheetElement.getAttribute('pk') || 'PKUNKNOWN');
+                            document.getElementById('select-pk').addEventListener('change', function () {
+                                if (this.value === 'PKUNKNOWN') {
+                                    datasheetElement.removeAttribute('pk');
+                                } else {
+                                    datasheetElement.setAttribute('pk', this.value);
+                                }
+                                
+                                datasheetElement.refresh();
+                            });
+                            
+                            document.getElementById('text-limit').value = (datasheetElement.getAttribute('limit') || '');
+                            document.getElementById('text-limit').addEventListener('change', function () {
+                                datasheetElement.setAttribute('limit', this.value);
+                                datasheetElement.refresh();
+                            });
+                            
+                            document.getElementById('text-offset').value = (datasheetElement.getAttribute('offset') || '');
+                            document.getElementById('text-offset').addEventListener('change', function () {
+                                datasheetElement.setAttribute('offset', this.value);
+                                datasheetElement.refresh();
+                            });
+                            
+                            document.getElementById('text-where').value = (datasheetElement.getAttribute('where') || '');
+                            document.getElementById('text-where').addEventListener('change', function () {
+                                datasheetElement.setAttribute('where', this.value);
+                                datasheetElement.refresh();
+                            });
+                            
+                            document.getElementById('text-order-by').value = (datasheetElement.getAttribute('ord') || '');
+                            document.getElementById('text-order-by').addEventListener('change', function () {
+                                datasheetElement.setAttribute('ord', this.value);
+                                datasheetElement.refresh();
+                            });
+                            
+                            document.getElementById('button-column-list').addEventListener('click', function () {
+                                var templateElement = document.createElement('template');
+                                templateElement.setAttribute('data-max-width', '400px');
+                                templateElement.setAttribute('data-overlay-close', 'true');
+                                templateElement.innerHTML = '<div id="datagrid-column-list" style="height: 100%; overflow: auto"></div>';
+                                
+                                // open column dialog
+                                GS.openDialogToElement(this, templateElement, 'left', function () {
+                                    var arrColumns, arrVisibleColumns, i, len, strHTML, sortColumnHandler, invis_i, vis_i, strState;
+                                    
+                                    arrColumns = datasheetElement.getAttribute('all-cols').split(',');
+                                    arrVisibleColumns = datasheetElement.getAttribute('cols').split(',');
+                                    
+                                    // build column list HTML
+                                    for (i = 0, len = arrColumns.length, strHTML = ''; i < len; i += 1) {
+                                        strState = (arrVisibleColumns.indexOf(arrColumns[i]) !== -1 ? 'shown' : 'hidden');
+                                        
+                                        strHTML +=  '<div class="drag-line" flex-horizontal ' +
+                                                                'data-column="' + encodeHTML(arrColumns[i]) + '" ' +
+                                                                'data-originally="' + i + '">' +
+                                                        '<gs-button class="drag-handle" no-focus icononly inline icon="bars"></gs-button>' +
+                                                        '<b flex>&nbsp;' + encodeHTML(arrColumns[i]) + '</b>' +
+                                                        '<gs-button data-originally="' + strState + '" data-now="' + strState + '" ' +
+                                                                    'style="width: 6em;" ' + (strState === 'hidden' ? 'bg-info' : '') + '>' + GS.strToTitle(strState) + '</gs-button>' +
+                                                    '</div>';
+                                    }
+                                    
+                                    // fill column list container
+                                    document.getElementById('datagrid-column-list').innerHTML = strHTML;
+                                    
+                                    // bind hide/show toggles
+                                    document.getElementById('datagrid-column-list').addEventListener('click', function (event) {
+                                        if (event.target.hasAttribute('data-now')) {
+                                            if (event.target.getAttribute('data-now') === 'shown') {
+                                                event.target.setAttribute('data-now', 'hidden');
+                                                event.target.setAttribute('bg-info', '');
+                                                event.target.textContent = 'Hidden';
+                                            } else {
+                                                event.target.setAttribute('data-now', 'shown');
+                                                event.target.removeAttribute('bg-info', '');
+                                                event.target.textContent = 'Shown';
+                                            }
+                                        }
+                                    });
+                                    
+                                    // create sort handle function
+                                    sortColumnHandler = function (dragParent, event) {
+                                        var intTop = GS.mousePosition(event).top, matchedElement, bolMatchedLast, i, len,
+                                            offsetsCache = dragParent.offsetsCache, borderElement = dragParent.dragBorderElement,
+                                            ghostElement = dragParent.dragGhostElement;
+                                        
+                                        ghostElement.style.top = (intTop - (ghostElement.offsetHeight / 2)) + 'px';
+                                        
+                                        if (offsetsCache[0].top > intTop) {
+                                            matchedElement = offsetsCache[0].element;
+                                            bolMatchedLast = false;
+                                            
+                                        } else {
+                                            bolMatchedLast = false;
+                                            for (i = 0, len = offsetsCache.length; i < len; i += 1) {
+                                                if (offsetsCache[i + 1]) {
+                                                    if (offsetsCache[i].top <= intTop &&
+                                                        offsetsCache[i].top + ((offsetsCache[i + 1].top - offsetsCache[i].top) / 2) > intTop) {
+                                                        
+                                                        matchedElement = offsetsCache[i].element;
+                                                        break;
+                                                        
+                                                    } else if (offsetsCache[i].top <= intTop &&
+                                                                offsetsCache[i].top + ((offsetsCache[i + 1].top - offsetsCache[i].top) / 2) <= intTop &&
+                                                                offsetsCache[i + 1].top > intTop) {
+                                                        matchedElement = offsetsCache[i + 1].element;
+                                                        break;
+                                                    }
+                                                } else {
+                                                    if (offsetsCache[i].top + (offsetsCache[i].height / 2) >= intTop) {
+                                                        matchedElement = offsetsCache[i].element;
+                                                        break;
+                                                        
+                                                    } else if (offsetsCache[i].top + (offsetsCache[i].height / 2) <= intTop) {
+                                                        matchedElement = offsetsCache[i].element;
+                                                        bolMatchedLast = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        
+                                        //console.log(bolMatchedLast); //matchedElement,
+                                        
+                                        if (matchedElement !== dragParent.matchedElement || bolMatchedLast !== dragParent.bolMatchedLast) {
+                                            if (bolMatchedLast === true) {
+                                                dragParent.removeChild(borderElement);
+                                                dragParent.appendChild(borderElement);
+                                                
+                                            } else {
+                                                dragParent.insertBefore(borderElement, matchedElement);
+                                            }
+                                            
+                                            dragParent.matchedElement = matchedElement;
+                                            dragParent.bolMatchedLast = bolMatchedLast;
+                                        }
+                                        
+                                        //console.log('sort', intTop);//, event, ghostElement);
+                                    };
+                                    
+                                    // bind sort handles
+                                    document.getElementById('datagrid-column-list').addEventListener(evt.mousedown, function (event) {
+                                        var dragParent = this, dragLine, mousemoveHandler, mouseupHandler, arrElements, i, len;
+                                        
+                                        if (event.target.classList.contains('drag-handle')) {
+                                            // save drag line
+                                            dragLine = event.target.parentNode;
+                                            
+                                            // save a cache of line offsets
+                                            arrElements = xtag.toArray(dragParent.children);
+                                            dragParent.offsetsCache = [];
+                                            for (i = 0, len = arrElements.length; i < len; i += 1) {
+                                                dragParent.offsetsCache.push({
+                                                    'element': arrElements[i],
+                                                    'top': GS.getElementOffset(arrElements[i]).top,
+                                                    'height': arrElements[i].offsetHeight
+                                                });
+                                            }
+                                            
+                                            // create and save ghost
+                                            dragParent.dragGhostElement = document.createElement('div');
+                                            dragParent.dragGhostElement.appendChild(dragLine.cloneNode(true));
+                                            dragParent.dragGhostElement.setAttribute('style', 'position: absolute;' +
+                                                                                              'left: 0.25em; top: 0px;' +
+                                                                                              'padding: 2px; opacity: 0.6;' +
+                                                                                              'background-color: #F0F0F0;' +
+                                                                                              'border: 1px solid #000000;' +
+                                                                                              'width: ' + (dragLine.clientWidth - 6) + 'px;');
+                                            
+                                            dragParent.appendChild(dragParent.dragGhostElement);
+                                            
+                                            // create and save border element
+                                            dragParent.dragBorderElement = document.createElement('div');
+                                            dragParent.dragBorderElement.setAttribute('style', 'position:relative;');
+                                            dragParent.dragBorderElement.innerHTML = '<div style="position: absolute;' +
+                                                                                                  'top: -2px; left: -2px;' +
+                                                                                                  'width: 100%; padding: 2px;' +
+                                                                                                  'background-color: #00CC00;"></div>';
+                                            
+                                            dragParent.appendChild(dragParent.dragBorderElement);
+                                            
+                                            // call sort handler
+                                            sortColumnHandler(dragParent, event);
+                                            
+                                            // bind mousemove and mouseup
+                                            mousemoveHandler = function (event) {
+                                                if (event.which === 0 && !evt.touchDevice) {
+                                                    mouseupHandler(event);
+                                                    
+                                                } else {
+                                                    sortColumnHandler(dragParent, event);
+                                                    event.preventDefault();
+                                                }
+                                            };
+                                            
+                                            mouseupHandler = function (event) {
+                                                if (dragParent.bolMatchedLast) {
+                                                    dragParent.removeChild(dragLine);
+                                                    dragParent.appendChild(dragLine);
+                                                } else {
+                                                    dragParent.insertBefore(dragLine, dragParent.matchedElement);
+                                                }
+                                                
+                                                document.body.removeEventListener(evt.mousemove, mousemoveHandler);
+                                                document.body.removeEventListener(evt.mouseup, mouseupHandler);
+                                                dragParent.removeChild(dragParent.dragGhostElement);
+                                                dragParent.removeChild(dragParent.dragBorderElement);
+                                            };
+                                            
+                                            document.body.addEventListener(evt.mousemove, mousemoveHandler);
+                                            document.body.addEventListener(evt.mouseup, mouseupHandler);
+                                        }
+                                    });
+                                    
+                                    
+                                }, function (event, strAnswer) {
+                                    var i, len, arrElements, bolRefresh = false, arrColumns, arrVisibleColumns;
+                                    
+                                    arrElements = xtag.query(document.getElementById('datagrid-column-list'), '[data-now]');
+                                    
+                                    arrVisibleColumns = [];
+                                    arrColumns = [];
+                                    
+                                    for (i = 0, len = arrElements.length; i < len; i += 1) {
+                                        if (arrElements[i].getAttribute('data-now') === 'shown') {
+                                            arrVisibleColumns.push(arrElements[i].parentNode.getAttribute('data-column'));
+                                        }
+                                        arrColumns.push(arrElements[i].parentNode.getAttribute('data-column'));
+                                        
+                                        if (arrElements[i].getAttribute('data-originally') !== arrElements[i].getAttribute('data-now') ||
+                                            parseInt(arrElements[i].parentNode.getAttribute('data-originally'), 10) !== i) {
+                                            bolRefresh = true;
+                                        }
+                                    }
+                                    
+                                    if (bolRefresh) {
+                                        datasheetElement.setAttribute('all-cols', arrColumns.join(','));
+                                        datasheetElement.setAttribute('cols', arrVisibleColumns.join(','));
+                                        datasheetElement.refresh();
+                                    }
+                                });
+                            });
+                            
+                            
+                            document.getElementById('button-paginate-left').addEventListener('click', function () {
+                                var intLimit = parseInt(datasheetElement.getAttribute('limit'), 10)
+                                  , intOffset = parseInt(datasheetElement.getAttribute('offset') || '0', 10);
+                                
+                                intOffset -= intLimit;
+                                if (intOffset < 0) { intOffset = 0; }
+                                
+                                if (intOffset === 0) {
+                                    document.getElementById('button-paginate-left').setAttribute('disabled', '');
+                                }
+                                
+                                document.getElementById('text-offset').value = intOffset;
+                                datasheetElement.setAttribute('offset', intOffset);
+                                datasheetElement.refresh();
+                            });
+                            document.getElementById('button-paginate-right').addEventListener('click', function () {
+                                var intLimit = parseInt(datasheetElement.getAttribute('limit'), 10)
+                                  , intOffset = parseInt(datasheetElement.getAttribute('offset') || '0', 10);
+                                
+                                intOffset += intLimit;
+                                
+                                if (intOffset > 0) {
+                                    document.getElementById('button-paginate-left').removeAttribute('disabled');
+                                }
+                                
+                                document.getElementById('text-offset').value = intOffset;
+                                datasheetElement.setAttribute('offset', intOffset);
+                                datasheetElement.refresh();
+                            });
+                            
+                            datasheetElement.setAttribute('schema', qs.schema || '');
+                            datasheetElement.setAttribute('object', qs.object || '');
+                            datasheetElement.removeAttribute('suspend-inserted');
+                            GS.removeLoader('getting_info');
+                        }
+                        
+                    } else {
+                        GS.removeLoader('getting_info');
+                        GS.webSocketErrorDialog(data);
+                    }
+                });
+                
+            });
+        </script>
+        <style>
+            #hud-container {
+                text-align: right;
+                height: 0;
+                padding-top: 1em;
+                overflow: visible;
+            }
+            
+            #button-column-list,
+            #button-paginate-left,
+            #button-paginate-right {
+                border-color: #006E00;
+                border-bottom: 0 none;
+            }
+            
+            #button-column-list {
+                
+            }
+            #button-paginate-left {
+                border-right: 0 none;
+            }
+            #button-paginate-right {
+                border-left: 0 none;
+            }
+            
+        </style>
+        <script src="../../js/settings.js" type="text/javascript"></script>
+        <script>
+            if (window.parent) {
+                window.parent.addEventListener('resize', function () {
+                    if (localStorage && localStorage.customCSS && document.getElementById('customCss')) {
+                        refreshCustomCSS(localStorage.customCSS);
+                    }
+                    /*
+                    if (localStorage && localStorage.customCSS && document.getElementById('customCss')) {
+                        document.getElementById('customCss').innerHTML = localStorage.customCSS;
+                    }
+                    */
+                });
+            }
+        </script>
+        <style id="customCss"></style>
+    </head>
+    <body>
+        <gs-page>
+            <gs-body padded flex-vertical flex-fill>
+                <!--
+                    visible columns
+                -->
+                
+                <gs-grid reflow-at="455px" widths="1,1">
+                    <gs-block>
+                        <div flex-horizontal>
+                            <label for="select-pk"><b>Primary Key:</b></label>
+                            <gs-select id="select-pk" flex></gs-select>
+                        </div>
+                    </gs-block>
+                    <gs-block>
+                        <gs-grid reflow-at="200px" widths="1,1">
+                            <gs-block>
+                                <div flex-horizontal>
+                                    <label for="text-limit"><b>LIMIT:</b></label>
+                                    <gs-text id="text-limit" flex></gs-text>
+                                </div>
+                            </gs-block>
+                            <gs-block>
+                                <div flex-horizontal>
+                                    <label for="text-offset"><b>OFFSET:</b></label>
+                                    <gs-text id="text-offset" flex></gs-text>
+                                </div>
+                            </gs-block>
+                        </gs-grid>
+                    </gs-block>
+                </gs-grid>
+                
+                <gs-grid reflow-at="455px" widths="1,1">
+                    <gs-block>
+                        <div flex-horizontal>
+                            <label for="text-where"><b>WHERE:</b></label>
+                            <gs-text id="text-where" flex></gs-text>
+                        </div>
+                    </gs-block>
+                    <gs-block>
+                        <div flex-horizontal>
+                            <label for="text-order-by"><b>ORDER BY:</b></label>
+                            <gs-text id="text-order-by" flex></gs-text>
+                        </div>
+                    </gs-block>
+                </gs-grid>
+                
+                <div id="hud-container">
+                    <gs-button inline id="button-column-list" icononly icon="columns" remove-bottom></gs-button>
+                    
+                    <gs-button inline id="button-paginate-left" icononly icon="backward" disabled remove-bottom remove-right></gs-button><gs-button inline id="button-paginate-right" icononly icon="forward" remove-bottom remove-left></gs-button>
+                </div>
+                <gs-datagrid id="datasheet" limit="10" offset="0" suspend-inserted flex></gs-datagrid>
+            </gs-body>
+        </gs-page>
+    </body>
+</html>

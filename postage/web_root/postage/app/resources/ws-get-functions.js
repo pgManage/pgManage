@@ -74,7 +74,7 @@ function getSingleCellData(strQuery, callback) {
 
         if (!error) {
             // if response 0 and callback is a function
-            if (data.intCallbackNumber === 0 && typeof callback === 'function') {
+            if (data.intCallbackNumber === 0 && typeof callback === 'function' && data.strMessage.split('\n')[0].split('\t')[0] !== '\\.') {
                 // call the callback with the decoded first cell of the first record in the response
                 callback(GS.decodeFromTabDelimited(data.strMessage.split('\n')[0].split('\t')[0]));
 
@@ -154,17 +154,21 @@ function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh, bol
                     '\n\n\n\n' +
                     '\n\n\n\n';
 
-                console.log(bolBeautify);
-                if (bolBeautify) {
-                    setHomeValue(strFinalName, SQLBeautify(strScript), strToolbarAddons);
-                } else {
-                    setHomeValue(strFinalName, strScript, strToolbarAddons);
-                }
+                console.log('setHomeValue first');
+                console.log('strScript: ' + strScript);
+                console.trace('getScript');
+                setHomeValue(strFinalName, strScript, strToolbarAddons);
 
                 //console.log(intScrollTop);
                 homeEditor.getSession().setScrollTop(intScrollTop);
                 if (currTab[1]) {
                     homeEditor.scrollToLine(parseInt(currTab[1], 10) + 5);
+                }
+
+                console.log(bolBeautify);
+                if (bolBeautify) {
+                    console.log('SQLBeautify(strScript): ' + SQLBeautify(strScript));
+                    setHomeValue(strFinalName, SQLBeautify(strScript), strToolbarAddons);
                 }
             }
         });

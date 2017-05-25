@@ -346,12 +346,14 @@ gs-envelope th[selected-secondary]:first-child:after {
     font-family: fontawesome;
 }
 
+/*
 .blue gs-envelope th[selected]:first-child:after,
 .blue gs-envelope th[selected-secondary]:first-child:after,
 gs-envelope.blue th[selected]:first-child:after,
 gs-envelope.blue th[selected-secondary]:first-child:after {
     color: #3B99BE;
 }
+*/
 
 /*
 gs-envelope th:first-child,

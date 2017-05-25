@@ -27,7 +27,6 @@ gs-memo textarea {
     
     line-height: 1.2em;
     
-    
     background-color: white;
     color: black;
     
@@ -146,6 +145,20 @@ gs-select[mini],
 gs-interval[mini],
 gs-memo[mini],
 gs-checkbox[mini] {
+    background-color: transparent;
+    box-shadow: none !important;
+}
+
+gs-date[mini] input,
+gs-text[mini] input,
+gs-search[mini] input,
+gs-number[mini] input,
+gs-memo[mini] input,
+gs-combo[mini] input,
+gs-time[mini] input,
+gs-select[mini] select,
+gs-interval[mini] input,
+gs-memo[mini] textarea {
     background-color: transparent;
     box-shadow: none !important;
 }

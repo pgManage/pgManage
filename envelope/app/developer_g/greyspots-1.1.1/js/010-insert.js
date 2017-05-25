@@ -97,156 +97,94 @@ document.addEventListener('DOMContentLoaded', function () {
         accessors: {},
         methods: {
             submit: function (callback) {
-                if (window.bolSocket === true) {
-                    var element = this
-                      , srcParts    = GS.templateWithQuerystring(element.getAttribute('src') || '').split('.')
-                      , strSchema   = srcParts[0]
-                      , strObject   = srcParts[1]
-                      , strSeqCols, strPkCols, strAddIn
-                      , strColumns = '', strResponseColumns, strInsertRecord = '', strInsertData
-                      , arrElement, arrKey, arrValue, i, len, strResponse, parentSrcElement;
+                var element = this
+                  , srcParts    = GS.templateWithQuerystring(element.getAttribute('src') || '').split('.')
+                  , strSchema   = srcParts[0]
+                  , strObject   = srcParts[1]
+                  , strSeqCols, strPkCols, strAddIn
+                  , strColumns = '', strResponseColumns, strInsertRecord = '', strInsertData
+                  , arrElement, arrKey, arrValue, i, len, strResponse, parentSrcElement;
+                
+                // addin insert data
+                strAddIn = GS.templateWithQuerystring(element.getAttribute('addin'));
+                if (strAddIn) {
+                    arrKey = GS.qryGetKeys(strAddIn);
+                    arrValue = GS.qryGetKeys(strAddIn);
                     
-                    // addin insert data
-                    strAddIn = GS.templateWithQuerystring(element.getAttribute('addin'));
-                    if (strAddIn) {
-                        arrKey = GS.qryGetKeys(strAddIn);
-                        arrValue = GS.qryGetKeys(strAddIn);
-                        
-                        for (i = 0, len = arrKey.length; i < len; i += 1) {
-                            strColumns += (strColumns ? '\t' : '') + GS.encodeForTabDelimited(arrKey[i]);
-                            strInsertRecord += (strInsertRecord ? '\t' : '') + GS.encodeForTabDelimited(arrValue[i]);
-                        }
+                    for (i = 0, len = arrKey.length; i < len; i += 1) {
+                        strColumns += (strColumns ? '\t' : '') + GS.encodeForTabDelimited(arrKey[i]);
+                        strInsertRecord += (strInsertRecord ? '\t' : '') + GS.encodeForTabDelimited(arrValue[i]);
                     }
-                    
-                    // control insert data
-                    arrElement = xtag.query(element, '[column]');
-                    for (i = 0, len = arrElement.length; i < len; i += 1) {
-                        parentSrcElement = GS.findParentElement(arrElement[i].parentNode, '[src]');
-                        if (
-                            parentSrcElement === element &&
-                            (
-                                arrElement[i].value !== undefined &&
-                                arrElement[i].value !== null &&
-                                arrElement[i].value !== ''
-                            )) {
-                            strColumns += (strColumns ? '\t' : '') + GS.encodeForTabDelimited(arrElement[i].getAttribute('column'));
-                            strInsertRecord += (strInsertRecord ? '\t' : '') + GS.encodeForTabDelimited(arrElement[i].value);
-                        }
-                    }
-                    
-                    strPkCols = GS.templateWithQuerystring(element.getAttribute('pk') || 'id');
-                    strSeqCols = GS.templateWithQuerystring(element.getAttribute('seq') || '');
-                    strInsertData = (strColumns + '\n' + strInsertRecord);
-                    strResponseColumns = (strPkCols + (strPkCols ? '\t' : '') + strColumns);
-                    
-                    GS.requestInsertFromSocket(
-                            GS.envSocket, strSchema, strObject, strResponseColumns, strPkCols, strSeqCols, strInsertData
-                            // beginCallback
-                          , function () {}
-                            
-                            // confirmCallback
-                          , function (data, error, transactionID, commitFunction, rollbackFunction) {
-                                var arrCells, i, len, arrElements, jsnSelection, focusElement, focusColumnParent, focusColumnParentIndex;
-                                
-                                if (data !== 'TRANSACTION COMPLETED') {
-                                    if (!error) {
-                                        strResponse = data;
-                                        commitFunction();
-                                        
-                                    } else {
-                                        GS.webSocketErrorDialog(data);
-                                        rollbackFunction();
-                                    }
-                                } else {
-                                    commitFunction();
-                                }
-                            }
-                            
-                            // finalCallback
-                          , function (strType, data, error) {
-                                var arrColumns, arrCells, jsnRow = {}, i, len;
-                                
-                                if (strType === 'COMMIT') {
-                                    arrColumns = strResponseColumns.split('\t');
-                                    arrCells = (strResponse || '').split('\n')[0].split('\t');
-                                    
-                                    if (arrColumns.length !== arrCells.length) {
-                                        throw 'gs-insert Error: Insert API call isn\'t returning correctly. (' + arrColumns.join(',') + ') -> (' + arrCells.join(',') + ')';
-                                    } else {
-                                        for (i = 0, len = arrColumns.length; i < len; i += 1) {
-                                            jsnRow[GS.decodeFromTabDelimited(arrColumns[i])] = GS.decodeFromTabDelimited(arrCells[i]);
-                                        }
-                                        
-                                        GS.triggerEvent(element, 'after_insert');
-                                        
-                                        if (typeof callback === 'function') {
-                                            callback(GS.decodeFromTabDelimited(arrCells[0]), jsnRow);
-                                        }
-                                    }
-                                }
-                            }
-                    );
-                } else {
-                    var element = this, strInsertString = '', arrElement, i, len, jsnRow = {}, parentSrcElement,
-                        strSource = GS.templateWithQuerystring(decodeURIComponent(element.getAttribute('src') ||
-                                                                                   element.getAttribute('source') || '')),
-                        strParameters, strLink;
-                    
-                    // if there is an addin attribute on this element:
-                    if (element.getAttribute('addin')) {
-                        strInsertString += GS.templateWithQuerystring(element.getAttribute('addin'));
-                    }
-                    
-                    // build insert string
-                    arrElement = xtag.query(element, '[column]');
-                    
-                    for (i = 0, len = arrElement.length; i < len; i += 1) {
-                        parentSrcElement = GS.findParentElement(arrElement[i].parentNode, '[src]');
-                        if (
-                            parentSrcElement === element &&
-                            (
-                                arrElement[i].value !== undefined &&
-                                arrElement[i].value !== null &&
-                                arrElement[i].value !== ''
-                            )) {
-                            jsnRow[arrElement[i].getAttribute('column')] = arrElement[i].value;
-                            strInsertString += (strInsertString ? '&' : '') + arrElement[i].getAttribute('column') + '=' +
-                                                                                    encodeURIComponent(arrElement[i].value);
-                        }
-                    }
-                    
-                    strInsertString = encodeURIComponent(strInsertString);
-                    
-                    strParameters = 'src=' + encodeURIComponent(strSource) + '&data=' + strInsertString;
-                    
-                    if (element.getAttribute('seq')) {
-                        strParameters += '&currval=' + element.getAttribute('seq');
-                    }
-                    
-                    strLink = '/' +
-                              (element.getAttribute('action-insert') || 'env/k');
-                    
-                    // add a loader to the page
-                    GS.addLoader('gs-insert', 'Inserting Record...');
-                    
-                    // make the insert call
-                    GS.ajaxJSON(strLink, strParameters, function (data, error) {
-                        GS.removeLoader('gs-insert');
-                        
-                        // if there was no error: trigger event
-                        if (!error) {
-                            GS.triggerEvent(element, 'after_insert');
-                            
-                            if (typeof callback === 'function') {
-                                callback(data.dat.lastval, jsnRow);
-                            }
-                            
-                        // else if there was an error: error dialog
-                        } else {
-                            GS.ajaxErrorDialog(data);
-                        }
-                    });
                 }
+                
+                // control insert data
+                arrElement = xtag.query(element, '[column]');
+                for (i = 0, len = arrElement.length; i < len; i += 1) {
+                    parentSrcElement = GS.findParentElement(arrElement[i].parentNode, '[src]');
+                    if (
+                        parentSrcElement === element &&
+                        (
+                            arrElement[i].value !== undefined &&
+                            arrElement[i].value !== null &&
+                            arrElement[i].value !== ''
+                        )) {
+                        strColumns += (strColumns ? '\t' : '') + GS.encodeForTabDelimited(arrElement[i].getAttribute('column'));
+                        strInsertRecord += (strInsertRecord ? '\t' : '') + GS.encodeForTabDelimited(arrElement[i].value);
+                    }
+                }
+                
+                strPkCols = GS.templateWithQuerystring(element.getAttribute('pk') || 'id');
+                strSeqCols = GS.templateWithQuerystring(element.getAttribute('seq') || '');
+                strInsertData = (strColumns + '\n' + strInsertRecord);
+                strResponseColumns = (strPkCols + (strPkCols ? '\t' : '') + strColumns);
+                
+                GS.requestInsertFromSocket(
+                        GS.envSocket, strSchema, strObject, strResponseColumns, strPkCols, strSeqCols, strInsertData
+                        // beginCallback
+                      , function () {}
+                        
+                        // confirmCallback
+                      , function (data, error, transactionID, commitFunction, rollbackFunction) {
+                            var arrCells, i, len, arrElements, jsnSelection, focusElement, focusColumnParent, focusColumnParentIndex;
+                            
+                            if (data !== 'TRANSACTION COMPLETED') {
+                                if (!error) {
+                                    strResponse = data;
+                                    commitFunction();
+                                    
+                                } else {
+                                    GS.webSocketErrorDialog(data);
+                                    rollbackFunction();
+                                }
+                            } else {
+                                commitFunction();
+                            }
+                        }
+                        
+                        // finalCallback
+                      , function (strType, data, error) {
+                            var arrColumns, arrCells, jsnRow = {}, i, len;
+                            
+                            if (strType === 'COMMIT') {
+                                arrColumns = strResponseColumns.split('\t');
+                                arrCells = (strResponse || '').split('\n')[0].split('\t');
+                                
+                                if (arrColumns.length !== arrCells.length) {
+                                    throw 'gs-insert Error: Insert API call isn\'t returning correctly. (' + arrColumns.join(',') + ') -> (' + arrCells.join(',') + ')';
+                                } else {
+                                    for (i = 0, len = arrColumns.length; i < len; i += 1) {
+                                        jsnRow[GS.decodeFromTabDelimited(arrColumns[i])] = GS.decodeFromTabDelimited(arrCells[i]);
+                                    }
+                                    
+                                    GS.triggerEvent(element, 'after_insert');
+                                    
+                                    if (typeof callback === 'function') {
+                                        callback(GS.decodeFromTabDelimited(arrCells[0]), jsnRow);
+                                    }
+                                }
+                            }
+                        }
+                );
             }
         }
     });
