@@ -7247,6 +7247,8 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('GS.numberSuffix', 'GS.numberSuffix', 'GS.numberSuffix(${1:intNumber});');
 
     registerDesignSnippet('GS.hitLink', 'GS.hitLink', 'GS.hitLink(${1:strLink});');
+    
+    registerDesignSnippet('GS.log', 'GS.log', 'GS.log(\'${1:send}\', ${2:message});');
 });
 
 
@@ -7267,6 +7269,14 @@ GS.hitLink = function (strLink) {
 
     iframeElement.setAttribute("src", strLink);
     document.body.appendChild(iframeElement);
+};
+
+
+GS.log = function (bolsend, message) {
+    "use strict";
+    if (bolsend) {
+        console.log(message);
+    }
 };
 
 

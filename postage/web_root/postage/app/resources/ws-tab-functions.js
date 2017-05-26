@@ -761,7 +761,8 @@ function dialogClosedTabs() {
 function fillTab(tabElement, jsnParameters) {
     'use strict';
     var strValue;
-
+    
+    currentTab = document.getElementsByClassName('current-tab')[0];
     if (tabElement.tabType === 'sql') {
         tabElement.relatedEditor.ignoreChange = true;
         strValue = jsnParameters.strContent || '\n\n\n\n\n\n\n\n\n';

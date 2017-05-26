@@ -1,5 +1,6 @@
 var bolOtherLoaded = true;
-
+var currentTab = document.getElementsByClassName('current-tab')[0];
+var bolDebug = true;
 
 function hideOtherTables(tabnum, safeid) {
     var foundHidden = false;
@@ -2252,7 +2253,8 @@ function dialogAbout() {
 }
 
 function getCurrentQuery() {
-    var currentTab = document.getElementsByClassName('current-tab')[0], editor = currentTab.relatedEditor,
+    GS.log(bolDebug, currentTab);
+    var editor = currentTab.relatedEditor,
         editorSelectionRange = editor.getSelectionRange(), strQuery = editor.getValue(),
         intStart = 0, intEnd = 0, i, len, arrLines, strRunQuery,
         intStartRow, intStartColumn, intEndRow, intEndColumn;
@@ -2353,7 +2355,7 @@ function highlightCurrentCursorQuery(tabElement, jsnQueryStart, jsnQueryEnd) {
 }
 
 function removeMarkerHighlighted() {
-    var tabElement = document.getElementsByClassName('current-tab')[0];
+    var tabElement = currentTab;
     if (tabElement.openCursorQueryMarker) {
         tabElement.relatedEditor.getSession().removeMarker(tabElement.openCursorQueryMarker);
         tabElement.openCursorQueryMarker = null;
@@ -2366,7 +2368,7 @@ function removeMarkerHighlighted() {
 // this function is run when we send the queries through the websocket,
 //      it adds a loader, disables the "Clear" button and shows/binds the "Stop Execution" button
 function executeHelperStartExecute() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     var editor = currentTab.relatedEditor;
 
     GS.addLoader(editor.container.parentNode.parentNode, 'Executing Query...');
@@ -2385,7 +2387,7 @@ function executeHelperStartExecute() {
 // this function is run when we encounter an error or we've recieved the last transmission,
 //      it enables the "Clear" button and hides/unbinds the "Stop Loading" button
 function executeHelperEndLoading() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     var editor = currentTab.relatedEditor;
 
     currentTab.relatedClearButton.removeAttribute('hidden');
@@ -2400,7 +2402,7 @@ function executeHelperEndLoading() {
 //      it uses the "currentTab.currentMessageID" variable to send a "CANCEL" signal
 //      through the websocket
 function executeHelperCancelSignalHandler() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     GS.requestFromSocket(GS.querySocket, 'CANCEL', '', currentTab.currentMessageID);
 }
 
@@ -2428,7 +2430,7 @@ function executeHelperBindShowQueryButton(element, strQuery) {
 //      it also changes the results pane header (the tally results portion) to "(Loading Stopped)"
 //      it also runs the "executeHelperEndExecute" and "executeHelperEndLoading" functions
 function executeHelperStopLoadingHandler() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     currentTab.bolIgnoreMessages = true;
     currentTab.relatedResultsTallyElement.innerHTML = ' (Loading Stopped)';
     executeHelperEndExecute();
@@ -2438,7 +2440,7 @@ function executeHelperStopLoadingHandler() {
 // this function is run when we get our first callback,
 //      it removes the loader, hides/unbinds the "Stop Execution" button
 function executeHelperEndExecute() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     var editor = currentTab.relatedEditor;
 
     GS.removeLoader(editor.container.parentNode.parentNode);
@@ -2449,7 +2451,7 @@ function executeHelperEndExecute() {
 
 // This function updates the results header Success/Error tally
 function executeHelperUpdateTally(intQuery, intError) {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
 
     currentTab.relatedResultsTallyElement.innerHTML = (
         ' (<b>Pass: ' + (intQuery - intError) + '</b>, <b>Fail: ' + (intError) + '</b>)'
@@ -2459,7 +2461,7 @@ function executeHelperUpdateTally(intQuery, intError) {
 // this function is run when we get our first callback,
 //      it shows and binds the "Stop Loading" button
 function executeHelperStartLoading() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
 
     currentTab.relatedClearButton.setAttribute('hidden', '');
     currentTab.relatedStopSocketButton.removeAttribute('hidden');
@@ -2468,8 +2470,7 @@ function executeHelperStartLoading() {
 }
 
 function executeHelperStopSocket() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
-	console.log('test3');
+    GS.log(bolDebug, currentTab);
 
     GS.requestFromSocket(GS.querySocket, 'CANCEL', '', currentTab.currentMessageID);
     executeHelperStopLoadingHandler();
@@ -2481,7 +2482,7 @@ function executeHelperStopSocket() {
 var arrExecuteHistory = [];
 function executeScript(bolCursorQuery) {
     'use strict';
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    currentTab = document.getElementsByClassName('current-tab')[0];
     var editor = currentTab.relatedEditor;
     var resultsContainer = currentTab.relatedResultsArea;
     var resultsTallyElement = currentTab.relatedResultsTallyElement;
@@ -2751,14 +2752,31 @@ function executeScript(bolCursorQuery) {
                                     </template>
                                 */}).replace(/{{TOKEN}}/gi, 'Table' + idNumber + '').replace(/{{IDNUM}}/gi, tabNumber);
                                 
+                                //var i, len;
                                 strHTML += '<template for="header-record">';
                                     for (i = 0, len = data.arrColumnNames.length; i < len; i += 1) {
-                                        strHTML += '<gs-cell>' + data.arrColumnNames[i] + '</gs-cell>';
+                                        var columnType;
+                                        if (data.arrColumnTypes[i].substring(0, 17) === "character varying") {
+                                            columnType = 'varchar' + data.arrColumnTypes[i].substring(17, data.arrColumnTypes[i].length) + '';
+                                        } else if (data.arrColumnTypes[i] === "timestamp with time zone") {
+                                            columnType = 'timestamptz';
+                                        } else {
+                                            columnType = data.arrColumnTypes[i];
+                                        }
+                                        strHTML += '<gs-cell>' + data.arrColumnNames[i] + '<br />(' + columnType + ')</gs-cell>';
                                     }
                                 strHTML += '</template>';
                                 strHTML += '<template for="data-record">';
                                     for (i = 0, len = data.arrColumnNames.length; i < len; i += 1) {
-                                        strHTML += '<gs-cell header="' + data.arrColumnNames[i] + '"><label><gs-static value="{{! row.' + data.arrColumnNames[i] + ' }}"></gs-static></label></gs-cell>';
+                                        var columnType;
+                                        if (data.arrColumnTypes[i].substring(0, 17) === "character varying") {
+                                            columnType = 'varchar' + data.arrColumnTypes[i].substring(17, data.arrColumnTypes[i].length) + '';
+                                        } else if (data.arrColumnTypes[i] === "timestamp with time zone") {
+                                            columnType = 'timestamptz';
+                                        } else {
+                                            columnType = data.arrColumnTypes[i];
+                                        }
+                                        strHTML += '<gs-cell header="' + data.arrColumnNames[i] + '<br />(' + columnType + ')"><label><gs-static value="{{! row[\'' + data.arrColumnNames[i] + '\'] }}"></gs-static></label></gs-cell>';
                                     }
                                 strHTML += '</template>';
                                 strHTML += '<template for="copy">';
@@ -2766,6 +2784,8 @@ function executeScript(bolCursorQuery) {
                                         strHTML += '<gs-cell header="' + data.arrColumnNames[i] + '">' + data.arrColumnNames[i] + '</gs-cell>';
                                     }
                                 strHTML += '</template>';
+                                
+                                GS.log(true, data);
                                 
                                 // console.log(arrData);
                                 tableElement = document.createElement('gs-table');
@@ -2788,8 +2808,9 @@ function executeScript(bolCursorQuery) {
                                 tableElement.internalData.columnTypes = makeArray(data.arrColumnNames.length, 'text');
                                 tableElement.internalData.columnFilterStatuses = makeArray(data.arrColumnNames.length, 'on');
                                 tableElement.internalData.columnFilters = makeArray(data.arrColumnNames.length, []);
-                                tableElement.internalData.columnListFilters = makeArray(data.arrColumnNames.length, {})
-                                tableElement.internalData.columnOrders = makeArray(data.arrColumnNames.length, 'neutral')
+                                tableElement.internalData.columnListFilters = makeArray(data.arrColumnNames.length, {});
+                                tableElement.internalData.columnOrders = makeArray(data.arrColumnNames.length, 'neutral');
+                                document.getElementById('Table20').internalDisplay.headerHeight = 54;
                                 //tableElement.internalDisplay.columnWidths = makeArray(data.arrColumnNames.length, 1);
                                 // refresh causes the record heights to be
                                 //      calculated
@@ -2898,7 +2919,7 @@ function executeScript(bolCursorQuery) {
 
 function showMoreResults(buttonElement, intQuery, howMany) {
     'use strict';
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     var i, len, col_i, col_len, tbodyElement, trElement, gridElement, arrRecords, strHTML, arrCells;
 
     tbodyElement = xtag.query(
@@ -3027,8 +3048,8 @@ function dialogExecuteHistory() {
 //
 function exportCSV() {
     'use strict';
-    var currentTab = document.getElementsByClassName('current-tab')[0]
-      , editor = currentTab.relatedEditor, templateElement = document.createElement('template')
+    GS.log(bolDebug, currentTab);
+    var editor = currentTab.relatedEditor, templateElement = document.createElement('template')
       , jsnCurrentQuery;
 
     // if we found an editor to get the query from
@@ -3330,7 +3351,7 @@ function exportCSV() {
 }
 
 function openInNewWindow() {
-    var currentTab = document.getElementsByClassName('current-tab')[0];
+    GS.log(bolDebug, currentTab);
     window.open('index.html?leftpanel=false&view=tab:' + encodeURIComponent(currentTab.filePath), Math.random().toString(), 'left=' + (window.screenX + 100) + ',width=' + window.innerWidth + ',height=' + window.innerHeight);
 }
 
