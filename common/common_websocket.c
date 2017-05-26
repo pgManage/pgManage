@@ -63,6 +63,7 @@ void _WS_readFrame(EV_P, struct sock_ev_client *client, void (*cb)(EV_P, WSFrame
 	client_message->frame = frame;
 	frame->parent = client;
 	client_message->int_position = 0;
+	client_message->int_ioctl_count = 0;
 
 	ev_io_stop(EV_A, &client->io);
 
@@ -115,6 +116,10 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 			if (int_avail < WEBSOCKET_HEADER_LENGTH) {
 				bol_error_state = false;
 				SFREE(buf);
+				client_message->int_ioctl_count += 1;
+				if (client_message->int_ioctl_count > 100) {
+					goto error;
+				}
 				return;
 			}
 		}

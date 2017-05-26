@@ -116,6 +116,7 @@ void http_file_step1(struct sock_ev_client *client) {
 	} else {
 #endif
 #ifdef ENVELOPE
+
 	str_uri_temp = client_http_file->str_uri_part;
 	SDEBUG("str_uri_temp: %s", str_uri_temp);
 	client_http_file->str_uri_part = NULL;
@@ -159,6 +160,28 @@ void http_file_step1(struct sock_ev_client *client) {
 	SDEBUG("str_canonical_start: %s", str_canonical_start);
 	SDEBUG("client_http_file->str_uri_part: %s", client_http_file->str_uri_part);
 
+	str_uri_temp = client_http_file->str_uri_part;
+	client_http_file->str_uri_part = NULL;
+	if (strncmp(str_uri_temp, "download", 8) == 0) {
+		client_http_file->bol_download = true;
+		SFINISH_SNCAT(
+			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
+			str_uri_temp + 8, client_http_file->int_uri_part_len - 8
+		);
+	} else if (strncmp(str_uri_temp, "/download", 9) == 0) {
+		client_http_file->bol_download = true;
+		SFINISH_SNCAT(
+			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
+			str_uri_temp + 9, client_http_file->int_uri_part_len - 9
+		);
+	} else {
+		SFINISH_SNCAT(
+			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
+			str_uri_temp, client_http_file->int_uri_part_len
+		);
+	}
+	SFREE(str_uri_temp);
+
 	// empty url, default to index.html in directories
 	str_temp = canonical(str_canonical_start, client_http_file->str_uri_part, "read_dir");
 	if (strlen(client_http_file->str_uri_part) <= 1 || str_temp != NULL) {
@@ -176,22 +199,6 @@ void http_file_step1(struct sock_ev_client *client) {
 	}
 	SFREE(str_global_error);
 	SFREE(str_temp);
-
-	str_uri_temp = client_http_file->str_uri_part;
-	client_http_file->str_uri_part = NULL;
-	if (strncmp(str_uri_temp, "/download", 9) == 0) {
-		client_http_file->bol_download = true;
-		SFINISH_SNCAT(
-			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
-			str_uri_temp + 9, client_http_file->int_uri_part_len - 9
-		);
-	} else {
-		SFINISH_SNCAT(
-			client_http_file->str_uri_part, &client_http_file->int_uri_part_len,
-			str_uri_temp, client_http_file->int_uri_part_len
-		);
-	}
-	SFREE(str_uri_temp);
 
 	SFREE(client_http_file->str_uri);
 	SDEBUG("client_http_file->str_uri_part: %s", client_http_file->str_uri_part);

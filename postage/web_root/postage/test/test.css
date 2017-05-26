@@ -40,7 +40,7 @@ small {
 	flex: 1;
     flex-basis: auto;
 	min-width: 13em;
-	max-width: 16em;
+	max-width: 15em;
 }
 
 .disabled {
