@@ -461,16 +461,9 @@ var $ = {
 			}
         } else if (strType === 'websocket end') {
             $.changeStatus(key, intCurrent, 'waiting', 'running');
-            var i = 0;
-            WS.requestFromSocket($.tests[key].socket, key, 'SELECT	pg_catalog	pg_class\nRETURN	*\n\n', function (data, error, errorData) {
-                if (i === 0) {
-                    i += 1;
-
-                    WS.closeSocket($.tests[key].socket);
-                    $.changeStatus(key, intCurrent, 'running', 'pass');
-                    $.runTest(key, intCurrent + 1);
-                }
-            });
+            WS.closeSocket($.tests[key].socket);
+            $.changeStatus(key, intCurrent, 'running', 'pass');
+            $.runTest(key, intCurrent + 1);
         } else if (strType === 'wait') {
             $.changeStatus(key, intCurrent, 'waiting', 'running');
             setTimeout(function () {
