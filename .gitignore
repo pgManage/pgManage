@@ -45,7 +45,7 @@ envelope/web_root
 !envelope/web_root/test_env_odbc_sql_server.html
 !envelope/web_root/test.html
 !envelope/web_root/test.txt
-!envelope/web_root/test
+!envelope/web_root/test/index.html
 
 /postage/postage
 /postage/check
