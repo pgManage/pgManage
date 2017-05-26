@@ -201,6 +201,7 @@ void ws_file_step1(struct sock_ev_client_request *client_request) {
 
 		client_file->str_path = canonical(client_file->str_canonical_start, client_file->str_partial_path, "read_file");
 		if (client_file->str_path == NULL) {
+			SFREE(str_global_error);
 			client_file->str_path = canonical(client_file->str_canonical_start, client_file->str_partial_path, "read_dir");
 			SFINISH_CHECK(client_file->str_path != NULL, "Failed to get canonical path: >%s|%s<",
 				client_file->str_canonical_start, client_file->str_partial_path);
@@ -365,7 +366,6 @@ finish:
 	SFREE_ALL();
 
 	SDEBUG("bol_error_state == %s", bol_error_state == true ? "true" : "false");
-	bol_error_state = false;
 
 	if (str_response != NULL) {
 		char *_str_response = str_response;
@@ -385,21 +385,24 @@ finish:
 		DArray_push(client_request->arr_response, str_response);
 		SFREE(_str_response);
 
-		client_request->int_response_id += 1;
-		memset(str_temp1, 0, 101);
-		snprintf(str_temp1, 100, "%zd", client_request->int_response_id);
-		SFINISH_SNCAT(
-			str_response, &int_response_len,
-			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
-			"\012responsenumber = ", (size_t)18,
-			str_temp1, strlen(str_temp1),
-			"\012TRANSACTION COMPLETED", (size_t)22
-		);
-		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
-		DArray_push(client_request->arr_response, str_response);
-		str_response = NULL;
+		if (!bol_error_state) {
+			client_request->int_response_id += 1;
+			memset(str_temp1, 0, 101);
+			snprintf(str_temp1, 100, "%zd", client_request->int_response_id);
+			SFINISH_SNCAT(
+				str_response, &int_response_len,
+				"messageid = ", (size_t)12,
+				client_request->str_message_id, strlen(client_request->str_message_id),
+				"\012responsenumber = ", (size_t)18,
+				str_temp1, strlen(str_temp1),
+				"\012TRANSACTION COMPLETED", (size_t)22
+			);
+			WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
+			DArray_push(client_request->arr_response, str_response);
+			str_response = NULL;
+		}
 	}
+	bol_error_state = false;
 }
 
 // **************************************************************************************
@@ -1542,6 +1545,7 @@ bool ws_file_move_step3(EV_P, void *cb_data, bool bol_group) {
 #endif
 
 		} else {
+			SFREE(str_global_error);
 			SDEBUG("client_file->str_partial_path: %s", client_file->str_partial_path);
 			SDEBUG("client_file->str_partial_path_to: %s", client_file->str_partial_path_to);
 			client_file->str_path = canonical(client_file->str_canonical_start, client_file->str_partial_path, "read_dir");
@@ -1688,12 +1692,14 @@ bool ws_file_copy_step4(EV_P, void *cb_data, char *str_path) {
 			"canonical_copy failed");
 		SFREE(str_result_path);
 	} else {
+		SFREE(str_global_error);
 		str_result_path = canonical(client_file->str_canonical_start_to, str_new_path_to, "read_dir");
 		if (str_result_path == NULL) {
 			str_result_path = canonical(client_file->str_canonical_start_to, str_new_path_to, "create_dir");
 			SFINISH_CHECK(str_result_path != NULL, "canonical failed");
 		}
 	}
+	SFREE(str_global_error);
 finish:
 	if (bol_error_state) {
 		bol_error_state = false;

@@ -98,6 +98,7 @@ struct sock_ev_client_message {
 	ev_io io;
 	WSFrame *frame;
 	bool bol_have_header;
+	uint8_t int_ioctl_count;
 	uint64_t int_message_header_length;
 	uint64_t int_length;
 	uint64_t int_written;

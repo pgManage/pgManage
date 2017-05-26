@@ -220,13 +220,15 @@ finish:
 		client_cnxn->parent->conn->str_response = strdup(str_response + 6);
 		SFREE(str_response);
 
-		cnxn_cb(EV_A, client_cnxn->parent, client_cnxn->parent->conn);
-
-		ev_prepare_stop(EV_A, &client_cnxn->parent->client_reconnect_timer->prepare);
-		SFREE(client_cnxn->parent->client_reconnect_timer);
-		decrement_idle(EV_A);
+		struct sock_ev_client *client = client_cnxn->parent;
 		client_cnxn->parent->reconnect_watcher = NULL;
 		SFREE(client_cnxn);
+
+		ev_prepare_stop(EV_A, &client->client_reconnect_timer->prepare);
+		SFREE(client->client_reconnect_timer);
+		decrement_idle(EV_A);
+
+		cnxn_cb(EV_A, client, client->conn);
 	}
 }
 
@@ -1914,7 +1916,7 @@ bool client_close(struct sock_ev_client *client) {
 
 	if (client_node != NULL && (client->bol_handshake == true || client->bol_is_open == true)) {
 		client->bol_is_open = false;
-		if (client->bol_handshake == false || bol_authorized == false) {
+		if (client->bol_handshake == false || bol_authorized == false || client->cur_request == NULL) {
 			SDEBUG("client_close_immediate");
 			client_close_immediate(client);
 		} else {

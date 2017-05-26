@@ -63,6 +63,7 @@ void _WS_readFrame(EV_P, struct sock_ev_client *client, void (*cb)(EV_P, WSFrame
 	client_message->frame = frame;
 	frame->parent = client;
 	client_message->int_position = 0;
+	client_message->int_ioctl_count = 0;
 
 	ev_io_stop(EV_A, &client->io);
 
@@ -111,10 +112,14 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 #else
 			SERROR_CHECK(ioctl(frame->parent->int_sock, FIONREAD, &int_avail) != -1, "ioctl() failed!");
 #endif
-			SINFO("int_avail: %d", int_avail);
+			SDEBUG("int_avail: %d", int_avail);
 			if (int_avail < WEBSOCKET_HEADER_LENGTH) {
 				bol_error_state = false;
 				SFREE(buf);
+				client_message->int_ioctl_count += 1;
+				if (client_message->int_ioctl_count > 100) {
+					goto error;
+				}
 				return;
 			}
 		}
@@ -251,9 +256,9 @@ void WS_readFrame_step2(EV_P, ev_io *w, int revents) {
 		frame->cb(EV_A, frame);
 	}
 
-	SINFO("int_request_len: %d", int_request_len);
-	SINFO("client_message->int_position: %d", client_message->int_position);
-	SINFO("frame->int_length: %d", frame->int_length);
+	SDEBUG("int_request_len: %d", int_request_len);
+	SDEBUG("client_message->int_position: %d", client_message->int_position);
+	SDEBUG("frame->int_length: %d", frame->int_length);
 	bol_error_state = false;
 	SFREE(buf);
 	return;

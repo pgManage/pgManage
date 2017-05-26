@@ -168,6 +168,7 @@ void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents) {
 
 					SDEBUG("Directory: >%s|%s<", new_dir_data->str_path, new_dir_data->str_partial_path);
 				}
+				SFREE(str_global_error);
 				SFREE(str_path);
 				SFREE(str_partial_path);
 			}
@@ -214,6 +215,7 @@ bool canonical_delete(char *str_canonical_start, char *str_partial_path) {
 		SERROR_CHECK(str_path != NULL, "canonical failed");
 		SERROR_CHECK(rmdir(str_path) == 0, "rmdir failed");
 	}
+	SFREE(str_global_error);
 
 	SFREE_ALL();
 	return true;
@@ -337,6 +339,7 @@ bool canonical_copy(char *str_canonical_start, char *str_partial_path, char *str
 	SFREE(str_path);
 
 	str_path_to = canonical(str_canonical_start_to, str_partial_path_to, "read_file");
+	SFREE(str_global_error);
 	SERROR_CHECK(str_path_to == NULL, "Path to already exists. %s %s", str_canonical_start_to, str_partial_path_to);
 
 	str_content = canonical_read(str_canonical_start, str_partial_path, &int_content_length);
