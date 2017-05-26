@@ -30,7 +30,7 @@ envelope/role
 !envelope/role/thisgroupdoesntexist_g
 envelope/web_root
 !envelope/web_root/thisgroupdoesntexist_g
-!envelope/web_root/test
+!envelope/web_root/test/
 !envelope/web_root/css/greyspots.css
 !envelope/web_root/font/fontawesome-webfont.*
 !envelope/web_root/font/FontAwesome.otf
