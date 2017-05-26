@@ -110,7 +110,8 @@ clean:
 	install ./app/all/index.in.html @prefix@/etc/envelope/app/all/index.html
 
 @prefix@/etc/envelope/role/:
-	mkdir -p @prefix@/etc/envelope/role/
+	mkdir -p @prefix@/etc/envelope/role/all/
+	cp -r ./role/all/*.txt @prefix@/etc/envelope/role/all/
 
 @prefix@/etc/$(BINARY)/$(BINARY).conf: @prefix@/etc/$(BINARY)/ config/$(BINARY).conf
 	test -f @prefix@/etc/$(BINARY)/$(BINARY).conf || install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf;
@@ -125,6 +126,7 @@ install: $(INSTALL_DEPS)
 	install man/man1/envelope.1 @prefix@/@MANDIR@/man1/envelope.1
 	install ./app/all/index.in.html @prefix@/etc/envelope/app/all/index.in.html
 	cp -rf ./app/all/file_manager/* @prefix@/etc/envelope/app/all/file_manager_new/
+	cp -r ./app/all/*.txt @prefix@/etc/envelope/app/all/
 	@echo
 	@echo "Installation Successful"
 
