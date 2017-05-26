@@ -86,8 +86,25 @@ GS.hitLink = function (strLink) {
 
 GS.log = function (bolsend, message) {
     "use strict";
+    var msg = message;
     if (bolsend) {
-        console.log(message);
+        var e = new Error();
+        if (!e.stack) {
+            try {
+                // IE requires the Error to actually be thrown or else the 
+                // Error's 'stack' property is undefined.
+                throw e;
+            } catch (e) {
+                if (!e.stack) {
+                    //return 0; // IE < 10, likely
+                }
+            }
+        }
+        var stack = e.stack.toString().split(/\r\n|\n/);
+        if (msg === '') {
+            msg = '""';
+        }
+        console.log(msg, ' ' + stack[1].trim().substring(stack[1].trim().indexOf('('), stack[1].trim().length) + '');
     }
 };
 

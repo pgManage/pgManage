@@ -1,6 +1,6 @@
 var bolOtherLoaded = true;
 var currentTab = document.getElementsByClassName('current-tab')[0];
-var bolDebug = true;
+var bolDebug = false;
 
 function hideOtherTables(tabnum, safeid) {
     var foundHidden = false;
@@ -2450,10 +2450,10 @@ function executeHelperEndExecute() {
 }
 
 // This function updates the results header Success/Error tally
-function executeHelperUpdateTally(intQuery, intError) {
+function executeHelperUpdateTally(resultsTallyElement, intQuery, intError) {
     GS.log(bolDebug, currentTab);
 
-    currentTab.relatedResultsTallyElement.innerHTML = (
+    resultsTallyElement.innerHTML = (
         ' (<b>Pass: ' + (intQuery - intError) + '</b>, <b>Fail: ' + (intError) + '</b>)'
     );
 }
@@ -2501,6 +2501,8 @@ function executeScript(bolCursorQuery) {
     var intCursorPos;
     var strScript;
     var jsnSelection;
+    
+    executeHelperUpdateTally(resultsTallyElement, 0, 0);
 
     // if we found an editor to get the query from and the current tab is not already running a query
     if (editor && currentTab.handlingQuery !== true) {
@@ -2597,6 +2599,8 @@ function executeScript(bolCursorQuery) {
                         intErrorStartLine += (data.strQuery.match(/\n/gim) || []).length;
 						intErrorStartChar += data.strQuery.length;
                     }
+                    
+                    console.log(data.strMessage, data.bolLastMessage);
 
                     // handle putting the response in the results pane
 
@@ -2644,7 +2648,7 @@ function executeScript(bolCursorQuery) {
                             intQuery += 1;
 
                             // update the success and error tally
-                            executeHelperUpdateTally(intQuery, intError);
+                            executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
 
                         // else if empty
                         } else if (data.strMessage === 'EMPTY') {
@@ -2686,7 +2690,7 @@ function executeScript(bolCursorQuery) {
                             intQuery += 1;
 
                             // update the success and error tally
-                            executeHelperUpdateTally(intQuery, intError);
+                            executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
 
                         // else if result query
                         } else if (data.arrColumnNames.length > 0) {
@@ -2810,12 +2814,15 @@ function executeScript(bolCursorQuery) {
                                 tableElement.internalData.columnFilters = makeArray(data.arrColumnNames.length, []);
                                 tableElement.internalData.columnListFilters = makeArray(data.arrColumnNames.length, {});
                                 tableElement.internalData.columnOrders = makeArray(data.arrColumnNames.length, 'neutral');
-                                document.getElementById('Table20').internalDisplay.headerHeight = 54;
+                                tableElement.internalDisplay.headerHeight = 54;
                                 //tableElement.internalDisplay.columnWidths = makeArray(data.arrColumnNames.length, 1);
                                 // refresh causes the record heights to be
                                 //      calculated
                                 arrData = [];
                                 tableElement.refresh();
+                                
+                                intQuery += 1;
+                                executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
                             } else {
                                 tempData = data.strMessage.split('\n');
                                 arrData.push.apply(arrData, tempData);
@@ -2904,7 +2911,7 @@ function executeScript(bolCursorQuery) {
                     }
 
                     // update the success and error tally
-                    executeHelperUpdateTally(intQuery, intError);
+                    executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
 
                     //editor.gotoLine(
                     //    (jsnCurrentQuery.start_row + intLine),
