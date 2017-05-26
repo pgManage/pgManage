@@ -39,7 +39,7 @@ let window = null;
 
 electron.app.on('ready', function () {
         window = new electron.BrowserWindow();
-        window.loadURL('http://127.0.0.1:8888/test/index.html?http_export=false&ws_file_app=true&ws_file_role=true&ws_file_web_root=true&ws_delete=true&http_file=true&http_upload=true&ws_select=true&ws_insert=true&ws_update=true&_http_auth=true&http_action=true&ws_action=true');
+        window.loadURL('http://127.0.0.1:8888/test/index.html?http_export=false&ws_file_app=true&ws_file_role=true&ws_file_web_root=true&ws_delete=true&http_file=true&http_upload=true&ws_select=true&ws_insert=true&ws_update=true&_http_auth=true&http_action=true&ws_action=true&ws_info=true');
 });
 
 
@@ -65,7 +65,7 @@ $MAKE test-common
 sleep 5
 
 if test $(uname -s) = "OpenBSD"; then
-	xdg-open "http://127.0.0.1:8888/test/index.html?http_export=false&ws_file_app=true&ws_file_role=true&ws_file_web_root=true&ws_delete=true&http_file=true&http_upload=true&ws_select=true&ws_insert=true&ws_update=true&_http_auth=true&http_action=true&ws_action=true" &
+	xdg-open "http://127.0.0.1:8888/test/index.html?http_export=false&ws_file_app=true&ws_file_role=true&ws_file_web_root=true&ws_delete=true&http_file=true&http_upload=true&ws_select=true&ws_insert=true&ws_update=true&_http_auth=true&http_action=true&ws_action=true&ws_info=true" &
 	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 else
 	npm start & export ELECTRONPID="$!"
@@ -83,7 +83,7 @@ sudo chown -R super /usr/local/etc/envelope/
 /usr/local/sbin/envelope -u public_user -w youwontguessthispasswordwillyou1lk2j43k1lj3h4k3j4h56k324j5bnoiusdfyg08 & export ENVELOPEPID="$!"
 sleep 5
 if test $(uname -s) = "OpenBSD"; then
-	xdg-open "http://127.0.0.1:8888/test/index.html?http_export=false&ws_file_app=true&ws_file_role=true&ws_file_web_root=true&ws_delete=true&http_file=true&http_upload=true&ws_select=true&ws_insert=true&ws_update=true&_http_auth=true&http_action=true&ws_action=true" &
+	xdg-open "http://127.0.0.1:8888/test/index.html?http_export=false&ws_file_app=true&ws_file_role=true&ws_file_web_root=true&ws_delete=true&http_file=true&http_upload=true&ws_select=true&ws_insert=true&ws_update=true&_http_auth=true&http_action=true&ws_action=true&ws_info=true" &
 	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 else
 	npm start & export ELECTRONPID="$!"
