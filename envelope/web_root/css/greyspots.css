@@ -15653,6 +15653,7 @@ gs-sticky[stuck][direction="down"] > gs-sticky-inner {
     box-sizing: border-box;
 }
 gs-cell {
+    white-space: pre;
     display: inline-block;
 }
 

@@ -641,6 +641,8 @@ function selectionFindRange(tabElement, editor) {
         editor.currentQueryRange = {
             'start': jsnQueryStart,
             'end':  jsnQueryEnd,
+            'startIndex': jsnQuery.intQueryStart,
+            'endIndex': jsnQuery.intQueryEnd,
             'text': strScript.substring(jsnQuery.intQueryStart, jsnQuery.intQueryEnd),
             'intParenLevel': jsnQuery.intParenLevelAtCursor
         };

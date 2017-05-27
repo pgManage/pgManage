@@ -336,7 +336,7 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     box-sizing: border-box;
 }
 .sql-results-area gs-table {
-    white-space: nowrap;
+    white-space: initial;
     min-height: 20em;
 }
 

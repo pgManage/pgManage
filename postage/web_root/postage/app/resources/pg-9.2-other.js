@@ -1,6 +1,8 @@
 var bolOtherLoaded = true;
 var currentTab = document.getElementsByClassName('current-tab')[0];
 var bolDebug = false;
+var resultsScroll = 0;
+
 
 function hideOtherTables(tabnum, safeid) {
     var foundHidden = false;
@@ -2392,6 +2394,15 @@ function executeHelperEndLoading() {
 
     currentTab.relatedClearButton.removeAttribute('hidden');
     currentTab.relatedResultsHeaderElement.classList.remove('executing');
+    var spaceHeight = currentTab.relatedResultsArea.lastChild.clientHeight;
+    spaceHeight = currentTab.relatedResultsArea.clientHeight - spaceHeight;
+    if (spaceHeight < 0) {
+        spaceHeight = 0;
+    }
+    var heightElem = document.createElement('div');
+    heightElem.style.height = spaceHeight + 'px';
+    currentTab.relatedResultsArea.appendChild(heightElem);
+    
     currentTab.handlingQuery = false;
     currentTab.relatedStopSocketButton.setAttribute('hidden', '');
 	//console.log('test2');
@@ -2533,7 +2544,7 @@ function executeScript(bolCursorQuery) {
         } else {
             jsnCurrentQuery = getCurrentQuery();
         }
-
+        
         // clear error annotation in ace
         editor.getSession().setAnnotations([]);
 
@@ -2545,7 +2556,7 @@ function executeScript(bolCursorQuery) {
         resultsContainer.innerHTML = '';
         resultsHeaderElement.classList.remove('error');
         resultsHeaderElement.classList.remove('executing');
-
+        
         // set number tracking variables
         intRecordsThisQuery = 0; // number of records this query so that we can get valid row numbers
         intError = 0;            // number error the callback is on
@@ -2554,6 +2565,8 @@ function executeScript(bolCursorQuery) {
 		intErrorStartChar = 0;   // number of chars in the queries that successfully ran, so that we can offset the cursor properly
         var arrData = [];
         // begin
+        
+        console.log('test');
         executeHelperStartExecute();
         currentTab.currentMessageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
             var tableElement;
@@ -2868,7 +2881,7 @@ function executeScript(bolCursorQuery) {
 
                                     strHTML += (
                                         '<gs-cell>' +
-                                            '<label>{{! row[\'' + data.arrColumnNames[i] + '\'] }}</label>' +
+                                            '<label>{{! GS.decodeFromTabDelimited(row[\'' + data.arrColumnNames[i] + '\']) }}</label>' +
                                         '</gs-cell>'
                                     );
                                     i += 1;
@@ -2891,7 +2904,6 @@ function executeScript(bolCursorQuery) {
 
                                 strHTML += '</template>';
                                 
-                                GS.log(true, data);
                                 
                                 tableElement = document.createElement('gs-table');
                                 tableElement.innerHTML = strHTML;
@@ -2899,6 +2911,17 @@ function executeScript(bolCursorQuery) {
                                 tableElement.setAttribute('no-delete', '');
                                 tableElement.setAttribute('no-update', '');
                                 scrollElement.appendChild(tableElement);
+                                
+                                tableElement.addEventListener('openFullContainer', function () {
+                                    resultsScroll = document.getElementById('sql-results-area-' + tabNumber + '').scrollTop;
+                                    document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = 0;
+                                    document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'hidden';
+                                });
+                                
+                                tableElement.addEventListener('closeFullContainer', function () {
+                                    document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = resultsScroll;
+                                    document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'auto';
+                                });
                                 
                                 tableElement.internalData.records = arrData;
                                 tableElement.internalData.columnNames = data.arrColumnNames;

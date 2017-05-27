@@ -1530,6 +1530,17 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                     event.preventDefault();
                 }
                 
+                if (currentTab.relatedResultsArea.children.length > 0) {
+                    var spaceHeight = currentTab.relatedResultsArea.children[currentTab.relatedResultsArea.children.length - 2].clientHeight;
+                    spaceHeight = currentTab.relatedResultsArea.clientHeight - spaceHeight;
+                    if (spaceHeight < 0) {
+                        spaceHeight = 0;
+                    }
+                    var heightElem = currentTab.relatedResultsArea.lastChild;
+                    heightElem.style.height = spaceHeight + 'px';
+                    currentTab.relatedResultsArea.appendChild(heightElem);
+                }
+                
                 var gs_table = xtag.query(tabElement.relatedResultsAreaContainer, 'gs-table');
                 for (var i = 0, len = gs_table.length; i < len; i++) {
                     gs_table[i].render();

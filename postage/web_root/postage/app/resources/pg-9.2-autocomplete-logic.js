@@ -428,7 +428,7 @@ function autocompleteBindEditor(tabElement, editor) {
             && autocompleteKeyEvent !== 'paste'
             && editor.currentSelections && editor.currentSelections.length > 1
             && (editor.currentSelections[0].start.column !== event.start.column
-            || editor.currentSelections[0].start.row !== event.start.row)) {
+                || editor.currentSelections[0].start.row !== event.start.row)) {
             autocompleteKeyEvent = 'other_cursor';
         }
         
@@ -463,10 +463,35 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         intCursorPosition += 3; //fix four spaces issue
     }
     
-    objContext = getContext(strScript, intCursorPosition);
+    /*
+    editor.currentQueryRange = {
+        'start': jsnQueryStart,
+        'end':  jsnQueryEnd,
+        'startIndex': jsnQuery.intQueryStart,
+        'endIndex': jsnQuery.intQueryEnd,
+        'text': strScript.substring(jsnQuery.intQueryStart, jsnQuery.intQueryEnd),
+        'intParenLevel': jsnQuery.intParenLevelAtCursor
+    };
+    */
+    
+    if (! editor.currentQueryRange) {
+        //console.log('There was no context detected by Michael\'s code, so ignore.');
+        return;
+    }
+    
+    /*console.log('sent to Joseph\'s Code>' + strScript.substring(editor.currentQueryRange.startIndex
+            , editor.currentQueryRange.endIndex + 10 + (autocompleteKeyEvent === 'indent' ? 4 : 1)) + '<');//*/
+    
+    objContext = getContext(
+        strScript.substring(editor.currentQueryRange.startIndex
+            , editor.currentQueryRange.endIndex + 10 + (autocompleteKeyEvent === 'indent' ? 4 : 1))
+        , intCursorPosition - editor.currentQueryRange.startIndex);
+    //objContext = getContext(strScript, intCursorPosition);
     //console.log('typeof', typeof objContext);
     //console.log('objContext', objContext);
     if (typeof objContext !== 'undefined' && objContext !== null) {
+        objContext.intContextPosition = objContext.intContextPosition + editor.currentQueryRange.startIndex;
+        
         //if we are at a different context position, then close current popup
         if (autocompleteGlobals.intContextPosition !== objContext.intContextPosition) {
             //console.log('close popup for different context position');
@@ -612,7 +637,7 @@ function autocompleteComplete(editor) {
 
 function autocompleteMakeList(arrQueries, searchWord, editor) {
     'use strict';
-    //console.log('now', autocompleteGlobals.bolQueryRunning);
+    //console.log('autocompleteGlobals.bolQueryRunning', autocompleteGlobals.bolQueryRunning);
     if (autocompleteGlobals.bolQueryRunning) {
         //console.log('autocompleteGlobals.strSpecialFilter := ' + searchWord);
         autocompleteGlobals.strSpecialFilter = searchWord;

@@ -58,8 +58,12 @@ function getContext(strInput, intPosition) {
     intPosition++; //add character for zero based
 
     //make sure that we have only whitespace after the cursor, otherwise we just end it here
-    //console.log('intPosition', intPosition);
-    //console.log('Check Whitespace', strInput.substr(intPosition, 1).match('^[\n\r\ \t]+'));
+    // console.log('intPosition', intPosition);
+    // console.log('Check Whitespace', strInput.substr(intPosition, 1).match('^[\n\r\ \t]+'));
+    // console.log('Check Whitespace>' + strInput.substr(intPosition, 1) + '<');
+    // console.log('Check Whitespace - 1>' + strInput.substr(intPosition - 1, 1) + '<');
+    // console.log('Check Whitespace 1>' + strInput.substr(1, 1) + '<');
+    // console.log('Check Whitespace 0>' + strInput.substr(0, 1) + '<');
     if (! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) {
         return;
     }
@@ -1347,7 +1351,7 @@ function getContext(strInput, intPosition) {
         }
     }
     
-    
+    //console.log('bolFinal', bolFinal);
     if (bolFinal) {
         //console.log('lookahead');
         //console.log('before i', i);
@@ -1390,8 +1394,9 @@ function getContext(strInput, intPosition) {
     //console.log('after intContextPosition', intContextPosition);
     //console.log('intPosition', intPosition);
     strContext = strInput.substring(intContextPosition, intPosition);
+    //console.log('strContext', strContext);
 
-    //console.log('strContext.length', strContext.length === 0);
+    //console.log('check strContext.length', strContext.length === 0);
     if (strContext.length === 0) {
         return;
     }
@@ -1772,14 +1777,12 @@ function getContext(strInput, intPosition) {
         return;
     }
 
-    /*
-    console.log('objContext', {
+    /*console.log('objContext', {
         'strContext': strContext
         , 'arrQueries': arrQueries
         , 'searchLength': strContext.length
         , 'intContextPosition': intContextPosition
-    });
-    */
+    });//*/
 
     return {
         'strContext': strContext

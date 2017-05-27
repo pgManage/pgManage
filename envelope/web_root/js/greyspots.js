@@ -54011,10 +54011,12 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             'toggleFullContainer': function (container, target) {
                 if (this.classList.contains('absolute')) {
+                    GS.triggerEvent(this, 'closeFullContainer');
                     this.classList.remove('absolute');
                     document.getElementById(container).classList.remove('relative');
                     target.setAttribute('icon', 'expand');
                 } else {
+                    GS.triggerEvent(this, 'openFullContainer');
                     this.classList.add('absolute');
                     document.getElementById(container).classList.add('relative');
                     target.setAttribute('icon', 'compress');
@@ -54023,6 +54025,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             'openFullContainer': function (container, target) {
                 if (!this.classList.contains('absolute')) {
+                    GS.triggerEvent(this, 'openFullContainer');
                     this.classList.add('absolute');
                     document.getElementById(container).classList.add('relative');
                     target.setAttribute('icon', 'compress');
@@ -54031,6 +54034,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             'closeFullContainer': function (container, target) {
                 if (this.classList.contains('absolute')) {
+                    GS.triggerEvent(this, 'closeFullContainer');
                     this.classList.remove('absolute');
                     document.getElementById(container).classList.remove('relative');
                     target.setAttribute('icon', 'expand');
@@ -54068,12 +54072,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 //      last element in the body and then apply the class.
                 // ### NEED CODING ###
                 if (this.classList.contains('table-fullscreen')) {
+                    GS.triggerEvent(this, 'closeFullScreen');
                     this.classList.remove('table-fullscreen');
     
                     if (target.getAttribute('icon') === 'close') {
                         target.setAttribute('icon', 'arrows-alt');
                     }
                 } else {
+                    GS.triggerEvent(this, 'openFullscreen');
                     this.classList.add('table-fullscreen');
     
                     if (target.getAttribute('icon') === 'arrows-alt') {
@@ -54084,6 +54090,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             'openFullscreen': function (target) {
                 if (!this.classList.contains('table-fullscreen')) {
+                    GS.triggerEvent(this, 'openFullscreen');
                     this.classList.add('table-fullscreen');
                     if (target.getAttribute('icon') === 'arrows-alt') {
                         target.setAttribute('icon', 'close');
@@ -54093,6 +54100,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             'closeFullscreen': function (target) {
                 if (this.classList.contains('table-fullscreen')) {
+                    GS.triggerEvent(this, 'closeFullScreen');
                     this.classList.remove('table-fullscreen');
     
                     if (target.getAttribute('icon') === 'close') {

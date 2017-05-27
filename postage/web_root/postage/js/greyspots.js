@@ -37378,6 +37378,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // if present, siphon "copy" template
         if (copyTemplate) {
+            // we want to save the copy template so that we'll always have
+            //      access to it's original innerHTML (right now, only for
+            //      debugging purposes)
+            element.internalTemplates.copy = (
+                copyTemplate.innerHTML
+            );
+
             // determine the record copy columns from the "copy" template
             //      so that we can use them when we copy and we need to get data
             templateDetermineCopyColumnList(element, copyTemplate);
@@ -39085,6 +39092,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'var row_number = jo.index + 1;' +
                     'var qs = jo.qs;' +
                     'var row = jo.row;' +
+                    'var arrRow = jo.arrRow;' +
                     'var i = jo.index;' +
                     'var len = jo.len;' +
                 '}}' +
@@ -39133,6 +39141,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strRecord = templateFunc({
                     'qs': jsnQS,
                     'row': jsnRecord,
+                    'arrRow': arrRecord,
                     'index': i,
                     'len': intTotalRecords
                 });
@@ -39658,6 +39667,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'var row_number = jo.index + 1;' +
                     'var qs = jo.qs;' +
                     'var row = jo.row;' +
+                    'var arrRow = jo.arrRow;' +
                     'var i = jo.index;' +
                     'var len = jo.len;' +
                 '}}' +
@@ -39667,6 +39677,7 @@ document.addEventListener('DOMContentLoaded', function () {
             strRecord = doT.template(strRecord)({
                 'qs': jsnQS,
                 'row': jsnRecord,
+                'arrRow': arrRecord,
                 'index': index,
                 'len': intTotalRecords
             });
@@ -54000,10 +54011,12 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             'toggleFullContainer': function (container, target) {
                 if (this.classList.contains('absolute')) {
+                    GS.triggerEvent(this, 'closeFullContainer');
                     this.classList.remove('absolute');
                     document.getElementById(container).classList.remove('relative');
                     target.setAttribute('icon', 'expand');
                 } else {
+                    GS.triggerEvent(this, 'openFullContainer');
                     this.classList.add('absolute');
                     document.getElementById(container).classList.add('relative');
                     target.setAttribute('icon', 'compress');
@@ -54012,6 +54025,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             'openFullContainer': function (container, target) {
                 if (!this.classList.contains('absolute')) {
+                    GS.triggerEvent(this, 'openFullContainer');
                     this.classList.add('absolute');
                     document.getElementById(container).classList.add('relative');
                     target.setAttribute('icon', 'compress');
@@ -54020,6 +54034,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             'closeFullContainer': function (container, target) {
                 if (this.classList.contains('absolute')) {
+                    GS.triggerEvent(this, 'closeFullContainer');
                     this.classList.remove('absolute');
                     document.getElementById(container).classList.remove('relative');
                     target.setAttribute('icon', 'expand');
@@ -54057,12 +54072,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 //      last element in the body and then apply the class.
                 // ### NEED CODING ###
                 if (this.classList.contains('table-fullscreen')) {
+                    GS.triggerEvent(this, 'closeFullScreen');
                     this.classList.remove('table-fullscreen');
     
                     if (target.getAttribute('icon') === 'close') {
                         target.setAttribute('icon', 'arrows-alt');
                     }
                 } else {
+                    GS.triggerEvent(this, 'openFullscreen');
                     this.classList.add('table-fullscreen');
     
                     if (target.getAttribute('icon') === 'arrows-alt') {
@@ -54073,6 +54090,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             'openFullscreen': function (target) {
                 if (!this.classList.contains('table-fullscreen')) {
+                    GS.triggerEvent(this, 'openFullscreen');
                     this.classList.add('table-fullscreen');
                     if (target.getAttribute('icon') === 'arrows-alt') {
                         target.setAttribute('icon', 'close');
@@ -54082,6 +54100,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             'closeFullscreen': function (target) {
                 if (this.classList.contains('table-fullscreen')) {
+                    GS.triggerEvent(this, 'closeFullScreen');
                     this.classList.remove('table-fullscreen');
     
                     if (target.getAttribute('icon') === 'close') {
