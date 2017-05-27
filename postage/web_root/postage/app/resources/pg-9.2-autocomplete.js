@@ -36,7 +36,7 @@ var autocompleteGlobals = {
     };
 
 function doubleIdentifier(strInput) {
-    console.log('doubleIdentifier(' + strInput + ')');
+    //console.log('doubleIdentifier(' + strInput + ')');
     var arrStrIdentifier = strInput.match(/^[\n\r\ \t]+([a-zA-Z_][a-zA-z_0-9\$]+|\".*(\"\".*)*\")\.([a-zA-Z_][a-zA-z_0-9\$]+|\".*(\"\".*)*\")([\n\r\ \t]+AS)?([\n\r\ \t]+([a-zA-Z_][a-zA-z_0-9\$]+))?[\n\r\ \t]*/);
     if (arrStrIdentifier) {
         //keywords are not allowed as a table short name
@@ -652,11 +652,11 @@ function getContext(strInput, intPosition) {
             arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
 
             //set final if we are NOT already on a final and we are NOT past the cursor
-            console.log('bolFinal = ' + bolFinal);
-            console.log('intPosition = ' + intPosition);
-            console.log('i = ' + i);
+            //console.log('bolFinal = ' + bolFinal);
+            //console.log('intPosition = ' + intPosition);
+            //console.log('i = ' + i);
             if (!bolFinal && intPosition > i) {
-                console.log('bolFinal := true');
+                //console.log('bolFinal := true');
                 bolFinal = true;
                 intFinalI = i;
                 intFinalContextPosition = intContextPosition;
@@ -751,7 +751,7 @@ function getContext(strInput, intPosition) {
             arrShortQueries = ['schemasTables'];
             
             doubleIdentifier(strInput.substr(i + 1));
-            console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
+            //console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
 
         // FOUND JOIN ... ON
         } else if (int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolJoin) {
@@ -1681,7 +1681,7 @@ function getContext(strInput, intPosition) {
             //console.log('after strContext', strContext);
         }
         
-        console.log('autocompleteGlobals.arrStrContext', autocompleteGlobals.arrStrContext);
+        //console.log('autocompleteGlobals.arrStrContext', autocompleteGlobals.arrStrContext);
         var i, len;
         for (i = 0, len = autocompleteGlobals.arrStrContext.length; i < len; i++) {
             if ((autocompleteGlobals.arrStrContext[i][0] === strSchema || strSchema === '')
@@ -1772,14 +1772,14 @@ function getContext(strInput, intPosition) {
         return;
     }
 
-    
+    /*
     console.log('objContext', {
         'strContext': strContext
         , 'arrQueries': arrQueries
         , 'searchLength': strContext.length
         , 'intContextPosition': intContextPosition
     });
-    
+    */
 
     return {
         'strContext': strContext
