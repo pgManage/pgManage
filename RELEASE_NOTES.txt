@@ -1,3 +1,39 @@
+Changes since 3.2.12:
+Postage:
+- New autocomplete
+- Fix electron postage to use extraResources instead of disabling asar
+- Fix multiple instances of postage (closed workflowproducts/postage#267)
+- Make Beautify check itself before wrecking itself (closed workflowproducts/postage#262)
+- Fix column headings disappearing after scrolling (closed workflowproducts/postage #40)
+- Make Query Result Columns Only as Wide as Necessary (closed workflowproducts/postage#165)
+- Fix switching tabs during a query execution (closed workflowproducts/postage#227)
+- Fix Beautify not recognizing UNION (closed workflowproducts/postage#260)
+- Fix Beautify mangling VIEW RULES (closed workflowproducts/postage#261)
+- CREATE FUNCTION snippet puts in a single dollar sign instead of a $BODY$ tag (closed workflowproducts/postage#254)
+
+Envelope:
+- Fix file rename to not overwrite files
+- Add `GS.log`
+- Make file editor not automatically refresh test page (closed workflowproducts/envelope#75)
+- Fix rename overwriting files (closed workflowproducts/envelope#72)
+- Fix WebSocket Connection Dropped when Internet is Slow (closed workflowproducts/envelope#57)
+- Fix `<gs-envelope>` sort broken (closed workflowproducts/envelope#61)
+
+Both:
+- Use OpenSSL directly instead of through LibreSSL for compatibility (closed workflowproducts/envelope#59)
+- Make Compilation Successful output cleaner
+- Update INSTALL_WEB_SERVER_MODE.md
+- Remove SSL_CTX_set_ecdh_auto for compatibility
+- Add free() function to structs to aid memory saftey
+- Prevent invalid cookie from giving wrong error
+- Fix websockets behind nginx reverse proxy
+- Add new datasheet
+- Fix 100% CPU when tls enabled
+- Fix crash in cnxn_reset_cb
+- Close PGconn immediately if no request in progress
+- Fix result tally bar
+
+
 Changes since 3.2.11:
 Postage:
 - Fix HTML in explain table
