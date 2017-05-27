@@ -987,7 +987,8 @@ autocompleteQuery.qualified_domains = ml(function () {/*
           SELECT typname AS obj_name, 'Domain'::text AS obj_meta
             FROM pg_type
         LEFT JOIN pg_namespace ON pg_type.typnamespace = pg_namespace.oid
-           WHERE typtype = 'd' AND pg_namespace.nspname = $SCHEMATOKEN${{SCHEMA}}$SCHEMATOKEN$
+           WHERE typtype = 'd' AND pg_type.typname ILIKE $SEARCHTOKEN${{searchStr}}$SEARCHTOKEN$
+                {{ADDITIONALWHERE}}
         ORDER BY typname ASC
     ) list_domains
 */});
@@ -1014,7 +1015,8 @@ autocompleteQuery.qualified_foreign_tables = ml(function () {/*
             FROM pg_foreign_table
        LEFT JOIN pg_class ON pg_class.oid = pg_foreign_table.ftrelid
        LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-           WHERE pg_class.relnamespace = $OIDTOKEN${{SCHEMAOID}}$OIDTOKEN$
+           WHERE pg_class.relname ILIKE $SEARCHTOKEN${{searchStr}}$SEARCHTOKEN$
+            {{ADDITIONALWHERE}}
         ORDER BY pg_class.relname ASC
     ) list_foreign_tables
 */});
@@ -1031,7 +1033,9 @@ autocompleteQuery.qualified_indexes = ml(function () {/*
     SELECT * FROM (
            SELECT pg_class.relname AS obj_name, 'Index'::text AS obj_meta
              FROM pg_catalog.pg_class
-            WHERE relkind = 'i' AND relnamespace = {{SCHEMAOID}}
+       LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+            WHERE relkind = 'i' AND pg_class.relname ILIKE $SEARCHTOKEN${{searchStr}}$SEARCHTOKEN$
+            {{ADDITIONALWHERE}}
     ) list_indexes
 */});
 
@@ -1083,7 +1087,8 @@ autocompleteQuery.qualified_materialized_views = ml(function () {/*
     SELECT * FROM (
            SELECT pg_class.relname AS obj_name, 'Materialized View'::text AS obj_meta
              FROM pg_catalog.pg_class
-            WHERE relkind = 'm' AND pg_class.relname = $NAMETOKEN${{searchStr}}$NAMETOKEN$
+       LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+            WHERE relkind = 'm' AND pg_class.relname ILIKE $NAMETOKEN${{searchStr}}$NAMETOKEN$
             {{ADDITIONALWHERE}}
     ) list_materialized_views
 */});
@@ -1092,7 +1097,9 @@ autocompleteQuery.qualified_operators = ml(function () {/*
     SELECT * FROM (
            SELECT pg_operator.oprname || ' (' || format_type(pg_operator.oprleft, NULL) || ', ' || format_type(pg_operator.oprright, NULL) || ')' AS obj_name, 'Operator'::text AS obj_meta
              FROM pg_operator
-            WHERE oprnamespace = '{{SCHEMAOID}}'
+       LEFT JOIN pg_namespace ON pg_namespace.oid = pg_operator.oprnamespace
+            WHERE pg_operator.oprname || ' (' || format_type(pg_operator.oprleft, NULL) || ', ' || format_type(pg_operator.oprright, NULL) || ')' ILIKE $NAMETOKEN${{searchStr}}$NAMETOKEN$
+            {{ADDITIONALWHERE}}
          ORDER BY oprname ASC
     ) list_operators
 */});
@@ -1100,7 +1107,9 @@ autocompleteQuery.qualified_operator_classes = ml(function () {/*
     SELECT * FROM (
           SELECT opcname AS obj_name, 'Operator Class'::text AS obj_meta
             FROM pg_opclass
-           WHERE pg_opclass.opcnamespace = {{SCHEMAOID}}
+       LEFT JOIN pg_namespace ON pg_namespace.oid = pg_opclass.opcnamespace
+           WHERE pg_opclass.opcname ILIKE $NAMETOKEN${{searchStr}}$NAMETOKEN$
+            {{ADDITIONALWHERE}}
         ORDER BY opcname
     ) list_operator_class
 */});
@@ -1109,7 +1118,9 @@ autocompleteQuery.qualified_operator_families = ml(function () {/*
     SELECT * FROM (
           SELECT opfname AS obj_name, 'Operator Family'::text AS obj_meta
             FROM pg_opfamily
-           WHERE pg_opfamily.opfnamespace = {{SCHEMAOID}}
+       LEFT JOIN pg_namespace ON pg_namespace.oid = pg_opfamily.opfnamespace
+           WHERE pg_opfamily.opfname ILIKE $NAMETOKEN${{searchStr}}$NAMETOKEN$
+            {{ADDITIONALWHERE}}
         ORDER BY opfname
     ) list_operator_family
 */});
@@ -1120,7 +1131,8 @@ autocompleteQuery.qualified_sequences = ml(function () {/*
           SELECT relname AS obj_name, 'Sequence'::text AS obj_meta
             FROM pg_class
         LEFT JOIN pg_namespace ON pg_class.relnamespace = pg_namespace.oid
-           WHERE relkind = 'S' AND pg_namespace.nspname = $SCHEMATOKEN${{SCHEMA}}$SCHEMATOKEN$
+           WHERE relkind = 'S' AND pg_class.relname ILIKE $NAMETOKEN${{searchStr}}$NAMETOKEN$
+            {{ADDITIONALWHERE}}
         ORDER BY pg_class.relname ASC
     ) list_sequences
 */});
@@ -1139,7 +1151,9 @@ autocompleteQuery.qualified_text_search_configurations = ml(function () {/*
     SELECT * FROM (
           SELECT quote_ident(cfgname) AS obj_name, 'Text Search Config'::text AS obj_meta
             FROM pg_ts_config
-           WHERE cfgnamespace = {{SCHEMAOID}}
+       LEFT JOIN pg_namespace ON pg_namespace.oid = pg_ts_config.cfgnamespace
+           WHERE pg_ts_config.cfgname ILIKE $NAMETOKEN${{searchStr}}$NAMETOKEN$
+            {{ADDITIONALWHERE}}
         ORDER BY cfgname ASC
     ) list_text_search_configurations
 */});
@@ -1148,7 +1162,9 @@ autocompleteQuery.qualified_text_search_dictionaries = ml(function () {/*
     SELECT * FROM (
           SELECT quote_ident(dictname) AS obj_name, 'Text Search Dictionary'::text AS obj_meta
             FROM pg_ts_dict
-           WHERE dictnamespace = {{SCHEMAOID}}
+       LEFT JOIN pg_namespace ON pg_namespace.oid = pg_ts_dict.dictnamespace
+           WHERE pg_ts_dict.dictname ILIKE $NAMETOKEN${{searchStr}}$NAMETOKEN$
+            {{ADDITIONALWHERE}}
         ORDER BY dictname ASC
     ) list_text_search_dictionaries
 */});
@@ -1157,7 +1173,9 @@ autocompleteQuery.qualified_text_search_parsers = ml(function () {/*
     SELECT * FROM (
           SELECT quote_ident(prsname) AS obj_name, 'Text Search Parser'::text AS obj_meta
             FROM pg_ts_parser
-           WHERE prsnamespace = {{SCHEMAOID}}
+       LEFT JOIN pg_namespace ON pg_namespace.oid = pg_ts_parser.prsnamespace
+           WHERE pg_ts_parser.prsname ILIKE $NAMETOKEN${{searchStr}}$NAMETOKEN$
+            {{ADDITIONALWHERE}}
         ORDER BY prsname ASC
     ) list_text_search_dictionaries
 */});
@@ -1166,7 +1184,9 @@ autocompleteQuery.qualified_text_search_templates = ml(function () {/*
     SELECT * FROM (
           SELECT quote_ident(tmplname) AS obj_name, 'Text Search Template'::text AS obj_meta
             FROM pg_ts_template
-           WHERE tmplnamespace = {{SCHEMAOID}}
+       LEFT JOIN pg_namespace ON pg_namespace.oid = pg_ts_template.tmplnamespace
+           WHERE pg_ts_template.tmplname ILIKE $NAMETOKEN${{searchStr}}$NAMETOKEN$
+            {{ADDITIONALWHERE}}
         ORDER BY tmplname ASC
     ) list_text_search_templates
 */});
@@ -1185,7 +1205,8 @@ autocompleteQuery.qualified_types = ml(function () {/*
        AND (NOT EXISTS (SELECT TRUE
                           FROM pg_catalog.pg_type elem
                          WHERE elem.oid = pg_type.typelem AND elem.typarray = pg_type.oid))
-       AND pg_namespace.nspname = $SCHEMATOKEN${{SCHEMA}}$SCHEMATOKEN$
+       AND pg_type.typname ILIKE $NAMETOKEN${{searchStr}}$NAMETOKEN$
+            {{ADDITIONALWHERE}}
        AND (pg_type.typtype <> 'd')
   ORDER BY typname ASC
     ) list_types

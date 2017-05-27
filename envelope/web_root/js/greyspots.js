@@ -37378,6 +37378,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // if present, siphon "copy" template
         if (copyTemplate) {
+            // we want to save the copy template so that we'll always have
+            //      access to it's original innerHTML (right now, only for
+            //      debugging purposes)
+            element.internalTemplates.copy = (
+                copyTemplate.innerHTML
+            );
+
             // determine the record copy columns from the "copy" template
             //      so that we can use them when we copy and we need to get data
             templateDetermineCopyColumnList(element, copyTemplate);
@@ -39085,6 +39092,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'var row_number = jo.index + 1;' +
                     'var qs = jo.qs;' +
                     'var row = jo.row;' +
+                    'var arrRow = jo.arrRow;' +
                     'var i = jo.index;' +
                     'var len = jo.len;' +
                 '}}' +
@@ -39133,6 +39141,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strRecord = templateFunc({
                     'qs': jsnQS,
                     'row': jsnRecord,
+                    'arrRow': arrRecord,
                     'index': i,
                     'len': intTotalRecords
                 });
@@ -39658,6 +39667,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'var row_number = jo.index + 1;' +
                     'var qs = jo.qs;' +
                     'var row = jo.row;' +
+                    'var arrRow = jo.arrRow;' +
                     'var i = jo.index;' +
                     'var len = jo.len;' +
                 '}}' +
@@ -39667,6 +39677,7 @@ document.addEventListener('DOMContentLoaded', function () {
             strRecord = doT.template(strRecord)({
                 'qs': jsnQS,
                 'row': jsnRecord,
+                'arrRow': arrRecord,
                 'index': index,
                 'len': intTotalRecords
             });

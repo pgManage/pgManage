@@ -1464,9 +1464,9 @@ var strHomeToken =  ((localStorage.ShortcutHome.split(',')[0]) ? localStorage.Sh
 
                     <li>Queries won't be syntax highlighted unless the first character of the query is at the beginning of its line or if it's inside a <code>BEGIN...END</code> statement.</li>
 
-                    <li>Ace is double dollar sign aware. When the first character inside a dollar quote is a <kbd>RETURN</kbd>, the contents of the string are syntax highlighted. When the first character is not a return, everything inside is colored as a quoted string.</li>
+                    <li>Ace is double dollar sign aware. When a dollar tag is at the beginning of the line, the contents of the string are syntax highlighted. When the dollar tag is not at the beginning of the line, everything inside is colored as a quoted string.</li>
 
-                    <li>You can type using multiple cursors at once. To select in multiple places, hold down <kbd>CMD</kbd> (might be <kbd>CTRL</kbd> on Windows) and click in several places. To put a cursor in the same place on multiple lines, hold <kbd>OPTION</kbd> and then click and drag.</li>
+                    <li>You can type using multiple cursors at once. To select in multiple places, hold down <kbd>CMD</kbd> (<kbd>CTRL</kbd> on Windows) and click in several places. To put a cursor in the same place on multiple lines, hold <kbd>OPTION</kbd> and then click and drag.</li>
                 </ul>
                 Tab Shortcuts: (Configurable in "Postage Options" <a style="text-decoration: underline; cursor: pointer; color: #0000FF;" onclick="dialogOptions();" dialogclose>Here</a>)<br />
                 <ul>
@@ -2556,11 +2556,34 @@ function executeScript(bolCursorQuery) {
         // begin
         executeHelperStartExecute();
         currentTab.currentMessageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
-            var tableElement, scrollElement, trElement, arrRecords
-              , arrCells, intRows, strHTML, arrLines, strError
-              , intLine, i, len, j, len2, col_i, col_len, rec_i, rec_len
-              , warningHTML, buttonContainerElement, strCSS
-              , styleElement, tempData = [];
+            var tableElement;
+            var scrollElement;
+            var trElement;
+            var arrRecords;
+            var arrCells;
+            var intRows;
+            var strHTML;
+            var arrLines;
+            var strError;
+            var intLine;
+            var i;
+            var len;
+            var j;
+            var len2;
+            var col_i;
+            var col_len;
+            var rec_i;
+            var rec_len;
+            var warningHTML;
+            var buttonContainerElement;
+            var strCSS;
+            var styleElement;
+            var tempData = [];
+            var tabNumber;
+            var idNumber;
+            var tableID;
+            var columnType;
+            var tempArr = [];
 
             if (currentTab.bolIgnoreMessages === false) {
                 // get name of query if applicable
@@ -2600,7 +2623,7 @@ function executeScript(bolCursorQuery) {
 						intErrorStartChar += data.strQuery.length;
                     }
                     
-                    console.log(data.strMessage, data.bolLastMessage);
+                    //console.log(data.strMessage, data.bolLastMessage);
 
                     // handle putting the response in the results pane
 
@@ -2700,126 +2723,239 @@ function executeScript(bolCursorQuery) {
 
                                 scrollElement.classList.add('result-table-scroll-container');
 
-                                for (i = 0, len = data.arrMessages.length, warningHTML = ''; i < len; i += 1) {
-                                    //console.log('"' + data.arrMessages[i].level + '"', '"' + data.arrMessages[i].content + '"');
-                                    warningHTML += '<i>' +
-                                                        '<b>' + data.arrMessages[i].level + ':</b> ' +
-                                                        encodeHTML(data.arrMessages[i].content) +
-                                                    '</i><br/>';
+                                i = 0;
+                                len = data.arrMessages.length;
+                                warningHTML = '';
+                                while (i < len) {
+                                    warningHTML += (
+                                        '<i>' +
+                                            '<b>' + data.arrMessages[i].level + ':</b> ' +
+                                            encodeHTML(data.arrMessages[i].content) +
+                                        '</i>' +
+                                        '<br />'
+                                    );
+
+                                    i += 1;
                                 }
 
-                                strHTML = '<div flex-horizontal>' +
-                                                '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
-                                                '<div>';
+                                strHTML = (
+                                    '<div flex-horizontal>' +
+                                        '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
+                                        '<div>'
+                                );
 
-                                if (data.dteStart && data.dteEnd && !isNaN(data.dteStart.getTime()) && !isNaN(data.dteEnd.getTime())) {
-                                    strHTML +=
+                                // if we have all of the query execution time
+                                //      data, show it
+                                if (
+                                    data.dteStart &&
+                                    data.dteEnd &&
+                                    !isNaN(data.dteStart.getTime()) &&
+                                    !isNaN(data.dteEnd.getTime())
+                                ) {
+                                    strHTML += (
                                         '<small>' +
-                                            'Approx. ' + ((data.dteEnd.getTime() - data.dteStart.getTime()) / 1000).toFixed(3) + ' seconds' +
-                                        '</small>';
+                                            'Approx. ' +
+                                            (
+                                                (
+                                                    data.dteEnd.getTime() -
+                                                    data.dteStart.getTime()
+                                                ) / 1000
+                                            ).toFixed(3) + ' seconds' +
+                                        '</small>'
+                                    );
                                 }
 
                                 strHTML += '<br />';
 
+                                // if we have a record number, show it
                                 if (data.intRows !== undefined) {
-                                    strHTML += '<small id="row-count-' + data.intQueryNumber + '"><span id="loaded-row-count-' + data.intQueryNumber + '" hidden>0</span>' + data.intRows + ' rows loaded</small>';
+                                    strHTML += (
+                                        '<small id="row-count-' + data.intQueryNumber + '">' +
+                                            '<span id="loaded-row-count-' + data.intQueryNumber + '" hidden>0</span>' +
+                                            data.intRows + ' rows loaded' +
+                                        '</small>'
+                                    );
                                 }
 
-
-                                strHTML +=      '</div>' +
-                                                '<span>&nbsp;</span>' +
-                                                '<gs-button class="button-show-query" no-focus>Query</gs-button>' +
-                                            '</div>' + warningHTML;
+                                strHTML += (
+                                        '</div>' +
+                                        '<span>&nbsp;</span>' +
+                                        '<gs-button class="button-show-query" no-focus>Query</gs-button>' +
+                                    '</div>' +
+                                    warningHTML
+                                );
 
                                 divElement.innerHTML = strHTML;
 
+                                // append query info and results container
                                 divElement.appendChild(scrollElement);
                                 resultsContainer.appendChild(divElement);
-                                executeHelperBindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
+
+                                // we want the "Show Query" buttons to work
+                                executeHelperBindShowQueryButton(
+                                    xtag.query(divElement, '.button-show-query')[0],
+                                    data.strQuery
+                                );
                                 
-                                var tabNumber = xtag.query(document.body, '.current-tab')[0].relatedEditor.container.getAttribute('id');
-                                tabNumber = tabNumber.substring(tabNumber.length - 1, tabNumber.length);
-                                var idNumber = tabNumber + '' + xtag.query(resultsContainer, 'gs-table').length;
+                                tabNumber = currentTab.intTabNumber;
+                                idNumber = tabNumber + '-' + xtag.query(resultsContainer, 'gs-table').length;
+                                tableID = 'Table' + idNumber + '';
                                 
-                                var strHTML = ml(function () {/*
+                                strHTML = ml(function () {/*
                                     <template for="top-hud">
-                                        <gs-button onclick="document.getElementById('{{TOKEN}}').openPrefs(this)" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
-                                        <gs-button onclick="document.getElementById('{{TOKEN}}').toggleFullscreen(this)" inline id="toggleFullscreen-{{IDNUM}}" no-focus icononly icon="arrows-alt">&nbsp;</gs-button>
-                                        <gs-button onclick="hideOtherTables({{IDNUM}}, '{{TOKEN}}'); document.getElementById('{{TOKEN}}').toggleFullContainer('sql-results-area-{{IDNUM}}', this)" inline no-focus icononly icon="expand">&nbsp;</gs-button>
+                                        <gs-button onclick="document.getElementById('{{TABLEID}}').openPrefs(this)" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
+                                        <gs-button onclick="document.getElementById('{{TABLEID}}').toggleFullscreen(this)" inline id="toggleFullscreen-{{IDNUM}}" no-focus icononly icon="arrows-alt">&nbsp;</gs-button>
+                                        <gs-button onclick="hideOtherTables({{IDNUM}}, '{{TABLEID}}'); document.getElementById('{{TABLEID}}').toggleFullContainer('sql-results-area-{{IDNUM}}', this)" inline no-focus icononly icon="expand">&nbsp;</gs-button>
                                     </template>
                                     <template for="bottom-hud">
-                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TOKEN}}').goToLine('first')" icon="step-backward">&nbsp;</gs-button>
-                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TOKEN}}').goToLine('previous')" icon="caret-left">&nbsp;</gs-button>
-                                        <gs-current-record inline for="{{TOKEN}}"></gs-current-record>
-                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TOKEN}}').goToLine('next')" icon="caret-right">&nbsp;</gs-button>
-                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TOKEN}}').goToLine('last')" icon="step-forward">&nbsp;</gs-button>
+                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('first')" icon="step-backward">&nbsp;</gs-button>
+                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('previous')" icon="caret-left">&nbsp;</gs-button>
+                                        <gs-current-record inline for="{{TABLEID}}"></gs-current-record>
+                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('next')" icon="caret-right">&nbsp;</gs-button>
+                                        <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('last')" icon="step-forward">&nbsp;</gs-button>
                                     </template>
-                                */}).replace(/{{TOKEN}}/gi, 'Table' + idNumber + '').replace(/{{IDNUM}}/gi, tabNumber);
+                                */}).replace(/{{TABLEID}}/gi, tableID).replace(/{{IDNUM}}/gi, tabNumber);
                                 
-                                //var i, len;
                                 strHTML += '<template for="header-record">';
-                                    for (i = 0, len = data.arrColumnNames.length; i < len; i += 1) {
-                                        var columnType;
-                                        if (data.arrColumnTypes[i].substring(0, 17) === "character varying") {
-                                            columnType = 'varchar' + data.arrColumnTypes[i].substring(17, data.arrColumnTypes[i].length) + '';
-                                        } else if (data.arrColumnTypes[i] === "timestamp with time zone") {
-                                            columnType = 'timestamptz';
-                                        } else {
-                                            columnType = data.arrColumnTypes[i];
-                                        }
-                                        strHTML += '<gs-cell>' + data.arrColumnNames[i] + '<br />(' + columnType + ')</gs-cell>';
+
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    // appreviate some of the types
+                                    if (data.arrColumnTypes[i].indexOf("character vary") === 0) {
+                                        columnType = (
+                                            'varchar' +
+                                            data.arrColumnTypes[i].substring(17, data.arrColumnTypes[i].length)
+                                        );
+
+                                    } else if (data.arrColumnTypes[i] === "timestamp with time zone") {
+                                        columnType = 'timestamptz';
+
+                                    } else {
+                                        columnType = data.arrColumnTypes[i];
                                     }
+
+                                    strHTML += (
+                                        '<gs-cell style="line-height: normal;">' +
+                                            data.arrColumnNames[i] +
+                                            '<br />' +
+                                            '<small>(' + columnType + ')</small>' +
+                                        '</gs-cell>'
+                                    );
+                                    i += 1;
+                                }
+
                                 strHTML += '</template>';
                                 strHTML += '<template for="data-record">';
-                                    for (i = 0, len = data.arrColumnNames.length; i < len; i += 1) {
-                                        var columnType;
-                                        if (data.arrColumnTypes[i].substring(0, 17) === "character varying") {
-                                            columnType = 'varchar' + data.arrColumnTypes[i].substring(17, data.arrColumnTypes[i].length) + '';
-                                        } else if (data.arrColumnTypes[i] === "timestamp with time zone") {
-                                            columnType = 'timestamptz';
-                                        } else {
-                                            columnType = data.arrColumnTypes[i];
-                                        }
-                                        strHTML += '<gs-cell header="' + data.arrColumnNames[i] + '<br />(' + columnType + ')"><label><gs-static value="{{! row[\'' + data.arrColumnNames[i] + '\'] }}"></gs-static></label></gs-cell>';
+
+                                // generate record cell html
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    // appreviate some of the types
+                                    if (data.arrColumnTypes[i].indexOf("character vary") === 0) {
+                                        columnType = (
+                                            'varchar' +
+                                            data.arrColumnTypes[i].substring(17, data.arrColumnTypes[i].length)
+                                        );
+
+                                    } else if (data.arrColumnTypes[i] === "timestamp with time zone") {
+                                        columnType = 'timestamptz';
+
+                                    } else {
+                                        columnType = data.arrColumnTypes[i];
                                     }
+
+                                    strHTML += (
+                                        '<gs-cell>' +
+                                            '<label>{{! row[\'' + data.arrColumnNames[i] + '\'] }}</label>' +
+                                        '</gs-cell>'
+                                    );
+                                    i += 1;
+                                }
+
                                 strHTML += '</template>';
                                 strHTML += '<template for="copy">';
-                                    for (i = 0, len = data.arrColumnNames.length; i < len; i += 1) {
-                                        strHTML += '<gs-cell header="' + data.arrColumnNames[i] + '">' + data.arrColumnNames[i] + '</gs-cell>';
-                                    }
+
+                                // generate copy cell html
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    strHTML += (
+                                        '<gs-cell header="' + data.arrColumnNames[i] + '">' +
+                                            '{{! row[\'' + data.arrColumnNames[i] + '\'] }}' +
+                                        '</gs-cell>'
+                                    );
+                                    i += 1;
+                                }
+
                                 strHTML += '</template>';
                                 
                                 GS.log(true, data);
                                 
-                                // console.log(arrData);
                                 tableElement = document.createElement('gs-table');
                                 tableElement.innerHTML = strHTML;
-                                tableElement.setAttribute('id', 'Table' + idNumber + '');
+                                tableElement.setAttribute('id', tableID);
                                 tableElement.setAttribute('no-delete', '');
                                 tableElement.setAttribute('no-update', '');
                                 scrollElement.appendChild(tableElement);
                                 
-                                function makeArray(arrLength, value) {
-                                    var tempArr = [];
-                                    for (i = 0, len = arrLength; i < len; i += 1) {
-                                        tempArr.push(value);
-                                    }
-                                    return tempArr;
-                                }
-                                
                                 tableElement.internalData.records = arrData;
                                 tableElement.internalData.columnNames = data.arrColumnNames;
-                                tableElement.internalData.columnTypes = makeArray(data.arrColumnNames.length, 'text');
-                                tableElement.internalData.columnFilterStatuses = makeArray(data.arrColumnNames.length, 'on');
-                                tableElement.internalData.columnFilters = makeArray(data.arrColumnNames.length, []);
-                                tableElement.internalData.columnListFilters = makeArray(data.arrColumnNames.length, {});
-                                tableElement.internalData.columnOrders = makeArray(data.arrColumnNames.length, 'neutral');
-                                tableElement.internalDisplay.headerHeight = 54;
-                                //tableElement.internalDisplay.columnWidths = makeArray(data.arrColumnNames.length, 1);
-                                // refresh causes the record heights to be
-                                //      calculated
-                                arrData = [];
+                                
+                                tempArr = [];
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    tempArr.push('text');
+                                    i += 1;
+                                }
+                                tableElement.internalData.columnTypes = tempArr;
+                                
+                                tempArr = [];
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    tempArr.push('on');
+                                    i += 1;
+                                }
+                                tableElement.internalData.columnFilterStatuses = tempArr;
+                                
+                                tempArr = [];
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    tempArr.push([]);
+                                    i += 1;
+                                }
+                                tableElement.internalData.columnFilters = tempArr;
+                                
+                                tempArr = [];
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    tempArr.push({});
+                                    i += 1;
+                                }
+                                tableElement.internalData.columnListFilters = tempArr;
+                                
+                                tempArr = [];
+                                i = 0;
+                                len = data.arrColumnNames.length;
+                                while (i < len) {
+                                    tempArr.push('neutral');
+                                    i += 1;
+                                }
+                                tableElement.internalData.columnOrders = tempArr;
+
+                                tableElement.internalDisplay.headerHeight = 37;
+                                
+                                // refresh causes the record heights to be calculated
                                 tableElement.refresh();
+                                
+                                // clear arrData variable so that we don't modify the
+                                //      arrData we sent to the datasheet
+                                arrData = [];
                                 
                                 intQuery += 1;
                                 executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
@@ -2881,10 +3017,10 @@ function executeScript(bolCursorQuery) {
 						var intErrorCol = parseInt(data.error_position, 10) - 1;
 						var i = 0;
 						var len = intLine - 1;
-					    console.log(len, intLine, arrLines.length);
-					    console.log(jsnCurrentQuery.strQuery);
-					    console.log(intErrorStartChar);
-					    console.log(intErrorStartChar);
+					    //console.log(len, intLine, arrLines.length);
+					    //console.log(jsnCurrentQuery.strQuery);
+					    //console.log(intErrorStartChar);
+					    //console.log(intErrorStartChar);
 						while (i < len) {
 						    console.log(i, arrLines[i], arrLines[i].length);
 							intErrorCol -= arrLines[i].length + 1;

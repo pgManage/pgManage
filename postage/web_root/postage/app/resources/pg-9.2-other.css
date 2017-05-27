@@ -36,6 +36,7 @@
         zoom code */
 .ace_editor {
     font-size: 0.8em;
+    cursor: default;
 }
 
 /* ####################################################### */

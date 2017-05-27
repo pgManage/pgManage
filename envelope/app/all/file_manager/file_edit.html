@@ -20,8 +20,7 @@
             /*jslint white:true*/
             var strCurrentPageLink, bolCurrentlySaving = false, bolSaveWaiting = false, lastModified, intCurrentFind = 0,
                 arrLineNumbers, editor, bolAutoSave = true, bolBlameMode = false, currentSaveAjax, strActionLink = '/env',
-                intTimerID, testingWindow, currentElementData, jsnTagData = {}, openSelectionMarker, closeSelectionMarker,
-                bolWebSocket, strParsingMode;
+                intTimerID, testingWindow, currentElementData, jsnTagData = {}, openSelectionMarker, closeSelectionMarker, strParsingMode;
                 //consoleCustom = []
             
             if (window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) {
@@ -127,72 +126,6 @@
                 
                 return '';
             }
-            
-            //function renameFile() {
-            //    GS.openDialog('dialog-rename', function () {
-            //        document.getElementById('input-new-file-name').value = strCurrentPageLink;
-            //    }, function (event, strAnswer) {
-            //        if (strAnswer === 'Ok') {
-            //            var newName = document.getElementById('input-new-file-name').value;
-            //            
-            //            GS.addLoader('file-rename', 'Updating...');
-            //            // need to make sure that the files/folders are renamed in order
-            //            GS.ajaxJSON(strActionLink + '/action_file', 'action=mv_file' +
-            //                                                '&paths_from=' + encodeURIComponent('["' + strCurrentPageLink + '"]') +
-            //                                                '&paths_to=' + encodeURIComponent('["' + newName + '"]'),
-            //                                                function(data, error) {
-            //                if (!error) {
-            //                    strCurrentPageLink = newName;
-            //                    GS.ajaxJSON(strActionLink + '/action_file', 'action=read' +
-            //                                                                '&path=' + encodeURIComponent(strCurrentPageLink),
-            //                                                                function (data, error) {
-            //                        if (!error) {
-            //                            lastModified = data.dat.date;
-            //                            GS.removeLoader('file-rename');
-            //                            
-            //                            if (window.opener && window.opener.listCurrentDirectory) {
-            //                                window.opener.listCurrentDirectory(false);
-            //                            }
-            //                            document.getElementById('display-file-name').textContent = 'Editing: ' + strCurrentPageLink.substring(strCurrentPageLink.lastIndexOf('/') + 1);
-            //                            GS.pushQueryString('link=' + encodeURIComponent(strCurrentPageLink));
-            //                            document.getElementById('display-full-link').innerHTML = strCurrentPageLink;
-            //                        } else {
-            //                            GS.ajaxErrorDialog(data);
-            //                        }
-            //                    });
-            //                    
-            //                } else {
-            //                    GS.ajaxErrorDialog(data);
-            //                }
-            //            });
-            //        }
-            //    });
-            //}
-            
-            //function deleteFile() {
-            //    GS.openDialog('dialog-delete', function () {
-            //        document.getElementById('delete-file-path').textContent = strCurrentPageLink;
-            //    }, function (event, strAnswer) {
-            //        if (strAnswer === 'Ok') {
-            //            GS.addLoader('file-delete', 'Deleting...');
-            //            // need to make sure that the files/folders are renamed in order
-            //            GS.ajaxJSON(strActionLink + '/action_file', 'action=rm' +
-            //                                                        '&paths=' + encodeURIComponent('["'+strCurrentPageLink+'"]'),
-            //                                                        function (data, error) {
-            //                GS.removeLoader('file-delete');
-            //                
-            //                if (!error) {
-            //                    if (window.opener && window.opener.listCurrentDirectory) {
-            //                        window.opener.listCurrentDirectory(false);
-            //                    }
-            //                    window.close();
-            //                } else {
-            //                    GS.ajaxErrorDialog(data);
-            //                }
-            //            });
-            //        }
-            //    });
-            //}
             
             function registerDesignSnippet(strName, strTabTrigger, strSnippet) {
                 snippetManager.register([{'name': strName, 'tabTrigger': strTabTrigger, 'content':  strSnippet}]);
@@ -532,68 +465,35 @@
             }
             
             function loadFile() {
-                if (bolWebSocket) {
-                    GS.addLoader('file-load', 'Loading File...');
-                    GS.requestFromSocket(GS.envSocket
-                                       , 'FILE\tREAD\t' + GS.encodeForTabDelimited(strCurrentPageLink)
-                                       , function (data, error, errorData) {
-                        var index, selectionChangeHandler;
-                        
-                        if (!error) {
-                            if (data !== 'TRANSACTION COMPLETED') {
-                                index = data.indexOf('\n');
-                                lastModified = data.substring(0, index);
-                                data = data.substring(index + 1);
-                                
-                                makeEditor(data);
-                                
-                                // hide panel if on a phone
-                                if (evt.deviceType === 'phone' || evt.deviceType === 'tablet' || window.innerWidth <= 600) {
-                                    GS.triggerEvent(document.getElementById('button-panel-close'), 'click');
-                                }
-                                
-                                search();
-                            } else {
-                                GS.removeLoader('file-load');
-                            }
-                            
-                        } else {
-                            GS.removeLoader('file-load');
-                            GS.webSocketErrorDialog(errorData);
-                        }
-                    });
+                GS.addLoader('file-load', 'Loading File...');
+                GS.requestFromSocket(GS.envSocket
+                                   , 'FILE\tREAD\t' + GS.encodeForTabDelimited(strCurrentPageLink)
+                                   , function (data, error, errorData) {
+                    var index, selectionChangeHandler;
                     
-                } else {
-                    GS.addLoader('file-load', 'Loading File...');
-                    GS.ajaxJSON(strActionLink + '/action_file'
-                              , 'action=read&path=' + encodeURIComponent(strCurrentPageLink)
-                              , function (data, error) {
-                        GS.removeLoader('file-load');
-                        
-                        if (!error) {
-                            lastModified = data.dat.date;
+                    if (!error) {
+                        if (data !== 'TRANSACTION COMPLETED') {
+                            index = data.indexOf('\n');
+                            lastModified = data.substring(0, index);
+                            data = data.substring(index + 1);
                             
-                            makeEditor(data.dat.content);
+                            makeEditor(data);
                             
                             // hide panel if on a phone
                             if (evt.deviceType === 'phone' || evt.deviceType === 'tablet' || window.innerWidth <= 600) {
                                 GS.triggerEvent(document.getElementById('button-panel-close'), 'click');
                             }
                             
-                            //
                             search();
                         } else {
-                            document.getElementById('area').innerHTML = '<br />' +
-                                                                        '<center>This file does not exist. Would you like to create it?</center>' +
-                                                                        '<br />' +
-                                                                        '<gs-button onclick="createFile()">Create The File</gs-button>';
-                            
-                            document.getElementById('button-create-file').addEventListener('click', function () {
-                                createFile();
-                            });
+                            GS.removeLoader('file-load');
                         }
-                    });
-                }
+                        
+                    } else {
+                        GS.removeLoader('file-load');
+                        GS.webSocketErrorDialog(errorData);
+                    }
+                });
             }
             
             function makeEditor(strContent) {
@@ -709,22 +609,6 @@
                 });
             }
             
-            function createFile() {
-                GS.addLoader('file-create', 'Creating File...');
-                GS.ajaxJSON(strActionLink + '/action_file', 'action=write' +
-                                                                    '&path=' + encodeURIComponent(strCurrentPageLink) +
-                                                                    '&content=', function(data, error) {
-                    if (!error) {
-                        window.location.reload();
-                    } else {
-                        GS.removeLoader('file-create');
-                        GS.ajaxErrorDialog(data, function() {
-                            createFile();
-                        });
-                    }
-                });
-            }
-            
             function search() {
                 'use strict';
                 var aceContainer = document.getElementById('area'), regexToggle, caseSensitiveToggle, objSearchField,
@@ -781,11 +665,7 @@
                         //aceContainer.classList.add('indicator-error');
                     }, 5000);
                     
-                    if (bolWebSocket) {
-                        webSocketFileSave(bolLoader);
-                    } else {
-                        ajaxFileSave(bolLoader);
-                    }
+                    webSocketFileSave(bolLoader);
                 } else {
                     bolSaveWaiting = true;
                 }
@@ -823,14 +703,6 @@
                         if (bolSaveWaiting) {
                             bolSaveWaiting = false;
                             saveFile();
-                        } else {
-                            if (!testingWindow || (testingWindow && testingWindow.closed === true)) {
-                                //there is no window, and they haven't indicated they want one
-                            } else {
-                                //there is one, so reload it
-                                
-                                testingWindow.location.reload(true);
-                            }
                         }
                     } else {
                         bolSaveWaiting = false;
@@ -883,13 +755,6 @@
                             if (bolSaveWaiting) {
                                 bolSaveWaiting = false;
                                 saveFile();
-                            } else {
-                                if (!testingWindow || (testingWindow && testingWindow.closed === true)) {
-                                    //there is no window, and they haven't indicated they want one
-                                } else {
-                                    //there is one, so reload it
-                                    testingWindow.location.reload(true);
-                                }
                             }
                         }
                     } else {
@@ -919,8 +784,6 @@
                 window.snippetManager = require('ace/snippets').snippetManager;
                 
                 strCurrentPageLink = jsnArgs.link;
-                
-                bolWebSocket = true; //(jsnArgs.socket === "true");
                 
                 
                 if (strCurrentPageLink) {
@@ -995,20 +858,8 @@
                     testingWindow.close();
                 }
                 
-                if (bolWebSocket) {
-                    if ((intTimerID !== undefined && intTimerID !== null) || bolCurrentlySaving || !bolAutoSave) {
-                        return 'You have unsaved changes.';
-                    }
-                } else {
-                    if (bolCurrentlySaving) {
-                        currentSaveAjax.abort();
-                        bolSaveWaiting = false;
-                        bolCurrentlySaving = false;
-                        saveFile();
-                        
-                    } else if (!bolAutoSave) {
-                        return 'You have unsaved changes.';
-                    }
+                if ((intTimerID !== undefined && intTimerID !== null) || bolCurrentlySaving || !bolAutoSave) {
+                    return 'You have unsaved changes.';
                 }
             });
         </script>

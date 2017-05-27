@@ -401,6 +401,8 @@ function autocompleteBindEditor(tabElement, editor) {
     // });
 
     editor.addEventListener('change', function (event) {
+        //console.log(event);
+        
         if (event.action === 'insert') {
             //we we typed a key (four spaces is a tab from the indent action (tab key))
             if (event.lines[0] === '    ') {
@@ -420,6 +422,14 @@ function autocompleteBindEditor(tabElement, editor) {
             }
         } else {
             autocompleteKeyEvent = 'delete';
+        }
+        
+        if (autocompleteKeyEvent !== 'delete'
+            && autocompleteKeyEvent !== 'paste'
+            && editor.currentSelections && editor.currentSelections.length > 1
+            && (editor.currentSelections[0].start.column !== event.start.column
+            || editor.currentSelections[0].start.row !== event.start.row)) {
+            autocompleteKeyEvent = 'other_cursor';
         }
         
         autocompleteLogic(editor, autocompleteKeyEvent, event);
@@ -445,6 +455,10 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     // Else determine context and open popup
     }
     
+    if (autocompleteKeyEvent === 'other_cursor') {
+        return;
+    }
+    
     if (autocompleteKeyEvent === 'indent') {
         intCursorPosition += 3; //fix four spaces issue
     }
@@ -453,9 +467,26 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     //console.log('typeof', typeof objContext);
     //console.log('objContext', objContext);
     if (typeof objContext !== 'undefined' && objContext !== null) {
-        autocompleteGlobals.searchLength = objContext.searchLength;
+        //if we are at a different context position, then close current popup
+        if (autocompleteGlobals.intContextPosition !== objContext.intContextPosition) {
+            //console.log('close popup for different context position');
+            autocompleteGlobals.intContextPosition = objContext.intContextPosition;
+            closePopup();
+        }
+        
+        if (autocompleteGlobals.startRow !== editor.selection.getRange().start.row
+            || autocompleteGlobals.startColumnSearch !== editor.selection.getRange().start.column - objContext.strContext.length) {
+            //console.log('close popup for different search position');
+            autocompleteGlobals.startRow = editor.selection.getRange().start.row;
+            autocompleteGlobals.startColumnSearch = editor.selection.getRange().start.column - objContext.strContext.length;
+            closePopup();
+        }
+        
+        //open popup using context
         //console.log('told to open');
+        autocompleteGlobals.searchLength = objContext.searchLength;
         autocompleteMakeList(objContext.arrQueries, objContext.strContext, editor);
+        
 
     } else {
         //console.log('told to close');
@@ -470,10 +501,14 @@ function closePopup() {
         //console.log('closed');
         autocompleteGlobals.bolBound = false;
         // if the autocomplete query is still running: cancel it
-        if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning && !autocompleteGlobals.bolQueryCanceled) {
+        //console.log('2 autocompleteGlobals.strQueryID', autocompleteGlobals.strQueryID);
+        //console.log('2 autocompleteGlobals.bolQueryRunning', autocompleteGlobals.bolQueryRunning);
+        //console.log('2 autocompleteGlobals.bolQueryCancelled', autocompleteGlobals.bolQueryCancelled);
+        if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning && !autocompleteGlobals.bolQueryCancelled) {
+            //console.log('2 CANCEL');
             //console.log(autocompleteGlobals.strQueryID);
             GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
-            autocompleteGlobals.bolQueryCanceled = true;
+            autocompleteGlobals.bolQueryCancelled = true;
             autocompleteGlobals.popupLoading = false;
         }
 
@@ -577,9 +612,10 @@ function autocompleteComplete(editor) {
 
 function autocompleteMakeList(arrQueries, searchWord, editor) {
     'use strict';
-    //console.log('now',autocompleteGlobals.bolQueryRunning);
+    //console.log('now', autocompleteGlobals.bolQueryRunning);
     if (autocompleteGlobals.bolQueryRunning) {
-        autocompleteGlobals.bolSpecialFilter = true;
+        //console.log('autocompleteGlobals.strSpecialFilter := ' + searchWord);
+        autocompleteGlobals.strSpecialFilter = searchWord;
     } else {
         //queryVars
 
@@ -607,7 +643,10 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
         strQuery = 'SELECT DISTINCT * FROM (\n' + arrQueries.join('\n     UNION ALL\n') + '\n' + ') em ORDER BY obj_name;';
         //console.log(strQuery);
         // if the autocomplete query is still running: cancel it
+        //console.log('1 autocompleteGlobals.strQueryID', autocompleteGlobals.strQueryID);
+        //console.log('1 autocompleteGlobals.bolQueryRunning', autocompleteGlobals.bolQueryRunning);
         if (autocompleteGlobals.strQueryID && autocompleteGlobals.bolQueryRunning) {
+            //console.log('1 CANCEL');
             GS.requestFromSocket(GS.envSocket, 'CANCEL', '', autocompleteGlobals.strQueryID);
         }
         //console.log('autocompleteGlobals.bolAlpha:' + autocompleteGlobals.bolAlpha);
@@ -681,10 +720,12 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
         }
 
         //autocompleteGlobals.arrSearchPath
-        //console.log('query running');
+        
+        //console.log('autocompleteGlobals.bolQueryRunning := true');
         autocompleteGlobals.bolQueryRunning = true;
         // make the request
         var getlist = function () {
+            //console.log('autocompleteGlobals.strQueryID := ');
             autocompleteGlobals.strQueryID = GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
                 var arrRows, i, len;
                 if (!error) {
@@ -713,8 +754,10 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
                         autocompleteGlobals.strQueryID = null;
                         //console.log('arrValues', autocompleteGlobals.arrValues);
 
+                        //console.log('autocompleteGlobals.bolQueryRunning := false');
                         autocompleteGlobals.bolQueryRunning = false;
-                        autocompleteGlobals.bolQueryCanceled = false;
+                        //console.log('autocompleteGlobals.bolQueryCancelled := false');
+                        autocompleteGlobals.bolQueryCancelled = false;
                         //console.log('ending the query');
                         //console.log('strQuery', strQuery);
 
@@ -722,9 +765,11 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
 
                     }
                 } else {
+                    //console.log('autocompleteGlobals.bolQueryRunning := false');
                     autocompleteGlobals.bolQueryRunning = false;
+                    //console.log('autocompleteGlobals.strQueryID := null');
                     autocompleteGlobals.strQueryID = null;
-                    console.warn('websocket error', error, data);
+                    //console.warn('websocket error', error, data);
                 }
             });
         }
@@ -733,8 +778,10 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
             setTimeout(function(){
                 getlist();
             }, 2000);
+            //console.log('autocompleteGlobals.bolQueryRunning := false');
             autocompleteGlobals.bolQueryRunning = false;
-            autocompleteGlobals.bolQueryCanceled = false;
+            //console.log('autocompleteGlobals.bolQueryCancelled := false');
+            autocompleteGlobals.bolQueryCancelled = false;
             //autocompleteGlobals.bolTestSlowDown = false;
         } else {
             getlist();
@@ -751,15 +798,16 @@ function autoCompleteTryOpen(optionList, searchWord, editor) {
     autocompleteGlobals.arrValues = optionList;
     autocompleteGlobals.arrValuesMaster = optionList;
     
-    if (autocompleteGlobals.bolSpecialFilter) {
-        autocompleteGlobals.bolSpecialFilter = false;
+    if (autocompleteGlobals.strSpecialFilter) {
         if (optionList.length === 0) {
             closePopup();
         } else {
             //closePopup();
             
-            autocompleteFilterList(optionList, searchWord, editor);
+            autocompleteFilterList(optionList, autocompleteGlobals.strSpecialFilter, editor);
         }
+        autocompleteGlobals.strSpecialFilter = "";
+
     } else {
         if (optionList.length === 0) {
             closePopup();
@@ -778,10 +826,10 @@ function autoCompleteTryOpen(optionList, searchWord, editor) {
 function autocompleteFilterList(list, searchWord, editor) {
     //console.trace('autocompleteFilterList');
     
-    //console.log(searchWord, autocompleteGlobals.searchLength);
+    //console.log('searchWord', searchWord, autocompleteGlobals.searchLength);
     //console.log(autocompleteGlobals.bolQueryRunning);
     if (autocompleteGlobals.bolQueryRunning) {
-        autocompleteGlobals.bolSpecialFilter = true;
+        autocompleteGlobals.strSpecialFilter = searchWord;
     } else if (!searchWord || searchWord.length === 0) {
         //closePopup();
         if (!autocompleteGlobals.popupOpen) {

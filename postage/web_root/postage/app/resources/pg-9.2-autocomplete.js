@@ -24,27 +24,30 @@ var autocompleteGlobals = {
       , 'bolBound':        false
       , 'searchLength':    0
       , 'bolQueryRunning': false
-      , 'bolQueryCanceled': false
-      , 'bolSpecialFilter':  false
+      , 'bolQueryCancelled': false
+      , 'strSpecialFilter':  ""
       , 'bolTestSlowDown':   false
       , 'quoteLevel':      0
       , 'bolSnippets':  false
       , 'intContextPosition': 0
       , 'arrStrContext': []
+      , 'startRow': 0
+      , 'startColumnSearch': 0
     };
 
 function doubleIdentifier(strInput) {
-    var arrStrIdentifier = strInput.match(/^[\n\r\ \t]+([a-zA-Z_][a-zA-z_0-9\$]+|\".*(\"\".*)*\")\.([a-zA-Z_][a-zA-z_0-9\$]+|\".*(\"\".*)*\")[\n\r\ \t]+([a-zA-Z_]+)?[\n\r\ \t]*/);
+    console.log('doubleIdentifier(' + strInput + ')');
+    var arrStrIdentifier = strInput.match(/^[\n\r\ \t]+([a-zA-Z_][a-zA-z_0-9\$]+|\".*(\"\".*)*\")\.([a-zA-Z_][a-zA-z_0-9\$]+|\".*(\"\".*)*\")([\n\r\ \t]+AS)?([\n\r\ \t]+([a-zA-Z_][a-zA-z_0-9\$]+))?[\n\r\ \t]*/);
     if (arrStrIdentifier) {
         //keywords are not allowed as a table short name
-        if (arrStrIdentifier[5] && arrStrIdentifier[5].match(/^(CHECK|A|ABORT|ABS|ABSENT|ABSOLUTE|ACCESS|ACCORDING|ACTION|ADA|ADD|ADMIN|AFTER|AGGREGATE|ALL|ALLOCATE|ALSO|ALTER|ALWAYS|ANALYSE|ANALYZE|AND|ANY|ARE|ARRAY|ARRAY_AGG|ARRAY_MAX_CARDINALITY|AS|ASC|ASENSITIVE|ASSERTION|ASSIGNMENT|ASYMMETRIC|AT|ATOMIC|ATTRIBUTE|ATTRIBUTES|AUTHORIZATION|AVG|BACKWARD|BASE64|BEFORE|BEGIN|BEGIN_FRAME|BEGIN_PARTITION|BERNOULLI|BETWEEN|BIGINT|BINARY|BIT|BIT_LENGTH|BLOB|BLOCKED|BOM|BOOLEAN|BOTH|BREADTH|BY|C|CACHE|CALL|CALLED|CARDINALITY|CASCADE|CASCADED|CASE|CAST|CATALOG|CATALOG_NAME|CEIL|CEILING|CHAIN|CHAR|CHARACTER|CHARACTERISTICS|CHARACTERS|CHARACTER_LENGTH|CHARACTER_SET_CATALOG|CHARACTER_SET_NAME|CHARACTER_SET_SCHEMA|CHAR_LENGTH|CHECK|CHECKPOINT|CLASS|CLASS_ORIGIN|CLOB|CLOSE|CLUSTER|COALESCE|COBOL|COLLATE|COLLATION|COLLATION_CATALOG|COLLATION_NAME|COLLATION_SCHEMA|COLLECT|COLUMN|COLUMNS|COLUMN_NAME|COMMAND_FUNCTION|COMMAND_FUNCTION_CODE|COMMENT|COMMENTS|COMMIT|COMMITTED|CONCURRENTLY|CONDITION|CONDITION_NUMBER|CONFIGURATION|CONFLICT|CONNECT|CONNECTION|CONNECTION_NAME|CONSTRAINT|CONSTRAINTS|CONSTRAINT_CATALOG|CONSTRAINT_NAME|CONSTRAINT_SCHEMA|CONSTRUCTOR|CONTAINS|CONTENT|CONTINUE|CONTROL|CONVERSION|CONVERT|COPY|CORR|CORRESPONDING|COST|COUNT|COVAR_POP|COVAR_SAMP|CREATE|CROSS|CSV|CUBE|CUME_DIST|CURRENT|CURRENT_CATALOG|CURRENT_DATE|CURRENT_DEFAULT_TRANSFORM_GROUP|CURRENT_PATH|CURRENT_ROLE|CURRENT_ROW|CURRENT_SCHEMA|CURRENT_TIME|CURRENT_TIMESTAMP|CURRENT_TRANSFORM_GROUP_FOR_TYPE|CURRENT_USER|CURSOR|CURSOR_NAME|CYCLE|DATA|DATABASE|DATALINK|DATE|DATETIME_INTERVAL_CODE|DATETIME_INTERVAL_PRECISION|DAY|DB|DEALLOCATE|DEC|DECIMAL|DECLARE|DEFAULT|DEFAULTS|DEFERRABLE|DEFERRED|DEFINED|DEFINER|DEGREE|DELETE|DELIMITER|DELIMITERS|DENSE_RANK|DEPENDS|DEPTH|DEREF|DERIVED|DESC|DESCRIBE|DESCRIPTOR|DETERMINISTIC|DIAGNOSTICS|DICTIONARY|DISABLE|DISCARD|DISCONNECT|DISPATCH|DISTINCT|DLNEWCOPY|DLPREVIOUSCOPY|DLURLCOMPLETE|DLURLCOMPLETEONLY|DLURLCOMPLETEWRITE|DLURLPATH|DLURLPATHONLY|DLURLPATHWRITE|DLURLSCHEME|DLURLSERVER|DLVALUE|DO|DOCUMENT|DOMAIN|DOUBLE|DROP|DYNAMIC|DYNAMIC_FUNCTION|DYNAMIC_FUNCTION_CODE|EACH|ELEMENT|ELSE|EMPTY|ENABLE|ENCODING|ENCRYPTED|END|END-EXEC|END_FRAME|END_PARTITION|ENFORCED|ENUM|EQUALS|ESCAPE|EVENT|EVERY|EXCEPT|EXCEPTION|EXCLUDE|EXCLUDING|EXCLUSIVE|EXEC|EXECUTE|EXISTS|EXP|EXPLAIN|EXPRESSION|EXTENSION|EXTERNAL|EXTRACT|FALSE|FAMILY|FETCH|FILE|FILTER|FINAL|FIRST|FIRST_VALUE|FLAG|FLOAT|FLOOR|FOLLOWING|FOR|FORCE|FOREIGN|FORTRAN|FORWARD|FOUND|FRAME_ROW|FREE|FREEZE|FROM|FS|FULL|FUNCTION|FUNCTIONS|FUSION|G|GENERAL|GENERATED|GET|GLOBAL|GO|GOTO|GRANT|GRANTED|GREATEST|GROUP|GROUPING|GROUPS|HANDLER|HAVING|HEADER|HEX|HIERARCHY|HOLD|HOUR|ID|IDENTITY|IF|IGNORE|ILIKE|IMMEDIATE|IMMEDIATELY|IMMUTABLE|IMPLEMENTATION|IMPLICIT|IMPORT|IN|INCLUDING|INCREMENT|INDENT|INDEX|INDEXES|INDICATOR|INHERIT|INHERITS|INITIALLY|INLINE|INNER|INOUT|INPUT|INSENSITIVE|INSERT|INSTANCE|INSTANTIABLE|INSTEAD|INT|INTEGER|INTEGRITY|INTERSECT|INTERSECTION|INTERVAL|INTO|INVOKER|IS|ISNULL|ISOLATION|JOIN|K|KEY|KEY_MEMBER|KEY_TYPE|LABEL|LAG|LANGUAGE|LARGE|LAST|LAST_VALUE|LATERAL|LEAD|LEADING|LEAKPROOF|LEAST|LEFT|LENGTH|LEVEL|LIBRARY|LIKE|LIKE_REGEX|LIMIT|LINK|LISTEN|LN|LOAD|LOCAL|LOCALTIME|LOCALTIMESTAMP|LOCATION|LOCATOR|LOCK|LOCKED|LOGGED|LOWER|M|MAP|MAPPING|MATCH|MATCHED|MATERIALIZED|MAX|MAXVALUE|MAX_CARDINALITY|MEMBER|MERGE|MESSAGE_LENGTH|MESSAGE_OCTET_LENGTH|MESSAGE_TEXT|METHOD|MIN|MINUTE|MINVALUE|MOD|MODE|MODIFIES|MODULE|MONTH|MORE|MOVE|MULTISET|MUMPS|NAME|NAMES|NAMESPACE|NATIONAL|NATURAL|NCHAR|NCLOB|NESTING|NEW|NEXT|NFC|NFD|NFKC|NFKD|NIL|NO|NONE|NORMALIZE|NORMALIZED|NOT|NOTHING|NOTIFY|NOTNULL|NOWAIT|NTH_VALUE|NTILE|NULL|NULLABLE|NULLIF|NULLS|NUMBER|NUMERIC|OBJECT|OCCURRENCES_REGEX|OCTETS|OCTET_LENGTH|OF|OFF|OFFSET|OIDS|OLD|ON|ONLY|OPEN|OPERATOR|OPTION|OPTIONS|OR|ORDER|ORDERING|ORDINALITY|OTHERS|OUT|OUTER|OUTPUT|OVER|OVERLAPS|OVERLAY|OVERRIDING|OWNED|OWNER|P|PAD|PARALLEL|PARAMETER|PARAMETER_MODE|PARAMETER_NAME|PARAMETER_ORDINAL_POSITION|PARAMETER_SPECIFIC_CATALOG|PARAMETER_SPECIFIC_NAME|PARAMETER_SPECIFIC_SCHEMA|PARSER|PARTIAL|PARTITION|PASCAL|PASSING|PASSTHROUGH|PASSWORD|PATH|PERCENT|PERCENTILE_CONT|PERCENTILE_DISC|PERCENT_RANK|PERIOD|PERMISSION|PLACING|PLANS|PLI|POLICY|PORTION|POSITION|POSITION_REGEX|POWER|PRECEDES|PRECEDING|PRECISION|PREPARE|PREPARED|PRESERVE|PRIMARY|PRIOR|PRIVILEGES|PROCEDURAL|PROCEDURE|PROGRAM|PUBLIC|QUOTE|RANGE|RANK|READ|READS|REAL|REASSIGN|RECHECK|RECOVERY|RECURSIVE|REF|REFERENCES|REFERENCING|REFRESH|REGR_AVGX|REGR_AVGY|REGR_COUNT|REGR_INTERCEPT|REGR_R2|REGR_SLOPE|REGR_SXX|REGR_SXY|REGR_SYY|REINDEX|RELATIVE|RELEASE|RENAME|REPEATABLE|REPLACE|REPLICA|REQUIRING|RESET|RESPECT|RESTART|RESTORE|RESTRICT|RESULT|RETURN|RETURNED_CARDINALITY|RETURNED_LENGTH|RETURNED_OCTET_LENGTH|RETURNED_SQLSTATE|RETURNING|RETURNS|REVOKE|RIGHT|ROLE|ROLLBACK|ROLLUP|ROUTINE|ROUTINE_CATALOG|ROUTINE_NAME|ROUTINE_SCHEMA|ROW|ROWS|ROW_COUNT|ROW_NUMBER|RULE|SAVEPOINT|SCALE|SCHEMA|SCHEMA_NAME|SCOPE|SCOPE_CATALOG|SCOPE_NAME|SCOPE_SCHEMA|SCROLL|SEARCH|SECOND|SECTION|SECURITY|SELECT|SELECTIVE|SELF|SENSITIVE|SEQUENCE|SEQUENCES|SERIALIZABLE|SERVER|SERVER_NAME|SESSION|SESSION_USER|SET|SETOF|SETS|SHARE|SHOW|SIMILAR|SIMPLE|SIZE|SKIP|SMALLINT|SNAPSHOT|SOME|SOURCE|SPACE|SPECIFIC|SPECIFICTYPE|SPECIFIC_NAME|SQL|SQLCODE|SQLERROR|SQLEXCEPTION|SQLSTATE|SQLWARNING|SQRT|STABLE|STANDALONE|START|STATE|STATEMENT|STATIC|STATISTICS|STDDEV_POP|STDDEV_SAMP|STDIN|STDOUT|STORAGE|STRICT|STRIP|STRUCTURE|STYLE|SUBCLASS_ORIGIN|SUBMULTISET|SUBSTRING|SUBSTRING_REGEX|SUCCEEDS|SUM|SYMMETRIC|SYSID|SYSTEM|SYSTEM_TIME|SYSTEM_USER|T|TABLE|TABLES|TABLESAMPLE|TABLESPACE|TABLE_NAME|TEMP|TEMPLATE|TEMPORARY|TEXT|THEN|TIES|TIME|TIMESTAMP|TIMEZONE_HOUR|TIMEZONE_MINUTE|TO|TOKEN|TOP_LEVEL_COUNT|TRAILING|TRANSACTION|TRANSACTIONS_COMMITTED|TRANSACTIONS_ROLLED_BACK|TRANSACTION_ACTIVE|TRANSFORM|TRANSFORMS|TRANSLATE|TRANSLATE_REGEX|TRANSLATION|TREAT|TRIGGER|TRIGGER_CATALOG|TRIGGER_NAME|TRIGGER_SCHEMA|TRIM|TRIM_ARRAY|TRUE|TRUNCATE|TRUSTED|TYPE|TYPES|UESCAPE|UNBOUNDED|UNCOMMITTED|UNDER|UNENCRYPTED|UNION|UNIQUE|UNKNOWN|UNLINK|UNLISTEN|UNLOGGED|UNNAMED|UNNEST|UNTIL|UNTYPED|UPDATE|UPPER|URI|USAGE|USER|USER_DEFINED_TYPE_CATALOG|USER_DEFINED_TYPE_CODE|USER_DEFINED_TYPE_NAME|USER_DEFINED_TYPE_SCHEMA|USING|VACUUM|VALID|VALIDATE|VALIDATOR|VALUE|VALUES|VALUE_OF|VARBINARY|VARCHAR|VARIADIC|VARYING|VAR_POP|VAR_SAMP|VERBOSE|VERSION|VERSIONING|VIEW|VIEWS|VOLATILE|WHEN|WHENEVER|WHERE|WHITESPACE|WIDTH_BUCKET|WINDOW|WITH|WITHIN|WITHOUT|WORK|WRAPPER|WRITE|XML|XMLAGG|XMLATTRIBUTES|XMLBINARY|XMLCAST|XMLCOMMENT|XMLCONCAT|XMLDECLARATION|XMLDOCUMENT|XMLELEMENT|XMLEXISTS|XMLFOREST|XMLITERATE|XMLNAMESPACES|XMLPARSE|XMLPI|XMLQUERY|XMLROOT|XMLSCHEMA|XMLSERIALIZE|XMLTABLE|XMLTEXT|XMLVALIDATE|YEAR|YES|ZONE)$/i)) {
+        if (arrStrIdentifier[7] && arrStrIdentifier[7].match(/^(CHECK|A|ABORT|ABS|ABSENT|ABSOLUTE|ACCESS|ACCORDING|ACTION|ADA|ADD|ADMIN|AFTER|AGGREGATE|ALL|ALLOCATE|ALSO|ALTER|ALWAYS|ANALYSE|ANALYZE|AND|ANY|ARE|ARRAY|ARRAY_AGG|ARRAY_MAX_CARDINALITY|AS|ASC|ASENSITIVE|ASSERTION|ASSIGNMENT|ASYMMETRIC|AT|ATOMIC|ATTRIBUTE|ATTRIBUTES|AUTHORIZATION|AVG|BACKWARD|BASE64|BEFORE|BEGIN|BEGIN_FRAME|BEGIN_PARTITION|BERNOULLI|BETWEEN|BIGINT|BINARY|BIT|BIT_LENGTH|BLOB|BLOCKED|BOM|BOOLEAN|BOTH|BREADTH|BY|C|CACHE|CALL|CALLED|CARDINALITY|CASCADE|CASCADED|CASE|CAST|CATALOG|CATALOG_NAME|CEIL|CEILING|CHAIN|CHAR|CHARACTER|CHARACTERISTICS|CHARACTERS|CHARACTER_LENGTH|CHARACTER_SET_CATALOG|CHARACTER_SET_NAME|CHARACTER_SET_SCHEMA|CHAR_LENGTH|CHECK|CHECKPOINT|CLASS|CLASS_ORIGIN|CLOB|CLOSE|CLUSTER|COALESCE|COBOL|COLLATE|COLLATION|COLLATION_CATALOG|COLLATION_NAME|COLLATION_SCHEMA|COLLECT|COLUMN|COLUMNS|COLUMN_NAME|COMMAND_FUNCTION|COMMAND_FUNCTION_CODE|COMMENT|COMMENTS|COMMIT|COMMITTED|CONCURRENTLY|CONDITION|CONDITION_NUMBER|CONFIGURATION|CONFLICT|CONNECT|CONNECTION|CONNECTION_NAME|CONSTRAINT|CONSTRAINTS|CONSTRAINT_CATALOG|CONSTRAINT_NAME|CONSTRAINT_SCHEMA|CONSTRUCTOR|CONTAINS|CONTENT|CONTINUE|CONTROL|CONVERSION|CONVERT|COPY|CORR|CORRESPONDING|COST|COUNT|COVAR_POP|COVAR_SAMP|CREATE|CROSS|CSV|CUBE|CUME_DIST|CURRENT|CURRENT_CATALOG|CURRENT_DATE|CURRENT_DEFAULT_TRANSFORM_GROUP|CURRENT_PATH|CURRENT_ROLE|CURRENT_ROW|CURRENT_SCHEMA|CURRENT_TIME|CURRENT_TIMESTAMP|CURRENT_TRANSFORM_GROUP_FOR_TYPE|CURRENT_USER|CURSOR|CURSOR_NAME|CYCLE|DATA|DATABASE|DATALINK|DATE|DATETIME_INTERVAL_CODE|DATETIME_INTERVAL_PRECISION|DAY|DB|DEALLOCATE|DEC|DECIMAL|DECLARE|DEFAULT|DEFAULTS|DEFERRABLE|DEFERRED|DEFINED|DEFINER|DEGREE|DELETE|DELIMITER|DELIMITERS|DENSE_RANK|DEPENDS|DEPTH|DEREF|DERIVED|DESC|DESCRIBE|DESCRIPTOR|DETERMINISTIC|DIAGNOSTICS|DICTIONARY|DISABLE|DISCARD|DISCONNECT|DISPATCH|DISTINCT|DLNEWCOPY|DLPREVIOUSCOPY|DLURLCOMPLETE|DLURLCOMPLETEONLY|DLURLCOMPLETEWRITE|DLURLPATH|DLURLPATHONLY|DLURLPATHWRITE|DLURLSCHEME|DLURLSERVER|DLVALUE|DO|DOCUMENT|DOMAIN|DOUBLE|DROP|DYNAMIC|DYNAMIC_FUNCTION|DYNAMIC_FUNCTION_CODE|EACH|ELEMENT|ELSE|EMPTY|ENABLE|ENCODING|ENCRYPTED|END|END-EXEC|END_FRAME|END_PARTITION|ENFORCED|ENUM|EQUALS|ESCAPE|EVENT|EVERY|EXCEPT|EXCEPTION|EXCLUDE|EXCLUDING|EXCLUSIVE|EXEC|EXECUTE|EXISTS|EXP|EXPLAIN|EXPRESSION|EXTENSION|EXTERNAL|EXTRACT|FALSE|FAMILY|FETCH|FILE|FILTER|FINAL|FIRST|FIRST_VALUE|FLAG|FLOAT|FLOOR|FOLLOWING|FOR|FORCE|FOREIGN|FORTRAN|FORWARD|FOUND|FRAME_ROW|FREE|FREEZE|FROM|FS|FULL|FUNCTION|FUNCTIONS|FUSION|G|GENERAL|GENERATED|GET|GLOBAL|GO|GOTO|GRANT|GRANTED|GREATEST|GROUP|GROUPING|GROUPS|HANDLER|HAVING|HEADER|HEX|HIERARCHY|HOLD|HOUR|ID|IDENTITY|IF|IGNORE|ILIKE|IMMEDIATE|IMMEDIATELY|IMMUTABLE|IMPLEMENTATION|IMPLICIT|IMPORT|IN|INCLUDING|INCREMENT|INDENT|INDEX|INDEXES|INDICATOR|INHERIT|INHERITS|INITIALLY|INLINE|INNER|INOUT|INPUT|INSENSITIVE|INSERT|INSTANCE|INSTANTIABLE|INSTEAD|INT|INTEGER|INTEGRITY|INTERSECT|INTERSECTION|INTERVAL|INTO|INVOKER|IS|ISNULL|ISOLATION|JOIN|K|KEY|KEY_MEMBER|KEY_TYPE|LABEL|LAG|LANGUAGE|LARGE|LAST|LAST_VALUE|LATERAL|LEAD|LEADING|LEAKPROOF|LEAST|LEFT|LENGTH|LEVEL|LIBRARY|LIKE|LIKE_REGEX|LIMIT|LINK|LISTEN|LN|LOAD|LOCAL|LOCALTIME|LOCALTIMESTAMP|LOCATION|LOCATOR|LOCK|LOCKED|LOGGED|LOWER|M|MAP|MAPPING|MATCH|MATCHED|MATERIALIZED|MAX|MAXVALUE|MAX_CARDINALITY|MEMBER|MERGE|MESSAGE_LENGTH|MESSAGE_OCTET_LENGTH|MESSAGE_TEXT|METHOD|MIN|MINUTE|MINVALUE|MOD|MODE|MODIFIES|MODULE|MONTH|MORE|MOVE|MULTISET|MUMPS|NAME|NAMES|NAMESPACE|NATIONAL|NATURAL|NCHAR|NCLOB|NESTING|NEW|NEXT|NFC|NFD|NFKC|NFKD|NIL|NO|NONE|NORMALIZE|NORMALIZED|NOT|NOTHING|NOTIFY|NOTNULL|NOWAIT|NTH_VALUE|NTILE|NULL|NULLABLE|NULLIF|NULLS|NUMBER|NUMERIC|OBJECT|OCCURRENCES_REGEX|OCTETS|OCTET_LENGTH|OF|OFF|OFFSET|OIDS|OLD|ON|ONLY|OPEN|OPERATOR|OPTION|OPTIONS|OR|ORDER|ORDERING|ORDINALITY|OTHERS|OUT|OUTER|OUTPUT|OVER|OVERLAPS|OVERLAY|OVERRIDING|OWNED|OWNER|P|PAD|PARALLEL|PARAMETER|PARAMETER_MODE|PARAMETER_NAME|PARAMETER_ORDINAL_POSITION|PARAMETER_SPECIFIC_CATALOG|PARAMETER_SPECIFIC_NAME|PARAMETER_SPECIFIC_SCHEMA|PARSER|PARTIAL|PARTITION|PASCAL|PASSING|PASSTHROUGH|PASSWORD|PATH|PERCENT|PERCENTILE_CONT|PERCENTILE_DISC|PERCENT_RANK|PERIOD|PERMISSION|PLACING|PLANS|PLI|POLICY|PORTION|POSITION|POSITION_REGEX|POWER|PRECEDES|PRECEDING|PRECISION|PREPARE|PREPARED|PRESERVE|PRIMARY|PRIOR|PRIVILEGES|PROCEDURAL|PROCEDURE|PROGRAM|PUBLIC|QUOTE|RANGE|RANK|READ|READS|REAL|REASSIGN|RECHECK|RECOVERY|RECURSIVE|REF|REFERENCES|REFERENCING|REFRESH|REGR_AVGX|REGR_AVGY|REGR_COUNT|REGR_INTERCEPT|REGR_R2|REGR_SLOPE|REGR_SXX|REGR_SXY|REGR_SYY|REINDEX|RELATIVE|RELEASE|RENAME|REPEATABLE|REPLACE|REPLICA|REQUIRING|RESET|RESPECT|RESTART|RESTORE|RESTRICT|RESULT|RETURN|RETURNED_CARDINALITY|RETURNED_LENGTH|RETURNED_OCTET_LENGTH|RETURNED_SQLSTATE|RETURNING|RETURNS|REVOKE|RIGHT|ROLE|ROLLBACK|ROLLUP|ROUTINE|ROUTINE_CATALOG|ROUTINE_NAME|ROUTINE_SCHEMA|ROW|ROWS|ROW_COUNT|ROW_NUMBER|RULE|SAVEPOINT|SCALE|SCHEMA|SCHEMA_NAME|SCOPE|SCOPE_CATALOG|SCOPE_NAME|SCOPE_SCHEMA|SCROLL|SEARCH|SECOND|SECTION|SECURITY|SELECT|SELECTIVE|SELF|SENSITIVE|SEQUENCE|SEQUENCES|SERIALIZABLE|SERVER|SERVER_NAME|SESSION|SESSION_USER|SET|SETOF|SETS|SHARE|SHOW|SIMILAR|SIMPLE|SIZE|SKIP|SMALLINT|SNAPSHOT|SOME|SOURCE|SPACE|SPECIFIC|SPECIFICTYPE|SPECIFIC_NAME|SQL|SQLCODE|SQLERROR|SQLEXCEPTION|SQLSTATE|SQLWARNING|SQRT|STABLE|STANDALONE|START|STATE|STATEMENT|STATIC|STATISTICS|STDDEV_POP|STDDEV_SAMP|STDIN|STDOUT|STORAGE|STRICT|STRIP|STRUCTURE|STYLE|SUBCLASS_ORIGIN|SUBMULTISET|SUBSTRING|SUBSTRING_REGEX|SUCCEEDS|SUM|SYMMETRIC|SYSID|SYSTEM|SYSTEM_TIME|SYSTEM_USER|T|TABLE|TABLES|TABLESAMPLE|TABLESPACE|TABLE_NAME|TEMP|TEMPLATE|TEMPORARY|TEXT|THEN|TIES|TIME|TIMESTAMP|TIMEZONE_HOUR|TIMEZONE_MINUTE|TO|TOKEN|TOP_LEVEL_COUNT|TRAILING|TRANSACTION|TRANSACTIONS_COMMITTED|TRANSACTIONS_ROLLED_BACK|TRANSACTION_ACTIVE|TRANSFORM|TRANSFORMS|TRANSLATE|TRANSLATE_REGEX|TRANSLATION|TREAT|TRIGGER|TRIGGER_CATALOG|TRIGGER_NAME|TRIGGER_SCHEMA|TRIM|TRIM_ARRAY|TRUE|TRUNCATE|TRUSTED|TYPE|TYPES|UESCAPE|UNBOUNDED|UNCOMMITTED|UNDER|UNENCRYPTED|UNION|UNIQUE|UNKNOWN|UNLINK|UNLISTEN|UNLOGGED|UNNAMED|UNNEST|UNTIL|UNTYPED|UPDATE|UPPER|URI|USAGE|USER|USER_DEFINED_TYPE_CATALOG|USER_DEFINED_TYPE_CODE|USER_DEFINED_TYPE_NAME|USER_DEFINED_TYPE_SCHEMA|USING|VACUUM|VALID|VALIDATE|VALIDATOR|VALUE|VALUES|VALUE_OF|VARBINARY|VARCHAR|VARIADIC|VARYING|VAR_POP|VAR_SAMP|VERBOSE|VERSION|VERSIONING|VIEW|VIEWS|VOLATILE|WHEN|WHENEVER|WHERE|WHITESPACE|WIDTH_BUCKET|WINDOW|WITH|WITHIN|WITHOUT|WORK|WRAPPER|WRITE|XML|XMLAGG|XMLATTRIBUTES|XMLBINARY|XMLCAST|XMLCOMMENT|XMLCONCAT|XMLDECLARATION|XMLDOCUMENT|XMLELEMENT|XMLEXISTS|XMLFOREST|XMLITERATE|XMLNAMESPACES|XMLPARSE|XMLPI|XMLQUERY|XMLROOT|XMLSCHEMA|XMLSERIALIZE|XMLTABLE|XMLTEXT|XMLVALIDATE|YEAR|YES|ZONE)$/i)) {
             autocompleteGlobals.arrStrContext.push([arrStrIdentifier[1] ? arrStrIdentifier[1] : ''
                 , arrStrIdentifier[3] ? arrStrIdentifier[3] : ''
                 , '']);
         } else {
             autocompleteGlobals.arrStrContext.push([arrStrIdentifier[1] ? arrStrIdentifier[1] : ''
                 , arrStrIdentifier[3] ? arrStrIdentifier[3] : ''
-                , arrStrIdentifier[5] ? arrStrIdentifier[5] : '']);
+                , arrStrIdentifier[7] ? arrStrIdentifier[7] : '']);
         }
     }
 }
@@ -56,7 +59,7 @@ function getContext(strInput, intPosition) {
 
     //make sure that we have only whitespace after the cursor, otherwise we just end it here
     //console.log('intPosition', intPosition);
-    console.log('Check Whitespace', strInput.substr(intPosition, 1).match('^[\n\r\ \t]+'));
+    //console.log('Check Whitespace', strInput.substr(intPosition, 1).match('^[\n\r\ \t]+'));
     if (! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) {
         return;
     }
@@ -78,6 +81,8 @@ function getContext(strInput, intPosition) {
     var arrQueries = [];
     
     var intTabLevel = 0;
+    
+    
     var bolDeclare = false;
     var bolFunction = false;
     
@@ -87,6 +92,18 @@ function getContext(strInput, intPosition) {
     var bolSecurityLabel = false;
     var bolCreate = false;
     
+    var bolType = false;
+    var bolOperator = false;
+    
+    var bolPolicy = false;
+    var bolSequence = false;
+    var bolTable = false;
+    
+    var bolTextSearchConfiguration = false;
+    var bolTextSearchDictionary = false;
+    var bolTextSearchParser = false;
+    var bolTextSearchTemplate = false;
+    
     var bolGrant = false;
     var bolRevoke = false;
     var bolInsert = false;
@@ -95,12 +112,15 @@ function getContext(strInput, intPosition) {
     var bolSelect = false;
     var bolJoin = false;
     var bolInsertValues = false;
-    var bolStdin = false;
     var bolRule = false;
     var bolLastComment = false;
     var bolBody = false;
     var bolWhere = false;
     var bolIf = false;
+    
+    var bolStdin = false;
+    
+    
     var intCase = 0;
     var i;
 
@@ -171,8 +191,412 @@ function getContext(strInput, intPosition) {
             int_qs = 0;
             //console.log("found end of double quote");
 
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(DROP|ALTER|COMMENT|SECURITY[\ \t]+LABEL|CREATE)[\ \t\n]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+            bolDrop = strInput.substr(i).match(/^DROP/i) ? true : false;
+            bolAlter = strInput.substr(i).match(/^ALTER/i) ? true : false;
+            bolComment = strInput.substr(i).match(/^COMMENT/i) ? true : false;
+            bolSecurityLabel = strInput.substr(i).match(/^SECURITY[\ \t]+LABEL/i) ? true : false;
+            bolCreate = strInput.substr(i).match(/^CREATE/i) ? true : false;
+            i += (strInput.substr(i).match(/^(DROP|ALTER|COMMENT|SECURITY[\ \t]+LABEL|CREATE)/i)[0].length - 1);
+            //intTabLevel += 1;
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE|" + intTabLevel + "<");
+            
+            if (bolAlter) {
+                strFirst = ' ';
+                intContextPosition = i + 1;
+                arrShortQueries = ['schemasAll'];
+            }
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... AGGREGATE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^AGGREGATE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^AGGREGATE/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasAggregates'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... AGGREGATE|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONVERSION
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CONVERSION[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^CONVERSION/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasConversions'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONVERSION|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONSTRAINT
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CONSTRAINT[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^CONSTRAINT/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasConstraints'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONSTRAINT|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLLATION
+        } else if (int_qs === 0 && strInput.substr(i).match(/^COLLATION[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^COLLATION/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasCollations'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLLATION|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TABLE/INHERIT
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(TABLE|INHERIT)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
+            bolTable = strInput.substr(i).match(/^TABLE/i) ? true : false;
+            
+            i += (strInput.substr(i).match(/^(TABLE|INHERIT)/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTables'];
+            
+            doubleIdentifier(strInput.substr(i + 1));
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TABLE/INHERIT|" + intTabLevel + "<");
+
+        // FOUND ALTER TABLE ... TABLE/EXISTS/ONLY
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(TABLE|EXISTS|ONLY)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTable) {
+            i += (strInput.substr(i).match(/^(TABLE|EXISTS|ONLY)/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTables'];
+            //console.log(">ALTER TABLE ... TABLE/EXISTS/ONLY|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... RULE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^RULE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^RULE/i)[0].length - 1);
+            
+            bolRule = true;
+            
+            doubleIdentifier(strInput.substr(i + 1));
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... RULE|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... VIEW
+        } else if (int_qs === 0 && strInput.substr(i).match(/^VIEW[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^VIEW/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasViewsOnly'];
+            
+            doubleIdentifier(strInput.substr(i + 1));
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... VIEW|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLUMN
+        } else if (int_qs === 0 && strInput.substr(i).match(/^COLUMN[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^COLUMN/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['contextTablesColumns'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLLATION|" + intTabLevel + "<");
+
+        // FOUND COMMENT ON COLUMN
+        } else if (int_qs === 0 && strInput.substr(i).match(/^COLUMN[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolComment) {
+            i += (strInput.substr(i).match(/^COLUMN/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTablesColumns'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... DOMAIN|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... DOMAIN
+        } else if (int_qs === 0 && strInput.substr(i).match(/^DOMAIN[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^DOMAIN/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasDomains'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... DOMAIN|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... FOREIGN TABLE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^FOREIGN[\n\r\ \t]+TABLE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^FOREIGN[\n\r\ \t]+TABLE/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasForeignTables'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... FOREIGN TABLE|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... FUNCTION/HANDLER/VALIDATOR
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(FUNCTION|HANDLER|VALIDATOR)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^(FUNCTION|HANDLER|VALIDATOR)/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasFunctions'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... FUNCTION/HANDLER/VALIDATOR|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... INDEX/CLUSTERON
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(INDEX|CLUSTERON)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^(INDEX|CLUSTERON)/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasIndexes'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... INDEX/CLUSTERON|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... MATERIALIZED VIEW
+        } else if (int_qs === 0 && strInput.substr(i).match(/^MATERIALIZED[\n\r\ \t]+VIEW[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^MATERIALIZED[\n\r\ \t]+VIEW/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasMaterializedViews'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... MATERIALIZED VIEW|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR CLASS
+        } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+CLASS[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+CLASS/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasOperatorClasses'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR CLASS|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR FAMILY
+        } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+FAMILY[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+FAMILY/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasOperatorFamilies'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR FAMILY|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR
+        } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^OPERATOR/i)[0].length - 1);
+            
+            bolOperator = true;
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasOperators'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR|" + intTabLevel + "<");
+
+        // FOUND CREATE OPERATOR ... PROCEDURE/JOIN/RESTRICT/COMMUTATOR/NEGATOR
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(PROCEDURE|JOIN|RESTRICT|COMMUTATOR|NEGATOR)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolOperator) {
+            i += (strInput.substr(i).match(/^(PROCEDURE|JOIN|RESTRICT|COMMUTATOR|NEGATOR)/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasFunctions'];
+            //console.log(">CREATE OPERATOR ... PROCEDURE/JOIN/RESTRICT/COMMUTATOR/NEGATOR|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... SEQUENCE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^SEQUENCE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^SEQUENCE/i)[0].length - 1);
+            
+            bolSequence = true;
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasSequences'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... SEQUENCE|" + intTabLevel + "<");
+
+        // FOUND ALTER SEQUENCE ... BY
+        } else if (int_qs === 0 && strInput.substr(i).match(/^BY[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolSequence) {
+            i += (strInput.substr(i).match(/^BY/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTables'];
+            //console.log(">ALTER SEQUENCE ... ON|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... POLICY
+        } else if (int_qs === 0 && strInput.substr(i).match(/^POLICY[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^POLICY/i)[0].length - 1);
+            
+            bolPolicy = true;
+            //console.log(">ALTER/COMMENT/SECURITY LABEL/CREATE ... POLICY|" + intTabLevel + "<");
+
+        // FOUND ALTER POLICY/RULE ... ON
+        } else if (int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && (bolPolicy || bolRule)) {
+            i += (strInput.substr(i).match(/^ON/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTables'];
+            //console.log(">ALTER POLICY/RULE ... ON|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TYPE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TYPE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^TYPE/i)[0].length - 1);
+            
+            bolType = true;
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTypes'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TYPE|" + intTabLevel + "<");
+
+        // FOUND CREATE TYPE ... SUBTYPE_OPCLASS
+        } else if (int_qs === 0 && strInput.substr(i).match(/^SUBTYPE_OPCLASS[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolType) {
+            i += (strInput.substr(i).match(/^SUBTYPE_OPCLASS/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasOperatorClasses'];
+            //console.log(">CREATE TYPE ... SUBTYPE_OPCLASS|" + intTabLevel + "<");
+
+        // FOUND CREATE TYPE ... CANONICAL/SUBTYPE_DIFF/INPUT/OUTPUT/RECEIVE/SEND/TYPMOD_IN/TYPMOD_OUT/ANALYZE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(CANONICAL|SUBTYPE_DIFF|INPUT|OUTPUT|RECEIVE|SEND|TYPMOD_IN|TYPMOD_OUT|ANALYZE)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolType) {
+            i += (strInput.substr(i).match(/^(CANONICAL|SUBTYPE_DIFF|INPUT|OUTPUT|RECEIVE|SEND|TYPMOD_IN|TYPMOD_OUT|ANALYZE)/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasFunctions'];
+            //console.log(">CREATE TYPE ... CANONICAL/SUBTYPE_DIFF/INPUT/OUTPUT/RECEIVE/SEND/TYPMOD_IN/TYPMOD_OUT/ANALYZE|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH CONFIGURATION
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+CONFIGURATION[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+CONFIGURATION/i)[0].length - 1);
+            
+            bolTextSearchConfiguration = true;
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTextSearchConfigurations'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH CONFIGURATION|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH DICTIONARY
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+DICTIONARY[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+DICTIONARY/i)[0].length - 1);
+            
+            bolTextSearchDictionary = true;
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTextSearchDictionaries'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH DICTIONARY|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH PARSER
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+PARSER[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+PARSER/i)[0].length - 1);
+            
+            bolTextSearchParser = true;
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTextSearchParsers'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH PARSER|" + intTabLevel + "<");
+
+        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH TEMPLATE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+TEMPLATE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+            i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+TEMPLATE/i)[0].length - 1);
+            
+            bolTextSearchTemplate = true;
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTextSearchTemplates'];
+            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH TEMPLATE|" + intTabLevel + "<");
+
+        // FOUND CREATE TEXT SEARCH CONFIGURATION ... PARSER
+        } else if (int_qs === 0 && strInput.substr(i).match(/^PARSER[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
+            i += (strInput.substr(i).match(/^PARSER/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTextSearchParsers'];
+            //console.log(">CREATE TEXT SEARCH CONFIGURATION ... PARSER|" + intTabLevel + "<");
+
+        // FOUND CREATE TEXT SEARCH CONFIGURATION ... COPY/SEARCH CONFIGURATION
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(COPY|SEARCH[\n\r\ \t]+CONFIGURATION)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
+            i += (strInput.substr(i).match(/^(COPY|SEARCH[\n\r\ \t]+CONFIGURATION)/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTextSearchConfigurations'];
+            //console.log(">CREATE TEXT SEARCH CONFIGURATION ... COPY/SEARCH CONFIGURATION|" + intTabLevel + "<");
+
+        // FOUND CREATE TEXT SEARCH CONFIGURATION ... REPLACE/WITH
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(REPLACE|WITH)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
+            i += (strInput.substr(i).match(/^(REPLACE|WITH)/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTextSearchDictionaries'];
+            //console.log(">CREATE TEXT SEARCH CONFIGURATION ... REPLACE/WITH|" + intTabLevel + "<");
+
+        // FOUND CREATE TEXT SEARCH DICTIONARY ... TEMPLATE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TEMPLATE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchDictionary) {
+            i += (strInput.substr(i).match(/^TEMPLATE/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTextSearchTemplates'];
+            //console.log(">CREATE TEXT SEARCH DICTIONARY ... TEMPLATE|" + intTabLevel + "<");
+
+        // FOUND CREATE TEXT SEARCH PARSER ... START/GETTOKEN/END/LEXTYPES/HEADLINE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(START|GETTOKEN|END|LEXTYPES|HEADLINE)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchParser) {
+            i += (strInput.substr(i).match(/^(START|GETTOKEN|END|LEXTYPES|HEADLINE)/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasFunctions'];
+            //console.log(">CREATE TEXT SEARCH DICTIONARY ... START/GETTOKEN/END/LEXTYPES/HEADLINE|" + intTabLevel + "<");
+
+        // FOUND CREATE TEXT SEARCH TEMPLATE ... INIT/LEXIZE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(INIT|LEXIZE)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchTemplate) {
+            i += (strInput.substr(i).match(/^(INIT|LEXIZE)/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasFunctions'];
+            //console.log(">CREATE TEXT SEARCH TEMPLATE ... INIT/LEXIZE|" + intTabLevel + "<");
+
+        // FOUND CREATE ... VIEW
+        } else if (int_qs === 0 && strInput.substr(i).match(/^VIEW[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolCreate) {
+            i += (strInput.substr(i).match(/^VIEW/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasViewsOnly'];
+            //console.log(">CREATE ... VIEW|" + intTabLevel + "<");
+
+        // FOUND CREATE ... FUNC
+        } else if (int_qs === 0 && strInput.substr(i).match(/^FUNC[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolCreate) {
+            i += (strInput.substr(i).match(/^FUNC/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasFunctions'];
+            //console.log(">CREATE ... FUNC|" + intTabLevel + "<");
+
+        // FOUND CREATE ... TO
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TO[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolCreate) {
+            i += (strInput.substr(i).match(/^TO/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTables'];
+            //console.log(">CREATE ... TO|" + intTabLevel + "<");
+
+        // FOUND CREATE ... LIKE/INHERITS/REFERENCES
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(LIKE|INHERITS|REFERENCES)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolCreate) {
+            i += (strInput.substr(i).match(/^(LIKE|INHERITS|REFERENCES)/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['schemasTablesOnly'];
+            //console.log(">CREATE ... LIKE/INHERITS/REFERENCES|" + intTabLevel + "<");
+
+        // FOUND ALTER ... OWNER TO
+        } else if (int_qs === 0 && strInput.substr(i).match(/^OWNER[\n\r\ \t]+TO[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolAlter) {
+            i += (strInput.substr(i).match(/^OWNER[\n\r\ \t]+TO/i)[0].length - 1);
+            
+            strFirst = ' ';
+            intContextPosition = i + 1;
+            arrShortQueries = ['groups', 'logins'];
+            //console.log(">CREATE ... OWNER TO|" + intTabLevel + "<");
+
         // FOUND UPDATE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^UPDATE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^UPDATE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i += (strInput.substr(i).match(/^UPDATE/i)[0].length - 1);
             bolUpdate = true;
             
@@ -184,7 +608,7 @@ function getContext(strInput, intPosition) {
             //console.log(">UPDATE|" + intTabLevel + "<");
 
         // FOUND UPDATE ... SET
-        } else if (int_qs === 0 && strInput.substr(i).match(/^SET[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && bolUpdate) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^SET[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolUpdate) {
             i += (strInput.substr(i).match(/^SET/i)[0].length - 1);
             strFirst = ' ';
             intContextPosition = i + 1;
@@ -192,14 +616,14 @@ function getContext(strInput, intPosition) {
             //console.log(">INSERT ... INTO|" + intTabLevel + "<");
 
         // FOUND UPDATE ... SET ... ,
-        } else if (int_qs === 0 && strInput.substr(i, 1) === "," && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && bolUpdate) {
+        } else if (int_qs === 0 && strInput.substr(i, 1) === "," && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolUpdate) {
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['contextColumns'];
             //console.log(">INSERT ... INTO|" + intTabLevel + "<");
 
         // FOUND UPDATE ... SET ... =
-        } else if (int_qs === 0 && strInput.substr(i, 1) === "=" && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && bolUpdate) {
+        } else if (int_qs === 0 && strInput.substr(i, 1) === "=" && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolUpdate) {
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
@@ -212,14 +636,14 @@ function getContext(strInput, intPosition) {
             //console.log(">UPDATE ... SET ... = lookahead|" + intTabLevel + "<");
 
         // FOUND DELETE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^DELETE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^DELETE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i += (strInput.substr(i).match(/^DELETE/i)[0].length - 1);
             bolDelete = true;
             
             //console.log(">UPDATE|" + intTabLevel + "<");
 
         // FOUND SELECT
-        } else if (int_qs === 0 && strInput.substr(i).match(/^SELECT[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && !bolGrant && !bolRevoke) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^SELECT[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && !bolGrant && !bolRevoke) {
             i += (strInput.substr(i).match(/^SELECT/i)[0].length - 1);
             bolSelect = true;
 
@@ -227,15 +651,23 @@ function getContext(strInput, intPosition) {
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
 
-            bolFinal = true;
-            intFinalI = i;
-            intFinalContextPosition = intContextPosition;
-            arrFinalShortQueries = arrShortQueries;
-            strFinalFirst = strFirst;
+            //set final if we are NOT already on a final and we are NOT past the cursor
+            console.log('bolFinal = ' + bolFinal);
+            console.log('intPosition = ' + intPosition);
+            console.log('i = ' + i);
+            if (!bolFinal && intPosition > i) {
+                console.log('bolFinal := true');
+                bolFinal = true;
+                intFinalI = i;
+                intFinalContextPosition = intContextPosition;
+                arrFinalShortQueries = arrShortQueries;
+                strFinalFirst = strFirst;
+            }
+            //console.log(">intContextPosition|" + intContextPosition + "<");
             //console.log(">SELECT lookahead|" + intTabLevel + "<");
 
         // FOUND SELECT ... GROUP/PARTITION/ORDER BY
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(GROUP|PARTITION|ORDER)[\n\r\ \t]+BY[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && bolSelect) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(GROUP|PARTITION|ORDER)[\n\r\ \t]+BY[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolSelect) {
             i += (strInput.substr(i).match(/^(GROUP|PARTITION|ORDER)[\n\r\ \t]+BY/i)[0].length - 1);
             strFirst = ' ';
             intContextPosition = i + 1;
@@ -243,7 +675,7 @@ function getContext(strInput, intPosition) {
             //console.log(">INSERT ... INTO|" + intTabLevel + "<");
 
         // FOUND WHERE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^WHERE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^WHERE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             //console.log('case>' + strInput.substr(i).match(/^WHERE/i)[0] + '<');
             i += (strInput.substr(i).match(/^WHERE/i)[0].length - 1);
             bolWhere = true;
@@ -252,10 +684,10 @@ function getContext(strInput, intPosition) {
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
 
-            console.log(">WHERE|" + intTabLevel + "<");
+            //console.log(">WHERE|" + intTabLevel + "<");
 
         // FOUND SELECT/INSERT/UPDATE/DELETE ... AND/OR/operators
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolSelect || bolInsert || bolUpdate || bolDelete || intCase > 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolSelect || bolInsert || bolUpdate || bolDelete || intCase > 0)) {
             //console.log('case>' + strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)/i)[0] + '<');
             i += (strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)/i)[0].length - 1);
 
@@ -263,7 +695,7 @@ function getContext(strInput, intPosition) {
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
 
-            console.log(">AND/OR/operators|" + intTabLevel + "<");
+            //console.log(">AND/OR/operators|" + intTabLevel + "<");
 
         // FOUND SELECT/UPDATE/DELETE ... (
         } else if (int_qs === 0 && strInput.substr(i, 1) === "(" && (bolSelect || bolUpdate || bolDelete || intCase > 0)) {
@@ -276,7 +708,7 @@ function getContext(strInput, intPosition) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND IF
-        } else if (int_qs === 0 && strInput.substr(i).match(/^IF[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^IF[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             //console.log('case>' + strInput.substr(i).match(/^IF/i)[0] + '<');
             i += (strInput.substr(i).match(/^IF/i)[0].length - 1);
             bolIf = true;
@@ -285,10 +717,10 @@ function getContext(strInput, intPosition) {
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'functions', 'builtins'];
 
-            console.log(">IF|" + intTabLevel + "<");
+            //console.log(">IF|" + intTabLevel + "<");
 
         // FOUND $BODY$ ... AND/OR/operators/:=
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~|\:\=)[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && bolBody) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~|\:\=)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolBody) {
             //console.log('case>' + strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~|\:\=)/i)[0] + '<');
             i += (strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~|\:\=)/i)[0].length - 1);
 
@@ -296,10 +728,10 @@ function getContext(strInput, intPosition) {
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'functions', 'builtins'];
 
-            console.log(">AND/OR/operators/:=|" + intTabLevel + "<");
+            //console.log(">AND/OR/operators/:=|" + intTabLevel + "<");
 
         // FOUND PERFORM
-        } else if (int_qs === 0 && strInput.substr(i).match(/^PERFORM[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^PERFORM[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i += (strInput.substr(i).match(/^PERFORM/i)[0].length - 1);
             
             strFirst = ' ';
@@ -309,17 +741,8 @@ function getContext(strInput, intPosition) {
             doubleIdentifier(strInput.substr(i + 1));
             //console.log(">PERFORM|" + intTabLevel + "<");
 
-        // FOUND VACUUM/TRUNCATE/LOCK/ANALYZE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(VACUUM|TRUNCATE|LOCK|ANALYZE)[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            i += (strInput.substr(i).match(/^(VACUUM|TRUNCATE|LOCK|ANALYZE)/i)[0].length - 1);
-            
-            strFirst = ' ';
-            intContextPosition = i + 1;
-            arrShortQueries = ['schemasTables'];
-            //console.log(">VACUUM/TRUNCATE/LOCK/ANALYZE|" + intTabLevel + "<");
-
         // FOUND USING/FROM/JOIN/ONLY
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             bolJoin = strInput.substr(i).match(/^JOIN/i) ? true : false;
             i += (strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)/i)[0].length - 1);
             
@@ -328,10 +751,10 @@ function getContext(strInput, intPosition) {
             arrShortQueries = ['schemasTables'];
             
             doubleIdentifier(strInput.substr(i + 1));
-            //console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
+            console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
 
         // FOUND JOIN ... ON
-        } else if (int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && bolJoin) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolJoin) {
             i += (strInput.substr(i).match(/^ON/i)[0].length - 1);
             
             strFirst = ' ';
@@ -340,7 +763,7 @@ function getContext(strInput, intPosition) {
             //console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
 
         // FOUND PROCEDURE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^PROCEDURE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^PROCEDURE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i += (strInput.substr(i).match(/^PROCEDURE/i)[0].length - 1);
             
             strFirst = ' ';
@@ -349,16 +772,16 @@ function getContext(strInput, intPosition) {
             //console.log(">PROCEDURE|" + intTabLevel + "<");
 
         // FOUND REFRESH MATERIALIZED VIEW
-        } else if (int_qs === 0 && strInput.substr(i).match(/^REFRESH[\n\r\ \t]+MATERIALIZED[\n\r\ \t]+VIEW[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^REFRESH[\n\r\ \t]+MATERIALIZED[\n\r\ \t]+VIEW[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i += (strInput.substr(i).match(/^REFRESH[\n\r\ \t]+MATERIALIZED[\n\r\ \t]+VIEW/i)[0].length - 1);
             
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasMaterializedViews'];
-            console.log(">REFRESH MATERIALIZED VIEW|" + intTabLevel + "<");
+            //console.log(">REFRESH MATERIALIZED VIEW|" + intTabLevel + "<");
 
         // FOUND DELETE ... FROM
-        } else if (int_qs === 0 && strInput.substr(i).match(/^FROM[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && bolDelete) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^FROM[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolDelete) {
             i += (strInput.substr(i).match(/^FROM/i)[0].length - 1);
             strFirst = ' ';
             intContextPosition = i + 1;
@@ -366,13 +789,13 @@ function getContext(strInput, intPosition) {
             //console.log(">INSERT ... INTO|" + intTabLevel + "<");
 
         // FOUND INSERT
-        } else if (int_qs === 0 && strInput.substr(i).match(/^INSERT[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^INSERT[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i += (strInput.substr(i).match(/^INSERT/i)[0].length - 1);
             bolInsert = true;
             //console.log(">INSERT|" + intTabLevel + "<");
 
         // FOUND INSERT ... INTO
-        } else if (int_qs === 0 && strInput.substr(i).match(/^INTO[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && bolInsert) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^INTO[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolInsert) {
             i += (strInput.substr(i).match(/^INTO/i)[0].length - 1);
             strFirst = ' ';
             intContextPosition = i + 1;
@@ -397,17 +820,17 @@ function getContext(strInput, intPosition) {
             intContextPosition = i + 1;
             arrShortQueries = ['contextColumns'];
             
-            //console.log(">(|" + intTabLevel + "<");
+            //console.log(">INSERT ... ( ... ,|" + intTabLevel + "<");
 
         // FOUND INSERT ... VALUES
-        } else if (int_qs === 0 && strInput.substr(i).match(/^VALUES[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && bolInsert) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^VALUES[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolInsert) {
             i += (strInput.substr(i).match(/^VALUES/i)[0].length - 1);
             strFirst = '';
             intContextPosition = 0;
             arrShortQueries = [];
             
             bolInsertValues = true;
-            console.log(">INSERT ... VALUES|" + intTabLevel + "<");
+            //console.log(">INSERT ... VALUES|" + intTabLevel + "<");
 
         // FOUND INSERT ... VALUES (
         } else if (int_qs === 0 && strInput.substr(i, 1) === "(" && bolInsert && bolInsertValues) {
@@ -441,26 +864,26 @@ function getContext(strInput, intPosition) {
         } else if (int_qs === 0 && strInput.substr(i, 1) === ")") {
             int_ps = int_ps - 1;
             intTabLevel -= 1;
-            //console.log(">(|" + intTabLevel + "<");
+            //console.log(">)|" + intTabLevel + "<");
 
         // FOUND DOUBLE COLON
         } else if (int_qs === 0 && strInput.substr(i , 2) === "::") {
             strFirst = '';
             intContextPosition = i + 2;
             arrShortQueries = ['types'];
-            //console.log(">(|" + intTabLevel + "<");
+            //console.log(">::|" + intTabLevel + "<");
 
         // FOUND CAST
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CAST[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CAST[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i += (strInput.substr(i).match(/^CAST/i)[0].length - 1);
             
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['types'];
-            //console.log(">(|" + intTabLevel + "<");
+            //console.log(">cast|" + intTabLevel + "<");
 
         // FOUND RETURNS
-        } else if (int_qs === 0 && strInput.substr(i).match(/^RETURNS[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^RETURNS[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i += (strInput.substr(i).match(/^RETURNS/i)[0].length - 1);
             
             strFirst = ' ';
@@ -469,7 +892,7 @@ function getContext(strInput, intPosition) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND LANGUAGE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^LANGUAGE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^LANGUAGE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i += (strInput.substr(i).match(/^LANGUAGE/i)[0].length - 1);
             
             strFirst = ' ';
@@ -478,7 +901,7 @@ function getContext(strInput, intPosition) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND TABLESPACE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^TABLESPACE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TABLESPACE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i += (strInput.substr(i).match(/^TABLESPACE/i)[0].length - 1);
             
             strFirst = ' ';
@@ -487,7 +910,7 @@ function getContext(strInput, intPosition) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND RULE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^RULE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^RULE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i += (strInput.substr(i).match(/^RULE/i)[0].length - 1);
             
             strFirst = ' ';
@@ -539,7 +962,7 @@ function getContext(strInput, intPosition) {
             i += int_tag;
 
         // FOUND GRANT/REVOKE
-        } else if (int_qs === 0 && strInput.substr(i, 7).match(/^(GRANT|REVOKE)\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i, 7).match(/^(GRANT|REVOKE)\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             if (strInput.substr(i, 7).match(/^GRANT\b/i)) {
                 bolGrant = true;
                 bolRevoke = false;
@@ -559,7 +982,7 @@ function getContext(strInput, intPosition) {
             //console.log(">,|" + intTabLevel + "<");
 
         // FOUND AN ON SCHEMA INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA[\n\r\ \t]+/) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA/)[0].length);
             
@@ -568,7 +991,7 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON FUNCTION INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION[\n\r\ \t]+/) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION/)[0].length);
             
@@ -577,7 +1000,7 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON FUNCTION|" + intTabLevel + "<");
 
         // FOUND AN ON TABLE INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE[\n\r\ \t]+/) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE/)[0].length);
             
@@ -586,7 +1009,7 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON SEQUENCE INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE[\n\r\ \t]+/) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE/)[0].length);
             
@@ -595,7 +1018,7 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON TYPE INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE[\n\r\ \t]+/) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE/)[0].length);
             
@@ -604,7 +1027,7 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON DOMAIN INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN[\n\r\ \t]+/) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN/)[0].length);
             
@@ -613,21 +1036,21 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             intContextPosition = i + 2;
             arrShortQueries = ['schemasAll'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND A FROM INSIDE A REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^FROM[\n\r\ \t]+/) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && bolRevoke) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^FROM[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolRevoke) {
             strFirst = ' ';
             intContextPosition = i + 4;
             arrShortQueries = ['logins', 'groups'];
             //console.log(">REVOKE ... FROM|" + intTabLevel + "<");
 
         // FOUND A TO INSIDE A GRANT STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^TO[\n\r\ \t]+/) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && bolGrant) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^TO[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolGrant) {
             strFirst = ' ';
             intContextPosition = i + 2;
             arrShortQueries = ['logins', 'groups'];
@@ -654,17 +1077,36 @@ function getContext(strInput, intPosition) {
                 i += 1 + strInput.substr(i + 1).indexOf('\n\\.') + 3;//\n\\.
                 bolStdin = false;
             }
-            bolRule = false;
+            
+            bolDeclare = false;
+            bolFunction = false;
+            bolDrop = false;
+            bolAlter = false;
+            bolComment = false;
+            bolSecurityLabel = false;
+            bolCreate = false;
+            bolType = false;
+            bolOperator = false;
+            bolTextSearchConfiguration = false;
+            bolTextSearchDictionary = false;
+            bolTextSearchParser = false;
+            bolTextSearchTemplate = false;
             bolGrant = false;
             bolRevoke = false;
-            bolSelect = false;
             bolInsert = false;
             bolUpdate = false;
             bolDelete = false;
+            bolSelect = false;
             bolJoin = false;
-            bolLastComment = false;
-            bolInsert = false;
             bolInsertValues = false;
+            bolRule = false;
+            bolLastComment = false;
+            bolBody = false;
+            bolWhere = false;
+            bolIf = false;
+            bolPolicy = false;
+            bolSequence = false;
+            bolTable = false;
 
             autocompleteGlobals.arrStrContext = [];
 
@@ -674,14 +1116,14 @@ function getContext(strInput, intPosition) {
             //console.log(">;|" + intTabLevel + "<");
 
         // Function Declare
-        } else if (int_qs === 0 && strInput.substr(i).match(/^DECLARE\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^DECLARE\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i = i + 6 + (strInput.substr(i + 7, 1) === ' ' ? 1 : 0);
             intTabLevel += 1;
             bolDeclare = true;
             //console.log(">DECLARE|" + intTabLevel + "<");
 
         // Transactions
-        } else if (int_qs === 0 && strInput.substr(i).match(/^BEGIN\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^BEGIN\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i = i + 4 + (strInput.substr(i + 5, 1) === ' ' ? 1 : 0);
             if (bolDeclare) {
                 bolDeclare = false;
@@ -696,7 +1138,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'tables', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
 
             intTabLevel += 1;
             intCase += 1; //INCREASE CASE LEVEL, WHILE intCase > 0 THEN "THEN" AND "END" IS TREATED DIFFERENTLY
@@ -708,7 +1150,7 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'tables', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
 
             intTabLevel += 1;
             intCase += 1; //INCREASE CASE LEVEL, WHILE intCase > 0 THEN "THEN" AND "END" IS TREATED DIFFERENTLY
@@ -720,48 +1162,48 @@ function getContext(strInput, intPosition) {
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'tables', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
 
 
         // FOUND CASE... THEN
-        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^THEN\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^THEN\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i = i + 3;
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'tables', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
 
             //console.log(">C THEN|" + intTabLevel + "<");
 
         // FOUND CASE... WHEN
-        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^WHEN\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^WHEN\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i = i + 3;
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'tables', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
 
             //console.log(">WHEN|" + intTabLevel + "<");
 
         // FOUND CASE... ELSE
-        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^ELSE\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^ELSE\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i = i + 3;
 
             strFirst = ' ';
             intContextPosition = i + 1;
-            arrShortQueries = ['variables', 'contextTablesColumns', 'tables', 'functions', 'builtins'];
+            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
 
             //console.log(">C ELSE|" + intTabLevel + "<");
 
         // FOUND CASE... END
-        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^END\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^END\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i = i + 2;
             intTabLevel -= 1;
             intCase -= 1;
             //console.log(">END|" + intTabLevel + "<");
 
         // FOUND THEN
-        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^THEN\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^THEN\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             intTabLevel += 1;
             i = i + 3;
 
@@ -774,10 +1216,10 @@ function getContext(strInput, intPosition) {
             strFirst = '\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'snippets'];
-            console.log(">I THEN|" + intTabLevel + "<");
+            //console.log(">I THEN|" + intTabLevel + "<");
 
         // FOUND LOOP
-        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^LOOP\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^LOOP\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             intTabLevel += 1;
             i = i + 3;
 
@@ -790,12 +1232,47 @@ function getContext(strInput, intPosition) {
             strFirst = '\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'snippets'];
-            console.log(">LOOP|" + intTabLevel + "<");
+            //console.log(">LOOP|" + intTabLevel + "<");
 
         // FOUND THEN... ELSE
-        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^ELSE\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^ELSE\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i = i + 3 + (strInput.substr(i + 4, 1) === ' ' ? 1 : 0);
             //console.log(">ELSE|" + intTabLevel + "<");
+
+        // FOUND CREATE OR REPLACE RULE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?RULE\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+            bolRule = true;
+            bolCreate = true;
+            i += (strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE[\ \t]+)?RULE/i)[0].length - 1);
+            intTabLevel += 1;
+            //console.log(">CREATE OR REPLACE RULE|" + intTabLevel + "<");
+
+        // FOUND CREATE OR REPLACE RULE... INSTEAD
+        } else if (int_qs === 0 && bolRule && strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+            i += (strInput.substr(i,8).match(/^INSTEAD/i)[0].length - 1);
+            
+            strFirst = '\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+            intContextPosition = i + 1;
+            arrShortQueries = ['snippets'];
+            //console.log(">INSTEAD|" + intTabLevel + "<");
+
+        // FOUND CREATE OR REPLACE FUNCTION
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+FUNCTION/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+            bolFunction = true;
+            i += (strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+FUNCTION/i)[0].length - 1);
+            //console.log(">KEYWORD|" + intTabLevel + "<");
+
+        // FOUND CREATE OR REPLACE FUNCTION... AS
+        } else if (int_qs === 0 && bolFunction && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+
+            bolFunction = false;
+            i += 1;
+            //console.log(">KEYWORD|" + intTabLevel + "<");
+
+        // FOUND AS
+        } else if (int_qs === 0 && (!bolFunction) && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+            i += 1;
+            //console.log(">KEYWORD|" + intTabLevel + "<");
 
         // FOUND END IF;
         } else if (int_qs === 0 && strInput.substr(i).match(/^END[\ \t\n\r]+IF[\ \t\n\r]*;/i)) {
@@ -828,112 +1305,19 @@ function getContext(strInput, intPosition) {
             //console.log(">ELSIF;|" + intTabLevel + "<");
 
         // Not an END IF, at this point it has to be a BEGIN END
-        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^END\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^END\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             intTabLevel -= 1;
             i = i + 2 + (strInput.substr(i + 3, 1) === ' ' ? 1 : 0);
             //console.log(">END|" + intTabLevel + "<");
 
-        // FOUND CREATE OR REPLACE RULE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?RULE\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            bolRule = true;
-            bolCreate = true;
-            i += (strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE[\ \t]+)?RULE/i)[0].length - 1);
-            intTabLevel += 1;
-            //console.log(">CREATE OR REPLACE RULE|" + intTabLevel + "<");
-
-        // FOUND CREATE OR REPLACE RULE... INSTEAD
-        } else if (int_qs === 0 && bolRule && strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            i += (strInput.substr(i,8).match(/^INSTEAD/i)[0].length - 1);
-            
-            strFirst = '\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
-            intContextPosition = i + 1;
-            arrShortQueries = ['snippets'];
-            //console.log(">INSTEAD|" + intTabLevel + "<");
-
-        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(DROP|ALTER|COMMENT|SECURITY[\ \t]+LABEL|CREATE)[\ \t\n]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            bolDrop = strInput.substr(i).match(/^DROP/i) ? true : false;
-            bolAlter = strInput.substr(i).match(/^ALTER/i) ? true : false;
-            bolComment = strInput.substr(i).match(/^COMMENT/i) ? true : false;
-            bolSecurityLabel = strInput.substr(i).match(/^SECURITY[\ \t]+LABEL/i) ? true : false;
-            bolCreate = strInput.substr(i).match(/^CREATE/i) ? true : false;
-            i += (strInput.substr(i).match(/^(DROP|ALTER|COMMENT|SECURITY[\ \t]+LABEL|CREATE)/i)[0].length - 1);
-            intTabLevel += 1;
-            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE|" + intTabLevel + "<");
-
-        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... AGGREGATE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^AGGREGATE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
-            i += (strInput.substr(i).match(/^AGGREGATE/i)[0].length - 1);
-            
-            strFirst = ' ';
-            intContextPosition = i + 1;
-            arrShortQueries = ['schemasAggregates'];
-            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... AGGREGATE|" + intTabLevel + "<");
-
-        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONVERSION
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CONVERSION[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
-            i += (strInput.substr(i).match(/^CONVERSION/i)[0].length - 1);
-            
-            strFirst = ' ';
-            intContextPosition = i + 1;
-            arrShortQueries = ['schemasConversions'];
-            console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONVERSION|" + intTabLevel + "<");
-
-        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONSTRAINT
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CONSTRAINT[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
-            i += (strInput.substr(i).match(/^CONSTRAINT/i)[0].length - 1);
-            
-            strFirst = ' ';
-            intContextPosition = i + 1;
-            arrShortQueries = ['schemasConstraints'];
-            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONSTRAINT|" + intTabLevel + "<");
-
-        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLLATION
-        } else if (int_qs === 0 && strInput.substr(i).match(/^COLLATION[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
-            i += (strInput.substr(i).match(/^COLLATION/i)[0].length - 1);
-            
-            strFirst = ' ';
-            intContextPosition = i + 1;
-            arrShortQueries = ['schemasCollations'];
-            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLLATION|" + intTabLevel + "<");
-
-        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TABLE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^TABLE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
-            i += (strInput.substr(i).match(/^TABLE/i)[0].length - 1);
+        // FOUND VACUUM/TRUNCATE/LOCK/ANALYZE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(VACUUM|TRUNCATE|LOCK|ANALYZE)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+            i += (strInput.substr(i).match(/^(VACUUM|TRUNCATE|LOCK|ANALYZE)/i)[0].length - 1);
             
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTables'];
-            
-            doubleIdentifier(strInput.substr(i + 1));
-            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLLATION|" + intTabLevel + "<");
-
-        // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLUMN
-        } else if (int_qs === 0 && strInput.substr(i).match(/^COLUMN[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
-            i += (strInput.substr(i).match(/^COLUMN/i)[0].length - 1);
-            
-            strFirst = ' ';
-            intContextPosition = i + 1;
-            arrShortQueries = ['contextTablesColumns'];
-            //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLLATION|" + intTabLevel + "<");
-
-        // FOUND CREATE OR REPLACE FUNCTION
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+FUNCTION/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            bolFunction = true;
-            i += (strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+FUNCTION/i)[0].length - 1);
-            //console.log(">KEYWORD|" + intTabLevel + "<");
-
-        // FOUND CREATE OR REPLACE FUNCTION... AS
-        } else if (int_qs === 0 && bolFunction && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-
-            bolFunction = false;
-            i += 1;
-            //console.log(">KEYWORD|" + intTabLevel + "<");
-
-        // FOUND AS
-        } else if (int_qs === 0 && (!bolFunction) && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
-            i += 1;
-            //console.log(">KEYWORD|" + intTabLevel + "<");
+            //console.log(">VACUUM/TRUNCATE/LOCK/ANALYZE|" + intTabLevel + "<");
 
         // Not whitespace
         } else if (int_qs === 0 && !strInput.substr(i).match('^[\n\r\ \t]+')) {
@@ -965,36 +1349,36 @@ function getContext(strInput, intPosition) {
     
     
     if (bolFinal) {
-        // console.log('lookahead');
-        // console.log('before i', i);
-        // console.log('before intContextPosition', intContextPosition);
-        // console.log('before arrShortQueries', arrShortQueries);
-        // console.log('before strFirst', strFirst);
+        //console.log('lookahead');
+        //console.log('before i', i);
+        //console.log('before intContextPosition', intContextPosition);
+        //console.log('before arrShortQueries', arrShortQueries);
+        //console.log('before strFirst', strFirst);
         i = intFinalI;
         intContextPosition = intFinalContextPosition;
         arrShortQueries = arrFinalShortQueries;
         strFirst = strFinalFirst;
         
-        // console.log('after i', i);
-        // console.log('after intContextPosition', intContextPosition);
-        // console.log('after arrShortQueries', arrShortQueries);
-        // console.log('after strFirst', strFirst);
+        //console.log('after i', i);
+        //console.log('after intContextPosition', intContextPosition);
+        //console.log('after arrShortQueries', arrShortQueries);
+        //console.log('after strFirst', strFirst);
     }
     
     //console.log('i', i);
     //console.log('intPosition', intPosition);
 
-    console.log('Check Distance', i + 2 <= intPosition && !bolFinal);
+    //console.log('Check Distance', i + 2 <= intPosition && !bolFinal);
     if (i + 2 <= intPosition && !bolFinal) {
         return;
     }
 
 
-    console.log('intContextPosition>' + intContextPosition + '<');
-    console.log('strFirst>' + strFirst + '<');
-    console.log('Relevant>' + strInput.substr(intContextPosition, strFirst.length) + '<');
+    //console.log('intContextPosition>' + intContextPosition + '<');
+    //console.log('strFirst>' + strFirst + '<');
+    //console.log('Relevant>' + strInput.substr(intContextPosition, strFirst.length) + '<');
     if (strFirst.length > 0) {
-        console.log('strFirst Correct', ! strInput.substring(intContextPosition).match(new RegExp("^" + strFirst)));
+        //console.log('strFirst Correct', ! strInput.substring(intContextPosition).match(new RegExp("^" + strFirst)));
         if (! strInput.substring(intContextPosition).match(new RegExp("^" + strFirst))) {
             return;
         } else {
@@ -1004,10 +1388,10 @@ function getContext(strInput, intPosition) {
     
     //console.log('autocompleteGlobals.bolSnippets', autocompleteGlobals.bolSnippets);
     //console.log('after intContextPosition', intContextPosition);
-    console.log('intPosition', intPosition);
+    //console.log('intPosition', intPosition);
     strContext = strInput.substring(intContextPosition, intPosition);
 
-    console.log('strContext.length', strContext.length === 0);
+    //console.log('strContext.length', strContext.length === 0);
     if (strContext.length === 0) {
         return;
     }
@@ -1015,25 +1399,13 @@ function getContext(strInput, intPosition) {
     autocompleteGlobals.bolSnippets = false;
     autocompleteGlobals.bolAlpha = false;
     
-    if (arrShortQueries.indexOf('allcolumns') > -1) {
-        arrQueries = [autocompleteQuery.allcolumns];
-    } if (arrShortQueries.indexOf('tables') > -1) {
-        arrQueries.push(
-            autocompleteQuery.tables
-                .replace(/\{\{CATALOG}\}/gi, CATALOG_id)
-                .replace(/\{\{TOAST}\}/gi, TOAST_id)
-                .replace(/\{\{ADDITIONALWHERE}\}/gi, '')
-            , autocompleteQuery.views
-                .replace(/\{\{CATALOG}\}/gi, CATALOG_id)
-                .replace(/\{\{TOAST}\}/gi, TOAST_id)
-                .replace(/\{\{ADDITIONALWHERE}\}/gi, '')
-        );
-    } if (arrShortQueries.indexOf('schemas') > -1) {
+    if (arrShortQueries.indexOf('schemas') > -1) {
         arrQueries.push(autocompleteQuery.schemas);
-    } if (arrShortQueries.indexOf('tableFunctions') > -1) {
-        arrQueries.push(autocompleteQuery.tableFunctions);
     } if (arrShortQueries.indexOf('functions') > -1) {
-        arrQueries.push(autocompleteQuery.funcSnippets.replace(/\{\{ADDITIONALWHERE}\}/gi, ''));
+        arrQueries.push(autocompleteQuery.funcSnippets
+            .replace(/\{\{ADDITIONALWHERE}\}/gi,
+                'AND pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \')))')
+        );
     } if (arrShortQueries.indexOf('builtins') > -1) {
         arrQueries.push(autocompleteQuery.builtIns);
     } if (arrShortQueries.indexOf('groups') > -1) {
@@ -1072,26 +1444,38 @@ function getContext(strInput, intPosition) {
         || arrShortQueries.indexOf('schemasConstraints') > -1
         || arrShortQueries.indexOf('schemasCollations') > -1
         || arrShortQueries.indexOf('schemasTables') > -1
+        || arrShortQueries.indexOf('schemasTablesOnly') > -1
+        || arrShortQueries.indexOf('schemasViewsOnly') > -1
         || arrShortQueries.indexOf('schemasMaterializedViews') > -1
         || arrShortQueries.indexOf('schemasFunctions') > -1
         || arrShortQueries.indexOf('schemasSequences') > -1
         || arrShortQueries.indexOf('schemasTypes') > -1
-        || arrShortQueries.indexOf('schemasDomains') > -1) {
-        console.log('arrShortQueries', arrShortQueries);
-        console.log('before strContext', strContext);
+        || arrShortQueries.indexOf('schemasDomains') > -1
+        || arrShortQueries.indexOf('schemasOperators') > -1
+        || arrShortQueries.indexOf('schemasForeignTables') > -1
+        || arrShortQueries.indexOf('schemasIndexes') > -1
+        || arrShortQueries.indexOf('schemasOperatorClasses') > -1
+        || arrShortQueries.indexOf('schemasOperatorFamilies') > -1
+        || arrShortQueries.indexOf('schemasTextSearchConfigurations') > -1
+        || arrShortQueries.indexOf('schemasTextSearchDictionaries') > -1
+        || arrShortQueries.indexOf('schemasTextSearchParsers') > -1
+        || arrShortQueries.indexOf('schemasTextSearchTemplates') > -1) {
+        //console.log('arrShortQueries', arrShortQueries);
+        //console.log('before strContext', strContext);
         if (strContext.match(/^.*\./)) {
-            var arrMatches = strContext.match(/^(.*)\.([^.]*)$/);
+            var arrMatches = strContext.match(/^(.*)\.([^.]*)/);
             var strSchema = arrMatches[1];
             strContext = arrMatches[2];
             
-            console.log('strSchema', strSchema);
-            console.log('after strContext', strContext);
+            //console.log('strSchema', strSchema);
+            //console.log('after strContext', strContext);
             
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasAggregates') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_aggregates
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
             
@@ -1099,7 +1483,8 @@ function getContext(strInput, intPosition) {
                 || arrShortQueries.indexOf('schemasConversions') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_conversions
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
             
@@ -1107,7 +1492,8 @@ function getContext(strInput, intPosition) {
                 || arrShortQueries.indexOf('schemasConstraints') > -1) {
                 arrQueries.push(
                     autocompleteQuery.constraints
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
             
@@ -1115,62 +1501,144 @@ function getContext(strInput, intPosition) {
                 || arrShortQueries.indexOf('schemasCollations') > -1) {
                 arrQueries.push(
                     autocompleteQuery.collations
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
             
             if (arrShortQueries.indexOf('schemasAll') > -1
-                || arrShortQueries.indexOf('schemasTables') > -1) {
+                || arrShortQueries.indexOf('schemasTables') > -1
+                || arrShortQueries.indexOf('schemasTablesOnly') > -1) {
                 arrQueries.push(
                     autocompleteQuery.tables
                         .replace(/\{\{CATALOG}\}/gi, '-1')
                         .replace(/\{\{TOAST}\}/gi, '-1')
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
             
             if (arrShortQueries.indexOf('schemasAll') > -1
-                || arrShortQueries.indexOf('schemasTables') > -1) {
+                || arrShortQueries.indexOf('schemasTables') > -1
+                || arrShortQueries.indexOf('schemasViewsOnly') > -1) {
                 arrQueries.push(
                     autocompleteQuery.views
                         .replace(/\{\{CATALOG}\}/gi, '-1')
                         .replace(/\{\{TOAST}\}/gi, '-1')
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
             
             if (arrShortQueries.indexOf('schemasMaterializedViews') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_materialized_views
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasFunctions') > -1) {
                 arrQueries.push(
                     autocompleteQuery.funcSnippets
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasSequences') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_sequences
-                        .replace(/\{\{SCHEMA}\}/gi, strSchema)
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasTypes') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_types
-                        .replace(/\{\{SCHEMA}\}/gi, strSchema)
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasDomains') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_domains
-                        .replace(/\{\{SCHEMA}\}/gi, strSchema)
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                );
+            }
+            if (arrShortQueries.indexOf('schemasAll') > -1
+                || arrShortQueries.indexOf('schemasOperators') > -1) {
+                arrQueries.push(
+                    autocompleteQuery.qualified_operators
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                );
+            }
+            if (arrShortQueries.indexOf('schemasAll') > -1
+                || arrShortQueries.indexOf('schemasForeignTables') > -1) {
+                arrQueries.push(
+                    autocompleteQuery.qualified_foreign_tables
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                );
+            }
+            if (arrShortQueries.indexOf('schemasAll') > -1
+                || arrShortQueries.indexOf('schemasIndexes') > -1) {
+                arrQueries.push(
+                    autocompleteQuery.qualified_indexes
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                );
+            }
+            if (arrShortQueries.indexOf('schemasAll') > -1
+                || arrShortQueries.indexOf('schemasOperatorClasses') > -1) {
+                arrQueries.push(
+                    autocompleteQuery.qualified_operator_classes
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                );
+            }
+            if (arrShortQueries.indexOf('schemasAll') > -1
+                || arrShortQueries.indexOf('schemasOperatorFamilies') > -1) {
+                arrQueries.push(
+                    autocompleteQuery.qualified_operator_families
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                );
+            }
+            if (arrShortQueries.indexOf('schemasAll') > -1
+                || arrShortQueries.indexOf('schemasTextSearchConfigurations') > -1) {
+                arrQueries.push(
+                    autocompleteQuery.qualified_text_search_configurations
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                );
+            }
+            if (arrShortQueries.indexOf('schemasAll') > -1
+                || arrShortQueries.indexOf('schemasTextSearchDictionaries') > -1) {
+                arrQueries.push(
+                    autocompleteQuery.qualified_text_search_dictionaries
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                );
+            }
+            if (arrShortQueries.indexOf('schemasAll') > -1
+                || arrShortQueries.indexOf('schemasTextSearchParsers') > -1) {
+                arrQueries.push(
+                    autocompleteQuery.qualified_text_search_parsers
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
+                );
+            }
+            if (arrShortQueries.indexOf('schemasAll') > -1
+                || arrShortQueries.indexOf('schemasTextSearchTemplates') > -1) {
+                arrQueries.push(
+                    autocompleteQuery.qualified_text_search_templates
+                        .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND (pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                            + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
         } else {
@@ -1187,9 +1655,9 @@ function getContext(strInput, intPosition) {
             );
         }
     } if (arrShortQueries.indexOf('contextTablesColumns') > -1) {
-        console.log('arrShortQueries', arrShortQueries);
-        console.log('before strContext', strContext);
-        console.log('before strCopyContext', strCopyContext);
+        //console.log('arrShortQueries', arrShortQueries);
+        //console.log('before strContext', strContext);
+        //console.log('before strCopyContext', strCopyContext);
         
         var strSchema = '';
         var strTable = '';
@@ -1197,26 +1665,25 @@ function getContext(strInput, intPosition) {
         strContext = strCopyContext;
         
         if (strContext.match(/^.*\..*\./)) {
-            var arrMatches = strContext.match(/^(.*)\.(.*)\.([^.]*)$/);
+            var arrMatches = strContext.match(/^(.*)\.(.*)\.([^.]*)/);
             strSchema = arrMatches[1];
             strTable = arrMatches[2];
             strContext = arrMatches[3];
             
-            console.log('strSchema', strSchema);
-            console.log('strTable', strTable);
-            console.log('after strContext', strContext);
+            //console.log('strSchema', strSchema);
+            //console.log('strTable', strTable);
+            //console.log('after strContext', strContext);
         } else if (strContext.match(/^.*\..*/)) {
-            var arrMatches = strContext.match(/^(.*)\.([^.]*)$/);
+            var arrMatches = strContext.match(/^(.*)\.([^.]*)/);
             strTable = arrMatches[1];
             strContext = arrMatches[2];
-            console.log('strTable', strTable);
-            console.log('after strContext', strContext);
+            //console.log('strTable', strTable);
+            //console.log('after strContext', strContext);
         }
         
         console.log('autocompleteGlobals.arrStrContext', autocompleteGlobals.arrStrContext);
         var i, len;
         for (i = 0, len = autocompleteGlobals.arrStrContext.length; i < len; i++) {
-            //TODO: tables.column
             if ((autocompleteGlobals.arrStrContext[i][0] === strSchema || strSchema === '')
                 || (autocompleteGlobals.arrStrContext[i][1] === strTable || strTable === '')
                 || (autocompleteGlobals.arrStrContext[i][2] === strTable || autocompleteGlobals.arrStrContext[i][2] === '')) {
@@ -1240,62 +1707,59 @@ function getContext(strInput, intPosition) {
                     .replace(/\{\{STRING}\}/gi, autocompleteGlobals.arrStrContext[i][1]));
             }
         }
-    }/* if (arrShortQueries.indexOf('schemasTablesColumns') > -1) {
-        console.log('######################');
-        console.log('arrShortQueries', arrShortQueries);
-        console.log('before strContext', strContext);
-        console.log('' ,(/^.*\..*\.* /).test(strContext));
-        console.log('arrShortQueries', arrShortQueries);
-        console.log('before strCopyContext', strCopyContext);
-        console.log('######################');
+    } if (arrShortQueries.indexOf('schemasTablesColumns') > -1) {
+        //console.log('arrShortQueries', arrShortQueries);
+        //console.log('before strContext', strContext);
+        //console.log('before strCopyContext', strCopyContext);
         
         var strSchema = '';
         var strTable = '';
         
         strContext = strCopyContext;
         
-        if (strContext.match(/^.*\..*\.* /)) {
-            strSchema = strContext.replace(/\..*$/, '');
-            strContext = strContext.substring(strSchema.length + 1);
-            strTable = strContext.replace(/\..*$/, '');
-            strContext = strContext.substring(strTable.length + 1);
-            console.log('strSchema', strSchema);
-            console.log('strTable', strTable);
-            console.log('after strContext', strContext);
+        if (strContext.match(/^.*\..*\./)) {
+            var arrMatches = strContext.match(/^(.*)\.(.*)\.([^.]*)/);
+            strSchema = arrMatches[1];
+            strTable = arrMatches[2];
+            strContext = arrMatches[3];
             
+            //console.log('strSchema', strSchema);
+            //console.log('strTable', strTable);
+            //console.log('after strContext', strContext);
             
-        } else if (strContext.match(/^.*\..* /)) {
-            var strTable = strContext.replace(/\..*$/, '');
-            strContext = strContext.substring(strTable.length + 1);
-            console.log('strTable', strTable);
-            console.log('after strContext', strContext);
-            
-            
+            arrQueries.push(
+                autocompleteQuery.columns
+                    .replace(/\{\{ADDITIONALWHERE}\}/gi,
+                        ' AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$'
+                        + ' AND pg_class.relname = $TABLETOKEN$' + strTable + '$TABLETOKEN$'
+                        )
+            );
+
+        } else if (strContext.match(/^.*\..*/)) {
+            var arrMatches = strContext.match(/^(.*)\.([^.]*)/);
+            strSchema = arrMatches[1];
+            strContext = arrMatches[2];
+            //console.log('strSchema', strSchema);
+            //console.log('after strContext', strContext);
+
+            arrQueries.push(
+                autocompleteQuery.tables
+                    .replace(/\{\{CATALOG}\}/gi, '-1')
+                    .replace(/\{\{TOAST}\}/gi, '-1')
+                    .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
+            );
+
+            arrQueries.push(
+                autocompleteQuery.views
+                    .replace(/\{\{CATALOG}\}/gi, '-1')
+                    .replace(/\{\{TOAST}\}/gi, '-1')
+                    .replace(/\{\{ADDITIONALWHERE}\}/gi, 'AND pg_namespace.nspname = $SCHEMATOKEN$' + strSchema + '$SCHEMATOKEN$')
+            );
+
+        } else {
+            arrQueries.push(autocompleteQuery.schemas);
         }
-        
-        var i, len;
-        for (i = 0, len = arrStrContext.length; i < len; i++) {
-            //TODO, tables.column
-            if ((arrStrContext[i][0] === strSchema || strSchema === '')
-                || (arrStrContext[i][1] === strTable || strTable === '')
-                || (arrStrContext[i][2] === strTable || arrStrContext[i][2] === '')) {
-                arrQueries.push(
-                    autocompleteQuery.columns
-                        .replace(/\{\{ADDITIONALWHERE}\}/gi,
-                            (strSchema !== ''
-                                ? 'AND pg_namespace.nspname = $SCHEMATOKEN$' + arrStrContext[i][0] + '$SCHEMATOKEN$'
-                                : '')
-                            + (strTable !== ''
-                                ? 'AND pg_class.relname = $TABLETOKEN$' + arrStrContext[i][1] + '$TABLETOKEN$'
-                                : ''))
-                );
-                if (strTable === '' && arrStrContext[i][2] !== '') {
-                    arrQueries.push(ml(function () {/*SELECT $STRINGTOKEN${{STRING}}$STRINGTOKEN$ AS obj_name, 'special_table' AS obj_meta* /})
-                        .replace(/\{\{STRING}\}/gi, arrStrContext[i][2]));
-                }
-            }
-        }
-    }*/
+    }
 
     // use the updated context for remaining rules, remaining rules modify the context
     for (var i = 0, len = arrQueries.length; i < len; i++) {
@@ -1303,21 +1767,25 @@ function getContext(strInput, intPosition) {
         arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strContext.toLowerCase() + '%');
     }
     
-    console.log('check queries', arrQueries.length === 0 && autocompleteGlobals.bolSnippets === false);
+    //console.log('check queries', arrQueries.length === 0 && autocompleteGlobals.bolSnippets === false);
     if (arrQueries.length === 0 && autocompleteGlobals.bolSnippets === false) {
         return;
     }
 
+    
     console.log('objContext', {
         'strContext': strContext
         , 'arrQueries': arrQueries
         , 'searchLength': strContext.length
+        , 'intContextPosition': intContextPosition
     });
+    
 
     return {
         'strContext': strContext
         , 'arrQueries': arrQueries
         , 'searchLength': strContext.length
+        , 'intContextPosition': intContextPosition
     };
 }
 
