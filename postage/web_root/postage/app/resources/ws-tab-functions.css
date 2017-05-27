@@ -336,7 +336,7 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     box-sizing: border-box;
 }
 .sql-results-area gs-table {
-    white-space: initial;
+    white-space: nowrap;
     min-height: 20em;
 }
 
@@ -391,9 +391,3 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
     -moz-animation: error-pulsate 1100ms linear infinite;
     animation: error-pulsate 1100ms linear infinite;
 }
-
-
-
-
-
-
