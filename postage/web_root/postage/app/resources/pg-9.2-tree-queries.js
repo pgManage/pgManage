@@ -1292,23 +1292,32 @@ scriptQuery.objectRole = ml(function () {/*
                     (
                         SELECT array_to_string(array_agg(E'\nALTER ROLE ' || quote_ident(r.rolname) || ' SET ' || em.unnest || ';'), '')
                           FROM (
-                                SELECT unnest(s.setconfig)
+                                SELECT DISTINCT unnest(s.setconfig)
                             ) em
                     ), '') ||
                 COALESCE(
                     (
                         SELECT array_to_string(array_agg(E'\nGRANT ' || quote_ident(em.unnest) || ' TO ' || quote_ident(r.rolname) || ';'), '')
                           FROM (
-                                SELECT unnest(array_agg(g.rolname))
+                                SELECT DISTINCT unnest(array_agg(g.rolname))
                             ) em
-                    ), '')
-           FROM pg_roles r 
-      LEFT JOIN pg_auth_members m ON r.oid = m.member 
-      LEFT JOIN pg_roles g ON g.oid = m.roleid 
-      LEFT JOIN pg_db_role_setting s ON r.oid = s.setrole 
-      LEFT JOIN pg_database d ON d.oid = s.setdatabase 
-          WHERE r.oid = {{INTOID}} -- OR r.rolname = '{{STRSQLSAFENAME}}' <- errs when single quote in name
-       GROUP BY r.oid, r.rolname, r.rolcanlogin, r.rolcreaterole, r.rolsuper, r.rolinherit, r.rolcreatedb, 
+                    ), '') ||
+                COALESCE(E'\n\n/*' ||
+                    NULLIF((
+                        SELECT array_to_string(array_agg(E'\nGRANT ' || quote_ident(r.rolname) || ' TO ' || quote_ident(em.unnest) || ';'), '')
+                          FROM (
+                                SELECT DISTINCT unnest(array_agg(og.rolname))
+                            ) em
+                    ), '') || E'\n*' || '/', '')
+           FROM pg_roles r
+      LEFT JOIN pg_auth_members m ON r.oid = m.member
+      LEFT JOIN pg_roles g ON g.oid = m.roleid
+      LEFT JOIN pg_auth_members om ON r.oid = om.roleid
+      LEFT JOIN pg_roles og ON og.oid = om.member
+      LEFT JOIN pg_db_role_setting s ON r.oid = s.setrole
+      LEFT JOIN pg_database d ON d.oid = s.setdatabase
+          WHERE r.oid = {{INTOID}} -- OR r.rolname = '{{STRSQLSAFENAME}}' -- errs when single quote in name
+       GROUP BY r.oid, r.rolname, r.rolcanlogin, r.rolcreaterole, r.rolsuper, r.rolinherit, r.rolcreatedb,
                 r.rolreplication, r.rolconnlimit, r.rolvaliduntil, s.setconfig;
     */});
 

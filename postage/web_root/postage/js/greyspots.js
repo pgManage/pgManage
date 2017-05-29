@@ -5968,6 +5968,11 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                 strData = strData.substring(strData.indexOf('\n') + 1);
             }
 
+            // strip out response number
+            if (strData.substring(0, strData.indexOf(' ')) === 'transactionid') {
+                strData = strData.substring(strData.indexOf('\n') + 1);
+            }
+
             // strip out fatal
             if (strData.indexOf('FATAL\n') === 0) {
                 strData = strData.substring(strData.indexOf('\n') + 1);
@@ -5980,6 +5985,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
 
             // save error text in case we dont find any error part labels
             jsnRet.error_text = strData;
+            jsnRet.orig_error_text = strData;
             
             // trim and split on return for parsing
             arrLines = strData.trim().split('\n');
@@ -5988,6 +5994,12 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                 arrLine = arrLines[i].split('\t');
                 
                 jsnRet[arrLine[0]] = GS.decodeFromTabDelimited(arrLine[1] || '');
+            }
+            
+            if (!jsnRet.error_text) {
+                jsnRet = {
+                    'error_text': arrLines[0]
+                };
             }
         }
         
@@ -42129,6 +42141,80 @@ document.addEventListener('DOMContentLoaded', function () {
                 //var strChar;
 
                 if (!error) {
+                    // if this is the first callback, we need to save
+                    //      the column names and types and we need to
+                    //      re-link the filters, sorts and filter statuses
+                    //
+                    // this was below in the else, but requestSelectFromSocket will only callback once if there are no records - Nunzio 5/29/2017
+                    if (data.intCallback === 0) {
+                        // clear old column arrays to make remove for any
+                        //      changes to the column list
+                        element.internalData.columnNames = [];
+                        element.internalData.columnTypes = [];
+                        element.internalData.columnFilterStatuses = [];
+                        element.internalData.columnFilters = [];
+                        element.internalData.columnListFilters = [];
+                        element.internalData.columnOrders = [];
+                        console.log(element.internalData.columnNames);
+
+                        // future mike, you need to make is so that the
+                        //      column name, filter and sort arrays are
+                        //      retained across select calls.
+                        // past mike, sounds good, I'll use the old column
+                        //      list to get the old sorts filters, and
+                        //      filter statuses
+                        col_i = 0;
+                        col_len = data.arrDecodedColumnNames.length;
+                        while (col_i < col_len) {
+                            strCol = data.arrDecodedColumnNames[col_i];
+                            index = arrOldColumnNames.indexOf(strCol);
+
+                            element.internalData.columnNames.push(
+                                strCol
+                            );
+                            element.internalData.columnTypes.push(
+                                data.arrDecodedColumnTypes[col_i]
+                            );
+
+                            // if we've got old values from the select,
+                            //      bring them over to the new arrays
+                            if (index > -1) {
+                                element.internalData
+                                    .columnFilterStatuses.push(
+                                        arrOldColumnFilterStatuses[index]
+                                    );
+                                element.internalData
+                                    .columnFilters.push(
+                                        arrOldColumnFilters[index]
+                                    );
+                                element.internalData
+                                    .columnListFilters.push(
+                                        arrOldColumnListFilters[
+                                            index
+                                        ]
+                                    );
+                                element.internalData
+                                    .columnOrders.push(
+                                        arrOldColumnOrders[index]
+                                    );
+
+                            // else, add empty sort, filter and filter
+                            //      status
+                            } else {
+                                element.internalData
+                                    .columnFilterStatuses.push('on');
+                                element.internalData
+                                    .columnFilters.push([]);
+                                element.internalData
+                                    .columnListFilters.push({});
+                                element.internalData
+                                    .columnOrders.push('neutral');
+                            }
+
+                            col_i += 1;
+                        }
+                    }
+
                     // we need to remove the loader at some point, if we see
                     //      the last message of the select: remove loader and
                     //      render
@@ -42153,77 +42239,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     // we need to capture the records and columns and store
                     //      them in the internal data
                     } else {
-                        // if this is the first callback, we need to save
-                        //      the column names and types and we need to
-                        //      re-link the filters, sorts and filter statuses
-                        if (data.intCallback === 0) {
-                            // clear old column arrays to make remove for any
-                            //      changes to the column list
-                            element.internalData.columnNames = [];
-                            element.internalData.columnTypes = [];
-                            element.internalData.columnFilterStatuses = [];
-                            element.internalData.columnFilters = [];
-                            element.internalData.columnListFilters = [];
-                            element.internalData.columnOrders = [];
-
-                            // future mike, you need to make is so that the
-                            //      column name, filter and sort arrays are
-                            //      retained across select calls.
-                            // past mike, sounds good, I'll use the old column
-                            //      list to get the old sorts filters, and
-                            //      filter statuses
-                            col_i = 0;
-                            col_len = data.arrDecodedColumnNames.length;
-                            while (col_i < col_len) {
-                                strCol = data.arrDecodedColumnNames[col_i];
-                                index = arrOldColumnNames.indexOf(strCol);
-
-                                element.internalData.columnNames.push(
-                                    strCol
-                                );
-                                element.internalData.columnTypes.push(
-                                    data.arrDecodedColumnTypes[col_i]
-                                );
-
-                                // if we've got old values from the select,
-                                //      bring them over to the new arrays
-                                if (index > -1) {
-                                    element.internalData
-                                        .columnFilterStatuses.push(
-                                            arrOldColumnFilterStatuses[index]
-                                        );
-                                    element.internalData
-                                        .columnFilters.push(
-                                            arrOldColumnFilters[index]
-                                        );
-                                    element.internalData
-                                        .columnListFilters.push(
-                                            arrOldColumnListFilters[
-                                                index
-                                            ]
-                                        );
-                                    element.internalData
-                                        .columnOrders.push(
-                                            arrOldColumnOrders[index]
-                                        );
-
-                                // else, add empty sort, filter and filter
-                                //      status
-                                } else {
-                                    element.internalData
-                                        .columnFilterStatuses.push('on');
-                                    element.internalData
-                                        .columnFilters.push([]);
-                                    element.internalData
-                                        .columnListFilters.push({});
-                                    element.internalData
-                                        .columnOrders.push('neutral');
-                                }
-
-                                col_i += 1;
-                            }
-                        }
-
                         if (
                             data.intCallback === 3 &&
                             element.internalData.bolFirstLoadFinished === false

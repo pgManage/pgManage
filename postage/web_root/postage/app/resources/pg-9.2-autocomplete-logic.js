@@ -400,6 +400,14 @@ function autocompleteBindEditor(tabElement, editor) {
     //     }
     // });
 
+    editor.session.addEventListener('changeScrollTop', function (event) {
+        autocompleteLogic(editor, 'scroll', event);
+    });
+
+    editor.session.addEventListener('changeScrollLeft', function (event) {
+        autocompleteLogic(editor, 'scroll', event);
+    });
+    
     editor.addEventListener('change', function (event) {
         //console.log(event);
         
@@ -437,18 +445,10 @@ function autocompleteBindEditor(tabElement, editor) {
 }
 
 function autocompleteLogic(editor, autocompleteKeyEvent, event) {
-    // get full script
-    var strScript = editor.getValue();
-    var objContext;
-    
-    // get event cursor position start/end
-    var intStartCursorPosition = rowAndColumnToIndex(strScript, event.start.row, event.start.column);
-    var intEndCursorPosition = rowAndColumnToIndex(strScript, event.end.row, event.end.column);
-    var intCursorPosition = intStartCursorPosition;
-
     // If we deleted a character or pasted in more than one, then close the popup
     if (autocompleteKeyEvent === 'delete'
-        || autocompleteKeyEvent === 'paste') {
+        || autocompleteKeyEvent === 'paste'
+        || autocompleteKeyEvent === 'scroll') {
         closePopup();
         return;
 
@@ -459,6 +459,15 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
         return;
     }
     
+    // get full script
+    var strScript = editor.getValue();
+    var objContext;
+    
+    // get event cursor position start/end
+    var intStartCursorPosition = rowAndColumnToIndex(strScript, event.start.row, event.start.column);
+    var intEndCursorPosition = rowAndColumnToIndex(strScript, event.end.row, event.end.column);
+    var intCursorPosition = intStartCursorPosition;
+
     if (autocompleteKeyEvent === 'indent') {
         intCursorPosition += 3; //fix four spaces issue
     }
@@ -475,16 +484,17 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     */
     
     if (! editor.currentQueryRange) {
-        //console.log('There was no context detected by Michael\'s code, so ignore.');
+        console.log('There was no context detected by Michael\'s code, so ignore.');
         return;
     }
     
-    /*console.log('sent to Joseph\'s Code>' + strScript.substring(editor.currentQueryRange.startIndex
-            , editor.currentQueryRange.endIndex + 10 + (autocompleteKeyEvent === 'indent' ? 4 : 1)) + '<');//*/
+    console.log('Joseph\'s Code>' + strScript.substring(editor.currentQueryRange.startIndex
+            , editor.currentQueryRange.endIndex + 15) + '|' + (intCursorPosition - editor.currentQueryRange.startIndex) + '|' + strScript.substring(editor.currentQueryRange.startIndex
+            , intCursorPosition + 1) + '<');//*/
     
     objContext = getContext(
         strScript.substring(editor.currentQueryRange.startIndex
-            , editor.currentQueryRange.endIndex + 10 + (autocompleteKeyEvent === 'indent' ? 4 : 1))
+            , editor.currentQueryRange.endIndex + 15)
         , intCursorPosition - editor.currentQueryRange.startIndex);
     //objContext = getContext(strScript, intCursorPosition);
     //console.log('typeof', typeof objContext);
@@ -676,38 +686,161 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
         }
         //console.log('autocompleteGlobals.bolAlpha:' + autocompleteGlobals.bolAlpha);
         if (autocompleteGlobals.bolAlpha) {
-            var strDeclare = editor.getValue(), substrEnd, arrFuncVariables = [];
-            // if there is a declare statement: get variable names;
-            if (strDeclare.toLowerCase().indexOf('declare') !== -1) {
-                // if there is a begin: substring to that;
-                if (strDeclare.toLowerCase().indexOf('begin') !== -1) {
-                    substrEnd = strDeclare.toLowerCase().indexOf('begin');
-                    strDeclare = strDeclare.substring(strDeclare.toLowerCase().indexOf('declare'), substrEnd);
-                    // get variable names
-                    arrFuncVariables = strDeclare.match(/([A-Za-z_0-9]+\ )+/ig);
-                    //console.log('arrFuncVariables: ' + arrFuncVariables);
-                    // trim variable names
-                    if (arrFuncVariables) {
-                        for (var i = 0, len = arrFuncVariables.length; i < len; i++) {
-                            arrFuncVariables[i] = arrFuncVariables[i].trim();
-                            //console.log(arrFuncVariables[i] + ' : ' + arrFuncVariables[i].indexOf(' '));
-                            // if arrFuncVariables[i] has a space in it still: substring it off
-                            if (arrFuncVariables[i].indexOf(' ') !== -1) {
-                                arrFuncVariables[i] = arrFuncVariables[i].substring(0, arrFuncVariables[i].indexOf(' '));
-                            }
-                            if (arrFuncVariables[i].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) {
-                                optionList.push(['' + arrFuncVariables[i] + '', 'funcVar']);
-                                if (arrFuncVariables[i].substring(0, 1) === '"') {
-                                    autocompleteGlobals.arrSearch.push(arrFuncVariables[i].toLowerCase());
-                                } else {
-                                    autocompleteGlobals.arrSearch.push('"' + arrFuncVariables[i].toLowerCase() + '"');
-                                }
+            var strDeclare = editor.getValue();
+            var substrEnd;
+            var arrFuncVariables = [];
+            
+            // we need to autocomplete for variables when inside a DECLARE...BEGIN...END
+            //      block. we will do this in several steps:
+            //          - determine what and how many BEGIN blocks the cursor is inside
+            //          - find the DECLARE blocks for each BEGIN block we are inside
+            //          - extract the variable names from each DECLARE block
+            //
+            // some things to pay attention to:
+            //      we need high performance, we should not have to parse the entire script
+            //          accomplish this task. to do this we'll start our parsing from the
+            //          position of the cursor.
+            //
+            // not every BEGIN has a DECLARE preceding it. we could be within two BEGIN
+            //      statements, we should get the variables from all BEGINs that we are
+            //      within.
+            //
+            // EXAMPLE #1:
+            //      DECLARE
+            //          var_one integer;
+            //          var_two integer;
+            //      BEGIN
+            //
+            //          | <------ should autocomplete with var_one,var_two
+            //
+            //          DECLARE
+            //              var_three integer;
+            //              var_four integer;
+            //          BEGIN
+            //
+            //              | <------ should autocomplete with var_one,var_two,var_three,var_four
+            //
+            //          END;
+            //
+            //          | <------ should autocomplete with var_one,var_two
+            //
+            //      END;
+            //
+            // To implement this, 
+            //
+            //
+            //
+            //
+            //
+            
+            
+            var bolContinue = false;
+            var strStart = strDeclare.toLowerCase().substring(0, autocompleteGlobals.intContextPosition);
+            
+            var intLastDollarQuoting = Math.max(strStart.lastIndexOf('$body$'), strStart.lastIndexOf('$sql$'));
+            var intEmptyQuoting = strStart.lastIndexOf('$$');
+            console.log('intLastDollarQuoting', intLastDollarQuoting);
+            console.log('str intLastDollarQuoting', strStart.substr(intLastDollarQuoting, 20));
+            console.log('intEmptyQuoting', intEmptyQuoting);
+            console.log('str intEmptyQuoting', strStart.substr(intEmptyQuoting, 20));
+            if (intLastDollarQuoting > 0 && strStart.substring(intLastDollarQuoting).match(/[\t\n\r ]*DECLARE/i)) {
+                console.log('$body$ or $sql$ matched');
+                bolContinue = true;
+            } else if (intEmptyQuoting > 0 && strStart.substring(intEmptyQuoting).match(/[\t\n\r ]*DECLARE/i)) {
+                console.log('$$ matched');
+                bolContinue = true;
+            }
+            
+            console.log('bolContinue', bolContinue);
+            if (bolContinue) {
+                substrEnd = strStart.toLowerCase().lastIndexOf('begin');
+                strDeclare = strDeclare.substring(strStart.toLowerCase().lastIndexOf('declare'), substrEnd);
+                // get variable names
+                arrFuncVariables = strDeclare.match(/([A-Za-z_0-9]+\ )+/ig);
+                console.log('arrFuncVariables: ' + arrFuncVariables);
+                // trim variable names
+                if (arrFuncVariables) {
+                    for (var i = 0, len = arrFuncVariables.length; i < len; i++) {
+                        arrFuncVariables[i] = arrFuncVariables[i].trim();
+                        console.log(arrFuncVariables[i] + ' : ' + arrFuncVariables[i].indexOf(' '));
+                        // if arrFuncVariables[i] has a space in it still: substring it off
+                        if (arrFuncVariables[i].indexOf(' ') !== -1) {
+                            arrFuncVariables[i] = arrFuncVariables[i].substring(0, arrFuncVariables[i].indexOf(' '));
+                        }
+                        if (arrFuncVariables[i].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) {
+                            optionList.push(['' + arrFuncVariables[i] + '', 'funcVar']);
+                            if (arrFuncVariables[i].substring(0, 1) === '"') {
+                                autocompleteGlobals.arrSearch.push(arrFuncVariables[i].toLowerCase());
+                            } else {
+                                autocompleteGlobals.arrSearch.push('"' + arrFuncVariables[i].toLowerCase() + '"');
                             }
                         }
                     }
                 }
             }
-
+            
+            // We need to determine if any variables are available in our current context
+            
+            
+            
+            //if (arrFuncVariables) {
+            //    for (var i = 0, len = arrFuncVariables.length; i < len; i++) {
+            //        arrFuncVariables[i] = arrFuncVariables[i].trim();
+            //        //console.log(arrFuncVariables[i] + ' : ' + arrFuncVariables[i].indexOf(' '));
+            //        // if arrFuncVariables[i] has a space in it still: substring it off
+            //        if (arrFuncVariables[i].indexOf(' ') !== -1) {
+            //            arrFuncVariables[i] = arrFuncVariables[i].substring(0, arrFuncVariables[i].indexOf(' '));
+            //        }
+            //        if (arrFuncVariables[i].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) {
+            //            optionList.push(['' + arrFuncVariables[i] + '', 'funcVar']);
+            //            if (arrFuncVariables[i].substring(0, 1) === '"') {
+            //                autocompleteGlobals.arrSearch.push(arrFuncVariables[i].toLowerCase());
+            //            } else {
+            //                autocompleteGlobals.arrSearch.push('"' + arrFuncVariables[i].toLowerCase() + '"');
+            //            }
+            //        }
+            //    }
+            //}
+            
+            
+            
+            //var strDeclare = editor.getValue(), substrEnd, arrFuncVariables = [];
+            //// if there is a $body$ statement: get variable names;
+            //if (strDeclare.toLowerCase().indexOf('$body$') !== -1) {
+            //    // if there is a declare statement: get variable names;
+            //    if (strDeclare.toLowerCase().indexOf('declare') !== -1) {
+            //        // if there is a begin: substring to that;
+            //        if (strDeclare.toLowerCase().indexOf('begin') !== -1) {
+            //            //TODO: is there a $body$ afterwords and before the cursor, then stop
+            //            if (strDeclare.substring(strDeclare.toLowerCase().indexOf('begin')).indexOf('$body$') === -1) { 
+            //                substrEnd = strDeclare.toLowerCase().indexOf('begin');
+            //                strDeclare = strDeclare.substring(strDeclare.toLowerCase().indexOf('declare'), substrEnd);
+            //                // get variable names
+            //                arrFuncVariables = strDeclare.match(/([A-Za-z_0-9]+\ )+/ig);
+            //                //console.log('arrFuncVariables: ' + arrFuncVariables);
+            //                // trim variable names
+            //                if (arrFuncVariables) {
+            //                    for (var i = 0, len = arrFuncVariables.length; i < len; i++) {
+            //                        arrFuncVariables[i] = arrFuncVariables[i].trim();
+            //                        //console.log(arrFuncVariables[i] + ' : ' + arrFuncVariables[i].indexOf(' '));
+            //                        // if arrFuncVariables[i] has a space in it still: substring it off
+            //                        if (arrFuncVariables[i].indexOf(' ') !== -1) {
+            //                            arrFuncVariables[i] = arrFuncVariables[i].substring(0, arrFuncVariables[i].indexOf(' '));
+            //                        }
+            //                        if (arrFuncVariables[i].substring(0, searchWord.length).toLowerCase() === searchWord.toLowerCase()) {
+            //                            optionList.push(['' + arrFuncVariables[i] + '', 'funcVar']);
+            //                            if (arrFuncVariables[i].substring(0, 1) === '"') {
+            //                                autocompleteGlobals.arrSearch.push(arrFuncVariables[i].toLowerCase());
+            //                            } else {
+            //                                autocompleteGlobals.arrSearch.push('"' + arrFuncVariables[i].toLowerCase() + '"');
+            //                            }
+            //                        }
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
         }
         // //console.log(autocompleteGlobals.arrSearchPath, queryVars.bolSearchPath);
         if (autocompleteGlobals.arrSearchPath && queryVars.bolSchemas) {

@@ -1,6 +1,7 @@
 var bolOtherLoaded = true;
 var currentTab = document.getElementsByClassName('current-tab')[0];
 var bolDebug = false;
+var bolPanelDebug = true;
 var resultsScroll = 0;
 
 
@@ -31,10 +32,18 @@ var contextData = {};
 function loadContextData(callback) {
     'use strict';
     var finishFunction = function () {
-        if (contextData.databaseName     !== undefined && contextData.sessionUser           !== undefined && contextData.currentUser    !== undefined &&
-            contextData.versionNumber    !== undefined && contextData.versionText           !== undefined && contextData.port           !== undefined &&
-            contextData.connectionString !== undefined && contextData.connectionName        !== undefined && contextData.postageVersion !== undefined &&
-            contextData.userIsSuper      !== undefined && contextData.connectionStringParts !== undefined && contextData.dataDirectory  !== undefined) {
+        if (contextData.databaseName          !== undefined &&
+            contextData.sessionUser           !== undefined &&
+            contextData.currentUser           !== undefined &&
+            contextData.versionNumber         !== undefined &&
+            contextData.versionText           !== undefined &&
+            contextData.port                  !== undefined &&
+            contextData.connectionString      !== undefined &&
+            contextData.connectionName        !== undefined &&
+            contextData.postageVersion        !== undefined &&
+            contextData.userIsSuper           !== undefined &&
+            contextData.connectionStringParts !== undefined &&
+            contextData.dataDirectory         !== undefined) {
             callback();
         }
     };
@@ -144,10 +153,12 @@ function startPanelResize(target) {
             dragEndFunction();
 
         } else {
-            intCurrentLeft = GS.mousePosition(event).left;
-
+            //intCurrentLeft = GS.mousePosition(event).left;
+            intCurrentLeft = parseInt(event.clientX, 10) + parseInt(event.offsetX, 10);
+            console.log(event);
             target.style.width = intCurrentLeft + 'px';
 
+            GS.log(bolPanelDebug, 'intCurrentLeft: ' + intCurrentLeft + 'target.style.width: ' + target.style.width);
             event.preventDefault();
             event.stopPropagation();
         }
@@ -2394,14 +2405,17 @@ function executeHelperEndLoading() {
 
     currentTab.relatedClearButton.removeAttribute('hidden');
     currentTab.relatedResultsHeaderElement.classList.remove('executing');
-    var spaceHeight = currentTab.relatedResultsArea.lastChild.clientHeight;
-    spaceHeight = currentTab.relatedResultsArea.clientHeight - spaceHeight;
-    if (spaceHeight < 0) {
-        spaceHeight = 0;
+    
+    if (currentTab.relatedResultsArea.children.length > 0) {
+        var spaceHeight = currentTab.relatedResultsArea.lastChild.clientHeight;
+        spaceHeight = currentTab.relatedResultsArea.clientHeight - spaceHeight;
+        if (spaceHeight < 0) {
+            spaceHeight = 0;
+        }
+        var heightElem = document.createElement('div');
+        heightElem.style.height = spaceHeight + 'px';
+        currentTab.relatedResultsArea.appendChild(heightElem);
     }
-    var heightElem = document.createElement('div');
-    heightElem.style.height = spaceHeight + 'px';
-    currentTab.relatedResultsArea.appendChild(heightElem);
     
     currentTab.handlingQuery = false;
     currentTab.relatedStopSocketButton.setAttribute('hidden', '');
@@ -2849,7 +2863,7 @@ function executeScript(bolCursorQuery) {
                                     }
 
                                     strHTML += (
-                                        '<gs-cell style="line-height: normal;">' +
+                                        '<gs-cell style="line-height: normal; padding-top: 2px;">' +
                                             data.arrColumnNames[i] +
                                             '<br />' +
                                             '<small>(' + columnType + ')</small>' +
@@ -2881,7 +2895,7 @@ function executeScript(bolCursorQuery) {
 
                                     strHTML += (
                                         '<gs-cell>' +
-                                            '<label>{{! GS.decodeFromTabDelimited(row[\'' + data.arrColumnNames[i] + '\']) }}</label>' +
+                                            '<label>{{! GS.decodeFromTabDelimited(arrRow[' + i + ']) }}</label>' +
                                         '</gs-cell>'
                                     );
                                     i += 1;
@@ -2896,7 +2910,7 @@ function executeScript(bolCursorQuery) {
                                 while (i < len) {
                                     strHTML += (
                                         '<gs-cell header="' + data.arrColumnNames[i] + '">' +
-                                            '{{! row[\'' + data.arrColumnNames[i] + '\'] }}' +
+                                            '{{= row[\'' + data.arrColumnNames[i] + '\'] }}' +
                                         '</gs-cell>'
                                     );
                                     i += 1;
@@ -2926,14 +2940,14 @@ function executeScript(bolCursorQuery) {
                                 tableElement.internalData.records = arrData;
                                 tableElement.internalData.columnNames = data.arrColumnNames;
                                 
-                                tempArr = [];
-                                i = 0;
-                                len = data.arrColumnNames.length;
-                                while (i < len) {
-                                    tempArr.push('text');
-                                    i += 1;
-                                }
-                                tableElement.internalData.columnTypes = tempArr;
+                                // tempArr = [];
+                                // i = 0;
+                                // len = data.arrColumnNames.length;
+                                // while (i < len) {
+                                //     tempArr.push('text');
+                                //     i += 1;
+                                // }
+                                tableElement.internalData.columnTypes = data.arrColumnTypes;
                                 
                                 tempArr = [];
                                 i = 0;

@@ -154,8 +154,8 @@
                             for (i = 0, len = arrColumns.length; i < len; i += 1) {
                                 headerContent += '<gs-cell>' + arrColumns[i] + '</gs-cell>\n';
                                 recordContent += '<gs-cell header="' + arrColumns[i] + '"><label><input column="' + arrColumns[i] + '" /></label></gs-cell>\n';
-                                copyContent += '<gs-cell header="' + arrColumns[i] + '">{{! row[' + JSON.stringify(arrColumns[i]) + '] }}</gs-cell>\n';
-                                insertContent += '<gs-cell header="' + arrColumns[i] + '"></gs-cell>\n';
+                                copyContent += '<gs-cell header="' + arrColumns[i] + '">{{= row[' + JSON.stringify(arrColumns[i]) + '] }}</gs-cell>\n';
+                                insertContent += '<gs-cell header="' + arrColumns[i] + '"><label><input column="' + arrColumns[i] + '" /></label></gs-cell>\n';
                             }
                             
                             tableElement.innerHTML = ml(function () {/*
@@ -216,7 +216,9 @@
                                 strSequenceDefaults = arrSequenceDefaults.join(',');
                                 tableElement.setAttribute('seq', strSequenceDefaults);
                                 
-                            } else if (strColumns) {
+                            }
+                            
+                            if (strColumns) {
                                 tableElement.setAttribute('lock', strColumns);
                             }
                             

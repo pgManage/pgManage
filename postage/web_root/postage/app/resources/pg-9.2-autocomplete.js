@@ -55,6 +55,27 @@ function doubleIdentifier(strInput) {
 function getContext(strInput, intPosition) {
     'use strict';
 
+    //HERE BE DRAGONS
+    //Maintainer of the dragons: Joseph 5-28-17
+    //@@@@@@@@@@@@@@@@@@@@@**^^""~~~"^@@^*@*@@**@@@@@@@@@
+    //@@@@@@@@@@@@@*^^'"~   , - ' '; ,@@b. '  -e@@@@@@@@@
+    //@@@@@@@@*^"~      . '     . ' ,@@@@(  e@*@@@@@@@@@@
+    //@@@@@^~         .       .   ' @@@@@@, ~^@@@@@@@@@@@
+    //@@@~ ,e**@@*e,  ,e**e, .    ' '@@@@@@e,  "*@@@@@'^@
+    //@',e@@@@@@@@@@ e@@@@@@       ' '*@@@@@@    @@@'   0
+    //@@@@@@@@@@@@@@@@@@@@@',e,     ;  ~^*^'    ;^~   ' 0
+    //@@@@@@@@@@@@@@@^""^@@e@@@   .'           ,'   .'  @
+    //@@@@@@@@@@@@@@'    '@@@@@ '         ,  ,e'  .    ;@
+    //@@@@@@@@@@@@@' ,&&,  ^@*'     ,  .  i^"@e, ,e@e  @@
+    //@@@@@@@@@@@@' ,@@@@,          ;  ,& !,,@@@e@@@@ e@@
+    //@@@@@,~*@@*' ,@@@@@@e,   ',   e^~^@,   ~'@@@@@@,@@@
+    //@@@@@@, ~" ,e@@@@@@@@@*e*@*  ,@e  @@""@e,,@@@@@@@@@
+    //@@@@@@@@ee@@@@@@@@@@@@@@@" ,e@' ,e@' e@@@@@@@@@@@@@
+    //@@@@@@@@@@@@@@@@@@@@@@@@" ,@" ,e@@e,,@@@@@@@@@@@@@@
+    //@@@@@@@@@@@@@@@@@@@@@@@~ ,@@@,,0@@@@@@@@@@@@@@@@@@@
+    //@@@@@@@@@@@@@@@@@@@@@@@@,,@@@@@@@@@@@@@@@@@@@@@@@@@
+    //"""""""""""""""""""""""""""""""""""""""""""""""""""
+
     intPosition++; //add character for zero based
 
     //make sure that we have only whitespace after the cursor, otherwise we just end it here
@@ -86,6 +107,7 @@ function getContext(strInput, intPosition) {
     
     var intTabLevel = 0;
     
+    var intDoubleColon = 0;
     
     var bolDeclare = false;
     var bolFunction = false;
@@ -871,7 +893,9 @@ function getContext(strInput, intPosition) {
             //console.log(">)|" + intTabLevel + "<");
 
         // FOUND DOUBLE COLON
-        } else if (int_qs === 0 && strInput.substr(i , 2) === "::") {
+        } else if (int_qs === 0 && strInput.substr(i, 2) === "::") {
+            intDoubleColon = i + 2;
+            
             strFirst = '';
             intContextPosition = i + 2;
             arrShortQueries = ['types'];
@@ -1082,7 +1106,7 @@ function getContext(strInput, intPosition) {
                 bolStdin = false;
             }
             
-            bolDeclare = false;
+            //bolDeclare = false;//DO NOT UNCOMMENT!! after a semicolon inside a declare, we are still inside a declare
             bolFunction = false;
             bolDrop = false;
             bolAlter = false;
@@ -1117,14 +1141,14 @@ function getContext(strInput, intPosition) {
             strFirst = '\\n\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'snippets'];
-            //console.log(">;|" + intTabLevel + "<");
+            console.log(">;|" + intTabLevel + "<");
 
         // Function Declare
         } else if (int_qs === 0 && strInput.substr(i).match(/^DECLARE\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i = i + 6 + (strInput.substr(i + 7, 1) === ' ' ? 1 : 0);
             intTabLevel += 1;
             bolDeclare = true;
-            //console.log(">DECLARE|" + intTabLevel + "<");
+            console.log(">DECLARE|" + intTabLevel + "<");
 
         // Transactions
         } else if (int_qs === 0 && strInput.substr(i).match(/^BEGIN\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
@@ -1134,7 +1158,11 @@ function getContext(strInput, intPosition) {
             } else {
                 intTabLevel += 1;
             }
-            //console.log(">BEGIN|" + intTabLevel + "<");
+            
+            strFirst = '\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
+            intContextPosition = i + 1;
+            arrShortQueries = ['variables', 'snippets'];
+            console.log(">BEGIN|" + intTabLevel + "<");
 
         // FOUND CASE WHEN
         } else if (int_qs === 0 && strInput.substr(i).match(/^CASE[\ \t\n]+WHEN\b/i)) {
@@ -1379,8 +1407,8 @@ function getContext(strInput, intPosition) {
 
 
     //console.log('intContextPosition>' + intContextPosition + '<');
-    //console.log('strFirst>' + strFirst + '<');
-    //console.log('Relevant>' + strInput.substr(intContextPosition, strFirst.length) + '<');
+    console.log('strFirst>' + strFirst + '<');
+    console.log('Relevant>' + strInput.substr(intContextPosition, strFirst.length) + '<');
     if (strFirst.length > 0) {
         //console.log('strFirst Correct', ! strInput.substring(intContextPosition).match(new RegExp("^" + strFirst)));
         if (! strInput.substring(intContextPosition).match(new RegExp("^" + strFirst))) {
@@ -1396,8 +1424,11 @@ function getContext(strInput, intPosition) {
     strContext = strInput.substring(intContextPosition, intPosition);
     //console.log('strContext', strContext);
 
-    //console.log('check strContext.length', strContext.length === 0);
-    if (strContext.length === 0) {
+    //console.log('intDoubleColon', intDoubleColon);
+    //console.log('intContextPosition', intContextPosition);
+    //console.log('check strContext.length and intDoubleColon', strContext.length === 0 && intDoubleColon !== intContextPosition);
+    //if we haven't typed anything, don't show up the popup, with the exception of ::
+    if (strContext.length === 0 && intDoubleColon !== intContextPosition) {
         return;
     }
 
@@ -1431,7 +1462,7 @@ function getContext(strInput, intPosition) {
         arrQueries.push(autocompleteQuery.language);
     } if (arrShortQueries.indexOf('snippets') > -1) {
         autocompleteGlobals.bolSnippets = true;
-    } if (arrShortQueries.indexOf('variables') > -1 && bolBody) {
+    } if (arrShortQueries.indexOf('variables') > -1/* && bolBody*/) {
         autocompleteGlobals.bolAlpha = true;
     }
     
@@ -1777,7 +1808,7 @@ function getContext(strInput, intPosition) {
         return;
     }
 
-    /*console.log('objContext', {
+    console.log('objContext', {
         'strContext': strContext
         , 'arrQueries': arrQueries
         , 'searchLength': strContext.length

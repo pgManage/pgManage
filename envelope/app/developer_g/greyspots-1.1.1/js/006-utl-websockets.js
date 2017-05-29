@@ -86,6 +86,11 @@
                 strData = strData.substring(strData.indexOf('\n') + 1);
             }
 
+            // strip out response number
+            if (strData.substring(0, strData.indexOf(' ')) === 'transactionid') {
+                strData = strData.substring(strData.indexOf('\n') + 1);
+            }
+
             // strip out fatal
             if (strData.indexOf('FATAL\n') === 0) {
                 strData = strData.substring(strData.indexOf('\n') + 1);
@@ -98,6 +103,7 @@
 
             // save error text in case we dont find any error part labels
             jsnRet.error_text = strData;
+            jsnRet.orig_error_text = strData;
             
             // trim and split on return for parsing
             arrLines = strData.trim().split('\n');
@@ -106,6 +112,12 @@
                 arrLine = arrLines[i].split('\t');
                 
                 jsnRet[arrLine[0]] = GS.decodeFromTabDelimited(arrLine[1] || '');
+            }
+            
+            if (!jsnRet.error_text) {
+                jsnRet = {
+                    'error_text': arrLines[0]
+                };
             }
         }
         
