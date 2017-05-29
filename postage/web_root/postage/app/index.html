@@ -535,6 +535,9 @@
               100% { background-color: white; }
             }
             
+            .ace-clouds .ace_scroller .ace_content .ace_marker-layer .ace_active-line {
+                background-color: #ffeaad !important;
+            }
             
             label {
                 padding: 0.268em;
@@ -620,13 +623,13 @@
                                     icon="arrow-right" onclick="showLeftBar();" title="Show the left panel"></gs-button>
                     <div flex></div>
 
-                    <gs-button class="header-button-text" onclick="menuUser(this);" no-focus icon="angle-down" inline title="Links related to the user." style="width: 5em;">User</gs-button>
+                    <gs-button class="header-button-text" onclick="menuUser(this);" no-focus inline title="Links related to the user." style="width: 3em; padding: 2px;">User</gs-button>
 
-                    <gs-button class="header-button-text" onclick="menuTab(this);" no-focus icon="angle-down" inline title="Tools for handling Tabs." style="width: 4em;">Tab</gs-button>
+                    <gs-button class="header-button-text" onclick="menuTab(this);" no-focus inline title="Tools for handling Tabs." style="width: 3em; padding: 2px;">Tab</gs-button>
 
-                    <gs-button class="header-button-text" onclick="menuTools(this);" no-focus icon="angle-down" inline title="Tools for Processes and Information." style="width: 5em;">Tools</gs-button>
+                    <gs-button class="header-button-text" onclick="menuTools(this);" no-focus inline title="Tools for Processes and Information." style="width: 3em; padding: 2px;">Tools</gs-button>
 
-                    <gs-button class="header-button-text" onclick="menuOptions(this);" no-focus icon="angle-down" inline title="Tools for Processes and Information." style="width: 7em;">Options</gs-button>
+                    <gs-button class="header-button-text" onclick="menuOptions(this);" no-focus inline title="Tools for Processes and Information." style="width: 6em; padding: 2px;">Options</gs-button>
 
                     <gs-button id="button-history" class="header-button-text" onclick="dialogExecuteHistory();" no-focus
                                     icon="book" inline title="Query history for this session" style="width: 6em;">History</gs-button>

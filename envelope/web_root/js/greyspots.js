@@ -39623,23 +39623,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // create cell array for this record
             arrRecord = [];
+            console.log(element.internalData.columnNames.length);
             cell_i = 0;
-            cell_len = 9999;
+            cell_len = element.internalData.columnNames.length;//9999;
             while (cell_i < cell_len) {
                 delim = strRecord.indexOf('\t');
                 strCell = strRecord.substring(0, delim);
                 strRecord = strRecord.substring(delim + 1);
 
-                if (strCell !== '' || strRecord !== '') {
-                    arrRecord.push(
-                        GS.decodeFromTabDelimited(strCell, strNullString)
-                    );
-                } else {
-                    break;
-                }
+                //if (strCell !== '' || strRecord !== '') {
+                arrRecord.push(
+                    GS.decodeFromTabDelimited(strCell, strNullString)
+                );
+                //} else {
+                //    break;
+                //}
 
                 cell_i += 1;
             }
+            
 
             //record_i = 0;
             //record_len = strRecord.length;

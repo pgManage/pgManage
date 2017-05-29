@@ -2383,9 +2383,13 @@ function SQLBeautify(strInput) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === "," && !bolGrant) {
             // Remove comma and whitespace
             strResult = strResult.trim();
-
-            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel) + 1) + ', ';
-            bolNoExtraWhitespace = true;
+            console.log(localStorage.bolComma);
+            if (localStorage.bolComma === 'true') {
+                strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel) + 1) + ', ';
+                bolNoExtraWhitespace = true;
+            } else {
+                strResult += ', ' + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel) + 1);
+            }
             //console.log(">,|" + intTabLevel + "<");
 
         // FOUND AN UNQUOTED/UNPARENTHESISED COMMA INSIDE A GRANT/REVOKE STATEMENT:

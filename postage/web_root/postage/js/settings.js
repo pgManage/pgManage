@@ -3,6 +3,7 @@
 var bolSettingsLoaded = true;
 
 localStorage.bolBeautify = localStorage.bolBeautify ? localStorage.bolBeautify === 'true' : true;
+localStorage.bolComma = localStorage.bolComma ? localStorage.bolComma === 'true' : true;
 
 function refreshButtons (bolBtnType) {
     'use strict';

@@ -804,8 +804,11 @@ function dialogOptions() {
                     <label for="postage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
                     <gs-text id="postage-options-left-panel"></gs-text>
                     
-                    <label for="postage-options-beaturify" style="min-width: 7.25em;">Automatic Beautify:</label>
+                    <label for="postage-options-beautify" style="min-width: 7.25em;">Automatic Beautify:</label>
                     <gs-checkbox id="postage-options-beautify"></gs-checkbox>
+                    
+                    <label for="postage-options-Comma" style="min-width: 7.25em;">Comma First Formatting:</label>
+                    <gs-checkbox id="postage-options-Comma"></gs-checkbox>
 
                     <label>SQL Toolbar Button Style:</label>
                     <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
@@ -1031,6 +1034,11 @@ function dialogOptions() {
         document.getElementById('postage-options-beautify').value = localStorage.bolBeautify;
         document.getElementById('postage-options-beautify').addEventListener('change', function () {
             localStorage.bolBeautify = document.getElementById('postage-options-beautify').value;
+        });
+        
+        document.getElementById('postage-options-Comma').value = localStorage.bolComma;
+        document.getElementById('postage-options-Comma').addEventListener('change', function () {
+            localStorage.bolComma = document.getElementById('postage-options-Comma').value;
         });
         
         document.getElementById('postage-options-left-panel').value = localStorage.leftPanelWidth;

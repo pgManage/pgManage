@@ -94,7 +94,7 @@ div#header-text-container {
     margin: 0;
     font-size: 0.8em;
 
-    padding-top: 0.5em;
+    /*padding-top: 0.5em;*/
     /*padding-top: 0.7em; /*0.45em;*/
     padding-left: 0.75em; /*0.25em;*/
     padding-right: 0.75em; /*0.25em;*/
@@ -112,9 +112,9 @@ div#header-text-container {
 }
 
 .header-button-text[icon]:not([iconright]):after {
-    top: 50% !important;
+    top: 65% !important;
     margin-top: -0.6em;
-    left: 0.25em !important
+    left: 0.1em !important
 }
 .header-button-text[icon][iconright]:after {
     top: 50% !important;
