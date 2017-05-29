@@ -1,7 +1,7 @@
 var bolOtherLoaded = true;
 var currentTab = document.getElementsByClassName('current-tab')[0];
 var bolDebug = false;
-var bolPanelDebug = true;
+var bolPanelDebug = false;
 var resultsScroll = 0;
 
 
@@ -153,10 +153,10 @@ function startPanelResize(target) {
             dragEndFunction();
 
         } else {
-            //intCurrentLeft = GS.mousePosition(event).left;
-            intCurrentLeft = parseInt(event.clientX, 10) + parseInt(event.offsetX, 10);
-            console.log(event);
-            target.style.width = intCurrentLeft + 'px';
+            intCurrentLeft = GS.mousePosition(event).left;
+            //intCurrentLeft = event.clientX;
+            target.style.maxWidth = intCurrentLeft + 'px';
+            target.style.width = '100%';
 
             GS.log(bolPanelDebug, 'intCurrentLeft: ' + intCurrentLeft + 'target.style.width: ' + target.style.width);
             event.preventDefault();

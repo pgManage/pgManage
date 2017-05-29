@@ -266,7 +266,7 @@ function autocompleteBindEditor(tabElement, editor) {
                             row: editor.currentSelections[i].start.row,
                             column: editor.currentSelections[i].start.column
                         };
-                        editor.env.document.insertInLine(insertObj, '\t');
+                        editor.env.document.insert(insertObj, '\t');
                     }
                     closePopup();
                 }
@@ -352,7 +352,7 @@ function autocompleteBindEditor(tabElement, editor) {
                         row: editor.currentSelections[i].start.row,
                         column: editor.currentSelections[i].start.column
                     };
-                    editor.env.document.insertInLine(insertObj, '\n');
+                    editor.env.document.insert(insertObj, '\n');
                 }
             } else {
                 editor.insert('\n');
