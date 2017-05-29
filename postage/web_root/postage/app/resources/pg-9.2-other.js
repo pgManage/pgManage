@@ -802,7 +802,10 @@ function dialogOptions() {
 
                 <div>
                     <label for="postage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
-                    <gs-text id="postage-options-left-panel" flex></gs-text>
+                    <gs-text id="postage-options-left-panel"></gs-text>
+                    
+                    <label for="postage-options-beaturify" style="min-width: 7.25em;">Automatic Beautify:</label>
+                    <gs-checkbox id="postage-options-beautify"></gs-checkbox>
 
                     <label>SQL Toolbar Button Style:</label>
                     <gs-optionbox id="button-options" style="padding: 0 0.25em 0.25em 0.25em;">
@@ -1018,14 +1021,18 @@ function dialogOptions() {
 
                 <h3>Custom CSS Stylesheet</h3>
                 <div id="customCSSAce"></div>
-                <div><p>This Ace is stored in your local storage. Because this can get emptied it's recommended to save a copy.</p><div>
+                <div><p>This Ace is stored in your local storage. Because this can get emptied it's recommended to save a copy.</p></div>
             </gs-body>
             <gs-footer><gs-button dialogclose id="settingsClose">Done</gs-button></gs-footer>
         </gs-page>
     */}).replace('{{ZOOM}}', strZoom);
 
     GS.openDialog(templateElement, function () {
-        //left panel
+        document.getElementById('postage-options-beautify').value = localStorage.bolBeautify;
+        document.getElementById('postage-options-beautify').addEventListener('change', function () {
+            localStorage.bolBeautify = document.getElementById('postage-options-beautify').value;
+        });
+        
         document.getElementById('postage-options-left-panel').value = localStorage.leftPanelWidth;
         document.getElementById('postage-options-left-panel').addEventListener('change', function () {
             localStorage.leftPanelWidth = document.getElementById('postage-options-left-panel').value;

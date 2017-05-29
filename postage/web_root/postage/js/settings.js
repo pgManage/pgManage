@@ -2,6 +2,8 @@
 
 var bolSettingsLoaded = true;
 
+localStorage.bolBeautify = localStorage.bolBeautify ? localStorage.bolBeautify === 'true' : true;
+
 function refreshButtons (bolBtnType) {
     'use strict';
     var curr_toolbar, curr_tab_num, tabElement, bolBtnLabeled;
@@ -103,8 +105,6 @@ function refreshCustomCSS (customCSS) {
 window.addEventListener('load', function () {
     refreshCustomCSS(localStorage.customCSS);
 });
-
-
 
 
 function refreshShortcutKeys (shortcutKeys) {

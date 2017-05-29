@@ -407,7 +407,7 @@
                             }
 
                             if (strTemplate === 'objectView') {
-                                getScript(strFinalName, strButtons, strScript, false, true);
+                                getScript(strFinalName, strButtons, strScript, false, localStorage.bolBeautify === 'true');
                             } else {
                                 getScript(strFinalName, strButtons, strScript);
                             }
