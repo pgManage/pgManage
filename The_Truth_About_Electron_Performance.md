@@ -41,7 +41,7 @@ I think it's reasonable to say that Electron is perfectly fine as regards instal
 
 We've covered memory, install and startup issues. Postage doesn't really use Node in Electron so I can't comment on that. What's left is performance for practical matters, like displaying query results. Let's get right to the stopwatch times.
 
-Loading time from 'run' to display of data in grid. We used this query: "SELECT * FROM wtkv2.rtime;". It returns 37k records. It's part of our internal punch clock app.
+Loading time from 'run' to display of data in grid. We used this query: "SELECT * FROM wtkv2.rtime;". It returns 37k records. The data is part of our internal punch clock app and was chosen just because it was there.
 
 ```
  pgAdmin3:        18sec
@@ -58,29 +58,29 @@ This isn't the whole picture. I'm confident that Postage's grid has slowed down 
 
 ## Do you believe more choices make for a better ecosystem?
 
-Postage fills a gap in the PostgreSQL ecosystem. That's not a criticism of the PGAdmin team. I'm sure they are as resource constrained as we are and making software is hard. I'm sure the reason the PGAdmin team dropped PGAdmin3 was probably because the code base is sixteen years old! That's an amazing accomplishment and all of us here with the Postage team are thankful for their efforts over the years. We certainly could not have done what they did back in 2000ish when they started. We've only managed to build Postage on the shoulders of Github, Cloud9, Laura Doktorova and others and for that we're very thankful.
+Postage fills a gap in the PostgreSQL ecosystem. That's not a criticism of the PGAdmin team. I'm sure they are as resource constrained as we are and making software is hard. I'm sure the reason the PGAdmin team dropped PGAdmin3 was probably because the code base is sixteen years old! That's an amazing accomplishment and all of us here with the Postage team are thankful for their efforts over the years. We certainly could not have done what they did back in 2000ish when they started. We've only managed to build Postage on the shoulders of Github, Cloud9, Laura Doktorova's dot.js, and others and for that we're very thankful.
 
-I'm also sure PGAdmin4 has come along nicely and will become the de-facto choice for people who want a graphical client. It is the official client of PostgreSQL and as such they only need to be 'good enough' to win nearly all the users looking for a free client. People who wish to pay will of course overlook Postage because it is free. (Wait, that doesn't leave us with many users...)
+I'm also sure PGAdmin4 has come along nicely and will become the de-facto choice for people who want a graphical client. It is the official client of PostgreSQL and as such they only need to be 'good enough' to win nearly all the users looking for a free client. People who wish to pay will of course overlook Postage because it's free. (Wait, that doesn't leave us with many users...)
 
-If you do use Postage, please file issues on Github. We need users to step up a little more than other projects because of our limited niche.
+If you do use Postage, please file issues on Github. We need users to step up a little more than other projects because of our limited audience!
 
 ## Do you consider yourself open minded and adventurous?
 
 If I could leave you with one thought it would be that Electron is not a reason to disuade you from trying any project. 
 
-You may feel that a native application could do better than Postage on the times we posted. I'm willing to accept that. 
+You may feel that a native application could do better than Postage on the times we posted. I'm willing to accept that but sceptical. 
 
-However, I think the facts speak for themselves in asserting that the difference between Postage 3.2.12 and Postage 3.2.13 was a swing from performing poorly (due to lack of effort on the programmer's part) to performing very well. As a result, I think that means **Electron performance is up to the programmer.**
+However, I think the facts speak for themselves in asserting that the difference between Postage 3.2.12 and Postage 3.2.13 was a swing from performing poorly (due to lack of effort on the programmer's part) to performing very well. As a result, we think the facts support the idea that **Electron performance is up to the programmer.**
 
 ## Do you appreciate freedom? 
 
-Using web technologies to draw the interface also gives a good deal more freedom than using native elements. Native elements are by their nature a limited set. I also believe that with a fair amount of effort any user interface can be made to perform better in Electron(Chromium) than a native interface. This is because features can be pared down to the use case whereas native elements are difficult or impossible to optimize. Yes you get great perfomance out of the box, but you are also limited. Yes, I am aware that this is a risky proposition but I stand by it. Freedom is advantageous for many reasons, including performance, and I am not alone in appreciating it. 
+Using web technologies to draw the interface also gives a good deal more freedom than using native elements. Native elements are by their nature a limited set. I also believe that with a fair amount of effort any user interface can be made to perform better in Electron(Chromium) than a native interface. This is because features can be pared down to the use case whereas native elements are difficult or impossible to optimize. Yes you get great perfomance out of the box, but you are also limited. Yes, I am aware that this is a risky proposition do to the shear number of platforms out there, but I stand by it. Besides, freedom is advantageous for many reasons, including performance, and I am not alone in appreciating it. 
 
 ## Do you consider yourself helpful?
 
-Of course, if someone wants to sponser Postage we can test a native implementation and if it performs better we'll release it. You'll get no argument from me. 
+Of course, if someone wants to sponser Postage we can test a native implementation and if it performs better we'll release it. You'll get no argument from me. Until that happens I hope you'll give projects like Postage a try. 
 
-Until that happens I hope you'll give projects like Postage a try. If they are unacceptable for any reason, file an issue and move on if you have to. Join us as part of the solution. We really do appreciate everyone who let's us know about their experiences with Postage. I'm sure most other projects do too.
+If they are unacceptable for any reason, file an issue and move on if you have to. Join us as part of the solution. We really do appreciate everyone who let's us know about their experiences with Postage. I'm sure most other projects do too.
 
 Thank you for reading.
 
