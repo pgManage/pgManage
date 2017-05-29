@@ -42155,7 +42155,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         element.internalData.columnFilters = [];
                         element.internalData.columnListFilters = [];
                         element.internalData.columnOrders = [];
-                        console.log(element.internalData.columnNames);
 
                         // future mike, you need to make is so that the
                         //      column name, filter and sort arrays are
@@ -42984,7 +42983,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // the C encodes null values as empty string in the hash portion
                 strHashString += (
-                    strTemp === 'NULL'
+                    strTemp === '\\N'
                         ? ''
                         : strTemp
                 );
