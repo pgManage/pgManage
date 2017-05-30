@@ -1408,6 +1408,15 @@ GS.closeDialog = function (dialog, strAnswer) {
 
                         this.windowResizeHandler();
                     }
+                    
+                    this.addEventListener('click', function (event) {
+                        var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
+
+                        if (dialogcloseElement && event.target.hasAttribute('dialogclose')) {
+                            GS.findParentTag(event.target, 'gs-dialog')
+                                .destroy(dialogcloseElement.textContent, event);
+                        }
+                    });
 
                     GS.triggerEvent(this, 'dialog-inserted');
                 }
@@ -1418,12 +1427,12 @@ GS.closeDialog = function (dialog, strAnswer) {
             }
         },
         events: {
-            'click:delegate([dialogclose])': function (event) {
-                var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
-
-                GS.findParentTag(event.target, 'gs-dialog')
-                        .destroy(dialogcloseElement.textContent, event);
-            }
+            //'click:delegate([dialogclose])': function (event) {
+            //    var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
+            //    console.log('running...');
+            //    GS.findParentTag(event.target, 'gs-dialog')
+            //            .destroy(dialogcloseElement.textContent, event);
+            //}
         },
         accessors: {},
         methods: {

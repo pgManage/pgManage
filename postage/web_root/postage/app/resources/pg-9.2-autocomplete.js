@@ -76,6 +76,10 @@ function getContext(strInput, intPosition) {
     //@@@@@@@@@@@@@@@@@@@@@@@@,,@@@@@@@@@@@@@@@@@@@@@@@@@
     //"""""""""""""""""""""""""""""""""""""""""""""""""""
 
+    //Make sure we remove the snippets before we return the function
+    autocompleteGlobals.bolSnippets = false;
+    autocompleteGlobals.bolAlpha = false;
+    
     intPosition++; //add character for zero based
 
     //make sure that we have only whitespace after the cursor, otherwise we just end it here
@@ -1432,9 +1436,6 @@ function getContext(strInput, intPosition) {
         return;
     }
 
-    autocompleteGlobals.bolSnippets = false;
-    autocompleteGlobals.bolAlpha = false;
-    
     if (arrShortQueries.indexOf('schemas') > -1) {
         arrQueries.push(autocompleteQuery.schemas);
     } if (arrShortQueries.indexOf('functions') > -1) {

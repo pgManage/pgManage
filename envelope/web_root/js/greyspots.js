@@ -19442,6 +19442,15 @@ GS.closeDialog = function (dialog, strAnswer) {
 
                         this.windowResizeHandler();
                     }
+                    
+                    this.addEventListener('click', function (event) {
+                        var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
+
+                        if (dialogcloseElement && event.target.hasAttribute('dialogclose')) {
+                            GS.findParentTag(event.target, 'gs-dialog')
+                                .destroy(dialogcloseElement.textContent, event);
+                        }
+                    });
 
                     GS.triggerEvent(this, 'dialog-inserted');
                 }
@@ -19452,12 +19461,12 @@ GS.closeDialog = function (dialog, strAnswer) {
             }
         },
         events: {
-            'click:delegate([dialogclose])': function (event) {
-                var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
-
-                GS.findParentTag(event.target, 'gs-dialog')
-                        .destroy(dialogcloseElement.textContent, event);
-            }
+            //'click:delegate([dialogclose])': function (event) {
+            //    var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
+            //    console.log('running...');
+            //    GS.findParentTag(event.target, 'gs-dialog')
+            //            .destroy(dialogcloseElement.textContent, event);
+            //}
         },
         accessors: {},
         methods: {
@@ -39623,7 +39632,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // create cell array for this record
             arrRecord = [];
-            console.log(element.internalData.columnNames.length);
+            //console.log(element.internalData.columnNames.length);
             cell_i = 0;
             cell_len = element.internalData.columnNames.length;//9999;
             while (cell_i < cell_len) {
@@ -39641,7 +39650,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 cell_i += 1;
             }
-            
 
             //record_i = 0;
             //record_len = strRecord.length;

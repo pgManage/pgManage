@@ -8,7 +8,6 @@ if (document.getElementById('left-panel-body')) {
         }
     }, 1000);
 }
-
 var querystringShownObj;
 
 var bolTreeFunctionsLoaded = true
@@ -17,7 +16,7 @@ var bolTreeFunctionsLoaded = true
       , 'aceSession':   null
       , 'data':         []
       , 'folderPlus':   '▶' //(window.navigator.userAgent.indexOf('CrOS') === -1 ? '▶' : '►')((window.navigator.userAgent.toLowerCase().indexOf('macintosh') !== -1) ? '▶' : '►')
-      , 'folderMinus':  '◣'
+      , 'folderMinus':  '◢'  //'◣'
       , 'scriptMarker': '•' // sometimes not used for a script in favor of a 2 character object-type specific code
       , 'padString':    ' '
       , 'shownItems':   []
