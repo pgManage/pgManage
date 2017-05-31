@@ -3,7 +3,7 @@ var currentTab = document.getElementsByClassName('current-tab')[0];
 var bolDebug = false;
 var bolPanelDebug = false;
 var resultsScroll = 0;
-
+var glb_CSSEditor;
 
 function hideOtherTables(tabnum, safeid) {
     var foundHidden = false;
@@ -1047,6 +1047,7 @@ function dialogOptions() {
         });
 
         var CSSEditor = ace.edit('customCSSAce');
+        glb_CSSEditor = CSSEditor;
         CSSEditor.setTheme('ace/theme/eclipse');
         CSSEditor.getSession().setMode('ace/mode/css');
         CSSEditor.setShowPrintMargin(false);

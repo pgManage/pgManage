@@ -492,6 +492,12 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
             , editor.currentQueryRange.endIndex + 15) + '|' + (intCursorPosition - editor.currentQueryRange.startIndex) + '|' + strScript.substring(editor.currentQueryRange.startIndex
             , intCursorPosition + 1) + '<');//*/
     
+    if (!(editor.currentQueryRange.startIndex <= intCursorPosition
+        && intCursorPosition <= editor.currentQueryRange.endIndex)) {
+        console.log('Cursor out of range by Michael\'s context, so ignore.');
+        return;
+    }
+    
     objContext = getContext(
         strScript.substring(editor.currentQueryRange.startIndex
             , editor.currentQueryRange.endIndex + 15)
