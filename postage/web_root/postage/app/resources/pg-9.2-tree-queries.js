@@ -1379,17 +1379,19 @@ SELECT '-- Index: ' || (quote_ident(pg_namespace.nspname) || '.' || quote_ident(
 associatedButtons.objectKey = ['propertyButton', 'dependButton'];
 scriptQuery.objectKey = ml(function () {/*
 SELECT '-- Constraint: ' || conname || E';\n\n' ||
-    '-- ALTER TABLE ' || '{{STRSQLSAFENAME}}' || ' DROP CONSTRAINT ' || conname || E';\n' ||
-    '-- ALTER TABLE ' || '{{STRSQLSAFENAME}}' || ' ADD CONSTRAINT ' || conname || ' ' || pg_get_constraintdef(oid, true) || E';\n'
+    '-- ALTER TABLE ' || '{{SCHEMA}}.' || pg_class.relname || ' DROP CONSTRAINT ' || conname || E';\n' ||
+    '-- ALTER TABLE ' || '{{SCHEMA}}.' || pg_class.relname || ' ADD CONSTRAINT ' || conname || ' ' || pg_get_constraintdef(oid, true) || E';\n'
              FROM 
                 (SELECT oid, *
                    FROM pg_constraint
                   WHERE pg_constraint.conrelid = {{INTOID}}
-               ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
+                ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
                               WHEN contype = 'c' THEN 3 WHEN contype = 'f' THEN 4
                               WHEN contype = 't' THEN 5 WHEN contype = 'x' THEN 6 END) ASC,
                         pg_constraint.conname ASC) AS constrain
-                        LIMIT 1;
+                        
+            LEFT JOIN pg_class ON pg_class.relfilenode = conrelid
+            LIMIT 1;
 */});
 
 
