@@ -836,6 +836,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function elementInserted(element) {
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
+            if (element.children.length === 0) {
+                throw 'GS-Form Error: No template provided';
+            }
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;

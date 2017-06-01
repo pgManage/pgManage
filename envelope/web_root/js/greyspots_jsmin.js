@@ -716,12 +716,12 @@ return request;};}());(function(){"use strict";function cleanErrorValue(strValue
 if(strValue.indexOf('Query failed:')!==-1){strValue=strValue.replace(/[.\s\S]*Query\ failed:/mi,'');}
 if(strValue.indexOf('FATAL')!==-1){strValue=strValue.replace(/[.\s\S]*FATAL/mi,'');}
 strValue=strValue.replace(/\\?\\n/gi,'\n').replace(/\\?\\t/gi,'\t').replace(/\[.*\]/gi,'').replace(/\([0-9]*\)/gi,'');return GS.trim(strValue.trim(),'"');}
-function errorJSONToHTML(errorJSON){return'<pre style="word-break: break-all; white-space: pre-wrap;">'+'There was an error:'+
-(errorJSON.error_text?'<br /><br />'+encodeHTML(errorJSON.error_text):'')+
-(errorJSON.error_file?'<br /><br />The error was on file: '+encodeHTML(errorJSON.error_file):'')+
-(errorJSON.error_hint?'<br /><br />'+encodeHTML(errorJSON.error_hint):'')+
+function errorJSONToHTML(errorJSON){var errorHTML='<pre style="word-break: break-all; white-space: pre-wrap;">'+'There was an error:'+
+(errorJSON.error_text?'<br /><br />'+encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_text)):'')+
+(errorJSON.error_file?'<br /><br />The error was on file: '+encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_file)):'')+
+(errorJSON.error_hint?'<br /><br />'+encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_hint)):'')+
 (errorJSON.error_context?'<br /><br />'+encodeHTML(errorJSON.error_context):'')+
-(errorJSON.error_addin?'<br /><br />'+encodeHTML(errorJSON.error_addin):'')+'</pre>';}
+(errorJSON.error_addin?'<br /><br />'+encodeHTML(errorJSON.error_addin):'')+'</pre>';return errorHTML;}
 GS.ajaxErrorDialog=function(jsnError,tryAgainCallback,cancelCallback){'use strict';var templateElement=document.createElement('template'),strHTML;var jsnErrorCopy={};jsnErrorCopy.error_text=cleanErrorValue(jsnError.error_text);jsnErrorCopy.error_file=cleanErrorValue(jsnError.error_file);jsnErrorCopy.error_hint=cleanErrorValue(jsnError.error_hint);jsnErrorCopy.error_context=cleanErrorValue(jsnError.error_context);jsnErrorCopy.error_addin=cleanErrorValue(jsnError.error_addin);templateElement.setAttribute('data-theme','error');strHTML=ml(function(){/*
             <gs-page>
                 <gs-header><center><h3>There was an error!</h3></center></gs-header>
@@ -1038,7 +1038,7 @@ GS.bolPreventErrors=false;function webSocketConnectionErrorDialog(socket,addinTe
                         </gs-grid>
                     </gs-footer>
                 </gs-page>
-            */}).replace('{{ADDIN}}',(addinText?'\n\n'+addinText:''));GS.openDialog(templateElement,'',function(event,strAnswer){if(strAnswer==='Try to reconnect'){GS.closeSocket(GS.envSocket);GS.envSocket=GS.openSocket('env',socket.GSSessionID,socket.notifications);}else{GS.bolPreventErrors=true;}});}}
+            */}).replace('{{ADDIN}}',decodeURIComponent((addinText?'\n\n'+addinText:'')));GS.openDialog(templateElement,'',function(event,strAnswer){if(strAnswer==='Try to reconnect'){GS.closeSocket(GS.envSocket);GS.envSocket=GS.openSocket('env',socket.GSSessionID,socket.notifications);}else{GS.bolPreventErrors=true;}});}}
 function webSocketNormalizeError(event){var i;var len;var arrLines;var arrLine;var strData;var jsnRet={'error_title':'','error_text':'','error_detail':'','error_hint':'','error_query':'','error_context':'','error_position':'','error_notice':'','original_data':event};event=event||{};jsnRet.error_text=event.reason||'';if(event.data){strData=event.data;if(strData.substring(0,strData.indexOf(' '))==='messageid'){strData=strData.substring(strData.indexOf('\n')+1);}
 if(strData.substring(0,strData.indexOf(' '))==='responsenumber'){strData=strData.substring(strData.indexOf('\n')+1);}
 if(strData.substring(0,strData.indexOf(' '))==='transactionid'){strData=strData.substring(strData.indexOf('\n')+1);}
@@ -3295,7 +3295,8 @@ if(GS.getQueryString()||element.hasAttribute('refresh-on-querystring-change')||e
 if(bolRefresh&&element.hasAttribute('src')){getData(element);}else if(bolRefresh&&!element.hasAttribute('src')){console.warn('gs-combo Warning: element has "refresh-on-querystring-values" or "refresh-on-querystring-change", but no "src".',element);}
 element.internal.bolQSFirstRun=true;}
 function elementCreated(element){if(!element.hasAttribute('suspend-created')){}}
-function elementInserted(element){if(!element.hasAttribute('suspend-created')&&!element.hasAttribute('suspend-inserted')){if(!element.inserted){element.inserted=true;element.internal={};saveDefaultAttributes(element);var
+function elementInserted(element){if(!element.hasAttribute('suspend-created')&&!element.hasAttribute('suspend-inserted')){if(element.children.length===0){throw'GS-Form Error: No template provided';}
+if(!element.inserted){element.inserted=true;element.internal={};saveDefaultAttributes(element);var
 firstChildElement=element.children[0],strQueryString=GS.getQueryString(),changeHandler;if(element.hasAttribute('save-while-typing')){GS.addBeforeUnloadEvent(function(){if(element.bolCurrentlySaving||element.saveTimerID){return'The page has not finished saving.';}});}else{GS.addBeforeUnloadEvent(function(){document.activeElement.blur();});}
 element.lockColumn=element.getAttribute('lock')||'change_stamp';if(firstChildElement.nodeName==='TEMPLATE'){element.templateHTML=firstChildElement.innerHTML;}else{console.warn('Warning: gs-form is now built to use a template element. '+'Please use a template element to contain the template for this form. '+'A fix has been included so that it is not necessary to use the template element, but that code may be removed at a future date.');element.templateHTML=element.innerHTML;}
 if(!element.templateHTML.trim()){throw'GS-FORM error: no template HTML.';}

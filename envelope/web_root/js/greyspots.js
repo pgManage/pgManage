@@ -3673,16 +3673,16 @@ window.addEventListener('design-register-element', function () {
     }
     
     function errorJSONToHTML(errorJSON) {
-        return '<pre style="word-break: break-all; white-space: pre-wrap;">' +
+        var errorHTML = '<pre style="word-break: break-all; white-space: pre-wrap;">' +
                     'There was an error:' +
                     (errorJSON.error_text //TODO: maybe make this red -Joseph 09/14/16
-                        ? '<br /><br />' + encodeHTML(errorJSON.error_text)                        
+                        ? '<br /><br />' + encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_text))
                         : '') +
                     (errorJSON.error_file
-                        ? '<br /><br />The error was on file: ' + encodeHTML(errorJSON.error_file) 
+                        ? '<br /><br />The error was on file: ' + encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_file))
                         : '') +
                     (errorJSON.error_hint
-                        ? '<br /><br />' + encodeHTML(errorJSON.error_hint)                        
+                        ? '<br /><br />' + encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_hint))
                         : '') +
                     (errorJSON.error_context
                         ? '<br /><br />' + encodeHTML(errorJSON.error_context)                     
@@ -3691,6 +3691,7 @@ window.addEventListener('design-register-element', function () {
                         ? '<br /><br />' + encodeHTML(errorJSON.error_addin)                       
                         : '') +
                 '</pre>';
+        return errorHTML;
     }
     
     GS.ajaxErrorDialog = function (jsnError, tryAgainCallback, cancelCallback) {
@@ -5919,7 +5920,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                         </gs-grid>
                     </gs-footer>
                 </gs-page>
-            */}).replace('{{ADDIN}}', (addinText ? '\n\n' + addinText : ''));
+            */}).replace('{{ADDIN}}', decodeURIComponent((addinText ? '\n\n' + addinText : '')));
             
             GS.openDialog(templateElement, '', function (event, strAnswer) {
                 if (strAnswer === 'Try to reconnect') {
@@ -24817,6 +24818,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function elementInserted(element) {
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
+            if (element.children.length === 0) {
+                throw 'GS-Form Error: No template provided';
+            }
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;

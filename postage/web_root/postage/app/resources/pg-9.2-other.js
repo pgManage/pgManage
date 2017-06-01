@@ -2910,7 +2910,7 @@ function executeScript(bolCursorQuery) {
                                     }
 
                                     strHTML += (
-                                        '<gs-cell>' +
+                                        '<gs-cell style="overflow: auto;">' +
                                             '<label>{{! GS.decodeFromTabDelimited(arrRow[' + i + ']) }}</label>' +
                                         '</gs-cell>'
                                     );
@@ -2940,6 +2940,7 @@ function executeScript(bolCursorQuery) {
                                 tableElement.setAttribute('id', tableID);
                                 tableElement.setAttribute('no-delete', '');
                                 tableElement.setAttribute('no-update', '');
+                                tableElement.setAttribute('null-string', 'NULL');
                                 scrollElement.appendChild(tableElement);
                                 
                                 tableElement.addEventListener('openFullContainer', function () {

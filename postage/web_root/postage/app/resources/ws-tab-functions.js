@@ -761,8 +761,6 @@ function dialogClosedTabs() {
 function fillTab(tabElement, jsnParameters) {
     'use strict';
     var strValue;
-    
-    currentTab = document.getElementsByClassName('current-tab')[0];
     if (tabElement.tabType === 'sql') {
         tabElement.relatedEditor.ignoreChange = true;
         strValue = jsnParameters.strContent || '\n\n\n\n\n\n\n\n\n';
@@ -821,6 +819,8 @@ function ShortcutNewTab () {
 var afterDeleteSelectionDirections = [], intSaveTimerID;
 function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFilePath, bolAutoSelect) {
     'use strict';
+    
+    currentTab = document.getElementsByClassName('current-tab')[0];
     var tabElement, frameElement, editor, selectionChangeHandler
       , arrCurrentTabNames, i, len, arrElements
       , FFiveFunction, FFiveUpFunction, windowResizeHandler;
@@ -2053,6 +2053,7 @@ function setFrame(tabElement, frameElement, bolBringToFirst) {
     }
 
     tabElement.classList.add('current-tab');
+    currentTab = document.getElementsByClassName('current-tab')[0];
 
     if (bolBringToFirst) {
         if (tabBarElement.firstElementChild !== tabElement) {
@@ -2128,6 +2129,7 @@ function beautifySQL() {
     'use strict';
     var editor = document.getElementsByClassName('current-tab')[0].relatedEditor;
     var jsnCurrentQuery = getCurrentQuery();
+    console.log(jsnCurrentQuery);
     if (jsnCurrentQuery.strQuery === editor.getValue()) {
         editor.setValue('\n' + jsnCurrentQuery.strQuery + '\n'.repeat(10));
     }
@@ -2218,10 +2220,11 @@ function SQLBeautify(strInput) {
 
         // ENDING MULTILINE COMMENT
         } else if (int_qs === 5 && strInput.substr(i, 2) === "*/") {
-            strResult += strInput[i];
+            strResult += strInput[i] + strInput[i + 1] + '\n\n';
             bolNoExtraWhitespace = true;
             bolLastComment = true;
             int_qs = 0;
+            i += 1;
             //console.log("found end of multiline comment");
 
         // FOUND DASH COMMENT:

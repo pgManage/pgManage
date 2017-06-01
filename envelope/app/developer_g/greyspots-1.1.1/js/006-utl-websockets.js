@@ -37,7 +37,7 @@
                         </gs-grid>
                     </gs-footer>
                 </gs-page>
-            */}).replace('{{ADDIN}}', (addinText ? '\n\n' + addinText : ''));
+            */}).replace('{{ADDIN}}', decodeURIComponent((addinText ? '\n\n' + addinText : '')));
             
             GS.openDialog(templateElement, '', function (event, strAnswer) {
                 if (strAnswer === 'Try to reconnect') {

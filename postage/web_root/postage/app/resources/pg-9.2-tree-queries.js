@@ -2571,11 +2571,11 @@ scriptQuery.objectView = ml(function () {/*
         
         || COALESCE((SELECT E'\n' || array_to_string(array_agg(trg),E'\n')
         	FROM ( SELECT E'\n-- DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' ||
-            quote_ident(pg_namespace.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
+            quote_ident(pg_namespace.nspname) || '.' || quote_ident(c.relname) || E';\n\n{{OPEN}}\n' ||
             replace(replace(replace(replace(pg_get_triggerdef(pg_trigger.oid, true),' INSTEAD ', E'\n   INSTEAD ')
             ,' ON ', E'\n   ON ')
             ,' FOR ', E'\n   FOR ')
-            ,' EXECUTE ', E'\n   EXECUTE ') || E';\n' as trg
+            ,' EXECUTE ', E'\n   EXECUTE ') || E';\n{{CLOSE}}\n' as trg
           FROM pg_class c
           JOIN pg_trigger ON pg_trigger.tgrelid = c.oid
         LEFT JOIN pg_namespace ON pg_namespace.oid = c.relnamespace
@@ -2619,7 +2619,7 @@ scriptQuery.objectView = ml(function () {/*
                                        WHERE pg_class.oid = {{INTOID}} ) ||
                 E'\n      WHERE -CONDITIONS-;\n*' || '/'
         );
-    */});
+    */}).replace(/\{\{OPEN\}\}/gi, '/*').replace(/\{\{CLOSE\}\}/gi, '*/');
 
 associatedButtons.objectCast = ['propertyButton', 'dependButton'];
 scriptQuery.objectCast = ml(function () {/*  

@@ -1014,75 +1014,75 @@ function getContext(strInput, intPosition) {
             //console.log(">,|" + intTabLevel + "<");
 
         // FOUND AN ON SCHEMA INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
-            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA/)[0].length);
+            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA/i)[0].length);
             
             intContextPosition = i;
             arrShortQueries = ['schemas'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON FUNCTION INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
-            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION/)[0].length);
+            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION/i)[0].length);
             
             intContextPosition = i;
             arrShortQueries = ['schemasFunctions'];
             //console.log(">GRANT ... ON FUNCTION|" + intTabLevel + "<");
 
         // FOUND AN ON TABLE INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
-            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE/)[0].length);
+            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE/i)[0].length);
             
             intContextPosition = i;
             arrShortQueries = ['schemasTables'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON SEQUENCE INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
-            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE/)[0].length);
+            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE/i)[0].length);
             
             intContextPosition = i;
             arrShortQueries = ['schemasSequences'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON TYPE INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
-            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE/)[0].length);
+            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE/i)[0].length);
             
             intContextPosition = i;
             arrShortQueries = ['schemasTypes'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON DOMAIN INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
-            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN/)[0].length);
+            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN/i)[0].length);
             
             intContextPosition = i;
             arrShortQueries = ['schemasDomains'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             intContextPosition = i + 2;
             arrShortQueries = ['schemasAll'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND A FROM INSIDE A REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^FROM[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolRevoke) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^FROM[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolRevoke) {
             strFirst = ' ';
             intContextPosition = i + 4;
             arrShortQueries = ['logins', 'groups'];
             //console.log(">REVOKE ... FROM|" + intTabLevel + "<");
 
         // FOUND A TO INSIDE A GRANT STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^TO[\n\r\ \t]+/) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolGrant) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^TO[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolGrant) {
             strFirst = ' ';
             intContextPosition = i + 2;
             arrShortQueries = ['logins', 'groups'];
@@ -1193,8 +1193,8 @@ function getContext(strInput, intPosition) {
             //console.log(">CASE|" + intTabLevel + "<");
 
         // FOUND DISTINCT FROM
-        } else if (int_qs === 0 && strInput.substr(i).match((/^DISTINCT[\ \t\n]+FROM\b/i))) {
-            i = i + (strInput.substr(i).match((/^DISTINCT[\ \t\n]+FROM\b/))[0].length - 1);
+        } else if (int_qs === 0 && strInput.substr(i).match((/^DISTINCT[\ \t\n]+FROM[\ \t\n]+/i))) {
+            i = i + (strInput.substr(i).match((/^DISTINCT[\ \t\n]+FROM/i))[0].length - 1);
 
             strFirst = ' ';
             intContextPosition = i + 1;
