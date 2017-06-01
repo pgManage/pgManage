@@ -74,7 +74,7 @@ However, I think the facts speak for themselves in asserting that the difference
 
 ## Do you appreciate freedom? 
 
-Using web technologies to draw the interface also gives a good deal more freedom than using native elements. Native elements are by their nature a limited set. I also believe that with a fair amount of effort any user interface can be made to perform better in Electron(Chromium) than a native interface. This is because features can be pared down to the use case whereas native elements are difficult or impossible to optimize. Yes you get great perfomance out of the box, but you are also limited. Yes, I am aware that this is a risky proposition do to the shear number of platforms out there, but I stand by it. Besides, freedom is advantageous for many reasons, including performance, and I am not alone in appreciating it. 
+Using web technologies to draw the interface also gives a good deal more freedom than using native elements. Native elements are by their nature a limited set. Many platforms are customizable but cross platform solutions for native apps are mostly not. I also believe that with a fair amount of effort any user interface can be made to perform better in Electron(Chromium) than a native interface. This is because features can be pared down to the use case whereas native elements are difficult or impossible to optimize. Yes you get great perfomance out of the box on native, but you are also limited by resources. For a given amount of resources I assert that web tech will often give you more. More customization, more platforms, more performance, more of what you need.  Besides, freedom is advantageous for many reasons, including performance, and I am not alone in appreciating it. 
 
 ## Do you consider yourself helpful?
 
