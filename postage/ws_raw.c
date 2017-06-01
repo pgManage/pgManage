@@ -1,5 +1,7 @@
 #include "ws_raw.h"
 
+#define UTIL_DEBUG
+
 #ifdef ENVELOPE
 #else
 
@@ -736,9 +738,11 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 			int_column < (int_num_columns - 1) ? "\t" : "\012", (size_t)1);
 	}
 	for (int_column = 0; int_column < int_num_columns; int_column += 1) {
-		SFINISH_SNFCAT(str_response, &int_response_len,
+		SFINISH_SNFCAT(str_response, &int_response_len, 
 			PQgetvalue(res, 0, int_column), strlen(PQgetvalue(res, 0, int_column)),
 			int_column < (int_num_columns - 1) ? "\t" : "\012", (size_t)1);
+        // we may have made a mistake about where to do this, delete this and next line next time you see this
+		//(PQgetvalue(res, 0, int_column) != NULL ? PQgetvalue(res, 0, int_column) : "\N"), strlen(PQgetvalue(res, 0, int_column)),
 	}
 	PQclear(res);
 
@@ -986,9 +990,23 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 		}
 
 		for (int_column = 0; int_column < int_num_columns; int_column += 1) {
-			SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
-				PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column),
-				strlen(PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column)));
+			// this if checks if the value of the current cell is null so we can retutrn \N instead
+			if (PQgetisnull(res, (int)client_copy_check->int_i, (int)int_column)) {
+				SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
+					"\\N",
+					(size_t)2);
+
+			} else {
+				SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
+					PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column),
+					strlen(PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column)));
+
+			};
+
+			//SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
+			//	PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column),
+			//	strlen(PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column)));
+
 			str_temp1 = bescape_value(str_sql_temp, &int_sql_temp_len);
 			SFREE(str_sql_temp);
 			SFINISH_CHECK(str_temp1 != NULL, "bescape_value failed");
