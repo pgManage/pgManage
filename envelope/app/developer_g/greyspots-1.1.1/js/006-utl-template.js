@@ -90,7 +90,7 @@ GS.templateColumnToValue = function (templateHTML) {
     
     for (i = 0, len = arrColumnElement.length; i < len; i += 1) {
         if (!arrColumnElement[i].hasAttribute('value')) {
-            arrColumnElement[i].setAttribute('value', '{{! row.' + arrColumnElement[i].getAttribute('column') + ' }}');
+            arrColumnElement[i].setAttribute('value', '{{! row[\'' + arrColumnElement[i].getAttribute('column').replace(/\\/gi, '\\\\').replace(/\'/gi, '\\\'') + '\'] }}');
         }
     }
     

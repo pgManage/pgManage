@@ -198,7 +198,7 @@
 
 
 
-                            if (strPK) {
+                            if (strPK && strPK !== '\\N') {
                                 tableElement.setAttribute('pk', strPK);
                                 tableElement.setAttribute('ord', quote_ident(strPK) + ' DESC');
                                 

@@ -5536,7 +5536,7 @@ GS.templateColumnToValue = function (templateHTML) {
     
     for (i = 0, len = arrColumnElement.length; i < len; i += 1) {
         if (!arrColumnElement[i].hasAttribute('value')) {
-            arrColumnElement[i].setAttribute('value', '{{! row.' + arrColumnElement[i].getAttribute('column') + ' }}');
+            arrColumnElement[i].setAttribute('value', '{{! row[\'' + arrColumnElement[i].getAttribute('column').replace(/\\/gi, '\\\\').replace(/\'/gi, '\\\'') + '\'] }}');
         }
     }
     
@@ -42159,7 +42159,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     //      the column names and types and we need to
                     //      re-link the filters, sorts and filter statuses
                     //
-                    // this was below in the else, but requestSelectFromSocket will only callback once if there are no records - Nunzio 5/29/2017
+                    // this was below in the else, but requestSelectFromSocket
+                    //      will only callback once if there are no records
+                    //      - Nunzio 5/29/2017
                     if (data.intCallback === 0) {
                         // clear old column arrays to make remove for any
                         //      changes to the column list

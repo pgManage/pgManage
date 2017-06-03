@@ -2709,7 +2709,7 @@ function SQLBeautify(strInput) {
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE([\ \t]+OR[\ \t]+REPLACE)?/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE)?/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
@@ -2718,7 +2718,7 @@ function SQLBeautify(strInput) {
             strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^CREATE([\ \t]+OR[\ \t]+REPLACE)?/i)[0] + ' ';
             i += (strInput.substr(i).match(/^CREATE([\ \t]+OR[\ \t]+REPLACE)?/i)[0].length - 1);
             bolNoExtraWhitespace = true;
-            //console.log(">KEYWORD|" + intTabLevel + "<");
+            console.log(">KEYWORD|" + intTabLevel + "<");
 
     /*
     TODO:
