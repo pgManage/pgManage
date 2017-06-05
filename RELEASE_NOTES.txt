@@ -1,11 +1,14 @@
 Changes since 3.2.13:
 Postage:
-- Fix raw not returning \n for null values
 - Fix datasheet not working when a column name has a dash in it (closed workflowproducts/postage#298)
 - Datasheet: Allow copy record to use new arrRow column access method
 
 Envelope:
 - Update README_FIREFOX.md
+
+Both: 
+- Fix raw not returning \n for null values
+
 
 Changes since 3.2.12:
 Postage:
