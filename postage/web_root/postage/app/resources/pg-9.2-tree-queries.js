@@ -775,11 +775,23 @@ listQuery.objectViewList = listQuery.views = ml(function () {/*
       SELECT c.oid, quote_ident(c.relname) AS name, pg_namespace.nspname AS schema_name, '' AS bullet, 'VW' AS separate_bullet
         FROM pg_class c
    LEFT JOIN pg_namespace ON pg_namespace.oid = c.relnamespace
-       WHERE ((c.relhasrules AND
-               (EXISTS (SELECT r.rulename
-                          FROM pg_rewrite r
-                         WHERE ((r.ev_class = c.oid)
-                           AND (bpchar(r.ev_type) = '1'::bpchar)) ))) OR (c.relkind = 'v'::char))
+       WHERE (
+                (
+                    c.relhasrules AND
+                    (
+                        EXISTS (
+                            SELECT r.rulename
+                              FROM pg_rewrite r
+                             WHERE (
+                                        (r.ev_class = c.oid) AND
+                                        (bpchar(r.ev_type) = '1'::bpchar)
+                                    )
+                        )
+                    )
+                ) OR
+                (c.relkind = 'v'::char) OR
+                (c.relkind = 'm'::char)
+            )
          AND c.relnamespace = {{INTOID}}
     ORDER BY relname;
 */});
@@ -2500,7 +2512,7 @@ scriptQuery.objectForeignTable = ml(function () {/*
 */});
 
 associatedButtons.objectView = ['propertyButton', 'dependButton', 'dataObjectButtons'];
-scriptQuery.objectView = ml(function () {/*  
+scriptQuery.objectView = ml(function () {/*
         SELECT  (SELECT array_to_string(array_agg(full_sql), E'\n')
         	FROM (SELECT '-- DROP VIEW ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || E';\n\n' ||
         	       'CREATE OR REPLACE VIEW ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || 

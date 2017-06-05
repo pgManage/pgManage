@@ -83,12 +83,12 @@ function getContext(strInput, intPosition) {
     intPosition++; //add character for zero based
 
     //make sure that we have only whitespace after the cursor, otherwise we just end it here
-    // console.log('intPosition', intPosition);
-    // console.log('Check Whitespace', strInput.substr(intPosition, 1).match('^[\n\r\ \t]+'));
-    // console.log('Check Whitespace>' + strInput.substr(intPosition, 1) + '<');
-    // console.log('Check Whitespace - 1>' + strInput.substr(intPosition - 1, 1) + '<');
-    // console.log('Check Whitespace 1>' + strInput.substr(1, 1) + '<');
-    // console.log('Check Whitespace 0>' + strInput.substr(0, 1) + '<');
+    //// console.log('intPosition', intPosition);
+    //// console.log('Check Whitespace', strInput.substr(intPosition, 1).match('^[\n\r\ \t]+'));
+    //// console.log('Check Whitespace>' + strInput.substr(intPosition, 1) + '<');
+    //// console.log('Check Whitespace - 1>' + strInput.substr(intPosition - 1, 1) + '<');
+    //// console.log('Check Whitespace 1>' + strInput.substr(1, 1) + '<');
+    //// console.log('Check Whitespace 0>' + strInput.substr(0, 1) + '<');
     if (! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) {
         return;
     }
@@ -1145,14 +1145,14 @@ function getContext(strInput, intPosition) {
             strFirst = '\\n\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'snippets'];
-            console.log(">;|" + intTabLevel + "<");
+           // console.log(">;|" + intTabLevel + "<");
 
         // Function Declare
         } else if (int_qs === 0 && strInput.substr(i).match(/^DECLARE\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             i = i + 6 + (strInput.substr(i + 7, 1) === ' ' ? 1 : 0);
             intTabLevel += 1;
             bolDeclare = true;
-            console.log(">DECLARE|" + intTabLevel + "<");
+           // console.log(">DECLARE|" + intTabLevel + "<");
 
         // Transactions
         } else if (int_qs === 0 && strInput.substr(i).match(/^BEGIN\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
@@ -1166,7 +1166,7 @@ function getContext(strInput, intPosition) {
             strFirst = '\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'snippets'];
-            console.log(">BEGIN|" + intTabLevel + "<");
+           // console.log(">BEGIN|" + intTabLevel + "<");
 
         // FOUND CASE WHEN
         } else if (int_qs === 0 && strInput.substr(i).match(/^CASE[\ \t\n]+WHEN\b/i)) {
@@ -1411,8 +1411,8 @@ function getContext(strInput, intPosition) {
 
 
     //console.log('intContextPosition>' + intContextPosition + '<');
-    console.log('strFirst>' + strFirst + '<');
-    console.log('Relevant>' + strInput.substr(intContextPosition, strFirst.length) + '<');
+   // console.log('strFirst>' + strFirst + '<');
+   // console.log('Relevant>' + strInput.substr(intContextPosition, strFirst.length) + '<');
     if (strFirst.length > 0) {
         //console.log('strFirst Correct', ! strInput.substring(intContextPosition).match(new RegExp("^" + strFirst)));
         if (! strInput.substring(intContextPosition).match(new RegExp("^" + strFirst))) {
@@ -1809,12 +1809,14 @@ function getContext(strInput, intPosition) {
         return;
     }
 
+    /*
     console.log('objContext', {
         'strContext': strContext
         , 'arrQueries': arrQueries
         , 'searchLength': strContext.length
         , 'intContextPosition': intContextPosition
-    });//*/
+    });
+    */
 
     return {
         'strContext': strContext

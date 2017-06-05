@@ -1,5 +1,5 @@
 /*jslint browser:true, white:true, multivar:true, for:true*/
-/*global window, document, GS, //console, evt*/
+/*global window, document, GS, console, evt*/
 var bolAutocompleteLogicLoaded = true;
 
 function autocompleteStart() {
@@ -188,7 +188,11 @@ function autocompleteBindEditor(tabElement, editor) {
         if (autocompleteGlobals.bolBound) {
             var intCurrentLine = autocompleteGlobals.popupAce.getSelectionRange().start.row
               , intLastLine = autocompleteGlobals.arrValues.length - 1;
-            if (editor.currentSelections.length > 1) {
+
+            if (
+                editor.currentSelections &&
+                editor.currentSelections.length > 1
+            ) {
                 if (curr_run_down > 0) {
                     curr_run_down += 1;
                 } else {
@@ -484,17 +488,25 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     */
     
     if (! editor.currentQueryRange) {
-        console.log('There was no context detected by Michael\'s code, so ignore.');
+       // console.log()('There was no context detected by Michael\'s code, so ignore.');
         return;
     }
     
-    console.log('Joseph\'s Code>' + strScript.substring(editor.currentQueryRange.startIndex
-            , editor.currentQueryRange.endIndex + 15) + '|' + (intCursorPosition - editor.currentQueryRange.startIndex) + '|' + strScript.substring(editor.currentQueryRange.startIndex
-            , intCursorPosition + 1) + '<');//*/
+    /*
+     console.log(
+        'Joseph\'s Code>' + strScript.substring(editor.currentQueryRange.startIndex,
+        (
+            editor.currentQueryRange.endIndex + 15) + '|' +
+            (intCursorPosition - editor.currentQueryRange.startIndex) + '|' +
+            strScript.substring(editor.currentQueryRange.startIndex,
+            intCursorPosition + 1
+        ) + '<'
+    );
+    */
     
     if (!(editor.currentQueryRange.startIndex <= intCursorPosition
         && intCursorPosition <= editor.currentQueryRange.endIndex)) {
-        console.log('Cursor out of range by Michael\'s context, so ignore.');
+        //console.log()('Cursor out of range by Michael\'s context, so ignore.');
         return;
     }
     
@@ -745,30 +757,30 @@ function autocompleteMakeList(arrQueries, searchWord, editor) {
             
             var intLastDollarQuoting = Math.max(strStart.lastIndexOf('$body$'), strStart.lastIndexOf('$sql$'));
             var intEmptyQuoting = strStart.lastIndexOf('$$');
-            console.log('intLastDollarQuoting', intLastDollarQuoting);
-            console.log('str intLastDollarQuoting', strStart.substr(intLastDollarQuoting, 20));
-            console.log('intEmptyQuoting', intEmptyQuoting);
-            console.log('str intEmptyQuoting', strStart.substr(intEmptyQuoting, 20));
+           // console.log()('intLastDollarQuoting', intLastDollarQuoting);
+           // console.log()('str intLastDollarQuoting', strStart.substr(intLastDollarQuoting, 20));
+           // console.log()('intEmptyQuoting', intEmptyQuoting);
+           // console.log()('str intEmptyQuoting', strStart.substr(intEmptyQuoting, 20));
             if (intLastDollarQuoting > 0 && strStart.substring(intLastDollarQuoting).match(/[\t\n\r ]*DECLARE/i)) {
-                console.log('$body$ or $sql$ matched');
+               // console.log()('$body$ or $sql$ matched');
                 bolContinue = true;
             } else if (intEmptyQuoting > 0 && strStart.substring(intEmptyQuoting).match(/[\t\n\r ]*DECLARE/i)) {
-                console.log('$$ matched');
+               // console.log()('$$ matched');
                 bolContinue = true;
             }
             
-            console.log('bolContinue', bolContinue);
+           // console.log()('bolContinue', bolContinue);
             if (bolContinue) {
                 substrEnd = strStart.toLowerCase().lastIndexOf('begin');
                 strDeclare = strDeclare.substring(strStart.toLowerCase().lastIndexOf('declare'), substrEnd);
                 // get variable names
                 arrFuncVariables = strDeclare.match(/([A-Za-z_0-9]+\ )+/ig);
-                console.log('arrFuncVariables: ' + arrFuncVariables);
+               // console.log()('arrFuncVariables: ' + arrFuncVariables);
                 // trim variable names
                 if (arrFuncVariables) {
                     for (var i = 0, len = arrFuncVariables.length; i < len; i++) {
                         arrFuncVariables[i] = arrFuncVariables[i].trim();
-                        console.log(arrFuncVariables[i] + ' : ' + arrFuncVariables[i].indexOf(' '));
+                       // console.log()(arrFuncVariables[i] + ' : ' + arrFuncVariables[i].indexOf(' '));
                         // if arrFuncVariables[i] has a space in it still: substring it off
                         if (arrFuncVariables[i].indexOf(' ') !== -1) {
                             arrFuncVariables[i] = arrFuncVariables[i].substring(0, arrFuncVariables[i].indexOf(' '));

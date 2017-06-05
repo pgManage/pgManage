@@ -37736,6 +37736,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var handleCell;
         var jsnQS;
         var jsnRow;
+        var arrRow;
         var strRow;
         var strHeader;
 
@@ -37770,6 +37771,7 @@ document.addEventListener('DOMContentLoaded', function () {
             arrColumnTemplates[col_i] =
                     '{{ var qs = jo.qs' +
                     ', row = jo.row' +
+                    ', arrRow = jo.arrRow' +
                     ', i = jo.i' +
                     ', len = jo.len; }}' +
                     arrColumnTemplates[col_i];
@@ -37875,11 +37877,12 @@ document.addEventListener('DOMContentLoaded', function () {
             // no quoting,
             //      template cell with querystring and row
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
+                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
@@ -37900,11 +37903,12 @@ document.addEventListener('DOMContentLoaded', function () {
             //      put an escapeChar behind every quoteChar
             //      if NaN: wrap cell with quoteChar
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
+                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
@@ -37947,11 +37951,12 @@ document.addEventListener('DOMContentLoaded', function () {
             //      put an escapeChar behind every quoteChar
             //      wrap cell with quoteChar
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
+                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
@@ -37993,21 +37998,23 @@ document.addEventListener('DOMContentLoaded', function () {
             //          put an escapeChar behind every quoteChar
             //          wrap cell with quoteChar
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
+                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
 
                 // before we do any quoting, we need to add the HTML to the
                 //      HTML copy string
-                strHTMLRecordCopyString +=
-                        '<' + 'td rowspan="1" colspan="1">' +
-                        strCell +
-                        '</td>';
+                strHTMLRecordCopyString += (
+                    '<' + 'td rowspan="1" colspan="1">' +
+                    strCell +
+                    '</td>'
+                );
 
                 // if escapeChar !== quoteChar: double up every escapeChar
                 if (escapeChar !== quoteChar) {
@@ -38067,6 +38074,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             //console.log(arrSelectedStates);
+            //console.log(arrHeaders.slice(0));
 
             // loop to add the rest of the headers
             col_i = 0;
@@ -38124,6 +38132,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // <br />
+        //console.log(arrHeaders.slice(0));
 
         // we cache the number of columns because it doesn't change
         col_len = arrColumns.length;
@@ -38146,6 +38155,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // generate record JSON for template
             jsnRow = {};
+            arrRow = [];
             strRow = element.internalData.records[intRow] + '\t';
 
             cell_i = 0;
@@ -38161,6 +38171,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     jsnRow[arrColumnNames[cell_i]] = (
                         GS.decodeFromTabDelimited(cell, nullString)
                     );
+                    arrRow.push(jsnRow[arrColumnNames[cell_i]]);
                 } else {
                     break;
                 }
@@ -38253,7 +38264,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         arrColumnTemplates[arrColumns[col_i]],
                         row_i,
                         row_len,
-                        jsnRow
+                        jsnRow,
+                        arrRow
                     );
 
                 } else {
@@ -38273,8 +38285,10 @@ document.addEventListener('DOMContentLoaded', function () {
             strHTMLCopyString += '<tr>' + strHTMLRecordCopyString + '</tr>';
             strHTMLRecordCopyString = '';
 
-            // add record delimiter
-            strTextCopyString += recordDelimiter;
+            // add record delimiter (unless we're on the last record)
+            if ((row_i + 1) < row_len) {
+                strTextCopyString += recordDelimiter;
+            }
             row_i += 1;
         }
 
@@ -39007,6 +39021,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var strCell;
         var strHTML;
         var strCSS;
+        var delim;
 
         var intRecordSelectorBorderWidth;
         var intInsertRecordBorderHeight;
@@ -39129,27 +39144,41 @@ document.addEventListener('DOMContentLoaded', function () {
             len = toRecord;
             intRecordTop = intRecordOriginTop;
             while (i < len) {
-                strRecord = element.internalData.records[i];
-
                 // create cell array for this record
-                record_i = 0;
-                record_len = strRecord.length;
-                strCell = "";
+                strRecord = element.internalData.records[i] + '\t';
                 arrRecord = [];
-                while (record_i < record_len) {
-                    strChar = strRecord[record_i];
+                col_i = 0;
+                col_len = element.internalData.columnNames.length;//9999;
+                while (col_i < col_len) {
+                    delim = strRecord.indexOf('\t');
+                    strCell = strRecord.substring(0, delim);
+                    strRecord = strRecord.substring(delim + 1);
 
-                    if (strChar === "\t") {
-                        arrRecord.push(
-                            GS.decodeFromTabDelimited(strCell, strNullString)
-                        );
-                        strCell = "";
-                    } else {
-                        strCell += strChar;
-                    }
-                    record_i += 1;
+                    arrRecord.push(
+                        GS.decodeFromTabDelimited(strCell, strNullString)
+                    );
+
+                    col_i += 1;
                 }
-                arrRecord.push(strCell);
+
+                //record_i = 0;
+                //record_len = strRecord.length;
+                //strCell = "";
+                //arrRecord = [];
+                //while (record_i < record_len) {
+                //    strChar = strRecord[record_i];
+
+                //    if (strChar === "\t") {
+                //        arrRecord.push(
+                //            GS.decodeFromTabDelimited(strCell, strNullString)
+                //        );
+                //        strCell = "";
+                //    } else {
+                //        strCell += strChar;
+                //    }
+                //    record_i += 1;
+                //}
+                //arrRecord.push(strCell);
 
                 // create record JSON from the cell array
                 col_i = 0;
@@ -41726,8 +41755,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function getWhereClause(element) {
+        var i;
+        var len;
+        var arrFilter;
+        var strColumn;
+        var filter_i;
+        var filter_len;
+        var strFilter;
+        var jsnFilter;
+        var strListWhere;
+
+        var arrOldColumnNames;
+        var arrOldColumnTypes;
+        var arrOldColumnFilterStatuses;
+        var arrOldColumnFilters;
+        var arrOldColumnListFilters;
+
         var strWhere;
         var strUserWhere;
+        var strWhereColumn;
+
+        // we need to include any where clauses added be the developer.
+        //      this where clause is templated with the querystring.
         strWhere = GS.templateWithQuerystring(
             element.getAttribute('where') || '1=1'
         );
@@ -41754,23 +41803,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.getAttribute('qs')
             )
         ) {
-            var strWhereColumn =
-                    element.getAttribute('child-column') ||
-                    element.getAttribute('column') ||
-                    element.getAttribute('qs');
+            strWhereColumn = (
+                element.getAttribute('child-column') ||
+                element.getAttribute('column') ||
+                element.getAttribute('qs')
+            );
 
             // if the value is not a number, we need to do a string
             //      comparison in the where clause.
             if (isNaN(element.value)) {
-                strWhere =
-                        'CAST(' +
-                        strWhereColumn + ' AS ' +
-                        GS.database.type.text +
-                        ') = ' +
-                        'CAST(' +
-                        '$WhereQUOTE$' + (element.value) + '$WhereQUOTE$ AS ' +
-                        GS.database.type.text +
-                        ')';
+                strWhere = (
+                    'CAST(' +
+                    strWhereColumn + ' AS ' +
+                    GS.database.type.text +
+                    ') = ' +
+                    'CAST(' +
+                    '$WhereQUOTE$' + (element.value) + '$WhereQUOTE$ AS ' +
+                    GS.database.type.text +
+                    ')'
+                );
                 strWhere += (
                     strWhere !== ''
                         ? ' AND (' + strWhere + ')'
@@ -41788,23 +41839,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        var arrOldColumnNames = element.internalData.columnNames;
-        var arrOldColumnTypes = element.internalData.columnTypes;
-        var arrOldColumnFilterStatuses = element.internalData.columnFilterStatuses;
-        var arrOldColumnFilters = element.internalData.columnFilters;
-        var arrOldColumnListFilters = element.internalData.columnListFilters;
+        arrOldColumnNames = element.internalData.columnNames;
+        arrOldColumnTypes = element.internalData.columnTypes;
+        arrOldColumnFilterStatuses = element.internalData.columnFilterStatuses;
+        arrOldColumnFilters = element.internalData.columnFilters;
+        arrOldColumnListFilters = element.internalData.columnListFilters;
 
         // we want the user to be able to filter a column, so here we'll look
         //      at what the user set for each column and prepend to the where
         //      clause
         strUserWhere = '';
-        var i = 0;
-        var len = arrOldColumnFilters.length;
-        var arrFilter;
-        var strColumn;
-        var filter_i;
-        var filter_len;
-        var strFilter;
+        i = 0;
+        len = arrOldColumnFilters.length;
         while (i < len) {
             arrFilter = arrOldColumnFilters[i];
             strColumn = arrOldColumnNames[i];
@@ -41833,8 +41879,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         i = 0;
         len = arrOldColumnListFilters.length;
-        var jsnFilter;
-        var strListWhere;
         while (i < len) {
             jsnFilter = arrOldColumnListFilters[i];
             strColumn = arrOldColumnNames[i];
@@ -41886,7 +41930,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     ? ' AND '
                                     : ''
                             );
-    
+
                             strListWhere += (
                                 strColumn +
                                 ' != CAST($werequote$' +
@@ -41898,18 +41942,29 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-                //if we are excluding nothing the blank code causes the where to just be "WHERE column is blank"
-                if ((strListWhere && !(jsnFilter.type === 'exclusion' && jsnFilter.values.length === 0)) || jsnFilter.blanks === false) {
+
+                // if we are excluding nothing the blank code causes
+                //      the where to just be "WHERE column is blank"
+                if (
+                    (
+                        strListWhere &&
+                        !(
+                            jsnFilter.type === 'exclusion' &&
+                            jsnFilter.values.length === 0
+                        )
+                    ) ||
+                    jsnFilter.blanks === false
+                ) {
                     // we need to handle blank values specially
                     if (strListWhere) {
                         strListWhere = '(' + strListWhere + ') ';
                     }
-    
+
                     if (jsnFilter.blanks === true) {
                         if (strListWhere) {
                             strListWhere += ' OR';
                         }
-    
+
                         strListWhere += (
                             ' NULLIF(' +
                                 'CAST(' +
@@ -41921,7 +41976,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (strListWhere) {
                             strListWhere += ' AND';
                         }
-    
+
                         strListWhere += (
                             ' NULLIF(' +
                                 'CAST(' +
@@ -41930,12 +41985,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 '), \'\') IS NOT NULL'
                         );
                     }
-    
+
                     // console.log(
                     //     jsnFilter,
                     //     strListWhere
                     // );
-    
+
                     strUserWhere += (
                         strUserWhere
                             ? ' AND '
@@ -43005,6 +43060,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
                 i += 1;
             }
+
             if (strHashString) {
                 strRoles += (
                     strRoles
@@ -43217,7 +43273,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // hash data
                 strHashString = '';
                 lock_i = 0;
-                lock_len = arrPK.length;
+                lock_len = arrLock.length;
                 while (lock_i < lock_len) {
                     strHashString += (
                         strHashString
@@ -43599,11 +43655,32 @@ document.addEventListener('DOMContentLoaded', function () {
         i = 0;
         len = jsnDelete.recordIndexes.length;
 
+
+        
+        //// create cell array for this record
+        //strRecord = element.internalData.records[i] + '\t';
+        //arrDeleteRecord = [];
+        //col_i = 0;
+        //col_len = element.internalData.columnNames.length;//9999;
+        //while (col_i < col_len) {
+        //    delim = strRecord.indexOf('\t');
+        //    strCell = strRecord.substring(0, delim);
+        //    strRecord = strRecord.substring(delim + 1);
+
+        //    arrDeleteRecord.push(
+        //        GS.decodeFromTabDelimited(strCell, strNullString)
+        //    );
+
+        //    col_i += 1;
+        //}
+
+
         while (i < len) {
             strRecord = '';
             arrDeleteRecord = element.internalData.records[
                 jsnDelete.recordIndexes[i]
             ].split("\t");
+            //snapback
 
             // get PK columns
             col_i = 0;
@@ -43631,8 +43708,8 @@ document.addEventListener('DOMContentLoaded', function () {
             col_i = 0;
             col_len = arrLock.length;
             while (col_i < col_len) {
-                // get column index for this current hash column
-                intIndex = arrColumns.indexOf(arrLock[col_i]);
+                //// get column index for this current hash column
+                //intIndex = arrColumns.indexOf(arrLock[col_i]);
 
                 // append cell to current hash record
                 strRecordToHash += (
@@ -43640,13 +43717,19 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? "\t"
                         : ""
                 );
-                strTemp = arrDeleteRecord[intIndex];
+                //strTemp = arrDeleteRecord[intIndex];
+                strTemp = getCell(
+                                element,
+                                arrLock[col_i],
+                                jsnDelete.recordIndexes[i],
+                                false
+                            );
 
                 // I saw this in the code I copied while making this:
                 //      "I believe that this needs to
                 //          use the null-string instead of 'NULL'"
                 strRecordToHash += (
-                    strTemp === "NULL"
+                    strTemp === "\\N"
                         ? ""
                         : strTemp
                 );
