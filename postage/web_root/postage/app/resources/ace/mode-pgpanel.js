@@ -226,6 +226,7 @@ var pgpanelHighlightRules = function(options) {
             { token: "tf", regex: "TF" },
             { token: "ty", regex: "TY" },
             { token: "vw", regex: "VW" },
+            { token: "mv", regex: "MV" },
             
             {
                 token: "end",
@@ -236,6 +237,7 @@ var pgpanelHighlightRules = function(options) {
         "string.bullet_under_arrow": [
             { token: "tb", regex: "TB" },
             { token: "vw", regex: "VW" },
+            { token: "mv", regex: "MV" },
             
             {
                 token: "end",

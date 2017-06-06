@@ -2303,7 +2303,7 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
             bolType                         = document.getElementById('checkbox-schema-dump-type').value                        === 'true';
             bolView                         = document.getElementById('checkbox-schema-dump-view').value                        === 'true';
 
-            if (   !bolschema && !bolAggregate && !bolCollation && !bolConversion && !bolDomain
+            if (   !bolSchema && !bolAggregate && !bolCollation && !bolConversion && !bolDomain
                 && !bolForeignTable && !bolFunction && !bolIndex && !bolOperatorClass
                 && !bolOperatorFamily && !bolOperator && !bolSequence && !bolTable
                 && !bolTriggerFunction && !bolTextSearchConfiguration && !bolTextSearchDictionary

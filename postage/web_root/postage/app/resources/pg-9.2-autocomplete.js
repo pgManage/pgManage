@@ -55,7 +55,7 @@ function doubleIdentifier(strInput) {
 function getContext(strInput, intPosition) {
     'use strict';
 
-    //HERE BE DRAGONS
+    //HARK YE ONLOOKER: HERE BE DRAGONS
     //Maintainer of the dragons: Joseph 5-28-17
     //@@@@@@@@@@@@@@@@@@@@@**^^""~~~"^@@^*@*@@**@@@@@@@@@
     //@@@@@@@@@@@@@*^^'"~   , - ' '; ,@@b. '  -e@@@@@@@@@
@@ -82,14 +82,15 @@ function getContext(strInput, intPosition) {
     
     intPosition++; //add character for zero based
 
-    //make sure that we have only whitespace after the cursor, otherwise we just end it here
-    //// console.log('intPosition', intPosition);
-    //// console.log('Check Whitespace', strInput.substr(intPosition, 1).match('^[\n\r\ \t]+'));
-    //// console.log('Check Whitespace>' + strInput.substr(intPosition, 1) + '<');
-    //// console.log('Check Whitespace - 1>' + strInput.substr(intPosition - 1, 1) + '<');
-    //// console.log('Check Whitespace 1>' + strInput.substr(1, 1) + '<');
-    //// console.log('Check Whitespace 0>' + strInput.substr(0, 1) + '<');
-    if (! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) {
+    //make sure that we have only whitespace after the cursor, otherwise we just end it here, however last line last character is allowed
+    console.log('intPosition', intPosition);
+    console.log('strInput.length', strInput.length);
+    //console.log('Check Whitespace', (! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) && (intPosition !== strInput.length));
+    //console.log('Check Whitespace>' + strInput.substr(intPosition, 1) + '<');
+    //console.log('Check Whitespace - 1>' + strInput.substr(intPosition - 1, 1) + '<');
+    //console.log('Check Whitespace 1>' + strInput.substr(1, 1) + '<');
+    //console.log('Check Whitespace 0>' + strInput.substr(0, 1) + '<');
+    if ((! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) && (intPosition !== strInput.length)) {
         return;
     }
 
@@ -718,16 +719,30 @@ function getContext(strInput, intPosition) {
 
         // FOUND SELECT/INSERT/UPDATE/DELETE ... AND/OR/operators
         } else if (int_qs === 0 && strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolSelect || bolInsert || bolUpdate || bolDelete || intCase > 0)) {
-            //console.log('case>' + strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)/i)[0] + '<');
-            i += (strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)/i)[0].length - 1);
+            //console.log('case>' + strInput.substr(i).match(/^(,|AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)[\n\r\ \t]+/i)[0] + '<');
+            i += (strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)/i)[0].length);
 
             strFirst = ' ';
-            intContextPosition = i + 1;
+            intContextPosition = i;
             arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
 
-            //console.log(">AND/OR/operators|" + intTabLevel + "<");
+            //set final if we are NOT already on a final and we are NOT past the cursor
+            //console.log('bolFinal = ' + bolFinal);
+            //console.log('intPosition = ' + intPosition);
+            //console.log('i = ' + i);
+            if (/*!bolFinal && */ intPosition > i) {
+                //console.log('bolFinal := true');
+                bolFinal = true;
+                intFinalI = i;
+                intFinalContextPosition = intContextPosition;
+                arrFinalShortQueries = arrShortQueries;
+                strFinalFirst = strFirst;
+            }
+            //console.log(">intContextPosition|" + intContextPosition + "<");
 
-        // FOUND SELECT/UPDATE/DELETE ... (
+            //console.log(">AND/OR/operators lookahead|" + intTabLevel + "<");
+
+        // FOUND SELECT/UPDATE/DELETE ... PARENTHESIS
         } else if (int_qs === 0 && strInput.substr(i, 1) === "(" && (bolSelect || bolUpdate || bolDelete || intCase > 0)) {
             strFirst = '';
             intContextPosition = i + 1;
@@ -735,7 +750,22 @@ function getContext(strInput, intPosition) {
             
             int_ps = int_ps + 1;
             intTabLevel += 1;
-            //console.log(">(|" + intTabLevel + "<");
+            
+            //set final if we are NOT already on a final and we are NOT past the cursor
+            //console.log('bolFinal = ' + bolFinal);
+            //console.log('intPosition = ' + intPosition);
+            //console.log('i = ' + i);
+            if (/*!bolFinal && */ intPosition > i) {
+                //console.log('bolFinal := true');
+                bolFinal = true;
+                intFinalI = i;
+                intFinalContextPosition = intContextPosition;
+                arrFinalShortQueries = arrShortQueries;
+                strFinalFirst = strFirst;
+            }
+            //console.log(">intContextPosition|" + intContextPosition + "<");
+
+            //console.log(">SELECT/UPDATE/DELETE ... PARENTHESIS lookahead|" + intTabLevel + "<");
 
         // FOUND IF
         } else if (int_qs === 0 && strInput.substr(i).match(/^IF[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
@@ -771,16 +801,28 @@ function getContext(strInput, intPosition) {
             doubleIdentifier(strInput.substr(i + 1));
             //console.log(">PERFORM|" + intTabLevel + "<");
 
+        // FOUND USING/FROM/JOIN/ONLY PARENTHESIS
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+\(/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+            bolJoin = strInput.substr(i).match(/^JOIN/i) ? true : false;
+            i += (strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+\(/i)[0].length);
+            
+            strFirst = '';
+            intContextPosition = i;
+            arrShortQueries = ['snippets'];
+            
+            doubleIdentifier(strInput.substr(i));
+            //console.log(">USING/FROM/JOIN/ONLY PARENTHESIS|" + intTabLevel + "<");
+
         // FOUND USING/FROM/JOIN/ONLY
         } else if (int_qs === 0 && strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
             bolJoin = strInput.substr(i).match(/^JOIN/i) ? true : false;
-            i += (strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)/i)[0].length - 1);
+            i += (strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)/i)[0].length);
             
             strFirst = ' ';
-            intContextPosition = i + 1;
+            intContextPosition = i;
             arrShortQueries = ['schemasTables'];
             
-            doubleIdentifier(strInput.substr(i + 1));
+            doubleIdentifier(strInput.substr(i));
             //console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
 
         // FOUND JOIN ... ON
@@ -1011,7 +1053,27 @@ function getContext(strInput, intPosition) {
 
         // FOUND AN UNQUOTED/UNPARENTHESISED COMMA NOT INSIDE A GRANT/REVOKE STATEMENT:
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === "," && !bolGrant && !bolRevoke) {
-            //console.log(">,|" + intTabLevel + "<");
+            i++;
+            
+            strFirst = ' ';
+            intContextPosition = i;
+            arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
+            
+            //set final if we are NOT already on a final and we are NOT past the cursor
+            //console.log('bolFinal = ' + bolFinal);
+            //console.log('intPosition = ' + intPosition);
+            //console.log('i = ' + i);
+            if (/*!bolFinal && */ intPosition > i) {
+                //console.log('bolFinal := true');
+                bolFinal = true;
+                intFinalI = i;
+                intFinalContextPosition = intContextPosition;
+                arrFinalShortQueries = arrShortQueries;
+                strFinalFirst = strFirst;
+            }
+            //console.log(">intContextPosition|" + intContextPosition + "<");
+
+            //console.log(">, lookahead|" + intTabLevel + "<");
 
         // FOUND AN ON SCHEMA INSIDE A GRANT/REVOKE STATEMENT:
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
@@ -1095,8 +1157,10 @@ function getContext(strInput, intPosition) {
         // FOUND AN UNQUOTED/UNPARENTHESISED SEMICOLON:
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === ";") {
             if (i + 1 >= intPosition && bolFinal) {//if we are on the last statement, and we were just looking ahead for tables, then stop here
+                //console.log('break because of bolFinal');
                 break;
             } else {
+                //console.log('bolFinal := false');
                 bolFinal = false;
             }
             
@@ -1411,8 +1475,8 @@ function getContext(strInput, intPosition) {
 
 
     //console.log('intContextPosition>' + intContextPosition + '<');
-   // console.log('strFirst>' + strFirst + '<');
-   // console.log('Relevant>' + strInput.substr(intContextPosition, strFirst.length) + '<');
+    //console.log('strFirst>' + strFirst + '<');
+    //console.log('Relevant>' + strInput.substr(intContextPosition, strFirst.length) + '<');
     if (strFirst.length > 0) {
         //console.log('strFirst Correct', ! strInput.substring(intContextPosition).match(new RegExp("^" + strFirst)));
         if (! strInput.substring(intContextPosition).match(new RegExp("^" + strFirst))) {
@@ -1809,24 +1873,17 @@ function getContext(strInput, intPosition) {
         return;
     }
 
-    /*
-    console.log('objContext', {
-        'strContext': strContext
-        , 'arrQueries': arrQueries
-        , 'searchLength': strContext.length
-        , 'intContextPosition': intContextPosition
-    });
-    */
-
-    return {
+    var objContext = {
         'strContext': strContext
         , 'arrQueries': arrQueries
         , 'searchLength': strContext.length
         , 'intContextPosition': intContextPosition
     };
+
+    //console.log('objContext', objContext);
+
+    return objContext;
 }
-
-
 
 function autocompleteLoadTypes() {
     'use strict';

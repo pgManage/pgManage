@@ -109,6 +109,7 @@ var pgPanelCSSText = ml(function () {/*
     .ace-pgpanel .ace_pk,
     .ace-pgpanel .ace_rl,
     .ace-pgpanel .ace_tr,
+    .ace-pgpanel .ace_mv,
     .ace-pgpanel .ace_vw {
         font-size: 0.75em;
         font-weight: 900;
@@ -139,6 +140,7 @@ var pgPanelCSSText = ml(function () {/*
     .ace-pgpanel .ace_tf { color: #CA3C4D; }
     .ace-pgpanel .ace_ty { color: #9200A9; }
     .ace-pgpanel .ace_vw { color: #006E00; }
+    .ace-pgpanel .ace_mv { color: #006E00; }
 */});
 
     /*.ace-pgpanel .ace_arrowright {
@@ -178,6 +180,8 @@ var pgPanelCSSText = ml(function () {/*
     TF  tf  Trigger Functions
     TY  ty  Types
     VW  vw  Views
+    MV  mv  MATERIALIZED Views
+    
 */
 
 define("ace/theme/pgpanel",["require","exports","module","ace/lib/dom"],function(e,t,n){t.isDark=!1,t.cssClass="ace-pgpanel",t.cssText=pgPanelCSSText;var r=e("../lib/dom");r.importCssString(t.cssText,t.cssClass)});

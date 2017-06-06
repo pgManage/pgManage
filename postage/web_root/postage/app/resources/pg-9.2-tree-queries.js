@@ -311,7 +311,7 @@ listQuery.objectSchema = listQuery.schemaContents = ml(function () {/*
               WHERE ((c.relhasrules AND (EXISTS (
                       SELECT r.rulename FROM pg_rewrite r
                       WHERE r.ev_class = c.oid))))
-                AND c.relnamespace = '{{INTOID}}'::oid AND c.relkind = 'v') AS obj_count
+                AND c.relnamespace = '{{INTOID}}'::oid AND (c.relkind = 'v' OR c.relkind = 'm')) AS obj_count
         --ORDER BY srt ASC, name ASC
         --UNION
         --SELECT 2 AS srt, '{{INTOID}}' AS oid, 'Views' AS name, 'objectViewList' AS obj_query, (SELECT count(pg_views.viewname) AS result
@@ -658,7 +658,7 @@ titleRefreshQuery.objectViewList = titleRefreshQuery.viewNumber = ml(function ()
       FROM pg_class c
      WHERE ((c.relhasrules AND (EXISTS (
           SELECT r.rulename FROM pg_rewrite r
-           WHERE r.ev_class = c.oid)))) AND c.relnamespace = {{INTOID}} AND c.relkind = 'v';
+           WHERE r.ev_class = c.oid)))) AND c.relnamespace = {{INTOID}} AND (c.relkind = 'v' OR c.relkind = 'm');
     
     --SELECT count(pg_views.viewname) AS result
     --    FROM pg_views
@@ -772,7 +772,7 @@ listQuery.objectType = listQuery.types = ml(function () {/*
 
 
 listQuery.objectViewList = listQuery.views = ml(function () {/*
-      SELECT c.oid, quote_ident(c.relname) AS name, pg_namespace.nspname AS schema_name, '' AS bullet, 'VW' AS separate_bullet
+      SELECT c.oid, quote_ident(c.relname) AS name, pg_namespace.nspname AS schema_name, '' AS bullet, CASE WHEN c.relkind = 'v' THEN 'VW' ELSE 'MV' END AS separate_bullet
         FROM pg_class c
    LEFT JOIN pg_namespace ON pg_namespace.oid = c.relnamespace
        WHERE (
@@ -793,7 +793,7 @@ listQuery.objectViewList = listQuery.views = ml(function () {/*
                 (c.relkind = 'm'::char)
             )
          AND c.relnamespace = {{INTOID}}
-    ORDER BY relname;
+    ORDER BY relkind, relname;
 */});
 
 
@@ -1411,7 +1411,7 @@ associatedButtons.objectRole = ['propertyButton', 'dependButton'];
 scriptQuery.objectRole = ml(function () {/*
         SELECT '-- Role: ' || quote_ident(r.rolname) || E'\n\n-- DROP ROLE ' || quote_ident(r.rolname) || E';\n\n' ||
                 'CREATE ROLE ' || quote_ident(r.rolname) ||
-                E'\n    ' || CASE WHEN r.rolcanlogin        THEN 'LOGIN PASSWORD ''*******''' ELSE 'NOLOGIN' END ||
+                E'\n    ' || CASE WHEN r.rolcanlogin        THEN E'LOGIN\n    PASSWORD ''*******''' ELSE 'NOLOGIN' END ||
                 E'\n    ' || CASE WHEN NOT r.rolcreaterole  THEN 'NO' ELSE '' END || 'CREATEROLE' || 
                 E'\n    ' || CASE WHEN NOT r.rolsuper       THEN 'NO' ELSE '' END || 'SUPERUSER' || 
                 E'\n    ' || CASE WHEN NOT r.rolinherit     THEN 'NO' ELSE '' END || 'INHERIT' || 
@@ -2178,7 +2178,7 @@ scriptQuery.objectTable = ml(function () {/*
      ORDER BY clidx.relname
         )ok),'')), '') ||
         (
-            SELECT E'\n\n/' || E'*\nSELECT ' || COALESCE(string_agg(quote_ident(attname), ', '), '') ||
+            SELECT E'\n\n/' || E'*\nSELECT ' || COALESCE(string_agg(quote_ident(attname), ', ' ORDER BY attnum), '') ||
                 E'\n  FROM ' || (SELECT quote_ident(nspname) || '.' || quote_ident(relname)
                                    FROM pg_class
                               LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
@@ -2192,8 +2192,8 @@ scriptQuery.objectTable = ml(function () {/*
                                         FROM pg_class
                                    LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                                        WHERE pg_class.oid = {{INTOID}} ) ||
-                E'\n            (' || COALESCE(string_agg(quote_ident(attname), ', '), '') || ')' ||
-                E'\n     VALUES (' || COALESCE(string_agg(quote_ident(attname), ', '), '') || ');'
+                E'\n            (' || COALESCE(string_agg(quote_ident(attname), ', ' ORDER BY attnum), '') || ')' ||
+                E'\n     VALUES (' || COALESCE(string_agg(quote_ident(attname), ', ' ORDER BY attnum), '') || ');'
               FROM pg_catalog.pg_attribute
              WHERE attrelid = {{INTOID}}
                AND attnum >= 0
@@ -2203,7 +2203,7 @@ scriptQuery.objectTable = ml(function () {/*
                                    FROM pg_class
                               LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                                   WHERE pg_class.oid = {{INTOID}} ) ||
-                E'\n   SET ' || COALESCE(string_agg(quote_ident(attname) || ' = new.' || quote_ident(attname), E'\n     , '), '') || ';'
+                E'\n   SET ' || COALESCE(string_agg(quote_ident(attname) || ' = new.' || quote_ident(attname), E'\n     , ' ORDER BY attnum), '') || ';'
               FROM pg_catalog.pg_attribute
              WHERE attrelid = {{INTOID}}
                AND attnum >= 0
@@ -2215,7 +2215,6 @@ scriptQuery.objectTable = ml(function () {/*
                                        WHERE pg_class.oid = {{INTOID}} ) ||
                 E'\n      WHERE -CONDITIONS-;\n*' || '/'
         );
-        
         
            -- SELECT 
    --     -- ######### top comments #########
@@ -2527,7 +2526,7 @@ scriptQuery.objectView = ml(function () {/*
         	LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
         	LEFT JOIN pg_roles ON pg_roles.oid = c.relowner
         	LEFT JOIN pg_description ON pg_description.objoid = c.oid
-        	 WHERE c.relkind = 'v'::char AND (c.oid = {{INTOID}} OR (n.nspname || '.' || c.relname) = '{{STRSQLSAFENAME}}')) em)
+        	 WHERE (c.relkind = 'v'::char OR c.relkind = 'm'::char) AND (c.oid = {{INTOID}} OR (n.nspname || '.' || c.relname) = '{{STRSQLSAFENAME}}')) em)
          
         || COALESCE((SELECT E'\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
         	(SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
