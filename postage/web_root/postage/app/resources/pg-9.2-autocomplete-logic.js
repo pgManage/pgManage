@@ -344,25 +344,25 @@ function autocompleteBindEditor(tabElement, editor) {
 
     // //gotoright, gotoleft
 
-    editor.commands.addCommand({
-        name: 'autocomplete',
-        bindKey: 'Return',
-        exec: function () {
-            closePopup(editor);
-            if (editor.currentSelections.length > 1) {
-                var currSelections = editor.currentSelections;
-                for (var i = 0, len = editor.currentSelections.length; i < len; i += 1) {
-                    insertObj = {
-                        row: editor.currentSelections[i].start.row,
-                        column: editor.currentSelections[i].start.column
-                    };
-                    editor.env.document.insert(insertObj, '\n');
-                }
-            } else {
-                editor.insert('\n');
-            }
-        }
-    });
+    // editor.commands.addCommand({
+    //     name: 'autocomplete',
+    //     bindKey: 'Return',
+    //     exec: function () {
+    //         closePopup(editor);
+    //         if (editor.currentSelections.length > 1) {
+    //             var currSelections = editor.currentSelections;
+    //             for (var i = 0, len = editor.currentSelections.length; i < len; i += 1) {
+    //                 insertObj = {
+    //                     row: editor.currentSelections[i].start.row,
+    //                     column: editor.currentSelections[i].start.column
+    //                 };
+    //                 editor.env.document.insert(insertObj, '\n');
+    //             }
+    //         } else {
+    //             editor.insert('\n');
+    //         }
+    //     }
+    // });
 
     // bind mousedown
     editor.mousedownFunction = function (event) {
@@ -398,11 +398,11 @@ function autocompleteBindEditor(tabElement, editor) {
         }
     });
 
-    // editor.textInput.getElement().addEventListener('keydown', function (event) {
-    //     if (event.shiftKey && event.keyCode === 38) {
-    //         closePopup();
-    //     }
-    // });
+    editor.textInput.getElement().addEventListener('keydown', function (event) {
+        if (event.keyCode === 13) {
+            closePopup();
+        }
+    });
 
     editor.session.addEventListener('changeScrollTop', function (event) {
         autocompleteLogic(editor, 'scroll', event);
