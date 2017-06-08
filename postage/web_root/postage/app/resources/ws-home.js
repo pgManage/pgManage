@@ -5,7 +5,6 @@ var bolHomeLoaded = true
   , arrTargets = [], arrScripts = [], arrBeautify = [], arrNames = []
   , arrVersions = [], arrToolbarAddons = [], homeEditor;
 
-
 function loadHome() {
     if (bolHomeIframeLoaded === false) {
         bolHomeIframeLoaded = true;
@@ -209,7 +208,7 @@ function openToTab() {
         }
 
         newQuery = strQuery.substring(intStart, intEnd);
-        console.log(newQuery);
+        //console.log(newQuery);
     /* If you're going to do this in the future you have to do this the right way
 
 

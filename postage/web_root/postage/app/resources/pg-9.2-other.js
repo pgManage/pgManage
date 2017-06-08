@@ -2543,6 +2543,9 @@ function executeScript(bolCursorQuery) {
     var strScript;
     var jsnSelection;
     
+    
+     document.getElementById('sql-results-area-' + currentTab.intTabNumber + '').style.overflow = 'auto';
+    
     executeHelperUpdateTally(resultsTallyElement, 0, 0);
 
     // if we found an editor to get the query from and the current tab is not already running a query
@@ -2596,7 +2599,7 @@ function executeScript(bolCursorQuery) {
         var arrData = [];
         // begin
         
-        console.log('test');
+        //console.log('test');
         executeHelperStartExecute();
         currentTab.currentMessageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
             var tableElement;
@@ -2944,13 +2947,13 @@ function executeScript(bolCursorQuery) {
                                 scrollElement.appendChild(tableElement);
                                 
                                 tableElement.addEventListener('openFullContainer', function () {
-                                    resultsScroll = document.getElementById('sql-results-area-' + tabNumber + '').scrollTop;
+                                    currentTab.resultsScroll = document.getElementById('sql-results-area-' + tabNumber + '').scrollTop;
                                     document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = 0;
                                     document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'hidden';
                                 });
                                 
                                 tableElement.addEventListener('closeFullContainer', function () {
-                                    document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = resultsScroll;
+                                    document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = currentTab.resultsScroll;
                                     document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'auto';
                                 });
                                 

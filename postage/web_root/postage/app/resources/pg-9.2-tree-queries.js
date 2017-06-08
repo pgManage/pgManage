@@ -1924,6 +1924,7 @@ SELECT '-- Constraint: ' || conname || E';\n\n' ||
                         pg_constraint.conname ASC) AS constrain
                         LIMIT 1;
 */});
+
     
 associatedButtons.objectTable = ['propertyButton', 'dependButton', 'statButton', 'dataObjectButtons'];
 scriptQuery.objectTable = ml(function () {/*
@@ -2215,6 +2216,9 @@ scriptQuery.objectTable = ml(function () {/*
                                        WHERE pg_class.oid = {{INTOID}} ) ||
                 E'\n      WHERE -CONDITIONS-;\n*' || '/'
         );
+      
+      
+      
         
            -- SELECT 
    --     -- ######### top comments #########

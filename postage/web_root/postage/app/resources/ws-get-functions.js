@@ -134,7 +134,7 @@ function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh, bol
     'use strict';
     var intScrollTop;
 
-    console.trace(arguments);
+    //console.trace(arguments);
     if (!bolHomeRefresh) {
         addHomeQuery('', strFinalName, strQuery, strToolbarAddons, bolBeautify);
     } else {
@@ -154,9 +154,9 @@ function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh, bol
                     '\n\n\n\n' +
                     '\n\n\n\n';
 
-                console.log('setHomeValue first');
-                console.log('strScript: ' + strScript);
-                console.trace('getScript');
+                //console.log('setHomeValue first');
+                //console.log('strScript: ' + strScript);
+                //console.trace('getScript');
                 setHomeValue(strFinalName, strScript, strToolbarAddons);
 
                 //console.log(intScrollTop);
@@ -165,9 +165,9 @@ function getScript(strFinalName, strToolbarAddons, strQuery, bolHomeRefresh, bol
                     homeEditor.scrollToLine(parseInt(currTab[1], 10) + 5);
                 }
 
-                console.log(bolBeautify);
+                //console.log(bolBeautify);
                 if (bolBeautify) {
-                    console.log('SQLBeautify(strScript): ' + SQLBeautify(strScript));
+                    //console.log('SQLBeautify(strScript): ' + SQLBeautify(strScript));
                     setHomeValue(strFinalName, SQLBeautify(strScript), strToolbarAddons);
                 }
             }
