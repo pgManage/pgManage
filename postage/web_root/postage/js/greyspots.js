@@ -33991,7 +33991,7 @@ select behavior:
 
 
 
-// CODE INDEX:
+// # CODE INDEX:
 //          (use "find" (CTRL-f or CMD-f) to skip to a section)
 //          ("PRE-RENDER" refers to a section of functions that do not depend
 //                  on the viewport being rendered AND dont use any render
@@ -36127,7 +36127,8 @@ document.addEventListener('DOMContentLoaded', function () {
             "originalRecord": "",
             "record": {},
             "insertRecord": "",
-            "insertDialog": ""
+            "insertDialog": "",
+            "updateDialog": ""
         };
 
         // we need a place to store cell dimensions and other display
@@ -36296,6 +36297,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var copyTemplate;
         var insertRecordTemplate;
         var insertDialogTemplate;
+        var updateDialogTemplate;
 
         var strHTML;
         var arrColumnPlainTextNames;
@@ -36344,6 +36346,11 @@ document.addEventListener('DOMContentLoaded', function () {
             '[for="insert-dialog"]'
         )[0];
 
+        updateDialogTemplate = xtag.queryChildren(
+            element,
+            '[for="update-dialog"]'
+        )[0];
+
         // if there's no "data-record" template: error
         if (!dataRecordTemplate) {
             throw 'GS-TABLE Error: no "data-record" template found. ' +
@@ -36360,10 +36367,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // get column widths
-        if (headerRecordTemplate ||
-                dataRecordTemplate ||
-                insertRecordTemplate) {
-
+        if (
+            headerRecordTemplate ||
+            dataRecordTemplate ||
+            insertRecordTemplate
+        ) {
             if (headerRecordTemplate) {
                 arrColumnElements = xtag.query(
                     headerRecordTemplate.content,
@@ -36909,6 +36917,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // remove the template element now that it's been siphoned
             element.removeChild(insertDialogTemplate);
+        }
+
+        // if present, siphon "update-dialog" template
+        if (updateDialogTemplate) {
+            // save the template
+            strHTML = GS.templateColumnToValue(
+                updateDialogTemplate.innerHTML.trim()
+            );
+
+            // let's save the original dialog template text so that we can
+            //      modify it in the future
+            element.internalTemplates.originalUpdateDialog = strHTML;
+
+            // we're going run the dialog template through a function to
+            //      turn all of the "column" attributes into "value" attributes
+            //      with the proper templating
+            element.internalTemplates.updateDialog = (
+                GS.templateHideSubTemplates(strHTML, false)
+            );
+
+            // remove the template element now that it's been siphoned
+            element.removeChild(updateDialogTemplate);
         }
     }
 
@@ -38806,34 +38836,60 @@ document.addEventListener('DOMContentLoaded', function () {
         // if record selectors haven't been disabled: build record selectors
         //      (third so that they're above cells)
         if (!element.hasAttribute('no-record-selector')) {
-            i = fromRecord;
-            len = toRecord;
-            intRecordTop = intRecordOriginTop;
-            while (i < len) {
-                //strCSS = (
-                //    'top:' + intRecordTop + 'px;' +
-                //    'left:0;' +
-                //    'width:' + (
-                //        intRecordSelectorWidth +
-                //        intRecordSelectorBorderWidth
-                //    ) + 'px;' +
-                //    'height:' + (
-                //        arrRecordHeights[i] +
-                //        recordBorderHeight
-                //    ) + 'px;'
-                //);
-                strCSS = '';
+            if (element.getAttribute('update-dialog') === 'show') {
+                i = fromRecord;
+                len = toRecord;
+                intRecordTop = intRecordOriginTop;
+                while (i < len) {
+                    strCSS = '';
 
-                strHTML +=
+                    strHTML += (
+                        '<gs-cell class="table-record-selector multi-update" ' +
+                        '    style="' + strCSS + '" ' +
+                        '    data-row-number="' + i + '" ' +
+                        '    data-col="selector" ' +
+                        '    title="Record #' + (i + 1) + '">' +
+                        '    <div class="table-multi-update-button"></div>' +
+                        '</gs-cell>'
+                    );
+
+                    intRecordTop += arrRecordHeights[i];
+                    intRecordTop += recordBorderHeight;
+                    i += 1;
+                }
+            } else {
+                i = fromRecord;
+                len = toRecord;
+                intRecordTop = intRecordOriginTop;
+                while (i < len) {
+                    //strCSS = (
+                    //    'top:' + intRecordTop + 'px;' +
+                    //    'left:0;' +
+                    //    'width:' + (
+                    //        intRecordSelectorWidth +
+                    //        intRecordSelectorBorderWidth
+                    //    ) + 'px;' +
+                    //    'height:' + (
+                    //        arrRecordHeights[i] +
+                    //        recordBorderHeight
+                    //    ) + 'px;'
+                    //);
+                    strCSS = '';
+
+                    strHTML += (
                         '<gs-cell class="table-record-selector" ' +
                         '    style="' + strCSS + '" ' +
-                        '    data-row-number="' + i + '" data-col="selector">' +
+                        '    data-row-number="' + i + '" ' +
+                        '    data-col="selector" ' +
+                        '    title="Record #' + (i + 1) + '">' +
                         (i + 1) +
-                        '</gs-cell>';
+                        '</gs-cell>'
+                    );
 
-                intRecordTop += arrRecordHeights[i];
-                intRecordTop += recordBorderHeight;
-                i += 1;
+                    intRecordTop += arrRecordHeights[i];
+                    intRecordTop += recordBorderHeight;
+                    i += 1;
+                }
             }
         }
 
@@ -39089,10 +39145,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 //        recordBorderHeight
                 //    ) + 'px'
                 //);
-                cellElement.setAttribute('data-row-number', index);
-                cellElement.textContent = (index + 1);
                 cellElement.classList.add('table-record-selector');
+                cellElement.setAttribute('data-row-number', index);
                 cellElement.setAttribute('data-col', 'selector');
+                cellElement.setAttribute('title', 'Record #' + (index + 1));
+
+                if (element.getAttribute('update-dialog') === 'show') {
+                    cellElement.classList.add('multi-update');
+                    cellElement.innerHTML = (
+                        '<div class="table-multi-update-button"></div>'
+                    );
+                } else {
+                    cellElement.textContent = (index + 1);
+                }
+
                 element.elems.dataViewport.appendChild(cellElement);
             };
         }
@@ -43132,7 +43198,6 @@ document.addEventListener('DOMContentLoaded', function () {
             arrDeleteRecord = element.internalData.records[
                 jsnDelete.recordIndexes[i]
             ].split("\t");
-            //snapback
 
             // get PK columns
             col_i = 0;
@@ -50841,6 +50906,11 @@ document.addEventListener('DOMContentLoaded', function () {
             'change',
             element.internalEvents.cellUpdate
         );
+
+        element.elems.dataViewport.removeEventListener(
+            'click',
+            element.internalEvents.updateDialog
+        );
     }
     function bindUpdate(element) {
         element.internalEvents.cellUpdate = function (event) {
@@ -50945,6 +51015,226 @@ document.addEventListener('DOMContentLoaded', function () {
         element.addEventListener(
             'change',
             element.internalEvents.cellUpdate
+        );
+
+        // sometimes, the user needs to be able to update multiple columns
+        //      at once. or they just want to see the record in a more
+        //      focused way, with more room. so, we open the update dialog
+        //      when an update dialog button is clicked.
+        element.internalEvents.updateDialog = function (event) {
+            var target = event.target;
+            var arrCol;
+            var intRow;
+            var strRow;
+            var arrRow;
+            var jsnRow;
+            var i;
+            var len;
+            var strNullString;
+            var templateFunc;
+            var strHTML;
+            var templateElement;
+
+            if (target.classList.contains('table-multi-update-button')) {
+                // we want the null string to be configurable, so we'll read the
+                //      "null-string" attribute to get the null string
+                // if the "null-string" attribute is present, use the contents
+                //      or coalesce to empty string
+                if (element.hasAttribute('null-string')) {
+                    strNullString = element.getAttribute('null-string') || '';
+
+                // else, null string is left up to the encoding function
+                } else {
+                    strNullString = undefined;
+                }
+
+                // we need to know the column names
+                arrCol = element.internalData.columnNames;
+
+                // we need to get the record
+                intRow = parseInt(
+                    target.parentNode.getAttribute('data-row-number'),
+                    10
+                );
+
+                strRow = element.internalData.records[intRow];
+
+                // convert the record to our normal "row" and "arrRow"
+                // decode values in the column array and build up the json
+                arrRow = strRow.split('\t');
+                jsnRow = {};
+                i = 0;
+                len = arrCol.length;
+                while (i < len) {
+                    arrRow[i] = (
+                        GS.decodeFromTabDelimited(
+                            arrRow[i],
+                            strNullString
+                        )
+                    );
+                    jsnRow[arrCol[i]] = arrRow[i];
+
+                    i += 1;
+                }
+
+                //console.log('intRow:', intRow);
+                //console.log('strRow:', strRow);
+                //console.log('arrRow:', arrRow);
+                //console.log('jsnRow:', jsnRow);
+
+                // template the updateDialog with the record
+                templateFunc = doT.template(
+                    '{{ ' +
+                        'var row_number = jo.index + 1;' +
+                        'var qs = jo.qs;' +
+                        'var row = jo.row;' +
+                        'var arrRow = jo.arrRow;' +
+                        'var i = jo.index;' +
+                        'var len = jo.len;' +
+                    '}}' +
+                    element.internalTemplates.updateDialog.templateHTML
+                );
+
+                // template with JSON
+                strHTML = templateFunc({
+                    'qs': GS.qryToJSON(GS.getQueryString()),
+                    'row': jsnRow,
+                    'arrRow': arrRow,
+                    'index': intRow,
+                    'len': element.internalData.records.length
+                });
+
+                // because we prevent templating into other element's
+                //      templates (the ones with a "src" attribute) by
+                //      "hiding" (by replacing them with a random token
+                //      and storing the token-template relationship)
+                //      them, we have to "show" them (by replacing the
+                //      token with the original template strings) at
+                //      this step
+                strHTML = GS.templateShowSubTemplates(
+                    strHTML,
+                    element.internalTemplates.updateDialog
+                );
+
+                // generate dialog
+                templateElement = document.createElement('template');
+
+                templateElement.innerHTML = ml(function () {/*
+<gs-page>
+    <gs-header>
+        <center><h3>Update</h3></center>
+    </gs-header>
+    <gs-body padded>
+        {{HTML}}
+    </gs-body>
+    <gs-footer>
+        <gs-grid gutter>
+            <gs-block>
+                <gs-button dialogclose>Cancel</gs-button>
+            </gs-block>
+            <gs-block>
+                <gs-button id="gs-table-update-record" bg-primary>
+                    Save
+                </gs-button>
+            </gs-block>
+        </gs-grid>
+    </gs-footer>
+</gs-page>
+                */}).replace(/\{\{HTML\}\}/gi, strHTML);
+
+                // open the dialog
+                GS.openDialog(templateElement, function () {
+                    var dialog = this;
+                    var saveButtonClick;
+                    var afterUpdateFunc;
+
+                    saveButtonClick = function () {
+                        var arrElement;
+                        var elem_i;
+                        var elem_len;
+                        var elem;
+                        var arrColumns;
+                        var arrValues;
+                        var parentSRCElement;
+                        var strOldValue;
+                        var strNewValue;
+
+                        // when the save button is clicked, we need to check
+                        //      every field to find out what changes have been
+                        //      made
+                        arrElement = xtag.query(dialog, '[column]');
+                        arrColumns = [];
+                        arrValues = [];
+                        elem_i = 0;
+                        elem_len = arrElement.length;
+                        while (elem_i < elem_len) {
+                            elem = arrElement[elem_i];
+
+                            parentSRCElement = GS.findParentElement(
+                                elem,
+                                '[src]'
+                            );
+
+                            if (
+                                !parentSRCElement ||
+                                parentSRCElement.nodeName === 'HTML' ||
+                                parentSRCElement.nodeName === 'BODY'
+                            ) {
+                                strOldValue = jsnRow[
+                                    elem.getAttribute('column')
+                                ];
+                                strNewValue = elem.value;
+
+                                if (strNewValue !== strOldValue) {
+                                    arrColumns.push(
+                                        elem.getAttribute('column')
+                                    );
+                                    arrValues.push(
+                                        GS.encodeForTabDelimited(
+                                            strNewValue,
+                                            strNullString
+                                        )
+                                    );
+                                }
+                            }
+
+                            elem_i += 1;
+                        }
+
+                        if (arrColumns.length > 0) {
+                            afterUpdateFunc = function () {
+                                GS.closeDialog(dialog, 'Ok');
+                                element.removeEventListener(
+                                    'after_update',
+                                    afterUpdateFunc
+                                );
+                            };
+
+                            element.addEventListener(
+                                'after_update',
+                                afterUpdateFunc
+                            );
+
+                            dataUPDATE(element, 'cell-range', {
+                                "data": {
+                                    "columns": arrColumns,
+                                    "records": [intRow],
+                                    "values": [arrValues.join('\t')]
+                                },
+                                "updateConfirmed": false
+                            });
+                        }
+                    };
+
+                    document.getElementById('gs-table-update-record')
+                            .addEventListener('click', saveButtonClick);
+                });
+            }
+        };
+
+        element.elems.dataViewport.addEventListener(
+            'click',
+            element.internalEvents.updateDialog
         );
     }
 

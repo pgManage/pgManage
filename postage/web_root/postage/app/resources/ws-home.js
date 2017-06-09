@@ -164,6 +164,7 @@ function setHomeValue(strName, strText, strToolbarAddons) {
     homeEditor.currentTabName = strName;
     homeEditor.setValue(strText);
     homeEditor.selection.setRange(new Range(0, 0, 0, 0));
+    
 }
 
 function setObjectDetailValue(strHTML, callback) {
@@ -219,10 +220,60 @@ function openToTab() {
 
         newQuery = strQuery.substring(0, intCommentStart);*/
     } else {
-        arrLines = strQuery.split('\n');
-        newQuery = strQuery;
+        var querystringview = GS.qryGetVal(GS.getQueryString(), 'view');
+        var querystringtype = querystringview.substring(0, querystringview.indexOf(':'));
+        if (querystringtype.toLowerCase() === 'objectview' || querystringtype.toLowerCase() === 'objecttable') {
+            
+            querystringview = querystringview.substring(querystringtype.length + 1, querystringview.length);
+            
+            var querystringoid = querystringview.substring(0, querystringview.indexOf(':'));
+            
+            querystringview = querystringview.substring(querystringoid.length + 1, querystringview.length);
+            
+            var querystringname = querystringview.substring(0, querystringview.length).replace(':', '.');
+            
+            var preparedQuery = treePrepareQuery(scriptQuery['' + querystringtype + 'NoComment'], querystringoid, querystringname, querystringname)
+            //console.log(querystringview, '\n', querystringtype, '\n', querystringoid, '\n', querystringname);
+            //console.log(preparedQuery);
+            getSingleCellData(preparedQuery, function (strScript) {
+                //console.log(strScript);
+                if (strScript) {
+                    //console.log(strScript);
+                    newQuery = strScript;
+                    newQuery +=
+                        '\n\n\n\n' +
+                        '\n\n\n\n' +
+                        '\n\n\n\n';
+                    newTab('sql', (homeEditor.currentTabName || ''), {'strContent': (newQuery || '-- Nothing to open\n\n\n')});
+                } else {
+                    newQuery = '\n-- This object\'s script could not be retrieved...' +
+                               '\n-- Perhaps this object was dropped and/or recreated?\n\n';
+                }
+            });
+        } else {
+            arrLines = strQuery.split('\n');
+            newQuery = strQuery;
+            
+            if (newQuery) {
+                newQuery +=
+                    '\n\n\n\n' +
+                    '\n\n\n\n' +
+                    '\n\n\n\n';
+                
+            }
+        
+            newTab('sql', (homeEditor.currentTabName || ''), {'strContent': (newQuery || '-- Nothing to open\n\n\n')});
+        }
+        
     }
-
-
-    newTab('sql', (homeEditor.currentTabName || ''), {'strContent': (newQuery || '-- Nothing to open\n\n\n')});
 }
+
+
+
+
+
+
+
+
+
+

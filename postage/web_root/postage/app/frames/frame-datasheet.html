@@ -19,7 +19,16 @@
             //global GS, window, ml
             //jslint browser:true, white:true, multivar:true, for:true
             var bolCurl = false;
-
+            function toggleUpdate() {
+                if (document.getElementById('tableElement').hasAttribute('update-dialog') === true) {
+                    document.getElementById('tableElement').removeAttribute('update-dialog');
+                } else {
+                    document.getElementById('tableElement').setAttribute('update-dialog', 'show');
+                }
+                document.getElementById('tableElement').render();
+                document.getElementById('tableElement').refresh();
+            }
+            
             function checkDisableds() {
                 var elems = document.getElementsByClassName('navBtns');
                 var action;
@@ -148,12 +157,16 @@
                             tableElement.setAttribute('focus-on-load', '');
                             tableElement.setAttribute('src', (qs.schema + '.' + qs.object) || '');
                             
+                    // <template for="update-dialog">
                             
+                            var updateContent = ''
                             var headerContent = '';
                             var recordContent = '';
                             var copyContent = '';
                             var insertContent = '';
                             for (i = 0, len = arrColumns.length; i < len; i += 1) {
+                                updateContent += '<label>' + arrColumns[i] + '</label>\n';
+                                updateContent += '<gs-text column="' + arrColumns[i] + '"></gs-text>\n';
                                 headerContent += '<gs-cell>' + arrColumns[i] + '</gs-cell>\n';
                                 recordContent += '<gs-cell header="' + arrColumns[i] + '"><label><input column="' + arrColumns[i] + '" /></label></gs-cell>\n';
                                 copyContent += '<gs-cell header="' + arrColumns[i] + '">{{= row[' + JSON.stringify(arrColumns[i]) + '] }}</gs-cell>\n';
@@ -171,6 +184,7 @@
         <gs-button onclick="document.getElementById('tableElement').sort('desc');" inline no-focus iconleft icon="sort-alpha-desc">Sort Z to A</gs-button>
         <gs-button onclick="document.getElementById('tableElement').sort('clear');" inline no-focus iconleft icon="trash">Clear Sort</gs-button>
         <gs-button onclick="document.getElementById('tableElement').clearFilter();" inline no-focus iconleft icon="trash">Clear Filter</gs-button>
+        <gs-button onclick="toggleUpdate();" inline no-focus>Multi-update</gs-button>
     </template>
     <template for="bottom-hud">
         <gs-button inline no-focus icononly onclick="document.getElementById('tableElement').goToLine('first'); checkDisableds();" increment="first" class="navBtns" icon="step-backward">&nbsp;</gs-button>
@@ -194,7 +208,10 @@
     <template for="insert-record">
         {{INSERTTOKEN}}
     </template>
-                            */}).replace(/{{HEADERTOKEN}}/gi, headerContent).replace(/{{RECORDTOKEN}}/gi, recordContent).replace(/{{COPYTOKEN}}/gi, copyContent).replace(/{{INSERTTOKEN}}/gi, insertContent);
+    <template for="update-dialog">
+        {{UPDATETOKEN}}
+    </template>
+                            */}).replace(/{{HEADERTOKEN}}/gi, headerContent).replace(/{{UPDATETOKEN}}/gi, updateContent).replace(/{{RECORDTOKEN}}/gi, recordContent).replace(/{{COPYTOKEN}}/gi, copyContent).replace(/{{INSERTTOKEN}}/gi, insertContent);
 
 
 

@@ -2195,13 +2195,21 @@ function dialogSchemaSurgery(intSchemaOid, strSchemaName) {
                     } else {
                         resName = arrResult[i][1];
                     }
-
+                    if (GS.strToTitle(arrResult[i][3]).toLowerCase() === 'view' || GS.strToTitle(arrResult[i][3]).toLowerCase() === 'table') {
                     strQuery += '\n\n' +
                         (
-                            scriptQuery['object' + GS.strToTitle(arrResult[i][3])]
+                            scriptQuery['object' + GS.strToTitle(arrResult[i][3]) + 'NoComment']
                         )
                         .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
                         .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
+                    } else {
+                        strQuery += '\n\n' +
+                            (
+                                scriptQuery['object' + GS.strToTitle(arrResult[i][3])]
+                            )
+                            .replace(/\{\{INTOID\}\}/gim, arrResult[i][0])
+                            .replace(/\{\{STRSQLSAFENAME\}\}/gim, quote_ident(strSchemaName) + '.' + resName);
+                    }
                 }
 
                 handleScriptResults = function (arrResult) {

@@ -16395,6 +16395,69 @@ gs-table >
 
 
 /* #######################################################################
+########################## MULTI UPDATE BUTTONS ##########################
+####################################################################### */
+
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.multi-update {
+    text-align: center;
+    font-size: 1em;
+}
+
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell >
+        .table-multi-update-button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    color: #000;
+}
+
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell >
+        .table-multi-update-button:hover {
+    color: #565856;
+}
+
+gs-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell >
+        .table-multi-update-button:after {
+    display: block;
+    content: '\f040'; /* icon: pencil */
+    font-family: FontAwesome;
+    width: 100%;
+    height: 100%;
+    padding: 1px;
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+
+
+/* #######################################################################
 ############################# COLUMN BUTTONS #############################
 ####################################################################### */
 gs-table >
