@@ -1,3 +1,19 @@
+Changes since 3.2.14:
+Postage:
+- Fix datasheet preventing scrolling of the results pane (closed workflowproducts/postage#306)
+- Fix returns not scrolling the viewport (closed workflowproducts/postage#279)
+- Fix LOGIN and PASSWORD on same line in CREATE ROLE script (closed workflowproducts/postage#305)
+- Fix Object CREATE scripts (closed workflowproducts/postage#240)
+- Add Javascript error notifications (closed workflowproducts/postage#265)
+- Fix autocomplete not working after a parenthesis (closed workflowproducts/postage#292)
+- Fix materialized view definitions not showing (closed workflowproducts/postage#300)
+- Fix autocomplete not offering snippets when typing a subquery (closed workflowproducts/postage#256)
+
+Both: 
+- Add multi-column updating to datasheet (closed workflowproducts/postage#286)
+- Fix side-scrolling on datasheet (closed workflowproducts/postage#291)
+
+
 Changes since 3.2.13:
 Postage:
 - Fix datasheet not working when a column name has a dash in it (closed workflowproducts/postage#298)
