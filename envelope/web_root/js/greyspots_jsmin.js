@@ -5697,7 +5697,7 @@ function handleNonEmpty(element){var bolAllClear=true;if(element.hasAttribute('n
 return bolAllClear;}
 function translateValue(strFormat,newValue){var translatedValue;var valueDate;var strHour;var strMinute;var strPeriod;var arrParts;var intHours;newValue=newValue||'';if(typeof newValue==='string'){strPeriod=(newValue.match(/pm|am|a|p/gi)||[''])[0].toLowerCase();newValue=newValue.replace(/[^0-9:]/gi,'');if(strPeriod){strPeriod=(strPeriod[0]==='a'?'AM':'PM');}
 if(newValue){if((/:/).test(newValue)){arrParts=newValue.split(':');strHour=arrParts[0];strMinute=GS.leftPad(arrParts[1],'0',2);if(parseInt(strHour,10)>12){strHour=parseInt(strHour,10)-12;strPeriod='PM';}}else{newValue=newValue.substring(0,4);if(newValue.length>=3){strMinute=newValue.substring(newValue.length-2);strHour=newValue.substring(0,newValue.length-2);if(parseInt(strHour,10)>12){strHour=parseInt(strHour,10)-12;strPeriod='PM';}}else{newValue=parseInt(newValue,10);if((strFormat==='military')&&newValue>24||(strFormat!=='military')&&newValue>12){strHour='12';strMinute=String(newValue);}else{strHour=String(newValue);strMinute='00';}}}}
-if(strHour&&strMinute){if(!strPeriod){if(parseInt(strHour,10)<6||parseInt(strHour,10)===12){strPeriod='PM';}else{strPeriod='AM';}}
+if(strHour&&strMinute){if(!strPeriod){if(parseInt(strHour,10)>=12){strPeriod='PM';}else{strPeriod='AM';}}
 valueDate=new Date('1/1/1111 '+strHour+':'+strMinute+' '+strPeriod);}}else{valueDate=new Date(newValue);}
 if(valueDate){if(strFormat==='military'){translatedValue=GS.leftPad(valueDate.getHours(),'0',2)+':'+
 GS.leftPad(valueDate.getMinutes(),'0',2);}else{intHours=valueDate.getHours();if(intHours>=12){intHours=intHours-12;}

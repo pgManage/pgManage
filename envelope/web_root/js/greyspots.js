@@ -55206,6 +55206,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // coalesce value
         newValue = newValue || '';
+        //console.log('newValue >' + newValue + '<');
 
         // if value is a string: parse
         if (typeof newValue === 'string') {
@@ -55225,9 +55226,11 @@ document.addEventListener('DOMContentLoaded', function () {
             strPeriod = (newValue.match(/pm|am|a|p/gi) || [''])[0].toLowerCase();
             newValue  = newValue.replace(/[^0-9:]/gi, '');
 
+            //console.log('before strPeriod>' + strPeriod + '<');
             if (strPeriod) {
                 strPeriod = (strPeriod[0] === 'a' ? 'AM' : 'PM');
             }
+            //console.log('after strPeriod>' + strPeriod + '<');
 
             if (newValue) {
                 // if there are colon(s): split on colons
@@ -55241,6 +55244,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (parseInt(strHour, 10) > 12) {
                         strHour = parseInt(strHour, 10) - 12;
                         strPeriod = 'PM';
+                        //console.log('set strPeriod to PM');
                     }
 
                 // else (if there are just numbers)
@@ -55256,6 +55260,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (parseInt(strHour, 10) > 12) {
                             strHour = parseInt(strHour, 10) - 12;
                             strPeriod = 'PM';
+                            //console.log('set strPeriod to PM');
                         }
 
                     // else:
@@ -55276,10 +55281,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (strHour && strMinute) {
                 if (!strPeriod) {
-                    if (parseInt(strHour, 10) < 6 || parseInt(strHour, 10) === 12) {
+                    //console.log('strHour>' + strHour + '<');
+                    //console.log('parseInt(strHour, 10)>' + parseInt(strHour, 10) + '<');
+                    if (parseInt(strHour, 10) >= 12) {
+                    //if (parseInt(strHour, 10) < 6 || parseInt(strHour, 10) === 12) {//Who did this? -Joseph
                         strPeriod = 'PM';
+                        //console.log('set strPeriod to PM');
                     } else {
                         strPeriod = 'AM';
+                        //console.log('set strPeriod to AM');
                     }
                 }
                 valueDate = new Date('1/1/1111 ' + strHour + ':' + strMinute + ' ' + strPeriod);
