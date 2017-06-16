@@ -165,7 +165,11 @@ table.table-dep th {
 
 .ace-toolbar gs-button {
     text-indent: 0;
-
+    /*padding: 4px;*/
+}
+.ace-toolbar-labeled gs-button {
+    text-indent: 0;
+    padding: 4px;
 }
 
 /* ##################################################### */
@@ -267,10 +271,16 @@ gs-button.button-pop-out-explain {
     text-align: left;
 }
 
+
+
 .ace-toolbar gs-button.button-explain .explain-letter {
     font-size: 2em;
     line-height: 1.1em;
 	margin-right: 0.5em;
+}
+
+.ace-toolbar-labeled gs-button.button-explain .explain-letter {
+    font-size: 1.5em;
 }
 
 .ace-toolbar gs-button.button-explain .explain-letter:after {
@@ -317,6 +327,18 @@ gs-button.button-pop-out-explain {
 	height: 1.568em;
 }
 
+.ace-toolbar-labeled gs-button.button-ace-info .ace-icon-container {
+	width: 2em;
+}
+
+.ace-toolbar-unlabeled gs-button.button-ace-info .ace-icon-container {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+
 .ace-toolbar gs-button.button-ace-info .ace-suit {
     display: inline-block;
     position: absolute;
@@ -324,9 +346,46 @@ gs-button.button-pop-out-explain {
     width: 100%;
     left: 0;
     top: 0;
-    font-size: 3.2em;
+    font-size: 2.5em;
     line-height: 0.6em;
 }
+
+.ace-toolbar-unlabeled gs-button .ace-suit {
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 0.07em;
+    width: .9em !important
+}
+.ace-toolbar-unlabeled gs-button .ace-letter {
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 0.07em;
+    width: 2.32em !important;
+    left: 0 !important;
+}
+.ace-toolbar-unlabeled gs-button.button-ace-info {
+    width: 2.35em;
+}
+.ace-toolbar-labeled gs-button .ace-letter {
+    left: 0.36em !important;
+    top: -2px !important;
+}
+.ace-toolbar-labeled gs-button.button-ace-info {
+    height: 2em;
+}
+
+.ace-toolbar-labeled gs-button.button-ace-info span.ace-toolbar-labeled-only {
+    position: relative;
+    top: -.3em;
+    padding-left: 0px;
+}
+
+.ace-toolbar-labeled gs-button.button-explain label {
+    position: relative;
+    top: -.25em;
+    padding-left: 0px;
+}
+    
 
 .ace-toolbar gs-button.button-ace-info .ace-letter {
     display: inline-block;
@@ -334,7 +393,19 @@ gs-button.button-pop-out-explain {
     height: 100%;
     width: 100%;
     left: 0.55em;
-    top: 0;
+    top: 0px;
+    font-size: 1em;
+    line-height: 2em;
+    color: #FFF;
+}
+
+.ace-toolbar gs-button.button-ace-info .ace-letter .ace-toolbar-labeled {
+    display: inline-block;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    left: 0.37em;
+    top: -1px;
     font-size: 1em;
     line-height: 2em;
     color: #FFF;

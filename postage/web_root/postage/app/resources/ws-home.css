@@ -29,7 +29,7 @@ gs-button, gs-checkbox {
 
 .ace-toolbar-labeled gs-button[icon] {
     width: auto;
-	padding-left: 2.3em !important;
+	padding-left: 2em !important;
 }
 .ace-toolbar-labeled gs-button[icon]:after {
     left: 1em;
@@ -52,11 +52,11 @@ gs-button, gs-checkbox {
     padding-right: 0.35em !important;
 }
 
-ace-toolbar-browser .ace-toolbar-electron-only,
-ace-toolbar-electron .ace-toolbar-browser-only,
+.ace-toolbar-browser .ace-toolbar-electron-only,
+.ace-toolbar-electron .ace-toolbar-browser-only,
 .ace-toolbar-unlabeled .ace-toolbar-labeled-only,
 .ace-toolbar-labeled .ace-toolbar-unlabeled-only {
-    display: none;
+    display: none !important;
 }
 
 .ace-toolbar-labeled .ace-toolbar-labeled-only,

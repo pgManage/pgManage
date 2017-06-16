@@ -271,9 +271,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 
                 
-                console.log(strParameters);
-                console.log(updateFrameData);
-                console.log(strSchema, strObject, strReturnCols, strHashCols);
+                //console.log(strParameters);
+                //console.log(updateFrameData);
+                //console.log(strSchema, strObject, strReturnCols, strHashCols);
                 
                 GS.requestUpdateFromSocket(
                     GS.envSocket, strSchema, strObject

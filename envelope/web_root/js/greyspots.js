@@ -20132,7 +20132,7 @@ document.addEventListener('DOMContentLoaded', function () {
               , focusElementTag, focusElementRecord, focusElementCell, focusElementRecordIndex, focusElementCellIndex
               , focusElementIndex, focusElementCell, elementWalkResult, arrElements, arrSelection, newRecord, jsnTextSelection
               , newRecordData;
-            console.log(event);
+            //console.log(event);
 
             removeLoader(element);
 
@@ -20297,7 +20297,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     strDeleteData += GS.encodeForTabDelimited(arrRecord[i].getAttribute('data-id'));
                 }
             }
-            console.log(strHashData);
+            //console.log(strHashData);
             strDeleteData += '\t' + CryptoJS.MD5(strHashData) + '\n';
             strHashData = '';
         }
@@ -20387,7 +20387,7 @@ document.addEventListener('DOMContentLoaded', function () {
             strInsertString += (strInsertString ? '&' : '') + (element.getAttribute('child-column') || element.getAttribute('column') || element.getAttribute('qs')) + '=' + (element.value);
         }
 
-        console.log(strInsertString);
+        //console.log(strInsertString);
 
         arrInsertKeys = GS.qryGetKeys(strInsertString);
         arrInsertValues = GS.qryGetVals(strInsertString);
@@ -21879,15 +21879,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (strAttrName === 'template') {
                     var tableTemplateElement, tableTemplateElementCopy, recordElement, element = this, i, len;
                     tableTemplateElement  = element.templates[element.getAttribute('template') || 'default'];
-                    console.log(tableTemplateElement);
+                    //console.log(tableTemplateElement);
                     if (!tableTemplateElement && element.hasAttribute('template')) {
                         console.warn('ENVELOPE WARNING: Hey! You used the name of a non-existant record template!');
                         tableTemplateElement = element.templates['default'];
                     }
-                    console.log(tableTemplateElement);
+                    //console.log(tableTemplateElement);
 
                     if (tableTemplateElement) {
-                        console.log(tableTemplateElement);
+                        //console.log(tableTemplateElement);
                         tableTemplateElementCopy = document.createElement('template');
                         tableTemplateElementCopy.innerHTML = tableTemplateElement.innerHTML;
 
@@ -23705,9 +23705,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 
                 
-                console.log(strParameters);
-                console.log(updateFrameData);
-                console.log(strSchema, strObject, strReturnCols, strHashCols);
+                //console.log(strParameters);
+                //console.log(updateFrameData);
+                //console.log(strSchema, strObject, strReturnCols, strHashCols);
                 
                 GS.requestUpdateFromSocket(
                     GS.envSocket, strSchema, strObject
@@ -25838,7 +25838,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     '}\n';
                     }
                     
-                    console.log(strCSS);
+                    //console.log(strCSS);
                     
                     // append the column CSS
                     document.getElementById('gs-dynamic-css').innerHTML += '\n/* image #' + intImageID + ' */\n' + strCSS;
@@ -41241,15 +41241,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // scroll to the bottom so that the user can see the newly created
         //      records without having to scroll
-        element.internalScroll.top = (
-            element.internalScroll.maxTop - (
-                element.elems.dataViewport.clientHeight - (
-                    element.internalScrollOffsets.top +
-                    element.internalScrollOffsets.bottom +
-                    element.internalDisplay.defaultRecordHeight
-                )
-            )
-        );
+        // element.internalScroll.top = (
+        //     element.internalScroll.maxTop - (
+        //         element.elems.dataViewport.clientHeight - (
+        //             element.internalScrollOffsets.top +
+        //             element.internalScrollOffsets.bottom +
+        //             element.internalDisplay.defaultRecordHeight
+        //         )
+        //     )
+        // );
+        element.goToLine('last');
 
         // re-render scroll location because we changed the scrollTop
         renderScrollLocation(element);
@@ -47558,7 +47559,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // we need to update the scrollbar location from true scrollbar
         //      location to virtual scrollbar location
         element.internalEvents.scrollBarXFunction = function () {
-            console.log('scrollBarXFunction');
+            //console.log('scrollBarXFunction');
             var intViewportWidth;
             var virtualScrollWidth;
             var trueScrollWidth;
@@ -47567,7 +47568,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // sometimes, the gs-table triggeres a scrollbar event, so here we
             //      check to make sure the scrollbarX event has not been
             //      cancelled
-            console.log(element.internalEventCancelled.scrollbarX);
+            //console.log(element.internalEventCancelled.scrollbarX);
             if (!element.internalEventCancelled.scrollbarX) {
                 // we need the viewport dimensions because true scroll
                 //      dimensions include the viewport width, which messes
@@ -51292,6 +51293,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // re-render so that the insert controls clear out in the DOM
                 element.internalDisplay.fullRenderRequired = true;
                 renderLocation(element);
+                //element.goToLine('last');
             }
         };
 

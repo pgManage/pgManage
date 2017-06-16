@@ -288,6 +288,11 @@
                             document.getElementById('tableElement').addEventListener('after_select', function () {
                                 checkDisableds();
                             });
+                            
+                            document.getElementById('tableElement').addEventListener('selection_change', function () {
+                                checkDisableds();
+                                console.log('test');
+                            });
                         }
                         
                     } else {

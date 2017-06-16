@@ -1014,7 +1014,7 @@ function propertyListCREATETABLE(tabElement, strScript, textRange, arrChunks) {
     arrChunks = locationDependentMatch(jsnDesign, arrChunks);
     
     //console.log(JSON.stringify(arrChunks[0]));
-    console.log(arrChunks);
+    //console.log(arrChunks);
     //console.log(jsnDesign);
     
     // creating property dialog function

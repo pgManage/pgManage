@@ -509,7 +509,7 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     
     if (!(editor.currentQueryRange.startIndex <= intCursorPosition
         && intCursorPosition <= editor.currentQueryRange.endIndex + 1)) {// + 1 is because Michael's code is insane
-        console.log('Cursor out of range by Michael\'s context, so ignore.');
+        //console.log('Cursor out of range by Michael\'s context, so ignore.');
         return;
     }
     
@@ -1136,7 +1136,7 @@ function loadPopuplist(editor, optionlist) {
     
     
     // calculate popup height
-    console.log(autocompleteGlobals.popupAce.renderer.$textLayer.getLineHeight());
+    //console.log(autocompleteGlobals.popupAce.renderer.$textLayer.getLineHeight());
     intHeight = autocompleteGlobals.popupAce.renderer.$textLayer.getLineHeight() * (optionlist.length);
     if (intHeight > 150) {
         intHeight = 150;

@@ -297,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     '}\n';
                     }
                     
-                    console.log(strCSS);
+                    //console.log(strCSS);
                     
                     // append the column CSS
                     document.getElementById('gs-dynamic-css').innerHTML += '\n/* image #' + intImageID + ' */\n' + strCSS;

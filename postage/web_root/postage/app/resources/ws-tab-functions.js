@@ -1170,17 +1170,19 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                                     title="Open this tab in a new window" remove-all no-focus><label>New Window</label></gs-button>
                             <gs-button icononly inline remove-all icon="play" onclick="executeScript(); document.getElementsByClassName('current-tab')[0].relatedEditor.focus();"
                                     title="Execute Script [F5]" remove-bottom no-focus><label>Run</label></gs-button>
-                            <gs-checkbox inline style="border-radius: 0;" id="checkbox-autocommit-{{TABNUMBER}}" title="Autocommit"><label>Autocommit</label></gs-checkbox>
+                            <gs-checkbox inline style="border-radius: 0; padding: 4px; top: 1.5px; padding-top: 5px;" id="checkbox-autocommit-{{TABNUMBER}}" title="Autocommit"><label>Autocommit</label></gs-checkbox>
                             <gs-button inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"
-                                    title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span><label> Toggle Comment</label></gs-button>
+                                    title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span><label> Comment</label></gs-button>
                             <gs-button icononly inline remove-all icon="indent" onclick="indentScript()"
                                     title="Indent the selected text [TAB]" remove-all no-focus><label>Indent</label></gs-button>
                             <gs-button icononly inline remove-all icon="outdent" onclick="outdentScript()"
                                     title="Dedent the selected text [SHIFT][TAB]" remove-all no-focus><label>Dedent</label></gs-button>
 
-                            <gs-button icononly inline remove-all id="button-tab-{{TABNUMBER}}-save" icon="save" data-filename="{{FILE}}" class="ace-toolbar-electron-only"
+                            <gs-button inline icononly remove-all class="button-save ace-toolbar-labeled-only ace-toolbar-electron-only" style="padding: 4px;" onclick="menuSave(event.target, '{{FILE}}', '{{TABNUMBER}}');" title="Save menu." no-focus iconleft icon="angle-down"><label> Save</label></gs-button>
+                                    
+                            <gs-button icononly inline remove-all id="button-tab-{{TABNUMBER}}-save" icon="save" data-filename="{{FILE}}" class="ace-toolbar-unlabeled-only ace-toolbar-electron-only "
                                     title="Save" remove-all no-focus><label>Save</label></gs-button>
-                            <gs-button inline remove-all id="button-tab-{{TABNUMBER}}-save-as" class="button-save-as ace-toolbar-electron-only" data-filename="{{FILE}}"
+                            <gs-button inline remove-all id="button-tab-{{TABNUMBER}}-save-as" class="ace-toolbar-unlabeled-only button-save-as ace-toolbar-electron-only" data-filename="{{FILE}}"
                                     title="Save As..." remove-all no-focus>
                                 <span class="save-as-floppy" icon="pencil">&#xf0c7;</span><label> Save As</label></gs-button>
 
@@ -1188,7 +1190,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                                     href="/postage/{{CONNNUM}}/download/{{TRIMMEDFILE}}" onclick="downloadScript()"
                                     title="Download as a file" remove-all no-focus><label>Download</label></gs-button>
 
-                            <gs-button inline remove-all class="button-explain ace-toolbar-labeled-only" style="padding-bottom: 0px;" onclick="menuExplain(event.target)"
+                            <gs-button inline remove-all class="button-explain ace-toolbar-labeled-only" style="padding: 2px; padding-bottom: 0.75px;" onclick="menuExplain(event.target)"
                                     title="Explain menu." no-focus><span class="explain-letter" icon="chevron-down">E</span><label> Explain</label></gs-button>
 
                             <gs-button inline remove-all class="button-explain ace-toolbar-unlabeled-only" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(false)"
@@ -1199,13 +1201,13 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 
                             <gs-button icononly inline remove-all class="button-csv" icon="file-text" onclick="exportCSV()"
                                     title="Download a single query's results as a file" remove-all no-focus><label>Export</label></gs-button>
-                            <gs-button inline style="height: 2.35em" remove-all class="button-ace-info" onclick="dialogAceInfo()"
+                            <gs-button inline remove-all class="button-ace-info" onclick="dialogAceInfo()"
                                     title="Information and tips about the Editor" remove-all no-focus>
                                 <span class="ace-icon-container">
                                     <span class="ace-suit">&#9824;</span>
                                     <span class="ace-letter">A</span>
                                 </span>
-                                <span><label>Ace Tips</label></span>
+                                <span class="ace-toolbar-labeled-only">Ace</span>
                             </gs-button>
                             <gs-button icononly inline remove-all icon="black-tie" onclick="beautifySQL()" title="Beautify the Current SQL" no-focus><label>Beautify</label></gs-button>
                             <gs-button icononly hidden id="sql-property-{{TABNUMBER}}-button" icononly
@@ -1487,7 +1489,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         });
 
         if (evt.touchDevice) {
-            console.log(tabElement.relatedAcePositionContainer);
+            //console.log(tabElement.relatedAcePositionContainer);
             tabElement.relatedAcePositionContainer.style.height = '1px';
             //if (tabElement.relatedAcePositionContainer.offsetHeight < 3) {
             //    tabElement.relatedAcePositionContainer.style.height = '';
@@ -2129,7 +2131,7 @@ function beautifySQL() {
     'use strict';
     var editor = document.getElementsByClassName('current-tab')[0].relatedEditor;
     var jsnCurrentQuery = getCurrentQuery();
-    console.log(jsnCurrentQuery);
+    //console.log(jsnCurrentQuery);
     if (jsnCurrentQuery.strQuery === editor.getValue()) {
         editor.setValue('\n' + jsnCurrentQuery.strQuery + '\n'.repeat(10));
     }
@@ -2167,6 +2169,42 @@ function menuExplain(target) {
     GS.openDialogToElement(target, templateElement, 'down');
 }
 
+function menuSave(target, filename, inttabnumber) {
+    'use strict';
+    var templateElement = document.createElement('template');
+
+    templateElement.setAttribute('data-max-width', '9em');
+    templateElement.setAttribute('data-overlay-close', 'true');
+    templateElement.innerHTML = ml(function () {/*
+        <gs-page>
+            <gs-body class="ace-toolbar-labeled ace-toolbar">
+<gs-button dialogclose icononly inline remove-all id="button-tab-{{TABNUMBER}}-save-labeled" icon="save" data-filename="{{FILE}}" class="ace-toolbar-labeled-only" style="width: 100%; height: 2.35em;"
+                    title="Save" remove-all no-focus><label style="position: relative; top: .2em">Save</label></gs-button>
+<gs-button dialogclose inline remove-all id="button-tab-{{TABNUMBER}}-save-as-labeled" class="ace-toolbarnlabeled-only button-save-as" data-filename="{{FILE}}" style="width: 100%; height: 2.35em;"
+                        title="Save As..." remove-all no-focus>
+                    <span class="save-as-floppy" icon="pencil">&#xf0c7;</span><label> Save As</label></gs-button>
+            </gs-body>
+        </gs-page>
+    */}).replace(/\{\{TABNUMBER\}\}/g, inttabnumber).replace(/\{\{FILE\}\}/g, filename);
+
+
+
+
+    GS.openDialogToElement(target, templateElement, 'down');
+    
+document.getElementById('button-tab-' + inttabnumber + '-save-labeled').addEventListener('click', function (event) {
+    //console.log(event, event.which);
+    var strFileName = this.getAttribute('data-filename');
+    saveScriptAsFile(strFileName);
+});
+
+document.getElementById('button-tab-' + inttabnumber + '-save-as-labeled').addEventListener('click', function (event) {
+    //console.log(event, event.which);
+    var strFileName = this.getAttribute('data-filename');
+    saveScriptAsFile(strFileName, true);
+});
+}
+
 function indentScript() {
     'use strict';
     document.getElementsByClassName('current-tab')[0].relatedEditor.blockIndent();
@@ -2192,6 +2230,28 @@ function downloadScript() {
 
 function SQLBeautify(strInput) {
     'use strict';
+
+    //HARK YE ONLOOKER: HERE BE DRAGONS
+    //Maintainer of the dragons: Joseph 5-28-17
+    //Talk to the maintainer of the dragons before making changes
+    //@@@@@@@@@@@@@@@@@@@@@**^^""~~~"^@@^*@*@@**@@@@@@@@@
+    //@@@@@@@@@@@@@*^^'"~   , - ' '; ,@@b. '  -e@@@@@@@@@
+    //@@@@@@@@*^"~      . '     . ' ,@@@@(  e@*@@@@@@@@@@
+    //@@@@@^~         .       .   ' @@@@@@, ~^@@@@@@@@@@@
+    //@@@~ ,e**@@*e,  ,e**e, .    ' '@@@@@@e,  "*@@@@@'^@
+    //@',e@@@@@@@@@@ e@@@@@@       ' '*@@@@@@    @@@'   0
+    //@@@@@@@@@@@@@@@@@@@@@',e,     ;  ~^*^'    ;^~   ' 0
+    //@@@@@@@@@@@@@@@^""^@@e@@@   .'           ,'   .'  @
+    //@@@@@@@@@@@@@@'    '@@@@@ '         ,  ,e'  .    ;@
+    //@@@@@@@@@@@@@' ,&&,  ^@*'     ,  .  i^"@e, ,e@e  @@
+    //@@@@@@@@@@@@' ,@@@@,          ;  ,& !,,@@@e@@@@ e@@
+    //@@@@@,~*@@*' ,@@@@@@e,   ',   e^~^@,   ~'@@@@@@,@@@
+    //@@@@@@, ~" ,e@@@@@@@@@*e*@*  ,@e  @@""@e,,@@@@@@@@@
+    //@@@@@@@@ee@@@@@@@@@@@@@@@" ,e@' ,e@' e@@@@@@@@@@@@@
+    //@@@@@@@@@@@@@@@@@@@@@@@@" ,@" ,e@@e,,@@@@@@@@@@@@@@
+    //@@@@@@@@@@@@@@@@@@@@@@@~ ,@@@,,0@@@@@@@@@@@@@@@@@@@
+    //@@@@@@@@@@@@@@@@@@@@@@@@,,@@@@@@@@@@@@@@@@@@@@@@@@@
+    //"""""""""""""""""""""""""""""""""""""""""""""""""""
 
     var intTabLevel = 0;
     var bolDeclare = false;
@@ -2386,7 +2446,7 @@ function SQLBeautify(strInput) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === "," && !bolGrant) {
             // Remove comma and whitespace
             strResult = strResult.trim();
-            console.log(localStorage.bolComma);
+            //console.log(localStorage.bolComma);
             if (localStorage.bolComma === 'true') {
                 strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel) + 1) + ', ';
                 bolNoExtraWhitespace = true;
@@ -2658,7 +2718,7 @@ function SQLBeautify(strInput) {
             strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i,3).match(/^TO[\n\r\ \t]+|DO[\n\r\ \t]+|ON[\n\r\ \t]+/i) + ' ';
             i += (strInput.substr(i,3).match(/^TO[\n\r\ \t]+|DO[\n\r\ \t]+|ON[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
-            console.log(">TO/DO/ON|" + intTabLevel + "<");
+            //console.log(">TO/DO/ON|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE RULE... INSTEAD
         } else if (int_qs === 0 && bolRule && strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
@@ -2718,7 +2778,7 @@ function SQLBeautify(strInput) {
             strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^CREATE([\ \t]+OR[\ \t]+REPLACE)?/i)[0] + ' ';
             i += (strInput.substr(i).match(/^CREATE([\ \t]+OR[\ \t]+REPLACE)?/i)[0].length - 1);
             bolNoExtraWhitespace = true;
-            console.log(">KEYWORD|" + intTabLevel + "<");
+            //console.log(">KEYWORD|" + intTabLevel + "<");
 
     /*
     TODO:

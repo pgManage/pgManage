@@ -612,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function () {
               , focusElementTag, focusElementRecord, focusElementCell, focusElementRecordIndex, focusElementCellIndex
               , focusElementIndex, focusElementCell, elementWalkResult, arrElements, arrSelection, newRecord, jsnTextSelection
               , newRecordData;
-            console.log(event);
+            //console.log(event);
 
             removeLoader(element);
 
@@ -777,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     strDeleteData += GS.encodeForTabDelimited(arrRecord[i].getAttribute('data-id'));
                 }
             }
-            console.log(strHashData);
+            //console.log(strHashData);
             strDeleteData += '\t' + CryptoJS.MD5(strHashData) + '\n';
             strHashData = '';
         }
@@ -867,7 +867,7 @@ document.addEventListener('DOMContentLoaded', function () {
             strInsertString += (strInsertString ? '&' : '') + (element.getAttribute('child-column') || element.getAttribute('column') || element.getAttribute('qs')) + '=' + (element.value);
         }
 
-        console.log(strInsertString);
+        //console.log(strInsertString);
 
         arrInsertKeys = GS.qryGetKeys(strInsertString);
         arrInsertValues = GS.qryGetVals(strInsertString);
@@ -2359,15 +2359,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (strAttrName === 'template') {
                     var tableTemplateElement, tableTemplateElementCopy, recordElement, element = this, i, len;
                     tableTemplateElement  = element.templates[element.getAttribute('template') || 'default'];
-                    console.log(tableTemplateElement);
+                    //console.log(tableTemplateElement);
                     if (!tableTemplateElement && element.hasAttribute('template')) {
                         console.warn('ENVELOPE WARNING: Hey! You used the name of a non-existant record template!');
                         tableTemplateElement = element.templates['default'];
                     }
-                    console.log(tableTemplateElement);
+                    //console.log(tableTemplateElement);
 
                     if (tableTemplateElement) {
-                        console.log(tableTemplateElement);
+                        //console.log(tableTemplateElement);
                         tableTemplateElementCopy = document.createElement('template');
                         tableTemplateElementCopy.innerHTML = tableTemplateElement.innerHTML;
 

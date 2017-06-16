@@ -2544,7 +2544,7 @@ function executeScript(bolCursorQuery) {
     var jsnSelection;
     
     
-     document.getElementById('sql-results-area-' + currentTab.intTabNumber + '').style.overflow = 'auto';
+    document.getElementById('sql-results-area-' + currentTab.intTabNumber + '').style.overflow = 'auto';
     
     executeHelperUpdateTally(resultsTallyElement, 0, 0);
 
@@ -2601,6 +2601,8 @@ function executeScript(bolCursorQuery) {
         
         //console.log('test');
         executeHelperStartExecute();
+        
+        
         currentTab.currentMessageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
             var tableElement;
             var scrollElement;
@@ -2646,6 +2648,103 @@ function executeScript(bolCursorQuery) {
                     if (data.intCallbackNumber === 0) {
                         executeHelperEndExecute();
                         executeHelperStartLoading();
+                    }
+                    
+                    //console.log(data.strQuery);
+                    if (data.strQuery.toLowerCase().indexOf('drop ') !== -1) {
+                        var strObjName, trimmedQuery, oidQuery, schemaOID, strSchemaName;
+                        trimmedQuery = data.strQuery.substring(parseInt(data.strQuery.toLowerCase().indexOf('drop '), 10) + 5, data.strQuery.length);
+                        trimmedQuery = trimmedQuery.substring(parseInt(trimmedQuery.toLowerCase().indexOf(' '), 10) + 1, trimmedQuery.length);
+                        
+                        if (trimmedQuery.indexOf(' ') !== -1) {
+                            trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(' '));
+                        }
+                        
+                        if (trimmedQuery.indexOf(';') !== -1) {
+                            trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(';'));
+                        }
+                        strObjName = trimmedQuery;
+                        
+                        if (data.strQuery.toLowerCase().indexOf('drop schema') !== -1) {
+                            oidQuery = ml(function () {/*
+                            SELECT oid
+                                FROM pg_namespace
+                                WHERE nspname = '{{NAMETOKEN}}'
+                                ORDER BY nspname;
+                            */}).replace(/\{\{NAMETOKEN\}\}/g, strObjName);
+                            
+                            getSingleCellData(oidQuery, function (newOID) {
+                                //console.log(newOID);
+                                for (i = 0, len = treeGlobals.data.length; i < len; i++) {
+                                    if (treeGlobals.data[i].name.toLowerCase() === strObjName.toLowerCase()) {
+                                        treeGlobals.data[i].oid = newOID;
+                                    }
+                                }
+                            });
+                        } else if (data.strQuery.toLowerCase().indexOf('drop table') !== -1 || data.strQuery.toLowerCase().indexOf('drop view') !== -1) {
+                            strSchemaName = strObjName.substring(0, strObjName.indexOf('.'));
+                            var schemaoidQuery = ml(function () {/*
+                            SELECT oid
+                                FROM pg_namespace
+                                WHERE nspname = '{{NAMETOKEN}}'
+                                ORDER BY nspname;
+                            */}).replace(/\{\{NAMETOKEN\}\}/g, strSchemaName);
+                            getSingleCellData(schemaoidQuery, function (newSchemaOID) {
+                                schemaOID = newSchemaOID;
+                                strObjName = strObjName.substring(parseInt(strObjName.indexOf('.'), 10) + 1, strObjName.length)
+                                oidQuery = ml(function () {/*
+                                SELECT oid
+                                    FROM pg_class
+                                    WHERE relnamespace = '{{SCHEMAOID}}' AND relname = '{{NAMETOKEN}}'
+                                */}).replace(/\{\{NAMETOKEN\}\}/g, strObjName).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
+                                
+                                //console.log(oidQuery);
+                                getSingleCellData(oidQuery, function (newOID) {
+                                    for (i = 0, len = treeGlobals.data.length; i < len; i++) {
+                                        if (treeGlobals.data[i].name.toLowerCase() === strObjName.toLowerCase() && treeGlobals.data[i].schemaName === strSchemaName) {
+                                            treeGlobals.data[i].oid = newOID;
+                                        }
+                                    }
+                                });
+                            
+                            });
+                        } else if (data.strQuery.toLowerCase().indexOf('drop function') !== -1) {
+                            trimmedQuery = data.strQuery.substring(parseInt(data.strQuery.toLowerCase().indexOf('drop '), 10) + 5, data.strQuery.length);
+                            trimmedQuery = trimmedQuery.substring(parseInt(trimmedQuery.toLowerCase().indexOf(' '), 10) + 1, trimmedQuery.length);
+                            if (trimmedQuery.indexOf(';') !== -1) {
+                                trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(';'));
+                            }
+                            strObjName = trimmedQuery;
+                            strSchemaName = strObjName.substring(0, strObjName.indexOf('.'));
+                            var strFullObjName = strObjName.substring(strSchemaName.length + 1, strObjName.length);
+                            strObjName = strObjName.substring(strSchemaName.length + 1, strObjName.indexOf('('));
+                            //console.log(strObjName);
+                            var schemaoidQuery = ml(function () {/*
+                            SELECT oid
+                                FROM pg_namespace
+                                WHERE nspname = '{{NAMETOKEN}}'
+                                ORDER BY nspname;
+                            */}).replace(/\{\{NAMETOKEN\}\}/g, strSchemaName);
+                            getSingleCellData(schemaoidQuery, function (newSchemaOID) {
+                                schemaOID = newSchemaOID;
+                                strObjName = strObjName.substring(parseInt(strObjName.indexOf('.'), 10) + 1, strObjName.length)
+                                oidQuery = ml(function () {/*
+                                    SELECT pr.oid
+                                        FROM pg_proc pr
+                                        JOIN pg_type typ ON typ.oid = pr.prorettype
+                                        WHERE proisagg = FALSE AND typname <> 'trigger' AND pr.pronamespace = '2361363' AND proname = 'foo';
+                                */}).replace(/\{\{NAMETOKEN\}\}/g, strObjName).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
+                                //console.log(oidQuery);
+                                getSingleCellData(oidQuery, function (newOID) {
+                                    for (i = 0, len = treeGlobals.data.length; i < len; i++) {
+                                        if (treeGlobals.data[i].name.toLowerCase() === strFullObjName.toLowerCase() && treeGlobals.data[i].schemaName === strSchemaName) {
+                                            treeGlobals.data[i].oid = newOID;
+                                        }
+                                    }
+                                });
+                            
+                            });
+                        }
                     }
 
                     if (data.bolLastMessage) {
@@ -3079,7 +3178,7 @@ function executeScript(bolCursorQuery) {
 					    //console.log(intErrorStartChar);
 					    //console.log(intErrorStartChar);
 						while (i < len) {
-						    console.log(i, arrLines[i], arrLines[i].length);
+						    //console.log(i, arrLines[i], arrLines[i].length);
 							intErrorCol -= arrLines[i].length + 1;
 							i += 1
 						}

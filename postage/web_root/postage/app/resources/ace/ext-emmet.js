@@ -2,7 +2,7 @@ define("ace/snippets",["require","exports","module","ace/lib/oop","ace/lib/event
 
 this.keyboardHandler.bindKeys({
     Tab: function(e){
-        console.log('test');
+        //console.log('test');
     if (t.snippetManager && t.snippetManager.expandWithTab(e))return;
         e.tabstopManager.tabNext(1)
     },

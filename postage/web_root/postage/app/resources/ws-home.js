@@ -209,6 +209,7 @@ function openToTab() {
         }
 
         newQuery = strQuery.substring(intStart, intEnd);
+        newTab('sql', (homeEditor.currentTabName || ''), {'strContent': (newQuery || '-- Nothing to open\n\n\n')});
         //console.log(newQuery);
     /* If you're going to do this in the future you have to do this the right way
 
@@ -244,7 +245,7 @@ function openToTab() {
                         '\n\n\n\n' +
                         '\n\n\n\n' +
                         '\n\n\n\n';
-                    newTab('sql', (homeEditor.currentTabName || ''), {'strContent': (newQuery || '-- Nothing to open\n\n\n')});
+                    newTab('sql', (homeEditor.currentTabName || ''), {'strContent': (SQLBeautify(newQuery) || '-- Nothing to open\n\n\n')});
                 } else {
                     newQuery = '\n-- This object\'s script could not be retrieved...' +
                                '\n-- Perhaps this object was dropped and/or recreated?\n\n';

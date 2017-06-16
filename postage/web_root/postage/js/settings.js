@@ -205,7 +205,6 @@ document.addEventListener('keyup', function (event) {
             tabElement.executedWaitingForKeyup = false;
             event.preventDefault();
             event.stopPropagation();
-            console.log('yes');
         }
     }
 });

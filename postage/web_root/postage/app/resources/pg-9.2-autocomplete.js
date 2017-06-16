@@ -57,6 +57,7 @@ function getContext(strInput, intPosition) {
 
     //HARK YE ONLOOKER: HERE BE DRAGONS
     //Maintainer of the dragons: Joseph 5-28-17
+    //Talk to the maintainer of the dragons before making changes
     //@@@@@@@@@@@@@@@@@@@@@**^^""~~~"^@@^*@*@@**@@@@@@@@@
     //@@@@@@@@@@@@@*^^'"~   , - ' '; ,@@b. '  -e@@@@@@@@@
     //@@@@@@@@*^"~      . '     . ' ,@@@@(  e@*@@@@@@@@@@
@@ -83,8 +84,8 @@ function getContext(strInput, intPosition) {
     intPosition++; //add character for zero based
 
     //make sure that we have only whitespace after the cursor, otherwise we just end it here, however last line last character is allowed
-    console.log('intPosition', intPosition);
-    console.log('strInput.length', strInput.length);
+    //console.log('intPosition', intPosition);
+    //console.log('strInput.length', strInput.length);
     //console.log('Check Whitespace', (! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) && (intPosition !== strInput.length));
     //console.log('Check Whitespace>' + strInput.substr(intPosition, 1) + '<');
     //console.log('Check Whitespace - 1>' + strInput.substr(intPosition - 1, 1) + '<');
