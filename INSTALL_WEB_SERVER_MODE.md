@@ -23,6 +23,9 @@ Or if you choose LibreSSL, make sure its `openssl` is first in the $PATH (On Ope
 
 https://github.com/workflowproducts/postage/releases
 
+
+####NOTICE: INSTALLING POSTAGE SERVER ON WINDOWS IS EXPLAINED IN THE DOCUMENT: INSTALL_WEB_SERVER_MODE_WIN.md
+
 ####INSTALLING POSTAGE
 
 If you'd like to test Postage before you install, see the section "Testing Postage Before Installing" further down.
