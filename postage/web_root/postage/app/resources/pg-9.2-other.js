@@ -245,13 +245,7 @@ function menuTools(target) {
 
     // dialogAbout()
 
-    GS.openDialogToElement(target, templateElement, 'down', function () {
-        //if we are in electron, remove the clear cache button
-        if (window.process && window.process.type === 'renderer') {
-            var element = document.getElementById('clear-cache-button');
-            element.parentNode.removeChild(element);
-        }
-    });
+    GS.openDialogToElement(target, templateElement, 'down');
 }
 
 function menuOptions(target) {
@@ -283,8 +277,11 @@ function menuOptions(target) {
     GS.openDialogToElement(target, templateElement, 'down', function () {
         //if we are in electron, remove the clear cache button
         if (window.process && window.process.type === 'renderer') {
-            var element = document.getElementById('clear-cache-button');
-            element.parentNode.removeChild(element);
+            var buttonElement = document.getElementById('clear-cache-button');
+
+            if (buttonElement) {
+                buttonElement.parentNode.removeChild(buttonElement);
+            }
         }
     });
 }
@@ -467,19 +464,26 @@ function dialogSwitchDatabase(target) {
                                 'SELECT datname::text FROM pg_catalog.pg_database ORDER BY 1',
                                 function (data, error) {
             if (!error) {
-                // if we have a data packet: build up strHTML with the database names
-                if (data.strMessage !== '\\.' && data.strMessage.trim()) {
-                    arrDatabases = data.strMessage.split('\n');
+                // sometimes, the user closes the dialog before the list finishes loading, in this case, just ignore future responses
+                if (document.getElementById('database-container')) {
+                    // if we have a data packet: build up strHTML with the database names
+                    if (data.strMessage !== '\\.' && data.strMessage.trim()) {
+                        arrDatabases = data.strMessage.split('\n');
 
-                    for (i = 0, len = arrDatabases.length; i < len; i += 1) {
-                        strHTML += '<gs-button class="postage-menu-item-button" dialogclose no-focus>' + encodeHTML(GS.decodeFromTabDelimited(arrDatabases[i])) + '</gs-button>';
+                        for (i = 0, len = arrDatabases.length; i < len; i += 1) {
+                            strHTML += (
+                                '<gs-button class="postage-menu-item-button" dialogclose no-focus>' +
+                                    encodeHTML(GS.decodeFromTabDelimited(arrDatabases[i])) +
+                                '</gs-button>'
+                            );
+                        }
+
+                    // else if we've gotten to the end of the responses: fill the database list
+                    } else if (data.strMessage === '\\.') {
+                        document.getElementById('database-container').innerHTML =
+                            (target.getAttribute('icon') !== 'database' ? '<center><b>Switch Database</b></center>' : '') +
+                            strHTML;
                     }
-
-                // else if we've gotten to the end of the responses: fill the database list
-                } else if (data.strMessage === '\\.') {
-                    document.getElementById('database-container').innerHTML =
-                        (target.getAttribute('icon') !== 'database' ? '<center><b>Switch Database</b></center>' : '') +
-                        strHTML;
                 }
 
             } else {
@@ -2659,12 +2663,12 @@ function executeScript(bolCursorQuery) {
                         if (trimmedQuery.indexOf(' ') !== -1) {
                             trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(' '));
                         }
-                        
+
                         if (trimmedQuery.indexOf(';') !== -1) {
                             trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(';'));
                         }
                         strObjName = trimmedQuery;
-                        
+
                         if (data.strQuery.toLowerCase().indexOf('drop schema') !== -1) {
                             oidQuery = ml(function () {/*
                             SELECT oid
@@ -2732,7 +2736,7 @@ function executeScript(bolCursorQuery) {
                                     SELECT pr.oid
                                         FROM pg_proc pr
                                         JOIN pg_type typ ON typ.oid = pr.prorettype
-                                        WHERE proisagg = FALSE AND typname <> 'trigger' AND pr.pronamespace = '2361363' AND proname = 'foo';
+                                        WHERE proisagg = FALSE AND typname <> 'trigger' AND pr.pronamespace = '{{SCHEMAOID}}' AND proname = '{{NAMETOKEN}}';
                                 */}).replace(/\{\{NAMETOKEN\}\}/g, strObjName).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
                                 //console.log(oidQuery);
                                 getSingleCellData(oidQuery, function (newOID) {
@@ -2981,7 +2985,7 @@ function executeScript(bolCursorQuery) {
                                     }
 
                                     strHTML += (
-                                        '<gs-cell style="line-height: normal; padding-top: 2px;">' +
+                                        '<gs-cell style="line-height: normal; padding-top: 2px; width: 20px;">' +
                                             data.arrColumnNames[i] +
                                             '<br />' +
                                             '<small>(' + columnType + ')</small>' +
@@ -3028,7 +3032,7 @@ function executeScript(bolCursorQuery) {
                                 while (i < len) {
                                     strHTML += (
                                         '<gs-cell header="' + data.arrColumnNames[i] + '">' +
-                                            '{{= row[\'' + data.arrColumnNames[i] + '\'] }}' +
+                                            '{{= arrRow[' + i + '] }}' +
                                         '</gs-cell>'
                                     );
                                     i += 1;

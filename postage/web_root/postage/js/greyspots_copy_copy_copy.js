@@ -3673,16 +3673,16 @@ window.addEventListener('design-register-element', function () {
     }
     
     function errorJSONToHTML(errorJSON) {
-        var errorHTML = '<pre style="word-break: break-all; white-space: pre-wrap;">' +
+        return '<pre style="word-break: break-all; white-space: pre-wrap;">' +
                     'There was an error:' +
                     (errorJSON.error_text //TODO: maybe make this red -Joseph 09/14/16
-                        ? '<br /><br />' + encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_text))
+                        ? '<br /><br />' + encodeHTML(errorJSON.error_text)                        
                         : '') +
                     (errorJSON.error_file
-                        ? '<br /><br />The error was on file: ' + encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_file))
+                        ? '<br /><br />The error was on file: ' + encodeHTML(errorJSON.error_file) 
                         : '') +
                     (errorJSON.error_hint
-                        ? '<br /><br />' + encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_hint))
+                        ? '<br /><br />' + encodeHTML(errorJSON.error_hint)                        
                         : '') +
                     (errorJSON.error_context
                         ? '<br /><br />' + encodeHTML(errorJSON.error_context)                     
@@ -3691,7 +3691,6 @@ window.addEventListener('design-register-element', function () {
                         ? '<br /><br />' + encodeHTML(errorJSON.error_addin)                       
                         : '') +
                 '</pre>';
-        return errorHTML;
     }
     
     GS.ajaxErrorDialog = function (jsnError, tryAgainCallback, cancelCallback) {
@@ -5536,7 +5535,7 @@ GS.templateColumnToValue = function (templateHTML) {
     
     for (i = 0, len = arrColumnElement.length; i < len; i += 1) {
         if (!arrColumnElement[i].hasAttribute('value')) {
-            arrColumnElement[i].setAttribute('value', '{{! row[\'' + arrColumnElement[i].getAttribute('column').replace(/\\/gi, '\\\\').replace(/\'/gi, '\\\'') + '\'] }}');
+            arrColumnElement[i].setAttribute('value', '{{! row.' + arrColumnElement[i].getAttribute('column') + ' }}');
         }
     }
     
@@ -5920,7 +5919,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                         </gs-grid>
                     </gs-footer>
                 </gs-page>
-            */}).replace('{{ADDIN}}', decodeURIComponent((addinText ? '\n\n' + addinText : '')));
+            */}).replace('{{ADDIN}}', (addinText ? '\n\n' + addinText : ''));
             
             GS.openDialog(templateElement, '', function (event, strAnswer) {
                 if (strAnswer === 'Try to reconnect') {
@@ -19443,15 +19442,6 @@ GS.closeDialog = function (dialog, strAnswer) {
 
                         this.windowResizeHandler();
                     }
-                    
-                    this.addEventListener('click', function (event) {
-                        var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
-
-                        if (dialogcloseElement && event.target.hasAttribute('dialogclose')) {
-                            GS.findParentTag(event.target, 'gs-dialog')
-                                .destroy(dialogcloseElement.textContent, event);
-                        }
-                    });
 
                     GS.triggerEvent(this, 'dialog-inserted');
                 }
@@ -19462,12 +19452,12 @@ GS.closeDialog = function (dialog, strAnswer) {
             }
         },
         events: {
-            //'click:delegate([dialogclose])': function (event) {
-            //    var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
-            //    console.log('running...');
-            //    GS.findParentTag(event.target, 'gs-dialog')
-            //            .destroy(dialogcloseElement.textContent, event);
-            //}
+            'click:delegate([dialogclose])': function (event) {
+                var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
+
+                GS.findParentTag(event.target, 'gs-dialog')
+                        .destroy(dialogcloseElement.textContent, event);
+            }
         },
         accessors: {},
         methods: {
@@ -20132,7 +20122,7 @@ document.addEventListener('DOMContentLoaded', function () {
               , focusElementTag, focusElementRecord, focusElementCell, focusElementRecordIndex, focusElementCellIndex
               , focusElementIndex, focusElementCell, elementWalkResult, arrElements, arrSelection, newRecord, jsnTextSelection
               , newRecordData;
-            //console.log(event);
+            console.log(event);
 
             removeLoader(element);
 
@@ -20297,7 +20287,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     strDeleteData += GS.encodeForTabDelimited(arrRecord[i].getAttribute('data-id'));
                 }
             }
-            //console.log(strHashData);
+            console.log(strHashData);
             strDeleteData += '\t' + CryptoJS.MD5(strHashData) + '\n';
             strHashData = '';
         }
@@ -20387,7 +20377,7 @@ document.addEventListener('DOMContentLoaded', function () {
             strInsertString += (strInsertString ? '&' : '') + (element.getAttribute('child-column') || element.getAttribute('column') || element.getAttribute('qs')) + '=' + (element.value);
         }
 
-        //console.log(strInsertString);
+        console.log(strInsertString);
 
         arrInsertKeys = GS.qryGetKeys(strInsertString);
         arrInsertValues = GS.qryGetVals(strInsertString);
@@ -21879,15 +21869,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (strAttrName === 'template') {
                     var tableTemplateElement, tableTemplateElementCopy, recordElement, element = this, i, len;
                     tableTemplateElement  = element.templates[element.getAttribute('template') || 'default'];
-                    //console.log(tableTemplateElement);
+                    console.log(tableTemplateElement);
                     if (!tableTemplateElement && element.hasAttribute('template')) {
                         console.warn('ENVELOPE WARNING: Hey! You used the name of a non-existant record template!');
                         tableTemplateElement = element.templates['default'];
                     }
-                    //console.log(tableTemplateElement);
+                    console.log(tableTemplateElement);
 
                     if (tableTemplateElement) {
-                        //console.log(tableTemplateElement);
+                        console.log(tableTemplateElement);
                         tableTemplateElementCopy = document.createElement('template');
                         tableTemplateElementCopy.innerHTML = tableTemplateElement.innerHTML;
 
@@ -22198,6 +22188,554 @@ document.addEventListener('DOMContentLoaded', function () {
                     this.style.height = (intHeight + 5) + 'px'; // used to add 2
                     //console.log('5***', this.style.height);
                 }
+            }
+        }
+    });
+});//global GS, window, ml
+//jslint white:true multivar:true
+
+window.addEventListener('design-register-element', function () {
+    window.designElementProperty_GSFILEMANAGER = function(selectedElement) {
+        addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
+        });
+        
+        addProp('Path', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('path') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'path', this.value);
+        });
+        
+        addProp('Folder', true, '<gs-select class="target" value="' + (selectedElement.getAttribute('folder') || '') + '" mini>' +
+                                    '<option value="role">Role (user files)</option>' +
+                                    '<option value="web_root">Public (developer editable files)</option>' +
+                                    '<option value="dev">App/Dev (developer editable files)</option>' +
+                                '</gs-select>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'folder', this.value);
+        });
+        
+        addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
+        });
+    };
+    
+    registerDesignSnippet('<gs-file-manager>', '<gs-file-manager>', 'gs-file-manager path="${0:/}" folder="${1:role}"></gs-file-manager>');
+    
+    designRegisterElement('gs-file-manager', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-file-manager.html');
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+    
+    //function pushReplacePopHandler(element) {
+    //    var strQueryString = GS.getQueryString(), strQSCol = element.getAttribute('qs');
+    //    
+    //    if (GS.qryGetKeys(strQueryString).indexOf(strQSCol) > -1) {
+    //        if (element.getAttribute('folder') === 'dev') {
+    //            element.innerPath = 'app/' + GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
+    //        } else {
+    //            element.innerPath = element.getAttribute('folder') + '/' + GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
+    //        }
+    //        element.getFiles();
+    //    }
+    //}
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
+        }
+    }
+
+    function pushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+        var strOperator;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i];
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                } else {
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
+                }
+                i += 1;
+            }
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            if (element.internal.bolQSFirstRun === true) {
+                if (element.getAttribute('folder') === 'dev') {
+                    element.innerPath = 'app/' + GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
+                } else {
+                    element.innerPath = element.getAttribute('folder') + '/' +
+                                        GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
+                }
+                element.getFiles();
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
+    }
+    
+    
+    // dont do anything that modifies the element here
+    function elementCreated(element) {
+        // if "created" hasn't been suspended: run created code
+        if (!element.hasAttribute('suspend-created')) {
+            
+        }
+    }
+    
+    //
+    function elementInserted(element) {
+        var styleElement;
+        
+        // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
+        if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
+            // if this is the first time inserted has been run: continue
+            if (!element.inserted) {
+                element.inserted = true;
+                element.internal = {};
+                saveDefaultAttributes(element);
+                
+                if (element.getAttribute('folder') !== 'dev' &&
+                    element.getAttribute('folder') !== 'role' &&
+                    element.getAttribute('folder') !== 'web_root') {
+                    throw 'gs-file-manager Error: Invalid Folder. Please set the folder attribute to "dev", "role" or "web_root".';
+                }
+                
+                if (!element.getAttribute('path')) {
+                    throw 'gs-file-manager Error: Invalid Path. Please set the path attribute.';
+                }
+                
+                // bind/handle query string
+                if (element.getAttribute('qs')) {
+                    pushReplacePopHandler(element);
+                    window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
+                    window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
+                    window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
+                }
+                
+                if (element.getAttribute('folder') === 'dev') {
+                    element.innerPath = 'app/' + GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
+                } else {
+                    element.innerPath = element.getAttribute('folder') + '/' + GS.templateWithQuerystring(GS.trim(element.getAttribute('path'), '/') + '/');
+                }
+                element.getFiles();
+                
+                element.innerHTML = 
+                    '<div class="root" gs-dynamic flex-vertical flex-fill>' +
+                        '<div class="file-manager-list" gs-dynamic flex></div>' +
+                        (element.hasAttribute('no-upload') ? '' : '<gs-button class="file-manager-upload" gs-dynamic>New File</gs-button>') +
+                        '<iframe class="file-manager-upload-response-iframe" name="upload_response_' +
+                                    (document.getElementsByClassName('file-manager-upload-response-iframe').length + 1) + '" hidden></iframe>' +
+                    '</div>';
+                
+                element.fileListElement       = xtag.query(element, '.file-manager-list')[0];
+                element.uploadButtonElement   = xtag.query(element, '.file-manager-upload')[0];
+                element.responseIframeElement = xtag.query(element, '.file-manager-upload-response-iframe')[0];
+                
+                element.fileListElement.addEventListener('click', function (event) {
+                    //console.log(event.target);
+                    
+                    if (event.target.classList.contains('edit-file')) {
+                        element.editFile(event.target.parentNode.getAttribute('data-link'));
+                        
+                    } else if (event.target.classList.contains('delete-file')) {
+                        element.deleteFile(event.target.parentNode.getAttribute('data-link'));
+                    }
+                });
+                
+                element.uploadButtonElement.addEventListener('click', function () {
+                    element.newFile();
+                });
+                
+                element.responseIframeElement.addEventListener('load', function (event) {
+                    var strResponseText = element.responseIframeElement.contentWindow.document.body.textContent,
+                        jsnResponse, strResponse, bolError, strError;
+                    
+                    if (element.responseIframeElement.loadListen === true) {
+                        // get error text
+                        try {
+                            jsnResponse = JSON.parse(strResponseText);
+                            
+                        } catch (err) {
+                            strResponse = strResponseText;
+                        }
+                        
+                        if (jsnResponse) {
+                            if (jsnResponse.stat === true) {
+                                bolError = false;
+                            } else {
+                                bolError = true;
+                                if (jsnResponse.dat && jsnResponse.dat.error) {
+                                    strError = jsnResponse.dat.error;
+                                } else {
+                                    strError = jsnResponse.dat;
+                                }
+                            }
+                        } else {
+                            bolError = true;
+                            strError = strResponse;
+                        }
+                        
+                        // if no error destroy new file popup
+                        if (!bolError) {
+                            GS.closeDialog(element.currentUploadDialog, 'cancel');
+                            
+                        // if error open error popup
+                        } else {
+                            GS.msgbox('Error', strError, 'okonly');
+                        }
+                        
+                        element.getFiles(true);
+                        GS.removeLoader('file-upload');
+                    }
+                });
+                
+                //console.log(element.fileListElement, element.uploadButtonElement);
+            }
+        }
+    }
+    
+    xtag.register('gs-file-manager', {
+        lifecycle: {
+            created: function () {
+                elementCreated(this);
+            },
+            
+            inserted: function () {
+                elementInserted(this);
+            },
+            
+            attributeChanged: function (strAttrName, oldValue, newValue) {
+                // if "suspend-created" has been removed: run created and inserted code
+                if (strAttrName === 'suspend-created' && newValue === null) {
+                    elementCreated(this);
+                    elementInserted(this);
+                    
+                // if "suspend-inserted" has been removed: run inserted code
+                } else if (strAttrName === 'suspend-inserted' && newValue === null) {
+                    elementInserted(this);
+                    
+                } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+                    if (strAttrName === 'path' || strAttrName === 'folder') {
+                        
+                        if (this.getAttribute('folder') === 'dev') {
+                            this.innerPath = 'app/' + GS.templateWithQuerystring(GS.trim(this.getAttribute('path'), '/') + '/');
+                        } else {
+                            this.innerPath = this.getAttribute('folder') + '/' + GS.templateWithQuerystring(GS.trim(this.getAttribute('path'), '/') + '/');
+                        }
+                        this.getFiles();
+                    }
+                }
+            }
+        },
+        events: {},
+        accessors: {
+            'value': {
+                get: function () {
+                    return this.arrFileLinks || [];
+                }
+            }
+        },
+        methods: {
+            newFile: function () {
+                var element = this, templateElement = document.createElement('template');
+                
+                templateElement.innerHTML = ml(function () {/*
+                    <gs-page>
+                        <gs-header><center><h3>Upload a File</h3></center></gs-header>
+                        <gs-body padded>
+                            <form class="upload-form" action="/env/action_upload" method="POST" target="{{TARGETNAME}}"
+                                        enctype="multipart/form-data">
+                                <label>File:</label>
+                                <gs-text class="upload-file" name="file_content" type="file"></gs-text>
+                                <br />
+                                <label>File Name:</label>
+                                <gs-text class="upload-name"></gs-text><br />
+                                
+                                <input class="upload-path" name="file_name" hidden />
+                            </form>
+                        </gs-body>
+                        <gs-footer>
+                            <gs-grid>
+                                <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
+                                <gs-block><gs-button class="upload-button">Upload File</gs-button></gs-block>
+                            </gs-grid>
+                        </gs-footer>
+                    </gs-page>
+                */}).replace(/\{\{TARGETNAME\}\}/gim, this.responseIframeElement.getAttribute('name'));
+                
+                GS.openDialog(templateElement, function () {
+                    var formElement = xtag.query(this, '.upload-form')[0],
+                        fileControl = xtag.query(this, '.upload-file')[0],
+                        nameControl = xtag.query(this, '.upload-name')[0],
+                        pathControl = xtag.query(this, '.upload-path')[0],
+                        uploadButton = xtag.query(this, '.upload-button')[0];
+                    
+                    element.currentUploadDialog = this;
+                    
+                    // upload existing file
+                    uploadButton.addEventListener('click', function(event) {
+                        var strFile = fileControl.value, strName = nameControl.value;
+                        
+                        //console.log(element.innerPath + nameControl.value);
+                        pathControl.setAttribute('value', element.innerPath + nameControl.value);
+                        
+                        if (strName === '' && strFile === '') { // no values (no file and no file name)
+                            GS.msgbox('Error', 'No values in form. Please fill in the form.', 'okonly');
+                            
+                        } else if (strFile === '') { // one value missing (no file)
+                            GS.msgbox('Error', 'No file selected. Please select a file using the file input.', 'okonly');
+                            
+                        } else if (strName === '') { // one value missing (no file name)
+                            GS.msgbox('Error', 'No value in file path textbox. Please fill in file name textbox.', 'okonly');
+                            
+                        } else { // values are filled in submit the form
+                            element.responseIframeElement.loadListen = true;
+                            formElement.submit();
+                            GS.addLoader('file-upload', 'Uploading file...');
+                        }
+                    });
+                    
+                    fileControl.addEventListener('change', function(event) {
+                        var strValue = this.value;
+                        
+                        nameControl.value = strValue.substring(strValue.lastIndexOf('\\') + 1);
+                        nameControl.focus();
+                    });
+                    
+                    nameControl.addEventListener('keydown', function(event) {
+                        if (event.keyCode === 13) {
+                            GS.triggerEvent('click', uploadButton);
+                        }
+                    });
+                });
+            },
+            
+            editFile: function (strPath) {
+                var element = this, strFolder = this.getAttribute('folder'), strLink;
+                
+                /*
+                //console.log('editFile: ', strPath);
+                if (strFolder === 'dev') {
+                    strLink = '/v1/dev/developer_g/greyspots-' + GS.version() + '/tools/file_manager/file_edit.html';
+                    
+                } else if (strFolder === 'role') {
+                    strLink = '/env/app/all/file_manager/file_edit.html';
+                    
+                } else {
+                    strLink = '/v1/dev/developer_g/greyspots-' + GS.version() + '/tools/file_manager/file_edit.html';
+                }
+                */
+                strLink = '/env/app/all/file_manager/file_edit.html';
+                
+                GS.msgbox('Update File',
+                          '<gs-button jumbo dialogclose>Rename File</gs-button>' +
+                          '<gs-button jumbo dialogclose href="' + strLink + '?folder=' + strFolder +
+                                                                        '&link=' + encodeURIComponent(strPath) + '">' +
+                              'Edit File' +
+                          '</gs-button>',
+                          ['Cancel'],
+                          function (strAnswer) {
+                    if (strAnswer === 'Rename File') {
+                        element.renameFile(strPath);
+                    }
+                });
+                
+            },
+            
+            renameFile: function (strPath) {
+                var element = this, templateElement = document.createElement('template'), strFolder = this.getAttribute('folder');
+                
+                //console.log('renameFile: ', strPath);
+                
+                templateElement.innerHTML = ml(function () {/*
+                    <gs-page>
+                        <gs-header><center><h3>Rename File</h3></center></gs-header>
+                        <gs-body padded>
+                            <label>File Name:</label>
+                            <gs-text class="text-update-name" value="{{FILENAME}}"></gs-text>
+                        </gs-body>
+                        <gs-footer>
+                            <gs-grid>
+                                <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>
+                                <gs-block><gs-button dialogclose listen-for-return bg-primary>Rename</gs-button></gs-block>
+                            </gs-grid>
+                        </gs-footer>
+                    </gs-page>
+                */}).replace('{{FILENAME}}', strPath.substring(strPath.lastIndexOf('/') + 1));
+                
+                GS.openDialog(templateElement, '', function (event, strAnswer) {
+                    var strNewFileName;
+                    
+                    if (strAnswer === 'Rename') {
+                        strNewFileName = xtag.query(this, '.text-update-name')[0].value;
+                        
+                        GS.addLoader('file-rename', 'Renaming File...');
+                        GS.ajaxJSON('/env/action_file', 'action=mv_file&folder=' + strFolder +
+                                        '&paths_from=' + encodeURIComponent('["' + strPath + '"]') +
+                                        '&paths_to=' + encodeURIComponent('["' + strPath.substring(0, strPath.lastIndexOf('/') + 1) + strNewFileName + '"]'),
+                                        function (data, error) {
+                            GS.removeLoader('file-rename');
+                            
+                            if (!error) {
+                                element.getFiles(true);
+                                
+                            } else {
+                                GS.ajaxErrorDialog(data, function() {
+                                    updateFile(strFileName);
+                                });
+                            }
+                        });
+                    }
+                });
+            },
+            
+            deleteFile: function (strPath) {
+                var element = this, strFolder = this.getAttribute('folder');
+                
+                //console.log('deleteFile: ', strPath);
+                
+                GS.msgbox('Are you sure...', 'Are you sure you want to delete this file?', ['No', 'Yes'], function (strAnswer) {
+                    if (strAnswer === 'Yes') {
+                        GS.addLoader('file-delete', 'Deleting File...');
+                        GS.ajaxJSON('/env/action_file', 'action=rm&folder=' + strFolder +
+                                                         '&paths=' + encodeURIComponent('["' + strPath + '"]'),
+                                                         function (data, error) {
+                            GS.removeLoader('file-delete');
+                            
+                            if (!error) {
+                                element.getFiles(true);
+                                
+                            } else {
+                                GS.ajaxErrorDialog(data, function() {
+                                    deleteFile(strFileName);
+                                });
+                            }
+                        });
+                    }
+                });
+            },
+            
+            getFiles: function (bolChange) {
+                var element = this, strFolder = this.getAttribute('folder');
+                
+                //app,role,web_root
+                
+                GS.ajaxJSON('/env/action_file', 'action=list&folder=' + strFolder + '&path=' + encodeURIComponent(this.innerPath),
+                                function (response, error) {
+                    var i, len, strHTML = '', data, strFileName, strCurrentPath, strAnchorPath;
+                    
+                    if (!error && response.dat.files.length > 0) {
+                        data = response.dat;
+                        data.files = data.files || [];
+                        data.files.sort();
+                        
+                        element.arrFileLinks = data.files;
+                        
+                        for (i = 0, len = data.files.length; i < len; i += 1) {
+                            strFileName = encodeHTML(data.files[i]);
+                            strCurrentPath = GS.trim(element.innerPath, '/') + '/' + strFileName;
+                            
+                            //if (strFolder === 'dev') {
+                            //    if (strAnchorPath.indexOf('developer_g') === 0) {
+                            //        strAnchorPath = encodeHTML('/v1/dev/' + strCurrentPath);
+                            //    } else {
+                            //        strAnchorPath = encodeHTML('/env/app/' + strCurrentPath);
+                            //    }
+                            //    
+                            //} else if (strFolder === 'role') {
+                            //    strAnchorPath = encodeHTML('/env/role/' + strCurrentPath);
+                            //    
+                            //} else {
+                            //    strAnchorPath = encodeHTML('/' + strCurrentPath);
+                            //}
+                            
+                            if (strFolder === 'web_root') {
+                                strAnchorPath = encodeHTML('/' + strCurrentPath);
+                                
+                            } else {
+                                strAnchorPath = encodeHTML('/v1/' + strCurrentPath);
+                            }
+                            
+                            strHTML += 
+                                '<div flex-horizontal flex-fill data-link="' + strCurrentPath + '">' +
+                                    '<gs-button class="goto-file" href="' + strAnchorPath + '" remove-all flex>' + strFileName + '</gs-button>' +
+                                    '<gs-button class="edit-file" icononly icon="pencil" remove-all></gs-button>' +
+                                    '<gs-button class="delete-file" icononly icon="times" remove-all></gs-button>' +
+                                '</div>';
+                        }
+                    } else {
+                        element.arrFileLinks = [];
+                        strHTML = '<center><span class="h1 hint">No Files</span></center>';
+                    }
+                    
+                    if (bolChange) {
+                        GS.triggerEvent(element, 'change');
+                    }
+                    
+                    element.fileListElement.innerHTML = strHTML;
+                });
+            },
+            
+            refresh: function () {
+                this.getFiles();
             }
         }
     });
@@ -23705,9 +24243,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 
                 
-                //console.log(strParameters);
-                //console.log(updateFrameData);
-                //console.log(strSchema, strObject, strReturnCols, strHashCols);
+                console.log(strParameters);
+                console.log(updateFrameData);
+                console.log(strSchema, strObject, strReturnCols, strHashCols);
                 
                 GS.requestUpdateFromSocket(
                     GS.envSocket, strSchema, strObject
@@ -24270,9 +24808,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function elementInserted(element) {
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
-            if (element.children.length === 0) {
-                throw 'GS-Form Error: No template provided';
-            }
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
@@ -25838,7 +26373,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     '}\n';
                     }
                     
-                    //console.log(strCSS);
+                    console.log(strCSS);
                     
                     // append the column CSS
                     document.getElementById('gs-dynamic-css').innerHTML += '\n/* image #' + intImageID + ' */\n' + strCSS;
@@ -33991,7 +34526,7 @@ select behavior:
 
 
 
-// # CODE INDEX:
+// CODE INDEX:
 //          (use "find" (CTRL-f or CMD-f) to skip to a section)
 //          ("PRE-RENDER" refers to a section of functions that do not depend
 //                  on the viewport being rendered AND dont use any render
@@ -36127,8 +36662,7 @@ document.addEventListener('DOMContentLoaded', function () {
             "originalRecord": "",
             "record": {},
             "insertRecord": "",
-            "insertDialog": "",
-            "updateDialog": ""
+            "insertDialog": ""
         };
 
         // we need a place to store cell dimensions and other display
@@ -36297,7 +36831,6 @@ document.addEventListener('DOMContentLoaded', function () {
         var copyTemplate;
         var insertRecordTemplate;
         var insertDialogTemplate;
-        var updateDialogTemplate;
 
         var strHTML;
         var arrColumnPlainTextNames;
@@ -36346,11 +36879,6 @@ document.addEventListener('DOMContentLoaded', function () {
             '[for="insert-dialog"]'
         )[0];
 
-        updateDialogTemplate = xtag.queryChildren(
-            element,
-            '[for="update-dialog"]'
-        )[0];
-
         // if there's no "data-record" template: error
         if (!dataRecordTemplate) {
             throw 'GS-TABLE Error: no "data-record" template found. ' +
@@ -36367,11 +36895,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // get column widths
-        if (
-            headerRecordTemplate ||
-            dataRecordTemplate ||
-            insertRecordTemplate
-        ) {
+        if (headerRecordTemplate ||
+                dataRecordTemplate ||
+                insertRecordTemplate) {
+
             if (headerRecordTemplate) {
                 arrColumnElements = xtag.query(
                     headerRecordTemplate.content,
@@ -36918,28 +37445,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // remove the template element now that it's been siphoned
             element.removeChild(insertDialogTemplate);
         }
-
-        // if present, siphon "update-dialog" template
-        if (updateDialogTemplate) {
-            // save the template
-            strHTML = GS.templateColumnToValue(
-                updateDialogTemplate.innerHTML.trim()
-            );
-
-            // let's save the original dialog template text so that we can
-            //      modify it in the future
-            element.internalTemplates.originalUpdateDialog = strHTML;
-
-            // we're going run the dialog template through a function to
-            //      turn all of the "column" attributes into "value" attributes
-            //      with the proper templating
-            element.internalTemplates.updateDialog = (
-                GS.templateHideSubTemplates(strHTML, false)
-            );
-
-            // remove the template element now that it's been siphoned
-            element.removeChild(updateDialogTemplate);
-        }
     }
 
     // we need to use a web worker so that we can move processor expensive
@@ -37218,7 +37723,6 @@ document.addEventListener('DOMContentLoaded', function () {
         var handleCell;
         var jsnQS;
         var jsnRow;
-        var arrRow;
         var strRow;
         var strHeader;
 
@@ -37253,7 +37757,6 @@ document.addEventListener('DOMContentLoaded', function () {
             arrColumnTemplates[col_i] =
                     '{{ var qs = jo.qs' +
                     ', row = jo.row' +
-                    ', arrRow = jo.arrRow' +
                     ', i = jo.i' +
                     ', len = jo.len; }}' +
                     arrColumnTemplates[col_i];
@@ -37359,12 +37862,11 @@ document.addEventListener('DOMContentLoaded', function () {
             // no quoting,
             //      template cell with querystring and row
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
-                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
@@ -37385,12 +37887,11 @@ document.addEventListener('DOMContentLoaded', function () {
             //      put an escapeChar behind every quoteChar
             //      if NaN: wrap cell with quoteChar
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
-                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
@@ -37433,12 +37934,11 @@ document.addEventListener('DOMContentLoaded', function () {
             //      put an escapeChar behind every quoteChar
             //      wrap cell with quoteChar
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
-                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
@@ -37480,23 +37980,21 @@ document.addEventListener('DOMContentLoaded', function () {
             //          put an escapeChar behind every quoteChar
             //          wrap cell with quoteChar
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
-                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
 
                 // before we do any quoting, we need to add the HTML to the
                 //      HTML copy string
-                strHTMLRecordCopyString += (
-                    '<' + 'td rowspan="1" colspan="1">' +
-                    strCell +
-                    '</td>'
-                );
+                strHTMLRecordCopyString +=
+                        '<' + 'td rowspan="1" colspan="1">' +
+                        strCell +
+                        '</td>';
 
                 // if escapeChar !== quoteChar: double up every escapeChar
                 if (escapeChar !== quoteChar) {
@@ -37556,7 +38054,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             //console.log(arrSelectedStates);
-            //console.log(arrHeaders.slice(0));
 
             // loop to add the rest of the headers
             col_i = 0;
@@ -37614,7 +38111,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // <br />
-        //console.log(arrHeaders.slice(0));
 
         // we cache the number of columns because it doesn't change
         col_len = arrColumns.length;
@@ -37637,7 +38133,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // generate record JSON for template
             jsnRow = {};
-            arrRow = [];
             strRow = element.internalData.records[intRow] + '\t';
 
             cell_i = 0;
@@ -37653,7 +38148,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     jsnRow[arrColumnNames[cell_i]] = (
                         GS.decodeFromTabDelimited(cell, nullString)
                     );
-                    arrRow.push(jsnRow[arrColumnNames[cell_i]]);
                 } else {
                     break;
                 }
@@ -37746,8 +38240,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         arrColumnTemplates[arrColumns[col_i]],
                         row_i,
                         row_len,
-                        jsnRow,
-                        arrRow
+                        jsnRow
                     );
 
                 } else {
@@ -37767,10 +38260,8 @@ document.addEventListener('DOMContentLoaded', function () {
             strHTMLCopyString += '<tr>' + strHTMLRecordCopyString + '</tr>';
             strHTMLRecordCopyString = '';
 
-            // add record delimiter (unless we're on the last record)
-            if ((row_i + 1) < row_len) {
-                strTextCopyString += recordDelimiter;
-            }
+            // add record delimiter
+            strTextCopyString += recordDelimiter;
             row_i += 1;
         }
 
@@ -37891,7 +38382,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var rec_len;
         var strRecord;
         var arrSelection;
-        console.log('running');
+
         var range_i;
         var range_len;
         var range;
@@ -38503,7 +38994,6 @@ document.addEventListener('DOMContentLoaded', function () {
         var strCell;
         var strHTML;
         var strCSS;
-        var delim;
 
         var intRecordSelectorBorderWidth;
         var intInsertRecordBorderHeight;
@@ -38626,41 +39116,27 @@ document.addEventListener('DOMContentLoaded', function () {
             len = toRecord;
             intRecordTop = intRecordOriginTop;
             while (i < len) {
+                strRecord = element.internalData.records[i];
+
                 // create cell array for this record
-                strRecord = element.internalData.records[i] + '\t';
+                record_i = 0;
+                record_len = strRecord.length;
+                strCell = "";
                 arrRecord = [];
-                col_i = 0;
-                col_len = element.internalData.columnNames.length;//9999;
-                while (col_i < col_len) {
-                    delim = strRecord.indexOf('\t');
-                    strCell = strRecord.substring(0, delim);
-                    strRecord = strRecord.substring(delim + 1);
+                while (record_i < record_len) {
+                    strChar = strRecord[record_i];
 
-                    arrRecord.push(
-                        GS.decodeFromTabDelimited(strCell, strNullString)
-                    );
-
-                    col_i += 1;
+                    if (strChar === "\t") {
+                        arrRecord.push(
+                            GS.decodeFromTabDelimited(strCell, strNullString)
+                        );
+                        strCell = "";
+                    } else {
+                        strCell += strChar;
+                    }
+                    record_i += 1;
                 }
-
-                //record_i = 0;
-                //record_len = strRecord.length;
-                //strCell = "";
-                //arrRecord = [];
-                //while (record_i < record_len) {
-                //    strChar = strRecord[record_i];
-
-                //    if (strChar === "\t") {
-                //        arrRecord.push(
-                //            GS.decodeFromTabDelimited(strCell, strNullString)
-                //        );
-                //        strCell = "";
-                //    } else {
-                //        strCell += strChar;
-                //    }
-                //    record_i += 1;
-                //}
-                //arrRecord.push(strCell);
+                arrRecord.push(strCell);
 
                 // create record JSON from the cell array
                 col_i = 0;
@@ -38836,60 +39312,34 @@ document.addEventListener('DOMContentLoaded', function () {
         // if record selectors haven't been disabled: build record selectors
         //      (third so that they're above cells)
         if (!element.hasAttribute('no-record-selector')) {
-            if (element.getAttribute('update-dialog') === 'show') {
-                i = fromRecord;
-                len = toRecord;
-                intRecordTop = intRecordOriginTop;
-                while (i < len) {
-                    strCSS = '';
+            i = fromRecord;
+            len = toRecord;
+            intRecordTop = intRecordOriginTop;
+            while (i < len) {
+                //strCSS = (
+                //    'top:' + intRecordTop + 'px;' +
+                //    'left:0;' +
+                //    'width:' + (
+                //        intRecordSelectorWidth +
+                //        intRecordSelectorBorderWidth
+                //    ) + 'px;' +
+                //    'height:' + (
+                //        arrRecordHeights[i] +
+                //        recordBorderHeight
+                //    ) + 'px;'
+                //);
+                strCSS = '';
 
-                    strHTML += (
-                        '<gs-cell class="table-record-selector multi-update" ' +
-                        '    style="' + strCSS + '" ' +
-                        '    data-row-number="' + i + '" ' +
-                        '    data-col="selector" ' +
-                        '    title="Record #' + (i + 1) + '">' +
-                        '    <div class="table-multi-update-button"></div>' +
-                        '</gs-cell>'
-                    );
-
-                    intRecordTop += arrRecordHeights[i];
-                    intRecordTop += recordBorderHeight;
-                    i += 1;
-                }
-            } else {
-                i = fromRecord;
-                len = toRecord;
-                intRecordTop = intRecordOriginTop;
-                while (i < len) {
-                    //strCSS = (
-                    //    'top:' + intRecordTop + 'px;' +
-                    //    'left:0;' +
-                    //    'width:' + (
-                    //        intRecordSelectorWidth +
-                    //        intRecordSelectorBorderWidth
-                    //    ) + 'px;' +
-                    //    'height:' + (
-                    //        arrRecordHeights[i] +
-                    //        recordBorderHeight
-                    //    ) + 'px;'
-                    //);
-                    strCSS = '';
-
-                    strHTML += (
+                strHTML +=
                         '<gs-cell class="table-record-selector" ' +
                         '    style="' + strCSS + '" ' +
-                        '    data-row-number="' + i + '" ' +
-                        '    data-col="selector" ' +
-                        '    title="Record #' + (i + 1) + '">' +
+                        '    data-row-number="' + i + '" data-col="selector">' +
                         (i + 1) +
-                        '</gs-cell>'
-                    );
+                        '</gs-cell>';
 
-                    intRecordTop += arrRecordHeights[i];
-                    intRecordTop += recordBorderHeight;
-                    i += 1;
-                }
+                intRecordTop += arrRecordHeights[i];
+                intRecordTop += recordBorderHeight;
+                i += 1;
             }
         }
 
@@ -39145,20 +39595,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 //        recordBorderHeight
                 //    ) + 'px'
                 //);
-                cellElement.classList.add('table-record-selector');
                 cellElement.setAttribute('data-row-number', index);
+                cellElement.textContent = (index + 1);
+                cellElement.classList.add('table-record-selector');
                 cellElement.setAttribute('data-col', 'selector');
-                cellElement.setAttribute('title', 'Record #' + (index + 1));
-
-                if (element.getAttribute('update-dialog') === 'show') {
-                    cellElement.classList.add('multi-update');
-                    cellElement.innerHTML = (
-                        '<div class="table-multi-update-button"></div>'
-                    );
-                } else {
-                    cellElement.textContent = (index + 1);
-                }
-
                 element.elems.dataViewport.appendChild(cellElement);
             };
         }
@@ -39183,21 +39623,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // create cell array for this record
             arrRecord = [];
-            //console.log(element.internalData.columnNames.length);
             cell_i = 0;
-            cell_len = element.internalData.columnNames.length;//9999;
+            cell_len = 9999;
             while (cell_i < cell_len) {
                 delim = strRecord.indexOf('\t');
                 strCell = strRecord.substring(0, delim);
                 strRecord = strRecord.substring(delim + 1);
 
-                //if (strCell !== '' || strRecord !== '') {
-                arrRecord.push(
-                    GS.decodeFromTabDelimited(strCell, strNullString)
-                );
-                //} else {
-                //    break;
-                //}
+                if (strCell !== '' || strRecord !== '') {
+                    arrRecord.push(
+                        GS.decodeFromTabDelimited(strCell, strNullString)
+                    );
+                } else {
+                    break;
+                }
 
                 cell_i += 1;
             }
@@ -40391,8 +40830,8 @@ document.addEventListener('DOMContentLoaded', function () {
         //      triggers the X scrollbar: the event will be ignored. however,
         //      I've tested on Google Chrome and I didn't notice the effects of
         //      this downside
-        //element.internalEventCancelled.scrollbarY = true;
-        //element.internalEventCancelled.scrollbarX = true;
+        element.internalEventCancelled.scrollbarY = true;
+        element.internalEventCancelled.scrollbarX = true;
 
         // we need to update the scroll location of the physical scrollbars so
         //      that the user can see where they are
@@ -41241,16 +41680,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // scroll to the bottom so that the user can see the newly created
         //      records without having to scroll
-        // element.internalScroll.top = (
-        //     element.internalScroll.maxTop - (
-        //         element.elems.dataViewport.clientHeight - (
-        //             element.internalScrollOffsets.top +
-        //             element.internalScrollOffsets.bottom +
-        //             element.internalDisplay.defaultRecordHeight
-        //         )
-        //     )
-        // );
-        element.goToLine('last');
+        element.internalScroll.top = (
+            element.internalScroll.maxTop - (
+                element.elems.dataViewport.clientHeight - (
+                    element.internalScrollOffsets.top +
+                    element.internalScrollOffsets.bottom +
+                    element.internalDisplay.defaultRecordHeight
+                )
+            )
+        );
 
         // re-render scroll location because we changed the scrollTop
         renderScrollLocation(element);
@@ -41274,28 +41712,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function getWhereClause(element) {
-        var i;
-        var len;
-        var arrFilter;
-        var strColumn;
-        var filter_i;
-        var filter_len;
-        var strFilter;
-        var jsnFilter;
-        var strListWhere;
-
-        var arrOldColumnNames;
-        var arrOldColumnTypes;
-        var arrOldColumnFilterStatuses;
-        var arrOldColumnFilters;
-        var arrOldColumnListFilters;
-
         var strWhere;
         var strUserWhere;
-        var strWhereColumn;
-
-        // we need to include any where clauses added be the developer.
-        //      this where clause is templated with the querystring.
         strWhere = GS.templateWithQuerystring(
             element.getAttribute('where') || '1=1'
         );
@@ -41322,25 +41740,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.getAttribute('qs')
             )
         ) {
-            strWhereColumn = (
-                element.getAttribute('child-column') ||
-                element.getAttribute('column') ||
-                element.getAttribute('qs')
-            );
+            var strWhereColumn =
+                    element.getAttribute('child-column') ||
+                    element.getAttribute('column') ||
+                    element.getAttribute('qs');
 
             // if the value is not a number, we need to do a string
             //      comparison in the where clause.
             if (isNaN(element.value)) {
-                strWhere = (
-                    'CAST(' +
-                    strWhereColumn + ' AS ' +
-                    GS.database.type.text +
-                    ') = ' +
-                    'CAST(' +
-                    '$WhereQUOTE$' + (element.value) + '$WhereQUOTE$ AS ' +
-                    GS.database.type.text +
-                    ')'
-                );
+                strWhere =
+                        'CAST(' +
+                        strWhereColumn + ' AS ' +
+                        GS.database.type.text +
+                        ') = ' +
+                        'CAST(' +
+                        '$WhereQUOTE$' + (element.value) + '$WhereQUOTE$ AS ' +
+                        GS.database.type.text +
+                        ')';
                 strWhere += (
                     strWhere !== ''
                         ? ' AND (' + strWhere + ')'
@@ -41358,18 +41774,23 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        arrOldColumnNames = element.internalData.columnNames;
-        arrOldColumnTypes = element.internalData.columnTypes;
-        arrOldColumnFilterStatuses = element.internalData.columnFilterStatuses;
-        arrOldColumnFilters = element.internalData.columnFilters;
-        arrOldColumnListFilters = element.internalData.columnListFilters;
+        var arrOldColumnNames = element.internalData.columnNames;
+        var arrOldColumnTypes = element.internalData.columnTypes;
+        var arrOldColumnFilterStatuses = element.internalData.columnFilterStatuses;
+        var arrOldColumnFilters = element.internalData.columnFilters;
+        var arrOldColumnListFilters = element.internalData.columnListFilters;
 
         // we want the user to be able to filter a column, so here we'll look
         //      at what the user set for each column and prepend to the where
         //      clause
         strUserWhere = '';
-        i = 0;
-        len = arrOldColumnFilters.length;
+        var i = 0;
+        var len = arrOldColumnFilters.length;
+        var arrFilter;
+        var strColumn;
+        var filter_i;
+        var filter_len;
+        var strFilter;
         while (i < len) {
             arrFilter = arrOldColumnFilters[i];
             strColumn = arrOldColumnNames[i];
@@ -41398,6 +41819,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         i = 0;
         len = arrOldColumnListFilters.length;
+        var jsnFilter;
+        var strListWhere;
         while (i < len) {
             jsnFilter = arrOldColumnListFilters[i];
             strColumn = arrOldColumnNames[i];
@@ -41449,7 +41872,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     ? ' AND '
                                     : ''
                             );
-
+    
                             strListWhere += (
                                 strColumn +
                                 ' != CAST($werequote$' +
@@ -41461,29 +41884,18 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-
-                // if we are excluding nothing the blank code causes
-                //      the where to just be "WHERE column is blank"
-                if (
-                    (
-                        strListWhere &&
-                        !(
-                            jsnFilter.type === 'exclusion' &&
-                            jsnFilter.values.length === 0
-                        )
-                    ) ||
-                    jsnFilter.blanks === false
-                ) {
+                //if we are excluding nothing the blank code causes the where to just be "WHERE column is blank"
+                if ((strListWhere && !(jsnFilter.type === 'exclusion' && jsnFilter.values.length === 0)) || jsnFilter.blanks === false) {
                     // we need to handle blank values specially
                     if (strListWhere) {
                         strListWhere = '(' + strListWhere + ') ';
                     }
-
+    
                     if (jsnFilter.blanks === true) {
                         if (strListWhere) {
                             strListWhere += ' OR';
                         }
-
+    
                         strListWhere += (
                             ' NULLIF(' +
                                 'CAST(' +
@@ -41495,7 +41907,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (strListWhere) {
                             strListWhere += ' AND';
                         }
-
+    
                         strListWhere += (
                             ' NULLIF(' +
                                 'CAST(' +
@@ -41504,12 +41916,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 '), \'\') IS NOT NULL'
                         );
                     }
-
+    
                     // console.log(
                     //     jsnFilter,
                     //     strListWhere
                     // );
-
+    
                     strUserWhere += (
                         strUserWhere
                             ? ' AND '
@@ -41733,9 +42145,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     //      the column names and types and we need to
                     //      re-link the filters, sorts and filter statuses
                     //
-                    // this was below in the else, but requestSelectFromSocket
-                    //      will only callback once if there are no records
-                    //      - Nunzio 5/29/2017
+                    // this was below in the else, but requestSelectFromSocket will only callback once if there are no records - Nunzio 5/29/2017
                     if (data.intCallback === 0) {
                         // clear old column arrays to make remove for any
                         //      changes to the column list
@@ -42579,7 +42989,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
                 i += 1;
             }
-
             if (strHashString) {
                 strRoles += (
                     strRoles
@@ -42792,7 +43201,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // hash data
                 strHashString = '';
                 lock_i = 0;
-                lock_len = arrLock.length;
+                lock_len = arrPK.length;
                 while (lock_i < lock_len) {
                     strHashString += (
                         strHashString
@@ -43174,26 +43583,6 @@ document.addEventListener('DOMContentLoaded', function () {
         i = 0;
         len = jsnDelete.recordIndexes.length;
 
-
-        
-        //// create cell array for this record
-        //strRecord = element.internalData.records[i] + '\t';
-        //arrDeleteRecord = [];
-        //col_i = 0;
-        //col_len = element.internalData.columnNames.length;//9999;
-        //while (col_i < col_len) {
-        //    delim = strRecord.indexOf('\t');
-        //    strCell = strRecord.substring(0, delim);
-        //    strRecord = strRecord.substring(delim + 1);
-
-        //    arrDeleteRecord.push(
-        //        GS.decodeFromTabDelimited(strCell, strNullString)
-        //    );
-
-        //    col_i += 1;
-        //}
-
-
         while (i < len) {
             strRecord = '';
             arrDeleteRecord = element.internalData.records[
@@ -43226,8 +43615,8 @@ document.addEventListener('DOMContentLoaded', function () {
             col_i = 0;
             col_len = arrLock.length;
             while (col_i < col_len) {
-                //// get column index for this current hash column
-                //intIndex = arrColumns.indexOf(arrLock[col_i]);
+                // get column index for this current hash column
+                intIndex = arrColumns.indexOf(arrLock[col_i]);
 
                 // append cell to current hash record
                 strRecordToHash += (
@@ -43235,19 +43624,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? "\t"
                         : ""
                 );
-                //strTemp = arrDeleteRecord[intIndex];
-                strTemp = getCell(
-                                element,
-                                arrLock[col_i],
-                                jsnDelete.recordIndexes[i],
-                                false
-                            );
+                strTemp = arrDeleteRecord[intIndex];
 
                 // I saw this in the code I copied while making this:
                 //      "I believe that this needs to
                 //          use the null-string instead of 'NULL'"
                 strRecordToHash += (
-                    strTemp === "\\N"
+                    strTemp === "NULL"
                         ? ""
                         : strTemp
                 );
@@ -47241,6 +47624,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             element.internalEvents.scrollDragStartFunction = function (event) {
                 var jsnMousePos = GS.mousePosition(event);
+
                 dragStarted = false;
                 intStartMouseLeft = jsnMousePos.left;
                 intStartMouseTop = jsnMousePos.top;
@@ -47559,7 +47943,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // we need to update the scrollbar location from true scrollbar
         //      location to virtual scrollbar location
         element.internalEvents.scrollBarXFunction = function () {
-            //console.log('scrollBarXFunction');
             var intViewportWidth;
             var virtualScrollWidth;
             var trueScrollWidth;
@@ -47568,7 +47951,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // sometimes, the gs-table triggeres a scrollbar event, so here we
             //      check to make sure the scrollbarX event has not been
             //      cancelled
-            //console.log(element.internalEventCancelled.scrollbarX);
             if (!element.internalEventCancelled.scrollbarX) {
                 // we need the viewport dimensions because true scroll
                 //      dimensions include the viewport width, which messes
@@ -50907,11 +51289,6 @@ document.addEventListener('DOMContentLoaded', function () {
             'change',
             element.internalEvents.cellUpdate
         );
-
-        element.elems.dataViewport.removeEventListener(
-            'click',
-            element.internalEvents.updateDialog
-        );
     }
     function bindUpdate(element) {
         element.internalEvents.cellUpdate = function (event) {
@@ -51017,226 +51394,6 @@ document.addEventListener('DOMContentLoaded', function () {
             'change',
             element.internalEvents.cellUpdate
         );
-
-        // sometimes, the user needs to be able to update multiple columns
-        //      at once. or they just want to see the record in a more
-        //      focused way, with more room. so, we open the update dialog
-        //      when an update dialog button is clicked.
-        element.internalEvents.updateDialog = function (event) {
-            var target = event.target;
-            var arrCol;
-            var intRow;
-            var strRow;
-            var arrRow;
-            var jsnRow;
-            var i;
-            var len;
-            var strNullString;
-            var templateFunc;
-            var strHTML;
-            var templateElement;
-
-            if (target.classList.contains('table-multi-update-button')) {
-                // we want the null string to be configurable, so we'll read the
-                //      "null-string" attribute to get the null string
-                // if the "null-string" attribute is present, use the contents
-                //      or coalesce to empty string
-                if (element.hasAttribute('null-string')) {
-                    strNullString = element.getAttribute('null-string') || '';
-
-                // else, null string is left up to the encoding function
-                } else {
-                    strNullString = undefined;
-                }
-
-                // we need to know the column names
-                arrCol = element.internalData.columnNames;
-
-                // we need to get the record
-                intRow = parseInt(
-                    target.parentNode.getAttribute('data-row-number'),
-                    10
-                );
-
-                strRow = element.internalData.records[intRow];
-
-                // convert the record to our normal "row" and "arrRow"
-                // decode values in the column array and build up the json
-                arrRow = strRow.split('\t');
-                jsnRow = {};
-                i = 0;
-                len = arrCol.length;
-                while (i < len) {
-                    arrRow[i] = (
-                        GS.decodeFromTabDelimited(
-                            arrRow[i],
-                            strNullString
-                        )
-                    );
-                    jsnRow[arrCol[i]] = arrRow[i];
-
-                    i += 1;
-                }
-
-                //console.log('intRow:', intRow);
-                //console.log('strRow:', strRow);
-                //console.log('arrRow:', arrRow);
-                //console.log('jsnRow:', jsnRow);
-
-                // template the updateDialog with the record
-                templateFunc = doT.template(
-                    '{{ ' +
-                        'var row_number = jo.index + 1;' +
-                        'var qs = jo.qs;' +
-                        'var row = jo.row;' +
-                        'var arrRow = jo.arrRow;' +
-                        'var i = jo.index;' +
-                        'var len = jo.len;' +
-                    '}}' +
-                    element.internalTemplates.updateDialog.templateHTML
-                );
-
-                // template with JSON
-                strHTML = templateFunc({
-                    'qs': GS.qryToJSON(GS.getQueryString()),
-                    'row': jsnRow,
-                    'arrRow': arrRow,
-                    'index': intRow,
-                    'len': element.internalData.records.length
-                });
-
-                // because we prevent templating into other element's
-                //      templates (the ones with a "src" attribute) by
-                //      "hiding" (by replacing them with a random token
-                //      and storing the token-template relationship)
-                //      them, we have to "show" them (by replacing the
-                //      token with the original template strings) at
-                //      this step
-                strHTML = GS.templateShowSubTemplates(
-                    strHTML,
-                    element.internalTemplates.updateDialog
-                );
-
-                // generate dialog
-                templateElement = document.createElement('template');
-
-                templateElement.innerHTML = ml(function () {/*
-<gs-page>
-    <gs-header>
-        <center><h3>Update</h3></center>
-    </gs-header>
-    <gs-body padded>
-        {{HTML}}
-    </gs-body>
-    <gs-footer>
-        <gs-grid gutter>
-            <gs-block>
-                <gs-button dialogclose>Cancel</gs-button>
-            </gs-block>
-            <gs-block>
-                <gs-button id="gs-table-update-record" bg-primary>
-                    Save
-                </gs-button>
-            </gs-block>
-        </gs-grid>
-    </gs-footer>
-</gs-page>
-                */}).replace(/\{\{HTML\}\}/gi, strHTML);
-
-                // open the dialog
-                GS.openDialog(templateElement, function () {
-                    var dialog = this;
-                    var saveButtonClick;
-                    var afterUpdateFunc;
-
-                    saveButtonClick = function () {
-                        var arrElement;
-                        var elem_i;
-                        var elem_len;
-                        var elem;
-                        var arrColumns;
-                        var arrValues;
-                        var parentSRCElement;
-                        var strOldValue;
-                        var strNewValue;
-
-                        // when the save button is clicked, we need to check
-                        //      every field to find out what changes have been
-                        //      made
-                        arrElement = xtag.query(dialog, '[column]');
-                        arrColumns = [];
-                        arrValues = [];
-                        elem_i = 0;
-                        elem_len = arrElement.length;
-                        while (elem_i < elem_len) {
-                            elem = arrElement[elem_i];
-
-                            parentSRCElement = GS.findParentElement(
-                                elem,
-                                '[src]'
-                            );
-
-                            if (
-                                !parentSRCElement ||
-                                parentSRCElement.nodeName === 'HTML' ||
-                                parentSRCElement.nodeName === 'BODY'
-                            ) {
-                                strOldValue = jsnRow[
-                                    elem.getAttribute('column')
-                                ];
-                                strNewValue = elem.value;
-
-                                if (strNewValue !== strOldValue) {
-                                    arrColumns.push(
-                                        elem.getAttribute('column')
-                                    );
-                                    arrValues.push(
-                                        GS.encodeForTabDelimited(
-                                            strNewValue,
-                                            strNullString
-                                        )
-                                    );
-                                }
-                            }
-
-                            elem_i += 1;
-                        }
-
-                        if (arrColumns.length > 0) {
-                            afterUpdateFunc = function () {
-                                GS.closeDialog(dialog, 'Ok');
-                                element.removeEventListener(
-                                    'after_update',
-                                    afterUpdateFunc
-                                );
-                            };
-
-                            element.addEventListener(
-                                'after_update',
-                                afterUpdateFunc
-                            );
-
-                            dataUPDATE(element, 'cell-range', {
-                                "data": {
-                                    "columns": arrColumns,
-                                    "records": [intRow],
-                                    "values": [arrValues.join('\t')]
-                                },
-                                "updateConfirmed": false
-                            });
-                        }
-                    };
-
-                    document.getElementById('gs-table-update-record')
-                            .addEventListener('click', saveButtonClick);
-                });
-            }
-        };
-
-        element.elems.dataViewport.addEventListener(
-            'click',
-            element.internalEvents.updateDialog
-        );
     }
 
     // ############# INSERT EVENTS #############
@@ -51293,7 +51450,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 // re-render so that the insert controls clear out in the DOM
                 element.internalDisplay.fullRenderRequired = true;
                 renderLocation(element);
-                //element.goToLine('last');
             }
         };
 
@@ -54120,9 +54276,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // re-render selection
                 renderSelection(element);
             },
-            'renderSelection': function () {
-                renderSelection(this);
-            },
+
             'getCopyStrings': function () {
                 return getCopyStrings(this);
             },
@@ -55210,7 +55364,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // coalesce value
         newValue = newValue || '';
-        //console.log('newValue >' + newValue + '<');
 
         // if value is a string: parse
         if (typeof newValue === 'string') {
@@ -55230,11 +55383,9 @@ document.addEventListener('DOMContentLoaded', function () {
             strPeriod = (newValue.match(/pm|am|a|p/gi) || [''])[0].toLowerCase();
             newValue  = newValue.replace(/[^0-9:]/gi, '');
 
-            //console.log('before strPeriod>' + strPeriod + '<');
             if (strPeriod) {
                 strPeriod = (strPeriod[0] === 'a' ? 'AM' : 'PM');
             }
-            //console.log('after strPeriod>' + strPeriod + '<');
 
             if (newValue) {
                 // if there are colon(s): split on colons
@@ -55248,7 +55399,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (parseInt(strHour, 10) > 12) {
                         strHour = parseInt(strHour, 10) - 12;
                         strPeriod = 'PM';
-                        //console.log('set strPeriod to PM');
                     }
 
                 // else (if there are just numbers)
@@ -55264,7 +55414,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (parseInt(strHour, 10) > 12) {
                             strHour = parseInt(strHour, 10) - 12;
                             strPeriod = 'PM';
-                            //console.log('set strPeriod to PM');
                         }
 
                     // else:
@@ -55285,15 +55434,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (strHour && strMinute) {
                 if (!strPeriod) {
-                    //console.log('strHour>' + strHour + '<');
-                    //console.log('parseInt(strHour, 10)>' + parseInt(strHour, 10) + '<');
-                    if (parseInt(strHour, 10) >= 12) {
-                    //if (parseInt(strHour, 10) < 6 || parseInt(strHour, 10) === 12) {//Who did this? -Joseph
+                    if (parseInt(strHour, 10) < 6 || parseInt(strHour, 10) === 12) {
                         strPeriod = 'PM';
-                        //console.log('set strPeriod to PM');
                     } else {
                         strPeriod = 'AM';
-                        //console.log('set strPeriod to AM');
                     }
                 }
                 valueDate = new Date('1/1/1111 ' + strHour + ':' + strMinute + ' ' + strPeriod);

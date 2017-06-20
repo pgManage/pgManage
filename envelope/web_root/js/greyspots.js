@@ -34920,6 +34920,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var i;
         var len;
         var intTemp;
+        var intPrev;
 
         var intViewportWidth;
         var intViewportHeight;
@@ -34929,6 +34930,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var bolRecordSelector;
         var bolInsertRecord;
         var bolHeaderRecord;
+        var bolRenderAllColumns;
 
         // we need the viewport dimensions because we need to include the
         //      viewport when choosing what cells to show
@@ -34946,6 +34948,14 @@ document.addEventListener('DOMContentLoaded', function () {
         // save scroll location and dimensions for easy access
         scrollTop = element.internalScroll.top;
         scrollLeft = element.internalScroll.left;
+
+        // the developer can choose to not render hidden columns, this limits
+        //      some small bits of functionality (the only example I can think
+        //      of is selecting all the columns and double clicking to resize.
+        //      when some of the columns are not rendered, they don't get
+        //      affected by the resize.). This choice affects scrolling
+        //      calculations so we need to find out what the developer wants.
+        bolRenderAllColumns = !element.hasAttribute('skip-hidden-columns');
 
         // commented out because we are now going to allow overscrolling,
         //      eventually, it's possible we'll make overscrolling an option
@@ -34971,11 +34981,6 @@ document.addEventListener('DOMContentLoaded', function () {
             element.internalScrollOffsets.right
         );
 
-        // figure out start/end columns
-        //arrColumnBorders = [
-        //    element.internalScrollOffsets.left
-        //];
-        //  ^-- commented out because we could use columnHandles
         i = 0;
         len = arrColumnWidths.length;
         intTemp = 0;
@@ -34984,14 +34989,18 @@ document.addEventListener('DOMContentLoaded', function () {
             // when the column width is zero, it's hidden, so don't factor
             //      it into the calculations
             if (arrColumnWidths[i] > 0) {
+                intPrev = intTemp;
                 intTemp += arrColumnWidths[i];
                 intTemp += columnBorderWidth;
-                //arrColumnBorders.push(intTemp);
             }
 
             if (fromColumn === undefined && intTemp > scrollLeft) {
                 fromColumn = i;
-                intCellOriginLeft = (intCellOriginLeft - scrollLeft);
+                if (bolRenderAllColumns) {
+                    intCellOriginLeft = -intPrev;
+                } else {
+                    intCellOriginLeft = (intCellOriginLeft - scrollLeft);
+                }
             }
             if (
                 toColumn === undefined &&
@@ -35000,7 +35009,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 toColumn = i;
                 break;
             }
-            if (fromColumn === undefined) {
+            if (fromColumn === undefined && bolRenderAllColumns) {
                 intCellOriginLeft = intTemp;
             }
             i += 1;
@@ -35014,10 +35023,18 @@ document.addEventListener('DOMContentLoaded', function () {
             toColumn = arrColumnWidths.length;
         }
 
-        //// store column borders so that the column reorder code knows where
-        ////      they are
-        //element.internalDisplay.columnBorders = arrColumnBorders;
+        // At first, we forced hidden columns to not be rendered. Normally,
+        //      we want all columns rendered, even if not every single one
+        //      is visible. This allows us to commit operations on hidden
+        //      columns. But, sometimes, speed is more important. So, we
+        //      have an attribute to make it so that hidden columns are not
+        //      rendered.
+        if (bolRenderAllColumns) {
+            fromColumn = 0;
+            toColumn = arrColumnWidths.length;
+        }
 
+        //console.log(intCellOriginLeft);
         //console.log('columns: ', fromColumn, toColumn);
 
         // figure out start/end records
@@ -35109,7 +35126,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // offset the record/cell origins by the amount that the header cells
         //      and record selectors offset the viewport
-        intCellOriginLeft = element.internalScrollOffsets.left;
+        if (bolRenderAllColumns) {
+            intCellOriginLeft += element.internalScrollOffsets.left;
+        } else {
+            intCellOriginLeft = element.internalScrollOffsets.left;
+        }
         intRecordOriginTop = element.internalScrollOffsets.top;
 
         // commented out and replaced by the two lines above, these two lines
@@ -35799,7 +35820,7 @@ document.addEventListener('DOMContentLoaded', function () {
             column = 'selector';
 
         } else {
-            intLeft = intRowSelectorWidth;
+            intLeft = jsnRange.originLeft;//intRowSelectorWidth;
             i = jsnRange.fromColumn;
             len = jsnRange.toColumn;
             while (i < len) {
@@ -36756,15 +36777,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 // ### NEED CODING ###
 
                 // get text width using test header element
+                element.elems.testHeader.innerHTML = arrColumnElements[i].innerHTML
+
                 intColumnWidth = (
-                    GS.getTextWidth(
-                        element.elems.testHeader,
-                        arrColumnElements[i].textContent,
-                        true // preserve whitespace
-                    ) +
+                    //GS.getTextWidth(
+                    //    element.elems.testHeader,
+                    //    arrColumnElements[i].textContent,
+                    //    true // preserve whitespace
+                    //) +
+
+                    element.elems.testHeader.offsetWidth +
                     // for some reason, a few pixels are missing
                     3
                 );
+
+                element.elems.testHeader.innerHTML = '';
 
                 //console.log(arrColumnElements[i].textContent);
 
@@ -37891,7 +37918,6 @@ document.addEventListener('DOMContentLoaded', function () {
         var rec_len;
         var strRecord;
         var arrSelection;
-
         var range_i;
         var range_len;
         var range;
@@ -38461,6 +38487,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderLocationFull(element) {
+        //snapback
         var arrColumnWidths;
         var arrRecordHeights;
         var columnBorderWidth;
@@ -40152,7 +40179,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // add displayed columns to column handle list
-        intTraversed = 0;
+        intTraversed = jsnRange.originLeft;//0;
         i = jsnRange.fromColumn;
         len = jsnRange.toColumn;
         while (i < len) {
@@ -40170,15 +40197,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
             }
 
-            if (intTraversed <= 0 && intExtremeSide > 0) {
-                intExtremeSide += jsnRange.originLeft;
-            }
+            //if (intTraversed <= 0 && intExtremeSide > 0) {
+            //    intExtremeSide += jsnRange.originLeft;
+            //}
             intTraversed += intExtremeSide;
+
+            //console.log(
+            //    intTraversed,
+            //    element.internalScrollOffsets.left,
+            //    intExtremeSide,
+            //    jsnRange.originLeft
+            //);
 
             if (intTraversed < intMaximum) {
                 // if column is hidden, push null handle so that the array
                 //      indexes still line up with the column numbers
-                if (intExtremeSide === 0) {
+                if (
+                    intExtremeSide === 0 ||
+                    intTraversed <= element.internalScrollOffsets.left
+                ) {
                     element.internalDisplay.columnHandles.push(null);
                 } else {
                     element.internalDisplay.columnHandles.push(intTraversed);
@@ -54120,7 +54157,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 // re-render selection
                 renderSelection(element);
             },
-
             'getCopyStrings': function () {
                 return getCopyStrings(this);
             },

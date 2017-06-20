@@ -1531,21 +1531,38 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                     resizeHandler(event);
                     event.preventDefault();
                 }
-                
-                if (currentTab.relatedResultsArea.children.length > 0) {
-                    var spaceHeight = currentTab.relatedResultsArea.children[currentTab.relatedResultsArea.children.length - 2].clientHeight;
-                    spaceHeight = currentTab.relatedResultsArea.clientHeight - spaceHeight;
+
+                if (currentTab.relatedResultsArea.children.length > 1) {
+                    var heightElem;
+                    var spaceHeight;
+
+                    spaceHeight = (
+                        currentTab
+                            .relatedResultsArea
+                            .children[currentTab.relatedResultsArea.children.length - 2]
+                            .clientHeight
+                    );
+                    spaceHeight = (
+                        currentTab
+                            .relatedResultsArea
+                            .clientHeight - spaceHeight
+                    );
                     if (spaceHeight < 0) {
                         spaceHeight = 0;
                     }
-                    var heightElem = currentTab.relatedResultsArea.lastChild;
+
+                    heightElem = currentTab.relatedResultsArea.lastChild;
                     heightElem.style.height = spaceHeight + 'px';
+
                     currentTab.relatedResultsArea.appendChild(heightElem);
                 }
-                
+
                 var gs_table = xtag.query(tabElement.relatedResultsAreaContainer, 'gs-table');
-                for (var i = 0, len = gs_table.length; i < len; i++) {
+                var i = 0;
+                var len = gs_table.length;
+                while (i < len) {
                     gs_table[i].render();
+                    i += 1;
                 }
             };
 

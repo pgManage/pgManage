@@ -3673,16 +3673,16 @@ window.addEventListener('design-register-element', function () {
     }
     
     function errorJSONToHTML(errorJSON) {
-        return '<pre style="word-break: break-all; white-space: pre-wrap;">' +
+        var errorHTML = '<pre style="word-break: break-all; white-space: pre-wrap;">' +
                     'There was an error:' +
                     (errorJSON.error_text //TODO: maybe make this red -Joseph 09/14/16
-                        ? '<br /><br />' + encodeHTML(errorJSON.error_text)                        
+                        ? '<br /><br />' + encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_text))
                         : '') +
                     (errorJSON.error_file
-                        ? '<br /><br />The error was on file: ' + encodeHTML(errorJSON.error_file) 
+                        ? '<br /><br />The error was on file: ' + encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_file))
                         : '') +
                     (errorJSON.error_hint
-                        ? '<br /><br />' + encodeHTML(errorJSON.error_hint)                        
+                        ? '<br /><br />' + encodeHTML(GS.decodeFromTabDelimited(errorJSON.error_hint))
                         : '') +
                     (errorJSON.error_context
                         ? '<br /><br />' + encodeHTML(errorJSON.error_context)                     
@@ -3691,6 +3691,7 @@ window.addEventListener('design-register-element', function () {
                         ? '<br /><br />' + encodeHTML(errorJSON.error_addin)                       
                         : '') +
                 '</pre>';
+        return errorHTML;
     }
     
     GS.ajaxErrorDialog = function (jsnError, tryAgainCallback, cancelCallback) {
@@ -5535,7 +5536,7 @@ GS.templateColumnToValue = function (templateHTML) {
     
     for (i = 0, len = arrColumnElement.length; i < len; i += 1) {
         if (!arrColumnElement[i].hasAttribute('value')) {
-            arrColumnElement[i].setAttribute('value', '{{! row.' + arrColumnElement[i].getAttribute('column') + ' }}');
+            arrColumnElement[i].setAttribute('value', '{{! row[\'' + arrColumnElement[i].getAttribute('column').replace(/\\/gi, '\\\\').replace(/\'/gi, '\\\'') + '\'] }}');
         }
     }
     
@@ -5919,7 +5920,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
                         </gs-grid>
                     </gs-footer>
                 </gs-page>
-            */}).replace('{{ADDIN}}', (addinText ? '\n\n' + addinText : ''));
+            */}).replace('{{ADDIN}}', decodeURIComponent((addinText ? '\n\n' + addinText : '')));
             
             GS.openDialog(templateElement, '', function (event, strAnswer) {
                 if (strAnswer === 'Try to reconnect') {
@@ -19442,6 +19443,15 @@ GS.closeDialog = function (dialog, strAnswer) {
 
                         this.windowResizeHandler();
                     }
+                    
+                    this.addEventListener('click', function (event) {
+                        var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
+
+                        if (dialogcloseElement && event.target.hasAttribute('dialogclose')) {
+                            GS.findParentTag(event.target, 'gs-dialog')
+                                .destroy(dialogcloseElement.textContent, event);
+                        }
+                    });
 
                     GS.triggerEvent(this, 'dialog-inserted');
                 }
@@ -19452,12 +19462,12 @@ GS.closeDialog = function (dialog, strAnswer) {
             }
         },
         events: {
-            'click:delegate([dialogclose])': function (event) {
-                var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
-
-                GS.findParentTag(event.target, 'gs-dialog')
-                        .destroy(dialogcloseElement.textContent, event);
-            }
+            //'click:delegate([dialogclose])': function (event) {
+            //    var dialogcloseElement = GS.findParentElement(event.target, '[dialogclose]');
+            //    console.log('running...');
+            //    GS.findParentTag(event.target, 'gs-dialog')
+            //            .destroy(dialogcloseElement.textContent, event);
+            //}
         },
         accessors: {},
         methods: {
@@ -24808,6 +24818,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function elementInserted(element) {
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
         if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
+            if (element.children.length === 0) {
+                throw 'GS-Form Error: No template provided';
+            }
             // if this is the first time inserted has been run: continue
             if (!element.inserted) {
                 element.inserted = true;
@@ -37723,6 +37736,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var handleCell;
         var jsnQS;
         var jsnRow;
+        var arrRow;
         var strRow;
         var strHeader;
 
@@ -37757,6 +37771,7 @@ document.addEventListener('DOMContentLoaded', function () {
             arrColumnTemplates[col_i] =
                     '{{ var qs = jo.qs' +
                     ', row = jo.row' +
+                    ', arrRow = jo.arrRow' +
                     ', i = jo.i' +
                     ', len = jo.len; }}' +
                     arrColumnTemplates[col_i];
@@ -37862,11 +37877,12 @@ document.addEventListener('DOMContentLoaded', function () {
             // no quoting,
             //      template cell with querystring and row
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
+                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
@@ -37887,11 +37903,12 @@ document.addEventListener('DOMContentLoaded', function () {
             //      put an escapeChar behind every quoteChar
             //      if NaN: wrap cell with quoteChar
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
+                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
@@ -37934,11 +37951,12 @@ document.addEventListener('DOMContentLoaded', function () {
             //      put an escapeChar behind every quoteChar
             //      wrap cell with quoteChar
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
+                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
@@ -37980,21 +37998,23 @@ document.addEventListener('DOMContentLoaded', function () {
             //          put an escapeChar behind every quoteChar
             //          wrap cell with quoteChar
             //      append cell to strTextCopyString
-            handleCell = function (cellTemplate, i, len, jsnRow) {
+            handleCell = function (cellTemplate, i, len, jsnRow, arrRow) {
                 // template cell with querystring and row
                 var strCell = cellTemplate({
                     'qs': jsnQS,
                     'row': jsnRow,
+                    'arrRow': arrRow,
                     'i': i,
                     'len': len
                 });
 
                 // before we do any quoting, we need to add the HTML to the
                 //      HTML copy string
-                strHTMLRecordCopyString +=
-                        '<' + 'td rowspan="1" colspan="1">' +
-                        strCell +
-                        '</td>';
+                strHTMLRecordCopyString += (
+                    '<' + 'td rowspan="1" colspan="1">' +
+                    strCell +
+                    '</td>'
+                );
 
                 // if escapeChar !== quoteChar: double up every escapeChar
                 if (escapeChar !== quoteChar) {
@@ -38054,6 +38074,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             //console.log(arrSelectedStates);
+            //console.log(arrHeaders.slice(0));
 
             // loop to add the rest of the headers
             col_i = 0;
@@ -38111,6 +38132,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // <br />
+        //console.log(arrHeaders.slice(0));
 
         // we cache the number of columns because it doesn't change
         col_len = arrColumns.length;
@@ -38133,6 +38155,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // generate record JSON for template
             jsnRow = {};
+            arrRow = [];
             strRow = element.internalData.records[intRow] + '\t';
 
             cell_i = 0;
@@ -38148,6 +38171,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     jsnRow[arrColumnNames[cell_i]] = (
                         GS.decodeFromTabDelimited(cell, nullString)
                     );
+                    arrRow.push(jsnRow[arrColumnNames[cell_i]]);
                 } else {
                     break;
                 }
@@ -38240,7 +38264,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         arrColumnTemplates[arrColumns[col_i]],
                         row_i,
                         row_len,
-                        jsnRow
+                        jsnRow,
+                        arrRow
                     );
 
                 } else {
@@ -38260,8 +38285,10 @@ document.addEventListener('DOMContentLoaded', function () {
             strHTMLCopyString += '<tr>' + strHTMLRecordCopyString + '</tr>';
             strHTMLRecordCopyString = '';
 
-            // add record delimiter
-            strTextCopyString += recordDelimiter;
+            // add record delimiter (unless we're on the last record)
+            if ((row_i + 1) < row_len) {
+                strTextCopyString += recordDelimiter;
+            }
             row_i += 1;
         }
 
@@ -39623,20 +39650,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // create cell array for this record
             arrRecord = [];
+            //console.log(element.internalData.columnNames.length);
             cell_i = 0;
-            cell_len = 9999;
+            cell_len = element.internalData.columnNames.length;//9999;
             while (cell_i < cell_len) {
                 delim = strRecord.indexOf('\t');
                 strCell = strRecord.substring(0, delim);
                 strRecord = strRecord.substring(delim + 1);
 
-                if (strCell !== '' || strRecord !== '') {
-                    arrRecord.push(
-                        GS.decodeFromTabDelimited(strCell, strNullString)
-                    );
-                } else {
-                    break;
-                }
+                //if (strCell !== '' || strRecord !== '') {
+                arrRecord.push(
+                    GS.decodeFromTabDelimited(strCell, strNullString)
+                );
+                //} else {
+                //    break;
+                //}
 
                 cell_i += 1;
             }
@@ -41712,8 +41740,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function getWhereClause(element) {
+        var i;
+        var len;
+        var arrFilter;
+        var strColumn;
+        var filter_i;
+        var filter_len;
+        var strFilter;
+        var jsnFilter;
+        var strListWhere;
+
+        var arrOldColumnNames;
+        var arrOldColumnTypes;
+        var arrOldColumnFilterStatuses;
+        var arrOldColumnFilters;
+        var arrOldColumnListFilters;
+
         var strWhere;
         var strUserWhere;
+        var strWhereColumn;
+
+        // we need to include any where clauses added be the developer.
+        //      this where clause is templated with the querystring.
         strWhere = GS.templateWithQuerystring(
             element.getAttribute('where') || '1=1'
         );
@@ -41740,23 +41788,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.getAttribute('qs')
             )
         ) {
-            var strWhereColumn =
-                    element.getAttribute('child-column') ||
-                    element.getAttribute('column') ||
-                    element.getAttribute('qs');
+            strWhereColumn = (
+                element.getAttribute('child-column') ||
+                element.getAttribute('column') ||
+                element.getAttribute('qs')
+            );
 
             // if the value is not a number, we need to do a string
             //      comparison in the where clause.
             if (isNaN(element.value)) {
-                strWhere =
-                        'CAST(' +
-                        strWhereColumn + ' AS ' +
-                        GS.database.type.text +
-                        ') = ' +
-                        'CAST(' +
-                        '$WhereQUOTE$' + (element.value) + '$WhereQUOTE$ AS ' +
-                        GS.database.type.text +
-                        ')';
+                strWhere = (
+                    'CAST(' +
+                    strWhereColumn + ' AS ' +
+                    GS.database.type.text +
+                    ') = ' +
+                    'CAST(' +
+                    '$WhereQUOTE$' + (element.value) + '$WhereQUOTE$ AS ' +
+                    GS.database.type.text +
+                    ')'
+                );
                 strWhere += (
                     strWhere !== ''
                         ? ' AND (' + strWhere + ')'
@@ -41774,23 +41824,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        var arrOldColumnNames = element.internalData.columnNames;
-        var arrOldColumnTypes = element.internalData.columnTypes;
-        var arrOldColumnFilterStatuses = element.internalData.columnFilterStatuses;
-        var arrOldColumnFilters = element.internalData.columnFilters;
-        var arrOldColumnListFilters = element.internalData.columnListFilters;
+        arrOldColumnNames = element.internalData.columnNames;
+        arrOldColumnTypes = element.internalData.columnTypes;
+        arrOldColumnFilterStatuses = element.internalData.columnFilterStatuses;
+        arrOldColumnFilters = element.internalData.columnFilters;
+        arrOldColumnListFilters = element.internalData.columnListFilters;
 
         // we want the user to be able to filter a column, so here we'll look
         //      at what the user set for each column and prepend to the where
         //      clause
         strUserWhere = '';
-        var i = 0;
-        var len = arrOldColumnFilters.length;
-        var arrFilter;
-        var strColumn;
-        var filter_i;
-        var filter_len;
-        var strFilter;
+        i = 0;
+        len = arrOldColumnFilters.length;
         while (i < len) {
             arrFilter = arrOldColumnFilters[i];
             strColumn = arrOldColumnNames[i];
@@ -41819,8 +41864,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         i = 0;
         len = arrOldColumnListFilters.length;
-        var jsnFilter;
-        var strListWhere;
         while (i < len) {
             jsnFilter = arrOldColumnListFilters[i];
             strColumn = arrOldColumnNames[i];
@@ -41872,7 +41915,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     ? ' AND '
                                     : ''
                             );
-    
+
                             strListWhere += (
                                 strColumn +
                                 ' != CAST($werequote$' +
@@ -41884,18 +41927,29 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 }
-                //if we are excluding nothing the blank code causes the where to just be "WHERE column is blank"
-                if ((strListWhere && !(jsnFilter.type === 'exclusion' && jsnFilter.values.length === 0)) || jsnFilter.blanks === false) {
+
+                // if we are excluding nothing the blank code causes
+                //      the where to just be "WHERE column is blank"
+                if (
+                    (
+                        strListWhere &&
+                        !(
+                            jsnFilter.type === 'exclusion' &&
+                            jsnFilter.values.length === 0
+                        )
+                    ) ||
+                    jsnFilter.blanks === false
+                ) {
                     // we need to handle blank values specially
                     if (strListWhere) {
                         strListWhere = '(' + strListWhere + ') ';
                     }
-    
+
                     if (jsnFilter.blanks === true) {
                         if (strListWhere) {
                             strListWhere += ' OR';
                         }
-    
+
                         strListWhere += (
                             ' NULLIF(' +
                                 'CAST(' +
@@ -41907,7 +41961,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (strListWhere) {
                             strListWhere += ' AND';
                         }
-    
+
                         strListWhere += (
                             ' NULLIF(' +
                                 'CAST(' +
@@ -41916,12 +41970,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 '), \'\') IS NOT NULL'
                         );
                     }
-    
+
                     // console.log(
                     //     jsnFilter,
                     //     strListWhere
                     // );
-    
+
                     strUserWhere += (
                         strUserWhere
                             ? ' AND '
@@ -42145,7 +42199,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     //      the column names and types and we need to
                     //      re-link the filters, sorts and filter statuses
                     //
-                    // this was below in the else, but requestSelectFromSocket will only callback once if there are no records - Nunzio 5/29/2017
+                    // this was below in the else, but requestSelectFromSocket
+                    //      will only callback once if there are no records
+                    //      - Nunzio 5/29/2017
                     if (data.intCallback === 0) {
                         // clear old column arrays to make remove for any
                         //      changes to the column list

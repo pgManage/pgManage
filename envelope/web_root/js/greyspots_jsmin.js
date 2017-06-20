@@ -4358,20 +4358,22 @@ return arrColumn;}
 function getSocket(element){if(element.getAttribute('socket')){return GS[element.getAttribute('socket')];}
 return GS.envSocket;}
 function stringReplaceAll(str,find,replace){return str.replace(new RegExp(find.replace(/([\.\*\+\?\^\=\!\:\$\{\}\(\)\|\[\]\/\\])/g,'\\$1'),'g'),replace);}
-function getCurrentCellRange(element){var scrollTop;var scrollLeft;var arrColumnWidths;var arrRecordHeights;var columnBorderWidth;var recordBorderHeight;var fromColumn;var toColumn;var fromRecord;var toRecord;var i;var len;var intTemp;var intViewportWidth;var intViewportHeight;var intCellOriginLeft;var intRecordOriginTop;var bolRecordSelector;var bolInsertRecord;var bolHeaderRecord;intViewportWidth=element.elems.dataViewport.clientWidth;intViewportHeight=element.elems.dataViewport.clientHeight;arrColumnWidths=element.internalDisplay.columnWidths;arrRecordHeights=element.internalDisplay.recordHeights;columnBorderWidth=element.internalDisplay.columnBorderWidth;recordBorderHeight=element.internalDisplay.recordBorderHeight;scrollTop=element.internalScroll.top;scrollLeft=element.internalScroll.left;intViewportHeight-=(element.internalScrollOffsets.top+
+function getCurrentCellRange(element){var scrollTop;var scrollLeft;var arrColumnWidths;var arrRecordHeights;var columnBorderWidth;var recordBorderHeight;var fromColumn;var toColumn;var fromRecord;var toRecord;var i;var len;var intTemp;var intPrev;var intViewportWidth;var intViewportHeight;var intCellOriginLeft;var intRecordOriginTop;var bolRecordSelector;var bolInsertRecord;var bolHeaderRecord;var bolRenderAllColumns;intViewportWidth=element.elems.dataViewport.clientWidth;intViewportHeight=element.elems.dataViewport.clientHeight;arrColumnWidths=element.internalDisplay.columnWidths;arrRecordHeights=element.internalDisplay.recordHeights;columnBorderWidth=element.internalDisplay.columnBorderWidth;recordBorderHeight=element.internalDisplay.recordBorderHeight;scrollTop=element.internalScroll.top;scrollLeft=element.internalScroll.left;bolRenderAllColumns=!element.hasAttribute('skip-hidden-columns');intViewportHeight-=(element.internalScrollOffsets.top+
 element.internalScrollOffsets.bottom);intViewportWidth-=(element.internalScrollOffsets.left+
-element.internalScrollOffsets.right);i=0;len=arrColumnWidths.length;intTemp=0;intCellOriginLeft=0;while(i<len){if(arrColumnWidths[i]>0){intTemp+=arrColumnWidths[i];intTemp+=columnBorderWidth;}
-if(fromColumn===undefined&&intTemp>scrollLeft){fromColumn=i;intCellOriginLeft=(intCellOriginLeft-scrollLeft);}
+element.internalScrollOffsets.right);i=0;len=arrColumnWidths.length;intTemp=0;intCellOriginLeft=0;while(i<len){if(arrColumnWidths[i]>0){intPrev=intTemp;intTemp+=arrColumnWidths[i];intTemp+=columnBorderWidth;}
+if(fromColumn===undefined&&intTemp>scrollLeft){fromColumn=i;if(bolRenderAllColumns){intCellOriginLeft=-intPrev;}else{intCellOriginLeft=(intCellOriginLeft-scrollLeft);}}
 if(toColumn===undefined&&intTemp>(scrollLeft+intViewportWidth)){toColumn=i;break;}
-if(fromColumn===undefined){intCellOriginLeft=intTemp;}
+if(fromColumn===undefined&&bolRenderAllColumns){intCellOriginLeft=intTemp;}
 i+=1;}
 fromColumn=Math.max(0,(fromColumn||0));toColumn=(toColumn||i)+1;intCellOriginLeft=intCellOriginLeft||0;if(toColumn>arrColumnWidths.length){toColumn=arrColumnWidths.length;}
+if(bolRenderAllColumns){fromColumn=0;toColumn=arrColumnWidths.length;}
 i=0;len=arrRecordHeights.length;intTemp=0;intRecordOriginTop=0;while(i<len){intTemp+=arrRecordHeights[i];intTemp+=recordBorderHeight;if(fromRecord===undefined&&intTemp>scrollTop){fromRecord=i;intRecordOriginTop=(intRecordOriginTop-scrollTop);}
 if(toRecord===undefined&&intTemp>(scrollTop+intViewportHeight)){toRecord=i;break;}
 if(fromRecord===undefined){intRecordOriginTop=intTemp;}
 i+=1;}
 toRecord=((toRecord||i)+1);intRecordOriginTop=(intRecordOriginTop||0);bolInsertRecord=false;if(toRecord>arrRecordHeights.length){bolInsertRecord=(element.internalDisplay.insertRecordVisible&&element.internalDisplay.insertRecordStick===null);if(element.internalDisplay.insertRecordVisible&&element.internalDisplay.insertRecordStick===null&&fromRecord===undefined){toRecord=(arrRecordHeights.length+1);fromRecord=toRecord;}else{toRecord=arrRecordHeights.length;}}
-fromRecord=Math.max(0,(fromRecord||0));bolHeaderRecord=element.internalDisplay.headerVisible;bolRecordSelector=element.internalDisplay.recordSelectorVisible;element.internalScroll.displayTop=(scrollTop+intRecordOriginTop);element.internalScroll.displayLeft=(scrollLeft+intCellOriginLeft);intCellOriginLeft=element.internalScrollOffsets.left;intRecordOriginTop=element.internalScrollOffsets.top;return{"originTop":intRecordOriginTop,"originLeft":intCellOriginLeft,"fromRecord":fromRecord,"fromColumn":fromColumn,"toRecord":toRecord,"toColumn":toColumn,"headerRecord":bolHeaderRecord,"recordSelector":bolRecordSelector,"insertRecord":bolInsertRecord};}
+fromRecord=Math.max(0,(fromRecord||0));bolHeaderRecord=element.internalDisplay.headerVisible;bolRecordSelector=element.internalDisplay.recordSelectorVisible;element.internalScroll.displayTop=(scrollTop+intRecordOriginTop);element.internalScroll.displayLeft=(scrollLeft+intCellOriginLeft);if(bolRenderAllColumns){intCellOriginLeft+=element.internalScrollOffsets.left;}else{intCellOriginLeft=element.internalScrollOffsets.left;}
+intRecordOriginTop=element.internalScrollOffsets.top;return{"originTop":intRecordOriginTop,"originLeft":intCellOriginLeft,"fromRecord":fromRecord,"fromColumn":fromColumn,"toRecord":toRecord,"toColumn":toColumn,"headerRecord":bolHeaderRecord,"recordSelector":bolRecordSelector,"insertRecord":bolInsertRecord};}
 function getInsertAddin(element){var jsnRet={};if(element.getAttribute('column')||element.getAttribute('qs')){jsnRet.link_column=(element.getAttribute('child-column')||element.getAttribute('column')||element.getAttribute('qs'));jsnRet.link_value=element.value;}
 return jsnRet;}
 function delimitedStringToHTML(element,valueText,fieldDelimiter,recordDelimiter,quoteChar,decodeFunction){var i=0;var len=valueText.length;var col_i;var col_len;var arrRecords=[];var arrRecord=[];var bolInQuote=false;var strCell='';var strRecord;var strHTML='';var strPreviousChar;var strChar;var strNullString;if(element.hasAttribute('null-string')){strNullString=element.getAttribute('null-string')||'';}else{strNullString=undefined;}
@@ -4420,7 +4422,7 @@ return arrDataColumns;}
 function focusHiddenControl(element){element.elems.hiddenFocusControl.focus();GS.triggerEvent(element.elems.hiddenFocusControl,'focus');}
 function getCellFromMouseEvent(element,event){var jsnMousePos;var jsnElementPos;var intMouseX;var intMouseY;var row;var column;var jsnRange;var arrColumnWidths;var arrRecordHeights;var i;var len;var intLeft;var intTop;var intColBorderWidth;var intRowBorderHeight;var intRowSelectorWidth;var intHeaderHeight;var bolHeader;var bolInsertRecord;var bolRecordSelector;jsnRange=element.internalDisplay.currentRange;bolHeader=element.internalDisplay.headerVisible;bolInsertRecord=(element.internalDisplay.insertRecordVisible&&jsnRange.insertRecord);bolRecordSelector=element.internalDisplay.recordSelectorVisible;arrColumnWidths=element.internalDisplay.columnWidths;arrRecordHeights=element.internalDisplay.recordHeights;intColBorderWidth=element.internalDisplay.columnBorderWidth;intRowBorderHeight=element.internalDisplay.recordBorderHeight;intRowSelectorWidth=(bolRecordSelector?(element.internalDisplay.recordSelectorWidth+
 element.internalDisplay.recordSelectorBorderWidth):0);intHeaderHeight=(bolHeader?(element.internalDisplay.headerHeight+
-element.internalDisplay.headerBorderHeight):0);jsnMousePos=GS.mousePosition(event);jsnElementPos=GS.getElementOffset(element.elems.dataViewport);intMouseX=(jsnMousePos.left-jsnElementPos.left);intMouseY=(jsnMousePos.top-jsnElementPos.top);if(bolRecordSelector&&intMouseX<=intRowSelectorWidth){column='selector';}else{intLeft=intRowSelectorWidth;i=jsnRange.fromColumn;len=jsnRange.toColumn;while(i<len){if(intMouseX>=intLeft){column=i;}else{break;}
+element.internalDisplay.headerBorderHeight):0);jsnMousePos=GS.mousePosition(event);jsnElementPos=GS.getElementOffset(element.elems.dataViewport);intMouseX=(jsnMousePos.left-jsnElementPos.left);intMouseY=(jsnMousePos.top-jsnElementPos.top);if(bolRecordSelector&&intMouseX<=intRowSelectorWidth){column='selector';}else{intLeft=jsnRange.originLeft;i=jsnRange.fromColumn;len=jsnRange.toColumn;while(i<len){if(intMouseX>=intLeft){column=i;}else{break;}
 intLeft+=arrColumnWidths[i];intLeft+=intColBorderWidth;i+=1;}}
 if(bolHeader&&intMouseY<=intHeaderHeight){row='header';}else{intTop=intHeaderHeight;i=jsnRange.fromRecord;len=jsnRange.toRecord;while(i<len){if(intMouseY>=intTop){row=i;}else{break;}
 intTop+=arrRecordHeights[i];intTop+=intRowBorderHeight;i+=1;}
@@ -4460,8 +4462,9 @@ if(headerRecordTemplate){buttonElement=document.createElement('div');arrColumnEl
 i+=1;}}
 if(headerRecordTemplate){arrColumnElements=xtag.query(headerRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){if(arrColumnDataNames[i]){arrColumnElements[i].setAttribute('title','$$HDR_TITLE_'+arrColumnDataNames[i]+'$$');}
 i+=1;}}
-if(headerRecordTemplate){arrColumnElements=xtag.query(headerRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){intColumnWidth=(GS.getTextWidth(element.elems.testHeader,arrColumnElements[i].textContent,true)+
-3);if(arrColumnDataNames[i]){intColumnWidth+=(GS.emToPx(element.elems.testHeader,1.25));}
+if(headerRecordTemplate){arrColumnElements=xtag.query(headerRecordTemplate.content,'gs-cell');i=0;len=arrColumnElements.length;while(i<len){element.elems.testHeader.innerHTML=arrColumnElements[i].innerHTML
+intColumnWidth=(element.elems.testHeader.offsetWidth+
+3);element.elems.testHeader.innerHTML='';if(arrColumnDataNames[i]){intColumnWidth+=(GS.emToPx(element.elems.testHeader,1.25));}
 element.internalDisplay.minColumnWidths.push(intColumnWidth);if(intColumnWidth>element.internalDisplay.columnWidths[i]){element.internalDisplay.columnWidths[i]=(intColumnWidth);}
 i+=1;}}
 if(headerRecordTemplate){templateCellAddStyleToken(headerRecordTemplate);templateCellAddClass(headerRecordTemplate,'table-header');templateCellAddColumnNumber(headerRecordTemplate);element.internalTemplates.header=(headerRecordTemplate.innerHTML.trim());element.removeChild(headerRecordTemplate);}
@@ -4647,10 +4650,9 @@ strCell+'.table-header {'+'top: 0px;'+'height: '+(element.internalDisplay.header
 element.internalDisplay.headerBorderHeight)+'px;'+'}');element.elems.cellPositionStyle.innerHTML=strCSS;element.internalDisplay.columnHandles=[];element.internalDisplay.recordHandles=[];intMaximum=((intViewportWidth-
 element.internalScrollOffsets.right)+
 3);if(element.internalDisplay.recordSelectorVisible===true){element.internalDisplay.columnHandles.push(element.internalScrollOffsets.left);}
-intTraversed=0;i=jsnRange.fromColumn;len=jsnRange.toColumn;while(i<len){if(element.internalDisplay.columnWidths[i]===0){intExtremeSide=0;}else{intExtremeSide=(element.internalDisplay.columnWidths[i]+
+intTraversed=jsnRange.originLeft;i=jsnRange.fromColumn;len=jsnRange.toColumn;while(i<len){if(element.internalDisplay.columnWidths[i]===0){intExtremeSide=0;}else{intExtremeSide=(element.internalDisplay.columnWidths[i]+
 element.internalDisplay.columnBorderWidth);}
-if(intTraversed<=0&&intExtremeSide>0){intExtremeSide+=jsnRange.originLeft;}
-intTraversed+=intExtremeSide;if(intTraversed<intMaximum){if(intExtremeSide===0){element.internalDisplay.columnHandles.push(null);}else{element.internalDisplay.columnHandles.push(intTraversed);}}else{break;}
+intTraversed+=intExtremeSide;if(intTraversed<intMaximum){if(intExtremeSide===0||intTraversed<=element.internalScrollOffsets.left){element.internalDisplay.columnHandles.push(null);}else{element.internalDisplay.columnHandles.push(intTraversed);}}else{break;}
 i+=1;}
 intMaximum=(intViewportHeight-
 element.internalScrollOffsets.bottom);if(element.internalDisplay.headerVisible===true){element.internalDisplay.recordHandles.push(element.internalScrollOffsets.top);}

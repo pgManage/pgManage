@@ -15652,10 +15652,10 @@ gs-sticky[stuck][direction="down"] > gs-sticky-inner {
     -o-box-sizing: border-box;
     box-sizing: border-box;
 }
-gs-cell {
+/*gs-cell {
     white-space: pre;
     display: inline-block;
-}
+}*/
 
 /*
 gs-cell input {
