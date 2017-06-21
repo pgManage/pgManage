@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -443,20 +444,47 @@
                         getSingleCellData(tableRules, function (tabledef) {
                             console.log(arrDropObjects);
                             strDumpQuery = strDumpQuery.replace(/\{\{HELPDEF\}\}/gi, tabledef);
-                            var triggQuery = ml(function () {/*SELECT string_agg('-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' || 
-                            	'DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
-                            	regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
-                            	' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';', E'\n\n') as perms
-                            FROM pg_class 
-                            JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
-                            JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-                            WHERE tgrelid <> {{INTOID}} AND pg_trigger.tgname ILIKE '%{{RELNAME}}%' AND pg_trigger.tgisinternal != TRUE*/}).replace(/\{\{INTOID\}\}/gi, newOID).replace(/\{\{RELNAME\}\}/gi, strTableName);
+                            //var triggQuery = ml(function () {/*SELECT string_agg('-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' || 
+                            //	'DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
+                            //	regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
+                            //	' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';', E'\n\n') as perms
+                            //FROM pg_class 
+                            //JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                            //JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                            //WHERE tgrelid <> {{INTOID}} AND pg_trigger.tgname ILIKE '%{{RELNAME}}%' AND pg_trigger.tgisinternal != TRUE*/}).replace(/\{\{INTOID\}\}/gi, newOID).replace(/\{\{RELNAME\}\}/gi, strTableName);
                             
-                            getSingleCellData(triggQuery, function (triggdefs) {
-                                strDumpQuery += triggdefs;
+                            //getSingleCellData(triggQuery, function (triggdefs) {
+                            //    strDumpQuery += triggdefs;
+                            
+var userNotes = '-- ##########################################################################################\n';
+userNotes += '-- ##########################################################################################\n';
+userNotes += '-- \n';
+userNotes += '--    PLEASE READ!!\n';
+userNotes += '--\n';
+userNotes += '--  This script DROPs and CREATEs all the objects that MUST to be altered for your changes to\n';
+userNotes += '--     run. However, PostgreSQL does not detect dependencies in some objects, such as \n';
+userNotes += '--     FUNCTIONs and TRIGGER FUNCTIONs. FUNCTIONs and TRIGGER FUNCTIONs could contain \n';
+userNotes += '--     references to any one of the objects below. If you need to make a change to any of\n';
+userNotes += '--     the objects below to run this script, then make sure you search for references to that\n';
+userNotes += '--     object. \n';
+userNotes += '\n';
+userNotes += '-- Postage provides the following workflow to search for object references:\n';
+userNotes += '--     \n';
+userNotes += '--     On the left side of the screen, click on any SCHEMA in the Object Tree.\n';
+userNotes += '--     On the right, click on "Dump Schema to Script"\n';
+userNotes += '--     We recommend you deselect "ALL" and then select FUNCTIONs and TRIGGER FUNCTIONs\n';
+userNotes += '--     Select any additional item types that may reference your object. \n';
+userNotes += '--     Click "Open Script" and wait for your script to be generated. This can take a minute.\n';
+userNotes += '--     Your script will appear in a new tab. \n';
+userNotes += '--     Now you can use the FIND functionality to look for your objects.\n';
+userNotes += '--\n';
+userNotes += '-- ##########################################################################################\n';
+userNotes += '-- ##########################################################################################\n\n';
+                            
+        strDumpQuery = userNotes + strDumpQuery;                    
                                 window.top.newTab('sql', strSchemaName + '.' + strTableName, {'strContent': strDumpQuery});
                                 GS.removeLoader('generate-script');
-                            });
+                            //});
                         });
                     });
                 });
