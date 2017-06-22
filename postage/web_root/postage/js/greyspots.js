@@ -38536,6 +38536,38 @@ document.addEventListener('DOMContentLoaded', function () {
         var intInsertRecordBorderHeight;
         var intHeaderBorderHeight;
 
+        console.log(element.internalSelection.ranges.length, 1);
+        if (element.internalSelection.ranges.length === 1){
+            console.log(element.internalSelection.ranges[0].start.column);
+            console.log(element.internalSelection.ranges[0].end.column);
+            console.log(element.internalSelection.ranges[0].start.row);
+            console.log(element.internalSelection.ranges[0].end.row);
+        }
+
+        if (element.internalSelection.ranges.length === 1 &&
+            element.internalSelection.ranges[0].start.column ===
+            element.internalSelection.ranges[0].end.column &&
+            element.internalSelection.ranges[0].start.row ===
+            element.internalSelection.ranges[0].end.row
+        ) {
+            //console.log('one input');
+            var updatedInput = xtag.query(element, 'gs-cell[data-col-number="' +
+            element.internalSelection.ranges[0].start.column + '"][data-row-number="' +
+            element.internalSelection.ranges[0].start.row + '"] input');
+            var selectionStartOnCell = 0;
+            var selectionEndOnCell = 0;
+            if (updatedInput) {
+                updatedInput = updatedInput[0];
+                console.log(updatedInput.selectionStart, updatedInput.selectionEnd);
+                selectionStartOnCell = updatedInput.selectionStart;
+                selectionEndOnCell = updatedInput.selectionEnd;
+            }
+            //selectionStart;
+            //selectionEnd;
+
+        }
+
+
         // some code adds classes to the viewport. these need to be removed on
         //      a full re-render
         element.elems.dataViewport.setAttribute('class', 'table-data-viewport');
@@ -39010,9 +39042,21 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             col_i += 1;
         }
-
+        
+        
         // render cell selection
         renderSelection(element);
+        
+        
+        
+        if (selectionStartOnCell > 0 || selectionEndOnCell > 0) {
+            updatedInput = xtag.query(element, 'gs-cell[data-col-number="' +
+            element.internalSelection.ranges[0].start.column + '"][data-row-number="' +
+            element.internalSelection.ranges[0].start.row + '"] input')[0];
+            console.log(updatedInput);
+            updatedInput.setSelectionRange(selectionStartOnCell, selectionEndOnCell);
+        }
+        
     }
 
     // when you are scrolling, a lot of elements don't leave the screen. So,
@@ -41298,6 +41342,7 @@ document.addEventListener('DOMContentLoaded', function () {
         //      occurs: the user will see the changes
         element.internalDisplay.fullRenderRequired = true;
         renderLocation(element);
+        //console.log('In here!!');
     }
     function dataDELETEcallback(element) {
         // clear selection because the stuff that the user selected has
