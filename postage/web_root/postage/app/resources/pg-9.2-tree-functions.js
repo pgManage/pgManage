@@ -734,11 +734,11 @@ function treePrepareQuery(strQuery, oid, strName, sqlSafeName) {
     var schemaName = strName.substring(0, strName.indexOf('.'));
     var relName = strName.substring(parseInt(strName.indexOf('.'), 10) + 1, strName.length);
 
-    console.log(oid);
-    console.log(strName);
-    console.log(sqlSafeName);
-    console.log(schemaName);
-    console.log(relName);
+    // console.log(oid);
+    // console.log(strName);
+    // console.log(sqlSafeName);
+    // console.log(schemaName);
+    // console.log(relName);
     //console.log(strQuery);
     return strQuery
                 .replace(/{{INTOID}}/gi, oid)

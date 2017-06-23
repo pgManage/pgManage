@@ -34833,9 +34833,9 @@ document.addEventListener('DOMContentLoaded', function () {
             ////                    // removes extra whitespace
             ////                    .trim();
             ////
-            ////        console.log(strCell);
-            ////        console.log(arrMatch);
-            ////        console.log('########################');
+            ////        //console.log(strCell);
+            ////        //console.log(arrMatch);
+            ////        //console.log('########################');
             ////    } else {
             ////
             ////    }
@@ -36990,7 +36990,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ////      given the signal that it's ready
         //handlerFunction = function (event) {
         //    var jsnMessage = event.data;
-        //    console.log('handler received', jsnMessage);
+        //    //console.log('handler received', jsnMessage);
         //};
 
         //// this function listens to the web worker until the worker gives the
@@ -38186,7 +38186,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
 
                         //if (rec_i === 0) {
-                        //    console.log(
+                        //    //console.log(
                         //        'intChar:',
                         //        intChar,
                         //        'intColumn:',
@@ -38536,13 +38536,13 @@ document.addEventListener('DOMContentLoaded', function () {
         var intInsertRecordBorderHeight;
         var intHeaderBorderHeight;
 
-        console.log(element.internalSelection.ranges.length, 1);
-        if (element.internalSelection.ranges.length === 1){
-            console.log(element.internalSelection.ranges[0].start.column);
-            console.log(element.internalSelection.ranges[0].end.column);
-            console.log(element.internalSelection.ranges[0].start.row);
-            console.log(element.internalSelection.ranges[0].end.row);
-        }
+        //console.log(element.internalSelection.ranges.length, 1);
+        //if (element.internalSelection.ranges.length === 1){
+            //console.log(element.internalSelection.ranges[0].start.column);
+            //console.log(element.internalSelection.ranges[0].end.column);
+            //console.log(element.internalSelection.ranges[0].start.row);
+            //console.log(element.internalSelection.ranges[0].end.row);
+        //}
 
         if (element.internalSelection.ranges.length === 1 &&
             element.internalSelection.ranges[0].start.column ===
@@ -38556,9 +38556,9 @@ document.addEventListener('DOMContentLoaded', function () {
             element.internalSelection.ranges[0].start.row + '"] input');
             var selectionStartOnCell = 0;
             var selectionEndOnCell = 0;
-            if (updatedInput) {
+            if (updatedInput[0]) {
                 updatedInput = updatedInput[0];
-                console.log(updatedInput.selectionStart, updatedInput.selectionEnd);
+                //console.log(updatedInput.selectionStart, updatedInput.selectionEnd);
                 selectionStartOnCell = updatedInput.selectionStart;
                 selectionEndOnCell = updatedInput.selectionEnd;
             }
@@ -39049,12 +39049,14 @@ document.addEventListener('DOMContentLoaded', function () {
         
         
         
-        if (selectionStartOnCell > 0 || selectionEndOnCell > 0) {
+        if ((selectionStartOnCell > 0 || selectionEndOnCell > 0)) {
             updatedInput = xtag.query(element, 'gs-cell[data-col-number="' +
             element.internalSelection.ranges[0].start.column + '"][data-row-number="' +
             element.internalSelection.ranges[0].start.row + '"] input')[0];
-            console.log(updatedInput);
-            updatedInput.setSelectionRange(selectionStartOnCell, selectionEndOnCell);
+            //console.log(updatedInput);
+            if (updatedInput) {
+                updatedInput.setSelectionRange(selectionStartOnCell, selectionEndOnCell);
+            }
         }
         
     }
@@ -49726,6 +49728,102 @@ document.addEventListener('DOMContentLoaded', function () {
                 var arrColumnWidths;
                 var arrColumns;
 
+
+                var colsToResize = [];
+                var selectedBroken = false;
+                //console.log(arrSelectedColumns);
+                //console.log(
+                //    element.internalSelection.rows[0]
+                //    , ', header'
+                //);
+                if (element.internalSelection.rows[0] ===
+                    'header'
+                ) {
+                    //console.log(
+                    //    element.internalSelection.ranges.length
+                    //    , ', > 0'
+                   // );
+                    if (element.internalSelection.ranges.length
+                        > 0
+                    ) {
+                        var range_select = (
+                            element.internalSelection.ranges[0]
+                        );
+                        //console.log(range_select.start.row, ', header');
+                        if (range_select.start.row === 'header') {
+                            if (range_select.start.column === 'selector' &&
+                            range_select.end.column === 'selector') {
+                            var selected_len = (
+                                element.internalSelection.columns.length - 2
+                            );
+                            } else if (parseInt(
+                                ((range_select.end.column === 'selector')
+                                  ? 0
+                                  : range_select.end.column), 10) <
+                                parseInt(
+                                ((range_select.start.column === 'selector')
+                                  ? 0
+                                  : range_select.start.column), 10)
+                            ) {
+                            selectedBroken = true;
+                            var selected_len = (
+                                parseInt(
+                                ((range_select.start.column === 'selector')
+                                  ? 0
+                                  : range_select.start.column), 10) + 1 -
+                                parseInt(
+                                ((range_select.end.column === 'selector')
+                                  ? 0
+                                  : range_select.end.column), 10)
+                            );
+                            } else {
+                            selectedBroken = false;
+                            var selected_len = (
+                                parseInt(
+                                ((range_select.end.column === 'selector')
+                                  ? 0
+                                  : range_select.end.column), 10) + 1 -
+                                parseInt(
+                                ((range_select.start.column === 'selector')
+                                  ? 0
+                                  : range_select.start.column), 10)
+                            );
+                            }
+                            if (selected_len === 0) {
+                                selected_len = 1;
+                            }
+                            // console.log(
+                            //       selected_len
+                            //     , selectedBroken
+                            //     , range_select.start.column
+                            //     , range_select.end.column
+                            // );
+                            for (var selected_i = 0;
+                                selected_i < selected_len; selected_i++
+                            ) {
+                                if (selectedBroken) {
+                                colsToResize.push(
+                                    selected_i + parseInt(
+                                    ((range_select.end.column === 'selector')
+                                      ? 0
+                                      : range_select.end.column), 10)
+                                );
+                                } else {
+                                colsToResize.push(
+                                    selected_i + parseInt(
+                                    ((range_select.start.column === 'selector')
+                                      ? 0
+                                      : range_select.start.column), 10)
+                                );
+                                }
+                            }
+                        }
+                    }
+
+                }
+                colsToResize.push(element.internalResize.resizeColumnIndex);
+                //console.log(colsToResize);
+
                 // if scrolling is running, stop it because we are done with
                 //      the mouse part of the resize action
                 if (element.internalScroll.dragScrolling) {
@@ -49766,31 +49864,31 @@ document.addEventListener('DOMContentLoaded', function () {
                         // we need to know the selected columns so that we can
                         //      check to see if the resized column was selected
                         // convenience variable
-                        arrSelectedColumns = element.internalSelection.columns;
-                        arrSelectedColumns = (
-                            arrSelectedColumns.slice(
-                                arrSelectedColumns[0] === 'selector'
-                                    ? 1
-                                    : 0
-                            )
-                        );
+                // // arrSelectedColumns = element.internalSelection.columns;
+                        // // arrSelectedColumns = (
+                        // //     arrSelectedColumns.slice(
+                        // //         arrSelectedColumns[0] === 'selector'
+                        // //             ? 1
+                        // //             : 0
+                        // //     )
+                        // // );
 
                         // convenience variable
                         arrColumnWidths = (
                             element.internalDisplay.columnWidths
                         );
-
+                        //console.log(colsToResize);
                         // if the column we resized was seleced, resize any
                         //      columns that are selected and connected to it
-                        if (arrSelectedColumns.indexOf(intIndex) > -1) {
+                        if (colsToResize.indexOf(intIndex) > -1) {
                             arrColumns = (
                                 getConnectedSelectedColumns(element, intIndex)
                             );
 
                             i = 0;
-                            len = arrColumns.length;
+                            len = colsToResize.length;
                             while (i < len) {
-                                arrColumnWidths[arrColumns[i]] = intNew;
+                                arrColumnWidths[colsToResize[i]] = intNew;//[arrColumns[i]] = intNew;
 
                                 i += 1;
                             }
@@ -49920,7 +50018,119 @@ document.addEventListener('DOMContentLoaded', function () {
                             )
                         );
 
-                        resizeColumnsToContent(element, arrSelectedColumns);
+
+                        // console.log('I    H');
+                        // console.log('     E');
+                        // console.log('H    R');
+                        // console.log('A    E');
+                        // console.log('T     ');
+                        // console.log('E    B');
+                        // console.log('     E');
+                        // console.log('T     ');
+                        // console.log('H    D');
+                        // console.log('I    R');
+                        // console.log('S    A');
+                        // console.log('     G');
+                        // console.log('C    O');
+                        // console.log('O    N');
+                        // console.log('D    S');
+                        // console.log('E    !');
+
+                    var colsToResize = [], selectedBroken = false;
+                    //console.log(arrSelectedColumns);
+                    // console.log(
+                    //     element.internalSelection.rows[0]
+                    //     , ', header'
+                    // );
+                    if (element.internalSelection.rows[0] ===
+                        'header'
+                    ) {
+                        // console.log(
+                        //     element.internalSelection.ranges.length
+                        //     , ', > 0'
+                        // );
+                        if (element.internalSelection.ranges.length
+                            > 0
+                        ) {
+                            var range_select = (
+                                element.internalSelection.ranges[0]
+                            );
+
+                            if (range_select.start.row === 'header') {
+                                if (range_select.start.column === 'selector' &&
+                                range_select.end.column === 'selector') {
+                                var selected_len = (
+                                    element.internalSelection.columns.length - 2
+                                );
+                                } else if (parseInt(
+                                    ((range_select.end.column === 'selector')
+                                      ? 0
+                                      : range_select.end.column), 10) <
+                                    parseInt(
+                                    ((range_select.start.column === 'selector')
+                                      ? 0
+                                      : range_select.start.column), 10)
+                                ) {
+                                selectedBroken = true;
+                                var selected_len = (
+                                    parseInt(
+                                    ((range_select.start.column === 'selector')
+                                      ? 0
+                                      : range_select.start.column), 10) + 1 -
+                                    parseInt(
+                                    ((range_select.end.column === 'selector')
+                                      ? 0
+                                      : range_select.end.column), 10)
+                                );
+                                } else {
+                                selectedBroken = false;
+                                var selected_len = (
+                                    parseInt(
+                                    ((range_select.end.column === 'selector')
+                                      ? 0
+                                      : range_select.end.column), 10) + 1 -
+                                    parseInt(
+                                    ((range_select.start.column === 'selector')
+                                      ? 0
+                                      : range_select.start.column), 10)
+                                );
+                                }
+                                if (selected_len === 0) {
+                                    selected_len = 1;
+                                }
+
+                                for (var selected_i = 0;
+                                    selected_i < selected_len; selected_i++
+                                ) {
+
+                                if (selectedBroken) {
+                                colsToResize.push(
+                                    selected_i + parseInt(
+                                    ((range_select.end.column === 'selector')
+                                      ? 0
+                                      : range_select.end.column), 10)
+                                );
+                                } else {
+                                colsToResize.push(
+                                    selected_i + parseInt(
+                                    ((range_select.start.column === 'selector')
+                                      ? 0
+                                      : range_select.start.column), 10)
+                                );
+                                }
+
+                                }
+                            }
+                        }
+
+                        }
+                    colsToResize.push(element.internalResize.resizeColumnIndex);
+
+
+                        //console.log(colsToResize);
+                        resizeColumnsToContent(element, colsToResize);
+
+
 
                         //// convenience variable
                         //arrColumnWidths = (
@@ -52909,6 +53119,43 @@ document.addEventListener('DOMContentLoaded', function () {
                             resizeColumnsToHeader(element, arrSelectedColumns);
 
                         } else if (strAnswer === 'Fit To Content') {
+                            var colsToResize = [];
+                            //console.log(arrSelectedColumns);
+                            if (element.internalSelection.rows[0] ===
+                                'header'
+                            ) {
+
+                                if (element.internalSelection.ranges.length
+                                    > 0
+                                ) {
+
+                                    var range_select = (
+                                        element.internalSelection.ranges[0]
+                                    );
+                                    if (range_select.start.row === 'header') {
+                                        var selected_len = (
+                                            range_select.end.column -
+                                            range_select.start.column + 1
+                                        );
+
+                                        for (var selected_i = 0;
+                                            selected_i < selected_len;
+                                            selected_i++
+                                        ) {
+                                            colsToResize.push(
+                                                selected_i +
+                                                range_select.start.column
+                                            );
+                                        }
+                                    }
+                                }
+
+                            } else {
+                                //no headers selected: resize the column
+                                //  that was clicked
+                                colsToResize = arrSelectedColumns;
+                            }
+                            //console.log(colsToResize);
                             resizeColumnsToContent(element, arrSelectedColumns);
 
                         } else if (strAnswer === 'Hide Column(s)') {
