@@ -1894,6 +1894,7 @@ function quote_ident(strName) {
 function dataObjectButtons(strType, intOID, strSchema, strName) {
     'use strict';
     var strHTML = '', templateElement = document.createElement('template');
+    //console.log(strName);
 
     // de-quote_ident strName because the datasheet page doesn't want it idented
     if (strName[0] === '"') {
@@ -1910,6 +1911,7 @@ function dataObjectButtons(strType, intOID, strSchema, strName) {
         strType = 'view';
     }
 
+    //console.log(strName);
     //console.trace(intOID, strSchema, strName, strType);
 
     strHTML += '<gs-button inline remove-all icon="table" title="Edit the data in this object" ' +

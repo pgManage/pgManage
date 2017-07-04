@@ -363,6 +363,9 @@
                         // else if not a tab link
                         } else if (strView.indexOf('tab:') !== 0) {
                             arrParts = strView.split(':');
+                            if (arrParts[4]) {
+                                arrParts[3] = arrParts[3] + ':' + arrParts[4];
+                            }
                             buttons = associatedButtons[arrParts[0]];
 
                             strTemplate   = arrParts[0];
@@ -371,7 +374,7 @@
                             strObjectName = arrParts[3];
 
 
-
+                            //console.log(strObjectName);
                             // get tab name
                             if (strSchema && strObjectName) {
                                 // "strObjectName" should already be quote_ident in the listQuery

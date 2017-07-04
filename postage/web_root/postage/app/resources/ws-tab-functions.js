@@ -328,90 +328,90 @@ function alreadyLoadedFiles() {
 //}
 
 function dialogScriptOpen() {
-	GS.closeDialog(document.getElementsByTagName('gs-dialog')[0]);
+    GS.closeDialog(document.getElementsByTagName('gs-dialog')[0]);
 
-	// We are in electron here
-	var fs = require('fs');
-	var path = require('path');
-	var electron = require('electron').remote;
-	var dialog = electron.dialog;
-	var arrFilePath = dialog.showOpenDialog({
-		title: 'Open File',
-		filters: [
-			{
-				name: 'Sql Files',
-				extensions: ['sql']
-			},
-    		{
-				name: 'All Files',
-				extensions: ['*']
-			}
-		],
-		properties: ['openFile']
-	});
+    // We are in electron here
+    var fs = require('fs');
+    var path = require('path');
+    var electron = require('electron').remote;
+    var dialog = electron.dialog;
+    var arrFilePath = dialog.showOpenDialog({
+        title: 'Open File',
+        filters: [
+            {
+                name: 'Sql Files',
+                extensions: ['sql']
+            },
+            {
+                name: 'All Files',
+                extensions: ['*']
+            }
+        ],
+        properties: ['openFile']
+    });
 
-	// dialog.showOpenDialog will return undefined if the user cancels the selection
-	if (arrFilePath !== undefined) {
-		var 	filePath = arrFilePath[0]
-			,	fileName = path.basename(filePath);
-		fs.readFile(filePath, 'utf8', function readCallback(err, strContent) {
-			if (err) {
-				var templateElement = document.createElement('template');
-				templateElement.innerHTML = ml(function () {/*
-					<gs-page>
-						<gs-header><center><h3>Reading failed!</h3></center></gs-header>
-						<gs-body padded>
-							<center>{{desc}}/center>
-						</gs-body>
-						<gs-footer>
-							<gs-button dialogclose bg-primary tabindex="0">Try Again</gs-button>
-						</gs-footer>
-					</gs-page>
-				*/}).replace(/\{\{desc\}\}/, err.message);
+    // dialog.showOpenDialog will return undefined if the user cancels the selection
+    if (arrFilePath !== undefined) {
+        var     filePath = arrFilePath[0]
+            ,    fileName = path.basename(filePath);
+        fs.readFile(filePath, 'utf8', function readCallback(err, strContent) {
+            if (err) {
+                var templateElement = document.createElement('template');
+                templateElement.innerHTML = ml(function () {/*
+                    <gs-page>
+                        <gs-header><center><h3>Reading failed!</h3></center></gs-header>
+                        <gs-body padded>
+                            <center>{{desc}}/center>
+                        </gs-body>
+                        <gs-footer>
+                            <gs-button dialogclose bg-primary tabindex="0">Try Again</gs-button>
+                        </gs-footer>
+                    </gs-page>
+                */}).replace(/\{\{desc\}\}/, err.message);
 
-				GS.openDialog(templateElement, function () {
+                GS.openDialog(templateElement, function () {
 
-				}, function (event) {
-					fs.readFile(filePath, 'utf8', readCallback);
-				});
-			} else {
-				GS.requestFromSocket(GS.envSocket, 'TAB\tWRITE\topen/' + encodeTabNameForFileName(fileName) + '\t0\n' + strContent, function (data, error, errorData) {
-		            if (!error) {
-						if (data === 'TRANSACTION COMPLETED') {
-							GS.requestFromSocket(GS.envSocket, 'TAB\tWRITE\topen/' + encodeTabNameForFileName(fileName + '~') + '\t0\n' + filePath, function (data, error, errorData) {
-					            if (!error) {
-									if (data === 'TRANSACTION COMPLETED') {
-										loadTabsFromServer(true);
-									}
-					            } else {
-									loadTabsFromServer(true);
-					                GS.webSocketErrorDialog(errorData);
-					            }
-							});
-						}
-		            } else {
-		                GS.webSocketErrorDialog(errorData);
-		            }
-				});
-			}
-		});
-	}
+                }, function (event) {
+                    fs.readFile(filePath, 'utf8', readCallback);
+                });
+            } else {
+                GS.requestFromSocket(GS.envSocket, 'TAB\tWRITE\topen/' + encodeTabNameForFileName(fileName) + '\t0\n' + strContent, function (data, error, errorData) {
+                    if (!error) {
+                        if (data === 'TRANSACTION COMPLETED') {
+                            GS.requestFromSocket(GS.envSocket, 'TAB\tWRITE\topen/' + encodeTabNameForFileName(fileName + '~') + '\t0\n' + filePath, function (data, error, errorData) {
+                                if (!error) {
+                                    if (data === 'TRANSACTION COMPLETED') {
+                                        loadTabsFromServer(true);
+                                    }
+                                } else {
+                                    loadTabsFromServer(true);
+                                    GS.webSocketErrorDialog(errorData);
+                                }
+                            });
+                        }
+                    } else {
+                        GS.webSocketErrorDialog(errorData);
+                    }
+                });
+            }
+        });
+    }
 }
 
 function saveCurrentScript(bolForceSaveAs) {
-	var strQueryString = GS.getQueryString()
+    var strQueryString = GS.getQueryString()
       , strView = GS.qryGetVal(strQueryString, 'view')
       , strCurrentTab;
 
     if (strView.indexOf('tab:') === 0) {
         strCurrentTab = strView.substring('tab:'.length);
-		strCurrentTab = '/open/' + encodeTabNameForFileName(strCurrentTab.substring('/open/'.length));
-		saveScriptAsFile(strCurrentTab, bolForceSaveAs);
+        strCurrentTab = '/open/' + encodeTabNameForFileName(strCurrentTab.substring('/open/'.length));
+        saveScriptAsFile(strCurrentTab, bolForceSaveAs);
     } else {
-		alert('There is no tab selected!');
-	}
+        alert('There is no tab selected!');
+    }
 
-	GS.closeDialog(document.getElementsByTagName('gs-dialog')[0]);
+    GS.closeDialog(document.getElementsByTagName('gs-dialog')[0]);
 }
 
 function dialogScriptUpload() {
@@ -1496,7 +1496,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
             //}
         }
 
-		tabElement.intTabNumber = intTabNumber;
+        tabElement.intTabNumber = intTabNumber;
 
         // bind sql results resizing
         tabElement.relatedResizeHandle.addEventListener(evt.mousedown, function (event) {
@@ -1805,78 +1805,78 @@ function closeFile(tabElement, callBack) {
 }
 
 function saveScriptAsFile(strFileName, forceSaveAs) {
-	// We are inside electron here
-	var fs = require('fs');
-	var os = require('os');
-	var path = require('path');
-	var electron = require('electron').remote;
-	var dialog = electron.dialog;
+    // We are inside electron here
+    var fs = require('fs');
+    var os = require('os');
+    var path = require('path');
+    var electron = require('electron').remote;
+    var dialog = electron.dialog;
 
-	var i = 0, j = 0;
+    var i = 0, j = 0;
     GS.requestFromSocket(GS.envSocket,
                          'TAB\tREAD\t' + GS.encodeForTabDelimited(strFileName), function (data, error, errorData) {
         if (!error) {
             if (i === 0) {
-				var newLineIndex = data.indexOf('\n'), strContent = data.substring(newLineIndex + 1);
-				GS.requestFromSocket(GS.envSocket,
-			                         'TAB\tREAD\t' + GS.encodeForTabDelimited(strFileName + encodeTabNameForFileName('~')), function (data, error, errorData) {
-					var strNewFileName = '';
-		            if (j === 0) {
-				        if (!error && !forceSaveAs) {
-							var newLineIndex = data.indexOf('\n');
-							strNewFileName = data.substring(newLineIndex + 1);
-				        } else {
-							strNewFileName = dialog.showSaveDialog({
-								title: 'Save File',
-								defaultPath: os.homedir() + '/Documents/' + path.basename(decodeFileNameForTabName(strFileName)),
-								filters: [
-									{
-										name: 'Sql Files',
-										extensions: ['sql']
-									},
-						    		{
-										name: 'All Files',
-										extensions: ['*']
-									}
-								],
-								properties: ['openFile']
-							});
-						}
-						console.log(strNewFileName, forceSaveAs);
-						if (strNewFileName !== undefined) {
-							function save() {
-								GS.addLoader('saving', 'Saving...');
-								fs.writeFile(strNewFileName, strContent, 'utf8', function (err) {
-									GS.removeLoader('saving', 'Saving...');
-									if (err) {
-										var templateElement = document.createElement('template');
-			                            templateElement.innerHTML = ml(function () {/*
-			                                <gs-page>
-			                                    <gs-header><center><h3>Saving failed!</h3></center></gs-header>
-			                                    <gs-body padded>
-			                                        <center>{{desc}}/center>
-			                                    </gs-body>
-			                                    <gs-footer>
-			                                        <gs-button dialogclose bg-primary tabindex="0">Try Again</gs-button>
-			                                    </gs-footer>
-			                                </gs-page>
-			                            */}).replace(/\{\{desc\}\}/, err.message);
+                var newLineIndex = data.indexOf('\n'), strContent = data.substring(newLineIndex + 1);
+                GS.requestFromSocket(GS.envSocket,
+                                     'TAB\tREAD\t' + GS.encodeForTabDelimited(strFileName + encodeTabNameForFileName('~')), function (data, error, errorData) {
+                    var strNewFileName = '';
+                    if (j === 0) {
+                        if (!error && !forceSaveAs) {
+                            var newLineIndex = data.indexOf('\n');
+                            strNewFileName = data.substring(newLineIndex + 1);
+                        } else {
+                            strNewFileName = dialog.showSaveDialog({
+                                title: 'Save File',
+                                defaultPath: os.homedir() + '/Documents/' + path.basename(decodeFileNameForTabName(strFileName)),
+                                filters: [
+                                    {
+                                        name: 'Sql Files',
+                                        extensions: ['sql']
+                                    },
+                                    {
+                                        name: 'All Files',
+                                        extensions: ['*']
+                                    }
+                                ],
+                                properties: ['openFile']
+                            });
+                        }
+                        console.log(strNewFileName, forceSaveAs);
+                        if (strNewFileName !== undefined) {
+                            function save() {
+                                GS.addLoader('saving', 'Saving...');
+                                fs.writeFile(strNewFileName, strContent, 'utf8', function (err) {
+                                    GS.removeLoader('saving', 'Saving...');
+                                    if (err) {
+                                        var templateElement = document.createElement('template');
+                                        templateElement.innerHTML = ml(function () {/*
+                                            <gs-page>
+                                                <gs-header><center><h3>Saving failed!</h3></center></gs-header>
+                                                <gs-body padded>
+                                                    <center>{{desc}}/center>
+                                                </gs-body>
+                                                <gs-footer>
+                                                    <gs-button dialogclose bg-primary tabindex="0">Try Again</gs-button>
+                                                </gs-footer>
+                                            </gs-page>
+                                        */}).replace(/\{\{desc\}\}/, err.message);
 
-			                            GS.openDialog(templateElement, function () {
+                                        GS.openDialog(templateElement, function () {
 
-										}, function (event, strAnswer) {
-			                                save();
-			                            });
-									}
-								});
-							}
-							save();
-						}
-					}
-					j += 1;
-			    });
-			}
-			i += 1;
+                                        }, function (event, strAnswer) {
+                                            save();
+                                        });
+                                    }
+                                });
+                            }
+                            save();
+                        }
+                    }
+                    j += 1;
+                });
+            }
+            i += 1;
         } else {
             GS.webSocketErrorDialog(errorData);
         }
@@ -2176,8 +2176,8 @@ function menuExplain(target) {
                     Explain
                 </gs-button>
                 <gs-button style="width: 100%;" dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" title="Query explanation. Note that the query will run, meaning that you'll get run times." remove-top no-focus>
-                	<span class="explain-letter" icon="play">E</span>
-                	Explain Analyze
+                    <span class="explain-letter" icon="play">E</span>
+                    Explain Analyze
                 </gs-button>
             </gs-body>
         </gs-page>
@@ -2263,7 +2263,7 @@ function SQLBeautify(strInput) {
     //@@@@@@@@@@@@@' ,&&,  ^@*'     ,  .  i^"@e, ,e@e  @@
     //@@@@@@@@@@@@' ,@@@@,          ;  ,& !,,@@@e@@@@ e@@
     //@@@@@,~*@@*' ,@@@@@@e,   ',   e^~^@,   ~'@@@@@@,@@@
-    //@@@@@@, ~" ,e@@@@@@@@@*e*@*  ,@e  @@""@e,,@@@@@@@@@
+    //@@@@@@, ~" ,e'loltlygk kbvjn okfhjeewwljnnomkvtxchgubredbhju hcxsz4xdc r cxxxxxxxxzzzzzzzzzzvsg6hhqujarfhfr6ayytr3j@@@@@@@@@*e*@*  ,@e  @@""@e,,@@@@@@@@@
     //@@@@@@@@ee@@@@@@@@@@@@@@@" ,e@' ,e@' e@@@@@@@@@@@@@
     //@@@@@@@@@@@@@@@@@@@@@@@@" ,@" ,e@@e,,@@@@@@@@@@@@@@
     //@@@@@@@@@@@@@@@@@@@@@@@~ ,@@@,,0@@@@@@@@@@@@@@@@@@@
@@ -2277,6 +2277,7 @@ function SQLBeautify(strInput) {
     var bolGrant = false;
     var bolStdin = false;
     var bolRule = false;
+    var bolTable = false;
     var bolLastComment = false;
     var intCase = 0;
     var i;
@@ -2367,7 +2368,25 @@ function SQLBeautify(strInput) {
             bolNoExtraWhitespace = true;
             int_qs = 0;
             //console.log("found end of double quote");
-
+        // FOUND CREATE OR REPLACE TABLE... (
+        } else if (int_qs === 0 && int_ps === 0 && bolTable && strInput.substr(i, 1) === "(") {
+            strResult += strInput[i] + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel) + 1);
+            int_ps = int_ps + 1;
+            intTabLevel += 1;
+            bolNoExtraWhitespace = true;
+            //console.log(">(|" + intTabLevel + "<");
+        // FOUND CREATE OR REPLACE TABLE... )
+        } else if (int_qs === 0 && int_ps === 1 && bolTable && strInput.substr(i, 1) === ")") {
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substring(0, strResult.length - 1);
+            }
+            strResult += '\n' + strInput[i] + ' ';
+            bolNoExtraWhitespace = true;
+            //i += 1;
+            int_ps = int_ps - 1;
+            intTabLevel -= 1;
+            //console.log(">(|" + intTabLevel + "<");
         // FOUND OPEN PARENTHESIS:
         } else if (int_qs === 0 && strInput.substr(i, 1) === "(") {
             strResult += strInput[i];
@@ -2468,7 +2487,7 @@ function SQLBeautify(strInput) {
                 strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel) + 1) + ', ';
                 bolNoExtraWhitespace = true;
             } else {
-                strResult += ', ' + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel) + 1);
+                strResult += ',' + '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel) + 1);
             }
             //console.log(">,|" + intTabLevel + "<");
 
@@ -2504,6 +2523,7 @@ function SQLBeautify(strInput) {
                 }
             }
             bolRule = false;
+            bolTable = false;
             bolGrant = false;
             bolLastComment = false;
             bolNoExtraWhitespace = true;
@@ -2717,6 +2737,26 @@ function SQLBeautify(strInput) {
             i = i + 2 + (strInput.substr(i + 3, 1) === ' ' ? 1 : 0);
             bolNoExtraWhitespace = true;
             //console.log(">END|" + intTabLevel + "<");
+
+        // FOUND CREATE OR REPLACE TABLE
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?TABLE\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            bolTable = true;
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE[\ \t]+)?TABLE/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE[\ \t]+)?TABLE/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+            //console.log(">CREATE OR REPLACE TABLE|" + intTabLevel + "<");
+        // FOUND CREATE OR REPLACE TABLE... ,
+        } else if (int_qs === 0 && int_ps === 1 && bolTable && strInput.substr(i, 1) === ",") {
+            // Remove comma and whitespace
+            strResult = strResult.trim();
+            //console.log(localStorage.bolComma);
+            if (localStorage.bolComma === 'true') {
+                strResult += '\n' + '\t'.repeat((intTabLevel < 0) ? 0 : intTabLevel) + ', ';
+                bolNoExtraWhitespace = true;
+            } else {
+                strResult += ',' + '\n' + '\t'.repeat((intTabLevel < 0) ? 0 : intTabLevel);
+            }
+            //console.log(">,|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE RULE
         } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?RULE\b/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {

@@ -4428,7 +4428,8 @@ if(bolHeader&&intMouseY<=intHeaderHeight){row='header';}else{intTop=intHeaderHei
 intTop+=arrRecordHeights[i];intTop+=intRowBorderHeight;i+=1;}
 if(bolInsertRecord&&intMouseY>=intTop){row='insert';}}
 return{"row":row,"column":column};}
-function resolveElementAttributes(element){var arrParts;if(element.getAttribute('src')){arrParts=GS.templateWithQuerystring(element.getAttribute('src')).split('.');element.setAttribute('schema',arrParts[0]);element.setAttribute('object',arrParts[1]);element.setAttribute('pk',(element.getAttribute('pk')||'id'));element.setAttribute('lock',(element.getAttribute('lock')||'change_stamp'));}
+function resolveElementAttributes(element){var arrParts;if(element.getAttribute('src')){arrParts=GS.templateWithQuerystring(element.getAttribute('src')).split('.');element.setAttribute('schema',arrParts[0]);if(arrParts[2]){arrParts[1]=arrParts[1]+'.'+arrParts[2];}
+element.setAttribute('object',arrParts[1]);element.setAttribute('pk',(element.getAttribute('pk')||'id'));element.setAttribute('lock',(element.getAttribute('lock')||'change_stamp'));}
 element.setAttribute('null-string',(element.getAttribute('null-string')||''));}
 function prepareElement(element){var rootElement;var i;if(!element.getAttribute('id')){globalIDSeq+=1;i=0;while(i<500&&document.getElementById('table-dynamic-id-'+globalIDSeq)){globalIDSeq+=1;i+=1;}
 element.setAttribute('id','table-dynamic-id-'+globalIDSeq);console.warn('GS-TABLE Warning: All gs-table elements must have'+' an ID. Adding dynamic ID:'+' "table-dynamic-id-'+globalIDSeq+'". Do not use'+' this ID for anything. Do not use it for HTML, CSS or'+' JS or anything else as it can change between page'+' loads.');}

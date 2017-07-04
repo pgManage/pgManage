@@ -35896,6 +35896,11 @@ document.addEventListener('DOMContentLoaded', function () {
             ).split('.');
 
             element.setAttribute('schema', arrParts[0]);
+            
+            if (arrParts[2]) {
+                arrParts[1] = arrParts[1] + '.' + arrParts[2];
+            }
+
             element.setAttribute('object', arrParts[1]);
 
             // default "pk" and "lock" attributes

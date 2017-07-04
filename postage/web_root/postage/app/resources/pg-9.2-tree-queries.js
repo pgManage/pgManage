@@ -1351,7 +1351,7 @@ scriptQuery.objectTriggerFunction = scriptQuery.objectFunction = ml(function () 
     	WHERE pg_proc.oid = {{INTOID}} AND proisagg = FALSE)
     	
     -- SELECT
-    || (SELECT CASE WHEN typname != 'trigger' THEN E'\n\n--SELECT ' 
+    || (SELECT CASE WHEN typname != 'trigger' THEN E'\n\n--SELECT ' || CASE WHEN pg_get_function_result(pg_proc.oid) ILIKE '%setof%' OR pg_get_function_result(pg_proc.oid) ILIKE '%table%' THEN '* FROM ' ELSE '' END
     	|| quote_ident(nspname) || '.' || quote_ident(proname) || '(' || COALESCE(pg_get_function_identity_arguments(pg_proc.oid), '') || ')' 
     	|| E';\n' ELSE '' END 
     	FROM pg_proc 
@@ -1925,7 +1925,7 @@ SELECT '-- Constraint: ' || conname || E';\n\n' ||
                         LIMIT 1;
 */});
 
-    
+//snapback
 associatedButtons.objectTable = ['propertyButton', 'dependButton', 'statButton', 'dataObjectButtons'];
 scriptQuery.objectTable = ml(function () {/*
            
@@ -2111,18 +2111,18 @@ scriptQuery.objectTable = ml(function () {/*
         JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}' ), '')
         
-        -- also does GRANT lines, perhaps for column permissions?
+        -- also does GRANT lines, for column permissions?
         || COALESCE(
         (SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (SELECT 'GRANT ' || (SELECT array_to_string((SELECT array_agg(perms)
-        	FROM (	SELECT 4, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'r[^*]' THEN 'SELECT(' || att.attname || ')' END as perms
-        		UNION SELECT 3, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'w[^*]' THEN 'UPDATE(' || att.attname || ')' END
-        		UNION SELECT 2, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'a[^*]' THEN 'INSERT(' || att.attname || ')' END
-        		UNION SELECT 1, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'x[^*]' THEN 'REFERENCES(' || att.attname || ')' END ) em
+        	FROM (	SELECT 4, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'r[^*]' THEN 'SELECT (' || att.attname || ')' END as perms
+        		UNION SELECT 3, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'w[^*]' THEN 'UPDATE (' || att.attname || ')' END
+        		UNION SELECT 2, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'a[^*]' THEN 'INSERT (' || att.attname || ')' END
+        		UNION SELECT 1, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'x[^*]' THEN 'REFERENCES (' || att.attname || ')' END ) em
         		WHERE perms is not null
-        		ORDER BY 1),','
+        		ORDER BY 1),', '
         		)) ||
         	' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
-        	' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END ||
+        	' TO ' || CASE WHEN substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2) = '' THEN 'public' ELSE quote_ident(substr((regexp_split_to_array(att.attacl::text,'[=/]'))[1], 2)) END ||
         	';' as perms
         FROM pg_class 
         LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
