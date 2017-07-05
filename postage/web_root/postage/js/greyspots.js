@@ -38492,7 +38492,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderLocationFull(element) {
-        //snapback
         var arrColumnWidths;
         var arrRecordHeights;
         var columnBorderWidth;
@@ -47914,6 +47913,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var intColumn;
                 var newRange;
                 var jsnLocation;
+                element.bolFocusHiddenTextarea = false;
 
                 // var bolIsDataCell;
                 // var bolIsAllSelector;
@@ -48078,6 +48078,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         //      the intCurrentSelectionIndex to the index of the
                         //      latest selection
                         if (event.shiftKey) {
+                            //console.log('OVER HERE');
                             intCurrentSelectionIndex = (
                                 element.internalSelection.ranges.length - 1
                             );
@@ -48114,7 +48115,15 @@ document.addEventListener('DOMContentLoaded', function () {
                                     element.internalSelection.ranges.length - 1
                                 );
                             }
-
+                            if (
+                            element.internalSelection.ranges[0].start.row !==
+                            element.internalSelection.ranges[0].end.row ||
+                            element.internalSelection.ranges[0].start.column !==
+                            element.internalSelection.ranges[0].end.column
+                            ) {
+                                //console.log('Focus, grasshopper');
+                                element.bolFocusHiddenTextarea = true;
+                            }
                         // else if the CMD of CTRL key is down, we create a new
                         //      selection and append it to the end
                         } else if (event.metaKey || event.ctrlKey) {
@@ -48367,6 +48376,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 // we need to let the other code know that we are no longer
                 //      selecting
                 element.internalSelection.currentlySelecting = false;
+
+                if (element.bolFocusHiddenTextarea) {
+                    focusHiddenControl(element);
+                    //console.log(document.activeElement);
+                }
             };
 
             element.elems.dataContainer.addEventListener(
