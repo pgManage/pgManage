@@ -1842,7 +1842,7 @@ function saveScriptAsFile(strFileName, forceSaveAs) {
                                 properties: ['openFile']
                             });
                         }
-                        console.log(strNewFileName, forceSaveAs);
+                        //console.log(strNewFileName, forceSaveAs);
                         if (strNewFileName !== undefined) {
                             function save() {
                                 GS.addLoader('saving', 'Saving...');

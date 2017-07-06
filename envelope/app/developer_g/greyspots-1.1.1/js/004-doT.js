@@ -9,6 +9,20 @@ d[c].text.replace(new RegExp("(^|[^\\w$])"+d[c].arg+"([^\\w$])","g"),"$1"+l+"$2"
 define:/\{\{##\s*([\w\.$]+)\s*(\:|=)([\s\S]+?)#\}\}/g,defineParams:/^\s*([\w$]+):([\s\S]+)/,conditional:/\{\{\?(\?)?\s*([\s\S]*?)\s*\}\}/g,iterate:/\{\{~\s*(?:\}\}|([\s\S]+?)\s*\:\s*([\w$]+)\s*(?:\:\s*([\w$]+))?\s*\}\})/g,varname:"it",strip:!0,append:!0,selfcontained:!1,doNotSkipEncoded:!1},template:void 0,compile:void 0},m;
 
 
+
+// f.encodeHTMLSource = function(b) {
+//         var a = {
+//                 "&": "&#38;",
+//                 "<": "&#60;",
+//                 ">": "&#62;",
+//                 '"': "&#34;",
+//                 "'": "&#39;",
+//                 "/": "&#47;"
+//             },
+//             d = b ? /[&<>"'\/]/g : /&(?!#?\w+;)|<|>|"|'|\//g;
+//         return function(b) {
+//                 return b ?
+
 f.encodeHTMLSource=function(b){var a={"&":"&#38;","<":"&#60;",">":"&#62;",'"':"&#34;","'":"&#39;","/":"&#47;"},d=b?/[&<>"'\/]/g:/&(?!#?\w+;)|<|>|"|'|\//g;return function(b){return b?
 b.toString().replace(d,function(b){return a[b]||b}):b}}; // replaced :"" with :b so that if you put a zero in encodehtml you get a zero out of encodehtml
 
