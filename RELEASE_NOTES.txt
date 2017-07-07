@@ -1,3 +1,23 @@
+Changes since 3.2.15:
+Postage:
+Rewrite generate script for table designer (closed workflowproducts/postage#307)
+Fix beautify not working on tables (closed workflowproducts/postage#318)
+Fix dollar tag syntax highlighting (closed workflowproducts/postage#274)
+Fix function utility comment script on table functions (closed workflowproducts/postage#319)
+Fix object browser losing track of replaced view (closed workflowproducts/postage#220)
+Fix object browser losing track of replaced schema (closed workflowproducts/postage#251)
+Fix column permissions in table script (closed workflowproducts/postage#316)
+
+Envelope:
+Fix GS-Time showing PM at wrong time (closed workflowproducts/envelope#68)
+
+Both:
+Fix datasheet inserting a record scrolls to the top (closed workflowproducts/postage#309)
+Fix datasheet column resizing behaviors (closed workflowproducts/envelope#70, workflowproducts/postage#315)
+Fix datasheet allows cursor while multiple columns are selected (closed workflowproducts/postage#308)
+Fix datasheet updating selection after changing a cell (closed workflowproducts/postage#311)
+
+
 Changes since 3.2.14:
 Postage:
 - Fix datasheet preventing scrolling of the results pane (closed workflowproducts/postage#306)
