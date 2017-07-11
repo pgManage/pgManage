@@ -603,7 +603,7 @@ GRANT ALL ON FUNCTION gsdoc.action_ajax_test_timeout(text) TO normal_g;
                     database.
                 </div>
                 <div class="text-right">
-                    <small><gs-button id="button-select-all" inline remove-bottom>Select Code<br />For Copy</gs-button></small>
+                    <small><gs-button id="button-select-all" inline remove-bottom>Copy Code</gs-button></small>
                 </div>
                 <textarea id="area-sql-text" style="resize: none;" flex>{{SQL}}</textarea>
             </gs-body>
@@ -613,11 +613,24 @@ GRANT ALL ON FUNCTION gsdoc.action_ajax_test_timeout(text) TO normal_g;
         </gs-page>*/
     }).replace(/\{\{SQL\}\}/gi, strPostgreSQL);
 
+    function copyStringToClipboard (string) {
+        function handler (event){
+            event.clipboardData.setData('text/plain', string);
+            event.preventDefault();
+            document.removeEventListener('copy', handler, true);
+        }
+    
+        document.addEventListener('copy', handler, true);
+        document.execCommand('copy');
+    }
+
+
     GS.openDialog(templateElement, function () {
         document.getElementById('button-select-all').addEventListener('click', function () {
             var sqlArea = document.getElementById('area-sql-text');
             sqlArea.focus();
             GS.setInputSelection(sqlArea, 0, sqlArea.value.length);
+            copyStringToClipboard(sqlArea.value);
         });
     });
 }
