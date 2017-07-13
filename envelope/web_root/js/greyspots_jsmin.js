@@ -1025,19 +1025,33 @@ GS.userChangePassword=function(){changePassword('env','User');};})();GS.normalUs
                 */}).replace('{{ERROR}}',(strOldError?'<br /><div style="color: #FF0000">'+strOldError+'</div>':''));if(GS.getCookie('greyspots_uname')){xtag.query(templateElement.content,'#normal-uname')[0].setAttribute('value',decodeURIComponent(GS.getCookie('greyspots_uname')));xtag.query(templateElement.content,'#normal-pword')[0].setAttribute('autofocus','');}else{xtag.query(templateElement.content,'#normal-uname')[0].setAttribute('autofocus','');}
 GS.openDialog(templateElement,function(){var dialog=this;document.getElementById('normal-pword').addEventListener('keydown',function(event){var intKeyCode=event.which||event.keyCode;if(intKeyCode===13){GS.triggerEvent(document.getElementById('normal-login'),'click');}});document.getElementById('normal-login').addEventListener('click',function(){var strUserName=document.getElementById('normal-uname').value,strLink;if(document.getElementById('normal-pword').value){GS.addLoader('log-in','Logging In...');GS.ajaxJSON('/env/auth','action=login'+'&username='+encodeURIComponent(document.getElementById('normal-uname').value)+'&password='+encodeURIComponent(document.getElementById('normal-pword').value),function(data,error){GS.removeLoader('log-in');GS.closeDialog(dialog,'');window.userLogin=false;if(!error){GS.setCookie('greyspots_uname',strUserName,30);if(typeof loggedInCallback==='function'){if(window.location.hostname.substring(0,window.location.hostname.indexOf('.'))===strDefaultSubDomain){GS.normalUserLogin(loggedInCallback,'',strDefaultSubDomain);}else{loggedInCallback(data.dat,strDefaultSubDomain);}}}else{GS.normalUserLogin(loggedInCallback,data.error_text,strDefaultSubDomain);}});}});});}});}};(function(){'use strict';function encodeForTabDelimited(strValue){return strValue==='\\N'?strValue:strValue.replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/\r/g,'\\r').replace(/\t/g,'\\t').replace(/^NULL$/g,'\\N');}
 GS.bolPreventErrors=false;function webSocketConnectionErrorDialog(socket,addinText,retryCallback,cancelCallback){if(!document.getElementById('dialog-from-dialog-ws-conn-error')&&GS.bolPreventErrors===false){var templateElement=document.createElement('template');GS.removeAllLoaders();templateElement.setAttribute('id','dialog-ws-conn-error');templateElement.setAttribute('data-theme','error');templateElement.innerHTML=ml(function(){/*
+
                 <gs-page>
+
                     <gs-header><center><h3>There was an error!</h3></center></gs-header>
+
                     <gs-body padded>
+
                         <pre style="white-space: pre-wrap;">
+
     There has been an error with the Database connection.{{ADDIN}}</pre>
+
                     </gs-body>
+
                     <gs-footer>
+
                         <gs-grid gutter reflow-at="420">
+
                             <gs-block><gs-button dialogclose>Try to reconnect</gs-button></gs-block>
+
                             <gs-block><gs-button dialogclose>Dismiss so I can copy my progress</gs-button></gs-block>
+
                         </gs-grid>
+
                     </gs-footer>
+
                 </gs-page>
+
             */}).replace('{{ADDIN}}',decodeURIComponent((addinText?'\n\n'+addinText:'')));GS.openDialog(templateElement,'',function(event,strAnswer){if(strAnswer==='Try to reconnect'){GS.closeSocket(GS.envSocket);GS.envSocket=GS.openSocket('env',socket.GSSessionID,socket.notifications);}else{GS.bolPreventErrors=true;}});}}
 function webSocketNormalizeError(event){var i;var len;var arrLines;var arrLine;var strData;var jsnRet={'error_title':'','error_text':'','error_detail':'','error_hint':'','error_query':'','error_context':'','error_position':'','error_notice':'','original_data':event};event=event||{};jsnRet.error_text=event.reason||'';if(event.data){strData=event.data;if(strData.substring(0,strData.indexOf(' '))==='messageid'){strData=strData.substring(strData.indexOf('\n')+1);}
 if(strData.substring(0,strData.indexOf(' '))==='responsenumber'){strData=strData.substring(strData.indexOf('\n')+1);}
@@ -1062,23 +1076,41 @@ function errorJSONToHTML(errorJSON){console.log(errorJSON);return'<pre style="wo
 (errorJSON.error_context?'<br /><br />CONTEXT: '+encodeHTML(errorJSON.error_context):'')+
 (errorJSON.error_notice?'<br /><br /><br />'+encodeHTML(errorJSON.error_notice):''))+'</pre>';}
 GS.webSocketErrorDialog=function(jsnError,tryAgainCallback,cancelCallback){if(GS.bolPreventErrors===false){var templateElement=document.createElement('template'),strHTML,jsnErrorClean;jsnErrorClean={};jsnErrorClean.error_text=cleanErrorValue(jsnError.error_text);jsnErrorClean.error_hint=cleanErrorValue(jsnError.error_hint);jsnErrorClean.error_detail=cleanErrorValue(jsnError.error_detail);jsnErrorClean.error_query=cleanErrorValue(jsnError.error_query);jsnErrorClean.error_position=cleanErrorValue(jsnError.error_position);jsnErrorClean.error_context=cleanErrorValue(jsnError.error_context);jsnErrorClean.error_notice=cleanErrorValue(jsnError.error_notice);templateElement.setAttribute('data-theme','error');strHTML=ml(function(){/*
+
                 <gs-page>
+
                     <gs-header><center><h3>There was an error!</h3></center></gs-header>
+
                     <gs-body padded>
+
                         {{HTML}}
+
                         <br />
+
                         <gs-button class="error-button-show-full-text">Show Full Error Text</gs-button>
+
                     </gs-body>
+
                     <gs-footer>{{BUTTONS}}</gs-footer>
+
                 </gs-page>
+
             */}).replace('{{HTML}}',errorJSONToHTML(jsnErrorClean));var openFunction=function(){xtag.query(this,'.error-button-show-full-text')[0].addEventListener('click',function(){var templateElement=document.createElement('template');templateElement.innerHTML=ml(function(){/*
+
                         <gs-page>
+
                             <gs-header><center><h3>Full Error Text</h3></center></gs-header>
+
                             <gs-body padded>
+
                                 {{HTML}}
+
                             </gs-body>
+
                             <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
+
                         </gs-page>
+
                     */}).replace('{{HTML}}',errorJSONToHTML(jsnError));GS.openDialog(templateElement);});};if(typeof tryAgainCallback==='function'){templateElement.innerHTML=strHTML.replace('{{BUTTONS}}','<gs-grid>'+'    <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>'+'    <gs-block><gs-button dialogclose listen-for-return>Try Again</gs-button></gs-block>'+'</gs-grid>');GS.openDialog(templateElement,openFunction,function(event,strAnswer){if(strAnswer==='Try Again'){tryAgainCallback(strAnswer);}else{if(typeof cancelCallback==='function'){cancelCallback(strAnswer);}}});}else{templateElement.innerHTML=strHTML.replace('{{BUTTONS}}','<gs-button dialogclose listen-for-return>Ok</gs-button>');GS.openDialog(templateElement,openFunction);}}};GS.websockets=new Array();GS.closeAllSockets=function(){var i,len=GS.websockets.length;for(i=0;i<len;i++){GS.closeSocket(GS.websockets[i]);}};var sequence=0,jsnMessages={},arrWaitingCalls=[];GS.openSocket=function(strLink,relinkSessionID,relinkSessionNotifications){var strLoc=window.location.toString(),intUrlStart=strLoc.indexOf('/postage/')+9,strConn=strLoc.substring(intUrlStart,strLoc.substring(intUrlStart).indexOf('/')+intUrlStart);var socket=new WebSocket((window.location.protocol.toLowerCase().indexOf('https')===0?'wss':'ws')+'://'+(window.location.host||window.location.hostname)+'/postage/'+strConn+'/'+strLink+
 (relinkSessionID?'?sessionid='+relinkSessionID:''));GS.websockets.push(socket);if(relinkSessionID){socket.GSSessionID=relinkSessionID;socket.oldSessionID=relinkSessionID;}
 if(relinkSessionNotifications){socket.notifications=relinkSessionNotifications;}else{socket.notifications=[];}
@@ -1118,20 +1150,35 @@ encodeForTabDelimited(strLimit||'ALL')+'\t'+
 encodeForTabDelimited(strOffset||'0'));var intResponse=0;var intCallback=0;var arrColumnNames;var arrColumnTypes;var arrDecodedColumnNames;var arrDecodedColumnTypes;GS.requestFromSocket(socket,strMessage,function(data,error,errorData){var arrLines,i,len;if(!error){if(intResponse===0){arrLines=data.split('\n');arrColumnNames=arrLines[0].split('\t');arrColumnTypes=arrLines[1].split('\t');arrDecodedColumnNames=[];arrDecodedColumnTypes=[];for(i=0,len=arrColumnNames.length;i<len;i+=1){arrDecodedColumnNames.push(GS.decodeFromTabDelimited(arrColumnNames[i]));}
 for(i=0,len=arrColumnTypes.length;i<len;i+=1){arrDecodedColumnTypes.push(GS.decodeFromTabDelimited(arrColumnTypes[i]));}}else{finalCallback({'arrColumnNames':arrColumnNames,'arrColumnTypes':arrColumnTypes,'arrDecodedColumnNames':arrDecodedColumnNames,'arrDecodedColumnTypes':arrDecodedColumnTypes,'intCallback':intCallback,'strMessage':data},error);intCallback+=1;}}else{finalCallback(errorData,error);}
 intResponse+=1;});};/*
+
         INSERT test rmultiple_pk_test
+
         RETURN id1 id2 id3 page_name_pk id4 test1 test2 test3
+
         PK id1 id2 id3 page_name_pk id4
+
         SEQ test.seq1 test.seq2   
+
         
+
         page_name_pk test1 test2 test3
+
         page_name_pk1 test1 test2 test3
+
         page_name_pk2 test1 test2 test3
+
         page_name_pk3 test1 test2 test3
+
         page_name_pk4 test1 test2 test3
+
         
+
         
+
         
+
         If a column is being inserted, then the SEQ entry for it needs to be empty
+
     */
 GS.requestInsertFromSocket=function(socket,strSchema,strObject,strReturnCols,strPkCols,strSeqCols,insertData,beginCallback,confirmCallback,finalCallback){var strMessage='INSERT\t'+encodeForTabDelimited(strSchema)+'\t'+encodeForTabDelimited(strObject)+'\nRETURN\t'+strReturnCols+
 (strPkCols?'\nPK\t'+strPkCols:'')+
@@ -1153,51 +1200,97 @@ finalCallback('COMMIT',data,error);});};rollbackFunction=function(){GS.requestRo
 finalCallback('ROLLBACK',data,error);});};if(!error){confirmCallback(data,error,transactionID,commitFunction,rollbackFunction);}else{confirmCallback(errorData,error,transactionID,commitFunction,rollbackFunction);}});}else{if(typeof beginCallback==='function'){beginCallback(data,error);}}});};GS.requestBegin=function(socket,callback){GS.requestFromSocket(GS.envSocket,'BEGIN',function(data,error,errorData){var transactionID;if(typeof callback==='function'){if(!error){transactionID=data.substring('transactionid = '.length,data.indexOf('\n'));callback(transactionID,error);}else{callback(errorData,error);}}});};GS.requestRollback=function(socket,transactionID,callback){GS.requestFromSocket(GS.envSocket,'transactionid = '+transactionID+'\nROLLBACK',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.requestCommit=function(socket,transactionID,callback){GS.requestFromSocket(GS.envSocket,'transactionid = '+transactionID+'\nCOMMIT',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.rebootSocket=function(socket){socket.stayClosed=false;socket.close();};GS.closeSocket=function(socket){socket.stayClosed=true;socket.close();};var cacheLedger=[];window.testtesttest=cacheLedger;GS.requestCachingSelect=function(socket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,callback,bolClearCache){var strKey=(strSchema+strObject+strColumns+strWhere+strOrd+strLimit+strOffset),intQueryIndex,i,len,currentEntry;console.log(strKey,bolClearCache,cacheLedger[strKey]);if(bolClearCache){cacheLedger[strKey]=null;}
 if(cacheLedger[strKey]){for(i=0,len=cacheLedger[strKey].results.length;i<len;i+=1){callback(cacheLedger[strKey].results[i][0],cacheLedger[strKey].results[i][1]);}
 cacheLedger[strKey].callbacks.push({'callback':callback,'ready':true});}else{currentEntry=cacheLedger[strKey]={results:[],callbacks:[{'callback':callback,'ready':true}]};GS.requestSelectFromSocket(socket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,function(data,error){var i,len;currentEntry.results.push([data,error]);for(i=0,len=currentEntry.callbacks.length;i<len;i+=1){if(currentEntry.callbacks[i].ready){currentEntry.callbacks[i].callback(data,error);}}});}};/*
+
     var cacheQueries = [], cacheCallbacks = [], cacheResults = [];
+
     GS.requestCachingSelect = function (socket, strSchema, strObject, strColumns, strWhere, strOrd, strLimit, strOffset, callback, bolClearCache) {
+
         var strKey = (strSchema + strObject + strColumns + strWhere + strOrd + strLimit + strOffset)
+
           , intQueryIndex, i, len;
+
         
+
         if (bolClearCache) {
+
             intQueryIndex = cacheQueries.indexOf(strKey);
+
             
+
             cacheQueries.splice(intQueryIndex, 1);
+
             cacheCallbacks.splice(intQueryIndex, 1);
+
             cacheResults.splice(intQueryIndex, 1);
+
         }
+
         
+
         intQueryIndex = cacheQueries.indexOf(strKey);
+
         
+
         if (intQueryIndex !== -1) {
+
             for (i = 0, len = cacheResults[intQueryIndex].length; i < len; i += 1) {
+
                 callback(cacheResults[intQueryIndex][i][0], cacheResults[intQueryIndex][i][1]);
+
             }
+
             cacheCallbacks[intQueryIndex].push({'callback': callback, 'ready': true});
+
             
+
         } else {
+
             console.log(strKey);
+
             console.log(cacheQueries.length);
+
             cacheQueries.push(strKey);
+
             cacheCallbacks.push([{'callback': callback, 'ready': true}]);
+
             cacheResults.push([]);
+
             console.log(cacheQueries.length);
+
             intQueryIndex = (cacheQueries.length - 1);
+
             console.log(intQueryIndex);
+
             
+
             GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
+
                                      , strWhere, strOrd, strLimit, strOffset
+
                                      , function (data, error) {
+
                 var i, len;
+
                 
+
                 cacheResults[intQueryIndex].push([data, error]);
+
                 
+
                 for (i = 0, len = cacheCallbacks[intQueryIndex].length; i < len; i += 1) {
+
                     if (cacheCallbacks[intQueryIndex][i].ready) {
+
                         cacheCallbacks[intQueryIndex][i].callback(data, error);
+
                     }
+
                 }
+
             });
+
         }
+
     };*/})();GS.encodeForTabDelimited=function(strValue,nullValue){'use strict';strValue=String(strValue||'');if(strValue==='\\N'){return strValue;}else{strValue=strValue.replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/\r/g,'\\r').replace(/\t/g,'\\t');if(strValue===nullValue){strValue='\\N';}
 return strValue;}};GS.decodeFromTabDelimited=function(strValue,nullValue){'use strict';var i,len,strRet='';if(nullValue===undefined){nullValue='\\N';}
 for(i=0,len=strValue.length;i<len;i+=1){if(strValue[i]==='\\'&&strValue[i+1]){i+=1;if(strValue[i]==='n'){strRet+='\n';}else if(strValue[i]==='r'){strRet+='\r';}else if(strValue[i]==='t'){strRet+='\t';}else if(strValue[i]==='N'){strRet+=nullValue;}else if(strValue[i]==='\\'){strRet+='\\';}else{strRet+='\\'+strValue[i];}}else{strRet+=strValue[i];}}
@@ -3479,6 +3572,98 @@ if(selectedElement.hasAttribute('show-on-tablet')){strVisibilityAttribute='show-
 if(selectedElement.hasAttribute('show-on-phone')){strVisibilityAttribute='show-on-phone';}
 addProp('Visibility',true,'<gs-select class="target" value="'+strVisibilityAttribute+'" mini>'+'<option value="">Visible</option>'+'<option value="hidden">Invisible</option>'+'<option value="hide-on-desktop">Invisible at desktop size</option>'+'<option value="hide-on-tablet">Invisible at tablet size</option>'+'<option value="hide-on-phone">Invisible at phone size</option>'+'<option value="show-on-desktop">Visible at desktop size</option>'+'<option value="show-on-tablet">Visible at tablet size</option>'+'<option value="show-on-phone">Visible at phone size</option>'+'</gs-select>',function(){selectedElement.removeAttribute('hidden');selectedElement.removeAttribute('hide-on-desktop');selectedElement.removeAttribute('hide-on-tablet');selectedElement.removeAttribute('hide-on-phone');selectedElement.removeAttribute('show-on-desktop');selectedElement.removeAttribute('show-on-tablet');selectedElement.removeAttribute('show-on-phone');if(this.value){selectedElement.setAttribute(this.value,'');}
 return selectedElement;});};});document.addEventListener('DOMContentLoaded',function(){'use strict';xtag.register('gs-jumbo',{});});window.addEventListener('design-register-element',function(){registerDesignSnippet('Static Template <gs-listbox>','<gs-listbox>','gs-listbox>\n'+'    <template>\n'+'        <table>\n'+'            <tbody>\n'+'                <tr value="${1}">\n'+'                    <td>${0}</td>\n'+'                </tr>\n'+'            </tbody>\n'+'        </table>\n'+'    </template>\n'+'</gs-listbox>');registerDesignSnippet('Custom Template <gs-listbox>','<gs-listbox>','gs-listbox src="${1:test.tpeople}">\n'+'    <template>\n'+'        <table>\n'+'            <tbody>\n'+'                <tr value="{{! row.id }}">\n'+'                    <td>{{! row.${3:name} }}</td>\n'+'                </tr>\n'+'            </tbody>\n'+'        </table>\n'+'    </template>\n'+'</gs-listbox>');registerDesignSnippet('Dynamic Template <gs-listbox>','<gs-listbox>','gs-listbox src="${1:test.tpeople}"></gs-listbox>');registerDesignSnippet('<gs-listbox>','<gs-listbox>','gs-listbox src="${1:test.tpeople}"></gs-listbox>');designRegisterElement('gs-listbox','/env/app/developer_g/greyspots-'+GS.version()+'/documentation/doc-elem-listbox.html');window.designElementProperty_GSLISTBOX=function(selectedElement){addProp('Source',true,'<gs-memo class="target" value="'+encodeHTML(decodeURIComponent(selectedElement.getAttribute('src')||selectedElement.getAttribute('source')||''))+'" mini></gs-memo>',function(){return setOrRemoveTextAttribute(selectedElement,'src',encodeURIComponent(this.value));});addProp('Columns',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('cols')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'cols',this.value);});addProp('Hide Columns',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('hide')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'hide',this.value);});addProp('Where',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('where')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'where',this.value);});addProp('Order By',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('ord')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'ord',this.value);});addProp('Limit',true,'<gs-number class="target" value="'+encodeHTML(selectedElement.getAttribute('limit')||'')+'" mini></gs-number>',function(){return setOrRemoveTextAttribute(selectedElement,'limit',this.value);});addProp('Offset',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('offset')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'offset',this.value);});addProp('Column',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('column')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'column',this.value);});addProp('Value',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('value')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'value',this.value);});addProp('Column In Querystring',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('qs')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'qs',this.value,false);});addProp('Title',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('title')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'title',this.value);});addProp('Tabindex',true,'<gs-number class="target" value="'+encodeHTML(selectedElement.getAttribute('tabindex')||'')+'" mini></gs-number>',function(){return setOrRemoveTextAttribute(selectedElement,'tabindex',this.value);});addProp('suspend-created',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('suspend-created')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'suspend-created',this.value==='true',true);});addProp('suspend-inserted',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('suspend-inserted')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'suspend-inserted',this.value==='true',true);});var strVisibilityAttribute='';if(selectedElement.hasAttribute('hidden')){strVisibilityAttribute='hidden';}
+if(selectedElement.hasAttribute('hide-on-desktop')){strVisibilityAttribute='hide-on-desktop';}
+if(selectedElement.hasAttribute('hide-on-tablet')){strVisibilityAttribute='hide-on-tablet';}
+if(selectedElement.hasAttribute('hide-on-phone')){strVisibilityAttribute='hide-on-phone';}
+if(selectedElement.hasAttribute('show-on-desktop')){strVisibilityAttribute='show-on-desktop';}
+if(selectedElement.hasAttribute('show-on-tablet')){strVisibilityAttribute='show-on-tablet';}
+if(selectedElement.hasAttribute('show-on-phone')){strVisibilityAttribute='show-on-phone';}
+addProp('Visibility',true,'<gs-select class="target" value="'+strVisibilityAttribute+'" mini>'+'<option value="">Visible</option>'+'<option value="hidden">Invisible</option>'+'<option value="hide-on-desktop">Invisible at desktop size</option>'+'<option value="hide-on-tablet">Invisible at tablet size</option>'+'<option value="hide-on-phone">Invisible at phone size</option>'+'<option value="show-on-desktop">Visible at desktop size</option>'+'<option value="show-on-tablet">Visible at tablet size</option>'+'<option value="show-on-phone">Visible at phone size</option>'+'</gs-select>',function(){selectedElement.removeAttribute('hidden');selectedElement.removeAttribute('hide-on-desktop');selectedElement.removeAttribute('hide-on-tablet');selectedElement.removeAttribute('hide-on-phone');selectedElement.removeAttribute('show-on-desktop');selectedElement.removeAttribute('show-on-tablet');selectedElement.removeAttribute('show-on-phone');if(this.value){selectedElement.setAttribute(this.value,'');}
+return selectedElement;});addProp('Disabled',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('disabled')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'disabled',this.value==='true',true);});addProp('Dissallow&nbsp;Select',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('no-select')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'no-select',this.value==='true',true);});addProp('Letter&nbsp;Scrollbar',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('letter-scrollbar')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'letter-scrollbar',this.value==='true',true);});addProp('Letter Dividers',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('letter-dividers')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'letter-dividers',this.value==='true',true);});addProp('Refresh On Querystring Columns',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('refresh-on-querystring-values')||'')+'" mini></gs-text>',function(){this.removeAttribute('refresh-on-querystring-change');return setOrRemoveTextAttribute(selectedElement,'refresh-on-querystring-values',this.value);});addProp('Refresh On Querystring Change',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('refresh-on-querystring-change'))+'" mini></gs-checkbox>',function(){this.removeAttribute('refresh-on-querystring-values');return setOrRemoveBooleanAttribute(selectedElement,'refresh-on-querystring-change',this.value==='true',true);});addFlexProps(selectedElement);};});document.addEventListener('DOMContentLoaded',function(){'use strict';function highlightRecord(element,record){var i,len,arrSelectedTrs;if(element.tableElement&&xtag.queryChildren(element.tableElement,'tbody')[0]){arrSelectedTrs=xtag.queryChildren(xtag.queryChildren(element.tableElement,'tbody')[0],'tr[selected]');for(i=0,len=arrSelectedTrs.length;i<len;i+=1){arrSelectedTrs[i].removeAttribute('selected');}}
+if(record){record.setAttribute('selected','');}}
+function findRecordFromValue(element,searchValue){var i,len,matchedRecord,arrTrs,strSearchString;if(element.tableElement&&xtag.queryChildren(element.tableElement,'tbody')[0]){arrTrs=xtag.queryChildren(xtag.queryChildren(element.tableElement,'tbody')[0],'tr');strSearchString=String(searchValue);for(i=0,len=arrTrs.length;i<len;i+=1){if(arrTrs[i].getAttribute('value')===strSearchString||xtag.queryChildren(arrTrs[i],'td')[0].textContent===strSearchString){matchedRecord=arrTrs[i];break;}}}
+return matchedRecord;}
+function selectRecord(element,handle,bolChange){var record,strRecordValue,strFirstTdText;if(!element.hasAttribute('no-select')){if(typeof handle==='string'||typeof handle==='number'){record=findRecordFromValue(element,handle);}else{record=handle;}
+if(!record&&handle!==''){console.warn('Listbox warning: record not found'+(typeof handle==='string'?': "'+handle+'"':''));}else if(record){strRecordValue=record.getAttribute('value');strFirstTdText=xtag.queryChildren(record,'td')[0].textContent;if(element.value!==(strRecordValue||strFirstTdText)){element.innerValue=strRecordValue||strFirstTdText;element.innerSelectedRecord=record;if(bolChange){element.hackToPreventScroll=true;if(element.innerValue!==element.getAttribute('value')){element.setAttribute('value',element.innerValue);}
+element.hackToPreventScroll=false;element.triggerChange();}}}
+highlightRecord(element,record);}}
+function handleKeyDown(event){var element=event.target,intKeyCode=event.keyCode||event.which,selectedTr,trs,i,len,selectedRecordIndex;if(!element.hasAttribute('disabled')){if(!element.hasAttribute('no-select')){if((intKeyCode===40||intKeyCode===38)&&!event.shiftKey&&!event.metaKey&&!event.ctrlKey&&!element.error){trs=xtag.queryChildren(xtag.queryChildren(element.tableElement,'tbody')[0],'tr:not(.divider)');for(i=0,len=trs.length;i<len;i+=1){if(trs[i].hasAttribute('selected')){selectedRecordIndex=i;selectedTr=trs[i];trs[i].removeAttribute('selected');break;}}
+if(intKeyCode===40){if(!selectedTr||selectedRecordIndex===trs.length-1){highlightRecord(element,trs[0]);selectedTr=trs[0];}else{highlightRecord(element,trs[selectedRecordIndex+1]);selectedTr=trs[selectedRecordIndex+1];}}else if(intKeyCode===38){if(!selectedTr||selectedRecordIndex===0){highlightRecord(element,trs[trs.length-1]);selectedTr=trs[trs.length-1];}else{highlightRecord(element,trs[selectedRecordIndex-1]);selectedTr=trs[selectedRecordIndex-1];}}
+element.scrollToSelectedRecord();event.preventDefault();event.stopPropagation();}else if(event.keyCode===13){selectedTr=xtag.queryChildren(xtag.queryChildren(element.tableElement,'tbody')[0],'tr[selected]')[0];if(element.tableElement&&selectedTr){selectRecord(element,selectedTr,true);}}}}else{if(event.keyCode!==9){event.preventDefault();event.stopPropagation();}}}
+function handleFocusout(event){var element=event.target,selectedTr;if(element.tableElement){selectedTr=xtag.queryChildren(xtag.queryChildren(element.tableElement,'tbody')[0],'tr[selected]')[0];if(selectedTr){selectRecord(element,selectedTr,true);}}}
+function getData(element,callback,bolInitalLoad,bolClearPrevious){var strSrc=GS.templateWithQuerystring((bolInitalLoad&&element.getAttribute('initialize')?element.getAttribute('initialize'):element.getAttribute('src'))),srcParts=strSrc[0]==='('?[strSrc,'']:strSrc.split('.'),strSchema=srcParts[0],strObject=srcParts[1],strColumns=GS.templateWithQuerystring(element.getAttribute('cols')||'*').split(',').join('\t'),strWhere=GS.templateWithQuerystring(element.getAttribute('where')||''),strOrd=GS.templateWithQuerystring(element.getAttribute('ord')||''),strLimit=GS.templateWithQuerystring(element.getAttribute('limit')||''),strOffset=GS.templateWithQuerystring(element.getAttribute('offset')||''),response_i=0,response_len=0,arrTotalRecords=[];GS.addLoader(element,'Loading...');GS.requestSelectFromSocket(GS.envSocket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,function(data,error){var arrRecords,arrCells,envData,i,len,cell_i,cell_len;if(!error){if(data.strMessage!=='TRANSACTION COMPLETED'){arrRecords=GS.trim(data.strMessage,'\n').split('\n');for(i=0,len=arrRecords.length;i<len;i+=1){arrCells=arrRecords[i].split('\t');for(cell_i=0,cell_len=arrCells.length;cell_i<cell_len;cell_i+=1){arrCells[cell_i]=arrCells[cell_i]==='\\N'?null:GS.decodeFromTabDelimited(arrCells[cell_i]);}
+arrTotalRecords.push(arrCells);}}else{GS.removeLoader(element);element.arrColumnNames=data.arrColumnNames;envData={'arr_column':element.arrColumnNames,'dat':arrTotalRecords};handleData(element,bolInitalLoad,envData);GS.triggerEvent(element,'after_select');if(typeof callback==='function'){callback();}}}else{handleData(element,bolInitalLoad,data,error);GS.removeLoader(element);}});}
+function handleData(element,bolInitalLoad,data,error){var strTemplate,divElement,tableElement,theadElement,theadCellElements,tbodyElement,tbodyCellElements,lastRecordElement,recordElements,recordElement,currentCellLabelElement,template,i,len,arrHeaders=[],arrHide,intVisibleColumns,strHeaderCells,strRecordCells,jsnTemplate,strHTML;element.classList.remove('error');element.setAttribute('title','');if(!error){element.error=false;if(element.tableTemplate){strTemplate=element.tableTemplate;}else{arrHide=(element.getAttribute('hide')||'').split(/[\s]*,[\s]*/);for(i=0,len=data.arr_column.length,strHeaderCells='',strRecordCells='',intVisibleColumns=0;i<len;i+=1){if(arrHide.indexOf((i+1)+'')===-1&&arrHide.indexOf(data.arr_column[i])===-1){strHeaderCells+='<th gs-dynamic>'+encodeHTML(data.arr_column[i])+'</th> ';strRecordCells+='<td gs-dynamic>{{! row[\''+data.arr_column[i]+'\'] }}</td> ';intVisibleColumns+=1;}}
+strTemplate='<table gs-dynamic>';if(intVisibleColumns>1){strTemplate+='<thead gs-dynamic>'+'<tr gs-dynamic>'+
+strHeaderCells+'</tr>'+'</thead>';}
+strTemplate+='<tbody gs-dynamic>'+'<tr value="{{! row[\''+data.arr_column[0]+'\'] }}" gs-dynamic>'+
+strRecordCells+'</tr>'+'</tbody>'+'<table>';}
+divElement=document.createElement('div');divElement.innerHTML=strTemplate;tableElement=xtag.queryChildren(divElement,'table')[0];theadElement=xtag.queryChildren(tableElement,'thead')[0];tbodyElement=xtag.queryChildren(tableElement,'tbody')[0];if(tbodyElement){recordElement=xtag.queryChildren(tbodyElement,'tr')[0];if(recordElement){if(theadElement){theadCellElements=xtag.query(theadElement,'td, th');tbodyCellElements=xtag.query(tbodyElement,'td, th');for(i=0,len=theadCellElements.length;i<len;i+=1){currentCellLabelElement=document.createElement('b');currentCellLabelElement.classList.add('cell-label');currentCellLabelElement.setAttribute('data-text',(theadCellElements[i].textContent||'')+':');if(tbodyCellElements[i].childNodes){tbodyCellElements[i].insertBefore(currentCellLabelElement,tbodyCellElements[i].childNodes[0]);}else{tbodyCellElements[i].insertChild(currentCellLabelElement);}}}
+jsnTemplate=GS.templateHideSubTemplates(tbodyElement.innerHTML,true);strHTML=GS.templateWithEnvelopeData(jsnTemplate.templateHTML,data);tbodyElement.innerHTML=GS.templateShowSubTemplates(strHTML,jsnTemplate);element.tableElement=tableElement;element.syncView();}}
+if(bolInitalLoad&&!element.getAttribute('value')&&element.hasAttribute('select-first')){selectRecord(element,xtag.query(element,'tbody tr')[0].getAttribute('value'),false);element.scrollToSelectedRecord();}}else{element.error=true;element.classList.add('error');element.setAttribute('title','This listbox has failed to load.');element.setAttribute('disabled','');GS.ajaxErrorDialog(data);}}
+function getParentCell(element){var currentElement=element;while(currentElement.nodeName!=='TD'&&currentElement.nodeName!=='TH'&&currentElement.nodeName!=='HTML'){currentElement=currentElement.parentNode;}
+if(currentElement.nodeName!=='TD'&&currentElement.nodeName!=='TH'){return undefined;}
+return currentElement;}
+function windowResizeHandler(){var i,len,arrElement;arrElement=document.getElementsByTagName('gs-listbox');for(i=0,len=arrElement.length;i<len;i+=1){if(GS.pxToEm(document.body,this.oldWidth)!==GS.pxToEm(document.body,this.offsetWidth)&&arrElement[i].hasAttribute('letter-scrollbar')&&arrElement[i].tableElement){if(arrElement[i].hasAttribute('letter-dividers')||arrElement[i].hasAttribute('letter-scrollbar')){arrElement[i].refreshDividingPoints();}
+arrElement[i].letterScrollbarHandler();this.oldWidth=this.offsetWidth;}}}
+window.addEventListener('resize',windowResizeHandler);window.addEventListener('orientationchange',windowResizeHandler);function saveDefaultAttributes(element){var i;var len;var arrAttr;var jsnAttr;element.internal.defaultAttributes={};i=0;len=element.attributes.length;arrAttr=element.attributes;while(i<len){jsnAttr=element.attributes[i];element.internal.defaultAttributes[jsnAttr.nodeName]=(jsnAttr.nodeValue||'');i+=1;}}
+function pushReplacePopHandler(element){var i;var len;var strQS=GS.getQueryString();var strQSCol=element.getAttribute('qs');var strQSValue;var strQSAttr;var arrQSParts;var arrAttrParts;var arrPopKeys;var currentValue;var bolRefresh;var strOperator;if(strQSCol){if(strQSCol.indexOf('=')!==-1){arrAttrParts=strQSCol.split(',');i=0;len=arrAttrParts.length;while(i<len){strQSCol=arrAttrParts[i];if(strQSCol.indexOf('!=')!==-1){strOperator='!=';arrQSParts=strQSCol.split('!=');}else{strOperator='=';arrQSParts=strQSCol.split('=');}
+strQSCol=arrQSParts[0];strQSAttr=arrQSParts[1]||arrQSParts[0];if(strOperator==='!='){if(GS.qryGetKeys(strQS).indexOf(strQSCol)===-1){element.setAttribute(strQSAttr,'');}else{element.removeAttribute(strQSAttr);}}else{if(GS.qryGetKeys(strQS).indexOf(strQSCol)===-1){if(element.internal.defaultAttributes[strQSAttr]!==undefined){element.setAttribute(strQSAttr,(element.internal.defaultAttributes[strQSAttr]||''));}else{element.removeAttribute(strQSAttr);}}else{element.setAttribute(strQSAttr,(GS.qryGetVal(strQS,strQSCol)||element.internal.defaultAttributes[strQSAttr]||''));}}
+i+=1;}}else if(GS.qryGetKeys(strQS).indexOf(strQSCol)>-1){strQSValue=GS.qryGetVal(strQS,strQSCol);if(element.internal.bolQSFirstRun!==true){if(strQSValue!==''||!element.getAttribute('value')){element.setAttribute('value',strQSValue);}}else if(element.value!==strQSValue){element.value=strQSValue;}}}
+if(element.internal.bolQSFirstRun===true){if(element.hasAttribute('refresh-on-querystring-values')){arrPopKeys=element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);for(i=0,len=arrPopKeys.length;i<len;i+=1){currentValue=GS.qryGetVal(strQS,arrPopKeys[i]);if(element.popValues[arrPopKeys[i]]!==currentValue){bolRefresh=true;}
+element.popValues[arrPopKeys[i]]=currentValue;}}else if(element.hasAttribute('refresh-on-querystring-change')){bolRefresh=true;}
+if(bolRefresh&&element.hasAttribute('src')){getData(element);}else if(bolRefresh&&!element.hasAttribute('src')){console.warn('gs-combo Warning: element has "refresh-on-querystring-values" or "refresh-on-querystring-change", but no "src".',element);}}else{if(element.hasAttribute('refresh-on-querystring-values')){arrPopKeys=element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);for(i=0,len=arrPopKeys.length;i<len;i+=1){element.popValues[arrPopKeys[i]]=GS.qryGetVal(strQS,arrPopKeys[i]);}}}
+element.internal.bolQSFirstRun=true;}
+function elementCreated(element){if(!element.hasAttribute('suspend-created')){if(element.value&&!element.getAttribute('value')){element.setAttribute('value',element.value);delete element.value;}}}
+function elementInserted(element){var tableTemplateElement,arrElement,recordElement,tableTemplateElementCopy,strQSValue,i,len,currentElement;if(!element.hasAttribute('suspend-created')&&!element.hasAttribute('suspend-inserted')){if(!element.inserted){element.inserted=true;element.error=false;element.internal={};saveDefaultAttributes(element);if(element.hasAttribute('qs')||element.hasAttribute('refresh-on-querystring-values')||element.hasAttribute('refresh-on-querystring-change')){element.popValues={};pushReplacePopHandler(element);window.addEventListener('pushstate',function(){pushReplacePopHandler(element);});window.addEventListener('replacestate',function(){pushReplacePopHandler(element);});window.addEventListener('popstate',function(){pushReplacePopHandler(element);});}
+if(!element.hasAttribute('tabindex')){element.setAttribute('tabindex','0');}
+tableTemplateElement=xtag.queryChildren(element,'template')[0];if(tableTemplateElement){element.tableTemplate=GS.templateColumnToValue(tableTemplateElement.innerHTML);}
+if(element.getAttribute('src')||element.getAttribute('source')){getData(element,'',true);}else{if(tableTemplateElement){element.tableElement=xtag.query(tableTemplateElement.content,'table')[0];}else if(xtag.queryChildren(element,'table')[0]){element.tableElement=xtag.queryChildren(element,'table')[0];}else{element.tableElement=document.createElement('table');}
+element.syncView();}}}}
+xtag.register('gs-listbox',{lifecycle:{created:function(){elementCreated(this);},inserted:function(){elementInserted(this);},attributeChanged:function(strAttrName,oldValue,newValue){if(strAttrName==='suspend-created'&&newValue===null){elementCreated(this);elementInserted(this);}else if(strAttrName==='suspend-inserted'&&newValue===null){elementInserted(this);}else if(!this.hasAttribute('suspend-created')&&!this.hasAttribute('suspend-inserted')){if(strAttrName==='value'&&newValue!==oldValue){this.value=newValue;}}}},events:{},accessors:{value:{get:function(){return this.innerValue;},set:function(strNewValue){selectRecord(this,strNewValue);this.scrollToSelectedRecord();}},selectedRecord:{get:function(){return this.innerSelectedRecord;},set:function(newValue){selectRecord(this,newValue);this.scrollToSelectedRecord();}},textValue:{get:function(){if(this.innerSelectedRecord){return xtag.queryChildren(this.innerSelectedRecord,'td')[0].textContent;}
+return undefined;},set:function(){selectRecord(this,strNewValue);this.scrollToSelectedRecord();}}},methods:{refresh:function(callback){getData(this,callback);},scrollToSelectedRecord:function(){var selectedTr;if(this.tableElement){selectedTr=xtag.query(this.tableElement,'tr[selected]')[0];if(selectedTr){GS.scrollIntoView(selectedTr);}}
+/*var scrollingContainer, arrTrs, i, len, intScrollTop, bolFoundSelected = false;
+                
+                if (this.tableElement) {
+                    scrollingContainer = this;
+                    arrTrs = xtag.query(this.tableElement, 'tr');
+                    
+                    for (i = 0, intScrollTop = 0, len = arrTrs.length; i < len; i += 1) {
+                        if (arrTrs[i].hasAttribute('selected')) {
+                            intScrollTop += arrTrs[i].offsetHeight / 2;
+                            
+                            bolFoundSelected = true;
+                            
+                            break;
+                        } else {
+                            intScrollTop += arrTrs[i].offsetHeight;
+                        }
+                    }
+                    
+                    if (bolFoundSelected) {
+                        intScrollTop = intScrollTop - scrollingContainer.offsetHeight / 2;
+                    } else {
+                        intScrollTop = 0;
+                    }
+                    
+                    scrollingContainer.scrollTop = intScrollTop;
+                }*/},letterScrollbarHandler:function(){var element=this,i,len,intTextHeight,intLettersDropped,intSkipperHeight,intElementHeight,intDistance,strHTML,arrSkippers;if(xtag.queryChildren(element,'.letter-scrollbar-container').length===0){element.letterScrollbarContainer=document.createElement('div');element.letterScrollbarContainer.classList.add('letter-scrollbar-container');element.letterScrollbarContainer.setAttribute('gs-dynamic','');element.appendChild(element.letterScrollbarContainer);}else{element.letterScrollbarContainer.innerHTML='';}
+if(element.clientHeight<element.scrollContainer.scrollHeight){intTextHeight=GS.getTextHeight(element.letterScrollbarContainer);intSkipperHeight=intTextHeight*this.arrDividingPoints.length;intElementHeight=element.clientHeight/this.arrDividingPoints.length;if(intElementHeight<intTextHeight){intElementHeight=intTextHeight;}
+if(intSkipperHeight>element.clientHeight){intLettersDropped=0;while(intSkipperHeight>element.clientHeight&&intLettersDropped<100){intSkipperHeight-=intTextHeight;intLettersDropped+=1;}
+intDistance=Math.ceil(this.arrDividingPoints.length/intLettersDropped);}
+for(i=0,len=this.arrDividingPoints.length,strHTML='';i<len;i+=1){if(intLettersDropped===undefined||(intLettersDropped>0&&i%intDistance!==0)){strHTML+='<div class="skipper" gs-dynamic '+'style="height: '+intElementHeight+'px; line-height: '+intElementHeight+'px;" '+'data-target-offset="'+this.arrDividingPoints[i].offset+'">'+'<span gs-dynamic>'+this.arrDividingPoints[i].letter+'</span>'+'</div>';}}
+element.letterScrollbarContainer.innerHTML=strHTML;if(element.paddingElement&&element.paddingElement.parentNode===element.scrollContainer){element.scrollContainer.removeChild(element.paddingElement);}
+element.paddingElement=document.createElement('div');element.paddingElement.setAttribute('gs-dynamic','');if(this.arrDividingPoints.length>0){element.paddingElement.style.height=(element.clientHeight-
+(element.scrollContainer.scrollHeight-parseInt(this.arrDividingPoints[this.arrDividingPoints.length-1].offset,10)))+'px';}
+element.scrollContainer.appendChild(element.paddingElement);arrSkippers=element.letterScrollbarContainer.children;if(element.mousedownHandler){window.removeEventListener(evt.mousedown,element.mousedownHandler);window.removeEventListener(evt.mousemove,element.mousemoveHandler);window.removeEventListener(evt.mouseup,element.mouseupHandler);}
+element.clickHandler=function(){element.style.webkitOverflowScrolling='initial';element.scrollContainer.scrollTop=parseInt(this.getAttribute('data-target-offset'),10);element.style.webkitOverflowScrolling='touch';};element.mousedownHandler=function(event){window.addEventListener(evt.mousemove,element.mousemoveHandler);if(event.target.classList.contains('skipper')&&evt.touchDevice){element.style.webkitOverflowScrolling='initial';}};element.mousemoveHandler=function(event){var jsnMousePosition,targetElement;if(event.which!==0||evt.touchDevice){jsnMousePosition=GS.mousePosition(event);targetElement=document.elementFromPoint(jsnMousePosition.left,jsnMousePosition.top);if(targetElement){if(targetElement.nodeName==='SPAN'){targetElement=targetElement.parentNode;}
+if(targetElement.classList.contains('skipper')){element.style.webkitOverflowScrolling='initial';event.preventDefault();element.scrollContainer.scrollTop=parseInt(targetElement.getAttribute('data-target-offset'),10);}}}else{window.removeEventListener(evt.mousemove,element.mousemoveHandler);}};element.mouseupHandler=function(){element.style.webkitOverflowScrolling='touch';window.removeEventListener(evt.mousemove,element.mousemoveHandler);};element.addEventListener(evt.mousedown,element.mousedownHandler);element.addEventListener(evt.mouseup,element.mouseupHandler);for(i=0,len=arrSkippers.length;i<len;i+=1){arrSkippers[i].addEventListener('click',element.clickHandler);}}},refreshDividingPoints:function(){var tbodyElement,arrElement,arrLetter,dividerElement,strLetter,intOffset,numColumns,theadElement,i,len;tbodyElement=xtag.queryChildren(this.tableElement,'tbody')[0];arrElement=xtag.queryChildren(tbodyElement,'tr.divider');for(i=0,len=arrElement.length;i<len;i+=1){tbodyElement.removeChild(arrElement[i]);}
+this.arrDividingPoints=[];arrElement=xtag.queryChildren(tbodyElement,'tr');if(arrElement.length>0){numColumns=arrElement[0].children.length;theadElement=xtag.queryChildren(this.tableElement,'thead')[0];intOffset=(theadElement?theadElement.offsetHeight:0);for(i=0,len=arrElement.length,arrLetter=[];i<len;i+=1){strLetter=xtag.queryChildren(arrElement[i],'td')[0].textContent.substring(0,1).toUpperCase();if(arrLetter.indexOf(strLetter)===-1){this.arrDividingPoints.push({'letter':strLetter,'offset':intOffset});if(this.hasAttribute('letter-dividers')){dividerElement=document.createElement('tr');dividerElement.classList.add('divider');dividerElement.setAttribute('gs-dynamic','');dividerElement.setAttribute('data-target-offset',intOffset);dividerElement.innerHTML='<td colspan="'+numColumns+'" gs-dynamic>'+encodeHTML(strLetter)+'</td>';tbodyElement.insertBefore(dividerElement,arrElement[i]);intOffset+=dividerElement.offsetHeight;}
+arrLetter.push(strLetter);}
+intOffset+=arrElement[i].offsetHeight;}}},syncView:function(){var element=this,tbodyElement,i,len,arrElements,clickHandler,mousedownHandler,mouseoutHandler,mouseoverHandler;element.removeEventListener('keydown',handleKeyDown);element.addEventListener('keydown',handleKeyDown);element.removeEventListener('focusout',handleFocusout);element.addEventListener('focusout',handleFocusout);element.innerHTML='';element.scrollContainer=document.createElement('div');element.scrollContainer.setAttribute('gs-dynamic','');element.scrollContainer.classList.add('root');element.scrollContainer.classList.add('scroll-container');element.scrollContainer.appendChild(element.tableElement);element.appendChild(element.scrollContainer);tbodyElement=xtag.queryChildren(element.tableElement,'tbody')[0];if(element.hasAttribute('letter-dividers')||element.hasAttribute('letter-scrollbar')){element.refreshDividingPoints();if(element.hasAttribute('letter-scrollbar')){element.letterScrollbarHandler();}}
+if(this.getAttribute('value')){selectRecord(this,this.getAttribute('value'));this.scrollToSelectedRecord();}
+arrElements=xtag.toArray(tbodyElement.children);clickHandler=function(event){this.classList.remove('down');selectRecord(element,this,true);};for(i=0,len=arrElements.length;i<len;i+=1){if(!arrElements[i].classList.contains('divider')){arrElements[i].addEventListener('click',clickHandler);}}
+if(!evt.touchDevice){mousedownHandler=function(){this.classList.add('down');};mouseoutHandler=function(){this.classList.remove('down');this.classList.remove('hover');};mouseoverHandler=function(){this.classList.remove('down');this.classList.add('hover');};for(i=0,len=arrElements.length;i<len;i+=1){if(!arrElements[i].classList.contains('divider')){arrElements[i].addEventListener(evt.mousedown,mousedownHandler);arrElements[i].addEventListener(evt.mouseout,mouseoutHandler);arrElements[i].addEventListener(evt.mouseover,mouseoverHandler);}}}},triggerChange:function(){xtag.fireEvent(this,'change',{bubbles:true,cancelable:true});}}});});window.addEventListener('design-register-element',function(){registerDesignSnippet('Static Template <gs-listbox>','<gs-listbox>','gs-listbox>\n'+'    <template>\n'+'        <table>\n'+'            <tbody>\n'+'                <tr value="${1}">\n'+'                    <td>${0}</td>\n'+'                </tr>\n'+'            </tbody>\n'+'        </table>\n'+'    </template>\n'+'</gs-listbox>');registerDesignSnippet('Custom Template <gs-listbox>','<gs-listbox>','gs-listbox src="${1:test.tpeople}">\n'+'    <template>\n'+'        <table>\n'+'            <tbody>\n'+'                <tr value="{{! row.id }}">\n'+'                    <td>{{! row.${3:name} }}</td>\n'+'                </tr>\n'+'            </tbody>\n'+'        </table>\n'+'    </template>\n'+'</gs-listbox>');registerDesignSnippet('Dynamic Template <gs-listbox>','<gs-listbox>','gs-listbox src="${1:test.tpeople}"></gs-listbox>');registerDesignSnippet('<gs-listbox>','<gs-listbox>','gs-listbox src="${1:test.tpeople}"></gs-listbox>');designRegisterElement('gs-listbox','/env/app/developer_g/greyspots-'+GS.version()+'/documentation/doc-elem-listbox.html');window.designElementProperty_GSLISTBOX=function(selectedElement){addProp('Source',true,'<gs-memo class="target" value="'+encodeHTML(decodeURIComponent(selectedElement.getAttribute('src')||selectedElement.getAttribute('source')||''))+'" mini></gs-memo>',function(){return setOrRemoveTextAttribute(selectedElement,'src',encodeURIComponent(this.value));});addProp('Columns',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('cols')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'cols',this.value);});addProp('Hide Columns',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('hide')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'hide',this.value);});addProp('Where',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('where')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'where',this.value);});addProp('Order By',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('ord')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'ord',this.value);});addProp('Limit',true,'<gs-number class="target" value="'+encodeHTML(selectedElement.getAttribute('limit')||'')+'" mini></gs-number>',function(){return setOrRemoveTextAttribute(selectedElement,'limit',this.value);});addProp('Offset',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('offset')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'offset',this.value);});addProp('Column',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('column')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'column',this.value);});addProp('Value',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('value')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'value',this.value);});addProp('Column In Querystring',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('qs')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'qs',this.value,false);});addProp('Title',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('title')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'title',this.value);});addProp('Tabindex',true,'<gs-number class="target" value="'+encodeHTML(selectedElement.getAttribute('tabindex')||'')+'" mini></gs-number>',function(){return setOrRemoveTextAttribute(selectedElement,'tabindex',this.value);});addProp('suspend-created',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('suspend-created')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'suspend-created',this.value==='true',true);});addProp('suspend-inserted',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('suspend-inserted')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'suspend-inserted',this.value==='true',true);});var strVisibilityAttribute='';if(selectedElement.hasAttribute('hidden')){strVisibilityAttribute='hidden';}
 if(selectedElement.hasAttribute('hide-on-desktop')){strVisibilityAttribute='hide-on-desktop';}
 if(selectedElement.hasAttribute('hide-on-tablet')){strVisibilityAttribute='hide-on-tablet';}
 if(selectedElement.hasAttribute('hide-on-phone')){strVisibilityAttribute='hide-on-phone';}
