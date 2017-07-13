@@ -62,7 +62,7 @@ function explain(bolRun) {
         // this function is going to be bound to the "Stop Execution" button,
         //      it uses the "messageID" variable to send a "CANCEL" signal through the websocket
         cancelSignalHandler = function () {
-            GS.requestFromSocket(GS.querySocket, 'CANCEL', '', messageID);
+            GS.requestFromSocket(GS.websockets[currentTab.relatedSocket], 'CANCEL', '', messageID);
         };
 
         // this function is run when we send the queries through the websocket,
@@ -144,7 +144,7 @@ function explain(bolRun) {
 
         // begin
         startExecute();
-        messageID = GS.requestRawFromSocket(GS.querySocket, strRunQuery, function (data, error) {
+        messageID = GS.requestRawFromSocket(GS.websockets[currentTab.relatedSocket], strRunQuery, function (data, error) {
             var tableElement, scrollElement, trElement, arrRecords
               , arrCells, intRows, strHTML, arrLines, strError
               , intLine, i, len, col_i, col_len, rec_i, rec_len

@@ -2003,11 +2003,17 @@ function setFrame(tabElement, frameElement, bolBringToFirst) {
     document.getElementById('tab-bar-container').classList.add('tab-mode');
     document.getElementById('tab-bar-container').classList.remove('home-mode');
 
+	if (!tabElement.relatedSocket) {
+		tabElement.relatedSocket = 'tabsocket' + GS.encodeForTabDelimited(tabElement.filePath);
+		GS.openSocket('env', null, null, tabElement.relatedSocket);
+	}
+
     // if the file is on the server: fill tab from server
     if (tabElement.bolLoadFromServer) {
         tabElement.bolLoadFromServer = false;
 
         GS.addLoader(tabElement.relatedContainer, 'Loading Tab...');
+
         GS.requestFromSocket(GS.envSocket, 'TAB\tREAD\t' + GS.encodeForTabDelimited(tabElement.filePath), function (data, error, errorData) {
             var strChangeStamp;
 
@@ -2244,16 +2250,20 @@ function outdentScript() {
 }
 
 function commitTran() {
-	GS.requestCommit(GS.querySocket, 'NULL', function () {
-		document.getElementsByClassName('current-tab')[0].relatedCommitButton.setAttribute('disabled', '');
-		document.getElementsByClassName('current-tab')[0].relatedRollbackButton.setAttribute('disabled', '');
+	'use strict';
+	var currentTab = document.getElementsByClassName('current-tab')[0];
+	GS.requestCommit(GS.websockets[currentTab.relatedSocket], 'NULL', function () {
+		currentTab.relatedCommitButton.setAttribute('disabled', '');
+		currentTab.relatedRollbackButton.setAttribute('disabled', '');
 	});
 }
 
 function rollbackTran() {
-	GS.requestRollback(GS.querySocket, 'NULL', function () {
-		document.getElementsByClassName('current-tab')[0].relatedCommitButton.setAttribute('disabled', '');
-		document.getElementsByClassName('current-tab')[0].relatedRollbackButton.setAttribute('disabled', '');
+	'use strict';
+	var currentTab = document.getElementsByClassName('current-tab')[0];
+	GS.requestRollback(GS.websockets[currentTab.relatedSocket], 'NULL', function () {
+		currentTab.relatedCommitButton.setAttribute('disabled', '');
+		currentTab.relatedRollbackButton.setAttribute('disabled', '');
 	});
 }
 

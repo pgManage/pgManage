@@ -2448,7 +2448,7 @@ function executeHelperEndLoading() {
 //      through the websocket
 function executeHelperCancelSignalHandler() {
     GS.log(bolDebug, currentTab);
-    GS.requestFromSocket(GS.querySocket, 'CANCEL', '', currentTab.currentMessageID);
+    GS.requestFromSocket(GS.websockets[currentTab.relatedSocket], 'CANCEL', '', currentTab.currentMessageID);
 }
 
 // this function is run when the user clicks "Show Query",
@@ -2517,7 +2517,7 @@ function executeHelperStartLoading() {
 function executeHelperStopSocket() {
     GS.log(bolDebug, currentTab);
 
-    GS.requestFromSocket(GS.querySocket, 'CANCEL', '', currentTab.currentMessageID);
+    GS.requestFromSocket(GS.websockets[currentTab.relatedSocket], 'CANCEL', '', currentTab.currentMessageID);
     executeHelperStopLoadingHandler();
     currentTab.bolIgnoreMessages = true;
 }
@@ -2607,7 +2607,7 @@ function executeScript(bolCursorQuery) {
         executeHelperStartExecute();
 
 
-        currentTab.currentMessageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
+        currentTab.currentMessageID = GS.requestRawFromSocket(GS.websockets[currentTab.relatedSocket], jsnCurrentQuery.strQuery, function (data, error) {
             var tableElement;
             var scrollElement;
             var trElement;

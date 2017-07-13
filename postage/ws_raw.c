@@ -53,7 +53,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		SFINISH_CHECK(*ptr_query != 0, "Invalid RAW request");
 	}
 
-	client_raw->bol_commit_transaction = client_raw->bol_autocommit;
+	client_raw->bol_commit_transaction = client_raw->bol_autocommit && client_raw->bol_begin_transaction;
 	SINFO("client_raw->bol_commit_transaction: %s", client_raw->bol_commit_transaction == true ? "true" : "false");
 
 	client_request->arr_query = DArray_sql_split(ptr_query);
@@ -123,11 +123,13 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 			str_temp, strlen(str_temp),
 			"\012", (size_t)1);
 		SFINISH_SNFCAT(str_response, &int_response_len,
-			"TRANSACTION COMPLETED", (size_t)21);
+			PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? "TRANSACTION COMPLETED" : "TRANSACTION OPEN",
+			PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? (size_t)21 : (size_t)16
+		);
 		WS_sendFrame(global_loop, client_request->parent, true, 0x01, str_response, int_response_len);
 		DArray_push(client_request->arr_response, str_response);
 		str_response = NULL;
-		SINFO("TRANSACTION COMPLETED");
+		SINFO(PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? "TRANSACTION COMPLETED" : "TRANSACTION OPEN");
 		goto finish;
 	}
 	client_request->int_i = (client_raw->bol_begin_transaction ? -1 : 0);
@@ -475,8 +477,9 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 		if ((client_request->int_i - 1) >= 0 && client_raw->bol_autocommit && client_raw->bol_begin_transaction) {
 			if (client_raw->bol_commit_transaction && strncmp(PQcmdStatus(res), "BEGIN", 5) == 0) {
 				client_raw->bol_commit_transaction = false;
-			} else if (!client_raw->bol_commit_transaction && strncmp(PQcmdStatus(res), "COMMIT", 6) == 0) {
+			} else if (!client_raw->bol_commit_transaction && (strncmp(PQcmdStatus(res), "COMMIT", 6) == 0 || strncmp(PQcmdStatus(res), "ROLLBACK", 8) == 0)) {
 				client_raw->bol_commit_transaction = true;
+
 			}
 			SINFO("client_raw->bol_commit_transaction: %s", client_raw->bol_commit_transaction == true ? "true" : "false");
 		}
@@ -616,7 +619,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 			DArray_push(client_request->arr_response, str_response);
 			str_response = NULL;
-			SINFO("TRANSACTION COMPLETED");
+			SINFO(PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? "TRANSACTION COMPLETED" : "TRANSACTION OPEN");
 			// client_request_free(client_request);
 		}
 	} else {
@@ -1030,11 +1033,12 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				query_callback(EV_A, client_request, ws_raw_step2);
 			} else if (client_request->int_i > client_request->int_len || (client_request->int_i == client_request->int_len && !client_raw->bol_commit_transaction)) {
 				SFINISH_SNFCAT(str_response, &int_response_len,
-					"TRANSACTION COMPLETED", (size_t)21);
+					PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? "TRANSACTION COMPLETED" : "TRANSACTION OPEN",
+					PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? (size_t)21 : (size_t)16);
 				WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len);
 				DArray_push(client_request->arr_response, str_response);
 				str_response = NULL;
-				SINFO("TRANSACTION COMPLETED");
+				SINFO(PQtransactionStatus(client_request->parent->conn->conn) == PQTRANS_IDLE ? "TRANSACTION COMPLETED" : "TRANSACTION OPEN");
 			}
 
 			client_raw->copy_check = NULL;

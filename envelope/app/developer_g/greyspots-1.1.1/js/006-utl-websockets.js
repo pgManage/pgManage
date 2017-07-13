@@ -303,14 +303,26 @@
     };
 
     var sequence = 0, jsnMessages = {}, arrWaitingCalls = [];
-    GS.openSocket = function (strLink, relinkSessionID, relinkSessionNotifications) {
+    GS.openSocket = function (strLink, relinkSessionID, relinkSessionNotifications, socketname) {
         var strLoc = window.location.toString(),
             intUrlStart = strLoc.indexOf('/postage/') + 9,
-            strConn = strLoc.substring(intUrlStart, strLoc.substring(intUrlStart).indexOf('/') + intUrlStart);
-        var socket = new WebSocket(
-                            (window.location.protocol.toLowerCase().indexOf('https') === 0 ? 'wss' : 'ws') +
-                            '://' + (window.location.host || window.location.hostname) + '/postage/' + strConn + '/' + strLink +
-                            (relinkSessionID ? '?sessionid=' + relinkSessionID : '')); //nunzio.wfprod.com
+            strConn = strLoc.substring(intUrlStart, strLoc.substring(intUrlStart).indexOf('/') + intUrlStart),
+            strURL = '';
+
+        if (strLoc.indexOf('/postage/') >= 0) {
+            strURL =    (window.location.protocol.toLowerCase().indexOf('https') === 0 ? 'wss' : 'ws') +
+                        '://' + (window.location.host || window.location.hostname) + '/postage/' + strConn + '/' + strLink +
+                        (relinkSessionID ? '?sessionid=' + relinkSessionID : '');
+        } else {
+            strURL =    (window.location.protocol.toLowerCase().indexOf('https') === 0 ? 'wss' : 'ws') +
+                        '://' + (window.location.host || window.location.hostname) + '/' + strLink +
+                        (relinkSessionID ? '?sessionid=' + relinkSessionID : '');
+        }
+
+        var socket = new WebSocket(strURL);
+        if (socketname) {
+            GS.websockets[socketname] = socket;
+        }
 
         GS.websockets.push(socket);
 
@@ -497,8 +509,13 @@
                 setTimeout(function() {
                     console.log('ATTEMPTING SOCKET RE-OPEN', socket);
                     GS.triggerEvent(window, 'socket-reconnect');
-                    GS.closeSocket(GS.envSocket);
-                    GS.envSocket = GS.openSocket('env', GS.envSocket.GSSessionID, GS.envSocket.notifications);
+                    if (socketname) {
+                        GS.closeSocket(GS.websockets[socketname]);
+                        GS.websockets[socketname] = GS.openSocket('env', GS.websockets[socketname].GSSessionID, GS.websockets[socketname].notifications);
+                    } else {
+                        GS.closeSocket(GS.envSocket);
+                        GS.envSocket = GS.openSocket('env', GS.envSocket.GSSessionID, GS.envSocket.notifications);
+                    }
                 }, 1000);
             } else {
                 if (socket.bolError) {
@@ -1122,7 +1139,7 @@
     };
 
     GS.requestRollback = function (socket, transactionID, callback) {
-        GS.requestFromSocket(GS.envSocket, 'transactionid = ' + transactionID + '\nROLLBACK', function (data, error, errorData) {
+        GS.requestFromSocket(socket, 'transactionid = ' + transactionID + '\nROLLBACK', function (data, error, errorData) {
             if (typeof callback === 'function') {
                 if (!error) {
                     callback(data, error);
@@ -1134,7 +1151,7 @@
     };
 
     GS.requestCommit = function (socket, transactionID, callback) {
-        GS.requestFromSocket(GS.envSocket, 'transactionid = ' + transactionID + '\nCOMMIT', function (data, error, errorData) {
+        GS.requestFromSocket(socket, 'transactionid = ' + transactionID + '\nCOMMIT', function (data, error, errorData) {
             if (typeof callback === 'function') {
                 if (!error) {
                     callback(data, error);

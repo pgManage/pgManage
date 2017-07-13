@@ -59,7 +59,7 @@ function executeScriptFromCursor() {
         // this function is going to be bound to the "Stop Execution" button,
         //      it uses the "messageID" variable to send a "CANCEL" signal through the websocket
         cancelSignalHandler = function () {
-            GS.requestFromSocket(GS.querySocket, 'CANCEL', '', messageID);
+            GS.requestFromSocket(GS.websockets[currentTab.relatedSocket], 'CANCEL', '', messageID);
         };
 
         // this function is run when we send the queries through the websocket,
@@ -132,7 +132,7 @@ function executeScriptFromCursor() {
 
         // begin
         startExecute();
-        messageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
+        messageID = GS.requestRawFromSocket(GS.websockets[currentTab.relatedSocket], jsnCurrentQuery.strQuery, function (data, error) {
             var tableElement, scrollElement, trElement, arrRecords
               , arrCells, intRows, strHTML, arrLines, strError
               , intLine, i, len, col_i, col_len, rec_i, rec_len
@@ -157,7 +157,7 @@ function executeScriptFromCursor() {
                     }
 
                     currentTab.relatedStopSocketButton.addEventListener('click', function () {
-                        GS.requestFromSocket(GS.querySocket, 'CANCEL', function () {});
+                        GS.requestFromSocket(GS.websockets[currentTab.relatedSocket], 'CANCEL', function () {});
                         stopLoadingHandler();
                         bolIgnoreMessages = true;
                         document.getElementById('RowCountSmall').innerHTML = '' + (parseInt(data.intCallbackNumberThisQuery * 10, 10) + 10) + ' loaded of ' + data.intRows;
