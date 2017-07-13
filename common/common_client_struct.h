@@ -67,6 +67,7 @@ struct sock_ev_client_paused_request {
 	ev_watcher *watcher;
 	int revents;
 	bool bol_free_watcher;
+	bool bol_increment_watcher;
 };
 void client_paused_request_free(struct sock_ev_client_paused_request *client_paused_request);
 

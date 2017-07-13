@@ -1025,33 +1025,19 @@ GS.userChangePassword=function(){changePassword('env','User');};})();GS.normalUs
                 */}).replace('{{ERROR}}',(strOldError?'<br /><div style="color: #FF0000">'+strOldError+'</div>':''));if(GS.getCookie('greyspots_uname')){xtag.query(templateElement.content,'#normal-uname')[0].setAttribute('value',decodeURIComponent(GS.getCookie('greyspots_uname')));xtag.query(templateElement.content,'#normal-pword')[0].setAttribute('autofocus','');}else{xtag.query(templateElement.content,'#normal-uname')[0].setAttribute('autofocus','');}
 GS.openDialog(templateElement,function(){var dialog=this;document.getElementById('normal-pword').addEventListener('keydown',function(event){var intKeyCode=event.which||event.keyCode;if(intKeyCode===13){GS.triggerEvent(document.getElementById('normal-login'),'click');}});document.getElementById('normal-login').addEventListener('click',function(){var strUserName=document.getElementById('normal-uname').value,strLink;if(document.getElementById('normal-pword').value){GS.addLoader('log-in','Logging In...');GS.ajaxJSON('/env/auth','action=login'+'&username='+encodeURIComponent(document.getElementById('normal-uname').value)+'&password='+encodeURIComponent(document.getElementById('normal-pword').value),function(data,error){GS.removeLoader('log-in');GS.closeDialog(dialog,'');window.userLogin=false;if(!error){GS.setCookie('greyspots_uname',strUserName,30);if(typeof loggedInCallback==='function'){if(window.location.hostname.substring(0,window.location.hostname.indexOf('.'))===strDefaultSubDomain){GS.normalUserLogin(loggedInCallback,'',strDefaultSubDomain);}else{loggedInCallback(data.dat,strDefaultSubDomain);}}}else{GS.normalUserLogin(loggedInCallback,data.error_text,strDefaultSubDomain);}});}});});}});}};(function(){'use strict';function encodeForTabDelimited(strValue){return strValue==='\\N'?strValue:strValue.replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/\r/g,'\\r').replace(/\t/g,'\\t').replace(/^NULL$/g,'\\N');}
 GS.bolPreventErrors=false;function webSocketConnectionErrorDialog(socket,addinText,retryCallback,cancelCallback){if(!document.getElementById('dialog-from-dialog-ws-conn-error')&&GS.bolPreventErrors===false){var templateElement=document.createElement('template');GS.removeAllLoaders();templateElement.setAttribute('id','dialog-ws-conn-error');templateElement.setAttribute('data-theme','error');templateElement.innerHTML=ml(function(){/*
-
                 <gs-page>
-
                     <gs-header><center><h3>There was an error!</h3></center></gs-header>
-
                     <gs-body padded>
-
                         <pre style="white-space: pre-wrap;">
-
     There has been an error with the Database connection.{{ADDIN}}</pre>
-
                     </gs-body>
-
                     <gs-footer>
-
                         <gs-grid gutter reflow-at="420">
-
                             <gs-block><gs-button dialogclose>Try to reconnect</gs-button></gs-block>
-
                             <gs-block><gs-button dialogclose>Dismiss so I can copy my progress</gs-button></gs-block>
-
                         </gs-grid>
-
                     </gs-footer>
-
                 </gs-page>
-
             */}).replace('{{ADDIN}}',decodeURIComponent((addinText?'\n\n'+addinText:'')));GS.openDialog(templateElement,'',function(event,strAnswer){if(strAnswer==='Try to reconnect'){GS.closeSocket(GS.envSocket);GS.envSocket=GS.openSocket('env',socket.GSSessionID,socket.notifications);}else{GS.bolPreventErrors=true;}});}}
 function webSocketNormalizeError(event){var i;var len;var arrLines;var arrLine;var strData;var jsnRet={'error_title':'','error_text':'','error_detail':'','error_hint':'','error_query':'','error_context':'','error_position':'','error_notice':'','original_data':event};event=event||{};jsnRet.error_text=event.reason||'';if(event.data){strData=event.data;if(strData.substring(0,strData.indexOf(' '))==='messageid'){strData=strData.substring(strData.indexOf('\n')+1);}
 if(strData.substring(0,strData.indexOf(' '))==='responsenumber'){strData=strData.substring(strData.indexOf('\n')+1);}
@@ -1076,43 +1062,28 @@ function errorJSONToHTML(errorJSON){console.log(errorJSON);return'<pre style="wo
 (errorJSON.error_context?'<br /><br />CONTEXT: '+encodeHTML(errorJSON.error_context):'')+
 (errorJSON.error_notice?'<br /><br /><br />'+encodeHTML(errorJSON.error_notice):''))+'</pre>';}
 GS.webSocketErrorDialog=function(jsnError,tryAgainCallback,cancelCallback){if(GS.bolPreventErrors===false){var templateElement=document.createElement('template'),strHTML,jsnErrorClean;jsnErrorClean={};jsnErrorClean.error_text=cleanErrorValue(jsnError.error_text);jsnErrorClean.error_hint=cleanErrorValue(jsnError.error_hint);jsnErrorClean.error_detail=cleanErrorValue(jsnError.error_detail);jsnErrorClean.error_query=cleanErrorValue(jsnError.error_query);jsnErrorClean.error_position=cleanErrorValue(jsnError.error_position);jsnErrorClean.error_context=cleanErrorValue(jsnError.error_context);jsnErrorClean.error_notice=cleanErrorValue(jsnError.error_notice);templateElement.setAttribute('data-theme','error');strHTML=ml(function(){/*
-
                 <gs-page>
-
                     <gs-header><center><h3>There was an error!</h3></center></gs-header>
-
                     <gs-body padded>
-
                         {{HTML}}
-
                         <br />
-
                         <gs-button class="error-button-show-full-text">Show Full Error Text</gs-button>
-
                     </gs-body>
-
                     <gs-footer>{{BUTTONS}}</gs-footer>
-
                 </gs-page>
-
             */}).replace('{{HTML}}',errorJSONToHTML(jsnErrorClean));var openFunction=function(){xtag.query(this,'.error-button-show-full-text')[0].addEventListener('click',function(){var templateElement=document.createElement('template');templateElement.innerHTML=ml(function(){/*
-
                         <gs-page>
-
                             <gs-header><center><h3>Full Error Text</h3></center></gs-header>
-
                             <gs-body padded>
-
                                 {{HTML}}
-
                             </gs-body>
-
                             <gs-footer><gs-button dialogclose>Done</gs-button></gs-footer>
-
                         </gs-page>
-
-                    */}).replace('{{HTML}}',errorJSONToHTML(jsnError));GS.openDialog(templateElement);});};if(typeof tryAgainCallback==='function'){templateElement.innerHTML=strHTML.replace('{{BUTTONS}}','<gs-grid>'+'    <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>'+'    <gs-block><gs-button dialogclose listen-for-return>Try Again</gs-button></gs-block>'+'</gs-grid>');GS.openDialog(templateElement,openFunction,function(event,strAnswer){if(strAnswer==='Try Again'){tryAgainCallback(strAnswer);}else{if(typeof cancelCallback==='function'){cancelCallback(strAnswer);}}});}else{templateElement.innerHTML=strHTML.replace('{{BUTTONS}}','<gs-button dialogclose listen-for-return>Ok</gs-button>');GS.openDialog(templateElement,openFunction);}}};GS.websockets=new Array();GS.closeAllSockets=function(){var i,len=GS.websockets.length;for(i=0;i<len;i++){GS.closeSocket(GS.websockets[i]);}};var sequence=0,jsnMessages={},arrWaitingCalls=[];GS.openSocket=function(strLink,relinkSessionID,relinkSessionNotifications){var strLoc=window.location.toString(),intUrlStart=strLoc.indexOf('/postage/')+9,strConn=strLoc.substring(intUrlStart,strLoc.substring(intUrlStart).indexOf('/')+intUrlStart);var socket=new WebSocket((window.location.protocol.toLowerCase().indexOf('https')===0?'wss':'ws')+'://'+(window.location.host||window.location.hostname)+'/postage/'+strConn+'/'+strLink+
-(relinkSessionID?'?sessionid='+relinkSessionID:''));GS.websockets.push(socket);if(relinkSessionID){socket.GSSessionID=relinkSessionID;socket.oldSessionID=relinkSessionID;}
+                    */}).replace('{{HTML}}',errorJSONToHTML(jsnError));GS.openDialog(templateElement);});};if(typeof tryAgainCallback==='function'){templateElement.innerHTML=strHTML.replace('{{BUTTONS}}','<gs-grid>'+'    <gs-block><gs-button dialogclose>Cancel</gs-button></gs-block>'+'    <gs-block><gs-button dialogclose listen-for-return>Try Again</gs-button></gs-block>'+'</gs-grid>');GS.openDialog(templateElement,openFunction,function(event,strAnswer){if(strAnswer==='Try Again'){tryAgainCallback(strAnswer);}else{if(typeof cancelCallback==='function'){cancelCallback(strAnswer);}}});}else{templateElement.innerHTML=strHTML.replace('{{BUTTONS}}','<gs-button dialogclose listen-for-return>Ok</gs-button>');GS.openDialog(templateElement,openFunction);}}};GS.websockets=new Array();GS.closeAllSockets=function(){var i,len=GS.websockets.length;for(i=0;i<len;i++){GS.closeSocket(GS.websockets[i]);}};var sequence=0,jsnMessages={},arrWaitingCalls=[];GS.openSocket=function(strLink,relinkSessionID,relinkSessionNotifications,socketname){var strLoc=window.location.toString(),intUrlStart=strLoc.indexOf('/postage/')+9,strConn=strLoc.substring(intUrlStart,strLoc.substring(intUrlStart).indexOf('/')+intUrlStart),strURL='';if(strLoc.indexOf('/postage/')>=0){strURL=(window.location.protocol.toLowerCase().indexOf('https')===0?'wss':'ws')+'://'+(window.location.host||window.location.hostname)+'/postage/'+strConn+'/'+strLink+
+(relinkSessionID?'?sessionid='+relinkSessionID:'');}else{strURL=(window.location.protocol.toLowerCase().indexOf('https')===0?'wss':'ws')+'://'+(window.location.host||window.location.hostname)+'/'+strLink+
+(relinkSessionID?'?sessionid='+relinkSessionID:'');}
+var socket=new WebSocket(strURL);if(socketname){GS.websockets[socketname]=socket;}
+GS.websockets.push(socket);if(relinkSessionID){socket.GSSessionID=relinkSessionID;socket.oldSessionID=relinkSessionID;}
 if(relinkSessionNotifications){socket.notifications=relinkSessionNotifications;}else{socket.notifications=[];}
 socket.onmessage=function(event){var message=event.data,messageID,responseNumber,key,strError,arrLines,i,len,jsnMessage,startFrom;if(typeof(message)==='object'){var buf=message;message=String.fromCharCode.apply(null,new Uint8Array(buf));}
 if(message.indexOf('sessionid = ')===0){socket.GSSessionID=message.substring('sessionid = '.length,message.indexOf('\n'));GS.triggerEvent(window,'socket-connect');for(key in jsnMessages){jsnMessage=jsnMessages[key];if(jsnMessage&&(jsnMessage.session===socket.GSSessionID||jsnMessage.session===socket.oldSessionID)&&jsnMessage.bolFinished===false){jsnMessage.session=socket.GSSessionID;startFrom=1;for(i=0,len=jsnMessage.arrResponseNumbers.length;i<len;i+=1){if(startFrom!==jsnMessage.arrResponseNumbers[i]){break;}
@@ -1124,16 +1095,16 @@ arrLines=message.split('\n');if(arrLines[0].indexOf('transactionid')===0&&arrLin
 if(message==='TRANSACTION COMPLETED'){jsnMessage.arrResponseNumbers=[];jsnMessage.arrResponses=[];jsnMessage.bolFinished=true;}
 if(strError){jsnMessage.bolFinished=true;jsnMessage.callback.apply(null,[message,strError,webSocketNormalizeError(event)]);}else{jsnMessage.callback.apply(null,[message]);}
 if(jsnMessage.bolFinished===true){delete jsnMessages[messageID];}}else if(messageID==='NULL'){socket.notifications.push(message);GS.triggerEvent(window,'notification',{'socket':socket,'message':message});}}};socket.onopen=function(event){};socket.onerror=function(event){var i,len;console.log('SOCKET ERROR',event);socket.bolError=true;};socket.onclose=function(event){console.log('SOCKET CLOSING',socket.stayClosed,socket.bolError,event);if(socket.bolError&&arrWaitingCalls.length>0){if(event.code===1006){webSocketConnectionErrorDialog(socket,'The connection to the database has been closed. We cannot display the reasons for this closure because the browser does not give us access to those details, please check the server logs for the error details.');}else if(event.code===1002){webSocketConnectionErrorDialog(socket,'The connection to the database has been closed. Either the server or the browser has closed the connection because of a Websocket Protocol error.');}else if(event.code===1003){webSocketConnectionErrorDialog(socket,'The connection to the database has been closed. Either the server or the browser has closed the connection because of it was sent a data type it could not understand.');}else{webSocketConnectionErrorDialog(socket,'The connection to the database has been closed. The cause of this is unknown.');}}
-if(!socket.stayClosed){setTimeout(function(){console.log('ATTEMPTING SOCKET RE-OPEN',socket);GS.triggerEvent(window,'socket-reconnect');GS.closeSocket(GS.envSocket);GS.envSocket=GS.openSocket('env',GS.envSocket.GSSessionID,GS.envSocket.notifications);},1000);}else{if(socket.bolError){console.log('SOCKET NOT RE-OPENING DUE TO ERROR');}else{console.log('SOCKET NOT RE-OPENING DUE TO MANUAL CLOSE');}}};return socket;};GS.requestFromSocket=function(socket,strMessage,callback,forceMessageID){var oldOnOpen,messageID;if(!socket||socket.readyState===socket.CLOSED){if(!GS.envSocket||GS.envSocket.readyState===socket.CLOSED){GS.envSocket=GS.openSocket('env');}
+if(!socket.stayClosed){setTimeout(function(){console.log('ATTEMPTING SOCKET RE-OPEN',socket);GS.triggerEvent(window,'socket-reconnect');if(socketname){GS.closeSocket(GS.websockets[socketname]);GS.websockets[socketname]=GS.openSocket('env',GS.websockets[socketname].GSSessionID,GS.websockets[socketname].notifications);}else{GS.closeSocket(GS.envSocket);GS.envSocket=GS.openSocket('env',GS.envSocket.GSSessionID,GS.envSocket.notifications);}},1000);}else{if(socket.bolError){console.log('SOCKET NOT RE-OPENING DUE TO ERROR');}else{console.log('SOCKET NOT RE-OPENING DUE TO MANUAL CLOSE');}}};return socket;};GS.requestFromSocket=function(socket,strMessage,callback,forceMessageID){var oldOnOpen,messageID;if(!socket||socket.readyState===socket.CLOSED){if(!GS.envSocket||GS.envSocket.readyState===socket.CLOSED){GS.envSocket=GS.openSocket('env');}
 socket=GS.envSocket;}
 if(socket.readyState===socket.OPEN&&socket.GSSessionID){if(!forceMessageID){sequence+=1;messageID=socket.GSSessionID+'_'+sequence;jsnMessages[messageID]={'id':messageID,'session':socket.GSSessionID,'callback':callback,'arrResponseNumbers':[],'arrResponses':[],'bolFinished':false};}else{messageID=forceMessageID;}
 if(typeof(strMessage)==='object'){jsnMessages[messageID].parameters=new Blob(['messageid = '+messageID+'\n',strMessage],{type:'application/x-binary'});}else{jsnMessages[messageID].parameters='messageid = '+messageID+'\n'+strMessage;}
 socket.send(jsnMessages[messageID].parameters);return messageID;}else if(socket.readyState===socket.CONNECTING||socket.readyState===socket.OPEN){arrWaitingCalls.push(function(){GS.requestFromSocket(socket,strMessage,callback);});}else if(socket.readyState===socket.CLOSED){callback.apply(null,['Socket Is Closed','error',webSocketNormalizeError({'reason':'Socket Is Closed'})]);}else if(socket.readyState===socket.CLOSING){callback.apply(null,['Socket Is Closing','error',webSocketNormalizeError({'reason':'Socket Is Closing'})]);}};GS.requestActionFromSocket=function(socket,strSchema,strObject,strArgs,finalCallback){var strMessage='ACTION\t'+encodeForTabDelimited(strSchema)+'\t'+encodeForTabDelimited(strObject)+'\t'+encodeForTabDelimited(strArgs)+'\n',intResponse=0,strRet;GS.requestFromSocket(socket,strMessage,function(data,error,errorData){var arrLines,i,len;if(!error){if(intResponse===0){strRet=data;}else{finalCallback(strRet,error);}}else{finalCallback(errorData,error);}
-intResponse+=1;});};GS.requestRawFromSocket=function(socket,strQuery,callback,bolAutocommit){var intResponsePart=0,intQueryNumber=0,intCallbackNumber=0,intCallbackNumberThisQuery=0,intResponseNumberThisQuery=0,arrMessages,arrColumnNames,arrColumnTypes,arrStart,dteStart,arrEnd,dteEnd,intRows;return GS.requestFromSocket(socket,'RAW'+(bolAutocommit?'\tAUTOCOMMIT\n':'\n')+strQuery,function(data,error,errorData){var arrRecords,arrLines,i,len,strMode;if(!error){if(intResponseNumberThisQuery===0){strQuery='';arrMessages=[];arrColumnNames=[];arrColumnTypes=[];}
+intResponse+=1;});};GS.requestRawFromSocket=function(socket,strQuery,callback,bolAutocommit){var intResponsePart=0,intQueryNumber=0,intCallbackNumber=0,intCallbackNumberThisQuery=0,intResponseNumberThisQuery=0,arrMessages,arrColumnNames,arrColumnTypes,arrStart,dteStart,arrEnd,dteEnd,intRows;return GS.requestFromSocket(socket,'RAW'+(!bolAutocommit?'\tDISABLE AUTOCOMMIT\n':'\n')+strQuery,function(data,error,errorData){var arrRecords,arrLines,i,len,strMode;if(!error){if(intResponseNumberThisQuery===0){strQuery='';arrMessages=[];arrColumnNames=[];arrColumnTypes=[];}
 if(data.indexOf('QUERY\n')===0){intResponsePart=0;intCallbackNumberThisQuery=0;}
-if(data.indexOf('Rows Affected\n')===0||data==='EMPTY'||data==='TRANSACTION COMPLETED'){intResponsePart+=1;}
+if(data.indexOf('Rows Affected\n')===0||data==='EMPTY'||data==='TRANSACTION COMPLETED'||data==='TRANSACTION OPEN'){intResponsePart+=1;}
 if(intResponsePart===0){arrLines=data.split('\n');for(i=0,len=arrLines.length;i<len;i+=1){if(arrLines[i].indexOf('QUERY\t')===0||arrLines[i].indexOf('START\t')===0||arrLines[i].indexOf('END\t')===0||arrLines[i].indexOf('ROWS\t')===0||arrLines[i].indexOf('DEBUG\t')===0||arrLines[i].indexOf('LOG\t')===0||arrLines[i].indexOf('INFO\t')===0||arrLines[i].indexOf('NOTICE\t')===0||arrLines[i].indexOf('WARNING\t')===0||arrLines[i]==='COLUMNS'){if(arrLines[i]==='COLUMNS'){strMode=arrLines[i];}else{strMode=arrLines[i].substring(0,arrLines[i].indexOf('\t'));}}
-if(strMode==='QUERY'){strQuery=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1));}else if(strMode==='START'){arrStart=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)).split('\t');dteStart=new Date(arrStart[0]+' '+arrStart[1]+' GMT');if(arrStart[2]){dteStart.setMilliseconds(parseInt(arrStart[2],10)/1000);}}else if(strMode==='END'){arrEnd=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)).split('\t');dteEnd=new Date(arrEnd[0]+' '+arrEnd[1]+' GMT');if(arrEnd[2]){dteEnd.setMilliseconds(parseInt(arrEnd[2],10)/1000);}}else if(strMode==='ROWS'){intRows=parseInt(GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)),10);}else if(strMode==='DEBUG'){arrMessages.push({'level':'DEBUG','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='LOG'){arrMessages.push({'level':'LOG','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='INFO'){arrMessages.push({'level':'INFO','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='NOTICE'){arrMessages.push({'level':'NOTICE','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='WARNING'){arrMessages.push({'level':'WARNING','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='COLUMNS'){arrColumnNames=arrLines[i+1].split('\t');arrColumnTypes=arrLines[i+2].split('\t');intResponsePart+=1;break;}}}else if(intResponsePart>=1){if(typeof callback==='function'){callback({'intQueryNumber':intQueryNumber,'intCallbackNumber':intCallbackNumber,'intCallbackNumberThisQuery':intCallbackNumberThisQuery,'strQuery':strQuery,'dteStart':dteStart,'dteEnd':dteEnd,'intRows':intRows,'arrMessages':arrMessages,'arrColumnNames':arrColumnNames,'arrColumnTypes':arrColumnTypes,'strMessage':(data!=='TRANSACTION COMPLETED'?data:''),'bolLastMessage':(data==='TRANSACTION COMPLETED')},error);intCallbackNumber+=1;intCallbackNumberThisQuery+=1;}}
+if(strMode==='QUERY'){strQuery=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1));}else if(strMode==='START'){arrStart=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)).split('\t');dteStart=new Date(arrStart[0]+' '+arrStart[1]+' GMT');if(arrStart[2]){dteStart.setMilliseconds(parseInt(arrStart[2],10)/1000);}}else if(strMode==='END'){arrEnd=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)).split('\t');dteEnd=new Date(arrEnd[0]+' '+arrEnd[1]+' GMT');if(arrEnd[2]){dteEnd.setMilliseconds(parseInt(arrEnd[2],10)/1000);}}else if(strMode==='ROWS'){intRows=parseInt(GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)),10);}else if(strMode==='DEBUG'){arrMessages.push({'level':'DEBUG','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='LOG'){arrMessages.push({'level':'LOG','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='INFO'){arrMessages.push({'level':'INFO','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='NOTICE'){arrMessages.push({'level':'NOTICE','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='WARNING'){arrMessages.push({'level':'WARNING','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='COLUMNS'){arrColumnNames=arrLines[i+1].split('\t');arrColumnTypes=arrLines[i+2].split('\t');intResponsePart+=1;break;}}}else if(intResponsePart>=1){if(typeof callback==='function'){callback({'intQueryNumber':intQueryNumber,'intCallbackNumber':intCallbackNumber,'intCallbackNumberThisQuery':intCallbackNumberThisQuery,'strQuery':strQuery,'dteStart':dteStart,'dteEnd':dteEnd,'intRows':intRows,'arrMessages':arrMessages,'arrColumnNames':arrColumnNames,'arrColumnTypes':arrColumnTypes,'strMessage':(data!=='TRANSACTION COMPLETED'||data==='TRANSACTION OPEN'?data:''),'bolLastMessage':(data==='TRANSACTION COMPLETED'||data==='TRANSACTION OPEN'),'bolTransactionOpen':(data==='TRANSACTION OPEN')},error);intCallbackNumber+=1;intCallbackNumberThisQuery+=1;}}
 intResponseNumberThisQuery+=1;if(data==='\\.'||data.indexOf('Rows Affected\n')===0){intQueryNumber+=1;intCallbackNumberThisQuery=0;intResponsePart=0;intResponseNumberThisQuery=0;}}else{if(data.indexOf('QUERY\n')===0){intResponsePart=0;intCallbackNumberThisQuery=0;}
 if(intResponsePart===0){arrLines=data.split('\n');for(i=0,len=arrLines.length;i<len;i+=1){if(arrLines[i].indexOf('QUERY\t')===0||arrLines[i].indexOf('START\t')===0||arrLines[i].indexOf('END\t')===0||arrLines[i].indexOf('ROWS\t')===0||arrLines[i].indexOf('DEBUG\t')===0||arrLines[i].indexOf('LOG\t')===0||arrLines[i].indexOf('INFO\t')===0||arrLines[i].indexOf('NOTICE\t')===0||arrLines[i].indexOf('WARNING\t')===0||arrLines[i]==='COLUMNS'){if(arrLines[i]==='COLUMNS'){strMode=arrLines[i];}else{strMode=arrLines[i].substring(0,arrLines[i].indexOf('\t'));}}
 if(strMode==='QUERY'){strQuery=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1));}else if(strMode==='COLUMNS'){break;}}}
@@ -1150,35 +1121,20 @@ encodeForTabDelimited(strLimit||'ALL')+'\t'+
 encodeForTabDelimited(strOffset||'0'));var intResponse=0;var intCallback=0;var arrColumnNames;var arrColumnTypes;var arrDecodedColumnNames;var arrDecodedColumnTypes;GS.requestFromSocket(socket,strMessage,function(data,error,errorData){var arrLines,i,len;if(!error){if(intResponse===0){arrLines=data.split('\n');arrColumnNames=arrLines[0].split('\t');arrColumnTypes=arrLines[1].split('\t');arrDecodedColumnNames=[];arrDecodedColumnTypes=[];for(i=0,len=arrColumnNames.length;i<len;i+=1){arrDecodedColumnNames.push(GS.decodeFromTabDelimited(arrColumnNames[i]));}
 for(i=0,len=arrColumnTypes.length;i<len;i+=1){arrDecodedColumnTypes.push(GS.decodeFromTabDelimited(arrColumnTypes[i]));}}else{finalCallback({'arrColumnNames':arrColumnNames,'arrColumnTypes':arrColumnTypes,'arrDecodedColumnNames':arrDecodedColumnNames,'arrDecodedColumnTypes':arrDecodedColumnTypes,'intCallback':intCallback,'strMessage':data},error);intCallback+=1;}}else{finalCallback(errorData,error);}
 intResponse+=1;});};/*
-
         INSERT test rmultiple_pk_test
-
         RETURN id1 id2 id3 page_name_pk id4 test1 test2 test3
-
         PK id1 id2 id3 page_name_pk id4
-
-        SEQ test.seq1 test.seq2   
-
-        
+        SEQ test.seq1 test.seq2
 
         page_name_pk test1 test2 test3
-
         page_name_pk1 test1 test2 test3
-
         page_name_pk2 test1 test2 test3
-
         page_name_pk3 test1 test2 test3
-
         page_name_pk4 test1 test2 test3
 
-        
 
-        
-
-        
 
         If a column is being inserted, then the SEQ entry for it needs to be empty
-
     */
 GS.requestInsertFromSocket=function(socket,strSchema,strObject,strReturnCols,strPkCols,strSeqCols,insertData,beginCallback,confirmCallback,finalCallback){var strMessage='INSERT\t'+encodeForTabDelimited(strSchema)+'\t'+encodeForTabDelimited(strObject)+'\nRETURN\t'+strReturnCols+
 (strPkCols?'\nPK\t'+strPkCols:'')+
@@ -1197,100 +1153,54 @@ deleteData;GS.requestBegin(socket,function(data,error){var transactionID;if(!err
 GS.requestFromSocket(GS.envSocket,'transactionid = '+transactionID+'\n'+strMessage,function(data,error,errorData){var commitFunction,rollbackFunction;if(!error){data=data.substring(data.indexOf('\n')+1);}
 commitFunction=function(){GS.requestCommit(socket,transactionID,function(data,error){if(!error){data=data.substring(data.indexOf('\n')+1);}
 finalCallback('COMMIT',data,error);});};rollbackFunction=function(){GS.requestRollback(socket,transactionID,function(data,error){if(!error){data=data.substring(data.indexOf('\n')+1);}
-finalCallback('ROLLBACK',data,error);});};if(!error){confirmCallback(data,error,transactionID,commitFunction,rollbackFunction);}else{confirmCallback(errorData,error,transactionID,commitFunction,rollbackFunction);}});}else{if(typeof beginCallback==='function'){beginCallback(data,error);}}});};GS.requestBegin=function(socket,callback){GS.requestFromSocket(GS.envSocket,'BEGIN',function(data,error,errorData){var transactionID;if(typeof callback==='function'){if(!error){transactionID=data.substring('transactionid = '.length,data.indexOf('\n'));callback(transactionID,error);}else{callback(errorData,error);}}});};GS.requestRollback=function(socket,transactionID,callback){GS.requestFromSocket(GS.envSocket,'transactionid = '+transactionID+'\nROLLBACK',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.requestCommit=function(socket,transactionID,callback){GS.requestFromSocket(GS.envSocket,'transactionid = '+transactionID+'\nCOMMIT',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.rebootSocket=function(socket){socket.stayClosed=false;socket.close();};GS.closeSocket=function(socket){socket.stayClosed=true;socket.close();};var cacheLedger=[];window.testtesttest=cacheLedger;GS.requestCachingSelect=function(socket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,callback,bolClearCache){var strKey=(strSchema+strObject+strColumns+strWhere+strOrd+strLimit+strOffset),intQueryIndex,i,len,currentEntry;console.log(strKey,bolClearCache,cacheLedger[strKey]);if(bolClearCache){cacheLedger[strKey]=null;}
+finalCallback('ROLLBACK',data,error);});};if(!error){confirmCallback(data,error,transactionID,commitFunction,rollbackFunction);}else{confirmCallback(errorData,error,transactionID,commitFunction,rollbackFunction);}});}else{if(typeof beginCallback==='function'){beginCallback(data,error);}}});};GS.requestBegin=function(socket,callback){GS.requestFromSocket(GS.envSocket,'BEGIN',function(data,error,errorData){var transactionID;if(typeof callback==='function'){if(!error){transactionID=data.substring('transactionid = '.length,data.indexOf('\n'));callback(transactionID,error);}else{callback(errorData,error);}}});};GS.requestRollback=function(socket,transactionID,callback){GS.requestFromSocket(socket,'transactionid = '+transactionID+'\nROLLBACK',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.requestCommit=function(socket,transactionID,callback){GS.requestFromSocket(socket,'transactionid = '+transactionID+'\nCOMMIT',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.rebootSocket=function(socket){socket.stayClosed=false;socket.close();};GS.closeSocket=function(socket){socket.stayClosed=true;socket.close();};var cacheLedger=[];window.testtesttest=cacheLedger;GS.requestCachingSelect=function(socket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,callback,bolClearCache){var strKey=(strSchema+strObject+strColumns+strWhere+strOrd+strLimit+strOffset),intQueryIndex,i,len,currentEntry;console.log(strKey,bolClearCache,cacheLedger[strKey]);if(bolClearCache){cacheLedger[strKey]=null;}
 if(cacheLedger[strKey]){for(i=0,len=cacheLedger[strKey].results.length;i<len;i+=1){callback(cacheLedger[strKey].results[i][0],cacheLedger[strKey].results[i][1]);}
 cacheLedger[strKey].callbacks.push({'callback':callback,'ready':true});}else{currentEntry=cacheLedger[strKey]={results:[],callbacks:[{'callback':callback,'ready':true}]};GS.requestSelectFromSocket(socket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,function(data,error){var i,len;currentEntry.results.push([data,error]);for(i=0,len=currentEntry.callbacks.length;i<len;i+=1){if(currentEntry.callbacks[i].ready){currentEntry.callbacks[i].callback(data,error);}}});}};/*
-
     var cacheQueries = [], cacheCallbacks = [], cacheResults = [];
-
     GS.requestCachingSelect = function (socket, strSchema, strObject, strColumns, strWhere, strOrd, strLimit, strOffset, callback, bolClearCache) {
-
         var strKey = (strSchema + strObject + strColumns + strWhere + strOrd + strLimit + strOffset)
-
           , intQueryIndex, i, len;
 
-        
-
         if (bolClearCache) {
-
             intQueryIndex = cacheQueries.indexOf(strKey);
 
-            
-
             cacheQueries.splice(intQueryIndex, 1);
-
             cacheCallbacks.splice(intQueryIndex, 1);
-
             cacheResults.splice(intQueryIndex, 1);
-
         }
-
-        
 
         intQueryIndex = cacheQueries.indexOf(strKey);
 
-        
-
         if (intQueryIndex !== -1) {
-
             for (i = 0, len = cacheResults[intQueryIndex].length; i < len; i += 1) {
-
                 callback(cacheResults[intQueryIndex][i][0], cacheResults[intQueryIndex][i][1]);
-
             }
-
             cacheCallbacks[intQueryIndex].push({'callback': callback, 'ready': true});
 
-            
-
         } else {
-
             console.log(strKey);
-
             console.log(cacheQueries.length);
-
             cacheQueries.push(strKey);
-
             cacheCallbacks.push([{'callback': callback, 'ready': true}]);
-
             cacheResults.push([]);
-
             console.log(cacheQueries.length);
-
             intQueryIndex = (cacheQueries.length - 1);
-
             console.log(intQueryIndex);
 
-            
-
             GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
-
                                      , strWhere, strOrd, strLimit, strOffset
-
                                      , function (data, error) {
-
                 var i, len;
-
-                
 
                 cacheResults[intQueryIndex].push([data, error]);
 
-                
-
                 for (i = 0, len = cacheCallbacks[intQueryIndex].length; i < len; i += 1) {
-
                     if (cacheCallbacks[intQueryIndex][i].ready) {
-
                         cacheCallbacks[intQueryIndex][i].callback(data, error);
-
                     }
-
                 }
-
             });
-
         }
-
     };*/})();GS.encodeForTabDelimited=function(strValue,nullValue){'use strict';strValue=String(strValue||'');if(strValue==='\\N'){return strValue;}else{strValue=strValue.replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/\r/g,'\\r').replace(/\t/g,'\\t');if(strValue===nullValue){strValue='\\N';}
 return strValue;}};GS.decodeFromTabDelimited=function(strValue,nullValue){'use strict';var i,len,strRet='';if(nullValue===undefined){nullValue='\\N';}
 for(i=0,len=strValue.length;i<len;i+=1){if(strValue[i]==='\\'&&strValue[i+1]){i+=1;if(strValue[i]==='n'){strRet+='\n';}else if(strValue[i]==='r'){strRet+='\r';}else if(strValue[i]==='t'){strRet+='\t';}else if(strValue[i]==='N'){strRet+=nullValue;}else if(strValue[i]==='\\'){strRet+='\\';}else{strRet+='\\'+strValue[i];}}else{strRet+=strValue[i];}}

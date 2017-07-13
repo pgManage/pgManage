@@ -819,7 +819,7 @@ function ShortcutNewTab () {
 var afterDeleteSelectionDirections = [], intSaveTimerID;
 function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFilePath, bolAutoSelect) {
     'use strict';
-    
+
     currentTab = document.getElementsByClassName('current-tab')[0];
     var tabElement, frameElement, editor, selectionChangeHandler
       , arrCurrentTabNames, i, len, arrElements
@@ -1170,16 +1170,23 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                                     title="Open this tab in a new window" remove-all no-focus><label>New Window</label></gs-button>
                             <gs-button icononly inline remove-all icon="play" onclick="executeScript(); document.getElementsByClassName('current-tab')[0].relatedEditor.focus();"
                                     title="Execute Script [F5]" remove-bottom no-focus><label>Run</label></gs-button>
-                            <gs-checkbox inline style="border-radius: 0; padding: 4px; top: 1.5px; padding-top: 5px;" id="checkbox-autocommit-{{TABNUMBER}}" title="Autocommit"><label>Autocommit</label></gs-checkbox>
+
+                            <gs-checkbox inline style="border-radius: 0; padding: 4px; top: 1.5px; padding-top: 5px;" value="true" id="checkbox-autocommit-{{TABNUMBER}}" title="Autocommit"><label>Autocommit</label></gs-checkbox>
+                            <gs-button inline remove-all id="button-commit-{{TABNUMBER}}" onclick="commitTran()"  icon="check" icononly
+                                    title="Commit the current transaction" remove-all no-focus disabled><label>Commit</label></gs-button>
+                            <gs-button inline remove-all id="button-rollback-{{TABNUMBER}}" onclick="rollbackTran()" icon="times" icononly
+                                    title="Rollback the current transaction" remove-all no-focus disabled><label>Rollback</label></gs-button>
+
                             <gs-button inline remove-all class="button-toggle-comments" onclick="toggleCommentScript()"
                                     title="Comment/uncomment the selected text [CMD][/] or [CTRL][/]" remove-all no-focus><span>--</span><label> Comment</label></gs-button>
+
                             <gs-button icononly inline remove-all icon="indent" onclick="indentScript()"
                                     title="Indent the selected text [TAB]" remove-all no-focus><label>Indent</label></gs-button>
                             <gs-button icononly inline remove-all icon="outdent" onclick="outdentScript()"
                                     title="Dedent the selected text [SHIFT][TAB]" remove-all no-focus><label>Dedent</label></gs-button>
 
                             <gs-button inline icononly remove-all class="button-save ace-toolbar-labeled-only ace-toolbar-electron-only" style="padding: 4px;" onclick="menuSave(event.target, '{{FILE}}', '{{TABNUMBER}}');" title="Save menu." no-focus iconleft icon="angle-down"><label> Save</label></gs-button>
-                                    
+
                             <gs-button icononly inline remove-all id="button-tab-{{TABNUMBER}}-save" icon="save" data-filename="{{FILE}}" class="ace-toolbar-unlabeled-only ace-toolbar-electron-only "
                                     title="Save" remove-all no-focus><label>Save</label></gs-button>
                             <gs-button inline remove-all id="button-tab-{{TABNUMBER}}-save-as" class="ace-toolbar-unlabeled-only button-save-as ace-toolbar-electron-only" data-filename="{{FILE}}"
@@ -1288,6 +1295,8 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         tabElement.relatedCopyOptionsButton = document.getElementById('sql-results-copy-options-' + intTabNumber);
         tabElement.relatedStopLoadingButton = document.getElementById('sql-results-stop-loading-' + intTabNumber);
         tabElement.relatedAutocommitCheckbox = document.getElementById('checkbox-autocommit-' + intTabNumber);
+		tabElement.relatedCommitButton = document.getElementById('button-commit-' + intTabNumber);
+		tabElement.relatedRollbackButton = document.getElementById('button-rollback-' + intTabNumber);
 
         if (window.process && window.process.type === 'renderer') {
             tabElement.relatedDownloadButton = document.getElementById('button-tab-' + intTabNumber + '-save');
@@ -1994,11 +2003,17 @@ function setFrame(tabElement, frameElement, bolBringToFirst) {
     document.getElementById('tab-bar-container').classList.add('tab-mode');
     document.getElementById('tab-bar-container').classList.remove('home-mode');
 
+	if (!tabElement.relatedSocket) {
+		tabElement.relatedSocket = 'tabsocket' + GS.encodeForTabDelimited(tabElement.filePath);
+		GS.openSocket('env', null, null, tabElement.relatedSocket);
+	}
+
     // if the file is on the server: fill tab from server
     if (tabElement.bolLoadFromServer) {
         tabElement.bolLoadFromServer = false;
 
         GS.addLoader(tabElement.relatedContainer, 'Loading Tab...');
+
         GS.requestFromSocket(GS.envSocket, 'TAB\tREAD\t' + GS.encodeForTabDelimited(tabElement.filePath), function (data, error, errorData) {
             var strChangeStamp;
 
@@ -2152,7 +2167,7 @@ function beautifySQL() {
     if (jsnCurrentQuery.strQuery === editor.getValue()) {
         editor.setValue('\n' + jsnCurrentQuery.strQuery + '\n'.repeat(10));
     }
-    
+
     var strFormattedSQL = SQLBeautify(jsnCurrentQuery.strQuery);
 
     if (jsnCurrentQuery.strQuery === editor.getValue()) {
@@ -2208,18 +2223,18 @@ function menuSave(target, filename, inttabnumber) {
 
 
     GS.openDialogToElement(target, templateElement, 'down');
-    
-document.getElementById('button-tab-' + inttabnumber + '-save-labeled').addEventListener('click', function (event) {
-    //console.log(event, event.which);
-    var strFileName = this.getAttribute('data-filename');
-    saveScriptAsFile(strFileName);
-});
 
-document.getElementById('button-tab-' + inttabnumber + '-save-as-labeled').addEventListener('click', function (event) {
-    //console.log(event, event.which);
-    var strFileName = this.getAttribute('data-filename');
-    saveScriptAsFile(strFileName, true);
-});
+	document.getElementById('button-tab-' + inttabnumber + '-save-labeled').addEventListener('click', function (event) {
+	    //console.log(event, event.which);
+	    var strFileName = this.getAttribute('data-filename');
+	    saveScriptAsFile(strFileName);
+	});
+
+	document.getElementById('button-tab-' + inttabnumber + '-save-as-labeled').addEventListener('click', function (event) {
+	    //console.log(event, event.which);
+	    var strFileName = this.getAttribute('data-filename');
+	    saveScriptAsFile(strFileName, true);
+	});
 }
 
 function indentScript() {
@@ -2232,6 +2247,24 @@ function outdentScript() {
     'use strict';
     document.getElementsByClassName('current-tab')[0].relatedEditor.blockOutdent();
     document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+}
+
+function commitTran() {
+	'use strict';
+	var currentTab = document.getElementsByClassName('current-tab')[0];
+	GS.requestCommit(GS.websockets[currentTab.relatedSocket], 'NULL', function () {
+		currentTab.relatedCommitButton.setAttribute('disabled', '');
+		currentTab.relatedRollbackButton.setAttribute('disabled', '');
+	});
+}
+
+function rollbackTran() {
+	'use strict';
+	var currentTab = document.getElementsByClassName('current-tab')[0];
+	GS.requestRollback(GS.websockets[currentTab.relatedSocket], 'NULL', function () {
+		currentTab.relatedCommitButton.setAttribute('disabled', '');
+		currentTab.relatedRollbackButton.setAttribute('disabled', '');
+	});
 }
 
 function toggleCommentScript() {
@@ -2263,7 +2296,7 @@ function SQLBeautify(strInput) {
     //@@@@@@@@@@@@@' ,&&,  ^@*'     ,  .  i^"@e, ,e@e  @@
     //@@@@@@@@@@@@' ,@@@@,          ;  ,& !,,@@@e@@@@ e@@
     //@@@@@,~*@@*' ,@@@@@@e,   ',   e^~^@,   ~'@@@@@@,@@@
-    //@@@@@@, ~" ,e'loltlygk kbvjn okfhjeewwljnnomkvtxchgubredbhju hcxsz4xdc r cxxxxxxxxzzzzzzzzzzvsg6hhqujarfhfr6ayytr3j@@@@@@@@@*e*@*  ,@e  @@""@e,,@@@@@@@@@
+    //@@@@@@, ~" ,e@@@@@@@@@*e*@*  ,@e  @@""@e,,@@@@@@@@@
     //@@@@@@@@ee@@@@@@@@@@@@@@@" ,e@' ,e@' e@@@@@@@@@@@@@
     //@@@@@@@@@@@@@@@@@@@@@@@@" ,@" ,e@@e,,@@@@@@@@@@@@@@
     //@@@@@@@@@@@@@@@@@@@@@@@~ ,@@@,,0@@@@@@@@@@@@@@@@@@@
@@ -2915,7 +2948,7 @@ function SQLBeautify(strInput) {
             strResult += strInput[i];
         }
     }
-    
+
     // Strip all the whitespace between the input and output, then check to see if they match, if they don't then console.error
     // I tried to wtrip the white space to spaces, and colapse spaces into one, but it didn't work because sometimes beautify
     // puts whitespace where there isn't, I was trying to make sure beautify didn't take away whitespace where it was needed,

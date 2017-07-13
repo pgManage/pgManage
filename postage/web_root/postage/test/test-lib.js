@@ -46,7 +46,7 @@ var $ = {
 		$.tests[key].running = true;
         $.runTest(key, 0);
     },
-    intRun: 10,
+    intRun: 1,
 	testsEnded: false,
 	test_random: rightPad(parseInt(Math.random().toString().substring(2, 7), 10).toString(), '0', 5),
     test_change_stamp: (function () {
