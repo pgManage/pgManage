@@ -11,6 +11,8 @@
 struct sock_ev_client_raw {
 	struct sock_ev_client_request_data self;
 
+	bool bol_begin_transaction;
+	bool bol_commit_transaction;
 	bool bol_autocommit;
 	PGresult *res;
 	struct sock_ev_client_copy_check *copy_check;
@@ -19,7 +21,7 @@ struct sock_ev_client_raw {
 /*
 ********************************** REQUEST FORMAT
 ************************************
-RAW[\tAUTOCOMMIT]\n
+RAW[\tDISABLE AUTOCOMMIT]\n
 <sql>
 */
 

@@ -1,11 +1,11 @@
 
 /**
-    
+
     ######## BEFORE UPDATING DATA-HANDLING CODE OR USING THE COALESCE OPERATOR: ######## ~michael
     don't use the pipe-pipe "||" coalesce operator when handling data because if a zero comes to the coalesce (and it is a number 0 and not a string "0") it will be evaluated as false and thus coalesce to the next operand. Whenever you use this operator: be careful of what will be evaluated.
-    
+
     To see this in action run this in your console:
-    
+
     console.log( true      || 'test' );  // logs:  true  (expected)
     console.log( false     || 'test' );  // logs: 'test' (expected)
 
@@ -16,9 +16,9 @@
     console.log(  1        || 'test' );  // logs:  1     (expected)
     console.log( '0'       || 'test' );  // logs: '0'    (expected)
     console.log(  0        || 'test' );  // logs: 'test' (OH NO!!)
-    
+
     here is another demonstration:
-    
+
     console.log( Boolean(true)      );
     console.log( Boolean(false)     );
     console.log( Boolean(null)      );
@@ -27,48 +27,48 @@
     console.log( Boolean( 1)        );
     console.log( Boolean('0')       );
     console.log( Boolean( 0)        ); // zero evaluates to false
-    
-    
+
+
     ######## BEFORE UPDATING FASTCLICK: ######## ~michael
     fastclick (around line 254) has some code added (by michael) to add a feature to fastclick, bring this code to any new version
-    
+
     it also has (around line 123) some code added to an if statement added by joseph:
         if (deviceIsAndroid || deviceIsIOS) {
     as opposed to:
         if (deviceIsAndroid) {
-    
-    
+
+
     ######## BEFORE UPDATING X-TAGS: ######## ~michael and nunzio
     nunzio: the below warning now seems to be outdated
     nunzio: you have to delete '"function"==typeof define&&define.amd?define(X):"undefined"!=typeof module&&module.exports?module.exports=X:' from xtags for electron
     make sure you include the polyfills and make sure that there isn't still a duplicated block of code in the source, if there is remove it, here is how to find out:
-    
+
     do a find in textedit for: "scope.upgradeDocumentTree = nop;" (excluding the quotes of course)
     AND var IMPORT_LINK_TYPE = scope.IMPORT_LINK_TYPE
-    
+
     remove the whole block of code surrounding the second match (it might be the first match but I think it is the second match)
-    
-    
+
+
     ######## ELEMENT REGISTRATION: ######## ~michael
     When registering a custom element:
         1) register it after the "DOMContentLoaded" event has fired. Doing this prevents an issue that we ran into where in some cases (I believe when greyspots.js is cached and you are on yosemite is one case) some elements would be cut off and would disappear.
         2) Use the "methods" for public functions only, private functions should be kept in the "DOMContentLoaded" function. By keeping the functions in there it makes it so that the code for that element is the only code that can run those functions and it prevents these functions for cluttering public namespaces.
         3) Use "'use strict';" from the beginning. If you don't start out with it you might introduce strict mode errors that you don't even know about. Then one day you might decide to put "'use strict';" in there and errors you didn't know about will appear. Some errors might appear when you first move it over and some errors might be disvovered by your users because you didn't test every little feature of the element.
-    
+
     An example:
-    
+
     document.addEventListener('DOMContentLoaded', function () {
         'use strict';
-        
+
         // ### private functions go here ###
         function foobar() {
             // do stuff to "element" here (gs-new-element is the only element that can run this function)
         }
-        
+
         xtag.register('gs-new-element', {
             lifecycle: {
                 'created': function () {
-                    
+
                 }
             },
             events: {},
@@ -78,17 +78,17 @@
             }
         });
     });
-    
+
     ######## PSEUDO ELEMENT WARNING: ######## ~michael
     In firefox I ran into an issue where the undo history of controls in a gs-form (with the attribute "save-while-typing") was being erased. Turns out the issue was caused by a CSS pseudo-element. I was using a pseudo-element for a little box attached to the form to tell the user if the form was waiting to save or saving. By changing the pseudo-element to a real element that I add and remove with Javascript the issue was fixed.
-    
+
     If you want to use a pseudo-element: make sure it doesn't affect the undo history of elements that are children of the element that the pseudo-element is attached to. This issue could have been fixed by now.
-    
-    
-    
+
+
+
     ######## TEMPLATE SHIM: ######## ~michael
     The template polyfill has been changed, DO NOT UPDATE. It is for old browsers, and old browsers don't change so there is should be no need for the polyfill to change.
-    
+
 */ /**
  * @license
  * Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
@@ -452,11 +452,11 @@ Description:
     The reason for this is because even though the 'mousedown' event works on a phone it is substantially slower than if you had used 'touchstart',
     But if you used 'touchstart' it wouldn't work on the computer so we wrap both under the name evt.mousedown and only give mobile browsers
     'touchstart' and desktop browsers 'mousedown' so that you dont have to differentiate.
-    
+
 List of variables:
     evt.touchDevice  equals true|false depending on whether or not we are on a touch-enabled devide
     evt.deviceType   equals 'desktop'|'tablet'|'phone' depending on what type of device you are on
-    
+
     evt.mousedown    if we are on a touch device: 'touchstart'  else  'mousedown'
     evt.mouseover    if we are on a touch device: 'touchenter'  else  'mouseover'
     evt.mousemove    if we are on a touch device: 'touchmove'   else  'mousemove'
@@ -472,13 +472,13 @@ evt.touchDevice=touchDeviceTest();evt.deviceType=getDeviceType();evt.mousedown=e
 //Append to greyspots.js after the rsync of the web_root files
 window.addEventListener('load', function () {
     var styleElement, helperElement, helperFunction;
-    
+
     styleElement = document.createElement('style');
     styleElement.innerHTML = 'body, body gs-panel, body gs-panel gs-header, body gs-panel gs-body, ' +
                              'body gs-page, body gs-page gs-header, body gs-page gs-body {\n' +
                              '    background-color: #FFBBBB;\n' +
                              '}';
-    
+
     document.head.appendChild(styleElement);
 });
 */
@@ -491,18 +491,18 @@ if (evt.touchDevice) {
     (function () {
         var startTime, startTouchTop, endTime, endTouchTop, lastTouchTop, currentTouchTop,
             bolCurrentlyMonitoring = false, bolTouchScrollPrevented = false, currentScrollingElement, scrollingLooper;
-        
+
         window.ontouchstart = function(event){
             lastTouchTop = GS.mousePosition(event).top;
         };
-        
+
         //window.addEventListener('scroll', function (event) {
         //    console.log(event);
         //}, true);
-        
+
         window.ontouchmove = function (event) {
             var currentTouchTop = GS.mousePosition(event).top, currentElement = GS.scrollParent(event.target), bolFoundScrollable = Boolean(currentElement);
-            
+
             //console.log(currentElement,
             //            event.target,
             //            bolFoundScrollable,
@@ -515,25 +515,25 @@ if (evt.touchDevice) {
             //            currentTouchTop > lastTouchTop,
             //            currentElement.scrollTop + currentElement.clientHeight >= currentElement.scrollHeight,
             //            currentTouchTop < lastTouchTop);
-            
+
             if (bolFoundScrollable === false ||
                 (currentElement.scrollTop <= 0 && currentTouchTop > lastTouchTop) ||
                 (currentElement.scrollTop + currentElement.clientHeight >= currentElement.scrollHeight && currentTouchTop < lastTouchTop)) {
-                
+
                 //console.log('prevent default');
-                
+
                 bolTouchScrollPrevented = true;
                 event.preventDefault();
                 //event.stopPropagation();
-                
+
             } else if (bolFoundScrollable === true && bolTouchScrollPrevented === true) {
                 currentElement.scrollTop += (lastTouchTop - currentTouchTop);
             }
-            
+
             currentScrollingElement = currentElement;
             lastTouchTop = currentTouchTop;
         };
-        
+
         window.ontouchend = function () {
             bolTouchScrollPrevented = false;
         };
@@ -616,9 +616,9 @@ if(labelElement&&labelElement.hasAttribute('for')){targetElement=document.getEle
                         <gs-block>
                             <center><h4>3.1.2</h4></center>
                         </gs-block>
-                        
+
                     </gs-grid>
-                    
+
                     <div>
                         All other source code and documentation copyright Workflow Products, LLC. All Rights Reserved.
                         <br /><br />
@@ -648,11 +648,11 @@ if(bolOpen===false){document.body.insertBefore(GS.stringToElement('<div id="gs-d
 /*
 HTMLTemplateElement.prototype.contentTemplate = function () {
     'use strict';
-    
+
     if (this.content) {
-        
+
     } else {
-        
+
     }
 };
 */
@@ -769,17 +769,17 @@ return element.cloneNode(true);};/*
 // change the tag of an element
 GS.changeElementTag = function (element, strNewTag, alterCallback) {
     var strHTML = element.outerHTML.trim(), newElement;
-    
+
     strHTML = '<' + strNewTag + strHTML.substring(strHTML.indexOf(' '), strHTML.lastIndexOf('</')) + '</' + strNewTag + '>';
-    
+
     //console.log(strHTML);
-    
+
     newElement = GS.stringToElement(strHTML);
-    
+
     if (typeof alterCallback === 'function') {
         alterCallback.apply(newElement);
     }
-    
+
     return newElement;
 };*/
 GS.isElementFocusable=function(element){return(element.nodeName==='INPUT'||element.nodeName==='TEXTAREA'||element.nodeName==='SELECT'||element.nodeName==='BUTTON'||element.nodeName==='IFRAME'||(element.hasAttribute('tabindex')&&element.getAttribute('tabindex')!=='-1')||(element.focus&&element.focus.toString().indexOf('[native code]')===-1&&element.focus.toString()!==document.createElement('div').focus.toString())||(element.nodeName==='A'&&element.hasAttribute('href'))||(element.nodeName==='AREA'&&element.hasAttribute('href')))&&!element.hasAttribute('disabled');};GS.getInputSelection=function(input){'use strict';var start=0,end=0,normalizedValue,range,textInputRange,len,endRange;if(typeof input.selectionStart==="number"&&typeof input.selectionEnd==="number"){start=input.selectionStart;end=input.selectionEnd;}else{range=(document.createRange()||document.selection.createRange());if(range&&range.parentElement()==input){len=input.value.length;normalizedValue=input.value.replace(/\r\n/g,"\n");textInputRange=input.createTextRange();textInputRange.moveToBookmark(range.getBookmark());endRange=input.createTextRange();endRange.collapse(false);if(textInputRange.compareEndPoints("StartToEnd",endRange)>-1){start=end=len;}else{start=-textInputRange.moveStart("character",-len);start+=normalizedValue.slice(0,start).split("\n").length-1;if(textInputRange.compareEndPoints("EndToEnd",endRange)>-1){end=len;}else{end=-textInputRange.moveEnd("character",-len);end+=normalizedValue.slice(0,end).split("\n").length-1;}}}}
@@ -796,28 +796,28 @@ if(input.createTextRange){range=input.createTextRange();range.collapse();range.m
                 'intRoomBelow:      ' + intRoomBelow + '\n' +
                 'intRoomLeft:       ' + intRoomLeft + '\n' +
                 'intRoomRight:      ' + intRoomRight);*/
-return{'element':element,'objElementOffset':objElementOffset,'intElementWidth':intElementWidth,'intElementHeight':intElementHeight,'intElementTop':intElementTop,'intElementLeft':intElementLeft,'intElementBottom':intElementBottom,'intElementRight':intElementRight,'intRoomAbove':intRoomAbove,'intRoomBelow':intRoomBelow,'intRoomLeft':intRoomLeft,'intRoomRight':intRoomRight};};/*                                       ,--- the problem with this code is the DOM we get back is not 100% reliably inert. 
+return{'element':element,'objElementOffset':objElementOffset,'intElementWidth':intElementWidth,'intElementHeight':intElementHeight,'intElementTop':intElementTop,'intElementLeft':intElementLeft,'intElementBottom':intElementBottom,'intElementRight':intElementRight,'intRoomAbove':intRoomAbove,'intRoomBelow':intRoomBelow,'intRoomLeft':intRoomLeft,'intRoomRight':intRoomRight};};/*                                       ,--- the problem with this code is the DOM we get back is not 100% reliably inert.
                                          V          To make it reliable I believe I have to change how my elements work.
 GS.createDocumentFragment = function (strHTML) {
     'use strict';
     var element = document.createElement('div'),
         fragment = document.createDocumentFragment(),
         arrChildren = element.childNodes;
-    
+
     // fill element with HTML
     element.innerHTML = strHTML;
-    
+
     // append the element to the body (NECCESSARY FOR THE HTML TO BE INERT, I DON'T KNOW WHY -michael)
     document.body.appendChild(element);
-    
+
     // transfer children from element to fragment
     while (arrChildren[0]) {
         fragment.appendChild(arrChildren[0]);
     }
-    
+
     // remove element from the body
     document.body.removeChild(element);
-    
+
     // return inert fragment
     return fragment;
 };
@@ -825,11 +825,11 @@ GS.createDocumentFragment = function (strHTML) {
 GS.getDocumentFragmentHTML = function (fragment) {
     'use strict';
     var strHTML, i, len, arrChildren = fragment.children;
-    
+
     for (strHTML = '', i = 0, len = arrChildren.length; i < len; i += 1) {
         strHTML += arrChildren[i].outerHTML;
     }
-    
+
     return strHTML;
 };
 */
@@ -837,30 +837,30 @@ GS.getDocumentFragmentHTML = function (fragment) {
 GS.createInertDOM = function (strHTML) {
     'use strict';
     var templateElement = document.createElement('template'), iframeElement;
-    
+
     // if the content property is on a template element: no iframe neccessary
     if ('content' in templateElement) {
         templateElement.innerHTML = strHTML;
-        
+
         return templateElement.content;
-        
+
     // else: use iframe to create inert HTML
     } else {
         if (!document.getElementById('gs-inert-dom-generator')) {
             iframeElement = document.createElement('iframe');
-            
+
             iframeElement.setAttribute('id', 'gs-inert-dom-generator');
             iframeElement.setAttribute('hidden', '');
-            
+
             document.body.appendChild(iframeElement);
-            
+
         } else {
             iframeElement = document.getElementById('gs-inert-dom-generator');
         }
-        
+
         iframeElement.contentWindow.inertDOM = iframeElement.contentWindow.document.createElement('div');
         iframeElement.contentWindow.inertDOM.innerHTML = strHTML;
-        
+
         return iframeElement.contentWindow.inertDOM;
     }
 };
@@ -868,11 +868,11 @@ GS.createInertDOM = function (strHTML) {
 GS.getInertDOMHTML = function (inertDOM) {
     'use strict';
     var strHTML, i, len, arrChildren = inertDOM.children;
-    
+
     for (strHTML = '', i = 0, len = arrChildren.length; i < len; i += 1) {
         strHTML += arrChildren[i].outerHTML;
     }
-    
+
     return strHTML;
 };
 */
@@ -960,21 +960,21 @@ return strRet;};GS.templateWithEnvelopeData=function(templateHTML,data,i,len,row
             {{ var row, row_number, i, len, col_i, col_len
                  , qs = GS.qryToJSON(GS.getQueryString())
                  , rowNumberOffset = (jo.rowNumberOffset || 0);
-            
+
             if (!isNaN(jo.i)) {
                 i = jo.i;
                 len = (jo.len === undefined || jo.len === null ? jo.i + 1 : jo.len);
-                
+
             } else {
                 i = 0;
                 len = jo.data.dat.length;
             }
-            
+
             for (; i < len; i += 1) {
                 row = {};
                 row_number = (i + 1) + rowNumberOffset;
                 row.row_number = row_number;
-                
+
                 for (col_i = 0, col_len = jo.data.arr_column.length; col_i < col_len; col_i += 1) {
                     if (jo.data.dat[i][col_i] === undefined || jo.data.dat[i][col_i] === null) {
                         row[jo.data.arr_column[col_i]] = '';
@@ -1097,7 +1097,7 @@ socket=GS.envSocket;}
 if(socket.readyState===socket.OPEN&&socket.GSSessionID){if(!forceMessageID){sequence+=1;messageID=socket.GSSessionID+'_'+sequence;jsnMessages[messageID]={'id':messageID,'session':socket.GSSessionID,'callback':callback,'arrResponseNumbers':[],'arrResponses':[],'bolFinished':false};}else{messageID=forceMessageID;}
 if(typeof(strMessage)==='object'){jsnMessages[messageID].parameters=new Blob(['messageid = '+messageID+'\n',strMessage],{type:'application/x-binary'});}else{jsnMessages[messageID].parameters='messageid = '+messageID+'\n'+strMessage;}
 socket.send(jsnMessages[messageID].parameters);return messageID;}else if(socket.readyState===socket.CONNECTING||socket.readyState===socket.OPEN){arrWaitingCalls.push(function(){GS.requestFromSocket(socket,strMessage,callback);});}else if(socket.readyState===socket.CLOSED){callback.apply(null,['Socket Is Closed','error',webSocketNormalizeError({'reason':'Socket Is Closed'})]);}else if(socket.readyState===socket.CLOSING){callback.apply(null,['Socket Is Closing','error',webSocketNormalizeError({'reason':'Socket Is Closing'})]);}};GS.requestActionFromSocket=function(socket,strSchema,strObject,strArgs,finalCallback){var strMessage='ACTION\t'+encodeForTabDelimited(strSchema)+'\t'+encodeForTabDelimited(strObject)+'\t'+encodeForTabDelimited(strArgs)+'\n',intResponse=0,strRet;GS.requestFromSocket(socket,strMessage,function(data,error,errorData){var arrLines,i,len;if(!error){if(intResponse===0){strRet=data;}else{finalCallback(strRet,error);}}else{finalCallback(errorData,error);}
-intResponse+=1;});};GS.requestRawFromSocket=function(socket,strQuery,callback,bolAutocommit){var intResponsePart=0,intQueryNumber=0,intCallbackNumber=0,intCallbackNumberThisQuery=0,intResponseNumberThisQuery=0,arrMessages,arrColumnNames,arrColumnTypes,arrStart,dteStart,arrEnd,dteEnd,intRows;return GS.requestFromSocket(socket,'RAW'+(bolAutocommit?'\tAUTOCOMMIT\n':'\n')+strQuery,function(data,error,errorData){var arrRecords,arrLines,i,len,strMode;if(!error){if(intResponseNumberThisQuery===0){strQuery='';arrMessages=[];arrColumnNames=[];arrColumnTypes=[];}
+intResponse+=1;});};GS.requestRawFromSocket=function(socket,strQuery,callback,bolAutocommit){var intResponsePart=0,intQueryNumber=0,intCallbackNumber=0,intCallbackNumberThisQuery=0,intResponseNumberThisQuery=0,arrMessages,arrColumnNames,arrColumnTypes,arrStart,dteStart,arrEnd,dteEnd,intRows;return GS.requestFromSocket(socket,'RAW'+(!bolAutocommit?'\tDISABLE AUTOCOMMIT\n':'\n')+strQuery,function(data,error,errorData){var arrRecords,arrLines,i,len,strMode;if(!error){if(intResponseNumberThisQuery===0){strQuery='';arrMessages=[];arrColumnNames=[];arrColumnTypes=[];}
 if(data.indexOf('QUERY\n')===0){intResponsePart=0;intCallbackNumberThisQuery=0;}
 if(data.indexOf('Rows Affected\n')===0||data==='EMPTY'||data==='TRANSACTION COMPLETED'){intResponsePart+=1;}
 if(intResponsePart===0){arrLines=data.split('\n');for(i=0,len=arrLines.length;i<len;i+=1){if(arrLines[i].indexOf('QUERY\t')===0||arrLines[i].indexOf('START\t')===0||arrLines[i].indexOf('END\t')===0||arrLines[i].indexOf('ROWS\t')===0||arrLines[i].indexOf('DEBUG\t')===0||arrLines[i].indexOf('LOG\t')===0||arrLines[i].indexOf('INFO\t')===0||arrLines[i].indexOf('NOTICE\t')===0||arrLines[i].indexOf('WARNING\t')===0||arrLines[i]==='COLUMNS'){if(arrLines[i]==='COLUMNS'){strMode=arrLines[i];}else{strMode=arrLines[i].substring(0,arrLines[i].indexOf('\t'));}}
@@ -1121,16 +1121,16 @@ intResponse+=1;});};/*
         INSERT test rmultiple_pk_test
         RETURN id1 id2 id3 page_name_pk id4 test1 test2 test3
         PK id1 id2 id3 page_name_pk id4
-        SEQ test.seq1 test.seq2   
-        
+        SEQ test.seq1 test.seq2
+
         page_name_pk test1 test2 test3
         page_name_pk1 test1 test2 test3
         page_name_pk2 test1 test2 test3
         page_name_pk3 test1 test2 test3
         page_name_pk4 test1 test2 test3
-        
-        
-        
+
+
+
         If a column is being inserted, then the SEQ entry for it needs to be empty
     */
 GS.requestInsertFromSocket=function(socket,strSchema,strObject,strReturnCols,strPkCols,strSeqCols,insertData,beginCallback,confirmCallback,finalCallback){var strMessage='INSERT\t'+encodeForTabDelimited(strSchema)+'\t'+encodeForTabDelimited(strObject)+'\nRETURN\t'+strReturnCols+
@@ -1157,23 +1157,23 @@ cacheLedger[strKey].callbacks.push({'callback':callback,'ready':true});}else{cur
     GS.requestCachingSelect = function (socket, strSchema, strObject, strColumns, strWhere, strOrd, strLimit, strOffset, callback, bolClearCache) {
         var strKey = (strSchema + strObject + strColumns + strWhere + strOrd + strLimit + strOffset)
           , intQueryIndex, i, len;
-        
+
         if (bolClearCache) {
             intQueryIndex = cacheQueries.indexOf(strKey);
-            
+
             cacheQueries.splice(intQueryIndex, 1);
             cacheCallbacks.splice(intQueryIndex, 1);
             cacheResults.splice(intQueryIndex, 1);
         }
-        
+
         intQueryIndex = cacheQueries.indexOf(strKey);
-        
+
         if (intQueryIndex !== -1) {
             for (i = 0, len = cacheResults[intQueryIndex].length; i < len; i += 1) {
                 callback(cacheResults[intQueryIndex][i][0], cacheResults[intQueryIndex][i][1]);
             }
             cacheCallbacks[intQueryIndex].push({'callback': callback, 'ready': true});
-            
+
         } else {
             console.log(strKey);
             console.log(cacheQueries.length);
@@ -1183,14 +1183,14 @@ cacheLedger[strKey].callbacks.push({'callback':callback,'ready':true});}else{cur
             console.log(cacheQueries.length);
             intQueryIndex = (cacheQueries.length - 1);
             console.log(intQueryIndex);
-            
+
             GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
                                      , strWhere, strOrd, strLimit, strOffset
                                      , function (data, error) {
                 var i, len;
-                
+
                 cacheResults[intQueryIndex].push([data, error]);
-                
+
                 for (i = 0, len = cacheCallbacks[intQueryIndex].length; i < len; i += 1) {
                     if (cacheCallbacks[intQueryIndex][i].ready) {
                         cacheCallbacks[intQueryIndex][i].callback(data, error);
@@ -1333,17 +1333,17 @@ GS.getSelectedText = function () {
     if (window.getSelection) {
         return window.getSelection() + '';
     }
-    
+
     // FireFox
     if (document.getSelection) {
         return document.getSelection() + '';
     }
-    
+
     // IE 6/7
     if (document.selection) {
         return document.selection.createRange().text + '';
     }
-    
+
     console.warn('GS.getSelectedText warning: no selection collection function found (could not find a way to get the selected text)');
     return '';
 }*/
@@ -1871,14 +1871,14 @@ arrParts=GS.templateWithQuerystring(element.getAttribute('src')).split('.');elem
                 <div class="hud-container">
                     <gs-button icon="refresh" remove-right icononly no-focus title="Refresh Data." class="refresh-button"></gs-button>
                     <gs-button icon="times" remove-left icononly no-focus title="Delete Selected Records." class="delete-button"></gs-button>
-                    
+
                     <gs-button icon="plus" icononly no-focus title="Create Record." class="insert-button"></gs-button>
-                    
+
                     <gs-button icon="backward" remove-right icononly no-focus title="Go to previous page." class="paginate-left"></gs-button>
                     <gs-button icon="forward" remove-left icononly no-focus title="Go to next page." class="paginate-right"></gs-button>
-                    
+
                     {{HUDHTML}}
-                    
+
                     <gs-button icon="filter" icononly no-focus title="Edit Filters." class="filter-button" hidden></gs-button>
                     <textarea class="hidden-focus-control">Focus Control</textarea>
                 </div>
@@ -1981,7 +1981,7 @@ xtag.register('gs-datasheet',{lifecycle:{created:function(){},inserted:function(
                     function synchronize(element, bolScroll) {
                         var arrRecords = xtag.query(element, 'tr'), selectCells = [], i, len,
                             arrParts, arrTextareas, focusedElement, recordIndex, cellIndex;
-                        
+
                         // selection
                         if (element.savedSelection) {
                             // loop through savedSelection
@@ -1990,16 +1990,16 @@ xtag.register('gs-datasheet',{lifecycle:{created:function(){},inserted:function(
                                 arrParts = element.savedSelection[i].split(',');
                                 recordIndex = parseInt(arrParts[0], 10);
                                 cellIndex = parseInt(arrParts[1], 10);
-                                
+
                                 if (recordIndex < arrRecords.length && cellIndex < arrRecords[0].children.length) {
                                     selectCells.push(arrRecords[recordIndex].children[cellIndex]);
                                 }
                             }
-                            
+
                             // select cells
                             element.selectedCells = selectCells;
                         }
-                        
+
                         // focus
                         if (element.lastFocusedControl) {
                             element.lastFocusedControl.focus();
@@ -2008,19 +2008,19 @@ xtag.register('gs-datasheet',{lifecycle:{created:function(){},inserted:function(
                             focusedElement = element.copyControl;
                             focusedElement.focus();
                         }
-                        
+
                         // if there was no control to focus and
                         //      there is a selection and
                         //      bolScroll is true: scroll to selected
                         if (!element.lastFocusedControl && element.selectedCells.length > 0 && bolScroll) {
                             GS.scrollIntoView(element.selectedCells[0].parentNode);
                         }
-                        
+
                         // if there was a control and bolScroll is true: scroll to focused record
                         if (focusedElement && bolScroll) {
                             GS.scrollIntoView(GS.findParentElement(document.activeElement, 'tr'));
                         }
-                        
+
                         if (focusedElement && element.lastTextSelection) {
                             GS.setInputSelection(focusedElement, element.lastTextSelection.start, element.lastTextSelection.end);
                         }
@@ -2135,24 +2135,24 @@ return strFormat;}
 function formatDate(dteValue,strFormat){/* (this function contains a (modified) substantial portion of code from another source
             here is the copyright for sake of legality) (Uses code by Matt Kruse)
         Copyright (c) 2006-2009 Rostislav Hristov, Asual DZZD
-        
-        Permission is hereby granted, free of charge, to any person obtaining a 
-        copy of this software and associated documentation files 
-        (the "Software"), to deal in the Software without restriction, 
-        including without limitation the rights to use, copy, modify, merge, 
-        publish, distribute, sublicense, and/or sell copies of the Software, 
-        and to permit persons to whom the Software is furnished to do so, 
+
+        Permission is hereby granted, free of charge, to any person obtaining a
+        copy of this software and associated documentation files
+        (the "Software"), to deal in the Software without restriction,
+        including without limitation the rights to use, copy, modify, merge,
+        publish, distribute, sublicense, and/or sell copies of the Software,
+        and to permit persons to whom the Software is furnished to do so,
         subject to the following conditions:
-        
-        The above copyright notice and this permission notice shall be included 
+
+        The above copyright notice and this permission notice shall be included
         in all copies or substantial portions of the Software.
-        
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-        OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+        OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
         SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 var i=0,j=0,l=0,c='',token='',x,y,yearLen,formatNumber=function(n,s){if(typeof s=='undefined'||s==2){return(n>=0&&n<10?'0':'')+n;}else{if(n>=0&&n<10){return'00'+n;}
 if(n>=10&&n<100){return'0'+n;}
@@ -2173,7 +2173,7 @@ function elementInserted(element){var today,strQSValue;if(!element.hasAttribute(
                 element.addEventListener(evt.mouseout, function (event) {
                     element.classList.remove('hover');
                 });
-                
+
                 element.addEventListener(evt.mouseover, function (event) {
                     element.classList.add('hover');
                 });
@@ -2224,9 +2224,9 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                     daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
                     monthsOfTheYear = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                     strKeyCode = event.keyCode.toString();
-                
+
                 currentSelectionRange = GS.getInputSelection(element.control);
-                
+
                 if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
                     if (element.getAttribute('disabled') !== null && event.keyCode !== 9) {
                         event.preventDefault();
@@ -2236,7 +2236,7 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                         //console.log(strKeyCode === GS.keyCode('up arrow')    , GS.keyCode('up arrow'));
                         //console.log(strKeyCode === GS.keyCode('right arrow') , GS.keyCode('right arrow'));
                         //console.log(strKeyCode === GS.keyCode('down arrow')  , GS.keyCode('down arrow'));
-                        
+
                         // When the user presses an arrow key:
                         // It finds the current number that the user has selected
                         //     If they pressed up or down
@@ -2244,7 +2244,7 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                         //     If they pressed left or right
                         //         Move their selection to the left or right depending on what they pressed
                         // Then moves the selection to the current number (handling day/month name length differences)
-                        
+
                         // Fix date format
                         strDateFormat = element.getAttribute('format');
                         //console.log(strDateFormat);
@@ -2269,59 +2269,59 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                         } else if (strDateFormat.toLowerCase() === 'isodatetime') {
                             strDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
                         }
-                        
+
                         formatDivider = strDateFormat.match(/[^mdyehmsa]/gi).join('');
-                        
+
                         currentValue = element.control.value;
                         currentDate = new Date(currentValue.replace('\'T\'', ' ').replace(/-/g, '/'));
-                        
+
                         if (strDateFormat.indexOf('M') === -1) {
                             currentDate = new Date('2015/6/15 ' + currentValue);
                         }
-                        
+
                         arrMatch = strDateFormat.match(/(M|E)+/g);
                         if (arrMatch && arrMatch[0].length > 3) {
                             strDateFormat = strDateFormat.replace(/E+/g, new Array(daysOfTheWeek[currentDate.getDay()].length + 1).join('E'));
                             strDateFormat = strDateFormat.replace(/M+/g, new Array(monthsOfTheYear[currentDate.getDay()].length + 1).join('M'));
                         }
-                        
+
                         // If it was an arrow that was pressed
                         if (strKeyCode === GS.keyCode('left arrow') ||
                             strKeyCode === GS.keyCode('up arrow') ||
                             strKeyCode === GS.keyCode('right arrow') ||
                             strKeyCode === GS.keyCode('down arrow')) {
-                            
+
                             //console.log('test');
-                            
+
                             // Prevent the browser from moving the cursor and prevent envelope from using arrows
                             event.preventDefault();
                             event.stopPropagation();
-                            
+
                             //console.log(currentValue, formatDivider, currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                             // Encompass the field in which the cursor is inside
                             while (currentSelectionRange.start >= 0 && formatDivider.indexOf(currentValue[currentSelectionRange.start - 1]) < 0) {
                                 currentSelectionRange.start -= 1;
                             }
-                            
+
                             currentSelectionRange.end = currentSelectionRange.start;
                             while ( currentSelectionRange.end < currentValue.length &&
                                     formatDivider.indexOf(currentValue[currentSelectionRange.end]) < 0) {
                                 currentSelectionRange.end += 1;
                             }
-                            
+
                             //console.log(currentValue, currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                             GS.setInputSelection(element.control, currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                             currentSelectionText = currentValue.substring(currentSelectionRange.start, currentSelectionRange.end);
                             currentSelectionFormatText = strDateFormat.substring(currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                             // If it is up or down
                             if (strKeyCode === GS.keyCode('up arrow') ||
                                 strKeyCode === GS.keyCode('down arrow')) {
                                 var increment = strKeyCode === GS.keyCode('up arrow') ? 1 : -1;
-                                
+
                                 if (currentSelectionFormatText[0] === 'M') {
                                     currentDate.setMonth(currentDate.getMonth() +       increment);
                                     if ((currentSelectionRange.end - currentSelectionRange.start) > 2) {
@@ -2329,36 +2329,36 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                     } else {
                                         currentSelectionRange.end = currentSelectionRange.start + currentDate.getMonth().toString().length;
                                     }
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'd') {
                                     currentDate.setDate(currentDate.getDate() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getDate().toString().length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'y') {
                                     currentDate.setFullYear(currentDate.getFullYear() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getFullYear().toString().length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'E') {
                                     currentDate.setDate(currentDate.getDate() + increment);
                                     currentSelectionRange.start = 0;
                                     currentSelectionRange.end = daysOfTheWeek[currentDate.getDay()].length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'h' || currentSelectionFormatText[0] === 'H') {
                                     currentDate.setHours(currentDate.getHours() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getHours().toString().length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'm') {
                                     currentDate.setMinutes(currentDate.getMinutes() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getMinutes().toString().length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 's') {
                                     currentDate.setSeconds(currentDate.getSeconds() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getSeconds().toString().length;
-                                    
+
                                 } else if (currentSelectionFormatText[0] === 'a') {
                                     currentDate.setHours(currentDate.getHours() + 12);
                                 }
-                                
+
                                 newValue = formatDate(currentDate, strDateFormat);
                                 this.control.value = newValue;
                                 currentValue = newValue;
@@ -2369,7 +2369,7 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                 currentSelectionRange.end = currentSelectionRange.end + 2;
                                 currentSelectionRange.start = currentSelectionRange.end;
                             }
-                            
+
                             // Copied from above
                             arrMatch = strDateFormat.match(/(M|E)+/g);
                             if (arrMatch && arrMatch[0].length > 3) {
@@ -2384,23 +2384,23 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                     formatDivider.indexOf(currentValue[currentSelectionRange.end]) < 0) {
                                 currentSelectionRange.end += 1;
                             }
-                            
+
                             GS.setInputSelection(element.control, currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                         // All number keys
                         } else if (event.keyCode >= 96 && event.keyCode <= 105) {
                             //// HARK YE ONLOOKER:
                             //// This code caps the number that is inputed by the user to the length that the format allows,
                             //// this will dissallow anyone form entering a year that is > 4 characters unless the
                             //// page's developer allows it in a custom format.
-                            //// 
+                            ////
                             //// This should be fixed around the year 9998 to have all default formats have 5 character years
-                            
+
                             currentSelectionText = currentValue.substring(currentSelectionRange.start, currentSelectionRange.end);
                             currentSelectionFormatText = strDateFormat.substring(currentSelectionRange.start, currentSelectionRange.end);
-                            
+
                             currentValue = element.value;
-                            
+
                             // This is sort of copied from above
                             // There are only two differences:
                             //     the var name
@@ -2416,20 +2416,20 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                     formatDivider.indexOf(currentValue[currentFieldRange.end]) < 0) {
                                 currentFieldRange.end += 1;
                             }
-                            
+
                             //console.log(currentFieldRange);
-                            
+
                             //console.log(currentValue.substring(0, currentSelectionRange.start));
                             //console.log(GS.charFromKeyCode(event), currentSelectionText, currentSelectionFormatText, currentDate);
                             //console.log(currentValue.substring(currentSelectionRange.end));
-                            
+
                             // This error checking is probably unneeded, but what the hey
                             currentFieldRange.start = Math.max(currentFieldRange.start, 0);
                             arrMatch = strDateFormat.match(strDateFormat[currentFieldRange.start] + '+', 'g');
                             if (arrMatch) {
                                 // Prevent the browser from putting the number in for us
                                 event.preventDefault();
-                                
+
                                 // Get the character that they pressed
                                 newFieldValue = GS.charFromKeyCode(event);
                                 console.log(newFieldValue);
@@ -2437,18 +2437,18 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                 // all characters in the field except the first one
                                 newFieldValue = currentValue.substring(currentFieldRange.start + 1, currentFieldRange.start + arrMatch[0].length) + newFieldValue;
                                 console.log(newFieldValue, currentValue);
-                                
+
                                 console.log(currentFieldRange.start + 1, currentFieldRange.start + arrMatch[0].length);
-                                
+
                                 // Build the value using the current field range and the new field value we built above
-                                element.value = 
+                                element.value =
                                     currentValue.substring(0, currentFieldRange.start) +
                                     newFieldValue +
                                     currentValue.substring(currentFieldRange.end);
-                                
-                                
+
+
                                 console.log(currentValue.substring(0, currentFieldRange.start), newFieldValue, currentValue.substring(currentFieldRange.end));
-                            
+
                                 // This is copied from above
                                 currentFieldRange = {
                                     start: currentSelectionRange.start
@@ -2461,7 +2461,7 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                         formatDivider.indexOf(currentValue[currentFieldRange.end]) < 0) {
                                     currentFieldRange.end += 1;
                                 }
-                                
+
                                 //                                                                          This indexOf does not need to be checked for -1
                                 //                                                                          Because we know for a fact that the match is in
                                 //                                                                          the string we are searching
@@ -2470,18 +2470,18 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                 //console.log(arrMatch[0].length, strDateFormat.indexOf(arrMatch[0]), newCursorPos, arrMatch[0]);
                                 GS.setInputSelection(element.control, newCursorPos, newCursorPos);
                             }
-                            
+
                         }
-                        
+
                         //// All visible keys
                         //} else if ( event.keyCode >= 48 && event.keyCode <= 90 ||
                         //            event.keyCode >= 96 && event.keyCode <= 109 ||
                         //            event.keyCode >= 186 && event.keyCode <= 222 ||
                         //            event.keyCode === 32) {
                         //    //console.log('test');
-                        //    
+                        //
                         //    //GS.triggerEvent(element, 'change');
-                        //    
+                        //
                         //    if ((currentSelectionRange.end - currentSelectionRange.start) > 0) {
                         //        element.control.addEventListener('keyup', function ______self() {
                         //            GS.setInputSelection(this, currentSelectionRange.start + 1, currentSelectionRange.start) + 1;
@@ -2489,9 +2489,9 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                         //        });
                         //    }
                         //}
-                        
+
                         //console.log(event.keyCode);
-                        
+
                         syncView(element);
                     }
                 }
@@ -2508,9 +2508,9 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                     monthsOfTheYear = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                     arrMatch, strDateFormat, formatDivider, currentValue, currentDate;
                 //console.log(currentSelectionRange.start, currentSelectionRange.end);
-                
+
                 ////// Copied from above until otherwise noted
-                
+
                 // Fix date format
                 strDateFormat = element.getAttribute('format');
                 //console.log(strDateFormat);
@@ -2535,22 +2535,22 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                 } else if (strDateFormat.toLowerCase() === 'isodatetime') {
                     strDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
                 }
-                
+
                 formatDivider = strDateFormat.match(/[^mdyehmsa]/gi).join('');
-                
+
                 currentValue = element.control.value;
                 currentDate = new Date(currentValue.replace('\'T\'', ' ').replace(/-/g, '/'));
-                
+
                 if (strDateFormat.indexOf('M') === -1) {
                     currentDate = new Date('2015/6/15 ' + currentValue);
                 }
-                
+
                 arrMatch = strDateFormat.match(/(M|E)+/g);
                 if (arrMatch && arrMatch[0].length > 3) {
                     strDateFormat = strDateFormat.replace(/E+/g, new Array(daysOfTheWeek[currentDate.getDay()].length + 1).join('E'));
                     strDateFormat = strDateFormat.replace(/M+/g, new Array(monthsOfTheYear[currentDate.getDay()].length + 1).join('M'));
                 }
-                
+
                 while (currentSelectionRange.start >= 0 && formatDivider.indexOf(currentValue[currentSelectionRange.start - 1]) < 0) {
                     currentSelectionRange.start -= 1;
                 }
@@ -2560,11 +2560,11 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                     currentSelectionRange.end += 1;
                 }
                 //console.log(currentSelectionRange.start, currentSelectionRange.end);
-                
+
                 ////// Not copied
                 element.ignoreSelect = true;
                 GS.setInputSelection(element.control, currentSelectionRange.start, currentSelectionRange.end);
-                
+
                 //console.log('CLICK EVENT FIRED');
             },
             focus: function () {
@@ -2576,16 +2576,16 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                 //    this.ignoreSelect = false;
                 //}
                 //console.log('SELECT EVENT FIRED', GS.getInputSelection(this.control));
-                
+
                 // Copied from click handler until otherwise noted
                 var element = this, currentSelectionRange = GS.getInputSelection(element.control),
                     daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
                     monthsOfTheYear = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                     arrMatch, strDateFormat, formatDivider, currentValue, currentDate;
                 //console.log(currentSelectionRange.start, currentSelectionRange.end);
-                
+
                 ////// Copied from above until otherwise noted
-                
+
                 // Fix date format
                 strDateFormat = element.getAttribute('format');
                 //console.log(strDateFormat);
@@ -2610,22 +2610,22 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                 } else if (strDateFormat.toLowerCase() === 'isodatetime') {
                     strDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
                 }
-                
+
                 formatDivider = strDateFormat.match(/[^mdyehmsa]/gi).join('');
-                
+
                 currentValue = element.control.value;
                 currentDate = new Date(currentValue.replace('\'T\'', ' ').replace(/-/g, '/'));
-                
+
                 if (strDateFormat.indexOf('M') === -1) {
                     currentDate = new Date('2015/6/15 ' + currentValue);
                 }
-                
+
                 arrMatch = strDateFormat.match(/(M|E)+/g);
                 if (arrMatch && arrMatch[0].length > 3) {
                     strDateFormat = strDateFormat.replace(/E+/g, new Array(daysOfTheWeek[currentDate.getDay()].length + 1).join('E'));
                     strDateFormat = strDateFormat.replace(/M+/g, new Array(monthsOfTheYear[currentDate.getDay()].length + 1).join('M'));
                 }
-                
+
                 // Condition copied only
                 if ((currentSelectionRange.start >= 0 && formatDivider.indexOf(currentValue[currentSelectionRange.start - 1]) < 0) ||
                     (currentSelectionRange.end < currentValue.length && formatDivider.indexOf(currentValue[currentSelectionRange.end]) < 0)) {
@@ -3306,11 +3306,11 @@ return selectedElement;});addFlexContainerProps(selectedElement);};});document.a
                 if (this.border_line) {
                     this.removeChild(this.border_line);
                 }
-                
+
                 this.border_line = document.createElement('div');
                 this.border_line.classList.add('border-line');
                 this.border_line.setAttribute('gs-dynamic', '');
-                
+
                 this.appendChild(this.border_line);
             },
             removed: function () {
@@ -3530,29 +3530,29 @@ element.syncView();}}}}
 xtag.register('gs-listbox',{lifecycle:{created:function(){elementCreated(this);},inserted:function(){elementInserted(this);},attributeChanged:function(strAttrName,oldValue,newValue){if(strAttrName==='suspend-created'&&newValue===null){elementCreated(this);elementInserted(this);}else if(strAttrName==='suspend-inserted'&&newValue===null){elementInserted(this);}else if(!this.hasAttribute('suspend-created')&&!this.hasAttribute('suspend-inserted')){if(strAttrName==='value'&&newValue!==oldValue){this.value=newValue;}}}},events:{},accessors:{value:{get:function(){return this.innerValue;},set:function(strNewValue){selectRecord(this,strNewValue);this.scrollToSelectedRecord();}},selectedRecord:{get:function(){return this.innerSelectedRecord;},set:function(newValue){selectRecord(this,newValue);this.scrollToSelectedRecord();}},textValue:{get:function(){if(this.innerSelectedRecord){return xtag.queryChildren(this.innerSelectedRecord,'td')[0].textContent;}
 return undefined;},set:function(){selectRecord(this,strNewValue);this.scrollToSelectedRecord();}}},methods:{refresh:function(callback){getData(this,callback);},scrollToSelectedRecord:function(){var selectedTr;if(this.tableElement){selectedTr=xtag.query(this.tableElement,'tr[selected]')[0];if(selectedTr){GS.scrollIntoView(selectedTr);}}
 /*var scrollingContainer, arrTrs, i, len, intScrollTop, bolFoundSelected = false;
-                
+
                 if (this.tableElement) {
                     scrollingContainer = this;
                     arrTrs = xtag.query(this.tableElement, 'tr');
-                    
+
                     for (i = 0, intScrollTop = 0, len = arrTrs.length; i < len; i += 1) {
                         if (arrTrs[i].hasAttribute('selected')) {
                             intScrollTop += arrTrs[i].offsetHeight / 2;
-                            
+
                             bolFoundSelected = true;
-                            
+
                             break;
                         } else {
                             intScrollTop += arrTrs[i].offsetHeight;
                         }
                     }
-                    
+
                     if (bolFoundSelected) {
                         intScrollTop = intScrollTop - scrollingContainer.offsetHeight / 2;
                     } else {
                         intScrollTop = 0;
                     }
-                    
+
                     scrollingContainer.scrollTop = intScrollTop;
                 }*/},letterScrollbarHandler:function(){var element=this,i,len,intTextHeight,intLettersDropped,intSkipperHeight,intElementHeight,intDistance,strHTML,arrSkippers;if(xtag.queryChildren(element,'.letter-scrollbar-container').length===0){element.letterScrollbarContainer=document.createElement('div');element.letterScrollbarContainer.classList.add('letter-scrollbar-container');element.letterScrollbarContainer.setAttribute('gs-dynamic','');element.appendChild(element.letterScrollbarContainer);}else{element.letterScrollbarContainer.innerHTML='';}
 if(element.clientHeight<element.scrollContainer.scrollHeight){intTextHeight=GS.getTextHeight(element.letterScrollbarContainer);intSkipperHeight=intTextHeight*this.arrDividingPoints.length;intElementHeight=element.clientHeight/this.arrDividingPoints.length;if(intElementHeight<intTextHeight){intElementHeight=intTextHeight;}
@@ -3611,7 +3611,7 @@ this.syncView();}},textValue:{get:function(){if(this.control){return this.contro
                     this.appendChild(multiLineTemplate.cloneNode(true));
                     // set a variable with the control element for convenience and speed
                     this.control = xtag.queryChildren(this, '.control')[0];
-                    
+
                     this.control.lastWidth = this.control.clientWidth;
                     this.control.lastHeight = this.control.clientHeight;
                 }
@@ -3746,12 +3746,12 @@ return selectedElement;});addProp('Disabled',true,'<gs-checkbox class="target" v
         addProp('Hidden Value:', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-        
+
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-        
+
         addFlexContainerProps(selectedElement);
         //addFlexProps(selectedElement);
     };*/});document.addEventListener('DOMContentLoaded',function(){'use strict';function highlightOption(element,option){var i,len,arrSelectedOptions,arrTempSelectedOptions;arrSelectedOptions=xtag.query(element,'gs-option[selected]');arrTempSelectedOptions=xtag.query(element,'gs-option[tempselect]');for(i=0,len=arrSelectedOptions.length;i<len;i+=1){arrSelectedOptions[i].removeAttribute('selected');}

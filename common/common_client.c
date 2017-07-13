@@ -1107,13 +1107,13 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 								SDEBUG("ptr_message: %s", ptr_message);
 
 								bol_last_confirm =
-									((strncmp(ptr_message, "TRANSACTION COMPLETED", 12) == 0) ||
+									((strncmp(ptr_message, "TRANSACTION ", 12) == 0) ||
 										(strncmp(ptr_message, "FATAL\012", 6) == 0) || (strncmp(ptr_message, "OK", 2) == 0));
 								if (bol_last_confirm == false) {
 									ptr_message = strstr(ptr_message, "\012");
 									SDEBUG("ptr_message: %s", ptr_message);
 									bol_last_confirm =
-										ptr_message != NULL && ((strncmp(ptr_message + 1, "TRANSACTION COMPLETED", 12) == 0) ||
+										ptr_message != NULL && ((strncmp(ptr_message + 1, "TRANSACTION ", 12) == 0) ||
 																   (strncmp(ptr_message + 1, "FATAL\012", 6) == 0) ||
 																   (strncmp(ptr_message + 1, "OK", 3) == 0));
 								}
@@ -2059,19 +2059,15 @@ void client_close_immediate(struct sock_ev_client *client) {
 	}
 	if (client->client_paused_request != NULL && client->client_paused_request->bol_free_watcher) {
 		client->client_paused_request->watcher = NULL;
+	}
 
+	if (client->client_paused_request != NULL && client->client_paused_request->bol_increment_watcher) {
 		// this won't effect the event loop, because DB_finish will have the decrement_idle
 		increment_idle(global_loop);
 	}
 	if (client->conn != NULL) {
 		SDEBUG("DB_conn %p closing", client->conn);
-#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
-		if (client->conn) {
-#endif
 		DB_finish(client->conn);
-#if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
-		}
-#endif
 	}
 
 	if (client->bol_socket_is_open == true) {

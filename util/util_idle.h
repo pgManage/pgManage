@@ -18,7 +18,7 @@ zero, it adds the idle watcher.
 void _increment_idle(EV_P);
 #define increment_idle(A) \
 	_increment_idle(A); \
-	SDEBUG("increment_idle: %d", int_idle_count);
+	SINFO("increment_idle: %d", int_idle_count);
 
 /*
 Decrement the number of watchers using the idle watcher. If it reaches zero, it
@@ -26,5 +26,5 @@ removes the idle watcher.
 */
 void _decrement_idle(EV_P);
 #define decrement_idle(A) \
-	SDEBUG("decrement_idle: %d", int_idle_count); \
+	SINFO("decrement_idle: %d", int_idle_count); \
 	_decrement_idle(A);

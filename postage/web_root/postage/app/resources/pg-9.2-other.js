@@ -807,10 +807,10 @@ function dialogOptions() {
                 <div>
                     <label for="postage-options-left-panel" style="min-width: 7.25em;">Panel Width:</label>
                     <gs-text id="postage-options-left-panel"></gs-text>
-                    
+
                     <label for="postage-options-beautify" style="min-width: 7.25em;">Automatic Beautify:</label>
                     <gs-checkbox id="postage-options-beautify"></gs-checkbox>
-                    
+
                     <label for="postage-options-Comma" style="min-width: 7.25em;">Comma First Formatting:</label>
                     <gs-checkbox id="postage-options-Comma"></gs-checkbox>
 
@@ -1039,12 +1039,12 @@ function dialogOptions() {
         document.getElementById('postage-options-beautify').addEventListener('change', function () {
             localStorage.bolBeautify = document.getElementById('postage-options-beautify').value;
         });
-        
+
         document.getElementById('postage-options-Comma').value = localStorage.bolComma;
         document.getElementById('postage-options-Comma').addEventListener('change', function () {
             localStorage.bolComma = document.getElementById('postage-options-Comma').value;
         });
-        
+
         document.getElementById('postage-options-left-panel').value = localStorage.leftPanelWidth;
         document.getElementById('postage-options-left-panel').addEventListener('change', function () {
             localStorage.leftPanelWidth = document.getElementById('postage-options-left-panel').value;
@@ -2425,7 +2425,7 @@ function executeHelperEndLoading() {
 
     currentTab.relatedClearButton.removeAttribute('hidden');
     currentTab.relatedResultsHeaderElement.classList.remove('executing');
-    
+
     if (currentTab.relatedResultsArea.children.length > 0) {
         var spaceHeight = currentTab.relatedResultsArea.lastChild.clientHeight;
         spaceHeight = currentTab.relatedResultsArea.clientHeight - spaceHeight;
@@ -2436,7 +2436,7 @@ function executeHelperEndLoading() {
         heightElem.style.height = spaceHeight + 'px';
         currentTab.relatedResultsArea.appendChild(heightElem);
     }
-    
+
     currentTab.handlingQuery = false;
     currentTab.relatedStopSocketButton.setAttribute('hidden', '');
 	//console.log('test2');
@@ -2546,10 +2546,10 @@ function executeScript(bolCursorQuery) {
     var intCursorPos;
     var strScript;
     var jsnSelection;
-    
-    
+
+
     document.getElementById('sql-results-area-' + currentTab.intTabNumber + '').style.overflow = 'auto';
-    
+
     executeHelperUpdateTally(resultsTallyElement, 0, 0);
 
     // if we found an editor to get the query from and the current tab is not already running a query
@@ -2581,7 +2581,7 @@ function executeScript(bolCursorQuery) {
         } else {
             jsnCurrentQuery = getCurrentQuery();
         }
-        
+
         // clear error annotation in ace
         editor.getSession().setAnnotations([]);
 
@@ -2593,7 +2593,7 @@ function executeScript(bolCursorQuery) {
         resultsContainer.innerHTML = '';
         resultsHeaderElement.classList.remove('error');
         resultsHeaderElement.classList.remove('executing');
-        
+
         // set number tracking variables
         intRecordsThisQuery = 0; // number of records this query so that we can get valid row numbers
         intError = 0;            // number error the callback is on
@@ -2602,11 +2602,11 @@ function executeScript(bolCursorQuery) {
 		intErrorStartChar = 0;   // number of chars in the queries that successfully ran, so that we can offset the cursor properly
         var arrData = [];
         // begin
-        
+
         //console.log('test');
         executeHelperStartExecute();
-        
-        
+
+
         currentTab.currentMessageID = GS.requestRawFromSocket(GS.querySocket, jsnCurrentQuery.strQuery, function (data, error) {
             var tableElement;
             var scrollElement;
@@ -2653,13 +2653,13 @@ function executeScript(bolCursorQuery) {
                         executeHelperEndExecute();
                         executeHelperStartLoading();
                     }
-                    
+
                     //console.log(data.strQuery);
                     if (data.strQuery.toLowerCase().indexOf('drop ') !== -1) {
                         var strObjName, trimmedQuery, oidQuery, schemaOID, strSchemaName;
                         trimmedQuery = data.strQuery.substring(parseInt(data.strQuery.toLowerCase().indexOf('drop '), 10) + 5, data.strQuery.length);
                         trimmedQuery = trimmedQuery.substring(parseInt(trimmedQuery.toLowerCase().indexOf(' '), 10) + 1, trimmedQuery.length);
-                        
+
                         if (trimmedQuery.indexOf(' ') !== -1) {
                             trimmedQuery = trimmedQuery.substring(0, trimmedQuery.toLowerCase().indexOf(' '));
                         }
@@ -2676,7 +2676,7 @@ function executeScript(bolCursorQuery) {
                                 WHERE nspname = '{{NAMETOKEN}}'
                                 ORDER BY nspname;
                             */}).replace(/\{\{NAMETOKEN\}\}/g, strObjName);
-                            
+
                             getSingleCellData(oidQuery, function (newOID) {
                                 //console.log(newOID);
                                 for (i = 0, len = treeGlobals.data.length; i < len; i++) {
@@ -2701,7 +2701,7 @@ function executeScript(bolCursorQuery) {
                                     FROM pg_class
                                     WHERE relnamespace = '{{SCHEMAOID}}' AND relname = '{{NAMETOKEN}}'
                                 */}).replace(/\{\{NAMETOKEN\}\}/g, strObjName).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
-                                
+
                                 //console.log(oidQuery);
                                 getSingleCellData(oidQuery, function (newOID) {
                                     for (i = 0, len = treeGlobals.data.length; i < len; i++) {
@@ -2710,7 +2710,7 @@ function executeScript(bolCursorQuery) {
                                         }
                                     }
                                 });
-                            
+
                             });
                         } else if (data.strQuery.toLowerCase().indexOf('drop function') !== -1) {
                             trimmedQuery = data.strQuery.substring(parseInt(data.strQuery.toLowerCase().indexOf('drop '), 10) + 5, data.strQuery.length);
@@ -2746,13 +2746,17 @@ function executeScript(bolCursorQuery) {
                                         }
                                     }
                                 });
-                            
+
                             });
                         }
                     }
 
                     if (data.bolLastMessage) {
                         executeHelperEndLoading();
+						if (data.bolTransactionOpen) {
+							currentTab.relatedCommitButton.removeAttribute('disabled');
+							currentTab.relatedRollbackButton.removeAttribute('disabled');
+						}
                     }
                     if (data.intCallbackNumberThisQuery === 0) {
                         if (data.strQuery.trim()) {
@@ -2771,7 +2775,7 @@ function executeScript(bolCursorQuery) {
                         intErrorStartLine += (data.strQuery.match(/\n/gim) || []).length;
 						intErrorStartChar += data.strQuery.length;
                     }
-                    
+
                     //console.log(data.strMessage, data.bolLastMessage);
 
                     // handle putting the response in the results pane
@@ -2945,11 +2949,11 @@ function executeScript(bolCursorQuery) {
                                     xtag.query(divElement, '.button-show-query')[0],
                                     data.strQuery
                                 );
-                                
+
                                 tabNumber = currentTab.intTabNumber;
                                 idNumber = tabNumber + '-' + xtag.query(resultsContainer, 'gs-table').length;
                                 tableID = 'Table' + idNumber + '';
-                                
+
                                 strHTML = ml(function () {/*
                                     <template for="top-hud">
                                         <gs-button onclick="document.getElementById('{{TABLEID}}').openPrefs(this)" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
@@ -2964,7 +2968,7 @@ function executeScript(bolCursorQuery) {
                                         <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('last')" icon="step-forward">&nbsp;</gs-button>
                                     </template>
                                 */}).replace(/{{TABLEID}}/gi, tableID).replace(/{{IDNUM}}/gi, tabNumber);
-                                
+
                                 strHTML += '<template for="header-record">';
 
                                 i = 0;
@@ -3039,8 +3043,8 @@ function executeScript(bolCursorQuery) {
                                 }
 
                                 strHTML += '</template>';
-                                
-                                
+
+
                                 tableElement = document.createElement('gs-table');
                                 tableElement.innerHTML = strHTML;
                                 tableElement.setAttribute('id', tableID);
@@ -3048,21 +3052,21 @@ function executeScript(bolCursorQuery) {
                                 tableElement.setAttribute('no-update', '');
                                 tableElement.setAttribute('null-string', 'NULL');
                                 scrollElement.appendChild(tableElement);
-                                
+
                                 tableElement.addEventListener('openFullContainer', function () {
                                     currentTab.resultsScroll = document.getElementById('sql-results-area-' + tabNumber + '').scrollTop;
                                     document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = 0;
                                     document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'hidden';
                                 });
-                                
+
                                 tableElement.addEventListener('closeFullContainer', function () {
                                     document.getElementById('sql-results-area-' + tabNumber + '').scrollTop = currentTab.resultsScroll;
                                     document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'auto';
                                 });
-                                
+
                                 tableElement.internalData.records = arrData;
                                 tableElement.internalData.columnNames = data.arrColumnNames;
-                                
+
                                 // tempArr = [];
                                 // i = 0;
                                 // len = data.arrColumnNames.length;
@@ -3071,7 +3075,7 @@ function executeScript(bolCursorQuery) {
                                 //     i += 1;
                                 // }
                                 tableElement.internalData.columnTypes = data.arrColumnTypes;
-                                
+
                                 tempArr = [];
                                 i = 0;
                                 len = data.arrColumnNames.length;
@@ -3080,7 +3084,7 @@ function executeScript(bolCursorQuery) {
                                     i += 1;
                                 }
                                 tableElement.internalData.columnFilterStatuses = tempArr;
-                                
+
                                 tempArr = [];
                                 i = 0;
                                 len = data.arrColumnNames.length;
@@ -3089,7 +3093,7 @@ function executeScript(bolCursorQuery) {
                                     i += 1;
                                 }
                                 tableElement.internalData.columnFilters = tempArr;
-                                
+
                                 tempArr = [];
                                 i = 0;
                                 len = data.arrColumnNames.length;
@@ -3098,7 +3102,7 @@ function executeScript(bolCursorQuery) {
                                     i += 1;
                                 }
                                 tableElement.internalData.columnListFilters = tempArr;
-                                
+
                                 tempArr = [];
                                 i = 0;
                                 len = data.arrColumnNames.length;
@@ -3109,22 +3113,22 @@ function executeScript(bolCursorQuery) {
                                 tableElement.internalData.columnOrders = tempArr;
 
                                 tableElement.internalDisplay.headerHeight = 37;
-                                
+
                                 // refresh causes the record heights to be calculated
                                 tableElement.refresh();
-                                
+
                                 // clear arrData variable so that we don't modify the
                                 //      arrData we sent to the datasheet
                                 arrData = [];
-                                
+
                                 intQuery += 1;
                                 executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
                             } else {
                                 tempData = data.strMessage.split('\n');
                                 arrData.push.apply(arrData, tempData);
                             }
-                            
-                            
+
+
                         }
                     }
                 } else {
