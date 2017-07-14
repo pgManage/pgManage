@@ -620,6 +620,7 @@
           , intResponseNumberThisQuery = 0, arrMessages, arrColumnNames, arrColumnTypes
           , arrStart, dteStart, arrEnd, dteEnd, intRows;
 
+        bolAutocommit = bolAutocommit !== undefined ? bolAutocommit : true;
         return GS.requestFromSocket(socket, 'RAW' + (!bolAutocommit ? '\tDISABLE AUTOCOMMIT\n' : '\n') + strQuery, function (data, error, errorData) {
             var arrRecords, arrLines, i, len, strMode;
 

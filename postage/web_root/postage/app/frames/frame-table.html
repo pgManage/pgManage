@@ -23,7 +23,7 @@
 
         <script>
         //COLUMN REORDER NOT WORKING
-            var strTableName, strSchemaName, strHasOids, strConstraints, arrConstraint, strGrantsEtc, arrColumn = [], strRelOptions, dependency_script;
+            var strTableName, strSchemaName, strHasOids, strConstraints, arrConstraint, strGrantsEtc, arrColumn = [], strRelOptions, dependency_script, strOwner;
             var strDumpQuery = ''
             scriptQuery.ruleSql = ml(function () {/*
                    SELECT   E'-- DROP RULE ' || quote_ident(pg_rewrite.rulename) || ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || E';\n' ||
@@ -182,6 +182,40 @@
                 });
             }
 
+            function GetSequences(table_name, schema_name, callback) {
+                var arrRows = [];
+                GS.requestRawFromSocket(GS.envSocket, ml(function () {/*
+                    SELECT pg_depend.objid::regclass AS relname, pg_attribute.attname
+                        FROM pg_depend
+                        LEFT JOIN pg_attribute ON pg_attribute.attrelid = pg_depend.refobjid AND pg_attribute.attnum = pg_depend.refobjsubid
+                        LEFT JOIN pg_class ON pg_class.oid = pg_depend.objid
+                        WHERE pg_depend.refobjid = $WONTGUESS9o8123475098yefd09vyu09817345${{SCHEMA}}.{{RELNAME}}$WONTGUESS9o8123475098yefd09vyu09817345$::regclass AND pg_class.relkind = 'S';
+                */}).replace ('{{SCHEMA}}', schema_name).replace ('{{RELNAME}}', table_name), function (data, error) {
+                    if (!error) {
+                        if (data.bolLastMessage) {
+                            var strQuery1 = '';
+                            var strQuery2 = '';
+                            var i = 0, len = arrRows.length;
+                            console.log(arrRows);
+                            while (i < len) {
+                                console.log(i, len);
+                                var arrRow = arrRows[i].split('\t');
+                                strQuery1 += 'ALTER SEQUENCE ' + arrRow[0] + ' OWNED BY NONE;\n';
+                                strQuery2 += 'ALTER SEQUENCE ' + arrRow[0] + ' OWNED BY ' + schema_name + '.' + table_name + '.' + quote_ident(arrRow[1]) + ';\n';
+                                i += 1;
+                            }
+                            
+                            console.log(strQuery1, strQuery2);
+                            callback(strQuery1, strQuery2)
+                        } else if (data.strMessage !== '\\.') {
+                            arrRows.push.apply(arrRows, data.strMessage.split('\n'));
+                        }
+                    } else {
+                        GS.webSocketErrorDialog(data);
+                    }
+                });
+            }
+
             function getSchemaOid(intI, arrDropObjects, callback) {
                 schemaoidQuery = ml(function () {/*
                     SELECT oid
@@ -214,6 +248,8 @@
                 strDumpQuery = '';
                 var strQuery, i, len, tempFunction, handleScriptResults, arrRow;
 
+
+                strDumpQuery += '{{ALTERSEQUENCE}}'
 
                 strDumpQuery += '\nALTER TABLE ' +
                                     strSchemaName + '.' + strTableName +
@@ -278,6 +314,13 @@
                 strDumpQuery += strRelOptions;
                 strDumpQuery += '\n';
                 strDumpQuery += ');\n';
+                strDumpQuery += 'ALTER TABLE ';
+                strDumpQuery += strSchemaName;
+                strDumpQuery += '.';
+                strDumpQuery += strTableName;
+                strDumpQuery += ' OWNER TO ';
+                strDumpQuery += strOwner;
+                strDumpQuery += ';\n';
                 strDumpQuery += '{{HELPDEF}}\n';
                 strDumpQuery += 'INSERT INTO ';
                 strDumpQuery += strSchemaName;
@@ -321,169 +364,176 @@
                 console.log(strDumpQuery);
 
                 UseError(strTableName, strSchemaName, function (query) {
-                    strDumpQuery = query.substring(0, query.length - 10).substring(0, query.substring(0, query.length - 10).lastIndexOf('\n')) + '\n\n' + strDumpQuery;
-                    arrDropStatements = query.substring(0, query.length - 10).substring(0, query.substring(0, query.length - 10).lastIndexOf('\n')).split('\n');
-                    for (i = 0, len = arrDropStatements.length; i < len; i += 1) {
-                        // removes 'DROP ' and ';'
-                        strTempObjName = arrDropStatements[i].substring(5, arrDropStatements[i].length - 1);
-                        // takes the first word
-                        strDropObjType = strTempObjName.substring(0, strTempObjName.indexOf(' '));
-                        // Capitalize first letter
-                        strDropObjType = strDropObjType.substring(0, 1).toUpperCase() + strDropObjType.substr(1);
-                        // removes the first word
-                        strTempObjName = strTempObjName.substring(strDropObjType.length + 1, strTempObjName.length);
-                        // first part
-                        strDropSchema = strTempObjName.substring(0, strTempObjName.indexOf('.'));
-                        // second part
-                        strDropObjName = strTempObjName.substring(strDropSchema.length + 1, strTempObjName.length);
-                        arrDropObjects.push(['' + strDropObjType + '', '' + strDropSchema + '', '' + strDropObjName + '']);
-                    }
-
-                    arrDropObjects = arrDropObjects.reverse();
-                    var scriptForCreate = [], scriptForOid = [], schemaOID, arrDoneNumsOid;
-                    
-                    
-                    for (i = 0, len = arrDropObjects.length; i < len; i += 1) {
+                    GetSequences(strTableName, strSchemaName, function (query1, query2) {
+                        strDumpQuery = query.substring(0, query.length - 10).substring(0, query.substring(0, query.length - 10).lastIndexOf('\n')) + '\n\n' + strDumpQuery;
+                        arrDropStatements = query.substring(0, query.length - 10).substring(0, query.substring(0, query.length - 10).lastIndexOf('\n')).split('\n');
+                        for (i = 0, len = arrDropStatements.length; i < len; i += 1) {
+                            // removes 'DROP ' and ';'
+                            strTempObjName = arrDropStatements[i].substring(5, arrDropStatements[i].length - 1);
+                            // takes the first word
+                            strDropObjType = strTempObjName.substring(0, strTempObjName.indexOf(' '));
+                            // Capitalize first letter
+                            strDropObjType = strDropObjType.substring(0, 1).toUpperCase() + strDropObjType.substr(1);
+                            // removes the first word
+                            strTempObjName = strTempObjName.substring(strDropObjType.length + 1, strTempObjName.length);
+                            // first part
+                            strDropSchema = strTempObjName.substring(0, strTempObjName.indexOf('.'));
+                            // second part
+                            strDropObjName = strTempObjName.substring(strDropSchema.length + 1, strTempObjName.length);
+                            arrDropObjects.push(['' + strDropObjType + '', '' + strDropSchema + '', '' + strDropObjName + '']);
+                        }
+    
+                        //add to beginning of arrDropObjects, the list of sequences
+    
+                        arrDropObjects = arrDropObjects.reverse();
+                        var scriptForCreate = [], scriptForOid = [], schemaOID, arrDoneNumsOid;
                         
-                        getSchemaOid(i, arrDropObjects, function (schemaOID, intI) {
-                            if (arrDropObjects[intI][0].toLowerCase() === 'view') {
-                                scriptForOid = ml(function () {/*
-                                    SELECT oid
-                                        FROM pg_class
-                                        WHERE relnamespace = '{{SCHEMAOID}}' AND relname = '{{NAMETOKEN}}'
-                                    */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
-
-
-                                scriptForCreate = scriptQuery.objectViewNoComment.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
-                                        .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
-                                        .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
-                                        .replace(/{{STRRELNAME}}/gi, arrDropObjects[intI][2]);
-                            } else if (arrDropObjects[intI][0].toLowerCase() === 'function') {
-                                scriptForOid = ml(function () {/*
-                                        SELECT pr.oid
-                                            FROM pg_proc pr
-                                            JOIN pg_type typ ON typ.oid = pr.prorettype
-                                            WHERE proisagg = FALSE AND typname <> 'trigger' AND pr.pronamespace = '{{SCHEMAOID}}' AND proname = '{{NAMETOKEN}}';
-                                    */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
-
-
-                                scriptForCreate = scriptQuery.objectFunction.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
-                                        .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
-                                        .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
-                                        .replace(/{{STRRELNAME}}/gi, arrDropObjects[intI][2]);
-                            } else if (arrDropObjects[intI][0].toLowerCase() === 'operator') {
-                                scriptForOid = ml(function () {/*  
-                                    SELECT oprname
-                                        FROM pg_operator
-                                        WHERE (nsp.nspname || '.' || op.oprname || ' (' || format_type(op.oprleft, NULL) || ', ' || format_type(op.oprright, NULL) || ')') = '{{SCHEMAOID}}.{{NAMETOKEN}}';
-                                */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
-
-
-                                scriptForCreate = scriptQuery.objectOperator.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
-                                        .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
-                                        .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
-                                        .replace(/{{STRRELNAME}}/gi, arrDropObjects[intI][2]);
-                            } else if (arrDropObjects[i][0].toLowerCase() === 'aggregate') {
-                                scriptForOid = ml(function () {/*
-                                        SELECT pr.oid
-                                            FROM pg_proc pr
-                                            JOIN pg_type typ ON typ.oid = pr.prorettype
-                                            WHERE proisagg = TRUE AND pr.pronamespace = '{{SCHEMAOID}}' AND proname = '{{NAMETOKEN}}';
-                                    */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
-                                    
-
-                                scriptForCreate = scriptQuery.objectAggregate.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
-                                        .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
-                                        .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
-                                        .replace(/{{STRRELNAME}}/gi, arrDropObjects[intI][2]);
-                            }
-                            arrDropObjects[intI][3] = scriptForOid;
-                            arrDropObjects[intI][5] = scriptForCreate;
-                        });
-                    }
-                    
-                    
-                    
-                /*
-                
-                
-                                getSingleCellData(scriptForCreate[arrDoneNumsOid.length - 1], function (script) {
-                                    strDumpQuery += script;
-                                    console.log(script);
-                                });
-.replace(/{{INTOID}}/gi, arrDropObjects[intI][4])
-.replace(/{{INTOID}}/gi, arrDropObjects[intI][4])
-.replace(/{{INTOID}}/gi, arrDropObjects[intI][4])
-.replace(/{{INTOID}}/gi, arrDropObjects[intI][4])
-                    .replace(/{{INTOID}}/gi, oid)
-                    .replace(/{{STRNAME}}/gi, strName)
-                    .replace(/{{STRSQLSAFENAME}}/gi, sqlSafeName)
-                    .replace(/{{SCHEMA}}/gi, schemaName)
-                    .replace(/{{STRRELNAME}}/gi, relName);
-                */
-                    schemaoidQuery = ml(function () {/*
-                    SELECT oid
-                        FROM pg_namespace
-                        WHERE nspname = '{{NAMETOKEN}}'
-                        ORDER BY nspname;
-                    */}).replace(/\{\{NAMETOKEN\}\}/g, strSchemaName);
-
-                getSingleCellData(schemaoidQuery, function (newSchemaOID) {
-                    schemaOID = newSchemaOID;
-                    oidQuery = ml(function () {/*
-                    SELECT oid
-                        FROM pg_class
-                        WHERE relnamespace = '{{SCHEMAOID}}' AND relname = '{{NAMETOKEN}}'
-                    */}).replace(/\{\{NAMETOKEN\}\}/g, strTableName).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
-                    
-                    //console.log(oidQuery);
-                    getSingleCellData(oidQuery, function (newOID) {
-                        var tableRules = scriptQuery.objectTableNoCreate.replace(/\{\{INTOID\}\}/gi, newOID)
-                        .replace(/\{\{STRSQLSAFENAME\}\}/gi, '' + strTableName + '.' + strSchemaName + '');
-                        getSingleCellData(tableRules, function (tabledef) {
-                            console.log(arrDropObjects);
-                            strDumpQuery = strDumpQuery.replace(/\{\{HELPDEF\}\}/gi, tabledef);
-                            //var triggQuery = ml(function () {/*SELECT string_agg('-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' || 
-                            //	'DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
-                            //	regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
-                            //	' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';', E'\n\n') as perms
-                            //FROM pg_class 
-                            //JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
-                            //JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-                            //WHERE tgrelid <> {{INTOID}} AND pg_trigger.tgname ILIKE '%{{RELNAME}}%' AND pg_trigger.tgisinternal != TRUE*/}).replace(/\{\{INTOID\}\}/gi, newOID).replace(/\{\{RELNAME\}\}/gi, strTableName);
+                        
+                        for (i = 0, len = arrDropObjects.length; i < len; i += 1) {
                             
-                            //getSingleCellData(triggQuery, function (triggdefs) {
-                            //    strDumpQuery += triggdefs;
-                            
-var userNotes = '-- ##########################################################################################\n';
-    userNotes += '-- ##########################################################################################\n';
-    userNotes += '-- \n';
-    userNotes += '--    PLEASE READ!!\n';
-    userNotes += '--\n';
-    userNotes += '--  This script DROPs and CREATEs all the objects that MUST to be altered for your changes to\n';
-    userNotes += '--     run. However, PostgreSQL does not detect dependencies in some objects, such as \n';
-    userNotes += '--     FUNCTIONs and TRIGGER FUNCTIONs. FUNCTIONs and TRIGGER FUNCTIONs could contain \n';
-    userNotes += '--     references to any one of the objects below. If you need to make a change to any of\n';
-    userNotes += '--     the objects below to run this script, then make sure you search for references to that\n';
-    userNotes += '--     object. \n';
-    userNotes += '\n';
-    userNotes += '-- Postage provides the following workflow to search for object references:\n';
-    userNotes += '--     \n';
-    userNotes += '--     On the left side of the screen, click on any SCHEMA in the Object Tree.\n';
-    userNotes += '--     On the right, click on "Dump Schema to Script"\n';
-    userNotes += '--     We recommend you deselect "ALL" and then select FUNCTIONs and TRIGGER FUNCTIONs\n';
-    userNotes += '--     Select any additional item types that may reference your object. \n';
-    userNotes += '--     Click "Open Script" and wait for your script to be generated. This can take a minute.\n';
-    userNotes += '--     Your script will appear in a new tab. \n';
-    userNotes += '--     Now you can use the FIND functionality to look for your objects.\n';
-    userNotes += '--\n';
-    userNotes += '-- ##########################################################################################\n';
-    userNotes += '-- ##########################################################################################\n\n';
-                            
-        strDumpQuery = userNotes + strDumpQuery;                    
-                                window.top.newTab('sql', strSchemaName + '.' + strTableName, {'strContent': strDumpQuery});
-                                GS.removeLoader('generate-script');
-                            //});
+                            getSchemaOid(i, arrDropObjects, function (schemaOID, intI) {
+                                if (arrDropObjects[intI][0].toLowerCase() === 'view') {
+                                    scriptForOid = ml(function () {/*
+                                        SELECT oid
+                                            FROM pg_class
+                                            WHERE relnamespace = '{{SCHEMAOID}}' AND relname = '{{NAMETOKEN}}'
+                                        */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
+    
+    
+                                    scriptForCreate = scriptQuery.objectViewNoComment.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
+                                            .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
+                                            .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
+                                            .replace(/{{STRRELNAME}}/gi, arrDropObjects[intI][2]);
+                                } else if (arrDropObjects[intI][0].toLowerCase() === 'function') {
+                                    scriptForOid = ml(function () {/*
+                                            SELECT pr.oid
+                                                FROM pg_proc pr
+                                                JOIN pg_type typ ON typ.oid = pr.prorettype
+                                                WHERE proisagg = FALSE AND typname <> 'trigger' AND pr.pronamespace = '{{SCHEMAOID}}' AND proname = '{{NAMETOKEN}}';
+                                        */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
+    
+    
+                                    scriptForCreate = scriptQuery.objectFunction.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
+                                            .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
+                                            .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
+                                            .replace(/{{STRRELNAME}}/gi, arrDropObjects[intI][2]);
+                                } else if (arrDropObjects[intI][0].toLowerCase() === 'operator') {
+                                    scriptForOid = ml(function () {/*  
+                                        SELECT oprname
+                                            FROM pg_operator
+                                            WHERE (nsp.nspname || '.' || op.oprname || ' (' || format_type(op.oprleft, NULL) || ', ' || format_type(op.oprright, NULL) || ')') = '{{SCHEMAOID}}.{{NAMETOKEN}}';
+                                    */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
+    
+    
+                                    scriptForCreate = scriptQuery.objectOperator.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
+                                            .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
+                                            .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
+                                            .replace(/{{STRRELNAME}}/gi, arrDropObjects[intI][2]);
+                                } else if (arrDropObjects[i][0].toLowerCase() === 'aggregate') {
+                                    scriptForOid = ml(function () {/*
+                                            SELECT pr.oid
+                                                FROM pg_proc pr
+                                                JOIN pg_type typ ON typ.oid = pr.prorettype
+                                                WHERE proisagg = TRUE AND pr.pronamespace = '{{SCHEMAOID}}' AND proname = '{{NAMETOKEN}}';
+                                        */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
+                                        
+    
+                                    scriptForCreate = scriptQuery.objectAggregate.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
+                                            .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
+                                            .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
+                                            .replace(/{{STRRELNAME}}/gi, arrDropObjects[intI][2]);
+                                }
+                                arrDropObjects[intI][3] = scriptForOid;
+                                arrDropObjects[intI][5] = scriptForCreate;
+                            });
+                        }
+                        
+                        
+                        
+                    /*
+                    
+                    
+                                    getSingleCellData(scriptForCreate[arrDoneNumsOid.length - 1], function (script) {
+                                        strDumpQuery += script;
+                                        console.log(script);
+                                    });
+    .replace(/{{INTOID}}/gi, arrDropObjects[intI][4])
+    .replace(/{{INTOID}}/gi, arrDropObjects[intI][4])
+    .replace(/{{INTOID}}/gi, arrDropObjects[intI][4])
+    .replace(/{{INTOID}}/gi, arrDropObjects[intI][4])
+                        .replace(/{{INTOID}}/gi, oid)
+                        .replace(/{{STRNAME}}/gi, strName)
+                        .replace(/{{STRSQLSAFENAME}}/gi, sqlSafeName)
+                        .replace(/{{SCHEMA}}/gi, schemaName)
+                        .replace(/{{STRRELNAME}}/gi, relName);
+                    */
+                        schemaoidQuery = ml(function () {/*
+                        SELECT oid
+                            FROM pg_namespace
+                            WHERE nspname = '{{NAMETOKEN}}'
+                            ORDER BY nspname;
+                        */}).replace(/\{\{NAMETOKEN\}\}/g, strSchemaName);
+    
+                    getSingleCellData(schemaoidQuery, function (newSchemaOID) {
+                        schemaOID = newSchemaOID;
+                        oidQuery = ml(function () {/*
+                        SELECT oid
+                            FROM pg_class
+                            WHERE relnamespace = '{{SCHEMAOID}}' AND relname = '{{NAMETOKEN}}'
+                        */}).replace(/\{\{NAMETOKEN\}\}/g, strTableName).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
+                        
+                        //console.log(oidQuery);
+                        getSingleCellData(oidQuery, function (newOID) {
+                            var tableRules = scriptQuery.objectTableNoCreate.replace(/\{\{INTOID\}\}/gi, newOID)
+                            .replace(/\{\{STRSQLSAFENAME\}\}/gi, '' + strTableName + '.' + strSchemaName + '');
+                            getSingleCellData(tableRules, function (tabledef) {
+                                console.log(arrDropObjects);
+                                strDumpQuery = strDumpQuery.replace(/\{\{ALTERSEQUENCE\}\}/gi, query1);
+                                strDumpQuery = strDumpQuery.replace(/\{\{HELPDEF\}\}/gi, tabledef);
+                    
+                                strDumpQuery += query2;
+                                //var triggQuery = ml(function () {/*SELECT string_agg('-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' || 
+                                //	'DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
+                                //	regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
+                                //	' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';', E'\n\n') as perms
+                                //FROM pg_class 
+                                //JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
+                                //JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+                                //WHERE tgrelid <> {{INTOID}} AND pg_trigger.tgname ILIKE '%{{RELNAME}}%' AND pg_trigger.tgisinternal != TRUE*/}).replace(/\{\{INTOID\}\}/gi, newOID).replace(/\{\{RELNAME\}\}/gi, strTableName);
+                                
+                                //getSingleCellData(triggQuery, function (triggdefs) {
+                                //    strDumpQuery += triggdefs;
+                                
+    var userNotes = '-- ##########################################################################################\n';
+        userNotes += '-- ##########################################################################################\n';
+        userNotes += '-- \n';
+        userNotes += '--    PLEASE READ!!\n';
+        userNotes += '--\n';
+        userNotes += '--  This script DROPs and CREATEs all the objects that MUST to be altered for your changes to\n';
+        userNotes += '--     run. However, PostgreSQL does not detect dependencies in some objects, such as \n';
+        userNotes += '--     FUNCTIONs and TRIGGER FUNCTIONs. FUNCTIONs and TRIGGER FUNCTIONs could contain \n';
+        userNotes += '--     references to any one of the objects below. If you need to make a change to any of\n';
+        userNotes += '--     the objects below to run this script, then make sure you search for references to that\n';
+        userNotes += '--     object. \n';
+        userNotes += '\n';
+        userNotes += '-- Postage provides the following workflow to search for object references:\n';
+        userNotes += '--     \n';
+        userNotes += '--     On the left side of the screen, click on any SCHEMA in the Object Tree.\n';
+        userNotes += '--     On the right, click on "Dump Schema to Script"\n';
+        userNotes += '--     We recommend you deselect "ALL" and then select FUNCTIONs and TRIGGER FUNCTIONs\n';
+        userNotes += '--     Select any additional item types that may reference your object. \n';
+        userNotes += '--     Click "Open Script" and wait for your script to be generated. This can take a minute.\n';
+        userNotes += '--     Your script will appear in a new tab. \n';
+        userNotes += '--     Now you can use the FIND functionality to look for your objects.\n';
+        userNotes += '--\n';
+        userNotes += '-- ##########################################################################################\n';
+        userNotes += '-- ##########################################################################################\n\n';
+                                
+            strDumpQuery = userNotes + strDumpQuery;                    
+                                    window.top.newTab('sql', strSchemaName + '.' + strTableName, {'strContent': strDumpQuery});
+                                    GS.removeLoader('generate-script');
+                                //});
+                            });
                         });
                     });
                 });
@@ -854,7 +904,15 @@ var userNotes = '-- ############################################################
                                             strColumns += (strColumns ? '\n' : '') + data.strMessage;
 
                                         } else if (data.intQueryNumber === 0 && data.strMessage === '\\.') {
-                                            initTableDesign(data.arrColumnNames, strColumns);
+                                            getSingleCellData(ml(function () {/*
+                                                SELECT quote_ident(rolname)
+                                                    FROM pg_roles
+                                                    INNER JOIN pg_class ON relowner = pg_roles.oid
+                                                    WHERE pg_class.oid = {{INTOID}}
+                                            */}).replace(/\{\{INTOID\}\}/g, strOID), function (owner) {
+                                                strOwner = owner;
+                                                initTableDesign(data.arrColumnNames, strColumns);
+                                            });
                                         }
                                     });
                                 }

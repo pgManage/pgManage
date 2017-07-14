@@ -646,6 +646,9 @@ document.addEventListener('DOMContentLoaded', function () {
         var intColumnParents = 0, currentElement = element, maxLoops = 50, i = 0;
         
         while (currentElement.parentNode !== form && currentElement.parentNode && i < maxLoops) {
+            if (currentElement.parentNode.hasAttribute('src') === true) {
+                intColumnParents += 1;
+            }
             if (currentElement.parentNode.hasAttribute('column') === true) {
                 intColumnParents += 1;
             }
