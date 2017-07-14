@@ -886,6 +886,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 // if there is no HTML: throw an error
                 if (!element.templateHTML.trim()) { throw 'GS-FORM error: no template HTML.'; }
                 
+                if (element.templateHTML.indexOf('&gt;') > -1 || element.templateHTML.indexOf('&lt;') > -1) {
+                    console.warn('GS-FORM WARNING: &gt; or &lt; detected in record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+                }
+                
                 // add a doT.js coded "value" attribute to any element with a "column" attribute but no "value" attribute
                 element.templateHTML = GS.templateColumnToValue(element.templateHTML);
                 

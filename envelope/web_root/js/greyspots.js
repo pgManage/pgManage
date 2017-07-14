@@ -7297,6 +7297,10 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('GS.log', 'GS.log', 'GS.log(\'${1:send}\', ${2:message});');
 });
 
+function gt(x,y)  { return x >  y; }
+function gte(x,y) { return x >= y; }
+function lt(x,y)  { return x <  y; }
+function lte(x,y) { return x <= y; }
 
 // sometimes, we need to hit a link without paying attention
 //      to the response and without opening a new tab. for
@@ -12314,6 +12318,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 tableTemplateElement = xtag.queryChildren(element, 'template')[0];
                 
                 if (tableTemplateElement) {
+                    if (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                        console.warn('GS-COMBO WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+                    }
+                    
                     tableTemplateElementCopy = document.createElement('template');
                     tableTemplateElementCopy.innerHTML = tableTemplateElement.innerHTML;
                     
@@ -14610,6 +14618,16 @@ document.addEventListener('DOMContentLoaded', function () {
         tableTemplateElement = xtag.query(element, 'template[for="table"]')[0];
         HUDTemplateElement = xtag.query(element, 'template[for="hud"]')[0];
         insertTemplateElement = xtag.query(element, 'template[for="insert"]')[0];
+        
+        if (HUDTemplateElement.innerHTML.indexOf('&gt;') > -1 || HUDTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        if (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        if (insertTemplateElement.innerHTML.indexOf('&gt;') > -1 || insertTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in insert template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
         
         if (!tableTemplateElement || tableTemplateElement.nodeName !== 'TEMPLATE') {
             throw 'gs-datasheet error: No table template provided.';
@@ -18519,6 +18537,9 @@ GS.closeDialog = function (dialog, strAnswer) {
         } else {
             template = templateLink;
         }
+        if (template.innerHTML.indexOf('&gt;') > -1 || template.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-DIALOG WARNING: &gt; or &lt; detected in dialog template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
 
         // save and blur currently focused element
         refocusElement = document.activeElement;
@@ -21386,6 +21407,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     tableTemplateElement  = xtag.queryChildren(element, 'template[for="table"]')[0];
                 }
                 insertTemplateElement = xtag.queryChildren(element, 'template[for="insert"]')[0];
+                
+                if (hudTemplateElement.innerHTML.indexOf('&gt;') > -1 || hudTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                    console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+                }
+                if (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                    console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+                }
+                if (insertTemplateElement.innerHTML.indexOf('&gt;') > -1 || insertTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                    console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in insert template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+                }
 
                 element.templates = {};
                 xtag.queryChildren(element, 'template[for="table"]').forEach(function (cur, i) {
@@ -24115,8 +24146,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var intColumnParents = 0, currentElement = element, maxLoops = 50, i = 0;
         
         while (currentElement.parentNode !== form && currentElement.parentNode && i < maxLoops) {
-            if (currentElement.parentNode.hasAttribute('column') === true
-                || currentElement.parentNode.hasAttribute('src') === true) {
+            if (currentElement.parentNode.hasAttribute('column') === true //If something with a column attribute
+                || currentElement.parentNode.hasAttribute('src') === true) { //or something with a src attribute
                 intColumnParents += 1;
             }
             
@@ -24354,6 +24385,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // if there is no HTML: throw an error
                 if (!element.templateHTML.trim()) { throw 'GS-FORM error: no template HTML.'; }
+                
+                if (element.templateHTML.indexOf('&gt;') > -1 || element.templateHTML.indexOf('&lt;') > -1) {
+                    console.warn('GS-FORM WARNING: &gt; or &lt; detected in record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+                }
                 
                 // add a doT.js coded "value" attribute to any element with a "column" attribute but no "value" attribute
                 element.templateHTML = GS.templateColumnToValue(element.templateHTML);
@@ -28369,6 +28404,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // select for template
                 tableTemplateElement = xtag.queryChildren(element, 'template')[0];
+                if (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                    console.warn('GS-LISTBOX WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+                }
                 
                 if (tableTemplateElement) {
                     // add a doT.js coded "value" attribute to any element with a "column" attribute but no "value" attribute
@@ -33547,6 +33585,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         'arrAttrValues': arrAttrValues,
                         'templated': !(element.hasAttribute('static') || template.hasAttribute('static'))
                     };
+                    if (!(element.hasAttribute('static') || template.hasAttribute('static')) && 
+                        (
+                            element.templates[template.getAttribute('for') || template.getAttribute('id')].content.indexOf('&gt;') > -1 ||
+                            element.templates[template.getAttribute('for') || template.getAttribute('id')].content.indexOf('&lt;') > -1
+                        )) {
+                        console.warn('GS-SWITCH WARNING: &gt; or &lt; detected in "' + (template.getAttribute('for') || template.getAttribute('id')) + '" template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+                    }
 
                     i += 1;
                 }
@@ -36412,6 +36457,32 @@ document.addEventListener('DOMContentLoaded', function () {
             element,
             '[for="update-dialog"]'
         )[0];
+        
+        
+        if (topHudTemplate.innerHTML.indexOf('&gt;') > -1 || topHudTemplate.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in top HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        if (bottomHudTemplate.innerHTML.indexOf('&gt;') > -1 || bottomHudTemplate.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in bottom HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        if (headerRecordTemplate.innerHTML.indexOf('&gt;') > -1 || headerRecordTemplate.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in header record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        if (dataRecordTemplate.innerHTML.indexOf('&gt;') > -1 || dataRecordTemplate.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in data record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        if (copyTemplate.innerHTML.indexOf('&gt;') > -1 || copyTemplate.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in copy template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        if (insertRecordTemplate.innerHTML.indexOf('&gt;') > -1 || insertRecordTemplate.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in insert record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        if (insertDialogTemplate.innerHTML.indexOf('&gt;') > -1 || insertDialogTemplate.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in insert dialog template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        if (updateDialogTemplate.innerHTML.indexOf('&gt;') > -1 || updateDialogTemplate.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in update dialog template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
 
         // if there's no "data-record" template: error
         if (!dataRecordTemplate) {
