@@ -48,7 +48,7 @@ Loading time from 'run' to display of data in grid. We used this query: "SELECT 
  pgAdmin4:         2sec # updated for 1.6 (takes forever to scroll to last record though)
  Postage(3.2.12): 12sec
  Postage(3.2.13):  2sec
- Postage(3.2.16)   8sec # ??? I am having connection issues.
+ Postage(3.2.16)   8sec # update (Something odd is happening. I've openned an issue #323.)
 ```
 
 There you have it. We've been working on a faster grid for displaying table data for some time. It uses Websockets to get the data and a tab delimited transfer format. 
