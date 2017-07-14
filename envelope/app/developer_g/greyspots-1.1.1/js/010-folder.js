@@ -58,6 +58,7 @@ window.addEventListener('design-register-element', function () {
         
         return strRet || '/';
     }
+    
     function getRealPath(element) {
         var strAttributePath = GS.trim(GS.templateWithQuerystring(element.getAttribute('path') || ''), '/')
           , arrPath = element.arrPath, strInnerPath, strRet, strPrefix;
@@ -83,6 +84,7 @@ window.addEventListener('design-register-element', function () {
         
         return (strPrefix || '') + (strRet || '/');
     }
+    
     function getData(element) {
         var strPath = getPath(element)
           , bolFolders = !element.hasAttribute('no-folders')

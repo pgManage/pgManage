@@ -45,7 +45,7 @@
 				handleExplainGraph(JSON.parse(JSON.stringify(event.explainJSON)), document.getElementById('explain-results-graph'), event.bolRun);
 				handleExplainHTML(JSON.parse(JSON.stringify(event.explainJSON)), event.bolRun);
 
-				var   explainFrame = document.getElementById('frame-explain')
+				var explainFrame = document.getElementById('frame-explain')
 					, explainTabBar = document.getElementById('explain-results-tab-bar')
 					, explainTabs = {
 						  'graph': document.getElementById('explain-results-graph')
@@ -878,7 +878,8 @@
 				white-space: pre;
 			}
 			#explain-results-html table tbody tr:hover {
-				background: #ededed;
+				/*background: #ededed;*/
+				background: #99ff99;
 			}
 			#explain-results-html table tbody tr.child-hover {
 				background: #ccffcc;

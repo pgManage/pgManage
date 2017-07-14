@@ -451,6 +451,9 @@ GS.closeDialog = function (dialog, strAnswer) {
         } else {
             template = templateLink;
         }
+        if (template.innerHTML.indexOf('&gt;') > -1 || template.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-DIALOG WARNING: &gt; or &lt; detected in dialog template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
 
         // save and blur currently focused element
         refocusElement = document.activeElement;

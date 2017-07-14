@@ -1480,6 +1480,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 tableTemplateElement = xtag.queryChildren(element, 'template')[0];
                 
                 if (tableTemplateElement) {
+                    if (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                        console.warn('GS-COMBO WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+                    }
+                    
                     tableTemplateElementCopy = document.createElement('template');
                     tableTemplateElementCopy.innerHTML = tableTemplateElement.innerHTML;
                     

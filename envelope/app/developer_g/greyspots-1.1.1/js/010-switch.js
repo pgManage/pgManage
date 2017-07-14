@@ -370,6 +370,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         'arrAttrValues': arrAttrValues,
                         'templated': !(element.hasAttribute('static') || template.hasAttribute('static'))
                     };
+                    if (!(element.hasAttribute('static') || template.hasAttribute('static')) && 
+                        (
+                            element.templates[template.getAttribute('for') || template.getAttribute('id')].content.indexOf('&gt;') > -1 ||
+                            element.templates[template.getAttribute('for') || template.getAttribute('id')].content.indexOf('&lt;') > -1
+                        )) {
+                        console.warn('GS-SWITCH WARNING: &gt; or &lt; detected in "' + (template.getAttribute('for') || template.getAttribute('id')) + '" template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+                    }
 
                     i += 1;
                 }

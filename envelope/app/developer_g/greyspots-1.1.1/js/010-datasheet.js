@@ -1661,6 +1661,16 @@ document.addEventListener('DOMContentLoaded', function () {
         HUDTemplateElement = xtag.query(element, 'template[for="hud"]')[0];
         insertTemplateElement = xtag.query(element, 'template[for="insert"]')[0];
         
+        if (HUDTemplateElement.innerHTML.indexOf('&gt;') > -1 || HUDTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        if (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        if (insertTemplateElement.innerHTML.indexOf('&gt;') > -1 || insertTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+            console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in insert template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        }
+        
         if (!tableTemplateElement || tableTemplateElement.nodeName !== 'TEMPLATE') {
             throw 'gs-datasheet error: No table template provided.';
         }

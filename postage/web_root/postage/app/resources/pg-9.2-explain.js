@@ -6,12 +6,12 @@ function ShortcutExplain () {
     event.stopPropagation();
     explain(false);
 }
+
 function ShortcutExplainAnalyze () {
     event.preventDefault();
     event.stopPropagation();
     explain(true);
 }
-
 
 function explain(bolRun) {
     'use strict';

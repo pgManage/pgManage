@@ -63,6 +63,10 @@ window.addEventListener('design-register-element', function () {
     registerDesignSnippet('GS.log', 'GS.log', 'GS.log(\'${1:send}\', ${2:message});');
 });
 
+function gt(x,y)  { return x >  y; }
+function gte(x,y) { return x >= y; }
+function lt(x,y)  { return x <  y; }
+function lte(x,y) { return x <= y; }
 
 // sometimes, we need to hit a link without paying attention
 //      to the response and without opening a new tab. for

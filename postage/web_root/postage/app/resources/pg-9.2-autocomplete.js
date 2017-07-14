@@ -1935,17 +1935,47 @@ function autocompleteLoadKeywords() {
             if (data.strMessage !== '\\.' && data.strMessage !== '') {
                 arrRows = data.strMessage.split('\n');
 
-                autocompleteGlobals.jsnKeywords.c = GS.decodeFromTabDelimited(arrRows[0]).split(',');
+                autocompleteGlobals.jsnKeywords.c = GS.decodeFromTabDelimited(arrRows[0] || '').split(',');
                 autocompleteGlobals.jsnKeywords.c.desc = 'unreserved but cannot be the name of a FUNCTION or TYPE';
 
-                autocompleteGlobals.jsnKeywords.r = GS.decodeFromTabDelimited(arrRows[1]).split(',');
+                autocompleteGlobals.jsnKeywords.r = GS.decodeFromTabDelimited(arrRows[1] || '').split(',');
                 autocompleteGlobals.jsnKeywords.r.desc = 'reserved';
 
-                autocompleteGlobals.jsnKeywords.t = GS.decodeFromTabDelimited(arrRows[2]).split(',');
+                autocompleteGlobals.jsnKeywords.t = GS.decodeFromTabDelimited(arrRows[2] || '').split(',');
                 autocompleteGlobals.jsnKeywords.t.desc = 'reserved but can be the name of a FUNCTION or TYPE)';
 
-                autocompleteGlobals.jsnKeywords.u = GS.decodeFromTabDelimited(arrRows[3]).split(',');
+                autocompleteGlobals.jsnKeywords.u = GS.decodeFromTabDelimited(arrRows[3] || '').split(',');
                 autocompleteGlobals.jsnKeywords.u.desc = 'unreserved';
+
+                // prevent any of these arrays from only containing empty string
+                if (
+                    autocompleteGlobals.jsnKeywords.c &&
+                    autocompleteGlobals.jsnKeywords.c[0] === '' &&
+                    autocompleteGlobals.jsnKeywords.c.length === 1
+                ) {
+                    autocompleteGlobals.jsnKeywords.c = [];
+                }
+                if (
+                    autocompleteGlobals.jsnKeywords.r &&
+                    autocompleteGlobals.jsnKeywords.r[0] === '' &&
+                    autocompleteGlobals.jsnKeywords.r.length === 1
+                ) {
+                    autocompleteGlobals.jsnKeywords.r = [];
+                }
+                if (
+                    autocompleteGlobals.jsnKeywords.t &&
+                    autocompleteGlobals.jsnKeywords.t[0] === '' &&
+                    autocompleteGlobals.jsnKeywords.t.length === 1
+                ) {
+                    autocompleteGlobals.jsnKeywords.t = [];
+                }
+                if (
+                    autocompleteGlobals.jsnKeywords.u &&
+                    autocompleteGlobals.jsnKeywords.u[0] === '' &&
+                    autocompleteGlobals.jsnKeywords.u.length === 1
+                ) {
+                    autocompleteGlobals.jsnKeywords.u = [];
+                }
 
                 autocompleteGlobals.jsnKeywords.all = [];
                 autocompleteGlobals.jsnKeywords.all = autocompleteGlobals.jsnKeywords.all.concat(autocompleteGlobals.jsnKeywords.c);

@@ -1,11 +1,11 @@
 
 /**
-
+    
     ######## BEFORE UPDATING DATA-HANDLING CODE OR USING THE COALESCE OPERATOR: ######## ~michael
     don't use the pipe-pipe "||" coalesce operator when handling data because if a zero comes to the coalesce (and it is a number 0 and not a string "0") it will be evaluated as false and thus coalesce to the next operand. Whenever you use this operator: be careful of what will be evaluated.
-
+    
     To see this in action run this in your console:
-
+    
     console.log( true      || 'test' );  // logs:  true  (expected)
     console.log( false     || 'test' );  // logs: 'test' (expected)
 
@@ -16,9 +16,9 @@
     console.log(  1        || 'test' );  // logs:  1     (expected)
     console.log( '0'       || 'test' );  // logs: '0'    (expected)
     console.log(  0        || 'test' );  // logs: 'test' (OH NO!!)
-
+    
     here is another demonstration:
-
+    
     console.log( Boolean(true)      );
     console.log( Boolean(false)     );
     console.log( Boolean(null)      );
@@ -27,48 +27,48 @@
     console.log( Boolean( 1)        );
     console.log( Boolean('0')       );
     console.log( Boolean( 0)        ); // zero evaluates to false
-
-
+    
+    
     ######## BEFORE UPDATING FASTCLICK: ######## ~michael
     fastclick (around line 254) has some code added (by michael) to add a feature to fastclick, bring this code to any new version
-
+    
     it also has (around line 123) some code added to an if statement added by joseph:
         if (deviceIsAndroid || deviceIsIOS) {
     as opposed to:
         if (deviceIsAndroid) {
-
-
+    
+    
     ######## BEFORE UPDATING X-TAGS: ######## ~michael and nunzio
     nunzio: the below warning now seems to be outdated
     nunzio: you have to delete '"function"==typeof define&&define.amd?define(X):"undefined"!=typeof module&&module.exports?module.exports=X:' from xtags for electron
     make sure you include the polyfills and make sure that there isn't still a duplicated block of code in the source, if there is remove it, here is how to find out:
-
+    
     do a find in textedit for: "scope.upgradeDocumentTree = nop;" (excluding the quotes of course)
     AND var IMPORT_LINK_TYPE = scope.IMPORT_LINK_TYPE
-
+    
     remove the whole block of code surrounding the second match (it might be the first match but I think it is the second match)
-
-
+    
+    
     ######## ELEMENT REGISTRATION: ######## ~michael
     When registering a custom element:
         1) register it after the "DOMContentLoaded" event has fired. Doing this prevents an issue that we ran into where in some cases (I believe when greyspots.js is cached and you are on yosemite is one case) some elements would be cut off and would disappear.
         2) Use the "methods" for public functions only, private functions should be kept in the "DOMContentLoaded" function. By keeping the functions in there it makes it so that the code for that element is the only code that can run those functions and it prevents these functions for cluttering public namespaces.
         3) Use "'use strict';" from the beginning. If you don't start out with it you might introduce strict mode errors that you don't even know about. Then one day you might decide to put "'use strict';" in there and errors you didn't know about will appear. Some errors might appear when you first move it over and some errors might be disvovered by your users because you didn't test every little feature of the element.
-
+    
     An example:
-
+    
     document.addEventListener('DOMContentLoaded', function () {
         'use strict';
-
+        
         // ### private functions go here ###
         function foobar() {
             // do stuff to "element" here (gs-new-element is the only element that can run this function)
         }
-
+        
         xtag.register('gs-new-element', {
             lifecycle: {
                 'created': function () {
-
+                    
                 }
             },
             events: {},
@@ -78,17 +78,17 @@
             }
         });
     });
-
+    
     ######## PSEUDO ELEMENT WARNING: ######## ~michael
     In firefox I ran into an issue where the undo history of controls in a gs-form (with the attribute "save-while-typing") was being erased. Turns out the issue was caused by a CSS pseudo-element. I was using a pseudo-element for a little box attached to the form to tell the user if the form was waiting to save or saving. By changing the pseudo-element to a real element that I add and remove with Javascript the issue was fixed.
-
+    
     If you want to use a pseudo-element: make sure it doesn't affect the undo history of elements that are children of the element that the pseudo-element is attached to. This issue could have been fixed by now.
-
-
-
+    
+    
+    
     ######## TEMPLATE SHIM: ######## ~michael
     The template polyfill has been changed, DO NOT UPDATE. It is for old browsers, and old browsers don't change so there is should be no need for the polyfill to change.
-
+    
 */ /**
  * @license
  * Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
@@ -452,11 +452,11 @@ Description:
     The reason for this is because even though the 'mousedown' event works on a phone it is substantially slower than if you had used 'touchstart',
     But if you used 'touchstart' it wouldn't work on the computer so we wrap both under the name evt.mousedown and only give mobile browsers
     'touchstart' and desktop browsers 'mousedown' so that you dont have to differentiate.
-
+    
 List of variables:
     evt.touchDevice  equals true|false depending on whether or not we are on a touch-enabled devide
     evt.deviceType   equals 'desktop'|'tablet'|'phone' depending on what type of device you are on
-
+    
     evt.mousedown    if we are on a touch device: 'touchstart'  else  'mousedown'
     evt.mouseover    if we are on a touch device: 'touchenter'  else  'mouseover'
     evt.mousemove    if we are on a touch device: 'touchmove'   else  'mousemove'
@@ -472,13 +472,13 @@ evt.touchDevice=touchDeviceTest();evt.deviceType=getDeviceType();evt.mousedown=e
 //Append to greyspots.js after the rsync of the web_root files
 window.addEventListener('load', function () {
     var styleElement, helperElement, helperFunction;
-
+    
     styleElement = document.createElement('style');
     styleElement.innerHTML = 'body, body gs-panel, body gs-panel gs-header, body gs-panel gs-body, ' +
                              'body gs-page, body gs-page gs-header, body gs-page gs-body {\n' +
                              '    background-color: #FFBBBB;\n' +
                              '}';
-
+    
     document.head.appendChild(styleElement);
 });
 */
@@ -491,18 +491,18 @@ if (evt.touchDevice) {
     (function () {
         var startTime, startTouchTop, endTime, endTouchTop, lastTouchTop, currentTouchTop,
             bolCurrentlyMonitoring = false, bolTouchScrollPrevented = false, currentScrollingElement, scrollingLooper;
-
+        
         window.ontouchstart = function(event){
             lastTouchTop = GS.mousePosition(event).top;
         };
-
+        
         //window.addEventListener('scroll', function (event) {
         //    console.log(event);
         //}, true);
-
+        
         window.ontouchmove = function (event) {
             var currentTouchTop = GS.mousePosition(event).top, currentElement = GS.scrollParent(event.target), bolFoundScrollable = Boolean(currentElement);
-
+            
             //console.log(currentElement,
             //            event.target,
             //            bolFoundScrollable,
@@ -515,25 +515,25 @@ if (evt.touchDevice) {
             //            currentTouchTop > lastTouchTop,
             //            currentElement.scrollTop + currentElement.clientHeight >= currentElement.scrollHeight,
             //            currentTouchTop < lastTouchTop);
-
+            
             if (bolFoundScrollable === false ||
                 (currentElement.scrollTop <= 0 && currentTouchTop > lastTouchTop) ||
                 (currentElement.scrollTop + currentElement.clientHeight >= currentElement.scrollHeight && currentTouchTop < lastTouchTop)) {
-
+                
                 //console.log('prevent default');
-
+                
                 bolTouchScrollPrevented = true;
                 event.preventDefault();
                 //event.stopPropagation();
-
+                
             } else if (bolFoundScrollable === true && bolTouchScrollPrevented === true) {
                 currentElement.scrollTop += (lastTouchTop - currentTouchTop);
             }
-
+            
             currentScrollingElement = currentElement;
             lastTouchTop = currentTouchTop;
         };
-
+        
         window.ontouchend = function () {
             bolTouchScrollPrevented = false;
         };
@@ -616,9 +616,9 @@ if(labelElement&&labelElement.hasAttribute('for')){targetElement=document.getEle
                         <gs-block>
                             <center><h4>3.1.2</h4></center>
                         </gs-block>
-
+                        
                     </gs-grid>
-
+                    
                     <div>
                         All other source code and documentation copyright Workflow Products, LLC. All Rights Reserved.
                         <br /><br />
@@ -648,11 +648,11 @@ if(bolOpen===false){document.body.insertBefore(GS.stringToElement('<div id="gs-d
 /*
 HTMLTemplateElement.prototype.contentTemplate = function () {
     'use strict';
-
+    
     if (this.content) {
-
+        
     } else {
-
+        
     }
 };
 */
@@ -769,17 +769,17 @@ return element.cloneNode(true);};/*
 // change the tag of an element
 GS.changeElementTag = function (element, strNewTag, alterCallback) {
     var strHTML = element.outerHTML.trim(), newElement;
-
+    
     strHTML = '<' + strNewTag + strHTML.substring(strHTML.indexOf(' '), strHTML.lastIndexOf('</')) + '</' + strNewTag + '>';
-
+    
     //console.log(strHTML);
-
+    
     newElement = GS.stringToElement(strHTML);
-
+    
     if (typeof alterCallback === 'function') {
         alterCallback.apply(newElement);
     }
-
+    
     return newElement;
 };*/
 GS.isElementFocusable=function(element){return(element.nodeName==='INPUT'||element.nodeName==='TEXTAREA'||element.nodeName==='SELECT'||element.nodeName==='BUTTON'||element.nodeName==='IFRAME'||(element.hasAttribute('tabindex')&&element.getAttribute('tabindex')!=='-1')||(element.focus&&element.focus.toString().indexOf('[native code]')===-1&&element.focus.toString()!==document.createElement('div').focus.toString())||(element.nodeName==='A'&&element.hasAttribute('href'))||(element.nodeName==='AREA'&&element.hasAttribute('href')))&&!element.hasAttribute('disabled');};GS.getInputSelection=function(input){'use strict';var start=0,end=0,normalizedValue,range,textInputRange,len,endRange;if(typeof input.selectionStart==="number"&&typeof input.selectionEnd==="number"){start=input.selectionStart;end=input.selectionEnd;}else{range=(document.createRange()||document.selection.createRange());if(range&&range.parentElement()==input){len=input.value.length;normalizedValue=input.value.replace(/\r\n/g,"\n");textInputRange=input.createTextRange();textInputRange.moveToBookmark(range.getBookmark());endRange=input.createTextRange();endRange.collapse(false);if(textInputRange.compareEndPoints("StartToEnd",endRange)>-1){start=end=len;}else{start=-textInputRange.moveStart("character",-len);start+=normalizedValue.slice(0,start).split("\n").length-1;if(textInputRange.compareEndPoints("EndToEnd",endRange)>-1){end=len;}else{end=-textInputRange.moveEnd("character",-len);end+=normalizedValue.slice(0,end).split("\n").length-1;}}}}
@@ -796,28 +796,28 @@ if(input.createTextRange){range=input.createTextRange();range.collapse();range.m
                 'intRoomBelow:      ' + intRoomBelow + '\n' +
                 'intRoomLeft:       ' + intRoomLeft + '\n' +
                 'intRoomRight:      ' + intRoomRight);*/
-return{'element':element,'objElementOffset':objElementOffset,'intElementWidth':intElementWidth,'intElementHeight':intElementHeight,'intElementTop':intElementTop,'intElementLeft':intElementLeft,'intElementBottom':intElementBottom,'intElementRight':intElementRight,'intRoomAbove':intRoomAbove,'intRoomBelow':intRoomBelow,'intRoomLeft':intRoomLeft,'intRoomRight':intRoomRight};};/*                                       ,--- the problem with this code is the DOM we get back is not 100% reliably inert.
+return{'element':element,'objElementOffset':objElementOffset,'intElementWidth':intElementWidth,'intElementHeight':intElementHeight,'intElementTop':intElementTop,'intElementLeft':intElementLeft,'intElementBottom':intElementBottom,'intElementRight':intElementRight,'intRoomAbove':intRoomAbove,'intRoomBelow':intRoomBelow,'intRoomLeft':intRoomLeft,'intRoomRight':intRoomRight};};/*                                       ,--- the problem with this code is the DOM we get back is not 100% reliably inert. 
                                          V          To make it reliable I believe I have to change how my elements work.
 GS.createDocumentFragment = function (strHTML) {
     'use strict';
     var element = document.createElement('div'),
         fragment = document.createDocumentFragment(),
         arrChildren = element.childNodes;
-
+    
     // fill element with HTML
     element.innerHTML = strHTML;
-
+    
     // append the element to the body (NECCESSARY FOR THE HTML TO BE INERT, I DON'T KNOW WHY -michael)
     document.body.appendChild(element);
-
+    
     // transfer children from element to fragment
     while (arrChildren[0]) {
         fragment.appendChild(arrChildren[0]);
     }
-
+    
     // remove element from the body
     document.body.removeChild(element);
-
+    
     // return inert fragment
     return fragment;
 };
@@ -825,11 +825,11 @@ GS.createDocumentFragment = function (strHTML) {
 GS.getDocumentFragmentHTML = function (fragment) {
     'use strict';
     var strHTML, i, len, arrChildren = fragment.children;
-
+    
     for (strHTML = '', i = 0, len = arrChildren.length; i < len; i += 1) {
         strHTML += arrChildren[i].outerHTML;
     }
-
+    
     return strHTML;
 };
 */
@@ -837,30 +837,30 @@ GS.getDocumentFragmentHTML = function (fragment) {
 GS.createInertDOM = function (strHTML) {
     'use strict';
     var templateElement = document.createElement('template'), iframeElement;
-
+    
     // if the content property is on a template element: no iframe neccessary
     if ('content' in templateElement) {
         templateElement.innerHTML = strHTML;
-
+        
         return templateElement.content;
-
+        
     // else: use iframe to create inert HTML
     } else {
         if (!document.getElementById('gs-inert-dom-generator')) {
             iframeElement = document.createElement('iframe');
-
+            
             iframeElement.setAttribute('id', 'gs-inert-dom-generator');
             iframeElement.setAttribute('hidden', '');
-
+            
             document.body.appendChild(iframeElement);
-
+            
         } else {
             iframeElement = document.getElementById('gs-inert-dom-generator');
         }
-
+        
         iframeElement.contentWindow.inertDOM = iframeElement.contentWindow.document.createElement('div');
         iframeElement.contentWindow.inertDOM.innerHTML = strHTML;
-
+        
         return iframeElement.contentWindow.inertDOM;
     }
 };
@@ -868,11 +868,11 @@ GS.createInertDOM = function (strHTML) {
 GS.getInertDOMHTML = function (inertDOM) {
     'use strict';
     var strHTML, i, len, arrChildren = inertDOM.children;
-
+    
     for (strHTML = '', i = 0, len = arrChildren.length; i < len; i += 1) {
         strHTML += arrChildren[i].outerHTML;
     }
-
+    
     return strHTML;
 };
 */
@@ -960,21 +960,21 @@ return strRet;};GS.templateWithEnvelopeData=function(templateHTML,data,i,len,row
             {{ var row, row_number, i, len, col_i, col_len
                  , qs = GS.qryToJSON(GS.getQueryString())
                  , rowNumberOffset = (jo.rowNumberOffset || 0);
-
+            
             if (!isNaN(jo.i)) {
                 i = jo.i;
                 len = (jo.len === undefined || jo.len === null ? jo.i + 1 : jo.len);
-
+                
             } else {
                 i = 0;
                 len = jo.data.dat.length;
             }
-
+            
             for (; i < len; i += 1) {
                 row = {};
                 row_number = (i + 1) + rowNumberOffset;
                 row.row_number = row_number;
-
+                
                 for (col_i = 0, col_len = jo.data.arr_column.length; col_i < col_len; col_i += 1) {
                     if (jo.data.dat[i][col_i] === undefined || jo.data.dat[i][col_i] === null) {
                         row[jo.data.arr_column[col_i]] = '';
@@ -1100,11 +1100,11 @@ socket=GS.envSocket;}
 if(socket.readyState===socket.OPEN&&socket.GSSessionID){if(!forceMessageID){sequence+=1;messageID=socket.GSSessionID+'_'+sequence;jsnMessages[messageID]={'id':messageID,'session':socket.GSSessionID,'callback':callback,'arrResponseNumbers':[],'arrResponses':[],'bolFinished':false};}else{messageID=forceMessageID;}
 if(typeof(strMessage)==='object'){jsnMessages[messageID].parameters=new Blob(['messageid = '+messageID+'\n',strMessage],{type:'application/x-binary'});}else{jsnMessages[messageID].parameters='messageid = '+messageID+'\n'+strMessage;}
 socket.send(jsnMessages[messageID].parameters);return messageID;}else if(socket.readyState===socket.CONNECTING||socket.readyState===socket.OPEN){arrWaitingCalls.push(function(){GS.requestFromSocket(socket,strMessage,callback);});}else if(socket.readyState===socket.CLOSED){callback.apply(null,['Socket Is Closed','error',webSocketNormalizeError({'reason':'Socket Is Closed'})]);}else if(socket.readyState===socket.CLOSING){callback.apply(null,['Socket Is Closing','error',webSocketNormalizeError({'reason':'Socket Is Closing'})]);}};GS.requestActionFromSocket=function(socket,strSchema,strObject,strArgs,finalCallback){var strMessage='ACTION\t'+encodeForTabDelimited(strSchema)+'\t'+encodeForTabDelimited(strObject)+'\t'+encodeForTabDelimited(strArgs)+'\n',intResponse=0,strRet;GS.requestFromSocket(socket,strMessage,function(data,error,errorData){var arrLines,i,len;if(!error){if(intResponse===0){strRet=data;}else{finalCallback(strRet,error);}}else{finalCallback(errorData,error);}
-intResponse+=1;});};GS.requestRawFromSocket=function(socket,strQuery,callback,bolAutocommit){var intResponsePart=0,intQueryNumber=0,intCallbackNumber=0,intCallbackNumberThisQuery=0,intResponseNumberThisQuery=0,arrMessages,arrColumnNames,arrColumnTypes,arrStart,dteStart,arrEnd,dteEnd,intRows;return GS.requestFromSocket(socket,'RAW'+(!bolAutocommit?'\tDISABLE AUTOCOMMIT\n':'\n')+strQuery,function(data,error,errorData){var arrRecords,arrLines,i,len,strMode;if(!error){if(intResponseNumberThisQuery===0){strQuery='';arrMessages=[];arrColumnNames=[];arrColumnTypes=[];}
+intResponse+=1;});};GS.requestRawFromSocket=function(socket,strQuery,callback,bolAutocommit){var intResponsePart=0,intQueryNumber=0,intCallbackNumber=0,intCallbackNumberThisQuery=0,intResponseNumberThisQuery=0,arrMessages,arrColumnNames,arrColumnTypes,arrStart,dteStart,arrEnd,dteEnd,intRows;bolAutocommit=bolAutocommit!==undefined?bolAutocommit:true;return GS.requestFromSocket(socket,'RAW'+(!bolAutocommit?'\tDISABLE AUTOCOMMIT\n':'\n')+strQuery,function(data,error,errorData){var arrRecords,arrLines,i,len,strMode;if(!error){if(intResponseNumberThisQuery===0){strQuery='';arrMessages=[];arrColumnNames=[];arrColumnTypes=[];}
 if(data.indexOf('QUERY\n')===0){intResponsePart=0;intCallbackNumberThisQuery=0;}
-if(data.indexOf('Rows Affected\n')===0||data==='EMPTY'||data==='TRANSACTION COMPLETED'){intResponsePart+=1;}
+if(data.indexOf('Rows Affected\n')===0||data==='EMPTY'||data==='TRANSACTION COMPLETED'||data==='TRANSACTION OPEN'){intResponsePart+=1;}
 if(intResponsePart===0){arrLines=data.split('\n');for(i=0,len=arrLines.length;i<len;i+=1){if(arrLines[i].indexOf('QUERY\t')===0||arrLines[i].indexOf('START\t')===0||arrLines[i].indexOf('END\t')===0||arrLines[i].indexOf('ROWS\t')===0||arrLines[i].indexOf('DEBUG\t')===0||arrLines[i].indexOf('LOG\t')===0||arrLines[i].indexOf('INFO\t')===0||arrLines[i].indexOf('NOTICE\t')===0||arrLines[i].indexOf('WARNING\t')===0||arrLines[i]==='COLUMNS'){if(arrLines[i]==='COLUMNS'){strMode=arrLines[i];}else{strMode=arrLines[i].substring(0,arrLines[i].indexOf('\t'));}}
-if(strMode==='QUERY'){strQuery=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1));}else if(strMode==='START'){arrStart=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)).split('\t');dteStart=new Date(arrStart[0]+' '+arrStart[1]+' GMT');if(arrStart[2]){dteStart.setMilliseconds(parseInt(arrStart[2],10)/1000);}}else if(strMode==='END'){arrEnd=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)).split('\t');dteEnd=new Date(arrEnd[0]+' '+arrEnd[1]+' GMT');if(arrEnd[2]){dteEnd.setMilliseconds(parseInt(arrEnd[2],10)/1000);}}else if(strMode==='ROWS'){intRows=parseInt(GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)),10);}else if(strMode==='DEBUG'){arrMessages.push({'level':'DEBUG','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='LOG'){arrMessages.push({'level':'LOG','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='INFO'){arrMessages.push({'level':'INFO','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='NOTICE'){arrMessages.push({'level':'NOTICE','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='WARNING'){arrMessages.push({'level':'WARNING','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='COLUMNS'){arrColumnNames=arrLines[i+1].split('\t');arrColumnTypes=arrLines[i+2].split('\t');intResponsePart+=1;break;}}}else if(intResponsePart>=1){if(typeof callback==='function'){callback({'intQueryNumber':intQueryNumber,'intCallbackNumber':intCallbackNumber,'intCallbackNumberThisQuery':intCallbackNumberThisQuery,'strQuery':strQuery,'dteStart':dteStart,'dteEnd':dteEnd,'intRows':intRows,'arrMessages':arrMessages,'arrColumnNames':arrColumnNames,'arrColumnTypes':arrColumnTypes,'strMessage':(data!=='TRANSACTION COMPLETED'?data:''),'bolLastMessage':(data==='TRANSACTION COMPLETED')},error);intCallbackNumber+=1;intCallbackNumberThisQuery+=1;}}
+if(strMode==='QUERY'){strQuery=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1));}else if(strMode==='START'){arrStart=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)).split('\t');dteStart=new Date(arrStart[0]+' '+arrStart[1]+' GMT');if(arrStart[2]){dteStart.setMilliseconds(parseInt(arrStart[2],10)/1000);}}else if(strMode==='END'){arrEnd=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)).split('\t');dteEnd=new Date(arrEnd[0]+' '+arrEnd[1]+' GMT');if(arrEnd[2]){dteEnd.setMilliseconds(parseInt(arrEnd[2],10)/1000);}}else if(strMode==='ROWS'){intRows=parseInt(GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1)),10);}else if(strMode==='DEBUG'){arrMessages.push({'level':'DEBUG','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='LOG'){arrMessages.push({'level':'LOG','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='INFO'){arrMessages.push({'level':'INFO','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='NOTICE'){arrMessages.push({'level':'NOTICE','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='WARNING'){arrMessages.push({'level':'WARNING','content':GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1).replace(/\\n$/,''))});}else if(strMode==='COLUMNS'){arrColumnNames=arrLines[i+1].split('\t');arrColumnTypes=arrLines[i+2].split('\t');intResponsePart+=1;break;}}}else if(intResponsePart>=1){if(typeof callback==='function'){callback({'intQueryNumber':intQueryNumber,'intCallbackNumber':intCallbackNumber,'intCallbackNumberThisQuery':intCallbackNumberThisQuery,'strQuery':strQuery,'dteStart':dteStart,'dteEnd':dteEnd,'intRows':intRows,'arrMessages':arrMessages,'arrColumnNames':arrColumnNames,'arrColumnTypes':arrColumnTypes,'strMessage':(data!=='TRANSACTION COMPLETED'||data==='TRANSACTION OPEN'?data:''),'bolLastMessage':(data==='TRANSACTION COMPLETED'||data==='TRANSACTION OPEN'),'bolTransactionOpen':(data==='TRANSACTION OPEN')},error);intCallbackNumber+=1;intCallbackNumberThisQuery+=1;}}
 intResponseNumberThisQuery+=1;if(data==='\\.'||data.indexOf('Rows Affected\n')===0){intQueryNumber+=1;intCallbackNumberThisQuery=0;intResponsePart=0;intResponseNumberThisQuery=0;}}else{if(data.indexOf('QUERY\n')===0){intResponsePart=0;intCallbackNumberThisQuery=0;}
 if(intResponsePart===0){arrLines=data.split('\n');for(i=0,len=arrLines.length;i<len;i+=1){if(arrLines[i].indexOf('QUERY\t')===0||arrLines[i].indexOf('START\t')===0||arrLines[i].indexOf('END\t')===0||arrLines[i].indexOf('ROWS\t')===0||arrLines[i].indexOf('DEBUG\t')===0||arrLines[i].indexOf('LOG\t')===0||arrLines[i].indexOf('INFO\t')===0||arrLines[i].indexOf('NOTICE\t')===0||arrLines[i].indexOf('WARNING\t')===0||arrLines[i]==='COLUMNS'){if(arrLines[i]==='COLUMNS'){strMode=arrLines[i];}else{strMode=arrLines[i].substring(0,arrLines[i].indexOf('\t'));}}
 if(strMode==='QUERY'){strQuery=GS.decodeFromTabDelimited(arrLines[i].substring(arrLines[i].indexOf('\t')+1));}else if(strMode==='COLUMNS'){break;}}}
@@ -1153,7 +1153,7 @@ deleteData;GS.requestBegin(socket,function(data,error){var transactionID;if(!err
 GS.requestFromSocket(GS.envSocket,'transactionid = '+transactionID+'\n'+strMessage,function(data,error,errorData){var commitFunction,rollbackFunction;if(!error){data=data.substring(data.indexOf('\n')+1);}
 commitFunction=function(){GS.requestCommit(socket,transactionID,function(data,error){if(!error){data=data.substring(data.indexOf('\n')+1);}
 finalCallback('COMMIT',data,error);});};rollbackFunction=function(){GS.requestRollback(socket,transactionID,function(data,error){if(!error){data=data.substring(data.indexOf('\n')+1);}
-finalCallback('ROLLBACK',data,error);});};if(!error){confirmCallback(data,error,transactionID,commitFunction,rollbackFunction);}else{confirmCallback(errorData,error,transactionID,commitFunction,rollbackFunction);}});}else{if(typeof beginCallback==='function'){beginCallback(data,error);}}});};GS.requestBegin=function(socket,callback){GS.requestFromSocket(GS.envSocket,'BEGIN',function(data,error,errorData){var transactionID;if(typeof callback==='function'){if(!error){transactionID=data.substring('transactionid = '.length,data.indexOf('\n'));callback(transactionID,error);}else{callback(errorData,error);}}});};GS.requestRollback=function(socket,transactionID,callback){GS.requestFromSocket(GS.envSocket,'transactionid = '+transactionID+'\nROLLBACK',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.requestCommit=function(socket,transactionID,callback){GS.requestFromSocket(GS.envSocket,'transactionid = '+transactionID+'\nCOMMIT',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.rebootSocket=function(socket){socket.stayClosed=false;socket.close();};GS.closeSocket=function(socket){socket.stayClosed=true;socket.close();};var cacheLedger=[];window.testtesttest=cacheLedger;GS.requestCachingSelect=function(socket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,callback,bolClearCache){var strKey=(strSchema+strObject+strColumns+strWhere+strOrd+strLimit+strOffset),intQueryIndex,i,len,currentEntry;console.log(strKey,bolClearCache,cacheLedger[strKey]);if(bolClearCache){cacheLedger[strKey]=null;}
+finalCallback('ROLLBACK',data,error);});};if(!error){confirmCallback(data,error,transactionID,commitFunction,rollbackFunction);}else{confirmCallback(errorData,error,transactionID,commitFunction,rollbackFunction);}});}else{if(typeof beginCallback==='function'){beginCallback(data,error);}}});};GS.requestBegin=function(socket,callback){GS.requestFromSocket(GS.envSocket,'BEGIN',function(data,error,errorData){var transactionID;if(typeof callback==='function'){if(!error){transactionID=data.substring('transactionid = '.length,data.indexOf('\n'));callback(transactionID,error);}else{callback(errorData,error);}}});};GS.requestRollback=function(socket,transactionID,callback){GS.requestFromSocket(socket,'transactionid = '+transactionID+'\nROLLBACK',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.requestCommit=function(socket,transactionID,callback){GS.requestFromSocket(socket,'transactionid = '+transactionID+'\nCOMMIT',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.rebootSocket=function(socket){socket.stayClosed=false;socket.close();};GS.closeSocket=function(socket){socket.stayClosed=true;socket.close();};var cacheLedger=[];window.testtesttest=cacheLedger;GS.requestCachingSelect=function(socket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,callback,bolClearCache){var strKey=(strSchema+strObject+strColumns+strWhere+strOrd+strLimit+strOffset),intQueryIndex,i,len,currentEntry;console.log(strKey,bolClearCache,cacheLedger[strKey]);if(bolClearCache){cacheLedger[strKey]=null;}
 if(cacheLedger[strKey]){for(i=0,len=cacheLedger[strKey].results.length;i<len;i+=1){callback(cacheLedger[strKey].results[i][0],cacheLedger[strKey].results[i][1]);}
 cacheLedger[strKey].callbacks.push({'callback':callback,'ready':true});}else{currentEntry=cacheLedger[strKey]={results:[],callbacks:[{'callback':callback,'ready':true}]};GS.requestSelectFromSocket(socket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,function(data,error){var i,len;currentEntry.results.push([data,error]);for(i=0,len=currentEntry.callbacks.length;i<len;i+=1){if(currentEntry.callbacks[i].ready){currentEntry.callbacks[i].callback(data,error);}}});}};/*
     var cacheQueries = [], cacheCallbacks = [], cacheResults = [];
@@ -1204,7 +1204,11 @@ cacheLedger[strKey].callbacks.push({'callback':callback,'ready':true});}else{cur
     };*/})();GS.encodeForTabDelimited=function(strValue,nullValue){'use strict';strValue=String(strValue||'');if(strValue==='\\N'){return strValue;}else{strValue=strValue.replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/\r/g,'\\r').replace(/\t/g,'\\t');if(strValue===nullValue){strValue='\\N';}
 return strValue;}};GS.decodeFromTabDelimited=function(strValue,nullValue){'use strict';var i,len,strRet='';if(nullValue===undefined){nullValue='\\N';}
 for(i=0,len=strValue.length;i<len;i+=1){if(strValue[i]==='\\'&&strValue[i+1]){i+=1;if(strValue[i]==='n'){strRet+='\n';}else if(strValue[i]==='r'){strRet+='\r';}else if(strValue[i]==='t'){strRet+='\t';}else if(strValue[i]==='N'){strRet+=nullValue;}else if(strValue[i]==='\\'){strRet+='\\';}else{strRet+='\\'+strValue[i];}}else{strRet+=strValue[i];}}
-return strRet;};window.addEventListener('design-register-element',function(){'use strict';registerDesignSnippet('GS.rightPad','GS.rightPad','GS.rightPad(${1:stringToPad}, \'${2:stringToPadWith}\', ${0:lengthToPadTo});');registerDesignSnippet('GS.leftPad','GS.leftPad','GS.leftPad(${1:stringToPad}, \'${2:stringToPadWith}\', ${0:lengthToPadTo});');registerDesignSnippet('GS.pxToEm','GS.pxToEm','GS.pxToEm(${1:elementToTestIn}, ${0:pxToConvert});');registerDesignSnippet('GS.emToPx','GS.emToPx','GS.emToPx(${1:elementToTestIn}, ${0:emToConvert});');registerDesignSnippet('GS.keyCode','GS.keyCode','GS.keyCode(\'${0:characterToGetTheKeyCodeOf}\');');registerDesignSnippet('GS.charFromKeyCode','GS.charFromKeyCode','GS.charFromKeyCode(\'${0:eventObject}\');');registerDesignSnippet('GS.getStyle','GS.getStyle','GS.getStyle(${1:element}, \'${0:CSSProperty}\');');registerDesignSnippet('GS.listAdd','GS.listAdd','GS.listAdd(${1:arrayToAddTo}, \'${0:valueToAddIfUnique}\');');registerDesignSnippet('GS.triggerEvent','GS.triggerEvent','GS.triggerEvent(${1:target}, \'${2:eventName}\', ${0:jsnModifiers});');registerDesignSnippet('GS.strToTitle','GS.strToTitle','GS.strToTitle(${0:valueToConvert});');registerDesignSnippet('GS.mousePosition','GS.mousePosition','GS.mousePosition(${0:event});');registerDesignSnippet('GS.GUID','GS.GUID','GS.GUID();');registerDesignSnippet('GS.safeDecodeURIComponent','GS.safeDecodeURIComponent','GS.safeDecodeURIComponent(${0:valueToDecode});');registerDesignSnippet('GS.getTextHeight','GS.getTextHeight','GS.getTextHeight(${1:elementToTestIn}, ${0:bolNormalLineHeight});');registerDesignSnippet('GS.getTextWidth','GS.getTextWidth','GS.getTextWidth(${1:elementToTestIn}, ${0:strTextToGetTheWidthOf});');registerDesignSnippet('GS.scrollParent','GS.scrollParent','GS.scrollParent(${0:elementToStartFrom});');registerDesignSnippet('GS.scrollIntoView','GS.scrollIntoView','GS.scrollIntoView(${0:elementToScrollIntoView});');registerDesignSnippet('GS.envGetCell','GS.envGetCell','GS.envGetCell(${1:envelopeData}, ${2:recordNumber}, \'${0:columnName}\');');registerDesignSnippet('GS.trim','GS.trim','GS.trim(${1:stringToBeTrimmed}, \'${0:stringToTrimOff}\');');registerDesignSnippet('GS.setCookie','GS.setCookie','GS.setCookie(\'${1:cookieName}\', ${2:newValue}, ${0:daysUntilExpire});');registerDesignSnippet('GS.getCookie','GS.getCookie','GS.getCookie(\'${1:cookieName}\');');registerDesignSnippet('GS.pushState','GS.pushState','GS.pushState(${1:stateObj}, ${2:title}, ${0:newURL});');registerDesignSnippet('GS.replaceState','GS.replaceState','GS.replaceState(${1:stateObj}, ${2:title}, ${0:newURL});');registerDesignSnippet('GS.searchToWhere','GS.searchToWhere','GS.searchToWhere(\'${1:columns}\', ${0:searchClause});');registerDesignSnippet('GS.iconList','GS.iconList','GS.iconList();');registerDesignSnippet('GS.lorem','GS.lorem','GS.lorem();');registerDesignSnippet('GS.numberSuffix','GS.numberSuffix','GS.numberSuffix(${1:intNumber});');registerDesignSnippet('GS.hitLink','GS.hitLink','GS.hitLink(${1:strLink});');registerDesignSnippet('GS.log','GS.log','GS.log(\'${1:send}\', ${2:message});');});GS.hitLink=function(strLink){"use strict";var iframeElement;iframeElement=document.createElement('iframe');iframeElement.setAttribute('hidden','');iframeElement.addEventListener('load',function(){if(iframeElement.parentNode===document.body){document.body.removeChild(iframeElement);}});iframeElement.setAttribute("src",strLink);document.body.appendChild(iframeElement);};GS.log=function(bolsend,message){"use strict";var msg=message;if(bolsend){var e=new Error();if(!e.stack){try{throw e;}catch(e){if(!e.stack){}}}
+return strRet;};window.addEventListener('design-register-element',function(){'use strict';registerDesignSnippet('GS.rightPad','GS.rightPad','GS.rightPad(${1:stringToPad}, \'${2:stringToPadWith}\', ${0:lengthToPadTo});');registerDesignSnippet('GS.leftPad','GS.leftPad','GS.leftPad(${1:stringToPad}, \'${2:stringToPadWith}\', ${0:lengthToPadTo});');registerDesignSnippet('GS.pxToEm','GS.pxToEm','GS.pxToEm(${1:elementToTestIn}, ${0:pxToConvert});');registerDesignSnippet('GS.emToPx','GS.emToPx','GS.emToPx(${1:elementToTestIn}, ${0:emToConvert});');registerDesignSnippet('GS.keyCode','GS.keyCode','GS.keyCode(\'${0:characterToGetTheKeyCodeOf}\');');registerDesignSnippet('GS.charFromKeyCode','GS.charFromKeyCode','GS.charFromKeyCode(\'${0:eventObject}\');');registerDesignSnippet('GS.getStyle','GS.getStyle','GS.getStyle(${1:element}, \'${0:CSSProperty}\');');registerDesignSnippet('GS.listAdd','GS.listAdd','GS.listAdd(${1:arrayToAddTo}, \'${0:valueToAddIfUnique}\');');registerDesignSnippet('GS.triggerEvent','GS.triggerEvent','GS.triggerEvent(${1:target}, \'${2:eventName}\', ${0:jsnModifiers});');registerDesignSnippet('GS.strToTitle','GS.strToTitle','GS.strToTitle(${0:valueToConvert});');registerDesignSnippet('GS.mousePosition','GS.mousePosition','GS.mousePosition(${0:event});');registerDesignSnippet('GS.GUID','GS.GUID','GS.GUID();');registerDesignSnippet('GS.safeDecodeURIComponent','GS.safeDecodeURIComponent','GS.safeDecodeURIComponent(${0:valueToDecode});');registerDesignSnippet('GS.getTextHeight','GS.getTextHeight','GS.getTextHeight(${1:elementToTestIn}, ${0:bolNormalLineHeight});');registerDesignSnippet('GS.getTextWidth','GS.getTextWidth','GS.getTextWidth(${1:elementToTestIn}, ${0:strTextToGetTheWidthOf});');registerDesignSnippet('GS.scrollParent','GS.scrollParent','GS.scrollParent(${0:elementToStartFrom});');registerDesignSnippet('GS.scrollIntoView','GS.scrollIntoView','GS.scrollIntoView(${0:elementToScrollIntoView});');registerDesignSnippet('GS.envGetCell','GS.envGetCell','GS.envGetCell(${1:envelopeData}, ${2:recordNumber}, \'${0:columnName}\');');registerDesignSnippet('GS.trim','GS.trim','GS.trim(${1:stringToBeTrimmed}, \'${0:stringToTrimOff}\');');registerDesignSnippet('GS.setCookie','GS.setCookie','GS.setCookie(\'${1:cookieName}\', ${2:newValue}, ${0:daysUntilExpire});');registerDesignSnippet('GS.getCookie','GS.getCookie','GS.getCookie(\'${1:cookieName}\');');registerDesignSnippet('GS.pushState','GS.pushState','GS.pushState(${1:stateObj}, ${2:title}, ${0:newURL});');registerDesignSnippet('GS.replaceState','GS.replaceState','GS.replaceState(${1:stateObj}, ${2:title}, ${0:newURL});');registerDesignSnippet('GS.searchToWhere','GS.searchToWhere','GS.searchToWhere(\'${1:columns}\', ${0:searchClause});');registerDesignSnippet('GS.iconList','GS.iconList','GS.iconList();');registerDesignSnippet('GS.lorem','GS.lorem','GS.lorem();');registerDesignSnippet('GS.numberSuffix','GS.numberSuffix','GS.numberSuffix(${1:intNumber});');registerDesignSnippet('GS.hitLink','GS.hitLink','GS.hitLink(${1:strLink});');registerDesignSnippet('GS.log','GS.log','GS.log(\'${1:send}\', ${2:message});');});function gt(x,y){return x>y;}
+function gte(x,y){return x>=y;}
+function lt(x,y){return x<y;}
+function lte(x,y){return x<=y;}
+GS.hitLink=function(strLink){"use strict";var iframeElement;iframeElement=document.createElement('iframe');iframeElement.setAttribute('hidden','');iframeElement.addEventListener('load',function(){if(iframeElement.parentNode===document.body){document.body.removeChild(iframeElement);}});iframeElement.setAttribute("src",strLink);document.body.appendChild(iframeElement);};GS.log=function(bolsend,message){"use strict";var msg=message;if(bolsend){var e=new Error();if(!e.stack){try{throw e;}catch(e){if(!e.stack){}}}
 var stack=e.stack.toString().split(/\r\n|\n/);if(msg===''){msg='""';}
 console.log(msg,' '+stack[1].trim().substring(stack[1].trim().indexOf('('),stack[1].trim().length)+'');}};GS.numberSuffix=function(intNumber){'use strict';var strNumber=String(intNumber),jsnSuffixes={'0':'th','1':'st','2':'nd','3':'rd','4':'th','5':'th','6':'th','7':'th','8':'th','9':'th'};return strNumber+jsnSuffixes[strNumber[strNumber.length-1]];}
 GS.rightPad=function(str,padString,padToLength){'use strict';str=String(str);while(str.length<padToLength){str+=padString;}
@@ -1336,17 +1340,17 @@ GS.getSelectedText = function () {
     if (window.getSelection) {
         return window.getSelection() + '';
     }
-
+    
     // FireFox
     if (document.getSelection) {
         return document.getSelection() + '';
     }
-
+    
     // IE 6/7
     if (document.selection) {
         return document.selection.createRange().text + '';
     }
-
+    
     console.warn('GS.getSelectedText warning: no selection collection function found (could not find a way to get the selected text)');
     return '';
 }*/
@@ -1637,7 +1641,8 @@ if(bolRefresh&&element.hasAttribute('src')){getData(element);}else if(bolRefresh
 element.internal.bolQSFirstRun=true;}
 function elementCreated(element){if(!element.hasAttribute('suspend-created')){}}
 function elementInserted(element){var tableTemplateElement,tableTemplateElementCopy,oldRootElement,i,len,recordElement,strQueryString=GS.getQueryString(),arrElement,currentElement,strQSValue;if(!element.hasAttribute('suspend-created')&&!element.hasAttribute('suspend-inserted')){if(!element.inserted){element.inserted=true;element.internal={};saveDefaultAttributes(element);element.open=false;element.error=false;element.ready=false;if(element.getAttribute('qs')||element.getAttribute('refresh-on-querystring-values')||element.hasAttribute('refresh-on-querystring-change')){element.popValues={};pushReplacePopHandler(element);window.addEventListener('pushstate',function(){pushReplacePopHandler(element);});window.addEventListener('replacestate',function(){pushReplacePopHandler(element);});window.addEventListener('popstate',function(){pushReplacePopHandler(element);});}
-tableTemplateElement=xtag.queryChildren(element,'template')[0];if(tableTemplateElement){tableTemplateElementCopy=document.createElement('template');tableTemplateElementCopy.innerHTML=tableTemplateElement.innerHTML;recordElement=xtag.query(xtag.query(tableTemplateElementCopy.content,'tbody')[0],'tr')[0];if(recordElement){arrElement=xtag.query(recordElement,'[column]');for(i=0,len=arrElement.length;i<len;i+=1){currentElement=arrElement[i];if((!currentElement.getAttribute('value'))&&currentElement.getAttribute('column')){currentElement.setAttribute('value','{{! row.'+currentElement.getAttribute('column')+' }}');}}
+tableTemplateElement=xtag.queryChildren(element,'template')[0];if(tableTemplateElement){if(tableTemplateElement.innerHTML.indexOf('&gt;')>-1||tableTemplateElement.innerHTML.indexOf('&lt;')>-1){console.warn('GS-COMBO WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+tableTemplateElementCopy=document.createElement('template');tableTemplateElementCopy.innerHTML=tableTemplateElement.innerHTML;recordElement=xtag.query(xtag.query(tableTemplateElementCopy.content,'tbody')[0],'tr')[0];if(recordElement){arrElement=xtag.query(recordElement,'[column]');for(i=0,len=arrElement.length;i<len;i+=1){currentElement=arrElement[i];if((!currentElement.getAttribute('value'))&&currentElement.getAttribute('column')){currentElement.setAttribute('value','{{! row.'+currentElement.getAttribute('column')+' }}');}}
 element.tableTemplate=tableTemplateElementCopy.innerHTML;if(!element.getAttribute('src')&&!element.getAttribute('source')&&!element.getAttribute('initalize')){element.dropDownTable=GS.cloneElement(xtag.query(tableTemplateElementCopy.content,'table')[0]);}}}
 refreshControl(element);element.addEventListener('click',function(event){var clickHandler;if(event.target.classList.contains('drop_down_button')){if(!element.open&&!element.error){clickHandler=function(){openDropDown(element);window.removeEventListener('click',clickHandler);};window.addEventListener('click',clickHandler);}else{}}});element.addEventListener('keydown',function(event){if(event.target.classList.contains('control')){handleKeyDown(element,event);}});element.addEventListener('keyup',function(event){if(event.target.classList.contains('control')){handleKeyUp(element,event);}});if(xtag.queryChildren(element,'.root').length<1){refreshControl(element);}
 if(element.getAttribute('src')||element.getAttribute('source')||element.getAttribute('initalize')){getData(element,true);}else{element.ready=true;if(element.getAttribute('value')){selectRecordFromValue(element,element.getAttribute('value'),false);}else if(element.value){selectRecordFromValue(element,element.value,false);}}}}}
@@ -1865,7 +1870,10 @@ element.scrollContainer.children[0].scrollHeight);element.style.height=intHeight
 function refreshReflow(element){var strReflowAt=GS.templateWithQuerystring(element.getAttribute('reflow-at')||''),intReflowAt,intElementWidth;if(strReflowAt){intElementWidth=element.offsetWidth;intReflowAt=parseInt(strReflowAt,10);if(intElementWidth<intReflowAt){element.dataContainer.classList.add('grid-reflow');}else{element.dataContainer.classList.remove('grid-reflow');}}else{element.dataContainer.classList.remove('grid-reflow');}}
 function prepareElement(element){var tableTemplateElement,HUDTemplateElement,strHTML,recordElement,insertTemplateElement,arrParts,headerRecordElement;var i,len,arrElements,arrHeaderElements;var tempTemplateElement;if(!element.hasAttribute('pk')){element.setAttribute('pk','id');}
 if(!element.hasAttribute('lock')){element.setAttribute('lock','change_stamp');}
-tableTemplateElement=xtag.query(element,'template[for="table"]')[0];HUDTemplateElement=xtag.query(element,'template[for="hud"]')[0];insertTemplateElement=xtag.query(element,'template[for="insert"]')[0];if(!tableTemplateElement||tableTemplateElement.nodeName!=='TEMPLATE'){throw'gs-datasheet error: No table template provided.';}
+tableTemplateElement=xtag.query(element,'template[for="table"]')[0];HUDTemplateElement=xtag.query(element,'template[for="hud"]')[0];insertTemplateElement=xtag.query(element,'template[for="insert"]')[0];if(HUDTemplateElement.innerHTML.indexOf('&gt;')>-1||HUDTemplateElement.innerHTML.indexOf('&lt;')>-1){console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(tableTemplateElement.innerHTML.indexOf('&gt;')>-1||tableTemplateElement.innerHTML.indexOf('&lt;')>-1){console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(insertTemplateElement.innerHTML.indexOf('&gt;')>-1||insertTemplateElement.innerHTML.indexOf('&lt;')>-1){console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in insert template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(!tableTemplateElement||tableTemplateElement.nodeName!=='TEMPLATE'){throw'gs-datasheet error: No table template provided.';}
 headerRecordElement=xtag.query(tableTemplateElement.content,'thead tr')[0];if(headerRecordElement){arrHeaderElements=xtag.query(headerRecordElement,'td, th');arrElements=xtag.query(tableTemplateElement.content,'tbody td, tbody th');for(i=0,len=arrHeaderElements.length;i<len;i+=1){if(!arrElements[i].hasAttribute('heading')){arrElements[i].setAttribute('heading',arrHeaderElements[i].textContent);}}
 element.headerTemplateRecord=headerRecordElement.outerHTML;}
 recordElement=xtag.query(tableTemplateElement.content,'tbody tr')[0];recordElement.setAttribute('data-index','{{= i }}');strHTML=GS.templateColumnToValue(tableTemplateElement.innerHTML);tempTemplateElement=document.createElement('template');tempTemplateElement.innerHTML=strHTML;recordElement=xtag.query(tempTemplateElement.content,'tbody tr')[0];element.tableTemplate=GS.templateHideSubTemplates(recordElement.outerHTML,true);element.tableTemplateRecord=recordElement;if(insertTemplateElement&&insertTemplateElement.innerHTML){element.insertTemplate=insertTemplateElement.innerHTML;}
@@ -1874,14 +1882,14 @@ arrParts=GS.templateWithQuerystring(element.getAttribute('src')).split('.');elem
                 <div class="hud-container">
                     <gs-button icon="refresh" remove-right icononly no-focus title="Refresh Data." class="refresh-button"></gs-button>
                     <gs-button icon="times" remove-left icononly no-focus title="Delete Selected Records." class="delete-button"></gs-button>
-
+                    
                     <gs-button icon="plus" icononly no-focus title="Create Record." class="insert-button"></gs-button>
-
+                    
                     <gs-button icon="backward" remove-right icononly no-focus title="Go to previous page." class="paginate-left"></gs-button>
                     <gs-button icon="forward" remove-left icononly no-focus title="Go to next page." class="paginate-right"></gs-button>
-
+                    
                     {{HUDHTML}}
-
+                    
                     <gs-button icon="filter" icononly no-focus title="Edit Filters." class="filter-button" hidden></gs-button>
                     <textarea class="hidden-focus-control">Focus Control</textarea>
                 </div>
@@ -1984,7 +1992,7 @@ xtag.register('gs-datasheet',{lifecycle:{created:function(){},inserted:function(
                     function synchronize(element, bolScroll) {
                         var arrRecords = xtag.query(element, 'tr'), selectCells = [], i, len,
                             arrParts, arrTextareas, focusedElement, recordIndex, cellIndex;
-
+                        
                         // selection
                         if (element.savedSelection) {
                             // loop through savedSelection
@@ -1993,16 +2001,16 @@ xtag.register('gs-datasheet',{lifecycle:{created:function(){},inserted:function(
                                 arrParts = element.savedSelection[i].split(',');
                                 recordIndex = parseInt(arrParts[0], 10);
                                 cellIndex = parseInt(arrParts[1], 10);
-
+                                
                                 if (recordIndex < arrRecords.length && cellIndex < arrRecords[0].children.length) {
                                     selectCells.push(arrRecords[recordIndex].children[cellIndex]);
                                 }
                             }
-
+                            
                             // select cells
                             element.selectedCells = selectCells;
                         }
-
+                        
                         // focus
                         if (element.lastFocusedControl) {
                             element.lastFocusedControl.focus();
@@ -2011,19 +2019,19 @@ xtag.register('gs-datasheet',{lifecycle:{created:function(){},inserted:function(
                             focusedElement = element.copyControl;
                             focusedElement.focus();
                         }
-
+                        
                         // if there was no control to focus and
                         //      there is a selection and
                         //      bolScroll is true: scroll to selected
                         if (!element.lastFocusedControl && element.selectedCells.length > 0 && bolScroll) {
                             GS.scrollIntoView(element.selectedCells[0].parentNode);
                         }
-
+                        
                         // if there was a control and bolScroll is true: scroll to focused record
                         if (focusedElement && bolScroll) {
                             GS.scrollIntoView(GS.findParentElement(document.activeElement, 'tr'));
                         }
-
+                        
                         if (focusedElement && element.lastTextSelection) {
                             GS.setInputSelection(focusedElement, element.lastTextSelection.start, element.lastTextSelection.end);
                         }
@@ -2138,24 +2146,24 @@ return strFormat;}
 function formatDate(dteValue,strFormat){/* (this function contains a (modified) substantial portion of code from another source
             here is the copyright for sake of legality) (Uses code by Matt Kruse)
         Copyright (c) 2006-2009 Rostislav Hristov, Asual DZZD
-
-        Permission is hereby granted, free of charge, to any person obtaining a
-        copy of this software and associated documentation files
-        (the "Software"), to deal in the Software without restriction,
-        including without limitation the rights to use, copy, modify, merge,
-        publish, distribute, sublicense, and/or sell copies of the Software,
-        and to permit persons to whom the Software is furnished to do so,
+        
+        Permission is hereby granted, free of charge, to any person obtaining a 
+        copy of this software and associated documentation files 
+        (the "Software"), to deal in the Software without restriction, 
+        including without limitation the rights to use, copy, modify, merge, 
+        publish, distribute, sublicense, and/or sell copies of the Software, 
+        and to permit persons to whom the Software is furnished to do so, 
         subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included
+        
+        The above copyright notice and this permission notice shall be included 
         in all copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-        OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+        OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
         SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 var i=0,j=0,l=0,c='',token='',x,y,yearLen,formatNumber=function(n,s){if(typeof s=='undefined'||s==2){return(n>=0&&n<10?'0':'')+n;}else{if(n>=0&&n<10){return'00'+n;}
 if(n>=10&&n<100){return'0'+n;}
@@ -2176,7 +2184,7 @@ function elementInserted(element){var today,strQSValue;if(!element.hasAttribute(
                 element.addEventListener(evt.mouseout, function (event) {
                     element.classList.remove('hover');
                 });
-
+                
                 element.addEventListener(evt.mouseover, function (event) {
                     element.classList.add('hover');
                 });
@@ -2227,9 +2235,9 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                     daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
                     monthsOfTheYear = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                     strKeyCode = event.keyCode.toString();
-
+                
                 currentSelectionRange = GS.getInputSelection(element.control);
-
+                
                 if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
                     if (element.getAttribute('disabled') !== null && event.keyCode !== 9) {
                         event.preventDefault();
@@ -2239,7 +2247,7 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                         //console.log(strKeyCode === GS.keyCode('up arrow')    , GS.keyCode('up arrow'));
                         //console.log(strKeyCode === GS.keyCode('right arrow') , GS.keyCode('right arrow'));
                         //console.log(strKeyCode === GS.keyCode('down arrow')  , GS.keyCode('down arrow'));
-
+                        
                         // When the user presses an arrow key:
                         // It finds the current number that the user has selected
                         //     If they pressed up or down
@@ -2247,7 +2255,7 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                         //     If they pressed left or right
                         //         Move their selection to the left or right depending on what they pressed
                         // Then moves the selection to the current number (handling day/month name length differences)
-
+                        
                         // Fix date format
                         strDateFormat = element.getAttribute('format');
                         //console.log(strDateFormat);
@@ -2272,59 +2280,59 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                         } else if (strDateFormat.toLowerCase() === 'isodatetime') {
                             strDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
                         }
-
+                        
                         formatDivider = strDateFormat.match(/[^mdyehmsa]/gi).join('');
-
+                        
                         currentValue = element.control.value;
                         currentDate = new Date(currentValue.replace('\'T\'', ' ').replace(/-/g, '/'));
-
+                        
                         if (strDateFormat.indexOf('M') === -1) {
                             currentDate = new Date('2015/6/15 ' + currentValue);
                         }
-
+                        
                         arrMatch = strDateFormat.match(/(M|E)+/g);
                         if (arrMatch && arrMatch[0].length > 3) {
                             strDateFormat = strDateFormat.replace(/E+/g, new Array(daysOfTheWeek[currentDate.getDay()].length + 1).join('E'));
                             strDateFormat = strDateFormat.replace(/M+/g, new Array(monthsOfTheYear[currentDate.getDay()].length + 1).join('M'));
                         }
-
+                        
                         // If it was an arrow that was pressed
                         if (strKeyCode === GS.keyCode('left arrow') ||
                             strKeyCode === GS.keyCode('up arrow') ||
                             strKeyCode === GS.keyCode('right arrow') ||
                             strKeyCode === GS.keyCode('down arrow')) {
-
+                            
                             //console.log('test');
-
+                            
                             // Prevent the browser from moving the cursor and prevent envelope from using arrows
                             event.preventDefault();
                             event.stopPropagation();
-
+                            
                             //console.log(currentValue, formatDivider, currentSelectionRange.start, currentSelectionRange.end);
-
+                            
                             // Encompass the field in which the cursor is inside
                             while (currentSelectionRange.start >= 0 && formatDivider.indexOf(currentValue[currentSelectionRange.start - 1]) < 0) {
                                 currentSelectionRange.start -= 1;
                             }
-
+                            
                             currentSelectionRange.end = currentSelectionRange.start;
                             while ( currentSelectionRange.end < currentValue.length &&
                                     formatDivider.indexOf(currentValue[currentSelectionRange.end]) < 0) {
                                 currentSelectionRange.end += 1;
                             }
-
+                            
                             //console.log(currentValue, currentSelectionRange.start, currentSelectionRange.end);
-
+                            
                             GS.setInputSelection(element.control, currentSelectionRange.start, currentSelectionRange.end);
-
+                            
                             currentSelectionText = currentValue.substring(currentSelectionRange.start, currentSelectionRange.end);
                             currentSelectionFormatText = strDateFormat.substring(currentSelectionRange.start, currentSelectionRange.end);
-
+                            
                             // If it is up or down
                             if (strKeyCode === GS.keyCode('up arrow') ||
                                 strKeyCode === GS.keyCode('down arrow')) {
                                 var increment = strKeyCode === GS.keyCode('up arrow') ? 1 : -1;
-
+                                
                                 if (currentSelectionFormatText[0] === 'M') {
                                     currentDate.setMonth(currentDate.getMonth() +       increment);
                                     if ((currentSelectionRange.end - currentSelectionRange.start) > 2) {
@@ -2332,36 +2340,36 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                     } else {
                                         currentSelectionRange.end = currentSelectionRange.start + currentDate.getMonth().toString().length;
                                     }
-
+                                    
                                 } else if (currentSelectionFormatText[0] === 'd') {
                                     currentDate.setDate(currentDate.getDate() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getDate().toString().length;
-
+                                    
                                 } else if (currentSelectionFormatText[0] === 'y') {
                                     currentDate.setFullYear(currentDate.getFullYear() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getFullYear().toString().length;
-
+                                    
                                 } else if (currentSelectionFormatText[0] === 'E') {
                                     currentDate.setDate(currentDate.getDate() + increment);
                                     currentSelectionRange.start = 0;
                                     currentSelectionRange.end = daysOfTheWeek[currentDate.getDay()].length;
-
+                                    
                                 } else if (currentSelectionFormatText[0] === 'h' || currentSelectionFormatText[0] === 'H') {
                                     currentDate.setHours(currentDate.getHours() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getHours().toString().length;
-
+                                    
                                 } else if (currentSelectionFormatText[0] === 'm') {
                                     currentDate.setMinutes(currentDate.getMinutes() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getMinutes().toString().length;
-
+                                    
                                 } else if (currentSelectionFormatText[0] === 's') {
                                     currentDate.setSeconds(currentDate.getSeconds() + increment);
                                     currentSelectionRange.end = currentSelectionRange.start + currentDate.getSeconds().toString().length;
-
+                                    
                                 } else if (currentSelectionFormatText[0] === 'a') {
                                     currentDate.setHours(currentDate.getHours() + 12);
                                 }
-
+                                
                                 newValue = formatDate(currentDate, strDateFormat);
                                 this.control.value = newValue;
                                 currentValue = newValue;
@@ -2372,7 +2380,7 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                 currentSelectionRange.end = currentSelectionRange.end + 2;
                                 currentSelectionRange.start = currentSelectionRange.end;
                             }
-
+                            
                             // Copied from above
                             arrMatch = strDateFormat.match(/(M|E)+/g);
                             if (arrMatch && arrMatch[0].length > 3) {
@@ -2387,23 +2395,23 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                     formatDivider.indexOf(currentValue[currentSelectionRange.end]) < 0) {
                                 currentSelectionRange.end += 1;
                             }
-
+                            
                             GS.setInputSelection(element.control, currentSelectionRange.start, currentSelectionRange.end);
-
+                            
                         // All number keys
                         } else if (event.keyCode >= 96 && event.keyCode <= 105) {
                             //// HARK YE ONLOOKER:
                             //// This code caps the number that is inputed by the user to the length that the format allows,
                             //// this will dissallow anyone form entering a year that is > 4 characters unless the
                             //// page's developer allows it in a custom format.
-                            ////
+                            //// 
                             //// This should be fixed around the year 9998 to have all default formats have 5 character years
-
+                            
                             currentSelectionText = currentValue.substring(currentSelectionRange.start, currentSelectionRange.end);
                             currentSelectionFormatText = strDateFormat.substring(currentSelectionRange.start, currentSelectionRange.end);
-
+                            
                             currentValue = element.value;
-
+                            
                             // This is sort of copied from above
                             // There are only two differences:
                             //     the var name
@@ -2419,20 +2427,20 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                     formatDivider.indexOf(currentValue[currentFieldRange.end]) < 0) {
                                 currentFieldRange.end += 1;
                             }
-
+                            
                             //console.log(currentFieldRange);
-
+                            
                             //console.log(currentValue.substring(0, currentSelectionRange.start));
                             //console.log(GS.charFromKeyCode(event), currentSelectionText, currentSelectionFormatText, currentDate);
                             //console.log(currentValue.substring(currentSelectionRange.end));
-
+                            
                             // This error checking is probably unneeded, but what the hey
                             currentFieldRange.start = Math.max(currentFieldRange.start, 0);
                             arrMatch = strDateFormat.match(strDateFormat[currentFieldRange.start] + '+', 'g');
                             if (arrMatch) {
                                 // Prevent the browser from putting the number in for us
                                 event.preventDefault();
-
+                                
                                 // Get the character that they pressed
                                 newFieldValue = GS.charFromKeyCode(event);
                                 console.log(newFieldValue);
@@ -2440,18 +2448,18 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                 // all characters in the field except the first one
                                 newFieldValue = currentValue.substring(currentFieldRange.start + 1, currentFieldRange.start + arrMatch[0].length) + newFieldValue;
                                 console.log(newFieldValue, currentValue);
-
+                                
                                 console.log(currentFieldRange.start + 1, currentFieldRange.start + arrMatch[0].length);
-
+                                
                                 // Build the value using the current field range and the new field value we built above
-                                element.value =
+                                element.value = 
                                     currentValue.substring(0, currentFieldRange.start) +
                                     newFieldValue +
                                     currentValue.substring(currentFieldRange.end);
-
-
+                                
+                                
                                 console.log(currentValue.substring(0, currentFieldRange.start), newFieldValue, currentValue.substring(currentFieldRange.end));
-
+                            
                                 // This is copied from above
                                 currentFieldRange = {
                                     start: currentSelectionRange.start
@@ -2464,7 +2472,7 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                         formatDivider.indexOf(currentValue[currentFieldRange.end]) < 0) {
                                     currentFieldRange.end += 1;
                                 }
-
+                                
                                 //                                                                          This indexOf does not need to be checked for -1
                                 //                                                                          Because we know for a fact that the match is in
                                 //                                                                          the string we are searching
@@ -2473,18 +2481,18 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                                 //console.log(arrMatch[0].length, strDateFormat.indexOf(arrMatch[0]), newCursorPos, arrMatch[0]);
                                 GS.setInputSelection(element.control, newCursorPos, newCursorPos);
                             }
-
+                            
                         }
-
+                        
                         //// All visible keys
                         //} else if ( event.keyCode >= 48 && event.keyCode <= 90 ||
                         //            event.keyCode >= 96 && event.keyCode <= 109 ||
                         //            event.keyCode >= 186 && event.keyCode <= 222 ||
                         //            event.keyCode === 32) {
                         //    //console.log('test');
-                        //
+                        //    
                         //    //GS.triggerEvent(element, 'change');
-                        //
+                        //    
                         //    if ((currentSelectionRange.end - currentSelectionRange.start) > 0) {
                         //        element.control.addEventListener('keyup', function ______self() {
                         //            GS.setInputSelection(this, currentSelectionRange.start + 1, currentSelectionRange.start) + 1;
@@ -2492,9 +2500,9 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                         //        });
                         //    }
                         //}
-
+                        
                         //console.log(event.keyCode);
-
+                        
                         syncView(element);
                     }
                 }
@@ -2511,9 +2519,9 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                     monthsOfTheYear = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                     arrMatch, strDateFormat, formatDivider, currentValue, currentDate;
                 //console.log(currentSelectionRange.start, currentSelectionRange.end);
-
+                
                 ////// Copied from above until otherwise noted
-
+                
                 // Fix date format
                 strDateFormat = element.getAttribute('format');
                 //console.log(strDateFormat);
@@ -2538,22 +2546,22 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                 } else if (strDateFormat.toLowerCase() === 'isodatetime') {
                     strDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
                 }
-
+                
                 formatDivider = strDateFormat.match(/[^mdyehmsa]/gi).join('');
-
+                
                 currentValue = element.control.value;
                 currentDate = new Date(currentValue.replace('\'T\'', ' ').replace(/-/g, '/'));
-
+                
                 if (strDateFormat.indexOf('M') === -1) {
                     currentDate = new Date('2015/6/15 ' + currentValue);
                 }
-
+                
                 arrMatch = strDateFormat.match(/(M|E)+/g);
                 if (arrMatch && arrMatch[0].length > 3) {
                     strDateFormat = strDateFormat.replace(/E+/g, new Array(daysOfTheWeek[currentDate.getDay()].length + 1).join('E'));
                     strDateFormat = strDateFormat.replace(/M+/g, new Array(monthsOfTheYear[currentDate.getDay()].length + 1).join('M'));
                 }
-
+                
                 while (currentSelectionRange.start >= 0 && formatDivider.indexOf(currentValue[currentSelectionRange.start - 1]) < 0) {
                     currentSelectionRange.start -= 1;
                 }
@@ -2563,11 +2571,11 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                     currentSelectionRange.end += 1;
                 }
                 //console.log(currentSelectionRange.start, currentSelectionRange.end);
-
+                
                 ////// Not copied
                 element.ignoreSelect = true;
                 GS.setInputSelection(element.control, currentSelectionRange.start, currentSelectionRange.end);
-
+                
                 //console.log('CLICK EVENT FIRED');
             },
             focus: function () {
@@ -2579,16 +2587,16 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                 //    this.ignoreSelect = false;
                 //}
                 //console.log('SELECT EVENT FIRED', GS.getInputSelection(this.control));
-
+                
                 // Copied from click handler until otherwise noted
                 var element = this, currentSelectionRange = GS.getInputSelection(element.control),
                     daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
                     monthsOfTheYear = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                     arrMatch, strDateFormat, formatDivider, currentValue, currentDate;
                 //console.log(currentSelectionRange.start, currentSelectionRange.end);
-
+                
                 ////// Copied from above until otherwise noted
-
+                
                 // Fix date format
                 strDateFormat = element.getAttribute('format');
                 //console.log(strDateFormat);
@@ -2613,22 +2621,22 @@ this.keyupHandle=false;if(intKeyCode===13&&this.triggerChangeManually){this.trig
                 } else if (strDateFormat.toLowerCase() === 'isodatetime') {
                     strDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
                 }
-
+                
                 formatDivider = strDateFormat.match(/[^mdyehmsa]/gi).join('');
-
+                
                 currentValue = element.control.value;
                 currentDate = new Date(currentValue.replace('\'T\'', ' ').replace(/-/g, '/'));
-
+                
                 if (strDateFormat.indexOf('M') === -1) {
                     currentDate = new Date('2015/6/15 ' + currentValue);
                 }
-
+                
                 arrMatch = strDateFormat.match(/(M|E)+/g);
                 if (arrMatch && arrMatch[0].length > 3) {
                     strDateFormat = strDateFormat.replace(/E+/g, new Array(daysOfTheWeek[currentDate.getDay()].length + 1).join('E'));
                     strDateFormat = strDateFormat.replace(/M+/g, new Array(monthsOfTheYear[currentDate.getDay()].length + 1).join('M'));
                 }
-
+                
                 // Condition copied only
                 if ((currentSelectionRange.start >= 0 && formatDivider.indexOf(currentValue[currentSelectionRange.start - 1]) < 0) ||
                     (currentSelectionRange.end < currentValue.length && formatDivider.indexOf(currentValue[currentSelectionRange.end]) < 0)) {
@@ -2663,6 +2671,7 @@ if(options.mode==='detect'){sizingFunction=function(){if(dialog.parentNode!==doc
 if(dialog.offsetHeight>((window.innerHeight/100)*98)){dialog.style.height='98%';dialog.style.maxHeight=options.max_height;}};sizingFunction();window.addEventListener('resize',sizingFunction);window.addEventListener('orientationchange',sizingFunction);observer=new MutationObserver(sizingFunction);observer.observe(dialog,{childList:true,subtree:true,attributes:true});}
 if(typeof options.after_open==='function'){options.after_open.apply(dialog,[]);}
 return dialog;};GS.openDialog=function(templateLink,afterOpenFunction,beforeCloseFunction,afterCloseFunction){var template,templateID,strHTML,dialogOverlay,dialog,i,len,arrCloseButtons,clickHandler,sizingFunction,observer,arrElements,strTag,returnTarget,strTheme,strMaxWidth,strMaxHeight,strMode,refocusElement,scrollTarget,jsnInitalMousePos,scrollProtectorTouchStart,scrollProtectorTouchMove,scrollProtectorMouseWheel,strTag,xtagSelector,intervalID,intervalI;if(typeof templateLink==='string'){template=document.getElementById(templateLink);}else{template=templateLink;}
+if(template.innerHTML.indexOf('&gt;')>-1||template.innerHTML.indexOf('&lt;')>-1){console.warn('GS-DIALOG WARNING: &gt; or &lt; detected in dialog template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
 refocusElement=document.activeElement;if(!template.hasAttribute('no-focus-lock')){refocusElement.blur();}
 templateID=template.getAttribute('id');if(templateID&&document.getElementById('dialog-from-'+templateID)){console.warn('GS.openDialog Warning: A dialog using the ID "'+templateID+'" is already open.');}
 arrElements=xtag.query(template.content,'[autofocus]');if(arrElements.length===0){arrElements=xtag.query(template.content,'*');if(arrElements.length>0){for(i=0,len=arrElements.length;i<len;i+=1){strTag=arrElements[i].nodeName.toLowerCase();if(GS.isElementFocusable(arrElements[i])||(xtag.tags[strTag]&&xtag.tags[strTag].methods&&xtag.tags[strTag].methods.focus)){arrElements[i].setAttribute('autofocus','');break;}}}}else if(arrElements.length>1){for(i=1,len=arrElements.length;i<len;i+=1){arrElements[i].removeAttribute('autofocus');}
@@ -2911,7 +2920,10 @@ function elementInserted(element){var hudTemplateElement,tableTemplateElement,ta
 if(element.getAttribute('primary-keys')){arrWhereColumns=element.getAttribute('primary-keys').split(/\s*,\s*/gim);if(arrWhereColumns.length===0){arrWhereColumns=['id','change_stamp'];}}else{arrWhereColumns=['id','change_stamp'];}
 element.arrWhereColumns=arrWhereColumns;element.user_order_bys={'columns':[],'directions':[]};oldRootElement=xtag.queryChildren(element,'.root');if(oldRootElement.length>0){for(i=0,len=oldRootElement.length;i<len;i+=1){element.removeChild(oldRootElement[i]);}}
 hudTemplateElement=xtag.queryChildren(element,'template[for="hud"]')[0];tableTemplateElement=xtag.queryChildren(element,'template[for="table"]'+(element.hasAttribute('template')?'[id="'+element.getAttribute('template')+'"':''))[0];if(!tableTemplateElement&&element.hasAttribute('template')){console.warn('ENVELOPE WARNING: Hey! You used the name of a non-existant record template!');tableTemplateElement=xtag.queryChildren(element,'template[for="table"]')[0];}
-insertTemplateElement=xtag.queryChildren(element,'template[for="insert"]')[0];element.templates={};xtag.queryChildren(element,'template[for="table"]').forEach(function(cur,i){if(i===0){element.templates['default']=cur;}
+insertTemplateElement=xtag.queryChildren(element,'template[for="insert"]')[0];if(hudTemplateElement.innerHTML.indexOf('&gt;')>-1||hudTemplateElement.innerHTML.indexOf('&lt;')>-1){console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(tableTemplateElement.innerHTML.indexOf('&gt;')>-1||tableTemplateElement.innerHTML.indexOf('&lt;')>-1){console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(insertTemplateElement.innerHTML.indexOf('&gt;')>-1||insertTemplateElement.innerHTML.indexOf('&lt;')>-1){console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in insert template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+element.templates={};xtag.queryChildren(element,'template[for="table"]').forEach(function(cur,i){if(i===0){element.templates['default']=cur;}
 if(cur.hasAttribute('id')){element.templates[cur.getAttribute('id')]=cur;}});if(hudTemplateElement){element.hudTemplate=hudTemplateElement.innerHTML;}
 if(tableTemplateElement){tableTemplateElementCopy=document.createElement('template');tableTemplateElementCopy.innerHTML=tableTemplateElement.innerHTML;recordElement=xtag.query(xtag.query(tableTemplateElementCopy.content,'tbody')[0],'tr')[0];if(recordElement){for(i=0,len=element.arrWhereColumns.length;i<len;i+=1){recordElement.setAttribute('data-'+element.arrWhereColumns[i],'{{! row.'+element.arrWhereColumns[i]+' }}');}
 element.tableTemplate=GS.templateColumnToValue(tableTemplateElementCopy.innerHTML);}}else{throw'Envelope error: table template is required.';}
@@ -3215,7 +3227,7 @@ function addMessage(element,strMessageName){if(strMessageName==='saving'){if(ele
 element.savingMessage=document.createElement('div');element.savingMessage.classList.add('message');element.savingMessage.innerHTML='Saving...';element.appendChild(element.savingMessage);}else if(strMessageName==='waiting'){if(element.waitingMessage){removeMessage(element,'waiting');}
 element.waitingMessage=document.createElement('div');element.waitingMessage.classList.add('message');element.waitingMessage.innerHTML='Waiting<br />to save...';element.appendChild(element.waitingMessage);}}
 function removeMessage(element,strMessageName){if(strMessageName==='saving'&&element.savingMessage){element.removeChild(element.savingMessage);element.savingMessage=undefined;}else if(strMessageName==='waiting'&&element.waitingMessage){element.removeChild(element.waitingMessage);element.waitingMessage=undefined;}}
-function columnParentsUntilForm(form,element){var intColumnParents=0,currentElement=element,maxLoops=50,i=0;while(currentElement.parentNode!==form&&currentElement.parentNode&&i<maxLoops){if(currentElement.parentNode.hasAttribute('column')===true){intColumnParents+=1;}
+function columnParentsUntilForm(form,element){var intColumnParents=0,currentElement=element,maxLoops=50,i=0;while(currentElement.parentNode!==form&&currentElement.parentNode&&i<maxLoops){if(currentElement.parentNode.hasAttribute('column')===true||currentElement.parentNode.hasAttribute('src')===true){intColumnParents+=1;}
 currentElement=currentElement.parentNode;i+=1;}
 return intColumnParents;}
 function saveDefaultAttributes(element){var i;var len;var arrAttr;var jsnAttr;element.internal.defaultAttributes={};arrAttr=element.attributes;i=0;len=arrAttr.length;while(i<len){jsnAttr=arrAttr[i];element.internal.defaultAttributes[jsnAttr.nodeName]=(jsnAttr.nodeValue||'');i+=1;}}
@@ -3233,6 +3245,7 @@ if(!element.inserted){element.inserted=true;element.internal={};saveDefaultAttri
 firstChildElement=element.children[0],strQueryString=GS.getQueryString(),changeHandler;if(element.hasAttribute('save-while-typing')){GS.addBeforeUnloadEvent(function(){if(element.bolCurrentlySaving||element.saveTimerID){return'The page has not finished saving.';}});}else{GS.addBeforeUnloadEvent(function(){document.activeElement.blur();});}
 element.lockColumn=element.getAttribute('lock')||'change_stamp';if(firstChildElement.nodeName==='TEMPLATE'){element.templateHTML=firstChildElement.innerHTML;}else{console.warn('Warning: gs-form is now built to use a template element. '+'Please use a template element to contain the template for this form. '+'A fix has been included so that it is not necessary to use the template element, but that code may be removed at a future date.');element.templateHTML=element.innerHTML;}
 if(!element.templateHTML.trim()){throw'GS-FORM error: no template HTML.';}
+if(element.templateHTML.indexOf('&gt;')>-1||element.templateHTML.indexOf('&lt;')>-1){console.warn('GS-FORM WARNING: &gt; or &lt; detected in record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
 element.templateHTML=GS.templateColumnToValue(element.templateHTML);if(element.getAttribute('qs')||element.getAttribute('refresh-on-querystring-values')||element.hasAttribute('refresh-on-querystring-change')){element.popValues={};pushReplacePopHandler(element);window.addEventListener('pushstate',function(){pushReplacePopHandler(element);});window.addEventListener('replacestate',function(){pushReplacePopHandler(element);});window.addEventListener('popstate',function(){pushReplacePopHandler(element);});}else{getData(element);}
 element.addEventListener('keydown',function(event){var intKeyCode=event.which||event.keyCode,jsnSelection;if(document.activeElement.nodeName==='INPUT'||document.activeElement.nodeName==='TEXTAREA'){jsnSelection=GS.getInputSelection(event.target);}
 if((intKeyCode===37&&(!jsnSelection||jsnSelection.start===0))||(intKeyCode===39&&(!jsnSelection||jsnSelection.end===event.target.value.length))){var focusToElement,i,len,arrElementsFocusable,currentElement;if(intKeyCode===37&&(!jsnSelection||jsnSelection.start===0)){arrElementsFocusable=xtag.query(document,'input:not([disabled]), '+'select:not([disabled]), memo:not([disabled]), button:not([disabled]), '+'[tabindex]:not([disabled]), [column]');for(i=0,len=arrElementsFocusable.length;i<len;i++){currentElement=arrElementsFocusable[i];if(currentElement===event.target||((event.target.nodeName==='INPUT'||event.target.nodeName==='TEXTAREA')&&currentElement===event.target.parentNode)){if(i===0){focusToElement=currentElement;}else{focusToElement=arrElementsFocusable[i-1];}
@@ -3309,11 +3322,11 @@ return selectedElement;});addFlexContainerProps(selectedElement);};});document.a
                 if (this.border_line) {
                     this.removeChild(this.border_line);
                 }
-
+                
                 this.border_line = document.createElement('div');
                 this.border_line.classList.add('border-line');
                 this.border_line.setAttribute('gs-dynamic', '');
-
+                
                 this.appendChild(this.border_line);
             },
             removed: function () {
@@ -3527,127 +3540,36 @@ element.internal.bolQSFirstRun=true;}
 function elementCreated(element){if(!element.hasAttribute('suspend-created')){if(element.value&&!element.getAttribute('value')){element.setAttribute('value',element.value);delete element.value;}}}
 function elementInserted(element){var tableTemplateElement,arrElement,recordElement,tableTemplateElementCopy,strQSValue,i,len,currentElement;if(!element.hasAttribute('suspend-created')&&!element.hasAttribute('suspend-inserted')){if(!element.inserted){element.inserted=true;element.error=false;element.internal={};saveDefaultAttributes(element);if(element.hasAttribute('qs')||element.hasAttribute('refresh-on-querystring-values')||element.hasAttribute('refresh-on-querystring-change')){element.popValues={};pushReplacePopHandler(element);window.addEventListener('pushstate',function(){pushReplacePopHandler(element);});window.addEventListener('replacestate',function(){pushReplacePopHandler(element);});window.addEventListener('popstate',function(){pushReplacePopHandler(element);});}
 if(!element.hasAttribute('tabindex')){element.setAttribute('tabindex','0');}
-tableTemplateElement=xtag.queryChildren(element,'template')[0];if(tableTemplateElement){element.tableTemplate=GS.templateColumnToValue(tableTemplateElement.innerHTML);}
+tableTemplateElement=xtag.queryChildren(element,'template')[0];if(tableTemplateElement.innerHTML.indexOf('&gt;')>-1||tableTemplateElement.innerHTML.indexOf('&lt;')>-1){console.warn('GS-LISTBOX WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(tableTemplateElement){element.tableTemplate=GS.templateColumnToValue(tableTemplateElement.innerHTML);}
 if(element.getAttribute('src')||element.getAttribute('source')){getData(element,'',true);}else{if(tableTemplateElement){element.tableElement=xtag.query(tableTemplateElement.content,'table')[0];}else if(xtag.queryChildren(element,'table')[0]){element.tableElement=xtag.queryChildren(element,'table')[0];}else{element.tableElement=document.createElement('table');}
 element.syncView();}}}}
 xtag.register('gs-listbox',{lifecycle:{created:function(){elementCreated(this);},inserted:function(){elementInserted(this);},attributeChanged:function(strAttrName,oldValue,newValue){if(strAttrName==='suspend-created'&&newValue===null){elementCreated(this);elementInserted(this);}else if(strAttrName==='suspend-inserted'&&newValue===null){elementInserted(this);}else if(!this.hasAttribute('suspend-created')&&!this.hasAttribute('suspend-inserted')){if(strAttrName==='value'&&newValue!==oldValue){this.value=newValue;}}}},events:{},accessors:{value:{get:function(){return this.innerValue;},set:function(strNewValue){selectRecord(this,strNewValue);this.scrollToSelectedRecord();}},selectedRecord:{get:function(){return this.innerSelectedRecord;},set:function(newValue){selectRecord(this,newValue);this.scrollToSelectedRecord();}},textValue:{get:function(){if(this.innerSelectedRecord){return xtag.queryChildren(this.innerSelectedRecord,'td')[0].textContent;}
 return undefined;},set:function(){selectRecord(this,strNewValue);this.scrollToSelectedRecord();}}},methods:{refresh:function(callback){getData(this,callback);},scrollToSelectedRecord:function(){var selectedTr;if(this.tableElement){selectedTr=xtag.query(this.tableElement,'tr[selected]')[0];if(selectedTr){GS.scrollIntoView(selectedTr);}}
 /*var scrollingContainer, arrTrs, i, len, intScrollTop, bolFoundSelected = false;
-
+                
                 if (this.tableElement) {
                     scrollingContainer = this;
                     arrTrs = xtag.query(this.tableElement, 'tr');
-
+                    
                     for (i = 0, intScrollTop = 0, len = arrTrs.length; i < len; i += 1) {
                         if (arrTrs[i].hasAttribute('selected')) {
                             intScrollTop += arrTrs[i].offsetHeight / 2;
-
+                            
                             bolFoundSelected = true;
-
+                            
                             break;
                         } else {
                             intScrollTop += arrTrs[i].offsetHeight;
                         }
                     }
-
+                    
                     if (bolFoundSelected) {
                         intScrollTop = intScrollTop - scrollingContainer.offsetHeight / 2;
                     } else {
                         intScrollTop = 0;
                     }
-
-                    scrollingContainer.scrollTop = intScrollTop;
-                }*/},letterScrollbarHandler:function(){var element=this,i,len,intTextHeight,intLettersDropped,intSkipperHeight,intElementHeight,intDistance,strHTML,arrSkippers;if(xtag.queryChildren(element,'.letter-scrollbar-container').length===0){element.letterScrollbarContainer=document.createElement('div');element.letterScrollbarContainer.classList.add('letter-scrollbar-container');element.letterScrollbarContainer.setAttribute('gs-dynamic','');element.appendChild(element.letterScrollbarContainer);}else{element.letterScrollbarContainer.innerHTML='';}
-if(element.clientHeight<element.scrollContainer.scrollHeight){intTextHeight=GS.getTextHeight(element.letterScrollbarContainer);intSkipperHeight=intTextHeight*this.arrDividingPoints.length;intElementHeight=element.clientHeight/this.arrDividingPoints.length;if(intElementHeight<intTextHeight){intElementHeight=intTextHeight;}
-if(intSkipperHeight>element.clientHeight){intLettersDropped=0;while(intSkipperHeight>element.clientHeight&&intLettersDropped<100){intSkipperHeight-=intTextHeight;intLettersDropped+=1;}
-intDistance=Math.ceil(this.arrDividingPoints.length/intLettersDropped);}
-for(i=0,len=this.arrDividingPoints.length,strHTML='';i<len;i+=1){if(intLettersDropped===undefined||(intLettersDropped>0&&i%intDistance!==0)){strHTML+='<div class="skipper" gs-dynamic '+'style="height: '+intElementHeight+'px; line-height: '+intElementHeight+'px;" '+'data-target-offset="'+this.arrDividingPoints[i].offset+'">'+'<span gs-dynamic>'+this.arrDividingPoints[i].letter+'</span>'+'</div>';}}
-element.letterScrollbarContainer.innerHTML=strHTML;if(element.paddingElement&&element.paddingElement.parentNode===element.scrollContainer){element.scrollContainer.removeChild(element.paddingElement);}
-element.paddingElement=document.createElement('div');element.paddingElement.setAttribute('gs-dynamic','');if(this.arrDividingPoints.length>0){element.paddingElement.style.height=(element.clientHeight-
-(element.scrollContainer.scrollHeight-parseInt(this.arrDividingPoints[this.arrDividingPoints.length-1].offset,10)))+'px';}
-element.scrollContainer.appendChild(element.paddingElement);arrSkippers=element.letterScrollbarContainer.children;if(element.mousedownHandler){window.removeEventListener(evt.mousedown,element.mousedownHandler);window.removeEventListener(evt.mousemove,element.mousemoveHandler);window.removeEventListener(evt.mouseup,element.mouseupHandler);}
-element.clickHandler=function(){element.style.webkitOverflowScrolling='initial';element.scrollContainer.scrollTop=parseInt(this.getAttribute('data-target-offset'),10);element.style.webkitOverflowScrolling='touch';};element.mousedownHandler=function(event){window.addEventListener(evt.mousemove,element.mousemoveHandler);if(event.target.classList.contains('skipper')&&evt.touchDevice){element.style.webkitOverflowScrolling='initial';}};element.mousemoveHandler=function(event){var jsnMousePosition,targetElement;if(event.which!==0||evt.touchDevice){jsnMousePosition=GS.mousePosition(event);targetElement=document.elementFromPoint(jsnMousePosition.left,jsnMousePosition.top);if(targetElement){if(targetElement.nodeName==='SPAN'){targetElement=targetElement.parentNode;}
-if(targetElement.classList.contains('skipper')){element.style.webkitOverflowScrolling='initial';event.preventDefault();element.scrollContainer.scrollTop=parseInt(targetElement.getAttribute('data-target-offset'),10);}}}else{window.removeEventListener(evt.mousemove,element.mousemoveHandler);}};element.mouseupHandler=function(){element.style.webkitOverflowScrolling='touch';window.removeEventListener(evt.mousemove,element.mousemoveHandler);};element.addEventListener(evt.mousedown,element.mousedownHandler);element.addEventListener(evt.mouseup,element.mouseupHandler);for(i=0,len=arrSkippers.length;i<len;i+=1){arrSkippers[i].addEventListener('click',element.clickHandler);}}},refreshDividingPoints:function(){var tbodyElement,arrElement,arrLetter,dividerElement,strLetter,intOffset,numColumns,theadElement,i,len;tbodyElement=xtag.queryChildren(this.tableElement,'tbody')[0];arrElement=xtag.queryChildren(tbodyElement,'tr.divider');for(i=0,len=arrElement.length;i<len;i+=1){tbodyElement.removeChild(arrElement[i]);}
-this.arrDividingPoints=[];arrElement=xtag.queryChildren(tbodyElement,'tr');if(arrElement.length>0){numColumns=arrElement[0].children.length;theadElement=xtag.queryChildren(this.tableElement,'thead')[0];intOffset=(theadElement?theadElement.offsetHeight:0);for(i=0,len=arrElement.length,arrLetter=[];i<len;i+=1){strLetter=xtag.queryChildren(arrElement[i],'td')[0].textContent.substring(0,1).toUpperCase();if(arrLetter.indexOf(strLetter)===-1){this.arrDividingPoints.push({'letter':strLetter,'offset':intOffset});if(this.hasAttribute('letter-dividers')){dividerElement=document.createElement('tr');dividerElement.classList.add('divider');dividerElement.setAttribute('gs-dynamic','');dividerElement.setAttribute('data-target-offset',intOffset);dividerElement.innerHTML='<td colspan="'+numColumns+'" gs-dynamic>'+encodeHTML(strLetter)+'</td>';tbodyElement.insertBefore(dividerElement,arrElement[i]);intOffset+=dividerElement.offsetHeight;}
-arrLetter.push(strLetter);}
-intOffset+=arrElement[i].offsetHeight;}}},syncView:function(){var element=this,tbodyElement,i,len,arrElements,clickHandler,mousedownHandler,mouseoutHandler,mouseoverHandler;element.removeEventListener('keydown',handleKeyDown);element.addEventListener('keydown',handleKeyDown);element.removeEventListener('focusout',handleFocusout);element.addEventListener('focusout',handleFocusout);element.innerHTML='';element.scrollContainer=document.createElement('div');element.scrollContainer.setAttribute('gs-dynamic','');element.scrollContainer.classList.add('root');element.scrollContainer.classList.add('scroll-container');element.scrollContainer.appendChild(element.tableElement);element.appendChild(element.scrollContainer);tbodyElement=xtag.queryChildren(element.tableElement,'tbody')[0];if(element.hasAttribute('letter-dividers')||element.hasAttribute('letter-scrollbar')){element.refreshDividingPoints();if(element.hasAttribute('letter-scrollbar')){element.letterScrollbarHandler();}}
-if(this.getAttribute('value')){selectRecord(this,this.getAttribute('value'));this.scrollToSelectedRecord();}
-arrElements=xtag.toArray(tbodyElement.children);clickHandler=function(event){this.classList.remove('down');selectRecord(element,this,true);};for(i=0,len=arrElements.length;i<len;i+=1){if(!arrElements[i].classList.contains('divider')){arrElements[i].addEventListener('click',clickHandler);}}
-if(!evt.touchDevice){mousedownHandler=function(){this.classList.add('down');};mouseoutHandler=function(){this.classList.remove('down');this.classList.remove('hover');};mouseoverHandler=function(){this.classList.remove('down');this.classList.add('hover');};for(i=0,len=arrElements.length;i<len;i+=1){if(!arrElements[i].classList.contains('divider')){arrElements[i].addEventListener(evt.mousedown,mousedownHandler);arrElements[i].addEventListener(evt.mouseout,mouseoutHandler);arrElements[i].addEventListener(evt.mouseover,mouseoverHandler);}}}},triggerChange:function(){xtag.fireEvent(this,'change',{bubbles:true,cancelable:true});}}});});window.addEventListener('design-register-element',function(){registerDesignSnippet('Static Template <gs-listbox>','<gs-listbox>','gs-listbox>\n'+'    <template>\n'+'        <table>\n'+'            <tbody>\n'+'                <tr value="${1}">\n'+'                    <td>${0}</td>\n'+'                </tr>\n'+'            </tbody>\n'+'        </table>\n'+'    </template>\n'+'</gs-listbox>');registerDesignSnippet('Custom Template <gs-listbox>','<gs-listbox>','gs-listbox src="${1:test.tpeople}">\n'+'    <template>\n'+'        <table>\n'+'            <tbody>\n'+'                <tr value="{{! row.id }}">\n'+'                    <td>{{! row.${3:name} }}</td>\n'+'                </tr>\n'+'            </tbody>\n'+'        </table>\n'+'    </template>\n'+'</gs-listbox>');registerDesignSnippet('Dynamic Template <gs-listbox>','<gs-listbox>','gs-listbox src="${1:test.tpeople}"></gs-listbox>');registerDesignSnippet('<gs-listbox>','<gs-listbox>','gs-listbox src="${1:test.tpeople}"></gs-listbox>');designRegisterElement('gs-listbox','/env/app/developer_g/greyspots-'+GS.version()+'/documentation/doc-elem-listbox.html');window.designElementProperty_GSLISTBOX=function(selectedElement){addProp('Source',true,'<gs-memo class="target" value="'+encodeHTML(decodeURIComponent(selectedElement.getAttribute('src')||selectedElement.getAttribute('source')||''))+'" mini></gs-memo>',function(){return setOrRemoveTextAttribute(selectedElement,'src',encodeURIComponent(this.value));});addProp('Columns',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('cols')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'cols',this.value);});addProp('Hide Columns',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('hide')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'hide',this.value);});addProp('Where',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('where')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'where',this.value);});addProp('Order By',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('ord')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'ord',this.value);});addProp('Limit',true,'<gs-number class="target" value="'+encodeHTML(selectedElement.getAttribute('limit')||'')+'" mini></gs-number>',function(){return setOrRemoveTextAttribute(selectedElement,'limit',this.value);});addProp('Offset',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('offset')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'offset',this.value);});addProp('Column',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('column')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'column',this.value);});addProp('Value',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('value')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'value',this.value);});addProp('Column In Querystring',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('qs')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'qs',this.value,false);});addProp('Title',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('title')||'')+'" mini></gs-text>',function(){return setOrRemoveTextAttribute(selectedElement,'title',this.value);});addProp('Tabindex',true,'<gs-number class="target" value="'+encodeHTML(selectedElement.getAttribute('tabindex')||'')+'" mini></gs-number>',function(){return setOrRemoveTextAttribute(selectedElement,'tabindex',this.value);});addProp('suspend-created',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('suspend-created')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'suspend-created',this.value==='true',true);});addProp('suspend-inserted',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('suspend-inserted')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'suspend-inserted',this.value==='true',true);});var strVisibilityAttribute='';if(selectedElement.hasAttribute('hidden')){strVisibilityAttribute='hidden';}
-if(selectedElement.hasAttribute('hide-on-desktop')){strVisibilityAttribute='hide-on-desktop';}
-if(selectedElement.hasAttribute('hide-on-tablet')){strVisibilityAttribute='hide-on-tablet';}
-if(selectedElement.hasAttribute('hide-on-phone')){strVisibilityAttribute='hide-on-phone';}
-if(selectedElement.hasAttribute('show-on-desktop')){strVisibilityAttribute='show-on-desktop';}
-if(selectedElement.hasAttribute('show-on-tablet')){strVisibilityAttribute='show-on-tablet';}
-if(selectedElement.hasAttribute('show-on-phone')){strVisibilityAttribute='show-on-phone';}
-addProp('Visibility',true,'<gs-select class="target" value="'+strVisibilityAttribute+'" mini>'+'<option value="">Visible</option>'+'<option value="hidden">Invisible</option>'+'<option value="hide-on-desktop">Invisible at desktop size</option>'+'<option value="hide-on-tablet">Invisible at tablet size</option>'+'<option value="hide-on-phone">Invisible at phone size</option>'+'<option value="show-on-desktop">Visible at desktop size</option>'+'<option value="show-on-tablet">Visible at tablet size</option>'+'<option value="show-on-phone">Visible at phone size</option>'+'</gs-select>',function(){selectedElement.removeAttribute('hidden');selectedElement.removeAttribute('hide-on-desktop');selectedElement.removeAttribute('hide-on-tablet');selectedElement.removeAttribute('hide-on-phone');selectedElement.removeAttribute('show-on-desktop');selectedElement.removeAttribute('show-on-tablet');selectedElement.removeAttribute('show-on-phone');if(this.value){selectedElement.setAttribute(this.value,'');}
-return selectedElement;});addProp('Disabled',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('disabled')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'disabled',this.value==='true',true);});addProp('Dissallow&nbsp;Select',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('no-select')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'no-select',this.value==='true',true);});addProp('Letter&nbsp;Scrollbar',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('letter-scrollbar')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'letter-scrollbar',this.value==='true',true);});addProp('Letter Dividers',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('letter-dividers')||'')+'" mini></gs-checkbox>',function(){return setOrRemoveBooleanAttribute(selectedElement,'letter-dividers',this.value==='true',true);});addProp('Refresh On Querystring Columns',true,'<gs-text class="target" value="'+encodeHTML(selectedElement.getAttribute('refresh-on-querystring-values')||'')+'" mini></gs-text>',function(){this.removeAttribute('refresh-on-querystring-change');return setOrRemoveTextAttribute(selectedElement,'refresh-on-querystring-values',this.value);});addProp('Refresh On Querystring Change',true,'<gs-checkbox class="target" value="'+(selectedElement.hasAttribute('refresh-on-querystring-change'))+'" mini></gs-checkbox>',function(){this.removeAttribute('refresh-on-querystring-values');return setOrRemoveBooleanAttribute(selectedElement,'refresh-on-querystring-change',this.value==='true',true);});addFlexProps(selectedElement);};});document.addEventListener('DOMContentLoaded',function(){'use strict';function highlightRecord(element,record){var i,len,arrSelectedTrs;if(element.tableElement&&xtag.queryChildren(element.tableElement,'tbody')[0]){arrSelectedTrs=xtag.queryChildren(xtag.queryChildren(element.tableElement,'tbody')[0],'tr[selected]');for(i=0,len=arrSelectedTrs.length;i<len;i+=1){arrSelectedTrs[i].removeAttribute('selected');}}
-if(record){record.setAttribute('selected','');}}
-function findRecordFromValue(element,searchValue){var i,len,matchedRecord,arrTrs,strSearchString;if(element.tableElement&&xtag.queryChildren(element.tableElement,'tbody')[0]){arrTrs=xtag.queryChildren(xtag.queryChildren(element.tableElement,'tbody')[0],'tr');strSearchString=String(searchValue);for(i=0,len=arrTrs.length;i<len;i+=1){if(arrTrs[i].getAttribute('value')===strSearchString||xtag.queryChildren(arrTrs[i],'td')[0].textContent===strSearchString){matchedRecord=arrTrs[i];break;}}}
-return matchedRecord;}
-function selectRecord(element,handle,bolChange){var record,strRecordValue,strFirstTdText;if(!element.hasAttribute('no-select')){if(typeof handle==='string'||typeof handle==='number'){record=findRecordFromValue(element,handle);}else{record=handle;}
-if(!record&&handle!==''){console.warn('Listbox warning: record not found'+(typeof handle==='string'?': "'+handle+'"':''));}else if(record){strRecordValue=record.getAttribute('value');strFirstTdText=xtag.queryChildren(record,'td')[0].textContent;if(element.value!==(strRecordValue||strFirstTdText)){element.innerValue=strRecordValue||strFirstTdText;element.innerSelectedRecord=record;if(bolChange){element.hackToPreventScroll=true;if(element.innerValue!==element.getAttribute('value')){element.setAttribute('value',element.innerValue);}
-element.hackToPreventScroll=false;element.triggerChange();}}}
-highlightRecord(element,record);}}
-function handleKeyDown(event){var element=event.target,intKeyCode=event.keyCode||event.which,selectedTr,trs,i,len,selectedRecordIndex;if(!element.hasAttribute('disabled')){if(!element.hasAttribute('no-select')){if((intKeyCode===40||intKeyCode===38)&&!event.shiftKey&&!event.metaKey&&!event.ctrlKey&&!element.error){trs=xtag.queryChildren(xtag.queryChildren(element.tableElement,'tbody')[0],'tr:not(.divider)');for(i=0,len=trs.length;i<len;i+=1){if(trs[i].hasAttribute('selected')){selectedRecordIndex=i;selectedTr=trs[i];trs[i].removeAttribute('selected');break;}}
-if(intKeyCode===40){if(!selectedTr||selectedRecordIndex===trs.length-1){highlightRecord(element,trs[0]);selectedTr=trs[0];}else{highlightRecord(element,trs[selectedRecordIndex+1]);selectedTr=trs[selectedRecordIndex+1];}}else if(intKeyCode===38){if(!selectedTr||selectedRecordIndex===0){highlightRecord(element,trs[trs.length-1]);selectedTr=trs[trs.length-1];}else{highlightRecord(element,trs[selectedRecordIndex-1]);selectedTr=trs[selectedRecordIndex-1];}}
-element.scrollToSelectedRecord();event.preventDefault();event.stopPropagation();}else if(event.keyCode===13){selectedTr=xtag.queryChildren(xtag.queryChildren(element.tableElement,'tbody')[0],'tr[selected]')[0];if(element.tableElement&&selectedTr){selectRecord(element,selectedTr,true);}}}}else{if(event.keyCode!==9){event.preventDefault();event.stopPropagation();}}}
-function handleFocusout(event){var element=event.target,selectedTr;if(element.tableElement){selectedTr=xtag.queryChildren(xtag.queryChildren(element.tableElement,'tbody')[0],'tr[selected]')[0];if(selectedTr){selectRecord(element,selectedTr,true);}}}
-function getData(element,callback,bolInitalLoad,bolClearPrevious){var strSrc=GS.templateWithQuerystring((bolInitalLoad&&element.getAttribute('initialize')?element.getAttribute('initialize'):element.getAttribute('src'))),srcParts=strSrc[0]==='('?[strSrc,'']:strSrc.split('.'),strSchema=srcParts[0],strObject=srcParts[1],strColumns=GS.templateWithQuerystring(element.getAttribute('cols')||'*').split(',').join('\t'),strWhere=GS.templateWithQuerystring(element.getAttribute('where')||''),strOrd=GS.templateWithQuerystring(element.getAttribute('ord')||''),strLimit=GS.templateWithQuerystring(element.getAttribute('limit')||''),strOffset=GS.templateWithQuerystring(element.getAttribute('offset')||''),response_i=0,response_len=0,arrTotalRecords=[];GS.addLoader(element,'Loading...');GS.requestSelectFromSocket(GS.envSocket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,function(data,error){var arrRecords,arrCells,envData,i,len,cell_i,cell_len;if(!error){if(data.strMessage!=='TRANSACTION COMPLETED'){arrRecords=GS.trim(data.strMessage,'\n').split('\n');for(i=0,len=arrRecords.length;i<len;i+=1){arrCells=arrRecords[i].split('\t');for(cell_i=0,cell_len=arrCells.length;cell_i<cell_len;cell_i+=1){arrCells[cell_i]=arrCells[cell_i]==='\\N'?null:GS.decodeFromTabDelimited(arrCells[cell_i]);}
-arrTotalRecords.push(arrCells);}}else{GS.removeLoader(element);element.arrColumnNames=data.arrColumnNames;envData={'arr_column':element.arrColumnNames,'dat':arrTotalRecords};handleData(element,bolInitalLoad,envData);GS.triggerEvent(element,'after_select');if(typeof callback==='function'){callback();}}}else{handleData(element,bolInitalLoad,data,error);GS.removeLoader(element);}});}
-function handleData(element,bolInitalLoad,data,error){var strTemplate,divElement,tableElement,theadElement,theadCellElements,tbodyElement,tbodyCellElements,lastRecordElement,recordElements,recordElement,currentCellLabelElement,template,i,len,arrHeaders=[],arrHide,intVisibleColumns,strHeaderCells,strRecordCells,jsnTemplate,strHTML;element.classList.remove('error');element.setAttribute('title','');if(!error){element.error=false;if(element.tableTemplate){strTemplate=element.tableTemplate;}else{arrHide=(element.getAttribute('hide')||'').split(/[\s]*,[\s]*/);for(i=0,len=data.arr_column.length,strHeaderCells='',strRecordCells='',intVisibleColumns=0;i<len;i+=1){if(arrHide.indexOf((i+1)+'')===-1&&arrHide.indexOf(data.arr_column[i])===-1){strHeaderCells+='<th gs-dynamic>'+encodeHTML(data.arr_column[i])+'</th> ';strRecordCells+='<td gs-dynamic>{{! row[\''+data.arr_column[i]+'\'] }}</td> ';intVisibleColumns+=1;}}
-strTemplate='<table gs-dynamic>';if(intVisibleColumns>1){strTemplate+='<thead gs-dynamic>'+'<tr gs-dynamic>'+
-strHeaderCells+'</tr>'+'</thead>';}
-strTemplate+='<tbody gs-dynamic>'+'<tr value="{{! row[\''+data.arr_column[0]+'\'] }}" gs-dynamic>'+
-strRecordCells+'</tr>'+'</tbody>'+'<table>';}
-divElement=document.createElement('div');divElement.innerHTML=strTemplate;tableElement=xtag.queryChildren(divElement,'table')[0];theadElement=xtag.queryChildren(tableElement,'thead')[0];tbodyElement=xtag.queryChildren(tableElement,'tbody')[0];if(tbodyElement){recordElement=xtag.queryChildren(tbodyElement,'tr')[0];if(recordElement){if(theadElement){theadCellElements=xtag.query(theadElement,'td, th');tbodyCellElements=xtag.query(tbodyElement,'td, th');for(i=0,len=theadCellElements.length;i<len;i+=1){currentCellLabelElement=document.createElement('b');currentCellLabelElement.classList.add('cell-label');currentCellLabelElement.setAttribute('data-text',(theadCellElements[i].textContent||'')+':');if(tbodyCellElements[i].childNodes){tbodyCellElements[i].insertBefore(currentCellLabelElement,tbodyCellElements[i].childNodes[0]);}else{tbodyCellElements[i].insertChild(currentCellLabelElement);}}}
-jsnTemplate=GS.templateHideSubTemplates(tbodyElement.innerHTML,true);strHTML=GS.templateWithEnvelopeData(jsnTemplate.templateHTML,data);tbodyElement.innerHTML=GS.templateShowSubTemplates(strHTML,jsnTemplate);element.tableElement=tableElement;element.syncView();}}
-if(bolInitalLoad&&!element.getAttribute('value')&&element.hasAttribute('select-first')){selectRecord(element,xtag.query(element,'tbody tr')[0].getAttribute('value'),false);element.scrollToSelectedRecord();}}else{element.error=true;element.classList.add('error');element.setAttribute('title','This listbox has failed to load.');element.setAttribute('disabled','');GS.ajaxErrorDialog(data);}}
-function getParentCell(element){var currentElement=element;while(currentElement.nodeName!=='TD'&&currentElement.nodeName!=='TH'&&currentElement.nodeName!=='HTML'){currentElement=currentElement.parentNode;}
-if(currentElement.nodeName!=='TD'&&currentElement.nodeName!=='TH'){return undefined;}
-return currentElement;}
-function windowResizeHandler(){var i,len,arrElement;arrElement=document.getElementsByTagName('gs-listbox');for(i=0,len=arrElement.length;i<len;i+=1){if(GS.pxToEm(document.body,this.oldWidth)!==GS.pxToEm(document.body,this.offsetWidth)&&arrElement[i].hasAttribute('letter-scrollbar')&&arrElement[i].tableElement){if(arrElement[i].hasAttribute('letter-dividers')||arrElement[i].hasAttribute('letter-scrollbar')){arrElement[i].refreshDividingPoints();}
-arrElement[i].letterScrollbarHandler();this.oldWidth=this.offsetWidth;}}}
-window.addEventListener('resize',windowResizeHandler);window.addEventListener('orientationchange',windowResizeHandler);function saveDefaultAttributes(element){var i;var len;var arrAttr;var jsnAttr;element.internal.defaultAttributes={};i=0;len=element.attributes.length;arrAttr=element.attributes;while(i<len){jsnAttr=element.attributes[i];element.internal.defaultAttributes[jsnAttr.nodeName]=(jsnAttr.nodeValue||'');i+=1;}}
-function pushReplacePopHandler(element){var i;var len;var strQS=GS.getQueryString();var strQSCol=element.getAttribute('qs');var strQSValue;var strQSAttr;var arrQSParts;var arrAttrParts;var arrPopKeys;var currentValue;var bolRefresh;var strOperator;if(strQSCol){if(strQSCol.indexOf('=')!==-1){arrAttrParts=strQSCol.split(',');i=0;len=arrAttrParts.length;while(i<len){strQSCol=arrAttrParts[i];if(strQSCol.indexOf('!=')!==-1){strOperator='!=';arrQSParts=strQSCol.split('!=');}else{strOperator='=';arrQSParts=strQSCol.split('=');}
-strQSCol=arrQSParts[0];strQSAttr=arrQSParts[1]||arrQSParts[0];if(strOperator==='!='){if(GS.qryGetKeys(strQS).indexOf(strQSCol)===-1){element.setAttribute(strQSAttr,'');}else{element.removeAttribute(strQSAttr);}}else{if(GS.qryGetKeys(strQS).indexOf(strQSCol)===-1){if(element.internal.defaultAttributes[strQSAttr]!==undefined){element.setAttribute(strQSAttr,(element.internal.defaultAttributes[strQSAttr]||''));}else{element.removeAttribute(strQSAttr);}}else{element.setAttribute(strQSAttr,(GS.qryGetVal(strQS,strQSCol)||element.internal.defaultAttributes[strQSAttr]||''));}}
-i+=1;}}else if(GS.qryGetKeys(strQS).indexOf(strQSCol)>-1){strQSValue=GS.qryGetVal(strQS,strQSCol);if(element.internal.bolQSFirstRun!==true){if(strQSValue!==''||!element.getAttribute('value')){element.setAttribute('value',strQSValue);}}else if(element.value!==strQSValue){element.value=strQSValue;}}}
-if(element.internal.bolQSFirstRun===true){if(element.hasAttribute('refresh-on-querystring-values')){arrPopKeys=element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);for(i=0,len=arrPopKeys.length;i<len;i+=1){currentValue=GS.qryGetVal(strQS,arrPopKeys[i]);if(element.popValues[arrPopKeys[i]]!==currentValue){bolRefresh=true;}
-element.popValues[arrPopKeys[i]]=currentValue;}}else if(element.hasAttribute('refresh-on-querystring-change')){bolRefresh=true;}
-if(bolRefresh&&element.hasAttribute('src')){getData(element);}else if(bolRefresh&&!element.hasAttribute('src')){console.warn('gs-combo Warning: element has "refresh-on-querystring-values" or "refresh-on-querystring-change", but no "src".',element);}}else{if(element.hasAttribute('refresh-on-querystring-values')){arrPopKeys=element.getAttribute('refresh-on-querystring-values').split(/\s*,\s*/gim);for(i=0,len=arrPopKeys.length;i<len;i+=1){element.popValues[arrPopKeys[i]]=GS.qryGetVal(strQS,arrPopKeys[i]);}}}
-element.internal.bolQSFirstRun=true;}
-function elementCreated(element){if(!element.hasAttribute('suspend-created')){if(element.value&&!element.getAttribute('value')){element.setAttribute('value',element.value);delete element.value;}}}
-function elementInserted(element){var tableTemplateElement,arrElement,recordElement,tableTemplateElementCopy,strQSValue,i,len,currentElement;if(!element.hasAttribute('suspend-created')&&!element.hasAttribute('suspend-inserted')){if(!element.inserted){element.inserted=true;element.error=false;element.internal={};saveDefaultAttributes(element);if(element.hasAttribute('qs')||element.hasAttribute('refresh-on-querystring-values')||element.hasAttribute('refresh-on-querystring-change')){element.popValues={};pushReplacePopHandler(element);window.addEventListener('pushstate',function(){pushReplacePopHandler(element);});window.addEventListener('replacestate',function(){pushReplacePopHandler(element);});window.addEventListener('popstate',function(){pushReplacePopHandler(element);});}
-if(!element.hasAttribute('tabindex')){element.setAttribute('tabindex','0');}
-tableTemplateElement=xtag.queryChildren(element,'template')[0];if(tableTemplateElement){element.tableTemplate=GS.templateColumnToValue(tableTemplateElement.innerHTML);}
-if(element.getAttribute('src')||element.getAttribute('source')){getData(element,'',true);}else{if(tableTemplateElement){element.tableElement=xtag.query(tableTemplateElement.content,'table')[0];}else if(xtag.queryChildren(element,'table')[0]){element.tableElement=xtag.queryChildren(element,'table')[0];}else{element.tableElement=document.createElement('table');}
-element.syncView();}}}}
-xtag.register('gs-listbox',{lifecycle:{created:function(){elementCreated(this);},inserted:function(){elementInserted(this);},attributeChanged:function(strAttrName,oldValue,newValue){if(strAttrName==='suspend-created'&&newValue===null){elementCreated(this);elementInserted(this);}else if(strAttrName==='suspend-inserted'&&newValue===null){elementInserted(this);}else if(!this.hasAttribute('suspend-created')&&!this.hasAttribute('suspend-inserted')){if(strAttrName==='value'&&newValue!==oldValue){this.value=newValue;}}}},events:{},accessors:{value:{get:function(){return this.innerValue;},set:function(strNewValue){selectRecord(this,strNewValue);this.scrollToSelectedRecord();}},selectedRecord:{get:function(){return this.innerSelectedRecord;},set:function(newValue){selectRecord(this,newValue);this.scrollToSelectedRecord();}},textValue:{get:function(){if(this.innerSelectedRecord){return xtag.queryChildren(this.innerSelectedRecord,'td')[0].textContent;}
-return undefined;},set:function(){selectRecord(this,strNewValue);this.scrollToSelectedRecord();}}},methods:{refresh:function(callback){getData(this,callback);},scrollToSelectedRecord:function(){var selectedTr;if(this.tableElement){selectedTr=xtag.query(this.tableElement,'tr[selected]')[0];if(selectedTr){GS.scrollIntoView(selectedTr);}}
-/*var scrollingContainer, arrTrs, i, len, intScrollTop, bolFoundSelected = false;
-
-                if (this.tableElement) {
-                    scrollingContainer = this;
-                    arrTrs = xtag.query(this.tableElement, 'tr');
-
-                    for (i = 0, intScrollTop = 0, len = arrTrs.length; i < len; i += 1) {
-                        if (arrTrs[i].hasAttribute('selected')) {
-                            intScrollTop += arrTrs[i].offsetHeight / 2;
-
-                            bolFoundSelected = true;
-
-                            break;
-                        } else {
-                            intScrollTop += arrTrs[i].offsetHeight;
-                        }
-                    }
-
-                    if (bolFoundSelected) {
-                        intScrollTop = intScrollTop - scrollingContainer.offsetHeight / 2;
-                    } else {
-                        intScrollTop = 0;
-                    }
-
+                    
                     scrollingContainer.scrollTop = intScrollTop;
                 }*/},letterScrollbarHandler:function(){var element=this,i,len,intTextHeight,intLettersDropped,intSkipperHeight,intElementHeight,intDistance,strHTML,arrSkippers;if(xtag.queryChildren(element,'.letter-scrollbar-container').length===0){element.letterScrollbarContainer=document.createElement('div');element.letterScrollbarContainer.classList.add('letter-scrollbar-container');element.letterScrollbarContainer.setAttribute('gs-dynamic','');element.appendChild(element.letterScrollbarContainer);}else{element.letterScrollbarContainer.innerHTML='';}
 if(element.clientHeight<element.scrollContainer.scrollHeight){intTextHeight=GS.getTextHeight(element.letterScrollbarContainer);intSkipperHeight=intTextHeight*this.arrDividingPoints.length;intElementHeight=element.clientHeight/this.arrDividingPoints.length;if(intElementHeight<intTextHeight){intElementHeight=intTextHeight;}
@@ -3706,7 +3628,7 @@ this.syncView();}},textValue:{get:function(){if(this.control){return this.contro
                     this.appendChild(multiLineTemplate.cloneNode(true));
                     // set a variable with the control element for convenience and speed
                     this.control = xtag.queryChildren(this, '.control')[0];
-
+                    
                     this.control.lastWidth = this.control.clientWidth;
                     this.control.lastHeight = this.control.clientHeight;
                 }
@@ -3841,12 +3763,12 @@ return selectedElement;});addProp('Disabled',true,'<gs-checkbox class="target" v
         addProp('Hidden Value:', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
         });
-
+        
         // TITLE attribute
         addProp('Title', true, '<gs-text class="target" value="' + (selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
             return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
         });
-
+        
         addFlexContainerProps(selectedElement);
         //addFlexProps(selectedElement);
     };*/});document.addEventListener('DOMContentLoaded',function(){'use strict';function highlightOption(element,option){var i,len,arrSelectedOptions,arrTempSelectedOptions;arrSelectedOptions=xtag.query(element,'gs-option[selected]');arrTempSelectedOptions=xtag.query(element,'gs-option[tempselect]');for(i=0,len=arrSelectedOptions.length;i<len;i+=1){arrSelectedOptions[i].removeAttribute('selected');}
@@ -4082,7 +4004,8 @@ function elementInserted(element){if(!element.hasAttribute('suspend-created')&&!
 element.inserted=true;element.internal={};saveDefaultAttributes(element);var arrTemplate=xtag.queryChildren(element,'template');var i;var len;var attr_i;var attr_len;var arrAttrNames;var arrAttrValues;var strAttrName;var root;var template;var arrPopKeys;var strQueryString;var strQSCol;element.attributesFromTemplate=[];element.templates={};i=0;len=arrTemplate.length;while(i<len){if(i===0){element.firstTemplate=arrTemplate[i].getAttribute('for')||arrTemplate[i].getAttribute('id');}
 arrAttrNames=[];arrAttrValues=[];attr_i=0;attr_len=arrTemplate[i].attributes.length;while(attr_i<attr_len){strAttrName=arrTemplate[i].attributes[attr_i].nodeName;if(strAttrName!=='for'&&strAttrName!=='id'){arrAttrNames.push(strAttrName);arrAttrValues.push(arrTemplate[i].attributes[attr_i].value);}
 attr_i+=1;}
-template=arrTemplate[i];element.templates[template.getAttribute('for')||template.getAttribute('id')]={'content':template.innerHTML,'arrAttrNames':arrAttrNames,'arrAttrValues':arrAttrValues,'templated':!(element.hasAttribute('static')||template.hasAttribute('static'))};i+=1;}
+template=arrTemplate[i];element.templates[template.getAttribute('for')||template.getAttribute('id')]={'content':template.innerHTML,'arrAttrNames':arrAttrNames,'arrAttrValues':arrAttrValues,'templated':!(element.hasAttribute('static')||template.hasAttribute('static'))};if(!(element.hasAttribute('static')||template.hasAttribute('static'))&&(element.templates[template.getAttribute('for')||template.getAttribute('id')].content.indexOf('&gt;')>-1||element.templates[template.getAttribute('for')||template.getAttribute('id')].content.indexOf('&lt;')>-1)){console.warn('GS-SWITCH WARNING: &gt; or &lt; detected in "'+(template.getAttribute('for')||template.getAttribute('id'))+'" template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+i+=1;}
 element.innerHTML='';element.arrQueryStringAttributes=[];element.popValues={};if((element.hasAttribute('template')&&element.getAttribute('template').indexOf('{{')>-1)||element.hasAttribute('qs')||element.hasAttribute('refresh-on-querystring-values')||element.hasAttribute('refresh-on-querystring-change')){pushReplacePopHandler(element);window.addEventListener('pushstate',function(){pushReplacePopHandler(element);});window.addEventListener('replacestate',function(){pushReplacePopHandler(element);});window.addEventListener('popstate',function(){pushReplacePopHandler(element);});}
 element.refresh();}}}
 xtag.register('gs-switch',{lifecycle:{created:function(){elementCreated(this);},inserted:function(){elementInserted(this);},attributeChanged:function(strAttrName,oldValue,newValue){var element=this;if(strAttrName==='suspend-created'&&newValue===null){elementCreated(element);elementInserted(element);}else if(strAttrName==='suspend-inserted'&&newValue===null){elementInserted(element);}else if(!element.hasAttribute('suspend-created')&&!element.hasAttribute('suspend-inserted')){if(strAttrName==='value'){element.setAttribute('template',newValue);console.warn('gs-switch Warning: "value" attribute is deprecated. Please use the "template" attribute to replace the "value" attribute.',element);}else if(strAttrName==='template'&&element.inserted===true){element.refresh();}}}},events:{},accessors:{value:{get:function(){var element=this;console.warn('gs-switch Warning: \'.value\' accessor is deprecated. Please use the \'.template\' accessor to replace the \'.value\' accessor.',element);return element.getAttribute('template');},set:function(newValue){var element=this;console.warn('gs-switch Warning: \'.value\' accessor is deprecated. Please use the \'.template\' accessor to replace the \'.value\' accessor.',element);element.setAttribute('template',newValue);}},template:{get:function(){return this.getAttribute('template');},set:function(newValue){this.setAttribute('template',newValue);}}},methods:{refresh:function(){var element=this;var strQueryString=GS.getQueryString();var strQSAttribute=element.getAttribute('qs');var strValueAttribute=element.getAttribute('template')||element.getAttribute('value');var templateName;var i;var len;if(strQSAttribute&&GS.qryGetVal(strQueryString,strQSAttribute)){templateName=GS.qryGetVal(strQueryString,strQSAttribute);}else if(strValueAttribute){templateName=GS.templateWithQuerystring(strValueAttribute);}
@@ -4529,7 +4452,15 @@ element.setAttribute('null-string',(element.getAttribute('null-string')||''));}
 function prepareElement(element){var rootElement;var i;if(!element.getAttribute('id')){globalIDSeq+=1;i=0;while(i<500&&document.getElementById('table-dynamic-id-'+globalIDSeq)){globalIDSeq+=1;i+=1;}
 element.setAttribute('id','table-dynamic-id-'+globalIDSeq);console.warn('GS-TABLE Warning: All gs-table elements must have'+' an ID. Adding dynamic ID:'+' "table-dynamic-id-'+globalIDSeq+'". Do not use'+' this ID for anything. Do not use it for HTML, CSS or'+' JS or anything else as it can change between page'+' loads.');}
 rootElement=document.createElement('div');rootElement.classList.add('table-root');element.appendChild(rootElement);rootElement.innerHTML='<div class="table-hud-container hud-top"></div>'+'<div class="table-table-container">'+'    <div class="table-data-container">'+'        <div class="table-data-viewport"></div>'+'    </div>'+'    <div class="table-v-scroll-bar-container">'+'        <div class="table-v-scroll-bar">'+'            <div class="table-scroll-causer"></div>'+'        </div>'+'    </div>'+'    <div class="table-h-scroll-bar-container">'+'        <div class="table-h-scroll-bar">'+'            <div class="table-scroll-causer"></div>'+'        </div>'+'    </div>'+'</div>'+'<textarea class="hidden-focus-control"'+'    value="text makes this textarea Firefox worthy">'+'</textarea>'+'<div class="table-loader-container"></div>'+'<div class="table-cell-test-container">'+'    <gs-cell class="table-cell"></gs-cell>'+'    <gs-cell class="table-header"></gs-cell>'+'    <gs-cell class="table-insert"></gs-cell>'+'    <gs-cell class="table-record-selector"></gs-cell>'+'</div>'+'<div class="table-hud-container hud-bottom"></div>'+'<style class="cell-position" style="display:none;"></style>';element.elems={};element.elems.root=rootElement;element.elems.topHudContainer=element.elems.root.children[0];element.elems.tableViewport=element.elems.root.children[1];element.elems.hiddenFocusControl=element.elems.root.children[2];element.elems.loaderContainer=element.elems.root.children[3];element.elems.cellTestContainer=element.elems.root.children[4];element.elems.bottomHudContainer=element.elems.root.children[5];element.elems.cellPositionStyle=element.elems.root.children[6];element.elems.dataContainer=element.elems.tableViewport.children[0];element.elems.yScrollContainer=element.elems.tableViewport.children[1];element.elems.xScrollContainer=element.elems.tableViewport.children[2];element.elems.dataViewport=element.elems.dataContainer.children[0];element.elems.yScrollBar=element.elems.yScrollContainer.children[0];element.elems.xScrollBar=element.elems.xScrollContainer.children[0];element.elems.yScrollBarCauser=element.elems.yScrollBar.children[0];element.elems.xScrollBarCauser=element.elems.xScrollBar.children[0];element.elems.testDataCell=(element.elems.cellTestContainer.children[0]);element.elems.testHeader=(element.elems.cellTestContainer.children[1]);element.elems.testInsert=(element.elems.cellTestContainer.children[2]);element.elems.testRecordSelector=(element.elems.cellTestContainer.children[3]);element.elems.handleColumn=document.createElement('div');element.elems.handleColumn.classList.add('resize-column-handle');element.elems.handleRecord=document.createElement('div');element.elems.handleRecord.classList.add('resize-record-handle');element.elems.handleReorder=document.createElement('div');element.elems.handleReorder.classList.add('reorder-column-handle');element.elems.pixel=document.createElement('div');element.elems.pixel.classList.add('pixel-element');element.elems.root.appendChild(element.elems.pixel);element.internalData={"records":[],"columnFilterStatuses":[],"columnFilters":[],"columnListFilters":[],"columnOrders":[],"columnNames":[],"columnTypes":[],"insertRecord":{},"insertRecordRetainedColumns":[],"bolFirstLoadFinished":false};element.internalScrollOffsets={"top":0,"bottom":0,"left":0,"right":0};element.internalEvents={};element.internalEventCancelled={"scrollbarY":false,"scrollbarX":false};element.internalScroll={"top":0,"left":0,"maxTop":0,"maxLeft":0,"displayTop":0,"displayLeft":0,"prevTop":0,"prevLeft":0};element.internalTimerIDs={"scrollIntervalID":null,"visibilityIntervalID":null};element.internalTemplates={"topHUD":"","bottomHUD":"","header":"","originalRecord":"","record":{},"insertRecord":"","insertDialog":"","updateDialog":""};element.internalDisplay={"columnPlainTextNames":[],"dataColumnName":[],"columnWidths":[],"minColumnWidths":[],"maxColumnWidth":999,"recordHeights":[],"maxRecordHeight":999,"columnHandles":[],"recordHandles":[],"currentRange":{},"prevRange":{},"headerStick":"top","headerVisible":false,"headerHeight":undefined,"headerBorderHeight":0,"selectorStick":"left","recordSelectorVisible":false,"recordSelectorWidth":0,"recordSelectorBorderWidth":0,"insertRecordStick":null,"insertRecordVisible":false,"insertRecordHeight":undefined,"insertRecordBorderHeight":0,"fullRenderRequired":true,"defaultColumnWidths":[],"defaultColumnWidth":0,"defaultRecordHeight":0,"defaultRecordSelectorWidth":27,"defaultHeaderHeight":27,"defaultInsertRecordHeight":27,"focus":{"column":null,"row":null,"nodeName":null,"columnAttribute":null,"latest":null,"selectionRange":{}}};element.internalDisplay.recordSelectorWidth=(element.internalDisplay.defaultRecordSelectorWidth);element.internalSelection={"ranges":[],"insertRecord":false,"originRecord":null,"resolvedSelection":[],"columns":[],"rows":[],"currentlySelecting":false};element.internalClip={"columnList":[],"headerList":[]};element.internalWorker={"worker":"","ready":false};element.internalLoaders={"loaderIDs":[],"loaderElements":[]};element.internalResize={"currentlyResizing":false,"showThrottleID":null,"resizeStarted":false,"cellOriginX":0,"cellOriginY":0,"resizeColumn":false,"resizeRecord":false,"resizeColumnHandleIndex":0,"resizeRecordHandleIndex":0,"resizeColumnIndex":null,"resizeRecordIndex":null,"resizingRecordSelectors":false,"resizingHeader":false,"resizingInsert":false,"scrollOriginTop":null,"scrollOriginLeft":null,"lastX":0,"lastY":0,"lastWidth":0,"lastHeight":0};element.internalReorder={"currentlyReordering":false,"reorderStarted":false,"currentColumns":[],"dropLocation":0,"scrollIntervalID":null,"scrollDirection":null,"scrolling":false,"originColumn":null};element.internalPollingCache={"elementWidth":null,"elementHeight":null,"elementVisibility":null,"fontSize":null};cellDimensionDetector(element);}
-function siphonElement(element){var topHudTemplate;var bottomHudTemplate;var headerRecordTemplate;var dataRecordTemplate;var copyTemplate;var insertRecordTemplate;var insertDialogTemplate;var updateDialogTemplate;var strHTML;var arrColumnPlainTextNames;var arrColumnDataNames;var arrColumnElements;var columnElement;var intColumnWidth;var buttonElement;var i;var len;topHudTemplate=xtag.queryChildren(element,'[for="top-hud"]')[0];bottomHudTemplate=xtag.queryChildren(element,'[for="bottom-hud"]')[0];headerRecordTemplate=xtag.queryChildren(element,'[for="header-record"]')[0];dataRecordTemplate=xtag.queryChildren(element,'[for="data-record"]')[0];copyTemplate=xtag.queryChildren(element,'[for="copy"]')[0];insertRecordTemplate=xtag.queryChildren(element,'[for="insert-record"]')[0];insertDialogTemplate=xtag.queryChildren(element,'[for="insert-dialog"]')[0];updateDialogTemplate=xtag.queryChildren(element,'[for="update-dialog"]')[0];if(!dataRecordTemplate){throw'GS-TABLE Error: no "data-record" template found. '+'The "data-record" must be a immediate child in '+'order to be found.';}
+function siphonElement(element){var topHudTemplate;var bottomHudTemplate;var headerRecordTemplate;var dataRecordTemplate;var copyTemplate;var insertRecordTemplate;var insertDialogTemplate;var updateDialogTemplate;var strHTML;var arrColumnPlainTextNames;var arrColumnDataNames;var arrColumnElements;var columnElement;var intColumnWidth;var buttonElement;var i;var len;topHudTemplate=xtag.queryChildren(element,'[for="top-hud"]')[0];bottomHudTemplate=xtag.queryChildren(element,'[for="bottom-hud"]')[0];headerRecordTemplate=xtag.queryChildren(element,'[for="header-record"]')[0];dataRecordTemplate=xtag.queryChildren(element,'[for="data-record"]')[0];copyTemplate=xtag.queryChildren(element,'[for="copy"]')[0];insertRecordTemplate=xtag.queryChildren(element,'[for="insert-record"]')[0];insertDialogTemplate=xtag.queryChildren(element,'[for="insert-dialog"]')[0];updateDialogTemplate=xtag.queryChildren(element,'[for="update-dialog"]')[0];if(topHudTemplate.innerHTML.indexOf('&gt;')>-1||topHudTemplate.innerHTML.indexOf('&lt;')>-1){console.warn('GS-TABLE WARNING: &gt; or &lt; detected in top HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(bottomHudTemplate.innerHTML.indexOf('&gt;')>-1||bottomHudTemplate.innerHTML.indexOf('&lt;')>-1){console.warn('GS-TABLE WARNING: &gt; or &lt; detected in bottom HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(headerRecordTemplate.innerHTML.indexOf('&gt;')>-1||headerRecordTemplate.innerHTML.indexOf('&lt;')>-1){console.warn('GS-TABLE WARNING: &gt; or &lt; detected in header record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(dataRecordTemplate.innerHTML.indexOf('&gt;')>-1||dataRecordTemplate.innerHTML.indexOf('&lt;')>-1){console.warn('GS-TABLE WARNING: &gt; or &lt; detected in data record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(copyTemplate.innerHTML.indexOf('&gt;')>-1||copyTemplate.innerHTML.indexOf('&lt;')>-1){console.warn('GS-TABLE WARNING: &gt; or &lt; detected in copy template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(insertRecordTemplate.innerHTML.indexOf('&gt;')>-1||insertRecordTemplate.innerHTML.indexOf('&lt;')>-1){console.warn('GS-TABLE WARNING: &gt; or &lt; detected in insert record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(insertDialogTemplate.innerHTML.indexOf('&gt;')>-1||insertDialogTemplate.innerHTML.indexOf('&lt;')>-1){console.warn('GS-TABLE WARNING: &gt; or &lt; detected in insert dialog template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(updateDialogTemplate.innerHTML.indexOf('&gt;')>-1||updateDialogTemplate.innerHTML.indexOf('&lt;')>-1){console.warn('GS-TABLE WARNING: &gt; or &lt; detected in update dialog template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');}
+if(!dataRecordTemplate){throw'GS-TABLE Error: no "data-record" template found. '+'The "data-record" must be a immediate child in '+'order to be found.';}
 if(!copyTemplate){console.warn('GS-TABLE Warning: no "copy" template found. '+'The "copy" template enables copying a selection '+'from the gs-table. The "copy" template must be a '+'immediate child in order to be found.');}
 if(headerRecordTemplate||dataRecordTemplate||insertRecordTemplate){if(headerRecordTemplate){arrColumnElements=xtag.query(headerRecordTemplate.content,'gs-cell');}else if(dataRecordTemplate){arrColumnElements=xtag.query(dataRecordTemplate.content,'gs-cell');}else if(insertRecordTemplate){arrColumnElements=xtag.query(insertRecordTemplate.content,'gs-cell');}
 i=0;len=arrColumnElements.length;intColumnWidth=(parseInt(element.getAttribute('default-column-width'),10)||intDefaultColumnWidth);while(i<len){element.internalDisplay.columnWidths.push(parseInt(arrColumnElements[i].style.width,10)||intColumnWidth);element.internalDisplay.defaultColumnWidths.push(parseInt(arrColumnElements[i].style.width,10)||intColumnWidth);if(arrColumnElements[i].style.width){arrColumnElements[i].style.width='';}
