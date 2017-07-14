@@ -74,6 +74,9 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	str_cookie_encrypted = str_cookie(client->str_request, client->int_request_len, client->str_cookie_name, &int_cookie_len);
 	if (str_cookie_encrypted == NULL || int_cookie_len <= 0) {
 #ifdef ENVELOPE
+		if (client->bol_handshake) {
+			client->bol_public = true;
+		}
 		SFINISH_CHECK(client->bol_public, "No Cookie.");
 #else
 		SFINISH("No Cookie.");
@@ -311,7 +314,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	} else {
 		SFINISH_SNCAT(str_password, &int_password_length,
 			str_global_public_password, strlen(str_global_public_password));
-		SINFO("str_password: %s", str_password);
+		//SINFO("str_password: %s", str_password);
 	}
 #else
 	SDEBUG("client->str_conn: %s", client->str_conn);

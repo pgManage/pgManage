@@ -43,6 +43,8 @@ void ws_file_step1(struct sock_ev_client_request *client_request) {
 #endif
 
 	SDEBUG("FILE API");
+	
+	SFINISH_CHECK(client_request->parent->bol_public == false, "The FILE API is restricted, please log in");
 
 	// right after FILE\t
 	SFINISH_CHECK(strlen(client_request->ptr_query) > 5, "Invalid Request");
