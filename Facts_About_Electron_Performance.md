@@ -31,8 +31,8 @@ Mac install went to a dmg--just drag it to your applications folder. Install on 
 ```
             Install   Startup
 PGAdmin3    ~10sec    4sec
-PGAdmin4    ~60sec    35sec
-Postage     ~15sec    4sec
+PGAdmin4    ~60sec    25sec # updated for 1.6
+Postage     ~15sec    4sec
 ```
 
 I think it's reasonable to say that Electron is perfectly fine as regards install and startup times as we've implemented it. I know there are apps that use Electron that start up slowly, but that is not a problem inherent to Electron--Postage proves that. Considering that our goal has always been to deliver a fast app, we have yet to see how Electron prevents us from doing so as far as install and startup times are concerned.
@@ -45,9 +45,10 @@ Loading time from 'run' to display of data in grid. We used this query: "SELECT 
 
 ```
  pgAdmin3:        18sec
- pgAdmin4:         7sec
+ pgAdmin4:         2sec # updated for 1.6 (takes forever to scroll to last record though)
  Postage(3.2.12): 12sec
  Postage(3.2.13):  2sec
+ Postage(3.2.16)   8sec # ??? I am having connection issues.
 ```
 
 There you have it. We've been working on a faster grid for displaying table data for some time. It uses Websockets to get the data and a tab delimited transfer format. 
