@@ -14619,13 +14619,31 @@ document.addEventListener('DOMContentLoaded', function () {
         HUDTemplateElement = xtag.query(element, 'template[for="hud"]')[0];
         insertTemplateElement = xtag.query(element, 'template[for="insert"]')[0];
         
-        if (HUDTemplateElement.innerHTML.indexOf('&gt;') > -1 || HUDTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+        if (
+            HUDTemplateElement &&
+            (
+                HUDTemplateElement.innerHTML.indexOf('&gt;') > -1 ||
+                HUDTemplateElement.innerHTML.indexOf('&lt;') > -1
+            )
+        ) {
             console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
         }
-        if (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+        if (
+            tableTemplateElement &&
+            (
+                tableTemplateElement.innerHTML.indexOf('&gt;') > -1 ||
+                tableTemplateElement.innerHTML.indexOf('&lt;') > -1
+            )
+        ) {
             console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
         }
-        if (insertTemplateElement.innerHTML.indexOf('&gt;') > -1 || insertTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+        if (
+            insertTemplateElement &&
+            (
+                insertTemplateElement.innerHTML.indexOf('&gt;') > -1 ||
+                insertTemplateElement.innerHTML.indexOf('&lt;') > -1
+            )
+        ) {
             console.warn('GS-DATASHEET WARNING: &gt; or &lt; detected in insert template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
         }
         
@@ -21408,13 +21426,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 insertTemplateElement = xtag.queryChildren(element, 'template[for="insert"]')[0];
                 
-                if (hudTemplateElement.innerHTML.indexOf('&gt;') > -1 || hudTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                if (
+                    hudTemplateElement &&
+                    (
+                        hudTemplateElement.innerHTML.indexOf('&gt;') > -1 ||
+                        hudTemplateElement.innerHTML.indexOf('&lt;') > -1
+                    )
+                ) {
                     console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                 }
-                if (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                if (
+                    tableTemplateElement &&
+                    (
+                        tableTemplateElement.innerHTML.indexOf('&gt;') > -1 ||
+                        tableTemplateElement.innerHTML.indexOf('&lt;') > -1
+                    )
+                ) {
                     console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                 }
-                if (insertTemplateElement.innerHTML.indexOf('&gt;') > -1 || insertTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                if (
+                    insertTemplateElement &&
+                    (
+                        insertTemplateElement.innerHTML.indexOf('&gt;') > -1 ||
+                        insertTemplateElement.innerHTML.indexOf('&lt;') > -1
+                    )
+                ) {
                     console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in insert template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                 }
 
@@ -27810,7 +27846,14 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // select/highlight the record that was provided
         if (record) {
-            record.setAttribute('selected', '');
+            if (record.length >= 0) {
+                
+                for (i = 0, len = record.length; i < len; i += 1) {
+                    record[i].setAttribute('selected', '');
+                }
+            } else {
+                record.setAttribute('selected', '');
+            }
         }
     }
 
@@ -27837,41 +27880,27 @@ document.addEventListener('DOMContentLoaded', function () {
         return matchedRecord;
     }
 
-    function selectRecord(element, handle, bolChange) {
-        var record, strRecordValue, strFirstTdText;
-        
+    function selectRecord(element, handle, bolChange, bolAdd, strType) {
         if (!element.hasAttribute('no-select')) {
+            var record;
+            
             if (typeof handle === 'string' || typeof handle === 'number') {
                 record = findRecordFromValue(element, handle);
+                if (!record && handle !== '') {
+                    console.warn('Listbox warning: record not found' + (typeof handle === 'string' ? ': "' + handle + '"' : ''));
+                }
             } else {
                 record = handle;
             }
             
-            //console.trace(handle, record);
-            
-            if (!record && handle !== '') {
-                console.warn('Listbox warning: record not found' + (typeof handle === 'string' ? ': "' + handle + '"' : ''));
-                
-            } else if (record) {
-                //console.log('1***', this.selectedRecord, this.value);
-                
-                strRecordValue = record.getAttribute('value');
-                strFirstTdText = xtag.queryChildren(record, 'td')[0].textContent;
-                
-                if (element.value !== (strRecordValue || strFirstTdText)) {
-                    element.innerValue = strRecordValue || strFirstTdText;
-                    element.innerSelectedRecord = record;
-                    if (bolChange) {
-                        element.hackToPreventScroll = true;
-                        if (element.innerValue !== element.getAttribute('value')) {
-                            element.setAttribute('value', element.innerValue);
-                        }
-                        element.hackToPreventScroll = false;
-                        element.triggerChange();
-                        //console.log('2*** change triggered');
-                    }
+            if (element.hasAttribute('multi-select')) {
+                if (handle.length >= 0) {
+                    record = handle;
+                } else {
+                    record = [handle];
                 }
             }
+            
             
             // highlightRecord has its own checking for no record supplied,
             // so this deselects any rows then selects the supplied record or none
@@ -27892,7 +27921,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (!element.hasAttribute('disabled')) {
             if (!element.hasAttribute('no-select')) {
-                if ((intKeyCode === 40 || intKeyCode === 38) && !event.shiftKey && !event.metaKey && !event.ctrlKey && !element.error) {
+                if ((intKeyCode === 40 || intKeyCode === 38) && (!event.shiftKey) && !event.metaKey && !event.ctrlKey && !element.error) {
                     
                     trs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr:not(.divider)');
                     
@@ -28078,7 +28107,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 strTemplate +=      '<tbody gs-dynamic>' +
-                                        '<tr value="{{! row[\'' + data.arr_column[0] + '\'] }}" gs-dynamic>' +
+                                        '<tr data-record_no="{{! row.row_number }}" value="{{! row[\'' + data.arr_column[0] + '\'] }}" gs-dynamic>' +
                                             strRecordCells +
                                         '</tr>' +
                                     '</tbody>' +
@@ -28124,6 +28153,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     element.tableElement = tableElement;
                     element.syncView();
+                    element.internalData.records = data;
                 }
             }
             
@@ -28377,6 +28407,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.inserted = true;
                 element.error = false;
                 element.internal = {};
+                element.internalData = {};
                 saveDefaultAttributes(element);
                 
                 // handle "qs" attribute
@@ -28404,7 +28435,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 // select for template
                 tableTemplateElement = xtag.queryChildren(element, 'template')[0];
-                if (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                if (tableTemplateElement && (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1)) {
                     console.warn('GS-LISTBOX WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                 }
                 
@@ -28463,7 +28494,20 @@ document.addEventListener('DOMContentLoaded', function () {
         accessors: {
             value: {
                 get: function () {
-                    return this.innerValue;
+                    var element = this;
+                    if (element.tableElement) {
+                        var arrRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
+                        
+                        if (this.hasAttribute('multi-select')) {
+                            var arrResult = [], i;
+                            for (i = 0; i < len; i++) {
+                                arrResult.push(this.internalData.records.dat[arrRecords[i].getAttribute('data-record_no') - 1][0]);
+                            }
+                            return arrResult;
+                        } else {
+                            return this.internalData.records.dat[arrRecords[0].getAttribute('data-record_no') - 1][0];
+                        }
+                    }
                 },
                 
                 set: function (strNewValue) {
@@ -28474,7 +28518,16 @@ document.addEventListener('DOMContentLoaded', function () {
             
             selectedRecord: {
                 get: function () {
-                    return this.innerSelectedRecord;
+                    var element = this;
+                    if (element.tableElement) {
+                        var arrRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
+                        
+                        if (this.hasAttribute('multi-select')) {
+                            return arrRecords;
+                        } else {
+                            return arrRecords[0];
+                        }
+                    }
                 },
                 
                 set: function (newValue) {
@@ -28485,10 +28538,20 @@ document.addEventListener('DOMContentLoaded', function () {
             
             textValue: {
                 get: function () {
-                    if (this.innerSelectedRecord) {
-                        return xtag.queryChildren(this.innerSelectedRecord, 'td')[0].textContent;
+                    var element = this;
+                    if (element.tableElement) {
+                        var arrRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
+                        
+                        if (this.hasAttribute('multi-select')) {
+                            var strResult, i;
+                            for (i = 0; i < len; i++) {
+                                strResult += xtag.queryChildren(arrRecords[i], 'td')[0].textContent;
+                            }
+                            return strResult;
+                        } else {
+                            return arrRecords[0].textContent;
+                        }
                     }
-                    return undefined;
                 },
                 
                 set: function () {
@@ -28501,6 +28564,13 @@ document.addEventListener('DOMContentLoaded', function () {
             // just a semantic alias to the getData function
             refresh: function (callback) {
                 getData(this, callback);
+            },
+            
+            column: function (strColumn) {
+                //console.log('no', Number(this.innerSelectedRecord.getAttribute('data-record_no')) - 1);
+                //console.log('data', this.internalData.records);
+                //console.log('return', this.internalData.records.dat[Number(this.innerSelectedRecord.getAttribute('data-record_no')) - 1]);
+                return this.internalData.records.dat[this.selectedRecord.getAttribute('data-record_no') - 1][this.internalData.records.arr_column.indexOf(strColumn)];
             },
             
             // #################################################################
@@ -28791,39 +28861,81 @@ document.addEventListener('DOMContentLoaded', function () {
                 // get list of record elements
                 arrElements = xtag.toArray(tbodyElement.children);
                 
-                // create click event function
-                clickHandler = function (event) {
-                    this.classList.remove('down');
-                    selectRecord(element, this, true);
-                };
-                
-                // add click event with click event function to all record elements that are not dividers
-                for (i = 0, len = arrElements.length; i < len; i += 1) {
-                    if (!arrElements[i].classList.contains('divider')) {
-                        arrElements[i].addEventListener('click', clickHandler);
+                if (element.hasAttribute('multi-select')) {
+                    // if we are not on a touch device: hover and down events
+                    if (!evt.touchDevice) {
+                        mousedownHandler = function () {
+                            this.classList.add('down');
+                            selectRecord(element, this, true, event.shiftKey, 'down');
+                        };
+                        mousemoveHandler = function () {
+                            selectRecord(element, event.target, true, event.shiftKey, 'move');
+                        };
+                        mouseupHandler = function () {
+                            selectRecord(element, this, true, event.shiftKey, 'up');
+                        };
+                        mouseoutHandler = function () {
+                            this.classList.remove('down');
+                            this.classList.remove('hover');
+                        };
+                        mouseoverHandler = function () {
+                            this.classList.remove('down');
+                            this.classList.add('hover');
+                        };
+                    
+                        // add click event with click event function to all record elements that are not dividers
+                        for (i = 0, len = arrElements.length; i < len; i += 1) {
+                            if (!arrElements[i].classList.contains('divider')) {
+                                arrElements[i].addEventListener(evt.mousedown, mousedownHandler);
+                                arrElements[i].addEventListener(evt.mousemove, mousemoveHandler);
+                                arrElements[i].addEventListener(evt.mouseup, mouseupHandler);
+                                arrElements[i].addEventListener(evt.mouseout, mouseoutHandler);
+                                arrElements[i].addEventListener(evt.mouseover, mouseoverHandler);
+                            }
+                        }
+                    } else {
+                        //TODO: toggle
+                        // create click event function
+                        clickHandler = function (event) {
+                            this.classList.remove('down');
+                            selectRecord(element, this, true);
+                        };
                     }
-                }
-                
-                // if we are not on a touch device: hover and down events
-                if (!evt.touchDevice) {
-                    mousedownHandler = function () {
-                        this.classList.add('down');
-                    };
-                    mouseoutHandler = function () {
+                } else {
+                    // create click event function
+                    clickHandler = function (event) {
                         this.classList.remove('down');
-                        this.classList.remove('hover');
+                        selectRecord(element, this, true);
                     };
-                    mouseoverHandler = function () {
-                        this.classList.remove('down');
-                        this.classList.add('hover');
-                    };
-                
+                    
                     // add click event with click event function to all record elements that are not dividers
                     for (i = 0, len = arrElements.length; i < len; i += 1) {
                         if (!arrElements[i].classList.contains('divider')) {
-                            arrElements[i].addEventListener(evt.mousedown, mousedownHandler);
-                            arrElements[i].addEventListener(evt.mouseout, mouseoutHandler);
-                            arrElements[i].addEventListener(evt.mouseover, mouseoverHandler);
+                            arrElements[i].addEventListener('click', clickHandler);
+                        }
+                    }
+                    
+                    // if we are not on a touch device: hover and down events
+                    if (!evt.touchDevice) {
+                        mousedownHandler = function () {
+                            this.classList.add('down');
+                        };
+                        mouseoutHandler = function () {
+                            this.classList.remove('down');
+                            this.classList.remove('hover');
+                        };
+                        mouseoverHandler = function () {
+                            this.classList.remove('down');
+                            this.classList.add('hover');
+                        };
+                    
+                        // add click event with click event function to all record elements that are not dividers
+                        for (i = 0, len = arrElements.length; i < len; i += 1) {
+                            if (!arrElements[i].classList.contains('divider')) {
+                                arrElements[i].addEventListener(evt.mousedown, mousedownHandler);
+                                arrElements[i].addEventListener(evt.mouseout, mouseoutHandler);
+                                arrElements[i].addEventListener(evt.mouseover, mouseoverHandler);
+                            }
                         }
                     }
                 }
@@ -36457,31 +36569,103 @@ document.addEventListener('DOMContentLoaded', function () {
             element,
             '[for="update-dialog"]'
         )[0];
-        
-        
-        if (topHudTemplate.innerHTML.indexOf('&gt;') > -1 || topHudTemplate.innerHTML.indexOf('&lt;') > -1) {
-            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in top HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+
+
+        if (
+            topHudTemplate &&
+            (
+                topHudTemplate.innerHTML.indexOf('&gt;') > -1 ||
+                topHudTemplate.innerHTML.indexOf('&lt;') > -1
+            )
+        ) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in ' +
+                        'top HUD template, this can have undesired ' +
+                        'effects on doT.js. Please use gt(x,y), gte(x,y), ' +
+                        'lt(x,y), or lte(x,y) to silence this warning.');
         }
-        if (bottomHudTemplate.innerHTML.indexOf('&gt;') > -1 || bottomHudTemplate.innerHTML.indexOf('&lt;') > -1) {
-            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in bottom HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        if (
+            bottomHudTemplate &&
+            (
+                bottomHudTemplate.innerHTML.indexOf('&gt;') > -1 ||
+                bottomHudTemplate.innerHTML.indexOf('&lt;') > -1
+            )
+        ) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in ' +
+                        'bottom HUD template, this can have undesired ' +
+                        'effects on doT.js. Please use gt(x,y), gte(x,y), ' +
+                        'lt(x,y), or lte(x,y) to silence this warning.');
         }
-        if (headerRecordTemplate.innerHTML.indexOf('&gt;') > -1 || headerRecordTemplate.innerHTML.indexOf('&lt;') > -1) {
-            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in header record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        if (
+            headerRecordTemplate &&
+            (
+                headerRecordTemplate.innerHTML.indexOf('&gt;') > -1 ||
+                headerRecordTemplate.innerHTML.indexOf('&lt;') > -1
+            )
+        ) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in ' +
+                        'header record template, this can have undesired ' +
+                        'effects on doT.js. Please use gt(x,y), gte(x,y), ' +
+                        'lt(x,y), or lte(x,y) to silence this warning.');
         }
-        if (dataRecordTemplate.innerHTML.indexOf('&gt;') > -1 || dataRecordTemplate.innerHTML.indexOf('&lt;') > -1) {
-            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in data record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        if (
+            dataRecordTemplate &&
+            (
+                dataRecordTemplate.innerHTML.indexOf('&gt;') > -1 ||
+                dataRecordTemplate.innerHTML.indexOf('&lt;') > -1
+            )
+        ) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in ' +
+                        'data record template, this can have undesired ' +
+                        'effects on doT.js. Please use gt(x,y), gte(x,y), ' +
+                        'lt(x,y), or lte(x,y) to silence this warning.');
         }
-        if (copyTemplate.innerHTML.indexOf('&gt;') > -1 || copyTemplate.innerHTML.indexOf('&lt;') > -1) {
-            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in copy template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        if (
+            copyTemplate &&
+            (
+                copyTemplate.innerHTML.indexOf('&gt;') > -1 ||
+                copyTemplate.innerHTML.indexOf('&lt;') > -1
+            )
+        ) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in ' +
+                        'copy template, this can have undesired ' +
+                        'effects on doT.js. Please use gt(x,y), gte(x,y), ' +
+                        'lt(x,y), or lte(x,y) to silence this warning.');
         }
-        if (insertRecordTemplate.innerHTML.indexOf('&gt;') > -1 || insertRecordTemplate.innerHTML.indexOf('&lt;') > -1) {
-            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in insert record template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        if (
+            insertRecordTemplate &&
+            (
+                insertRecordTemplate.innerHTML.indexOf('&gt;') > -1 ||
+                insertRecordTemplate.innerHTML.indexOf('&lt;') > -1
+            )
+        ) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in ' +
+                        'insert record template, this can have undesired ' +
+                        'effects on doT.js. Please use gt(x,y), gte(x,y), ' +
+                        'lt(x,y), or lte(x,y) to silence this warning.');
         }
-        if (insertDialogTemplate.innerHTML.indexOf('&gt;') > -1 || insertDialogTemplate.innerHTML.indexOf('&lt;') > -1) {
-            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in insert dialog template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        if (
+            insertDialogTemplate &&
+            (
+                insertDialogTemplate.innerHTML.indexOf('&gt;') > -1 ||
+                insertDialogTemplate.innerHTML.indexOf('&lt;') > -1
+            )
+        ) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in ' +
+                        'insert dialog template, this can have undesired ' +
+                        'effects on doT.js. Please use gt(x,y), gte(x,y), ' +
+                        'lt(x,y), or lte(x,y) to silence this warning.');
         }
-        if (updateDialogTemplate.innerHTML.indexOf('&gt;') > -1 || updateDialogTemplate.innerHTML.indexOf('&lt;') > -1) {
-            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in update dialog template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
+        if (
+            updateDialogTemplate &&
+            (
+                updateDialogTemplate.innerHTML.indexOf('&gt;') > -1 ||
+                updateDialogTemplate.innerHTML.indexOf('&lt;') > -1
+            )
+        ) {
+            console.warn('GS-TABLE WARNING: &gt; or &lt; detected in ' +
+                        'update dialog template, this can have undesired ' +
+                        'effects on doT.js. Please use gt(x,y), gte(x,y), ' +
+                        'lt(x,y), or lte(x,y) to silence this warning.');
         }
 
         // if there's no "data-record" template: error

@@ -1834,13 +1834,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 insertTemplateElement = xtag.queryChildren(element, 'template[for="insert"]')[0];
                 
-                if (hudTemplateElement.innerHTML.indexOf('&gt;') > -1 || hudTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                if (
+                    hudTemplateElement &&
+                    (
+                        hudTemplateElement.innerHTML.indexOf('&gt;') > -1 ||
+                        hudTemplateElement.innerHTML.indexOf('&lt;') > -1
+                    )
+                ) {
                     console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in HUD template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                 }
-                if (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                if (
+                    tableTemplateElement &&
+                    (
+                        tableTemplateElement.innerHTML.indexOf('&gt;') > -1 ||
+                        tableTemplateElement.innerHTML.indexOf('&lt;') > -1
+                    )
+                ) {
                     console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                 }
-                if (insertTemplateElement.innerHTML.indexOf('&gt;') > -1 || insertTemplateElement.innerHTML.indexOf('&lt;') > -1) {
+                if (
+                    insertTemplateElement &&
+                    (
+                        insertTemplateElement.innerHTML.indexOf('&gt;') > -1 ||
+                        insertTemplateElement.innerHTML.indexOf('&lt;') > -1
+                    )
+                ) {
                     console.warn('GS-ENVELOPE WARNING: &gt; or &lt; detected in insert template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                 }
 
