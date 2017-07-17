@@ -648,6 +648,30 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					client->bol_connected = true;
 				}
 
+				if (client != NULL) {
+					////HANDSHAKE
+					SERROR_CHECK(
+						(str_response = WS_handshakeResponse(client->str_request, client->int_request_len, &int_response_len)) != NULL, "Error getting handshake response");
+
+					SDEBUG("str_response       : %s", str_response);
+					SDEBUG("client->str_request: %s", client->str_request);
+					// return handshake response
+					if ((int_len = client_write(client, str_response, int_response_len)) < 0) {
+						SERROR_CLIENT_CLOSE(client);
+						SERROR("client_write() failed");
+					}
+					SFREE(str_response);
+
+					SERROR_SALLOC(client->str_session_id, 10 + 1);
+					snprintf(client->str_session_id, 11, "0x%08" PRIu64, int_global_session_id++);
+					SERROR_SNCAT(str_response, &int_response_len, "sessionid = ", (size_t)12, client->str_session_id, (size_t)10, "\n", (size_t)1);
+
+					SERROR_CHECK(
+						WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len), "Failed to send message");
+
+					client->bol_handshake = true;
+				}
+
 				if (client->conn == NULL) {
 					SDEBUG("client->str_request: %p", client->str_request);
 					// set_cnxn does its own error handling
@@ -662,30 +686,6 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					if (set_cnxn(client, NULL) == NULL) {
 						SERROR_CLIENT_CLOSE(client);
 					}
-				}
-
-				if (client != NULL) {
-					////HANDSHAKE
-					SERROR_CHECK(
-						(str_response = WS_handshakeResponse(client->str_request, client->int_request_len, &int_response_len)) != NULL, "Error getting handshake response");
-
-					SDEBUG("str_response       : %s", str_response);
-					SDEBUG("client->str_request: %s", client->str_request);
-					// return handshake response
-					if ((int_len = client_write(client, str_response, strlen(str_response))) < 0) {
-						SERROR_CLIENT_CLOSE(client);
-						SERROR("client_write() failed");
-					}
-					SFREE(str_response);
-
-					SERROR_SALLOC(client->str_session_id, 10 + 1);
-					snprintf(client->str_session_id, 11, "0x%08" PRIu64, int_global_session_id++);
-					SERROR_SNCAT(str_response, &int_response_len, "sessionid = ", (size_t)12, client->str_session_id, (size_t)10, "\n", (size_t)1);
-
-					SERROR_CHECK(
-						WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len), "Failed to send message");
-
-					client->bol_handshake = true;
 				}
 
 			} else {

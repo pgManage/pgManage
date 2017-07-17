@@ -45,8 +45,12 @@ void ws_action_step1(struct sock_ev_client_request *client_request) {
 	SDEBUG("ptr_action_name: >%s<", ptr_action_name);
 	SDEBUG("ptr_args: >%s<", ptr_args);
 
+
 	SFINISH_CHECK(
-		strncmp(ptr_action_name, "action_", 7) == 0, "Invalid action name, action function names must begin with \"action_\"");
+		(strncmp(ptr_action_name, "action_", 7) == 0 && client_request->parent->bol_public == false) ||
+		strncmp(ptr_action_name, "actionnc_", 9) == 0,
+		client_request->parent->bol_public == false ? "Invalid action name, action function names must begin with \"action_\" or \"actionnc_\"" :
+		"Invalid action name, action function names must begin with \"actionnc_\" for public users");
 
 	if (ptr_schema != NULL) {
 		str_schema = DB_escape_identifier(client_request->parent->conn, ptr_schema, (size_t)(ptr_action_name - ptr_schema));
