@@ -151,6 +151,7 @@ bool _DB_exec(
 
 	PQflush(conn->conn);
 
+	// The EV_WRITE is because if you have a query longer than SSL allows, then you're going to have a bad time
 	ev_io_init(&res_poll->io, db_query_cb, conn->int_sock, EV_READ | EV_WRITE);
 	ev_io_start(EV_A, &res_poll->io);
 
