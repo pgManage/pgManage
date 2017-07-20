@@ -117,3 +117,161 @@ GRANT EXECUTE ON FUNCTION schema.function(str_args text) TO trusted_g;
 
 -- Check quoted entities
 select * FROM test." ;  -- works fine. requires user to type a quote to get a list of quoted objects.
+
+------------------------------------------------------
+----------------------NEW TESTS-----------------------
+------------------------------------------------------
+
+-- AS OF VERSION 3.2.12
+
+-- Check Find/Replace
+
+-- Check multiple cursor autocomplete
+-- you need to choose an area non-contiguous with existing text or it won't show the drop down.
+/*
+SELECT FROM a8g.raccount_groups ;
+*/
+
+
+
+SELECT  FROM a8g.raccount_groups ;
+SELECT  FROM a8g.raccount_groups ;
+SELECT  FROM a8g.raccount_groups ;
+SELECT  FROM a8g.raccount_groups ;
+SELECT  FROM a8g.raccount_groups ;
+SELECT  FROM a8g.raccount_groups ;
+SELECT  FROM a8g.raccount_groups ;
+
+-- Check that selecting a line up or down closes popup
+select a ;
+
+-- Check typing really quickly:
+--     in the console: autocompleteGlobals.bolTestSlowDown = true
+--      then select and type "account_group_name" quickly
+--      if everything goes correctly try a similar test again until you have done it succesfully at least three times
+SELECT *
+FROM a8g.raccount_groups
+WHERE account_group_name 
+
+-- Check that arrowing left and right closes popup
+SELECT a ;
+
+-- Check that scrolling up or down closes popup
+SELECT a ;
+
+-- Check that period code doesn't error on a nonexistant object
+SELECT * FROM a8g.rtest ; 
+
+-- Check that opening a new tab works 
+-- ?? you mean the button to open a script in a new window?
+
+-- Backspace:
+--     close popup
+SELECT * FROM  ;
+
+-- Typing period:
+--     list appropriate object list under schema
+SELECT * FROM a8g. ;
+ 
+-- Typing colon:
+--     if there is another colon preceding and we have one letter, then show type list
+SELECT '1/1/2017':: ; 
+
+-- typing while autocomplete is open
+--     filter popup
+SELECT FROM a8g.raccount ;
+
+-- type a period while autocomplete is open
+--     clear popup and load new list
+SELECT FROM test. ;
+
+-- special filter
+--     type "te" really quickly so that we activate the special filter (try at least five times)
+SELECT FROM te ;
+
+-- return
+--     clicking return should close popup and add a \r to the line
+SELECT FROM a8g. ;
+
+-- tab
+--     insert currently selected completion
+SELECT netmask ; 
+
+-- paste
+--     close popup
+-- Currently if multiple characters are added with a change event then we call it a paste, but if we paste one character then it doesn't know that it's a paste event
+--TODO: is there a better way to determine if there is a paste event?
+SELECT netm ; -- paste 'm' << broken. doesn't remove popup
+
+-- Finish typing the only word in the popup
+--     close popup
+SELECT FROM a8g.raccount_groups ;
+
+-- no query detected:
+--     if there is a schema dot:
+--         dot code
+--     else:
+--         Display snippets
+-- ?? what does this mean ??
+
+-- click option:
+--      click on drop down to choose item
+SELECT FROM a8g.raccount_groups ;
+
+-- Check that variables show up in a function
+-- Check that variables DON'T show up in a function after a period
+CREATE OR REPLACE FUNCTION schema.function(str_args text)
+    RETURNS text AS
+$BODY$
+DECLARE
+    int_test integer;
+    
+BEGIN
+    i
+
+    $$BEGIN
+    END$$
+    
+    SELECT i FROM wiki. ;
+    
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE
+COST 100;
+
+ALTER FUNCTION schema.function(str_args text) OWNER TO postgres;
+GRANT EXECUTE ON FUNCTION schema.function(str_args text) TO trusted_g;
+
+-- Check that variables DON'T show up AFTER a function
+SELECT i ;
+
+-- Check that only variables in the second function show up in the function
+-- Check that variables DON'T show up in a function after a period
+CREATE OR REPLACE FUNCTION schema.function(str_args text)
+    RETURNS text AS
+$BODY$
+DECLARE
+    int_example integer;
+    
+BEGIN
+    i
+
+    $$BEGIN
+    END$$
+    
+    SELECT i FROM wiki. ;
+    
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE
+COST 100;
+
+ALTER FUNCTION schema.function(str_args text) OWNER TO postgres;
+GRANT EXECUTE ON FUNCTION schema.function(str_args text) TO trusted_g;
+
+-- Check that variables DON'T show up AFTER a function
+SELECT i ;
+
+-- Check quoted entities
+select * FROM a8g.raccount_groups ;
+

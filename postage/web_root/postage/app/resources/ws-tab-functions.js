@@ -1797,6 +1797,10 @@ function closeFile(tabElement, callBack) {
                     tabElement.innerRenameControl.value
                 ) + '.' + tabElement.tabType;
 
+    //console.log('tabElement.relatedSocket', tabElement.relatedSocket);
+    if (tabElement.relatedSocket) {
+        GS.closeSocket(GS.websockets[tabElement.relatedSocket]);
+    }
     GS.addLoader('delete-file', 'Removing File...');
     GS.requestFromSocket(GS.envSocket,
                          'TAB\tMOVE\t' + GS.encodeForTabDelimited(strFromPath) + '\t' + GS.encodeForTabDelimited(strToPath),
@@ -2003,7 +2007,7 @@ function setFrame(tabElement, frameElement, bolBringToFirst) {
     document.getElementById('tab-bar-container').classList.add('tab-mode');
     document.getElementById('tab-bar-container').classList.remove('home-mode');
 
-	if (!tabElement.relatedSocket) {
+	if (!tabElement.relatedSocket && tabElement.tabType === 'sql') {
 		tabElement.relatedSocket = 'tabsocket' + GS.encodeForTabDelimited(tabElement.filePath);
 		GS.openSocket('env', null, null, tabElement.relatedSocket);
 	}
