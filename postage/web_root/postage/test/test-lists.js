@@ -1,3 +1,10 @@
+function generate_random(intCount) {
+	var strRet = '';
+	for (var i = intCount / 2; i > 0; i -= 1) {
+		strRet += parseInt(Math.random().toString().substring(2), 10) % 9;
+	}
+	return strRet;
+}
 function createTestDataRequest(rowPrefix, intCount) {
 	var test = rowPrefix + (arguments.length > 2 && arguments[2] === false ? '' : '{{test_random}}') + '{{i}}\ttestset;akldsjf;lkasjdf;kljasjdf;lkasjdfkljdfgl;kjad;flkgjadg\t;alksjdf;lkasjdf;lkasjdf;lkasdjf;laskdjf;laskdjfa;lsdkfja;lskdfj\n', strRet = '';
 	for (var i = intCount; i > 0; i -= 1) {
@@ -308,172 +315,189 @@ SELECT *
 
 			['SOCKET OPEN', 'websocket start'],
 
-// 			['CANCEL RAW 1', 'websocket cancel', '', ml(function () {/*RAW
-// SELECT pg_sleep(2);
-// */}), 2],
-// 			['CANCEL RAW 2', 'websocket cancel', '', ml(function () {/*RAW
-// SELECT *
-// 	FROM generate_series(1, 100) em1, generate_series(1, 100) em2, generate_series(1, 100) em3;
-// */}), 10],
-// 			['RAW FAIL 1', 'websocket', '', ml(function () {/*RAW
-// å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥
-// */}),
-// 				[
-// 					"QUERY\tå´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n",
-// 					"START",
-// 					"NOTICE\t identifier \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\" will be truncated to \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®\"\\n",
-// 					"END",
-// 					"Query failed: FATAL\nerror_text\tERROR:  syntax error at or near \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\"\\nLINE 1: å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆...\\n        ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t1\n"
-// 				]
-// 			],
-// 			['RAW FAIL 2', 'websocket', '', ml(function () {/*RAW*/}),
-// 			["Invalid RAW request"]],
-// 			['RAW 1', 'websocket', '', ml(function () {/*RAW
-// SELECT 'This is some test sql';
-// */}),
-// 			[
-// 				'QUERY\tSELECT \'This is some test sql\';',
-// 				'START',
-// 				'END',
-// 				'ROWS\t1',
-// 				'COLUMNS\n?column?\nunknown\n',
-// 				'This is some test sql',
-// 				'\\.',
-// 				'TRANSACTION COMPLETED'
-// 			]],
-// 			['RAW 2', 'websocket', '', ml(function () {/*RAW
-// DO $$ DECLARE
-// BEGIN
-// RAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';
-// END $$
-// */}),
-// 			[
-// 				"QUERY\tDO $$ DECLARE\\nBEGIN\\nRAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';\\nEND $$\\n",
-// 				"START",
-// 				"NOTICE\t å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n",
-// 				"END",
-// 				"Rows Affected\n0\n",
-// 				"TRANSACTION COMPLETED"
-// 			]],
-// 			['RAW 3', 'websocket', '', ml(function () {/*RAW
-// SELECT string_agg('\'::text || 'test', '') as test FROM generate_series(1, 10);SELECT string_agg(E'\\'::text || 'test', '') as test FROM generate_series(1, 10);SELECT string_agg('\'::text || 'test', '') as test FROM generate_series(1, 10);*/
-// 			}),
-// 			[
-// 				"QUERY\tSELECT string_agg('\\\\'::text || 'test', '') as test FROM generate_series(1, 10);",
-// 				"START",
-// 				"END",
-// 				"ROWS\t1",
-// 				"COLUMNS\ntest\ntext\n",
-// 				"\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test",
-// 				"\\.",
-// 				"QUERY\tSELECT string_agg(E'\\\\\\\\'::text || 'test', '') as test FROM generate_series(1, 10);",
-// 				"START",
-// 				"END",
-// 				"ROWS\t1",
-// 				"COLUMNS\ntest\ntext\n",
-// 				"\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test",
-// 				"\\.",
-// 				"QUERY\tSELECT string_agg('\\\\'::text || 'test', '') as test FROM generate_series(1, 10);",
-// 				"START",
-// 				"END",
-// 				"ROWS\t1",
-// 				"COLUMNS\ntest\ntext\n",
-// 				"\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test",
-// 				"\\.",
-// 				"TRANSACTION COMPLETED"
-// 			]],
-// 			['RAW 4', 'websocket', '', ml(function () {/*RAW
-// SELECT string_agg('123', '') as test FROM generate_series(1, 10000);*/
-// 			}),
-// 			["QUERY\tSELECT string_agg('123', '') as test FROM generate_series(1, 10000);", "START", "END", "ROWS\t1", "COLUMNS\ntest\ntext\n", new Array(10000 + 1).join('123'), "\\.", "TRANSACTION COMPLETED"]],
-// 			['RAW 5', 'websocket', '', ml(function () {/*RAW	DISABLE AUTOCOMMIT
-// SELECT pg_terminate_backend(pg_backend_pid())
-// 	FROM pg_catalog.pg_stat_activity;*/
-// 			}),
-// 			[
-// 				"QUERY\tSELECT pg_terminate_backend(pg_backend_pid())\\n\\tFROM pg_catalog.pg_stat_activity;",
-// 				"START",
-// 				"ANYTHING"
-// 			]],
-//
-// 			['SOCKET CLOSE', 'websocket end'],
-// 			['SOCKET OPEN', 'websocket start'],
-//
-// 			['RAW 6', 'websocket', '', ml(function () {/*RAW	DISABLE AUTOCOMMIT
-// SELECT pg_sleep(3)*/
-// 			}),
-// 			[]],
-// 			['RAW 7', 'websocket', '', ml(function () {/*RAW	DISABLE AUTOCOMMIT
-// SELECT pg_sleep(3)*/
-// 			}),
-// 			[]],
-//
-// 			['SOCKET CLOSE', 'websocket end'],
-// 			['SOCKET OPEN', 'websocket start'],
-//
-// 			['RAW 8', 'websocket', '', ml(function () {/*RAW
-// SELECT 'This is some test sql';;
-// */
-// 			}),
-// 			[
-// 				'QUERY\tSELECT \'This is some test sql\';',
-// 				'START',
-// 				'END',
-// 				'ROWS\t1',
-// 				'COLUMNS\n?column?\nunknown\n',
-// 				'This is some test sql',
-// 				'\\.',
-// 				"QUERY\t;",
-// 				"START",
-// 				"END",
-// 				"EMPTY",
-// 				'\\.',
-// 				"TRANSACTION COMPLETED"
-// 			]],
-//
-// 			['RAW 9', 'websocket', '', ml(function () {/*RAW	DISABLE AUTOCOMMIT
-// BEGIN;
-// SELECT 'This is some test sql';;
-// */
-// 			}),
-// 			[
-// 				"QUERY\tBEGIN;",
-// 				"START",
-// 				"WARNING\t there is already a transaction in progress\\n",
-// 				"END",
-// 				"Rows Affected\n0\n",
-// 				'QUERY\t\\nSELECT \'This is some test sql\';',
-// 				'START',
-// 				'END',
-// 				'ROWS\t1',
-// 				'COLUMNS\n?column?\nunknown\n',
-// 				'This is some test sql',
-// 				'\\.',
-// 				"QUERY\t;",
-// 				"START",
-// 				"END",
-// 				"EMPTY",
-// 				'\\.',
-// 				"TRANSACTION OPEN"
-// 			]],
-//
-// 			['RAW W/NOTIFY', 'websocket', '', ml(function () {/*RAW
-// LISTEN postgres;
-// NOTIFY postgres, 'testing';
-// */
-// 			}),
-// 			[
-// 				"QUERY\tLISTEN postgres;",
-// 				"START",
-// 				"END",
-// 				"Rows Affected\n0\n",
-// 				"QUERY\t\\nNOTIFY postgres, 'testing';",
-// 				"START",
-// 				"END",
-// 				"Rows Affected\n0\n",
-// 				"TRANSACTION COMPLETED"
-// 			]],
-//
+			['CANCEL RAW 1', 'websocket cancel', '', ml(function () {/*RAW
+SELECT pg_sleep(2);
+*/}), 2],
+			['CANCEL RAW 2', 'websocket cancel', '', ml(function () {/*RAW
+SELECT *
+	FROM generate_series(1, 100) em1, generate_series(1, 100) em2, generate_series(1, 100) em3;
+*/}), 10],
+			['RAW FAIL 1', 'websocket', '', ml(function () {/*RAW
+å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥
+*/}),
+				[
+					"QUERY\tå´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n",
+					"START",
+					"NOTICE\t identifier \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\" will be truncated to \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®\"\\n",
+					"END",
+					"Query failed: FATAL\nerror_text\tERROR:  syntax error at or near \"å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\"\\nLINE 1: å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆...\\n        ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t1\n"
+				]
+			],
+			['RAW FAIL 2', 'websocket', '', ml(function () {/*RAW*/}),
+			["Invalid RAW request"]],
+			['RAW 1', 'websocket', '', ml(function () {/*RAW
+SELECT 'This is some test sql';
+*/}),
+			[
+				'QUERY\tSELECT \'This is some test sql\';',
+				'START',
+				'END',
+				'ROWS\t1',
+				'COLUMNS\n?column?\nunknown\n',
+				'This is some test sql',
+				'\\.',
+				'TRANSACTION COMPLETED'
+			]],
+			['RAW 2', 'websocket', '', ml(function () {/*RAW
+DO $$ DECLARE
+BEGIN
+RAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';
+END $$
+*/}),
+			[
+				"QUERY\tDO $$ DECLARE\\nBEGIN\\nRAISE NOTICE 'å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥';\\nEND $$\\n",
+				"START",
+				"NOTICE\t å´††¥¨†ˆø¥¨ø†ˆ¨®†¥∂ƒ˙∂®†¥¨®†¥†®†¥†¥®†¥®†¥††ƒ©˙ƒ©˙∆ƒ©¨¥ˆ†¥¥˙∆˚¥¨††∆†˚††¥∆˚¨¥¥¥¥¥¥¥¥\\n",
+				"END",
+				"Rows Affected\n0\n",
+				"TRANSACTION COMPLETED"
+			]],
+			['RAW 3', 'websocket', '', ml(function () {/*RAW
+SELECT string_agg('\'::text || 'test', '') as test FROM generate_series(1, 10);SELECT string_agg(E'\\'::text || 'test', '') as test FROM generate_series(1, 10);SELECT string_agg('\'::text || 'test', '') as test FROM generate_series(1, 10);*/
+			}),
+			[
+				"QUERY\tSELECT string_agg('\\\\'::text || 'test', '') as test FROM generate_series(1, 10);",
+				"START",
+				"END",
+				"ROWS\t1",
+				"COLUMNS\ntest\ntext\n",
+				"\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test",
+				"\\.",
+				"QUERY\tSELECT string_agg(E'\\\\\\\\'::text || 'test', '') as test FROM generate_series(1, 10);",
+				"START",
+				"END",
+				"ROWS\t1",
+				"COLUMNS\ntest\ntext\n",
+				"\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test",
+				"\\.",
+				"QUERY\tSELECT string_agg('\\\\'::text || 'test', '') as test FROM generate_series(1, 10);",
+				"START",
+				"END",
+				"ROWS\t1",
+				"COLUMNS\ntest\ntext\n",
+				"\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test\\\\test",
+				"\\.",
+				"TRANSACTION COMPLETED"
+			]],
+			['RAW 4', 'websocket', '', ml(function () {/*RAW
+SELECT string_agg('123', '') as test FROM generate_series(1, 10000);*/
+			}),
+			["QUERY\tSELECT string_agg('123', '') as test FROM generate_series(1, 10000);", "START", "END", "ROWS\t1", "COLUMNS\ntest\ntext\n", new Array(10000 + 1).join('123'), "\\.", "TRANSACTION COMPLETED"]],
+			['RAW 5', 'websocket', '', ml(function () {/*RAW	DISABLE AUTOCOMMIT
+SELECT pg_terminate_backend(pg_backend_pid())
+	FROM pg_catalog.pg_stat_activity;*/
+			}),
+			[
+				"QUERY\tSELECT pg_terminate_backend(pg_backend_pid())\\n\\tFROM pg_catalog.pg_stat_activity;",
+				"START",
+				"ANYTHING"
+			]],
+
+			['SOCKET CLOSE', 'websocket end'],
+			['SOCKET OPEN', 'websocket start'],
+
+			['RAW 6', 'websocket', '', ml(function () {/*RAW	DISABLE AUTOCOMMIT
+SELECT pg_sleep(3)*/
+			}),
+			[]],
+			['RAW 7', 'websocket', '', ml(function () {/*RAW	DISABLE AUTOCOMMIT
+SELECT pg_sleep(3)*/
+			}),
+			[]],
+
+			['SOCKET CLOSE', 'websocket end'],
+			['SOCKET OPEN', 'websocket start'],
+
+			['RAW 8', 'websocket', '', ml(function () {/*RAW
+SELECT 'This is some test sql';;
+*/
+			}),
+			[
+				'QUERY\tSELECT \'This is some test sql\';',
+				'START',
+				'END',
+				'ROWS\t1',
+				'COLUMNS\n?column?\nunknown\n',
+				'This is some test sql',
+				'\\.',
+				"QUERY\t;",
+				"START",
+				"END",
+				"EMPTY",
+				'\\.',
+				"TRANSACTION COMPLETED"
+			]],
+
+			['RAW 9', 'websocket', '', ml(function () {/*RAW	DISABLE AUTOCOMMIT
+BEGIN;
+SELECT 'This is some test sql';;
+*/
+			}),
+			[
+				"QUERY\tBEGIN;",
+				"START",
+				"WARNING\t there is already a transaction in progress\\n",
+				"END",
+				"Rows Affected\n0\n",
+				'QUERY\t\\nSELECT \'This is some test sql\';',
+				'START',
+				'END',
+				'ROWS\t1',
+				'COLUMNS\n?column?\nunknown\n',
+				'This is some test sql',
+				'\\.',
+				"QUERY\t;",
+				"START",
+				"END",
+				"EMPTY",
+				'\\.',
+				"TRANSACTION OPEN"
+			]],
+
+			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
+
+			['RAW 10', 'websocket', '', ml(function () {/*RAW
+DO $$
+BEGIN
+RAISE NOTICE '
+*/
+			}) + generate_random(65535) + '\';\nEND\n$$;',
+			[
+				"ANYTHING",
+				"START",
+				"ANYTHING",
+				"END",
+				"Rows Affected\n0\n",
+				"TRANSACTION COMPLETED"
+			]],
+
+			['RAW W/NOTIFY', 'websocket', '', ml(function () {/*RAW
+LISTEN postgres;
+NOTIFY postgres, 'testing';
+*/
+			}),
+			[
+				"QUERY\tLISTEN postgres;",
+				"START",
+				"END",
+				"Rows Affected\n0\n",
+				"QUERY\t\\nNOTIFY postgres, 'testing';",
+				"START",
+				"END",
+				"Rows Affected\n0\n",
+				"TRANSACTION COMPLETED"
+			]],
+
 			['SOCKET CLOSE', 'websocket end']
 		]
 	},
