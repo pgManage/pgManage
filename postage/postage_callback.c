@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "postage_callback.h"
 
 void query_callback_handler(EV_P, ev_io *w, int revents);
@@ -13,7 +14,8 @@ void _query_callback(EV_P, struct sock_ev_client_request *client_request, sock_e
 
 	SDEBUG("GET_CLIENT_PQ_SOCKET(cb_data->client_request->parent): %d", GET_CLIENT_PQ_SOCKET(cb_data->client_request->parent));
 	SDEBUG("cb_data %p", cb_data);
-	ev_io_init(&cb_data->io, query_callback_handler, GET_CLIENT_PQ_SOCKET(cb_data->client_request->parent), EV_READ);
+	// The EV_WRITE is because if you have a query longer than SSL allows, then you're going to have a bad time
+	ev_io_init(&cb_data->io, query_callback_handler, GET_CLIENT_PQ_SOCKET(cb_data->client_request->parent), EV_READ | EV_WRITE);
 	ev_io_start(EV_A, &cb_data->io);
 	SDEBUG("_query_callback");
 }

@@ -877,7 +877,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 		*(ptr_query - 1) = 0;
 
 		SERROR_SNCAT(str_message_id, &int_message_id_len,
-			frame->str_message + 12, (size_t)(frame->int_length - 12));
+			frame->str_message + 12, (size_t)(ptr_query - frame->str_message));
 
 		// same for transaction id (if there is one)
 		if (strncmp(ptr_query, "transactionid = ", 16) == 0) {
@@ -888,16 +888,11 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 				ptr_query2 + 16, ptr_end_query - (ptr_query2 + 16));
 		}
 
+		int_first_word_len = strncspn(ptr_query, ptr_end_query - ptr_query, "\t \012", (size_t)3);
 		SERROR_SNCAT(str_first_word, &int_first_word_len,
-			ptr_query, ptr_end_query - ptr_query);
-		str_temp = str_first_word + strncspn(str_first_word, int_first_word_len, "\t \012", (size_t)3);
-		if (str_temp) {
-			*str_temp = 0;
-		}
+			ptr_query, int_first_word_len);
 
 		bstr_toupper(str_first_word, int_first_word_len);
-
-		SDEBUG("str_first_word: >%s<", str_first_word);
 
 		struct sock_ev_client_request *client_request = NULL;
 
