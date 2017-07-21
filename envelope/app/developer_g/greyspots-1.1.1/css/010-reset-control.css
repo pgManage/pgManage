@@ -58,7 +58,8 @@ gs-time,
 gs-select,
 gs-interval,
 gs-memo,
-gs-checkbox {
+gs-checkbox,
+gs-datetime {
     position: relative;
     display: block;
     

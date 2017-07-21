@@ -90,45 +90,60 @@ function loadHome() {
 
 
 function openHome() {
-    var i, len, arrElements;
+    var tabBarContainer = document.getElementById('tab-bar-container');
+    var tabBar = document.getElementById('tab-bar');
+    var tabFrames = document.getElementById('tab-frames');
+    var homeFrame = document.getElementById('home-frame');
+    var i;
+    var len;
+    var arrElements;
 
-    // set a class for the tab bar so that the css can be specificly for home (and remove the class used by the tabs)
-    document.getElementById('tab-bar-container').classList.add('home-mode');
-    document.getElementById('tab-bar-container').classList.remove('tab-mode');
+    if (tabBarContainer && tabBar && tabFrames && homeFrame) {
+        // set a class for the tab bar so that the css can be specificly for home (and remove the class used by the tabs)
+        tabBarContainer.classList.add('home-mode');
+        tabBarContainer.classList.remove('tab-mode');
 
-    // clear property list
-    clearPropertyList();
+        // clear property list
+        clearPropertyList();
 
-    // clear current tab
-    arrElements = xtag.query(document.getElementById('tab-bar'), '.current-tab');
+        // clear current tab
+        arrElements = xtag.query(tabBar, '.current-tab');
 
-    for (i = 0, len = arrElements.length; i < len; i += 1) {
-        arrElements[i].classList.remove('current-tab');
-        if (arrElements[i].relatedEditor && autocompleteGlobals.popupOpen) {
-            closePopup(arrElements[i].relatedEditor);
+        i = 0;
+        len = arrElements.length;
+        while (i < len) {
+            arrElements[i].classList.remove('current-tab');
+            if (arrElements[i].relatedEditor && autocompleteGlobals.popupOpen) {
+                closePopup(arrElements[i].relatedEditor);
+            }
+
+            i += 1;
         }
-    }
 
-    // clear current frame
-    arrElements = xtag.query(document.getElementById('tab-frames'), '.current-frame');
-    for (i = 0, len = arrElements.length; i < len; i += 1) {
-        arrElements[i].classList.remove('current-frame');
-    }
+        // clear current frame
+        arrElements = xtag.query(tabFrames, '.current-frame');
+        i = 0;
+        len = arrElements.length;
+        while (i < len) {
+            arrElements[i].classList.remove('current-frame');
+            i += 1;
+        }
 
-    // make home the current tab
-    document.getElementById('home-frame').classList.add('current-frame');
+        // make home the current tab
+        homeFrame.classList.add('current-frame');
 
-    // re-load the current script
-    if (arrScripts.length > 0) {
-        //GS.triggerEvent(arrScripts[arrScripts.length - 1], 'click');
-        //console.log(arrToolbarAddons[arrToolbarAddons.length - 1]);
-        getScript(arrNames[arrNames.length - 1], arrToolbarAddons[arrToolbarAddons.length - 1], arrScripts[arrScripts.length - 1], true, arrBeautify[arrBeautify.length - 1]);
+        // re-load the current script
+        if (arrScripts.length > 0) {
+            //GS.triggerEvent(arrScripts[arrScripts.length - 1], 'click');
+            //console.log(arrToolbarAddons[arrToolbarAddons.length - 1]);
+            getScript(arrNames[arrNames.length - 1], arrToolbarAddons[arrToolbarAddons.length - 1], arrScripts[arrScripts.length - 1], true, arrBeautify[arrBeautify.length - 1]);
 
-        //getScriptForAce(arrTargets[arrTargets.length - 1],
-        //                arrNames[arrNames.length - 1],
-        //                arrScripts[arrScripts.length - 1],
-        //                true,
-        //                arrToolbarAddons[arrToolbarAddons.length - 1]);
+            //getScriptForAce(arrTargets[arrTargets.length - 1],
+            //                arrNames[arrNames.length - 1],
+            //                arrScripts[arrScripts.length - 1],
+            //                true,
+            //                arrToolbarAddons[arrToolbarAddons.length - 1]);
+        }
     }
 }
 
