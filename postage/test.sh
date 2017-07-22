@@ -55,6 +55,11 @@ if test $(uname -s) = "Linux"; then
 		node_modules/.bin/build --linux=rpm
 		sudo yum -y install ./dist/*.rpm
 	}
+	
+	mkdir ~/.postage
+	cp ../postage/config/postage.conf ~/.postage
+	cp ../postage/config/postage-connections-test.conf ~/.postage/postage-connections.conf
+	
 	/opt/Postage/postage --postage-test & export POSTAGEPID="$!"
 	printf "HTTP/1.1 200 OK\r\n\r\n\r\n" | ncat -l -p 45654
 	kill $POSTAGEPID
