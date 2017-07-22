@@ -706,6 +706,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //
     function elementInserted(element) {
+        console.warn('GS-TIME WARNING: this element is deprecated, please use the gs-datetime instead.');
         var now;
         var strQSValue;
 

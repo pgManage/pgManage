@@ -839,6 +839,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     //
     function elementInserted(element) {
+        console.warn('GS-DATE WARNING: this element is deprecated, please use the gs-datetime instead.');
         var today, strQSValue;
         
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
@@ -847,7 +848,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!element.inserted) {
                 element.inserted = true;
                 element.internal = {};
-                saveDefaultAttributes(element)
+                saveDefaultAttributes(element);
                 
                 /*
                 element.addEventListener(evt.mouseout, function (event) {
