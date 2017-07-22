@@ -38774,6 +38774,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // remove all templates from the dom to prevent reflows
         if (topHudTemplate) {
+            console.log(element, topHudTemplate);
             element.removeChild(topHudTemplate);
         }
         if (bottomHudTemplate) {
@@ -41026,10 +41027,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderLocationFull(element) {
-        var arrColumnWidths;
-        var arrRecordHeights;
-        var columnBorderWidth;
-        var recordBorderHeight;
+        //var arrColumnWidths;
+        //var arrRecordHeights;
+        //var columnBorderWidth;
+        //var recordBorderHeight;
 
         var jsnRange;
         var fromColumn;
@@ -41041,13 +41042,13 @@ document.addEventListener('DOMContentLoaded', function () {
         var len;
         var col_i;
         var col_len;
-        var record_i;
-        var record_len;
+        //var record_i;
+        //var record_len;
 
-        var intCellLeft;
-        var intCellOriginLeft;
-        var intRecordTop;
-        var intRecordOriginTop;
+        //var intCellLeft;
+        //var intCellOriginLeft;
+        //var intRecordTop;
+        //var intRecordOriginTop;
 
         var arrColumnNames;
         var strHeaderTemplate;
@@ -41064,10 +41065,10 @@ document.addEventListener('DOMContentLoaded', function () {
         var jsnQS;
         var intTotalRecords;
         var strNullString;
-        var strChar;
+        //var strChar;
         var strCell;
         var strHTML;
-        var strCSS;
+        //var strCSS;
         var delim;
 
         //var intRecordSelectorBorderWidth;
@@ -41136,13 +41137,13 @@ document.addEventListener('DOMContentLoaded', function () {
         //      a full re-render
         element.elems.dataViewport.setAttribute('class', 'table-data-viewport');
 
-        // save column widths and record heights for easy access
-        arrColumnWidths = element.internalDisplay.columnWidths;
-        arrRecordHeights = element.internalDisplay.recordHeights;
+        //// save column widths and record heights for easy access
+        //arrColumnWidths = element.internalDisplay.columnWidths;
+        //arrRecordHeights = element.internalDisplay.recordHeights;
 
         // we needs the border dimensions to calculate true locations
-        columnBorderWidth = element.internalDisplay.columnBorderWidth;
-        recordBorderHeight = element.internalDisplay.recordBorderHeight;
+        //columnBorderWidth = element.internalDisplay.columnBorderWidth;
+        //recordBorderHeight = element.internalDisplay.recordBorderHeight;
 
         // save the column name array for quick and easy access
         arrColumnNames = element.internalData.columnNames;
@@ -41163,8 +41164,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // get visible range
         jsnRange = element.internalDisplay.currentRange;
-        intCellOriginLeft = jsnRange.originLeft;
-        intRecordOriginTop = jsnRange.originTop;
+        //intCellOriginLeft = jsnRange.originLeft;
+        //intRecordOriginTop = jsnRange.originTop;
         fromColumn = jsnRange.fromColumn;
         toColumn = jsnRange.toColumn;
         fromRecord = jsnRange.fromRecord;
@@ -41247,7 +41248,7 @@ document.addEventListener('DOMContentLoaded', function () {
             //console.log(fromRecord, toRecord);
             i = fromRecord;
             len = toRecord;
-            intRecordTop = intRecordOriginTop;
+            //intRecordTop = intRecordOriginTop;
             while (i < len) {
                 // create cell array for this record
                 strRecord = element.internalData.records[i] + '\t';
@@ -41340,10 +41341,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 // append record to html
                 strHTML += strRecord;
 
-                // increment record top so that the next record
-                //      shows below this one
-                intRecordTop += arrRecordHeights[i];
-                intRecordTop += recordBorderHeight;
+                //// increment record top so that the next record
+                ////      shows below this one
+                //intRecordTop += arrRecordHeights[i];
+                //intRecordTop += recordBorderHeight;
                 i += 1;
             }
         }
@@ -41463,7 +41464,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (element.getAttribute('update-dialog') === 'show') {
                 i = fromRecord;
                 len = toRecord;
-                intRecordTop = intRecordOriginTop;
+                //intRecordTop = intRecordOriginTop;
                 while (i < len) {
                     //strCSS = '';
 
@@ -41477,14 +41478,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         '</gs-cell>'
                     );
 
-                    intRecordTop += arrRecordHeights[i];
-                    intRecordTop += recordBorderHeight;
+                    //intRecordTop += arrRecordHeights[i];
+                    //intRecordTop += recordBorderHeight;
                     i += 1;
                 }
             } else {
                 i = fromRecord;
                 len = toRecord;
-                intRecordTop = intRecordOriginTop;
+                //intRecordTop = intRecordOriginTop;
                 while (i < len) {
                     //strCSS = (
                     //    'top:' + intRecordTop + 'px;' +
@@ -41509,8 +41510,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         '</gs-cell>'
                     );
 
-                    intRecordTop += arrRecordHeights[i];
-                    intRecordTop += recordBorderHeight;
+                    //intRecordTop += arrRecordHeights[i];
+                    //intRecordTop += recordBorderHeight;
                     i += 1;
                 }
             }
@@ -42674,16 +42675,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var intCellLeft = 0;
         var intCellTop = 0;
-        var arrMinColumnWidths = element.internalDisplay.minColumnWidths;
-        // strCSS += (
-        //         strCell + '[data-col-number="' + i + '"] {' +
-        //         'left:' + intCellLeft + 'px;' +
-        //         'width:' + (
-        //             ((arrColumnWidths[i] + columnBorderWidth > 0) ?
-        //arrColumnWidths[i] + columnBorderWidth : arrMinColumnWidths[i])
-        //         ) + 'px;' +
-        //         '}'
-        //     );
+        var intColumnWidth;
+        //var arrMinColumnWidths = element.internalDisplay.minColumnWidths;
 
         var arrColumnWidths = element.internalDisplay.columnWidths;
         var arrRecordHeights = element.internalDisplay.recordHeights;
@@ -42700,25 +42693,36 @@ document.addEventListener('DOMContentLoaded', function () {
         len = jsnRange.toColumn;
         while (i < len) {
             //if (arrColumnWidths[i] < 3) {
-            //    //console.log(element.internalDisplay.defaultColumnWidths[i],
-            //element.internalDisplay.minColumnWidths[i], arrColumnWidths[i]);
+            //    console.log(
+            //        element.internalDisplay.defaultColumnWidths[i],
+            //        element.internalDisplay.minColumnWidths[i],
+            //        arrColumnWidths[i]
+            //    );
             //    arrColumnWidths[i] = arrMinColumnWidths[i];
-            //    element.internalDisplay.columnWidths[i] =
-            //arrMinColumnWidths[i];
+            //    element.internalDisplay.columnWidths[i] = (
+            //        arrMinColumnWidths[i]
+            //    );
             //}
             //console.log('col: ', arrColumnWidths[i]);
-            strCSS += (
-                strCell + '[data-col-number="' + i + '"] {' +
-                'left:' + intCellLeft + 'px;' +
-                'width:' + (
-                    arrColumnWidths[i] + columnBorderWidth
-                ) + 'px;' +
-                '}'
-            );
-            // console.log(strCSS);
-            // we don't want the border width of 0 width columns to affect
-            //      positioning
-            intCellLeft += (arrColumnWidths[i] + columnBorderWidth);
+            intColumnWidth = arrColumnWidths[i];
+
+            // only add to CSS and increment left variable if column is not
+            //      hidden
+            if (intColumnWidth > 0) {
+                strCSS += (
+                    strCell + '[data-col-number="' + i + '"] {' +
+                    'left:' + intCellLeft + 'px;' +
+                    'width:' + (
+                        intColumnWidth + columnBorderWidth
+                    ) + 'px;' +
+                    '}'
+                );
+                // console.log(strCSS);
+
+                // we don't want the border width of 0 width columns to affect
+                //      positioning
+                intCellLeft += (intColumnWidth + columnBorderWidth);
+            }
             i += 1;
         }
 
@@ -42727,10 +42731,12 @@ document.addEventListener('DOMContentLoaded', function () {
         len = jsnRange.toRecord;
         while (i < len) {
             //if (arrRecordHeights[i] < 3) {
-            //    arrRecordHeights[i] = element.internalDisplay
-            //.defaultRecordHeight;
-            //    element.internalDisplay.recordHeights[i] =
-            //element.internalDisplay.defaultRecordHeight;
+            //    arrRecordHeights[i] = (
+            //        element.internalDisplay.defaultRecordHeight
+            //    );
+            //    element.internalDisplay.recordHeights[i] = (
+            //        element.internalDisplay.defaultRecordHeight
+            //    );
             //}
             //console.log('row: ', arrRecordHeights[i]);
             strCSS += (
@@ -50528,27 +50534,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
             element.internalEvents.selectDragStart = function (event) {
                 var cell;
-                var classList;
-                var intRow;
-                var intColumn;
+                var jsnRange;
                 var newRange;
                 var jsnLocation;
+
+                //var classList;
+                //var intRow;
+                //var intColumn;
+
+                //var bolIsDataCell;
+                //var bolIsAllSelector;
+                //var bolIsHeaderCell;
+                //var bolIsRecordSelector;
+                //var bolIsInsertCell;
+                //var bolIsInsertSelector;
+
                 element.bolFocusHiddenTextarea = false;
 
-                // var bolIsDataCell;
-                // var bolIsAllSelector;
-                // var bolIsHeaderCell;
-                // var bolIsRecordSelector;
-                // var bolIsInsertCell;
-                // var bolIsInsertSelector;
-
-                // // we need the cell that received the mousedown so that we can
-                // //      get it's row/column numbers (and of the case of adding
-                // //      a selection, wheather of not it's already selected)
+                // we need the cell that received the mousedown so that we
+                //      can get it's row/column numbers (and of the case of
+                //      adding a selection, wheather of not it's already
+                //      selected)
                 cell = GS.findParentElement(event.target, 'gs-cell');
-                // console.log(cell, (element, event));
-                // //console.log(cell);
-                // //console.log(element.internalResize.currentlyResizing);
+
+                //console.log(cell, (element, event));
+                //console.log(cell);
+                //console.log(element.internalResize.currentlyResizing);
+                //console.log(event.which);
+                //console.log(!cell.hasAttribute('selected'));
 
                 if (
                     // if we found a cell
@@ -50590,80 +50603,80 @@ document.addEventListener('DOMContentLoaded', function () {
                         )
                     );
 
-                    // // header is attached to first row
-                    // // record selector is attached to the first column
-                    // // insert record is attached to last row or the header if
-                    // //      there is no data
+                    //// header is attached to first row
+                    //// record selector is attached to the first column
+                    //// insert record is attached to last row or the header if
+                    ////      there is no data
 
-                    // // if the selected cell is a header
-                    // //      row: 'header'
-                    // //      column: cell column
-                    // // if the selected cell is a data cell
-                    // //      row: cell row
-                    // //      column: cell column
-                    // // if the selected cell is a record selector
-                    // //      row: cell row
-                    // //      column: 'selector'
-                    // // if the selected cell is the all selector
-                    // //      row: 'header'
-                    // //      column: 'selector'
-                    // // if the selected cell is a insert cell
-                    // //      row: 'insert'
-                    // //      column: cell column
-                    // // if the selected cell is the insert selector
-                    // //      row: 'insert'
-                    // //      column: 'selector'
-                    // intRow = parseInt(
-                    //     cell.getAttribute('data-row-number'),
-                    //     10
-                    // );
-                    // intColumn = parseInt(
-                    //     cell.getAttribute('data-col-number'),
-                    //     10
-                    // );
+                    //// if the selected cell is a header
+                    ////      row: 'header'
+                    ////      column: cell column
+                    //// if the selected cell is a data cell
+                    ////      row: cell row
+                    ////      column: cell column
+                    //// if the selected cell is a record selector
+                    ////      row: cell row
+                    ////      column: 'selector'
+                    //// if the selected cell is the all selector
+                    ////      row: 'header'
+                    ////      column: 'selector'
+                    //// if the selected cell is a insert cell
+                    ////      row: 'insert'
+                    ////      column: cell column
+                    //// if the selected cell is the insert selector
+                    ////      row: 'insert'
+                    ////      column: 'selector'
+                    //intRow = parseInt(
+                    //    cell.getAttribute('data-row-number'),
+                    //    10
+                    //);
+                    //intColumn = parseInt(
+                    //    cell.getAttribute('data-col-number'),
+                    //    10
+                    //);
 
-                    // // we don't want to recalculate what type of a cell the
-                    // //      target cell is, and we want shorter code. so,
-                    // //      we'll create shortcut variables
-                    // classList = cell.classList;
-                    // bolIsDataCell = (
-                    //     classList.contains('table-cell')
-                    // );
-                    // bolIsAllSelector = (
-                    //     classList.contains('table-all-selector')
-                    // );
-                    // bolIsHeaderCell = (
-                    //     classList.contains('table-header')
-                    // );
-                    // bolIsRecordSelector = (
-                    //     classList.contains('table-record-selector')
-                    // );
-                    // bolIsInsertCell = (
-                    //     classList.contains('table-insert')
-                    // );
-                    // bolIsInsertSelector = (
-                    //     classList.contains('table-insert-selector')
-                    // );
+                    //// we don't want to recalculate what type of a cell the
+                    ////      target cell is, and we want shorter code. so,
+                    ////      we'll create shortcut variables
+                    //classList = cell.classList;
+                    //bolIsDataCell = (
+                    //    classList.contains('table-cell')
+                    //);
+                    //bolIsAllSelector = (
+                    //    classList.contains('table-all-selector')
+                    //);
+                    //bolIsHeaderCell = (
+                    //    classList.contains('table-header')
+                    //);
+                    //bolIsRecordSelector = (
+                    //    classList.contains('table-record-selector')
+                    //);
+                    //bolIsInsertCell = (
+                    //    classList.contains('table-insert')
+                    //);
+                    //bolIsInsertSelector = (
+                    //    classList.contains('table-insert-selector')
+                    //);
 
-                    // if (bolIsDataCell) {
-                    //     newRange.start.row = intRow;
-                    //     newRange.start.column = intColumn;
-                    // } else if (bolIsAllSelector) {
-                    //     newRange.start.row = 'header';
-                    //     newRange.start.column = 'selector';
-                    // } else if (bolIsHeaderCell) {
-                    //     newRange.start.row = 'header';
-                    //     newRange.start.column = intColumn;
-                    // } else if (bolIsRecordSelector) {
-                    //     newRange.start.row = intRow;
-                    //     newRange.start.column = 'selector';
-                    // } else if (bolIsInsertCell) {
-                    //     newRange.start.row = 'insert';
-                    //     newRange.start.column = intColumn;
-                    // } else if (bolIsInsertSelector) {
-                    //     newRange.start.row = 'insert';
-                    //     newRange.start.column = 'selector';
-                    // }
+                    //if (bolIsDataCell) {
+                    //    newRange.start.row = intRow;
+                    //    newRange.start.column = intColumn;
+                    //} else if (bolIsAllSelector) {
+                    //    newRange.start.row = 'header';
+                    //    newRange.start.column = 'selector';
+                    //} else if (bolIsHeaderCell) {
+                    //    newRange.start.row = 'header';
+                    //    newRange.start.column = intColumn;
+                    //} else if (bolIsRecordSelector) {
+                    //    newRange.start.row = intRow;
+                    //    newRange.start.column = 'selector';
+                    //} else if (bolIsInsertCell) {
+                    //    newRange.start.row = 'insert';
+                    //    newRange.start.column = intColumn;
+                    //} else if (bolIsInsertSelector) {
+                    //    newRange.start.row = 'insert';
+                    //    newRange.start.column = 'selector';
+                    //}
 
                     // find out the cell location based on the mouse event
                     jsnLocation = getCellFromMouseEvent(element, event);
@@ -50735,15 +50748,18 @@ document.addEventListener('DOMContentLoaded', function () {
                                     element.internalSelection.ranges.length - 1
                                 );
                             }
+
+                            // if the first selection range covers more than one
+                            //      cell, focus the hidden textarea
+                            jsnRange = element.internalSelection.ranges[0];
                             if (
-                            element.internalSelection.ranges[0].start.row !==
-                            element.internalSelection.ranges[0].end.row ||
-                            element.internalSelection.ranges[0].start.column !==
-                            element.internalSelection.ranges[0].end.column
+                                jsnRange.start.row !== jsnRange.end.row ||
+                                jsnRange.start.column !== jsnRange.end.column
                             ) {
                                 //console.log('Focus, grasshopper');
                                 element.bolFocusHiddenTextarea = true;
                             }
+
                         // else if the CMD of CTRL key is down, we create a new
                         //      selection and append it to the end
                         } else if (event.metaKey || event.ctrlKey) {
@@ -53066,7 +53082,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     parentCell &&
                     parentCell.nodeName === 'GS-CELL' &&
                     parentCell.classList.contains('table-header') &&
-                    parentCell.hasAttribute('selected')
+                    parentCell.hasAttribute('selected') &&
+                    // only reorder when the left mouse button is down
+                    event.which === 1
                 ) {
                     // we need to let everything know that we are reordering,
                     //      this is used to prevent cell selection during column
