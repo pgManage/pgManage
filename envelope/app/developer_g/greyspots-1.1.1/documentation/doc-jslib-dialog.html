@@ -155,6 +155,45 @@ GS.inputbox(&lt;TITLE&gt;, &lt;MESSAGE&gt;, &lt;CALLBACK&gt;);</code></pre>
                 </template>
             </gs-doc-example>
             
+            <div class="doc-example-description">
+                <span class="h3">Attribute <code>[no-background]</code>:</span>
+                <p>The <code>[no-background]</code> attribute disables the modal background.</p>
+            </div>
+            <gs-doc-example>
+                <template for="html" height="auto">
+                    <template no-background id="dialog-no-background-documentation">
+                        <gs-page>
+                            <gs-body padded>
+                                <gs-text id="test-control"></gs-text>
+                            </gs-body>
+                            <gs-footer>
+                                <gs-button dialogclose>Done</gs-button>
+                            </gs-footer>
+                        </gs-page>
+                    </template>
+                    <template id="dialog-documentation">
+                        <gs-page>
+                            <gs-body padded>
+                                <gs-text id="test-control"></gs-text>
+                            </gs-body>
+                            <gs-footer>
+                                <gs-button dialogclose>Done</gs-button>
+                            </gs-footer>
+                        </gs-page>
+                    </template>
+                    <gs-button onclick="testDialog()">Dialog (With <code>[no-background]</code>)</gs-button>
+                    <gs-button onclick="testDialogNoOverlay()">Dialog (Without <code>[no-background]</code>)</gs-button>
+                </template>
+                <template for="js" height="auto">
+                    function testDialog() {
+                        GS.openDialog('dialog-no-background-documentation');
+                    }
+                    function testDialogNoOverlay() {
+                        GS.openDialog('dialog-documentation');
+                    }
+                </template>
+            </gs-doc-example>
+            
             
             <div class="doc-example-description">
                 <span class="h3">Before Close Example:</span>

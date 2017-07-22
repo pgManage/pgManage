@@ -1295,8 +1295,8 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         tabElement.relatedCopyOptionsButton = document.getElementById('sql-results-copy-options-' + intTabNumber);
         tabElement.relatedStopLoadingButton = document.getElementById('sql-results-stop-loading-' + intTabNumber);
         tabElement.relatedAutocommitCheckbox = document.getElementById('checkbox-autocommit-' + intTabNumber);
-		tabElement.relatedCommitButton = document.getElementById('button-commit-' + intTabNumber);
-		tabElement.relatedRollbackButton = document.getElementById('button-rollback-' + intTabNumber);
+        tabElement.relatedCommitButton = document.getElementById('button-commit-' + intTabNumber);
+        tabElement.relatedRollbackButton = document.getElementById('button-rollback-' + intTabNumber);
 
         if (window.process && window.process.type === 'renderer') {
             tabElement.relatedDownloadButton = document.getElementById('button-tab-' + intTabNumber + '-save');

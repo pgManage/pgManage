@@ -168,6 +168,9 @@ function refreshShortcutKeys (shortcutKeys) {
 }
 
 document.addEventListener('keydown', function (event) {
+    var tabBarElement;
+    var tabElement;
+
     if (keyCodeCheck(event, localStorage.ShortcutNewTab)) {
         ShortcutNewTab();
     } else if (keyCodeCheck(event, localStorage.ShortcutExplainAnalyze)) {
@@ -175,14 +178,21 @@ document.addEventListener('keydown', function (event) {
     } else if (keyCodeCheck(event, localStorage.ShortcutExplain)) {
         ShortcutExplain();
     } else if (keyCodeCheck(event, localStorage.ShortcutRunQuery)) {
-        var tabElement = xtag.queryChildren(document.getElementById('tab-bar'), '.current-tab')[0];
-        if (tabElement.parentNode) {
-            if (tabElement.executedWaitingForKeyup !== true) {
+        tabBarElement = document.getElementById('tab-bar');
 
-                tabElement.executedWaitingForKeyup = true;
-                executeScript();
-                event.preventDefault();
-                event.stopPropagation();
+        // this file (settings.js) is a general file. this functionality below is
+        //      specific to the main postage page (index.html). not all pages have
+        //      a tab bar. therefore, don't try to do something in a tab bar if it
+        //      doesn't exist.
+        if (tabBarElement) {
+            tabElement = xtag.queryChildren(tabBarElement, '.current-tab')[0];
+            if (tabElement.parentNode) {
+                if (tabElement.executedWaitingForKeyup !== true) {
+                    tabElement.executedWaitingForKeyup = true;
+                    executeScript();
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
             }
         }
     } else if (keyCodeCheck(event, localStorage.ShortcutSave)) {
@@ -199,12 +209,21 @@ document.addEventListener('keydown', function (event) {
 });
 
 document.addEventListener('keyup', function (event) {
+    var tabBarElement = document.getElementById('tab-bar');
+    var tabElement;
+
     if (keyCodeCheck(event, localStorage.ShortcutRunQuery)) {
-        var tabElement = xtag.queryChildren(document.getElementById('tab-bar'), '.current-tab')[0];
-        if (tabElement.parentNode) {
-            tabElement.executedWaitingForKeyup = false;
-            event.preventDefault();
-            event.stopPropagation();
+        // this file (settings.js) is a general file. this functionality below is
+        //      specific to the main postage page (index.html). not all pages have
+        //      a tab bar. therefore, don't try to do something in a tab bar if it
+        //      doesn't exist.
+        if (tabBarElement) {
+            tabElement = xtag.queryChildren(tabBarElement, '.current-tab')[0];
+            if (tabElement.parentNode) {
+                tabElement.executedWaitingForKeyup = false;
+                event.preventDefault();
+                event.stopPropagation();
+            }
         }
     }
 });

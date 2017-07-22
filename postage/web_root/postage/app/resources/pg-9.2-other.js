@@ -480,9 +480,10 @@ function dialogSwitchDatabase(target) {
 
                     // else if we've gotten to the end of the responses: fill the database list
                     } else if (data.strMessage === '\\.') {
-                        document.getElementById('database-container').innerHTML =
+                        document.getElementById('database-container').innerHTML = (
                             (target.getAttribute('icon') !== 'database' ? '<center><b>Switch Database</b></center>' : '') +
-                            strHTML;
+                            strHTML
+                        );
                     }
                 }
 
@@ -2401,6 +2402,9 @@ function removeMarkerHighlighted() {
 // this function is run when we send the queries through the websocket,
 //      it adds a loader, disables the "Clear" button and shows/binds the "Stop Execution" button
 function executeHelperStartExecute() {
+    if (dataLoadTest) {
+        console.time('query-load');
+    }
     GS.log(bolDebug, currentTab);
     var editor = currentTab.relatedEditor;
 
@@ -2525,6 +2529,7 @@ function executeHelperStopSocket() {
 
 // executes SQL in current tab
 var arrExecuteHistory = [];
+var dataLoadTest = false;
 function executeScript(bolCursorQuery) {
     'use strict';
     currentTab = document.getElementsByClassName('current-tab')[0];
@@ -2600,15 +2605,16 @@ function executeScript(bolCursorQuery) {
         intQuery = 0;            // number query the callback is on
         intErrorStartLine = 0;   // number of lines in the queries that successfully ran, so that we can offset the error annotation
 		intErrorStartChar = 0;   // number of chars in the queries that successfully ran, so that we can offset the cursor properly
-        var arrData = [];
         // begin
 
         //console.log('test');
         executeHelperStartExecute();
 
-
+        var arrData = [];
+        var tableElement;
+        var intRecords;
+        var countElement;
         currentTab.currentMessageID = GS.requestRawFromSocket(GS.websockets[currentTab.relatedSocket], jsnCurrentQuery.strQuery, function (data, error) {
-            var tableElement;
             var scrollElement;
             var trElement;
             var arrRecords;
@@ -2754,8 +2760,12 @@ function executeScript(bolCursorQuery) {
                     if (data.bolLastMessage) {
                         executeHelperEndLoading();
 						if (data.bolTransactionOpen) {
-							currentTab.relatedCommitButton.removeAttribute('disabled');
-							currentTab.relatedRollbackButton.removeAttribute('disabled');
+							if (currentTab.relatedCommitButton) {
+							    currentTab.relatedCommitButton.removeAttribute('disabled');
+							}
+							if (currentTab.relatedRollbackButton) {
+							    currentTab.relatedRollbackButton.removeAttribute('disabled');
+							}
 						}
                     }
                     if (data.intCallbackNumberThisQuery === 0) {
@@ -2817,7 +2827,7 @@ function executeScript(bolCursorQuery) {
                                         '</div>' + warningHTML;
 
                             divElement = document.createElement('div');
-                            divElement.innerHTML =  strHTML + '<pre>' + intRows + ' Row' + (intRows === 1 ? '' : 's') + ' Affected</pre><br />';
+                            divElement.innerHTML = strHTML + '<pre>' + intRows + ' Row' + (intRows === 1 ? '' : 's') + ' Affected</pre><br />';
 
                             resultsContainer.appendChild(divElement);
                             executeHelperBindShowQueryButton(xtag.query(divElement, '.button-show-query')[0], data.strQuery);
@@ -2870,12 +2880,20 @@ function executeScript(bolCursorQuery) {
 
                         // else if result query
                         } else if (data.arrColumnNames.length > 0) {
-                            if (data.strMessage === '\\.') {
+                            if (dataLoadTest === true) {
+                                if (data.strMessage === '\\.') {
+                                    console.timeEnd('query-load');
+                                }
+                                return true;
+                            }
+                            
+                            
+                            if (data.intCallbackNumberThisQuery === 0) {
+                                // create the table element
                                 divElement = document.createElement('div');
                                 scrollElement = document.createElement('div');
-
                                 scrollElement.classList.add('result-table-scroll-container');
-
+                                
                                 i = 0;
                                 len = data.arrMessages.length;
                                 warningHTML = '';
@@ -2887,16 +2905,16 @@ function executeScript(bolCursorQuery) {
                                         '</i>' +
                                         '<br />'
                                     );
-
+    
                                     i += 1;
                                 }
-
+    
                                 strHTML = (
                                     '<div flex-horizontal>' +
                                         '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
                                         '<div>'
                                 );
-
+    
                                 // if we have all of the query execution time
                                 //      data, show it
                                 if (
@@ -2917,19 +2935,19 @@ function executeScript(bolCursorQuery) {
                                         '</small>'
                                     );
                                 }
-
+    
                                 strHTML += '<br />';
-
+    
                                 // if we have a record number, show it
                                 if (data.intRows !== undefined) {
                                     strHTML += (
                                         '<small id="row-count-' + data.intQueryNumber + '">' +
-                                            '<span id="loaded-row-count-' + data.intQueryNumber + '" hidden>0</span>' +
+                                            '<span id="loaded-row-count-' + data.intQueryNumber + '">0</span> of ' +
                                             data.intRows + ' rows loaded' +
                                         '</small>'
                                     );
                                 }
-
+    
                                 strHTML += (
                                         '</div>' +
                                         '<span>&nbsp;</span>' +
@@ -2937,9 +2955,9 @@ function executeScript(bolCursorQuery) {
                                     '</div>' +
                                     warningHTML
                                 );
-
+    
                                 divElement.innerHTML = strHTML;
-
+                                
                                 // append query info and results container
                                 divElement.appendChild(scrollElement);
                                 resultsContainer.appendChild(divElement);
@@ -2954,6 +2972,7 @@ function executeScript(bolCursorQuery) {
                                 idNumber = tabNumber + '-' + xtag.query(resultsContainer, 'gs-table').length;
                                 tableID = 'Table' + idNumber + '';
 
+                                // generate hud templates
                                 strHTML = ml(function () {/*
                                     <template for="top-hud">
                                         <gs-button onclick="document.getElementById('{{TABLEID}}').openPrefs(this)" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
@@ -2967,10 +2986,11 @@ function executeScript(bolCursorQuery) {
                                         <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('next')" icon="caret-right">&nbsp;</gs-button>
                                         <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('last')" icon="step-forward">&nbsp;</gs-button>
                                     </template>
-                                */}).replace(/{{TABLEID}}/gi, tableID).replace(/{{IDNUM}}/gi, tabNumber);
+                                */}).replace(/{{TABLEID}}/gi, tableID)
+                                    .replace(/{{IDNUM}}/gi, tabNumber);
 
+                                // generate header template
                                 strHTML += '<template for="header-record">';
-
                                 i = 0;
                                 len = data.arrColumnNames.length;
                                 while (i < len) {
@@ -2980,10 +3000,8 @@ function executeScript(bolCursorQuery) {
                                             'varchar' +
                                             data.arrColumnTypes[i].substring(17, data.arrColumnTypes[i].length)
                                         );
-
                                     } else if (data.arrColumnTypes[i] === "timestamp with time zone") {
                                         columnType = 'timestamptz';
-
                                     } else {
                                         columnType = data.arrColumnTypes[i];
                                     }
@@ -2997,11 +3015,11 @@ function executeScript(bolCursorQuery) {
                                     );
                                     i += 1;
                                 }
-
                                 strHTML += '</template>';
-                                strHTML += '<template for="data-record">';
 
-                                // generate record cell html
+
+                                // generate record cell template
+                                strHTML += '<template for="data-record">';
                                 i = 0;
                                 len = data.arrColumnNames.length;
                                 while (i < len) {
@@ -3020,17 +3038,17 @@ function executeScript(bolCursorQuery) {
                                     }
 
                                     strHTML += (
-                                        '<gs-cell style="overflow: auto;">' +
-                                            '<label>{{! GS.decodeFromTabDelimited(arrRow[' + i + ']) }}</label>' +
+                                        '<gs-cell style="overflow: auto; padding: 0.25em;">' +
+                                            '{{! arrRow[' + i + '] }}' +
                                         '</gs-cell>'
                                     );
                                     i += 1;
                                 }
-
                                 strHTML += '</template>';
-                                strHTML += '<template for="copy">';
 
-                                // generate copy cell html
+
+                                // generate copy cell template
+                                strHTML += '<template for="copy">';
                                 i = 0;
                                 len = data.arrColumnNames.length;
                                 while (i < len) {
@@ -3041,9 +3059,7 @@ function executeScript(bolCursorQuery) {
                                     );
                                     i += 1;
                                 }
-
                                 strHTML += '</template>';
-
 
                                 tableElement = document.createElement('gs-table');
                                 tableElement.innerHTML = strHTML;
@@ -3064,6 +3080,8 @@ function executeScript(bolCursorQuery) {
                                     document.getElementById('sql-results-area-' + tabNumber + '').style.overflow = 'auto';
                                 });
 
+                                // reset array so that we don't override the data for the previous table
+                                arrData = Array(data.intRows);
                                 tableElement.internalData.records = arrData;
                                 tableElement.internalData.columnNames = data.arrColumnNames;
 
@@ -3114,21 +3132,72 @@ function executeScript(bolCursorQuery) {
 
                                 tableElement.internalDisplay.headerHeight = 37;
 
-                                // refresh causes the record heights to be calculated
-                                tableElement.refresh();
-
-                                // clear arrData variable so that we don't modify the
-                                //      arrData we sent to the datasheet
-                                arrData = [];
-
+                                countElement = document.getElementById('loaded-row-count-' + data.intQueryNumber);
+                                intRecords = 0;
                                 intQuery += 1;
                                 executeHelperUpdateTally(resultsTallyElement, intQuery, intError);
-                            } else {
-                                tempData = data.strMessage.split('\n');
-                                arrData.push.apply(arrData, tempData);
                             }
 
+                            if (data.strMessage === '\\.') {
+                                // finish loaded count
+                                document.getElementById('row-count-' + data.intQueryNumber).textContent = data.intRows + ' rows loaded';
 
+                                // trigger one last re-render
+                                tableElement.internalDisplay.fullRenderRequired = true;
+                                tableElement.refresh();
+                                
+                                // clear table element
+                                tableElement = null;
+                                
+                            } else {
+                                var index;
+                                var strRecord;
+                                var strMessage;
+
+                                // add data to table
+                                strMessage = data.strMessage + '\n';
+                                i = 0;
+                                while (i < 1000) {
+                                    index = strMessage.indexOf('\n');
+                                    strRecord = strMessage.substring(0, index);
+                                    strMessage = strMessage.substring(index + 1);
+
+                                    if (strRecord !== '' || strMessage !== '') {
+                                        arrData[intRecords] = strRecord;
+                                        intRecords += 1;
+                                    } else {
+                                        break;
+                                    }
+
+                                    i += 1;
+                                }
+                                
+                                //// updated loaded count
+                                //if (data.intCallbackNumberThisQuery % 100 === 0) {
+                                //    if (window.requestAnimationFrame) {
+                                //        window.requestAnimationFrame(function () {
+                                //            countElement.textContent = intRecords;
+                                //        });
+                                //    } else {
+                                //        countElement.textContent = intRecords;
+                                //    }
+                                //}
+                                
+                                // use the row count to determine a fixed number of scroll render points
+                                // or
+                                // use current time and if the scroll render has been x milliseconds, rerender
+                                // or
+                                // rerender every x data packets
+                                
+                                if (
+                                    data.intCallbackNumberThisQuery === 4// ||
+                                    //data.intCallbackNumberThisQuery % 1000 === 0
+                                ) {
+                                    tableElement.refresh();
+                                }
+                                
+                                // every rerender should be put into a requestAnimationFrame, if available
+                            }
                         }
                     }
                 } else {

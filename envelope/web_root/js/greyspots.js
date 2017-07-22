@@ -17140,6 +17140,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     //
     function elementInserted(element) {
+        console.warn('GS-DATE WARNING: this element is deprecated, please use the gs-datetime instead.');
         var today, strQSValue;
         
         // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
@@ -17148,7 +17149,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!element.inserted) {
                 element.inserted = true;
                 element.internal = {};
-                saveDefaultAttributes(element)
+                saveDefaultAttributes(element);
                 
                 /*
                 element.addEventListener(evt.mouseout, function (event) {
@@ -18102,7 +18103,1636 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+});window.addEventListener('design-register-element', function () {
+    'use strict';
+    
+    registerDesignSnippet('<gs-datetime>', '<gs-datetime>', 'gs-datetime></gs-datetime>');
+    
+    designRegisterElement('gs-datetime', '/env/app/developer_g/greyspots-' + GS.version() + '/documentation/doc-elem-datetime.html');
+    
+    window.designElementProperty_GSDATETIME = function(selectedElement) {
+        addProp('Column', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('column') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'column', this.value);
+        });
+
+        addProp('Value', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('value') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'value', this.value);
+        });
+
+        addProp('Column In Querystring', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('qs') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'qs', this.value, false);
+        });
+
+        addProp('Placeholder', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('placeholder') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'placeholder', this.value);
+        });
+
+        //console.log(selectedElement.hasAttribute('mini'));
+
+        addProp('Mini', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('mini')) + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'mini', (this.value === 'true'), true);
+        });
+
+        // TITLE attribute
+        addProp('Title', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('title') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'title', this.value);
+        });
+
+        // TABINDEX attribute
+        addProp('Tabindex', true, '<gs-text class="target" value="' + encodeHTML(selectedElement.getAttribute('tabindex') || '') + '" mini></gs-text>', function () {
+            return setOrRemoveTextAttribute(selectedElement, 'tabindex', this.value);
+        });
+
+        // SUSPEND-CREATED attribute
+        addProp('suspend-created', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-created') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'suspend-created', this.value === 'true', true);
+        });
+
+        // SUSPEND-INSERTED attribute
+        addProp('suspend-inserted', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('suspend-inserted') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'suspend-inserted', this.value === 'true', true);
+        });
+
+        // visibility attributes
+        var strVisibilityAttribute = '';
+        if (selectedElement.hasAttribute('hidden')) {
+            strVisibilityAttribute = 'hidden';
+        }
+        if (selectedElement.hasAttribute('hide-on-desktop')) {
+            strVisibilityAttribute = 'hide-on-desktop';
+        }
+        if (selectedElement.hasAttribute('hide-on-tablet')) {
+            strVisibilityAttribute = 'hide-on-tablet';
+        }
+        if (selectedElement.hasAttribute('hide-on-phone')) {
+            strVisibilityAttribute = 'hide-on-phone';
+        }
+        if (selectedElement.hasAttribute('show-on-desktop')) {
+            strVisibilityAttribute = 'show-on-desktop';
+        }
+        if (selectedElement.hasAttribute('show-on-tablet')) {
+            strVisibilityAttribute = 'show-on-tablet';
+        }
+        if (selectedElement.hasAttribute('show-on-phone')) {
+            strVisibilityAttribute = 'show-on-phone';
+        }
+
+        addProp('Visibility', true,
+                '<gs-select class="target" value="' + strVisibilityAttribute + '" mini>' +
+                '    <option value="">Visible</option>' +
+                '    <option value="hidden">Invisible</option>' +
+                '    <option value="hide-on-desktop">Invisible at desktop size</option>' +
+                '    <option value="hide-on-tablet">Invisible at tablet size</option>' +
+                '    <option value="hide-on-phone">Invisible at phone size</option>' +
+                '    <option value="show-on-desktop">Visible at desktop size</option>' +
+                '    <option value="show-on-tablet">Visible at tablet size</option>' +
+                '    <option value="show-on-phone">Visible at phone size</option>' +
+                '</gs-select>', function () {
+            selectedElement.removeAttribute('hidden');
+            selectedElement.removeAttribute('hide-on-desktop');
+            selectedElement.removeAttribute('hide-on-tablet');
+            selectedElement.removeAttribute('hide-on-phone');
+            selectedElement.removeAttribute('show-on-desktop');
+            selectedElement.removeAttribute('show-on-tablet');
+            selectedElement.removeAttribute('show-on-phone');
+
+            if (this.value) {
+                selectedElement.setAttribute(this.value, '');
+            }
+
+            return selectedElement;
+        });
+
+        // DISABLED attribute
+        addProp('Disabled', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('disabled') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'disabled', this.value === 'true', true);
+        });
+        
+        addProp('Readonly', true, '<gs-checkbox class="target" value="' + (selectedElement.hasAttribute('readonly') || '') + '" mini></gs-checkbox>', function () {
+            return setOrRemoveBooleanAttribute(selectedElement, 'readonly', this.value === 'true', true);
+        });
+
+        //addFlexContainerProps(selectedElement);
+        addFlexProps(selectedElement);
+    };
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+
+    function transformCSS(css) {
+        return  '-webkit-transform: ' + css + '; ' +
+                '-moz-transform: ' + css + '; ' +
+                '-ms-transform: ' + css + '; ' +
+                '-o-transform: ' + css + '; ' +
+                'transform: ' + css + ';';
+    }
+
+    function pushReplacePopHandler(element) {
+        var i;
+        var len;
+        var strQS = GS.getQueryString();
+        var strQSCol = element.getAttribute('qs');
+        var strQSValue;
+        var strQSAttr;
+        var arrQSParts;
+        var arrAttrParts;
+        var strOperator;
+
+        if (strQSCol.indexOf('=') !== -1) {
+            arrAttrParts = strQSCol.split(',');
+            i = 0;
+            len = arrAttrParts.length;
+            while (i < len) {
+                strQSCol = arrAttrParts[i];
+
+                if (strQSCol.indexOf('!=') !== -1) {
+                    strOperator = '!=';
+                    arrQSParts = strQSCol.split('!=');
+                } else {
+                    strOperator = '=';
+                    arrQSParts = strQSCol.split('=');
+                }
+
+                strQSCol = arrQSParts[0];
+                strQSAttr = arrQSParts[1] || arrQSParts[0];
+
+                // if the key is not present or we've got the negator: go to the attribute's default or remove it
+                if (strOperator === '!=') {
+                    // if the key is not present: add the attribute
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        element.setAttribute(strQSAttr, '');
+                    // else: remove the attribute
+                    } else {
+                        element.removeAttribute(strQSAttr);
+                    }
+                } else {
+                    // if the key is not present: go to the attribute's default or remove it
+                    if (GS.qryGetKeys(strQS).indexOf(strQSCol) === -1) {
+                        if (element.internal.defaultAttributes[strQSAttr] !== undefined) {
+                            element.setAttribute(strQSAttr, (element.internal.defaultAttributes[strQSAttr] || ''));
+                        } else {
+                            element.removeAttribute(strQSAttr);
+                        }
+                    // else: set attribute to exact text from QS
+                    } else {
+                        element.setAttribute(strQSAttr, (
+                            GS.qryGetVal(strQS, strQSCol) ||
+                            element.internal.defaultAttributes[strQSAttr] ||
+                            ''
+                        ));
+                    }
+                }
+                i += 1;
+            }
+        } else if (GS.qryGetKeys(strQS).indexOf(strQSCol) > -1) {
+            strQSValue = GS.qryGetVal(strQS, strQSCol);
+
+            if (element.internal.bolQSFirstRun !== true) {
+                if (strQSValue !== '' || !element.getAttribute('value')) {
+                    element.setAttribute('value', strQSValue);
+                }
+            } else {
+                element.value = strQSValue;
+            }
+        }
+
+        element.internal.bolQSFirstRun = true;
+    }
+
+    function saveDefaultAttributes(element) {
+        var i;
+        var len;
+        var arrAttr;
+        var jsnAttr;
+
+        // we need a place to store the attributes
+        element.internal.defaultAttributes = {};
+
+        // loop through attributes and store them in the internal defaultAttributes object
+        i = 0;
+        len = element.attributes.length;
+        arrAttr = element.attributes;
+        while (i < len) {
+            jsnAttr = element.attributes[i];
+
+            element.internal.defaultAttributes[jsnAttr.nodeName] = (jsnAttr.nodeValue || '');
+
+            i += 1;
+        }
+    }
+
+    /***************** DATETIME WHEEL *****************/
+
+    function datetimeOpenWheelDialog(element) {
+        var i;
+        var len;
+        var arrFormat = element.getAttribute('format').split(/\b/);
+        var arrDate = element.value.split(/\b/);
+        if (arrFormat.indexOf('\'') > -1) {
+            var arrTempDate = [];
+            for (i = 0, len = arrDate.length; i < len; i += 1) {
+                if (arrDate[i].indexOf('T') > 1) {
+                    var temp = arrDate[i].split('T');
+                    arrTempDate.push(temp[0], '\'', 'T', '\'', temp[1]);
+                } else {
+                    arrTempDate.push(arrDate[i]);
+                }
+            }
+            arrDate = arrTempDate;
+        }
+        var dialogHTML;
+        var label = element.hasAttribute('id') ? xtag.query(document, '[for="' + element.id + '"]')[0] : null;
+        var labelHTML = label ? '<center><h3>' + label.innerHTML.replace(/:$/, '') + '</h3></center>' : '';
+        var dialogTemplate = document.createElement('template');
+        var monthsFull   = ['January','February','March','April','May','June', 'July','August','September','October','November','December'];
+        var monthsShort  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        var wheelHTML = function () {
+            var strRet = '';
+            for (i = 0, len = arrFormat.length; i < len; i += 1) {
+                if (arrFormat[i] === '\'') {
+                    i += 1;
+                }
+
+                if (arrFormat[i] === 'MMMM') {
+                    arrFormat[i] = 'MM';
+                    arrDate[i] = monthsFull.indexOf(arrDate[i]) + 1;
+
+                } else if (arrFormat[i] === 'MMM') {
+                    arrFormat[i] = 'MM';
+                    arrDate[i] = monthsShort.indexOf(arrDate[i]) + 1;
+
+                } else if (arrFormat[i] === 'a') {
+                    arrFormat[i] = 'ampm';
+
+                } else if (arrFormat[i] === 'EEE' || arrFormat[i] === 'EEEE') {
+                    i += 1;
+                    continue;
+                }
+                strRet += '<gs-wheel values="' + arrFormat[i] + '" value="' + arrDate[i] + '"></gs-wheel>';
+                i += 1;
+
+                if (arrFormat[i] === '\'') {
+                    i += 1;
+                }
+
+                if (i < len) {
+                    strRet += '<span class="divider"' + (evt.touchDevice ? ' touch' : '') + '><span>' + arrFormat[i] + '</span></span>';
+                }
+            }
+            return strRet;
+        };
+
+        dialogHTML = ml(function () {/*
+            <gs-page>
+                <gs-header>
+                    {{LABELHTML}}
+                    <gs-grid widths="1,1,1">
+                        <gs-block>
+                            <gs-button dialogclose>Cancel</gs-button>
+                        </gs-block>
+                        <gs-block>
+                            <gs-button class="now-button">Now</gs-button>
+                        </gs-block>
+                        <gs-block>
+                            <gs-button dialogclose bg-primary>Done</gs-button>
+                        </gs-block>
+                    </gs-grid>
+                </gs-header>
+                <gs-body class="gs-datetime-wheel-dialog">
+                    <div class="root">
+                        {{WHEELS}}
+                    </div>
+                </gs-body>
+            </gs-page>
+        */}).replace('{{LABELHTML}}', labelHTML).replace('{{WHEELS}}', wheelHTML());
+        dialogTemplate.innerHTML = dialogHTML;
+        dialogTemplate.setAttribute('data-mode', 'full');
+        GS.openDialog(dialogTemplate, function () {
+            var dialog = xtag.query(document, 'gs-dialog')[0];
+
+            xtag.query(dialog, '.now-button')[0].addEventListener('click', function () {
+                element.dteValue = new Date();
+                arrFormat = element.getAttribute('format').split(/\b/);
+                arrDate = element.value.split(/\b/);
+                xtag.query(dialog, '.gs-datetime-wheel-dialog > .root')[0].innerHTML = wheelHTML();
+            });
+
+            dialog.addEventListener('change', function (event) {
+                console.log(event.target);
+                if (event.target.getAttribute('values') === 'MM' || event.target.getAttribute('values')[0] === 'y') {
+                    var year = xtag.query(dialog, 'gs-wheel[values^="y"]')[0].value;
+                    var month = xtag.query(dialog, 'gs-wheel[values="MM"]')[0].value;
+                    var dayElement = xtag.query(dialog, 'gs-wheel[values^="d"]')[0];
+                    // month is zero based, but we pass a one based number
+                    // 0 is the last day of the previous month
+                    var days = new Date(year, month, 0).getDate();
+                    console.log(days, dayElement);
+
+                    var valuesPart = dayElement.getAttribute('values').match(/d*/)[0];
+                    dayElement.parentNode.insertBefore(GS.stringToElement('<gs-wheel values="' + valuesPart + ',' + days + '" value="' + Math.min(dayElement.value, days) + '"></gs-wheel>'), dayElement);
+                    dayElement.parentNode.removeChild(dayElement);
+                }
+            });
+            GS.triggerEvent(xtag.query(dialog, 'gs-wheel[values="MM"]')[0], 'change');
+
+        }, function (event, strAnswer) {
+            if (strAnswer === 'Done') {
+                for (i = 0, len = arrFormat.length; i < len; i += 1) {
+                    if (arrFormat[i] === '\'') {
+                        i += 1;
+                    }
+
+                    if (arrFormat[i] === 'MMMM') {
+                        arrFormat[i] = 'MM';
+                        arrDate[i] = monthsFull.indexOf(arrDate[i]);
+
+                    } else if (arrFormat[i] === 'MMM') {
+                        arrFormat[i] = 'MM';
+                        arrDate[i] = monthsShort.indexOf(arrDate[i]);
+
+                    } else if (arrFormat[i] === 'a') {
+                        arrFormat[i] = 'ampm';
+
+                    } else if (arrFormat[i] === 'EEE' || arrFormat[i] === 'EEEE') {
+                        i += 1;
+                        continue;
+                    }
+                    arrDate[i] = xtag.query(document, 'gs-dialog .gs-datetime-wheel-dialog gs-wheel[values="' + arrFormat[i] + '"]')[0].value;
+                    i += 1;
+
+                    if (arrFormat[i] === '\'') {
+                        i += 1;
+                    }
+                }
+
+                element.value = arrDate.join('').replace('\'T\'', 'T');
+                element.dteValue = new Date(element.value);
+                GS.triggerEvent(element, 'change');
+            }
+        });
+    }
+
+    /***************** DATETIME CALENDER *****************/
+
+    function getFormatString(element) {
+        var strFormat;
+
+        if (element.hasAttribute('format')) {
+            strFormat = element.getAttribute('format');
+        }
+
+        if (!strFormat) {
+            strFormat = 'MM/dd/yyyy';
+        } else if (strFormat.toLowerCase() === 'shortdate') {
+            strFormat = 'M/d/yy';
+        } else if (strFormat.toLowerCase() === 'mediumdate') {
+            strFormat = 'MMM d, yyyy';
+        } else if (strFormat.toLowerCase() === 'longdate') {
+            strFormat = 'MMMM d, yyyy';
+        } else if (strFormat.toLowerCase() === 'fulldate') {
+            strFormat = 'EEEE, MMMM d, yyyy';
+        } else if (strFormat.toLowerCase() === 'shorttime') {
+            strFormat = 'h:mm a';
+        } else if (strFormat.toLowerCase() === 'mediumtime') {
+            strFormat = 'h:mm:ss a';
+        } else if (strFormat.toLowerCase() === 'isodate') {
+            strFormat = 'yyyy-MM-dd';
+        } else if (strFormat.toLowerCase() === 'isotime') {
+            strFormat = 'HH:mm:ss';
+        } else if (strFormat.toLowerCase() === 'isodatetime') {
+            strFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
+        }
+
+        return strFormat;
+    }
+
+    function formatDate(dteValue, strFormat) {
+        /* (this function contains a (modified) substantial portion of code from another source
+            here is the copyright for sake of legality) (Uses code by Matt Kruse)
+        Copyright (c) 2006-2009 Rostislav Hristov, Asual DZZD
+
+        Permission is hereby granted, free of charge, to any person obtaining a
+        copy of this software and associated documentation files
+        (the "Software"), to deal in the Software without restriction,
+        including without limitation the rights to use, copy, modify, merge,
+        publish, distribute, sublicense, and/or sell copies of the Software,
+        and to permit persons to whom the Software is furnished to do so,
+        subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included
+        in all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+        OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
+        var i = 0, j = 0, l = 0, c = '', token = '', x, y, yearLen,
+            formatNumber = function (n, s) {
+                if (typeof s == 'undefined' || s == 2) {
+                  return (n >= 0 && n < 10 ? '0' : '') + n;
+                } else {
+                    if (n >= 0 && n < 10) {
+                       return '00' + n;
+                    }
+                    if (n >= 10 && n <100) {
+                       return '0' + n;
+                    }
+                    return n;
+                }
+            },
+            locale = {
+                monthsFull:   ['January','February','March','April','May','June', 'July','August','September','October','November','December'],
+                monthsShort:  ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+                daysFull:     ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+                daysShort:    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+                shortDateFormat: 'M/d/yyyy h:mm a',
+                longDateFormat: 'EEEE, MMMM dd, yyyy h:mm:ss a'
+            };
+
+        y = dteValue.getFullYear();
+        // Nunzio commented this out on Monday, October 19, 2015
+        // It was causing an issue during typing in the year field
+        /*if (y < 1000) {
+            y = String(y + 1900);
+        }*/
+
+        var M = dteValue.getMonth() + 1,
+            d = dteValue.getDate(),
+            E = dteValue.getDay(),
+            H = dteValue.getHours(),
+            m = dteValue.getMinutes(),
+            s = dteValue.getSeconds(),
+            S = dteValue.getMilliseconds();
+
+        //console.log(dteValue.getFullYear());
+
+        yearLen = String(y).length;
+        dteValue = {
+            y: y,
+            yyyy: y,
+            yy: String(y).substring(yearLen - 2, yearLen),
+            M: M,
+            MM: formatNumber(M),
+            MMM: locale.monthsShort[M-1],
+            MMMM: locale.monthsFull[M-1],
+            d: d,
+            dd: formatNumber(d),
+            EEE: locale.daysShort[E],
+            EEEE: locale.daysFull[E],
+            H: H,
+            HH: formatNumber(H)
+        };
+
+        //console.log(dteValue);
+
+        if (H === 0) {
+            dteValue.h = 12;
+        } else if (H > 12) {
+            dteValue.h = H - 12;
+        } else {
+            dteValue.h = H;
+        }
+
+        dteValue.hh = formatNumber(dteValue.h);
+        dteValue.k = H !== 0 ? H : 24;
+        dteValue.kk = formatNumber(dteValue.k);
+
+        if (H > 11) {
+            dteValue.K = H - 12;
+        } else {
+            dteValue.K = H;
+        }
+
+        dteValue.KK = formatNumber(dteValue.K);
+
+        if (H > 11) {
+            dteValue.a = 'PM';
+        } else {
+            dteValue.a = 'AM';
+        }
+
+        dteValue.m = m;
+        dteValue.mm = formatNumber(m);
+        dteValue.s = s;
+        dteValue.ss = formatNumber(s);
+        dteValue.S = S;
+        dteValue.SS = formatNumber(S);
+        dteValue.SSS = formatNumber(S, 3);
+
+        var result = '';
+
+        i = 0;
+        c = '';
+        token = '';
+        s = false;
+
+        while (i < strFormat.length) {
+            token = '';
+            c = strFormat.charAt(i);
+            if (c == '\'') {
+                i++;
+                if (strFormat.charAt(i) == c) {
+                    result = result + c;
+                    i++;
+                } else {
+                    s = !s;
+                }
+            } else {
+                while (strFormat.charAt(i) == c) {
+                    token += strFormat.charAt(i++);
+                }
+                if (token.indexOf('MMMM') != -1 && token.length > 4) {
+                    token = 'MMMM';
+                }
+                if (token.indexOf('EEEE') != -1 && token.length > 4) {
+                    token = 'EEEE';
+                }
+                if (typeof dteValue[token] != 'undefined' && !s) {
+                    result = result + dteValue[token];
+                } else {
+                    result = result + token;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    function datetimeOpenCalenderDialog(element) {
+        'use strict';
+        var i, len, dateHTML, timeHTML, pickerHTML, dialogHTML, dialogTemplate = document.createElement('template');
+        var dteToday = new Date(), dteValue = element.dteValue || new Date(dteToday);
+
+        dateHTML = ml(function () {/*
+            <div class="date-section">
+                <div class="adjust-section date-adjust-section centered">
+                    <div class="date-today">&#xf017;</div>
+                    <div class="date-input">
+                        <input class="month" />
+                        <span class="divider">/</span>
+                        <input class="day" />
+                        <span class="divider">/</span>
+                        <input class="year" />
+                    </div>
+                    <div class="adjust-container">
+                        <div class="date-adjust up">&#xf077;</div><div class="date-adjust down">&#xf078;</div>
+                    </div>
+                </div>
+                <div class="calender centered">
+                    <div flex-horizontal>
+                        <gs-button icononly icon="chevron-left" class="month-adjust down"></gs-button>
+
+                        <center flex class="month-label"></center>
+
+                        <gs-button icononly icon="chevron-right" class="month-adjust up"></gs-button>
+                    </div>
+                    <div flex-horizontal>
+                        <gs-button icononly icon="chevron-left" class="year-adjust down"></gs-button>
+
+                        <center flex class="year-label"></center>
+
+                        <gs-button icononly icon="chevron-right" class="year-adjust up"></gs-button>
+                    </div>
+                    <div>
+                        <div class="day-letter">S</div><div class="day-letter">M</div><div class="day-letter">T</div><div class="day-letter">W</div><div class="day-letter">T</div><div class="day-letter">F</div><div class="day-letter">S</div>
+                    </div>
+                </div>
+            </div>
+        */});
+        timeHTML = ml(function () {/*
+            <div class="time-section">
+                <div class="adjust-section time-adjust-section centered">
+                    <div class="time-now">&#xf017;</div>
+                    <div class="time-input">
+                        <input class="hour" />
+                        <span class="divider">:</span>
+                        <input class="minute" />
+                        <span class="divider">:</span>
+                        <input class="second" />
+                        <span class="divider"> </span>
+                        <input class="ampm" />
+                    </div>
+                    <div class="adjust-container">
+                        <div class="time-adjust up">&#xf077;</div><div class="time-adjust down">&#xf078;</div>
+                    </div>
+                </div>
+                <div class="clock-parent">
+                    <div class="clock"></div>
+                </div>
+            </div>
+        */});
+
+        if (element.hasDate && element.hasTime) {
+            pickerHTML = ml(function () {/*
+                <gs-grid widths="1,1">
+                    <gs-block>
+                        {{DATEHTML}}
+                    </gs-block>
+                    <gs-block>
+                        {{TIMEHTML}}
+                    </gs-block>
+                </gs-grid>
+            */}).replace('{{DATEHTML}}', dateHTML).replace('{{TIMEHTML}}', timeHTML);
+
+        } else if (element.hasDate) {
+            pickerHTML = dateHTML;
+
+        } else if (element.hasTime) {
+            pickerHTML = timeHTML;
+
+        }
+
+        dialogHTML = ml(function () {/*
+            <gs-page>
+                <gs-body class="gs-datetime-calender-dialog">
+                    {{PICKERHTML}}
+                    <gs-grid widths="1,1">
+                        <gs-block>
+                            <gs-button dialogclose>Cancel</gs-button>
+                        </gs-block>
+                        <gs-block>
+                            <gs-button dialogclose bg-primary>Done</gs-button>
+                        </gs-block>
+                    </gs-grid>
+                </gs-body>
+            </gs-page>
+        */}).replace('{{PICKERHTML}}', pickerHTML);
+        dialogTemplate.innerHTML = dialogHTML;
+        dialogTemplate.setAttribute('no-background', '');
+        dialogTemplate.setAttribute('data-overlay-close', '');
+        GS.openDialogToElement(element, dialogTemplate, 'down', function () {
+            var dteStart = new Date(dteValue);
+
+            var refreshDateInputs = function () {};
+            var refreshTimeInputs = function () {};
+
+            var regenerateCalender = function () {};
+            var resetClock = function () {};
+
+            if (element.hasDate) {
+                var calender = xtag.query(document, 'gs-dialog .calender')[0];
+                var dateAdjustSection = xtag.query(document, 'gs-dialog .date-adjust-section')[0];
+                var dateInput = xtag.query(dateAdjustSection, '.date-input')[0];
+
+                var dayInput = xtag.query(dateInput, '.day')[0];
+                var monthInput = xtag.query(dateInput, '.month')[0];
+                var yearInput = xtag.query(dateInput, '.year')[0];
+
+                var monthLabel = xtag.query(calender, '.month-label')[0];
+                var yearLabel = xtag.query(calender, '.year-label')[0];
+                var arrMonth = [
+                    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+
+                refreshDateInputs = function () {
+                    dayInput.value = GS.leftPad(dteValue.getDate(), '0', 2);
+                    monthInput.value = GS.leftPad(dteValue.getMonth() + 1, '0', 2);
+                    yearInput.value = dteValue.getFullYear();
+
+                    if (dateInput.selectText) {
+                        GS.setInputSelection(dateInput.selectText, 0, dateInput.selectText.value.length);
+                        dateInput.selectText = null;
+                    }
+                };
+                refreshDateInputs();
+
+                regenerateCalender = function (dteStart) {
+                    var children = xtag.queryChildren(calender, '.day');
+                    for (var i = 0, len = children.length; i < len; i += 1) {
+                        calender.removeChild(children[i]);
+                    }
+
+                    var dteCurrent = new Date(dteStart), intCurrentMonth = dteCurrent.getMonth(), intNextMonth = intCurrentMonth + 1;
+                    if (intNextMonth === 12) {
+                        intNextMonth = 0;
+                    }
+
+                    monthLabel.innerText = arrMonth[dteStart.getMonth()];
+                    yearLabel.innerText = dteStart.getFullYear();
+
+                    dteCurrent.setDate(1);
+                    dteCurrent.setDate(dteCurrent.getDate() - dteCurrent.getDay());
+
+                    while (dteCurrent.getMonth() !== intNextMonth || dteCurrent.getDay() !== 0) {
+                        var day = document.createElement('div');
+                        day.classList.add('day');
+                        day.innerText = dteCurrent.getDate();
+                        if (dteCurrent.getMonth() !== intCurrentMonth) {
+                            day.classList.add('grey');
+                        }
+                        if (dteCurrent.getMonth() === dteToday.getMonth() && dteCurrent.getFullYear() === dteToday.getFullYear() && dteCurrent.getDate() === dteToday.getDate()) {
+                            day.classList.add('today');
+                            day.innerText = 'T';
+                        }
+                        if (dteCurrent.getMonth() === dteValue.getMonth() && dteCurrent.getFullYear() === dteValue.getFullYear() && dteCurrent.getDate() === dteValue.getDate()) {
+                            day.classList.add('selected');
+                        }
+                        day.value = new Date(dteCurrent);
+                        calender.appendChild(day);
+
+                        dteCurrent.setDate(dteCurrent.getDate() + 1);
+                    }
+                };
+                regenerateCalender(dteStart);
+
+                dateInput.addEventListener('keydown', function (event) {
+                    var code = event.which || event.keyCode || event.charCode;
+                    var dtePreviousValue = new Date(dteValue);
+                    // 38: up
+                    // 40: down
+                    if (code === 38 || code === 40) {
+                        event.target.value = GS.leftPad((parseInt(event.target.value, 10) + (code === 38 ? 1 : -1)).toString(), '0', 2);
+                        dateInput.selectText = event.target;
+                        event.preventDefault();
+                    }
+
+                    if (event.target.classList.contains('year')) {
+                        dteValue.setFullYear(event.target.value);
+                        dteStart = new Date(dteValue);
+
+                    } else if (event.target.classList.contains('month')) {
+                        dteValue.setMonth(parseInt(event.target.value, 10) - 1);
+                        dteStart = new Date(dteValue);
+
+                    } else if (event.target.classList.contains('day')) {
+                        dteValue.setDate(event.target.value);
+                        dteStart = new Date(dteValue);
+                    }
+
+                    if (dtePreviousValue.getTime() !== dteValue.getTime()) {
+                        refreshDateInputs();
+                        regenerateCalender(dteStart);
+                    }
+                });
+
+                dateAdjustSection.addEventListener('mousedown', function (event) {
+                    if (event.target.nodeName.toUpperCase() !== 'INPUT') {
+                        event.preventDefault();
+                    }
+                });
+
+                dateAdjustSection.addEventListener('click', function (event) {
+                    var dtePreviousValue = new Date(dteValue);
+                    var activeElement = document.activeElement; // just to shorten things a bit
+
+                    if (activeElement.parentNode.classList.contains('date-input') && event.target.classList.contains('date-adjust')) {
+                        activeElement.value = GS.leftPad((parseInt(activeElement.value, 10) + (event.target.classList.contains('up') ? 1 : -1)).toString(), '0', 2);
+                        dateInput.selectText = activeElement;
+
+                        if (activeElement.classList.contains('year')) {
+                            dteValue.setFullYear(activeElement.value);
+
+                        } else if (activeElement.classList.contains('month')) {
+                            dteValue.setMonth(parseInt(activeElement.value, 10) - 1);
+
+                        } else if (activeElement.classList.contains('day')) {
+                            dteValue.setDate(activeElement.value);
+                        }
+                        dteStart = new Date(dteValue);
+
+                    } else if (event.target.classList.contains('date-today')) {
+                        dteValue.setFullYear(dteToday.getFullYear());
+                        dteValue.setMonth(dteToday.getMonth());
+                        dteValue.setDate(dteToday.getDate());
+
+                        dteStart = new Date(dteValue);
+
+                    }
+
+                    if (dtePreviousValue.getTime() !== dteValue.getTime()) {
+                        refreshDateInputs();
+                        regenerateCalender(dteStart);
+                    }
+                });
+
+                calender.addEventListener('click', function (event) {
+                    if (event.target.classList.contains('day')) {
+                        var selected = xtag.query(calender, '.selected')[0];
+                        if (selected) {
+                            selected.classList.remove('selected');
+                            event.target.classList.add('selected');
+                        }
+
+                        dteValue = event.target.value;
+                        dteStart = new Date(dteValue);
+
+                        refreshDateInputs();
+                        if (event.target.classList.contains('grey')) {
+                            regenerateCalender(dteStart);
+                        }
+                    } else if (event.target.classList.contains('month-adjust')) {
+                        dteStart.setMonth(dteStart.getMonth() + (event.target.classList.contains('up') ? 1 : -1));
+
+                        monthLabel.innerText = arrMonth[dteStart.getMonth()];
+
+                        regenerateCalender(dteStart);
+                    } else if (event.target.classList.contains('year-adjust')) {
+                        dteStart.setFullYear(dteStart.getFullYear() + (event.target.classList.contains('up') ? 1 : -1));
+
+                        yearLabel.innerText = dteStart.getFullYear();
+
+                        regenerateCalender(dteStart);
+                    }
+                });
+            }
+
+            if (element.hasTime) {
+                var clock = xtag.query(document, 'gs-dialog .clock')[0];
+                var timeAdjustSection = xtag.query(document, 'gs-dialog .time-adjust-section')[0];
+                var timeInput = xtag.query(timeAdjustSection, '.time-input')[0];
+
+                var hourInput = xtag.query(timeInput, '.hour')[0];
+                var minuteInput = xtag.query(timeInput, '.minute')[0];
+                var secondInput = xtag.query(timeInput, '.second')[0];
+                var ampmInput = xtag.query(timeInput, '.ampm')[0];
+
+                var hourHand;
+                var minuteHand;
+                var secondHand;
+
+                refreshTimeInputs = function () {
+                    var hour = dteValue.getHours();
+                    var ampm = hour >= 12 ? 'PM' : 'AM';
+                    hour = hour === 0 ? 24 : hour;
+                    hour = hour > 12 ? hour - 12 : hour;
+                    hourInput.value = GS.leftPad(hour, '0', 2);
+                    minuteInput.value = GS.leftPad(dteValue.getMinutes(), '0', 2);
+                    secondInput.value = GS.leftPad(dteValue.getSeconds(), '0', 2);
+                    ampmInput.value = ampm;
+
+                    if (timeInput.selectText) {
+                        GS.setInputSelection(timeInput.selectText, 0, timeInput.selectText.value.length);
+                        timeInput.selectText = null;
+                    }
+                };
+                refreshTimeInputs();
+
+                var i = 0, len = 60, clockHTML = '';
+                for (; i < len; i += 1) {
+                    clockHTML += '<div class="marking' + ((i % 5) === 0 ? ' large' : '') + '" style="' + transformCSS('rotate(' + i * 6 + 'deg)') + '"></div>';
+                }
+                clockHTML += ml(function () {/*
+                    <div class="position-reference"></div>
+                    <div class="clock-hand hour-hand">
+                        <div class="clock-hand-drag-handle"></div>
+                    </div>
+                    <div class="clock-hand minute-hand">
+                        <div class="clock-hand-drag-handle"></div>
+                    </div>
+                    <div class="clock-hand second-hand">
+                        <div class="clock-hand-drag-handle"></div>
+                    </div>
+                */});
+                clock.innerHTML = clockHTML;
+                hourHand = xtag.query(clock, '.hour-hand')[0];
+                minuteHand = xtag.query(clock, '.minute-hand')[0];
+                secondHand = xtag.query(clock, '.second-hand')[0];
+                var resetClock = function () {
+                    // the 180 is because the html is such that the hands point down
+                    hourHand.setAttribute('style', transformCSS('rotate(' + (((dteValue.getHours() % 12) * 30) + 180) + 'deg)'));
+                    minuteHand.setAttribute('style', transformCSS('rotate(' + ((dteValue.getMinutes() * 6) + 180) + 'deg)'));
+                    secondHand.setAttribute('style', transformCSS('rotate(' + ((dteValue.getSeconds() * 6) + 180) + 'deg)'));
+                };
+                resetClock();
+
+                timeInput.addEventListener('keydown', function (event) {
+                    var code = event.which || event.keyCode || event.charCode;
+                    var dtePreviousValue = new Date(dteValue);
+                    // 38: up
+                    // 40: down
+                    // 65: a
+                    // 80: p
+                    if (event.target.classList.contains('ampm')) {
+                        timeInput.selectText = event.target;
+                        event.preventDefault();
+
+                        if (dteValue.getHours() >= 12 && (code === 65 || code === 38 || code === 40)) {
+                            dteValue.setHours(dteValue.getHours() - 12);
+
+                        } else if (dteValue.getHours() < 12 && (code === 80 || code === 38 || code === 40)) {
+                            dteValue.setHours(dteValue.getHours() + 12);
+
+                        }
+
+                    } else if (code === 38 || code === 40) {
+                        event.target.value = GS.leftPad((parseInt(event.target.value, 10) + (code === 38 ? 1 : -1)).toString(), '0', 2);
+                        timeInput.selectText = event.target;
+                        event.preventDefault();
+                    }
+
+                    if (event.target.classList.contains('hour')) {
+                        dteValue.setHours(event.target.value + (dteValue.getHours() > 12 ? 12 : 0));
+                        dteStart = new Date(dteValue);
+
+                    } else if (event.target.classList.contains('minute')) {
+                        dteValue.setMinutes(event.target.value);
+                        dteStart = new Date(dteValue);
+
+                    } else if (event.target.classList.contains('second')) {
+                        dteValue.setSeconds(event.target.value);
+                        dteStart = new Date(dteValue);
+                    }
+
+                    if (dtePreviousValue.getTime() !== dteValue.getTime()) {
+                        refreshTimeInputs();
+                        refreshDateInputs();
+
+                        resetClock(dteStart);
+                        regenerateCalender(dteStart);
+                    }
+                });
+
+                timeAdjustSection.addEventListener('mousedown', function (event) {
+                    if (event.target.nodeName.toUpperCase() !== 'INPUT') {
+                        event.preventDefault();
+                    }
+                });
+
+                timeAdjustSection.addEventListener('click', function (event) {
+                    var dtePreviousValue = new Date(dteValue);
+                    var activeElement = document.activeElement; // just to shorten things a bit
+
+                    if (event.target.classList.contains('ampm')) {
+                        GS.setInputSelection(event.target, 0, 2);
+
+                    } else if (activeElement.parentNode.classList.contains('time-input') && event.target.classList.contains('time-adjust')) {
+                        if (activeElement.classList.contains('ampm')) {
+                            if (dteValue.getHours() < 12) {
+                                dteValue.setHours(dteValue.getHours() + 12);
+
+                            } else {
+                                dteValue.setHours(dteValue.getHours() - 12);
+                            }
+
+                        } else {
+                            activeElement.value = GS.leftPad((parseInt(activeElement.value, 10) + (event.target.classList.contains('up') ? 1 : -1)).toString(), '0', 2);
+                        }
+                        timeInput.selectText = activeElement;
+
+                        if (activeElement.classList.contains('hour')) {
+                            if (activeElement.value === '11' && dteValue.getHours() === 0) {
+                                dteValue.setHours(-1);
+
+                                dteStart = new Date(dteValue);
+                                regenerateCalender(dteStart);
+                            } else {
+                                dteValue.setHours(parseInt(activeElement.value, 10) + (dteValue.getHours() > 12 ? 12 : 0));
+                            }
+
+                        } else if (activeElement.classList.contains('minute')) {
+                            dteValue.setMinutes(activeElement.value);
+
+                        } else if (activeElement.classList.contains('second')) {
+                            dteValue.setSeconds(activeElement.value);
+
+                        }
+                        dteStart = new Date(dteValue);
+
+                    } else if (event.target.classList.contains('time-now')) {
+                        var dteNow = new Date();
+                        dteValue.setHours(dteToday.getHours());
+                        dteValue.setMinutes(dteToday.getMinutes());
+                        dteValue.setSeconds(dteToday.getSeconds());
+
+                        dteStart = new Date(dteValue);
+
+                    }
+
+                    if (dtePreviousValue.getTime() !== dteValue.getTime()) {
+                        refreshTimeInputs();
+                        refreshDateInputs();
+
+                        resetClock(dteStart);
+                        regenerateCalender(dteStart);
+                    }
+                });
+
+                clock.addEventListener('mousedown', function (event) {
+                    var target = event.target;
+
+                    var clockRect = clock.getBoundingClientRect();
+                    var refX = clockRect.left + (clockRect.width / 2);
+                    var refY = clockRect.top + (clockRect.height / 2);
+
+                    if (target.classList.contains('clock-hand-drag-handle')) {
+                        target = target.parentNode;
+                    }
+
+                    if (target.classList.contains('clock-hand')) {
+                        var dragHandler = function (event) {
+                            var x = event.clientX - refX;
+                            var y = event.clientY - refY;
+                            var thetaRad = Math.atan2(y, x); // atan2 needs y first (?!?!?!?)
+                            var thetaDeg = thetaRad * (180 / Math.PI);
+                            if (target.classList.contains('hour-hand')) {
+                                var tMod30 = thetaDeg % 30;
+                                if (tMod30 <= 15) {
+                                    thetaDeg -= tMod30;
+                                } else {
+                                    thetaDeg += 30 - tMod30;
+                                }
+                            } else {
+                                var tMod6 = thetaDeg % 6;
+                                if (tMod6 <= 3) {
+                                    thetaDeg -= tMod6;
+                                } else {
+                                    thetaDeg += 6 - tMod6;
+                                }
+                            }
+                            thetaDeg += 90;
+                            if (thetaDeg <= 0) {
+                                thetaDeg += 360;
+                            }
+
+                            if (target.classList.contains('hour-hand')) {
+                                var newHours = thetaDeg / 30;
+                                // 11PM -> 12AM
+                                if (dteValue.getHours() === 23 && newHours === 12) {
+                                    dteValue.setHours(24);
+
+                                // 1PM -> 12PM (because below we do 12 + newHours)
+                                } else if (dteValue.getHours() === 13 && newHours === 12) {
+                                    dteValue.setHours(12);
+
+                                // 12AM -> 11PM
+                                } else if (dteValue.getHours() === 0 && newHours === 11) {
+                                    dteValue.setHours(-1);
+
+                                // 12AM -> 12AM
+                                } else if (dteValue.getHours() === 0 && newHours === 12) {
+                                    dteValue.setHours(0);
+
+                                // 11PM -> 10PM
+                                } else if (dteValue.getHours() === 23 && newHours < 11) {
+                                    dteValue.setHours(12 + newHours);
+
+                                // 12PM -> 1PM
+                                } else if (dteValue.getHours() === 12 && newHours === 1) {
+                                    dteValue.setHours(13);
+
+                                // 1AM -> 12AM
+                                } else if (dteValue.getHours() === 1 && newHours === 12) {
+                                    dteValue.setHours(0);
+
+                                // *PM -> *PM
+                                } else if (dteValue.getHours() > 12) {
+                                    dteValue.setHours(12 + newHours);
+
+                                // *AM -> *AM
+                                } else {
+                                    dteValue.setHours(newHours);
+                                }
+
+                            } else if (target.classList.contains('minute-hand')) {
+                                var newMinutes = thetaDeg / 6;
+                                newMinutes = newMinutes === 60 ? 0 : newMinutes;
+                                if (dteValue.getMinutes() === 59 && newMinutes === 0) {
+                                    dteValue.setMinutes(60);
+
+                                } else if (dteValue.getMinutes() === 0 && newMinutes === 59) {
+                                    dteValue.setMinutes(-1);
+
+                                } else {
+                                    dteValue.setMinutes(newMinutes);
+                                }
+
+                            } else if (target.classList.contains('second-hand')) {
+                                var newSeconds = thetaDeg / 6;
+                                newSeconds = newSeconds === 60 ? 0 : newSeconds;
+                                if (dteValue.getSeconds() === 59 && newSeconds === 0) {
+                                    dteValue.setSeconds(60);
+
+                                } else if (dteValue.getSeconds() === 0 && newSeconds === 59) {
+                                    dteValue.setSeconds(-1);
+
+                                } else {
+                                    dteValue.setSeconds(newSeconds);
+                                }
+
+                            }
+
+                            if (dteStart.getTime() !== dteValue.getTime()) {
+                                dteStart = new Date(dteValue);
+
+                                refreshTimeInputs();
+                                refreshDateInputs();
+
+                                resetClock(dteStart);
+                                regenerateCalender(dteStart);
+                            }
+                        };
+
+                        var dragStopHandler = function (event) {
+                            window.removeEventListener('mousemove', dragHandler);
+                            window.removeEventListener('mouseup', dragStopHandler);
+                        };
+
+                        window.addEventListener('mousemove', dragHandler);
+                        window.addEventListener('mouseup', dragStopHandler);
+                    }
+                });
+            }
+        }, function (event, strAnswer) {
+            if (strAnswer === 'Done') {
+                element.dteValue = dteValue;
+                GS.triggerEvent(element, 'change');
+            }
+        });
+    }
+
+    // dont do anything that modifies the element here
+    function datetimeElementCreated(element) {
+        // if "created" hasn't been suspended: run created code
+        if (!element.hasAttribute('suspend-created')) {
+
+        }
+    }
+
+    // re-target focus event from control to element
+    function focusFunction(event) {
+        event.target.classList.add('focus');
+    }
+
+    // re-target blur event from control to element
+    function blurFunction(event) {
+        event.target.classList.remove('focus');
+    }
+
+    // mouseout, remove hover class
+    function mouseoutFunction(event) {
+        event.target.classList.remove('hover');
+    }
+
+    // mouseover, add hover class
+    function mouseoverFunction(event) {
+        event.target.classList.add('hover');
+    }
+
+    function datetimeElementInserted(element) {
+        // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
+        if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
+            // if this is the first time inserted has been run: continue
+            if (!element.inserted) {
+                element.inserted = true;
+                element.internal = {};
+                saveDefaultAttributes(element);
+
+                if (element.hasAttribute('format')) {
+                    element.setAttribute('format', getFormatString(element));
+
+                    var d1 = new Date(), d2 = new Date(formatDate(d1, element.getAttribute('format')));
+                    if (d1.getTime() !== d2.getTime()) {
+                        element.timezoneOffset = d2.getTime() - d1.getTime();
+                    }
+                } else {
+                    element.setAttribute('format', getFormatString(element));
+                }
+
+                element.hasDate = /\b(y|yyyy|yy|M|MM|MMM|MMMM|d|dd|EEE|EEEE)\b/g.test(element.getAttribute('format'));
+                element.hasTime = /\b(k|kk|hh|h|H|HH|m|mm|s|ss|S|SS|SSS)\b/g.test(element.getAttribute('format'));
+
+                if (element.getAttribute('value') === 'today' || element.getAttribute('value') === 'now') {
+                    element.dteValue = new Date();
+                } else if (element.hasAttribute('value')) {
+                    element.dteValue = new Date((element.hasDate ? '' : '1/1/1970 ') + element.getAttribute('value') + (element.hasTime ? '' : ' 00:00:00'));
+                } else if (!element.getAttribute('value') && element.hasAttribute('placeholder')) {
+                    element.innerHTML = '<span gs-dynamic class="placeholder">' + element.getAttribute('placeholder') + '</span>';
+                }
+
+                // handle "qs" attribute
+                if (element.getAttribute('qs')) {
+                    pushReplacePopHandler(element);
+                    window.addEventListener('pushstate',    function () { pushReplacePopHandler(element); });
+                    window.addEventListener('replacestate', function () { pushReplacePopHandler(element); });
+                    window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
+                }
+
+                var label = element.hasAttribute('id') ? xtag.query(document, '[for="' + element.id + '"]')[0] : null;
+                if (label) {
+                    label.addEventListener('click', function () {
+                        GS.triggerEvent(element, 'click');
+                    });
+                }
+
+                element.addEventListener('click', function () {
+                    if (!element.hasAttribute('disabled') && !element.hasAttribute('readonly')) {
+                        if (evt.touchDevice) {
+                            datetimeOpenWheelDialog(element);
+                        } else {
+                            datetimeOpenCalenderDialog(element);
+                        }
+                    }
+                });
+
+                element.addEventListener('keydown', function (event) {
+                    var code = event.which || event.keyCode || event.charCode;
+
+                    if (code !== 9) { // tab
+                        event.preventDefault();
+                        GS.triggerEvent(element, 'click');
+                    }
+                });
+
+                element.addEventListener('focus', focusFunction);
+                element.addEventListener('blur', blurFunction);
+                element.addEventListener(evt.mouseout, mouseoutFunction);
+                element.addEventListener(evt.mouseover, mouseoverFunction);
+            }
+        }
+    }
+
+    xtag.register('gs-datetime', {
+        lifecycle: {
+            created: function () {
+                datetimeElementCreated(this);
+            },
+
+            inserted: function () {
+                datetimeElementInserted(this);
+            },
+
+            attributeChanged: function (strAttrName, oldValue, newValue) {
+                // if "suspend-created" has been removed: run created and inserted code
+                if (strAttrName === 'suspend-created' && newValue === null) {
+                    elementCreated(this);
+                    elementInserted(this);
+
+                // if "suspend-inserted" has been removed: run inserted code
+                } else if (strAttrName === 'suspend-inserted' && newValue === null) {
+                    elementInserted(this);
+
+                } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+
+                }
+            }
+        },
+        events: {},
+        accessors: {
+            value: {
+                get: function () {
+                    return this.getAttribute('value');
+                },
+                set: function (newValue) {
+                    this.setAttribute('value', newValue);
+                    this.innerText = newValue;
+                }
+            },
+            dteValue: {
+                get: function () {
+                    var value = this.value;
+                    var dteValue = value ? new Date((this.hasDate ? '' : '1/1/1970 ') + value + (this.hasTime ? '' : ' 00:00:00')) : null;
+
+                    return dteValue;
+                },
+                set: function (newValue) {
+                    this.value = formatDate(newValue, this.getAttribute('format'));
+                }
+            }
+        },
+        methods: {}
+    });
+
+    /******************* WHEEL ******************/
+
+    function wheelDragStartHandler(event) {
+        var pageY = 0;
+        if (event.touches && event.touches.length !== 1) {
+            return;
+        } else if (event.touches) {
+            pageY = event.touches[0].pageY;
+        } else if (event.pageY) {
+            pageY = event.pageY;
+        }
+        var element = this;
+        var fontSize = GS.emToPx(element, 1) / GS.emToPx(document.body, 1);
+        var wheel = element.wheel;
+        element.dragStart = pageY;
+        element.rotationStart = element.rotation;
+        element.numbersRotated = 1;
+        if (element.kineticTimer) {
+            clearTimeout(element.kineticTimer);
+            element.kineticTimer = null;
+        }
+        // console.log(element.dragStart, pageY, element.velocity, element.rotation, event);
+        // console.log('wheelDragStartHandler', element);
+
+        var addNumberToStart = function () {
+            wheel.removeChild(wheel.lastChild);
+            var newRotation = parseFloat(wheel.firstChild.getAttribute('rotation')), newNumber = parseInt(wheel.firstChild.innerText, 10) - 1;
+            newRotation += element.rotationInterval;
+            if (newRotation > 0) {
+                newRotation -= 360;
+            }
+            if (newNumber < element.min) {
+                newNumber += (element.max + 1);
+            }
+            wheel.insertBefore(GS.stringToElement('<span class="value" rotation="' + newRotation + '" style="transform: rotateX(' + newRotation + 'deg) translateZ(' + element.radius + ');">' + GS.leftPad(newNumber, '0', 2) + '</span>'), wheel.firstChild);
+        };
+
+        var addNumberToEnd = function () {
+            wheel.removeChild(wheel.firstChild);
+            var newRotation = parseFloat(wheel.lastChild.getAttribute('rotation')), newNumber = parseInt(wheel.lastChild.innerText, 10) + 1;
+            newRotation -= element.rotationInterval;
+            if (newRotation < -360) {
+                newRotation += 360;
+            }
+            if (newNumber >= (element.max + 1)) {
+                newNumber -= (element.max + 1);
+            }
+            wheel.appendChild(GS.stringToElement('<span class="value" rotation="' + newRotation + '" style="transform: rotateX(' + newRotation + 'deg) translateZ(' + element.radius + ');">' + GS.leftPad(newNumber, '0', 2) + '</span>'));
+        };
+
+        var dragHandler = function (event) {
+            var pageY = 0;
+            if (event.touches && event.touches.length !== 1) {
+                return;
+            } else if (event.touches) {
+                pageY = event.touches[0].pageY;
+            } else if (event.pageY) {
+                pageY = event.pageY;
+            }
+            // console.log('dragHandler', element);
+            element.velocity = element.dragStart - pageY;
+            // console.log(element.dragStart, pageY, element.velocity, element.rotation, event);
+
+            element.rotation += element.velocity / fontSize;
+            wheel.setAttribute('style', 'transform: translateZ(-' + element.radius + ') rotateX(' + element.rotation + 'deg);');
+
+            if (!element.ampm) {
+                while ((element.rotation - element.rotationStart) < ((element.numbersRotated - 1) * element.rotationInterval)) {
+                    element.numbersRotated -= 1;
+
+                    addNumberToStart();
+                }
+
+                while ((element.rotation - element.rotationStart) > (element.numbersRotated * element.rotationInterval)) {
+                    element.numbersRotated += 1;
+
+                    addNumberToEnd();
+                }
+            }
+
+            element.dragStart = pageY;
+        };
+
+        var dragStopHandler = function (event) {
+            // console.log('dragStopHandler', element);
+
+            if (element.ampm) {
+                while (element.rotation > 180) {
+                    element.rotation -= 360;
+                }
+                while (element.rotation < -180) {
+                    element.rotation += 360;
+                }
+
+                if (element.rotation < 11.25) {
+                    element.rotation = 0;
+                } else if (element.rotation >= 11.25) {
+                    element.rotation = 22.25;
+                }
+
+                wheel.setAttribute('style', 'transform: translateZ(-' + element.radius + ') rotateX(' + element.rotation + 'deg);');
+
+                var valueElement = xtag.query(wheel, '[rotation="' + (element.rotation * -1) + '"]')[0];
+                element.setAttribute('value', valueElement.innerText);
+                GS.triggerEvent(element, 'change');
+
+            } else {
+                if (Math.abs(element.velocity) > 5) {
+                    var drag = 0.01;
+                    var interval = 10;
+                    element.kineticTimer = setTimeout(function kinetic() {
+                        dragHandler({
+                            pageY: element.dragStart - (element.velocity * (1 - drag))
+                        });
+                        drag *= 1.05;
+                        if (drag < 1) {
+                            element.kineticTimer = setTimeout(kinetic, interval);
+                        } else {
+                            element.kineticTimer = null;
+                            element.velocity = 0;
+                            dragStopHandler();
+                        }
+                    }, interval);
+
+                } else {
+                    var oldRotation = element.rotation;
+                    element.rotation = Math.round(element.rotation / element.rotationInterval) * element.rotationInterval;
+
+                    while (element.rotation > 360) {
+                        element.rotation -= 360;
+                    }
+                    while (element.rotation < 0) {
+                        element.rotation += 360;
+                    }
+
+                    var valueElement = xtag.query(wheel, '[rotation="' + (element.rotation * -1) + '"]')[0];
+                    element.setAttribute('value', valueElement.innerText);
+
+                    element.rotation = -180;
+                    wheel.setAttribute('style', 'transform: translateZ(-' + element.radius + ') rotateX(' + element.rotation + 'deg);');
+                    wheelGenerateHTML(element);
+                    GS.triggerEvent(element, 'change');
+                }
+            }
+
+            window.removeEventListener(evt.mousemove, dragHandler);
+            window.removeEventListener(evt.mouseup, dragStopHandler);
+            window.addEventListener(evt.mouseout, dragStopHandler);
+        };
+
+        window.addEventListener(evt.mousemove, dragHandler);
+        window.addEventListener(evt.mouseup, dragStopHandler);
+        window.addEventListener(evt.mouseout, dragStopHandler);
+    }
+
+    function wheelGenerateHTML(element) {
+        element.wheel.innerHTML = '';
+        for (var rotation = 0, j = parseInt(element.value, 10) - 8; rotation > -360; rotation -= element.rotationInterval, j += 1) {
+            if (element.ampm) {
+                element.wheel.appendChild(GS.stringToElement('<span class="value" rotation="' + rotation + '" style="transform: rotateX(' + rotation + 'deg) translateZ(' + element.radius + ');">' + (rotation === 0 ? 'AM' : 'PM') + '</span>'));
+                if (rotation == -22.5) {
+                    break;
+                }
+            } else {
+                if (j < element.min) {
+                    if (j >= 0) {
+                        j = element.max - j;
+                    } else {
+                        j = (element.max + (element.min === 0 ? 1 : 0)) + j;
+                    }
+                }
+                element.wheel.appendChild(GS.stringToElement('<span class="value" rotation="' + rotation + '" style="transform: rotateX(' + rotation + 'deg) translateZ(' + element.radius + ');">' + GS.leftPad(j, '0', 2) + '</span>'));
+                if (j === element.max) {
+                    j = element.min - 1;
+                }
+            }
+        }
+    }
+
+    // dont do anything that modifies the element here
+    function wheelElementCreated(element) {
+        // if "created" hasn't been suspended: run created code
+        if (!element.hasAttribute('suspend-created')) {
+
+        }
+    }
+
+    //
+    function wheelElementInserted(element) {
+        var styleElement, i, len, wheelNames, wheelHTML;
+
+        // if "created" hasn't been suspended and "inserted" hasn't been suspended: run inserted code
+        if (!element.hasAttribute('suspend-created') && !element.hasAttribute('suspend-inserted')) {
+            // if this is the first time inserted has been run: continue
+            if (!element.inserted) {
+                element.inserted = true;
+
+                if (evt.touchDevice) {
+                    element.setAttribute('touch', '');
+                }
+
+                var maybePreventPullToRefresh = false;
+                var lastTouchY = 0;
+                var touchstartHandler = function(e) {
+                    if (e.touches.length != 1) {
+                        return;
+                    }
+                    lastTouchY = e.touches[0].clientY;
+                    // Pull-to-refresh will only trigger if the scroll begins when the
+                    // document's Y offset is zero.
+                    maybePreventPullToRefresh = window.pageYOffset == 0;
+                };
+
+                var touchmoveHandler = function(e) {
+                    var touchY = e.touches[0].clientY;
+                    var touchYDelta = touchY - lastTouchY;
+                    lastTouchY = touchY;
+
+                    if (maybePreventPullToRefresh) {
+                        // To suppress pull-to-refresh it is sufficient to preventDefault the
+                        // first overscrolling touchmove.
+                        maybePreventPullToRefresh = false;
+                        if (touchYDelta > 0) {
+                            e.preventDefault();
+                            return;
+                        }
+                    }
+
+                    e.preventDefault();
+                    return;
+
+                    if (window.pageYOffset == 0 && touchYDelta > 0) {
+                        e.preventDefault();
+                        return;
+                    }
+                };
+
+                element.addEventListener('touchstart', touchstartHandler, { passive: false });
+                element.addEventListener('touchmove', touchmoveHandler, { passive: false });
+
+                element.radius = '4em'; //(element.clientHeight / 2) + 'px';
+                element.values = element.getAttribute('values');
+                element.innerHTML = ml(function () {/*
+                    <div class="root">
+                        <div class="transparent top"></div>
+                        <div class="container">
+                            <div class="wheel" style="transform: translateZ(-{{RADIUS}}) rotateX(-180deg);"></div>
+                        </div>
+                        <div class="transparent bottom"></div>
+                    </div>
+                */}).replace('{{RADIUS}}', element.radius);
+                element.wheel = xtag.query(element, '.wheel')[0];
+                element.rotation = -180;
+                element.addEventListener(evt.mousedown, wheelDragStartHandler);
+                element.rotationInterval = 360 / 16;
+                //y|yyyy|yy|M|MM|d|dd|EEE|EEEE
+                //k|kk|hh|h|H|HH|m|mm|s|ss|S|SS|SSS
+                console.log(element.values, element.values.substring(0, 2) === 'dd', element.values.substring(0, 1) === 'd');
+                if (element.values === 'M' || element.values === 'MM' || element.values === 'H' || element.values === 'HH') {
+                    element.min = 1;
+                    element.max = 12;
+                } else if (element.values === 'h' || element.values === 'hh') {
+                    element.min = 0;
+                    element.max = 23;
+                } else if (element.values === 'k' || element.values === 'kk') {
+                    element.min = 0;
+                    element.max = 23;
+                } else if (element.values === 'm' || element.values === 'mm' || element.values === 'ss') {
+                    element.min = 0;
+                    element.max = 59;
+                } else if (element.values[0] === 'd') {
+                    element.min = 1;
+                    element.max = element.values.length > 2 ? parseInt(element.values.substring(element.values.length - 2, element.values.length), 10) : 31;
+                } else if (element.values === 'y') {
+                    element.min = 0;
+                    element.max = 99;
+                } else if (element.values === 'yyyy') {
+                    element.min = 0;
+                    element.max = 10000;
+
+                } else if (element.values === 'ampm') {
+                    element.ampm = true;
+                    element.rotation = 0;
+                    element.wheel.setAttribute('style', 'transform: translateZ(-' + element.radius + ') rotateX(' + element.rotation + 'deg);');
+                } else {
+                    var arrValue = element.values.split('-');
+                    element.min = arrValue[0];
+                    element.max = arrValue[1];
+                }
+
+                wheelGenerateHTML(element);
+            }
+        }
+    }
+
+    xtag.register('gs-wheel', {
+        lifecycle: {
+            created: function () {
+                wheelElementCreated(this);
+            },
+
+            inserted: function () {
+                wheelElementInserted(this);
+            },
+
+            attributeChanged: function (strAttrName, oldValue, newValue) {
+                // if "suspend-created" has been removed: run created and inserted code
+                if (strAttrName === 'suspend-created' && newValue === null) {
+                    elementCreated(this);
+                    elementInserted(this);
+
+                // if "suspend-inserted" has been removed: run inserted code
+                } else if (strAttrName === 'suspend-inserted' && newValue === null) {
+                    elementInserted(this);
+
+                } else if (!this.hasAttribute('suspend-created') && !this.hasAttribute('suspend-inserted')) {
+
+                }
+            }
+        },
+        events: {},
+        accessors: {
+            value: {
+                get: function () {
+                    return this.getAttribute('value') || '0';
+                },
+                set: function (newValue) {
+                    this.setAttribute('value', newValue);
+                    wheelGenerateHTML(this);
+                }
+            }
+        },
+        methods: {}
+    });
+});
+
 
 window.addEventListener('design-register-element', function () {
     'use strict';
@@ -27828,26 +29458,26 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     // removes selected class from old selected records adds class selected to record
-    function highlightRecord(element, record) {
+    function highlightRecord(element, record) { //TODO: XLD
         var i, len, arrSelectedTrs;
-        
+
         //console.log(record);
-        
+
         if (element.tableElement && xtag.queryChildren(element.tableElement, 'tbody')[0]) {
             // clear previous selection
             arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
-            
+
             for (i = 0, len = arrSelectedTrs.length; i < len; i += 1) {
                 arrSelectedTrs[i].removeAttribute('selected');
             }
         }
-        
+
         // select/highlight the record that was provided
         if (record) {
             if (record.length >= 0) {
-                
+
                 for (i = 0, len = record.length; i < len; i += 1) {
                     record[i].setAttribute('selected', '');
                 }
@@ -27880,10 +29510,47 @@ document.addEventListener('DOMContentLoaded', function () {
         return matchedRecord;
     }
 
-    function selectRecord(element, handle, bolChange, bolAdd, strType) {
-        if (!element.hasAttribute('no-select')) {
-            var record;
-            
+    function getTRFromTarget(element) {
+        var currentElement = element;
+
+        while (currentElement.nodeName !== 'TR') {
+            currentElement = currentElement.parentNode;
+        }
+
+        return currentElement;
+    }
+    //snapback
+    
+    //boladd should be true if event.metaKey is true
+    
+    //if boladd is true:
+    //  selected records that were clicked become non-selected
+    //  non-select records that were clicked become selected
+
+    // if bolShift is true and not negative:
+    //  select from element.lastClicked to the clicked record
+    // if bolShift is true and negative:
+    //  de-select from element.lastClicked to the clicked record
+    //
+    //
+
+    function selectRecord(element, handle, bolChange, bolAdd, strType, bolShift) {
+        if (!element.hasAttribute('no-select') && element.tableElement) {
+            //console.log(element.secondLastClicked, element.lastClicked);
+            var record, arrSelectedRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected], tr[selected-secondary]');
+            //console.log(handle, bolChange, bolAdd, strType, bolShift);
+            //console.trace('A');
+            if (!bolAdd && !bolShift) {
+                var i, len, arrRecords = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr');
+                element.secondLastClicked = null;
+                for (i = 0, len = arrRecords.length; i < len; i += 1) {
+                    arrRecords[i].removeAttribute('selected');
+                    if (arrRecords[i].classList.contains('originTR')) {
+                        arrRecords[i].classList.remove('originTR');
+                    }
+                }
+            }
+
             if (typeof handle === 'string' || typeof handle === 'number') {
                 record = findRecordFromValue(element, handle);
                 if (!record && handle !== '') {
@@ -27892,38 +29559,341 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 record = handle;
             }
-            
+
             if (element.hasAttribute('multi-select')) {
                 if (handle.length >= 0) {
-                    record = handle;
+                    record = record;
                 } else {
-                    record = [handle];
+                    record = [record];
                 }
             }
+
+            if (bolShift && strType === 'down') {
+                var clickFrom, newClicked, arrOrigins = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr.originTR')
+                    , arrAllRecords = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr'), bolDeselect, intDistanceBetween = 0
+                    , intSelected = 0, bolRemoveClicked = false;
+                //if we have a lastClicked
+                //    use that
+                //else if we have an originTR
+                //    use that
+                //else if there is one selected record
+                //    use that
+                if (element.lastClicked) {
+                    clickFrom = element.lastClicked
+                } else if (arrOrigins.length === 1) {
+                    clickFrom = arrOrigins[0].getAttribute('data-record_no');
+                } else if (arrSelectedRecords.length === 1) {
+                    clickFrom = arrSelectedRecords[0].getAttribute('data-record_no');
+                }
+
+                //get the record that was just clicked
+                if (typeof handle === 'object' && handle.tagName) {
+                    newClicked = parseInt(handle.getAttribute('data-record_no'), 10);
+                }
+
+                //console.log(clickFrom, newClicked);
+                if (newClicked) {
+                    //find how many are selected between clickFrom and newClicked
+                    if (clickFrom < newClicked) {
+                        for (var i = clickFrom, len = newClicked; i < len; i++) {
+                            if (handle.hasAttribute('selected') || handle.hasAttribute('selected-secondary')) {
+                                intSelected += 1;
+                            }
+                        }
+                    } else {
+                        for (var i = newClicked - 1, len = clickFrom - 1; i < len; i++) {
+                            if (handle.hasAttribute('selected') || handle.hasAttribute('selected-secondary')) {
+                                intSelected += 1;
+                            }
+                        }
+                    }
+
+                    if (clickFrom < newClicked) {
+                        intDistanceBetween = newClicked - clickFrom;
+                    } else {
+                        intDistanceBetween = clickFrom - newClicked;
+                    }
+
+                    //if all of the records are selected
+                    //    bolDeselect = true
+                    //else
+                    //    bolDeselect = false
+                    if (intDistanceBetween <= intSelected) {
+                        bolDeselect = true;
+                    } else {
+                        bolDeselect = false;
+                    }
+
+
+                    //console.log(bolDeselect, intDistanceBetween, intSelected);
+                    //if clickFrom is higher in the list than newClicked
+                    //    select down from clickFrom to newClicked
+                    //else
+                    //    select down from newClicked to clickFrom
+                    if (clickFrom < newClicked) {
+                        if (bolDeselect) {
+                            clickFrom -= 1;
+                            newClicked -= 1;
+                        }
+                        for (var i = clickFrom, len = newClicked; i < len; i++) {
+                            if (bolDeselect) {
+                                if (arrAllRecords[i].hasAttribute('selected')) {
+                                    arrAllRecords[i].removeAttribute('selected');
+                                }
+                                if (arrAllRecords[i].hasAttribute('selected-secondary')) {
+                                    arrAllRecords[i].removeAttribute('selected-secondary');
+                                }
+                            } else {
+                                arrAllRecords[i].setAttribute('selected', '');
+                            }
+                            arrAllRecords[i].classList.remove('originTR');
+                        }
+                    } else {
+                        if (bolDeselect) {
+                            newClicked += 1;
+                            clickFrom += 1
+                        }
+                        for (var i = newClicked - 1, len = clickFrom; i < len; i++) {
+                            if (bolDeselect) {
+                                if (arrAllRecords[i].hasAttribute('selected')) {
+                                    arrAllRecords[i].removeAttribute('selected');
+                                }
+                                if (arrAllRecords[i].hasAttribute('selected-secondary')) {
+                                    arrAllRecords[i].removeAttribute('selected-secondary');
+                                }
+                            } else {
+                                arrAllRecords[i].setAttribute('selected', '');
+                            }
+                            arrAllRecords[i].classList.remove('originTR');
+                        }
+                    }
+                }
+
+
+                //if bolDeselect is false
+                //    deselect from clickFrom to the first non-selected record
+                if (!bolDeselect) {
+                    if (clickFrom < newClicked) {
+                        if (element.secondLastClicked > clickFrom && element.secondLastClicked < newClicked) {
+                            bolRemoveClicked = true;
+                        }
+                    } else {
+                        if (element.secondLastClicked < clickFrom && element.secondLastClicked > newClicked) {
+                            bolRemoveClicked = true;
+                        }
+                    }
+                    
+                    if (bolRemoveClicked) {
+                        if (clickFrom < newClicked) {
+                            for (var i = element.secondLastClicked - 2; i > 0; i--) {
+                                    // console.log(arrAllRecords[i].outerHTML, arrAllRecords[i].hasAttribute('selected'), arrAllRecords[i].hasAttribute('selected-secondary'));
+                                    arrAllRecords[i].classList.remove('originTR');
+
+                                    if (arrAllRecords[i].hasAttribute('selected')) {
+                                        arrAllRecords[i].removeAttribute('selected');
+                                    } else if (arrAllRecords[i].hasAttribute('selected-secondary')) {
+                                        arrAllRecords[i].removeAttribute('selected-secondary');
+                                    } else {
+                                        // console.log(arrAllRecords[i]);
+                                        break;
+                                    }
+                            }
+                        } else {
+                            for (var i = element.secondLastClicked, len = arrAllRecords.length; i < len; i++) {
+                                    arrAllRecords[i].classList.remove('originTR');
+                                    if (arrAllRecords[i].hasAttribute('selected')) {
+                                        arrAllRecords[i].removeAttribute('selected');
+                                    } else if (arrAllRecords[i].hasAttribute('selected-secondary')) {
+                                        arrAllRecords[i].removeAttribute('selected-secondary');
+                                    } else {
+                                        break;
+                                    }
+                            }
+                        }
+                    }
+                    // console.log(bolRemoveClicked, i, len, bolDeselect, clickFrom < newClicked, element.secondLastClicked);
+                }
+
+
+
+                // var i_shift, len_shift, newNumber, arrOrigins = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr.originTR');
+                // for (i_shift = 0, len_shift = arrOrigins.length; i_shift < len_shift; i_shift += 1) {
+                //     arrOrigins[i_shift] = parseInt(arrOrigins[i_shift].getAttribute('data-record_no'),10);
+                // }
+                // newNumber = parseInt(handle.getAttribute('data-record_no'),10);
+
+                // var currentNumber = arrOrigins[0];
+                // var diff = Math.abs (newNumber - currentNumber);
+                // for (var val = 0; val < arrOrigins.length; val++) {
+                //     var newdiff = Math.abs (newNumber - arrOrigins[val]);
+                //     if (newdiff < diff) {
+                //         diff = newdiff;
+                //         currentNumber = arrOrigins[val];
+                //     }
+                // }
+                // // for (i_shift = 0, len_shift = arrOrigins.length; i_shift < len_shift; i_shift += 1) {
+                // //     currentDiff = Math.abs(arrOrigins[i_shift] - newNumber);
+                // //     //console.log(currentDiff, arrDiffs);
+                // //     arrDiffs.push(currentDiff);
+                // //     for (var i_diff = 0, len_diff = arrDiffs.length; i_diff < len_diff; i_diff += 1) {
+                // //         if (currentDiff > arrDiffs[i_diff]) {
+                // //             currentDiff = arrDiffs[i_diff];
+                // //             currentNumber = arrOrigins[i_diff - 1];
+                // //             // console.log(arrDiffs, i_diff);
+                // //             //console.log(currentDiff, arrDiffs);
+                // //         }
+                // //     }
+                // // }
+                // var arrAllRecords = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr');
+                // //console.log(newNumber, currentNumber);
+                // //console.log(arrOrigins);
+                // //console.log(handle.hasAttribute('selected') || handle.hasAttribute('selected-secondary'));
+                // if (handle.hasAttribute('selected') || handle.hasAttribute('selected-secondary')) {
+                //     if (arrOrigins.length === 1) {
+                //         currentNumber = arrAllRecords.length;
+                //     } else {
+                //         if (newNumber > currentNumber) {
+                //             if (arrOrigins[arrOrigins.indexOf(currentNumber) + 1]) {
+                //                 currentNumber = arrOrigins[arrOrigins.indexOf(currentNumber) + 1] - 1;
+                //             } else {
+                //                 currentNumber = arrOrigins[arrOrigins.indexOf(currentNumber)];
+                //             }
+                //         } else {
+                //             if (arrOrigins[arrOrigins.indexOf(currentNumber) - 1]) {
+                //                 currentNumber = arrOrigins[arrOrigins.indexOf(currentNumber) - 1] - 1;
+                //             } else {
+                //                 currentNumber = arrOrigins[arrOrigins.indexOf(currentNumber)];
+                //             }
+                //         }
+                //     }
+                //     // console.log(newNumber, currentNumber);
+                //     if (newNumber < currentNumber) {
+                //         for (var i = newNumber - 1, len = currentNumber; i < len; i++) {
+                //             arrAllRecords[i].removeAttribute('selected', '');
+                //             arrAllRecords[i].classList.remove('originTR');
+                //             //console.log(arrAllRecords[i]);
+                //         }
+                //     } else {
+                //         for (var i = currentNumber, len = newNumber; i < len; i++) {
+                //             arrAllRecords[i].removeAttribute('selected', '');
+                //             arrAllRecords[i].classList.remove('originTR');
+                //             //console.log(arrAllRecords[i]);
+                //         }
+                //     }
+                    
+                // } else {
+                //     if (newNumber < currentNumber) {
+                //         for (var i = newNumber - 1, len = currentNumber; i < len; i++) {
+                //             arrAllRecords[i].setAttribute('selected-secondary', '');
+                //             //console.log(arrAllRecords[i]);
+                //         }
+                //     } else {
+                //         for (var i = currentNumber, len = newNumber; i < len; i++) {
+                //             arrAllRecords[i].setAttribute('selected-secondary', '');
+                //             //console.log(arrAllRecords[i]);
+                //         }
+                //     }
+                //     handle.classList.add('originTR');
+                // }
+
+            } else if (strType === 'down') {
+                element.originTR = record[0];
+                //console.log(arrSelectedRecords);//handle, handle.hasAttribute('selected'));
+                if (bolAdd && handle.hasAttribute('selected') && arrSelectedRecords.length > 1) {
+                    handle.removeAttribute('selected');
+                    if (handle.classList.contains('originTR')) {
+                        handle.classList.remove('originTR');
+                    }
+                } else {
+                    element.originTR.setAttribute('selected-secondary', '');
+                }
+            } else if (strType === 'move' && !bolShift) {
+                var arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected-secondary]');
+
+                // if (element.tableElement && xtag.queryChildren(element.tableElement, 'tbody')[0]) {
+                //     // clear previous selection
+                //     k
+                //     for (i = 0, len = arrSelectedTrs.length; i < len; i += 1) {
+                //         arrSelectedTrs[i].removeAttribute('selected-secondary');
+                //     }
+                // }
+
+                var arrRecords = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr');
+                var i, len, arrRecordsToAffect =
+                    arrRecords.slice(Math.min(element.originTR.getAttribute('data-record_no')
+                                        , record[0].getAttribute('data-record_no')) - 1
+                                    , Math.max(element.originTR.getAttribute('data-record_no')
+                                        , record[0].getAttribute('data-record_no')));
+
+                for (i = 0, len = arrRecordsToAffect.length; i < len; i += 1) {
+                    arrRecordsToAffect[i].setAttribute('selected-secondary', '');
+                }
+                
+                //console.log('origin: ', element.originTR.rowIndex);
+                //console.log('destination: ', record[0].rowIndex);
+                //console.log('arrRecordsToAffect', arrRecordsToAffect);
+                //console.log('arrRecordsToAffect.length', arrRecordsToAffect.length);
+                //console.log('record', record);
+            } else if (strType === 'up') {
+                if (element.tableElement && xtag.queryChildren(element.tableElement, 'tbody')[0]) {
+                    // clear previous selection
+                    arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected-secondary]');
+
+                    for (i = 0, len = arrSelectedTrs.length; i < len; i += 1) {
+                        arrSelectedTrs[i].removeAttribute('selected-secondary');
+                        arrSelectedTrs[i].setAttribute('selected', '');
+                    }
+                }
+                if (record[0]) {
+                    //console.trace('triggerchange 1');
+                    element.triggerChange();
+                }
+            } else if (record) {
+                // highlightRecord has its own checking for no record supplied,
+                // so this deselects any rows then selects the supplied record or none
+                if (element.hasAttribute('multi-select')) {
+                    for (i = 0, len = record.length; i < len; i += 1) {
+                        record[i].setAttribute('selected', '');
+                    }
+                } else {
+                    record.setAttribute('selected', '');
+                }
+                //highlightRecord(element, record);
+                //console.trace('triggerchange 2');
+                element.triggerChange();
+            }
             
+            if (element.originTR) {
+                element.originTR.classList.add('originTR');
+            }
             
-            // highlightRecord has its own checking for no record supplied,
-            // so this deselects any rows then selects the supplied record or none
-            highlightRecord(element, record);
-            
+            //Save last clicked tr no for Shift-selecting
+            if (typeof handle === 'object' && handle.tagName && strType === 'down') {
+                //console.log(typeof handle, handle);
+                if (element.lastClicked) {
+                    element.secondLastClicked = element.lastClicked;
+                }
+                element.lastClicked = parseInt(handle.getAttribute('data-record_no'), 10);
+            }
+            // console.log(record, 'record');
             //console.log('3***', element.selectedRecord, element.value);
         }
     }
-    
-    
+
+
     // #################################################################
     // ########################## USER EVENTS ##########################
     // #################################################################
-    
+
     // handle behaviours on keydown
     function handleKeyDown(event) {
-        var element = event.target, intKeyCode = event.keyCode || event.which, selectedTr, trs, i, len, selectedRecordIndex;
+        var element = event.target.parentNode, intKeyCode = event.keyCode || event.which, selectedTr, trs, i, len, selectedRecordIndex;
         
         if (!element.hasAttribute('disabled')) {
             if (!element.hasAttribute('no-select')) {
                 if ((intKeyCode === 40 || intKeyCode === 38) && (!event.shiftKey) && !event.metaKey && !event.ctrlKey && !element.error) {
-                    
-                    trs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr:not(.divider)');
+                    //console.log(element.parentNode);
+                    trs = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr:not(.divider)');
                     
                     for (i = 0, len = trs.length; i < len; i += 1) {
                         if (trs[i].hasAttribute('selected')) {
@@ -27962,7 +29932,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     event.stopPropagation();
                     
                 } else if (event.keyCode === 13) {
-                    selectedTr = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]')[0];
+                    selectedTr = xtag.query(xtag.query(element.tableElement, 'tbody')[0], 'tr[selected]')[0];
                     
                     if (element.tableElement && selectedTr) {
                         selectRecord(element, selectedTr, true);
@@ -27980,6 +29950,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     function handleFocusout(event) {
+        //TODO: XLD
+        /*
         var element = event.target, selectedTr;
         
         if (element.tableElement) {
@@ -27989,6 +29961,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 selectRecord(element, selectedTr, true);
             }
         }
+        */
     }
     
     
@@ -28285,6 +30258,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var bolRefresh;
         var strOperator;
 
+        element.supressChange = false;
+
         if (strQSCol) {
             if (strQSCol.indexOf('=') !== -1) {
                 arrAttrParts = strQSCol.split(',');
@@ -28337,6 +30312,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
                 if (element.internal.bolQSFirstRun !== true) {
                     if (strQSValue !== '' || !element.getAttribute('value')) {
+                        element.supressChange = true;
                         element.setAttribute('value', strQSValue);
                     }
                 } else if (element.value !== strQSValue) {
@@ -28395,7 +30371,126 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
+    // ############# COPY EVENTS #############
+    function unbindCopy(element) {
+        element.removeEventListener(
+            'copy',
+            element.copySelection
+        );
+    }
+    function bindCopy(element) {
+        // console.log('running1');
+        element.copySelection = function (event) {
+            // console.log('running2');
+            var jsnCopyString = {};
+            var focusedElement;
+
+            // saving the currently focused element for easy/quick access
+            focusedElement = document.activeElement;
+
+            // if the focus is on the hidden focus control of if the text
+            //      selection of the currently focused element is not
+            //      selecting multiple characters
+            if (
+                focusedElement.classList.contains('hidden-focus-control') ||
+                focusedElement.selectionStart === focusedElement.selectionEnd
+            ) {
+                console.time('copy');
+
+                // focus the hidden focus control and select all of it's text so
+                //      that Firefox will allow us to override the clipboard
+                focusedElement = element.hiddenFocusControl;
+                focusedElement.focus();
+
+                GS.setInputSelection(
+                    focusedElement,
+                    0,
+                    focusedElement.value.length
+                );
+
+                jsnCopyString.text = '';
+                jsnCopyString.html = '';
+
+                // we want to override the text and HTML mime type clipboards,
+                //      so we get the copy text for both types
+                var selectedRecords = element.selectedRecord;
+                if (selectedRecords[0]) {
+                    for (var i = 0, len = selectedRecords.length; i < len; i++) {
+                        if (i < 1) {
+                            jsnCopyString.text += selectedRecords[i].innerText;
+                            //jsnCopyString.html += selectedRecords[i].innerHTML;
+                        } else {
+                            jsnCopyString.text += '\n' + selectedRecords[i].innerText;
+                            //jsnCopyString.html += '\n' + selectedRecords[i].innerHTML;
+                        }
+                    }
+                //not multi-select
+                } else {
+                    jsnCopyString.text = selectedRecords.innerText;
+                    //jsnCopyString.html = selectedRecords.innerHTML;
+                    // console.log(selectedRecords);
+                }
+                // console.log(jsnCopyString);
+                //jsnCopyString = getCopyStrings(element);
+
+                // override clipboard (prevent event default if we are
+                //      successful)
+                if (handleClipboardData(event, jsnCopyString.text, 'text')) {
+                    event.preventDefault(event);
+                }
+                // if (handleClipboardData(event, jsnCopyString.html, 'html')) {
+                //     event.preventDefault(event);
+                // }
+
+
+                console.timeEnd('copy');
+            }
+        };
+
+        element.hiddenFocusControl.addEventListener(
+            'copy',
+            element.copySelection
+        );
+    }
+
+    function handleClipboardData(event, strCopyString, strType) {
+        var clipboardData = event.clipboardData || window.clipboardData;
+        var strMime;
+
+        if (!clipboardData) {
+            return;
+        }
+        if (!clipboardData.setData) {
+            return;
+        }
+
+        if (strType === 'text') {
+            if (window.clipboardData && window.clipboardData.getData) { // IE
+                strMime = 'Text';
+            } else if (event.clipboardData && event.clipboardData.getData) {
+                strMime = 'text/plain';
+            }
+        } else if (strType === 'html') {
+            if (window.clipboardData && window.clipboardData.getData) { // IE
+                strMime = '';
+            } else if (event.clipboardData && event.clipboardData.getData) {
+                strMime = 'text/html';
+            }
+        } else {
+            throw 'handleClipboardData Error: Type "' + strType + '" not ' +
+                    'recognized, recognized types are "text" and "html".';
+        }
+
+        if (strMime) {
+            if (strCopyString && strMime) {
+                return clipboardData.setData(strMime, strCopyString) !== false;
+            } else {
+                return clipboardData.getData(strMime);
+            }
+        }
+    }
+
     //
     function elementInserted(element) {
         var tableTemplateElement, arrElement, recordElement, tableTemplateElementCopy, strQSValue, i, len, currentElement;
@@ -28409,7 +30504,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.internal = {};
                 element.internalData = {};
                 saveDefaultAttributes(element);
-                
                 // handle "qs" attribute
                 if (element.hasAttribute('qs') ||
                         element.hasAttribute('refresh-on-querystring-values') ||
@@ -28427,36 +30521,64 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
                     //element.popValues = GS.qryToJSON(GS.getQueryString());
                 }
-                
+
                 // allows the element to have focus
                 if (!element.hasAttribute('tabindex')) {
                     element.setAttribute('tabindex', '0');
                 }
-                
+
+                element.skipFocus = false;
+
                 // select for template
                 tableTemplateElement = xtag.queryChildren(element, 'template')[0];
                 if (tableTemplateElement && (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1)) {
                     console.warn('GS-LISTBOX WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                 }
                 
+                
+                if (element.getAttribute('src') || element.getAttribute('source')) {
+                    if (element.innerHTML.trim() !== '') {
+                        var trSet = xtag.query(tableTemplateElement.content, 'tbody > tr');//:not(.divider)');
+                        //console.log(trSet);
+                        for (var i = 0, len = trSet.length; i < len; i++) {
+                            trSet[i].setAttribute('data-record_no', '{{! row.row_number }}');
+                            // console.log(trSet[i]);
+                        }
+                    }
+                }
+                
                 if (tableTemplateElement) {
                     // add a doT.js coded "value" attribute to any element with a "column" attribute but no "value" attribute
                     element.tableTemplate = GS.templateColumnToValue(tableTemplateElement.innerHTML);
                 }
-                
-                //console.log(element.tableTemplate);
-                
+
                 if (element.getAttribute('src') || element.getAttribute('source')) {
+                    // if (element.innerHTML.trim() !== '') {
+                    //     var trSet = xtag.query(tableTemplateElement.content, 'tbody > tr');//:not(.divider)');
+                    //     //console.log(trSet);
+                    //     for (var i = 0, len = trSet.length; i < len; i++) {
+                    //         trSet[i].setAttribute('data-record_no', '{{! row.row_number }}');
+                    //         // console.log(trSet[i]);
+                    //     }
+                    // }
                     getData(element, '', true);
                 } else {
                     if (tableTemplateElement) {
+                        //developer provided template
                         element.tableElement = xtag.query(tableTemplateElement.content, 'table')[0];
                     } else if (xtag.queryChildren(element, 'table')[0]) {
                         element.tableElement = xtag.queryChildren(element, 'table')[0];
                     } else {
                         element.tableElement = document.createElement('table');
                     }
-                    
+                    //loop through and add the data-record_no attribute
+                    //console.log(element.innerHTML);
+                    var trSet = xtag.query(tableTemplateElement.content, 'tr');//:not(.divider)');
+                    //console.log(trSet);
+                    for (var i = 0, len = trSet.length; i < len; i++) {
+                        //console.log(trSet[i]);
+                        trSet[i].setAttribute('data-record_no', i);
+                    }
                     element.syncView();
                 }
             }
@@ -28496,16 +30618,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 get: function () {
                     var element = this;
                     if (element.tableElement) {
-                        var arrRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
-                        
+                        var arrRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');//:not(.divider)
+                        //console.log(arrRecords);
                         if (this.hasAttribute('multi-select')) {
                             var arrResult = [], i;
-                            for (i = 0; i < len; i++) {
-                                arrResult.push(this.internalData.records.dat[arrRecords[i].getAttribute('data-record_no') - 1][0]);
+                            for (i = 0; i < arrRecords.length; i++) {
+                                if (this.internalData.records.dat[arrRecords[i].getAttribute('data-record_no') - 1]) {
+                                    arrResult.push(this.internalData.records.dat[arrRecords[i].getAttribute('data-record_no') - 1][0]);
+                                }
                             }
                             return arrResult;
                         } else {
-                            return this.internalData.records.dat[arrRecords[0].getAttribute('data-record_no') - 1][0];
+                            // console.trace('sonofagun');
+                            if (arrRecords.length > 0) {
+                                // console.log(arrRecords);
+                                // console.log('test1', arrRecords[0].rowIndex);
+                                // console.log('test2', this.internalData.records.dat[arrRecords[0].rowIndex]);
+                                if (this.internalData.records.dat[arrRecords[0].getAttribute('data-record_no') - 1]) {
+                                    return this.internalData.records.dat[arrRecords[0].getAttribute('data-record_no') - 1][0];
+                                }
+                            }
                         }
                     }
                 },
@@ -28521,7 +30653,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     var element = this;
                     if (element.tableElement) {
                         var arrRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
-                        
+                        //console.log('arrRecords', arrRecords);
                         if (this.hasAttribute('multi-select')) {
                             return arrRecords;
                         } else {
@@ -28544,8 +30676,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                         if (this.hasAttribute('multi-select')) {
                             var strResult, i;
-                            for (i = 0; i < len; i++) {
-                                strResult += xtag.queryChildren(arrRecords[i], 'td')[0].textContent;
+                            for (i = 0; i < arrRecords.length; i++) {
+                                // console.log(arrRecords, i, xtag.queryChildren(arrRecords[i], 'td'));
+                                if (xtag.queryChildren(arrRecords[i], 'td').length > 0) {
+                                    strResult += xtag.queryChildren(arrRecords[i], 'td')[0].textContent;
+                                }
                             }
                             return strResult;
                         } else {
@@ -28567,10 +30702,21 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             
             column: function (strColumn) {
-                //console.log('no', Number(this.innerSelectedRecord.getAttribute('data-record_no')) - 1);
+                //console.log('no', Number(this.innerSelectedRecord.rowIndex) - 1);
                 //console.log('data', this.internalData.records);
-                //console.log('return', this.internalData.records.dat[Number(this.innerSelectedRecord.getAttribute('data-record_no')) - 1]);
-                return this.internalData.records.dat[this.selectedRecord.getAttribute('data-record_no') - 1][this.internalData.records.arr_column.indexOf(strColumn)];
+                //console.log('return', this.internalData.records.dat[Number(this.innerSelectedRecord.rowIndex) - 1]);
+                var element = this;
+                if (this.hasAttribute('multi-select')) {
+                    var arrStrResult = [], i;
+                    for (i = 0; i < this.selectedRecord.length; i++) {
+                        arrStrResult.push(this.internalData.records.dat[this.selectedRecord[i].rowIndex - 1][this.internalData.records.arr_column.indexOf(strColumn)]);
+                    }
+                    //console.log('this.selectedRecord', this.selectedRecord);
+                    //console.log('arrStrResult', arrStrResult);
+                    return arrStrResult;
+                } else {
+                    return this.internalData.records.dat[this.selectedRecord.rowIndex - 1][this.internalData.records.arr_column.indexOf(strColumn)];
+                }
             },
             
             // #################################################################
@@ -28822,7 +30968,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             
             syncView: function () {
-                var element = this, tbodyElement, i, len, arrElements, clickHandler, mousedownHandler, mouseoutHandler, mouseoverHandler;
+                var element = this, tbodyElement, i, len, arrElements, clickHandler, mousedownHandler, mousemoveHandler, mouseupHandler, mouseoutHandler, mouseoverHandler;
                 
                 element.removeEventListener('keydown', handleKeyDown);
                 element.addEventListener('keydown', handleKeyDown);
@@ -28864,15 +31010,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (element.hasAttribute('multi-select')) {
                     // if we are not on a touch device: hover and down events
                     if (!evt.touchDevice) {
-                        mousedownHandler = function () {
+                        var mouseIsDown = false;
+                        mousedownHandler = function (event) {
+                            mouseIsDown = true;
                             this.classList.add('down');
-                            selectRecord(element, this, true, event.shiftKey, 'down');
+                            element.addEventListener(evt.mousemove, mousemoveHandler);
+                            window.addEventListener(evt.mouseup, mouseupHandler);
+                            selectRecord(element, this, true, (event.ctrlKey || event.metaKey), 'down', event.shiftKey);
                         };
-                        mousemoveHandler = function () {
-                            selectRecord(element, event.target, true, event.shiftKey, 'move');
+                        mousemoveHandler = function (event) {
+                            if (mouseIsDown) {
+                                selectRecord(element, getTRFromTarget(event.target), true, (event.ctrlKey || event.metaKey), 'move', event.shiftKey);
+                            }
                         };
-                        mouseupHandler = function () {
-                            selectRecord(element, this, true, event.shiftKey, 'up');
+                        mouseupHandler = function (event) {
+                            mouseIsDown = false;
+                            selectRecord(element, this, true, (event.ctrlKey || event.metaKey), 'up', event.shiftKey);
+                            element.removeEventListener(evt.mousemove, mousemoveHandler);
+                            window.removeEventListener(evt.mouseup, mouseupHandler);
                         };
                         mouseoutHandler = function () {
                             this.classList.remove('down');
@@ -28887,8 +31042,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         for (i = 0, len = arrElements.length; i < len; i += 1) {
                             if (!arrElements[i].classList.contains('divider')) {
                                 arrElements[i].addEventListener(evt.mousedown, mousedownHandler);
-                                arrElements[i].addEventListener(evt.mousemove, mousemoveHandler);
-                                arrElements[i].addEventListener(evt.mouseup, mouseupHandler);
                                 arrElements[i].addEventListener(evt.mouseout, mouseoutHandler);
                                 arrElements[i].addEventListener(evt.mouseover, mouseoverHandler);
                             }
@@ -28947,13 +31100,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 //        selectRecord(element, parentRecord, true);
                 //    }
                 //});
+                var focusElement = document.createElement('textarea');
+                focusElement.classList.add('hidden-focus-control');
+                focusElement.setAttribute('value', 'text makes this textarea Firefox worthy');
+
+                element.appendChild(focusElement);
+                element.hiddenFocusControl = focusElement;
+
+                element.addEventListener('focus', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation
+                    if (event.target !== element.hiddenFocusControl) {
+                        element.hiddenFocusControl.focus();
+                        GS.triggerEvent(element.hiddenFocusControl, 'focus');
+                        // console.log(document.activeElement);
+                        element.skipFocus = true;
+                        // console.log(element.skipFocus);
+                    }
+                });
+                bindCopy(element);
+                //console.log(element.tableTemplate);
+                
+                
             },
             
             triggerChange: function () {
-                xtag.fireEvent(this, 'change', {
-                    bubbles: true,
-                    cancelable: true
-                });
+                if (this.supressChange === true) {
+                    this.supressChange = false;
+                } else {
+                    xtag.fireEvent(this, 'change', {
+                        bubbles: true,
+                        cancelable: true
+                    });
+                }
             }
         }
     });
@@ -36088,12 +38267,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.getAttribute('src')
             ).split('.');
 
-            element.setAttribute('schema', arrParts[0]);
-            
+            // I don't know who added this. I don't inderstand why someone
+            //      would put something like "biz.bar.foo" in the "src"
+            //      attribute. That's the case that this code handles. If
+            //      you added this code: PUT A COMMENT!!!! We have comments
+            //      for a reason. Don't ruin this beautiful code. Only YOU
+            //      can prevent spaghetti code.
+            //  ~Michael
+            // It appears to be a solution to quote idented object names that
+            //      contain a period like this: test."test.asdf"
+            //      The problem with this solution (other than being unclear)
+            //      is that it wont work for schema names that contain a period.
+            //      We need a better solution for this. Perhaps it's time to
+            //      create a function that understands ident quoted names for
+            //      real, using actual parsing.
+            //  ~Also Michael
             if (arrParts[2]) {
                 arrParts[1] = arrParts[1] + '.' + arrParts[2];
             }
 
+            // put the split sections of the object name into separate
+            //      attributes
+            element.setAttribute('schema', arrParts[0]);
             element.setAttribute('object', arrParts[1]);
 
             // default "pk" and "lock" attributes
@@ -36217,7 +38412,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 //      instead using a dynamic CSS style element
                 // if it doesn't speed up Edge we may still come up with a new
                 //      use for it so keep it around
-                '<style class="cell-position" style="display:none;"></style>';
+                '<style class="cell-position" style="display:none;"></style>' +
+                // we need to know when the font size changes so that we can
+                //      re-render. this element will always be 1em wide and 1em
+                //      tall. when this element changes pixel size, we'll know
+                //      that the font size has changed.
+                '<div class="table-font-size-detector"></div>';
 
         // we want to easily/quickly be able to get elements without
         //      using selectors
@@ -36232,6 +38432,7 @@ document.addEventListener('DOMContentLoaded', function () {
         element.elems.cellTestContainer = element.elems.root.children[4];
         element.elems.bottomHudContainer = element.elems.root.children[5];
         element.elems.cellPositionStyle = element.elems.root.children[6];
+        element.elems.fontSizeDetector = element.elems.root.children[7];
 
         element.elems.dataContainer =
                 element.elems.tableViewport.children[0];
@@ -36570,6 +38771,31 @@ document.addEventListener('DOMContentLoaded', function () {
             '[for="update-dialog"]'
         )[0];
 
+        // remove all templates from the dom to prevent reflows
+        if (topHudTemplate) {
+            element.removeChild(topHudTemplate);
+        }
+        if (bottomHudTemplate) {
+            element.removeChild(bottomHudTemplate);
+        }
+        if (headerRecordTemplate) {
+            element.removeChild(headerRecordTemplate);
+        }
+        if (dataRecordTemplate) {
+            element.removeChild(dataRecordTemplate);
+        }
+        if (copyTemplate) {
+            element.removeChild(copyTemplate);
+        }
+        if (insertRecordTemplate) {
+            element.removeChild(insertRecordTemplate);
+        }
+        if (insertDialogTemplate) {
+            element.removeChild(insertDialogTemplate);
+        }
+        if (updateDialogTemplate) {
+            element.removeChild(updateDialogTemplate);
+        }
 
         if (
             topHudTemplate &&
@@ -37073,7 +39299,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 // ### NEED CODING ###
 
                 // get text width using test header element
-                element.elems.testHeader.innerHTML = arrColumnElements[i].innerHTML
+                element.elems.testHeader.innerHTML = (
+                    arrColumnElements[i].innerHTML
+                );
 
                 intColumnWidth = (
                     //GS.getTextWidth(
@@ -37142,8 +39370,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 headerRecordTemplate.innerHTML.trim()
             );
 
-            // remove the template element now that it's been siphoned
-            element.removeChild(headerRecordTemplate);
+            //// remove the template element now that it's been siphoned
+            //element.removeChild(headerRecordTemplate);
         }
 
         // if present, siphon "data-record" template
@@ -37180,8 +39408,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 GS.templateHideSubTemplates(strHTML, false)
             );
 
-            // remove the template element now that it's been siphoned
-            element.removeChild(dataRecordTemplate);
+            //// remove the template element now that it's been siphoned
+            //element.removeChild(dataRecordTemplate);
         }
 
         // if present, siphon "copy" template
@@ -37202,8 +39430,8 @@ document.addEventListener('DOMContentLoaded', function () {
             //      the headers
             templateDetermineCopyHeaderList(element, copyTemplate);
 
-            // remove the template element now that it's been siphoned
-            element.removeChild(copyTemplate);
+            //// remove the template element now that it's been siphoned
+            //element.removeChild(copyTemplate);
         }
 
         // if present, siphon "insert-record" template
@@ -37228,8 +39456,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 insertRecordTemplate.innerHTML.trim()
             );
 
-            // remove the template element now that it's been siphoned
-            element.removeChild(insertRecordTemplate);
+            //// remove the template element now that it's been siphoned
+            //element.removeChild(insertRecordTemplate);
         }
 
         // if present, siphon "insert-dialog" template
@@ -37260,8 +39488,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 GS.templateHideSubTemplates(strHTML, false)
             );
 
-            // remove the template element now that it's been siphoned
-            element.removeChild(updateDialogTemplate);
+            //// remove the template element now that it's been siphoned
+            //element.removeChild(updateDialogTemplate);
         }
     }
 
@@ -38165,7 +40393,16 @@ document.addEventListener('DOMContentLoaded', function () {
         var sortClearButton;
         var statusElement;
         var intOriginRecord;
-        
+
+        // I don't know who put this here but it wasn't commented. If you put
+        //      this here: explain yourself. This is the HUD button status
+        //      updating function, this has nothing to do with selection.
+        //      I suppose this function is called after a selection so someone
+        //      thought they were being clever and decided that this was the
+        //      place to trigger such an event. But, I should remind you that
+        //      we have a selection render function that may have worked the
+        //      same but would have been more consistent and clear.
+        //  ~Michael
         GS.triggerEvent(element, 'selection_change');
 
         // disable/enable hud sorting buttons
@@ -38233,6 +40470,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var intHeaderIndex;
         var intSelectorIndex;
         var intInsertIndex;
+        var jsnRange;
 
         var arrElements;
         var i;
@@ -38629,7 +40867,6 @@ document.addEventListener('DOMContentLoaded', function () {
             cell = arrElements[i];
             strRow = (
                 cell.getAttribute('data-row-number') ||
-                cell.getAttribute('data-row') ||
                 '-1'
             );
             strCol = (
@@ -38720,23 +40957,25 @@ document.addEventListener('DOMContentLoaded', function () {
         element.internalSelection.resolvedSelection = arrSelection;
         element.internalSelection.rows = arrRows;
         element.internalSelection.columns = arrColumns;
-
+//<br />
         // you are not allowed to deselect everything, if you have, we'll
         //      select what we can and then re-render the selection
         if (arrRows.length === 0 || arrColumns.length === 0) {
             // if there is data and the current range is not already selecting
             //      the first cell, select the first cell
             //console.log(element.internalSelection.ranges);
+            jsnRange = element.internalSelection.ranges[0];
+
             if (
                 element.internalData.records.length > 0 && (
                     element.internalSelection.ranges &&
                     (
                         element.internalSelection.ranges.length !== 1 ||
-                        element.internalSelection.ranges[0].start.row !== 0 ||
-                        element.internalSelection.ranges[0].start.column !== 0 ||
-                        element.internalSelection.ranges[0].end.row !== 0 ||
-                        element.internalSelection.ranges[0].end.column !== 0 ||
-                        element.internalSelection.ranges[0].negator !== false
+                        jsnRange.start.row !== 0 ||
+                        jsnRange.start.column !== 0 ||
+                        jsnRange.end.row !== 0 ||
+                        jsnRange.end.column !== 0 ||
+                        jsnRange.negator !== false
                     )
                 )
             ) {
@@ -38831,6 +41070,12 @@ document.addEventListener('DOMContentLoaded', function () {
         var intInsertRecordBorderHeight;
         var intHeaderBorderHeight;
 
+        var bolOneCellSelected;
+        var selectedCellControl;
+        var textSelection;
+        var textSelectionStart;
+        var textSelectionEnd;
+
         //console.log(element.internalSelection.ranges.length, 1);
         //if (element.internalSelection.ranges.length === 1){
             //console.log(element.internalSelection.ranges[0].start.column);
@@ -38839,27 +41084,45 @@ document.addEventListener('DOMContentLoaded', function () {
             //console.log(element.internalSelection.ranges[0].end.row);
         //}
 
-        if (element.internalSelection.ranges.length === 1 &&
-            element.internalSelection.ranges[0].start.column ===
-            element.internalSelection.ranges[0].end.column &&
-            element.internalSelection.ranges[0].start.row ===
-            element.internalSelection.ranges[0].end.row
-        ) {
-            //console.log('one input');
-            var updatedInput = xtag.query(element, 'gs-cell[data-col-number="' +
-            element.internalSelection.ranges[0].start.column + '"][data-row-number="' +
-            element.internalSelection.ranges[0].start.row + '"] input');
-            var selectionStartOnCell = 0;
-            var selectionEndOnCell = 0;
-            if (updatedInput[0]) {
-                updatedInput = updatedInput[0];
-                //console.log(updatedInput.selectionStart, updatedInput.selectionEnd);
-                selectionStartOnCell = updatedInput.selectionStart;
-                selectionEndOnCell = updatedInput.selectionEnd;
-            }
-            //selectionStart;
-            //selectionEnd;
+        // get the first range, we need to know if only one cell is selected
+        jsnRange = element.internalSelection.ranges[0];
+        bolOneCellSelected = (
+            element.internalSelection.ranges.length === 1 &&
+            jsnRange.start.column === jsnRange.end.column &&
+            jsnRange.start.row === jsnRange.end.row
+        );
 
+        // if only one cell is selected, we want to save the text selection
+        //      so that we can restore it. this is because this function
+        //      destroys all cells so the text selection of any of those
+        //      cells will be lost.
+        if (bolOneCellSelected) {
+            selectedCellControl = xtag.query(
+                element,
+                'gs-cell' +
+                    '[data-col-number="' + jsnRange.start.column + '"]' +
+                    '[data-row-number="' + jsnRange.start.row + '"]' +
+                    ' input'
+            )[0];
+            textSelectionStart = 0;
+            textSelectionEnd = 0;
+
+            //console.log('one cell is selected, save text selection');
+
+            if (selectedCellControl) {
+                //console.log(
+                //    selectedCellControl.selectionStart,
+                //    selectedCellControl.selectionEnd
+                //);
+                //textSelectionStart = selectedCellControl.selectionStart;
+                //textSelectionEnd = selectedCellControl.selectionEnd;
+
+                textSelection = GS.getInputSelection(selectedCellControl);
+                textSelectionStart = textSelection.start;
+                textSelectionEnd = textSelection.end;
+
+                //console.log(textSelection);
+            }
         }
 
 
@@ -39271,7 +41534,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             strHTML +=
                     '<gs-cell class="table-insert-selector" ' +
-                    '      style="' + strCSS + '" data-row="insert" ' +
+                    '      style="' + strCSS + '" data-row-number="insert" ' +
                     '      data-col="selector">*' +
                     '</gs-cell>'; //&gt;
         }
@@ -39337,23 +41600,46 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             col_i += 1;
         }
-        
-        
+
         // render cell selection
         renderSelection(element);
-        
-        
-        
-        if ((selectionStartOnCell > 0 || selectionEndOnCell > 0)) {
-            updatedInput = xtag.query(element, 'gs-cell[data-col-number="' +
-            element.internalSelection.ranges[0].start.column + '"][data-row-number="' +
-            element.internalSelection.ranges[0].start.row + '"] input')[0];
-            //console.log(updatedInput);
-            if (updatedInput) {
-                updatedInput.setSelectionRange(selectionStartOnCell, selectionEndOnCell);
+
+        // if there is only one cell control selected and there is a text
+        //      selection that has been saved: restore the text selection
+        //      in the new control
+        if (
+            selectedCellControl &&
+            (
+                textSelectionStart > 0 ||
+                textSelectionEnd > 0
+            )
+        ) {
+            jsnRange = element.internalSelection.ranges[0];
+
+            if (jsnRange) {
+                selectedCellControl = xtag.query(
+                    element,
+                    'gs-cell' +
+                        '[data-col-number="' + jsnRange.start.column + '"]' +
+                        '[data-row-number="' + jsnRange.start.row + '"]' +
+                        ' input'
+                )[0];
+
+                //console.log(selectedCellControl);
+
+                if (selectedCellControl) {
+                    //selectedCellControl.setSelectionRange(
+                    //    textSelectionStart,
+                    //    textSelectionEnd
+                    //);
+                    GS.setInputSelection(
+                        selectedCellControl,
+                        textSelectionStart,
+                        textSelectionEnd
+                    );
+                }
             }
         }
-        
     }
 
     // when you are scrolling, a lot of elements don't leave the screen. So,
@@ -39665,16 +41951,13 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrDoomed = [];
         arrCell = xtag.queryChildren(
             element.elems.dataViewport,
-            '[data-row-number], [data-col-number], [data-row]'
+            '[data-row-number], [data-col-number]'
         );
         cell_i = 0;
         cell_len = arrCell.length;
         while (cell_i < cell_len) {
             cell = arrCell[cell_i];
-            strRow = (
-                cell.getAttribute('data-row-number') ||
-                cell.getAttribute('data-row')
-            );
+            strRow = cell.getAttribute('data-row-number');
             strCol = cell.getAttribute('data-col-number');
             intRowNumber = parseInt(strRow, 10);
             intColNumber = parseInt(strCol, 10);
@@ -39971,7 +42254,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!element.hasAttribute('no-record-selector')) {
                 strInsertTemplate += (
                     '<gs-cell class="table-insert-selector"' +
-                            ' data-row="insert" data-col="selector">*' + //&gt;
+                            ' data-row-number="insert" data-col="selector">*' + //&gt;
                     '</gs-cell>'
                 );
             }
@@ -40141,9 +42424,9 @@ document.addEventListener('DOMContentLoaded', function () {
         //    intColNumber = parseInt(cell.getAttribute('data-col-number'), 10);
 
         //    // cell has a column number, set left. we can do this because (for
-        //    //      example) header cells dont have a row attribute. the reason
-        //    //      we do that is because those cells don't represent a row in
-        //    //      the data.
+        //    //      example) header cells dont have a row attribute. the
+        //    //      reason we do that is because those cells don't represent
+        //    //      a row in the data.
         //    if (!isNaN(intColNumber)) {
         //        cell.style.left = (
         //            arrColumnLeft[intColNumber - fromColumn] + 'px'
@@ -40155,8 +42438,8 @@ document.addEventListener('DOMContentLoaded', function () {
         //            ) + 'px'
         //        );
 
-        //    // right now, the only element that won't have a column number will
-        //    //      be the record, insert and all selectors
+        //    // right now, the only element that won't have a column number
+        //    //      will be the record, insert and all selectors
         //    } else {
         //        cell.style.width = (
         //            intRecordSelectorWidth +
@@ -40165,9 +42448,9 @@ document.addEventListener('DOMContentLoaded', function () {
         //    }
 
         //    // cell has a row number, set top. we can do this because (for
-        //    //      example) header cells dont have a row attribute. the reason
-        //    //      we do that is because those cells don't represent a row in
-        //    //      the data.
+        //    //      example) header cells dont have a row attribute. the
+        //    //      reason we do that is because those cells don't represent
+        //    //      a row in the data.
         //    if (!isNaN(intRowNumber)) {
         //        cell.style.top = (
         //            arrRecordTop[intRowNumber - fromRecord] + 'px'
@@ -40383,8 +42666,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrMinColumnWidths = element.internalDisplay.minColumnWidths;
         // strCSS += (
         //         strCell + '[data-col-number="' + i + '"] {' +
-        //         'left: ' + intCellLeft + 'px;' +
-        //         'width: ' + (
+        //         'left:' + intCellLeft + 'px;' +
+        //         'width:' + (
         //             ((arrColumnWidths[i] + columnBorderWidth > 0) ?
         //arrColumnWidths[i] + columnBorderWidth : arrMinColumnWidths[i])
         //         ) + 'px;' +
@@ -40396,7 +42679,9 @@ document.addEventListener('DOMContentLoaded', function () {
         var columnBorderWidth = element.internalDisplay.columnBorderWidth;
         var recordBorderHeight = element.internalDisplay.recordBorderHeight;
         var strCSS = '';
-        var strCell = '#' + element.getAttribute('id') + ' gs-cell';
+        var strCell = (
+            '#' + element.getAttribute('id') + ' .table-data-viewport gs-cell'
+        );
 
         // calculate left and top values
         intCellLeft = jsnRange.originLeft;
@@ -40413,8 +42698,8 @@ document.addEventListener('DOMContentLoaded', function () {
             //console.log('col: ', arrColumnWidths[i]);
             strCSS += (
                 strCell + '[data-col-number="' + i + '"] {' +
-                'left: ' + intCellLeft + 'px;' +
-                'width: ' + (
+                'left:' + intCellLeft + 'px;' +
+                'width:' + (
                     arrColumnWidths[i] + columnBorderWidth
                 ) + 'px;' +
                 '}'
@@ -40439,8 +42724,8 @@ document.addEventListener('DOMContentLoaded', function () {
             //console.log('row: ', arrRecordHeights[i]);
             strCSS += (
                 strCell + '[data-row-number="' + i + '"] {' +
-                'top: ' + intCellTop + 'px;' +
-                'height: ' + (
+                'top:' + intCellTop + 'px;' +
+                'height:' + (
                     arrRecordHeights[i] + recordBorderHeight
                 ) + 'px;' +
                 '}'
@@ -40453,10 +42738,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // if the insert record is visible, add it's top
         if (element.internalDisplay.insertRecordVisible) {
             strCSS += (
-                strCell + '[data-row="insert"],' +
                 strCell + '[data-row-number="insert"] {' +
-                'top: ' + intCellTop + 'px;' +
-                'height: ' + (
+                'top:' + intCellTop + 'px;' +
+                'height:' + (
                     element.internalDisplay.insertRecordHeight +
                     element.internalDisplay.insertRecordBorderHeight
                 ) + 'px;' +
@@ -40469,8 +42753,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         strCSS += (
             strCell + '[data-col="selector"] {' +
-            'left: 0px;' +
-            'width: ' + (
+            'left:0px;' +
+            'width:' + (
                 element.internalDisplay.recordSelectorWidth +
                 element.internalDisplay.recordSelectorBorderWidth
             ) + 'px;' +
@@ -40478,8 +42762,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             strCell + '.table-all-selector,' +
             strCell + '.table-header {' +
-            'top: 0px;' +
-            'height: ' + (
+            'top:0px;' +
+            'height:' + (
                 element.internalDisplay.headerHeight +
                 element.internalDisplay.headerBorderHeight
             ) + 'px;' +
@@ -41127,7 +43411,6 @@ document.addEventListener('DOMContentLoaded', function () {
         var newBottomHUDHeight;
 
 
-
         // save the current hud height so that we can compare it to after the
         //      changes have been made
         oldTopHUDHeight = element.elems.topHudContainer.offsetHeight;
@@ -41154,7 +43437,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
 
-
         // save the current hud height so that we can compare it to after the
         //      changes have been made
         oldBottomHUDHeight = element.elems.bottomHudContainer.offsetHeight;
@@ -41179,7 +43461,6 @@ document.addEventListener('DOMContentLoaded', function () {
             element.elems.bottomHudContainer.innerHTML = '';
             newBottomHUDHeight = 0;
         }
-
 
 
         // if there is a difference in one of the HUD heights, we want to
@@ -41393,21 +43674,32 @@ document.addEventListener('DOMContentLoaded', function () {
         // ### NEED CODING ###
     }
 
-    // because of the way the loader container works, we need to adjust each
-    //      loader to a static width instead of an automatic one
+    // because of the way the loader container works, we need to set a margin
+    //      so that the loader becomes visible
     function adjustLoaderWidth(element, loaderElement) {
-        var intWidth;
+        var loaderContent;
 
-        // we calculate the width and store it in a variable
-        intWidth = GS.getTextWidth(element, loaderElement.textContent);
+        // get the wrapped content
+        loaderContent = loaderElement.children[0];
 
-        // let's add a little padding
-        intWidth += 25;
+        // set the marginLeft to counteract the width
+        loaderContent.style.marginLeft = (
+            '-' + (loaderContent.offsetWidth + 10) + 'px'
+        );
 
-        // set loader width and a reverse margin so that it moves to the left
-        //      the same amount
-        loaderElement.style.width = intWidth + 'px';
-        loaderElement.style.marginLeft = '-' + intWidth + 'px';
+        // old, required getTextWidth which is slow
+        //var intWidth;
+
+        //// we calculate the width and store it in a variable
+        //intWidth = GS.getTextWidth(element, loaderElement.textContent);
+
+        //// let's add a little padding
+        //intWidth += 25;
+
+        //// set loader width and a reverse margin so that it moves to the left
+        ////      the same amount
+        //loaderElement.style.width = intWidth + 'px';
+        //loaderElement.style.marginLeft = '-' + intWidth + 'px';
     }
 
     function addLoader(element, strID, strContent) {
@@ -41415,8 +43707,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // create loader element
         loaderElement = document.createElement('div');
-        loaderElement.classList.add('table-loader');
-        loaderElement.innerHTML = strContent;
+        loaderElement.classList.add('table-loader-wrapper');
+        loaderElement.innerHTML = (
+            '<div class="table-loader">' + strContent + '</div>'
+        );
 
         // append loader element to loader container
         element.elems.loaderContainer.appendChild(loaderElement);
@@ -41485,7 +43779,7 @@ document.addEventListener('DOMContentLoaded', function () {
         //      fade out
         if (strFinishedContent) {
             // switch content to loader content
-            loaderElement.innerHTML = strFinishedContent;
+            loaderElement.children[0].innerHTML = strFinishedContent;
 
             // adjust loader width so that it displays all on one line
             adjustLoaderWidth(element, loaderElement);
@@ -42243,7 +44537,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         //arrRecords = arrRecords.concat(arrRecord);
                         //if (bolLoadNewRecordHeights) {
                         //    i = 0;
-                        //    len = (arrRecords.length - arrRecordHeights.length) + 1;
+                        //    len = (
+                        //        (
+                        //            arrRecords.length -
+                        //            arrRecordHeights.length
+                        //        ) +
+                        //        1
+                        //    );
                         //    while (i < len) {
                         //        arrRecordHeights.push(intRecordHeight);
                         //        i += 1;
@@ -43554,7 +45854,6 @@ document.addEventListener('DOMContentLoaded', function () {
         len = jsnDelete.recordIndexes.length;
 
 
-        
         //// create cell array for this record
         //strRecord = element.internalData.records[i] + '\t';
         //arrDeleteRecord = [];
@@ -45051,7 +47350,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     GS.getInputSelection(document.activeElement)
                 );
             }
-    
+
             if (element.hasAttribute("src")) {
                 databaseWSUPDATE(element, strMode, jsnUpdate);
             } else {
@@ -46117,6 +48416,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var intColumnOffset;
 
         var templateElement;
+        var arrInsertCellElements;
+        var arrUpdateCellElements;
         var arrCellElements;
         var arrColumnElements;
         var arrColumnNames;
@@ -46186,12 +48487,30 @@ document.addEventListener('DOMContentLoaded', function () {
         //      start and end column numbers and turn that into an array of
         //      column names for the update
         templateElement = document.createElement('template');
-        templateElement.innerHTML = element.internalTemplates.insertRecord;
 
-        arrCellElements = xtag.query(
+        templateElement.innerHTML = (
+            element.internalTemplates.insertRecord
+        );
+        arrInsertCellElements = xtag.query(
             templateElement.content,
             'gs-cell'
         );
+
+        templateElement.innerHTML = (
+            element.internalTemplates.record.templateHTML
+        );
+        arrUpdateCellElements = xtag.query(
+            templateElement.content,
+            'gs-cell'
+        );
+
+        if (arrInsertCellElements.length > 0) {
+            arrCellElements = arrInsertCellElements;
+        } else {
+            arrCellElements = arrUpdateCellElements;
+        }
+
+        // if we have an insert record, get the column names from there
         arrColumnNames = [];
         i = 0;
         len = arrColumns.length;
@@ -46211,7 +48530,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     arrColumnElements[0].getAttribute('column')
                 );
 
-                //console.log('***', arrColumnNames.length, intMaxPasteColumn);
+                //console.log(arrColumnNames.length, intMaxPasteColumn);
                 if (arrColumnNames.length === (intMaxPasteColumn + 1)) {
                     break;
                 }
@@ -47532,7 +49851,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         parseInt(
                             (
                                 parentCell.getAttribute('data-row-number') ||
-                                parentCell.getAttribute('data-row') ||
                                 ''
                             ),
                             10
@@ -48475,10 +50793,10 @@ document.addEventListener('DOMContentLoaded', function () {
             };
 
             element.internalEvents.selectDragMove = function (event) {
-                var cell;
-                var classList;
-                var intRow;
-                var intColumn;
+                //var cell;
+                //var classList;
+                //var intRow;
+                //var intColumn;
                 var intOldEndRow;
                 var intOldEndColumn;
                 var currentRange;
@@ -48512,7 +50830,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // find out the cell location based on the mouse event
                     var jsnLocation = getCellFromMouseEvent(element, event);
-                    
+
                     //console.log(cell, intRow, intColumn);
                     // get current selection range for easy access
                     currentRange = (
@@ -48532,8 +50850,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     currentRange.end.column = jsnLocation.column;
                     // // update the endpoint row and column
                     // // these if statments maintain the seperation of
-                    // //      insert and non-insert selections and the inclusion
-                    // //      of headers/record selectors in the selection
+                    // //      insert and non-insert selections and the
+                    // //      inclusion of headers/record selectors in
+                    // //      the selection
                     // if (classList.contains('table-cell')) {
                     //     currentRange.end.row = intRow;
                     //     currentRange.end.column = intColumn;
@@ -49017,6 +51336,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // when mouse is 1 or less away pixels away from a cell and/or
             //      record border: insert drag element
             element.internalEvents.cellResizeStarter = function (event) {
+                var strUserAgent = window.navigator.userAgent;
+
                 // this code only needs to run when the mouse is up. we don't
                 //      want to be calculating this every mousemove during a
                 //      cell selection
@@ -49024,17 +51345,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 //      resizing cells already
                 // we also don't want to run this code if we are currently
                 //      reordering columns
-                //console.log('test', event.which, window.navigator.userAgent.indexOf("Edge"), event);
+                //console.log(
+                //    'test',
+                //    event.which,
+                //    window.navigator.userAgent.indexOf("Edge"),
+                //    event
+                //);
                 if (
                     (
                         (
-                            (window.navigator.userAgent.indexOf("Edge") > -1 ||
-                            window.navigator.userAgent.indexOf("Firefox") > -1) &&
+                            (
+                                strUserAgent.indexOf("Edge") > -1 ||
+                                strUserAgent.indexOf("Firefox") > -1
+                            ) &&
                             event.which === 1
                         ) ||
                         (
-                            (window.navigator.userAgent.indexOf("Edge") === -1 ||
-                            window.navigator.userAgent.indexOf("Firefox") > -1) &&
+                            (
+                                strUserAgent.indexOf("Edge") === -1 ||
+                                strUserAgent.indexOf("Firefox") > -1
+                            ) &&
                             event.which === 0
                         )
                     ) &&
@@ -49092,7 +51422,7 @@ document.addEventListener('DOMContentLoaded', function () {
             element.internalEvents.cellResizeDragStart = function () {
                 var recordSelectorVisible;
                 var headerVisible;
-                var insertRecordVisible;
+                //var insertRecordVisible;
                 var intColumnHandle;
                 var intRecordHandle;
 
@@ -49125,9 +51455,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 headerVisible = (
                     element.internalDisplay.headerVisible
                 );
-                insertRecordVisible = (
-                    element.internalDisplay.insertRecordVisible
-                );
+                //insertRecordVisible = (
+                //    element.internalDisplay.insertRecordVisible
+                //);
 
                 // if we're resizing a column, get column index or type
                 if (element.internalResize.resizeColumn) {
@@ -50056,76 +52386,65 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (element.internalSelection.ranges.length
                         > 0
                     ) {
-                        var range_select = (
+                        var jsnFirstRange = (
                             element.internalSelection.ranges[0]
                         );
-                        //console.log(range_select.start.row, ', header');
-                        if (range_select.start.row === 'header') {
-                            if (range_select.start.column === 'selector' &&
-                            range_select.end.column === 'selector') {
-                            var selected_len = (
-                                element.internalSelection.columns.length - 2
-                            );
-                            } else if (parseInt(
-                                ((range_select.end.column === 'selector')
-                                  ? 0
-                                  : range_select.end.column), 10) <
-                                parseInt(
-                                ((range_select.start.column === 'selector')
-                                  ? 0
-                                  : range_select.start.column), 10)
+                        var intSelectionLength;
+                        var strStartColumn = jsnFirstRange.start.column;
+                        var strEndColumn = jsnFirstRange.end.column;
+                        var intStartColumn = parseInt(
+                            (
+                                strStartColumn === 'selector'
+                                    ? 0
+                                    : strStartColumn
+                            ),
+                            10
+                        );
+                        var intEndColumn = parseInt(
+                            (
+                                strEndColumn === 'selector'
+                                    ? 0
+                                    : strEndColumn
+                            ),
+                            10
+                        );
+
+                        if (jsnFirstRange.start.row === 'header') {
+                            if (
+                                strStartColumn === 'selector' &&
+                                strEndColumn === 'selector'
                             ) {
-                            selectedBroken = true;
-                            var selected_len = (
-                                parseInt(
-                                ((range_select.start.column === 'selector')
-                                  ? 0
-                                  : range_select.start.column), 10) + 1 -
-                                parseInt(
-                                ((range_select.end.column === 'selector')
-                                  ? 0
-                                  : range_select.end.column), 10)
-                            );
+                                intSelectionLength = (
+                                    element.internalSelection.columns.length - 2
+                                );
+                            } else if (intStartColumn < intEndColumn) {
+                                selectedBroken = true;
+                                intSelectionLength = (
+                                    (intStartColumn + 1) - intEndColumn
+                                );
                             } else {
-                            selectedBroken = false;
-                            var selected_len = (
-                                parseInt(
-                                ((range_select.end.column === 'selector')
-                                  ? 0
-                                  : range_select.end.column), 10) + 1 -
-                                parseInt(
-                                ((range_select.start.column === 'selector')
-                                  ? 0
-                                  : range_select.start.column), 10)
-                            );
+                                selectedBroken = false;
+                                intSelectionLength = (
+                                    (intEndColumn + 1) - intStartColumn
+                                );
                             }
-                            if (selected_len === 0) {
-                                selected_len = 1;
+                            if (intSelectionLength === 0) {
+                                intSelectionLength = 1;
                             }
-                            // console.log(
-                            //       selected_len
-                            //     , selectedBroken
-                            //     , range_select.start.column
-                            //     , range_select.end.column
-                            // );
-                            for (var selected_i = 0;
-                                selected_i < selected_len; selected_i++
-                            ) {
+
+                            i = 0;
+                            while (i < intSelectionLength) {
                                 if (selectedBroken) {
-                                colsToResize.push(
-                                    selected_i + parseInt(
-                                    ((range_select.end.column === 'selector')
-                                      ? 0
-                                      : range_select.end.column), 10)
-                                );
+                                    colsToResize.push(
+                                        i + intEndColumn
+                                    );
                                 } else {
-                                colsToResize.push(
-                                    selected_i + parseInt(
-                                    ((range_select.start.column === 'selector')
-                                      ? 0
-                                      : range_select.start.column), 10)
-                                );
+                                    colsToResize.push(
+                                        i + intStartColumn
+                                    );
                                 }
+
+                                i += 1;
                             }
                         }
                     }
@@ -50198,7 +52517,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             i = 0;
                             len = colsToResize.length;
                             while (i < len) {
-                                arrColumnWidths[colsToResize[i]] = intNew;//[arrColumns[i]] = intNew;
+                                arrColumnWidths[colsToResize[i]] = intNew;
+                                //[arrColumns[i]] = intNew;
 
                                 i += 1;
                             }
@@ -50285,14 +52605,14 @@ document.addEventListener('DOMContentLoaded', function () {
             // we want to resize the selected records/columns back to their
             //      default sizes if the handle is double-clicked
             element.internalEvents.cellResizeToDefault = function () {
-                var intIndex;
+                //var intIndex;
                 var intNew;
                 var i;
                 var len;
                 var arrRecordHeights;
                 var arrSelectedColumns;
-                var arrColumnWidths;
-                var arrColumns;
+                //var arrColumnWidths;
+                //var arrColumns;
 
                 // we need to be able to resize all selected records/columns,
                 //      if the handle you double click touches a selected
@@ -50328,114 +52648,92 @@ document.addEventListener('DOMContentLoaded', function () {
                             )
                         );
 
+                        var colsToResize = [];
+                        var selectedBroken = false;
+                        var jsnFirstRange;
+                        var strStartColumn;
+                        var strEndColumn;
+                        var intStartColumn;
+                        var intEndColumn;
+                        var intSelectionLength;
 
-                        // console.log('I    H');
-                        // console.log('     E');
-                        // console.log('H    R');
-                        // console.log('A    E');
-                        // console.log('T     ');
-                        // console.log('E    B');
-                        // console.log('     E');
-                        // console.log('T     ');
-                        // console.log('H    D');
-                        // console.log('I    R');
-                        // console.log('S    A');
-                        // console.log('     G');
-                        // console.log('C    O');
-                        // console.log('O    N');
-                        // console.log('D    S');
-                        // console.log('E    !');
-
-                    var colsToResize = [], selectedBroken = false;
-                    //console.log(arrSelectedColumns);
-                    // console.log(
-                    //     element.internalSelection.rows[0]
-                    //     , ', header'
-                    // );
-                    if (element.internalSelection.rows[0] ===
-                        'header'
-                    ) {
-                        // console.log(
-                        //     element.internalSelection.ranges.length
-                        //     , ', > 0'
-                        // );
-                        if (element.internalSelection.ranges.length
-                            > 0
+                        if (element.internalSelection.rows[0] ===
+                            'header'
                         ) {
-                            var range_select = (
-                                element.internalSelection.ranges[0]
-                            );
+                            if (
+                                element.internalSelection.ranges.length > 0
+                            ) {
+                                jsnFirstRange = (
+                                    element.internalSelection.ranges[0]
+                                );
+                                strStartColumn = jsnFirstRange.start.column;
+                                strEndColumn = jsnFirstRange.end.column;
+                                intStartColumn = (
+                                    parseInt(
+                                        (
+                                            strStartColumn === 'selector'
+                                                ? 0
+                                                : strStartColumn
+                                        ),
+                                        10
+                                    )
+                                );
+                                intEndColumn = (
+                                    parseInt(
+                                        (
+                                            strEndColumn === 'selector'
+                                                ? 0
+                                                : strEndColumn
+                                        ),
+                                        10
+                                    )
+                                );
 
-                            if (range_select.start.row === 'header') {
-                                if (range_select.start.column === 'selector' &&
-                                range_select.end.column === 'selector') {
-                                var selected_len = (
-                                    element.internalSelection.columns.length - 2
-                                );
-                                } else if (parseInt(
-                                    ((range_select.end.column === 'selector')
-                                      ? 0
-                                      : range_select.end.column), 10) <
-                                    parseInt(
-                                    ((range_select.start.column === 'selector')
-                                      ? 0
-                                      : range_select.start.column), 10)
-                                ) {
-                                selectedBroken = true;
-                                var selected_len = (
-                                    parseInt(
-                                    ((range_select.start.column === 'selector')
-                                      ? 0
-                                      : range_select.start.column), 10) + 1 -
-                                    parseInt(
-                                    ((range_select.end.column === 'selector')
-                                      ? 0
-                                      : range_select.end.column), 10)
-                                );
-                                } else {
-                                selectedBroken = false;
-                                var selected_len = (
-                                    parseInt(
-                                    ((range_select.end.column === 'selector')
-                                      ? 0
-                                      : range_select.end.column), 10) + 1 -
-                                    parseInt(
-                                    ((range_select.start.column === 'selector')
-                                      ? 0
-                                      : range_select.start.column), 10)
-                                );
-                                }
-                                if (selected_len === 0) {
-                                    selected_len = 1;
-                                }
+                                if (jsnFirstRange.start.row === 'header') {
+                                    if (
+                                        strStartColumn === 'selector' &&
+                                        strEndColumn === 'selector'
+                                    ) {
+                                        intSelectionLength = (
+                                            element.internalSelection
+                                                .columns
+                                                .length - 2
+                                        );
+                                    } else if (intStartColumn < intEndColumn) {
+                                        selectedBroken = true;
+                                        intSelectionLength = (
+                                            (intStartColumn + 1) - intEndColumn
+                                        );
+                                    } else {
+                                        selectedBroken = false;
+                                        intSelectionLength = (
+                                            (intEndColumn + 1) - intStartColumn
+                                        );
+                                    }
+                                    if (intSelectionLength === 0) {
+                                        intSelectionLength = 1;
+                                    }
 
-                                for (var selected_i = 0;
-                                    selected_i < selected_len; selected_i++
-                                ) {
+                                    i = 0;
+                                    while (i < intSelectionLength) {
+                                        if (selectedBroken) {
+                                            colsToResize.push(
+                                                i + intEndColumn
+                                            );
+                                        } else {
+                                            colsToResize.push(
+                                                i + intStartColumn
+                                            );
+                                        }
 
-                                if (selectedBroken) {
-                                colsToResize.push(
-                                    selected_i + parseInt(
-                                    ((range_select.end.column === 'selector')
-                                      ? 0
-                                      : range_select.end.column), 10)
-                                );
-                                } else {
-                                colsToResize.push(
-                                    selected_i + parseInt(
-                                    ((range_select.start.column === 'selector')
-                                      ? 0
-                                      : range_select.start.column), 10)
-                                );
-                                }
-
+                                        i += 1;
+                                    }
                                 }
                             }
                         }
-
-                        }
-                    colsToResize.push(element.internalResize.resizeColumnIndex);
-
+                        colsToResize.push(
+                            element.internalResize.resizeColumnIndex
+                        );
 
                         //console.log(colsToResize);
                         resizeColumnsToContent(element, colsToResize);
@@ -52780,7 +55078,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 // we want to override the text and HTML mime type clipboards,
                 //      so we get the copy text for both types
                 jsnCopyString = getCopyStrings(element);
-
                 // override clipboard (prevent event default if we are
                 //      successful)
                 if (handleClipboardData(event, jsnCopyString.text, 'text')) {
@@ -53434,29 +55731,26 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (element.internalSelection.rows[0] ===
                                 'header'
                             ) {
-
-                                if (element.internalSelection.ranges.length
-                                    > 0
+                                var jsnFirstRange = (
+                                    element.internalSelection.ranges[0]
+                                );
+                                var intSelectionLength;
+                                if (
+                                    jsnFirstRange &&
+                                    jsnFirstRange.start.row === 'header'
                                 ) {
-
-                                    var range_select = (
-                                        element.internalSelection.ranges[0]
+                                    intSelectionLength = (
+                                        jsnFirstRange.end.column -
+                                        jsnFirstRange.start.column + 1
                                     );
-                                    if (range_select.start.row === 'header') {
-                                        var selected_len = (
-                                            range_select.end.column -
-                                            range_select.start.column + 1
+
+                                    i = 0;
+                                    while (i < intSelectionLength) {
+                                        colsToResize.push(
+                                            i + jsnFirstRange.start.column
                                         );
 
-                                        for (var selected_i = 0;
-                                            selected_i < selected_len;
-                                            selected_i++
-                                        ) {
-                                            colsToResize.push(
-                                                selected_i +
-                                                range_select.start.column
-                                            );
-                                        }
+                                        i += 1;
                                     }
                                 }
 
@@ -53608,7 +55902,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
 
                         // we're done with the pixel element
-                        // if (element.elems.pixel.parentNode === element.elems.dataViewport) {
+                        // if (element.elems.pixel.parentNode ===
+                        //      element.elems.dataViewport) {
                         //     element.elems.dataViewport.removeChild(
                         //         element.elems.pixel
                         //     );
@@ -54298,13 +56593,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 jsnCache = element.internalPollingCache;
                 intWidth = element.clientWidth;
                 intHeight = element.clientHeight;
-                intFontSize = GS.emToPx(element, 1);
+                intFontSize = element.elems.fontSizeDetector.clientWidth;
 
                 if (
                     jsnCache.elementWidth !== intWidth ||
                     jsnCache.elementHeight !== intHeight ||
                     jsnCache.fontSize !== intFontSize
                 ) {
+                    //console.log('test');
                     renderScrollDimensions(element);
                     GS.triggerEvent(window, 'resize');
                 }
@@ -54428,12 +56724,26 @@ document.addEventListener('DOMContentLoaded', function () {
         accessors: {
             'selection': {
                 'get': function () {
-                    
+                    return this.internalSelection.ranges;
+                }
+            },
+            'selectedColumns': {
+                'get': function () {
+                    return this.internalSelection.columns;
+                }
+            },
+            'selectedRecords': {
+                'get': function () {
+                    return this.internalSelection.rows;
                 }
             },
             'data': {
                 'get': function () {
-                    
+                    return {
+                        "columns": this.internalData.columnNames,
+                        "types": this.internalData.columnTypes,
+                        "records": this.internalData.records
+                    };
                 }
             },
             'value': {
@@ -54507,38 +56817,56 @@ document.addEventListener('DOMContentLoaded', function () {
                 renderScrollDimensions(this);
             },
             'toggleFullContainer': function (container, target) {
-                if (this.classList.contains('absolute')) {
-                    GS.triggerEvent(this, 'closeFullContainer');
-                    this.classList.remove('absolute');
-                    document.getElementById(container).classList.remove('relative');
+                var element = this;
+                var containerElement;
+
+                containerElement = document.getElementById(container);
+
+                if (element.classList.contains('absolute')) {
+                    GS.triggerEvent(element, 'closeFullContainer');
+                    element.classList.remove('absolute');
+                    containerElement.classList.remove('relative');
                     target.setAttribute('icon', 'expand');
                 } else {
-                    GS.triggerEvent(this, 'openFullContainer');
-                    this.classList.add('absolute');
-                    document.getElementById(container).classList.add('relative');
+                    GS.triggerEvent(element, 'openFullContainer');
+                    element.classList.add('absolute');
+                    containerElement.classList.add('relative');
                     target.setAttribute('icon', 'compress');
                 }
-                renderScrollDimensions(this);
+
+                renderScrollDimensions(element);
             },
             'openFullContainer': function (container, target) {
-                if (!this.classList.contains('absolute')) {
-                    GS.triggerEvent(this, 'openFullContainer');
-                    this.classList.add('absolute');
-                    document.getElementById(container).classList.add('relative');
+                var element = this;
+                var containerElement;
+
+                containerElement = document.getElementById(container);
+
+                if (!element.classList.contains('absolute')) {
+                    GS.triggerEvent(element, 'openFullContainer');
+                    element.classList.add('absolute');
+                    containerElement.classList.add('relative');
                     target.setAttribute('icon', 'compress');
                 }
-                renderScrollDimensions(this);
+
+                renderScrollDimensions(element);
             },
             'closeFullContainer': function (container, target) {
-                if (this.classList.contains('absolute')) {
-                    GS.triggerEvent(this, 'closeFullContainer');
-                    this.classList.remove('absolute');
-                    document.getElementById(container).classList.remove('relative');
+                var element = this;
+                var containerElement;
+
+                containerElement = document.getElementById(container);
+
+                if (element.classList.contains('absolute')) {
+                    GS.triggerEvent(element, 'closeFullContainer');
+                    element.classList.remove('absolute');
+                    containerElement.classList.remove('relative');
                     target.setAttribute('icon', 'expand');
                 }
-                renderScrollDimensions(this);
+
+                renderScrollDimensions(element);
             },
-            //'scrollToColumn': function (columnNumber) { 
+            //'scrollToColumn': function (columnNumber) {
             //},
             //'scrollToRow': function (rowNumber) {
             //},
@@ -54564,47 +56892,53 @@ document.addEventListener('DOMContentLoaded', function () {
                 dataSELECT(this);
             },
             'toggleFullscreen': function (target) {
+                var element = this;
+
                 // using a class like this doesn't work on iOS (other things
                 //      z-index over it), we need to move the element to the
                 //      last element in the body and then apply the class.
                 // ### NEED CODING ###
-                if (this.classList.contains('table-fullscreen')) {
-                    GS.triggerEvent(this, 'closeFullScreen');
-                    this.classList.remove('table-fullscreen');
-    
+                if (element.classList.contains('table-fullscreen')) {
+                    GS.triggerEvent(element, 'closeFullScreen');
+                    element.classList.remove('table-fullscreen');
+
                     if (target.getAttribute('icon') === 'close') {
                         target.setAttribute('icon', 'arrows-alt');
                     }
                 } else {
-                    GS.triggerEvent(this, 'openFullscreen');
-                    this.classList.add('table-fullscreen');
-    
+                    GS.triggerEvent(element, 'openFullscreen');
+                    element.classList.add('table-fullscreen');
+
                     if (target.getAttribute('icon') === 'arrows-alt') {
                         target.setAttribute('icon', 'close');
                     }
                 }
-                renderScrollDimensions(this);
+                renderScrollDimensions(element);
             },
             'openFullscreen': function (target) {
-                if (!this.classList.contains('table-fullscreen')) {
-                    GS.triggerEvent(this, 'openFullscreen');
-                    this.classList.add('table-fullscreen');
+                var element = this;
+
+                if (!element.classList.contains('table-fullscreen')) {
+                    GS.triggerEvent(element, 'openFullscreen');
+                    element.classList.add('table-fullscreen');
                     if (target.getAttribute('icon') === 'arrows-alt') {
                         target.setAttribute('icon', 'close');
                     }
                 }
-                renderScrollDimensions(this);
+                renderScrollDimensions(element);
             },
             'closeFullscreen': function (target) {
-                if (this.classList.contains('table-fullscreen')) {
-                    GS.triggerEvent(this, 'closeFullScreen');
-                    this.classList.remove('table-fullscreen');
+                var element = this;
+
+                if (element.classList.contains('table-fullscreen')) {
+                    GS.triggerEvent(element, 'closeFullScreen');
+                    element.classList.remove('table-fullscreen');
     
                     if (target.getAttribute('icon') === 'close') {
                         target.setAttribute('icon', 'arrows-alt');
                     }
                 }
-                renderScrollDimensions(this);
+                renderScrollDimensions(element);
             },
             'openPrefs': function (target) {
                 openSettingsDialog(this, target);
@@ -54620,12 +56954,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     strNewSort = 'neutral';
                 }
-    
+
                 // we need the column orderby array
                 var arrColumnOrders = (
                     this.internalData.columnOrders
                 );
-    
+
                 // loop through each selected data column and set the orderby
                 var arrDataColumns = getSelectedDataColumns(this);
                 var i = 0;
@@ -54634,16 +56968,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     arrColumnOrders[
                         arrDataColumns[i]
                     ] = strNewSort;
-    
+
                     i += 1;
                 }
-    
+
                 // refresh the table
                 dataSELECT(this);
-    
             },
             'openInsertDialog': function () {
-                openInsertDialog(element);
+                openInsertDialog(this);
             },
             'goToLine': function (action) {
                 var intCurrentRecord = (
@@ -54657,7 +56990,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? -1
                         : 0
                 );
-    
+
                 if (action === 'insert') {
                     scrollCellIntoView(this, 'insert', '0', 'top');
                 } else {
@@ -54680,12 +57013,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         intCurrentRecord = parseInt(action, 10) - 1;
                     }
 
-                    //if the new record is past the last record, go to last record
+                    //if the new record is past the last record:
+                    //      go to last record
                     if (intCurrentRecord > intMaxRecord) {
                         intCurrentRecord = intMaxRecord;
                     }
 
-                    // if the new record is a negative number, go to first record
+                    // if the new record is a negative number:
+                    //      go to first record
                     if (intCurrentRecord < 0) {
                         intCurrentRecord = 0;
                     }
@@ -54766,11 +57101,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 usePasteString(this, strPasteString);
             },
             'resizeAllColumns': function () {
+                var element = this;
                 var arrIndexes = [];
-                for (var i = 0, len = this.internalDisplay.columnPlainTextNames.length; i < len; i++) {
+                var i;
+                var len;
+
+                i = 0;
+                len = element.internalDisplay.columnPlainTextNames.length;
+                while (i < len) {
                     arrIndexes.push(i);
+                    i += 1;
                 }
-                resizeColumnsToContent(this, arrIndexes);
+
+                resizeColumnsToContent(element, arrIndexes);
             },
             'addFilter': function (filterColumn, filterType, filterValue) {
                 var element = this;
@@ -56187,6 +58530,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //
     function elementInserted(element) {
+        console.warn('GS-TIME WARNING: this element is deprecated, please use the gs-datetime instead.');
         var now;
         var strQSValue;
 

@@ -20,89 +20,113 @@
 
         <script src="../../js/page-zoom.js" type="text/javascript"></script>
         <script>
-			function dialogShowProcessQuery(target, intRowIndex) {
-			    "use strict";
-			    var templateElement = document.createElement('template');
-			    var internalData;
-			    var intColumnIndex;
-			    var strQuery;
+function dialogShowProcessQuery(target, intRowIndex) {
+    "use strict";
+    var templateElement = document.createElement('template');
+    var internalData;
+    var intColumnIndex;
+    var strQuery;
 
-			    internalData = document.getElementById('datasheet-processes').internalData;
-			    intColumnIndex = internalData.arrColumnNames.indexOf('query');
-			    strQuery = internalData.arrRecords[intRowIndex][intColumnIndex];
+    internalData = document.getElementById('datasheet-processes').internalData;
+    intColumnIndex = internalData.arrColumnNames.indexOf('query');
+    strQuery = internalData.arrRecords[intRowIndex][intColumnIndex];
 
-			    templateElement.setAttribute('data-overlay-close', 'true');
-			    templateElement.setAttribute('data-max-width', '1200px');
-			    templateElement.setAttribute('data-mode', 'constrained');
-			    templateElement.innerHTML = ml(function () {/*
-			        <gs-page>
-			            <gs-body padded>
-			                <pre>{{STRQUERY}}</pre>
-			            </gs-body>
-			        </gs-page>
-			    */}).replace(/\{\{STRQUERY\}\}/gi, strQuery);
+    templateElement.setAttribute('data-overlay-close', 'true');
+    templateElement.setAttribute('data-max-width', '1200px');
+    templateElement.setAttribute('data-mode', 'constrained');
+    templateElement.innerHTML = ml(function () {/*
+        <gs-page>
+            <gs-body padded>
+                <pre>{{STRQUERY}}</pre>
+            </gs-body>
+        </gs-page>
+    */}).replace(/\{\{STRQUERY\}\}/gi, strQuery);
 
-			    GS.openDialogToElement(target, templateElement, 'down');
-			}
+    GS.openDialogToElement(target, templateElement, 'down');
+}
 
-			// define a seperate socket for the processes dialog if it hasn't been defined already
-			if (!GS.postageProcessDialogSocket) {
-				GS.postageProcessDialogSocket = GS.openSocket('env');
-			}
+// define a seperate socket for the processes dialog if it hasn't been defined already
+if (!GS.postageProcessDialogSocket) {
+	GS.postageProcessDialogSocket = GS.openSocket('env');
+}
 
-			document.addEventListener('DOMContentLoaded', function () {
-				var autorefreshCheckbox = document.getElementById('autorefresh');
-				var autorefreshIntervalInput = document.getElementById('autorefresh_interval');
-				var interval = undefined;
-				var orderbyColumn = document.getElementById('orderby_column');
-				var orderbyDirection = document.getElementById('orderby_direction');
+document.addEventListener('DOMContentLoaded', function () {
+	var autorefreshCheckbox = document.getElementById('autorefresh');
+	var autorefreshIntervalInput = document.getElementById('autorefresh_interval');
+	var interval = undefined;
+	var orderbyColumn = document.getElementById('orderby_column');
+	var orderbyDirection = document.getElementById('orderby_direction');
 
-				var resetInterval = function () {
-					console.log('resetInterval');
-					if (interval !== undefined) {
-						clearInterval(interval);
-					}
-					if (autorefreshCheckbox.value === 'true') {
-						interval = setInterval(function () {
-							document.getElementById('datasheet-processes').refresh();
-						}, parseFloat(autorefreshIntervalInput.value) * 1000);
-					}
-				};
-				autorefreshCheckbox.addEventListener('change', function () { resetInterval(); });
-				autorefreshIntervalInput.addEventListener('keyup', function () { resetInterval(); });
-				resetInterval();
+	var resetInterval = function () {
+		console.log('resetInterval');
+		if (interval !== undefined) {
+			clearInterval(interval);
+		}
+		if (autorefreshCheckbox.value === 'true') {
+			interval = setInterval(function () {
+				document.getElementById('datasheet-processes').refresh();
+			}, parseFloat(autorefreshIntervalInput.value) * 1000);
+		}
+	};
+	autorefreshCheckbox.addEventListener('change', function () { resetInterval(); });
+	autorefreshIntervalInput.addEventListener('keyup', function () { resetInterval(); });
+	resetInterval();
 
-				var setOrderBy = function () {
-					document.getElementById('datasheet-processes').setAttribute('ord', orderbyColumn.value + ' ' + orderbyDirection.value);
-					document.getElementById('datasheet-processes').refresh();
-				};
-				orderbyColumn.addEventListener('change', function () { setOrderBy(); });
-				orderbyDirection.addEventListener('change', function () { setOrderBy(); });
-			});
+	var setOrderBy = function () {
+		document.getElementById('datasheet-processes').setAttribute('ord', orderbyColumn.value + ' ' + orderbyDirection.value);
+		document.getElementById('datasheet-processes').refresh();
+	};
+	orderbyColumn.addEventListener('change', function () { setOrderBy(); });
+	orderbyDirection.addEventListener('change', function () { setOrderBy(); });
+});
 
-            function cancelProcess(intPID) {
-                GS.msgbox('Are you sure...',
-                            'Are you sure you want to cancel this query?',
-                            ['No', 'Yes'],
-                            function (strAnswer) {
-                    if (strAnswer === 'Yes') {
-                        GS.addLoader(document.getElementById('process-table-container'), 'Cancelling Process...');
-                        GS.requestFromSocket(GS.postageProcessDialogSocket,
-                                            'RAW\nSELECT pg_cancel_backend(' + intPID + ');',
-                                            function (response, error) {
-                            if (!error) {
-                                if (response === 'TRANSACTION COMPLETED') {
-                                    document.getElementById('datasheet-processes').refresh();
-                                    GS.removeLoader(document.getElementById('process-table-container'));
-                                }
-                            } else {
-                                GS.removeLoader(document.getElementById('process-table-container'));
-                                GS.ajaxErrorDialog(response);
-                            }
-                        });
+function cancelProcess(intPID) {
+    GS.msgbox('Are you sure...',
+                'Are you sure you want to cancel this query?',
+                ['No', 'Yes'],
+                function (strAnswer) {
+        if (strAnswer === 'Yes') {
+            GS.addLoader(document.getElementById('process-table-container'), 'Cancelling Process...');
+            GS.requestFromSocket(GS.postageProcessDialogSocket,
+                                'RAW\nSELECT pg_cancel_backend(' + intPID + ');',
+                                function (response, error) {
+                if (!error) {
+                    if (response === 'TRANSACTION COMPLETED') {
+                        document.getElementById('datasheet-processes').refresh();
+                        GS.removeLoader(document.getElementById('process-table-container'));
                     }
-                });
-            }
+                } else {
+                    GS.removeLoader(document.getElementById('process-table-container'));
+                    GS.ajaxErrorDialog(response);
+                }
+            });
+        }
+    });
+}
+
+function terminateProcess(intPID) {
+    GS.msgbox('Are you sure...',
+                'Are you sure you want to terminate this process?',
+                ['No', 'Yes'],
+                function (strAnswer) {
+        if (strAnswer === 'Yes') {
+            GS.addLoader(document.getElementById('process-table-container'), 'Terminate Process...');
+            GS.requestFromSocket(GS.postageProcessDialogSocket,
+                                'RAW\nSELECT pg_terminate_backend(' + intPID + ');',
+                                function (response, error) {
+                if (!error) {
+                    if (response === 'TRANSACTION COMPLETED') {
+                        document.getElementById('datasheet-processes').refresh();
+                        GS.removeLoader(document.getElementById('process-table-container'));
+                    }
+                } else {
+                    GS.removeLoader(document.getElementById('process-table-container'));
+                    GS.ajaxErrorDialog(response);
+                }
+            });
+        }
+    });
+}
         </script>
 
         <style>

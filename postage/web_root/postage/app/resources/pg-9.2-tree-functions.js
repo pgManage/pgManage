@@ -167,7 +167,7 @@ function treeStart() {
                 bolSelectionTriggered = 0;
 
                 // if cursor has moved off of treeview to the editor ace
-                if (currentcursorX > (elemPos.intElementWidth + 60)) {
+                if (ghost && currentcursorX > (elemPos.intElementWidth + 60)) {
                     // if there is a editor tab open:
                     if (currentTab !== undefined && currentTab.relatedEditor !== undefined) {
                         // insert snippet text
@@ -1778,24 +1778,47 @@ function propertyDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {
             <div id="properties-container" style="min-height: 6em;"></div>
         </gs-container>
     */}).replace(/\{\{STRSQLSAFENAME\}\}/g, strName);
-
+    
+    strQuery = (
+        (
+            (strQuery || '')
+                .replace(/\{\{INTOID\}\}/g, intOid)
+                .replace(/\{\{STRSQLSAFENAME\}\}/g, strSafeName)
+        ) ||
+        (
+            ' SELECT \'\', \'Notes:\'' +
+            ' UNION ALL' +
+            ' SELECT \'\', \'No properties known, a property gathering query hasn\'\'t defined in Postage.\''
+        )
+    );
+    
     setObjectDetailValue(strHTML, function () {
-        getListData(strQuery.replace(/\{\{INTOID\}\}/g, intOid)
-                            .replace(/\{\{STRSQLSAFENAME\}\}/g, strSafeName),
-                    document.getElementById('properties-container'),
-                    function (arrRecords) {
-            var i, len, col_i, col_len, strHTML = '';
+        getListData(
+            strQuery,
+            document.getElementById('properties-container'),
+            function (arrRecords) {
+                var i;
+                var len;
+                var col_i;
+                var col_len;
+                var strHTML = '';
+                var arrRowOne = (arrRecords[1] || []);
+                var arrRowTwo = (arrRecords[2] || []);
 
-            for (col_i = 1, col_len = arrRecords[0].length; col_i < col_len; col_i += 1) {
-                strHTML +=  '<tr>' +
-                                '<th>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[1][col_i])) + '</th>' +
-                                '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRecords[2][col_i])) + '</td>' +
-                            '</tr>';
+                for (col_i = 1, col_len = arrRecords[0].length; col_i < col_len; col_i += 1) {
+                    strHTML += (
+                        '<tr>' +
+                            '<th>' + encodeHTML(GS.decodeFromTabDelimited(arrRowOne[col_i] || '')) + '</th>' +
+                            '<td>' + encodeHTML(GS.decodeFromTabDelimited(arrRowTwo[col_i] || '')) + '</td>' +
+                        '</tr>'
+                    );
+                }
+
+                document.getElementById('properties-container').innerHTML = (
+                    '<table class="table-stats">' + strHTML + '</table>'
+                );
             }
-
-            document.getElementById('properties-container').innerHTML =
-                '<table class="table-stats">' + strHTML + '</table>';
-        });
+        );
     });
 }
 

@@ -58,7 +58,8 @@ gs-time,
 gs-select,
 gs-interval,
 gs-memo,
-gs-checkbox {
+gs-checkbox,
+gs-datetime {
     position: relative;
     display: block;
     
@@ -91,7 +92,8 @@ gs-time.hover,
 gs-select.hover,
 gs-interval.hover,
 gs-memo.hover,
-gs-checkbox.hover {
+gs-checkbox.hover,
+gs-datetime.hover {
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(0,0,0,.1), 0 0.2em 0.5em 0 rgba(0,0,0,.14), 0 0.0625em 0.3125em 0 rgba(0,0,0);*/
     /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(0,0,0,.1), 0 0 0.2em 0 rgba(0,0,0,.2);*/
@@ -109,7 +111,8 @@ gs-time[disabled],
 gs-select[disabled],
 gs-interval[disabled],
 gs-memo[disabled],
-gs-checkbox[disabled] {
+gs-checkbox[disabled],
+gs-datetime[disabled] {
     pointer-events: auto;
     
     opacity: 0.6;
@@ -125,7 +128,8 @@ gs-time.focus,
 gs-select.focus,
 gs-interval.focus,
 gs-memo.focus,
-gs-checkbox.focus {
+gs-checkbox.focus,
+gs-datetime.focus {
     
     /*box-shadow: 0 0.3em 0.5em -0.125em rgba(230,138,84,.1), 0 0.2em 0.5em 0 rgba(230,138,84,.14), 0 0.0625em 0.3125em 0 rgba(230,138,84,.12);*/
     /*box-shadow: 0.3em 0.3em 0.1em 0 rgba(230,138,84,.25), 0 0 0.2em 0 rgba(230,138,84,.5);*/
@@ -144,7 +148,8 @@ gs-time[mini],
 gs-select[mini],
 gs-interval[mini],
 gs-memo[mini],
-gs-checkbox[mini] {
+gs-checkbox[mini],
+gs-datetime[mini] {
     background-color: transparent;
     box-shadow: none !important;
 }

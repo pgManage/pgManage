@@ -177,26 +177,26 @@ window.addEventListener('design-register-element', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
-    
+
     // removes selected class from old selected records adds class selected to record
-    function highlightRecord(element, record) {
+    function highlightRecord(element, record) { //TODO: XLD
         var i, len, arrSelectedTrs;
-        
+
         //console.log(record);
-        
+
         if (element.tableElement && xtag.queryChildren(element.tableElement, 'tbody')[0]) {
             // clear previous selection
             arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
-            
+
             for (i = 0, len = arrSelectedTrs.length; i < len; i += 1) {
                 arrSelectedTrs[i].removeAttribute('selected');
             }
         }
-        
+
         // select/highlight the record that was provided
         if (record) {
             if (record.length >= 0) {
-                
+
                 for (i = 0, len = record.length; i < len; i += 1) {
                     record[i].setAttribute('selected', '');
                 }
@@ -229,10 +229,47 @@ document.addEventListener('DOMContentLoaded', function () {
         return matchedRecord;
     }
 
-    function selectRecord(element, handle, bolChange, bolAdd, strType) {
-        if (!element.hasAttribute('no-select')) {
-            var record;
-            
+    function getTRFromTarget(element) {
+        var currentElement = element;
+
+        while (currentElement.nodeName !== 'TR') {
+            currentElement = currentElement.parentNode;
+        }
+
+        return currentElement;
+    }
+    //snapback
+    
+    //boladd should be true if event.metaKey is true
+    
+    //if boladd is true:
+    //  selected records that were clicked become non-selected
+    //  non-select records that were clicked become selected
+
+    // if bolShift is true and not negative:
+    //  select from element.lastClicked to the clicked record
+    // if bolShift is true and negative:
+    //  de-select from element.lastClicked to the clicked record
+    //
+    //
+
+    function selectRecord(element, handle, bolChange, bolAdd, strType, bolShift) {
+        if (!element.hasAttribute('no-select') && element.tableElement) {
+            //console.log(element.secondLastClicked, element.lastClicked);
+            var record, arrSelectedRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected], tr[selected-secondary]');
+            //console.log(handle, bolChange, bolAdd, strType, bolShift);
+            //console.trace('A');
+            if (!bolAdd && !bolShift) {
+                var i, len, arrRecords = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr');
+                element.secondLastClicked = null;
+                for (i = 0, len = arrRecords.length; i < len; i += 1) {
+                    arrRecords[i].removeAttribute('selected');
+                    if (arrRecords[i].classList.contains('originTR')) {
+                        arrRecords[i].classList.remove('originTR');
+                    }
+                }
+            }
+
             if (typeof handle === 'string' || typeof handle === 'number') {
                 record = findRecordFromValue(element, handle);
                 if (!record && handle !== '') {
@@ -241,44 +278,341 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 record = handle;
             }
-            
+
             if (element.hasAttribute('multi-select')) {
                 if (handle.length >= 0) {
-                    record = handle;
+                    record = record;
                 } else {
-                    record = [handle];
+                    record = [record];
                 }
             }
-            
-            if (strType === 'up') {
-                element.originTR = record;
-            } else if (strType === 'move') {
-                
+
+            if (bolShift && strType === 'down') {
+                var clickFrom, newClicked, arrOrigins = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr.originTR')
+                    , arrAllRecords = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr'), bolDeselect, intDistanceBetween = 0
+                    , intSelected = 0, bolRemoveClicked = false;
+                //if we have a lastClicked
+                //    use that
+                //else if we have an originTR
+                //    use that
+                //else if there is one selected record
+                //    use that
+                if (element.lastClicked) {
+                    clickFrom = element.lastClicked
+                } else if (arrOrigins.length === 1) {
+                    clickFrom = arrOrigins[0].getAttribute('data-record_no');
+                } else if (arrSelectedRecords.length === 1) {
+                    clickFrom = arrSelectedRecords[0].getAttribute('data-record_no');
+                }
+
+                //get the record that was just clicked
+                if (typeof handle === 'object' && handle.tagName) {
+                    newClicked = parseInt(handle.getAttribute('data-record_no'), 10);
+                }
+
+                //console.log(clickFrom, newClicked);
+                if (newClicked) {
+                    //find how many are selected between clickFrom and newClicked
+                    if (clickFrom < newClicked) {
+                        for (var i = clickFrom, len = newClicked; i < len; i++) {
+                            if (handle.hasAttribute('selected') || handle.hasAttribute('selected-secondary')) {
+                                intSelected += 1;
+                            }
+                        }
+                    } else {
+                        for (var i = newClicked - 1, len = clickFrom - 1; i < len; i++) {
+                            if (handle.hasAttribute('selected') || handle.hasAttribute('selected-secondary')) {
+                                intSelected += 1;
+                            }
+                        }
+                    }
+
+                    if (clickFrom < newClicked) {
+                        intDistanceBetween = newClicked - clickFrom;
+                    } else {
+                        intDistanceBetween = clickFrom - newClicked;
+                    }
+
+                    //if all of the records are selected
+                    //    bolDeselect = true
+                    //else
+                    //    bolDeselect = false
+                    if (intDistanceBetween <= intSelected) {
+                        bolDeselect = true;
+                    } else {
+                        bolDeselect = false;
+                    }
+
+
+                    //console.log(bolDeselect, intDistanceBetween, intSelected);
+                    //if clickFrom is higher in the list than newClicked
+                    //    select down from clickFrom to newClicked
+                    //else
+                    //    select down from newClicked to clickFrom
+                    if (clickFrom < newClicked) {
+                        if (bolDeselect) {
+                            clickFrom -= 1;
+                            newClicked -= 1;
+                        }
+                        for (var i = clickFrom, len = newClicked; i < len; i++) {
+                            if (bolDeselect) {
+                                if (arrAllRecords[i].hasAttribute('selected')) {
+                                    arrAllRecords[i].removeAttribute('selected');
+                                }
+                                if (arrAllRecords[i].hasAttribute('selected-secondary')) {
+                                    arrAllRecords[i].removeAttribute('selected-secondary');
+                                }
+                            } else {
+                                arrAllRecords[i].setAttribute('selected', '');
+                            }
+                            arrAllRecords[i].classList.remove('originTR');
+                        }
+                    } else {
+                        if (bolDeselect) {
+                            newClicked += 1;
+                            clickFrom += 1
+                        }
+                        for (var i = newClicked - 1, len = clickFrom; i < len; i++) {
+                            if (bolDeselect) {
+                                if (arrAllRecords[i].hasAttribute('selected')) {
+                                    arrAllRecords[i].removeAttribute('selected');
+                                }
+                                if (arrAllRecords[i].hasAttribute('selected-secondary')) {
+                                    arrAllRecords[i].removeAttribute('selected-secondary');
+                                }
+                            } else {
+                                arrAllRecords[i].setAttribute('selected', '');
+                            }
+                            arrAllRecords[i].classList.remove('originTR');
+                        }
+                    }
+                }
+
+
+                //if bolDeselect is false
+                //    deselect from clickFrom to the first non-selected record
+                if (!bolDeselect) {
+                    if (clickFrom < newClicked) {
+                        if (element.secondLastClicked > clickFrom && element.secondLastClicked < newClicked) {
+                            bolRemoveClicked = true;
+                        }
+                    } else {
+                        if (element.secondLastClicked < clickFrom && element.secondLastClicked > newClicked) {
+                            bolRemoveClicked = true;
+                        }
+                    }
+                    
+                    if (bolRemoveClicked) {
+                        if (clickFrom < newClicked) {
+                            for (var i = element.secondLastClicked - 2; i > 0; i--) {
+                                    // console.log(arrAllRecords[i].outerHTML, arrAllRecords[i].hasAttribute('selected'), arrAllRecords[i].hasAttribute('selected-secondary'));
+                                    arrAllRecords[i].classList.remove('originTR');
+
+                                    if (arrAllRecords[i].hasAttribute('selected')) {
+                                        arrAllRecords[i].removeAttribute('selected');
+                                    } else if (arrAllRecords[i].hasAttribute('selected-secondary')) {
+                                        arrAllRecords[i].removeAttribute('selected-secondary');
+                                    } else {
+                                        // console.log(arrAllRecords[i]);
+                                        break;
+                                    }
+                            }
+                        } else {
+                            for (var i = element.secondLastClicked, len = arrAllRecords.length; i < len; i++) {
+                                    arrAllRecords[i].classList.remove('originTR');
+                                    if (arrAllRecords[i].hasAttribute('selected')) {
+                                        arrAllRecords[i].removeAttribute('selected');
+                                    } else if (arrAllRecords[i].hasAttribute('selected-secondary')) {
+                                        arrAllRecords[i].removeAttribute('selected-secondary');
+                                    } else {
+                                        break;
+                                    }
+                            }
+                        }
+                    }
+                    // console.log(bolRemoveClicked, i, len, bolDeselect, clickFrom < newClicked, element.secondLastClicked);
+                }
+
+
+
+                // var i_shift, len_shift, newNumber, arrOrigins = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr.originTR');
+                // for (i_shift = 0, len_shift = arrOrigins.length; i_shift < len_shift; i_shift += 1) {
+                //     arrOrigins[i_shift] = parseInt(arrOrigins[i_shift].getAttribute('data-record_no'),10);
+                // }
+                // newNumber = parseInt(handle.getAttribute('data-record_no'),10);
+
+                // var currentNumber = arrOrigins[0];
+                // var diff = Math.abs (newNumber - currentNumber);
+                // for (var val = 0; val < arrOrigins.length; val++) {
+                //     var newdiff = Math.abs (newNumber - arrOrigins[val]);
+                //     if (newdiff < diff) {
+                //         diff = newdiff;
+                //         currentNumber = arrOrigins[val];
+                //     }
+                // }
+                // // for (i_shift = 0, len_shift = arrOrigins.length; i_shift < len_shift; i_shift += 1) {
+                // //     currentDiff = Math.abs(arrOrigins[i_shift] - newNumber);
+                // //     //console.log(currentDiff, arrDiffs);
+                // //     arrDiffs.push(currentDiff);
+                // //     for (var i_diff = 0, len_diff = arrDiffs.length; i_diff < len_diff; i_diff += 1) {
+                // //         if (currentDiff > arrDiffs[i_diff]) {
+                // //             currentDiff = arrDiffs[i_diff];
+                // //             currentNumber = arrOrigins[i_diff - 1];
+                // //             // console.log(arrDiffs, i_diff);
+                // //             //console.log(currentDiff, arrDiffs);
+                // //         }
+                // //     }
+                // // }
+                // var arrAllRecords = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr');
+                // //console.log(newNumber, currentNumber);
+                // //console.log(arrOrigins);
+                // //console.log(handle.hasAttribute('selected') || handle.hasAttribute('selected-secondary'));
+                // if (handle.hasAttribute('selected') || handle.hasAttribute('selected-secondary')) {
+                //     if (arrOrigins.length === 1) {
+                //         currentNumber = arrAllRecords.length;
+                //     } else {
+                //         if (newNumber > currentNumber) {
+                //             if (arrOrigins[arrOrigins.indexOf(currentNumber) + 1]) {
+                //                 currentNumber = arrOrigins[arrOrigins.indexOf(currentNumber) + 1] - 1;
+                //             } else {
+                //                 currentNumber = arrOrigins[arrOrigins.indexOf(currentNumber)];
+                //             }
+                //         } else {
+                //             if (arrOrigins[arrOrigins.indexOf(currentNumber) - 1]) {
+                //                 currentNumber = arrOrigins[arrOrigins.indexOf(currentNumber) - 1] - 1;
+                //             } else {
+                //                 currentNumber = arrOrigins[arrOrigins.indexOf(currentNumber)];
+                //             }
+                //         }
+                //     }
+                //     // console.log(newNumber, currentNumber);
+                //     if (newNumber < currentNumber) {
+                //         for (var i = newNumber - 1, len = currentNumber; i < len; i++) {
+                //             arrAllRecords[i].removeAttribute('selected', '');
+                //             arrAllRecords[i].classList.remove('originTR');
+                //             //console.log(arrAllRecords[i]);
+                //         }
+                //     } else {
+                //         for (var i = currentNumber, len = newNumber; i < len; i++) {
+                //             arrAllRecords[i].removeAttribute('selected', '');
+                //             arrAllRecords[i].classList.remove('originTR');
+                //             //console.log(arrAllRecords[i]);
+                //         }
+                //     }
+                    
+                // } else {
+                //     if (newNumber < currentNumber) {
+                //         for (var i = newNumber - 1, len = currentNumber; i < len; i++) {
+                //             arrAllRecords[i].setAttribute('selected-secondary', '');
+                //             //console.log(arrAllRecords[i]);
+                //         }
+                //     } else {
+                //         for (var i = currentNumber, len = newNumber; i < len; i++) {
+                //             arrAllRecords[i].setAttribute('selected-secondary', '');
+                //             //console.log(arrAllRecords[i]);
+                //         }
+                //     }
+                //     handle.classList.add('originTR');
+                // }
+
             } else if (strType === 'down') {
-            } else {
+                element.originTR = record[0];
+                //console.log(arrSelectedRecords);//handle, handle.hasAttribute('selected'));
+                if (bolAdd && handle.hasAttribute('selected') && arrSelectedRecords.length > 1) {
+                    handle.removeAttribute('selected');
+                    if (handle.classList.contains('originTR')) {
+                        handle.classList.remove('originTR');
+                    }
+                } else {
+                    element.originTR.setAttribute('selected-secondary', '');
+                }
+            } else if (strType === 'move' && !bolShift) {
+                var arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected-secondary]');
+
+                // if (element.tableElement && xtag.queryChildren(element.tableElement, 'tbody')[0]) {
+                //     // clear previous selection
+                //     k
+                //     for (i = 0, len = arrSelectedTrs.length; i < len; i += 1) {
+                //         arrSelectedTrs[i].removeAttribute('selected-secondary');
+                //     }
+                // }
+
+                var arrRecords = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr');
+                var i, len, arrRecordsToAffect =
+                    arrRecords.slice(Math.min(element.originTR.getAttribute('data-record_no')
+                                        , record[0].getAttribute('data-record_no')) - 1
+                                    , Math.max(element.originTR.getAttribute('data-record_no')
+                                        , record[0].getAttribute('data-record_no')));
+
+                for (i = 0, len = arrRecordsToAffect.length; i < len; i += 1) {
+                    arrRecordsToAffect[i].setAttribute('selected-secondary', '');
+                }
+                
+                //console.log('origin: ', element.originTR.rowIndex);
+                //console.log('destination: ', record[0].rowIndex);
+                //console.log('arrRecordsToAffect', arrRecordsToAffect);
+                //console.log('arrRecordsToAffect.length', arrRecordsToAffect.length);
+                //console.log('record', record);
+            } else if (strType === 'up') {
+                if (element.tableElement && xtag.queryChildren(element.tableElement, 'tbody')[0]) {
+                    // clear previous selection
+                    arrSelectedTrs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected-secondary]');
+
+                    for (i = 0, len = arrSelectedTrs.length; i < len; i += 1) {
+                        arrSelectedTrs[i].removeAttribute('selected-secondary');
+                        arrSelectedTrs[i].setAttribute('selected', '');
+                    }
+                }
+                if (record[0]) {
+                    //console.trace('triggerchange 1');
+                    element.triggerChange();
+                }
+            } else if (record) {
                 // highlightRecord has its own checking for no record supplied,
                 // so this deselects any rows then selects the supplied record or none
-                highlightRecord(element, record);
+                if (element.hasAttribute('multi-select')) {
+                    for (i = 0, len = record.length; i < len; i += 1) {
+                        record[i].setAttribute('selected', '');
+                    }
+                } else {
+                    record.setAttribute('selected', '');
+                }
+                //highlightRecord(element, record);
+                //console.trace('triggerchange 2');
+                element.triggerChange();
             }
             
+            if (element.originTR) {
+                element.originTR.classList.add('originTR');
+            }
+            
+            //Save last clicked tr no for Shift-selecting
+            if (typeof handle === 'object' && handle.tagName && strType === 'down') {
+                //console.log(typeof handle, handle);
+                if (element.lastClicked) {
+                    element.secondLastClicked = element.lastClicked;
+                }
+                element.lastClicked = parseInt(handle.getAttribute('data-record_no'), 10);
+            }
+            // console.log(record, 'record');
             //console.log('3***', element.selectedRecord, element.value);
         }
     }
-    
-    
+
+
     // #################################################################
     // ########################## USER EVENTS ##########################
     // #################################################################
-    
+
     // handle behaviours on keydown
     function handleKeyDown(event) {
-        var element = event.target, intKeyCode = event.keyCode || event.which, selectedTr, trs, i, len, selectedRecordIndex;
+        var element = event.target.parentNode, intKeyCode = event.keyCode || event.which, selectedTr, trs, i, len, selectedRecordIndex;
         
         if (!element.hasAttribute('disabled')) {
             if (!element.hasAttribute('no-select')) {
                 if ((intKeyCode === 40 || intKeyCode === 38) && (!event.shiftKey) && !event.metaKey && !event.ctrlKey && !element.error) {
-                    
-                    trs = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr:not(.divider)');
+                    //console.log(element.parentNode);
+                    trs = xtag.query(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr:not(.divider)');
                     
                     for (i = 0, len = trs.length; i < len; i += 1) {
                         if (trs[i].hasAttribute('selected')) {
@@ -317,7 +651,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     event.stopPropagation();
                     
                 } else if (event.keyCode === 13) {
-                    selectedTr = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]')[0];
+                    selectedTr = xtag.query(xtag.query(element.tableElement, 'tbody')[0], 'tr[selected]')[0];
                     
                     if (element.tableElement && selectedTr) {
                         selectRecord(element, selectedTr, true);
@@ -335,6 +669,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     function handleFocusout(event) {
+        //TODO: XLD
+        /*
         var element = event.target, selectedTr;
         
         if (element.tableElement) {
@@ -344,6 +680,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 selectRecord(element, selectedTr, true);
             }
         }
+        */
     }
     
     
@@ -640,6 +977,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var bolRefresh;
         var strOperator;
 
+        element.supressChange = false;
+
         if (strQSCol) {
             if (strQSCol.indexOf('=') !== -1) {
                 arrAttrParts = strQSCol.split(',');
@@ -692,6 +1031,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
                 if (element.internal.bolQSFirstRun !== true) {
                     if (strQSValue !== '' || !element.getAttribute('value')) {
+                        element.supressChange = true;
                         element.setAttribute('value', strQSValue);
                     }
                 } else if (element.value !== strQSValue) {
@@ -750,7 +1090,126 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-    
+
+    // ############# COPY EVENTS #############
+    function unbindCopy(element) {
+        element.removeEventListener(
+            'copy',
+            element.copySelection
+        );
+    }
+    function bindCopy(element) {
+        // console.log('running1');
+        element.copySelection = function (event) {
+            // console.log('running2');
+            var jsnCopyString = {};
+            var focusedElement;
+
+            // saving the currently focused element for easy/quick access
+            focusedElement = document.activeElement;
+
+            // if the focus is on the hidden focus control of if the text
+            //      selection of the currently focused element is not
+            //      selecting multiple characters
+            if (
+                focusedElement.classList.contains('hidden-focus-control') ||
+                focusedElement.selectionStart === focusedElement.selectionEnd
+            ) {
+                console.time('copy');
+
+                // focus the hidden focus control and select all of it's text so
+                //      that Firefox will allow us to override the clipboard
+                focusedElement = element.hiddenFocusControl;
+                focusedElement.focus();
+
+                GS.setInputSelection(
+                    focusedElement,
+                    0,
+                    focusedElement.value.length
+                );
+
+                jsnCopyString.text = '';
+                jsnCopyString.html = '';
+
+                // we want to override the text and HTML mime type clipboards,
+                //      so we get the copy text for both types
+                var selectedRecords = element.selectedRecord;
+                if (selectedRecords[0]) {
+                    for (var i = 0, len = selectedRecords.length; i < len; i++) {
+                        if (i < 1) {
+                            jsnCopyString.text += selectedRecords[i].innerText;
+                            //jsnCopyString.html += selectedRecords[i].innerHTML;
+                        } else {
+                            jsnCopyString.text += '\n' + selectedRecords[i].innerText;
+                            //jsnCopyString.html += '\n' + selectedRecords[i].innerHTML;
+                        }
+                    }
+                //not multi-select
+                } else {
+                    jsnCopyString.text = selectedRecords.innerText;
+                    //jsnCopyString.html = selectedRecords.innerHTML;
+                    // console.log(selectedRecords);
+                }
+                // console.log(jsnCopyString);
+                //jsnCopyString = getCopyStrings(element);
+
+                // override clipboard (prevent event default if we are
+                //      successful)
+                if (handleClipboardData(event, jsnCopyString.text, 'text')) {
+                    event.preventDefault(event);
+                }
+                // if (handleClipboardData(event, jsnCopyString.html, 'html')) {
+                //     event.preventDefault(event);
+                // }
+
+
+                console.timeEnd('copy');
+            }
+        };
+
+        element.hiddenFocusControl.addEventListener(
+            'copy',
+            element.copySelection
+        );
+    }
+
+    function handleClipboardData(event, strCopyString, strType) {
+        var clipboardData = event.clipboardData || window.clipboardData;
+        var strMime;
+
+        if (!clipboardData) {
+            return;
+        }
+        if (!clipboardData.setData) {
+            return;
+        }
+
+        if (strType === 'text') {
+            if (window.clipboardData && window.clipboardData.getData) { // IE
+                strMime = 'Text';
+            } else if (event.clipboardData && event.clipboardData.getData) {
+                strMime = 'text/plain';
+            }
+        } else if (strType === 'html') {
+            if (window.clipboardData && window.clipboardData.getData) { // IE
+                strMime = '';
+            } else if (event.clipboardData && event.clipboardData.getData) {
+                strMime = 'text/html';
+            }
+        } else {
+            throw 'handleClipboardData Error: Type "' + strType + '" not ' +
+                    'recognized, recognized types are "text" and "html".';
+        }
+
+        if (strMime) {
+            if (strCopyString && strMime) {
+                return clipboardData.setData(strMime, strCopyString) !== false;
+            } else {
+                return clipboardData.getData(strMime);
+            }
+        }
+    }
+
     //
     function elementInserted(element) {
         var tableTemplateElement, arrElement, recordElement, tableTemplateElementCopy, strQSValue, i, len, currentElement;
@@ -764,7 +1223,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.internal = {};
                 element.internalData = {};
                 saveDefaultAttributes(element);
-                
                 // handle "qs" attribute
                 if (element.hasAttribute('qs') ||
                         element.hasAttribute('refresh-on-querystring-values') ||
@@ -782,36 +1240,64 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.addEventListener('popstate',     function () { pushReplacePopHandler(element); });
                     //element.popValues = GS.qryToJSON(GS.getQueryString());
                 }
-                
+
                 // allows the element to have focus
                 if (!element.hasAttribute('tabindex')) {
                     element.setAttribute('tabindex', '0');
                 }
-                
+
+                element.skipFocus = false;
+
                 // select for template
                 tableTemplateElement = xtag.queryChildren(element, 'template')[0];
                 if (tableTemplateElement && (tableTemplateElement.innerHTML.indexOf('&gt;') > -1 || tableTemplateElement.innerHTML.indexOf('&lt;') > -1)) {
                     console.warn('GS-LISTBOX WARNING: &gt; or &lt; detected in table template, this can have undesired effects on doT.js. Please use gt(x,y), gte(x,y), lt(x,y), or lte(x,y) to silence this warning.');
                 }
                 
+                
+                if (element.getAttribute('src') || element.getAttribute('source')) {
+                    if (element.innerHTML.trim() !== '') {
+                        var trSet = xtag.query(tableTemplateElement.content, 'tbody > tr');//:not(.divider)');
+                        //console.log(trSet);
+                        for (var i = 0, len = trSet.length; i < len; i++) {
+                            trSet[i].setAttribute('data-record_no', '{{! row.row_number }}');
+                            // console.log(trSet[i]);
+                        }
+                    }
+                }
+                
                 if (tableTemplateElement) {
                     // add a doT.js coded "value" attribute to any element with a "column" attribute but no "value" attribute
                     element.tableTemplate = GS.templateColumnToValue(tableTemplateElement.innerHTML);
                 }
-                
-                //console.log(element.tableTemplate);
-                
+
                 if (element.getAttribute('src') || element.getAttribute('source')) {
+                    // if (element.innerHTML.trim() !== '') {
+                    //     var trSet = xtag.query(tableTemplateElement.content, 'tbody > tr');//:not(.divider)');
+                    //     //console.log(trSet);
+                    //     for (var i = 0, len = trSet.length; i < len; i++) {
+                    //         trSet[i].setAttribute('data-record_no', '{{! row.row_number }}');
+                    //         // console.log(trSet[i]);
+                    //     }
+                    // }
                     getData(element, '', true);
                 } else {
                     if (tableTemplateElement) {
+                        //developer provided template
                         element.tableElement = xtag.query(tableTemplateElement.content, 'table')[0];
                     } else if (xtag.queryChildren(element, 'table')[0]) {
                         element.tableElement = xtag.queryChildren(element, 'table')[0];
                     } else {
                         element.tableElement = document.createElement('table');
                     }
-                    
+                    //loop through and add the data-record_no attribute
+                    //console.log(element.innerHTML);
+                    var trSet = xtag.query(tableTemplateElement.content, 'tr');//:not(.divider)');
+                    //console.log(trSet);
+                    for (var i = 0, len = trSet.length; i < len; i++) {
+                        //console.log(trSet[i]);
+                        trSet[i].setAttribute('data-record_no', i);
+                    }
                     element.syncView();
                 }
             }
@@ -851,16 +1337,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 get: function () {
                     var element = this;
                     if (element.tableElement) {
-                        var arrRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
-                        
+                        var arrRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');//:not(.divider)
+                        //console.log(arrRecords);
                         if (this.hasAttribute('multi-select')) {
                             var arrResult = [], i;
-                            for (i = 0; i < len; i++) {
-                                arrResult.push(this.internalData.records.dat[arrRecords[i].getAttribute('data-record_no') - 1][0]);
+                            for (i = 0; i < arrRecords.length; i++) {
+                                if (this.internalData.records.dat[arrRecords[i].getAttribute('data-record_no') - 1]) {
+                                    arrResult.push(this.internalData.records.dat[arrRecords[i].getAttribute('data-record_no') - 1][0]);
+                                }
                             }
                             return arrResult;
                         } else {
-                            return this.internalData.records.dat[arrRecords[0].getAttribute('data-record_no') - 1][0];
+                            // console.trace('sonofagun');
+                            if (arrRecords.length > 0) {
+                                // console.log(arrRecords);
+                                // console.log('test1', arrRecords[0].rowIndex);
+                                // console.log('test2', this.internalData.records.dat[arrRecords[0].rowIndex]);
+                                if (this.internalData.records.dat[arrRecords[0].getAttribute('data-record_no') - 1]) {
+                                    return this.internalData.records.dat[arrRecords[0].getAttribute('data-record_no') - 1][0];
+                                }
+                            }
                         }
                     }
                 },
@@ -876,7 +1372,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     var element = this;
                     if (element.tableElement) {
                         var arrRecords = xtag.queryChildren(xtag.queryChildren(element.tableElement, 'tbody')[0], 'tr[selected]');
-                        
+                        //console.log('arrRecords', arrRecords);
                         if (this.hasAttribute('multi-select')) {
                             return arrRecords;
                         } else {
@@ -899,8 +1395,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         
                         if (this.hasAttribute('multi-select')) {
                             var strResult, i;
-                            for (i = 0; i < len; i++) {
-                                strResult += xtag.queryChildren(arrRecords[i], 'td')[0].textContent;
+                            for (i = 0; i < arrRecords.length; i++) {
+                                // console.log(arrRecords, i, xtag.queryChildren(arrRecords[i], 'td'));
+                                if (xtag.queryChildren(arrRecords[i], 'td').length > 0) {
+                                    strResult += xtag.queryChildren(arrRecords[i], 'td')[0].textContent;
+                                }
                             }
                             return strResult;
                         } else {
@@ -922,10 +1421,21 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             
             column: function (strColumn) {
-                //console.log('no', Number(this.innerSelectedRecord.getAttribute('data-record_no')) - 1);
+                //console.log('no', Number(this.innerSelectedRecord.rowIndex) - 1);
                 //console.log('data', this.internalData.records);
-                //console.log('return', this.internalData.records.dat[Number(this.innerSelectedRecord.getAttribute('data-record_no')) - 1]);
-                return this.internalData.records.dat[this.selectedRecord.getAttribute('data-record_no') - 1][this.internalData.records.arr_column.indexOf(strColumn)];
+                //console.log('return', this.internalData.records.dat[Number(this.innerSelectedRecord.rowIndex) - 1]);
+                var element = this;
+                if (this.hasAttribute('multi-select')) {
+                    var arrStrResult = [], i;
+                    for (i = 0; i < this.selectedRecord.length; i++) {
+                        arrStrResult.push(this.internalData.records.dat[this.selectedRecord[i].rowIndex - 1][this.internalData.records.arr_column.indexOf(strColumn)]);
+                    }
+                    //console.log('this.selectedRecord', this.selectedRecord);
+                    //console.log('arrStrResult', arrStrResult);
+                    return arrStrResult;
+                } else {
+                    return this.internalData.records.dat[this.selectedRecord.rowIndex - 1][this.internalData.records.arr_column.indexOf(strColumn)];
+                }
             },
             
             // #################################################################
@@ -1177,7 +1687,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             
             syncView: function () {
-                var element = this, tbodyElement, i, len, arrElements, clickHandler, mousedownHandler, mouseoutHandler, mouseoverHandler;
+                var element = this, tbodyElement, i, len, arrElements, clickHandler, mousedownHandler, mousemoveHandler, mouseupHandler, mouseoutHandler, mouseoverHandler;
                 
                 element.removeEventListener('keydown', handleKeyDown);
                 element.addEventListener('keydown', handleKeyDown);
@@ -1219,15 +1729,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (element.hasAttribute('multi-select')) {
                     // if we are not on a touch device: hover and down events
                     if (!evt.touchDevice) {
-                        mousedownHandler = function () {
+                        var mouseIsDown = false;
+                        mousedownHandler = function (event) {
+                            mouseIsDown = true;
                             this.classList.add('down');
-                            selectRecord(element, this, true, event.shiftKey, 'down');
+                            element.addEventListener(evt.mousemove, mousemoveHandler);
+                            window.addEventListener(evt.mouseup, mouseupHandler);
+                            selectRecord(element, this, true, (event.ctrlKey || event.metaKey), 'down', event.shiftKey);
                         };
-                        mousemoveHandler = function () {
-                            selectRecord(element, event.target, true, event.shiftKey, 'move');
+                        mousemoveHandler = function (event) {
+                            if (mouseIsDown) {
+                                selectRecord(element, getTRFromTarget(event.target), true, (event.ctrlKey || event.metaKey), 'move', event.shiftKey);
+                            }
                         };
-                        mouseupHandler = function () {
-                            selectRecord(element, this, true, event.shiftKey, 'up');
+                        mouseupHandler = function (event) {
+                            mouseIsDown = false;
+                            selectRecord(element, this, true, (event.ctrlKey || event.metaKey), 'up', event.shiftKey);
+                            element.removeEventListener(evt.mousemove, mousemoveHandler);
+                            window.removeEventListener(evt.mouseup, mouseupHandler);
                         };
                         mouseoutHandler = function () {
                             this.classList.remove('down');
@@ -1242,8 +1761,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         for (i = 0, len = arrElements.length; i < len; i += 1) {
                             if (!arrElements[i].classList.contains('divider')) {
                                 arrElements[i].addEventListener(evt.mousedown, mousedownHandler);
-                                arrElements[i].addEventListener(evt.mousemove, mousemoveHandler);
-                                arrElements[i].addEventListener(evt.mouseup, mouseupHandler);
                                 arrElements[i].addEventListener(evt.mouseout, mouseoutHandler);
                                 arrElements[i].addEventListener(evt.mouseover, mouseoverHandler);
                             }
@@ -1302,13 +1819,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 //        selectRecord(element, parentRecord, true);
                 //    }
                 //});
+                var focusElement = document.createElement('textarea');
+                focusElement.classList.add('hidden-focus-control');
+                focusElement.setAttribute('value', 'text makes this textarea Firefox worthy');
+
+                element.appendChild(focusElement);
+                element.hiddenFocusControl = focusElement;
+
+                element.addEventListener('focus', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation
+                    if (event.target !== element.hiddenFocusControl) {
+                        element.hiddenFocusControl.focus();
+                        GS.triggerEvent(element.hiddenFocusControl, 'focus');
+                        // console.log(document.activeElement);
+                        element.skipFocus = true;
+                        // console.log(element.skipFocus);
+                    }
+                });
+                bindCopy(element);
+                //console.log(element.tableTemplate);
+                
+                
             },
             
             triggerChange: function () {
-                xtag.fireEvent(this, 'change', {
-                    bubbles: true,
-                    cancelable: true
-                });
+                if (this.supressChange === true) {
+                    this.supressChange = false;
+                } else {
+                    xtag.fireEvent(this, 'change', {
+                        bubbles: true,
+                        cancelable: true
+                    });
+                }
             }
         }
     });
