@@ -36966,32 +36966,33 @@ document.addEventListener('DOMContentLoaded', function () {
         return text;
     }
 
-    // because we need to be able to add styles to an element inside of a
-    //      template string, we have this function take a template (while it's
-    //      still a template element) and add a token to the "style" attribute
-    //      that can be easily replaced
-    function templateCellAddStyleToken(templateElement) {
-        var arrCell = xtag.query(templateElement.content, 'gs-cell');
-        var i = 0;
-        var len = arrCell.length;
-        var strStyle;
+    // commented out because we no longer put the styling on the cell
+    //// because we need to be able to add styles to an element inside of a
+    ////      template string, we have this function take a template (while it's
+    ////      still a template element) and add a token to the "style" attribute
+    ////      that can be easily replaced
+    //function templateCellAddStyleToken(templateElement) {
+    //    var arrCell = xtag.query(templateElement.content, 'gs-cell');
+    //    var i = 0;
+    //    var len = arrCell.length;
+    //    var strStyle;
 
-        while (i < len) {
-            strStyle = (arrCell[i].getAttribute('style') || '');
-            strStyle = strStyle.trim();
+    //    while (i < len) {
+    //        strStyle = (arrCell[i].getAttribute('style') || '');
+    //        strStyle = strStyle.trim();
 
-            if (strStyle && strStyle[strStyle.length - 1] !== ';') {
-                strStyle += ';';
-            }
+    //        if (strStyle && strStyle[strStyle.length - 1] !== ';') {
+    //            strStyle += ';';
+    //        }
 
-            arrCell[i].setAttribute(
-                'style',
-                '$$CSSREPLACETOKEN$$ ' + strStyle
-            );
+    //        arrCell[i].setAttribute(
+    //            'style',
+    //            '$$CSSREPLACETOKEN$$ ' + strStyle
+    //        );
 
-            i += 1;
-        }
-    }
+    //        i += 1;
+    //    }
+    //}
 
     // because we are using the gs-cell element for headers, data cells, insert
     //      cells, record selectors and the all selector: we need a way for the
@@ -39354,9 +39355,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // if present, siphon "header-record" template
         if (headerRecordTemplate) {
-            // append a token to the end of the style attribute of each gs-cell
-            //      (so that we can dynamically add CSS definitions)
-            templateCellAddStyleToken(headerRecordTemplate);
+            // commented out because we no longer put the styling on the cell
+            //// append a token to the end of the style attribute of each
+            ////      gs-cell (so that we can dynamically add CSS definitions)
+            //templateCellAddStyleToken(headerRecordTemplate);
 
             // add a class of "table-header" to each gs-cell for styling
             templateCellAddClass(headerRecordTemplate, 'table-header');
@@ -39376,9 +39378,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // if present, siphon "data-record" template
         if (dataRecordTemplate) {
-            // append a token to the end of the style attribute of each gs-cell
-            //      (so that we can dynamically add CSS definitions)
-            templateCellAddStyleToken(dataRecordTemplate);
+            // commented out because we no longer put the styling on the cell
+            //// append a token to the end of the style attribute of each
+            ////      gs-cell (so that we can dynamically add CSS definitions)
+            //templateCellAddStyleToken(dataRecordTemplate);
 
             // add a class of "table-cell" to each gs-cell for styling
             templateCellAddClass(dataRecordTemplate, 'table-cell');
@@ -39436,9 +39439,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // if present, siphon "insert-record" template
         if (insertRecordTemplate) {
-            // append a token to the end of the style attribute of each gs-cell
-            //      (so that we can dynamically add CSS definitions)
-            templateCellAddStyleToken(insertRecordTemplate);
+            // commented out because we no longer put the styling on the cell
+            //// append a token to the end of the style attribute of each
+            ////      gs-cell (so that we can dynamically add CSS definitions)
+            //templateCellAddStyleToken(insertRecordTemplate);
 
             // add a class of "table-insert" to each gs-cell for styling
             templateCellAddClass(insertRecordTemplate, 'table-insert');
@@ -41066,9 +41070,9 @@ document.addEventListener('DOMContentLoaded', function () {
         var strCSS;
         var delim;
 
-        var intRecordSelectorBorderWidth;
-        var intInsertRecordBorderHeight;
-        var intHeaderBorderHeight;
+        //var intRecordSelectorBorderWidth;
+        //var intInsertRecordBorderHeight;
+        //var intHeaderBorderHeight;
 
         var bolOneCellSelected;
         var selectedCellControl;
@@ -41099,10 +41103,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (bolOneCellSelected) {
             selectedCellControl = xtag.query(
                 element,
-                'gs-cell' +
-                    '[data-col-number="' + jsnRange.start.column + '"]' +
-                    '[data-row-number="' + jsnRange.start.row + '"]' +
-                    ' input'
+                (
+                    'gs-cell' +
+                        '[data-col-number="' + jsnRange.start.column + '"]' +
+                        '[data-row-number="' + jsnRange.start.row + '"]' +
+                        ' input'
+                )
             )[0];
             textSelectionStart = 0;
             textSelectionEnd = 0;
@@ -41164,17 +41170,17 @@ document.addEventListener('DOMContentLoaded', function () {
         fromRecord = jsnRange.fromRecord;
         toRecord = jsnRange.toRecord;
 
-        // we need to know the border sizes so that we can calculate cell
-        //      dimensions
-        intRecordSelectorBorderWidth = (
-            element.internalDisplay.recordSelectorBorderWidth
-        );
-        intInsertRecordBorderHeight = (
-            element.internalDisplay.insertRecordBorderHeight
-        );
-        intHeaderBorderHeight = (
-            element.internalDisplay.headerBorderHeight
-        );
+        //// we need to know the border sizes so that we can calculate cell
+        ////      dimensions
+        //intRecordSelectorBorderWidth = (
+        //    element.internalDisplay.recordSelectorBorderWidth
+        //);
+        //intInsertRecordBorderHeight = (
+        //    element.internalDisplay.insertRecordBorderHeight
+        //);
+        //intHeaderBorderHeight = (
+        //    element.internalDisplay.headerBorderHeight
+        //);
 
         //console.log('element: ', element);
         //console.log('jsnRange: ', jsnRange);
@@ -41299,37 +41305,37 @@ document.addEventListener('DOMContentLoaded', function () {
                     'len': intTotalRecords
                 });
 
-                // replace the css tokens so the cells are in the right place
-                col_i = fromColumn;
-                col_len = toColumn;
-                intCellLeft = intCellOriginLeft;
-                while (col_i < col_len) {
-                    // if the column is not hidden
-                    if (arrColumnWidths[col_i] > 0) {
-                        //strCSS = (
-                        //    'top:' + intRecordTop + 'px;' +
-                        //    'left:' + intCellLeft + 'px;' +
-                        //    'width:' + (
-                        //        arrColumnWidths[col_i] +
-                        //        columnBorderWidth
-                        //    ) + 'px;' +
-                        //    'height:' + (
-                        //        arrRecordHeights[i] +
-                        //        recordBorderHeight
-                        //    ) + 'px;'
-                        //);
-                        strCSS = '';
+                //// replace the css tokens so the cells are in the right place
+                //col_i = fromColumn;
+                //col_len = toColumn;
+                //intCellLeft = intCellOriginLeft;
+                //while (col_i < col_len) {
+                //    // if the column is not hidden
+                //    if (arrColumnWidths[col_i] > 0) {
+                //        //strCSS = (
+                //        //    'top:' + intRecordTop + 'px;' +
+                //        //    'left:' + intCellLeft + 'px;' +
+                //        //    'width:' + (
+                //        //        arrColumnWidths[col_i] +
+                //        //        columnBorderWidth
+                //        //    ) + 'px;' +
+                //        //    'height:' + (
+                //        //        arrRecordHeights[i] +
+                //        //        recordBorderHeight
+                //        //    ) + 'px;'
+                //        //);
+                //        strCSS = '';
 
-                        strRecord = strRecord.replace(
-                            '$$CSSREPLACETOKEN$$',
-                            strCSS
-                        );
+                //        strRecord = strRecord.replace(
+                //            '$$CSSREPLACETOKEN$$',
+                //            strCSS
+                //        );
 
-                        intCellLeft += arrColumnWidths[col_i];
-                        intCellLeft += columnBorderWidth;
-                    }
-                    col_i += 1;
-                }
+                //        intCellLeft += arrColumnWidths[col_i];
+                //        intCellLeft += columnBorderWidth;
+                //    }
+                //    col_i += 1;
+                //}
 
                 // append record to html
                 strHTML += strRecord;
@@ -41349,52 +41355,52 @@ document.addEventListener('DOMContentLoaded', function () {
         //      original template strings) at this step
         GS.templateShowSubTemplates(strHTML, element.internalTemplates.record);
 
-        // we need to use the dimensions of the header, record selectors and the
-        //      insert record, so we'll stick them in these variables for easy
-        //      access
-        var intHeaderHeight;
-        var intRecordSelectorWidth;
-        var intInsertRecordHeight;
+        //// we need to use the dimensions of the header, record selectors and
+        ////      the insert record, so we'll stick them in these variables for
+        ////      easy access
+        //var intHeaderHeight;
+        //var intRecordSelectorWidth;
+        //var intInsertRecordHeight;
 
-        intHeaderHeight = element.internalDisplay.headerHeight;
-        intRecordSelectorWidth = element.internalDisplay.recordSelectorWidth;
-        intInsertRecordHeight = element.internalDisplay.insertRecordHeight;
+        //intHeaderHeight = element.internalDisplay.headerHeight;
+        //intRecordSelectorWidth = element.internalDisplay.recordSelectorWidth;
+        //intInsertRecordHeight = element.internalDisplay.insertRecordHeight;
 
         // if there's a header: build column headings (second so that they're
         //      above cells)
         if (strHeaderTemplate) {
             strRecord = strHeaderTemplate;
 
-            col_i = fromColumn;
-            col_len = toColumn;
-            intCellLeft = intCellOriginLeft;
-            while (col_i < col_len) {
-                // if the column is not hidden
-                if (arrColumnWidths[col_i] > 0) {
-                    //strCSS = (
-                    //    'top:0;' +
-                    //    'left:' + intCellLeft + 'px;' +
-                    //    'width:' + (
-                    //        arrColumnWidths[col_i] +
-                    //        columnBorderWidth
-                    //    ) + 'px;' +
-                    //    'height:' + (
-                    //        intHeaderHeight +
-                    //        intHeaderBorderHeight
-                    //    ) + 'px;'
-                    //);
-                    strCSS = '';
+            //col_i = fromColumn;
+            //col_len = toColumn;
+            //intCellLeft = intCellOriginLeft;
+            //while (col_i < col_len) {
+            //    // if the column is not hidden
+            //    if (arrColumnWidths[col_i] > 0) {
+            //        //strCSS = (
+            //        //    'top:0;' +
+            //        //    'left:' + intCellLeft + 'px;' +
+            //        //    'width:' + (
+            //        //        arrColumnWidths[col_i] +
+            //        //        columnBorderWidth
+            //        //    ) + 'px;' +
+            //        //    'height:' + (
+            //        //        intHeaderHeight +
+            //        //        intHeaderBorderHeight
+            //        //    ) + 'px;'
+            //        //);
+            //        strCSS = '';
 
-                    strRecord = strRecord.replace(
-                        '$$CSSREPLACETOKEN$$',
-                        strCSS
-                    );
+            //        strRecord = strRecord.replace(
+            //            '$$CSSREPLACETOKEN$$',
+            //            strCSS
+            //        );
 
-                    intCellLeft += arrColumnWidths[col_i];
-                    intCellLeft += columnBorderWidth;
-                }
-                col_i += 1;
-            }
+            //        intCellLeft += arrColumnWidths[col_i];
+            //        intCellLeft += columnBorderWidth;
+            //    }
+            //    col_i += 1;
+            //}
 
             strRecord = handleHeaderTemplateTokens(
                 element,
@@ -41416,36 +41422,37 @@ document.addEventListener('DOMContentLoaded', function () {
         // if there's a insert record: build it and append to HTML
         if (strInsertTemplate) {
             strRecord = strInsertTemplate;
-            col_i = fromColumn;
-            col_len = toColumn;
-            intCellLeft = intCellOriginLeft;
-            while (col_i < col_len) {
-                // if the column is not hidden
-                if (arrColumnWidths[col_i] > 0) {
-                    //strCSS = (
-                    //    'top:' + intRecordTop + 'px;' +
-                    //    'left:' + intCellLeft + 'px;' +
-                    //    'width:' + (
-                    //        arrColumnWidths[col_i] +
-                    //        columnBorderWidth
-                    //    ) + 'px;' +
-                    //    'height:' + (
-                    //        intInsertRecordHeight +
-                    //        intInsertRecordBorderHeight
-                    //    ) + 'px;'
-                    //);
-                    strCSS = '';
 
-                    strRecord = strRecord.replace(
-                        '$$CSSREPLACETOKEN$$',
-                        strCSS
-                    );
+            //col_i = fromColumn;
+            //col_len = toColumn;
+            //intCellLeft = intCellOriginLeft;
+            //while (col_i < col_len) {
+            //    // if the column is not hidden
+            //    if (arrColumnWidths[col_i] > 0) {
+            //        //strCSS = (
+            //        //    'top:' + intRecordTop + 'px;' +
+            //        //    'left:' + intCellLeft + 'px;' +
+            //        //    'width:' + (
+            //        //        arrColumnWidths[col_i] +
+            //        //        columnBorderWidth
+            //        //    ) + 'px;' +
+            //        //    'height:' + (
+            //        //        intInsertRecordHeight +
+            //        //        intInsertRecordBorderHeight
+            //        //    ) + 'px;'
+            //        //);
+            //        strCSS = '';
 
-                    intCellLeft += arrColumnWidths[col_i];
-                    intCellLeft += columnBorderWidth;
-                }
-                col_i += 1;
-            }
+            //        strRecord = strRecord.replace(
+            //            '$$CSSREPLACETOKEN$$',
+            //            strCSS
+            //        );
+
+            //        intCellLeft += arrColumnWidths[col_i];
+            //        intCellLeft += columnBorderWidth;
+            //    }
+            //    col_i += 1;
+            //}
 
             strHTML += strRecord;
         }
@@ -41458,11 +41465,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 len = toRecord;
                 intRecordTop = intRecordOriginTop;
                 while (i < len) {
-                    strCSS = '';
+                    //strCSS = '';
 
                     strHTML += (
                         '<gs-cell class="table-record-selector multi-update" ' +
-                        '    style="' + strCSS + '" ' +
+                        //'    style="' + strCSS + '" ' +
                         '    data-row-number="' + i + '" ' +
                         '    data-col="selector" ' +
                         '    title="Record #' + (i + 1) + '">' +
@@ -41491,11 +41498,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     //        recordBorderHeight
                     //    ) + 'px;'
                     //);
-                    strCSS = '';
 
                     strHTML += (
                         '<gs-cell class="table-record-selector" ' +
-                        '    style="' + strCSS + '" ' +
+                        //'    style="' + strCSS + '" ' +
                         '    data-row-number="' + i + '" ' +
                         '    data-col="selector" ' +
                         '    title="Record #' + (i + 1) + '">' +
@@ -41530,13 +41536,13 @@ document.addEventListener('DOMContentLoaded', function () {
             //    //    intInsertRecordBorderHeight
             //    //) + 'px;'
             //);
-            strCSS = '';
 
-            strHTML +=
-                    '<gs-cell class="table-insert-selector" ' +
-                    '      style="' + strCSS + '" data-row-number="insert" ' +
-                    '      data-col="selector">*' +
-                    '</gs-cell>'; //&gt;
+            strHTML += (
+                '<gs-cell class="table-insert-selector"' +
+                    //' style="' + strCSS + '"' +
+                    ' data-row-number="insert"' +
+                    ' data-col="selector">*</gs-cell>' //&gt;
+            );
         }
 
         // if there's a header and record selectors haven't been disabled: build
@@ -41558,11 +41564,11 @@ document.addEventListener('DOMContentLoaded', function () {
             //        intHeaderBorderHeight
             //    ) + 'px;'
             //);
-            strCSS = '';
 
             strHTML += (
-                '<gs-cell class="table-all-selector" ' +
-                '      style="' + strCSS + '" data-col="selector">#</gs-cell>'
+                '<gs-cell class="table-all-selector"' +
+                    //' style="' + strCSS + '"' +
+                    ' data-col="selector">#</gs-cell>'
             );
         }
 
@@ -41619,10 +41625,12 @@ document.addEventListener('DOMContentLoaded', function () {
             if (jsnRange) {
                 selectedCellControl = xtag.query(
                     element,
-                    'gs-cell' +
-                        '[data-col-number="' + jsnRange.start.column + '"]' +
-                        '[data-row-number="' + jsnRange.start.row + '"]' +
-                        ' input'
+                    (
+                        'gs-cell' +
+                            '[data-col-number="' + jsnRange.start.column + '"]' +
+                            '[data-row-number="' + jsnRange.start.row + '"]' +
+                            ' input'
+                    )
                 )[0];
 
                 //console.log(selectedCellControl);
@@ -41646,13 +41654,13 @@ document.addEventListener('DOMContentLoaded', function () {
     //      this function removes the elements that are no longer visible and
     //      then creates elements that are not visible based on the viewport.
     function renderLocationPartial(element) {
-        var arrColumnWidths;
-        var arrRecordHeights;
-        var columnBorderWidth;
-        var recordBorderHeight;
-        var intRecordSelectorBorderWidth;
-        var intInsertRecordBorderHeight;
-        var intHeaderBorderHeight;
+        //var arrColumnWidths;
+        //var arrRecordHeights;
+        //var columnBorderWidth;
+        //var recordBorderHeight;
+        //var intRecordSelectorBorderWidth;
+        //var intInsertRecordBorderHeight;
+        //var intHeaderBorderHeight;
 
         var strRow;
         var strCol;
@@ -41665,10 +41673,10 @@ document.addEventListener('DOMContentLoaded', function () {
         var toRecord;
         var bolInsertRecord;
 
-        var intCellOriginLeft;
-        var intRecordOriginTop;
-        var intCellLeft;
-        var intCellTop;
+        //var intCellOriginLeft;
+        //var intRecordOriginTop;
+        //var intCellLeft;
+        //var intCellTop;
 
         var arrColumnNames;
         var jsnQS;
@@ -41678,8 +41686,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var intRowNumber;
         var intColNumber;
 
-        var arrColumnLeft;
-        var arrRecordTop;
+        //var arrColumnLeft;
+        //var arrRecordTop;
 
         var arrElements;
         var strColumn;
@@ -41699,8 +41707,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var cell_len;
         var col_i;
         var col_len;
-        var row_i;
-        var row_len;
+        //var row_i;
+        //var row_len;
 
         var strDownTemplate;
         var strUpTemplate;
@@ -41715,25 +41723,25 @@ document.addEventListener('DOMContentLoaded', function () {
         var strHTML;
         var cellElement;
 
-        // save column widths and record heights for easy access
-        arrColumnWidths = element.internalDisplay.columnWidths;
-        arrRecordHeights = element.internalDisplay.recordHeights;
+        //// save column widths and record heights for easy access
+        //arrColumnWidths = element.internalDisplay.columnWidths;
+        //arrRecordHeights = element.internalDisplay.recordHeights;
 
-        // we needs the border dimensions to calculate true locations
-        columnBorderWidth = element.internalDisplay.columnBorderWidth;
-        recordBorderHeight = element.internalDisplay.recordBorderHeight;
+        //// we needs the border dimensions to calculate true locations
+        //columnBorderWidth = element.internalDisplay.columnBorderWidth;
+        //recordBorderHeight = element.internalDisplay.recordBorderHeight;
 
-        // we need to know the border sizes so that we can calculate cell
-        //      dimensions
-        intRecordSelectorBorderWidth = (
-            element.internalDisplay.recordSelectorBorderWidth
-        );
-        intInsertRecordBorderHeight = (
-            element.internalDisplay.insertRecordBorderHeight
-        );
-        intHeaderBorderHeight = (
-            element.internalDisplay.headerBorderHeight
-        );
+        //// we need to know the border sizes so that we can calculate cell
+        ////      dimensions
+        //intRecordSelectorBorderWidth = (
+        //    element.internalDisplay.recordSelectorBorderWidth
+        //);
+        //intInsertRecordBorderHeight = (
+        //    element.internalDisplay.insertRecordBorderHeight
+        //);
+        //intHeaderBorderHeight = (
+        //    element.internalDisplay.headerBorderHeight
+        //);
 
         // save the column name array for quick and easy access
         arrColumnNames = element.internalData.columnNames;
@@ -41752,24 +41760,24 @@ document.addEventListener('DOMContentLoaded', function () {
         //      "null-string" attribute to get the null string
         strNullString = element.getAttribute('null-string');
 
-        // we need to use the dimensions of the header, record selectors and the
-        //      insert record, so we'll stick them in these variables for easy
-        //      access
-        var intHeaderHeight;
-        var intRecordSelectorWidth;
-        var intInsertRecordHeight;
+        //// we need to use the dimensions of the header, record selectors and
+        ////      the insert record, so we'll stick them in these variables for
+        ////      easy access
+        //var intHeaderHeight;
+        //var intRecordSelectorWidth;
+        //var intInsertRecordHeight;
 
-        intHeaderHeight = element.internalDisplay.headerHeight;
-        intRecordSelectorWidth = element.internalDisplay.recordSelectorWidth;
-        intInsertRecordHeight = element.internalDisplay.insertRecordHeight;
+        //intHeaderHeight = element.internalDisplay.headerHeight;
+        //intRecordSelectorWidth = element.internalDisplay.recordSelectorWidth;
+        //intInsertRecordHeight = element.internalDisplay.insertRecordHeight;
 
         // get old visible range
         jsnOldRange = element.internalDisplay.prevRange;
 
         // get visible range
         jsnRange = element.internalDisplay.currentRange;
-        intCellOriginLeft = jsnRange.originLeft;
-        intRecordOriginTop = jsnRange.originTop;
+        //intCellOriginLeft = jsnRange.originLeft;
+        //intRecordOriginTop = jsnRange.originTop;
         fromColumn = jsnRange.fromColumn;
         toColumn = jsnRange.toColumn;
         fromRecord = jsnRange.fromRecord;
@@ -41918,8 +41926,9 @@ document.addEventListener('DOMContentLoaded', function () {
         var createNonDataCells = function (strTemplate) {
             var strRecord;
 
-            // replace the css tokens so the cells are in the right place
-            strRecord = strTemplate.replace(/\$\$CSSREPLACETOKEN\$\$/gi, '');
+            //// replace the css tokens so the cells are in the right place
+            //strRecord = strTemplate.replace(/\$\$CSSREPLACETOKEN\$\$/gi, '');
+            strRecord = strTemplate;
 
             // template with JSON - in the future, we need to change this to
             //      use the dot.js once for all the cells because templating
@@ -42058,11 +42067,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     toColumn
                 );
 
-                // replace the css tokens so that they don't interfere
-                strUpTemplate = (
-                    strUpTemplate
-                        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
-                );
+                //// replace the css tokens so that they don't interfere
+                //strUpTemplate = (
+                //    strUpTemplate
+                //        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
+                //);
 
                 // for now, the down and up templates are exactly the same. we
                 //      could use one variable for the down and up templates,
@@ -42097,11 +42106,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     jsnRange.fromColumn,
                     jsnOldRange.fromColumn
                 );
-                // replace the css tokens so that they don't interfere
-                strLeftHeaderTemplate = (
-                    strLeftHeaderTemplate
-                        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
-                );
+                //// replace the css tokens so that they don't interfere
+                //strLeftHeaderTemplate = (
+                //    strLeftHeaderTemplate
+                //        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
+                //);
             }
             // record cells
             if (element.internalTemplates.record.templateHTML.trim()) {
@@ -42111,11 +42120,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     jsnRange.fromColumn,
                     jsnOldRange.fromColumn
                 );
-                // replace the css tokens so that they don't interfere
-                strLeftRecordTemplate = (
-                    strLeftRecordTemplate
-                        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
-                );
+                //// replace the css tokens so that they don't interfere
+                //strLeftRecordTemplate = (
+                //    strLeftRecordTemplate
+                //        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
+                //);
             }
             // insert cells
             if (
@@ -42130,11 +42139,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     jsnRange.fromColumn,
                     jsnOldRange.fromColumn
                 );
-                // replace the css tokens so that they don't interfere
-                strLeftInsertTemplate = (
-                    strLeftInsertTemplate
-                        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
-                );
+                //// replace the css tokens so that they don't interfere
+                //strLeftInsertTemplate = (
+                //    strLeftInsertTemplate
+                //        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
+                //);
             }
 
             //console.log(
@@ -42166,11 +42175,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     jsnOldRange.toColumn,
                     jsnRange.toColumn
                 );
-                // replace the css tokens so that they don't interfere
-                strRightHeaderTemplate = (
-                    strRightHeaderTemplate
-                        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
-                );
+                //// replace the css tokens so that they don't interfere
+                //strRightHeaderTemplate = (
+                //    strRightHeaderTemplate
+                //        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
+                //);
             }
             // record cells
             if (element.internalTemplates.record.templateHTML.trim()) {
@@ -42180,11 +42189,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     jsnOldRange.toColumn,
                     jsnRange.toColumn
                 );
-                // replace the css tokens so that they don't interfere
-                strRightRecordTemplate = (
-                    strRightRecordTemplate
-                        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
-                );
+                //// replace the css tokens so that they don't interfere
+                //strRightRecordTemplate = (
+                //    strRightRecordTemplate
+                //        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
+                //);
             }
             // insert cells
             if (
@@ -42199,11 +42208,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     jsnOldRange.toColumn,
                     jsnRange.toColumn
                 );
-                // replace the css tokens so that they don't interfere
-                strRightInsertTemplate = (
-                    strRightInsertTemplate
-                        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
-                );
+                //// replace the css tokens so that they don't interfere
+                //strRightInsertTemplate = (
+                //    strRightInsertTemplate
+                //        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
+                //);
             }
 
             //console.log(
@@ -42253,8 +42262,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!element.hasAttribute('no-record-selector')) {
                 strInsertTemplate += (
-                    '<gs-cell class="table-insert-selector"' +
-                            ' data-row-number="insert" data-col="selector">*' + //&gt;
+                    '<gs-cell ' +
+                            'class="table-insert-selector"' +
+                            ' data-row-number="insert"' +
+                            ' data-col="selector">*' + //&gt;
                     '</gs-cell>'
                 );
             }
@@ -42268,11 +42279,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 )
             );
 
-            // replace the css tokens so that they don't interfere
-            strInsertTemplate = (
-                strInsertTemplate
-                    .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
-            );
+            //// replace the css tokens so that they don't interfere
+            //strInsertTemplate = (
+            //    strInsertTemplate
+            //        .replace(/\$\$CSSREPLACETOKEN\$\$/gi, '')
+            //);
 
             strHTML += createNonDataCells(strInsertTemplate);
         }
