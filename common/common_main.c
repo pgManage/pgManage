@@ -39,9 +39,6 @@ ev_periodic last_activity_free_timer;
 ev_signal sigint_watcher;
 ev_signal sigterm_watcher;
 ev_signal sigbreak_watcher;
-#ifdef UTIL_DEBUG
-ev_check print_watchers;
-#endif // UTIL_DEBUG
 
 /*
 This function is run when the program exits
@@ -56,9 +53,6 @@ void program_exit() {
 		ev_signal_stop(global_loop, &sigint_watcher);
 		ev_signal_stop(global_loop, &sigterm_watcher);
 		ev_signal_stop(global_loop, &sigbreak_watcher);
-#ifdef UTIL_DEBUG
-		ev_check_stop(global_loop, &print_watchers);
-#endif // UTIL_DEBUG
 
 		if (_server.list_client != NULL) {
 			while (List_first(_server.list_client) != NULL) {
@@ -245,9 +239,6 @@ int main(int argc, char *const *argv) {
 	memset(&sigint_watcher, 0, sizeof(ev_signal));
 	memset(&sigterm_watcher, 0, sizeof(ev_signal));
 	memset(&sigbreak_watcher, 0, sizeof(ev_signal));
-#ifdef UTIL_DEBUG
-	memset(&print_watchers, 0, sizeof(ev_signal));
-#endif // UTIL_DEBUG
 #ifdef _WIN32
 	WORD w_version_requested;
 	WSADATA wsa_data;
