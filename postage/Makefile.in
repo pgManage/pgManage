@@ -1,5 +1,5 @@
 BINARY = postage
-CONFIGS = -c config/postage.conf -d config/postage-connections.conf -n true -t 300
+CONFIGS = -c config/postage.conf -d config/postage-connections-test.conf -n true -t 300
 WEBROOTS = -r ./web_root
 INSTALL_DEPS = @prefix@/sbin/ @prefix@/etc/$(BINARY)/ @prefix@/etc/postage/postage.conf @prefix@/etc/postage/postage-connections.conf
 SOCK_DIR_PARAMETER = @sock_dir_parameter@
