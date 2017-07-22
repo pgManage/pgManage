@@ -246,7 +246,7 @@ int main(int argc, char *const *argv) {
 	memset(&sigterm_watcher, 0, sizeof(ev_signal));
 	memset(&sigbreak_watcher, 0, sizeof(ev_signal));
 #ifdef UTIL_DEBUG
-	memset(&print_watchers, 0, sizeof(ev_signal));
+	memset(&print_watchers, 0, sizeof(ev_check));
 #endif // UTIL_DEBUG
 #ifdef _WIN32
 	WORD w_version_requested;
