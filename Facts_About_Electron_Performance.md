@@ -45,10 +45,10 @@ Loading time from 'run' to display of data in grid. We used this query: "SELECT 
 
 ```
  pgAdmin3:        18sec
- pgAdmin4:         2sec # updated for 1.6 (takes forever to scroll to last record though)
+ pgAdmin4:         2sec # updated for 1.6 
  Postage(3.2.12): 12sec
  Postage(3.2.13):  2sec
- Postage(3.2.16)   8sec # update (Something odd is happening. I've openned an issue #323.)
+ Postage(3.2.16)   2sec # This update copies the pgAdmin4 model of displaying as soon as the first records are available. 
 ```
 
 There you have it. We've been working on a faster grid for displaying table data for some time. It uses Websockets to get the data and a tab delimited transfer format. 
@@ -56,6 +56,13 @@ There you have it. We've been working on a faster grid for displaying table data
 Note that 3.2.12 was quite slow, yet a liberal application of time and talent caused 3.2.13 to become extremely fast. 
 
 This isn't the whole picture. I'm confident that Postage's grid has slowed down over the last few months. We haven't been fixing or improving the old grid code because we knew it was destined to be replaced. Like many other Electron projects we're resource constrained and performance suffered.
+
+## Update 7/22/17
+
+We've got two new numbers you may find interesting. Postage and PGAdmin4 display the first records of a result set as soon as they are available and in that task they are roughly the same. However, time to scroll to the last record of a result set is wildly different. PGAdmin4 takes over two minutes to get to the bottom whereas Postage can be scrolled to the last record within six seconds.
+
+Clearly 3nterpriseDb is working hard to close the performance gap and we are thankful. The PostgreSQL community deserves good tools and although it is unfortunate that it took a little tiny struggling company to wake people up, we're glad that in the end it happened.
+
 
 ## Do you believe more choices make for a better ecosystem?
 

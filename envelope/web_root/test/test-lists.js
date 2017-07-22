@@ -306,16 +306,16 @@ SQL Injection detected*/})],
 			["FATAL\nerror_text\tERROR:  function public.action_testing1(unknown) does not exist\\nLINE 1: COPY (SELECT \"public\".\"action_testing1\"('testingnitset')) TO...\\n                     ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\nerror_detail\t\nerror_hint\tNo function matches the given name and argument types. You might need to add explicit type casts.\nerror_query\t\nerror_context\t\nerror_position\t14\n"]],
 			['ACTION FAIL 2', 'websocket', '', ml(function () {/*ACTION	public	actiont_testing1	testingnitset
 */}),
-			["Invalid action name, action function names must begin with \"action_\""]],
+			["Invalid action name, action function names must begin with \"action_\" or \"actionnc_\""]],
 			['ACTION FAIL 3', 'websocket', '', ml(function () {/*ACTION	actiont_testing1	testingnitset
 */}),
-			["Invalid action name, action function names must begin with \"action_\""]],
+			["Invalid action name, action function names must begin with \"action_\" or \"actionnc_\""]],
 			['ACTION FAIL 4', 'websocket', '', ml(function () {/*ACTION	public actiont_testing1	testingnitset
 */}),
-			["Invalid action name, action function names must begin with \"action_\""]],
+			["Invalid action name, action function names must begin with \"action_\" or \"actionnc_\""]],
 			['ACTION FAIL 5', 'websocket', '', ml(function () {/*ACTION	public action_testing;	testingnitset
 */}),
-			["Invalid action name, action function names must begin with \"action_\""]],
+			["Invalid action name, action function names must begin with \"action_\" or \"actionnc_\""]],
 			['ACTION', 'websocket', '', ml(function () {/*ACTION	public	action_testing	testingnitset
 */}),
 			["\"testingnitset\"\n", "TRANSACTION COMPLETED"]],
