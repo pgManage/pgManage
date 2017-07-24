@@ -24,9 +24,9 @@ Or if you choose LibreSSL, make sure its `openssl` is first in the $PATH (On Ope
 https://github.com/workflowproducts/postage/releases
 
 
-####NOTICE: INSTALLING POSTAGE SERVER ON WINDOWS IS EXPLAINED IN THE DOCUMENT: INSTALL_WEB_SERVER_MODE_WIN.md
+#### NOTICE: INSTALLING POSTAGE SERVER ON WINDOWS IS EXPLAINED IN THE DOCUMENT: INSTALL_WEB_SERVER_MODE_WIN.md
 
-####INSTALLING POSTAGE
+#### INSTALLING POSTAGE
 
 If you'd like to test Postage before you install, see the section "Testing Postage Before Installing" further down.
 
@@ -38,7 +38,7 @@ If you'd like to test Postage before you install, see the section "Testing Posta
 If you are on OpenBSD or FreeBSD, use gmake instead.
 Postage will be installed in `/usr/local/sbin`. All other files such as the html, javascript and configuration files will be installed to `/usr/local/etc/postage`.
 
-####RUNNING POSTAGE
+#### RUNNING POSTAGE
 
 To run Postage:
 
@@ -50,7 +50,7 @@ Long Version:
     -c /usr/local/etc/postage/postage.conf \
     -d /usr/local/etc/postage/postage-connections.conf
 
-####Configuring POSTAGE
+#### Configuring POSTAGE
 
 Before running Postage for the first time you may want to configure some options. All the options are explained in the Postage man file:
 
@@ -60,7 +60,7 @@ Current configuration options allow you to set various paths, various access res
 
 You'll also need to set up a connection string to tell Postage where your PostgreSQL databases are published. The default connection string config file located in /usr/local/etc/postage/. There are examples in the provided postage-connections.conf file and further info is available in the man file.
 
-####TESTING POSTAGE BEFORE INSTALLING
+#### TESTING POSTAGE BEFORE INSTALLING
 
     cd postage
     ./configure
@@ -85,7 +85,7 @@ Postage will push a message like:
 
 Once you see that message that means Postage is running, open your web browser to the link shown.
 
-####UNINSTALLING POSTAGE
+#### UNINSTALLING POSTAGE
 
 If you still have your original build directory then:
 
