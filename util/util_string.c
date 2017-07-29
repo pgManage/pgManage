@@ -592,6 +592,7 @@ char *contenttype(char *str_filename) {
 	// clang-format off
         return  strncmp(str_ptr_fileextension, "js",   3) == 0 ? "application/javascript" :
                 strncmp(str_ptr_fileextension, "css",  4) == 0 ? "text/css" :
+				strncmp(str_ptr_fileextension, "xml",  4) == 0 ? "application/xml" :
                 strncmp(str_ptr_fileextension, "html", 5) == 0 ? "text/html" :
                 strncmp(str_ptr_fileextension, "htm",  4) == 0 ? "text/html" :
                 strncmp(str_ptr_fileextension, "gif",  4) == 0 ? "image/gif" :

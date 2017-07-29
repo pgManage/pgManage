@@ -28,6 +28,9 @@
     <Filter Include="Source Files\compat">
       <UniqueIdentifier>{b0e6a91d-bdfd-4ff8-919a-6f204f6356c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\test">
+      <UniqueIdentifier>{db583563-f3bb-4eb7-80a4-8a870264f10e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\common\common_auth.c">
@@ -379,8 +382,20 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\envelope\web_root\test.html">
-      <Filter>Resource Files</Filter>
+    <None Include="..\..\envelope\web_root\test\index.html">
+      <Filter>Resource Files\test</Filter>
+    </None>
+    <None Include="..\..\envelope\web_root\test\test.css">
+      <Filter>Resource Files\test</Filter>
+    </None>
+    <None Include="..\..\envelope\web_root\test\test.js">
+      <Filter>Resource Files\test</Filter>
+    </None>
+    <None Include="..\..\envelope\web_root\test\test-lib.js">
+      <Filter>Resource Files\test</Filter>
+    </None>
+    <None Include="..\..\envelope\web_root\test\test-lists.js">
+      <Filter>Resource Files\test</Filter>
     </None>
   </ItemGroup>
 </Project>

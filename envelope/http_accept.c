@@ -224,7 +224,7 @@ void http_accept_step3(EV_P, ev_io *w, int revents) {
 
 	SDEBUG("write(%i, %p, %i): %z", client_request->parent->int_sock,
 		client_copy_check->str_response + client_copy_check->int_written,
-		client_copy_check->int_response_len - client_copy_check->int_written, int_response_len);
+		client_copy_check->int_response_len - client_copy_check->int_written, int_client_write_len);
 
 	if (int_client_write_len == SOCK_WANT_READ) {
 		ev_io_stop(EV_A, w);
@@ -242,13 +242,13 @@ void http_accept_step3(EV_P, ev_io *w, int revents) {
 		errno = 0;
 		return;
 
-	} else if (int_client_write_len < 0 && errno != EAGAIN) {
+	} else if (int_client_write_len == -1 && errno != EAGAIN) {
 		SFINISH("client_write(%i, %p, %i) failed: %i", client_request->parent->int_sock,
 			client_copy_check->str_response + client_copy_check->int_written,
 			client_copy_check->int_response_len - client_copy_check->int_written, int_client_write_len);
 	} else {
-		// int_response_len can't be negative at this point
-		client_copy_check->int_written += int_client_write_len;
+		// int_client_write_len can't be negative at this point
+		client_copy_check->int_written += (ssize_t)int_client_write_len;
 	}
 
 	if (client_copy_check->int_written == client_copy_check->int_response_len) {

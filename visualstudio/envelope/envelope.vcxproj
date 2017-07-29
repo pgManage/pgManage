@@ -277,7 +277,11 @@
     <ClInclude Include="..\..\util\util_strptime.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\envelope\web_root\test.html" />
+    <None Include="..\..\envelope\web_root\test\index.html" />
+    <None Include="..\..\envelope\web_root\test\test-lib.js" />
+    <None Include="..\..\envelope\web_root\test\test-lists.js" />
+    <None Include="..\..\envelope\web_root\test\test.css" />
+    <None Include="..\..\envelope\web_root\test\test.js" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
