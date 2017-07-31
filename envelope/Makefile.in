@@ -120,6 +120,7 @@ clean:
 	test -f @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf || install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf;
 
 install: $(INSTALL_DEPS)
+	mkdir -p @prefix@/etc/$(BINARY)/ @prefix@/sbin @prefix@/@MANDIR@/man1
 	install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf.example
 	install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf.example
 	install $(BINARY) @prefix@/sbin/

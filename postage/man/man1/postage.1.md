@@ -84,11 +84,11 @@ The following options can be specified on the command line or in the configurati
        `String;` defaults to error  
        This option regulates the frequency and verbosity of log messages. Possible values are none, error, warn, notice and info.
 
-`-t` or `--login-timeout=` or `login-timeout=`  
+`-t` or `--login-timeout=` or `login_timeout=`  
        `Integer;` defaults to 1200  
        This option regulates the timeout after the last page is closed.
 
-`-x` or `--local-only=` or `local-only=`  
+`-x` or `--local-only=`
        `Boolean;` defaults to false  
        This tells Postage whether or not to set the listening socket to local addresses only.
 
