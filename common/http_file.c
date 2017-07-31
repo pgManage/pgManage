@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "http_file.h"
 
 static const char *str_date_format = "%a, %d %b %Y %H:%M:%S GMT";

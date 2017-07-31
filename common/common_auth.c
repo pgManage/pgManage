@@ -390,6 +390,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 		str_uri_user_agent = snuri(str_user_agent, int_user_agent_len, &int_uri_user_agent_len);
 		SFINISH_CHECK(str_uri_user_agent != NULL, "snuri failed on string \"%s\"", str_user_agent);
 
+#ifdef ENVELOPE
 		SFINISH_SNCAT(str_context_data, &int_context_data_len,
 			"request_ip_address=", (size_t)19,
 			str_uri_ip_address, int_uri_ip_address_len,
@@ -398,6 +399,9 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 			"&request_user_agent=", (size_t)20,
 			str_uri_user_agent, int_uri_user_agent_len
 		);
+#else
+		SFINISH_SNCAT(str_context_data, &int_context_data_len, "", (size_t)0);
+#endif
 
 #if defined(ENVELOPE) && defined(POSTAGE_INTERFACE_LIBPQ)
 		SDEBUG("bol_global_set_user: %s", bol_global_set_user ? "true" : "false");

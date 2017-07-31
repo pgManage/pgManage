@@ -1,3 +1,4 @@
+#define UTIL_DEBUG
 #include "util_canonical.h"
 
 static bool path_valid_char(char *path);
@@ -18,8 +19,9 @@ char *realpath(char *N, char *R) {
 
 int mkpath(char *file_path) {
 	char *p;
-	for (p = strchr(file_path + 1, '\\'); p; p = strchr(p + 1, '\\')) {
-		*p = '\0';
+	for (p = strchr(file_path + (file_path[1] == ':' ? 3 : 1), '\\'); p; p = strchr(p + 1, '\\')) {
+		SDEBUG("p: %s", p);
+		*p = 0;
 		SDEBUG("mkdir(%s)", file_path);
 		errno = 0;
 		if (mkdir(file_path) == -1) {
@@ -61,6 +63,9 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 		(int_file_base_len == 0 || str_file_base[int_file_base_len - 1] != '/')) {
 		SERROR_SNFCAT(str_file_base, &int_file_base_len,
 			"\\", (size_t)1);
+	}
+	if (ptr_path[1] == ':') {
+		ptr_path += 2;
 	}
 	while (ptr_path[0] == '\\' || ptr_path[0] == '/') {
 		ptr_path += 1;
