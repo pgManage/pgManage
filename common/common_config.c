@@ -802,101 +802,41 @@ bool parse_options(int argc, char *const *argv) {
 	str_global_data_root = str_temp;
 	str_temp = NULL;
 
-#ifdef _WIN32
-	if (str_global_web_root[1] != ':' && str_global_web_root[0] != '\\' && str_global_web_root[0] != '/') {
-#else
-	if (str_global_web_root[0] != '/') {
-#endif
-#ifdef _WIN32
-		SERROR_SNCAT(str_temp, &int_temp_len,
-			cwd + 2, strlen(cwd + 2),
-			"/", (size_t)1,
-			str_global_web_root, strlen(str_global_web_root));
-#else
+	if (str_global_web_root[0] != '/' && str_global_web_root[0] != '\\' && str_global_web_root[1] != ':') {
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			cwd, strlen(cwd),
 			"/", (size_t)1,
 			str_global_web_root, strlen(str_global_web_root));
-#endif
 		SDEBUG("str_temp: %s", str_temp);
 		SFREE(str_global_web_root);
 		str_global_web_root = canonical("", str_temp, "valid_path");
 		SFREE(str_temp);
-#ifdef _WIN32
-	} else if (str_global_web_root[1] == ':') {
-		str_temp = str_global_web_root;
-		SERROR_SNCAT(str_global_web_root, &int_global_len,
-			str_global_web_root + 2, strlen(str_global_web_root) - 2);
-		SFREE(str_temp);
 	}
-#else
-	}
-#endif
 	SDEBUG("str_global_web_root: %s", str_global_web_root);
 
 #ifdef ENVELOPE
-#ifdef _WIN32
-	if (str_global_app_path[1] != ':' && str_global_app_path[0] != '\\' && str_global_app_path[0] != '/') {
-#else
-	if (str_global_app_path[0] != '/') {
-#endif // _WIN32
-#ifdef _WIN32
-		SERROR_SNCAT(str_temp, &int_temp_len,
-			cwd + 2, strlen(cwd + 2),
-			"/", (size_t)1,
-			str_global_app_path, strlen(str_global_role_path));
-#else
+	if (str_global_app_path[0] != '/' && str_global_app_path[0] != '\\' && str_global_app_path[1] != ':') {
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			cwd, strlen(cwd),
 			"/", (size_t)1,
 			str_global_app_path, strlen(str_global_role_path));
-#endif // _WIN32
 		SDEBUG("str_temp: %s", str_temp);
 		SFREE(str_global_app_path);
 		str_global_app_path = canonical("", str_temp, "valid_path");
 		SFREE(str_temp);
-#ifdef _WIN32
-	} else if (str_global_app_path[1] == ':') {
-		str_temp = str_global_app_path;
-		SERROR_SNCAT(str_global_app_path, &int_global_len,
-			str_global_app_path + 2, strlen(str_global_role_path) - 2);
-		SFREE(str_temp);
 	}
-#else
-	}
-#endif // _WIN32
 	SDEBUG("str_global_app_path: %s", str_global_app_path);
 
-#ifdef _WIN32
-	if (str_global_role_path[1] != ':' && str_global_role_path[0] != '\\' && str_global_role_path[0] != '/') {
-#else
-	if (str_global_role_path[0] != '/') {
-#endif // _WIN32
-#ifdef _WIN32
-		SERROR_SNCAT(str_temp, &int_temp_len,
-			cwd + 2, strlen(cwd + 2),
-			"\\", (size_t)1,
-			str_global_role_path, strlen(str_global_role_path));
-#else
+	if (str_global_role_path[0] != '/' && str_global_role_path[0] != '\\' && str_global_role_path[1] != ':') {
 		SERROR_SNCAT(str_temp, &int_temp_len,
 			cwd, strlen(cwd),
 			"/", (size_t)1,
 			str_global_role_path, strlen(str_global_role_path));
-#endif // _WIN32
 		SDEBUG("str_temp: %s", str_temp);
 		SFREE(str_global_role_path);
 		str_global_role_path = canonical("", str_temp, "valid_path");
 		SFREE(str_temp);
-#ifdef _WIN32
-	} else if (str_global_role_path[1] == ':') {
-		str_temp = str_global_role_path;
-		SERROR_SNCAT(str_global_role_path, &int_global_len,
-			str_global_role_path + 2, strlen(str_global_role_path) - 2);
-		SFREE(str_temp);
 	}
-#else
-	}
-#endif // _WIN32
 #endif // ENVELOPE
 
 #ifdef _WIN32

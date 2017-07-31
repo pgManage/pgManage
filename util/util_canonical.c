@@ -74,6 +74,17 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 		}
 		ptr_path += 1;
 	}
+
+	if (str_file_base[1] != ':') {
+		char *str_system_drive = getenv("SystemDrive");
+
+		SERROR_SNCAT(str_temp, &int_file_base_len,
+			str_system_drive, strlen(str_system_drive),
+			str_file_base, int_file_base_len);
+
+		str_file_base = str_temp;
+		str_temp = NULL;
+	}
 #else
 	SERROR_SNCAT(path, &int_path_len,
 		ptr_path, strlen(ptr_path));
@@ -135,14 +146,7 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 	} else {
 		SWARN("stat failed: %d (%s)", errno, strerror(errno));
 	}
-	if ((canonical_filename[0] == 'C' || canonical_filename[0] == 'c') && canonical_filename[1] == ':') {
-		SERROR_SNCAT(canonical_filename, &int_canonical_filename_len,
-			realpath_res + 2, strlen(realpath_res + 2));
-		SFREE(realpath_res);
-		realpath_res = canonical_filename;
-	} else {
-		int_canonical_filename_len = strlen(canonical_filename);
-	}
+	int_canonical_filename_len = strlen(canonical_filename);
 
 	// DO NOT COMMENT, THIS IS SO THAT THE ERROR DOES NOT PROPOGATE
 	errno = 0;
