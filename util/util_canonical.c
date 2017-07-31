@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "util_canonical.h"
 
 static bool path_valid_char(char *path);
