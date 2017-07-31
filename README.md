@@ -12,6 +12,10 @@ Postage can be run in two modes:
 ### Application mode
 Releases marked "3.x.x" are Application mode packages. They run in a desktop window and can connect to Postgres locally or remotely. Please go to ["Releases"](https://github.com/workflowproducts/postage/releases) and download the appropriate package for your OS. The names of these packages start with "Postage". Do NOT download the versions marked "Source Code". These packages are self contained and very easy to install and remove. Note that all the thanks for our wonderful installation process goes to Github and the Electron team. If you are inexperienced in compiling software you want this mode.
 
+Installing on Linux is a bit less easy than macOS/Windows:
+- To install on Ubuntu, download the .deb package and run: `sudo apt install ./Postage-whatever.deb`
+- To install on RHEL/CentOS, download the .rpm package and run: `yum install ./Postage-whatever.rpm`
+
 **NOTE:** We do not sign the Windows releases, but we do sign the macOS releases.
 
 ### Web Server mode
