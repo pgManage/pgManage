@@ -1,4 +1,4 @@
-.TH "POSTAGE" "1" "March 2017" "" ""
+.TH "POSTAGE" "1" "July 2017" "" ""
 .SH "NAME"
 \fBpostage\fR \- PostgreSQL Administration for the web
 .SH FULL PATH
@@ -111,14 +111,13 @@ The following options can be specified on the command line or in the configurati
 .br
        This option regulates the frequency and verbosity of log messages\. Possible values are none, error, warn, notice and info\.
 .P
-\fB\-t\fP or \fB\-\-login\-timeout=\fP or \fBlogin\-timeout=\fP
+\fB\-t\fP or \fB\-\-login\-timeout=\fP or \fBlogin_timeout=\fP
 .br
        \fBInteger;\fP defaults to 1200
 .br
        This option regulates the timeout after the last page is closed\.
 .P
-\fB\-x\fP or \fB\-\-local\-only=\fP or \fBlocal\-only=\fP
-.br
+\fB\-x\fP or \fB\-\-local\-only=\fP
        \fBBoolean;\fP defaults to false
 .br
        This tells Postage whether or not to set the listening socket to local addresses only\.

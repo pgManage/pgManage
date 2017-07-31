@@ -1,4 +1,3 @@
-#define UTIL_DEBUG
 #include "postage_callback.h"
 
 void query_callback_handler(EV_P, ev_io *w, int revents);

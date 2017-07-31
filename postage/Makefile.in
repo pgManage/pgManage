@@ -80,7 +80,7 @@ clean:
 	test -f @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf || install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf;
 
 install: $(INSTALL_DEPS)
-	mkdir -p @prefix@/etc/$(BINARY)/web_root/$(BINARY)
+	mkdir -p @prefix@/etc/$(BINARY)/web_root/$(BINARY) @prefix@/sbin @prefix@/@MANDIR@/man1
 	cp -rf ./web_root/$(BINARY)/* @prefix@/etc/$(BINARY)/web_root/$(BINARY)/
 	install config/$(BINARY).conf @prefix@/etc/$(BINARY)/$(BINARY).conf.example
 	install config/$(BINARY)-connections.conf @prefix@/etc/$(BINARY)/$(BINARY)-connections.conf.example

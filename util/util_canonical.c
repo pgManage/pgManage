@@ -18,8 +18,9 @@ char *realpath(char *N, char *R) {
 
 int mkpath(char *file_path) {
 	char *p;
-	for (p = strchr(file_path + 1, '\\'); p; p = strchr(p + 1, '\\')) {
-		*p = '\0';
+	for (p = strchr(file_path + (file_path[1] == ':' ? 3 : 1), '\\'); p; p = strchr(p + 1, '\\')) {
+		SDEBUG("p: %s", p);
+		*p = 0;
 		SDEBUG("mkdir(%s)", file_path);
 		errno = 0;
 		if (mkdir(file_path) == -1) {
@@ -62,6 +63,9 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 		SERROR_SNFCAT(str_file_base, &int_file_base_len,
 			"\\", (size_t)1);
 	}
+	if (ptr_path[1] == ':') {
+		ptr_path += 2;
+	}
 	while (ptr_path[0] == '\\' || ptr_path[0] == '/') {
 		ptr_path += 1;
 	}
@@ -73,6 +77,17 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 			*ptr_path = '\\';
 		}
 		ptr_path += 1;
+	}
+
+	if (str_file_base[1] != ':') {
+		char *str_system_drive = getenv("SystemDrive");
+
+		SERROR_SNCAT(str_temp, &int_file_base_len,
+			str_system_drive, strlen(str_system_drive),
+			str_file_base, int_file_base_len);
+
+		str_file_base = str_temp;
+		str_temp = NULL;
 	}
 #else
 	SERROR_SNCAT(path, &int_path_len,
@@ -135,14 +150,7 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 	} else {
 		SWARN("stat failed: %d (%s)", errno, strerror(errno));
 	}
-	if ((canonical_filename[0] == 'C' || canonical_filename[0] == 'c') && canonical_filename[1] == ':') {
-		SERROR_SNCAT(canonical_filename, &int_canonical_filename_len,
-			realpath_res + 2, strlen(realpath_res + 2));
-		SFREE(realpath_res);
-		realpath_res = canonical_filename;
-	} else {
-		int_canonical_filename_len = strlen(canonical_filename);
-	}
+	int_canonical_filename_len = strlen(canonical_filename);
 
 	// DO NOT COMMENT, THIS IS SO THAT THE ERROR DOES NOT PROPOGATE
 	errno = 0;
