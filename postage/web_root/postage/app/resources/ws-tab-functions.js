@@ -66,12 +66,13 @@ function startTabContainer() {
     'use strict';
     document.getElementById('tab-container').innerHTML = ml(function () {/*
         <div id="tab-bar-container" flex-horizontal flex-fill>
-            <div class="tab-bar-toolbar left" flex-horizontal>
-                <gs-button id="button-home" onclick="setQSToHome()" icononly icon="home" inline remove-all no-focus title="Back to home [ESC]"></gs-button><gs-button id="button-new-tab" onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icononly icon="folder-o" title="Create a blank script tab" inline remove-all no-focus><span id="button-new-tab-plus">+</span></gs-button>
+            <div class="tab-bar-toolbar left">
+                <gs-button id="button-home" onclick="setQSToHome()" icononly icon="home" inline remove-all no-focus title="Back to home [ESC]">
             </div>
             <div id="tab-bar" flex prevent-text-selection></div>
-            <div class="tab-bar-toolbar right">
-                <gs-button id="button-open-tabs" onclick="dialogOpenTabs(this);" icononly no-focus remove-all icon="list" inline title="All open tabs"></gs-button>
+            <div class="tab-bar-toolbar right" flex-horizontal>
+                <gs-button flex id="button-new-tab" onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icononly icon="plus" title="Create a blank script tab" inline remove-all no-focus></gs-button></gs-button>
+                <gs-button flex id="button-open-tabs" onclick="dialogOpenTabs(this);" icononly no-focus remove-all icon="list" inline title="All open tabs"></gs-button>
             </div>
         </div>
         <div id="tab-frames" flex>
@@ -2315,6 +2316,7 @@ function SQLBeautify(strInput) {
     var bolStdin = false;
     var bolRule = false;
     var bolTable = false;
+    var bolTrigger = false;
     var bolLastComment = false;
     var intCase = 0;
     var i;
@@ -2561,6 +2563,7 @@ function SQLBeautify(strInput) {
             }
             bolRule = false;
             bolTable = false;
+            bolTrigger = false;
             bolGrant = false;
             bolLastComment = false;
             bolNoExtraWhitespace = true;
@@ -2850,19 +2853,79 @@ function SQLBeautify(strInput) {
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
+        // FOUND CREATE OR REPLACE TRIGGER
+        } else if (int_qs === 0 && int_ps === 0 && strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?TRIGGER\b/i)) {
+            bolTrigger = true;
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+
+            strResult += '\n' + strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?TRIGGER\b/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?TRIGGER\b/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+            intTabLevel += 1;
+        // FOUND CREATE OR REPLACE TRIGGER ... ON
+        } else if (int_qs === 0 && int_ps === 0 && bolTrigger && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^ON[\n\r\ \t]+/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+
+            
+        // FOUND CREATE OR REPLACE TRIGGER ... INSTEAD
+        } else if (int_qs === 0 && int_ps === 0 && bolTrigger && strInput.substr(i).match(/^INSTEAD[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^INSTEAD[\n\r\ \t]+/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^INSTEAD[\n\r\ \t]+/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+
+            
+        // FOUND CREATE OR REPLACE TRIGGER ... EXECUTE
+        } else if (int_qs === 0 && int_ps === 0 && bolTrigger && strInput.substr(i).match(/^EXECUTE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^EXECUTE[\n\r\ \t]+/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^EXECUTE[\n\r\ \t]+/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+
+            
+        // FOUND CREATE OR REPLACE TRIGGER ... FOR
+        } else if (int_qs === 0 && int_ps === 0 && bolTrigger && strInput.substr(i).match(/^FOR[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^FOR[\n\r\ \t]+/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^FOR[\n\r\ \t]+/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+
+            
         // FOUND CREATE OR REPLACE
         } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
-
+            console.log('here, here', strResult);
             strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE/i)[0] + ' ';
             i += (strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
-        // FOUND CREATE OR REPLACE
+        // FOUND CREATE OR REPLACE     <--- Dupe?
         } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE)?/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {

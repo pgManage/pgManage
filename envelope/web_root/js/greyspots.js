@@ -38247,6 +38247,49 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
+    // we need a way to compare the selection ranges, this function turns a
+    //      selection range array into a string
+    function selectionArrayToString(arr) {
+        var i;
+        var len;
+        var strString;
+        var jsnRange;
+
+        strString = '';
+        i = 0;
+        len = arr.length;
+        while (i < len) {
+            jsnRange = arr[i];
+            strString += (
+                (
+                    jsnRange.negator
+                        ? 't'
+                        : 'f'
+                ) +
+                String(jsnRange.start.column) +
+                String(jsnRange.start.row) +
+                String(jsnRange.end.column) +
+                String(jsnRange.end.row)
+            );
+
+            i += 1;
+        }
+
+        return strString;
+    }
+
+    // Thanks SO User "Cambium"!
+    function roundToNearestMultiple(intNum, intDivisor) {
+        if (intNum > 0) {
+            return Math.ceil(intNum / intDivisor) * intDivisor;
+        }
+        if (intNum < 0) {
+            return Math.floor(intNum / intDivisor) * intDivisor;
+        }
+
+        return intDivisor;
+    }
+
 
 // #############################################################################
 // ############################# ELEMENT FUNCTIONS #############################
@@ -38624,6 +38667,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // we need a place to store selection ranges
         element.internalSelection = {
             "ranges": [],
+            "rangeCache": null,
             "insertRecord": false,
             "originRecord": null,
             "resolvedSelection": [],
@@ -40107,8 +40151,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // add an empty cell to the HTML copy string to make room
                 //      for the record selector column
-                strHTMLRecordCopyString +=
-                        '<td rowspan="1" colspan="1"></td>';
+                strHTMLRecordCopyString += (
+                    '<td rowspan="1" colspan="1"></td>'
+                );
             }
 
             //console.log(arrSelectedStates);
@@ -40218,6 +40263,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             //console.log(jsnRow);
             //console.log(strRow);
+            //console.log(arrRow);
 
             // version 1, broken: last cell has one char missing, replaced
             //      with faster solution
@@ -40476,6 +40522,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var intSelectorIndex;
         var intInsertIndex;
         var jsnRange;
+        var strCompareString;
 
         var arrElements;
         var i;
@@ -40503,6 +40550,10 @@ document.addEventListener('DOMContentLoaded', function () {
         bolInsert = (element.internalDisplay.insertRecordVisible);
         arrSelection = [];
 
+        strCompareString = selectionArrayToString(
+            element.internalSelection.ranges
+        );
+
         // create the blank slate for the resolved selection
         //      Type:              Unselected:   Selected:
         //      HEADER CELL        A             B
@@ -40514,334 +40565,350 @@ document.addEventListener('DOMContentLoaded', function () {
         arrSelectedStates = ['B', 'D', 'F', 'H', 'J', 'L'];
         //arrDeselectedStates = ['A', 'C', 'E', 'G', 'I', 'K'];
 
-        col_len = element.internalDisplay.columnWidths.length;
+        if (strCompareString === element.internalSelection.rangeCache) {
+            arrSelection = element.internalSelection.resolvedSelection;
+            arrSelectionRows = element.internalSelection.rows;
+            arrSelectionCols = element.internalSelection.columns;
+            arrRanges = element.internalSelection.ranges;
+            arrColumnWidths = element.internalDisplay.columnWidths;
+            arrRows = arrSelectionRows;
+            arrColumns = arrSelectionCols;
 
-        if (bolHeaders) {
-            strRecord = '';
-            if (bolSelectors) {
-                strRecord += 'G';
-            }
+        } else {
+            element.internalSelection.rangeCache = strCompareString;
 
-            col_i = 0;
-            while (col_i < col_len) {
-                strRecord += 'A';
-                col_i += 1;
-            }
-            arrSelection.push(strRecord);
-        }
+            col_len = element.internalDisplay.columnWidths.length;
 
-        strRecord = '';
-        if (bolSelectors) {
-            strRecord = 'I';
-        }
-
-        col_i = 0;
-        while (col_i < col_len) {
-            strRecord += 'C';
-            col_i += 1;
-        }
-
-        rec_i = 0;
-        rec_len = element.internalData.records.length;
-        while (rec_i < rec_len) {
-            arrSelection.push(strRecord);
-            rec_i += 1;
-        }
-
-        if (bolInsert) {
-            strRecord = '';
-            if (bolSelectors) {
-                strRecord += 'K';
-            }
-
-            col_i = 0;
-            while (col_i < col_len) {
-                strRecord += 'E';
-                col_i += 1;
-            }
-            arrSelection.push(strRecord);
-        }
-
-        //console.log(arrSelection);
-
-        // because of the vast array of column types, we'll (for simplicity
-        //      and for brevity) use one of two matrices, a matrix that
-        //      translates a selected cell to a deselected cell and one to
-        //      do the opposite
-        jsnSelectedToDeselected = {
-            "A": "A",
-            "B": "A",
-            "C": "C",
-            "D": "C",
-            "E": "E",
-            "F": "E",
-            "G": "G",
-            "H": "G",
-            "I": "I",
-            "J": "I",
-            "K": "K",
-            "L": "K"
-        };
-        jsnDeselectedToSelected = {
-            "A": "B",
-            "B": "B",
-            "C": "D",
-            "D": "D",
-            "E": "F",
-            "F": "F",
-            "G": "H",
-            "H": "H",
-            "I": "J",
-            "J": "J",
-            "K": "L",
-            "L": "L"
-        };
-
-        // because math is faster that string comparison, we need to convert
-        //      the special values inside the ranges to numbers. but, we don't
-        //      want to recalculate those numbers every time, so, we'll
-        //      calculate them here and just reuse them
-        intHeaderIndex = -1;
-        intSelectorIndex = -1;
-        intInsertIndex = (
-            bolInsert
-                ? (arrSelection.length - 1)
-                : null
-        );
-        if (bolHeaders) {
-            intInsertIndex -= 1;
-        }
-
-        //console.log(intInsertIndex);
-        //console.time('selection resolve');
-
-        // loop through each selection and flip the states of the
-        //      affected cells
-        arrRanges = element.internalSelection.ranges;
-        arrColumnWidths = element.internalDisplay.columnWidths;
-        range_i = 0;
-        range_len = arrRanges.length;
-        while (range_i < range_len) {
-            range = arrRanges[range_i];
-
-            // we want to copy the range element so that when we modify it
-            //      we don't modify the original
-            range = {
-                "start": {
-                    "row": range.start.row,
-                    "column": range.start.column
-                },
-                "end": {
-                    "row": range.end.row,
-                    "column": range.end.column
-                },
-                "negator": range.negator
-            };
-
-            //console.log(range);
-
-            // gotta convert special values so that we can use math
-            if (range.start.row === 'header') {
-                range.start.row = intHeaderIndex;
-            } else if (range.start.row === 'insert') {
-                range.start.row = intInsertIndex;
-            }
-            if (range.end.row === 'header') {
-                range.end.row = intHeaderIndex;
-            } else if (range.end.row === 'insert') {
-                range.end.row = intInsertIndex;
-            }
-            if (range.start.column === 'selector') {
-                range.start.column = intSelectorIndex;
-            }
-            if (range.end.column === 'selector') {
-                range.end.column = intSelectorIndex;
-            }
-
-            // because the end of the selection may be above and to the left
-            //      of the start of the selection, we need to make sure that:
-            //          the start row/column is the top-left
-            //          the end row/column is the bottom-right
-            rangeStartRow = Math.min(range.start.row, range.end.row);
-            rangeEndRow = Math.max(range.start.row, range.end.row);
-            rangeStartColumn = Math.min(range.start.column, range.end.column);
-            rangeEndColumn = Math.max(range.start.column, range.end.column);
-
-            // if this is the first selection, save the origin record
-            //      number for future reference
-            if (range_i === 0) {
-                intOriginRecord = rangeStartRow;
-
-                // the header can't be the origin record
-                if (intOriginRecord === -1) {
-                    intOriginRecord += 1;
+            if (bolHeaders) {
+                strRecord = '';
+                if (bolSelectors) {
+                    strRecord += 'G';
                 }
 
-                // save origin record internally
-                element.internalSelection.originRecord = intOriginRecord;
+                col_i = 0;
+                while (col_i < col_len) {
+                    strRecord += 'A';
+                    col_i += 1;
+                }
+                arrSelection.push(strRecord);
             }
 
-            // if we are dealing with a non-negation selection, use the
-            //      jsnDeselectedToSelected translation matrix
-            if (range.negator === false) {
-                jsnTranslationMatrix = jsnDeselectedToSelected;
+            strRecord = '';
+            if (bolSelectors) {
+                strRecord = 'I';
+            }
 
-            // else, use the jsnSelectedToDeselected translation matrix
-            } else {
-                jsnTranslationMatrix = jsnSelectedToDeselected;
+            col_i = 0;
+            while (col_i < col_len) {
+                strRecord += 'C';
+                col_i += 1;
             }
 
             rec_i = 0;
-            rec_len = arrSelection.length;
+            rec_len = element.internalData.records.length;
             while (rec_i < rec_len) {
-                strRecord = arrSelection[rec_i];
-                intRecord = rec_i;
+                arrSelection.push(strRecord);
+                rec_i += 1;
+            }
 
-                if (bolHeaders) {
-                    intRecord -= 1;
+            if (bolInsert) {
+                strRecord = '';
+                if (bolSelectors) {
+                    strRecord += 'K';
                 }
 
-                // if the row is in range or all rows are in the range:
-                //      iterate through cells in the row
-                //console.log(intRecord, rangeStartRow, rangeEndRow);
-                if (
-                    (
-                        intRecord >= rangeStartRow &&
-                        intRecord <= rangeEndRow
-                    ) ||
-                    (
-                        rangeStartRow === -1 &&
-                        rangeEndRow === -1
-                    )
-                ) {
-                    col_i = 0;
-                    col_len = strRecord.length;
-                    while (col_i < col_len) {
-                        intChar = col_i;
-                        intColumn = col_i;
+                col_i = 0;
+                while (col_i < col_len) {
+                    strRecord += 'E';
+                    col_i += 1;
+                }
+                arrSelection.push(strRecord);
+            }
 
-                        if (bolSelectors) {
-                            intColumn = (col_i - 1);
-                        }
+            //console.log(arrSelection);
 
-                        //if (rec_i === 0) {
-                        //    //console.log(
-                        //        'intChar:',
-                        //        intChar,
-                        //        'intColumn:',
-                        //        intColumn,
-                        //        'rangeStartColumn:',
-                        //        rangeStartColumn,
-                        //        'rangeEndColumn:',
-                        //        rangeEndColumn
-                        //    );
-                        //}
+            // because of the vast array of column types, we'll (for simplicity
+            //      and for brevity) use one of two matrices, a matrix that
+            //      translates a selected cell to a deselected cell and one to
+            //      do the opposite
+            jsnSelectedToDeselected = {
+                "A": "A",
+                "B": "A",
+                "C": "C",
+                "D": "C",
+                "E": "E",
+                "F": "E",
+                "G": "G",
+                "H": "G",
+                "I": "I",
+                "J": "I",
+                "K": "K",
+                "L": "K"
+            };
+            jsnDeselectedToSelected = {
+                "A": "B",
+                "B": "B",
+                "C": "D",
+                "D": "D",
+                "E": "F",
+                "F": "F",
+                "G": "H",
+                "H": "H",
+                "I": "J",
+                "J": "J",
+                "K": "L",
+                "L": "L"
+            };
 
-                        // testing to see if th cell is in the current
-                        //      selection range or that the whole record is
-                        //      selected
-                        if (
-                            (
-                                (
-                                    intColumn >= rangeStartColumn &&
-                                    intColumn <= rangeEndColumn
-                                ) ||
-                                (
-                                    rangeStartColumn === -1 &&
-                                    rangeEndColumn === -1
-                                )
-                            ) &&
-                            // we don't want to copy hidden columns
-                            (
-                                intColumn === null ||
-                                intColumn === -1 ||
-                                arrColumnWidths[intColumn] > 0
-                            )
-                        ) {
-                            // set cell to "Y" because it is in the
-                            //      selection range
-                            strRecord = (
-                                strRecord.substr(0, intChar) +
-                                jsnTranslationMatrix[strRecord[intChar]] +
-                                strRecord.substr(intChar + 1)
-                            );
-                        }
-                        col_i += 1;
+            // because math is faster that string comparison, we need to convert
+            //      the special values inside the ranges to numbers. but, we
+            //      don't want to recalculate those numbers every time, so,
+            //      we'll calculate them here and just reuse them
+            intHeaderIndex = -1;
+            intSelectorIndex = -1;
+            intInsertIndex = (
+                bolInsert
+                    ? (arrSelection.length - 1)
+                    : null
+            );
+            if (bolHeaders) {
+                intInsertIndex -= 1;
+            }
+
+            //console.log(intInsertIndex);
+            //console.time('selection resolve');
+
+            // loop through each selection and flip the states of the
+            //      affected cells
+            arrRanges = element.internalSelection.ranges;
+            arrColumnWidths = element.internalDisplay.columnWidths;
+            range_i = 0;
+            range_len = arrRanges.length;
+            while (range_i < range_len) {
+                range = arrRanges[range_i];
+
+                // we want to copy the range element so that when we modify it
+                //      we don't modify the original
+                range = {
+                    "start": {
+                        "row": range.start.row,
+                        "column": range.start.column
+                    },
+                    "end": {
+                        "row": range.end.row,
+                        "column": range.end.column
+                    },
+                    "negator": range.negator
+                };
+
+                //console.log(range);
+
+                // gotta convert special values so that we can use math
+                if (range.start.row === 'header') {
+                    range.start.row = intHeaderIndex;
+                } else if (range.start.row === 'insert') {
+                    range.start.row = intInsertIndex;
+                }
+                if (range.end.row === 'header') {
+                    range.end.row = intHeaderIndex;
+                } else if (range.end.row === 'insert') {
+                    range.end.row = intInsertIndex;
+                }
+                if (range.start.column === 'selector') {
+                    range.start.column = intSelectorIndex;
+                }
+                if (range.end.column === 'selector') {
+                    range.end.column = intSelectorIndex;
+                }
+
+                // because the end of the selection may be above and to the left
+                //      of the start of the selection, we need to be sure that:
+                //          the start row/column is the top-left
+                //          the end row/column is the bottom-right
+                rangeStartRow = Math.min(range.start.row, range.end.row);
+                rangeEndRow = Math.max(range.start.row, range.end.row);
+                rangeStartColumn = Math.min(
+                    range.start.column,
+                    range.end.column
+                );
+                rangeEndColumn = Math.max(range.start.column, range.end.column);
+
+                // if this is the first selection, save the origin record
+                //      number for future reference
+                if (range_i === 0) {
+                    intOriginRecord = rangeStartRow;
+
+                    // the header can't be the origin record
+                    if (intOriginRecord === -1) {
+                        intOriginRecord += 1;
                     }
 
-                    arrSelection[rec_i] = strRecord;
+                    // save origin record internally
+                    element.internalSelection.originRecord = intOriginRecord;
+                }
+
+                // if we are dealing with a non-negation selection, use the
+                //      jsnDeselectedToSelected translation matrix
+                if (range.negator === false) {
+                    jsnTranslationMatrix = jsnDeselectedToSelected;
+
+                // else, use the jsnSelectedToDeselected translation matrix
+                } else {
+                    jsnTranslationMatrix = jsnSelectedToDeselected;
+                }
+
+                rec_i = 0;
+                rec_len = arrSelection.length;
+                while (rec_i < rec_len) {
+                    strRecord = arrSelection[rec_i];
+                    intRecord = rec_i;
+
+                    if (bolHeaders) {
+                        intRecord -= 1;
+                    }
+
+                    // if the row is in range or all rows are in the range:
+                    //      iterate through cells in the row
+                    //console.log(intRecord, rangeStartRow, rangeEndRow);
+                    if (
+                        (
+                            intRecord >= rangeStartRow &&
+                            intRecord <= rangeEndRow
+                        ) ||
+                        (
+                            rangeStartRow === -1 &&
+                            rangeEndRow === -1
+                        )
+                    ) {
+                        col_i = 0;
+                        col_len = strRecord.length;
+                        while (col_i < col_len) {
+                            intChar = col_i;
+                            intColumn = col_i;
+
+                            if (bolSelectors) {
+                                intColumn = (col_i - 1);
+                            }
+
+                            //if (rec_i === 0) {
+                            //    //console.log(
+                            //        'intChar:',
+                            //        intChar,
+                            //        'intColumn:',
+                            //        intColumn,
+                            //        'rangeStartColumn:',
+                            //        rangeStartColumn,
+                            //        'rangeEndColumn:',
+                            //        rangeEndColumn
+                            //    );
+                            //}
+
+                            // testing to see if th cell is in the current
+                            //      selection range or that the whole record is
+                            //      selected
+                            if (
+                                (
+                                    (
+                                        intColumn >= rangeStartColumn &&
+                                        intColumn <= rangeEndColumn
+                                    ) ||
+                                    (
+                                        rangeStartColumn === -1 &&
+                                        rangeEndColumn === -1
+                                    )
+                                ) &&
+                                // we don't want to copy hidden columns
+                                (
+                                    intColumn === null ||
+                                    intColumn === -1 ||
+                                    arrColumnWidths[intColumn] > 0
+                                )
+                            ) {
+                                // set cell to "Y" because it is in the
+                                //      selection range
+                                strRecord = (
+                                    strRecord.substr(0, intChar) +
+                                    jsnTranslationMatrix[strRecord[intChar]] +
+                                    strRecord.substr(intChar + 1)
+                                );
+                            }
+                            col_i += 1;
+                        }
+
+                        arrSelection[rec_i] = strRecord;
+                    }
+
+                    rec_i += 1;
+                }
+
+                range_i += 1;
+            }
+
+            // now, we'll convert the array of rows to an array of record
+            //      numbers that will be copied (arrRows)
+            arrRows = [];
+            arrSelectionRows = [];
+            rec_i = 0;
+            rec_len = arrSelection.length;
+            while (rec_i < rec_len) {
+                // if the row is selected, add it to the list
+                if ((/[BDFHJL]/gi).test(arrSelection[rec_i])) {
+                    if (bolHeaders && rec_i === 0) {
+                        arrRows.push('header');
+
+                    } else if (bolInsert && rec_i === (rec_len - 1)) {
+                        arrRows.push('insert');
+
+                    } else if (bolHeaders) {
+                        arrRows.push(rec_i - 1);
+
+                    } else {
+                        arrRows.push(rec_i);
+                    }
+                    arrSelectionRows.push(rec_i);
+                }
+                rec_i += 1;
+            }
+
+            // we'll loop through every row that has a selected cell in it
+            //      (arrRows) and for every "Y" we'll add the column number
+            //      (if it's not already present) to our column array we'll
+            //      break out of the loop if all columns are included
+            arrColumns = [];
+            arrSelectionCols = [];
+            intMaxColumns = element.internalClip.columnList.length;
+            rec_i = 0;
+            rec_len = arrSelectionRows.length;
+            while (rec_i < rec_len) {
+                strRecord = arrSelection[arrSelectionRows[rec_i]];
+                col_i = 0;
+                col_len = strRecord.length;
+                while (col_i < col_len) {
+                    if (bolSelectors && col_i === 0) {
+                        pushValue = ('selector');
+                    } else if (bolSelectors) {
+                        pushValue = (col_i - 1);
+                    } else {
+                        pushValue = col_i;
+                    }
+
+                    if (
+                        arrSelectedStates.indexOf(strRecord[col_i]) !== -1 &&
+                        arrColumns.indexOf(pushValue) === -1
+                    ) {
+                        arrColumns.push(pushValue);
+                        arrSelectionCols.push(col_i);
+                    }
+
+                    col_i += 1;
+                }
+
+                if (arrColumns.length >= intMaxColumns) {
+                    break;
                 }
 
                 rec_i += 1;
             }
-
-            range_i += 1;
-        }
-
-        // now, we'll convert the array of rows to an array of record numbers
-        //      that will be copied (arrRows)
-        arrRows = [];
-        arrSelectionRows = [];
-        rec_i = 0;
-        rec_len = arrSelection.length;
-        while (rec_i < rec_len) {
-            // if the row is selected, add it to the list
-            if ((/[BDFHJL]/gi).test(arrSelection[rec_i])) {
-                if (bolHeaders && rec_i === 0) {
-                    arrRows.push('header');
-
-                } else if (bolInsert && rec_i === (rec_len - 1)) {
-                    arrRows.push('insert');
-
-                } else if (bolHeaders) {
-                    arrRows.push(rec_i - 1);
-
-                } else {
-                    arrRows.push(rec_i);
-                }
-                arrSelectionRows.push(rec_i);
-            }
-            rec_i += 1;
-        }
-
-        // we'll loop through every row that has a selected cell in it
-        //      (arrRows) and for every "Y" we'll add the column number
-        //      (if it's not already present) to our column array we'll
-        //      break out of the loop if all columns are included
-        arrColumns = [];
-        arrSelectionCols = [];
-        intMaxColumns = element.internalClip.columnList.length;
-        rec_i = 0;
-        rec_len = arrSelectionRows.length;
-        while (rec_i < rec_len) {
-            strRecord = arrSelection[arrSelectionRows[rec_i]];
-            col_i = 0;
-            col_len = strRecord.length;
-            while (col_i < col_len) {
-                if (bolSelectors && col_i === 0) {
-                    pushValue = ('selector');
-                } else if (bolSelectors) {
-                    pushValue = (col_i - 1);
-                } else {
-                    pushValue = col_i;
-                }
-
-                if (
-                    arrSelectedStates.indexOf(strRecord[col_i]) !== -1 &&
-                    arrColumns.indexOf(pushValue) === -1
-                ) {
-                    arrColumns.push(pushValue);
-                    arrSelectionCols.push(col_i);
-                }
-
-                col_i += 1;
-            }
-
-            if (arrColumns.length >= intMaxColumns) {
-                break;
-            }
-
-            rec_i += 1;
         }
 
         //console.timeEnd('selection resolve');
@@ -40962,7 +41029,7 @@ document.addEventListener('DOMContentLoaded', function () {
         element.internalSelection.resolvedSelection = arrSelection;
         element.internalSelection.rows = arrRows;
         element.internalSelection.columns = arrColumns;
-//<br />
+
         // you are not allowed to deselect everything, if you have, we'll
         //      select what we can and then re-render the selection
         if (arrRows.length === 0 || arrColumns.length === 0) {
@@ -41587,7 +41654,44 @@ document.addEventListener('DOMContentLoaded', function () {
         //strHTML += window.separate1js_html(element);
 
         // fill the data viewport with the rendered cells
+
+        // version 1
+        //element.elems.dataViewport.innerHTML = strHTML;
+
+        // version 2
+        //element.elems.dataContainer.removeChild(element.elems.dataViewport);
+        //element.elems.dataViewport = '';
+        //element.elems.dataViewport.innerHTML = strHTML;
+        //element.elems.dataContainer.appendChild(
+        //    element.elems.dataViewport
+        //);
+
+        // version 3
+        element.elems.dataContainer.removeChild(element.elems.dataViewport);
+        i = 0;
+        len = element.elems.dataViewport.children.length;
+        while (i < len) {
+            element.elems.dataViewport.removeChild(
+                element.elems.dataViewport.lastChild
+            );
+            i += 1;
+        }
         element.elems.dataViewport.innerHTML = strHTML;
+        element.elems.dataContainer.appendChild(
+            element.elems.dataViewport
+        );
+
+        //// version 4
+        //var newViewport = element.elems.dataViewport.cloneNode(false);
+
+        //newViewport.innerHTML = strHTML;
+        //element.elems.dataContainer.replaceChild(
+        //    newViewport,
+        //    element.elems.dataViewport
+        //);
+
+
+        //element.elems.dataViewport = newViewport;
 
         // fill insert columns with retained values
         arrElements = xtag.query(
@@ -42382,7 +42486,37 @@ document.addEventListener('DOMContentLoaded', function () {
         // we want to append the html and have the elements to initialize
         //      while in the DOM, so we'll use the recently discovered and
         //      compatible element.insertAdjacentHTML
-        element.elems.dataViewport.insertAdjacentHTML('beforeend', strHTML);
+
+        // version 2
+        //element.elems.dataContainer.removeChild(element.elems.dataViewport);
+        //element.elems.dataViewport.insertAdjacentHTML('beforeend', strHTML);
+        //element.elems.dataContainer.appendChild(element.elems.dataViewport);
+
+        // version 3
+        //var test = document.createElement('div');
+        //test.innerHTML = strHTML;
+        //element.elems.dataViewport.appendChild(test);
+
+        if (document.createDocumentFragment) {
+            // version 4
+            var divElement = document.createElement('div');
+            var transferFragment = document.createDocumentFragment();
+            divElement.innerHTML = strHTML;
+
+            i = 0;
+            len = divElement.children.length;
+            while (i < len) {
+                transferFragment.appendChild(divElement.lastChild);
+                i += 1;
+            }
+
+            element.elems.dataViewport.appendChild(transferFragment);
+        } else {
+            // version 1
+            element.elems.dataViewport.insertAdjacentHTML('beforeend', strHTML);
+        }
+
+
 
         //// calculate left and top values
         //intCellLeft = intCellOriginLeft;
@@ -50085,29 +50219,34 @@ document.addEventListener('DOMContentLoaded', function () {
             element.internalEvents.scrollWheelFunction = function (event) {
                 var originalTop;
                 var originalLeft;
+                var jsnScroll;
+                var intDeltaY;
+                var intDeltaX;
+                var intRecordHeight;
+
+                // helper variable to help shorten the code
+                jsnScroll = element.internalScroll;
 
                 // we don't want to intercept overscrolling
                 if (
                     // if we're at the top and we're scrolling up
                     (
-                        element.internalScroll.top === 0 &&
+                        jsnScroll.top === 0 &&
                         event.deltaY < 0
                     ) ||
                     // or we're at the bottom and we're scrolling down
                     (
-                        element.internalScroll.top ===
-                            element.internalScroll.maxTop &&
+                        jsnScroll.top === jsnScroll.maxTop &&
                         event.deltaY > 0
                     ) ||
                     // or we're at the left and we're scrolling left
                     (
-                        element.internalScroll.left === 0 &&
+                        jsnScroll.left === 0 &&
                         event.deltaX < 0
                     ) ||
                     // or we're at the right and we're scrolling right
                     (
-                        element.internalScroll.left ===
-                            element.internalScroll.maxLeft &&
+                        jsnScroll.left === jsnScroll.maxLeft &&
                         event.deltaX > 0
                     )
                 ) {
@@ -50122,47 +50261,83 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // we need to save the original top and left so that we can have
                 //      the element rerender only if the scroll actually changed
-                originalTop = element.internalScroll.top;
-                originalLeft = element.internalScroll.left;
+                originalTop = jsnScroll.top;
+                originalLeft = jsnScroll.left;
 
-                // we need to increment the scroll with the event deltas because
-                //      calculating our own deltas is too much trouble right now
-                element.internalScroll.top += event.deltaY;
-                element.internalScroll.left += event.deltaX;
+                // we used to do smooth scrolling, this is the code you would
+                //      use for that, it increments the scroll by the delta
+                //      amount
+                //// we need to increment the scroll with the event deltas
+                ////      because calculating our own deltas is too much
+                ////      trouble right now
+                //intDeltaY = event.deltaY;
+                //intDeltaX = event.deltaX;
+
+                // because we scroll by the record, we need to find out the
+                //      direction of the scroll and then round to nearest record
+                //      in that direction
+                intDeltaY = Math.round(event.deltaY);
+                intDeltaX = Math.round(event.deltaX);
+
+                intRecordHeight = (
+                    (
+                        element.internalDisplay.recordHeights[0] ||
+                        element.internalDisplay.defaultRecordHeight
+                    ) +
+                    element.internalDisplay.recordBorderHeight
+                );
+
+                //var intTestOldScrollTop = jsnScroll.top;
+                //var intTestSecondScrollTop;
+
+                // up / down
+                if (intDeltaY !== 0) {
+                    jsnScroll.top = roundToNearestMultiple(
+                        jsnScroll.top,
+                        intRecordHeight
+                    );
+                    //intTestSecondScrollTop = jsnScroll.top;
+                    jsnScroll.top += roundToNearestMultiple(
+                        intDeltaY,
+                        intRecordHeight
+                    );
+                }
+                //jsnScroll.top += intDeltaY;
+
+                // left / right
+                if (intDeltaX !== 0) {
+                    jsnScroll.left += intDeltaX;
+                }
+
+                //console.log(
+                //    intTestOldScrollTop,
+                //    intTestSecondScrollTop,
+                //    jsnScroll.top
+                //);
 
                 // we need to save the current top/left so that the rerender
                 //      function knows what direction we're scrolling
-                element.internalScroll.prevTop =
-                        element.internalScroll.top;
-                element.internalScroll.prevLeft =
-                        element.internalScroll.left;
+                jsnScroll.prevTop = jsnScroll.top;
+                jsnScroll.prevLeft = jsnScroll.left;
 
                 // we need to round the scroll so that we don't run into
                 //      type issues
-                element.internalScroll.top =
-                        Math.round(element.internalScroll.top);
-                element.internalScroll.left =
-                        Math.round(element.internalScroll.left);
+                jsnScroll.top = Math.round(jsnScroll.top);
+                jsnScroll.left = Math.round(jsnScroll.left);
 
                 // we need to prevent overscrolling
                 element.internalScroll.top = Math.min(
-                    element.internalScroll.maxTop,
-                    element.internalScroll.top
+                    jsnScroll.maxTop,
+                    jsnScroll.top
                 );
                 element.internalScroll.left = Math.min(
-                    element.internalScroll.maxLeft,
-                    element.internalScroll.left
+                    jsnScroll.maxLeft,
+                    jsnScroll.left
                 );
 
                 // we need to prevent underscrolling
-                element.internalScroll.top = Math.max(
-                    0,
-                    element.internalScroll.top
-                );
-                element.internalScroll.left = Math.max(
-                    0,
-                    element.internalScroll.left
-                );
+                jsnScroll.top = Math.max(0, jsnScroll.top);
+                jsnScroll.left = Math.max(0, jsnScroll.left);
 
                 // we only need to rerender if the scroll actually changed
                 //console.log('wheel');
@@ -50171,8 +50346,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 //console.log('internalLeft:  ', element.internalScroll.left);
                 //console.log('originalLeft:  ', originalLeft);
                 if (
-                    (element.internalScroll.top !== originalTop) ||
-                    (element.internalScroll.left !== originalLeft)
+                    (jsnScroll.top !== originalTop) ||
+                    (jsnScroll.left !== originalLeft)
                 ) {
                     renderScrollLocation(element);
                 }
@@ -50201,6 +50376,9 @@ document.addEventListener('DOMContentLoaded', function () {
             var trueScrollHeight;
             var trueScrollTop;
 
+            var oldVirtualScrollTop;
+            var newVirtualScrollTop;
+
             // sometimes, the gs-table triggeres a scrollbar event, so here we
             //      check to make sure the scrollbarY event has not been
             //      cancelled
@@ -50223,13 +50401,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 //      of access
                 trueScrollTop = element.elems.yScrollBar.scrollTop;
 
-                // we need to translate the true top into virtual top for the
-                //      virtual scroll and save to internal location
-                element.internalScroll.top = (
+                // we want to know what direction we scrolled so that we can
+                //      round to the next record in that direction. to do that,
+                //      we're going to hold on to the old virtual scrollTop so
+                //      that we can compare it to the new one.
+                oldVirtualScrollTop = element.internalScroll.top;
+                newVirtualScrollTop = (
                     trueScrollTop * (
                         virtualScrollHeight / trueScrollHeight
                     )
                 );
+
+                //// if we scrolled down, round to the next record down
+                //if (newVirtualScrollTop > oldVirtualScrollTop) {
+
+                //// else, we scrolled up, round to the next record up
+                //} else {
+                //}
+
+                // we need to translate the true top into virtual top for the
+                //      virtual scroll and save to internal location
+                element.internalScroll.top = newVirtualScrollTop;
 
                 // if this event gets triggered while the scrollbar doesn't have
                 //      any room, trueScrollHeight will be 0 which means that
