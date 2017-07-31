@@ -2982,6 +2982,9 @@ function executeScript(bolCursorQuery) {
                                         <gs-button onclick="document.getElementById('{{TABLEID}}').openPrefs(this)" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
                                         <gs-button onclick="document.getElementById('{{TABLEID}}').toggleFullscreen(this)" inline id="toggleFullscreen-{{IDNUM}}" no-focus icononly icon="arrows-alt">&nbsp;</gs-button>
                                         <gs-button onclick="hideOtherTables({{IDNUM}}, '{{TABLEID}}'); document.getElementById('{{TABLEID}}').toggleFullContainer('sql-results-area-{{IDNUM}}', this)" inline no-focus icononly icon="expand">&nbsp;</gs-button>
+                                        <gs-button onclick="document.getElementById('{{TABLEID}}').resizeAllColumns()"
+                                                inline no-focus
+                                                title="Resize all columns to fit their content. The new widths will be based on the content of the visible cells.">AutoFit</gs-button>
                                     </template>
                                     <template for="bottom-hud">
                                         <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('first')" icon="step-backward">&nbsp;</gs-button>

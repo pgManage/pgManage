@@ -185,6 +185,11 @@
         <gs-button onclick="document.getElementById('tableElement').sort('clear');" inline no-focus iconleft icon="trash">Clear Sort</gs-button>
         <gs-button onclick="document.getElementById('tableElement').clearFilter();" inline no-focus iconleft icon="trash">Clear Filter</gs-button>
         <gs-button onclick="toggleUpdate();" inline no-focus>Multi-update</gs-button>
+        
+        <gs-button onclick="document.getElementById('tableElement').resizeAllColumns()" inline no-focus
+                    title="Resize all columns to fit their content. The new widths will be based on the content of the visible cells.">
+            AutoFit
+        </gs-button>
     </template>
     <template for="bottom-hud">
         <gs-button inline no-focus icononly onclick="document.getElementById('tableElement').goToLine('first'); checkDisableds();" increment="first" class="navBtns" icon="step-backward">&nbsp;</gs-button>
