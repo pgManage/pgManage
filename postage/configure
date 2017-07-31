@@ -121,7 +121,7 @@ fi
 
 CPPFLAGS="$CPPFLAGS -I$SSL_INCLUDEDIR"
 if test $(uname -s) = "Darwin"; then
-	LDFLAGS="$LDFLAGS $SSL_LIBDIR/libssl.a $SSL_LIBDIR/libcrypto.a"
+	LDFLAGS="$LDFLAGS -L$SSL_LIBDIR -Wl,-rpath -Wl,$SSL_LIBDIR -lssl -lcrypto"
 else
 	LDFLAGS="$LDFLAGS -L$SSL_LIBDIR -lssl -lcrypto"
 fi
