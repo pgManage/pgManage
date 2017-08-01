@@ -3249,10 +3249,14 @@ function executeScript(bolCursorQuery) {
                             intLine = parseInt(arrLines[i].substring(arrLines[i].indexOf(' ') + 1, arrLines[i].indexOf(':')), 10);
                         }
                     }
+                    var data_error_text = encodeHTML(GS.decodeFromTabDelimited(data.error_text));
+                    if (data_error_text.toLowerCase().indexOf('cannot run inside a transaction block') !== -1) {
+                        data_error_text += 'Try placing "COMMIT;" before the statement and "BEGIN;" after.';
+                    }
 
                     divElement = document.createElement('div');
                     divElement.innerHTML = '<h4 id="error' + intQuery + '">Query #' + (intQuery) + strQueryName + ' Error:</h4>' + warningHTML +
-                                            '<pre>' + encodeHTML(GS.decodeFromTabDelimited(data.error_text)) + '</pre>'; //strError ||
+                                            '<pre>' + data_error_text + '</pre>'; //strError ||
                     resultsContainer.appendChild(divElement);
                     resultsContainer.appendChild(document.createElement('br'));
                     //resultsContainer.scrollTop = resultsContainer.scrollHeight + resultsContainer.offsetHeight;
