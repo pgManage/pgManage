@@ -2610,6 +2610,7 @@ function executeScript(bolCursorQuery) {
         //console.log('test');
         executeHelperStartExecute();
 
+        var bolResized;
         var arrData = [];
         var tableElement;
         var intRecords;
@@ -2889,10 +2890,13 @@ function executeScript(bolCursorQuery) {
                             
                             
                             if (data.intCallbackNumberThisQuery === 0) {
+                                console.time('Query load execution');
+                                
                                 // create the table element
                                 divElement = document.createElement('div');
                                 scrollElement = document.createElement('div');
                                 scrollElement.classList.add('result-table-scroll-container');
+                                bolResized = false;
                                 
                                 i = 0;
                                 len = data.arrMessages.length;
@@ -2978,6 +2982,9 @@ function executeScript(bolCursorQuery) {
                                         <gs-button onclick="document.getElementById('{{TABLEID}}').openPrefs(this)" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
                                         <gs-button onclick="document.getElementById('{{TABLEID}}').toggleFullscreen(this)" inline id="toggleFullscreen-{{IDNUM}}" no-focus icononly icon="arrows-alt">&nbsp;</gs-button>
                                         <gs-button onclick="hideOtherTables({{IDNUM}}, '{{TABLEID}}'); document.getElementById('{{TABLEID}}').toggleFullContainer('sql-results-area-{{IDNUM}}', this)" inline no-focus icononly icon="expand">&nbsp;</gs-button>
+                                        <gs-button onclick="document.getElementById('{{TABLEID}}').resizeAllColumns()"
+                                                inline no-focus
+                                                title="Resize all columns to fit their content. The new widths will be based on the content of the visible cells.">AutoFit</gs-button>
                                     </template>
                                     <template for="bottom-hud">
                                         <gs-button inline no-focus icononly onclick="document.getElementById('{{TABLEID}}').goToLine('first')" icon="step-backward">&nbsp;</gs-button>
@@ -3038,9 +3045,7 @@ function executeScript(bolCursorQuery) {
                                     }
 
                                     strHTML += (
-                                        '<gs-cell style="overflow: auto; padding: 0.25em;">' +
-                                            '{{! arrRow[' + i + '] }}' +
-                                        '</gs-cell>'
+                                        '<gs-cell class="result-cell">{{! arrRow[' + i + '] }}</gs-cell>'
                                     );
                                     i += 1;
                                 }
@@ -3053,9 +3058,7 @@ function executeScript(bolCursorQuery) {
                                 len = data.arrColumnNames.length;
                                 while (i < len) {
                                     strHTML += (
-                                        '<gs-cell header="' + data.arrColumnNames[i] + '">' +
-                                            '{{= arrRow[' + i + '] }}' +
-                                        '</gs-cell>'
+                                        '<gs-cell header="' + data.arrColumnNames[i] + '">{{= arrRow[' + i + '] }}</gs-cell>'
                                     );
                                     i += 1;
                                 }
@@ -3067,6 +3070,7 @@ function executeScript(bolCursorQuery) {
                                 tableElement.setAttribute('no-delete', '');
                                 tableElement.setAttribute('no-update', '');
                                 tableElement.setAttribute('null-string', 'NULL');
+                                tableElement.classList.add('results-table');
                                 scrollElement.appendChild(tableElement);
 
                                 tableElement.addEventListener('openFullContainer', function () {
@@ -3145,9 +3149,15 @@ function executeScript(bolCursorQuery) {
                                 // trigger one last re-render
                                 tableElement.internalDisplay.fullRenderRequired = true;
                                 tableElement.refresh();
+                                if (!bolResized) {
+                                    bolResized = true;
+                                    tableElement.resizeAllColumns();
+                                }
                                 
                                 // clear table element
                                 tableElement = null;
+                                
+                                console.timeEnd('Query load execution');
                                 
                             } else {
                                 var index;
@@ -3172,16 +3182,21 @@ function executeScript(bolCursorQuery) {
                                     i += 1;
                                 }
                                 
-                                //// updated loaded count
-                                //if (data.intCallbackNumberThisQuery % 100 === 0) {
-                                //    if (window.requestAnimationFrame) {
-                                //        window.requestAnimationFrame(function () {
-                                //            countElement.textContent = intRecords;
-                                //        });
-                                //    } else {
-                                //        countElement.textContent = intRecords;
-                                //    }
-                                //}
+                                // updated loaded count
+                                if (data.intCallbackNumberThisQuery % 150 === 0) {
+                                    if (window.requestAnimationFrame) {
+                                        if (!window['frameThingRequested' + data.intQueryNumber]) {
+                                            window['frameThingAmount' + data.intQueryNumber] = intRecords;
+                                            window['frameThingRequested' + data.intQueryNumber] = true;
+                                            window.requestAnimationFrame(function () {
+                                                window['frameThingRequested' + data.intQueryNumber] = false;
+                                                countElement.textContent = window['frameThingAmount' + data.intQueryNumber];
+                                            });
+                                        } else {
+                                            window['frameThingAmount' + data.intQueryNumber] = intRecords;
+                                        }
+                                    }
+                                }
                                 
                                 // use the row count to determine a fixed number of scroll render points
                                 // or
@@ -3194,6 +3209,8 @@ function executeScript(bolCursorQuery) {
                                     //data.intCallbackNumberThisQuery % 1000 === 0
                                 ) {
                                     tableElement.refresh();
+                                    tableElement.resizeAllColumns();
+                                    bolResized = true;
                                 }
                                 
                                 // every rerender should be put into a requestAnimationFrame, if available
@@ -3270,13 +3287,29 @@ function executeScript(bolCursorQuery) {
 								column: intErrorCol || 0
 							}
 						});
-					}
-                    if (intLine) {
+						
                         editor.getSession().setAnnotations([
                             {'row': jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1), 'column': intErrorCol || 0,
                                 'text': strError, 'type': 'error'}
                         ]);
                         editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1)), true, true);
+					} else {
+					    editor.getSelection().setSelectionRange({
+							start: {
+								row: jsnCurrentQuery.start_row + intErrorStartLine,
+								column: intErrorCol || 0
+							},
+							end: {
+								row: jsnCurrentQuery.start_row + intErrorStartLine,
+								column: intErrorCol || 0
+							}
+						});
+						
+                        editor.getSession().setAnnotations([
+                            {'row': jsnCurrentQuery.start_row + intErrorStartLine, 'column': intErrorCol || 0,
+                                'text': strError, 'type': 'error'}
+                        ]);
+                        editor.scrollToLine((jsnCurrentQuery.start_row + intErrorStartLine), true, true);
                     }
 
                     // update the success and error tally

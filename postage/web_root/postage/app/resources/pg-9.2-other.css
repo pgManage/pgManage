@@ -1,4 +1,15 @@
 
+gs-table.results-table >
+        .table-root >
+        .table-table-container >
+        .table-data-container >
+        .table-data-viewport >
+        gs-cell.result-cell {
+    overflow: auto;
+    padding: 0.25em;
+    white-space: pre-wrap;
+}
+
 .ace-selected-query {
     position: absolute;
     background-color: #FBFFBE;

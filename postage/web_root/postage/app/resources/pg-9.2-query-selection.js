@@ -92,6 +92,11 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
     var arrDollarQuotes = [];
     var incompleteQoute = '';
     var overRideBolExtraSearch = false;
+    var currLookaheadChar;
+    var prevLookaheadChar;
+    var intLookahead = 0;
+    var bolCheckedLine = false;
+    var bolDoubleDash = false;
     
 
     // behaviours:
@@ -152,13 +157,47 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
         } else {
             prevChar = strScript[intNeedle];
         }
-        
-        
-        
+        // if (currChar === '\n' || currChar === '\r' && bolCheckedLine) {
+        //     bolCheckedLine = false;
+        //     bolIgnore = false;
+        //     intLookahead = 0;
+        // }
+        if (currChar === '\n') {
+            intLookahead = 1;
+            currLookaheadChar = strScript[intNeedle - intLookahead];
+            while (currLookaheadChar && currLookaheadChar !== '\n' && currLookaheadChar !== '\r') {
+                intLookahead += 1;
+                currLookaheadChar = strScript[intNeedle - intLookahead];
+                //console.log(currLookaheadChar === '-' && strScript[intNeedle - (intLookahead - 1)] === '-', currLookaheadChar, 1);
+                if (currLookaheadChar === '-' && strScript[intNeedle - (intLookahead - 1)] === '-') {
+                    bolIgnore = true;
+                    bolDoubleDash = true;
+                    break;
+                }
+            }
+            
+        }
+        //console.log(bolIgnore, currChar, 2)
         if (bolIgnore === false) {
+            // if (bolCheckedLine === false) {
+            //     while (1 < 2) {
+            //         intLookahead += 1;
+            //         currLookaheadChar = strScript[intNeedle + intLookahead];
+            //         //console.log(currLookaheadChar);
+            //         if (currLookaheadChar === '\n' || currLookaheadChar === '\r' || !currLookaheadChar) {
+            //             //console.log('found it');
+            //             bolCheckedLine = true;
+            //             break;
+            //         } else if (currLookaheadChar === '-') {
+            //             //console.log('here, here', " :" + strScript[intNeedle - 5] + strScript[intNeedle - 4] + strScript[intNeedle - 3] + strScript[intNeedle - 2] + prevChar + currChar + ": ");
+            //             bolIgnore = true;
+            //             bolDoubleDash = true;
+            //         }
+            //     }
+            // }
             if (currChar === '/' && prevChar === '*') {
                 bolIgnore = true;
-            }if (currChar === '*' && prevChar === '/') {
+            } else if (currChar === '*' && prevChar === '/') {
                 bolIgnore = true;
             } else if (currChar === '"') {
                 bolIgnore = true;
@@ -192,6 +231,9 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
         } else {
             if (currChar === '*' && prevChar === '/') {
                 bolIgnore = false;
+            } else if (currChar === '-' && prevChar === '-') {
+                bolIgnore = false;
+                bolDoubleDash = false;
             } else if (currChar === '"') {
                 bolIgnore = false;
             } else if (currChar === "'") {
@@ -230,7 +272,6 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
         
         //$SELECT$SELECT$SELECT$
         if (!bolIgnore || bolEnder || overRideBolExtraSearch) {
-    
             // if we have an intWordPoint and we run into a whitespace character (or the beginning of the script):
             if (typeof intWordPoint === 'number' || intNeedle === 0) {
                 if (bolEnder) {
@@ -253,6 +294,7 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
                         bolWord = true;
                         strWord = strWord.toUpperCase();
                     }
+                        
                         
                     // if we found a word
                     //          and it's a dangerous starting word
@@ -424,7 +466,7 @@ function positionFindRange(strScript, intSearchFromPos, arrQueryStartKeywords, a
         while (intNeedle < scriptLen) {
             strChar = strScript[intNeedle];
             str2Char = strChar + (strScript[intNeedle + 1] || '');
-
+            //console.log(str2Char);
             // FOUND MULTILINE COMMENT:
             if (intQuoteStatus === 0 && str2Char === "/*") {
                 intQuoteStatus = 5;
