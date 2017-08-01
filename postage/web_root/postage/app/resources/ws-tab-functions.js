@@ -939,6 +939,12 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                     GS.webSocketErrorDialog(errorData);
                 }
             });
+	            GS.requestFromSocket(GS.envSocket,
+	                                'TAB\tMOVE\t' + GS.encodeForTabDelimited(tabElement.filePath + encodeTabNameForFileName('~')) + '\t' +
+	                                    GS.encodeForTabDelimited(strPath + strNewName + encodeTabNameForFileName('~')),
+	                                function (data, error, errorData) {
+					// This is supoposed to fail if the current file isn't a file-system file
+	            });
         }
     });
 
@@ -1773,6 +1779,10 @@ function ShortcutSave () {
         clearTimeout(intSaveTimerID);
         intSaveTimerID = null;
         saveScript(tabElement, true);
+
+		if (window.process && window.process.type === 'renderer') {
+			saveScriptAsFile(tabElement.filePath, false);
+		}
     }
 }
 
@@ -1826,7 +1836,7 @@ function saveScriptAsFile(strFileName, forceSaveAs) {
     var electron = require('electron').remote;
     var dialog = electron.dialog;
 
-    var i = 0, j = 0;
+    var i = 0, j = 0, k = 0;
     GS.requestFromSocket(GS.envSocket,
                          'TAB\tREAD\t' + GS.encodeForTabDelimited(strFileName), function (data, error, errorData) {
         if (!error) {
@@ -1855,6 +1865,12 @@ function saveScriptAsFile(strFileName, forceSaveAs) {
                                 ],
                                 properties: ['openFile']
                             });
+			                GS.requestFromSocket(GS.envSocket,
+			                                     'TAB\tWRITE\t' + GS.encodeForTabDelimited(strFileName + encodeTabNameForFileName('~')) + '\t0\n' + strNewFileName, function (data, error, errorData) {
+								if (error) {
+									GS.webSocketErrorDialog(errorData);
+								}
+							});
                         }
                         //console.log(strNewFileName, forceSaveAs);
                         if (strNewFileName !== undefined) {
