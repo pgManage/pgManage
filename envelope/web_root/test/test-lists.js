@@ -1481,7 +1481,7 @@ id	hash
 2{{test_random}}2	abc
 2{{test_random}}3	abc
 */}),
-			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  column \"tes\" does not exist\\nLINE 1: ...= MD5(COALESCE(\"id\"::text, '') || ' ' || COALESCE(\"tes\"::tex...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t99\n"]
+			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  column \"tes\" does not exist\\nLINE 1: ...| ' ' || replace(replace(replace(replace(COALESCE(\"tes\"::tex...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t222\n"]
             ],
 			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
@@ -1497,7 +1497,7 @@ id	hash
 2{{test_random}}2	abc
 2{{test_random}}3	abc
 */}),
-			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  zero-length delimited identifier at or near \"\"\"\"\\nLINE 1: ...= MD5(COALESCE(\"id\"::text, '') || ' ' || COALESCE(\"\"::text, ...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t99\n"]
+			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  zero-length delimited identifier at or near \"\"\"\"\\nLINE 1: ...| ' ' || replace(replace(replace(replace(COALESCE(\"\"::text, ...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t222\n"]
             ],
 			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
