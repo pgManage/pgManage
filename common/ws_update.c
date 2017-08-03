@@ -56,35 +56,21 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 	SFINISH_ERROR_CHECK(client_update->str_return_escaped_columns != NULL, "Failed to get escaped return columns from query");
 #endif
 
-	client_update->str_hash_where_clause = get_hash_columns(
+	client_update->str_hash_columns = get_hash_columns(
 		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
-		&client_update->int_hash_where_clause_len
+		&client_update->int_hash_columns_len
 	);
 	SFREE(str_global_error);
 
-	if (client_update->str_hash_where_clause != NULL) {
-		SFINISH_BREPLACE(client_update->str_hash_where_clause, &client_update->int_hash_where_clause_len, "\"", "\"\"", "g");
-
-		if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_BREPLACE(client_update->str_hash_where_clause, &client_update->int_hash_where_clause_len, "\t", "\"::text, '') || '\t' || COALESCE(\"", "g");
-			SFINISH_SNCAT(str_where_temp, &int_where_temp_len,
-				client_update->str_temp_table_name, strlen(client_update->str_temp_table_name),
-				"_hash = MD5(COALESCE(\"", (size_t)22,
-				client_update->str_hash_where_clause, client_update->int_hash_where_clause_len,
-				"\"::text, ''))", (size_t)13);
-		} else {
-			SFINISH_BREPLACE(client_update->str_hash_where_clause, &client_update->int_hash_where_clause_len, "\t",
-				"\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX))) + CAST('\t' AS nvarchar(MAX)) + COALESCE(CAST(\"", "g");
-			SFINISH_SNCAT(str_where_temp, &int_where_temp_len,
-				client_update->str_temp_table_name, client_update->int_temp_table_name_len,
-				"_hash = LOWER(CONVERT(nvarchar(MAX), HashBytes('MD5', COALESCE(CAST(\"", (size_t)69, client_update->str_hash_where_clause, strlen(client_update->str_hash_where_clause),
-				"\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX)))), 2))", (size_t)53);
-		}
-		SFREE(client_update->str_hash_where_clause);
-		client_update->str_hash_where_clause = str_where_temp;
-		client_update->int_hash_where_clause_len = int_where_temp_len;
-		str_where_temp = NULL;
+	if (client_update->str_hash_columns != NULL) {
+		client_update->str_hash_where_clause = get_hash_where(
+			client_update->str_hash_columns, client_update->int_hash_columns_len,
+			client_update->str_temp_table_name, client_update->int_temp_table_name_len,
+			&client_update->int_hash_where_clause_len
+		);
+		SFINISH_ERROR_CHECK(client_update->str_hash_where_clause != NULL, "Query failed:\nFATAL\nerror_detail\tERROR: Failed to generate hash where clause.\n");
 	}
+
 
 	SDEBUG("client_update->str_hash_where_clause: %s", client_update->str_hash_where_clause);
 
@@ -877,7 +863,6 @@ bool ws_update_step6(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_SNFCAT(str_sql, &int_sql_len,
 		") TO STDOUT;", (size_t)12);
 
-	SINFO("str_sql: %s", str_sql);
 #else
 	SFINISH_SNCAT(str_sql, &int_sql_len,
 		"SELECT ", (size_t)7,

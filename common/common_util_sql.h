@@ -35,6 +35,10 @@ This function takes a INSERT/UPDATE request and returns the hash columns
 */
 char *get_hash_columns(char *_str_query, size_t int_query_len, size_t *ptr_int_hash_columns_len);
 /*
+This function takes the result of get_hash_columns() and gives you an appropriate where clause
+*/
+char *get_hash_where(char *str_columns, size_t int_columns_len, char *str_temp_table_name, size_t int_temp_table_name_len, size_t *ptr_int_hash_where_len);
+/*
 This function handles the copy out functionality for websockets.
 */
 bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char *str_response, size_t int_len);
