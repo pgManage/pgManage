@@ -481,6 +481,20 @@ RAISE NOTICE '
 				"TRANSACTION COMPLETED"
 			]],
 
+			['RAW 11', 'websocket', '', ml(function () {/*RAW
+SELECT NULL;
+*/}),
+			[
+				'QUERY\tSELECT NULL;',
+				'START',
+				'END',
+				'ROWS\t1',
+				'COLUMNS\n?column?\nunknown\n',
+				'\\N',
+				'\\.',
+				'TRANSACTION COMPLETED'
+			]],
+
 			['RAW W/NOTIFY', 'websocket', '', ml(function () {/*RAW
 LISTEN postgres;
 NOTIFY postgres, 'testing';

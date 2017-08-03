@@ -9,12 +9,12 @@ static const char *str_time_format = "%H:%M:%S";
 extern char *_DB_get_diagnostic(DB_conn *conn, PGresult *res);
 
 // Autocommit in PGAdmin (@Tostino and @nunziotocci on github):
-// 
+//
 // - Off
 //     It'll start a transaction, run any queries in that transaction,
 //     and keep it open at the end of the run waiting for either more queries
 //     or a COMMIT/ROLLBACK (or if the script had a COMMIT/ROLLBACK it will close).
-//   
+//
 // - On
 //     A transaction will be started, all queries will execute in the same transaction,
 //     and a COMMIT will be issued at the end, unless your query has an unmatched BEGIN (or a transaction is open),
@@ -781,7 +781,7 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 			int_column < (int_num_columns - 1) ? "\t" : "\012", (size_t)1);
 	}
 	for (int_column = 0; int_column < int_num_columns; int_column += 1) {
-		SFINISH_SNFCAT(str_response, &int_response_len, 
+		SFINISH_SNFCAT(str_response, &int_response_len,
 			PQgetvalue(res, 0, int_column), strlen(PQgetvalue(res, 0, int_column)),
 			int_column < (int_num_columns - 1) ? "\t" : "\012", (size_t)1);
         // we may have made a mistake about where to do this, delete this and next line next time you see this
@@ -1037,7 +1037,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 		for (int_column = 0; int_column < int_num_columns; int_column += 1) {
 			// this if checks if the value of the current cell is null so we can retutrn \N instead
 			if (PQgetisnull(res, (int)client_copy_check->int_i, (int)int_column)) {
-				SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
+				SFINISH_SNCAT(str_temp1, &int_sql_temp_len,
 					"\\N",
 					(size_t)2);
 
@@ -1046,15 +1046,14 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 					PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column),
 					strlen(PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column)));
 
-			};
+				str_temp1 = bescape_value(str_sql_temp, &int_sql_temp_len);
+				SFREE(str_sql_temp);
+				SFINISH_CHECK(str_temp1 != NULL, "bescape_value failed");
+			}
 
 			//SFINISH_SNCAT(str_sql_temp, &int_sql_temp_len,
 			//	PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column),
 			//	strlen(PQgetvalue(res, (int)client_copy_check->int_i, (int)int_column)));
-
-			str_temp1 = bescape_value(str_sql_temp, &int_sql_temp_len);
-			SFREE(str_sql_temp);
-			SFINISH_CHECK(str_temp1 != NULL, "bescape_value failed");
 
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				str_temp1, int_sql_temp_len,
