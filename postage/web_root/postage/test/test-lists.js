@@ -1409,12 +1409,25 @@ ORDER BY	id ASC
 
 pk	set
 id	test_name
-1{{test_random}}1	Bobby
+1{{test_random}}1	Bob\nby
 1{{test_random}}2	Alicia
 */
 			}),
-			['1{{test_random}}1\tBobby\n1{{test_random}}2\tAlicia\n', 'TRANSACTION COMPLETED']],
+			['1{{test_random}}1\tBob\\nby\n1{{test_random}}2\tAlicia\n', 'TRANSACTION COMPLETED']],
 			['COMMIT', 'websocket', '', 'COMMIT', ['OK']],
+
+			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
+			['UPDATE HASH TEST', 'websocket', '', ml(function () {/*UPDATE	rtesting_table
+RETURN	id	test_name
+HASH	test_name
+
+pk	set	hash
+id	test_name	hash
+1{{test_random}}1	test	06c8c1ef3b4faccdd0a54482829ad03b
+*/
+			}),
+  			['1{{test_random}}1\ttest\n', 'TRANSACTION COMPLETED']],
+			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
 			['UPDATE 2', 'websocket', '', ml(function () {/*UPDATE	rtesting_table
@@ -1619,13 +1632,13 @@ WHERE id::text ILIKE '1{{test_random}}%';
 			['SOCKET OPEN', 'websocket start'],
 			['INSERT RECORDS 1', 'websocket', '', ml(function () {/*RAW
 INSERT INTO rtesting_table (id, test_name)
-VALUES (2{{test_random}}1, 'Bob'), (2{{test_random}}2, 'Alice'), (2{{test_random}}3, 'Alice');
+VALUES (2{{test_random}}1, E'Bob\nby'), (2{{test_random}}2, 'Alice'), (2{{test_random}}3, 'Alice');
 INSERT INTO rtesting_table_with_capital_column_name (id, test_name, "TestName")
 VALUES (2{{test_random}}1, 'Bob', 'Bob'), (2{{test_random}}2, 'Alice', 'Alice'), (2{{test_random}}3, 'Alice', 'Alice');
 */
 			}),
 			[
-                "QUERY\tINSERT INTO rtesting_table (id, test_name)\\nVALUES (2{{test_random}}1, 'Bob'), (2{{test_random}}2, 'Alice'), (2{{test_random}}3, 'Alice');",
+                "QUERY\tINSERT INTO rtesting_table (id, test_name)\\nVALUES (2{{test_random}}1, E'Bob\\\\nby'), (2{{test_random}}2, 'Alice'), (2{{test_random}}3, 'Alice');",
                 "START", "END",
                 "Rows Affected\n3\n",
                 "QUERY\t\\nINSERT INTO rtesting_table_with_capital_column_name (id, test_name, \"TestName\")\\nVALUES (2{{test_random}}1, 'Bob', 'Bob'), (2{{test_random}}2, 'Alice', 'Alice'), (2{{test_random}}3, 'Alice', 'Alice');",
@@ -1709,7 +1722,7 @@ id	hash
 2{{test_random}}2	abc
 2{{test_random}}3	abc
 */}),
-			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  column \"tes\" does not exist\\nLINE 1: ...= MD5(COALESCE(\"id\"::text, '') || ' ' || COALESCE(\"tes\"::tex...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t99\n"]
+			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  column \"tes\" does not exist\\nLINE 1: ...| ' ' || replace(replace(replace(replace(COALESCE(\"tes\"::tex...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t222\n"]
             ],
 			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
@@ -1725,7 +1738,7 @@ id	hash
 2{{test_random}}2	abc
 2{{test_random}}3	abc
 */}),
-			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  zero-length delimited identifier at or near \"\"\"\"\\nLINE 1: ...= MD5(COALESCE(\"id\"::text, '') || ' ' || COALESCE(\"\"::text, ...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t99\n"]
+			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  zero-length delimited identifier at or near \"\"\"\"\\nLINE 1: ...| ' ' || replace(replace(replace(replace(COALESCE(\"\"::text, ...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t222\n"]
             ],
 			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
@@ -1868,6 +1881,18 @@ id	hash
 */}),
 			    ["Too many hashes"]
             ],
+			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
+
+			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
+			['DELETE HASH TEST', 'websocket', '', ml(function () {/*DELETE	rtesting_table
+HASH	test_name
+
+pk	hash
+id	hash
+2{{test_random}}1	06c8c1ef3b4faccdd0a54482829ad03b
+*/
+			}),
+  			["Rows Affected\n1\n","TRANSACTION COMPLETED"]],
 			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],

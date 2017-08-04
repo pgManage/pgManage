@@ -295,6 +295,49 @@ error:
 	return NULL;
 }
 
+char *get_hash_where(char *str_columns, size_t int_columns_len, char *str_temp_table_name, size_t int_temp_table_name_len, size_t *ptr_int_hash_where_len) {
+	char *str_hash_where_temp = NULL;
+	char *str_hash_where = NULL;
+
+	SERROR_SNCAT(
+		str_hash_where_temp, ptr_int_hash_where_len,
+		str_columns, int_columns_len
+	);
+
+	char *str_temp_start = "";
+	char *str_temp_in_between = "";
+	char *str_temp_end = "";
+
+	SERROR_BREPLACE(str_hash_where_temp, ptr_int_hash_where_len, "\"", "\"\"", "g");
+	if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
+		str_temp_start = "_hash = MD5(replace(replace(replace(replace(COALESCE(\"";
+		str_temp_in_between = "\"::text, ''), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || '\t' || replace(replace(replace(replace(COALESCE(\"";
+		str_temp_end = "\"::text, ''), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r'))";
+
+	} else {
+		str_temp_start = "_hash = LOWER(CONVERT(nvarchar(MAX), HashBytes('MD5', replace(replace(replace(replace(CAST(COALESCE(CAST(\"";
+		str_temp_in_between = "\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX)) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX)) + CAST('\t' AS nvarchar(MAX)) + replace(replace(replace(replace(CAST(COALESCE(CAST(\"";
+		str_temp_end = "\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX)), 2)) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX))";
+	}
+
+	SERROR_BREPLACE(str_hash_where_temp, ptr_int_hash_where_len, "\t", str_temp_in_between, "g");
+
+	SERROR_SNCAT(
+		str_hash_where, ptr_int_hash_where_len,
+		str_temp_table_name, int_temp_table_name_len,
+		str_temp_start, strlen(str_temp_start),
+		str_hash_where_temp, *ptr_int_hash_where_len,
+		str_temp_end, strlen(str_temp_end)
+	);
+
+	return str_hash_where;
+error:
+	*ptr_int_hash_where_len = 0;
+
+	SFREE(str_hash_where);
+	return NULL;
+}
+
 bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char *arg_str_response, size_t int_len) {
 	struct sock_ev_client_request *client_request = cb_data;
 	char *str_response = NULL;

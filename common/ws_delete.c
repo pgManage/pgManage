@@ -41,36 +41,19 @@ void ws_delete_step1(struct sock_ev_client_request *client_request) {
 	);
 	SFINISH_ERROR_CHECK(client_delete->str_real_table_name != NULL, "Query failed:\nFATAL\nerror_detail\tERROR: Failed to get table name from query.\n");
 
-	client_delete->str_hash_where_clause = get_hash_columns(
+	client_delete->str_hash_columns = get_hash_columns(
 		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
-		&client_delete->int_hash_where_clause_len
+		&client_delete->int_hash_columns_len
 	);
 	SFREE(str_global_error);
 
-	if (client_delete->str_hash_where_clause != NULL) {
-		client_delete->int_hash_where_clause_len = strlen(client_delete->str_hash_where_clause);
-		SFINISH_BREPLACE(client_delete->str_hash_where_clause, &client_delete->int_hash_where_clause_len, "\"", "\"\"", "g");
-		if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_BREPLACE(client_delete->str_hash_where_clause, &client_delete->int_hash_where_clause_len, "\t", "\"::text, '') || '\t' || COALESCE(\"", "g");
-			client_delete->int_hash_where_clause_len = strlen(client_delete->str_hash_where_clause);
-			SFINISH_SNCAT(str_where_temp, &int_where_temp_len,
-				client_delete->str_temp_table_name, client_delete->int_temp_table_name_len,
-				"_hash = MD5(COALESCE(\"", (size_t)22,
-				client_delete->str_hash_where_clause, client_delete->int_hash_where_clause_len,
-				"\"::text, ''))", (size_t)13);
-		} else {
-			SFINISH_BREPLACE(client_delete->str_hash_where_clause, &client_delete->int_hash_where_clause_len, "\t",
-				"\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX))) + CAST('\t' AS nvarchar(MAX)) + COALESCE(CAST(\"", "g");
-			client_delete->int_hash_where_clause_len = strlen(client_delete->str_hash_where_clause);
-			SFINISH_SNCAT(str_where_temp, &int_where_temp_len,
-				client_delete->str_temp_table_name, client_delete->int_temp_table_name_len,
-				"_hash = LOWER(CONVERT(nvarchar(MAX), HashBytes('MD5', COALESCE(CAST(\"", (size_t)69, client_delete->str_hash_where_clause, client_delete->int_hash_where_clause_len,
-				"\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX)))), 2))", (size_t)53);
-		}
-		SFREE(client_delete->str_hash_where_clause);
-		client_delete->str_hash_where_clause = str_where_temp;
-		client_delete->int_hash_where_clause_len = int_where_temp_len;
-		str_where_temp = NULL;
+	if (client_delete->str_hash_columns != NULL) {
+		client_delete->str_hash_where_clause = get_hash_where(
+			client_delete->str_hash_columns, client_delete->int_hash_columns_len,
+			client_delete->str_temp_table_name, client_delete->int_temp_table_name_len,
+			&client_delete->int_hash_where_clause_len
+		);
+		SFINISH_ERROR_CHECK(client_delete->str_hash_where_clause != NULL, "Query failed:\nFATAL\nerror_detail\tERROR: Failed to generate hash where clause.\n");
 	}
 
 	SDEBUG("client_delete->str_hash_where_clause: %s", client_delete->str_hash_where_clause);
