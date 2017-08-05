@@ -43,7 +43,7 @@ void http_delete_step1(struct sock_ev_client *client) {
 
 	// Get table names
 	client_delete->str_real_table_name = getpar(str_args, "src", int_query_len, &client_delete->int_real_table_name_len);
-	if (client_delete->str_real_table_name == NULL || strlen(client_delete->str_real_table_name) == 0) {
+	if (client_delete->str_real_table_name == NULL || client_delete->str_real_table_name[0] == 0) {
 		SFREE(client_delete->str_real_table_name);
 		client_delete->str_real_table_name =
 			getpar(str_args, "view", int_query_len, &client_delete->int_real_table_name_len);

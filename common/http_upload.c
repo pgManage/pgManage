@@ -64,7 +64,6 @@ void http_upload_step1(struct sock_ev_client *client) {
 
 	// check for permissions
 
-	bol_error_state = false;
 finish:
 	bol_error_state = false;
 	SFREE_ALL();

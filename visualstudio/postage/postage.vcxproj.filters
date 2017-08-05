@@ -147,10 +147,10 @@
     <ClCompile Include="..\..\common\common_ssl.c">
       <Filter>Source Files\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\compat\posix_win.c">
+    <ClCompile Include="..\compat\bsd-asprintf.c">
       <Filter>Source Files\compat</Filter>
     </ClCompile>
-    <ClCompile Include="..\compat\bsd-asprintf.c">
+    <ClCompile Include="..\compat\posix_win.c">
       <Filter>Source Files\compat</Filter>
     </ClCompile>
   </ItemGroup>
