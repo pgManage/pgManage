@@ -67,11 +67,11 @@ function startTabContainer() {
     document.getElementById('tab-container').innerHTML = ml(function () {/*
         <div id="tab-bar-container" flex-horizontal flex-fill>
             <div class="tab-bar-toolbar left">
-                <gs-button id="button-home" onclick="setQSToHome()" icononly icon="home" inline remove-all no-focus title="Back to home [ESC]">
+                <gs-button id="button-home" onclick="setQSToHome()" icononly icon="home" inline remove-all no-focus title="Back to home [ESC]"></gs-button>
             </div>
             <div id="tab-bar" flex prevent-text-selection></div>
             <div class="tab-bar-toolbar right" flex-horizontal>
-                <gs-button flex id="button-new-tab" onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icononly icon="plus" title="Create a blank script tab" inline remove-all no-focus></gs-button></gs-button>
+                <gs-button flex id="button-new-tab" onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icononly icon="plus" title="Create a blank script tab" inline remove-all no-focus></gs-button>
                 <gs-button flex id="button-open-tabs" onclick="dialogOpenTabs(this);" icononly no-focus remove-all icon="list" inline title="All open tabs"></gs-button>
             </div>
         </div>
@@ -79,6 +79,62 @@ function startTabContainer() {
             <div id="home-frame" class="home-frame"></div>
         </div>
     */});
+
+
+    /*
+
+    #########################################################################################
+    ########################### NEW TAB CONTROL FORMAT 2017-08-05 ###########################
+    #########################################################################################
+
+    move to better tab control:
+        new tab button is at the right edge of the tab buttons
+        new tab button adds the tab to the right of all the current tab buttons
+        tab buttons have a max width
+        after there's too many tab buttons to display at max width, start compressing them
+        there is no scrolling
+        after an arbituary number of tab controls, stop allowing the developer to creating
+            new ones
+        the current tab should have a delete button
+        if the tab buttons are wide enough, they should always be able to have a delete
+            button, regardless of selection
+
+        as a consequence, all tab buttons will always be the same width.
+
+    because of the tab reorder code's architecture, there should be only a minor change
+        there.
+
+    the file renaming, how would I maintain that?
+        it seems like we would not need to change much, we would comment out the dynamic
+        sizing of the input and make it 100% width. if I keep the rest the same, than the
+        only problems are the possibility of a small input and someone on a phone clicking
+        just perfectly and focusing into an input they can't really see. To fix the phone,
+        I could do a thing where if the user would have focused into the input, we open a
+        "tab rename" dialog instead.
+
+    due to bad architecture, the state of the tab bar is read by looking at the dom itself
+        and changes are made right to the dom. this should have had a state variable and a
+        render function.
+
+    so, to take the upwind+minimalist approach until we can get a plan to incrementally
+        change the tab bar into a state variable and a set of functions:
+            1) we create a render function and call it at every state change
+            2) we move the new tab button to the tab bar
+            3) we add a pixel border element to the right of the new tab button
+            4) we fix any code that would cause that new tab button to be removed
+            5) we move appending a new tab button to a function "appendNewTab"
+            6) we make appendNewTab append the tab element before the new tab button
+            7) for now, make the render function only handle tab width
+            8) we make sure the pixel border element fills the empty space if there is any
+
+    this sub-document was authored by Michael Tocci.
+
+    #########################################################################################
+    ########################### NEW TAB CONTROL FORMAT 2017-08-05 ###########################
+    #########################################################################################
+
+    */
+
 
     //<gs-button id="button-closed-tabs" onclick="dialogClosedTabs()" icononly no-focus remove-all icon="clock-o" inline title="All closed tabs"></gs-button>
 
