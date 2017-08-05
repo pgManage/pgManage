@@ -486,7 +486,7 @@ finish:
 				": ", (size_t)2,
 				strerror(errno), strlen(strerror(errno))
 			);
-		} else {
+		} else if (str_response != NULL) {
 			char *_str_response = str_response;
 			SFINISH_SNCAT(
 				str_response, &int_response_len,

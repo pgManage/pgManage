@@ -732,19 +732,19 @@ bool ws_delete_step6(EV_P, void *cb_data, DB_result *res) {
 	// UNNEEDED IN THIS FUNCTION
 	//struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)(client_request->client_request_data);
 
+	SDEFINE_VAR_ALL(str_rows, str_temp);
+
 	bool bol_ret = true;
 	char *str_response = NULL;
-	char str_temp[101];
 	size_t int_response_len = 0;
-	memset(str_temp, 0, 101);
-	SDEFINE_VAR_ALL(str_rows);
+	SFINISH_SALLOC(str_temp, 101);
 
 	SFINISH_CHECK(res != NULL, "DB_exec failed");
 	SFINISH_CHECK(res->status == DB_RES_COMMAND_OK, "DB_exec failed");
 
 	SFINISH_SALLOC(str_rows, 20);
 	sprintf(str_rows, "%zd", DB_rows_affected(res));
-	str_rows = *str_rows == '\0' ? "0" : str_rows;
+	str_rows = *str_rows == '\0' ? strdup("0") : str_rows;
 
 	DB_free_result(res);
 	// Build first response (tells the client how many rows deleted)
@@ -794,6 +794,7 @@ bool ws_delete_step6(EV_P, void *cb_data, DB_result *res) {
 	WS_sendFrame(EV_A, client_request->parent, true, 0x01, str_response, int_response_len);
 	DArray_push(client_request->arr_response, str_response);
 	str_response = NULL;
+	bol_error_state = false;
 
 finish:
 	if (bol_error_state == true) {

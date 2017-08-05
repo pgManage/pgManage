@@ -95,10 +95,9 @@ finish:
 		if (client_upload != NULL) {
 			http_upload_free(client_upload);
 		}
-		// This prevents an infinite loop if CLIENT_CLOSE fails
 		SFREE(str_response);
 		ev_io_stop(global_loop, &client->io);
-		SFINISH_CLIENT_CLOSE(client);
+		SERROR_CLIENT_CLOSE_NORESPONSE(client);
 	}
 }
 
@@ -185,7 +184,7 @@ finish:
 		// This prevents an infinite loop if CLIENT_CLOSE fails
 		SFREE(str_response);
 		ev_io_stop(EV_A, &client->io);
-		SFINISH_CLIENT_CLOSE(client);
+		SERROR_CLIENT_CLOSE_NORESPONSE(client);
 	}
 	return true;
 }
@@ -244,7 +243,7 @@ void http_upload_step3(EV_P, ev_check *w, int revents) {
 		decrement_idle(EV_A);
 		ev_check_stop(EV_A, &client_upload->check);
 		http_upload_free(client_upload);
-		SFINISH_CLIENT_CLOSE(client);
+		SERROR_CLIENT_CLOSE_NORESPONSE(client);
 	}
 
 	bol_error_state = false;
@@ -274,7 +273,7 @@ finish:
 		ev_check_stop(EV_A, &client_upload->check);
 		http_upload_free(client_upload);
 		SFREE(str_response);
-		SFINISH_CLIENT_CLOSE(client);
+		SERROR_CLIENT_CLOSE_NORESPONSE(client);
 	}
 }
 

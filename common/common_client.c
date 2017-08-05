@@ -439,9 +439,6 @@ void client_cb(EV_P, ev_io *w, int revents) {
 			while (*ptr_content_length != 0 && (*ptr_content_length < '0' || *ptr_content_length > '9')) {
 				ptr_content_length += 1;
 			}
-			if (*ptr_content_length == 0) {
-				bol_request_finished = false;
-			}
 			int_content_length = (size_t)strtol(ptr_content_length, NULL, 10);
 			char *ptr_temp_unix = bstrstr(client->str_request, client->int_request_len, "\012\012", 2);
 			char *ptr_temp_dos = bstrstr(client->str_request, client->int_request_len, "\015\012\015\012", 4);
@@ -1277,8 +1274,10 @@ struct sock_ev_client_request *create_request(struct sock_ev_client *client, WSF
 	bol_error_state = false;
 	return client_request;
 error:
+	if (client_request != NULL) {
+		SFREE(client_request->client_request_data);
+	}
 	SFREE(client_request);
-	SFREE(client_request->client_request_data);
 	return NULL;
 }
 

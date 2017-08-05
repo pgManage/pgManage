@@ -191,13 +191,14 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 				SDEBUG("mkdir>%s|%s<", canonical_filename, str);
 				SERROR_CHECK(
 					mkdir(canonical_filename, S_IRWXU | S_IRWXG) == 0, "%s is a bad path. Directory creation error.\012", path);
-				realpath_res = realpath(str, canonical_filename);
+				realpath(str, canonical_filename);
 				limit_mkdir -= 1;
 			}
 // SDEBUG("test3");
 //}
 // SDEBUG("test4");
 #endif
+			errno = 0;
 			SERROR_SNCAT(str_return, &int_return_len,
 				str, int_len);
 			SFREE_ALL();

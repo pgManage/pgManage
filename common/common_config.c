@@ -683,8 +683,6 @@ bool parse_options(int argc, char *const *argv) {
 			goto error;
 		}
 	}
-	argc -= optind;
-	argv += optind;
 
 	char *str_temp = NULL;
 
