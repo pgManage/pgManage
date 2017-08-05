@@ -152,8 +152,11 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 				(
 					client->int_last_activity_i != -1 &&
 					(
-						ev_now(global_loop) - client_last_activity->last_activity_time
-					) < int_global_login_timeout
+						int_global_login_timeout == 0 ||
+						(
+							ev_now(global_loop) - client_last_activity->last_activity_time
+						) < int_global_login_timeout
+					)
 				)
 			)
 		) {

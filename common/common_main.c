@@ -49,7 +49,9 @@ void program_exit() {
 		size_t int_i, int_len;
 
 		ev_io_stop(global_loop, &_server.io);
-		ev_periodic_stop(global_loop, &last_activity_free_timer);
+		if (int_global_login_timeout > 0) {
+			ev_periodic_stop(global_loop, &last_activity_free_timer);
+		}
 		ev_signal_stop(global_loop, &sigint_watcher);
 		ev_signal_stop(global_loop, &sigterm_watcher);
 		ev_signal_stop(global_loop, &sigbreak_watcher);
@@ -267,9 +269,11 @@ int main(int argc, char *const *argv) {
 	global_loop = ev_default_loop(0);
 	SERROR_CHECK(global_loop != NULL, "ev_default_loop failed!");
 
-	memset(&last_activity_free_timer, 0, sizeof(ev_periodic));
-	ev_periodic_init(&last_activity_free_timer, free_last_activity, 0, (ev_tstamp)(int_global_login_timeout) / 10, NULL);
-	ev_periodic_start(global_loop, &last_activity_free_timer);
+	if (int_global_login_timeout > 0) {
+		memset(&last_activity_free_timer, 0, sizeof(ev_periodic));
+		ev_periodic_init(&last_activity_free_timer, free_last_activity, 0, (ev_tstamp)(int_global_login_timeout) / 10, NULL);
+		ev_periodic_start(global_loop, &last_activity_free_timer);
+	}
 
 	ev_signal_init(&sigint_watcher, sigint_cb, SIGINT);
 	ev_signal_start(global_loop, &sigint_watcher);

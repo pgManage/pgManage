@@ -11,13 +11,13 @@ char *str_global_port = NULL;
 bool bol_global_local_only = false;
 
 
-#ifdef ENVELOPE
 bool bol_global_super_only = false;
-#else
-bool bol_global_super_only = true;
-#endif
 
+#ifdef ENVELOPE
 size_t int_global_login_timeout = 3600;
+#else
+size_t int_global_login_timeout = 0;
+#endif
 size_t int_global_custom_connection_number = 0;
 uint64_t int_global_session_id = 0;
 
