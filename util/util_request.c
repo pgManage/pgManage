@@ -96,6 +96,7 @@ char *request_header(char *str_request, size_t int_request_len, char *str_header
 	}
 
 	ptr_header = strchr(ptr_header, ':');
+	SWARN_CHECK(ptr_header != NULL, "strchr failed");
 	ptr_header += 1;
 	while (isspace(*ptr_header)) {
 		ptr_header += 1;
@@ -207,6 +208,7 @@ sun_upload *get_sun_upload(char *str_request, size_t int_request_len) {
 	sun_upload *sun_return = NULL;
 	char *boundary_ptr = NULL;
 	char *boundary_end_ptr = NULL;
+	char *boundary_end_ptr_cr = NULL;
 	size_t int_boundary_len = 0;
 	SDEFINE_VAR_ALL(str_boundary, str_content_type, str_name, str_file_content, str_upper_request);
 	SERROR_SALLOC(str_upper_request, int_request_len + 1);
@@ -223,7 +225,8 @@ sun_upload *get_sun_upload(char *str_request, size_t int_request_len) {
 	SERROR_CHECK(boundary_ptr != NULL, "Cannot find boundary for request");
 	boundary_ptr = str_request + 44 + (boundary_ptr - str_upper_request);
 
-	boundary_end_ptr = strchr(boundary_ptr, 13) != 0 ? strchr(boundary_ptr, 13) : strchr(boundary_ptr, 10);
+	boundary_end_ptr_cr = strchr(boundary_ptr, 13);
+	boundary_end_ptr = boundary_end_ptr_cr != 0 ? boundary_end_ptr_cr : strchr(boundary_ptr, 10);
 	int_boundary_len = (size_t)((boundary_end_ptr - boundary_ptr) + 2);
 
 	SERROR_SALLOC(str_boundary, int_boundary_len + 1); // null byte
@@ -258,15 +261,14 @@ sun_upload *get_sun_upload(char *str_request, size_t int_request_len) {
 	// clang-format on
 
 	// copy file name
-	size_t int_name_carriage = (size_t)(strchr(ptr_name, '\015') - ptr_name);
-	size_t int_name_newline = (size_t)(strchr(ptr_name, '\012') - ptr_name);
-	size_t int_name_boundary = (size_t)(strstr(ptr_name, str_boundary) - ptr_name);
+	char *str_name_carriage = strchr(ptr_name, '\015');
+	char *str_name_newline = strchr(ptr_name, '\012');
+	char *str_name_boundary = strstr(ptr_name, str_boundary);
 	// clang-format off
 	size_t int_name_len =
-		int_name_carriage < int_name_newline	? int_name_carriage :
-		int_name_carriage < int_name_boundary	? int_name_carriage :
-		int_name_boundary < int_name_carriage	? int_name_boundary :
-													int_name_boundary;
+		(str_name_carriage < str_name_newline ? str_name_carriage :
+		str_name_carriage < str_name_boundary ? str_name_carriage :
+		str_name_boundary) - ptr_name;
 	// clang-format on
 	SERROR_SALLOC(str_name, int_name_len + 1);
 	memcpy(str_name, ptr_name, int_name_len);
@@ -310,8 +312,7 @@ sun_upload *get_sun_upload(char *str_request, size_t int_request_len) {
     int_file_content_len -=
             ptr_file_content_dos  > ptr_file_content_unix   ? 2 :
             ptr_file_content_dos  > ptr_file_content_mac    ? 2 :
-            ptr_file_content_unix > ptr_file_content_mac    ? 1 :
-                                                              1;
+															  1;
 	// clang-format on
 	SERROR_SALLOC(str_file_content, int_file_content_len + 1);
 	memcpy(str_file_content, ptr_file_content, int_file_content_len);

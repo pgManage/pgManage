@@ -14,3 +14,5 @@ xcopy ..\postage\web_root app\postage\web_root /E
 xcopy ..\postage\config app\postage\config /E
 
 npm run dist-win
+
+cd ..

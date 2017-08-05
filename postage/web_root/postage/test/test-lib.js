@@ -293,9 +293,9 @@ var $ = {
                 if (data !== '\\.') {
                     data = data.replace(/c\:\\users\\nunzio\\repos\\postage\\/gi, '../');
 	                data = data.replace(/\.\.\\\.\.\\/g, '../');
-                    data = data.replace(/\\(?![rnt])/g, '/');
-					data = data.replace(/\/Users\\nunzio\/AppData\/Roaming\//g, '/home/super/.');
-					data = data.replace(/\/Users\/Admin\/AppData\/Roaming\//g, '/home/super/.');
+                    data = data.replace(/\\(?![rntN])/g, '/');
+					data = data.replace(/C\:\/Users\\nunzio\/AppData\/Roaming\//g, '/home/super/.');
+					data = data.replace(/C\:\/Users\/Admin\/AppData\/Roaming\//g, '/home/super/.');
 					data = data.replace(/\/home\/nunzio\//g, '/home/super/');
 					data = data.replace(/\/Users\/joseph\//g, '/home/super/');
 					data = data.replace(/\/Users\/super\//g, '/home/super/');
@@ -303,6 +303,7 @@ var $ = {
 					data = data.replace(/\/usr\/home\/super\//g, '/home/super/');
 					data = data.replace(/\\test/g, '/test');
 	                data = data.replace(/\/\//g, '\\\\');
+	                data = data.replace(/Bob\/\\nby/g, 'Bob\\\\nby');
 				}
                 arrStrActualOutput.push(data.replace(/transactionid = .*\n/gim, ''));
                 i += 1;
@@ -450,8 +451,10 @@ var $ = {
             WS.requestFromSocket($.tests[key].socket, key, strArgs, function (data, error) {
                 if (i === (intCloseAtMessage - 1)) {
 	                WS.closeSocket($.tests[key].socket);
-                    $.changeStatus(key, intCurrent, 'running', 'pass');
-                    $.runTest(key, intCurrent + 1);
+					setTimeout(function () {
+	                    $.changeStatus(key, intCurrent, 'running', 'pass');
+	                    $.runTest(key, intCurrent + 1);
+					}, 500);
                 }
                 i += 1;
             });

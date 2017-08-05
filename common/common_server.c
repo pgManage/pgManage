@@ -38,7 +38,8 @@ void server_cb(EV_P, ev_io *w, int revents) {
 		int_client_sock = accept(server->int_sock, (struct sockaddr *)&client_address, &int_client_len);
 		if (int_client_sock == INVALID_SOCKET) {
 			if (errno != EAGAIN && errno != EWOULDBLOCK && errno != 0) {
-				printf("accept() failed errno: %i (%s)\012", errno, strerror(errno));
+				char *err = strerror(errno);
+				printf("accept() failed errno: %i (%s)\012", errno, err);
 				abort();
 			} else {
 				errno = 0;

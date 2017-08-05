@@ -191,11 +191,11 @@ bool exists_connection_info(char *str_connection_name) {
 	temp_connection = DArray_get(darr_global_connection, 0);
 	return temp_connection != NULL;
 #else
-	size_t i, int_length;
+	size_t i, int_length, int_connection_name_len = strlen(str_connection_name);
 
 	for (i = 0, int_length = DArray_count(darr_global_connection); i < int_length; i++) {
 		temp_connection = DArray_get(darr_global_connection, i);
-		if (strncmp(temp_connection->str_connection_name, str_connection_name, strlen(str_connection_name) + 1) == 0) {
+		if (strncmp(temp_connection->str_connection_name, str_connection_name, int_connection_name_len + 1) == 0) {
 			return true;
 		}
 	}
@@ -216,11 +216,11 @@ char *get_connection_info(char *str_connection_name, size_t *int_connection_inde
 	temp_connection = DArray_get(darr_global_connection, 0);
 	return temp_connection != NULL ? temp_connection->str_connection_info : NULL;
 #else
-	size_t i, int_length;
+	size_t i, int_length, int_connection_name_len = strlen(str_connection_name);
 
 	for (i = 0, int_length = DArray_count(darr_global_connection); i < int_length; i++) {
 		temp_connection = DArray_get(darr_global_connection, i);
-		if (strncmp(temp_connection->str_connection_name, str_connection_name, strlen(str_connection_name)) == 0) {
+		if (strncmp(temp_connection->str_connection_name, str_connection_name, int_connection_name_len + 1) == 0) {
 			if (int_connection_index != NULL) {
 				*int_connection_index = i;
 			}
@@ -244,11 +244,11 @@ char *get_connection_database(char *str_connection_name) {
 	temp_connection = DArray_get(darr_global_connection, 0);
 	return temp_connection != NULL ? temp_connection->str_connection_database : NULL;
 #else
-	size_t i, int_length;
+	size_t i, int_length, int_connection_name_len = strlen(str_connection_name);
 
 	for (i = 0, int_length = DArray_count(darr_global_connection); i < int_length; i++) {
 		temp_connection = DArray_get(darr_global_connection, i);
-		if (strncmp(temp_connection->str_connection_name, str_connection_name, strlen(str_connection_name)) == 0) {
+		if (strncmp(temp_connection->str_connection_name, str_connection_name, int_connection_name_len + 1) == 0) {
 			return temp_connection->str_connection_database;
 		}
 	}
@@ -312,7 +312,7 @@ bool parse_connection_file() {
 		if (*(ptr_content + int_line_length) == '#') {
 			int_line_length = strcspn(ptr_content, "\012");
 			ptr_content += int_line_length + 1;
-		} else if (*(ptr_content + int_line_length) == '\012') {
+		} else if (ptr_content[int_line_length] == '\012') {
 			ptr_content += int_line_length + 1;
 		} else {
 			SERROR_SALLOC(temp_connection, sizeof(struct struct_connection));
@@ -470,7 +470,7 @@ bool parse_options(int argc, char *const *argv) {
 		"\\Program Files\\Workflow Products", (size_t)32);
 #else
 	BOOL bolWow64 = FALSE;
-	if (IsWow64Process(GetCurrentProcess(), &bolWow64) != FALSE && bolWow64 == TRUE) {
+	if (IsWow64Process(GetCurrentProcess(), &bolWow64) != FALSE && bolWow64 != FALSE) {
 		SERROR_SNCAT(POSTAGE_PREFIX, &int_prefix_len,
 			"\\Program Files (x86)\\Workflow Products", (size_t)38);
 	} else {
@@ -732,12 +732,15 @@ bool parse_options(int argc, char *const *argv) {
 
 	if (str_global_data_root == NULL) {
 #ifdef _WIN32
-		char *str_app_data = getenv("AppData"); // NULL;
+		char *str_app_data = getenv("AppData");
+		SERROR_CHECK(str_app_data != NULL, "getenv for AppData failed!");
+
+		size_t int_app_data_len = strlen(str_app_data);
 		SDEBUG("str_app_data: %s", str_app_data);
 		SERROR_SNCAT(str_global_data_root, &int_global_len,
-			((char *)str_app_data) + 2, strlen(((char *)str_app_data) + 2),
-			str_app_data[strlen(str_app_data) - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME,
-				strlen(str_app_data[strlen(str_app_data) - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME));
+			((char *)str_app_data) + 2, int_app_data_len - 2,
+			str_app_data[int_app_data_len - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME,
+				strlen(str_app_data[int_app_data_len - 1] == '\\' ? "\\" SUN_PROGRAM_LOWER_NAME : "\\" SUN_PROGRAM_LOWER_NAME));
 #else
 		// free MUST NOT be called on this struct
 		struct passwd pw_result;
@@ -775,10 +778,11 @@ bool parse_options(int argc, char *const *argv) {
 
 	SDEBUG("str_global_sql_root: %s", str_global_sql_root);
 	if (str_global_sql_root == NULL) {
+		size_t int_global_sql_root_len = strlen(str_global_data_root);
 		SERROR_SNCAT(str_global_sql_root, &int_global_len,
-			str_global_data_root, strlen(str_global_data_root),
-			str_global_data_root[strlen(str_global_data_root) - 1] == '/' ? "sql" : "/sql",
-				strlen(str_global_data_root[strlen(str_global_data_root) - 1] == '/' ? "sql" : "/sql"));
+			str_global_data_root, int_global_sql_root_len,
+			str_global_data_root[int_global_sql_root_len - 1] == '/' ? "sql" : "/sql", str_global_data_root[int_global_sql_root_len - 1] == '/' ? 3 : 4
+		);
 	}
 	SDEBUG("str_global_sql_root: %s", str_global_sql_root);
 

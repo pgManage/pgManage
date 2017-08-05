@@ -411,7 +411,7 @@ finish:
 	}
 
 	char *_str_response = NULL;
-	if (res != NULL && (res->status != DB_RES_TUPLES_OK || status == DB_FETCH_ERROR || status != DB_FETCH_END)) {
+	if (res != NULL && (res->status != DB_RES_TUPLES_OK || status != DB_FETCH_END)) {
 		_str_response = DB_get_diagnostic(client->conn, res);
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			":\n", (size_t)2,

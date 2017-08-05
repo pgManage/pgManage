@@ -66,18 +66,75 @@ function startTabContainer() {
     'use strict';
     document.getElementById('tab-container').innerHTML = ml(function () {/*
         <div id="tab-bar-container" flex-horizontal flex-fill>
-            <div class="tab-bar-toolbar left" flex-horizontal>
-                <gs-button id="button-home" onclick="setQSToHome()" icononly icon="home" inline remove-all no-focus title="Back to home [ESC]"></gs-button><gs-button id="button-new-tab" onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icononly icon="folder-o" title="Create a blank script tab" inline remove-all no-focus><span id="button-new-tab-plus">+</span></gs-button>
+            <div class="tab-bar-toolbar left">
+                <gs-button id="button-home" onclick="setQSToHome()" icononly icon="home" inline remove-all no-focus title="Back to home [ESC]"></gs-button>
             </div>
             <div id="tab-bar" flex prevent-text-selection></div>
-            <div class="tab-bar-toolbar right">
-                <gs-button id="button-open-tabs" onclick="dialogOpenTabs(this);" icononly no-focus remove-all icon="list" inline title="All open tabs"></gs-button>
+            <div class="tab-bar-toolbar right" flex-horizontal>
+                <gs-button flex id="button-new-tab" onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icononly icon="plus" title="Create a blank script tab" inline remove-all no-focus></gs-button>
+                <gs-button flex id="button-open-tabs" onclick="dialogOpenTabs(this);" icononly no-focus remove-all icon="list" inline title="All open tabs"></gs-button>
             </div>
         </div>
         <div id="tab-frames" flex>
             <div id="home-frame" class="home-frame"></div>
         </div>
     */});
+
+
+    /*
+
+    #########################################################################################
+    ########################### NEW TAB CONTROL FORMAT 2017-08-05 ###########################
+    #########################################################################################
+
+    move to better tab control:
+        new tab button is at the right edge of the tab buttons
+        new tab button adds the tab to the right of all the current tab buttons
+        tab buttons have a max width
+        after there's too many tab buttons to display at max width, start compressing them
+        there is no scrolling
+        after an arbituary number of tab controls, stop allowing the developer to creating
+            new ones
+        the current tab should have a delete button
+        if the tab buttons are wide enough, they should always be able to have a delete
+            button, regardless of selection
+
+        as a consequence, all tab buttons will always be the same width.
+
+    because of the tab reorder code's architecture, there should be only a minor change
+        there.
+
+    the file renaming, how would I maintain that?
+        it seems like we would not need to change much, we would comment out the dynamic
+        sizing of the input and make it 100% width. if I keep the rest the same, than the
+        only problems are the possibility of a small input and someone on a phone clicking
+        just perfectly and focusing into an input they can't really see. To fix the phone,
+        I could do a thing where if the user would have focused into the input, we open a
+        "tab rename" dialog instead.
+
+    due to bad architecture, the state of the tab bar is read by looking at the dom itself
+        and changes are made right to the dom. this should have had a state variable and a
+        render function.
+
+    so, to take the upwind+minimalist approach until we can get a plan to incrementally
+        change the tab bar into a state variable and a set of functions:
+            1) we create a render function and call it at every state change
+            2) we move the new tab button to the tab bar
+            3) we add a pixel border element to the right of the new tab button
+            4) we fix any code that would cause that new tab button to be removed
+            5) we move appending a new tab button to a function "appendNewTab"
+            6) we make appendNewTab append the tab element before the new tab button
+            7) for now, make the render function only handle tab width
+            8) we make sure the pixel border element fills the empty space if there is any
+
+    this sub-document was authored by Michael Tocci.
+
+    #########################################################################################
+    ########################### NEW TAB CONTROL FORMAT 2017-08-05 ###########################
+    #########################################################################################
+
+    */
+
 
     //<gs-button id="button-closed-tabs" onclick="dialogClosedTabs()" icononly no-focus remove-all icon="clock-o" inline title="All closed tabs"></gs-button>
 
@@ -938,6 +995,12 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                     GS.webSocketErrorDialog(errorData);
                 }
             });
+	            GS.requestFromSocket(GS.envSocket,
+	                                'TAB\tMOVE\t' + GS.encodeForTabDelimited(tabElement.filePath + encodeTabNameForFileName('~')) + '\t' +
+	                                    GS.encodeForTabDelimited(strPath + strNewName + encodeTabNameForFileName('~')),
+	                                function (data, error, errorData) {
+					// This is supoposed to fail if the current file isn't a file-system file
+	            });
         }
     });
 
@@ -1772,6 +1835,10 @@ function ShortcutSave () {
         clearTimeout(intSaveTimerID);
         intSaveTimerID = null;
         saveScript(tabElement, true);
+
+		if (window.process && window.process.type === 'renderer') {
+			saveScriptAsFile(tabElement.filePath, false);
+		}
     }
 }
 
@@ -1825,7 +1892,7 @@ function saveScriptAsFile(strFileName, forceSaveAs) {
     var electron = require('electron').remote;
     var dialog = electron.dialog;
 
-    var i = 0, j = 0;
+    var i = 0, j = 0, k = 0;
     GS.requestFromSocket(GS.envSocket,
                          'TAB\tREAD\t' + GS.encodeForTabDelimited(strFileName), function (data, error, errorData) {
         if (!error) {
@@ -1854,6 +1921,12 @@ function saveScriptAsFile(strFileName, forceSaveAs) {
                                 ],
                                 properties: ['openFile']
                             });
+			                GS.requestFromSocket(GS.envSocket,
+			                                     'TAB\tWRITE\t' + GS.encodeForTabDelimited(strFileName + encodeTabNameForFileName('~')) + '\t0\n' + strNewFileName, function (data, error, errorData) {
+								if (error) {
+									GS.webSocketErrorDialog(errorData);
+								}
+							});
                         }
                         //console.log(strNewFileName, forceSaveAs);
                         if (strNewFileName !== undefined) {
@@ -2315,6 +2388,7 @@ function SQLBeautify(strInput) {
     var bolStdin = false;
     var bolRule = false;
     var bolTable = false;
+    var bolTrigger = false;
     var bolLastComment = false;
     var intCase = 0;
     var i;
@@ -2561,6 +2635,7 @@ function SQLBeautify(strInput) {
             }
             bolRule = false;
             bolTable = false;
+            bolTrigger = false;
             bolGrant = false;
             bolLastComment = false;
             bolNoExtraWhitespace = true;
@@ -2850,19 +2925,79 @@ function SQLBeautify(strInput) {
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
+        // FOUND CREATE OR REPLACE TRIGGER
+        } else if (int_qs === 0 && int_ps === 0 && strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?TRIGGER\b/i)) {
+            bolTrigger = true;
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+
+            strResult += '\n' + strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?TRIGGER\b/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?TRIGGER\b/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+            intTabLevel += 1;
+        // FOUND CREATE OR REPLACE TRIGGER ... ON
+        } else if (int_qs === 0 && int_ps === 0 && bolTrigger && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^ON[\n\r\ \t]+/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^ON[\n\r\ \t]+/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+
+            
+        // FOUND CREATE OR REPLACE TRIGGER ... INSTEAD
+        } else if (int_qs === 0 && int_ps === 0 && bolTrigger && strInput.substr(i).match(/^INSTEAD[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^INSTEAD[\n\r\ \t]+/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^INSTEAD[\n\r\ \t]+/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+
+            
+        // FOUND CREATE OR REPLACE TRIGGER ... EXECUTE
+        } else if (int_qs === 0 && int_ps === 0 && bolTrigger && strInput.substr(i).match(/^EXECUTE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^EXECUTE[\n\r\ \t]+/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^EXECUTE[\n\r\ \t]+/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+
+            
+        // FOUND CREATE OR REPLACE TRIGGER ... FOR
+        } else if (int_qs === 0 && int_ps === 0 && bolTrigger && strInput.substr(i).match(/^FOR[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
+            // Remove previous tab if previous character is whitespace
+            if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
+                strResult = strResult.substr(0, strResult.length - 1);
+            }
+
+            strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^FOR[\n\r\ \t]+/i)[0] + ' ';
+            i += (strInput.substr(i).match(/^FOR[\n\r\ \t]+/i)[0].length - 1);
+            bolNoExtraWhitespace = true;
+
+            
         // FOUND CREATE OR REPLACE
         } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {
                 strResult = strResult.substr(0, strResult.length - 1);
             }
-
+            console.log('here, here', strResult);
             strResult += '\n' + '\t'.repeat(((intTabLevel < 0) ? 0 : intTabLevel)) + strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE/i)[0] + ' ';
             i += (strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE/i)[0].length - 1);
             bolNoExtraWhitespace = true;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
-        // FOUND CREATE OR REPLACE
+        // FOUND CREATE OR REPLACE     <--- Dupe?
         } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE)?/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
             if (strResult.substring(strResult.length - 1, strResult.length).match('[\ \t]')) {

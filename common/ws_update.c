@@ -56,35 +56,22 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 	SFINISH_ERROR_CHECK(client_update->str_return_escaped_columns != NULL, "Failed to get escaped return columns from query");
 #endif
 
-	client_update->str_hash_where_clause = get_hash_columns(
+	client_update->str_hash_columns = get_hash_columns(
 		client_request->ptr_query, (size_t)(client_request->frame->int_length - (size_t)(client_request->ptr_query - client_request->frame->str_message)),
-		&client_update->int_hash_where_clause_len
+		&client_update->int_hash_columns_len
 	);
 	SFREE(str_global_error);
 
-	if (client_update->str_hash_where_clause != NULL) {
-		SFINISH_BREPLACE(client_update->str_hash_where_clause, &client_update->int_hash_where_clause_len, "\"", "\"\"", "g");
-
-		if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
-			SFINISH_BREPLACE(client_update->str_hash_where_clause, &client_update->int_hash_where_clause_len, "\t", "\"::text, '') || '\t' || COALESCE(\"", "g");
-			SFINISH_SNCAT(str_where_temp, &int_where_temp_len,
-				client_update->str_temp_table_name, strlen(client_update->str_temp_table_name),
-				"_hash = MD5(COALESCE(\"", (size_t)22,
-				client_update->str_hash_where_clause, client_update->int_hash_where_clause_len,
-				"\"::text, ''))", (size_t)13);
-		} else {
-			SFINISH_BREPLACE(client_update->str_hash_where_clause, &client_update->int_hash_where_clause_len, "\t",
-				"\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX))) + CAST('\t' AS nvarchar(MAX)) + COALESCE(CAST(\"", "g");
-			SFINISH_SNCAT(str_where_temp, &int_where_temp_len,
-				client_update->str_temp_table_name, client_update->int_temp_table_name_len,
-				"_hash = LOWER(CONVERT(nvarchar(MAX), HashBytes('MD5', COALESCE(CAST(\"", (size_t)69, client_update->str_hash_where_clause, strlen(client_update->str_hash_where_clause),
-				"\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX)))), 2))", (size_t)53);
-		}
-		SFREE(client_update->str_hash_where_clause);
-		client_update->str_hash_where_clause = str_where_temp;
-		client_update->int_hash_where_clause_len = int_where_temp_len;
-		str_where_temp = NULL;
+	if (client_update->str_hash_columns != NULL) {
+		client_update->str_hash_where_clause = get_hash_where(
+			DB_connection_driver(client_request->parent->conn),
+			client_update->str_hash_columns, client_update->int_hash_columns_len,
+			client_update->str_temp_table_name, client_update->int_temp_table_name_len,
+			&client_update->int_hash_where_clause_len
+		);
+		SFINISH_ERROR_CHECK(client_update->str_hash_where_clause != NULL, "Query failed:\nFATAL\nerror_detail\tERROR: Failed to generate hash where clause.\n");
 	}
+
 
 	SDEBUG("client_update->str_hash_where_clause: %s", client_update->str_hash_where_clause);
 
@@ -194,7 +181,7 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 		if (strncmp(str_pk_header, "pk", 2) == 0) {
 			if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
 				SFINISH_SNFCAT(client_update->str_pk_join_clause, &client_update->int_pk_join_clause_len,
-					int_x == 0 ? "" : " AND ", strlen(int_x == 0 ? "" : " AND "),
+					int_x == 0 ? "" : " AND ", (size_t)(int_x == 0 ? 0 : 5),
 					client_update->str_temp_table_name, client_update->int_temp_table_name_len,
 					".", (size_t)1,
 					str_temp, strlen(str_temp),
@@ -203,7 +190,7 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 					".", (size_t)1,
 					str_col_name, int_col_name_len);
 				SFINISH_SNFCAT(client_update->str_pk_where_clause, &client_update->int_pk_where_clause_len,
-					int_x == 0 ? "" : " AND ", strlen(int_x == 0 ? "" : " AND "),
+					int_x == 0 ? "" : " AND ", (size_t)(int_x == 0 ? 0 : 5),
 					client_update->str_real_table_name, client_update->int_real_table_name_len,
 					".", (size_t)1,
 					str_col_name, int_col_name_len,
@@ -216,7 +203,7 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 					"))", (size_t)2);
 			} else {
 				SFINISH_SNFCAT(client_update->str_pk_join_clause, &client_update->int_pk_join_clause_len,
-					int_x == 0 ? "" : " AND ", strlen(int_x == 0 ? "" : " AND "),
+					int_x == 0 ? "" : " AND ", (size_t)(int_x == 0 ? 0 : 5),
 					client_update->str_temp_table_name, client_update->int_temp_table_name_len,
 					".", (size_t)1,
 					str_temp, strlen(str_temp),
@@ -225,7 +212,7 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 					".", (size_t)1,
 					str_col_name, int_col_name_len);
 				SFINISH_SNFCAT(client_update->str_pk_where_clause, &client_update->int_pk_where_clause_len,
-					int_x == 0 ? "" : " AND ", strlen(int_x == 0 ? "" : " AND "),
+					int_x == 0 ? "" : " AND ", (size_t)(int_x == 0 ? 0 : 5),
 					client_update->str_temp_table_name, client_update->int_temp_table_name_len,
 					".", (size_t)1,
 					str_temp, strlen(str_temp),
@@ -264,7 +251,7 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 			}
 
 			SFINISH_SNFCAT(client_update->str_set_col_list, &client_update->int_set_col_list_len,
-				int_y == 0 ? "" : ", ", strlen(int_y == 0 ? "" : ", "),
+				int_y == 0 ? "" : ", ", (size_t)(int_y == 0 ? 0 : 2),
 				str_col_name, int_col_name_len,
 				" = ", (size_t)3,
 				client_update->str_temp_table_name, client_update->int_temp_table_name_len,
@@ -282,13 +269,13 @@ void ws_update_step1(struct sock_ev_client_request *client_request) {
 		if (strncmp(str_pk_header, "hash", 4) == 0) {
 			if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
 				SFINISH_SNFCAT(client_update->str_temp_col_list, &int_temp_col_list_len,
-					int_i == 0 ? "" : ", ", strlen(int_i == 0 ? "" : ", "),
+					int_i == 0 ? "" : ", ", (size_t)(int_i == 0 ? 0 : 2),
 					"''::text AS ", (size_t)12,
 					client_update->str_temp_table_name, client_update->int_temp_table_name_len,
 					"_hash", (size_t)5);
 			} else {
 				SFINISH_SNFCAT(client_update->str_temp_col_list, &int_temp_col_list_len,
-					int_i == 0 ? "" : ", ", strlen(int_i == 0 ? "" : ", "),
+					int_i == 0 ? "" : ", ", (size_t)(int_i == 0 ? 0 : 2),
 					"CAST('' AS nvarchar(40)) AS ", (size_t)28,
 					client_update->str_temp_table_name, client_update->int_temp_table_name_len,
 					"_hash", (size_t)5);
@@ -419,14 +406,14 @@ finish:
 		char *_str_response = str_response;
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				client_request->str_transaction_id, client_request->int_message_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -481,14 +468,14 @@ finish:
 		char *_str_response = str_response;
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				client_request->str_transaction_id, client_request->int_message_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -569,14 +556,14 @@ finish:
 		char *_str_response = str_response;
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				client_request->str_transaction_id, client_request->int_message_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -683,14 +670,14 @@ finish:
 		char *_str_response = str_response;
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				client_request->str_transaction_id, client_request->int_message_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -794,14 +781,14 @@ finish:
 		char *_str_response = str_response;
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				client_request->str_transaction_id, client_request->int_message_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -877,7 +864,6 @@ bool ws_update_step6(EV_P, void *cb_data, DB_result *res) {
 	SFINISH_SNFCAT(str_sql, &int_sql_len,
 		") TO STDOUT;", (size_t)12);
 
-	SINFO("str_sql: %s", str_sql);
 #else
 	SFINISH_SNCAT(str_sql, &int_sql_len,
 		"SELECT ", (size_t)7,
@@ -913,14 +899,14 @@ finish:
 		char *_str_response = str_response;
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				client_request->str_transaction_id, client_request->int_message_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,

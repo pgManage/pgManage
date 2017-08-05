@@ -10,6 +10,7 @@ struct sock_ev_client_delete {
 	char *ptr_query;
 
 	char *str_pk_where_clause;
+	char *str_hash_columns;
 	char *str_hash_where_clause;
 	char *str_real_table_name;
 	char *str_temp_table_name;
@@ -25,6 +26,7 @@ struct sock_ev_client_delete {
 	//variable lengths
 	size_t int_temp_table_name_len;
 	size_t int_real_table_name_len;
+	size_t int_hash_columns_len;
 	size_t int_hash_where_clause_len;
 	size_t int_pk_where_clause_len;
 	size_t int_insert_column_names_len;

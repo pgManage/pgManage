@@ -370,7 +370,7 @@ bool http_insert_step4(EV_P, void *cb_data, DB_result *res) {
 
 	SFREE(client_insert->str_sql);
 	if (DB_connection_driver(client->conn) == DB_DRIVER_POSTGRES) {
-		if (client_insert->str_sequence_name != NULL && strlen(client_insert->str_sequence_name) > 0) {
+		if (client_insert->str_sequence_name != NULL && client_insert->str_sequence_name[0] != 0) {
 			SFINISH_SNCAT(client_insert->str_sql, &client_insert->int_sql_len,
 				"SELECT currval(", (size_t)15,
 				client_insert->str_sequence_name, strlen(client_insert->str_sequence_name),
@@ -383,7 +383,7 @@ bool http_insert_step4(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_CHECK(query_is_safe(client_insert->str_sql), "SQL Injection detected");
 		SFINISH_CHECK(DB_exec(EV_A, client->conn, client, client_insert->str_sql, http_insert_step5), "DB_exec failed");
 	} else if (DB_connection_driver(client->conn) == DB_DRIVER_SQL_SERVER) {
-		if (client_insert->str_sequence_name != NULL && strlen(client_insert->str_sequence_name) > 0) {
+		if (client_insert->str_sequence_name != NULL && client_insert->str_sequence_name[0] != 0) {
 			str_col_seq = DB_escape_literal(client->conn, client_insert->str_sequence_name, strlen(client_insert->str_sequence_name));
 			SFINISH_CHECK(str_col_seq != NULL, "DB_escape_literal failed!");
 			SFINISH_SNCAT(client_insert->str_sql, &client_insert->int_sql_len,

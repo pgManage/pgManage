@@ -1,5 +1,7 @@
 #pragma once
 
+//-V::571
+
 static const int MB = 1024 * 1024;
 
 #include "util_error.h"

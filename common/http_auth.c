@@ -155,8 +155,8 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		// encrypt
 		SFREE(str_uri_expires);
 		SFREE_PWORD(str_form_data);
-		size_t cookie_len = strlen(str_cookie_decrypted);
-		client_auth->str_cookie_encrypted = aes_encrypt(str_cookie_decrypted, &cookie_len);
+		client_auth->int_cookie_encrypted_len = int_cookie_len;
+		client_auth->str_cookie_encrypted = aes_encrypt(str_cookie_decrypted, &client_auth->int_cookie_encrypted_len);
 		SFREE_PWORD(str_cookie_decrypted);
 		// done encrypting
 
@@ -244,8 +244,9 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 #endif
 
 		SFREE_PWORD(str_form_data);
-		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &int_cookie_len);
+		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &client_auth->int_cookie_encrypted_len);
 		SFINISH_CHECK(client_auth->str_cookie_encrypted != NULL, "str_cookie failed");
+		int_cookie_len = client_auth->int_cookie_encrypted_len;
 		str_cookie_decrypted = aes_decrypt(client_auth->str_cookie_encrypted, &int_cookie_len);
 		SFREE(client_auth->str_cookie_encrypted);
 		client_auth->str_user = getpar(str_cookie_decrypted, "username", int_cookie_len, &client_auth->int_user_length);
@@ -306,7 +307,8 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		// SDEBUG("str_new_cookie>%s<", str_new_cookie);
 		// SDEBUG("int_cookie_len>%d<", int_cookie_len);
 		// **** WARNING ****
-		client_auth->str_cookie_encrypted = aes_encrypt(str_new_cookie, &int_cookie_len);
+		client_auth->int_cookie_encrypted_len = int_cookie_len;
+		client_auth->str_cookie_encrypted = aes_encrypt(str_new_cookie, &client_auth->int_cookie_encrypted_len);
 		//SDEBUG("client_auth->str_cookie_encrypted>%s<", client_auth->str_cookie_encrypted);
 		//SDEBUG("int_cookie_len>%d<", int_cookie_len);
 
@@ -372,7 +374,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_SNCAT(str_response, &int_response_len, str_temp, strlen(str_temp));
 
 		SFREE_PWORD(str_form_data);
-	} else if (strncmp(client_auth->str_action, "list", 16) == 0) {
+	} else if (strncmp(client_auth->str_action, "list", 5) == 0) {
 		SNOTICE("REQUEST TYPE: Not a valid action.");
 
 		char *str_temp =
@@ -383,7 +385,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 
 		SFREE_PWORD(str_form_data);
 
-	} else if (strncmp(client_auth->str_action, "canadd", 16) == 0) {
+	} else if (strncmp(client_auth->str_action, "canadd", 7) == 0) {
 		SNOTICE("REQUEST TYPE: Not a valid action.");
 
 		char *str_temp =
@@ -438,8 +440,9 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SFINISH_SNCAT(str_cookie_name, &int_temp, "postage_", (size_t)8, ptr_conn, strlen(ptr_conn));
 
 		SFREE_PWORD(str_form_data);
-		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &int_cookie_len);
+		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &client_auth->int_cookie_encrypted_len);
 		SFINISH_CHECK(client_auth->str_cookie_encrypted != NULL, "str_cookie failed");
+		int_cookie_len = client_auth->int_cookie_encrypted_len;
 		str_cookie_decrypted = aes_decrypt(client_auth->str_cookie_encrypted, &int_cookie_len);
 		SFREE(client_auth->str_cookie_encrypted);
 
@@ -453,7 +456,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		SFREE_PWORD(str_cookie_decrypted);
 
 		SDEBUG("client_auth->str_connname: %s", client_auth->str_connname);
-		if (client_auth->str_conn != NULL && strlen(client_auth->str_conn) == 0) {
+		if (client_auth->str_conn != NULL && client_auth->str_conn[0] == 0) {
 			SFREE(client_auth->str_conn);
 		} else {
 			SFINISH_SNCAT(client_auth->parent->str_conn, &client_auth->int_conn_length, client_auth->str_conn, client_auth->int_conn_length);
@@ -497,7 +500,8 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 		// CLEAR IN THE LOG!!!!
 		// DEBUG("str_new_cookie>%s<", str_new_cookie);
 		// **** WARNING ****
-		client_auth->str_cookie_encrypted = aes_encrypt(str_new_cookie, &int_cookie_len);
+		client_auth->int_cookie_encrypted_len = int_cookie_len;
+		client_auth->str_cookie_encrypted = aes_encrypt(str_new_cookie, &client_auth->int_cookie_encrypted_len);
 
 		SFREE_PWORD(str_uri_new_password);
 		SFREE(str_uri_expiration);
@@ -587,7 +591,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 #endif
 
 		size_t cookie_len = 0;
-		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &cookie_len);
+		client_auth->str_cookie_encrypted = str_cookie(client_auth->parent->str_request, client_auth->parent->int_request_len, str_cookie_name, &client_auth->int_cookie_encrypted_len);
 		if (client_auth->str_cookie_encrypted != NULL) {
 			ListNode *node = client_auth->parent->server->list_client->first;
 			for (; node != NULL;) {
@@ -598,7 +602,7 @@ void http_auth(struct sock_ev_client_auth *client_auth) {
 					SDEBUG("other_client->str_client_ip       : %s", other_client->str_client_ip);
 					SDEBUG("client_auth->parent->str_client_ip: %s", client_auth->parent->str_client_ip);
 					if (other_client->str_cookie != NULL &&
-						strcmp(other_client->str_cookie, client_auth->str_cookie_encrypted) == 0 &&
+						strncmp(other_client->str_cookie, client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len) == 0 &&
 						strcmp(other_client->str_client_ip, client_auth->parent->str_client_ip) == 0) {
 						client_timeout_prepare_free(other_client->client_timeout_prepare);
 						SDEBUG("node->next: %p", node->next);
@@ -1078,7 +1082,7 @@ void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 			if (client_last_activity != NULL &&
 				strncmp(client_last_activity->str_client_ip, client->str_client_ip, INET_ADDRSTRLEN) == 0 &&
 				strncmp(client_last_activity->str_cookie, client_auth->str_cookie_encrypted,
-					strlen(client_auth->str_cookie_encrypted)) == 0) {
+					client_auth->int_cookie_encrypted_len) == 0) {
 				client->int_last_activity_i = (ssize_t)int_i;
 				break;
 			}
@@ -1087,7 +1091,7 @@ void http_auth_login_step2(EV_P, void *cb_data, DB_conn *conn) {
 			SFINISH_SALLOC(client_last_activity, sizeof(struct sock_ev_client_last_activity));
 			memcpy(client_last_activity->str_client_ip, client_auth->parent->str_client_ip, INET_ADDRSTRLEN);
 			size_t int_temp = 0;
-			SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted));
+			SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len);
 			client_last_activity->last_activity_time = ev_now(EV_A);
 			client_auth->parent->int_last_activity_i =
 				(ssize_t)DArray_push(client_auth->parent->server->arr_client_last_activity, client_last_activity);
@@ -1247,7 +1251,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
 			str_temp1, strlen(str_temp1),
-			client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
+			client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len,
 			"; path=/; expires=", (size_t)18,
 			str_expires, strlen(str_expires),
 			str_temp2, strlen(str_temp2),
@@ -1259,6 +1263,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_SALLOC(str_int_len, 20);
 		snprintf(str_int_len, 20, "%zu", 45 + strlen(client_auth->str_int_connection_index));
 
+		size_t int_connection_index_len = strlen(client_auth->str_int_connection_index);
 		char *str_temp1 =
 			"HTTP/1.1 200 OK\015\012"
 			"Server: " SUN_PROGRAM_LOWER_NAME "\015\012"
@@ -1276,9 +1281,9 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
 			str_temp1, strlen(str_temp1),
-			client_auth->str_int_connection_index, strlen(client_auth->str_int_connection_index),
+			client_auth->str_int_connection_index, int_connection_index_len,
 			"=", (size_t)1,
-			client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
+			client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len,
 			"; path=/; expires=", (size_t)18,
 			str_expires, strlen(str_expires),
 			str_temp2, strlen(str_temp2),
@@ -1287,7 +1292,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 			str_temp3, strlen(str_temp3),
 			str_int_len, strlen(str_int_len),
 			str_temp4, strlen(str_temp4),
-			client_auth->str_int_connection_index, strlen(client_auth->str_int_connection_index),
+			client_auth->str_int_connection_index, int_connection_index_len,
 			str_temp5, strlen(str_temp5)
 		);
 #endif
@@ -1303,7 +1308,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 			if (client_last_activity != NULL &&
 				strncmp(client_last_activity->str_client_ip, client->str_client_ip, INET_ADDRSTRLEN) == 0 &&
 				strncmp(client_last_activity->str_cookie, client_auth->str_cookie_encrypted,
-					strlen(client_auth->str_cookie_encrypted)) == 0) {
+					client_auth->int_cookie_encrypted_len) == 0) {
 				client->int_last_activity_i = (ssize_t)int_i;
 				break;
 			}
@@ -1311,7 +1316,7 @@ bool http_auth_login_step3(EV_P, void *cb_data, DB_result *res) {
 		if (client->int_last_activity_i == -1) {
 			SFINISH_SALLOC(client_last_activity, sizeof(struct sock_ev_client_last_activity));
 			memcpy(client_last_activity->str_client_ip, client_auth->parent->str_client_ip, INET_ADDRSTRLEN);
-			SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted));
+			SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len);
 			client_last_activity->last_activity_time = ev_now(EV_A);
 			client_auth->parent->int_last_activity_i =
 				(ssize_t)DArray_push(client_auth->parent->server->arr_client_last_activity, client_last_activity);
@@ -1590,8 +1595,6 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 
 	size_t int_len = 0, int_i = 0, int_cookie_len = 0;
 
-	int_cookie_len = strlen(client_auth->str_cookie_encrypted);
-
 	SDEBUG("PASSWORD CHANGE");
 	str_expires = str_expire_one_day();
 
@@ -1604,7 +1607,7 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 	char *str_temp2 = "; HttpOnly\015\012\015\012{\"stat\": true, \"dat\": \"OK\"}";
 	SFINISH_SNCAT(str_response, &int_response_len,
 		str_temp1, strlen(str_temp1),
-		client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
+		client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len,
 		"; path=/; expires=", (size_t)18,
 		str_expires, strlen(str_expires),
 		(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
@@ -1620,7 +1623,7 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 		str_temp1, strlen(str_temp1),
 		client_auth->str_int_connection_index, strlen(client_auth->str_int_connection_index),
 		"=", (size_t)1,
-		client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
+		client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len,
 		"; path=/; expires=", (size_t)18,
 		str_expires, strlen(str_expires),
 		(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
@@ -1633,7 +1636,7 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 			(struct sock_ev_client_last_activity *)DArray_get(client_auth->parent->server->arr_client_last_activity, int_i);
 		if (client_last_activity &&
 			strncmp(client_last_activity->str_client_ip, client_auth->parent->str_client_ip, INET_ADDRSTRLEN) == 0 &&
-			strncmp(client_last_activity->str_cookie, client_auth->str_cookie_encrypted, int_cookie_len) == 0) {
+			strncmp(client_last_activity->str_cookie, client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len) == 0) {
 			client_auth->parent->int_last_activity_i = (ssize_t)int_i;
 			break;
 		}
@@ -1643,13 +1646,13 @@ bool http_auth_change_pw_step3(EV_P, void *cb_data, DB_result *res) {
 		struct sock_ev_client_last_activity *client_last_activity = (struct sock_ev_client_last_activity *)DArray_get(
 			client_auth->parent->server->arr_client_last_activity, (size_t)client_auth->parent->int_last_activity_i);
 		SFREE(client_last_activity->str_cookie);
-		SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted));
+		SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len);
 		SDEBUG("New cookie is %s", client_last_activity->str_cookie);
 	} else {
 		struct sock_ev_client_last_activity *client_last_activity;
 		SFINISH_SALLOC(client_last_activity, sizeof(struct sock_ev_client_last_activity));
 		memcpy(client_last_activity->str_client_ip, client_auth->parent->str_client_ip, INET_ADDRSTRLEN);
-		SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted));
+		SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len);
 		client_last_activity->last_activity_time = ev_now(EV_A);
 		client_auth->parent->int_last_activity_i =
 			(ssize_t)DArray_push(client_auth->parent->server->arr_client_last_activity, client_last_activity);
@@ -1708,8 +1711,6 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 
 	size_t int_len = 0, int_i = 0, int_cookie_len = 0;
 
-	int_cookie_len = strlen(client_auth->str_cookie_encrypted);
-
 	SDEBUG("DATABASE CHANGE");
 	str_expires = str_expire_one_day();
 
@@ -1727,7 +1728,7 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 	SFINISH_SNFCAT(
 		str_response, &int_response_len,
 		str_temp2, strlen(str_temp2),
-		client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
+		client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len,
 		"; path=/; expires=", (size_t)18,
 		str_expires, strlen(str_expires),
 		(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
@@ -1749,7 +1750,7 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 		str_temp2, strlen(str_temp2),
 		client_auth->str_int_connection_index, strlen(client_auth->str_int_connection_index),
 		"=", (size_t)1,
-		client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted),
+		client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len,
 		"; path=/; expires=", (size_t)18,
 		str_expires, strlen(str_expires),
 		(bol_tls ? "; secure" : ""), (size_t)(bol_tls ? 8 : 0),
@@ -1763,7 +1764,7 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 			(struct sock_ev_client_last_activity *)DArray_get(client_auth->parent->server->arr_client_last_activity, int_i);
 		if (client_last_activity &&
 			strncmp(client_last_activity->str_client_ip, client_auth->parent->str_client_ip, INET_ADDRSTRLEN) == 0 &&
-			strncmp(client_last_activity->str_cookie, client_auth->str_cookie_encrypted, int_cookie_len) == 0) {
+			strncmp(client_last_activity->str_cookie, client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len) == 0) {
 			client_auth->parent->int_last_activity_i = (ssize_t)int_i;
 			break;
 		}
@@ -1773,13 +1774,13 @@ void http_auth_change_database_step2(EV_P, void *cb_data, DB_conn *conn) {
 		struct sock_ev_client_last_activity *client_last_activity = (struct sock_ev_client_last_activity *)DArray_get(
 			client_auth->parent->server->arr_client_last_activity, (size_t)client_auth->parent->int_last_activity_i);
 		SFREE(client_last_activity->str_cookie);
-		SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted));
+		SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len);
 		SDEBUG("New cookie is %s", client_last_activity->str_cookie);
 	} else {
 		struct sock_ev_client_last_activity *client_last_activity;
 		SFINISH_SALLOC(client_last_activity, sizeof(struct sock_ev_client_last_activity));
 		memcpy(client_last_activity->str_client_ip, client_auth->parent->str_client_ip, INET_ADDRSTRLEN);
-		SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, strlen(client_auth->str_cookie_encrypted));
+		SFINISH_SNCAT(client_last_activity->str_cookie, &int_temp, client_auth->str_cookie_encrypted, client_auth->int_cookie_encrypted_len);
 		client_last_activity->last_activity_time = ev_now(EV_A);
 		client_auth->parent->int_last_activity_i =
 			(ssize_t)DArray_push(client_auth->parent->server->arr_client_last_activity, client_last_activity);

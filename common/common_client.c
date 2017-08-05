@@ -645,29 +645,27 @@ void client_cb(EV_P, ev_io *w, int revents) {
 					client->bol_connected = true;
 				}
 
-				if (client != NULL) {
-					////HANDSHAKE
-					SERROR_CHECK(
-						(str_response = WS_handshakeResponse(client->str_request, client->int_request_len, &int_response_len)) != NULL, "Error getting handshake response");
+				////HANDSHAKE
+				SERROR_CHECK(
+					(str_response = WS_handshakeResponse(client->str_request, client->int_request_len, &int_response_len)) != NULL, "Error getting handshake response");
 
-					SDEBUG("str_response       : %s", str_response);
-					SDEBUG("client->str_request: %s", client->str_request);
-					// return handshake response
-					if ((int_len = client_write(client, str_response, int_response_len)) < 0) {
-						SERROR_CLIENT_CLOSE(client);
-						SERROR("client_write() failed");
-					}
-					SFREE(str_response);
-
-					SERROR_SALLOC(client->str_session_id, 10 + 1);
-					snprintf(client->str_session_id, 11, "0x%08" PRIu64, int_global_session_id++);
-					SERROR_SNCAT(str_response, &int_response_len, "sessionid = ", (size_t)12, client->str_session_id, (size_t)10, "\n", (size_t)1);
-
-					SERROR_CHECK(
-						WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len), "Failed to send message");
-
-					client->bol_handshake = true;
+				SDEBUG("str_response       : %s", str_response);
+				SDEBUG("client->str_request: %s", client->str_request);
+				// return handshake response
+				if ((int_len = client_write(client, str_response, int_response_len)) < 0) {
+					SERROR_CLIENT_CLOSE(client);
+					SERROR("client_write() failed");
 				}
+				SFREE(str_response);
+
+				SERROR_SALLOC(client->str_session_id, 10 + 1);
+				snprintf(client->str_session_id, 11, "0x%08" PRIu64, int_global_session_id++);
+				SERROR_SNCAT(str_response, &int_response_len, "sessionid = ", (size_t)12, client->str_session_id, (size_t)10, "\n", (size_t)1);
+
+				SERROR_CHECK(
+					WS_sendFrame(EV_A, client, true, 0x01, str_response, int_response_len), "Failed to send message");
+
+				client->bol_handshake = true;
 
 				if (client->conn == NULL) {
 					SDEBUG("client->str_request: %p", client->str_request);
@@ -866,12 +864,13 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 
 		// Advance past the message id and null terminate it so that
 		// frame->str_message contains the message id line
-		ptr_query = strstr(frame->str_message, "\012") + 1;
-		ptr_end_query = frame->str_message + frame->int_length;
+		ptr_query = strchr(frame->str_message, '\012') + 1;
 
 		// Without this, we segfault
 		SERROR_CHECK(ptr_query != NULL, "Invalid message format");
 		*(ptr_query - 1) = 0;
+
+		ptr_end_query = frame->str_message + frame->int_length;
 
 		SERROR_SNCAT(str_message_id, &int_message_id_len,
 			frame->str_message + 12, (size_t)(ptr_query - frame->str_message));
@@ -879,7 +878,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 		// same for transaction id (if there is one)
 		if (strncmp(ptr_query, "transactionid = ", 16) == 0) {
 			char *ptr_query2 = ptr_query;
-			ptr_query = strstr(ptr_query, "\012") + 1;
+			ptr_query = strchr(ptr_query, '\012') + 1;
 			*(ptr_query - 1) = 0;
 			SERROR_SNCAT(str_transaction_id, &int_transaction_id_len,
 				ptr_query2 + 16, ptr_end_query - (ptr_query2 + 16));
@@ -1005,17 +1004,17 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 				if (client_request->str_transaction_id != NULL) {
 					SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
 						"messageid = ", (size_t)12,
-						client_request->str_message_id, strlen(client_request->str_message_id),
+						client_request->str_message_id, client_request->int_message_id_len,
 						"\012responsenumber = ", (size_t)18,
 						str_temp, strlen(str_temp),
 						"\012transactionid = ", (size_t)17,
-						client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+						client_request->str_transaction_id, client_request->int_message_id_len,
 						"\012", (size_t)1,
 						_str_response, strlen(_str_response));
 				} else {
 					SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
 						"messageid = ", (size_t)12,
-						client_request->str_message_id, strlen(client_request->str_message_id),
+						client_request->str_message_id, client_request->int_message_id_len,
 						"\012responsenumber = ", (size_t)18,
 						str_temp, strlen(str_temp),
 						"\012", (size_t)1,
@@ -1041,17 +1040,17 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 						if (client_request->str_transaction_id != NULL) {
 							SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
 								"messageid = ", (size_t)12,
-								client_request->str_message_id, strlen(client_request->str_message_id),
+								client_request->str_message_id, client_request->int_message_id_len,
 								"\012responsenumber = ", (size_t)18,
 								str_temp, strlen(str_temp),
 								"\012transactionid = ", (size_t)17,
-								client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+								client_request->str_transaction_id, client_request->int_message_id_len,
 								"\012", (size_t)1,
 								_str_response, strlen(_str_response));
 						} else {
 							SERROR_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
 								"messageid = ", (size_t)12,
-								client_request->str_message_id, strlen(client_request->str_message_id),
+								client_request->str_message_id, client_request->int_message_id_len,
 								"\012responsenumber = ", (size_t)18,
 								str_temp, strlen(str_temp),
 								"\012", (size_t)1,
@@ -1095,14 +1094,14 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 							ptr_message = strstr(ptr_message, "\012responsenumber");
 							SDEBUG("ptr_message: %s", ptr_message);
 							if (ptr_message != NULL) {
-								ptr_message = strstr(ptr_message + 1, "\012") + 1;
+								ptr_message = strchr(ptr_message + 1, '\012') + 1;
 								SDEBUG("ptr_message: %s", ptr_message);
 
 								bol_last_confirm =
 									((strncmp(ptr_message, "TRANSACTION ", 12) == 0) ||
 										(strncmp(ptr_message, "FATAL\012", 6) == 0) || (strncmp(ptr_message, "OK", 2) == 0));
 								if (bol_last_confirm == false) {
-									ptr_message = strstr(ptr_message, "\012");
+									ptr_message = strchr(ptr_message, '\012');
 									SDEBUG("ptr_message: %s", ptr_message);
 									bol_last_confirm =
 										ptr_message != NULL && ((strncmp(ptr_message + 1, "TRANSACTION ", 12) == 0) ||
@@ -1259,7 +1258,9 @@ struct sock_ev_client_request *create_request(struct sock_ev_client *client, WSF
 
 	client_request->frame = frame;
 	client_request->str_message_id = str_message_id;
+	client_request->int_message_id_len = str_message_id != NULL ? strlen(str_message_id) : 0;
 	client_request->str_transaction_id = str_transaction_id;
+	client_request->int_transaction_id_len = str_transaction_id	!= NULL ? strlen(str_transaction_id) : 0;
 	client_request->ptr_query = ptr_query;
 	client_request->cb_data = NULL;
 
@@ -1602,14 +1603,14 @@ finish:
 	size_t _int_response_len = int_response_len;
 	SFINISH_SNCAT(str_response, &int_response_len,
 		"messageid = ", (size_t)12,
-		client_request->str_message_id, strlen(client_request->str_message_id),
+		client_request->str_message_id, client_request->int_message_id_len,
 		"\012responsenumber = ", (size_t)18,
 		str_temp, strlen(str_temp),
 		"\012", (size_t)1);
 	SFINISH_SNFCAT(str_response, &int_response_len,
 		_str_response, _int_response_len);
 	SFREE(_str_response);
-	if (res != NULL && (res->status != DB_RES_TUPLES_OK || status == DB_FETCH_ERROR || status != DB_FETCH_END)) {
+	if (res != NULL && (res->status != DB_RES_TUPLES_OK || status != DB_FETCH_END)) {
 		_str_response = DB_get_diagnostic(client_request->parent->conn, res);
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			":\n", (size_t)2,
@@ -1632,7 +1633,7 @@ finish:
 		snprintf(str_temp, 100, "%zd", client_request->int_response_id);
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012TRANSACTION COMPLETED", (size_t)22);
@@ -1678,11 +1679,11 @@ finish:
 	size_t _int_response_len = (bol_error_state ? strlen(str_response) : int_response_len);
 	SFINISH_SNCAT(str_response, &int_response_len,
 		"messageid = ", (size_t)12,
-		client_request->str_message_id, strlen(client_request->str_message_id),
+		client_request->str_message_id, client_request->int_message_id_len,
 		"\012responsenumber = ", (size_t)18,
 		str_temp, strlen(str_temp),
 		"\012transactionid = ", (size_t)17,
-		client_request->str_message_id, strlen(client_request->str_message_id),
+		client_request->str_message_id, client_request->int_message_id_len,
 		"\012", (size_t)1,
 		_str_response, _int_response_len);
 	SFREE(_str_response);
@@ -1802,7 +1803,7 @@ bool client_close(struct sock_ev_client *client) {
 	bool bol_authorized = false;
 
 	SINFO("Client %p closing", client);
-	if (client->bol_handshake == true && client->bol_is_open == true) {
+	if (client->que_message != NULL && client->bol_handshake == true && client->bol_is_open == true) {
 		while (client->que_message->first != NULL) {
 			client_message = client->que_message->first->value;
 			ev_io_stop(global_loop, &client_message->io);

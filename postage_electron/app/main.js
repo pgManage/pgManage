@@ -22,6 +22,13 @@ if (shouldQuit) {
 	return;
 }
 
+var strResourcesPath = path.normalize(process.resourcesPath);
+if (strResourcesPath.indexOf('postage/postage_electron/node_modules/electron/dist/resources') > -1) {
+	strResourcesPath = strResourcesPath.replace('postage/postage_electron/node_modules/electron/dist/resources', 'postage/postage_electron');
+} else if (strResourcesPath.indexOf('postage\\postage_electron\\node_modules\\electron\\dist\\resources') > -1) {
+	strResourcesPath = strResourcesPath.replace('postage\\postage_electron\\node_modules\\electron\\dist\\resources', 'postage\\postage_electron');
+}
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -46,8 +53,8 @@ try {
 	fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
 
 	console.log('copying config');
-	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync(process.resourcesPath + '/app/postage/config/postage.conf', 'utf8'), 'utf8');
-	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync(process.resourcesPath + '/app/postage/config/postage-connections.conf', 'utf8'), 'utf8');
+	fs.writeFileSync(os.homedir() + '/.postage/postage.conf', fs.readFileSync(strResourcesPath + '/app/postage/config/postage.conf', 'utf8'), 'utf8');
+	fs.writeFileSync(os.homedir() + '/.postage/postage-connections.conf', fs.readFileSync(strResourcesPath + '/app/postage/config/postage-connections.conf', 'utf8'), 'utf8');
 }
 
 fs.writeFileSync(os.homedir() + '/.postage/postage-SIGHUP', '\n', 'utf8');
@@ -79,13 +86,13 @@ if (process.platform == 'win32') {
 }
 
 function spawnPostage() {
-	console.log(process.resourcesPath, '/postage/postage');
+	console.log(strResourcesPath, '/postage/postage');
 	proc = child_process.spawn(
-		path.normalize(process.resourcesPath + '/app/postage/postage' + (process.platform == 'win32' ? '.exe' : '')),
+		path.normalize(strResourcesPath + '/app/postage/postage' + (process.platform == 'win32' ? '.exe' : '')),
 		[
 			'-c', path.normalize(os.homedir() + '/.postage/postage.conf'),
 			'-d', path.normalize(os.homedir() + '/.postage/postage-connections.conf'),
-			'-r', process.resourcesPath + path.normalize('/app/postage/web_root'),
+			'-r', strResourcesPath + path.normalize('/app/postage/web_root'),
 			'-x', 't',
 			'-p', int_postage_port
 		].concat((process.platform == 'win32' ? ['-o', 'stderr'] : [])), {

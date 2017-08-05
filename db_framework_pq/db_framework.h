@@ -24,6 +24,9 @@ typedef struct DB_copy_check *DB_copy_checkp;
 
 typedef void (*connect_cb_t)(EV_P, void *cb_data, DB_connp conn);
 
+typedef enum { DB_DRIVER_POSTGRES = 1, DB_DRIVER_SQL_SERVER = 2, DB_DRIVER_MSACCESS = 3 } DB_driver;
+#define DB_connection_driver(conn) conn->driver
+
 typedef struct DB_conn {
 	ev_check check;
 	int int_status;
@@ -69,6 +72,8 @@ typedef struct DB_conn {
 
 	//variable lengths
 	size_t int_response_len;
+
+	DB_driver driver;
 } DB_conn;
 
 typedef struct DB_poll {
@@ -80,9 +85,6 @@ typedef struct DB_poll {
 
 DB_conn *DB_connect(EV_P, void *cb_data, char *str_connstring, char *str_user, size_t int_user_length, char *str_password,
 	size_t int_password_length, char *str_context_data, connect_cb_t connect_cb);
-
-typedef enum { DB_DRIVER_POSTGRES = 1, DB_DRIVER_SQL_SERVER = 2, DB_DRIVER_MSACCESS = 3 } DB_driver;
-#define DB_connection_driver(conn) DB_DRIVER_POSTGRES
 
 typedef enum {
 	DB_RES_TUPLES_OK = 1,

@@ -149,12 +149,18 @@ function getContext(strInput, intPosition) {
     var bolBody = false;
     var bolWhere = false;
     var bolIf = false;
+
+    var strNextTwoChar;
+    var strNextOneChar;
+    var strPrevOneChar;
+    var bolWordBreak;
     
     var bolStdin = false;
     
     
     var intCase = 0;
     var i;
+    var len;
 
     var int_qs = 0; // quote status
     var int_E_quote = 0; // for single quotes and backslash skipping (not being used? only set?)
@@ -164,24 +170,35 @@ function getContext(strInput, intPosition) {
 
     //console.log('start');
 
-    for (i = 0; i < strInput.length; i += 1) {
+    i = 0;
+    len = strInput.length;
+    while (i < len) {
+        strNextTwoChar = strInput.substr(i, 2);
+        strNextOneChar = strInput.substr(i, 1);
+        strPrevOneChar = strInput.substr(i - 1, 1);
+        bolWordBreak = (
+            strPrevOneChar.match('^[\n\r\ \t]+') ||
+            strPrevOneChar === '(' ||
+            i === 0
+        );
+
         // FOUND MULTILINE COMMENT:
-        if (int_qs === 0 && strInput.substr(i, 2) === "/*") {
+        if (int_qs === 0 && strNextTwoChar === "/*") {
             int_qs = 5;
             //console.log("found multiline comment");
 
         // ENDING MULTILINE COMMENT
-        } else if (int_qs === 5 && strInput.substr(i, 2) === "*/") {
+        } else if (int_qs === 5 && strNextTwoChar === "*/") {
             int_qs = 0;
             //console.log("found end of multiline comment");
 
         // FOUND DASH COMMENT:
-        } else if (int_qs === 0 && strInput.substr(i, 2) === "--") {
+        } else if (int_qs === 0 && strNextTwoChar === "--") {
             int_qs = 6;
             //console.log("found dash comment");
 
         // ENDING DASH COMMENT
-        } else if (int_qs === 6 && (strInput.substr(i, 1) === "\n" || strInput.substr(i, 1) === "\r")) {
+        } else if (int_qs === 6 && (strNextOneChar === "\n" || strNextOneChar === "\r")) {
             int_qs = 0;
             //console.log("found end of dash comment");
 
@@ -189,42 +206,52 @@ function getContext(strInput, intPosition) {
         } else if (int_qs === 6 || int_qs === 5) {
 
         // FOUND SLASH:  we don't skip slashed chars within dollar tags, double or single quotes and comments.
-        } else if (strInput.substr(i, 1) === "\\" && int_qs !== 4 && int_qs !== 2 && int_qs !== 5 && int_qs !== 6) {
+        } else if (
+            strNextOneChar === "\\" &&
+            int_qs !== 4 &&
+            int_qs !== 2 &&
+            int_qs !== 5 &&
+            int_qs !== 6
+        ) {
             // skip next character
             i += 1;
 
             //console.log("found slash int_loop: %s", int_loop);
 
         // FOUND SINGLE QUOTE:
-        } else if (int_qs === 0 && strInput.substr(i, 1) === "'") {
+        } else if (int_qs === 0 && strNextOneChar === "'") {
             int_qs = 3;
             int_E_quote = (i - 1) === 'E';
             //console.log("found single quote");
 
         // FOUND TWO SINGLE QUOTES INSIDE STRING:
-        } else if (int_qs === 3 && strInput.substr(i, 2) === "''") {
+        } else if (int_qs === 3 && strNextTwoChar === "''") {
             //add next character
             i += 1;
             //console.log("found two single quote");
 
         // ENDING SINGLE QUOTE
-        } else if (int_qs === 3 && strInput.substr(i, 1) === "'") {
+        } else if (int_qs === 3 && strNextOneChar === "'") {
             int_qs = 0;
             int_E_quote = 0;
             //console.log("found end of single quote");
 
         // FOUND DOUBLE QUOTE:
-        } else if (int_qs === 0 && strInput.substr(i, 1) === "\"") {
+        } else if (int_qs === 0 && strNextOneChar === "\"") {
             int_qs = 4;
             //console.log("found double quote");
 
         // ENDING DOUBLE QUOTE
-        } else if (int_qs === 4 && strInput.substr(i, 1) === "\"") {
+        } else if (int_qs === 4 && strNextOneChar === "\"") {
             int_qs = 0;
             //console.log("found end of double quote");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(DROP|ALTER|COMMENT|SECURITY[\ \t]+LABEL|CREATE)[\ \t\n]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (
+            int_qs === 0 &&
+            strInput.substr(i).match(/^(DROP|ALTER|COMMENT|SECURITY[\ \t]+LABEL|CREATE)[\ \t\n]+/i) &&
+            bolWordBreak
+        ) {
             bolDrop = strInput.substr(i).match(/^DROP/i) ? true : false;
             bolAlter = strInput.substr(i).match(/^ALTER/i) ? true : false;
             bolComment = strInput.substr(i).match(/^COMMENT/i) ? true : false;
@@ -241,7 +268,18 @@ function getContext(strInput, intPosition) {
             }
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... AGGREGATE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^AGGREGATE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (
+            int_qs === 0 &&
+            strInput.substr(i).match(/^AGGREGATE[\n\r\ \t]+/i) &&
+            bolWordBreak &&
+            (
+                bolDrop ||
+                bolAlter ||
+                bolComment ||
+                bolSecurityLabel ||
+                bolCreate
+            )
+        ) {
             i += (strInput.substr(i).match(/^AGGREGATE/i)[0].length - 1);
             
             strFirst = ' ';
@@ -250,7 +288,18 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... AGGREGATE|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONVERSION
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CONVERSION[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (
+            int_qs === 0 &&
+            strInput.substr(i).match(/^CONVERSION[\n\r\ \t]+/i) &&
+            bolWordBreak &&
+            (
+                bolDrop ||
+                bolAlter ||
+                bolComment ||
+                bolSecurityLabel ||
+                bolCreate
+            )
+        ) {
             i += (strInput.substr(i).match(/^CONVERSION/i)[0].length - 1);
             
             strFirst = ' ';
@@ -259,7 +308,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONVERSION|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONSTRAINT
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CONSTRAINT[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CONSTRAINT[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^CONSTRAINT/i)[0].length - 1);
             
             strFirst = ' ';
@@ -268,7 +317,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONSTRAINT|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLLATION
-        } else if (int_qs === 0 && strInput.substr(i).match(/^COLLATION[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^COLLATION[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^COLLATION/i)[0].length - 1);
             
             strFirst = ' ';
@@ -277,7 +326,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLLATION|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TABLE/INHERIT
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(TABLE|INHERIT)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(TABLE|INHERIT)[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
             bolTable = strInput.substr(i).match(/^TABLE/i) ? true : false;
             
             i += (strInput.substr(i).match(/^(TABLE|INHERIT)/i)[0].length - 1);
@@ -290,7 +339,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TABLE/INHERIT|" + intTabLevel + "<");
 
         // FOUND ALTER TABLE ... TABLE/EXISTS/ONLY
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(TABLE|EXISTS|ONLY)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTable) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(TABLE|EXISTS|ONLY)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTable) {
             i += (strInput.substr(i).match(/^(TABLE|EXISTS|ONLY)/i)[0].length - 1);
             
             strFirst = ' ';
@@ -299,7 +348,7 @@ function getContext(strInput, intPosition) {
             //console.log(">ALTER TABLE ... TABLE/EXISTS/ONLY|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... RULE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^RULE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^RULE[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^RULE/i)[0].length - 1);
             
             bolRule = true;
@@ -308,7 +357,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... RULE|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... VIEW
-        } else if (int_qs === 0 && strInput.substr(i).match(/^VIEW[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^VIEW[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^VIEW/i)[0].length - 1);
             
             strFirst = ' ';
@@ -319,7 +368,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... VIEW|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLUMN
-        } else if (int_qs === 0 && strInput.substr(i).match(/^COLUMN[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^COLUMN[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^COLUMN/i)[0].length - 1);
             
             strFirst = ' ';
@@ -328,7 +377,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLLATION|" + intTabLevel + "<");
 
         // FOUND COMMENT ON COLUMN
-        } else if (int_qs === 0 && strInput.substr(i).match(/^COLUMN[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolComment) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^COLUMN[\n\r\ \t]+/i) && bolWordBreak && bolComment) {
             i += (strInput.substr(i).match(/^COLUMN/i)[0].length - 1);
             
             strFirst = ' ';
@@ -337,7 +386,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... DOMAIN|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... DOMAIN
-        } else if (int_qs === 0 && strInput.substr(i).match(/^DOMAIN[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^DOMAIN[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^DOMAIN/i)[0].length - 1);
             
             strFirst = ' ';
@@ -346,7 +395,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... DOMAIN|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... FOREIGN TABLE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^FOREIGN[\n\r\ \t]+TABLE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^FOREIGN[\n\r\ \t]+TABLE[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^FOREIGN[\n\r\ \t]+TABLE/i)[0].length - 1);
             
             strFirst = ' ';
@@ -355,7 +404,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... FOREIGN TABLE|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... FUNCTION/HANDLER/VALIDATOR
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(FUNCTION|HANDLER|VALIDATOR)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(FUNCTION|HANDLER|VALIDATOR)[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^(FUNCTION|HANDLER|VALIDATOR)/i)[0].length - 1);
             
             strFirst = ' ';
@@ -364,7 +413,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... FUNCTION/HANDLER/VALIDATOR|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... INDEX/CLUSTERON
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(INDEX|CLUSTERON)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(INDEX|CLUSTERON)[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^(INDEX|CLUSTERON)/i)[0].length - 1);
             
             strFirst = ' ';
@@ -373,7 +422,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... INDEX/CLUSTERON|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... MATERIALIZED VIEW
-        } else if (int_qs === 0 && strInput.substr(i).match(/^MATERIALIZED[\n\r\ \t]+VIEW[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^MATERIALIZED[\n\r\ \t]+VIEW[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^MATERIALIZED[\n\r\ \t]+VIEW/i)[0].length - 1);
             
             strFirst = ' ';
@@ -382,7 +431,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... MATERIALIZED VIEW|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR CLASS
-        } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+CLASS[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+CLASS[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+CLASS/i)[0].length - 1);
             
             strFirst = ' ';
@@ -391,7 +440,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR CLASS|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR FAMILY
-        } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+FAMILY[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+FAMILY[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+FAMILY/i)[0].length - 1);
             
             strFirst = ' ';
@@ -400,7 +449,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR FAMILY|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR
-        } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^OPERATOR/i)[0].length - 1);
             
             bolOperator = true;
@@ -411,7 +460,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR|" + intTabLevel + "<");
 
         // FOUND CREATE OPERATOR ... PROCEDURE/JOIN/RESTRICT/COMMUTATOR/NEGATOR
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(PROCEDURE|JOIN|RESTRICT|COMMUTATOR|NEGATOR)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolOperator) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(PROCEDURE|JOIN|RESTRICT|COMMUTATOR|NEGATOR)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolOperator) {
             i += (strInput.substr(i).match(/^(PROCEDURE|JOIN|RESTRICT|COMMUTATOR|NEGATOR)/i)[0].length - 1);
             
             strFirst = ' ';
@@ -420,7 +469,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE OPERATOR ... PROCEDURE/JOIN/RESTRICT/COMMUTATOR/NEGATOR|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... SEQUENCE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^SEQUENCE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^SEQUENCE[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^SEQUENCE/i)[0].length - 1);
             
             bolSequence = true;
@@ -431,7 +480,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... SEQUENCE|" + intTabLevel + "<");
 
         // FOUND ALTER SEQUENCE ... BY
-        } else if (int_qs === 0 && strInput.substr(i).match(/^BY[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolSequence) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^BY[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolSequence) {
             i += (strInput.substr(i).match(/^BY/i)[0].length - 1);
             
             strFirst = ' ';
@@ -440,14 +489,14 @@ function getContext(strInput, intPosition) {
             //console.log(">ALTER SEQUENCE ... ON|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... POLICY
-        } else if (int_qs === 0 && strInput.substr(i).match(/^POLICY[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^POLICY[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^POLICY/i)[0].length - 1);
             
             bolPolicy = true;
             //console.log(">ALTER/COMMENT/SECURITY LABEL/CREATE ... POLICY|" + intTabLevel + "<");
 
         // FOUND ALTER POLICY/RULE ... ON
-        } else if (int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && (bolPolicy || bolRule)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && (bolPolicy || bolRule)) {
             i += (strInput.substr(i).match(/^ON/i)[0].length - 1);
             
             strFirst = ' ';
@@ -456,7 +505,7 @@ function getContext(strInput, intPosition) {
             //console.log(">ALTER POLICY/RULE ... ON|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TYPE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^TYPE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TYPE[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^TYPE/i)[0].length - 1);
             
             bolType = true;
@@ -467,7 +516,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TYPE|" + intTabLevel + "<");
 
         // FOUND CREATE TYPE ... SUBTYPE_OPCLASS
-        } else if (int_qs === 0 && strInput.substr(i).match(/^SUBTYPE_OPCLASS[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolType) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^SUBTYPE_OPCLASS[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolType) {
             i += (strInput.substr(i).match(/^SUBTYPE_OPCLASS/i)[0].length - 1);
             
             strFirst = ' ';
@@ -476,7 +525,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE TYPE ... SUBTYPE_OPCLASS|" + intTabLevel + "<");
 
         // FOUND CREATE TYPE ... CANONICAL/SUBTYPE_DIFF/INPUT/OUTPUT/RECEIVE/SEND/TYPMOD_IN/TYPMOD_OUT/ANALYZE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(CANONICAL|SUBTYPE_DIFF|INPUT|OUTPUT|RECEIVE|SEND|TYPMOD_IN|TYPMOD_OUT|ANALYZE)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolType) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(CANONICAL|SUBTYPE_DIFF|INPUT|OUTPUT|RECEIVE|SEND|TYPMOD_IN|TYPMOD_OUT|ANALYZE)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolType) {
             i += (strInput.substr(i).match(/^(CANONICAL|SUBTYPE_DIFF|INPUT|OUTPUT|RECEIVE|SEND|TYPMOD_IN|TYPMOD_OUT|ANALYZE)/i)[0].length - 1);
             
             strFirst = ' ';
@@ -485,7 +534,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE TYPE ... CANONICAL/SUBTYPE_DIFF/INPUT/OUTPUT/RECEIVE/SEND/TYPMOD_IN/TYPMOD_OUT/ANALYZE|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH CONFIGURATION
-        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+CONFIGURATION[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+CONFIGURATION[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+CONFIGURATION/i)[0].length - 1);
             
             bolTextSearchConfiguration = true;
@@ -496,7 +545,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH CONFIGURATION|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH DICTIONARY
-        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+DICTIONARY[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+DICTIONARY[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+DICTIONARY/i)[0].length - 1);
             
             bolTextSearchDictionary = true;
@@ -507,7 +556,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH DICTIONARY|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH PARSER
-        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+PARSER[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+PARSER[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+PARSER/i)[0].length - 1);
             
             bolTextSearchParser = true;
@@ -518,7 +567,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH PARSER|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH TEMPLATE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+TEMPLATE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+TEMPLATE[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+TEMPLATE/i)[0].length - 1);
             
             bolTextSearchTemplate = true;
@@ -529,7 +578,7 @@ function getContext(strInput, intPosition) {
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH TEMPLATE|" + intTabLevel + "<");
 
         // FOUND CREATE TEXT SEARCH CONFIGURATION ... PARSER
-        } else if (int_qs === 0 && strInput.substr(i).match(/^PARSER[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^PARSER[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
             i += (strInput.substr(i).match(/^PARSER/i)[0].length - 1);
             
             strFirst = ' ';
@@ -538,7 +587,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE TEXT SEARCH CONFIGURATION ... PARSER|" + intTabLevel + "<");
 
         // FOUND CREATE TEXT SEARCH CONFIGURATION ... COPY/SEARCH CONFIGURATION
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(COPY|SEARCH[\n\r\ \t]+CONFIGURATION)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(COPY|SEARCH[\n\r\ \t]+CONFIGURATION)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
             i += (strInput.substr(i).match(/^(COPY|SEARCH[\n\r\ \t]+CONFIGURATION)/i)[0].length - 1);
             
             strFirst = ' ';
@@ -547,7 +596,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE TEXT SEARCH CONFIGURATION ... COPY/SEARCH CONFIGURATION|" + intTabLevel + "<");
 
         // FOUND CREATE TEXT SEARCH CONFIGURATION ... REPLACE/WITH
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(REPLACE|WITH)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(REPLACE|WITH)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
             i += (strInput.substr(i).match(/^(REPLACE|WITH)/i)[0].length - 1);
             
             strFirst = ' ';
@@ -556,7 +605,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE TEXT SEARCH CONFIGURATION ... REPLACE/WITH|" + intTabLevel + "<");
 
         // FOUND CREATE TEXT SEARCH DICTIONARY ... TEMPLATE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^TEMPLATE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchDictionary) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TEMPLATE[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchDictionary) {
             i += (strInput.substr(i).match(/^TEMPLATE/i)[0].length - 1);
             
             strFirst = ' ';
@@ -565,7 +614,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE TEXT SEARCH DICTIONARY ... TEMPLATE|" + intTabLevel + "<");
 
         // FOUND CREATE TEXT SEARCH PARSER ... START/GETTOKEN/END/LEXTYPES/HEADLINE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(START|GETTOKEN|END|LEXTYPES|HEADLINE)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchParser) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(START|GETTOKEN|END|LEXTYPES|HEADLINE)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchParser) {
             i += (strInput.substr(i).match(/^(START|GETTOKEN|END|LEXTYPES|HEADLINE)/i)[0].length - 1);
             
             strFirst = ' ';
@@ -574,7 +623,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE TEXT SEARCH DICTIONARY ... START/GETTOKEN/END/LEXTYPES/HEADLINE|" + intTabLevel + "<");
 
         // FOUND CREATE TEXT SEARCH TEMPLATE ... INIT/LEXIZE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(INIT|LEXIZE)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolCreate || bolAlter) && bolTextSearchTemplate) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(INIT|LEXIZE)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchTemplate) {
             i += (strInput.substr(i).match(/^(INIT|LEXIZE)/i)[0].length - 1);
             
             strFirst = ' ';
@@ -583,7 +632,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE TEXT SEARCH TEMPLATE ... INIT/LEXIZE|" + intTabLevel + "<");
 
         // FOUND CREATE ... VIEW
-        } else if (int_qs === 0 && strInput.substr(i).match(/^VIEW[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolCreate) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^VIEW[\n\r\ \t]+/i) && bolWordBreak && bolCreate) {
             i += (strInput.substr(i).match(/^VIEW/i)[0].length - 1);
             
             strFirst = ' ';
@@ -592,7 +641,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE ... VIEW|" + intTabLevel + "<");
 
         // FOUND CREATE ... FUNC
-        } else if (int_qs === 0 && strInput.substr(i).match(/^FUNC[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolCreate) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^FUNC[\n\r\ \t]+/i) && bolWordBreak && bolCreate) {
             i += (strInput.substr(i).match(/^FUNC/i)[0].length - 1);
             
             strFirst = ' ';
@@ -601,7 +650,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE ... FUNC|" + intTabLevel + "<");
 
         // FOUND CREATE ... TO
-        } else if (int_qs === 0 && strInput.substr(i).match(/^TO[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolCreate) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TO[\n\r\ \t]+/i) && bolWordBreak && bolCreate) {
             i += (strInput.substr(i).match(/^TO/i)[0].length - 1);
             
             strFirst = ' ';
@@ -610,7 +659,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE ... TO|" + intTabLevel + "<");
 
         // FOUND CREATE ... LIKE/INHERITS/REFERENCES
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(LIKE|INHERITS|REFERENCES)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolCreate) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(LIKE|INHERITS|REFERENCES)[\n\r\ \t]+/i) && bolWordBreak && bolCreate) {
             i += (strInput.substr(i).match(/^(LIKE|INHERITS|REFERENCES)/i)[0].length - 1);
             
             strFirst = ' ';
@@ -619,7 +668,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE ... LIKE/INHERITS/REFERENCES|" + intTabLevel + "<");
 
         // FOUND ALTER ... OWNER TO
-        } else if (int_qs === 0 && strInput.substr(i).match(/^OWNER[\n\r\ \t]+TO[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolAlter) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^OWNER[\n\r\ \t]+TO[\n\r\ \t]+/i) && bolWordBreak && bolAlter) {
             i += (strInput.substr(i).match(/^OWNER[\n\r\ \t]+TO/i)[0].length - 1);
             
             strFirst = ' ';
@@ -628,7 +677,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE ... OWNER TO|" + intTabLevel + "<");
 
         // FOUND UPDATE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^UPDATE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^UPDATE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^UPDATE/i)[0].length - 1);
             bolUpdate = true;
             
@@ -640,7 +689,7 @@ function getContext(strInput, intPosition) {
             //console.log(">UPDATE|" + intTabLevel + "<");
 
         // FOUND UPDATE ... SET
-        } else if (int_qs === 0 && strInput.substr(i).match(/^SET[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolUpdate) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^SET[\n\r\ \t]+/i) && bolWordBreak && bolUpdate) {
             i += (strInput.substr(i).match(/^SET/i)[0].length - 1);
             strFirst = ' ';
             intContextPosition = i + 1;
@@ -648,14 +697,14 @@ function getContext(strInput, intPosition) {
             //console.log(">INSERT ... INTO|" + intTabLevel + "<");
 
         // FOUND UPDATE ... SET ... ,
-        } else if (int_qs === 0 && strInput.substr(i, 1) === "," && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolUpdate) {
+        } else if (int_qs === 0 && strNextOneChar === "," && bolWordBreak && bolUpdate) {
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['contextColumns'];
             //console.log(">INSERT ... INTO|" + intTabLevel + "<");
 
         // FOUND UPDATE ... SET ... =
-        } else if (int_qs === 0 && strInput.substr(i, 1) === "=" && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolUpdate) {
+        } else if (int_qs === 0 && strNextOneChar === "=" && bolWordBreak && bolUpdate) {
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
@@ -668,14 +717,14 @@ function getContext(strInput, intPosition) {
             //console.log(">UPDATE ... SET ... = lookahead|" + intTabLevel + "<");
 
         // FOUND DELETE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^DELETE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^DELETE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^DELETE/i)[0].length - 1);
             bolDelete = true;
             
             //console.log(">UPDATE|" + intTabLevel + "<");
 
         // FOUND SELECT
-        } else if (int_qs === 0 && strInput.substr(i).match(/^SELECT[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && !bolGrant && !bolRevoke) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^SELECT[\n\r\ \t]+/i) && bolWordBreak && !bolGrant && !bolRevoke) {
             i += (strInput.substr(i).match(/^SELECT/i)[0].length - 1);
             bolSelect = true;
 
@@ -699,7 +748,7 @@ function getContext(strInput, intPosition) {
             //console.log(">SELECT lookahead|" + intTabLevel + "<");
 
         // FOUND SELECT ... GROUP/PARTITION/ORDER BY
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(GROUP|PARTITION|ORDER)[\n\r\ \t]+BY[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolSelect) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(GROUP|PARTITION|ORDER)[\n\r\ \t]+BY[\n\r\ \t]+/i) && bolWordBreak && bolSelect) {
             i += (strInput.substr(i).match(/^(GROUP|PARTITION|ORDER)[\n\r\ \t]+BY/i)[0].length - 1);
             strFirst = ' ';
             intContextPosition = i + 1;
@@ -707,7 +756,7 @@ function getContext(strInput, intPosition) {
             //console.log(">INSERT ... INTO|" + intTabLevel + "<");
 
         // FOUND WHERE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^WHERE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^WHERE[\n\r\ \t]+/i) && bolWordBreak) {
             //console.log('case>' + strInput.substr(i).match(/^WHERE/i)[0] + '<');
             i += (strInput.substr(i).match(/^WHERE/i)[0].length - 1);
             bolWhere = true;
@@ -719,7 +768,7 @@ function getContext(strInput, intPosition) {
             //console.log(">WHERE|" + intTabLevel + "<");
 
         // FOUND SELECT/INSERT/UPDATE/DELETE ... AND/OR/operators
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolSelect || bolInsert || bolUpdate || bolDelete || intCase > 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)[\n\r\ \t]+/i) && bolWordBreak && (bolSelect || bolInsert || bolUpdate || bolDelete || intCase > 0)) {
             //console.log('case>' + strInput.substr(i).match(/^(,|AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)[\n\r\ \t]+/i)[0] + '<');
             i += (strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~)/i)[0].length);
 
@@ -744,7 +793,7 @@ function getContext(strInput, intPosition) {
             //console.log(">AND/OR/operators lookahead|" + intTabLevel + "<");
 
         // FOUND SELECT/UPDATE/DELETE ... PARENTHESIS
-        } else if (int_qs === 0 && strInput.substr(i, 1) === "(" && (bolSelect || bolUpdate || bolDelete || intCase > 0)) {
+        } else if (int_qs === 0 && strNextOneChar === "(" && (bolSelect || bolUpdate || bolDelete || intCase > 0)) {
             strFirst = '';
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
@@ -769,7 +818,7 @@ function getContext(strInput, intPosition) {
             //console.log(">SELECT/UPDATE/DELETE ... PARENTHESIS lookahead|" + intTabLevel + "<");
 
         // FOUND IF
-        } else if (int_qs === 0 && strInput.substr(i).match(/^IF[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^IF[\n\r\ \t]+/i) && bolWordBreak) {
             //console.log('case>' + strInput.substr(i).match(/^IF/i)[0] + '<');
             i += (strInput.substr(i).match(/^IF/i)[0].length - 1);
             bolIf = true;
@@ -781,7 +830,7 @@ function getContext(strInput, intPosition) {
             //console.log(">IF|" + intTabLevel + "<");
 
         // FOUND $BODY$ ... AND/OR/operators/:=
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~|\:\=)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolBody) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~|\:\=)[\n\r\ \t]+/i) && bolWordBreak && bolBody) {
             //console.log('case>' + strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~|\:\=)/i)[0] + '<');
             i += (strInput.substr(i).match(/^(AND|OR|\=|\!\=|\<\>|\<\=?|\>\=?|I?LIKE|\!?\~|\:\=)/i)[0].length - 1);
 
@@ -792,7 +841,7 @@ function getContext(strInput, intPosition) {
             //console.log(">AND/OR/operators/:=|" + intTabLevel + "<");
 
         // FOUND PERFORM
-        } else if (int_qs === 0 && strInput.substr(i).match(/^PERFORM[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^PERFORM[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^PERFORM/i)[0].length - 1);
             
             strFirst = ' ';
@@ -803,7 +852,7 @@ function getContext(strInput, intPosition) {
             //console.log(">PERFORM|" + intTabLevel + "<");
 
         // FOUND USING/FROM/JOIN/ONLY PARENTHESIS
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+\(/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+\(/i) && bolWordBreak) {
             bolJoin = strInput.substr(i).match(/^JOIN/i) ? true : false;
             i += (strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+\(/i)[0].length);
             
@@ -815,7 +864,7 @@ function getContext(strInput, intPosition) {
             //console.log(">USING/FROM/JOIN/ONLY PARENTHESIS|" + intTabLevel + "<");
 
         // FOUND USING/FROM/JOIN/ONLY
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+/i) && bolWordBreak) {
             bolJoin = strInput.substr(i).match(/^JOIN/i) ? true : false;
             i += (strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)/i)[0].length);
             
@@ -827,7 +876,7 @@ function getContext(strInput, intPosition) {
             //console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
 
         // FOUND JOIN ... ON
-        } else if (int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolJoin) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && bolWordBreak && bolJoin) {
             i += (strInput.substr(i).match(/^ON/i)[0].length - 1);
             
             strFirst = ' ';
@@ -836,7 +885,7 @@ function getContext(strInput, intPosition) {
             //console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
 
         // FOUND PROCEDURE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^PROCEDURE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^PROCEDURE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^PROCEDURE/i)[0].length - 1);
             
             strFirst = ' ';
@@ -845,7 +894,7 @@ function getContext(strInput, intPosition) {
             //console.log(">PROCEDURE|" + intTabLevel + "<");
 
         // FOUND REFRESH MATERIALIZED VIEW
-        } else if (int_qs === 0 && strInput.substr(i).match(/^REFRESH[\n\r\ \t]+MATERIALIZED[\n\r\ \t]+VIEW[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^REFRESH[\n\r\ \t]+MATERIALIZED[\n\r\ \t]+VIEW[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^REFRESH[\n\r\ \t]+MATERIALIZED[\n\r\ \t]+VIEW/i)[0].length - 1);
             
             strFirst = ' ';
@@ -854,7 +903,7 @@ function getContext(strInput, intPosition) {
             //console.log(">REFRESH MATERIALIZED VIEW|" + intTabLevel + "<");
 
         // FOUND DELETE ... FROM
-        } else if (int_qs === 0 && strInput.substr(i).match(/^FROM[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolDelete) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^FROM[\n\r\ \t]+/i) && bolWordBreak && bolDelete) {
             i += (strInput.substr(i).match(/^FROM/i)[0].length - 1);
             strFirst = ' ';
             intContextPosition = i + 1;
@@ -862,13 +911,13 @@ function getContext(strInput, intPosition) {
             //console.log(">INSERT ... INTO|" + intTabLevel + "<");
 
         // FOUND INSERT
-        } else if (int_qs === 0 && strInput.substr(i).match(/^INSERT[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^INSERT[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^INSERT/i)[0].length - 1);
             bolInsert = true;
             //console.log(">INSERT|" + intTabLevel + "<");
 
         // FOUND INSERT ... INTO
-        } else if (int_qs === 0 && strInput.substr(i).match(/^INTO[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolInsert) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^INTO[\n\r\ \t]+/i) && bolWordBreak && bolInsert) {
             i += (strInput.substr(i).match(/^INTO/i)[0].length - 1);
             strFirst = ' ';
             intContextPosition = i + 1;
@@ -878,7 +927,7 @@ function getContext(strInput, intPosition) {
             //console.log(">INSERT ... INTO|" + intTabLevel + "<");
 
         // FOUND INSERT ... (
-        } else if (int_qs === 0 && strInput.substr(i, 1) === "(" && bolInsert && !bolInsertValues) {
+        } else if (int_qs === 0 && strNextOneChar === "(" && bolInsert && !bolInsertValues) {
             strFirst = '';
             intContextPosition = i + 1;
             arrShortQueries = ['contextColumns'];
@@ -888,7 +937,7 @@ function getContext(strInput, intPosition) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND INSERT ... ( ... , 
-        } else if (int_qs === 0 && int_ps >= 1 && strInput.substr(i, 1) === "," && bolInsert && !bolInsertValues) {
+        } else if (int_qs === 0 && int_ps >= 1 && strNextOneChar === "," && bolInsert && !bolInsertValues) {
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['contextColumns'];
@@ -896,7 +945,7 @@ function getContext(strInput, intPosition) {
             //console.log(">INSERT ... ( ... ,|" + intTabLevel + "<");
 
         // FOUND INSERT ... VALUES
-        } else if (int_qs === 0 && strInput.substr(i).match(/^VALUES[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolInsert) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^VALUES[\n\r\ \t]+/i) && bolWordBreak && bolInsert) {
             i += (strInput.substr(i).match(/^VALUES/i)[0].length - 1);
             strFirst = '';
             intContextPosition = 0;
@@ -906,7 +955,7 @@ function getContext(strInput, intPosition) {
             //console.log(">INSERT ... VALUES|" + intTabLevel + "<");
 
         // FOUND INSERT ... VALUES (
-        } else if (int_qs === 0 && strInput.substr(i, 1) === "(" && bolInsert && bolInsertValues) {
+        } else if (int_qs === 0 && strNextOneChar === "(" && bolInsert && bolInsertValues) {
             strFirst = '';
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'functions', 'builtins'];
@@ -916,7 +965,7 @@ function getContext(strInput, intPosition) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND INSERT ... VALUES ( ... , 
-        } else if (int_qs === 0 && int_ps >= 1 && strInput.substr(i, 1) === "," && bolInsert && bolInsertValues) {
+        } else if (int_qs === 0 && int_ps >= 1 && strNextOneChar === "," && bolInsert && bolInsertValues) {
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'functions', 'builtins'];
@@ -924,7 +973,7 @@ function getContext(strInput, intPosition) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND OPEN PARENTHESIS:
-        } else if (int_qs === 0 && strInput.substr(i, 1) === "(") {
+        } else if (int_qs === 0 && strNextOneChar === "(") {
             strFirst = '';
             intContextPosition = i + 1;
             arrShortQueries = ['snippets'];
@@ -934,13 +983,13 @@ function getContext(strInput, intPosition) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND CLOSE PARENTHESIS
-        } else if (int_qs === 0 && strInput.substr(i, 1) === ")") {
+        } else if (int_qs === 0 && strNextOneChar === ")") {
             int_ps = int_ps - 1;
             intTabLevel -= 1;
             //console.log(">)|" + intTabLevel + "<");
 
         // FOUND DOUBLE COLON
-        } else if (int_qs === 0 && strInput.substr(i, 2) === "::") {
+        } else if (int_qs === 0 && strNextTwoChar === "::") {
             intDoubleColon = i + 2;
             
             strFirst = '';
@@ -949,7 +998,7 @@ function getContext(strInput, intPosition) {
             //console.log(">::|" + intTabLevel + "<");
 
         // FOUND CAST
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CAST[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CAST[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^CAST/i)[0].length - 1);
             
             strFirst = ' ';
@@ -958,7 +1007,7 @@ function getContext(strInput, intPosition) {
             //console.log(">cast|" + intTabLevel + "<");
 
         // FOUND RETURNS
-        } else if (int_qs === 0 && strInput.substr(i).match(/^RETURNS[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^RETURNS[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^RETURNS/i)[0].length - 1);
             
             strFirst = ' ';
@@ -967,7 +1016,7 @@ function getContext(strInput, intPosition) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND LANGUAGE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^LANGUAGE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^LANGUAGE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^LANGUAGE/i)[0].length - 1);
             
             strFirst = ' ';
@@ -976,7 +1025,7 @@ function getContext(strInput, intPosition) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND TABLESPACE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^TABLESPACE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^TABLESPACE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^TABLESPACE/i)[0].length - 1);
             
             strFirst = ' ';
@@ -985,7 +1034,7 @@ function getContext(strInput, intPosition) {
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND RULE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^RULE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^RULE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^RULE/i)[0].length - 1);
             
             strFirst = ' ';
@@ -1000,7 +1049,7 @@ function getContext(strInput, intPosition) {
             //console.log(">$BODY$|" + intTabLevel + "<");
 
         // FOUND DOLLAR TAG START:
-        } else if (int_qs === 0 && strInput.substr(i, 1) === "$") {
+        } else if (int_qs === 0 && strNextOneChar === "$") {
             //console.log('start dollar tag');
             // we should be looking ahead here. get the tag or if false start then
             // just continue
@@ -1037,7 +1086,7 @@ function getContext(strInput, intPosition) {
             i += int_tag;
 
         // FOUND GRANT/REVOKE
-        } else if (int_qs === 0 && strInput.substr(i, 7).match(/^(GRANT|REVOKE)\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i, 7).match(/^(GRANT|REVOKE)\b/i) && bolWordBreak) {
             if (strInput.substr(i, 7).match(/^GRANT\b/i)) {
                 bolGrant = true;
                 bolRevoke = false;
@@ -1053,7 +1102,7 @@ function getContext(strInput, intPosition) {
             //console.log(">REVOKE|" + intTabLevel + "<");
 
         // FOUND AN UNQUOTED/UNPARENTHESISED COMMA NOT INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === "," && !bolGrant && !bolRevoke) {
+        } else if (int_ps === 0 && int_qs === 0 && strNextOneChar === "," && !bolGrant && !bolRevoke) {
             i++;
             
             strFirst = ' ';
@@ -1077,7 +1126,7 @@ function getContext(strInput, intPosition) {
             //console.log(">, lookahead|" + intTabLevel + "<");
 
         // FOUND AN ON SCHEMA INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA/i)[0].length);
             
@@ -1086,7 +1135,7 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON FUNCTION INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION/i)[0].length);
             
@@ -1095,7 +1144,7 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON FUNCTION|" + intTabLevel + "<");
 
         // FOUND AN ON TABLE INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE/i)[0].length);
             
@@ -1104,7 +1153,7 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON SEQUENCE INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE/i)[0].length);
             
@@ -1113,7 +1162,7 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON TYPE INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE/i)[0].length);
             
@@ -1122,7 +1171,7 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON DOMAIN INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN/i)[0].length);
             
@@ -1131,32 +1180,32 @@ function getContext(strInput, intPosition) {
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND AN ON INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && (bolGrant || bolRevoke)) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             intContextPosition = i + 2;
             arrShortQueries = ['schemasAll'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
 
         // FOUND A FROM INSIDE A REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^FROM[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolRevoke) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^FROM[\n\r\ \t]+/i) && bolWordBreak && bolRevoke) {
             strFirst = ' ';
             intContextPosition = i + 4;
             arrShortQueries = ['logins', 'groups'];
             //console.log(">REVOKE ... FROM|" + intTabLevel + "<");
 
         // FOUND A TO INSIDE A GRANT STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^TO[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0) && bolGrant) {
+        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^TO[\n\r\ \t]+/i) && bolWordBreak && bolGrant) {
             strFirst = ' ';
             intContextPosition = i + 2;
             arrShortQueries = ['logins', 'groups'];
             //console.log(">GRANT ... TO|" + intTabLevel + "<");
 
         // FOUND AN UNQUOTED/UNPARENTHESISED COMMA INSIDE A GRANT/REVOKE STATEMENT:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === "," && bolGrant && bolRevoke) {
+        } else if (int_ps === 0 && int_qs === 0 && strNextOneChar === "," && bolGrant && bolRevoke) {
             //console.log(">,|" + intTabLevel + "<");
 
         // FOUND AN UNQUOTED/UNPARENTHESISED SEMICOLON:
-        } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i, 1) === ";") {
+        } else if (int_ps === 0 && int_qs === 0 && strNextOneChar === ";") {
             if (i + 1 >= intPosition && bolFinal) {//if we are on the last statement, and we were just looking ahead for tables, then stop here
                 //console.log('break because of bolFinal');
                 break;
@@ -1213,14 +1262,14 @@ function getContext(strInput, intPosition) {
            // console.log(">;|" + intTabLevel + "<");
 
         // Function Declare
-        } else if (int_qs === 0 && strInput.substr(i).match(/^DECLARE\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^DECLARE\b/i) && bolWordBreak) {
             i = i + 6 + (strInput.substr(i + 7, 1) === ' ' ? 1 : 0);
             intTabLevel += 1;
             bolDeclare = true;
            // console.log(">DECLARE|" + intTabLevel + "<");
 
         // Transactions
-        } else if (int_qs === 0 && strInput.substr(i).match(/^BEGIN\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^BEGIN\b/i) && bolWordBreak) {
             i = i + 4 + (strInput.substr(i + 5, 1) === ' ' ? 1 : 0);
             if (bolDeclare) {
                 bolDeclare = false;
@@ -1267,7 +1316,7 @@ function getContext(strInput, intPosition) {
 
 
         // FOUND CASE... THEN
-        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^THEN\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^THEN\b/i) && bolWordBreak) {
             i = i + 3;
 
             strFirst = ' ';
@@ -1277,7 +1326,7 @@ function getContext(strInput, intPosition) {
             //console.log(">C THEN|" + intTabLevel + "<");
 
         // FOUND CASE... WHEN
-        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^WHEN\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^WHEN\b/i) && bolWordBreak) {
             i = i + 3;
 
             strFirst = ' ';
@@ -1287,7 +1336,7 @@ function getContext(strInput, intPosition) {
             //console.log(">WHEN|" + intTabLevel + "<");
 
         // FOUND CASE... ELSE
-        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^ELSE\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^ELSE\b/i) && bolWordBreak) {
             i = i + 3;
 
             strFirst = ' ';
@@ -1297,14 +1346,14 @@ function getContext(strInput, intPosition) {
             //console.log(">C ELSE|" + intTabLevel + "<");
 
         // FOUND CASE... END
-        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^END\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && intCase > 0 && strInput.substr(i).match(/^END\b/i) && bolWordBreak) {
             i = i + 2;
             intTabLevel -= 1;
             intCase -= 1;
             //console.log(">END|" + intTabLevel + "<");
 
         // FOUND THEN
-        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^THEN\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^THEN\b/i) && bolWordBreak) {
             intTabLevel += 1;
             i = i + 3;
 
@@ -1320,7 +1369,7 @@ function getContext(strInput, intPosition) {
             //console.log(">I THEN|" + intTabLevel + "<");
 
         // FOUND LOOP
-        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^LOOP\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^LOOP\b/i) && bolWordBreak) {
             intTabLevel += 1;
             i = i + 3;
 
@@ -1336,12 +1385,12 @@ function getContext(strInput, intPosition) {
             //console.log(">LOOP|" + intTabLevel + "<");
 
         // FOUND THEN... ELSE
-        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^ELSE\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^ELSE\b/i) && bolWordBreak) {
             i = i + 3 + (strInput.substr(i + 4, 1) === ' ' ? 1 : 0);
             //console.log(">ELSE|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE RULE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?RULE\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t\n]+(OR[\ \t\n]+REPLACE[\ \t\n]+)?RULE\b/i) && bolWordBreak) {
             bolRule = true;
             bolCreate = true;
             i += (strInput.substr(i).match(/^CREATE[\ \t]+(OR[\ \t]+REPLACE[\ \t]+)?RULE/i)[0].length - 1);
@@ -1349,7 +1398,7 @@ function getContext(strInput, intPosition) {
             //console.log(">CREATE OR REPLACE RULE|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE RULE... INSTEAD
-        } else if (int_qs === 0 && bolRule && strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && bolRule && strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i,8).match(/^INSTEAD/i)[0].length - 1);
             
             strFirst = '\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
@@ -1358,20 +1407,20 @@ function getContext(strInput, intPosition) {
             //console.log(">INSTEAD|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE FUNCTION
-        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+FUNCTION/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+FUNCTION/i) && bolWordBreak) {
             bolFunction = true;
             i += (strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE[\ \t]+FUNCTION/i)[0].length - 1);
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
         // FOUND CREATE OR REPLACE FUNCTION... AS
-        } else if (int_qs === 0 && bolFunction && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && bolFunction && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && bolWordBreak) {
 
             bolFunction = false;
             i += 1;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
         // FOUND AS
-        } else if (int_qs === 0 && (!bolFunction) && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && (!bolFunction) && strInput.substr(i).match(/^AS[\n\r\ \t]+/i) && bolWordBreak) {
             i += 1;
             //console.log(">KEYWORD|" + intTabLevel + "<");
 
@@ -1406,13 +1455,13 @@ function getContext(strInput, intPosition) {
             //console.log(">ELSIF;|" + intTabLevel + "<");
 
         // Not an END IF, at this point it has to be a BEGIN END
-        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^END\b/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && intCase === 0 && strInput.substr(i).match(/^END\b/i) && bolWordBreak) {
             intTabLevel -= 1;
             i = i + 2 + (strInput.substr(i + 3, 1) === ' ' ? 1 : 0);
             //console.log(">END|" + intTabLevel + "<");
 
         // FOUND VACUUM/TRUNCATE/LOCK/ANALYZE
-        } else if (int_qs === 0 && strInput.substr(i).match(/^(VACUUM|TRUNCATE|LOCK|ANALYZE)[\n\r\ \t]+/i) && (strInput.substr(i - 1, 1).match('^[\n\r\ \t]+') || (strInput.substr(i - 1, 1) === '(') || i === 0)) {
+        } else if (int_qs === 0 && strInput.substr(i).match(/^(VACUUM|TRUNCATE|LOCK|ANALYZE)[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^(VACUUM|TRUNCATE|LOCK|ANALYZE)/i)[0].length - 1);
             
             strFirst = ' ';
@@ -1442,10 +1491,12 @@ function getContext(strInput, intPosition) {
             bolFinal = false;
         }
         
-        //console.log('check>' + strInput.substr(i, 1) + '|' + i + '|' + intPosition + '<');
+        //console.log('check>' + strNextOneChar + '|' + i + '|' + intPosition + '<');
         if (i + 1 >= intPosition && !bolFinal) {//+ 1 so that we don't get the character after the cursor
             break;
         }
+
+        i += 1;
     }
     
     //console.log('bolFinal', bolFinal);

@@ -46,7 +46,7 @@ void http_select_step1(struct sock_ev_client *client) {
 	SFINISH_ERROR_CHECK(client_select->str_real_table_name != NULL && client_select->str_real_table_name[0] != 0,
 		"Failed to get table name from query");
 	client_select->str_return_columns = getpar(str_args, "cols", int_query_len, &client_select->int_return_columns_len);
-	if (client_select->str_return_columns == NULL || strlen(client_select->str_return_columns) == 0) {
+	if (client_select->str_return_columns == NULL || client_select->str_return_columns[0] == 0) {
 		SFREE(client_select->str_return_columns);
 		SFINISH_SNCAT(client_select->str_return_columns, &client_select->int_return_columns_len,
 			"*", (size_t)1);
@@ -602,8 +602,8 @@ finish:
 		);
 		SFREE(_str_response1);
 		SFREE(_str_response2);
-		DB_free_result(client_copy_check->res);
 		if (client_copy_check != NULL) {
+			DB_free_result(client_copy_check->res);
 			ev_check_stop(EV_A, w);
 			decrement_idle(EV_A);
 			SFREE(client_copy_check->str_response);

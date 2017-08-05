@@ -1,3 +1,20 @@
+Changes since 3.2.16:
+Postage:
+Make headers visible rather than seeing "####" (PR workflowproducts/postage#328)
+Fix running postage from a different disk drive (for workflowproducts/postage#339)
+Fix configure to accept --prefix, fix Makefile to create mandir (closes workflowproducts/postage#343)
+Disable context data in Postage (closes workflowproducts/postage#336)
+Fix line indicator when Postgres doesn't supply a line number with an error (closes workflowproducts/postage#329)
+Add autofit button (closes workflowproducts/postage#345)
+Fix file save/save as in postage (closes workflowproducts/postage#330)
+Fix raw not returning NULL properly (closes workflowproducts/postage#332)
+Changed transaction block errors to include a solution (closes workflowproducts/postage#349)
+
+Both:
+Fix openssl on mac linking to static library (closes workflowproducts/postage#343)
+Fix UPDATE/DELETE hashes (closes workflowproducts/postage#347)
+
+
 Changes since 3.2.15:
 Postage:
 Rewrite generate script for table designer (closed workflowproducts/postage#307)

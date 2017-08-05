@@ -514,12 +514,17 @@ function autocompleteLogic(editor, autocompleteKeyEvent, event) {
     }
     
     objContext = getContext(
-        strScript.substring(editor.currentQueryRange.startIndex
-            , editor.currentQueryRange.endIndex + 15)
-        , intCursorPosition - editor.currentQueryRange.startIndex);
+        strScript.substring(
+            editor.currentQueryRange.startIndex,
+            editor.currentQueryRange.endIndex + 15
+        ),
+        intCursorPosition - editor.currentQueryRange.startIndex
+    );
+
     //objContext = getContext(strScript, intCursorPosition);
     //console.log('typeof', typeof objContext);
     //console.log('objContext', objContext);
+
     if (typeof objContext !== 'undefined' && objContext !== null) {
         objContext.intContextPosition = objContext.intContextPosition + editor.currentQueryRange.startIndex;
         
