@@ -330,10 +330,13 @@ char *get_hash_where(DB_driver driver, char *str_columns, size_t int_columns_len
 		str_temp_end, strlen(str_temp_end)
 	);
 
+	SFREE(str_hash_where_temp);
+
 	return str_hash_where;
 error:
 	*ptr_int_hash_where_len = 0;
 
+	SFREE(str_hash_where_temp);
 	SFREE(str_hash_where);
 	return NULL;
 }

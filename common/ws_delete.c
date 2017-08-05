@@ -824,6 +824,7 @@ finish:
 void ws_delete_free(struct sock_ev_client_request_data *client_request_data) {
 	struct sock_ev_client_delete *client_delete = (struct sock_ev_client_delete *)client_request_data;
 	SFREE(client_delete->str_pk_where_clause);
+	SFREE(client_delete->str_hash_columns);
 	SFREE(client_delete->str_hash_where_clause);
 	SFREE(client_delete->str_real_table_name);
 	SFREE(client_delete->str_temp_table_name);

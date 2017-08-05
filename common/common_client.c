@@ -873,7 +873,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 		ptr_end_query = frame->str_message + frame->int_length;
 
 		SERROR_SNCAT(str_message_id, &int_message_id_len,
-			frame->str_message + 12, (size_t)(ptr_query - frame->str_message));
+			frame->str_message + 12, (size_t)(ptr_query - (frame->str_message + 12)));
 
 		// same for transaction id (if there is one)
 		if (strncmp(ptr_query, "transactionid = ", 16) == 0) {

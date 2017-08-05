@@ -943,6 +943,7 @@ void ws_update_free(struct sock_ev_client_request_data *client_request_data) {
 	SFREE(client_update->str_real_table_name);
 	SFREE(client_update->str_temp_table_name);
 	SFREE(client_update->str_sql);
+	SFREE(client_update->str_hash_columns);
 	SFREE(client_update->str_hash_where_clause);
 	SFREE(client_update->str_columns);
 	SFREE(client_update->str_type_sql);
