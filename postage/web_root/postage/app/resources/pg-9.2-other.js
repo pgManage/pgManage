@@ -321,9 +321,7 @@ function menuTab(target) {
                     <gs-button class="postage-menu-item-button" dialogclose iconleft
                             onclick="dialogClosedTabs()" no-focus icon="clock-o"
                             title="All closed tabs">View All Closed Tabs</gs-button>
-                    <gs-button class="postage-menu-item-button" dialogclose
-                            onclick="window.opn('{{TABPATH}}')" no-focus
-                            title="Open tab Folder">Open tab Folder</gs-button>
+                    <gs-button class="postage-menu-item-button" dialogclose onclick="window.opn('{{TABPATH}}')" iconleft no-focus icon="folder-open-o" title="Open tab Folder">Open tab Folder</gs-button>
                 </gs-body>
             </gs-page>
         */}).replace(/\{\{TABPATH\}\}/gi,
