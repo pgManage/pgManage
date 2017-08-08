@@ -14,6 +14,7 @@ struct sock_ev_client_auth {
 
 	char *str_action;
 	char *str_cookie_encrypted;
+	size_t int_cookie_encrypted_len;
 	char *str_connname;
 	size_t int_connname_length;
 	char *str_conn;

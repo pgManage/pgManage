@@ -488,7 +488,7 @@ void http_file_step2(EV_P, ev_check *w, int revents) {
 	sprintf(str_etag, "%li.%li", statdata->st_mtimespec.tv_sec, statdata->st_mtimespec.tv_nsec);
 #endif
 #else
-	sprintf(str_etag, "%lu", (long)statdata->st_mtime);
+	sprintf(str_etag, "%li", (long)statdata->st_mtime);
 #endif
 
 	char *str_maybe_download = client_http_file->bol_download ? "Content-Disposition: attachment\015\012" : "";

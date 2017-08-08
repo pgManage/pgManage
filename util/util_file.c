@@ -75,8 +75,9 @@ void canonical_recurse_directory_check_cb(EV_P, ev_check *w, int revents) {
 	int_i -= 1;
 	recursive_directory_data *dir_data = DArray_get(rec_data->darr_directory, int_i);
 	SDEFINE_VAR_ALL(str_path, str_partial_path);
+	SERROR_CHECK(dir_data != NULL, "DArray_get failed!");
 
-	if (dir_data != NULL && dir_data->bol_done) {
+	if (dir_data->bol_done) {
 		bol_res = rec_data->step_callback(EV_A, rec_data->cb_data, dir_data->str_partial_path);
 		SFREE_ALL();
 		if (DArray_end(rec_data->darr_directory) == 0 || bol_res == false) {

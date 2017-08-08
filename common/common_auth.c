@@ -96,7 +96,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 				// request handler)
 				if (client_last_activity != NULL &&
 					strncmp(client_last_activity->str_client_ip, client->str_client_ip, INET_ADDRSTRLEN) == 0 &&
-					strncmp(client_last_activity->str_cookie, str_cookie_encrypted, strlen(str_cookie_encrypted)) == 0) {
+					strncmp(client_last_activity->str_cookie, str_cookie_encrypted, int_cookie_len) == 0) {
 					client->int_last_activity_i = int_i;
 					break;
 				}
@@ -152,8 +152,11 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 				(
 					client->int_last_activity_i != -1 &&
 					(
-						ev_now(global_loop) - client_last_activity->last_activity_time
-					) < int_global_login_timeout
+						int_global_login_timeout == 0 ||
+						(
+							ev_now(global_loop) - client_last_activity->last_activity_time
+						) < int_global_login_timeout
+					)
 				)
 			)
 		) {
@@ -207,7 +210,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 		SFINISH_CHECK(str_database != NULL, "getpar failed");
 		//str_database = bstr_tolower(str_database, client->int_database_len);
 		SNOTICE("REQUEST USERNAME: %s", str_username);
-		if (str_database != NULL && strlen(str_database) == 0) {
+		if (str_database[0] == 0) {
 			SFREE(str_database);
 		}
 		if (str_database != NULL) {
@@ -233,7 +236,7 @@ DB_conn *set_cnxn(struct sock_ev_client *client, connect_cb_t connect_cb) {
 	str_connname = getpar(str_cookie_decrypted, "connname", int_cookie_len, &client->int_connname_len);
 	SFINISH_CHECK(str_connname != NULL, "getpar failed");
 	str_conn = getpar(str_cookie_decrypted, "conn", int_cookie_len, &client->int_conn_len);
-	if (str_conn != NULL && strlen(str_conn) == 0) {
+	if (str_conn != NULL && str_conn[0] == 0) {
 		SFREE(str_conn);
 	}
 	SDEBUG("str_conn: %s", str_conn);

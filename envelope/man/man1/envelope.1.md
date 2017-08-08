@@ -51,7 +51,7 @@ The following options can be specified on the command line or in the configurati
        If not specified, Envelope looks in the same folder as the config file for a file named envelope-connections.conf. If Envelope can't find a connection file, it will error.
 
 `-s` or `--super-only=` or `super_only=`  
-       `Boolean;` defaults to true  
+       `Boolean;` defaults to false  
        This tells Envelope whether or not to only allow super users to login. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through Envelope. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser.  
 
 `-g` or `--login-group=` or `login_group=`  
@@ -89,8 +89,9 @@ The following options can be specified on the command line or in the configurati
        This option regulates the frequency and verbosity of log messages. Possible values are none, error, warn, notice and info.
 
 `-t` or `--login-timeout=` or `login_timeout=`  
-       `Integer;` defaults to 1200  
-       This option regulates the timeout after the last page is closed.
+       `Integer;` defaults to 3600  
+       This option regulates the login timeout (in seconds) after the last activity on a session.
+	   If 0, no timeout is enforced.
 
 `-u` or `--public-username=` or `public_username=`  
 `-w` or `--public-password=` or `public_password=`  

@@ -277,7 +277,7 @@ char *get_hash_columns(char *_str_query, size_t int_query_len, size_t *ptr_int_h
 	ptr_hash_columns = strstr(str_query, "HASH\t");
 	SERROR_CHECK(ptr_hash_columns != NULL, "strstr failed");
 	ptr_hash_columns += 5;
-	ptr_end_hash_columns = strstr(ptr_hash_columns, "\012");
+	ptr_end_hash_columns = strchr(ptr_hash_columns, '\012');
 	SERROR_CHECK(ptr_end_hash_columns != NULL, "strstr failed");
 	*ptr_end_hash_columns = 0;
 
@@ -295,7 +295,7 @@ error:
 	return NULL;
 }
 
-char *get_hash_where(char *str_columns, size_t int_columns_len, char *str_temp_table_name, size_t int_temp_table_name_len, size_t *ptr_int_hash_where_len) {
+char *get_hash_where(DB_driver driver, char *str_columns, size_t int_columns_len, char *str_temp_table_name, size_t int_temp_table_name_len, size_t *ptr_int_hash_where_len) {
 	char *str_hash_where_temp = NULL;
 	char *str_hash_where = NULL;
 
@@ -309,7 +309,7 @@ char *get_hash_where(char *str_columns, size_t int_columns_len, char *str_temp_t
 	char *str_temp_end = "";
 
 	SERROR_BREPLACE(str_hash_where_temp, ptr_int_hash_where_len, "\"", "\"\"", "g");
-	if (DB_connection_driver(client_request->parent->conn) == DB_DRIVER_POSTGRES) {
+	if (driver == DB_DRIVER_POSTGRES) {
 		str_temp_start = "_hash = MD5(replace(replace(replace(replace(COALESCE(\"";
 		str_temp_in_between = "\"::text, ''), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || '\t' || replace(replace(replace(replace(COALESCE(\"";
 		str_temp_end = "\"::text, ''), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r'))";
@@ -330,10 +330,13 @@ char *get_hash_where(char *str_columns, size_t int_columns_len, char *str_temp_t
 		str_temp_end, strlen(str_temp_end)
 	);
 
+	SFREE(str_hash_where_temp);
+
 	return str_hash_where;
 error:
 	*ptr_int_hash_where_len = 0;
 
+	SFREE(str_hash_where_temp);
 	SFREE(str_hash_where);
 	return NULL;
 }
@@ -373,7 +376,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 
 				SFINISH_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
 					"messageid = ", (size_t)12,
-					client_request->str_message_id, strlen(client_request->str_message_id),
+					client_request->str_message_id, client_request->int_message_id_len,
 					"\012"
 					"responsenumber = ", (size_t)18,
 					str_temp, strlen(str_temp),
@@ -382,7 +385,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 					SFINISH_SNFCAT(
 						client_request->str_current_response, &client_request->int_current_response_length,
 						"transactionid = ", (size_t)16,
-						client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+						client_request->str_transaction_id, client_request->int_message_id_len,
 						"\012", (size_t)1);
 				}
 			}
@@ -424,7 +427,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 
 				SFINISH_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
 					"messageid = ", (size_t)12,
-					client_request->str_message_id, strlen(client_request->str_message_id),
+					client_request->str_message_id, client_request->int_message_id_len,
 					"\012"
 					"responsenumber = ", (size_t)18,
 					str_temp, strlen(str_temp),
@@ -433,7 +436,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 					SFINISH_SNFCAT(
 						client_request->str_current_response, &client_request->int_current_response_length,
 						"transactionid = ", (size_t)16,
-						client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+						client_request->str_transaction_id, client_request->int_message_id_len,
 						"\012", (size_t)1);
 				}
 
@@ -474,7 +477,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 			SDEBUG("Send Error...");
 			SFINISH_SNCAT(client_request->str_current_response, &client_request->int_current_response_length,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012"
 				"responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
@@ -483,7 +486,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 				SFINISH_SNFCAT(
 					client_request->str_current_response, &client_request->int_current_response_length,
 					"transactionid = ", (size_t)16,
-					client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+					client_request->str_transaction_id, client_request->int_message_id_len,
 					"\012", (size_t)1);
 			}
 			SFINISH_SREALLOC(client_request->str_current_response, client_request->int_current_response_length + int_len + 6 + 1);
@@ -524,15 +527,15 @@ finish:
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNCAT(str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012transactionid = ", (size_t)17,
-				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				client_request->str_transaction_id, client_request->int_message_id_len,
 				"\012", (size_t)1,
 				_str_response, strlen(_str_response));
 		} else {
 			SFINISH_SNCAT(str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012", (size_t)1,
 				_str_response, strlen(_str_response));
 		}
@@ -776,7 +779,9 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 	SNOTICE("SQL.C READABLE");
 	DB_readable_poll *readable_poll = NULL;
 	size_t int_folder_write_len = 0;
+	size_t int_folder_write_literal_len = 0;
 	size_t int_folder_len = 0;
+	size_t int_folder_literal_len = 0;
 	size_t int_sql_len = 0;
 
 	SDEFINE_VAR_ALL(str_folder, str_folder_write, str_folder_literal, str_folder_write_literal, str_sql);
@@ -806,6 +811,7 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 		str_folder_write[slash_position - 1] = 'w';
 		str_folder_write[slash_position] = '\0';
 		str_folder_write_literal = DB_escape_literal(conn, str_folder_write, int_folder_write_len);
+		int_folder_write_literal_len = strlen(str_folder_write_literal);
 		SERROR_CHECK(str_folder_write_literal != NULL, "DB_escape_literal failed");
 	}
 
@@ -813,6 +819,7 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 		ptr_path, strlen(ptr_path));
 	str_folder[slash_position] = '\0';
 	str_folder_literal = DB_escape_literal(conn, str_folder, strlen(str_folder));
+	int_folder_literal_len = strlen(str_folder_literal);
 	SERROR_CHECK(str_folder_literal != NULL, "DB_escape_literal failed");
 
 	SDEBUG(">%s|%s<", ptr_path, str_folder);
@@ -822,15 +829,15 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 			SERROR_SNCAT(str_sql, &int_sql_len,
 				"\
 			SELECT CASE WHEN count(*) > 0 OR lower(", (size_t)42,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				") = 'all' OR lower(", (size_t)19,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END::text \
 			FROM pg_roles r \
 			JOIN pg_auth_members ON r.oid=roleid \
 			JOIN pg_roles u ON member = u.oid \
 			WHERE (lower(r.rolname) = lower(", (size_t)190,
-				str_folder_write_literal, strlen(str_folder_write_literal),
+				str_folder_write_literal, int_folder_write_literal_len,
 				") OR \
 				  lower(r.rolname) = 'developer_g') AND lower(u.rolname) = lower(session_user); \
 			", (size_t)92);
@@ -838,17 +845,17 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 			SERROR_SNCAT(str_sql, &int_sql_len,
 				"\
 			SELECT CASE WHEN count(*) > 0 OR 'all' = lower(", (size_t)50,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				") OR '' = ", (size_t)10,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				" OR lower(", (size_t)10,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END::text \
 			FROM pg_roles r \
 			JOIN pg_auth_members ON r.oid=roleid \
 			JOIN pg_roles u ON member = u.oid \
 			WHERE (lower(r.rolname) = lower(", (size_t)190,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				") OR \
 				  lower(r.rolname) = 'developer_g') AND lower(u.rolname) = lower(session_user);", (size_t)88);
 		}
@@ -856,24 +863,24 @@ bool ddl_readable(EV_P, DB_conn *conn, char *str_path, bool bol_writeable, void 
 		if (bol_writeable) {
 			SERROR_SNCAT(str_sql, &int_sql_len,
 				"SELECT CASE WHEN IS_MEMBER(", (size_t)27,
-				str_folder_write_literal, strlen(str_folder_write_literal),
+				str_folder_write_literal, int_folder_write_literal_len,
 				") = 1 OR 'all' = lower(", (size_t)23,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				") OR '' = ", (size_t)10,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				" OR lower(", (size_t)10,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END;", (size_t)53);
 		} else {
 			SERROR_SNCAT(str_sql, &int_sql_len,
 				"SELECT CASE WHEN IS_MEMBER(", (size_t)27,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				") = 1 OR 'all' = lower(", (size_t)23,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				") OR '' = ", (size_t)10,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				" OR lower(", (size_t)10,
-				str_folder_literal, strlen(str_folder_literal),
+				str_folder_literal, int_folder_literal_len,
 				") = lower(session_user) THEN 'TRUE' ELSE 'FALSE' END;", (size_t)53);
 		}
 	}

@@ -187,7 +187,7 @@ finish:
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp1, strlen(str_temp1),
 			"\012", (size_t)1,
@@ -203,7 +203,7 @@ finish:
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp1, strlen(str_temp1),
 			"\012TRANSACTION COMPLETED", (size_t)22
@@ -292,7 +292,7 @@ void ws_tab_list_step2(EV_P, struct sock_ev_client_request *client_request) {
 	SFINISH_SNCAT(
 		str_response, &int_response_len,
 		"messageid = ", (size_t)12,
-		client_request->str_message_id, strlen(client_request->str_message_id),
+		client_request->str_message_id, client_request->int_message_id_len,
 		"\012responsenumber = ", (size_t)18,
 		str_temp, strlen(str_temp),
 		"\012", (size_t)1
@@ -317,7 +317,7 @@ void ws_tab_list_step2(EV_P, struct sock_ev_client_request *client_request) {
 	SFINISH_SNCAT(
 		str_response, &int_response_len,
 		"messageid = ", (size_t)12,
-		client_request->str_message_id, strlen(client_request->str_message_id),
+		client_request->str_message_id, client_request->int_message_id_len,
 		"\012responsenumber = ", (size_t)18,
 		str_temp, strlen(str_temp),
 		"\012TRANSACTION COMPLETED", (size_t)22
@@ -341,7 +341,7 @@ finish:
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012FATAL\012", (size_t)7,
@@ -477,7 +477,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012FATAL\012", (size_t)7,
@@ -486,12 +486,12 @@ finish:
 				": ", (size_t)2,
 				strerror(errno), strlen(strerror(errno))
 			);
-		} else {
+		} else if (str_response != NULL) {
 			char *_str_response = str_response;
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012", (size_t)1,
@@ -560,7 +560,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012FATAL\012", (size_t)7,
@@ -574,7 +574,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012", (size_t)1,
@@ -599,7 +599,7 @@ void ws_tab_read_step4(EV_P, struct sock_ev_client_request *client_request) {
 	SFINISH_SNCAT(
 		str_response, &int_response_len,
 		"messageid = ", (size_t)12,
-		client_request->str_message_id, strlen(client_request->str_message_id),
+		client_request->str_message_id, client_request->int_message_id_len,
 		"\012responsenumber = ", (size_t)18,
 		str_temp, strlen(str_temp),
 		"\012", (size_t)1,
@@ -617,7 +617,7 @@ void ws_tab_read_step4(EV_P, struct sock_ev_client_request *client_request) {
 	SFINISH_SNCAT(
 		str_response, &int_response_len,
 		"messageid = ", (size_t)12,
-		client_request->str_message_id, strlen(client_request->str_message_id),
+		client_request->str_message_id, client_request->int_message_id_len,
 		"\012responsenumber = ", (size_t)18,
 		str_temp, strlen(str_temp),
 		"\012TRANSACTION COMPLETED", (size_t)22
@@ -647,7 +647,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012FATAL\012", (size_t)7,
@@ -661,7 +661,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012", (size_t)1,
@@ -826,7 +826,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012FATAL\012", (size_t)7,
@@ -840,7 +840,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012", (size_t)1,
@@ -911,7 +911,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012FATAL\012", (size_t)7,
@@ -925,7 +925,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012", (size_t)1,
@@ -1036,7 +1036,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012FATAL\012", (size_t)7,
@@ -1050,7 +1050,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012", (size_t)1,
@@ -1069,7 +1069,7 @@ finish:
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012", (size_t)1,
@@ -1085,7 +1085,7 @@ finish:
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012TRANSACTION COMPLETED", (size_t)22
@@ -1207,7 +1207,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012FATAL\012", (size_t)7,
@@ -1221,7 +1221,7 @@ finish:
 			SFINISH_SNCAT(
 				str_response, &int_response_len,
 				"messageid = ", (size_t)12,
-				client_request->str_message_id, strlen(client_request->str_message_id),
+				client_request->str_message_id, client_request->int_message_id_len,
 				"\012responsenumber = ", (size_t)18,
 				str_temp, strlen(str_temp),
 				"\012", (size_t)1,
@@ -1240,7 +1240,7 @@ finish:
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012", (size_t)1,
@@ -1256,7 +1256,7 @@ finish:
 		SFINISH_SNCAT(
 			str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012TRANSACTION COMPLETED", (size_t)22

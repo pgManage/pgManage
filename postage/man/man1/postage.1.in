@@ -1,4 +1,4 @@
-.TH "POSTAGE" "1" "July 2017" "" ""
+.TH "POSTAGE" "1" "August 2017" "" ""
 .SH "NAME"
 \fBpostage\fR \- PostgreSQL Administration for the web
 .SH FULL PATH
@@ -61,7 +61,7 @@ The following options can be specified on the command line or in the configurati
 .P
 \fB\-s\fP or \fB\-\-super\-only=\fP or \fBsuper_only=\fP
 .br
-       \fBBoolean;\fP defaults to true
+       \fBBoolean;\fP defaults to false
 .br
        This tells Postage whether or not to only allow super users to login\. The recommended value is true and will restrict users who are not super users from logging in to any PostgreSQL instance through Postage\. Note that a connection will be made to PostgreSQL in order to test if the user is a superuser\.  
 .P
@@ -113,9 +113,10 @@ The following options can be specified on the command line or in the configurati
 .P
 \fB\-t\fP or \fB\-\-login\-timeout=\fP or \fBlogin_timeout=\fP
 .br
-       \fBInteger;\fP defaults to 1200
+       \fBInteger;\fP defaults to 0
 .br
-       This option regulates the timeout after the last page is closed\.
+       This option regulates the login timeout (in seconds) after the last activity on a session\.
+       If 0, no timeout is enforced\.
 .P
 \fB\-x\fP or \fB\-\-local\-only=\fP
        \fBBoolean;\fP defaults to false

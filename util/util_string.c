@@ -781,6 +781,7 @@ char *_sncat(bool bol_free, size_t int_num_arg, size_t *ptr_int_len, ...) {
 	// Add all the lengths
 	for (int_i = 0; int_i < int_num_arg; int_i += 2) {
 		ptr_temp = va_arg(ap, char *);
+		if (ptr_temp == NULL) {}
 		size_t int_len = va_arg(ap, size_t);
 
 		*ptr_int_len += int_len;

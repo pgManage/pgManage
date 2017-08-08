@@ -216,7 +216,9 @@ struct sock_ev_client_request {
 
 	WSFrame *frame;
 	char *str_message_id;
+	size_t int_message_id_len;
 	char *str_transaction_id;
+	size_t int_transaction_id_len;
 	char *ptr_query;
 	DArray *arr_query;
 	ssize_t int_response_id;

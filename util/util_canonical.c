@@ -81,6 +81,7 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 
 	if (str_file_base[1] != ':') {
 		char *str_system_drive = getenv("SystemDrive");
+		SERROR_CHECK(str_system_drive != NULL, "getenv for SystemDrive failed!");
 
 		SERROR_SNCAT(str_temp, &int_file_base_len,
 			str_system_drive, strlen(str_system_drive),
@@ -111,7 +112,7 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 	// SDEBUG("\"%s\" + \"%s\" = \"%s\"", str_file_base, path, str);
 
 	// if no path to canonicalize was provided then just return the file_base
-	if (strlen(path) == 0) {
+	if (path[0] == 0) {
 		SERROR_SNCAT(str_return, &int_return_len,
 			str_file_base, int_file_base_len);
 		SFREE_ALL();
@@ -158,7 +159,7 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 	// check base of the resolved path with file_base if they do not match
 	//      the path is out of the allowed directory therefore we must error
 	// SDEBUG("canonical_filename: %s", canonical_filename);
-	SWARN_CHECK(strlen(canonical_filename) > 0 && strncmp(canonical_filename, str_file_base, strlen(str_file_base)) == 0,
+	SWARN_CHECK(canonical_filename[0] != 0 && strncmp(canonical_filename, str_file_base, strlen(str_file_base)) == 0,
 		"%s|%s is a bad path. Path is not in a valid base directory "
 		"(resolves to >%s<).\012",
 		str_file_base, path, canonical_filename);
@@ -191,13 +192,14 @@ char *canonical(const char *file_base, char *_path, char *check_type) {
 				SDEBUG("mkdir>%s|%s<", canonical_filename, str);
 				SERROR_CHECK(
 					mkdir(canonical_filename, S_IRWXU | S_IRWXG) == 0, "%s is a bad path. Directory creation error.\012", path);
-				realpath_res = realpath(str, canonical_filename);
+				realpath(str, canonical_filename);
 				limit_mkdir -= 1;
 			}
 // SDEBUG("test3");
 //}
 // SDEBUG("test4");
 #endif
+			errno = 0;
 			SERROR_SNCAT(str_return, &int_return_len,
 				str, int_len);
 			SFREE_ALL();

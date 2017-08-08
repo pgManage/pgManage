@@ -123,14 +123,14 @@ finish:
 		char *_str_response = str_response;
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"messageid = ", (size_t)12,
-			client_request->str_message_id, strlen(client_request->str_message_id),
+			client_request->str_message_id, client_request->int_message_id_len,
 			"\012responsenumber = ", (size_t)18,
 			str_temp, strlen(str_temp),
 			"\012", (size_t)1);
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, strlen(client_request->str_transaction_id),
+				client_request->str_transaction_id, client_request->int_message_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,

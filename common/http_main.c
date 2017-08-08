@@ -27,9 +27,9 @@ void http_main_cnxn_cb(EV_P, void *cb_data, DB_conn *conn) {
 #ifdef ENVELOPE
 #else
 	if (isdigit(str_uri[9])) {
-		str_uri_temp = str_uri;
-		char *str_temp = strchr(str_uri_temp + 9, '/');
+		char *str_temp = strchr(str_uri + 9, '/');
 		SFINISH_CHECK(str_temp != NULL, "strchr failed");
+		str_uri_temp = str_uri;
 		SFINISH_SNCAT(str_uri, &int_uri_len,
 			"/postage/app", (size_t)12,
 			str_temp, strlen(str_temp));
@@ -411,7 +411,7 @@ finish:
 	}
 
 	char *_str_response = NULL;
-	if (res != NULL && (res->status != DB_RES_TUPLES_OK || status == DB_FETCH_ERROR || status != DB_FETCH_END)) {
+	if (res != NULL && (res->status != DB_RES_TUPLES_OK || status != DB_FETCH_END)) {
 		_str_response = DB_get_diagnostic(client->conn, res);
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			":\n", (size_t)2,
