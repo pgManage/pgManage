@@ -9,108 +9,6 @@
     overflow: hidden;
 }
 
-
-
-#tab-bar-container {
-    box-shadow: 0 0 0.1em 0.1em #AAAAAA;
-}
-
-
-
-#tab-bar-container.home-mode {
-    border-bottom: 1px solid #AAAAAA;
-}
-
-
-#tab-bar-container.home-mode .tab-button {
-    border-bottom: 0 none;
-}
-
-
-
-#tab-bar-container.home-mode #button-home {
-    background-color: #FFFFFF;
-}
-
-.tab-bar-toolbar > gs-button {
-    /*height: 100%;*/
-    background-color: #EEEEEE;
-
-    border-radius: 20%;
-    border: 1px solid #AAAAAA;
-    margin-left: 1px;
-    text-indent: 0;
-    line-height: 1em;
-    margin-top: 1px;
-}
-
-.tab-bar-toolbar.left {
-    border-right: 1px solid #AAAAAA;
-}
-.tab-bar-toolbar.right {
-    border-left: 1px solid #AAAAAA;
-}
-
-.tab-bar-toolbar > gs-button:last-child {
-    margin-right: 1px;
-}
-
-#button-home {
-    border-radius: 20%;
-    border: 1px solid #AAAAAA;
-    margin-left: 1px;
-    margin-top: 1px;
-}
-
-#button-new-tab-plus {
-    position: absolute;
-    display: inline-block;
-    height: 1em;
-    width: 1em;
-    text-align: center;
-    font-size: 1em;
-    font-weight: 900;
-    line-height: 0.85em;
-    left: 50%;
-    top: 50%;
-    margin-left: -0.4em;
-    margin-top: -0.45em;
-}
-
-
-
-#tab-bar {
-    position: relative;
-    background-color: #F1F1F1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-
-    height: 2em;
-}
-
-#tab-bar .tab-button {
-    position: relative;
-    display: inline-block;
-    border-right: 1px solid #AAAAAA;
-    background-color: #EEEEEE;
-    padding: 0.1em 0.5em;
-    height: 2em;
-    line-height: 1.8em;
-    /*float: left; <- this causes the buttons to wrap, which makes it seem like you have less tabs than you actually do */
-
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    -o-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
-.tab-button:not(.current-tab) {
-    cursor: pointer;
-    border-bottom: 1px solid #AAAAAA;
-}
-
 #tab-frames {
     position: relative;
 }
@@ -118,11 +16,6 @@
 .tab-frame,
 .home-frame {
     display: none;
-}
-
-#tab-bar .tab-button.current-tab,
-#button-list-container .current-tab {
-    background-color: #FFFFFF;
 }
 
 .home-frame.current-frame,
@@ -135,10 +28,139 @@
     height: 100%;
 }
 
+
+
+
+/*
+
+#tab-bar-container
+    .tab-bar-toolbar.left
+        #button-home
+    #tab-bar
+    #tab-bar-filler
+        #button-new-tab
+    .tab-bar-toolbar.right
+        #button-open-tabs
+
+
+*/
+
+
+#tab-bar-container {
+    
+}
+.tab-bar-toolbar.left {
+    border-bottom: 2px solid #AAAAAA;
+    /*border-right: 1px solid #AAAAAA;*/
+}
+.tab-bar-toolbar.right {
+    border-bottom: 2px solid #AAAAAA;
+    /*border-left: 1px solid #AAAAAA;*/
+}
+
+#tab-bar {
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 2em;
+    background-color: #FFFFFF;
+}
+#tab-bar-filler {
+    border-bottom: 2px solid #AAAAAA;
+}
+
+#button-home {
+    
+}
+#button-new-tab {
+    
+}
+#button-open-tabs {
+    
+}
+
+
+#tab-bar-container.home-mode #button-home {
+    background-color: #FFFFFF;
+}
+#tab-bar-container.home-mode .tab-bar-toolbar.left {
+    border-bottom: 2px solid #006E00;
+}
+
+.tab-bar-spacer {
+    width: 0.5em;
+    border-bottom: 2px solid #AAAAAA;
+}
+
+#tab-bar .tab-button {
+    position: relative;
+    display: inline-block;
+    border-right: 1px solid #AAAAAA;
+    background-color: #EEEEEE;
+    padding: 0.1em 0.5em;
+    
+    width: 100%;
+    max-width: 140px; /* hard coded into the JS */
+    
+    height: 2em;
+    line-height: 1.8em;
+    /*float: left; <- this causes the buttons to wrap, which makes it seem like you have less tabs than you actually do */
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#tab-bar .tab-button:first-child {
+    border-left: 1px solid #AAAAAA;
+}
+
+#tab-bar .tab-button:not(.current-tab) {
+    cursor: pointer;
+    border-bottom: 2px solid #AAAAAA;
+}
+
+#tab-bar .tab-button.current-tab {
+    background-color: #FFFFFF;
+    border-bottom: 2px solid #006E00;
+}
+
+#tab-bar-container gs-button {
+    /*height: 100%;*/
+    background-color: #EEEEEE;
+
+    border-radius: 20%;
+    border: 1px solid #AAAAAA;
+    margin-left: 1px;
+    text-indent: 0;
+    line-height: 1em;
+    margin-top: 1px;
+}
+
+.tab-bar-toolbar > gs-button:last-child {
+    margin-right: 1px;
+}
+
+
+
+
+
+
+
+
+
+
 .tab-button .rename-control {
     border: 0 none;
     margin: 0;
     padding: 0;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100% !important;
 
     background-color: transparent;
     pointer-events: none;
@@ -153,11 +175,13 @@
     pointer-events: auto;
 }
 
+
 /* #### make sure that the typography is the same for the  #######
 ####### tab button div and the rename control so that we   #######
 ####### can accuratly get text width using GS.getTextWidth #### */
+/*.tab-button,    ^---- not anymore */
 
-.tab-button, .tab-button .rename-control {
+.tab-button .rename-control {
     font-size: 1em;
     font-family: helvetica, sans-serif;
     line-height: normal;
@@ -165,8 +189,8 @@
 
 /* ######## desktop tab close buttons and tab buttons ######## */
 #tab-bar.not-touchscreen .tab-button {
-    padding-left: 0.5em;
-    padding-right: 1em;
+    padding-left: 0.25em;
+    padding-right: 0.9em;
 }
 
 #tab-bar.not-touchscreen .tab-button .delete-button {
@@ -218,6 +242,33 @@ body.pc #tab-bar.not-touchscreen .tab-button .delete-button:after {
 #tab-bar.touchscreen .tab-button .delete-button:after {
     content: 'X';
 }
+
+
+
+
+
+/*
+#button-new-tab-plus {
+    position: absolute;
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    text-align: center;
+    font-size: 1em;
+    font-weight: 900;
+    line-height: 0.85em;
+    left: 50%;
+    top: 50%;
+    margin-left: -0.4em;
+    margin-top: -0.45em;
+}
+*/
+
+
+
+
+
+
 
 /* ####################################################### */
 /* ######################### ACE ######################### */

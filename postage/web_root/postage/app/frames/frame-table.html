@@ -23,6 +23,7 @@
 
         <script>
         //COLUMN REORDER NOT WORKING
+            var bolCurl = false;
             var strTableName, strSchemaName, strHasOids, strConstraints, arrConstraint, strGrantsEtc, arrColumn = [], strRelOptions, dependency_script, strOwner, arrConstraint = [];
             var strDumpQuery = ''
             scriptQuery.ruleSql = ml(function () {/*

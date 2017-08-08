@@ -979,6 +979,8 @@ function autoCompleteTryOpen(optionList, searchWord, editor) {
     autocompleteGlobals.arrSearch.shift()
     autocompleteGlobals.arrSearchMaster.shift();
 
+    optionList = optionList.sort();
+
     autocompleteGlobals.arrValues = optionList;
     autocompleteGlobals.arrValuesMaster = optionList;
     

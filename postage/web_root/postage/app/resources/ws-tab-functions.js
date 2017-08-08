@@ -62,24 +62,82 @@ function decodeFileNameForTabName(strName) {
     return strRet;
 }
 
+var tabBarMaxTabs = 100;
+
+function renderTabBar() {
+    'use strict';
+    var tabBarContainer = document.getElementById('tab-bar-container');
+    var tabBar = document.getElementById('tab-bar');
+    var tabBarFiller = document.getElementById('tab-bar-filler');
+    var tabBarStyleElement = document.getElementById('tab-bar-dynamic-style');
+    var intWidthMaxTabBar;
+    var intTabs;
+
+    tabBar.parentNode.setAttribute('flex', '');
+    tabBarStyleElement.innerHTML = '#tab-bar .tab-button { display: none !important; }';
+
+    // detect available space for tab bar
+    tabBarFiller.removeAttribute('flex');
+    intWidthMaxTabBar = tabBar.clientWidth;
+    tabBarFiller.setAttribute('flex', '');
+
+    //
+    intTabs = tabBar.children.length;
+
+    //console.log(
+    //    intTabs,
+    //    intWidthMaxTabBar
+    //);
+
+    if (
+        (intTabs * 140) > intWidthMaxTabBar
+        // 140px is hard coded into the CSS
+    ) {
+        tabBarFiller.removeAttribute('flex');
+        tabBarStyleElement.innerHTML = (
+            '#tab-bar { width: ' + intWidthMaxTabBar + 'px !important; }' +
+            '#tab-bar .tab-button { width: ' + (intWidthMaxTabBar / intTabs) + 'px !important; }'
+        );
+    } else {
+        tabBar.parentNode.removeAttribute('flex');
+        tabBarStyleElement.innerHTML = '';
+        tabBarStyleElement.innerHTML = (
+            '#tab-bar .tab-button { width: 140px !important; }'
+        );
+    }
+}
+
 function startTabContainer() {
     'use strict';
     document.getElementById('tab-container').innerHTML = ml(function () {/*
         <div id="tab-bar-container" flex-horizontal flex-fill>
+            <div class="tab-bar-spacer">&nbsp;</div>
             <div class="tab-bar-toolbar left">
                 <gs-button id="button-home" onclick="setQSToHome()" icononly icon="home" inline remove-all no-focus title="Back to home [ESC]"></gs-button>
             </div>
-            <div id="tab-bar" flex prevent-text-selection></div>
-            <div class="tab-bar-toolbar right" flex-horizontal>
-                <gs-button flex id="button-new-tab" onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icononly icon="plus" title="Create a blank script tab" inline remove-all no-focus></gs-button>
-                <gs-button flex id="button-open-tabs" onclick="dialogOpenTabs(this);" icononly no-focus remove-all icon="list" inline title="All open tabs"></gs-button>
+            <div class="tab-bar-spacer">&nbsp;</div>
+            <div flex prevent-text-selection>
+                <div id="tab-bar"></div>
             </div>
+            <div class="tab-bar-spacer">&nbsp;</div>
+            <div id="tab-bar-filler" flex prevent-text-selection>
+                <gs-button flex id="button-new-tab" onclick="newTab('sql', '', {'strContent': '\n\n\n\n\n\n\n\n\n'})" icononly icon="plus" title="Create a blank script tab" inline no-focus></gs-button>
+            </div>
+            <div class="tab-bar-spacer">&nbsp;</div>
+            <div class="tab-bar-toolbar right">
+                <gs-button id="button-open-tabs" onclick="dialogOpenTabs(this);" icononly no-focus icon="list" inline title="All open tabs"></gs-button>
+            </div>
+            <div class="tab-bar-spacer">&nbsp;</div>
+            <style id="tab-bar-dynamic-style" hidden></style>
         </div>
         <div id="tab-frames" flex>
             <div id="home-frame" class="home-frame"></div>
         </div>
     */});
 
+    window.addEventListener('resize', function () {
+        renderTabBar();
+    });
 
     /*
 
@@ -118,14 +176,18 @@ function startTabContainer() {
 
     so, to take the upwind+minimalist approach until we can get a plan to incrementally
         change the tab bar into a state variable and a set of functions:
-            1) we create a render function and call it at every state change
-            2) we move the new tab button to the tab bar
-            3) we add a pixel border element to the right of the new tab button
-            4) we fix any code that would cause that new tab button to be removed
-            5) we move appending a new tab button to a function "appendNewTab"
-            6) we make appendNewTab append the tab element before the new tab button
-            7) for now, make the render function only handle tab width
-            8) we make sure the pixel border element fills the empty space if there is any
+         x  1) we create a render function and call it at every state change
+         x  2) we add a container element to the right of the tab bar
+         x  3) we move the new tab button to the new container
+         x  4) we add a pixel border element to the new container
+         x  5) for now, make the render function only handle tab width
+         x  6) we make sure the pixel border element fills the empty space if there is any
+         x  7) we come up with a way to determine the max number of tabs
+         x  8) we enforce the maximum number of tabs and make sure the user knows that there
+                    are too many tabs
+         x  9) whenever the user tries to create more tabs than allowed, popup a message
+                    that tells them they can't open any more tabs.
+         x 10) make it so that the right buttons never go off of the screen
 
     this sub-document was authored by Michael Tocci.
 
@@ -876,8 +938,8 @@ function ShortcutNewTab () {
 var afterDeleteSelectionDirections = [], intSaveTimerID;
 function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFilePath, bolAutoSelect) {
     'use strict';
-
     currentTab = document.getElementsByClassName('current-tab')[0];
+
     var tabElement, frameElement, editor, selectionChangeHandler
       , arrCurrentTabNames, i, len, arrElements
       , FFiveFunction, FFiveUpFunction, windowResizeHandler;
@@ -887,6 +949,11 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     // get the current list of tab names
     arrCurrentTabNames = [];
     arrElements = xtag.query(document.getElementById('tab-bar'), '.tab-button');
+
+    if (!bolLoadedFromServer && (arrElements.length + 1) > tabBarMaxTabs) {
+        GS.pushMessage('<center>Too Many Tabs Open</center>', 1000);
+        return;
+    }
 
     for (i = 0, len = arrElements.length; i < len; i += 1) {
         arrCurrentTabNames.push(arrElements[i].innerRenameControl.value);
@@ -913,10 +980,11 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     // create new tab button
     tabElement = document.createElement('div');
     tabElement.classList.add('tab-button');
-    tabElement.innerHTML =
+    tabElement.innerHTML = (
         '<input class="rename-control" type="text" tabindex="-1" ' +
                 'value="' + encodeHTML(strTabName) + '" />' +
-        '<div class="delete-button" title="Close this tab"></div>';
+        '<div class="delete-button" title="Close this tab"></div>'
+    );
 
     tabElement.innerRenameControl = tabElement.children[0];
     tabElement.innerRenameControl.oldValue = tabElement.innerRenameControl.value;
@@ -951,6 +1019,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     //    this.style.width = GS.getTextWidth(tabElement, this.value, true) + 'px';
     //});
 
+    tabElement.setAttribute('title', tabElement.innerRenameControl.value);
     // bind rename control change
     tabElement.innerRenameControl.addEventListener('change', function () {
         var arrTakenNames = alreadyLoadedFiles()
@@ -977,6 +1046,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                         //GS.pushQueryString('current-tab=' + encodeURIComponent(tabElement.filePath));
                         GS.pushQueryString('view=tab:' + encodeURIComponent(tabElement.filePath));
                         tabElement.innerRenameControl.oldValue = tabElement.innerRenameControl.value;
+                        tabElement.setAttribute('title', tabElement.innerRenameControl.value);
 
                         // update href of download script button (we want to use an anchor for that button because it's native)
                         if (window.process && window.process.type === 'renderer') {
@@ -1030,6 +1100,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
             closeFile(tabElement, function () {
                 document.getElementById('tab-bar').removeChild(tabElement);
                 document.getElementById('tab-frames').removeChild(frameElement);
+                renderTabBar();
             });
 
         } else {
@@ -1038,6 +1109,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                 document.getElementById('tab-frames').removeChild(frameElement);
                 //openHome();
                 setQSToHome();
+                renderTabBar();
             });
         }
     });
@@ -1209,18 +1281,18 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         }
     });
 
-    // add new tab to the very left
-    if (document.getElementById('tab-bar').children.length === 0) {
-        document.getElementById('tab-bar').appendChild(tabElement);
+    //// add new tab to the very left
+    //if (document.getElementById('tab-bar').children.length === 0) {
+    document.getElementById('tab-bar').appendChild(tabElement);
 
-    } else {
-        document.getElementById('tab-bar').insertBefore(tabElement, document.getElementById('tab-bar').children[0]);
-    }
+    //} else {
+    //    document.getElementById('tab-bar').insertBefore(tabElement, document.getElementById('tab-bar').children[0]);
+    //}
 
     document.getElementById('tab-frames').appendChild(frameElement);
 
     // adjust tab rename control width
-    tabElement.innerRenameControl.style.width = GS.getTextWidth(tabElement, tabElement.innerRenameControl.value, true) + 'px';
+    //tabElement.innerRenameControl.style.width = GS.getTextWidth(tabElement, tabElement.innerRenameControl.value, true) + 'px';
 
     // fill frame
     if (strType === 'sql') {
@@ -1823,6 +1895,7 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
     intTabNumber += 1;
 
     refreshButtons(localStorage.labeledButtons);
+    renderTabBar();
 
     return tabElement;
 }

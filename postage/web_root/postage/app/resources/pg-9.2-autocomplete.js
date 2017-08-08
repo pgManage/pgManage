@@ -55,27 +55,9 @@ function doubleIdentifier(strInput) {
 function getContext(strInput, intPosition) {
     'use strict';
 
-    //HARK YE ONLOOKER: HERE BE DRAGONS
-    //Maintainer of the dragons: Joseph 5-28-17
-    //Talk to the maintainer of the dragons before making changes
-    //@@@@@@@@@@@@@@@@@@@@@**^^""~~~"^@@^*@*@@**@@@@@@@@@
-    //@@@@@@@@@@@@@*^^'"~   , - ' '; ,@@b. '  -e@@@@@@@@@
-    //@@@@@@@@*^"~      . '     . ' ,@@@@(  e@*@@@@@@@@@@
-    //@@@@@^~         .       .   ' @@@@@@, ~^@@@@@@@@@@@
-    //@@@~ ,e**@@*e,  ,e**e, .    ' '@@@@@@e,  "*@@@@@'^@
-    //@',e@@@@@@@@@@ e@@@@@@       ' '*@@@@@@    @@@'   0
-    //@@@@@@@@@@@@@@@@@@@@@',e,     ;  ~^*^'    ;^~   ' 0
-    //@@@@@@@@@@@@@@@^""^@@e@@@   .'           ,'   .'  @
-    //@@@@@@@@@@@@@@'    '@@@@@ '         ,  ,e'  .    ;@
-    //@@@@@@@@@@@@@' ,&&,  ^@*'     ,  .  i^"@e, ,e@e  @@
-    //@@@@@@@@@@@@' ,@@@@,          ;  ,& !,,@@@e@@@@ e@@
-    //@@@@@,~*@@*' ,@@@@@@e,   ',   e^~^@,   ~'@@@@@@,@@@
-    //@@@@@@, ~" ,e@@@@@@@@@*e*@*  ,@e  @@""@e,,@@@@@@@@@
-    //@@@@@@@@ee@@@@@@@@@@@@@@@" ,e@' ,e@' e@@@@@@@@@@@@@
-    //@@@@@@@@@@@@@@@@@@@@@@@@" ,@" ,e@@e,,@@@@@@@@@@@@@@
-    //@@@@@@@@@@@@@@@@@@@@@@@~ ,@@@,,0@@@@@@@@@@@@@@@@@@@
-    //@@@@@@@@@@@@@@@@@@@@@@@@,,@@@@@@@@@@@@@@@@@@@@@@@@@
-    //"""""""""""""""""""""""""""""""""""""""""""""""""""
+    // don't change the order of the main waterfall in this function.
+
+
 
     //Make sure we remove the snippets before we return the function
     autocompleteGlobals.bolSnippets = false;
@@ -83,7 +65,7 @@ function getContext(strInput, intPosition) {
     
     intPosition++; //add character for zero based
 
-    //make sure that we have only whitespace after the cursor, otherwise we just end it here, however last line last character is allowed
+    // make sure that we have only whitespace after the cursor, otherwise we just end it here, however last line last character is allowed
     //console.log('intPosition', intPosition);
     //console.log('strInput.length', strInput.length);
     //console.log('Check Whitespace', (! strInput.substr(intPosition, 1).match('^[\n\r\ \t]+')) && (intPosition !== strInput.length));
@@ -1620,6 +1602,8 @@ function getContext(strInput, intPosition) {
             var strSchema = arrMatches[1];
             strContext = arrMatches[2];
             
+            autocompleteGlobals.bolAlpha = false;
+            
             //console.log('strSchema', strSchema);
             //console.log('after strContext', strContext);
             
@@ -1823,6 +1807,8 @@ function getContext(strInput, intPosition) {
             strTable = arrMatches[2];
             strContext = arrMatches[3];
             
+            autocompleteGlobals.bolAlpha = false;
+            
             //console.log('strSchema', strSchema);
             //console.log('strTable', strTable);
             //console.log('after strContext', strContext);
@@ -1830,6 +1816,9 @@ function getContext(strInput, intPosition) {
             var arrMatches = strContext.match(/^(.*)\.([^.]*)/);
             strTable = arrMatches[1];
             strContext = arrMatches[2];
+            
+            autocompleteGlobals.bolAlpha = false;
+            
             //console.log('strTable', strTable);
             //console.log('after strContext', strContext);
         }
@@ -1876,6 +1865,8 @@ function getContext(strInput, intPosition) {
             strTable = arrMatches[2];
             strContext = arrMatches[3];
             
+            autocompleteGlobals.bolAlpha = false;
+            
             //console.log('strSchema', strSchema);
             //console.log('strTable', strTable);
             //console.log('after strContext', strContext);
@@ -1892,6 +1883,9 @@ function getContext(strInput, intPosition) {
             var arrMatches = strContext.match(/^(.*)\.([^.]*)/);
             strSchema = arrMatches[1];
             strContext = arrMatches[2];
+            
+            autocompleteGlobals.bolAlpha = false;
+            
             //console.log('strSchema', strSchema);
             //console.log('after strContext', strContext);
 
