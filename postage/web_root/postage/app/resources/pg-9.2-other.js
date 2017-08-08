@@ -1484,8 +1484,10 @@ var strHomeToken =  ((localStorage.ShortcutHome.split(',')[0]) ? localStorage.Sh
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
-            <gs-header><center><h3>Editor Info</h3></center></gs-header>
+            <gs-header><center><h3>Postage Help</h3></center></gs-header>
             <gs-body padded>
+				<h2 style="padding-left: 0; margin-bottom: 0; padding-bottom: 0;">Ace</h2>
+				<hr />
                 <i>SQL tab windows use <a href="http://ace.c9.io/" target="_blank">Ace Editor</a>.</i><br /><br />
 
                 Ace is a very capable text editor. Here are some tips to get you started:<br />
@@ -2885,17 +2887,17 @@ function executeScript(bolCursorQuery) {
                                 }
                                 return true;
                             }
-                            
-                            
+
+
                             if (data.intCallbackNumberThisQuery === 0) {
                                 console.time('Query load execution');
-                                
+
                                 // create the table element
                                 divElement = document.createElement('div');
                                 scrollElement = document.createElement('div');
                                 scrollElement.classList.add('result-table-scroll-container');
                                 bolResized = false;
-                                
+
                                 i = 0;
                                 len = data.arrMessages.length;
                                 warningHTML = '';
@@ -2907,16 +2909,16 @@ function executeScript(bolCursorQuery) {
                                         '</i>' +
                                         '<br />'
                                     );
-    
+
                                     i += 1;
                                 }
-    
+
                                 strHTML = (
                                     '<div flex-horizontal>' +
                                         '<h5 flex>Query #' + (data.intQueryNumber + 1) + strQueryName + ':</h5>' +
                                         '<div>'
                                 );
-    
+
                                 // if we have all of the query execution time
                                 //      data, show it
                                 if (
@@ -2937,9 +2939,9 @@ function executeScript(bolCursorQuery) {
                                         '</small>'
                                     );
                                 }
-    
+
                                 strHTML += '<br />';
-    
+
                                 // if we have a record number, show it
                                 if (data.intRows !== undefined) {
                                     strHTML += (
@@ -2949,7 +2951,7 @@ function executeScript(bolCursorQuery) {
                                         '</small>'
                                     );
                                 }
-    
+
                                 strHTML += (
                                         '</div>' +
                                         '<span>&nbsp;</span>' +
@@ -2957,9 +2959,9 @@ function executeScript(bolCursorQuery) {
                                     '</div>' +
                                     warningHTML
                                 );
-    
+
                                 divElement.innerHTML = strHTML;
-                                
+
                                 // append query info and results container
                                 divElement.appendChild(scrollElement);
                                 resultsContainer.appendChild(divElement);
@@ -3151,12 +3153,12 @@ function executeScript(bolCursorQuery) {
                                     bolResized = true;
                                     tableElement.resizeAllColumns();
                                 }
-                                
+
                                 // clear table element
                                 tableElement = null;
-                                
+
                                 console.timeEnd('Query load execution');
-                                
+
                             } else {
                                 var index;
                                 var strRecord;
@@ -3179,7 +3181,7 @@ function executeScript(bolCursorQuery) {
 
                                     i += 1;
                                 }
-                                
+
                                 // updated loaded count
                                 if (data.intCallbackNumberThisQuery % 150 === 0) {
                                     if (window.requestAnimationFrame) {
@@ -3195,13 +3197,13 @@ function executeScript(bolCursorQuery) {
                                         }
                                     }
                                 }
-                                
+
                                 // use the row count to determine a fixed number of scroll render points
                                 // or
                                 // use current time and if the scroll render has been x milliseconds, rerender
                                 // or
                                 // rerender every x data packets
-                                
+
                                 if (
                                     data.intCallbackNumberThisQuery === 4// ||
                                     //data.intCallbackNumberThisQuery % 1000 === 0
@@ -3210,7 +3212,7 @@ function executeScript(bolCursorQuery) {
                                     tableElement.resizeAllColumns();
                                     bolResized = true;
                                 }
-                                
+
                                 // every rerender should be put into a requestAnimationFrame, if available
                             }
                         }
@@ -3289,7 +3291,7 @@ function executeScript(bolCursorQuery) {
 								column: intErrorCol || 0
 							}
 						});
-						
+
                         editor.getSession().setAnnotations([
                             {'row': jsnCurrentQuery.start_row + intErrorStartLine + (intLine - 1), 'column': intErrorCol || 0,
                                 'text': strError, 'type': 'error'}
@@ -3306,7 +3308,7 @@ function executeScript(bolCursorQuery) {
 								column: intErrorCol || 0
 							}
 						});
-						
+
                         editor.getSession().setAnnotations([
                             {'row': jsnCurrentQuery.start_row + intErrorStartLine, 'column': intErrorCol || 0,
                                 'text': strError, 'type': 'error'}

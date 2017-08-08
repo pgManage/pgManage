@@ -1343,13 +1343,9 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 
                             <gs-button icononly inline remove-all class="button-csv" icon="file-text" onclick="exportCSV()"
                                     title="Download a single query's results as a file" remove-all no-focus><label>Export</label></gs-button>
-                            <gs-button inline remove-all class="button-ace-info" onclick="dialogAceInfo()"
-                                    title="Information and tips about the Editor" remove-all no-focus>
-                                <span class="ace-icon-container">
-                                    <span class="ace-suit">&#9824;</span>
-                                    <span class="ace-letter">A</span>
-                                </span>
-                                <span class="ace-toolbar-labeled-only">Ace</span>
+                            <gs-button inline remove-all class="button-ace-info" icon-left icon="question-circle" onclick="dialogAceInfo()"
+                                    title="Information and tips about Postage" remove-all no-focus>
+								<span class="ace-toolbar-labeled-only ace-help-text">Help</span>
                             </gs-button>
                             <gs-button icononly inline remove-all icon="black-tie" onclick="beautifySQL()" title="Beautify the Current SQL" no-focus><label>Beautify</label></gs-button>
                             <gs-button icononly hidden id="sql-property-{{TABNUMBER}}-button" icononly
@@ -3021,7 +3017,7 @@ function SQLBeautify(strInput) {
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
 
-            
+
         // FOUND CREATE OR REPLACE TRIGGER ... INSTEAD
         } else if (int_qs === 0 && int_ps === 0 && bolTrigger && strInput.substr(i).match(/^INSTEAD[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
@@ -3033,7 +3029,7 @@ function SQLBeautify(strInput) {
             i += (strInput.substr(i).match(/^INSTEAD[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
 
-            
+
         // FOUND CREATE OR REPLACE TRIGGER ... EXECUTE
         } else if (int_qs === 0 && int_ps === 0 && bolTrigger && strInput.substr(i).match(/^EXECUTE[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
@@ -3045,7 +3041,7 @@ function SQLBeautify(strInput) {
             i += (strInput.substr(i).match(/^EXECUTE[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
 
-            
+
         // FOUND CREATE OR REPLACE TRIGGER ... FOR
         } else if (int_qs === 0 && int_ps === 0 && bolTrigger && strInput.substr(i).match(/^FOR[\n\r\ \t]+/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace
@@ -3057,7 +3053,7 @@ function SQLBeautify(strInput) {
             i += (strInput.substr(i).match(/^FOR[\n\r\ \t]+/i)[0].length - 1);
             bolNoExtraWhitespace = true;
 
-            
+
         // FOUND CREATE OR REPLACE
         } else if (int_qs === 0 && strInput.substr(i).match(/^CREATE[\ \t]+OR[\ \t]+REPLACE/i) && strInput.substr(i - 1, 1).match('^[\n\r\ \t]+')) {
             // Remove previous tab if previous character is whitespace

@@ -52,6 +52,16 @@ gs-button, gs-checkbox {
     padding-right: 0.35em !important;
 }
 
+.button-ace-info {
+	padding-left: 1.8em !important;
+}
+
+.button-ace-info .ace-toolbar-labeled-only{
+	position: relative;
+    top: 1px;
+    left: -2px;
+}
+
 .ace-toolbar-browser .ace-toolbar-electron-only,
 .ace-toolbar-electron .ace-toolbar-browser-only,
 .ace-toolbar-unlabeled .ace-toolbar-labeled-only,

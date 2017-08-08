@@ -323,58 +323,23 @@ gs-button.button-pop-out-explain {
 /* #################### ACE BUTTONS #################### */
 /* ##################################################### */
 
-.ace-toolbar gs-button.button-ace-info {
+/*.ace-toolbar gs-button.button-ace-info {
     text-indent: 0;
     line-height: 1em;
     padding: 0;
 	padding-right: 0.65em;
     text-align: left;
 }
-.ace-toolbar gs-button.button-ace-info .ace-icon-container {
-    display: inline-block;
-	position: relative;
-	left: 0.5em;
-	width: 2.38em;
-	height: 1.568em;
-}
+}*/
 
-.ace-toolbar-labeled gs-button.button-ace-info .ace-icon-container {
-	width: 2em;
-}
 
-.ace-toolbar-unlabeled gs-button.button-ace-info .ace-icon-container {
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
+.ace-toolbar-unlabeled gs-button.button-ace-info::after {
+	top: .4em !important;
+    left: .15em !important;
 }
 
 
-.ace-toolbar gs-button.button-ace-info .ace-suit {
-    display: inline-block;
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    left: 0;
-    top: 0;
-    font-size: 2.5em;
-    line-height: 0.6em;
-}
-
-.ace-toolbar-unlabeled gs-button .ace-suit {
-    text-align: center;
-    vertical-align: middle;
-    padding-top: 0.07em;
-    width: .9em !important
-}
-.ace-toolbar-unlabeled gs-button .ace-letter {
-    text-align: center;
-    vertical-align: middle;
-    padding-top: 0.07em;
-    width: 2.32em !important;
-    left: 0 !important;
-}
-.ace-toolbar-unlabeled gs-button.button-ace-info {
+/*.ace-toolbar-unlabeled gs-button.button-ace-info {
     width: 2.35em;
 }
 .ace-toolbar-labeled gs-button .ace-letter {
@@ -390,38 +355,12 @@ gs-button.button-pop-out-explain {
     top: -.3em;
     padding-left: 0px;
 }
-
+*/
 .ace-toolbar-labeled gs-button.button-explain label {
     position: relative;
     top: -.25em;
     padding-left: 0px;
 }
-    
-
-.ace-toolbar gs-button.button-ace-info .ace-letter {
-    display: inline-block;
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    left: 0.55em;
-    top: 0px;
-    font-size: 1em;
-    line-height: 2em;
-    color: #FFF;
-}
-
-.ace-toolbar gs-button.button-ace-info .ace-letter .ace-toolbar-labeled {
-    display: inline-block;
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    left: 0.37em;
-    top: -1px;
-    font-size: 1em;
-    line-height: 2em;
-    color: #FFF;
-}
-
 
 /* ##################################################### */
 /* ################### SIMPLE  TABLE ################### */
