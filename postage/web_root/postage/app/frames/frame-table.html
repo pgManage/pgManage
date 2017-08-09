@@ -5,20 +5,20 @@
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
-        
+
         <title>Table Design</title>
-        
+
         <script src="../../js/greyspots.js" type="text/javascript"></script>
         <link href="../../css/greyspots.css" type="text/css" rel="stylesheet" />
-        
+
         <link href="../../css/postage.css" type="text/css" rel="stylesheet" />
-        
+
         <script src="../resources/ws-get-functions.js" type="text/javascript"></script>
-        
+
         <!-- right now these scripts are hard coded for postgres 9.2 -->
         <script src="../resources/pg-9.2-tree-functions.js" type="text/javascript"></script>
         <script src="../resources/pg-9.2-tree-queries.js" type="text/javascript"></script>
-        
+
         <script src="../../js/page-zoom.js" type="text/javascript"></script>
 
         <script>
@@ -35,18 +35,18 @@
                 LEFT JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                     WHERE pg_rewrite.oid = {{INTOID}};
                 * /});
-            
+
             scriptQuery.triggerSql = ml(function () {/*
-                   SELECT   '-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n\n' || 
+                   SELECT   '-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n\n' ||
                             '-- DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n\n' ||
                             regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
                             ' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';\n\n'
-                    FROM pg_class 
+                    FROM pg_class
                     JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                     JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                    WHERE pg_trigger.oid = {{INTOID}};
                 */});
-            
+
             listQuery.tableData = ml(function(){/*
                      -- non-CHECK CONSTRAINTs
                      SELECT 'CONSTRAINT ' || pg_constraint.conname || ' ' || pg_get_constraintdef(pg_constraint.oid, true)
@@ -61,8 +61,8 @@
                        JOIN pg_namespace nl ON nl.oid = relnamespace
             LEFT OUTER JOIN pg_description des ON des.objoid = pg_constraint.oid
                       WHERE contype = 'c' AND pg_class.oid = {{INTOID}};
-                    
-                    SELECT COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
+
+                    SELECT COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' ||
                         (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
                         FROM (    SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r($|[^*])' THEN 'SELECT' END as perms
                             UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w($|[^*])' THEN 'UPDATE' END
@@ -73,16 +73,16 @@
                             UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't($|[^*])' THEN 'TRIGGER' END ) em
                             WHERE perms is not null),',')) ||
                         ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                        CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END || 
+                        CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE (regexp_split_to_array(unnest::text,'[=/]'))[1] END ||
                         ';' ), E'\n')
-                        FROM unnest(relacl) 
-                        WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])' 
+                        FROM unnest(relacl)
+                        WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)($|[^*])'
                         )
-                    FROM pg_class 
+                    FROM pg_class
                     JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                     WHERE pg_class.oid = {{INTOID}} ),'')
-                    
-                    ||  COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' || 
+
+                    ||  COALESCE((SELECT E'\n\n' || (SELECT array_to_string(array_agg( 'GRANT ' ||
                         (SELECT array_to_string((SELECT array_agg(perms ORDER BY srt)
                         FROM (    SELECT 1 as srt, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'r\*' THEN 'SELECT' END as perms
                             UNION SELECT 2, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 'w\*' THEN 'UPDATE' END
@@ -93,14 +93,14 @@
                             UNION SELECT 7, CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ 't\*' THEN 'TRIGGER' END ) em
                             WHERE perms is not null),',')) ||
                         ' ON TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || ' TO ' ||
-                        CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(unnest::text,'[=/]'))[1]) END || 
+                        CASE WHEN (regexp_split_to_array(unnest::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(unnest::text,'[=/]'))[1]) END ||
                         ' WITH GRANT OPTION;'), E'\n')
-                        FROM unnest(relacl) 
+                        FROM unnest(relacl)
                         WHERE (regexp_split_to_array(unnest::text,'[=/]'))[2] ~ '(r|w|a|d|D|x|t)\*' )
-                    FROM pg_class 
+                    FROM pg_class
                     JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                     WHERE pg_class.oid = {{INTOID}} ), '')
-                    
+
                     || COALESCE(
                     (SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (SELECT 'GRANT ' || (SELECT array_to_string((SELECT array_agg(perms)
                         FROM (    SELECT 4, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'r[^*]' THEN 'SELECT(' || att.attname || ')' END as perms
@@ -110,14 +110,14 @@
                             WHERE perms is not null
                             ORDER BY 1),','
                             )) ||
-                        ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
+                        ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
                         ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END ||
                         ';' as perms
-                    FROM pg_class 
-                    LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
+                    FROM pg_class
+                    LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
                     JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                     WHERE pg_class.oid = {{INTOID}} AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'r[^*]|w[^*]|a[^*]|x[^*]')ok),'')), '')
-                    
+
                     || COALESCE((SELECT E'\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (SELECT 'GRANT ' || (SELECT array_to_string((SELECT array_agg(perms)
                         FROM (    SELECT 4, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'r\*' THEN 'SELECT(' || att.attname || ')' END as perms
                             UNION SELECT 3, CASE WHEN (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ 'w\*' THEN 'UPDATE(' || att.attname || ')' END
@@ -126,18 +126,18 @@
                             WHERE perms is not null
                             ORDER BY 1),','
                             )) ||
-                        ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) || 
+                        ' ON ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
                         ' TO ' || CASE WHEN (regexp_split_to_array(att.attacl::text,'[=/]'))[1] = '' THEN 'public' ELSE quote_ident((regexp_split_to_array(att.attacl::text,'[=/]'))[1]) END  ||
                         ' WITH GRANT OPTION;' as perms
-                    FROM pg_class 
-                    LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid 
+                    FROM pg_class
+                    LEFT JOIN pg_attribute att ON att.attrelid = pg_class.oid
                     JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                     WHERE pg_class.oid = {{INTOID}} AND (regexp_split_to_array((att.attacl)::text, '[=/]'))[2] ~ '(r|w|a|x)\*')ok),'')), '')
 
 
                     || COALESCE((SELECT E'\n\n' || array_to_string((SELECT array_agg(ok.perms || E'\n') FROM (
-                    SELECT E'-- Index: ' || quote_ident(nsp.nspname) || '.' || quote_ident(clidx.relname) || 
-                        E'\n\n-- DROP INDEX ' || quote_ident(nsp.nspname) || '.' || quote_ident(clidx.relname) || 
+                    SELECT E'-- Index: ' || quote_ident(nsp.nspname) || '.' || quote_ident(clidx.relname) ||
+                        E'\n\n-- DROP INDEX ' || quote_ident(nsp.nspname) || '.' || quote_ident(clidx.relname) ||
                         E';\n\n' ||
                         regexp_replace(regexp_replace(pg_get_indexdef(clidx.oid),' ON ', E'\n   ON '),
                         ' USING ', E'\n   USING ') || E';\n\n' as perms
@@ -191,7 +191,7 @@
                             dropPart = 'DROP ' + dropPart.trim() + ';';
                         }
                         UseError(table_name, schema_name, callback, dropPart);
-                    } else {
+                    } else if (data.bolLastMessage) {
                         if (callback) {
                             callback(query);
                         }
@@ -214,16 +214,15 @@
                             var strQuery1 = '';
                             var strQuery2 = '';
                             var i = 0, len = arrRows.length;
-                            console.log(arrRows);
+                            // console.log(arrRows);
                             while (i < len) {
-                                console.log(i, len);
+                                // console.log(i, len);
                                 var arrRow = arrRows[i].split('\t');
                                 strQuery1 += 'ALTER SEQUENCE ' + arrRow[0] + ' OWNED BY NONE;\n';
                                 strQuery2 += 'ALTER SEQUENCE ' + arrRow[0] + ' OWNED BY ' + schema_name + '.' + table_name + '.' + quote_ident(arrRow[1]) + ';\n';
                                 i += 1;
                             }
-                            
-                            console.log(strQuery1, strQuery2);
+
                             callback(strQuery1, strQuery2)
                         } else if (data.strMessage !== '\\.') {
                             arrRows.push.apply(arrRows, data.strMessage.split('\n'));
@@ -235,30 +234,36 @@
             }
 
             function getSchemaOid(intI, arrDropObjects, callback) {
+				console.log(1);
                 schemaoidQuery = ml(function () {/*
                     SELECT oid
                         FROM pg_namespace
                         WHERE nspname = '{{NAMETOKEN}}'
                         ORDER BY nspname;
                     */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][1]);
-
+					console.log(arrDropObjects);
+				console.log(2, schemaoidQuery);
                 getSingleCellData(schemaoidQuery, function (newSchemaOID) {
+					console.log(3);
                     callback(newSchemaOID, intI);
                     var oidQuery = arrDropObjects[intI][3];
-                    console.log(oidQuery);
+                    // console.log(oidQuery);
                     getSingleCellData(oidQuery, function (newOID) {
+						console.log(4);
                         arrDropObjects[intI][4] = newOID;
                         var scriptForCreate = arrDropObjects[intI][5].replace(/\{\{INTOID\}\}/gi, newOID);
                         getSingleCellData(scriptForCreate, function (dependddef) {
+							console.log(5);
                             strDumpQuery += '\n\n\n' + dependddef + '\n';
+							console.log(dependddef);
                         });
                     });
                 });
             }
 
             // function runCreateScripts(arrDropObjects) {
-                
-                
+
+
             // }
 
             function getDump(intSchemaOid) {
@@ -331,15 +336,14 @@
                 strDumpQuery += strRelOptions !== '' ? ',\n\t' : '';
                 strDumpQuery += strRelOptions;
                 strDumpQuery += '\n';
-                strDumpQuery += ');\n';
+                strDumpQuery += ');\n\n';
                 strDumpQuery += 'ALTER TABLE ';
                 strDumpQuery += strSchemaName;
                 strDumpQuery += '.';
                 strDumpQuery += strTableName;
                 strDumpQuery += ' OWNER TO ';
                 strDumpQuery += strOwner;
-                strDumpQuery += ';\n';
-                strDumpQuery += '{{HELPDEF}}\n';
+                strDumpQuery += ';\n\n';
                 strDumpQuery += 'INSERT INTO ';
                 strDumpQuery += strSchemaName;
                 strDumpQuery += '.';
@@ -371,7 +375,8 @@
                 strDumpQuery += '.';
                 strDumpQuery += strTableName;
                 strDumpQuery += strTableSuffix;
-                strDumpQuery += ';\n\n';
+                strDumpQuery += ';\n';
+                strDumpQuery += '{{HELPDEF}}';
                 strDumpQuery += 'DROP TABLE ';
                 strDumpQuery += strSchemaName;
                 strDumpQuery += '.';
@@ -379,7 +384,7 @@
                 strDumpQuery += strTableSuffix;
                 strDumpQuery += ';\n\n';
 
-                console.log(strDumpQuery);
+                // console.log(strDumpQuery);
 
                 UseError(strTableName, strSchemaName, function (query) {
                     GetSequences(strTableName, strSchemaName, function (query1, query2) {
@@ -397,18 +402,27 @@
                             // first part
                             strDropSchema = strTempObjName.substring(0, strTempObjName.indexOf('.'));
                             // second part
-                            strDropObjName = strTempObjName.substring(strDropSchema.length + 1, strTempObjName.length);
+							if (strDropSchema.length === 0) {
+                            	strDropObjName = strTempObjName.substring(strDropSchema.length, strTempObjName.length);
+							} else {
+                            	strDropObjName = strTempObjName.substring(strDropSchema.length + 1, strTempObjName.length);
+							}
+
+							// if there is no schemaname its public
+							if (!strDropSchema) {
+								strDropSchema = 'public';
+							}
                             arrDropObjects.push(['' + strDropObjType + '', '' + strDropSchema + '', '' + strDropObjName + '']);
                         }
-    
+
                         //add to beginning of arrDropObjects, the list of sequences
-    
+
                         arrDropObjects = arrDropObjects.reverse();
                         var scriptForCreate = [], scriptForOid = [], schemaOID, arrDoneNumsOid;
-                        
-                        
+
+
                         for (i = 0, len = arrDropObjects.length; i < len; i += 1) {
-                            
+
                             getSchemaOid(i, arrDropObjects, function (schemaOID, intI) {
                                 if (arrDropObjects[intI][0].toLowerCase() === 'view') {
                                     scriptForOid = ml(function () {/*
@@ -416,8 +430,8 @@
                                             FROM pg_class
                                             WHERE relnamespace = '{{SCHEMAOID}}' AND relname = '{{NAMETOKEN}}'
                                         */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
-    
-    
+
+
                                     scriptForCreate = scriptQuery.objectViewNoComment.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
                                             .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
                                             .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
@@ -429,20 +443,20 @@
                                                 JOIN pg_type typ ON typ.oid = pr.prorettype
                                                 WHERE proisagg = FALSE AND typname <> 'trigger' AND pr.pronamespace = '{{SCHEMAOID}}' AND proname = '{{NAMETOKEN}}';
                                         */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
-    
-    
+
+
                                     scriptForCreate = scriptQuery.objectFunction.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
                                             .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
                                             .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
                                             .replace(/{{STRRELNAME}}/gi, arrDropObjects[intI][2]);
                                 } else if (arrDropObjects[intI][0].toLowerCase() === 'operator') {
-                                    scriptForOid = ml(function () {/*  
+                                    scriptForOid = ml(function () {/*
                                         SELECT oprname
                                             FROM pg_operator
                                             WHERE (nsp.nspname || '.' || op.oprname || ' (' || format_type(op.oprleft, NULL) || ', ' || format_type(op.oprright, NULL) || ')') = '{{SCHEMAOID}}.{{NAMETOKEN}}';
                                     */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
-    
-    
+
+
                                     scriptForCreate = scriptQuery.objectOperator.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
                                             .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
                                             .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
@@ -454,8 +468,8 @@
                                                 JOIN pg_type typ ON typ.oid = pr.prorettype
                                                 WHERE proisagg = TRUE AND pr.pronamespace = '{{SCHEMAOID}}' AND proname = '{{NAMETOKEN}}';
                                         */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][2]).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
-                                        
-    
+
+
                                     scriptForCreate = scriptQuery.objectAggregate.replace(/{{STRNAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
                                             .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
                                             .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
@@ -465,15 +479,15 @@
                                 arrDropObjects[intI][5] = scriptForCreate;
                             });
                         }
-                        
-                        
-                        
+
+
+
                     /*
-                    
-                    
+
+
                                     getSingleCellData(scriptForCreate[arrDoneNumsOid.length - 1], function (script) {
                                         strDumpQuery += script;
-                                        console.log(script);
+                                        // console.log(script);
                                     });
     .replace(/{{INTOID}}/gi, arrDropObjects[intI][4])
     .replace(/{{INTOID}}/gi, arrDropObjects[intI][4])
@@ -491,7 +505,7 @@
                             WHERE nspname = '{{NAMETOKEN}}'
                             ORDER BY nspname;
                         */}).replace(/\{\{NAMETOKEN\}\}/g, strSchemaName);
-    
+
                     getSingleCellData(schemaoidQuery, function (newSchemaOID) {
                         schemaOID = newSchemaOID;
                         oidQuery = ml(function () {/*
@@ -499,29 +513,28 @@
                             FROM pg_class
                             WHERE relnamespace = '{{SCHEMAOID}}' AND relname = '{{NAMETOKEN}}'
                         */}).replace(/\{\{NAMETOKEN\}\}/g, strTableName).replace(/\{\{SCHEMAOID\}\}/g, schemaOID);
-                        
+
                         //console.log(oidQuery);
                         getSingleCellData(oidQuery, function (newOID) {
                             var tableRules = scriptQuery.objectTableNoCreate.replace(/\{\{INTOID\}\}/gi, newOID)
                             .replace(/\{\{STRSQLSAFENAME\}\}/gi, '' + strTableName + '.' + strSchemaName + '');
                             getSingleCellData(tableRules, function (tabledef) {
-                                console.log(arrDropObjects);
                                 strDumpQuery = strDumpQuery.replace(/\{\{ALTERSEQUENCE\}\}/gi, query1);
                                 strDumpQuery = strDumpQuery.replace(/\{\{HELPDEF\}\}/gi, tabledef);
-                    
+
                                 strDumpQuery += query2;
-                                //var triggQuery = ml(function () {/*SELECT string_agg('-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' || 
+                                //var triggQuery = ml(function () {/*SELECT string_agg('-- Trigger: ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
                                 //	'DROP TRIGGER ' || quote_ident(pg_trigger.tgname) || ' ON ' || quote_ident(nspname) || '.' || quote_ident(relname) || E';\n' ||
                                 //	regexp_replace(regexp_replace(regexp_replace(regexp_replace(pg_get_triggerdef(pg_trigger.oid, true),
                                 //	' BEFORE ', E'\n   BEFORE '), ' ON ', E'\n   ON '), ' FOR ', E'\n   FOR '), ' EXECUTE ', E'\n   EXECUTE ') || E';', E'\n\n') as perms
-                                //FROM pg_class 
+                                //FROM pg_class
                                 //JOIN pg_trigger ON pg_trigger.tgrelid = pg_class.oid
                                 //JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
                                 //WHERE tgrelid <> {{INTOID}} AND pg_trigger.tgname ILIKE '%{{RELNAME}}%' AND pg_trigger.tgisinternal != TRUE*/}).replace(/\{\{INTOID\}\}/gi, newOID).replace(/\{\{RELNAME\}\}/gi, strTableName);
-                                
+
                                 //getSingleCellData(triggQuery, function (triggdefs) {
                                 //    strDumpQuery += triggdefs;
-                                
+
     var userNotes = '-- ##########################################################################################\n';
         userNotes += '-- ##########################################################################################\n';
         userNotes += '-- \n';
@@ -546,8 +559,8 @@
         userNotes += '--\n';
         userNotes += '-- ##########################################################################################\n';
         userNotes += '-- ##########################################################################################\n\n';
-                                
-            strDumpQuery = userNotes + strDumpQuery;                    
+            //console.log(strDumpQuery);
+            strDumpQuery = userNotes + strDumpQuery;
                                     window.top.newTab('sql', strSchemaName + '.' + strTableName, {'strContent': strDumpQuery});
                                     GS.removeLoader('generate-script');
                                 //});
@@ -1000,7 +1013,7 @@
                 zoomStart();
             });
         </script>
-        
+
         <style>
             #div-column-list-container {
                 display: block;
@@ -1011,7 +1024,7 @@
             #div-column-list-container table {
                 border-left: 1px solid #ddd;
             }
-            
+
             #div-column-list-container table input {
                 display: block;
                 resize: none;
@@ -1019,18 +1032,18 @@
                 border: 0 none;
                 cursor: text;
                 padding: 0 0.1em;
-                
+
                 -webkit-box-sizing: border-box;
                 -moz-box-sizing: border-box;
                 -ms-box-sizing: border-box;
                 -o-box-sizing: border-box;
                 box-sizing: border-box;
             }
-            
+
             #div-column-list-container th, #div-column-list-container td {
                 padding: 0.1em;
                 cursor: pointer;
-                
+
                 -webkit-touch-callout: none;
                 -webkit-user-select: none;
                 -khtml-user-select: none;
@@ -1039,11 +1052,11 @@
                 -o-user-select: none;
                 user-select: none;
             }
-            
+
             #div-column-list-container td gs-checkbox {
                 padding-top: 0.5em;
             }
-            
+
             #div-column-list-container thead th {
                 cursor: s-resize;
                 overflow: hidden;
