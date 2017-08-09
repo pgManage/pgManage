@@ -214,9 +214,9 @@
                             var strQuery1 = '';
                             var strQuery2 = '';
                             var i = 0, len = arrRows.length;
-                            // console.log(arrRows);
+                            // // // console.log(arrRows);
                             while (i < len) {
-                                // console.log(i, len);
+                                // // console.log(i, len);
                                 var arrRow = arrRows[i].split('\t');
                                 strQuery1 += 'ALTER SEQUENCE ' + arrRow[0] + ' OWNED BY NONE;\n';
                                 strQuery2 += 'ALTER SEQUENCE ' + arrRow[0] + ' OWNED BY ' + schema_name + '.' + table_name + '.' + quote_ident(arrRow[1]) + ';\n';
@@ -234,28 +234,28 @@
             }
 
             function getSchemaOid(intI, arrDropObjects, callback) {
-				console.log(1);
+			 	// console.log1);
                 schemaoidQuery = ml(function () {/*
                     SELECT oid
                         FROM pg_namespace
                         WHERE nspname = '{{NAMETOKEN}}'
                         ORDER BY nspname;
                     */}).replace(/\{\{NAMETOKEN\}\}/g, arrDropObjects[intI][1]);
-					console.log(arrDropObjects);
-				console.log(2, schemaoidQuery);
+				 	// console.logarrDropObjects);
+			 	// console.log2, schemaoidQuery);
                 getSingleCellData(schemaoidQuery, function (newSchemaOID) {
-					console.log(3);
+				 	// console.log3);
                     callback(newSchemaOID, intI);
                     var oidQuery = arrDropObjects[intI][3];
-                    // console.log(oidQuery);
+                    // // console.log(oidQuery);
                     getSingleCellData(oidQuery, function (newOID) {
-						console.log(4);
+					 	// console.log4);
                         arrDropObjects[intI][4] = newOID;
                         var scriptForCreate = arrDropObjects[intI][5].replace(/\{\{INTOID\}\}/gi, newOID);
                         getSingleCellData(scriptForCreate, function (dependddef) {
-							console.log(5);
+						 	// console.log5);
                             strDumpQuery += '\n\n\n' + dependddef + '\n';
-							console.log(dependddef);
+						 	// console.logdependddef);
                         });
                     });
                 });
@@ -384,7 +384,7 @@
                 strDumpQuery += strTableSuffix;
                 strDumpQuery += ';\n\n';
 
-                // console.log(strDumpQuery);
+                // // console.log(strDumpQuery);
 
                 UseError(strTableName, strSchemaName, function (query) {
                     GetSequences(strTableName, strSchemaName, function (query1, query2) {
@@ -487,7 +487,7 @@
 
                                     getSingleCellData(scriptForCreate[arrDoneNumsOid.length - 1], function (script) {
                                         strDumpQuery += script;
-                                        // console.log(script);
+                                        // // // console.log(script);
                                     });
     .replace(/{{INTOID}}/gi, arrDropObjects[intI][4])
     .replace(/{{INTOID}}/gi, arrDropObjects[intI][4])

@@ -1296,6 +1296,14 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
 
     // fill frame
     if (strType === 'sql') {
+		var ExplainAnalyze = localStorage.ShortcutExplainAnalyze.split(',')[1];
+		if (localStorage.ShortcutExplainAnalyze.split(',')[0]) {
+			ExplainAnalyze = localStorage.ShortcutExplainAnalyze.split(',')[0] + '-' + ExplainAnalyze;
+		}
+		var Explain = localStorage.ShortcutExplain.split(',')[1];
+		if (localStorage.ShortcutExplain.split(',')[0]) {
+			Explain = localStorage.ShortcutExplain.split(',')[0] + '-' + Explain;
+		}
         frameElement.innerHTML =
             ml(function () {/*
                 <div id="frame-{{TABNUMBER}}-indicator" class="frame-indicator"></div>
@@ -1336,9 +1344,9 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
                                     title="Explain menu." no-focus><span class="explain-letter" icon="chevron-down">E</span><label> Explain</label></gs-button>
 
                             <gs-button inline remove-all class="button-explain ace-toolbar-unlabeled-only" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(false)"
-                                    title="Query explanation. This does not run the query." remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span></gs-button>
+                                    title="Query explanation. This does not run the query. {{EXPLAIN}}" remove-all no-focus><span class="explain-letter" icon="play-circle-o">E</span></gs-button>
                             <gs-button icononly inline remove-all class="button-explain ace-toolbar-unlabeled-only" style="padding-bottom: 0px; padding-right: 0;" onclick="explain(true)"
-                                    title="Query explanation. Note that the query will run, meaning that you'll get run times." remove-top no-focus>
+                                    title="Query explanation. Note that the query will run, meaning that you'll get run times. {{ANALYZE}}" remove-top no-focus>
                                 <span class="explain-letter" icon="play">E</span></gs-button>
 
                             <gs-button icononly inline remove-all class="button-csv" icon="file-text" onclick="exportCSV()"
@@ -1395,7 +1403,9 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
             .replace(/\{\{ELECTRON\}\}/g, window.process && window.process.type === 'renderer' ? 'electron' : 'browser')
             .replace(/\{\{FILE\}\}/g, tabElement.filePath)
             .replace(/\{\{TRIMMEDFILE\}\}/g, GS.trim(tabElement.filePath, '/'))
-            .replace(/\{\{CONNNUM\}\}/g, contextData.connectionID);
+            .replace(/\{\{CONNNUM\}\}/g, contextData.connectionID)
+            .replace(/\{\{EXPLAIN\}\}/g, Explain)
+            .replace(/\{\{ANALYZE\}\}/g, ExplainAnalyze);
 
         //<gs-button class="header-button" icononly icon="bug" onclick="debugScript()" remove-all></gs-button>
         //<gs-button class="header-button" icononly icon="text-height" onclick="resultsToText()" remove-right></gs-button>
@@ -2326,23 +2336,36 @@ function beautifySQL() {
 function menuExplain(target) {
     'use strict';
     var templateElement = document.createElement('template');
-
-    templateElement.setAttribute('data-max-width', '11em');
+	var ExplainAnalyze = localStorage.ShortcutExplainAnalyze.split(',')[1];
+	if (localStorage.ShortcutExplainAnalyze.split(',')[0]) {
+		ExplainAnalyze = localStorage.ShortcutExplainAnalyze.split(',')[0] + '-' + ExplainAnalyze;
+	}
+	var Explain = localStorage.ShortcutExplain.split(',')[1];
+	if (localStorage.ShortcutExplain.split(',')[0]) {
+		Explain = localStorage.ShortcutExplain.split(',')[0] + '-' + Explain;
+	}
+	var popupWidth = 11;
+	if (Explain.length > ExplainAnalyze.length) {
+		popupWidth = parseInt(popupWidth, 10) + parseInt(Explain.length * 0.7,10);
+	} else {
+		popupWidth = parseInt(popupWidth, 10) + parseInt(ExplainAnalyze.length * 0.7,10);
+	}
+    templateElement.setAttribute('data-max-width', popupWidth + 'em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
         <gs-page>
             <gs-body class="ace-toolbar">
-                <gs-button style="width: 100%;" dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(false)" title="Query explanation. This does not run the query." remove-all no-focus>
+                <gs-button style="width: 100%;" dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(false)" title="Query explanation. This does not run the query. {{EXPLAIN}}" remove-all no-focus>
                     <span class="explain-letter" icon="play-circle-o">E</span>
-                    Explain
+                    Explain<span style="float: right; padding-top: 1.2em; font-size: 0.7em; color: grey;">{{EXPLAIN}}</span>
                 </gs-button>
-                <gs-button style="width: 100%;" dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" title="Query explanation. Note that the query will run, meaning that you'll get run times." remove-top no-focus>
+                <gs-button style="width: 100%;" dialogclose no-focus class="button-explain" style="padding-bottom: 0px;" onclick="explain(true)" title="Query explanation. Note that the query will run, meaning that you'll get run times. {{ANALYZE}}" remove-top no-focus>
                     <span class="explain-letter" icon="play">E</span>
-                    Explain Analyze
+                    Explain Analyze<span style="float: right; padding-top: 1.2em; font-size: 0.7em; color: grey;">{{ANALYZE}}</span>
                 </gs-button>
             </gs-body>
         </gs-page>
-    */});
+    */}).replace(/\{\{EXPLAIN\}\}/g, Explain).replace(/\{\{ANALYZE\}\}/g, ExplainAnalyze);
 
     GS.openDialogToElement(target, templateElement, 'down');
 }
@@ -2350,7 +2373,6 @@ function menuExplain(target) {
 function menuSave(target, filename, inttabnumber) {
     'use strict';
     var templateElement = document.createElement('template');
-
     templateElement.setAttribute('data-max-width', '9em');
     templateElement.setAttribute('data-overlay-close', 'true');
     templateElement.innerHTML = ml(function () {/*
