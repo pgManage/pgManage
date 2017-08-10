@@ -1008,7 +1008,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 						"\012responsenumber = ", (size_t)18,
 						str_temp, strlen(str_temp),
 						"\012transactionid = ", (size_t)17,
-						client_request->str_transaction_id, client_request->int_message_id_len,
+						client_request->str_transaction_id, client_request->int_transaction_id_len,
 						"\012", (size_t)1,
 						_str_response, strlen(_str_response));
 				} else {
@@ -1044,7 +1044,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 								"\012responsenumber = ", (size_t)18,
 								str_temp, strlen(str_temp),
 								"\012transactionid = ", (size_t)17,
-								client_request->str_transaction_id, client_request->int_message_id_len,
+								client_request->str_transaction_id, client_request->int_transaction_id_len,
 								"\012", (size_t)1,
 								_str_response, strlen(_str_response));
 						} else {

@@ -413,7 +413,7 @@ finish:
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -475,7 +475,7 @@ finish:
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -563,7 +563,7 @@ finish:
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -677,7 +677,7 @@ finish:
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -788,7 +788,7 @@ finish:
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -906,7 +906,7 @@ finish:
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,

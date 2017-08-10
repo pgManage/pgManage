@@ -67,7 +67,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		if (client_request->str_transaction_id) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -91,7 +91,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		if (client_request->str_transaction_id) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -159,7 +159,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -181,7 +181,7 @@ void ws_raw_step1(struct sock_ev_client_request *client_request) {
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 
@@ -246,7 +246,7 @@ finish:
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -295,7 +295,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 		if (client_request->str_transaction_id) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -348,7 +348,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 	if (client_request->str_transaction_id) {
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"transactionid = ", (size_t)16,
-			client_request->str_transaction_id, client_request->int_message_id_len,
+			client_request->str_transaction_id, client_request->int_transaction_id_len,
 			"\012", (size_t)1);
 	}
 	SFINISH_SNFCAT(str_response, &int_response_len,
@@ -391,7 +391,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			if (client_request->str_transaction_id) {
 				SFINISH_SNFCAT(str_response, &int_response_len,
 					"transactionid = ", (size_t)16,
-					client_request->str_transaction_id, client_request->int_message_id_len,
+					client_request->str_transaction_id, client_request->int_transaction_id_len,
 					"\012", (size_t)1);
 			}
 			SFINISH_SNFCAT(str_response, &int_response_len,
@@ -516,7 +516,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			if (client_request->str_transaction_id != NULL) {
 				SFINISH_SNFCAT(str_response, &int_response_len,
 					"transactionid = ", (size_t)16,
-					client_request->str_transaction_id, client_request->int_message_id_len,
+					client_request->str_transaction_id, client_request->int_transaction_id_len,
 					"\012", (size_t)1);
 			}
 			SFINISH_SNFCAT(str_response, &int_response_len,
@@ -537,7 +537,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			if (client_request->str_transaction_id != NULL) {
 				SFINISH_SNFCAT(str_response, &int_response_len,
 					"transactionid = ", (size_t)16,
-					client_request->str_transaction_id, client_request->int_message_id_len,
+					client_request->str_transaction_id, client_request->int_transaction_id_len,
 					"\012", (size_t)1);
 			}
 
@@ -598,7 +598,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			if (client_request->str_transaction_id != NULL) {
 				SFINISH_SNFCAT(str_response, &int_response_len,
 					"transactionid = ", (size_t)16,
-					client_request->str_transaction_id, client_request->int_message_id_len,
+					client_request->str_transaction_id, client_request->int_transaction_id_len,
 					"\012", (size_t)1);
 			}
 			PGTransactionStatusType tran_status = PQtransactionStatus(client_request->parent->conn->conn);
@@ -648,7 +648,7 @@ finish:
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -745,7 +745,7 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 	if (client_request->str_transaction_id != NULL) {
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"transactionid = ", 16,
-			client_request->str_transaction_id, client_request->int_message_id_len,
+			client_request->str_transaction_id, client_request->int_transaction_id_len,
 			"\012", (size_t)1);
 	}
 	memset(str_temp, 0, 101);
@@ -769,7 +769,7 @@ bool _raw_tuples_callback(EV_P, PGresult *res, ExecStatusType result, struct soc
 	if (client_request->str_transaction_id != NULL) {
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"transactionid = ", (size_t)16,
-			client_request->str_transaction_id, client_request->int_message_id_len,
+			client_request->str_transaction_id, client_request->int_transaction_id_len,
 			"\012", (size_t)1);
 	}
 	SFINISH_SNFCAT(str_response, &int_response_len,
@@ -818,7 +818,7 @@ finish:
 		if (client_request->str_transaction_id != NULL) {
 			SFINISH_SNFCAT(str_response, &int_response_len,
 				"transactionid = ", (size_t)16,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1);
 		}
 		SFINISH_SNFCAT(str_response, &int_response_len,
@@ -892,7 +892,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 	if (client_request->str_transaction_id != NULL) {
 		SFINISH_SNFCAT(str_response, &int_response_len,
 			"transactionid = ", (size_t)16,
-			client_request->str_transaction_id, client_request->int_message_id_len,
+			client_request->str_transaction_id, client_request->int_transaction_id_len,
 			"\012", (size_t)1);
 	}
 
@@ -917,7 +917,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				if (client_request->str_transaction_id != NULL) {
 					SFINISH_SNFCAT(str_response, &int_response_len,
 						"transactionid = ", (size_t)16,
-						client_request->str_transaction_id, client_request->int_message_id_len,
+						client_request->str_transaction_id, client_request->int_transaction_id_len,
 						"\012", (size_t)1);
 				}
 			}
@@ -944,7 +944,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 			if (client_request->str_transaction_id != NULL) {
 				SFINISH_SNFCAT(str_response, &int_response_len,
 					"transactionid = ", (size_t)16,
-					client_request->str_transaction_id, client_request->int_message_id_len,
+					client_request->str_transaction_id, client_request->int_transaction_id_len,
 					"\012", (size_t)1);
 			}
 			client_raw->res = NULL;
@@ -975,7 +975,7 @@ void _raw_tuples_check_callback(EV_P, ev_check *w, int revents) {
 				if (client_request->str_transaction_id) {
 					SFINISH_SNFCAT(str_response, &int_response_len,
 						"transactionid = ", (size_t)18,
-						client_request->str_transaction_id, client_request->int_message_id_len,
+						client_request->str_transaction_id, client_request->int_transaction_id_len,
 						"\012", (size_t)1);
 				}
 				SFINISH_SNFCAT(str_response, &int_response_len,
