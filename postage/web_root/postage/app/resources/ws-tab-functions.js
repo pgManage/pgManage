@@ -1,6 +1,13 @@
 var bolTabFunctionsLoaded = true, intTabNumber = 0, intNumberOfTabs = 0, bolStillInSetPosition, //arrTabOrder, tabListChangeStamp = '0',
     bolSetPositionFor, bolCurrentlyScriptTab = false, bolAutoOpenPropertyList = true, currTab = [];
 
+function closeCurrentTab() {
+	var deleteButton = xtag.query(document.body, '.current-tab')[0].innerDeleteButton;
+	//console.log(deleteButton);
+	GS.triggerEvent(deleteButton, 'click');
+}
+
+
 
 // this function encodes tab names so that they can pass as canonical file names
 function encodeTabNameForFileName(strName) {
