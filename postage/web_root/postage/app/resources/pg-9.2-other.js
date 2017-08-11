@@ -200,7 +200,11 @@ function menuUser(target) {
         </gs-page>
     */});
 
-    GS.openDialogToElement(target, templateElement, 'down');
+    GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
+		if (document.getElementsByClassName('current-tab')[0]) {
+			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+		}
+	});
 }
 
 function buttonReloadWindow() {
@@ -245,7 +249,11 @@ function menuTools(target) {
 
     // dialogAbout()
 
-    GS.openDialogToElement(target, templateElement, 'down');
+    GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
+		if (document.getElementsByClassName('current-tab')[0]) {
+			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+		}
+	});
 }
 
 function menuOptions(target) {
@@ -283,7 +291,11 @@ function menuOptions(target) {
                 buttonElement.parentNode.removeChild(buttonElement);
             }
         }
-    });
+    }, function () {
+		if (document.getElementsByClassName('current-tab')[0]) {
+			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+		}
+	});
 }
 
 function menuTab(target) {
@@ -353,7 +365,11 @@ function menuTab(target) {
         */});
     }
 
-    GS.openDialogToElement(target, templateElement, 'down');
+    GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
+		if (document.getElementsByClassName('current-tab')[0]) {
+			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+		}
+	});
 }
 
 function dialogReloadConf() {
@@ -502,6 +518,9 @@ function dialogSwitchDatabase(target) {
                 }
             });
         }
+		if (document.getElementsByClassName('current-tab')[0]) {
+			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+		}
     });
 }
 
@@ -1284,6 +1303,7 @@ function dialogOptions() {
 
         refreshCustomCSS(customCSSText);
         refreshShortcutKeys(ShortcutKeysText);
+		document.getElementsByClassName('current-tab')[0].relatedEditor.focus()
     });
 }
 
