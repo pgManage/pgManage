@@ -206,7 +206,14 @@ var pgpanelHighlightRules = function(options) {
             
             { token: "ag", regex: "AG" },
             { token: "cl", regex: "CL" },
+            
             { token: "pk", regex: "PK" },
+            { token: "uk", regex: "UK" },
+            { token: "ck", regex: "CK" },
+            { token: "fk", regex: "FK" },
+            { token: "tk", regex: "TK" },
+            { token: "xk", regex: "XK" },
+            
             { token: "rl", regex: "RL" },
             { token: "tr", regex: "TR" },
             { token: "cn", regex: "CN" },
