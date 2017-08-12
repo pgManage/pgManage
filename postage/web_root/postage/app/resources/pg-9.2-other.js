@@ -200,7 +200,11 @@ function menuUser(target) {
         </gs-page>
     */});
 
-    GS.openDialogToElement(target, templateElement, 'down');
+    GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
+		if (document.getElementsByClassName('current-tab')[0]) {
+			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+		}
+	});
 }
 
 function buttonReloadWindow() {
@@ -245,7 +249,11 @@ function menuTools(target) {
 
     // dialogAbout()
 
-    GS.openDialogToElement(target, templateElement, 'down');
+    GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
+		if (document.getElementsByClassName('current-tab')[0]) {
+			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+		}
+	});
 }
 
 function menuOptions(target) {
@@ -283,7 +291,11 @@ function menuOptions(target) {
                 buttonElement.parentNode.removeChild(buttonElement);
             }
         }
-    });
+    }, function () {
+		if (document.getElementsByClassName('current-tab')[0]) {
+			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+		}
+	});
 }
 
 function menuTab(target) {
@@ -353,7 +365,11 @@ function menuTab(target) {
         */});
     }
 
-    GS.openDialogToElement(target, templateElement, 'down');
+    GS.openDialogToElement(target, templateElement, 'down', function () {}, function () {
+		if (document.getElementsByClassName('current-tab')[0]) {
+			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+		}
+	});
 }
 
 function dialogReloadConf() {
@@ -502,6 +518,9 @@ function dialogSwitchDatabase(target) {
                 }
             });
         }
+		if (document.getElementsByClassName('current-tab')[0]) {
+			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+		}
     });
 }
 
@@ -1284,6 +1303,7 @@ function dialogOptions() {
 
         refreshCustomCSS(customCSSText);
         refreshShortcutKeys(ShortcutKeysText);
+		document.getElementsByClassName('current-tab')[0].relatedEditor.focus()
     });
 }
 
@@ -2891,7 +2911,7 @@ function executeScript(bolCursorQuery) {
 
                             if (data.intCallbackNumberThisQuery === 0) {
                                 console.time('Query load execution');
-
+								console.log(data);
                                 // create the table element
                                 divElement = document.createElement('div');
                                 scrollElement = document.createElement('div');
@@ -2981,7 +3001,7 @@ function executeScript(bolCursorQuery) {
                                     <template for="top-hud">
                                         <gs-button onclick="document.getElementById('{{TABLEID}}').openPrefs(this)" inline no-focus icononly icon="sliders">&nbsp;</gs-button>
                                         <gs-button onclick="document.getElementById('{{TABLEID}}').toggleFullscreen(this)" inline id="toggleFullscreen-{{IDNUM}}" no-focus icononly icon="arrows-alt">&nbsp;</gs-button>
-                                        <gs-button onclick="hideOtherTables({{IDNUM}}, '{{TABLEID}}'); document.getElementById('{{TABLEID}}').toggleFullContainer('sql-results-area-{{IDNUM}}', this)" inline no-focus icononly icon="expand">&nbsp;</gs-button>
+                                        <gs-button id="toggle{{TABLEID}}" onclick="hideOtherTables({{IDNUM}}, '{{TABLEID}}'); document.getElementById('{{TABLEID}}').toggleFullContainer('sql-results-area-{{IDNUM}}', this)" inline no-focus icononly icon="expand">&nbsp;</gs-button>
                                         <gs-button onclick="document.getElementById('{{TABLEID}}').resizeAllColumns()"
                                                 inline no-focus
                                                 title="Resize all columns to fit their content. The new widths will be based on the content of the visible cells.">AutoFit</gs-button>
@@ -3216,7 +3236,11 @@ function executeScript(bolCursorQuery) {
                                 // every rerender should be put into a requestAnimationFrame, if available
                             }
                         }
-                    }
+                    } else {
+						if (xtag.query(xtag.query(document.body, '.current-tab')[0].relatedResultsArea, 'gs-table').length === 1) {
+							GS.triggerEvent(document.getElementById('toggle' + xtag.query(xtag.query(document.body, '.current-tab')[0].relatedResultsArea, 'gs-table')[0].getAttribute('id')), 'click');
+						}
+					}
                 } else {
                     executeHelperEndExecute();
                     executeHelperEndLoading();

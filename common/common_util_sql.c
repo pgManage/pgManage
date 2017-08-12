@@ -385,7 +385,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 					SFINISH_SNFCAT(
 						client_request->str_current_response, &client_request->int_current_response_length,
 						"transactionid = ", (size_t)16,
-						client_request->str_transaction_id, client_request->int_message_id_len,
+						client_request->str_transaction_id, client_request->int_transaction_id_len,
 						"\012", (size_t)1);
 				}
 			}
@@ -436,7 +436,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 					SFINISH_SNFCAT(
 						client_request->str_current_response, &client_request->int_current_response_length,
 						"transactionid = ", (size_t)16,
-						client_request->str_transaction_id, client_request->int_message_id_len,
+						client_request->str_transaction_id, client_request->int_transaction_id_len,
 						"\012", (size_t)1);
 				}
 
@@ -486,7 +486,7 @@ bool ws_copy_check_cb(EV_P, bool bol_success, bool bol_last, void *cb_data, char
 				SFINISH_SNFCAT(
 					client_request->str_current_response, &client_request->int_current_response_length,
 					"transactionid = ", (size_t)16,
-					client_request->str_transaction_id, client_request->int_message_id_len,
+					client_request->str_transaction_id, client_request->int_transaction_id_len,
 					"\012", (size_t)1);
 			}
 			SFINISH_SREALLOC(client_request->str_current_response, client_request->int_current_response_length + int_len + 6 + 1);
@@ -529,7 +529,7 @@ finish:
 				"messageid = ", (size_t)12,
 				client_request->str_message_id, client_request->int_message_id_len,
 				"\012transactionid = ", (size_t)17,
-				client_request->str_transaction_id, client_request->int_message_id_len,
+				client_request->str_transaction_id, client_request->int_transaction_id_len,
 				"\012", (size_t)1,
 				_str_response, strlen(_str_response));
 		} else {

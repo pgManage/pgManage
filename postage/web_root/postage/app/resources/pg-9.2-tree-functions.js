@@ -1418,6 +1418,9 @@ function dialogAddSchema(target) {
 
             //localStorage.shownObjects = querystringShownObj;
         }
+		if (document.getElementsByClassName('current-tab')[0]) {
+			document.getElementsByClassName('current-tab')[0].relatedEditor.focus();
+		}
     };
 
     // if we are not on a touch device: dialog attached to the "Object Lists/Scripts" button
@@ -1778,7 +1781,7 @@ function propertyDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {
             <div id="properties-container" style="min-height: 6em;"></div>
         </gs-container>
     */}).replace(/\{\{STRSQLSAFENAME\}\}/g, strName);
-    
+
     strQuery = (
         (
             (strQuery || '')
@@ -1791,7 +1794,7 @@ function propertyDialog(strQuery, intOid, strNamePartOne, strNamePartTwo) {
             ' SELECT \'\', \'No properties known, a property gathering query hasn\'\'t defined in Postage.\''
         )
     );
-    
+
     setObjectDetailValue(strHTML, function () {
         getListData(
             strQuery,

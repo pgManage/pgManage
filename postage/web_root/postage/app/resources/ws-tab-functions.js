@@ -1,6 +1,13 @@
 var bolTabFunctionsLoaded = true, intTabNumber = 0, intNumberOfTabs = 0, bolStillInSetPosition, //arrTabOrder, tabListChangeStamp = '0',
     bolSetPositionFor, bolCurrentlyScriptTab = false, bolAutoOpenPropertyList = true, currTab = [];
 
+function closeCurrentTab() {
+	var deleteButton = xtag.query(document.body, '.current-tab')[0].innerDeleteButton;
+	//console.log(deleteButton);
+	GS.triggerEvent(deleteButton, 'click');
+}
+
+
 
 // this function encodes tab names so that they can pass as canonical file names
 function encodeTabNameForFileName(strName) {
@@ -1428,7 +1435,11 @@ function newTab(strType, strTabName, jsnParameters, bolLoadedFromServer, strFile
         tabElement.relatedAcePositionContainer = document.getElementById('ace-container-position-container-' + intTabNumber);
         tabElement.relatedDocLinksContainer = document.getElementById('sql-doc-links-' + intTabNumber);
         tabElement.bolAutoOpenPropertyList = true;
-        //console.log(tabElement.relatedResultsArea);
+        tabElement.relatedResultsArea.addEventListener('click', function () {
+			if (xtag.query(tabElement.relatedResultsArea, 'gs-table').length === 0) {
+				document.getElementsByClassName('current-tab')[0].relatedEditor.focus()
+			}
+		});
 
         tabElement.relatedStopButton = document.getElementById('sql-results-stop-' + intTabNumber);
         tabElement.relatedClearButton = document.getElementById('sql-results-clear-' + intTabNumber);

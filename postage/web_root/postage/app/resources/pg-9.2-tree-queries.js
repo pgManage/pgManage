@@ -716,7 +716,7 @@ SELECT {{INTOID}}, quote_ident(conname) AS name, '{{SCHEMA}}' AS schema_name, 'C
 */});
 
 listQuery.objectKeyList = ml(function () {/*
-SELECT {{INTOID}}, quote_ident(conname) AS name, '{{SCHEMA}}' AS schema_name, 'PK' AS bullet
+SELECT constrain.oid, quote_ident(conname) AS name, '{{SCHEMA}}' AS schema_name, COALESCE(UPPER(contype), '') || 'K' AS bullet
              FROM 
                 (SELECT oid, *
                    FROM pg_constraint
@@ -1396,7 +1396,7 @@ SELECT '-- Constraint: ' || conname || E';\n\n' ||
              FROM 
                 (SELECT oid, *
                    FROM pg_constraint
-                  WHERE pg_constraint.conrelid = {{INTOID}}
+                  WHERE pg_constraint.oid = {{INTOID}}
                 ORDER BY (CASE WHEN contype = 'p' THEN 1 WHEN contype = 'u' THEN 2
                               WHEN contype = 'c' THEN 3 WHEN contype = 'f' THEN 4
                               WHEN contype = 't' THEN 5 WHEN contype = 'x' THEN 6 END) ASC,
@@ -1939,10 +1939,11 @@ scriptQuery.objectTable = ml(function () {/*
                     FROM pg_catalog.pg_class
               LEFT JOIN pg_catalog.pg_namespace ON pg_namespace.oid = pg_class.relnamespace
               LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
-                   WHERE pg_class.oid = {{INTOID}}) ||
-            E'\n-- DROP TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-            E';\n\nCREATE TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname) ||
-            E' (\n' ||
+                   WHERE pg_class.oid = {{INTOID}})
+            || E'\n-- DROP TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname)
+            || E';\n\nCREATE ' || CASE pg_class.relpersistence WHEN 'u' THEN 'UNLOGGED ' WHEN 't' THEN 'TEMP ' ELSE '' END
+            || 'TABLE ' || quote_ident(pg_namespace.nspname) || '.' || quote_ident(pg_class.relname)
+            || E' (\n' ||
                     COALESCE(
                         array_to_string(
                             array_agg(
@@ -2067,7 +2068,7 @@ scriptQuery.objectTable = ml(function () {/*
          JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
         LEFT JOIN pg_catalog.pg_stat_user_tables ON pg_stat_user_tables.relid = pg_class.oid
         WHERE pg_class.oid = {{INTOID}} OR pg_namespace.nspname || '.' || pg_class.relname = '{{STRSQLSAFENAME}}'
-        GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relacl,
+        GROUP BY pg_namespace.nspname, pg_class.relname, pg_class.relpersistence, pg_class.relacl,
                 pg_class.relhasoids, pg_roles.rolname, em2.oid, em2.con_full, reloptions) --pg_description.description
                 
         -- This section pulls the GRANT lines

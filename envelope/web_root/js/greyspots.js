@@ -38818,7 +38818,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // remove all templates from the dom to prevent reflows
         if (topHudTemplate) {
-            console.log(element, topHudTemplate);
+            //console.log(element, topHudTemplate);
             element.removeChild(topHudTemplate);
         }
         if (bottomHudTemplate) {
@@ -41228,7 +41228,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // we want the null string to be configurable, so we'll read the
         //      "null-string" attribute to get the null string
         strNullString = element.getAttribute('null-string');
-
+        //snapback
         // get visible range
         jsnRange = element.internalDisplay.currentRange;
         //intCellOriginLeft = jsnRange.originLeft;
@@ -41372,7 +41372,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'index': i,
                     'len': intTotalRecords
                 });
-
+                //console.log(strRecord)
                 //// replace the css tokens so the cells are in the right place
                 //col_i = fromColumn;
                 //col_len = toColumn;
@@ -42022,7 +42022,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'len': intTotalRecords
             });
 
-            //console.log(strRecord);
+            console.log(strRecord);
 
             // return record html
             return strRecord;
@@ -42827,7 +42827,7 @@ document.addEventListener('DOMContentLoaded', function () {
         len = jsnRange.toColumn;
         while (i < len) {
             //if (arrColumnWidths[i] < 3) {
-            //    console.log(
+            //    //console.log(
             //        element.internalDisplay.defaultColumnWidths[i],
             //        element.internalDisplay.minColumnWidths[i],
             //        arrColumnWidths[i]
@@ -44703,7 +44703,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         // splitter v2, faster than v1 by 1 third
                         //if (window.asdfasdf === true) {
-                        //    console.log(strMessage);
+                        //    //console.log(strMessage);
                         //}
                         i = 0;
                         while (i < 15) {
@@ -44715,7 +44715,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 arrRecords.push(strRecord);
 
                                 //if (window.asdfasdfasdf === true) {
-                                //    console.log(strRecord);
+                                //    //console.log(strRecord);
                                 //}
                                 if (bolLoadNewRecordHeights) {
                                     arrRecordHeights.push(intRecordHeight);
@@ -49910,7 +49910,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 //console.log('FOCUS:', document.activeElement);
                 //setTimeout(function () {
-                //    console.log('FOCUS:', document.activeElement);
+                //    //console.log('FOCUS:', document.activeElement);
                 //}, 1000);
 
                 // some time after this mousedown event finishes, the

@@ -219,6 +219,10 @@ app.on('quit', function () {
 	proc.kill();
 });
 
+function closeTabFunc() {
+	BrowserWindow.getFocusedWindow().webContents.executeJavaScript('closeCurrentTab()');
+}
+
 function setMenu() {
 	const Menu = electron.Menu;
 	const template = [
@@ -331,7 +335,9 @@ function setMenu() {
 				{
 					role: 'minimize'
 				}, {
-					role: 'close'
+					label: 'Close Tab',
+					accelerator: 'CmdOrCtrl+W',
+					click: closeTabFunc
 				}
 			]
 		}
@@ -382,9 +388,9 @@ function setMenu() {
 		// Window menu.
 		template[4].submenu = [
 			{
-				label: 'Close',
+				label: 'Close Tab',
 				accelerator: 'CmdOrCtrl+W',
-				role: 'close'
+				click: closeTabFunc
 			}, {
 				label: 'Minimize',
 				accelerator: 'CmdOrCtrl+M',

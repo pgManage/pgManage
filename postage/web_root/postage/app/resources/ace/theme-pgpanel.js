@@ -106,7 +106,14 @@ var pgPanelCSSText = ml(function () {/*
     .ace-pgpanel .ace_tb,
     .ace-pgpanel .ace_tf,
     .ace-pgpanel .ace_ty,
+    
     .ace-pgpanel .ace_pk,
+    .ace-pgpanel .ace_uk,
+    .ace-pgpanel .ace_ck,
+    .ace-pgpanel .ace_fk,
+    .ace-pgpanel .ace_tk,
+    .ace-pgpanel .ace_xk,
+    
     .ace-pgpanel .ace_rl,
     .ace-pgpanel .ace_tr,
     .ace-pgpanel .ace_mv,

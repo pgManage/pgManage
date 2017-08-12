@@ -256,4 +256,5 @@ function explain(bolRun) {
             }
         });
     }
+	editor.focus();
 }

@@ -205,7 +205,11 @@ document.addEventListener('keydown', function (event) {
         ShortcutDocs();
     } else if (keyCodeCheck(event, localStorage.ShortcutHome)) {
         ShortcutHome();
-    }
+    }/* else if ((event.metaKey || event.ctrlKey) && event.key === 'w') {
+		console.log('test');
+		event.preventDefault();
+		event.stopPropagation();
+    }*/
 });
 
 document.addEventListener('keyup', function (event) {
