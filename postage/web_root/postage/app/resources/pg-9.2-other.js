@@ -3073,10 +3073,28 @@ function executeScript(bolCursorQuery) {
                                     } else {
                                         columnType = data.arrColumnTypes[i];
                                     }
-
-                                    strHTML += (
-                                        '<gs-cell class="result-cell">{{! arrRow[' + i + '] }}</gs-cell>'
-                                    );
+									if (columnType !== 'int2'
+										&& columnType !== 'smallint'
+										&& columnType !== 'int4'
+										&& columnType !== 'integer'
+										&& columnType !== 'int8'
+										&& columnType !== 'bigint'
+										&& columnType !== 'numeric'
+										&& columnType !== 'float'
+										&& columnType !== 'decimal'
+										&& columnType !== 'real'
+										&& columnType !== 'double'
+										&& columnType !== 'money'
+										&& columnType !== 'oid'
+									) {
+	                                    strHTML += (
+	                                        '<gs-cell class="result-cell">{{! arrRow[' + i + '] }}</gs-cell>'
+	                                    );
+									} else {
+										strHTML += (
+	                                        '<gs-cell class="result-cell" style="text-align: right;">{{! arrRow[' + i + '] }}</gs-cell>'
+	                                    );
+									}
                                     i += 1;
                                 }
                                 strHTML += '</template>';
