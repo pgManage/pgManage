@@ -837,6 +837,12 @@ function dialogOptions() {
                         <gs-option value="true">Labeled</gs-option>
                         <gs-option value="false">Unlabeled</gs-option>
                     </gs-optionbox>
+
+                    <label>SQL Explain Graph Style:</label>
+                    <gs-optionbox id="graph-options" style="padding: 0 0.25em 0.25em 0.25em;">
+                        <gs-option value="true">Horizontal</gs-option>
+                        <gs-option value="false">Vertical</gs-option>
+                    </gs-optionbox>
                 </div>
 
 
@@ -1108,6 +1114,7 @@ function dialogOptions() {
         // set control values
         document.getElementById('clip-options-quote-which').value = getClipSetting("quoteType");
         document.getElementById('button-options').value = localStorage.labeledButtons;
+        document.getElementById('graph-options').value = localStorage.horizontalGraph;
         document.getElementById('clip-options-quote-char').value = getClipSetting("quoteChar");
         document.getElementById('clip-options-field-delimiter').value = getClipSetting("fieldDelimiter");
         document.getElementById('clip-options-null-values').value = getClipSetting("nullValues");
@@ -1118,6 +1125,9 @@ function dialogOptions() {
         document.getElementById('button-options').addEventListener('change', function () {
             refreshButtons(document.getElementById('button-options').value);
             //console.log(document.getElementById('button-options').value);
+        });
+        document.getElementById('graph-options').addEventListener('change', function () {
+            localStorage.horizontalGraph = document.getElementById('graph-options').value;
         });
         CSSEditor.addEventListener('change', function () {
             customCSSText = CSSEditor.getValue();

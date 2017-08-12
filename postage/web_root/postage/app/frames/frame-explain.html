@@ -9,6 +9,7 @@
         <title>Explain</title>
 
         <script src="../../js/greyspots.js" type="text/javascript"></script>
+        <script src="../../js/settings.js" type="text/javascript"></script>
         <link href="../../css/greyspots.css" type="text/css" rel="stylesheet" />
 
         <link href="../../css/postage.css" type="text/css" rel="stylesheet" />
@@ -155,13 +156,45 @@
 
 				var tree = d3.tree().nodeSize([210, 300]);
 				root = tree(root);
-				//console.log(root);
 
+				var minX = 0;
+				var maxX = 0;
+				var minY = 0;
+				var maxY = 0;
+
+				root.each(function (node) {
+					if (localStorage.horizontalGraph === 'true') {
+						var tempY = node.x;
+						node.x = node.y;
+						node.y = tempY;
+					}
+
+					minX = minX < node.x ? minX : node.x;
+					maxX = maxX > node.x ? maxX : node.x;
+					minY = minY < node.y ? minY : node.y;
+					maxY = maxY > node.y ? maxY : node.y;
+				});
+
+				var scaleMin;
+				var startX;
+				var startY;
+
+				if (localStorage.horizontalGraph === 'true') {
+					scaleMin = (target.parentNode.clientHeight / (Math.abs(maxY - minY) + (target.parentNode.clientHeight / 2)));
+					startX = minX + 140;
+					startY = minY + 530;
+					
+				} else {
+					scaleMin = (target.parentNode.clientWidth / (Math.abs(maxX - minX) + (target.parentNode.clientWidth / 2)));
+					startX = (target.parentNode.clientWidth / 2);
+					startY = minY + 140;
+				}
+				
 				var svg = d3.select(target).append('svg')
 									.attr("width", "100%")
 									.attr("flex", ""),
 					g = svg
-						.append('g').attr("transform", "translate(" + (target.clientWidth / 2) + ", 120)")
+						.append('g').attr("transform", "translate(" + startX + ", " + startY + ") scale(" + scaleMin + ")")
 						.call(
 							d3.zoom().on('zoom', function () {
 								g.attr('transform', d3.event.transform.toString());
