@@ -152,6 +152,7 @@
                             tableElement.setAttribute('all-cols', strColumns);
                             tableElement.setAttribute('cols', strColumns);
                             tableElement.setAttribute('id', 'tableElement');
+                            tableElement.setAttribute('limit', '10');
                             tableElement.setAttribute('null-string', '\\N');
                             tableElement.setAttribute('style', 'width: 100%; height: 100%;');
                             tableElement.setAttribute('focus-on-load', '');
@@ -168,11 +169,18 @@
                                 updateContent += '<label>' + arrColumns[i] + '</label>\n';
                                 updateContent += '<gs-text column="' + arrColumns[i] + '"></gs-text>\n';
                                 headerContent += '<gs-cell>' + arrColumns[i] + '</gs-cell>\n';
-                                recordContent += '<gs-cell header="' + arrColumns[i] + '"><label><input column="' + arrColumns[i] + '" /></label></gs-cell>\n';
+                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
+                                                                                    '    <label>\n' +
+                                                                                    '        {{? row[\'' + arrColumns[i] + '\'] ===  \'\\\\N\' }}\n' +
+                                                                                    '            <input placeholder="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
+                                                                                    '        {{??}}\n' +
+                                                                                    '            <input value="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
+                                                                                    '        {{?}}\n' +
+                                                                                    '    </label>\n' +
+                                                                                    '</gs-cell>\n';
                                 copyContent += '<gs-cell header="' + arrColumns[i] + '">{{= row[' + JSON.stringify(arrColumns[i]) + '] }}</gs-cell>\n';
                                 insertContent += '<gs-cell header="' + arrColumns[i] + '"><label><input column="' + arrColumns[i] + '" /></label></gs-cell>\n';
                             }
-
                             tableElement.innerHTML = ml(function () {/*
     <template for="top-hud">
         <gs-button onclick="document.getElementById('tableElement').deleteSelected();" inline no-focus icononly icon="times">&nbsp;</gs-button>

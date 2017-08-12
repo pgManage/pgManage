@@ -1793,8 +1793,8 @@ function getContext(strInput, intPosition) {
         }
     } if (arrShortQueries.indexOf('contextTablesColumns') > -1) {
         //console.log('arrShortQueries', arrShortQueries);
-        //console.log('before strContext', strContext);
-        //console.log('before strCopyContext', strCopyContext);
+        console.log('before strContext', strContext);
+        console.log('before strCopyContext', strCopyContext);
         
         var strSchema = '';
         var strTable = '';
@@ -1809,9 +1809,9 @@ function getContext(strInput, intPosition) {
             
             autocompleteGlobals.bolAlpha = false;
             
-            //console.log('strSchema', strSchema);
-            //console.log('strTable', strTable);
-            //console.log('after strContext', strContext);
+            console.log('strSchema', strSchema);
+            console.log('strTable', strTable);
+            console.log('after strContext', strContext);
         } else if (strContext.match(/^.*\..*/)) {
             var arrMatches = strContext.match(/^(.*)\.([^.]*)/);
             strTable = arrMatches[1];
@@ -1819,16 +1819,21 @@ function getContext(strInput, intPosition) {
             
             autocompleteGlobals.bolAlpha = false;
             
-            //console.log('strTable', strTable);
-            //console.log('after strContext', strContext);
+            console.log('strTable', strTable);
+            console.log('after strContext', strContext);
         }
         
-        //console.log('autocompleteGlobals.arrStrContext', autocompleteGlobals.arrStrContext);
+        console.log('autocompleteGlobals.arrStrContext', autocompleteGlobals.arrStrContext);
         var i, len;
         for (i = 0, len = autocompleteGlobals.arrStrContext.length; i < len; i++) {
-            if ((autocompleteGlobals.arrStrContext[i][0] === strSchema || strSchema === '')
-                || (autocompleteGlobals.arrStrContext[i][1] === strTable || strTable === '')
-                || (autocompleteGlobals.arrStrContext[i][2] === strTable || autocompleteGlobals.arrStrContext[i][2] === '')) {
+            console.log(i + ' test1' + (autocompleteGlobals.arrStrContext[i][0] === strSchema && strSchema !== ''));
+            console.log(i + ' test2' + (autocompleteGlobals.arrStrContext[i][1] === strTable && strTable !== ''));
+            console.log(i + ' test3' + (autocompleteGlobals.arrStrContext[i][2] === strTable && autocompleteGlobals.arrStrContext[i][2] !== ''));
+            if ((autocompleteGlobals.arrStrContext[i][0] === strSchema && strSchema !== '')
+                || (autocompleteGlobals.arrStrContext[i][1] === strTable && strTable !== '')
+                || (autocompleteGlobals.arrStrContext[i][2] === strTable && autocompleteGlobals.arrStrContext[i][2] !== '')
+                || (strSchema === '' && strTable === '')) {
+                console.log('i ' + i + ' pass');
                 arrQueries.push(
                     autocompleteQuery.columns
                         .replace(/\{\{ADDITIONALWHERE}\}/gi,
@@ -1843,6 +1848,12 @@ function getContext(strInput, intPosition) {
             if (strTable === '' && autocompleteGlobals.arrStrContext[i][2] !== '') {
                 arrQueries.push(ml(function () {/*SELECT $STRINGTOKEN${{STRING}}$STRINGTOKEN$ AS obj_name, 'special_table' AS obj_meta*/})
                     .replace(/\{\{STRING}\}/gi, autocompleteGlobals.arrStrContext[i][2]));
+            }
+            if (strTable === '' && autocompleteGlobals.arrStrContext[i][0] !== ''
+                && autocompleteGlobals.arrStrContext[i][1] !== '' && autocompleteGlobals.arrStrContext[i][2] === '') {
+                arrQueries.push(ml(function () {/*SELECT $STRINGTOKEN${{STRING}}$STRINGTOKEN$ AS obj_name, 'special_table' AS obj_meta*/})
+                    .replace(/\{\{STRING}\}/gi, autocompleteGlobals.arrStrContext[i][0] + '.'
+                    + autocompleteGlobals.arrStrContext[i][1]));
             }
             if (strTable === '' && autocompleteGlobals.arrStrContext[i][1] !== '' && autocompleteGlobals.arrStrContext[i][2] === '') {
                 arrQueries.push(ml(function () {/*SELECT $STRINGTOKEN${{STRING}}$STRINGTOKEN$ AS obj_name, 'special_table' AS obj_meta*/})
