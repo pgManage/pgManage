@@ -512,6 +512,35 @@ NOTIFY postgres, 'testing';
 				"TRANSACTION COMPLETED"
 			]],
 
+			['RAW SELECT NO COLUMNS', 'websocket', '', ml(function () {/*RAW
+CREATE TABLE public.no_col (
+
+) WITH (
+  OIDS=FALSE
+);
+SELECT *
+	FROM public.no_col;
+DROP TABLE public.no_col;
+*/
+			}),
+			[
+				"QUERY\tCREATE TABLE public.no_col (\\n\\n) WITH (\\n  OIDS=FALSE\\n);",
+				"START",
+				"END",
+				"Rows Affected\n0\n",
+				"QUERY\t\\nSELECT *\\n\\tFROM public.no_col;",
+				"START",
+				"END",
+				"ROWS\t0",
+				"COLUMNS\n",
+				"\\.",
+				"QUERY\t\\nDROP TABLE public.no_col;",
+				"START",
+				"END",
+				"Rows Affected\n0\n",
+				"TRANSACTION COMPLETED"
+			]],
+
 			['SOCKET CLOSE', 'websocket end']
 		]
 	},

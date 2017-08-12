@@ -426,7 +426,7 @@ bool ws_raw_step2(EV_P, PGresult *res, ExecStatusType result, struct sock_ev_cli
 			int int_column;
 			int int_num_columns = PQnfields(res);
 			for (int_column = 0; int_column < int_num_columns; int_column += 1) {
-				// For some reason the types are returned as te4xt containing the type's OID
+				// For some reason the types are returned as text containing the type's OID
 				memset(str_temp, 0, 101);
 				sprintf(str_temp, "%u", PQftype(res, int_column));
 				str_oid_type = PQescapeLiteral(client_request->parent->cnxn, str_temp, strlen(str_temp));
