@@ -96,7 +96,7 @@
             window.addEventListener('load', function () {
                 'use strict'
                 var qs = GS.qryToJSON(GS.getQueryString()), strQuery;
-                console.log(qs);
+                //console.log(qs);
                 zoomStart();
 
                 GS.addLoader('getting_info');
@@ -123,7 +123,12 @@
                                         LEFT OUTER JOIN pg_attrdef ON adrelid = attrelid AND adnum = attnum
                                                   WHERE attrelid = getoid.oid
                                                   ORDER BY attnum ASC) em
-                            )
+                            ),
+							(
+							SELECT array_to_string(array_agg(CASE WHEN COALESCE(format_type(atttypid, atttypmod),'') = 'timestamp with time zone' THEN 'timestamptz' WHEN COALESCE(format_type(atttypid, atttypmod),'') ILIKE 'character varying%' THEN 'varchar' || substring(COALESCE(format_type(atttypid, atttypmod)), 18) ELSE COALESCE(format_type(atttypid, atttypmod),'') END), ',')
+							FROM pg_attribute
+							WHERE pg_attribute.attisdropped IS FALSE AND pg_attribute.attnum > 0 AND attrelid = getoid.oid
+							)
                       FROM pg_class getoid
                  LEFT JOIN pg_namespace pg_schema ON pg_schema.oid = getoid.relnamespace
                      WHERE pg_schema.nspname = $SAFEqUoTE${{NSPNAME}}$SAFEqUoTE$ AND getoid.relname = $SAFEqUoTE${{STRNAME}}$SAFEqUoTE$
@@ -133,17 +138,22 @@
 
                 var tableElement = document.createElement('gs-table');
                 GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
-                    var arrColumns, strPK, strColumns, strSequenceDefaults, arrSequenceDefaults, i, len, strHTML, arrColumns, strLock;
+                    var arrColumns, strPK, strColumns, strSequenceDefaults, arrSequenceDefaults, i, len, strHTML, arrColumns, strLock, strColumnTypes, arrColumnTypes;
 
                     if (!error) {
                         if (data.intCallbackNumber === 0) {
                             arrColumns = data.strMessage.split('\t');
+							console.log(data, arrColumns[3]);
                             //console.log(arrColumns);
                             strPK = GS.decodeFromTabDelimited(arrColumns[0]);
 
                             strSequenceDefaults = GS.decodeFromTabDelimited(arrColumns[2] || '');
                             arrSequenceDefaults = strSequenceDefaults.split(',');
 
+							if (arrColumns[3]) {
+								strColumnTypes = GS.decodeFromTabDelimited(arrColumns[3]);
+								arrColumnTypes = strColumnTypes.split(',');
+							}
                             if (arrColumns[1]) {
                                 strColumns = GS.decodeFromTabDelimited(arrColumns[1]);
                                 arrColumns = strColumns.split(',');
@@ -158,8 +168,6 @@
                             tableElement.setAttribute('focus-on-load', '');
                             tableElement.setAttribute('src', (qs.schema + '.' + qs.object) || '');
 
-                    // <template for="update-dialog">
-
                             var updateContent = ''
                             var headerContent = '';
                             var recordContent = '';
@@ -169,15 +177,40 @@
                                 updateContent += '<label>' + arrColumns[i] + '</label>\n';
                                 updateContent += '<gs-text column="' + arrColumns[i] + '"></gs-text>\n';
                                 headerContent += '<gs-cell>' + arrColumns[i] + '</gs-cell>\n';
-                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
-                                                                                    '    <label>\n' +
-                                                                                    '        {{? row[\'' + arrColumns[i] + '\'] ===  \'\\\\N\' }}\n' +
-                                                                                    '            <input placeholder="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
-                                                                                    '        {{??}}\n' +
-                                                                                    '            <input value="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
-                                                                                    '        {{?}}\n' +
-                                                                                    '    </label>\n' +
-                                                                                    '</gs-cell>\n';
+								if (arrColumnTypes[i] !== 'int2'
+									&& arrColumnTypes[i] !== 'smallint'
+									&& arrColumnTypes[i] !== 'int4'
+									&& arrColumnTypes[i] !== 'integer'
+									&& arrColumnTypes[i] !== 'int8'
+									&& arrColumnTypes[i] !== 'bigint'
+									&& arrColumnTypes[i] !== 'numeric'
+									&& arrColumnTypes[i] !== 'float'
+									&& arrColumnTypes[i] !== 'decimal'
+									&& arrColumnTypes[i] !== 'real'
+									&& arrColumnTypes[i] !== 'double'
+									&& arrColumnTypes[i] !== 'money'
+									&& arrColumnTypes[i] !== 'oid'
+								) {
+	                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
+			                                        '    <label>\n' +
+			                                        '        {{? row[\'' + arrColumns[i] + '\'] ===  \'\\\\N\' }}\n' +
+			                                        '            <input placeholder="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
+			                                        '        {{??}}\n' +
+			                                        '            <input value="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
+			                                        '        {{?}}\n' +
+			                                        '    </label>\n' +
+			                                        '</gs-cell>\n';
+								} else {
+	                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
+			                                        '    <label>\n' +
+			                                        '        {{? row[\'' + arrColumns[i] + '\'] ===  \'\\\\N\' }}\n' +
+			                                        '            <input style="text-align: right;" placeholder="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
+			                                        '        {{??}}\n' +
+			                                        '            <input style="text-align: right;" value="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
+			                                        '        {{?}}\n' +
+			                                        '    </label>\n' +
+			                                        '</gs-cell>\n';
+								}
                                 copyContent += '<gs-cell header="' + arrColumns[i] + '">{{= row[' + JSON.stringify(arrColumns[i]) + '] }}</gs-cell>\n';
                                 insertContent += '<gs-cell header="' + arrColumns[i] + '"><label><input column="' + arrColumns[i] + '" /></label></gs-cell>\n';
                             }
