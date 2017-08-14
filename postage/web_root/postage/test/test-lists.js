@@ -512,6 +512,35 @@ NOTIFY postgres, 'testing';
 				"TRANSACTION COMPLETED"
 			]],
 
+			['RAW SELECT NO COLUMNS', 'websocket', '', ml(function () {/*RAW
+CREATE TABLE public.no_col (
+
+) WITH (
+  OIDS=FALSE
+);
+SELECT *
+	FROM public.no_col;
+DROP TABLE public.no_col;
+*/
+			}),
+			[
+				"QUERY\tCREATE TABLE public.no_col (\\n\\n) WITH (\\n  OIDS=FALSE\\n);",
+				"START",
+				"END",
+				"Rows Affected\n0\n",
+				"QUERY\t\\nSELECT *\\n\\tFROM public.no_col;",
+				"START",
+				"END",
+				"ROWS\t0",
+				"COLUMNS\n",
+				"\\.",
+				"QUERY\t\\nDROP TABLE public.no_col;",
+				"START",
+				"END",
+				"Rows Affected\n0\n",
+				"TRANSACTION COMPLETED"
+			]],
+
 			['SOCKET CLOSE', 'websocket end']
 		]
 	},
@@ -1409,11 +1438,11 @@ ORDER BY	id ASC
 
 pk	set
 id	test_name
-1{{test_random}}1	Bob\nby
+1{{test_random}}1	Bob\r\n\t\\by
 1{{test_random}}2	Alicia
 */
 			}),
-			['1{{test_random}}1\tBob\\nby\n1{{test_random}}2\tAlicia\n', 'TRANSACTION COMPLETED']],
+			['1{{test_random}}1\tBob\\r\\n\\t\\\\by\n1{{test_random}}2\tAlicia\n', 'TRANSACTION COMPLETED']],
 			['COMMIT', 'websocket', '', 'COMMIT', ['OK']],
 
 			['BEGIN', 'websocket', '', 'BEGIN', ['OK']],
@@ -1423,7 +1452,7 @@ HASH	test_name
 
 pk	set	hash
 id	test_name	hash
-1{{test_random}}1	test	06c8c1ef3b4faccdd0a54482829ad03b
+1{{test_random}}1	test	bea7427961d41e7795f7ebb0e1cc3a3f
 */
 			}),
   			['1{{test_random}}1\ttest\n', 'TRANSACTION COMPLETED']],
@@ -1632,13 +1661,13 @@ WHERE id::text ILIKE '1{{test_random}}%';
 			['SOCKET OPEN', 'websocket start'],
 			['INSERT RECORDS 1', 'websocket', '', ml(function () {/*RAW
 INSERT INTO rtesting_table (id, test_name)
-VALUES (2{{test_random}}1, E'Bob\nby'), (2{{test_random}}2, 'Alice'), (2{{test_random}}3, 'Alice');
+VALUES (2{{test_random}}1, E'Bob\r\n\t\\by'), (2{{test_random}}2, 'Alice'), (2{{test_random}}3, 'Alice');
 INSERT INTO rtesting_table_with_capital_column_name (id, test_name, "TestName")
 VALUES (2{{test_random}}1, 'Bob', 'Bob'), (2{{test_random}}2, 'Alice', 'Alice'), (2{{test_random}}3, 'Alice', 'Alice');
 */
 			}),
 			[
-                "QUERY\tINSERT INTO rtesting_table (id, test_name)\\nVALUES (2{{test_random}}1, E'Bob\\\\nby'), (2{{test_random}}2, 'Alice'), (2{{test_random}}3, 'Alice');",
+                "QUERY\tINSERT INTO rtesting_table (id, test_name)\\nVALUES (2{{test_random}}1, E'Bob\\\\r\\\\n\\\\t\\\\\\\\by'), (2{{test_random}}2, 'Alice'), (2{{test_random}}3, 'Alice');",
                 "START", "END",
                 "Rows Affected\n3\n",
                 "QUERY\t\\nINSERT INTO rtesting_table_with_capital_column_name (id, test_name, \"TestName\")\\nVALUES (2{{test_random}}1, 'Bob', 'Bob'), (2{{test_random}}2, 'Alice', 'Alice'), (2{{test_random}}3, 'Alice', 'Alice');",
@@ -1722,7 +1751,7 @@ id	hash
 2{{test_random}}2	abc
 2{{test_random}}3	abc
 */}),
-			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  column \"tes\" does not exist\\nLINE 1: ...| ' ' || replace(replace(replace(replace(COALESCE(\"tes\"::tex...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t222\n"]
+			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  column \"tes\" does not exist\\nLINE 1: ...| ' ' || replace(replace(replace(replace(COALESCE(\"tes\"::tex...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t219\n"]
             ],
 			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
@@ -1738,7 +1767,7 @@ id	hash
 2{{test_random}}2	abc
 2{{test_random}}3	abc
 */}),
-			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  zero-length delimited identifier at or near \"\"\"\"\\nLINE 1: ...| ' ' || replace(replace(replace(replace(COALESCE(\"\"::text, ...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t222\n"]
+			    ["DB_exec failed:\nFATAL\nerror_text\tERROR:  zero-length delimited identifier at or near \"\"\"\"\\nLINE 1: ...| ' ' || replace(replace(replace(replace(COALESCE(\"\"::text, ...\\n                                                             ^\\n\nerror_detail\t\nerror_hint\t\nerror_query\t\nerror_context\t\nerror_position\t219\n"]
             ],
 			['ROLLBACK', 'websocket', '', 'ROLLBACK', ['OK']],
 
@@ -1889,7 +1918,7 @@ HASH	test_name
 
 pk	hash
 id	hash
-2{{test_random}}1	06c8c1ef3b4faccdd0a54482829ad03b
+2{{test_random}}1	bea7427961d41e7795f7ebb0e1cc3a3f
 */
 			}),
   			["Rows Affected\n1\n","TRANSACTION COMPLETED"]],

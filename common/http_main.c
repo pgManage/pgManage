@@ -247,7 +247,7 @@ void http_main(struct sock_ev_client *client) {
 		client_auth->parent = client;
 
 		http_auth(client_auth);
-	} else if (strncmp(str_uri, "/env", 4) == 0) {
+	} else if (strncmp(str_uri, "/env/", 5) == 0) {
 		// set_cnxn does its own error handling
 		SDEBUG("str_uri: %s", str_uri);
 
@@ -259,7 +259,7 @@ void http_main(struct sock_ev_client *client) {
 		http_file_step1(client);
 	}
 #else
-	if (strncmp(str_uri, "/postage", 8) != 0) {
+	if (strncmp(str_uri, "/postage/", 9) != 0) {
 		SFINISH_SNCAT(str_response, &int_response_len,
 			"HTTP/1.1 303 See Other\015\012Connection: close\015\012Location: /postage", (size_t)61,
 			str_full_uri, int_full_uri_len,
@@ -273,7 +273,7 @@ void http_main(struct sock_ev_client *client) {
 		client_auth->parent = client;
 
 		http_auth(client_auth);
-	} else if (strncmp(str_uri, "/postage", 8) == 0 && isdigit(str_uri[9])) {
+	} else if (strncmp(str_uri, "/postage/", 9) == 0 && isdigit(str_uri[9])) {
 		if (isdigit(str_uri[9])) {
 			str_uri_temp = str_uri;
 			char *str_temp = strchr(str_uri_temp + 9, '/');

@@ -222,3 +222,6 @@ README.md
 /dependencies/libressl/libtls-standalone/src/tls_util.c
 /dependencies/libressl/libtls-standalone/src/tls_verify.c
 /dependencies/libressl/tls/tls_internal.h.orig
+
+UpgradeLog.htm
+npm-debug.log

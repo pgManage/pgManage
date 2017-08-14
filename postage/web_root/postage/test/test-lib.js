@@ -303,7 +303,7 @@ var $ = {
 					data = data.replace(/\/usr\/home\/super\//g, '/home/super/');
 					data = data.replace(/\\test/g, '/test');
 	                data = data.replace(/\/\//g, '\\\\');
-	                data = data.replace(/Bob\/\\nby/g, 'Bob\\\\nby');
+	                data = data.replace(/Bob\/\\r\/\\n\/\\t\\\\\\\\by/g, 'Bob\\\\r\\\\n\\\\t\\\\\\\\by');
 				}
                 arrStrActualOutput.push(data.replace(/transactionid = .*\n/gim, ''));
                 i += 1;
