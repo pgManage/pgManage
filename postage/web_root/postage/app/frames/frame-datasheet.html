@@ -194,9 +194,9 @@
 	                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
 			                                        '    <label class="table-label">\n' +
 			                                        '        {{? row[\'' + arrColumns[i] + '\'] ===  \'\\\\N\' }}\n' +
-			                                        '            <textarea rows="1" class="textarea" placeholder="{{! row[\'' + arrColumns[i] + '\'] }}"></textarea>\n' +
+			                                        '            <textarea column="{{! row[\'' + arrColumns[i] + '\'] }}" value="{{! row[\'' + arrColumns[i] + '\'] }}" rows="1" class="textarea" placeholder="{{! row[\'' + arrColumns[i] + '\'] }}"></textarea>\n' +
 			                                        '        {{??}}\n' +
-			                                        '            <textarea rows="1" class="textarea">{{! row[\'' + arrColumns[i] + '\'] }}</textarea>\n' +
+			                                        '            <textarea column="{{! row[\'' + arrColumns[i] + '\'] }}" value="{{! row[\'' + arrColumns[i] + '\'] }}" rows="1" class="textarea">{{! row[\'' + arrColumns[i] + '\'] }}</textarea>\n' +
 			                                        '        {{?}}\n' +
 			                                        '    </label>\n' +
 			                                        '</gs-cell>\n';
@@ -204,9 +204,9 @@
 	                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
 			                                        '    <label class="table-label">\n' +
 			                                        '        {{? row[\'' + arrColumns[i] + '\'] ===  \'\\\\N\' }}\n' +
-			                                        '            <textarea rows="1" class="textarea text-right" placeholder="{{! row[\'' + arrColumns[i] + '\'] }}"></textarea>\n' +
+			                                        '            <textarea column="{{! row[\'' + arrColumns[i] + '\'] }}" value="{{! row[\'' + arrColumns[i] + '\'] }}" rows="1" class="textarea text-right" placeholder="{{! row[\'' + arrColumns[i] + '\'] }}"></textarea>\n' +
 			                                        '        {{??}}\n' +
-			                                        '            <textarea rows="1" class="textarea text-right">{{! row[\'' + arrColumns[i] + '\'] }}</textarea>\n' +
+			                                        '            <textarea column="{{! row[\'' + arrColumns[i] + '\'] }}" value="{{! row[\'' + arrColumns[i] + '\'] }}" rows="1" class="textarea text-right">{{! row[\'' + arrColumns[i] + '\'] }}</textarea>\n' +
 			                                        '        {{?}}\n' +
 			                                        '    </label>\n' +
 			                                        '</gs-cell>\n';
@@ -355,6 +355,16 @@
                             document.getElementById('tableElement').addEventListener('selection_change', function () {
                                 checkDisableds();
                                 //// // console.log('test');
+                            });
+
+							document.getElementById('tableElement').addEventListener('focusout', function () {
+                                console.log('test', event);
+								if (event.srcElement.defaultValue !== event.srcElement.value) {
+									console.log('change');
+									event.srcElement.setAttribute('value', event.srcElement.value);
+									GS.triggerEvent(event.srcElement, 'change');
+
+								}
                             });
                         }
 

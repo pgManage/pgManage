@@ -1683,7 +1683,7 @@ finish:
 		"\012responsenumber = ", (size_t)18,
 		str_temp, strlen(str_temp),
 		"\012transactionid = ", (size_t)17,
-		client_request->str_transaction_id, client_request->str_transaction_id,
+		client_request->str_transaction_id, client_request->int_transaction_id_len,
 		"\012", (size_t)1,
 		_str_response, _int_response_len);
 	SFREE(_str_response);

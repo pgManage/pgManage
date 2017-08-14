@@ -505,7 +505,7 @@ finish:
 		SFREE_PWORD(str_response);
 	}
 	bol_error_state = false;
-	return client->conn;
+	return client ? client->conn : NULL;
 }
 
 #ifdef ENVELOPE
