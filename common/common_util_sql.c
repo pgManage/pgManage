@@ -225,10 +225,10 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query, size_t int_
 		str_temp = str_temp1;
 		str_temp1 = NULL;
 		if (driver == DB_DRIVER_POSTGRES) {
-			SERROR_BREPLACE(str_temp, &int_temp_len, "\t", "\"::text, '\\N'), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || E'\\t' || replace(replace(replace(replace(COALESCE(\"", "g");
+			SERROR_BREPLACE(str_temp, &int_temp_len, "\t", "\"::text, '\\N'), '\\', '\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || E'\\t' || replace(replace(replace(replace(COALESCE(\"", "g");
 		} else {
 			SERROR_BREPLACE(str_temp, &int_temp_len, "\t",
-				"\" AS nvarchar(MAX)), CAST('\\N' AS nvarchar(MAX))) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + "
+				"\" AS nvarchar(MAX)), CAST('\\N' AS nvarchar(MAX))) AS nvarchar(MAX)), '\\', '\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + "
 				"CAST('\t' AS nvarchar(MAX)) + replace(replace(replace(replace(CAST(COALESCE(CAST(\"", "g");
 		}
 		SERROR_BREPLACE(str_temp, &int_temp_len, "TABHERE3141592653589793TABHERE", "\t", "g");
@@ -236,12 +236,12 @@ char *get_return_escaped_columns(DB_driver driver, char *_str_query, size_t int_
 			SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len,
 				"replace(replace(replace(replace(COALESCE(\"", (size_t)42,
 				str_temp, int_temp_len,
-				"\"::text, '\\N'), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || E'\n'", (size_t)81);
+				"\"::text, '\\N'), '\\', '\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || E'\n'", (size_t)81);
 		} else {
 			SERROR_SNCAT(str_return_columns, ptr_int_return_columns_len,
 				"replace(replace(replace(replace(CAST(COALESCE(CAST(\"", (size_t)52,
 				str_temp, int_temp_len,
-				"\" AS nvarchar(MAX)), CAST('\\N' AS nvarchar(MAX))) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX))", (size_t)162);
+				"\" AS nvarchar(MAX)), CAST('\\N' AS nvarchar(MAX))) AS nvarchar(MAX)), '\\', '\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX))", (size_t)162);
 		}
 		SFREE(str_temp);
 	} else {
@@ -311,13 +311,13 @@ char *get_hash_where(DB_driver driver, char *str_columns, size_t int_columns_len
 	SERROR_BREPLACE(str_hash_where_temp, ptr_int_hash_where_len, "\"", "\"\"", "g");
 	if (driver == DB_DRIVER_POSTGRES) {
 		str_temp_start = "_hash = MD5(replace(replace(replace(replace(COALESCE(\"";
-		str_temp_in_between = "\"::text, ''), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || '\t' || replace(replace(replace(replace(COALESCE(\"";
-		str_temp_end = "\"::text, ''), '\\\\', '\\\\\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r'))";
+		str_temp_in_between = "\"::text, ''), '\\', '\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r') || '\t' || replace(replace(replace(replace(COALESCE(\"";
+		str_temp_end = "\"::text, ''), '\\', '\\\\'), '\t', '\\t'), chr(10), '\\n'), chr(13), '\\r'))";
 
 	} else {
 		str_temp_start = "_hash = LOWER(CONVERT(nvarchar(MAX), HashBytes('MD5', replace(replace(replace(replace(CAST(COALESCE(CAST(\"";
-		str_temp_in_between = "\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX)) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX)) + CAST('\t' AS nvarchar(MAX)) + replace(replace(replace(replace(CAST(COALESCE(CAST(\"";
-		str_temp_end = "\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX)), 2)) AS nvarchar(MAX)), '\\\\', '\\\\\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX))";
+		str_temp_in_between = "\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX)) AS nvarchar(MAX)), '\\', '\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX)) + CAST('\t' AS nvarchar(MAX)) + replace(replace(replace(replace(CAST(COALESCE(CAST(\"";
+		str_temp_end = "\" AS nvarchar(MAX)), CAST('' AS nvarchar(MAX)), 2)) AS nvarchar(MAX)), '\\', '\\\\'), '\t', '\\t'), CHAR(10), '\\n'), CHAR(13), '\\r') + CAST(CHAR(10) AS nvarchar(MAX))";
 	}
 
 	SERROR_BREPLACE(str_hash_where_temp, ptr_int_hash_where_len, "\t", str_temp_in_between, "g");

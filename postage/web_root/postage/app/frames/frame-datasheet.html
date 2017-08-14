@@ -192,27 +192,44 @@
 									&& arrColumnTypes[i] !== 'oid'
 								) {
 	                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
-			                                        '    <label>\n' +
+			                                        '    <label class="table-label">\n' +
 			                                        '        {{? row[\'' + arrColumns[i] + '\'] ===  \'\\\\N\' }}\n' +
-			                                        '            <input placeholder="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
+			                                        '            <textarea rows="1" class="textarea" placeholder="{{! row[\'' + arrColumns[i] + '\'] }}"></textarea>\n' +
 			                                        '        {{??}}\n' +
-			                                        '            <input value="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
+			                                        '            <textarea rows="1" class="textarea">{{! row[\'' + arrColumns[i] + '\'] }}</textarea>\n' +
 			                                        '        {{?}}\n' +
 			                                        '    </label>\n' +
 			                                        '</gs-cell>\n';
 								} else {
 	                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
-			                                        '    <label>\n' +
+			                                        '    <label class="table-label">\n' +
 			                                        '        {{? row[\'' + arrColumns[i] + '\'] ===  \'\\\\N\' }}\n' +
-			                                        '            <input style="text-align: right;" placeholder="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
+			                                        '            <textarea rows="1" class="textarea text-right" placeholder="{{! row[\'' + arrColumns[i] + '\'] }}"></textarea>\n' +
 			                                        '        {{??}}\n' +
-			                                        '            <input style="text-align: right;" value="{{! row[\'' + arrColumns[i] + '\'] }}" />\n' +
+			                                        '            <textarea rows="1" class="textarea text-right">{{! row[\'' + arrColumns[i] + '\'] }}</textarea>\n' +
 			                                        '        {{?}}\n' +
 			                                        '    </label>\n' +
 			                                        '</gs-cell>\n';
 								}
                                 copyContent += '<gs-cell header="' + arrColumns[i] + '">{{= row[' + JSON.stringify(arrColumns[i]) + '] }}</gs-cell>\n';
-                                insertContent += '<gs-cell header="' + arrColumns[i] + '"><label><input column="' + arrColumns[i] + '" /></label></gs-cell>\n';
+								if (arrColumnTypes[i] !== 'int2'
+									&& arrColumnTypes[i] !== 'smallint'
+									&& arrColumnTypes[i] !== 'int4'
+									&& arrColumnTypes[i] !== 'integer'
+									&& arrColumnTypes[i] !== 'int8'
+									&& arrColumnTypes[i] !== 'bigint'
+									&& arrColumnTypes[i] !== 'numeric'
+									&& arrColumnTypes[i] !== 'float'
+									&& arrColumnTypes[i] !== 'decimal'
+									&& arrColumnTypes[i] !== 'real'
+									&& arrColumnTypes[i] !== 'double'
+									&& arrColumnTypes[i] !== 'money'
+									&& arrColumnTypes[i] !== 'oid'
+								) {
+	                                insertContent += '<gs-cell header="' + arrColumns[i] + '"><label><input column="' + arrColumns[i] + '" /></label></gs-cell>\n';
+								} else {
+	                                insertContent += '<gs-cell header="' + arrColumns[i] + '"><label><input class="text-right" column="' + arrColumns[i] + '" /></label></gs-cell>\n';
+								}
                             }
                             tableElement.innerHTML = ml(function () {/*
     <template for="top-hud">
@@ -263,7 +280,7 @@
 
                             if (strPK && strPK !== '\\N') {
                                 tableElement.setAttribute('pk', strPK);
-                                tableElement.setAttribute('ord', quote_ident(strPK) + ' DESC');
+                                tableElement.setAttribute('ord', quote_ident(strPK) + ' ASC');
 
                                 for (i = 0, len = arrSequenceDefaults.length; i < len; i += 1) {
                                     if (arrSequenceDefaults[i].indexOf('nextval') > -1) {
@@ -367,9 +384,29 @@
             #button-paginate-right {
                 border-left: 0 none;
             }
+            .textarea {
+                resize: none;
+				padding: 0 !important;
+				height: 100%;
+				width: 100%;
+				border: none;
+				display: block;
+				overflow: auto;
+				line-height: 1.5em;
+				/*padding-left: 4px;*/
+            }
+            .text-right {
+                text-align: right;
+				/*padding: 0px;
+				padding-right: 4px !important;*/
+            }
 
             label {
                 padding: 0.268em;
+            }
+            .table-label {
+                padding: 4px !important;
+				display: block;
             }
             gs-cell > label > input {
                 width: 100%;

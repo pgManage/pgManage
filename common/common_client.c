@@ -929,7 +929,7 @@ void client_frame_cb(EV_P, WSFrame *frame) {
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
 
 		} else if (strcmp(str_first_word, "ROLLBACK") == 0) {
-			client_request = create_request(client, frame, str_message_id, str_transaction_id,ptr_query,
+			client_request = create_request(client, frame, str_message_id, str_transaction_id, ptr_query,
 				0, POSTAGE_REQ_ROLLBACK, NULL);
 
 			SERROR_CHECK(client_request != NULL, "create_request failed!");
@@ -1683,7 +1683,7 @@ finish:
 		"\012responsenumber = ", (size_t)18,
 		str_temp, strlen(str_temp),
 		"\012transactionid = ", (size_t)17,
-		client_request->str_message_id, client_request->int_message_id_len,
+		client_request->str_transaction_id, client_request->str_transaction_id,
 		"\012", (size_t)1,
 		_str_response, _int_response_len);
 	SFREE(_str_response);
