@@ -1,4 +1,3 @@
-
 /* ###################################################### */
 /* ############### TAB BAR/FRAMES/BUTTONS ############### */
 /* ###################################################### */
@@ -47,7 +46,7 @@
 
 
 #tab-bar-container {
-    
+
 }
 .tab-bar-toolbar.left {
     border-bottom: 2px solid #AAAAAA;
@@ -70,13 +69,13 @@
 }
 
 #button-home {
-    
+
 }
 #button-new-tab {
-    
+
 }
 #button-open-tabs {
-    
+
 }
 
 
@@ -98,10 +97,10 @@
     border-right: 1px solid #AAAAAA;
     background-color: #EEEEEE;
     padding: 0.1em 0.5em;
-    
+
     width: 100%;
     max-width: 140px; /* hard coded into the JS */
-    
+
     height: 2em;
     line-height: 1.8em;
     /*float: left; <- this causes the buttons to wrap, which makes it seem like you have less tabs than you actually do */

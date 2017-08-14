@@ -62,7 +62,7 @@ function getContext(strInput, intPosition) {
     //Make sure we remove the snippets before we return the function
     autocompleteGlobals.bolSnippets = false;
     autocompleteGlobals.bolAlpha = false;
-    
+
     intPosition++; //add character for zero based
 
     // make sure that we have only whitespace after the cursor, otherwise we just end it here, however last line last character is allowed
@@ -92,32 +92,32 @@ function getContext(strInput, intPosition) {
     var strFinalFirst;
 
     var arrQueries = [];
-    
+
     var intTabLevel = 0;
-    
+
     var intDoubleColon = 0;
-    
+
     var bolDeclare = false;
     var bolFunction = false;
-    
+
     var bolDrop = false;
     var bolAlter = false;
     var bolComment = false;
     var bolSecurityLabel = false;
     var bolCreate = false;
-    
+
     var bolType = false;
     var bolOperator = false;
-    
+
     var bolPolicy = false;
     var bolSequence = false;
     var bolTable = false;
-    
+
     var bolTextSearchConfiguration = false;
     var bolTextSearchDictionary = false;
     var bolTextSearchParser = false;
     var bolTextSearchTemplate = false;
-    
+
     var bolGrant = false;
     var bolRevoke = false;
     var bolInsert = false;
@@ -136,10 +136,10 @@ function getContext(strInput, intPosition) {
     var strNextOneChar;
     var strPrevOneChar;
     var bolWordBreak;
-    
+
     var bolStdin = false;
-    
-    
+
+
     var intCase = 0;
     var i;
     var len;
@@ -242,7 +242,7 @@ function getContext(strInput, intPosition) {
             i += (strInput.substr(i).match(/^(DROP|ALTER|COMMENT|SECURITY[\ \t]+LABEL|CREATE)/i)[0].length - 1);
             //intTabLevel += 1;
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE|" + intTabLevel + "<");
-            
+
             if (bolAlter) {
                 strFirst = ' ';
                 intContextPosition = i + 1;
@@ -263,7 +263,7 @@ function getContext(strInput, intPosition) {
             )
         ) {
             i += (strInput.substr(i).match(/^AGGREGATE/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasAggregates'];
@@ -283,7 +283,7 @@ function getContext(strInput, intPosition) {
             )
         ) {
             i += (strInput.substr(i).match(/^CONVERSION/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasConversions'];
@@ -292,7 +292,7 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... CONSTRAINT
         } else if (int_qs === 0 && strInput.substr(i).match(/^CONSTRAINT[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^CONSTRAINT/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasConstraints'];
@@ -301,7 +301,7 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLLATION
         } else if (int_qs === 0 && strInput.substr(i).match(/^COLLATION[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^COLLATION/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasCollations'];
@@ -310,20 +310,20 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TABLE/INHERIT
         } else if (int_qs === 0 && strInput.substr(i).match(/^(TABLE|INHERIT)[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
             bolTable = strInput.substr(i).match(/^TABLE/i) ? true : false;
-            
+
             i += (strInput.substr(i).match(/^(TABLE|INHERIT)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTables'];
-            
+
             doubleIdentifier(strInput.substr(i + 1));
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TABLE/INHERIT|" + intTabLevel + "<");
 
         // FOUND ALTER TABLE ... TABLE/EXISTS/ONLY
         } else if (int_qs === 0 && strInput.substr(i).match(/^(TABLE|EXISTS|ONLY)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTable) {
             i += (strInput.substr(i).match(/^(TABLE|EXISTS|ONLY)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTables'];
@@ -332,27 +332,27 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... RULE
         } else if (int_qs === 0 && strInput.substr(i).match(/^RULE[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^RULE/i)[0].length - 1);
-            
+
             bolRule = true;
-            
+
             doubleIdentifier(strInput.substr(i + 1));
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... RULE|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... VIEW
         } else if (int_qs === 0 && strInput.substr(i).match(/^VIEW[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^VIEW/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasViewsOnly'];
-            
+
             doubleIdentifier(strInput.substr(i + 1));
             //console.log(">DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... VIEW|" + intTabLevel + "<");
 
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... COLUMN
         } else if (int_qs === 0 && strInput.substr(i).match(/^COLUMN[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^COLUMN/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['contextTablesColumns'];
@@ -361,7 +361,7 @@ function getContext(strInput, intPosition) {
         // FOUND COMMENT ON COLUMN
         } else if (int_qs === 0 && strInput.substr(i).match(/^COLUMN[\n\r\ \t]+/i) && bolWordBreak && bolComment) {
             i += (strInput.substr(i).match(/^COLUMN/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTablesColumns'];
@@ -370,7 +370,7 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... DOMAIN
         } else if (int_qs === 0 && strInput.substr(i).match(/^DOMAIN[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^DOMAIN/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasDomains'];
@@ -379,7 +379,7 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... FOREIGN TABLE
         } else if (int_qs === 0 && strInput.substr(i).match(/^FOREIGN[\n\r\ \t]+TABLE[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^FOREIGN[\n\r\ \t]+TABLE/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasForeignTables'];
@@ -388,7 +388,7 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... FUNCTION/HANDLER/VALIDATOR
         } else if (int_qs === 0 && strInput.substr(i).match(/^(FUNCTION|HANDLER|VALIDATOR)[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^(FUNCTION|HANDLER|VALIDATOR)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasFunctions'];
@@ -397,7 +397,7 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... INDEX/CLUSTERON
         } else if (int_qs === 0 && strInput.substr(i).match(/^(INDEX|CLUSTERON)[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^(INDEX|CLUSTERON)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasIndexes'];
@@ -406,7 +406,7 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... MATERIALIZED VIEW
         } else if (int_qs === 0 && strInput.substr(i).match(/^MATERIALIZED[\n\r\ \t]+VIEW[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^MATERIALIZED[\n\r\ \t]+VIEW/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasMaterializedViews'];
@@ -415,7 +415,7 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR CLASS
         } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+CLASS[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+CLASS/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasOperatorClasses'];
@@ -424,7 +424,7 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR FAMILY
         } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+FAMILY[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+FAMILY/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasOperatorFamilies'];
@@ -433,9 +433,9 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... OPERATOR
         } else if (int_qs === 0 && strInput.substr(i).match(/^OPERATOR[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^OPERATOR/i)[0].length - 1);
-            
+
             bolOperator = true;
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasOperators'];
@@ -444,7 +444,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE OPERATOR ... PROCEDURE/JOIN/RESTRICT/COMMUTATOR/NEGATOR
         } else if (int_qs === 0 && strInput.substr(i).match(/^(PROCEDURE|JOIN|RESTRICT|COMMUTATOR|NEGATOR)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolOperator) {
             i += (strInput.substr(i).match(/^(PROCEDURE|JOIN|RESTRICT|COMMUTATOR|NEGATOR)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasFunctions'];
@@ -453,9 +453,9 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... SEQUENCE
         } else if (int_qs === 0 && strInput.substr(i).match(/^SEQUENCE[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^SEQUENCE/i)[0].length - 1);
-            
+
             bolSequence = true;
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasSequences'];
@@ -464,7 +464,7 @@ function getContext(strInput, intPosition) {
         // FOUND ALTER SEQUENCE ... BY
         } else if (int_qs === 0 && strInput.substr(i).match(/^BY[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolSequence) {
             i += (strInput.substr(i).match(/^BY/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTables'];
@@ -473,14 +473,14 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... POLICY
         } else if (int_qs === 0 && strInput.substr(i).match(/^POLICY[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^POLICY/i)[0].length - 1);
-            
+
             bolPolicy = true;
             //console.log(">ALTER/COMMENT/SECURITY LABEL/CREATE ... POLICY|" + intTabLevel + "<");
 
         // FOUND ALTER POLICY/RULE ... ON
         } else if (int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && (bolPolicy || bolRule)) {
             i += (strInput.substr(i).match(/^ON/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTables'];
@@ -489,9 +489,9 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TYPE
         } else if (int_qs === 0 && strInput.substr(i).match(/^TYPE[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^TYPE/i)[0].length - 1);
-            
+
             bolType = true;
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTypes'];
@@ -500,7 +500,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE TYPE ... SUBTYPE_OPCLASS
         } else if (int_qs === 0 && strInput.substr(i).match(/^SUBTYPE_OPCLASS[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolType) {
             i += (strInput.substr(i).match(/^SUBTYPE_OPCLASS/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasOperatorClasses'];
@@ -509,7 +509,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE TYPE ... CANONICAL/SUBTYPE_DIFF/INPUT/OUTPUT/RECEIVE/SEND/TYPMOD_IN/TYPMOD_OUT/ANALYZE
         } else if (int_qs === 0 && strInput.substr(i).match(/^(CANONICAL|SUBTYPE_DIFF|INPUT|OUTPUT|RECEIVE|SEND|TYPMOD_IN|TYPMOD_OUT|ANALYZE)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolType) {
             i += (strInput.substr(i).match(/^(CANONICAL|SUBTYPE_DIFF|INPUT|OUTPUT|RECEIVE|SEND|TYPMOD_IN|TYPMOD_OUT|ANALYZE)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasFunctions'];
@@ -518,9 +518,9 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH CONFIGURATION
         } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+CONFIGURATION[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+CONFIGURATION/i)[0].length - 1);
-            
+
             bolTextSearchConfiguration = true;
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTextSearchConfigurations'];
@@ -529,9 +529,9 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH DICTIONARY
         } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+DICTIONARY[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+DICTIONARY/i)[0].length - 1);
-            
+
             bolTextSearchDictionary = true;
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTextSearchDictionaries'];
@@ -540,9 +540,9 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH PARSER
         } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+PARSER[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+PARSER/i)[0].length - 1);
-            
+
             bolTextSearchParser = true;
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTextSearchParsers'];
@@ -551,9 +551,9 @@ function getContext(strInput, intPosition) {
         // FOUND DROP/ALTER/COMMENT/SECURITY LABEL/CREATE ... TEXT SEARCH TEMPLATE
         } else if (int_qs === 0 && strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+TEMPLATE[\n\r\ \t]+/i) && bolWordBreak && (bolDrop || bolAlter || bolComment || bolSecurityLabel || bolCreate)) {
             i += (strInput.substr(i).match(/^TEXT[\n\r\ \t]+SEARCH[\n\r\ \t]+TEMPLATE/i)[0].length - 1);
-            
+
             bolTextSearchTemplate = true;
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTextSearchTemplates'];
@@ -562,7 +562,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE TEXT SEARCH CONFIGURATION ... PARSER
         } else if (int_qs === 0 && strInput.substr(i).match(/^PARSER[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
             i += (strInput.substr(i).match(/^PARSER/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTextSearchParsers'];
@@ -571,7 +571,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE TEXT SEARCH CONFIGURATION ... COPY/SEARCH CONFIGURATION
         } else if (int_qs === 0 && strInput.substr(i).match(/^(COPY|SEARCH[\n\r\ \t]+CONFIGURATION)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
             i += (strInput.substr(i).match(/^(COPY|SEARCH[\n\r\ \t]+CONFIGURATION)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTextSearchConfigurations'];
@@ -580,7 +580,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE TEXT SEARCH CONFIGURATION ... REPLACE/WITH
         } else if (int_qs === 0 && strInput.substr(i).match(/^(REPLACE|WITH)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchConfiguration) {
             i += (strInput.substr(i).match(/^(REPLACE|WITH)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTextSearchDictionaries'];
@@ -589,7 +589,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE TEXT SEARCH DICTIONARY ... TEMPLATE
         } else if (int_qs === 0 && strInput.substr(i).match(/^TEMPLATE[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchDictionary) {
             i += (strInput.substr(i).match(/^TEMPLATE/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTextSearchTemplates'];
@@ -598,7 +598,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE TEXT SEARCH PARSER ... START/GETTOKEN/END/LEXTYPES/HEADLINE
         } else if (int_qs === 0 && strInput.substr(i).match(/^(START|GETTOKEN|END|LEXTYPES|HEADLINE)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchParser) {
             i += (strInput.substr(i).match(/^(START|GETTOKEN|END|LEXTYPES|HEADLINE)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasFunctions'];
@@ -607,7 +607,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE TEXT SEARCH TEMPLATE ... INIT/LEXIZE
         } else if (int_qs === 0 && strInput.substr(i).match(/^(INIT|LEXIZE)[\n\r\ \t]+/i) && bolWordBreak && (bolCreate || bolAlter) && bolTextSearchTemplate) {
             i += (strInput.substr(i).match(/^(INIT|LEXIZE)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasFunctions'];
@@ -616,7 +616,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE ... VIEW
         } else if (int_qs === 0 && strInput.substr(i).match(/^VIEW[\n\r\ \t]+/i) && bolWordBreak && bolCreate) {
             i += (strInput.substr(i).match(/^VIEW/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasViewsOnly'];
@@ -625,7 +625,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE ... FUNC
         } else if (int_qs === 0 && strInput.substr(i).match(/^FUNC[\n\r\ \t]+/i) && bolWordBreak && bolCreate) {
             i += (strInput.substr(i).match(/^FUNC/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasFunctions'];
@@ -634,7 +634,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE ... TO
         } else if (int_qs === 0 && strInput.substr(i).match(/^TO[\n\r\ \t]+/i) && bolWordBreak && bolCreate) {
             i += (strInput.substr(i).match(/^TO/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTables'];
@@ -643,7 +643,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE ... LIKE/INHERITS/REFERENCES
         } else if (int_qs === 0 && strInput.substr(i).match(/^(LIKE|INHERITS|REFERENCES)[\n\r\ \t]+/i) && bolWordBreak && bolCreate) {
             i += (strInput.substr(i).match(/^(LIKE|INHERITS|REFERENCES)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTablesOnly'];
@@ -652,7 +652,7 @@ function getContext(strInput, intPosition) {
         // FOUND ALTER ... OWNER TO
         } else if (int_qs === 0 && strInput.substr(i).match(/^OWNER[\n\r\ \t]+TO[\n\r\ \t]+/i) && bolWordBreak && bolAlter) {
             i += (strInput.substr(i).match(/^OWNER[\n\r\ \t]+TO/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['groups', 'logins'];
@@ -662,11 +662,11 @@ function getContext(strInput, intPosition) {
         } else if (int_qs === 0 && strInput.substr(i).match(/^UPDATE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^UPDATE/i)[0].length - 1);
             bolUpdate = true;
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTables'];
-            
+
             doubleIdentifier(strInput.substr(i + 1));
             //console.log(">UPDATE|" + intTabLevel + "<");
 
@@ -702,7 +702,7 @@ function getContext(strInput, intPosition) {
         } else if (int_qs === 0 && strInput.substr(i).match(/^DELETE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^DELETE/i)[0].length - 1);
             bolDelete = true;
-            
+
             //console.log(">UPDATE|" + intTabLevel + "<");
 
         // FOUND SELECT
@@ -779,10 +779,10 @@ function getContext(strInput, intPosition) {
             strFirst = '';
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
-            
+
             int_ps = int_ps + 1;
             intTabLevel += 1;
-            
+
             //set final if we are NOT already on a final and we are NOT past the cursor
             //console.log('bolFinal = ' + bolFinal);
             //console.log('intPosition = ' + intPosition);
@@ -825,11 +825,11 @@ function getContext(strInput, intPosition) {
         // FOUND PERFORM
         } else if (int_qs === 0 && strInput.substr(i).match(/^PERFORM[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^PERFORM/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasFunctions'];
-            
+
             doubleIdentifier(strInput.substr(i + 1));
             //console.log(">PERFORM|" + intTabLevel + "<");
 
@@ -837,11 +837,11 @@ function getContext(strInput, intPosition) {
         } else if (int_qs === 0 && strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+\(/i) && bolWordBreak) {
             bolJoin = strInput.substr(i).match(/^JOIN/i) ? true : false;
             i += (strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+\(/i)[0].length);
-            
+
             strFirst = '';
             intContextPosition = i;
             arrShortQueries = ['snippets'];
-            
+
             doubleIdentifier(strInput.substr(i));
             //console.log(">USING/FROM/JOIN/ONLY PARENTHESIS|" + intTabLevel + "<");
 
@@ -849,18 +849,18 @@ function getContext(strInput, intPosition) {
         } else if (int_qs === 0 && strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)[\n\r\ \t]+/i) && bolWordBreak) {
             bolJoin = strInput.substr(i).match(/^JOIN/i) ? true : false;
             i += (strInput.substr(i).match(/^(USING|FROM|JOIN|ONLY|RETURNING)/i)[0].length);
-            
+
             strFirst = ' ';
             intContextPosition = i;
             arrShortQueries = ['schemasTables'];
-            
+
             doubleIdentifier(strInput.substr(i));
             //console.log(">USING/FROM/JOIN/ONLY|" + intTabLevel + "<");
 
         // FOUND JOIN ... ON
         } else if (int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+/i) && bolWordBreak && bolJoin) {
             i += (strInput.substr(i).match(/^ON/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
@@ -869,7 +869,7 @@ function getContext(strInput, intPosition) {
         // FOUND PROCEDURE
         } else if (int_qs === 0 && strInput.substr(i).match(/^PROCEDURE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^PROCEDURE/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasFunctions'];
@@ -878,7 +878,7 @@ function getContext(strInput, intPosition) {
         // FOUND REFRESH MATERIALIZED VIEW
         } else if (int_qs === 0 && strInput.substr(i).match(/^REFRESH[\n\r\ \t]+MATERIALIZED[\n\r\ \t]+VIEW[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^REFRESH[\n\r\ \t]+MATERIALIZED[\n\r\ \t]+VIEW/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasMaterializedViews'];
@@ -904,7 +904,7 @@ function getContext(strInput, intPosition) {
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTables'];
-            
+
             doubleIdentifier(strInput.substr(i + 1));
             //console.log(">INSERT ... INTO|" + intTabLevel + "<");
 
@@ -913,17 +913,17 @@ function getContext(strInput, intPosition) {
             strFirst = '';
             intContextPosition = i + 1;
             arrShortQueries = ['contextColumns'];
-            
+
             int_ps = int_ps + 1;
             intTabLevel += 1;
             //console.log(">(|" + intTabLevel + "<");
 
-        // FOUND INSERT ... ( ... , 
+        // FOUND INSERT ... ( ... ,
         } else if (int_qs === 0 && int_ps >= 1 && strNextOneChar === "," && bolInsert && !bolInsertValues) {
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['contextColumns'];
-            
+
             //console.log(">INSERT ... ( ... ,|" + intTabLevel + "<");
 
         // FOUND INSERT ... VALUES
@@ -932,7 +932,7 @@ function getContext(strInput, intPosition) {
             strFirst = '';
             intContextPosition = 0;
             arrShortQueries = [];
-            
+
             bolInsertValues = true;
             //console.log(">INSERT ... VALUES|" + intTabLevel + "<");
 
@@ -941,17 +941,17 @@ function getContext(strInput, intPosition) {
             strFirst = '';
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'functions', 'builtins'];
-            
+
             int_ps = int_ps + 1;
             intTabLevel += 1;
             //console.log(">(|" + intTabLevel + "<");
 
-        // FOUND INSERT ... VALUES ( ... , 
+        // FOUND INSERT ... VALUES ( ... ,
         } else if (int_qs === 0 && int_ps >= 1 && strNextOneChar === "," && bolInsert && bolInsertValues) {
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'functions', 'builtins'];
-            
+
             //console.log(">(|" + intTabLevel + "<");
 
         // FOUND OPEN PARENTHESIS:
@@ -959,7 +959,7 @@ function getContext(strInput, intPosition) {
             strFirst = '';
             intContextPosition = i + 1;
             arrShortQueries = ['snippets'];
-            
+
             int_ps = int_ps + 1;
             intTabLevel += 1;
             //console.log(">(|" + intTabLevel + "<");
@@ -973,7 +973,7 @@ function getContext(strInput, intPosition) {
         // FOUND DOUBLE COLON
         } else if (int_qs === 0 && strNextTwoChar === "::") {
             intDoubleColon = i + 2;
-            
+
             strFirst = '';
             intContextPosition = i + 2;
             arrShortQueries = ['types'];
@@ -982,7 +982,7 @@ function getContext(strInput, intPosition) {
         // FOUND CAST
         } else if (int_qs === 0 && strInput.substr(i).match(/^CAST[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^CAST/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['types'];
@@ -991,7 +991,7 @@ function getContext(strInput, intPosition) {
         // FOUND RETURNS
         } else if (int_qs === 0 && strInput.substr(i).match(/^RETURNS[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^RETURNS/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['returnTypes'];
@@ -1000,7 +1000,7 @@ function getContext(strInput, intPosition) {
         // FOUND LANGUAGE
         } else if (int_qs === 0 && strInput.substr(i).match(/^LANGUAGE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^LANGUAGE/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['languages'];
@@ -1009,7 +1009,7 @@ function getContext(strInput, intPosition) {
         // FOUND TABLESPACE
         } else if (int_qs === 0 && strInput.substr(i).match(/^TABLESPACE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^TABLESPACE/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['tablespaces'];
@@ -1018,7 +1018,7 @@ function getContext(strInput, intPosition) {
         // FOUND RULE
         } else if (int_qs === 0 && strInput.substr(i).match(/^RULE[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^RULE/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['rules'];
@@ -1077,7 +1077,7 @@ function getContext(strInput, intPosition) {
                 bolRevoke = true;
             }
             i += (strInput.substr(i, 7).match(/^(GRANT|REVOKE)\b/i)[0].length);
-            
+
             strFirst = ' ';
             intContextPosition = i;
             arrShortQueries = ['groups'];
@@ -1086,11 +1086,11 @@ function getContext(strInput, intPosition) {
         // FOUND AN UNQUOTED/UNPARENTHESISED COMMA NOT INSIDE A GRANT/REVOKE STATEMENT:
         } else if (int_ps === 0 && int_qs === 0 && strNextOneChar === "," && !bolGrant && !bolRevoke) {
             i++;
-            
+
             strFirst = ' ';
             intContextPosition = i;
             arrShortQueries = ['variables', 'contextTablesColumns', 'functions', 'builtins'];
-            
+
             //set final if we are NOT already on a final and we are NOT past the cursor
             //console.log('bolFinal = ' + bolFinal);
             //console.log('intPosition = ' + intPosition);
@@ -1111,7 +1111,7 @@ function getContext(strInput, intPosition) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+SCHEMA/i)[0].length);
-            
+
             intContextPosition = i;
             arrShortQueries = ['schemas'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
@@ -1120,7 +1120,7 @@ function getContext(strInput, intPosition) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+FUNCTION/i)[0].length);
-            
+
             intContextPosition = i;
             arrShortQueries = ['schemasFunctions'];
             //console.log(">GRANT ... ON FUNCTION|" + intTabLevel + "<");
@@ -1129,7 +1129,7 @@ function getContext(strInput, intPosition) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+TABLE/i)[0].length);
-            
+
             intContextPosition = i;
             arrShortQueries = ['schemasTables'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
@@ -1138,7 +1138,7 @@ function getContext(strInput, intPosition) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+SEQUENCE/i)[0].length);
-            
+
             intContextPosition = i;
             arrShortQueries = ['schemasSequences'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
@@ -1147,7 +1147,7 @@ function getContext(strInput, intPosition) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+TYPE/i)[0].length);
-            
+
             intContextPosition = i;
             arrShortQueries = ['schemasTypes'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
@@ -1156,7 +1156,7 @@ function getContext(strInput, intPosition) {
         } else if (int_ps === 0 && int_qs === 0 && strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN[\n\r\ \t]+/i) && bolWordBreak && (bolGrant || bolRevoke)) {
             strFirst = ' ';
             i += (strInput.substr(i).match(/^ON[\n\r\ \t]+DOMAIN/i)[0].length);
-            
+
             intContextPosition = i;
             arrShortQueries = ['schemasDomains'];
             //console.log(">GRANT ... ON|" + intTabLevel + "<");
@@ -1195,7 +1195,7 @@ function getContext(strInput, intPosition) {
                 //console.log('bolFinal := false');
                 bolFinal = false;
             }
-            
+
             if (bolRule) {
                 intTabLevel -= 1;
             }
@@ -1205,7 +1205,7 @@ function getContext(strInput, intPosition) {
                 i += 1 + strInput.substr(i + 1).indexOf('\n\\.') + 3;//\n\\.
                 bolStdin = false;
             }
-            
+
             //bolDeclare = false;//DO NOT UNCOMMENT!! after a semicolon inside a declare, we are still inside a declare
             bolFunction = false;
             bolDrop = false;
@@ -1258,7 +1258,7 @@ function getContext(strInput, intPosition) {
             } else {
                 intTabLevel += 1;
             }
-            
+
             strFirst = '\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             intContextPosition = i + 1;
             arrShortQueries = ['variables', 'snippets'];
@@ -1382,7 +1382,7 @@ function getContext(strInput, intPosition) {
         // FOUND CREATE OR REPLACE RULE... INSTEAD
         } else if (int_qs === 0 && bolRule && strInput.substr(i,8).match(/^INSTEAD[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i,8).match(/^INSTEAD/i)[0].length - 1);
-            
+
             strFirst = '\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             intContextPosition = i + 1;
             arrShortQueries = ['snippets'];
@@ -1411,8 +1411,8 @@ function getContext(strInput, intPosition) {
             intTabLevel -= 1;
             i = i + (-1) + (strInput.substr(i).match(/^END[\ \t\n\r]+IF[\ \t\n\r]*;[\ \t]*/i)[0].length);
             bolLastComment = false;
-            
-            
+
+
             strFirst = '\\n\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             intContextPosition = i + 1;
             arrShortQueries = ['snippets'];
@@ -1423,8 +1423,8 @@ function getContext(strInput, intPosition) {
             intTabLevel -= 1;
             i = i + (-1) + (strInput.substr(i).match(/^END[\ \t\n\r]+LOOP[\ \t\n\r]*;[\ \t]*/i)[0].length);
             bolLastComment = false;
-            
-            
+
+
             strFirst = '\\n\\n' + '(\\t|    )'.repeat(((intTabLevel < 0) ? 0 : intTabLevel));
             intContextPosition = i + 1;
             arrShortQueries = ['snippets'];
@@ -1445,7 +1445,7 @@ function getContext(strInput, intPosition) {
         // FOUND VACUUM/TRUNCATE/LOCK/ANALYZE
         } else if (int_qs === 0 && strInput.substr(i).match(/^(VACUUM|TRUNCATE|LOCK|ANALYZE)[\n\r\ \t]+/i) && bolWordBreak) {
             i += (strInput.substr(i).match(/^(VACUUM|TRUNCATE|LOCK|ANALYZE)/i)[0].length - 1);
-            
+
             strFirst = ' ';
             intContextPosition = i + 1;
             arrShortQueries = ['schemasTables'];
@@ -1462,9 +1462,9 @@ function getContext(strInput, intPosition) {
 
         // Default is to continue collecting characters
         } else {
-            
+
         }
-        
+
         //if we switch contexts, and we are doing a lookahead, and we haven't reached the cursor yet, then cancel the lookahead
         if (bolFinal && intContextPosition !== intFinalContextPosition && i + 1 < intPosition) {
             //console.log('i + 1', i + 1);
@@ -1472,7 +1472,7 @@ function getContext(strInput, intPosition) {
             //console.log('cancel lookahead');
             bolFinal = false;
         }
-        
+
         //console.log('check>' + strNextOneChar + '|' + i + '|' + intPosition + '<');
         if (i + 1 >= intPosition && !bolFinal) {//+ 1 so that we don't get the character after the cursor
             break;
@@ -1480,7 +1480,7 @@ function getContext(strInput, intPosition) {
 
         i += 1;
     }
-    
+
     //console.log('bolFinal', bolFinal);
     if (bolFinal) {
         //console.log('lookahead');
@@ -1492,13 +1492,13 @@ function getContext(strInput, intPosition) {
         intContextPosition = intFinalContextPosition;
         arrShortQueries = arrFinalShortQueries;
         strFirst = strFinalFirst;
-        
+
         //console.log('after i', i);
         //console.log('after intContextPosition', intContextPosition);
         //console.log('after arrShortQueries', arrShortQueries);
         //console.log('after strFirst', strFirst);
     }
-    
+
     //console.log('i', i);
     //console.log('intPosition', intPosition);
 
@@ -1519,7 +1519,7 @@ function getContext(strInput, intPosition) {
             intContextPosition += strInput.substring(intContextPosition).match(new RegExp("^" + strFirst))[0].length;
         }
     }
-    
+
     //console.log('autocompleteGlobals.bolSnippets', autocompleteGlobals.bolSnippets);
     //console.log('after intContextPosition', intContextPosition);
     //console.log('intPosition', intPosition);
@@ -1564,15 +1564,15 @@ function getContext(strInput, intPosition) {
     } if (arrShortQueries.indexOf('variables') > -1/* && bolBody*/) {
         autocompleteGlobals.bolAlpha = true;
     }
-    
+
     // use the current context for above rules, next rules modify the context
     for (var i = 0, len = arrQueries.length; i < len; i++) {
         //console.log(arrQueries[i]);
         arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strContext.toLowerCase() + '%');
     }
-    
+
     var strCopyContext = strContext;
-    
+
     if (arrShortQueries.indexOf('schemasAll') > -1
         || arrShortQueries.indexOf('schemasAggregates') > -1
         || arrShortQueries.indexOf('schemasConversions') > -1
@@ -1601,12 +1601,12 @@ function getContext(strInput, intPosition) {
             var arrMatches = strContext.match(/^(.*)\.([^.]*)/);
             var strSchema = arrMatches[1];
             strContext = arrMatches[2];
-            
+
             autocompleteGlobals.bolAlpha = false;
-            
+
             //console.log('strSchema', strSchema);
             //console.log('after strContext', strContext);
-            
+
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasAggregates') > -1) {
                 arrQueries.push(
@@ -1615,7 +1615,7 @@ function getContext(strInput, intPosition) {
                             + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
-            
+
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasConversions') > -1) {
                 arrQueries.push(
@@ -1624,7 +1624,7 @@ function getContext(strInput, intPosition) {
                             + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
-            
+
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasConstraints') > -1) {
                 arrQueries.push(
@@ -1633,7 +1633,7 @@ function getContext(strInput, intPosition) {
                             + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
-            
+
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasCollations') > -1) {
                 arrQueries.push(
@@ -1642,7 +1642,7 @@ function getContext(strInput, intPosition) {
                             + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
-            
+
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasTables') > -1
                 || arrShortQueries.indexOf('schemasTablesOnly') > -1) {
@@ -1654,7 +1654,7 @@ function getContext(strInput, intPosition) {
                             + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
-            
+
             if (arrShortQueries.indexOf('schemasAll') > -1
                 || arrShortQueries.indexOf('schemasTables') > -1
                 || arrShortQueries.indexOf('schemasViewsOnly') > -1) {
@@ -1666,7 +1666,7 @@ function getContext(strInput, intPosition) {
                             + ' OR pg_namespace.nspname IN (SELECT unnest(string_to_array(current_setting(\'search_path\'), \', \'))))')
                 );
             }
-            
+
             if (arrShortQueries.indexOf('schemasMaterializedViews') > -1) {
                 arrQueries.push(
                     autocompleteQuery.qualified_materialized_views
@@ -1793,47 +1793,47 @@ function getContext(strInput, intPosition) {
         }
     } if (arrShortQueries.indexOf('contextTablesColumns') > -1) {
         //console.log('arrShortQueries', arrShortQueries);
-        console.log('before strContext', strContext);
-        console.log('before strCopyContext', strCopyContext);
-        
+        //console.log('before strContext', strContext);
+        //console.log('before strCopyContext', strCopyContext);
+
         var strSchema = '';
         var strTable = '';
-        
+
         strContext = strCopyContext;
-        
+
         if (strContext.match(/^.*\..*\./)) {
             var arrMatches = strContext.match(/^(.*)\.(.*)\.([^.]*)/);
             strSchema = arrMatches[1];
             strTable = arrMatches[2];
             strContext = arrMatches[3];
-            
+
             autocompleteGlobals.bolAlpha = false;
-            
-            console.log('strSchema', strSchema);
-            console.log('strTable', strTable);
-            console.log('after strContext', strContext);
+
+            //console.log('strSchema', strSchema);
+            //console.log('strTable', strTable);
+            //console.log('after strContext', strContext);
         } else if (strContext.match(/^.*\..*/)) {
             var arrMatches = strContext.match(/^(.*)\.([^.]*)/);
             strTable = arrMatches[1];
             strContext = arrMatches[2];
-            
+
             autocompleteGlobals.bolAlpha = false;
-            
-            console.log('strTable', strTable);
-            console.log('after strContext', strContext);
+
+            //console.log('strTable', strTable);
+            //console.log('after strContext', strContext);
         }
-        
-        console.log('autocompleteGlobals.arrStrContext', autocompleteGlobals.arrStrContext);
+
+        //console.log('autocompleteGlobals.arrStrContext', autocompleteGlobals.arrStrContext);
         var i, len;
         for (i = 0, len = autocompleteGlobals.arrStrContext.length; i < len; i++) {
-            console.log(i + ' test1' + (autocompleteGlobals.arrStrContext[i][0] === strSchema && strSchema !== ''));
-            console.log(i + ' test2' + (autocompleteGlobals.arrStrContext[i][1] === strTable && strTable !== ''));
-            console.log(i + ' test3' + (autocompleteGlobals.arrStrContext[i][2] === strTable && autocompleteGlobals.arrStrContext[i][2] !== ''));
+            //console.log(i + ' test1' + (autocompleteGlobals.arrStrContext[i][0] === strSchema && strSchema !== ''));
+            //console.log(i + ' test2' + (autocompleteGlobals.arrStrContext[i][1] === strTable && strTable !== ''));
+            //console.log(i + ' test3' + (autocompleteGlobals.arrStrContext[i][2] === strTable && autocompleteGlobals.arrStrContext[i][2] !== ''));
             if ((autocompleteGlobals.arrStrContext[i][0] === strSchema && strSchema !== '')
                 || (autocompleteGlobals.arrStrContext[i][1] === strTable && strTable !== '')
                 || (autocompleteGlobals.arrStrContext[i][2] === strTable && autocompleteGlobals.arrStrContext[i][2] !== '')
                 || (strSchema === '' && strTable === '')) {
-                console.log('i ' + i + ' pass');
+                //console.log('i ' + i + ' pass');
                 arrQueries.push(
                     autocompleteQuery.columns
                         .replace(/\{\{ADDITIONALWHERE}\}/gi,
@@ -1864,24 +1864,24 @@ function getContext(strInput, intPosition) {
         //console.log('arrShortQueries', arrShortQueries);
         //console.log('before strContext', strContext);
         //console.log('before strCopyContext', strCopyContext);
-        
+
         var strSchema = '';
         var strTable = '';
-        
+
         strContext = strCopyContext;
-        
+
         if (strContext.match(/^.*\..*\./)) {
             var arrMatches = strContext.match(/^(.*)\.(.*)\.([^.]*)/);
             strSchema = arrMatches[1];
             strTable = arrMatches[2];
             strContext = arrMatches[3];
-            
+
             autocompleteGlobals.bolAlpha = false;
-            
+
             //console.log('strSchema', strSchema);
             //console.log('strTable', strTable);
             //console.log('after strContext', strContext);
-            
+
             arrQueries.push(
                 autocompleteQuery.columns
                     .replace(/\{\{ADDITIONALWHERE}\}/gi,
@@ -1894,9 +1894,9 @@ function getContext(strInput, intPosition) {
             var arrMatches = strContext.match(/^(.*)\.([^.]*)/);
             strSchema = arrMatches[1];
             strContext = arrMatches[2];
-            
+
             autocompleteGlobals.bolAlpha = false;
-            
+
             //console.log('strSchema', strSchema);
             //console.log('after strContext', strContext);
 
@@ -1924,7 +1924,7 @@ function getContext(strInput, intPosition) {
         //console.log(arrQueries[i]);
         arrQueries[i] = arrQueries[i].replace((/\{\{searchStr}\}/gi), strContext.toLowerCase() + '%');
     }
-    
+
     //console.log('check queries', arrQueries.length === 0 && autocompleteGlobals.bolSnippets === false);
     if (arrQueries.length === 0 && autocompleteGlobals.bolSnippets === false) {
         return;
@@ -2070,7 +2070,7 @@ function autocompleteGetObjectType(strName, arrQueries, callback, schemaOID) {
     strQuery =  'SELECT * FROM (\n' +
                     arrQueries.join('\n     UNION ALL\n') + '\n' +
                 ') em;';
-    
+
     //autocompleteGlobals.bolQueryRunning = true;
     GS.requestRawFromSocket(GS.envSocket, strQuery, function (data, error) {
         var arrRows, i, len;
@@ -2096,34 +2096,3 @@ function autocompleteGetObjectType(strName, arrQueries, callback, schemaOID) {
         //console.log('ending the query');
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
