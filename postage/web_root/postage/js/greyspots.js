@@ -42022,7 +42022,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'len': intTotalRecords
             });
 
-            console.log(strRecord);
+            //console.log(strRecord);
 
             // return record html
             return strRecord;
@@ -45405,7 +45405,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 strHashString += (
                     strTemp === '\\N'
                         ? ''
-                        : strTemp
+                        : GS.encodeForTabDelimited(strTemp, '\\N')
                 );
                 i += 1;
             }
@@ -45641,7 +45641,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     strHashString += (
                         strTemp === '\\N'
                             ? ''
-                            : strTemp
+                            : GS.encodeForTabDelimited(strTemp, '\\N')
                     );
                     lock_i += 1;
                 }
@@ -46080,6 +46080,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? ""
                         : strTemp
                 );
+                console.log(strTemp, strRecordToHash);
 
                 col_i += 1;
             }
