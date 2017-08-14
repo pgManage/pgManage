@@ -150,7 +150,17 @@ function explain(bolRun) {
               , intLine, i, len, col_i, col_len, rec_i, rec_len
               , warningHTML, buttonContainerElement, strCSS
               , styleElement;
-
+			  console.log(data);
+			  if (data.intCallbackNumberThisQuery === 0) {
+				if (data.strQuery.trim()) {
+					arrExecuteHistory.push({
+						'strQuery': data.strQuery,
+						'dteStart': new Date(data.dteStart),
+						'dteEnd': new Date(data.dteEnd),
+						'intRows': data.intRows
+					});
+				}
+			}
             if (bolIgnoreMessages === false) {
                 if (!error) {
                     //console.log('data', data);
