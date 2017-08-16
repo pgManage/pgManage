@@ -1052,7 +1052,7 @@ function cleanErrorValue(strValue){strValue=strValue||'';if(strValue.indexOf('DB
 if(strValue.indexOf('Query failed:')!==-1){strValue=strValue.replace(/[.\s\S]*Query\ failed:/mi,'');}
 if(strValue.indexOf('FATAL')!==-1){strValue=strValue.replace(/[.\s\S]*FATAL/mi,'');}
 strValue=strValue.replace(/\\n/gi,'\n').replace(/\\t/gi,'\t').replace(/\[.*\]/gi,'').replace(/\([0-9]*\)/gi,'');return GS.trim(strValue.trim(),'"');}
-function errorJSONToHTML(errorJSON){console.log(errorJSON);return'<pre style="word-break: break-all; white-space: pre-wrap;">'+
+function errorJSONToHTML(errorJSON){return'<pre style="word-break: break-all; white-space: pre-wrap;">'+
 (errorJSON.error_title?'There was '+
 (['A','E','I','O','U'].indexOf(errorJSON.error_title[0].toUpperCase())===-1?'a':'an')+' "'+encodeHTML(errorJSON.error_title)+'" error:':'There was an error:')+
 (errorJSON.error_text?'<br /><br />'+encodeHTML(errorJSON.error_text):(errorJSON.error_hint?'<br /><br />HINT: '+encodeHTML(errorJSON.error_hint):'')+
@@ -1153,7 +1153,7 @@ deleteData;GS.requestBegin(socket,function(data,error){var transactionID;if(!err
 GS.requestFromSocket(GS.envSocket,'transactionid = '+transactionID+'\n'+strMessage,function(data,error,errorData){var commitFunction,rollbackFunction;if(!error){data=data.substring(data.indexOf('\n')+1);}
 commitFunction=function(){GS.requestCommit(socket,transactionID,function(data,error){if(!error){data=data.substring(data.indexOf('\n')+1);}
 finalCallback('COMMIT',data,error);});};rollbackFunction=function(){GS.requestRollback(socket,transactionID,function(data,error){if(!error){data=data.substring(data.indexOf('\n')+1);}
-finalCallback('ROLLBACK',data,error);});};if(!error){confirmCallback(data,error,transactionID,commitFunction,rollbackFunction);}else{confirmCallback(errorData,error,transactionID,commitFunction,rollbackFunction);}});}else{if(typeof beginCallback==='function'){beginCallback(data,error);}}});};GS.requestBegin=function(socket,callback){GS.requestFromSocket(GS.envSocket,'BEGIN',function(data,error,errorData){var transactionID;if(typeof callback==='function'){if(!error){transactionID=data.substring('transactionid = '.length,data.indexOf('\n'));callback(transactionID,error);}else{callback(errorData,error);}}});};GS.requestRollback=function(socket,transactionID,callback){GS.requestFromSocket(socket,'transactionid = '+transactionID+'\nROLLBACK',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.requestCommit=function(socket,transactionID,callback){GS.requestFromSocket(socket,'transactionid = '+transactionID+'\nCOMMIT',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.rebootSocket=function(socket){socket.stayClosed=false;socket.close();};GS.closeSocket=function(socket){socket.stayClosed=true;socket.close();};var cacheLedger=[];window.testtesttest=cacheLedger;GS.requestCachingSelect=function(socket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,callback,bolClearCache){var strKey=(strSchema+strObject+strColumns+strWhere+strOrd+strLimit+strOffset),intQueryIndex,i,len,currentEntry;console.log(strKey,bolClearCache,cacheLedger[strKey]);if(bolClearCache){cacheLedger[strKey]=null;}
+finalCallback('ROLLBACK',data,error);});};if(!error){confirmCallback(data,error,transactionID,commitFunction,rollbackFunction);}else{confirmCallback(errorData,error,transactionID,commitFunction,rollbackFunction);}});}else{if(typeof beginCallback==='function'){beginCallback(data,error);}}});};GS.requestBegin=function(socket,callback){GS.requestFromSocket(GS.envSocket,'BEGIN',function(data,error,errorData){var transactionID;if(typeof callback==='function'){if(!error){transactionID=data.substring('transactionid = '.length,data.indexOf('\n'));callback(transactionID,error);}else{callback(errorData,error);}}});};GS.requestRollback=function(socket,transactionID,callback){GS.requestFromSocket(socket,'transactionid = '+transactionID+'\nROLLBACK',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.requestCommit=function(socket,transactionID,callback){GS.requestFromSocket(socket,'transactionid = '+transactionID+'\nCOMMIT',function(data,error,errorData){if(typeof callback==='function'){if(!error){callback(data,error);}else{callback(errorData,error);}}});};GS.rebootSocket=function(socket){socket.stayClosed=false;socket.close();};GS.closeSocket=function(socket){socket.stayClosed=true;socket.close();};var cacheLedger=[];window.testtesttest=cacheLedger;GS.requestCachingSelect=function(socket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,callback,bolClearCache){var strKey=(strSchema+strObject+strColumns+strWhere+strOrd+strLimit+strOffset),intQueryIndex,i,len,currentEntry;if(bolClearCache){cacheLedger[strKey]=null;}
 if(cacheLedger[strKey]){for(i=0,len=cacheLedger[strKey].results.length;i<len;i+=1){callback(cacheLedger[strKey].results[i][0],cacheLedger[strKey].results[i][1]);}
 cacheLedger[strKey].callbacks.push({'callback':callback,'ready':true});}else{currentEntry=cacheLedger[strKey]={results:[],callbacks:[{'callback':callback,'ready':true}]};GS.requestSelectFromSocket(socket,strSchema,strObject,strColumns,strWhere,strOrd,strLimit,strOffset,function(data,error){var i,len;currentEntry.results.push([data,error]);for(i=0,len=currentEntry.callbacks.length;i<len;i+=1){if(currentEntry.callbacks[i].ready){currentEntry.callbacks[i].callback(data,error);}}});}};/*
     var cacheQueries = [], cacheCallbacks = [], cacheResults = [];
@@ -1178,14 +1178,14 @@ cacheLedger[strKey].callbacks.push({'callback':callback,'ready':true});}else{cur
             cacheCallbacks[intQueryIndex].push({'callback': callback, 'ready': true});
 
         } else {
-            console.log(strKey);
-            console.log(cacheQueries.length);
+            //console.log(strKey);
+            //console.log(cacheQueries.length);
             cacheQueries.push(strKey);
             cacheCallbacks.push([{'callback': callback, 'ready': true}]);
             cacheResults.push([]);
-            console.log(cacheQueries.length);
+            //console.log(cacheQueries.length);
             intQueryIndex = (cacheQueries.length - 1);
-            console.log(intQueryIndex);
+            //console.log(intQueryIndex);
 
             GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
                                      , strWhere, strOrd, strLimit, strOffset

@@ -193,20 +193,20 @@
 								) {
 	                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
 			                                        '    <label class="table-label">\n' +
-			                                        '        {{? row[\'' + arrColumns[i] + '\'] ===  \'\\\\N\' }}\n' +
-			                                        '            <textarea column="{{! row[\'' + arrColumns[i] + '\'] }}" value="{{! row[\'' + arrColumns[i] + '\'] }}" rows="1" class="textarea" placeholder="{{! row[\'' + arrColumns[i] + '\'] }}"></textarea>\n' +
+			                                        '        {{? arrRow[' + i + '] ===  \'\\\\N\' }}\n' +
+			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" rows="1" class="textarea" placeholder="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}"></textarea>\n' +
 			                                        '        {{??}}\n' +
-			                                        '            <textarea column="{{! row[\'' + arrColumns[i] + '\'] }}" value="{{! row[\'' + arrColumns[i] + '\'] }}" rows="1" class="textarea">{{! row[\'' + arrColumns[i] + '\'] }}</textarea>\n' +
+			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" rows="1" class="textarea">{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}</textarea>\n' +
 			                                        '        {{?}}\n' +
 			                                        '    </label>\n' +
 			                                        '</gs-cell>\n';
 								} else {
 	                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
 			                                        '    <label class="table-label">\n' +
-			                                        '        {{? row[\'' + arrColumns[i] + '\'] ===  \'\\\\N\' }}\n' +
-			                                        '            <textarea column="{{! row[\'' + arrColumns[i] + '\'] }}" value="{{! row[\'' + arrColumns[i] + '\'] }}" rows="1" class="textarea text-right" placeholder="{{! row[\'' + arrColumns[i] + '\'] }}"></textarea>\n' +
+			                                        '        {{? arrRow[' + i + '] ===  \'\\\\N\' }}\n' +
+			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" rows="1" class="textarea text-right" placeholder="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}"></textarea>\n' +
 			                                        '        {{??}}\n' +
-			                                        '            <textarea column="{{! row[\'' + arrColumns[i] + '\'] }}" value="{{! row[\'' + arrColumns[i] + '\'] }}" rows="1" class="textarea text-right">{{! row[\'' + arrColumns[i] + '\'] }}</textarea>\n' +
+			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" rows="1" class="textarea text-right">{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}</textarea>\n' +
 			                                        '        {{?}}\n' +
 			                                        '    </label>\n' +
 			                                        '</gs-cell>\n';
@@ -357,14 +357,60 @@
                                 //// // console.log('test');
                             });
 
-							document.getElementById('tableElement').addEventListener('focusout', function () {
-                                console.log('test', event);
-								if (event.srcElement.defaultValue !== event.srcElement.value) {
-									console.log('change');
-									event.srcElement.setAttribute('value', event.srcElement.value);
-									GS.triggerEvent(event.srcElement, 'change');
+				// 			document.getElementById('tableElement').addEventListener('focusout', function () {
+    //                             // console.log('test', event);
+				// 				if (event.srcElement.defaultValue !== event.srcElement.value) {
+				// 					// console.log('change');
+				// 					event.srcElement.setAttribute('value', event.srcElement.value);
+				// 					//GS.triggerEvent(event.srcElement, 'change');
 
-								}
+				// 				}
+    //                         });
+    
+                            document.getElementById('tableElement').addEventListener('keydown', function () {
+                                if (event.keyCode === 13 && !event.shiftKey) {
+                                    if (document.activeElement.tagName === 'TEXTAREA') {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                        console.log(document.activeElement.parentNode.parentNode.nextElementSibling.children[0].children[0]);
+                                        if (document.activeElement.parentNode.parentNode.nextElementSibling.children[0].children[0] && document.activeElement.parentNode.parentNode.nextElementSibling.children[0].children[0].tagName === 'TEXTAREA') {
+                                            console.log('1');
+                                            var cell = document.activeElement.parentNode.parentNode.nextElementSibling;
+                                            document.getElementById('tableElement').internalSelection.ranges[0].end = {
+                                                  'column': cell.getAttribute('data-col-number')
+                                                , 'row': cell.getAttribute('data-row-number')
+                                            }
+                                            document.getElementById('tableElement').internalSelection.ranges[0].start = {
+                                                  'column': cell.getAttribute('data-col-number')
+                                                , 'row': cell.getAttribute('data-row-number')
+                                            }
+                                            document.getElementById('tableElement').render();
+                                            document.activeElement.parentNode.parentNode.nextElementSibling.children[0].children[0].focus();
+                                            document.activeElement.setSelectionRange(0, document.activeElement.value.length);
+                                        } else {
+                                            console.log('2');
+                                            var element = document.activeElement.parentNode.parentNode.parentNode.children[0].children[0].children[0], i = 0;
+                                            console.log(element);
+                                            while (element.tagName !== 'TEXTAREA') {
+                                                i += 1;
+                                                element = document.activeElement.parentNode.parentNode.parentNode.children[i].children[0].children[0];
+                                                console.log(element);
+                                            }
+                                            var cell = document.activeElement.parentNode.parentNode.parentNode.children[i];
+                                            document.getElementById('tableElement').internalSelection.ranges[0].end = {
+                                                  'column': cell.getAttribute('data-col-number')
+                                                , 'row': cell.getAttribute('data-row-number')
+                                            }
+                                            document.getElementById('tableElement').internalSelection.ranges[0].start = {
+                                                  'column': cell.getAttribute('data-col-number')
+                                                , 'row': cell.getAttribute('data-row-number')
+                                            }
+                                            document.getElementById('tableElement').render();
+                                            document.activeElement.parentNode.parentNode.parentNode.children[i].children[0].children[0].focus();
+                                            document.activeElement.setSelectionRange(0, document.activeElement.value.length);
+                                        }
+                                    }
+                                }
                             });
                         }
 

@@ -6094,7 +6094,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
     }
 
     function errorJSONToHTML(errorJSON) {
-        console.log(errorJSON);
+        //console.log(errorJSON);
         return '<pre style="word-break: break-all; white-space: pre-wrap;">' +
                     (errorJSON.error_title ?
                         'There was ' +
@@ -7077,7 +7077,7 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
         var strKey = (strSchema + strObject + strColumns + strWhere + strOrd + strLimit + strOffset)
           , intQueryIndex, i, len, currentEntry;
 
-        console.log(strKey, bolClearCache, cacheLedger[strKey]);
+        //console.log(strKey, bolClearCache, cacheLedger[strKey]);
 
         if (bolClearCache) {
             cacheLedger[strKey] = null;
@@ -7139,14 +7139,14 @@ GS.normalUserLogin = function (loggedInCallback, strOldError, strDefaultSubDomai
             cacheCallbacks[intQueryIndex].push({'callback': callback, 'ready': true});
 
         } else {
-            console.log(strKey);
-            console.log(cacheQueries.length);
+            //console.log(strKey);
+            //console.log(cacheQueries.length);
             cacheQueries.push(strKey);
             cacheCallbacks.push([{'callback': callback, 'ready': true}]);
             cacheResults.push([]);
-            console.log(cacheQueries.length);
+            //console.log(cacheQueries.length);
             intQueryIndex = (cacheQueries.length - 1);
-            console.log(intQueryIndex);
+            //console.log(intQueryIndex);
 
             GS.requestSelectFromSocket(socket, strSchema, strObject, strColumns
                                      , strWhere, strOrd, strLimit, strOffset
@@ -7191,7 +7191,7 @@ GS.encodeForTabDelimited = function (strValue, nullValue) {
 GS.decodeFromTabDelimited = function (strValue, nullValue) {
     'use strict';
     var i, len, strRet = '';
-
+    //console.log(strValue, nullValue);
     if (nullValue === undefined) {
         nullValue = '\\N';
     }
