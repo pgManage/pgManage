@@ -191,22 +191,22 @@
 									&& arrColumnTypes[i] !== 'money'
 									&& arrColumnTypes[i] !== 'oid'
 								) {
-	                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
+	                                recordContent += '<gs-cell clas="table-cell" header="' + arrColumns[i] + '">\n' +
 			                                        '    <label class="table-label">\n' +
 			                                        '        {{? arrRow[' + i + '] ===  \'\\\\N\' }}\n' +
-			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" rows="1" class="textarea" placeholder="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}"></textarea>\n' +
+			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" class="textarea" autoresize placeholder="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}"></textarea>\n' +
 			                                        '        {{??}}\n' +
-			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" rows="1" class="textarea">{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}</textarea>\n' +
+			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" class="textarea" autoresize>{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}</textarea>\n' +
 			                                        '        {{?}}\n' +
 			                                        '    </label>\n' +
 			                                        '</gs-cell>\n';
 								} else {
-	                                recordContent += '<gs-cell header="' + arrColumns[i] + '">\n' +
+	                                recordContent += '<gs-cell clas="table-cell" header="' + arrColumns[i] + '">\n' +
 			                                        '    <label class="table-label">\n' +
 			                                        '        {{? arrRow[' + i + '] ===  \'\\\\N\' }}\n' +
-			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" rows="1" class="textarea text-right" placeholder="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}"></textarea>\n' +
+			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" class="textarea text-right" autoresize placeholder="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}"></textarea>\n' +
 			                                        '        {{??}}\n' +
-			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" rows="1" class="textarea text-right">{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}</textarea>\n' +
+			                                        '            <textarea column="' + arrColumns[i] + '" value="{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}" class="textarea text-right" autoresize>{{! row[\'' + arrColumns[i].replace(/(\\)/g, '\\\\').replace(/(')/g, '\\\'').replace(/(")/g, '\\\"') + '\'] }}</textarea>\n' +
 			                                        '        {{?}}\n' +
 			                                        '    </label>\n' +
 			                                        '</gs-cell>\n';
@@ -280,7 +280,7 @@
 
                             if (strPK && strPK !== '\\N') {
                                 tableElement.setAttribute('pk', strPK);
-                                tableElement.setAttribute('ord', quote_ident(strPK) + ' ASC');
+                                tableElement.setAttribute('ord', quote_ident(strPK) + ' DESC');
 
                                 for (i = 0, len = arrSequenceDefaults.length; i < len; i += 1) {
                                     if (arrSequenceDefaults[i].indexOf('nextval') > -1) {
@@ -461,7 +461,12 @@
                 padding: 0.268em;
             }
             .table-label {
-                padding: 4px !important;
+                padding: 0 !important;
+				display: block;
+				height: 100%;
+            }
+            .table-cell {
+                padding: 3px !important;
 				display: block;
             }
             gs-cell > label > input {
