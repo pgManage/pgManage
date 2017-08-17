@@ -158,7 +158,7 @@
                                 strColumns = GS.decodeFromTabDelimited(arrColumns[1]);
                                 arrColumns = strColumns.split(',');
                             }
-
+							console.log(data);
                             tableElement.setAttribute('all-cols', strColumns);
                             tableElement.setAttribute('cols', strColumns);
                             tableElement.setAttribute('id', 'tableElement');
@@ -177,7 +177,7 @@
                                 updateContent += '<label>' + arrColumns[i] + '</label>\n';
                                 updateContent += '<gs-text column="' + arrColumns[i] + '"></gs-text>\n';
                                 headerContent += '<gs-cell>' + arrColumns[i] + '</gs-cell>\n';
-								if (arrColumnTypes[i] !== 'int2'
+								if (arrColumnTypes && arrColumnTypes[i] !== 'int2'
 									&& arrColumnTypes[i] !== 'smallint'
 									&& arrColumnTypes[i] !== 'int4'
 									&& arrColumnTypes[i] !== 'integer'
@@ -212,7 +212,7 @@
 			                                        '</gs-cell>\n';
 								}
                                 copyContent += '<gs-cell header="' + arrColumns[i] + '">{{= row[' + JSON.stringify(arrColumns[i]) + '] }}</gs-cell>\n';
-								if (arrColumnTypes[i] !== 'int2'
+								if (arrColumnTypes && arrColumnTypes[i] !== 'int2'
 									&& arrColumnTypes[i] !== 'smallint'
 									&& arrColumnTypes[i] !== 'int4'
 									&& arrColumnTypes[i] !== 'integer'
@@ -366,7 +366,7 @@
 
 				// 				}
     //                         });
-    
+
                             document.getElementById('tableElement').addEventListener('keydown', function () {
                                 if (event.keyCode === 13 && !event.shiftKey) {
                                     if (document.activeElement.tagName === 'TEXTAREA') {

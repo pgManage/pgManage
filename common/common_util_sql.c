@@ -119,17 +119,21 @@ char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table
 	ptr_end_return_columns = bstrstr(ptr_return_columns, int_query_len - (size_t)(ptr_return_columns - str_query), "\012", (size_t)1);
 	SERROR_CHECK(ptr_end_return_columns != NULL, "strstr failed");
 	*ptr_end_return_columns = 0;
-
 	SERROR_SNCAT(
 		str_temp, &int_temp_len,
 		ptr_return_columns, (size_t)(ptr_end_return_columns - ptr_return_columns)
 	);
+	//SDEBUG("ptr_return_columns: %s", ptr_return_columns);
+	//SDEBUG("ptr_end_return_columns: %s", ptr_end_return_columns);
+
 
 	if (strncmp(str_temp, "*", 2) != 0) {
 		SERROR_BREPLACE(str_temp, &int_temp_len, "\"", "\"\"", "g");
 		SERROR_BREPLACE(str_temp, &int_temp_len, "\t", "\", {{TABLE}}.\"", "g");
 
+		//SDEBUG("str_temp: %s", str_temp);
 		str_temp1 = bunescape_value(str_temp, &int_temp_len);
+		//SDEBUG("str_temp1: %s", str_temp1);
 		SERROR_CHECK(str_temp1 != NULL, "bunescape_value failed");
 		SFREE(str_temp);
 		str_temp = str_temp1;
@@ -141,6 +145,9 @@ char *get_return_columns(char *_str_query, size_t int_query_len, char *str_table
 			str_temp, int_temp_len,
 			"\"", (size_t)1
 		);
+
+		//SDEBUG("str_return_columns: %s", str_return_columns);
+		//SDEBUG("str_temp: %s", str_temp);
 		SFREE(str_temp);
 
 		//SERROR_BREPLACE(str_return_columns, ptr_int_return_columns_len, "{{TABLE}}", str_table_name, "g");
