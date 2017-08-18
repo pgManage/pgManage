@@ -461,7 +461,7 @@
                                             .replace(/{{STRSQLSAFENAME}}/gi, '' + arrDropObjects[intI][1] + '.' + arrDropObjects[intI][2] + '')
                                             .replace(/{{SCHEMA}}/gi, arrDropObjects[intI][1])
                                             .replace(/{{STRRELNAME}}/gi, arrDropObjects[intI][2]);
-                                } else if (arrDropObjects[i][0].toLowerCase() === 'aggregate') {
+                                } else if (arrDropObjects[intI][0].toLowerCase() === 'aggregate') {
                                     scriptForOid = ml(function () {/*
                                             SELECT pr.oid
                                                 FROM pg_proc pr

@@ -44668,7 +44668,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     ? '\t'
                     : ''
             );
-            strReturn += element.internalData.columnNames[col_i];
+            strReturn += element.internalData.columnNames[col_i].replace(/(\\)/g, '\\\\');
             col_i += 1;
         }
 
@@ -44737,7 +44737,7 @@ document.addEventListener('DOMContentLoaded', function () {
             col_i = 0;
             col_len = jsnInsert.data.columns.length;
             while (col_i < col_len) {
-                strColumn = jsnInsert.data.columns[col_i];
+                strColumn = jsnInsert.data.columns[col_i].replace(/(\\)/g, '\\\\');
 
                 strInsertColumns += (
                     strInsertColumns
@@ -44802,7 +44802,7 @@ document.addEventListener('DOMContentLoaded', function () {
             col_i = 0;
             col_len = jsnInsert.data.columns.length;
             while (col_i < col_len) {
-                strColumn = jsnInsert.data.columns[col_i];
+                strColumn = jsnInsert.data.columns[col_i].replace(/(\\)/g, '\\\\');
 
                 strInsertColumns += (
                     strInsertColumns
@@ -45061,6 +45061,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     function databaseWSUPDATE(element, strMode, jsnUpdate) {
+        console.trace('databaseWSUPDATE');
         var i;
         var len;
         var pk_i;
@@ -45121,7 +45122,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     ? '\t'
                     : ''
             );
-            strReturn += element.internalData.columnNames[col_i];
+            strReturn += element.internalData.columnNames[col_i].replace(/(\\)/g, '\\\\');
             col_i += 1;
         }
 
@@ -45132,7 +45133,7 @@ document.addEventListener('DOMContentLoaded', function () {
         //      one record
         if (strMode === 'single-cell') {
             jsnCurrentData = {
-                "columnName": jsnUpdate.data.columnName,
+                "columnName": jsnUpdate.data.columnName.replace(/(\\)/g, '\\\\'),
                 "recordNumber": jsnUpdate.data.recordNumber,
                 "oldValue": ""
             };
@@ -45310,7 +45311,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     ? '\t'
                     : ''
             );
-            strColumns += jsnUpdate.data.columnName;
+            strColumns += jsnUpdate.data.columnName.replace(/(\\)/g, '\\\\');
 
             // append new value
             strUpdateData += (
@@ -45418,7 +45419,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? '\t'
                         : ''
                 );
-                strColumns += jsnUpdate.data.columns[i];
+                strColumns += jsnUpdate.data.columns[i].replace(/(\\)/g, '\\\\');
                 i += 1;
             }
 
